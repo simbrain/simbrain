@@ -14,6 +14,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.neurongroups.BasicNeuronGroupParams
 import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.neurongroups.NeuronGroupParams
+import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
@@ -1059,6 +1060,94 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
         networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
 
+    }
+
+    fun canCreateConvolutionalNeuralNetwork(): Pair<Boolean, String> {
+        val reasons = mutableListOf<String>()
+        val source = networkPanel.selectionManager.filterSelectedSourceModels<Tensor>().firstOrNull()
+        val target = networkPanel.selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
+        if (source == null) {
+            reasons.add("No source Tensor selected (Ctrl+click a Tensor to set as source)")
+        }
+        if (target == null) {
+            reasons.add("No target NeuronArray selected")
+        }
+        if (source != null && target != null) {
+            // Check that a path exists through the CNN pipeline
+            try {
+                // Verify pipeline can be discovered
+                var currentTensor: Tensor = source
+                var foundFlatten = false
+                val pipelineModels = mutableListOf<NetworkModel>(source)
+                while (true) {
+                    if (currentTensor.outgoingFlattenConnectors.isNotEmpty()) {
+                        val flatten = currentTensor.outgoingFlattenConnectors.first()
+                        pipelineModels.add(flatten)
+                        pipelineModels.add(flatten.target)
+                        foundFlatten = true
+                        break
+                    }
+                    val outgoing = currentTensor.outgoingTensorConnectors
+                    if (outgoing.isEmpty()) break
+                    val connector = outgoing.first()
+                    pipelineModels.add(connector)
+                    pipelineModels.add(connector.target)
+                    currentTensor = connector.target
+                }
+                if (!foundFlatten) {
+                    reasons.add("No Flatten connector found in pipeline from source Tensor")
+                } else {
+                    val loose = pipelineModels
+                        .distinct()
+                        .filter { it in networkPanel.network.allModels && networkPanel.network.childToParentMap[it] == null }
+                    if (loose.isNotEmpty()) {
+                        reasons.add("CNN wrapper requires an unowned pipeline (current pipeline models are loose top-level models)")
+                    }
+                }
+            } catch (e: Exception) {
+                reasons.add("Error discovering pipeline: ${e.message}")
+            }
+        }
+        if (source != null && networkPanel.network.getModels<ConvolutionalNeuralNetwork>().any {
+                it.inputTensor == source
+            }) {
+            reasons.add("A convolutional neural network already exists for this input Tensor")
+        }
+        return reasons.isEmpty() to reasons.joinToString(", ")
+    }
+
+    val createConvolutionalNeuralNetworkAction = networkPanel.createAction(
+        name = "Create convolutional neural network",
+        description = "Create a convolutional neural network from selected source Tensor to target NeuronArray"
+    ) {
+        val (canCreate) = canCreateConvolutionalNeuralNetwork()
+
+        if (canCreate) {
+            val input = selectionManager.sourceModels.firstOrNull() as? Tensor
+            val output = selectionManager.selectedModels.firstOrNull() as? NeuronArray
+
+            if (input != null && output != null) {
+                addSubnetworkAction(networkPanel) {
+                    ConvolutionalNeuralNetwork(input, output)
+                }
+            }
+        }
+    }.also {
+        fun updateAction() {
+            val (canCreate, reason) = canCreateConvolutionalNeuralNetwork()
+            it.isEnabled = canCreate
+            it.putValue(
+                SHORT_DESCRIPTION,
+                "Create a convolutional neural network from selected source Tensor to target NeuronArray"
+                        + if (!canCreate) " (Disabled: $reason)" else ""
+            )
+        }
+
+        updateAction()
+
+        networkPanel.network.events.modelAdded.on { updateAction() }
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     }
 
     fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(

@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.events.TensorEvents
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -8,7 +9,9 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
+import kotlin.math.exp
 import kotlin.math.max
+import kotlin.math.tanh
 
 /**
  * Activation function applied element-wise to tensor activations after input accumulation.
@@ -16,18 +19,33 @@ import kotlin.math.max
 enum class TensorActivation {
     IDENTITY {
         override fun apply(x: Double) = x
+        override fun derivative(x: Double) = 1.0
     },
     RELU {
         override fun apply(x: Double) = max(0.0, x)
+        override fun derivative(x: Double) = if (x > 0.0) 1.0 else 0.0
     },
     SIGMOID {
-        override fun apply(x: Double) = 1.0 / (1.0 + Math.exp(-x))
+        override fun apply(x: Double) = 1.0 / (1.0 + exp(-x))
+        override fun derivative(x: Double): Double {
+            val s = apply(x)
+            return s * (1.0 - s)
+        }
     },
     TANH {
-        override fun apply(x: Double) = Math.tanh(x)
+        override fun apply(x: Double) = tanh(x)
+        override fun derivative(x: Double): Double {
+            val t = tanh(x)
+            return 1.0 - t * t
+        }
     };
 
     abstract fun apply(x: Double): Double
+
+    /**
+     * Derivative of the activation function at [x] (the pre-activation value).
+     */
+    abstract fun derivative(x: Double): Double
 }
 
 /**
@@ -50,6 +68,13 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
             events.clampChanged.fire()
         }
 
+    @UserParameter(label = "Thumbnail Strip", description = "Show all channels as a thumbnail strip", tab = "GUI", order = 30)
+    var thumbnailStripMode = true
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
     /** Current activations (HWC flat array). */
     val activations = DoubleArray(shape.size)
 
@@ -58,6 +83,12 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
 
     /** Per-element biases. */
     val biases = DoubleArray(shape.size)
+
+    /** Gradients for backpropagation (same layout as activations). */
+    val gradients = DoubleArray(shape.size)
+
+    /** Pre-activation values (input + bias, before activation function). Stored during update for backprop. */
+    val preActivations = DoubleArray(shape.size)
 
     @Transient
     var incomingTensorConnectors: MutableList<TensorConnector> = mutableListOf()
@@ -89,7 +120,7 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
             events.locationChanged.fire()
         }
 
-    override val name: String get() = "Tensor"
+    override val name: String get() = displayName
 
     // --- Indexed access ---
 
@@ -159,18 +190,24 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
     override fun update() {
         if (isClamped) return
         for (i in activations.indices) {
-            activations[i] = activationFunction.apply(inputs[i] + biases[i])
+            val pre = inputs[i] + biases[i]
+            preActivations[i] = pre
+            activations[i] = activationFunction.apply(pre)
         }
         inputs.fill(0.0)
         events.updated.fire()
     }
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        val rand = randomizer ?: org.simbrain.network.gui.dialogs.NetworkPreferences.activationRandomizer
+        val rand = randomizer ?: NetworkPreferences.activationRandomizer
         for (i in activations.indices) {
             activations[i] = rand.sampleDouble()
         }
         events.updated.fire()
+    }
+
+    fun clearGradients() {
+        gradients.fill(0.0)
     }
 
     override fun clear() {

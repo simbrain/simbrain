@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 
 class TensorShapeTest {
@@ -59,6 +60,24 @@ class TensorShapeTest {
     }
 
     @Test
+    fun `conv output shape SAME with stride 2 uses ceil spatial sizing`() {
+        val input = TensorShape(5, 5, 3)
+        val output = input.convOutputShape(kernelSize = 3, stride = 2, padding = Padding.SAME, numFilters = 16)
+        assertEquals(3, output.height)
+        assertEquals(3, output.width)
+        assertEquals(16, output.channels)
+    }
+
+    @Test
+    fun `conv output shape SAME with stride 2 works for even-sized input`() {
+        val input = TensorShape(4, 4, 1)
+        val output = input.convOutputShape(kernelSize = 3, stride = 2, padding = Padding.SAME, numFilters = 8)
+        assertEquals(2, output.height)
+        assertEquals(2, output.width)
+        assertEquals(8, output.channels)
+    }
+
+    @Test
     fun `pool output shape`() {
         val input = TensorShape(28, 28, 16)
         val output = input.poolOutputShape(poolSize = 2, stride = 2)
@@ -80,5 +99,37 @@ class TensorShapeTest {
         val shape = TensorShape(5, 5)
         assertEquals(1, shape.channels)
         assertEquals(25, shape.size)
+    }
+
+    @Test
+    fun `invalid tensor dimensions throw`() {
+        assertThrows(IllegalArgumentException::class.java) { TensorShape(0, 5, 1) }
+        assertThrows(IllegalArgumentException::class.java) { TensorShape(5, 0, 1) }
+        assertThrows(IllegalArgumentException::class.java) { TensorShape(5, 5, 0) }
+    }
+
+    @Test
+    fun `invalid convolution params throw`() {
+        val input = TensorShape(5, 5, 1)
+        assertThrows(IllegalArgumentException::class.java) {
+            input.convOutputShape(kernelSize = 0, stride = 1, padding = Padding.SAME, numFilters = 1)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            input.convOutputShape(kernelSize = 3, stride = 0, padding = Padding.SAME, numFilters = 1)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            input.convOutputShape(kernelSize = 3, stride = 1, padding = Padding.SAME, numFilters = 0)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            input.convOutputShape(kernelSize = 7, stride = 1, padding = Padding.VALID, numFilters = 1)
+        }
+    }
+
+    @Test
+    fun `invalid pooling params throw`() {
+        val input = TensorShape(5, 5, 1)
+        assertThrows(IllegalArgumentException::class.java) { input.poolOutputShape(poolSize = 0, stride = 1) }
+        assertThrows(IllegalArgumentException::class.java) { input.poolOutputShape(poolSize = 2, stride = 0) }
+        assertThrows(IllegalArgumentException::class.java) { input.poolOutputShape(poolSize = 6, stride = 1) }
     }
 }

@@ -8,6 +8,12 @@ import org.simbrain.workspace.AttributeContainer
  * Base class for connectors between [Tensor] nodes. Analogous to [Connector] but for the
  * tensor/CNN hierarchy. Subclasses implement [propagate] to accumulate their output into
  * [target]'s inputs array.
+ *
+ * **Gradient accumulation contract:** During backpropagation, backward methods accumulate
+ * into [Tensor.gradients] and connector gradient arrays (e.g. [ConvolutionConnector.kernelGrads]).
+ * Callers must clear these arrays before a new backward pass or batch:
+ * - Call [Tensor.clearGradients] on each tensor before backpropagation.
+ * - Call [ConvolutionConnector.clearGrads] on conv connectors before accumulating a new batch.
  */
 abstract class TensorConnector(val source: Tensor, val target: Tensor) :
     NetworkModel(), EditableObject, AttributeContainer {

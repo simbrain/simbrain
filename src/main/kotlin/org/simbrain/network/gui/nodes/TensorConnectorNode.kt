@@ -3,6 +3,8 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PImage
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -15,8 +17,11 @@ import org.simbrain.network.gui.createArrowButton
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
+import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.Font
 import java.awt.RenderingHints
+import java.awt.image.BufferedImage
 import javax.swing.JPopupMenu
 
 /**
@@ -57,6 +62,82 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         createArrowButton(ArrowDirection.RIGHT) { nextInputChannel() }
     }
 
+    /** Container for kernel grid display. */
+    private val kernelGridGroup = PNode()
+
+    // --- Pre-allocated resources for ConvolutionConnector visualization ---
+
+    /** Pre-allocated buffer for extracting a single kernel slice. */
+    private val kernelSlice: DoubleArray? = (connector as? ConvolutionConnector)?.let {
+        DoubleArray(it.kernelSize * it.kernelSize)
+    }
+
+    /** Pre-allocated BufferedImage for single-kernel view. */
+    private val singleKernelImage: BufferedImage? = (connector as? ConvolutionConnector)?.let {
+        BufferedImage(it.kernelSize, it.kernelSize, BufferedImage.TYPE_INT_RGB)
+    }
+
+    /** Pre-allocated grid cell BufferedImages: [filter][channel]. */
+    private val gridCellImages: Array<Array<BufferedImage>>? = (connector as? ConvolutionConnector)?.let { conv ->
+        Array(conv.numFilters) { Array(conv.source.shape.channels) {
+            BufferedImage(conv.kernelSize, conv.kernelSize, BufferedImage.TYPE_INT_RGB)
+        }}
+    }
+
+    /** Pre-allocated grid cell PImage nodes: [filter][channel]. */
+    private val gridCellPImages: Array<Array<PImage>>? = (connector as? ConvolutionConnector)?.let { conv ->
+        val kSize = conv.kernelSize
+        val numFilters = conv.numFilters
+        val inputChannels = conv.source.shape.channels
+        val cellSize = (120.0 / maxOf(numFilters, inputChannels)).coerceIn(8.0, 20.0)
+        val gap = 2.0
+        val labelOffset = 14.0
+
+        // Add column labels ("C1", "C2", ...) along top
+        for (c in 0 until inputChannels) {
+            val label = PText("C${c + 1}").apply {
+                font = Font("Arial", Font.PLAIN, 7)
+            }
+            label.setOffset(
+                labelOffset + c * (cellSize + gap) + (cellSize - label.width) / 2,
+                0.0
+            )
+            kernelGridGroup.addChild(label)
+        }
+
+        // Add row labels ("F1", "F2", ...) along left
+        for (f in 0 until numFilters) {
+            val label = PText("F${f + 1}").apply {
+                font = Font("Arial", Font.PLAIN, 7)
+            }
+            label.setOffset(
+                0.0,
+                labelOffset + f * (cellSize + gap) + (cellSize - label.height) / 2
+            )
+            kernelGridGroup.addChild(label)
+        }
+
+        // Create PImage and border nodes for each cell
+        Array(numFilters) { f ->
+            Array(inputChannels) { c ->
+                val x = labelOffset + c * (cellSize + gap)
+                val y = labelOffset + f * (cellSize + gap)
+                val pImage = PImage(gridCellImages!![f][c])
+                pImage.setBounds(x, y, cellSize, cellSize)
+                kernelGridGroup.addChild(pImage)
+
+                // Thin border
+                val border = PPath.createRectangle(x, y, cellSize, cellSize)
+                border.paint = null
+                border.strokePaint = Color.GRAY
+                border.stroke = BasicStroke(0.5f)
+                kernelGridGroup.addChild(border)
+
+                pImage
+            }
+        }
+    }
+
     private val arrow: BezierArrow
 
     init {
@@ -76,7 +157,16 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
                 val px = pt.x
                 val py = pt.y
-                if (connector is ConvolutionConnector) {
+
+                val conv = connector as? ConvolutionConnector
+                if (conv != null && conv.kernelGridMode) {
+                    // Grid mode: center kernelGridGroup on midpoint
+                    kernelGridGroup.centerFullBoundsOnPoint(px, py)
+                    val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
+                    interactionBox.centerFullBoundsOnPoint(
+                        px, py - gridHalfH - interactionBox.fullBounds.height / 2.0 - 3.0
+                    )
+                } else if (connector is ConvolutionConnector) {
                     imageBox.centerFullBoundsOnPoint(px, py)
 
                     val hi = imgSize.toDouble() / 2.0
@@ -110,18 +200,29 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             addChild(channelNextButton)
             addChild(imageBox)
             addChild(detailLabel)
+            addChild(kernelGridGroup)
             renderKernelImage()
+            syncKernelDisplayMode()
         }
 
         // Wire up events
         val connectorEvents = connector.events
         connectorEvents.updated.on { connectorEvents.updateGraphics.fire() }
         connectorEvents.updateGraphics.on(Dispatchers.Swing) {
-            if (connector is ConvolutionConnector) renderKernelImage()
+            if (connector is ConvolutionConnector) {
+                if (connector.kernelGridMode) {
+                    renderKernelGrid()
+                } else {
+                    renderKernelImage()
+                }
+            }
             updateDetailLabel()
         }
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connector.displayName)
+        }
+        connectorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
+            syncKernelDisplayMode()
         }
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
@@ -136,17 +237,67 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         updateDetailLabel()
     }
 
+    /** Switch visibility between single-kernel UI and grid UI. */
+    private fun syncKernelDisplayMode() {
+        val conv = connector as? ConvolutionConnector ?: return
+        if (conv.kernelGridMode) {
+            imageBox.visible = false
+            filterPrevButton?.visible = false
+            filterNextButton?.visible = false
+            channelPrevButton?.visible = false
+            channelNextButton?.visible = false
+            detailLabel.visible = false
+            kernelGridGroup.visible = true
+            renderKernelGrid()
+        } else {
+            imageBox.visible = true
+            filterPrevButton?.visible = true
+            filterNextButton?.visible = true
+            channelPrevButton?.visible = true
+            channelNextButton?.visible = true
+            detailLabel.visible = true
+            kernelGridGroup.visible = false
+            renderKernelImage()
+            updateDetailLabel()
+        }
+        arrow.invalidateFullBounds()
+    }
+
     private fun renderKernelImage() {
         val conv = connector as? ConvolutionConnector ?: return
+        val slice = kernelSlice ?: return
+        val img = singleKernelImage ?: return
         val kSize = conv.kernelSize
         val inC = conv.source.shape.channels
         val kernelArea = kSize * kSize
         val filterOffset = currentFilter * inC * kernelArea + currentInputChannel * kernelArea
-        val slice = DoubleArray(kernelArea)
         for (i in 0 until kernelArea) {
             slice[i] = conv.kernels[filterOffset + i]
         }
-        imageBox.image = slice.toSimbrainColorImage(kSize, kSize)
+        slice.writeSimbrainColorImage(img)
+        imageBox.image = img
+    }
+
+    private fun renderKernelGrid() {
+        val conv = connector as? ConvolutionConnector ?: return
+        val slice = kernelSlice ?: return
+        val cellImages = gridCellImages ?: return
+        val cellPImages = gridCellPImages ?: return
+
+        val inputChannels = conv.source.shape.channels
+        val kSize = conv.kernelSize
+        val kernelArea = kSize * kSize
+
+        for (f in 0 until conv.numFilters) {
+            for (c in 0 until inputChannels) {
+                val filterOffset = f * inputChannels * kernelArea + c * kernelArea
+                for (i in 0 until kernelArea) {
+                    slice[i] = conv.kernels[filterOffset + i]
+                }
+                slice.writeSimbrainColorImage(cellImages[f][c])
+                cellPImages[f][c].invalidatePaint()
+            }
+        }
     }
 
     private fun updateDetailLabel() {
@@ -211,10 +362,21 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
             if (connector is ConvolutionConnector) {
                 contextMenu.addSeparator()
-                contextMenu.add(networkPanel.createAction(name = "Next Filter") { nextFilter() })
-                contextMenu.add(networkPanel.createAction(name = "Previous Filter") { previousFilter() })
-                contextMenu.add(networkPanel.createAction(name = "Next Input Channel") { nextInputChannel() })
-                contextMenu.add(networkPanel.createAction(name = "Previous Input Channel") { previousInputChannel() })
+
+                // Kernel grid toggle
+                contextMenu.add(networkPanel.createAction(
+                    name = if (connector.kernelGridMode) "Show Single Kernel View" else "Show Kernel Grid"
+                ) {
+                    connector.kernelGridMode = !connector.kernelGridMode
+                })
+
+                if (!connector.kernelGridMode) {
+                    contextMenu.add(networkPanel.createAction(name = "Next Filter") { nextFilter() })
+                    contextMenu.add(networkPanel.createAction(name = "Previous Filter") { previousFilter() })
+                    contextMenu.add(networkPanel.createAction(name = "Next Input Channel") { nextInputChannel() })
+                    contextMenu.add(networkPanel.createAction(name = "Previous Input Channel") { previousInputChannel() })
+                }
+
                 contextMenu.addSeparator()
                 contextMenu.add(networkPanel.networkActions.randomizeObjectsAction)
             }
@@ -236,6 +398,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 arrow.globalBounds.intersects(bound) ||
                 interactionBox.globalBounds.intersects(bound) ||
                 detailLabel.globalBounds.intersects(bound) ||
+                kernelGridGroup.globalBounds.intersects(bound) ||
                 (filterPrevButton?.globalBounds?.intersects(bound) == true) ||
                 (filterNextButton?.globalBounds?.intersects(bound) == true) ||
                 (channelPrevButton?.globalBounds?.intersects(bound) == true) ||

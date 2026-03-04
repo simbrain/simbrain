@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import kotlin.math.abs
 
 class TensorNetworkTest {
 
@@ -249,7 +250,7 @@ class TensorNetworkTest {
         restored.update()  // NeuronArray accumulates + updates
 
         val expected = 0.5
-        assertTrue(restoredArray.activationArray.any { Math.abs(it - expected) < 1e-9 },
+        assertTrue(restoredArray.activationArray.any { abs(it - expected) < 1e-9 },
             "Flattened activations should propagate through restored pipeline")
     }
 
@@ -275,5 +276,28 @@ class TensorNetworkTest {
             "FlattenConnector should be deleted when source Tensor is deleted")
         assertTrue(array.incomingFlattenConnectors.isEmpty(),
             "NeuronArray should have no incoming flatten connectors after cascade delete")
+    }
+
+    @Test
+    fun `deleting flatten target cascades to FlattenConnector`() = runBlocking {
+        val net = Network()
+
+        val tensor = Tensor(TensorShape(2, 2, 1))
+        val array = NeuronArray(4)
+        val flatten = FlattenConnector(tensor, array)
+
+        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(array, usePlacementManager = false)
+        net.addNetworkModelAsync(flatten, usePlacementManager = false)
+
+        assertEquals(1, tensor.outgoingFlattenConnectors.size)
+        assertEquals(1, array.incomingFlattenConnectors.size)
+
+        net.deleteModels(listOf(array))
+
+        assertTrue(net.getModels<FlattenConnector>().isEmpty(),
+            "FlattenConnector should be deleted when target NeuronArray is deleted")
+        assertTrue(tensor.outgoingFlattenConnectors.isEmpty(),
+            "Tensor should have no outgoing flatten connectors after target deletion")
     }
 }

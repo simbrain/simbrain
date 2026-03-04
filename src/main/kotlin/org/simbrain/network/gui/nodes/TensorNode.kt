@@ -13,6 +13,7 @@ import org.simbrain.network.gui.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
 import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
@@ -30,7 +31,6 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     private val mainNode = PNode().also { addChild(it) }
 
     private val imageSize = 100.0
-    private val channelOffset = 3.0
 
     /** Currently visible front channel (index). */
     private var currentChannel = 0
@@ -38,14 +38,11 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     /** When true and channels==3, show an RGB composite. */
     var rgbComposite = false
 
-    private var cachedImage: BufferedImage? = null
+    /** Pre-allocated main image (tensor shape is fixed at construction). */
+    private val mainImage = BufferedImage(tensor.shape.width, tensor.shape.height, BufferedImage.TYPE_INT_RGB)
 
-    /** Return a reusable BufferedImage, only allocating when the dimensions change. */
-    private fun getOrCreateImage(w: Int, h: Int): BufferedImage {
-        val existing = cachedImage
-        if (existing != null && existing.width == w && existing.height == h) return existing
-        return BufferedImage(w, h, BufferedImage.TYPE_INT_RGB).also { cachedImage = it }
-    }
+    /** Pre-allocated buffer for extracting a single channel's data. */
+    private val channelBuffer = DoubleArray(tensor.shape.height * tensor.shape.width)
 
     private val activationImage = PImage().apply { mainNode.addChild(this) }
     private val channelLabel = PText("").apply {
@@ -57,6 +54,49 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         .also { mainNode.addChild(it) }
     private val nextChannelButton = createArrowButton(ArrowDirection.RIGHT) { nextChannel() }
         .also { mainNode.addChild(it) }
+
+    /** Container for thumbnail strip nodes. */
+    private val thumbnailStripNode = PNode().also { mainNode.addChild(it) }
+
+    // --- Pre-allocated thumbnail resources (fixed count = number of channels) ---
+    private val numChannels = tensor.shape.channels
+    private val thumbSize = (imageSize / numChannels).coerceIn(8.0, 20.0)
+    private val thumbGap = 1.0
+    private val thumbTotalWidth = numChannels * thumbSize + (numChannels - 1) * thumbGap
+    private val thumbStartX = (imageSize - thumbTotalWidth) / 2.0
+    private val thumbStripY = imageSize + 4.0
+
+    /** Pre-allocated BufferedImages for each thumbnail (written into, never recreated). */
+    private val thumbImages = Array(numChannels) {
+        BufferedImage(tensor.shape.width, tensor.shape.height, BufferedImage.TYPE_INT_RGB)
+    }
+
+    /** Pre-allocated PImage nodes for each thumbnail. */
+    private val thumbPImages = Array(numChannels) { c ->
+        PImage(thumbImages[c]).apply {
+            val x = thumbStartX + c * (thumbSize + thumbGap)
+            setBounds(x, thumbStripY, thumbSize, thumbSize)
+            addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
+                override fun mouseClicked(event: org.piccolo2d.event.PInputEvent) {
+                    currentChannel = c
+                    updateActivationImage()
+                    updateBorder()
+                }
+            })
+            thumbnailStripNode.addChild(this)
+        }
+    }
+
+    /** Pre-allocated border PPath nodes for each thumbnail. */
+    private val thumbBorders = Array(numChannels) { c ->
+        val x = thumbStartX + c * (thumbSize + thumbGap)
+        PPath.createRectangle(x, thumbStripY, thumbSize, thumbSize).apply {
+            paint = null
+            strokePaint = Color.GRAY
+            stroke = BasicStroke(1f)
+            thumbnailStripNode.addChild(this)
+        }
+    }
 
     private val margin = 10.0
 
@@ -86,6 +126,10 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         tensorEvents.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
         }
+        tensorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
+            updateActivationImage()
+            updateBorder()
+        }
 
         addChild(interactionBox)
         interactionBox.setText(tensor.displayName)
@@ -97,8 +141,21 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         layoutChildren()
     }
 
+    /**
+     * Extract channel [c] into [channelBuffer] without allocation.
+     */
+    private fun extractChannel(c: Int) {
+        for (h in 0 until tensor.shape.height) {
+            for (w in 0 until tensor.shape.width) {
+                channelBuffer[h * tensor.shape.width + w] = tensor.activations[tensor.shape.index(h, w, c)]
+            }
+        }
+    }
+
     private fun updateActivationImage() {
-        if (rgbComposite && tensor.shape.channels == 3) {
+        if (tensor.thumbnailStripMode) {
+            renderThumbnailStrip()
+        } else if (rgbComposite && tensor.shape.channels == 3) {
             renderRGBComposite()
         } else {
             renderSingleChannel()
@@ -106,38 +163,80 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         updateChannelLabel()
     }
 
-    private fun renderSingleChannel() {
-        activationImage.removeAllChildren()
+    private fun renderCurrentChannelToMainImage() {
         val ch = currentChannel.coerceIn(0, tensor.shape.channels - 1)
-        val channelData = tensor.getChannel(ch)
-        val img = getOrCreateImage(tensor.shape.width, tensor.shape.height)
-        channelData.writeSimbrainColorImage(img)
-        activationImage.image = img
+        extractChannel(ch)
+        channelBuffer.writeSimbrainColorImage(mainImage)
+        activationImage.image = mainImage
         activationImage.setBounds(0.0, 0.0, imageSize, imageSize)
         activationImage.addBorder()
+        activationImage.visible = true
+    }
+
+    private fun renderSingleChannel() {
+        activationImage.removeAllChildren()
+        thumbnailStripNode.visible = false
+        renderCurrentChannelToMainImage()
     }
 
     private fun renderRGBComposite() {
         activationImage.removeAllChildren()
+        thumbnailStripNode.visible = false
         val w = tensor.shape.width
         val h = tensor.shape.height
-        val img = getOrCreateImage(w, h)
-        val pixels = (img.raster.dataBuffer as java.awt.image.DataBufferInt).data
-        val rCh = tensor.getChannel(0)
-        val gCh = tensor.getChannel(1)
-        val bCh = tensor.getChannel(2)
-        for (i in pixels.indices) {
-            val r = (rCh[i].coerceIn(0.0, 1.0) * 255).toInt()
-            val g = (gCh[i].coerceIn(0.0, 1.0) * 255).toInt()
-            val b = (bCh[i].coerceIn(0.0, 1.0) * 255).toInt()
-            pixels[i] = (r shl 16) or (g shl 8) or b
+        val pixels = (mainImage.raster.dataBuffer as java.awt.image.DataBufferInt).data
+        for (py in 0 until h) {
+            for (px in 0 until w) {
+                val idx = py * w + px
+                val r = (tensor.activations[tensor.shape.index(py, px, 0)].coerceIn(0.0, 1.0) * 255).toInt()
+                val g = (tensor.activations[tensor.shape.index(py, px, 1)].coerceIn(0.0, 1.0) * 255).toInt()
+                val b = (tensor.activations[tensor.shape.index(py, px, 2)].coerceIn(0.0, 1.0) * 255).toInt()
+                pixels[idx] = (r shl 16) or (g shl 8) or b
+            }
         }
-        activationImage.image = img
+        activationImage.image = mainImage
         activationImage.setBounds(0.0, 0.0, imageSize, imageSize)
         activationImage.addBorder()
+        activationImage.visible = true
+    }
+
+    private fun renderThumbnailStrip() {
+        // Render main image for currentChannel
+        activationImage.removeAllChildren()
+        renderCurrentChannelToMainImage()
+
+        // Update pre-allocated thumbnail pixel data and repaint (no re-assignment needed
+        // since writeSimbrainColorImage writes directly into the backing buffer)
+        thumbnailStripNode.visible = true
+        val selectedCh = currentChannel.coerceIn(0, tensor.shape.channels - 1)
+        for (c in 0 until numChannels) {
+            extractChannel(c)
+            channelBuffer.writeSimbrainColorImage(thumbImages[c])
+            thumbPImages[c].invalidatePaint()
+
+            // Update border: orange for selected, gray for others
+            if (c == selectedCh) {
+                thumbBorders[c].strokePaint = Color.ORANGE
+                thumbBorders[c].stroke = BasicStroke(2f)
+            } else {
+                thumbBorders[c].strokePaint = Color.GRAY
+                thumbBorders[c].stroke = BasicStroke(1f)
+            }
+        }
     }
 
     private fun updateChannelLabel() {
+        val inStripMode = tensor.thumbnailStripMode
+
+        if (inStripMode) {
+            // Hide arrow buttons and channel label text in strip mode
+            channelLabel.visible = false
+            prevChannelButton.visible = false
+            nextChannelButton.visible = false
+            return
+        }
+
+        channelLabel.visible = true
         channelLabel.text = if (rgbComposite && tensor.shape.channels == 3) {
             "RGB Composite"
         } else {
@@ -238,7 +337,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
             // Edit
             contextMenu.add(networkPanel.createAction(name = "Edit Tensor...") {
-                propertyDialog?.display()
+                propertyDialog.display()
             })
             contextMenu.addSeparator()
 
@@ -254,15 +353,28 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             })
             contextMenu.addSeparator()
 
-            // Channel navigation
+            // Channel navigation & display modes
+            // Thumbnail strip toggle
+            contextMenu.add(networkPanel.createAction(
+                name = if (tensor.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail Strip"
+            ) {
+                tensor.thumbnailStripMode = !tensor.thumbnailStripMode
+            })
+
             if (tensor.shape.channels > 1) {
-                contextMenu.add(networkPanel.createAction(name = "Next Channel") { nextChannel() })
-                contextMenu.add(networkPanel.createAction(name = "Previous Channel") { previousChannel() })
+                if (!tensor.thumbnailStripMode) {
+                    contextMenu.add(networkPanel.createAction(name = "Next Channel") { nextChannel() })
+                    contextMenu.add(networkPanel.createAction(name = "Previous Channel") { previousChannel() })
+                }
+
                 if (tensor.shape.channels == 3) {
                     contextMenu.add(networkPanel.createAction(
                         name = if (rgbComposite) "Show Single Channel" else "Show RGB Composite"
                     ) {
                         rgbComposite = !rgbComposite
+                        if (rgbComposite) {
+                            tensor.thumbnailStripMode = false
+                        }
                         updateActivationImage()
                         updateBorder()
                     })
@@ -281,19 +393,19 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             return contextMenu
         }
 
-    override fun createEditDialog(): StandardDialog? {
+    override fun createEditDialog(): StandardDialog {
         return tensor.createEditorDialog()
     }
 
-    override val propertyDialog: StandardDialog?
+    override val propertyDialog: StandardDialog
         get() = createEditDialog()
 
     override val model: Tensor get() = tensor
 
     inner class TensorInteractionBox(net: NetworkPanel) : InteractionBox(net) {
-        override val contextMenu: JPopupMenu?
+        override val contextMenu: JPopupMenu
             get() = this@TensorNode.contextMenu
-        override val propertyDialog: StandardDialog?
+        override val propertyDialog: StandardDialog
             get() = this@TensorNode.propertyDialog
         override val model: Tensor
             get() = this@TensorNode.tensor

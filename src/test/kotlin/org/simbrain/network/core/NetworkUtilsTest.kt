@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 
 class NetworkUtilsTest {
@@ -85,6 +86,24 @@ class NetworkUtilsTest {
         assertEquals(0.2, weights[0, 1])
         assertEquals(0.3, weights[1, 0])
         assertEquals(0.4, weights[1, 1])
+    }
+
+    @Test
+    fun `addConvolutionalNeuralNetwork adds wrapper and adopts pipeline`() {
+        val network = Network()
+        val inputTensor = Tensor(TensorShape(2, 2, 1))
+        val flatArray = NeuronArray(4)
+        val outputArray = NeuronArray(1)
+        FlattenConnector(inputTensor, flatArray)
+        WeightMatrix(flatArray, outputArray)
+
+        val cnn = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
+            label = "CNN"
+        }
+
+        assertTrue(cnn in network.allModels)
+        assertEquals(cnn, network.childToParentMap[inputTensor])
+        assertEquals(cnn, network.childToParentMap[outputArray])
     }
 
 }

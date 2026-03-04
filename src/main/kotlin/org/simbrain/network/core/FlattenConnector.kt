@@ -22,20 +22,30 @@ class FlattenConnector(val source: Tensor, val target: NeuronArray) :
     override var events: TensorConnectorEvents = TensorConnectorEvents()
 
     init {
+        require(source.shape.size == target.size) {
+            "FlattenConnector requires matching sizes, but source has ${source.shape.size} elements and target has size ${target.size}"
+        }
         source.addOutgoingFlattenConnector(this)
         target.addIncomingFlattenConnector(this)
     }
 
     /**
      * Copy source activations into target inputs. Called during the target's
-     * accumulateInputs pass.
+     * accumulateInputs pass. The array is copied internally by [ArrayLayer.addInputs].
      */
     fun propagate() {
-        val src = source.activations
-        val n = minOf(src.size, target.size)
-        val col = DoubleArray(target.size)
-        src.copyInto(col, endIndex = n)
-        target.addInputs(col)
+        target.addInputs(source.activations)
+    }
+
+    /**
+     * Backward pass: copies dense-layer gradient back into the source tensor's gradients.
+     */
+    fun backward(denseGrad: DoubleArray) {
+        require(denseGrad.size == source.shape.size) {
+            "Flatten backward gradient size ${denseGrad.size} must match source tensor size ${source.shape.size}"
+        }
+        source.clearGradients()
+        System.arraycopy(denseGrad, 0, source.gradients, 0, source.shape.size)
     }
 
     override suspend fun delete(): List<NetworkModel> {

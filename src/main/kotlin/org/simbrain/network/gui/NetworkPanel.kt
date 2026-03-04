@@ -432,13 +432,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is ClassifierNetwork -> SmileClassifierNode(this, subnetwork)
+            is ConvolutionalNeuralNetwork -> ConvolutionalNeuralNetworkNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val subnetworkNodes = subnetwork.modelList.allInUpdatingOrder.map {
-            createNode(it)
+        val subnetworkNodes = subnetwork.modelList.allInUpdatingOrder.map { model ->
+            modelNodeMap.getImmediately<ScreenElement>(model) ?: createNode(model)
         }
-        val customInfoNode = subnetwork.customInfo?.let { createNode(it) }
+        val customInfoNode = subnetwork.customInfo?.let { model ->
+            modelNodeMap.getImmediately<ScreenElement>(model) ?: createNode(model)
+        }
         createSubNetwork().apply {
             // Add "sub-nodes" to subnetwork node
             subnetworkNodes.forEach { addNode(it) }

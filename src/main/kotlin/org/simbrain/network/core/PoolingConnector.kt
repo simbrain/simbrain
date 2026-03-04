@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import org.simbrain.network.conv.ConvOps
 import org.simbrain.util.UserParameter
 
+
 /**
  * Pooling type.
  */
@@ -44,6 +45,30 @@ class PoolingConnector(
             PoolingType.AVERAGE -> ConvOps.avgPool2d(
                 source.activations, source.shape,
                 target.inputs, target.shape,
+                poolSize, stride
+            )
+        }
+    }
+
+    /**
+     * Backward pass: propagates gradient from target back to source.
+     * Assumes target.gradients contains the gradient from downstream.
+     *
+     * Accumulates into [source].gradients. Call [source].clearGradients() before a new pass.
+     */
+    fun backward() {
+        when (poolingType) {
+            PoolingType.MAX -> {
+                val indices = maxIndices ?: error("maxIndices not available for MAX pool backward")
+                ConvOps.maxPool2dBackward(
+                    target.gradients, target.shape,
+                    indices,
+                    source.gradients
+                )
+            }
+            PoolingType.AVERAGE -> ConvOps.avgPool2dBackward(
+                target.gradients, target.shape,
+                source.gradients, source.shape,
                 poolSize, stride
             )
         }

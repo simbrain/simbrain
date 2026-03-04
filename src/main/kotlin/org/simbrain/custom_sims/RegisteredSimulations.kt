@@ -1,6 +1,7 @@
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
+import org.simbrain.custom_sims.simulations.backprop.cnnMNIST
 import org.simbrain.custom_sims.simulations.behaviorism.classicalConditioning
 import org.simbrain.custom_sims.simulations.behaviorism.operantWithEnvironment
 import org.simbrain.custom_sims.simulations.behaviorism.simpleOperant
@@ -8,11 +9,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.avoider
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergGame
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
-import org.simbrain.custom_sims.simulations.demos.cnnDemo
-import org.simbrain.custom_sims.simulations.demos.competitiveSim
-import org.simbrain.custom_sims.simulations.demos.somNetSmells
-import org.simbrain.custom_sims.simulations.demos.view3dNavigationLateralInhibitionDemo
-import org.simbrain.custom_sims.simulations.demos.view3dNavigationPipelineDemo
+import org.simbrain.custom_sims.simulations.demos.*
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
@@ -54,6 +51,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Three Object Detector") { threeObjectDetector }
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Tiny MNIST") { tinyMNIST }
+        item("CNN MNIST") { cnnMNIST }
     }
 
     dir("Braitenberg") {
@@ -183,6 +181,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
         //item("Attention as gain") { attentionAsGain }
         item("CNN Demo") { cnnDemo }
+        item("CNN Training Demo") { cnnTrainingDemo }
     }
 
     //dir("Testing") {

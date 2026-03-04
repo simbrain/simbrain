@@ -48,6 +48,7 @@ val NetworkPanel.editMenu
             add(showLayoutDialogAction)
             addSeparator()
             add(createSupervisedModelAction)
+            add(createConvolutionalNeuralNetworkAction)
             addSeparator()
             add(neuronCollectionAction)
             addSeparator()

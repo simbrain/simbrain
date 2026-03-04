@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.conv.ConvOps
+import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import kotlin.math.sqrt
@@ -25,6 +26,13 @@ class ConvolutionConnector(
     val padding: Padding = Padding.SAME
 ) : TensorConnector(source, target) {
 
+    @UserParameter(label = "Kernel Grid", description = "Show all kernels in a grid", tab = "GUI", order = 50)
+    var kernelGridMode = true
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
     private val inputChannels = source.shape.channels
     private val kernelArea = kernelSize * kernelSize
 
@@ -34,10 +42,20 @@ class ConvolutionConnector(
     /** Per-filter biases */
     val filterBiases = DoubleArray(numFilters)
 
-    private val padH: Int
-    private val padW: Int
+    /** Accumulated kernel gradients for backprop. */
+    val kernelGrads = DoubleArray(numFilters * inputChannels * kernelArea)
+
+    /** Accumulated bias gradients for backprop. */
+    val biasGrads = DoubleArray(numFilters)
+
+    internal val padH: Int
+    internal val padW: Int
 
     init {
+        require(kernelSize > 0) { "kernelSize must be > 0, but was $kernelSize" }
+        require(numFilters > 0) { "numFilters must be > 0, but was $numFilters" }
+        require(stride > 0) { "stride must be > 0, but was $stride" }
+
         val (ph, pw) = padding.compute(source.shape.height, source.shape.width, kernelSize, stride)
         padH = ph
         padW = pw
@@ -57,11 +75,14 @@ class ConvolutionConnector(
     fun heInitialize() {
         val fanIn = inputChannels * kernelArea
         val std = sqrt(2.0 / fanIn)
-        val random = java.util.Random()
         for (i in kernels.indices) {
             kernels[i] = random.nextGaussian() * std
         }
         filterBiases.fill(0.0)
+    }
+
+    companion object {
+        private val random = java.util.Random()
     }
 
     override fun propagate() {
@@ -74,13 +95,37 @@ class ConvolutionConnector(
         )
     }
 
+    /**
+     * Backward pass: computes kernel/bias gradients and propagates error to source tensor.
+     * Assumes target.gradients contains the gradient from downstream.
+     *
+     * Accumulates into [kernelGrads], [biasGrads], and [source].gradients.
+     * Call [clearGrads] and [source].clearGradients() before a new batch.
+     */
+    fun backward() {
+        ConvOps.conv2dBackwardKernels(
+            target.gradients, target.shape,
+            source.activations, source.shape,
+            kernelGrads, numFilters, kernelSize,
+            biasGrads,
+            stride, padH, padW
+        )
+        ConvOps.conv2dBackwardInput(
+            target.gradients, target.shape,
+            kernels, numFilters, kernelSize,
+            source.gradients, source.shape,
+            stride, padH, padW
+        )
+    }
+
+    fun clearGrads() {
+        kernelGrads.fill(0.0)
+        biasGrads.fill(0.0)
+    }
+
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        if (randomizer != null) {
-            for (i in kernels.indices) {
-                kernels[i] = randomizer.sampleDouble()
-            }
-        } else {
-            heInitialize()
+        for (i in kernels.indices) {
+            kernels[i] = (randomizer ?: weightRandomizer).sampleDouble()
         }
         events.updated.fire()
     }

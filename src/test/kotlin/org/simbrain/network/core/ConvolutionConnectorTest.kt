@@ -37,6 +37,16 @@ class ConvolutionConnectorTest {
     }
 
     @Test
+    fun `invalid stride throws IllegalArgumentException`() {
+        val source = Tensor(TensorShape(4, 4, 1))
+        val target = Tensor(TensorShape(4, 4, 1))
+
+        assertThrows<IllegalArgumentException> {
+            ConvolutionConnector(source, target, kernelSize = 3, numFilters = 1, stride = 0, padding = Padding.SAME)
+        }
+    }
+
+    @Test
     fun `he initialization produces non-zero weights`() {
         val source = Tensor(TensorShape(8, 8, 3))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 4)

@@ -131,9 +131,15 @@ val cnnMNIST = newSim {
         batchSize = 32
         lossFunction = CnnLossFunction.CrossEntropy
     }
+
+    // Pre-load input with a random training image
+    val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
+    inputTensor.setActivations(trainingSet.inputs[randomSampleIndex].toDoubleArray())
+    
     // --- GUI ---
 
     place(networkComponent, 0, 0, 600, 800)
+    workspace.simpleIterate()
 
     addSidebarInfo(
         """

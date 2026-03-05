@@ -185,11 +185,14 @@ val cnnTrainingDemo = newSim {
         lossFunction = CnnLossFunction.CrossEntropy
     }
 
+    // Pre-load input with a random diagonal training image
+    val diagonalSampleIndex = 60 + rng.nextInt(30)
+    inputTensor.setActivations(inputs[diagonalSampleIndex].toDoubleArray())
     
     // --- GUI ---
 
     place(networkComponent, 0, 0, 850, 730)
-    workspace.simpleIterate() // So some activations are showin
+    workspace.simpleIterate() // So some activations are shown
 
     addSidebarInfo(
         """

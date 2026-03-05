@@ -77,11 +77,11 @@ val cnnMNIST = newSim {
 
     // Pool1: 2x2 → 10x10x5
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
-    val pool1Out = Tensor(pool1OutShape).apply {
+    val poolLayer1 = Tensor(pool1OutShape).apply {
         label = "Pool1 (${pool1OutShape})"
     }
-    pool1Out.setLocation(leftX, topY + stepY * 2)
-    val pool1 = PoolingConnector(conv1Out, pool1Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    poolLayer1.setLocation(leftX, topY + stepY * 2)
+    val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     // Conv2: 3x3, 8 filters, SAME → 10x10x8
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
@@ -90,15 +90,15 @@ val cnnMNIST = newSim {
         activationFunction = TensorActivation.RELU
     }
     conv2Out.setLocation(leftX, topY + stepY * 3)
-    val conv2 = ConvolutionConnector(pool1Out, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
+    val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     // Pool2: 2x2 → 5x5x8
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
-    val pool2Out = Tensor(pool2OutShape).apply {
+    val poolLayer2 = Tensor(pool2OutShape).apply {
         label = "Pool2 (${pool2OutShape})"
     }
-    pool2Out.setLocation(rightX, topY + stepY * 3)
-    val pool2 = PoolingConnector(conv2Out, pool2Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    poolLayer2.setLocation(rightX, topY + stepY * 3)
+    val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     // Flatten: 5x5x8 = 200
     val flatSize = pool2OutShape.size
@@ -106,7 +106,7 @@ val cnnMNIST = newSim {
         label = "Flatten ($flatSize)"
     }
     flatArray.setLocation(rightX, topY + stepY * 2)
-    val flatten = FlattenConnector(pool2Out, flatArray)
+    val flatten = FlattenConnector(poolLayer2, flatArray)
 
     // Dense output: 10 classes
     val outputArray = NeuronArray(10).apply {

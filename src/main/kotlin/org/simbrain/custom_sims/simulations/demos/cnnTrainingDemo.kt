@@ -42,7 +42,7 @@ val cnnTrainingDemo = newSim {
         label = "Conv (${convOutShape})"
         activationFunction = TensorActivation.RELU
     }
-    convOut.setLocation(0.0, 200.0)
+    convOut.setLocation(0.0, 400.0)
     val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
     // MaxPool: 2x2 -> 4x4x4
@@ -50,7 +50,7 @@ val cnnTrainingDemo = newSim {
     val poolOut = Tensor(poolOutShape).apply {
         label = "Pool (${poolOutShape})"
     }
-    poolOut.setLocation(0.0, 400.0)
+    poolOut.setLocation(0.0, 800.0)
     val pool = PoolingConnector(convOut, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     // Flatten: 4x4x4 = 64 -> NeuronArray(64)
@@ -58,14 +58,14 @@ val cnnTrainingDemo = newSim {
     val flatArray = NeuronArray(flatSize).apply {
         label = "Flatten ($flatSize)"
     }
-    flatArray.setLocation(0.0, 600.0)
+    flatArray.setLocation(0.0, 1200.0)
     val flatten = FlattenConnector(poolOut, flatArray)
 
     // Dense output: 3 classes
     val outputArray = NeuronArray(3).apply {
         label = "Output (3)"
     }
-    outputArray.setLocation(0.0, 800.0)
+    outputArray.setLocation(0.0, 1600.0)
     val dense = WeightMatrix(flatArray, outputArray)
 
     // --- Generate synthetic training data ---
@@ -126,7 +126,7 @@ val cnnTrainingDemo = newSim {
     }
     // --- GUI ---
 
-    place(networkComponent, 0, 0, 500, 900)
+    place(networkComponent, 0, 0, 500, 800)
 
     addSidebarInfo(
         """

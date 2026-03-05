@@ -27,7 +27,7 @@ class ConvolutionConnector(
 ) : TensorConnector(source, target) {
 
     @UserParameter(label = "Kernel Grid", description = "Show all kernels in a grid", tab = "GUI", order = 50)
-    var kernelGridMode = true
+    var kernelGridMode = false
         set(value) {
             field = value
             events.visualPropertiesChanged.fire()

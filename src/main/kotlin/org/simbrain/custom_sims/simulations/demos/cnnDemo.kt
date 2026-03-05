@@ -76,39 +76,39 @@ val cnnDemo = newSim {
         activationFunction = TensorActivation.RELU
     }
     network.addNetworkModelAsync(conv1Output, usePlacementManager = false)
-    conv1Output.setLocation(0.0, 200.0)
+    conv1Output.setLocation(0.0, 400.0)
     val conv1 = ConvolutionConnector(inputTensor, conv1Output, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
     network.addNetworkModelAsync(conv1, usePlacementManager = false)
 
     // MaxPool1: 2x2 -> output 32x32x8
     val pool1OutputShape = conv1OutputShape.poolOutputShape(2, 2)
-    val pool1Output = Tensor(pool1OutputShape).apply {
+    val pool1Layer = Tensor(pool1OutputShape).apply {
         label = "Pool1 (${pool1OutputShape})"
     }
-    network.addNetworkModelAsync(pool1Output, usePlacementManager = false)
-    pool1Output.setLocation(0.0, 400.0)
-    val pool1 = PoolingConnector(conv1Output, pool1Output, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    network.addNetworkModelAsync(pool1Layer, usePlacementManager = false)
+    pool1Layer.setLocation(0.0, 800.0)
+    val pool1 = PoolingConnector(conv1Output, pool1Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
     network.addNetworkModelAsync(pool1, usePlacementManager = false)
 
     // Conv2: 3x3, 16 filters, SAME padding -> output 32x32x16
     val conv2OutputShape = pool1OutputShape.convOutputShape(3, 1, Padding.SAME, 16)
-    val conv2Output = Tensor(conv2OutputShape).apply {
+    val conv2Layer = Tensor(conv2OutputShape).apply {
         label = "Conv2 (${conv2OutputShape})"
         activationFunction = TensorActivation.RELU
     }
-    network.addNetworkModelAsync(conv2Output, usePlacementManager = false)
-    conv2Output.setLocation(0.0, 600.0)
-    val conv2 = ConvolutionConnector(pool1Output, conv2Output, kernelSize = 3, numFilters = 16, stride = 1, padding = Padding.SAME)
+    network.addNetworkModelAsync(conv2Layer, usePlacementManager = false)
+    conv2Layer.setLocation(0.0, 1200.0)
+    val conv2 = ConvolutionConnector(pool1Layer, conv2Layer, kernelSize = 3, numFilters = 16, stride = 1, padding = Padding.SAME)
     network.addNetworkModelAsync(conv2, usePlacementManager = false)
 
     // MaxPool2: 2x2 -> output 16x16x16
     val pool2OutputShape = conv2OutputShape.poolOutputShape(2, 2)
-    val pool2Output = Tensor(pool2OutputShape).apply {
+    val pool2Layer = Tensor(pool2OutputShape).apply {
         label = "Pool2 (${pool2OutputShape})"
     }
-    network.addNetworkModelAsync(pool2Output, usePlacementManager = false)
-    pool2Output.setLocation(0.0, 800.0)
-    val pool2 = PoolingConnector(conv2Output, pool2Output, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    network.addNetworkModelAsync(pool2Layer, usePlacementManager = false)
+    pool2Layer.setLocation(0.0, 1600.0)
+    val pool2 = PoolingConnector(conv2Layer, pool2Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
     network.addNetworkModelAsync(pool2, usePlacementManager = false)
 
     // Flatten: 16x16x16 = 4096 -> NeuronArray(4096)
@@ -117,8 +117,8 @@ val cnnDemo = newSim {
         label = "Flatten ($flattenSize)"
     }
     network.addNetworkModelAsync(flattenArray, usePlacementManager = false)
-    flattenArray.setLocation(0.0, 1000.0)
-    val flatten = FlattenConnector(pool2Output, flattenArray)
+    flattenArray.setLocation(0.0, 2000.0)
+    val flatten = FlattenConnector(pool2Layer, flattenArray)
     network.addNetworkModelAsync(flatten, usePlacementManager = false)
 
     // Dense output: small output layer (e.g. 3 categories)
@@ -126,7 +126,7 @@ val cnnDemo = newSim {
         label = "Output (3)"
     }
     network.addNetworkModelAsync(outputArray, usePlacementManager = false)
-    outputArray.setLocation(0.0, 1200.0)
+    outputArray.setLocation(0.0, 2400.0)
     val dense = WeightMatrix(flattenArray, outputArray)
     network.addNetworkModelAsync(dense, usePlacementManager = false)
 
@@ -138,7 +138,7 @@ val cnnDemo = newSim {
 
     // --- Layout ---
     place(odorWorldComponent, 0, 0, 400, 400)
-    place(networkComponent, 410, 0, 500, 900)
+    place(networkComponent, 410, 0, 500, 800)
 
     addSidebarInfo(
         """

@@ -29,10 +29,10 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
 
     private val arrow = if (source == target) {
-        RecurrentArrow(NetworkPreferences.weightMatrixArrowColor)
+        RecurrentArrow(NetworkPreferences.connectorArrowColor)
     } else {
         bezierArrow {
-            color = NetworkPreferences.weightMatrixArrowColor
+            color = NetworkPreferences.connectorArrowColor
 
             padding {
                 tail = when (source) {

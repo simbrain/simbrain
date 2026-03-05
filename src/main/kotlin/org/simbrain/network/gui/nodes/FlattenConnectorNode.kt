@@ -5,6 +5,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
@@ -28,7 +29,7 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         pickable = true
 
         arrow = bezierArrow {
-            color = java.awt.Color.DARK_GRAY
+            color = NetworkPreferences.connectorArrowColor
 
             padding {
                 tail = 0.0

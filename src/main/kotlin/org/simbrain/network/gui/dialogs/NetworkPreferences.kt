@@ -98,6 +98,14 @@ object NetworkPreferences: PreferenceHolder() {
     var synapseGroupArrowColor by ColorPreference(Color.GREEN)
 
     @UserParameter(
+        label = "Connector arrow color",
+        description = "Color for arrows between weight matrices, tensor layers, etc.",
+        tab = "Colors",
+        order = 120
+    )
+    var connectorArrowColor by ColorPreference(Color.ORANGE)
+
+    @UserParameter(
         label = "Nudge amount",
         description = "Distance in pixels to move selected objects when using Shift + arrow keys",
         tab = "GUI",

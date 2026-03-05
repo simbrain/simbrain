@@ -15,7 +15,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     SubnetworkNode(networkPanel, smileClassifier) {
 
     val arrow =  bezierArrow {
-        color = NetworkPreferences.weightMatrixArrowColor
+        color = NetworkPreferences.connectorArrowColor
         padding {
             head = arrowSize
             tail = 0.0

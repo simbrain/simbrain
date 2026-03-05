@@ -14,6 +14,7 @@ import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.ImageBox
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createArrowButton
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
@@ -144,8 +145,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         pickable = true
 
         arrow = bezierArrow {
-            color = java.awt.Color.DARK_GRAY
-
+            color = NetworkPreferences.connectorArrowColor
             padding {
                 tail = 0.0
                 head = 5.0 + arrowSize

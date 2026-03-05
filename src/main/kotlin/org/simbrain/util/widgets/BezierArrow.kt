@@ -3,6 +3,7 @@ package org.simbrain.util.widgets
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PArea
 import org.piccolo2d.nodes.PPath
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
@@ -121,8 +122,7 @@ annotation class BezierArrowMaker
 @BezierArrowMaker
 class BezierArrowTemplate {
 
-    // Default color for all arrows
-    var color: Color = Color.GREEN
+    var color: Color = NetworkPreferences.connectorArrowColor
 
     var thickness = 20.0f
 

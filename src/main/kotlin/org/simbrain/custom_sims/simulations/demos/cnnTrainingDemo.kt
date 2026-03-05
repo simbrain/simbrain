@@ -12,12 +12,12 @@ import kotlin.random.Random
 /**
  * Demo simulation showing a trainable CNN pipeline with synthetic data.
  *
- * Pipeline: Input(8x8x1) -> Conv(3x3, 4 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
+ * Pipeline: Input(16x16x1) -> Conv(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
  *
- * Three synthetic pattern classes:
- * - Class 0: horizontal stripe (rows 2-3)
- * - Class 1: vertical stripe (cols 2-3)
- * - Class 2: diagonal pattern
+ * Three synthetic pattern classes with random positions to demonstrate CNN translation invariance:
+ * - Class 0: horizontal line (1 pixel wide, 3-4 pixels long)
+ * - Class 1: vertical line (1 pixel wide, 3-4 pixels long)
+ * - Class 2: diagonal line (1 pixel wide, 3-4 pixels long)
  */
 val cnnTrainingDemo = newSim {
 
@@ -28,105 +28,168 @@ val cnnTrainingDemo = newSim {
 
     // --- Build CNN Pipeline ---
 
-    // Input: 8x8x1
-    val inputShape = TensorShape(8, 8, 1)
+    // Input: 16x16x1
+    val inputShape = TensorShape(16, 16, 1)
     val inputTensor = Tensor(inputShape).apply {
-        label = "Input (8x8x1)"
+        label = "Input Layer"
         isClamped = true
     }
-    inputTensor.setLocation(0.0, 0.0)
+    inputTensor.setLocation(-786.2994660296812, 398.3040858920673)
 
-    // Conv: 3x3, 4 filters, SAME -> 8x8x4
-    val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
+    // Conv: 3x3, 8 filters, SAME -> 16x16x8
+    val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
     val convOut = Tensor(convOutShape).apply {
-        label = "Conv (${convOutShape})"
+        label = "Feature Map"
         activationFunction = TensorActivation.RELU
     }
     convOut.setLocation(0.0, 400.0)
-    val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
+    val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME).apply {
+        label = "Convolution"
+    }
 
-    // MaxPool: 2x2 -> 4x4x4
+    // MaxPool: 2x2 -> 8x8x8
     val poolOutShape = convOutShape.poolOutputShape(2, 2)
     val poolOut = Tensor(poolOutShape).apply {
-        label = "Pool (${poolOutShape})"
+        label = "Pooled Layer"
     }
-    poolOut.setLocation(0.0, 800.0)
-    val pool = PoolingConnector(convOut, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
+    poolOut.setLocation(-784.9973490798225, 75.65382689571582)
+    val pool = PoolingConnector(convOut, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
+        label = "Pooling"
+    }
 
-    // Flatten: 4x4x4 = 64 -> NeuronArray(64)
+    // Flatten: 8x8x8 = 512 -> NeuronArray(512)
     val flatSize = poolOutShape.size
     val flatArray = NeuronArray(flatSize).apply {
-        label = "Flatten ($flatSize)"
+        label = "Flattened Layer"
     }
-    flatArray.setLocation(0.0, 1200.0)
-    val flatten = FlattenConnector(poolOut, flatArray)
+    flatArray.setLocation(72.39336683145689, -125.50848409739262)
+    val flatten = FlattenConnector(poolOut, flatArray).apply {
+        label = "Flatten"
+    }
 
     // Dense output: 3 classes
     val outputArray = NeuronArray(3).apply {
-        label = "Output (3)"
+        label = "Output Layer"
+        circleMode = true
+        labelArray = arrayOf("Horizontal", "Vertical", "Diagonal")
     }
-    outputArray.setLocation(0.0, 1600.0)
-    val dense = WeightMatrix(flatArray, outputArray)
+    outputArray.setLocation(-773.5011725522106, -175.7068655854972)
+    val dense = WeightMatrix(flatArray, outputArray).apply {
+        label = "Dense Connector"
+    }
 
     // --- Generate synthetic training data ---
 
     val rng = Random(42)
     val inputs = mutableListOf<MutableList<Double>>()
     val targets = mutableListOf<MutableList<Double>>()
+    val imageSize = 16
 
-    // Class 0: horizontal stripe (rows 3-4)
+    // Class 0: horizontal line (1 pixel wide, 3-4 pixels long) at random positions
     repeat(30) {
-        val img = MutableList(64) { 0.0 }
-        for (w in 0 until 8) {
-            img[3 * 8 + w] = 0.8 + rng.nextDouble() * 0.2
-            img[4 * 8 + w] = 0.8 + rng.nextDouble() * 0.2
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize)
+        val startCol = rng.nextInt(imageSize - length + 1)
+        for (col in startCol until (startCol + length)) {
+            img[startRow * imageSize + col] = 1.0
         }
-        // Add small noise
-        for (i in img.indices) img[i] += rng.nextDouble() * 0.1
         inputs.add(img)
         targets.add(mutableListOf(1.0, 0.0, 0.0))
     }
 
-    // Class 1: vertical stripe (cols 3-4)
+    // Class 1: vertical line (1 pixel wide, 3-4 pixels long) at random positions
     repeat(30) {
-        val img = MutableList(64) { 0.0 }
-        for (h in 0 until 8) {
-            img[h * 8 + 3] = 0.8 + rng.nextDouble() * 0.2
-            img[h * 8 + 4] = 0.8 + rng.nextDouble() * 0.2
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize - length + 1)
+        val startCol = rng.nextInt(imageSize)
+        for (row in startRow until (startRow + length)) {
+            img[row * imageSize + startCol] = 1.0
         }
-        for (i in img.indices) img[i] += rng.nextDouble() * 0.1
         inputs.add(img)
         targets.add(mutableListOf(0.0, 1.0, 0.0))
     }
 
-    // Class 2: diagonal
+    // Class 2: diagonal line (3-4 pixels long) at random positions
     repeat(30) {
-        val img = MutableList(64) { 0.0 }
-        for (k in 0 until 8) {
-            img[k * 8 + k] = 0.8 + rng.nextDouble() * 0.2
-            if (k + 1 < 8) img[k * 8 + k + 1] = 0.5 + rng.nextDouble() * 0.2
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize - length + 1)
+        val startCol = rng.nextInt(imageSize - length + 1)
+        for (i in 0 until length) {
+            img[(startRow + i) * imageSize + (startCol + i)] = 1.0
         }
-        for (i in img.indices) img[i] += rng.nextDouble() * 0.1
         inputs.add(img)
         targets.add(mutableListOf(0.0, 0.0, 1.0))
     }
 
-    val dataset = TrainingDataset(inputs, targets, inputSize = 64, targetSize = 3)
+    val dataset = TrainingDataset(inputs, targets, inputSize = imageSize * imageSize, targetSize = 3)
+
+    // --- Generate testing data ---
+
+    val testInputs = mutableListOf<MutableList<Double>>()
+    val testTargets = mutableListOf<MutableList<Double>>()
+
+    // Class 0: horizontal line at different positions (5 test samples)
+    repeat(5) {
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize)
+        val startCol = rng.nextInt(imageSize - length + 1)
+        for (col in startCol until (startCol + length)) {
+            img[startRow * imageSize + col] = 1.0
+        }
+        testInputs.add(img)
+        testTargets.add(mutableListOf(1.0, 0.0, 0.0))
+    }
+
+    // Class 1: vertical line at different positions (5 test samples)
+    repeat(5) {
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize - length + 1)
+        val startCol = rng.nextInt(imageSize)
+        for (row in startRow until (startRow + length)) {
+            img[row * imageSize + startCol] = 1.0
+        }
+        testInputs.add(img)
+        testTargets.add(mutableListOf(0.0, 1.0, 0.0))
+    }
+
+    // Class 2: diagonal at different positions (5 test samples)
+    repeat(5) {
+        val img = MutableList(imageSize * imageSize) { 0.0 }
+        val length = rng.nextInt(3, 5)
+        val startRow = rng.nextInt(imageSize - length + 1)
+        val startCol = rng.nextInt(imageSize - length + 1)
+        for (i in 0 until length) {
+            img[(startRow + i) * imageSize + (startCol + i)] = 1.0
+        }
+        testInputs.add(img)
+        testTargets.add(mutableListOf(0.0, 0.0, 1.0))
+    }
+
+    val testDataset = TrainingDataset(testInputs, testTargets, inputSize = imageSize * imageSize, targetSize = 3)
 
     // --- Create ConvolutionalNeuralNetwork ---
 
     val cnnModel = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
         label = "CNN Classifier"
         trainingSet = dataset
+        testingSet = testDataset
     }
     cnnModel.trainerConfig.apply {
         learningRate = 0.001
         batchSize = 30
         lossFunction = CnnLossFunction.CrossEntropy
     }
+
+    
     // --- GUI ---
 
-    place(networkComponent, 0, 0, 500, 800)
+    place(networkComponent, 0, 0, 850, 730)
+    workspace.simpleIterate() // So some activations are showin
 
     addSidebarInfo(
         """
@@ -134,24 +197,36 @@ val cnnTrainingDemo = newSim {
 
         This simulation demonstrates training a small convolutional neural network
         on synthetic pattern data using backpropagation with Adam optimizer.
+        
+        The key feature is **translation invariance**: patterns appear at random positions
+        in the 16x16 input images, and the CNN learns to recognize them regardless of 
+        where they appear.
 
         ## Pipeline
-        - **Input**: 8x8x1 grayscale patterns
-        - **Conv**: 3x3 kernel, 4 filters, SAME padding, ReLU
-        - **MaxPool**: 2x2 pool
-        - **Flatten**: 4x4x4 = 64 -> NeuronArray
-        - **Dense**: 64 -> 3 output neurons (cross-entropy + softmax)
+        - **Input Layer**: 16x16x1 grayscale patterns
+        - **Convolution Layer**: 3x3 kernel, 8 filters, SAME padding, ReLU
+        - **Pooling Layer**: 2x2 max pool → 8x8x8
+        - **Flatten Layer**: 512 features
+        - **Output Layer**: 3 output neurons (cross-entropy + softmax)
 
         ## Training Data
-        Three synthetic pattern classes (30 samples each):
-        - **Class 0**: Horizontal stripe
-        - **Class 1**: Vertical stripe
-        - **Class 2**: Diagonal stripe
+        Three pattern classes (30 training, 5 test samples each):
+        - **Horizontal**: 1 pixel wide, 3-4 pixels long horizontal line at random positions
+        - **Vertical**: 1 pixel wide, 3-4 pixels long vertical line at random positions  
+        - **Diagonal**: 1 pixel wide, 3-4 pixels long diagonal line at random positions
+        
+        Each pattern appears at different locations to demonstrate the CNN's ability
+        to learn position-invariant features.
 
         ## How to use
-        - Right-click the CNN outline -> **Train...** to open the training dialog
-        - Use Step/Run/Stop buttons to train
-        - Watch the loss plot decrease as training progresses
+        1. Right-click the CNN outline → **Train...** to open the training dialog
+        2. Use Step/Run/Stop buttons to train
+        3. Watch both training (red) and testing (blue) error decrease
+        4. After training, test the network:
+           - Switch to the **Testing** tab
+           - Browse test samples with the "Inputs" toolbar
+           - Click **apply current row as input to network**
+           - Watch the output layer neurons show predictions
         """.trimIndent()
     )
 }

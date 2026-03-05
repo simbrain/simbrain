@@ -175,13 +175,13 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Vision") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
-        item("Photo album (100 x 100)") { photoAlbumExample }
+        //item("Photo album (100 x 100)") { photoAlbumExample }
         //item("3D View Example") { view3dDemo }
         item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
         item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
         //item("Attention as gain") { attentionAsGain }
-        item("CNN Demo") { cnnDemo }
-        item("CNN Training Demo") { cnnTrainingDemo }
+        //item("CNN Demo") { cnnDemo } // Develop into 3d demo
+        item("CNN Simple Demo") { cnnTrainingDemo }
     }
 
     //dir("Testing") {

@@ -91,18 +91,18 @@ class NetworkUtilsTest {
     @Test
     fun `addConvolutionalNeuralNetwork adds wrapper and adopts pipeline`() {
         val network = Network()
-        val inputTensor = Tensor(TensorShape(2, 2, 1))
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1))
         val flatArray = NeuronArray(4)
         val outputArray = NeuronArray(1)
-        FlattenConnector(inputTensor, flatArray)
+        FlattenConnector(inputTensorLayer, flatArray)
         WeightMatrix(flatArray, outputArray)
 
-        val cnn = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
+        val cnn = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
             label = "CNN"
         }
 
         assertTrue(cnn in network.allModels)
-        assertEquals(cnn, network.childToParentMap[inputTensor])
+        assertEquals(cnn, network.childToParentMap[inputTensorLayer])
         assertEquals(cnn, network.childToParentMap[outputArray])
     }
 

@@ -5,7 +5,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 
 /**
- * Bridges the CNN [Tensor] hierarchy to the Layer/[NeuronArray] hierarchy by flattening
+ * Bridges the CNN [TensorLayer] hierarchy to the Layer/[NeuronArray] hierarchy by flattening
  * a Tensor's HWC activations into a 1D input vector for a NeuronArray.
  *
  * This is neither a [TensorConnector] (target is NeuronArray, not Tensor) nor a [Connector]
@@ -15,7 +15,7 @@ import org.simbrain.workspace.AttributeContainer
  * During [propagate], the source Tensor's activations are copied into the target NeuronArray's
  * inputs via [ArrayLayer.addInputs].
  */
-class FlattenConnector(val source: Tensor, val target: NeuronArray) :
+class FlattenConnector(val source: TensorLayer, val target: NeuronArray) :
     NetworkModel(), EditableObject, AttributeContainer {
 
     @Transient

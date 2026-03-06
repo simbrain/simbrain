@@ -12,11 +12,11 @@ enum class PoolingType {
 }
 
 /**
- * Connects two [Tensor] nodes via a pooling operation (max or average).
+ * Connects two [TensorLayer] nodes via a pooling operation (max or average).
  * No learnable weights - this is a purely structural downsampling operation.
  */
 class PoolingConnector(
-    source: Tensor, target: Tensor,
+    source: TensorLayer, target: TensorLayer,
     @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", displayOnly = true, order = 1)
     val poolSize: Int = 2,
     @UserParameter(label = "Stride", description = "Pooling stride", displayOnly = true, order = 2)

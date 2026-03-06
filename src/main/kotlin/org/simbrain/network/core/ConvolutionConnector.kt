@@ -7,7 +7,7 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import kotlin.math.sqrt
 
 /**
- * Connects two [Tensor] nodes via a 2D convolution operation.
+ * Connects two [TensorLayer] nodes via a 2D convolution operation.
  *
  * Kernel weights are stored as a flat array in filter-major order:
  * `[numFilters][inputChannels][kernelSize][kernelSize]`.
@@ -15,7 +15,7 @@ import kotlin.math.sqrt
  * During [propagate], the convolution result is accumulated into [target]'s inputs.
  */
 class ConvolutionConnector(
-    source: Tensor, target: Tensor,
+    source: TensorLayer, target: TensorLayer,
     @UserParameter(label = "Kernel Size", description = "Spatial size of convolution kernel", displayOnly = true, order = 1)
     val kernelSize: Int = 3,
     @UserParameter(label = "Num Filters", description = "Number of output filters", displayOnly = true, order = 2)

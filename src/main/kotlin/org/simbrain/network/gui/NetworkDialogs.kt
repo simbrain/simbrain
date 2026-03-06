@@ -73,7 +73,7 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
 }
 
 fun NetworkPanel.showTensorCreationDialog() {
-    Tensor.CreationTemplate().createEditorDialog {
+    TensorLayer.CreationTemplate().createEditorDialog {
         val tensor = it.create()
         network.addNetworkModelAsync(tensor)
         undoManager.addUndoableAction(
@@ -89,91 +89,91 @@ fun NetworkPanel.showTensorCreationDialog() {
 /**
  * Dialog for adding a convolution layer (target Tensor + ConvolutionConnector) from a source Tensor.
  */
-fun NetworkPanel.showAddConvLayerDialog(sourceTensor: Tensor) {
+fun NetworkPanel.showAddConvLayerDialog(sourceTensorLayer: TensorLayer) {
     val template = ConvLayerTemplate()
     template.createEditorDialog {
-        addConvLayer(sourceTensor, it)
+        addConvLayer(sourceTensorLayer, it)
     }.also {
-        it.title = "Add Conv Layer from ${sourceTensor.displayName}"
+        it.title = "Add Conv Layer from ${sourceTensorLayer.displayName}"
     }.display()
 }
 
 /**
  * Dialog for adding a pooling layer (target Tensor + PoolingConnector) from a source Tensor.
  */
-fun NetworkPanel.showAddPoolLayerDialog(sourceTensor: Tensor) {
+fun NetworkPanel.showAddPoolLayerDialog(sourceTensorLayer: TensorLayer) {
     val template = PoolLayerTemplate()
     template.createEditorDialog {
-        addPoolLayer(sourceTensor, it)
+        addPoolLayer(sourceTensorLayer, it)
     }.also {
-        it.title = "Add Pool Layer from ${sourceTensor.displayName}"
+        it.title = "Add Pool Layer from ${sourceTensorLayer.displayName}"
     }.display()
 }
 
-internal fun NetworkPanel.addConvLayer(sourceTensor: Tensor, template: ConvLayerTemplate): Pair<Tensor, ConvolutionConnector> {
-    val outputShape = sourceTensor.shape.convOutputShape(
+internal fun NetworkPanel.addConvLayer(sourceTensorLayer: TensorLayer, template: ConvLayerTemplate): Pair<TensorLayer, ConvolutionConnector> {
+    val outputShape = sourceTensorLayer.shape.convOutputShape(
         template.kernelSize, template.stride, template.padding, template.numFilters
     )
-    val targetTensor = Tensor(outputShape)
-    targetTensor.activationFunction = template.activation
-    targetTensor.shouldBePlaced = false
+    val targetTensorLayer = TensorLayer(outputShape)
+    targetTensorLayer.activationFunction = template.activation
+    targetTensorLayer.shouldBePlaced = false
     val connector = ConvolutionConnector(
-        sourceTensor, targetTensor,
+        sourceTensorLayer, targetTensorLayer,
         template.kernelSize, template.numFilters, template.stride, template.padding
     )
-    network.addNetworkModelAsync(targetTensor, usePlacementManager = false)
-    targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+    network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
-        description = "Add conv layer from ${sourceTensor.id}",
-        undo = { network.deleteModels(listOf(targetTensor)) },
+        description = "Add conv layer from ${sourceTensorLayer.id}",
+        undo = { network.deleteModels(listOf(targetTensorLayer)) },
         redo = {
-            network.addNetworkModel(targetTensor, usePlacementManager = false, useAutoAssignedId = false)
-            targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+            network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )
-    return targetTensor to connector
+    return targetTensorLayer to connector
 }
 
-internal fun NetworkPanel.addPoolLayer(sourceTensor: Tensor, template: PoolLayerTemplate): Pair<Tensor, PoolingConnector> {
-    val outputShape = sourceTensor.shape.poolOutputShape(template.poolSize, template.stride)
-    val targetTensor = Tensor(outputShape)
-    targetTensor.shouldBePlaced = false
-    val connector = PoolingConnector(sourceTensor, targetTensor, template.poolSize, template.stride, template.poolingType)
-    network.addNetworkModelAsync(targetTensor, usePlacementManager = false)
-    targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+internal fun NetworkPanel.addPoolLayer(sourceTensorLayer: TensorLayer, template: PoolLayerTemplate): Pair<TensorLayer, PoolingConnector> {
+    val outputShape = sourceTensorLayer.shape.poolOutputShape(template.poolSize, template.stride)
+    val targetTensorLayer = TensorLayer(outputShape)
+    targetTensorLayer.shouldBePlaced = false
+    val connector = PoolingConnector(sourceTensorLayer, targetTensorLayer, template.poolSize, template.stride, template.poolingType)
+    network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
-        description = "Add pool layer from ${sourceTensor.id}",
-        undo = { network.deleteModels(listOf(targetTensor)) },
+        description = "Add pool layer from ${sourceTensorLayer.id}",
+        undo = { network.deleteModels(listOf(targetTensorLayer)) },
         redo = {
-            network.addNetworkModel(targetTensor, usePlacementManager = false, useAutoAssignedId = false)
-            targetTensor.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+            network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )
-    return targetTensor to connector
+    return targetTensorLayer to connector
 }
 
 /**
  * Add a flatten layer: creates a NeuronArray sized to the source Tensor's total element count
  * and a FlattenConnector linking them. No dialog needed since the size is fully determined.
  */
-fun NetworkPanel.addFlattenLayer(sourceTensor: Tensor) {
-    val flatSize = sourceTensor.shape.size
+fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
+    val flatSize = sourceTensorLayer.shape.size
     val targetArray = NeuronArray(flatSize)
     targetArray.shouldBePlaced = false
-    val connector = FlattenConnector(sourceTensor, targetArray)
+    val connector = FlattenConnector(sourceTensorLayer, targetArray)
     network.addNetworkModelAsync(targetArray, usePlacementManager = false)
-    targetArray.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+    targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
-        description = "Add flatten layer from ${sourceTensor.id}",
+        description = "Add flatten layer from ${sourceTensorLayer.id}",
         undo = { network.deleteModels(listOf(connector, targetArray)) },
         redo = {
             network.addNetworkModel(targetArray, usePlacementManager = false, useAutoAssignedId = false)
-            targetArray.setLocation(sourceTensor.locationX, sourceTensor.locationY + 200)
+            targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )

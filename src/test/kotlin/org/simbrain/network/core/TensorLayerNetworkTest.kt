@@ -5,20 +5,20 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import kotlin.math.abs
 
-class TensorNetworkTest {
+class TensorLayerNetworkTest {
 
     @Test
     fun `full pipeline update cycle`() {
         val net = Network()
 
         // Input -> Conv -> Pool
-        val input = Tensor(TensorShape(4, 4, 1))
+        val input = TensorLayer(TensorShape(4, 4, 1))
         val convOutShape = input.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val convOut = Tensor(convOutShape).apply {
+        val convOut = TensorLayer(convOutShape).apply {
             activationFunction = TensorActivation.RELU
         }
         val poolOutShape = convOutShape.poolOutputShape(2, 2)
-        val poolOut = Tensor(poolOutShape)
+        val poolOut = TensorLayer(poolOutShape)
 
         val conv = ConvolutionConnector(input, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         val pool = PoolingConnector(convOut, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
@@ -47,21 +47,21 @@ class TensorNetworkTest {
 
     @Test
     fun `tensors appear in update order`() {
-        val inputTensor = Tensor(TensorShape(4, 4, 1))
-        val convOutShape = inputTensor.shape.convOutputShape(3, 1, Padding.SAME, 1)
-        val convOut = Tensor(convOutShape)
-        val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 1, stride = 1, padding = Padding.SAME)
+        val inputTensorLayer = TensorLayer(TensorShape(4, 4, 1))
+        val convOutShape = inputTensorLayer.shape.convOutputShape(3, 1, Padding.SAME, 1)
+        val convOut = TensorLayer(convOutShape)
+        val conv = ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 1, stride = 1, padding = Padding.SAME)
 
         // Tensor should come before TensorConnector in update order
-        assertTrue(updatingOrder(inputTensor) < updatingOrder(conv))
+        assertTrue(updatingOrder(inputTensorLayer) < updatingOrder(conv))
         assertTrue(updatingOrder(convOut) < updatingOrder(conv))
     }
 
     @Test
     fun `delete tensor cascades to connectors`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
 
         val net = Network()
@@ -79,9 +79,9 @@ class TensorNetworkTest {
     fun `multiple incoming connectors sum additively`() {
         val net = Network()
 
-        val src1 = Tensor(TensorShape(2, 2, 1))
-        val src2 = Tensor(TensorShape(2, 2, 1))
-        val target = Tensor(TensorShape(2, 2, 1))
+        val src1 = TensorLayer(TensorShape(2, 2, 1))
+        val src2 = TensorLayer(TensorShape(2, 2, 1))
+        val target = TensorLayer(TensorShape(2, 2, 1))
 
         // Use 1x1 conv (identity-like) to just pass values through
         val conn1 = ConvolutionConnector(src1, target, kernelSize = 1, numFilters = 1, stride = 1, padding = Padding.VALID)
@@ -114,17 +114,17 @@ class TensorNetworkTest {
         val net = Network()
 
         // Build pipeline: Input(4x4x2) -> Conv(3x3, 3 filters, SAME) -> ReLU -> Pool(2x2) -> MaxPool
-        val input = Tensor(TensorShape(4, 4, 2)).apply {
+        val input = TensorLayer(TensorShape(4, 4, 2)).apply {
             label = "input"
             isClamped = true
         }
         val convOutShape = input.shape.convOutputShape(3, 1, Padding.SAME, 3)
-        val convOut = Tensor(convOutShape).apply {
+        val convOut = TensorLayer(convOutShape).apply {
             label = "convOut"
             activationFunction = TensorActivation.RELU
         }
         val poolOutShape = convOutShape.poolOutputShape(2, 2)
-        val poolOut = Tensor(poolOutShape).apply {
+        val poolOut = TensorLayer(poolOutShape).apply {
             label = "poolOut"
         }
 
@@ -147,9 +147,9 @@ class TensorNetworkTest {
         val restored = xstream.fromXML(xml) as Network
 
         // Verify tensors survived
-        val restoredInput = restored.getModelByLabel(Tensor::class.java, "input")
-        val restoredConvOut = restored.getModelByLabel(Tensor::class.java, "convOut")
-        val restoredPoolOut = restored.getModelByLabel(Tensor::class.java, "poolOut")
+        val restoredInput = restored.getModelByLabel(TensorLayer::class.java, "input")
+        val restoredConvOut = restored.getModelByLabel(TensorLayer::class.java, "convOut")
+        val restoredPoolOut = restored.getModelByLabel(TensorLayer::class.java, "poolOut")
         assertNotNull(restoredInput, "Input tensor should survive serialization")
         assertNotNull(restoredConvOut, "Conv output tensor should survive serialization")
         assertNotNull(restoredPoolOut, "Pool output tensor should survive serialization")
@@ -210,16 +210,16 @@ class TensorNetworkTest {
         val net = Network()
 
         // Tensor(4x4x2) -> Flatten -> NeuronArray(32)
-        val tensor = Tensor(TensorShape(4, 4, 2)).apply {
+        val tensorLayer = TensorLayer(TensorShape(4, 4, 2)).apply {
             label = "source"
             isClamped = true
         }
         val array = NeuronArray(32).apply {
             label = "target"
         }
-        val flatten = FlattenConnector(tensor, array)
+        val flatten = FlattenConnector(tensorLayer, array)
 
-        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(tensorLayer, usePlacementManager = false)
         net.addNetworkModelAsync(array, usePlacementManager = false)
         net.addNetworkModelAsync(flatten, usePlacementManager = false)
 
@@ -229,23 +229,23 @@ class TensorNetworkTest {
         val restored = xstream.fromXML(xml) as Network
 
         // Verify models survived
-        val restoredTensor = restored.getModelByLabel(Tensor::class.java, "source")
+        val restoredTensorLayer = restored.getModelByLabel(TensorLayer::class.java, "source")
         val restoredArray = restored.getModelByLabel(NeuronArray::class.java, "target")
         val restoredFlatten = restored.getModels<FlattenConnector>().firstOrNull()
-        assertNotNull(restoredTensor, "Source tensor should survive serialization")
+        assertNotNull(restoredTensorLayer, "Source tensor should survive serialization")
         assertNotNull(restoredArray, "Target NeuronArray should survive serialization")
         assertNotNull(restoredFlatten, "FlattenConnector should survive serialization")
 
         // Verify wiring
-        assertEquals(restoredTensor, restoredFlatten!!.source)
+        assertEquals(restoredTensorLayer, restoredFlatten!!.source)
         assertEquals(restoredArray, restoredFlatten.target)
-        assertTrue(restoredTensor!!.outgoingFlattenConnectors.contains(restoredFlatten),
+        assertTrue(restoredTensorLayer!!.outgoingFlattenConnectors.contains(restoredFlatten),
             "Tensor should have flatten as outgoing connector after deserialization")
         assertTrue(restoredArray!!.incomingFlattenConnectors.contains(restoredFlatten),
             "NeuronArray should have flatten as incoming connector after deserialization")
 
         // Verify data flows through the restored pipeline
-        restoredTensor.activations.fill(0.5)
+        restoredTensorLayer.activations.fill(0.5)
         restored.update()  // Tensor clamped -> activations stay, flatten propagates
         restored.update()  // NeuronArray accumulates + updates
 
@@ -258,19 +258,19 @@ class TensorNetworkTest {
     fun `FlattenConnector deletion cascades properly`() = runBlocking {
         val net = Network()
 
-        val tensor = Tensor(TensorShape(2, 2, 1))
+        val tensorLayer = TensorLayer(TensorShape(2, 2, 1))
         val array = NeuronArray(4)
-        val flatten = FlattenConnector(tensor, array)
+        val flatten = FlattenConnector(tensorLayer, array)
 
-        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(tensorLayer, usePlacementManager = false)
         net.addNetworkModelAsync(array, usePlacementManager = false)
         net.addNetworkModelAsync(flatten, usePlacementManager = false)
 
         // Deleting the source tensor should cascade to the FlattenConnector
-        assertEquals(1, tensor.outgoingFlattenConnectors.size)
+        assertEquals(1, tensorLayer.outgoingFlattenConnectors.size)
         assertEquals(1, array.incomingFlattenConnectors.size)
 
-        net.deleteModels(listOf(tensor))
+        net.deleteModels(listOf(tensorLayer))
 
         assertTrue(net.getModels<FlattenConnector>().isEmpty(),
             "FlattenConnector should be deleted when source Tensor is deleted")
@@ -282,22 +282,22 @@ class TensorNetworkTest {
     fun `deleting flatten target cascades to FlattenConnector`() = runBlocking {
         val net = Network()
 
-        val tensor = Tensor(TensorShape(2, 2, 1))
+        val tensorLayer = TensorLayer(TensorShape(2, 2, 1))
         val array = NeuronArray(4)
-        val flatten = FlattenConnector(tensor, array)
+        val flatten = FlattenConnector(tensorLayer, array)
 
-        net.addNetworkModelAsync(tensor, usePlacementManager = false)
+        net.addNetworkModelAsync(tensorLayer, usePlacementManager = false)
         net.addNetworkModelAsync(array, usePlacementManager = false)
         net.addNetworkModelAsync(flatten, usePlacementManager = false)
 
-        assertEquals(1, tensor.outgoingFlattenConnectors.size)
+        assertEquals(1, tensorLayer.outgoingFlattenConnectors.size)
         assertEquals(1, array.incomingFlattenConnectors.size)
 
         net.deleteModels(listOf(array))
 
         assertTrue(net.getModels<FlattenConnector>().isEmpty(),
             "FlattenConnector should be deleted when target NeuronArray is deleted")
-        assertTrue(tensor.outgoingFlattenConnectors.isEmpty(),
+        assertTrue(tensorLayer.outgoingFlattenConnectors.isEmpty(),
             "Tensor should have no outgoing flatten connectors after target deletion")
     }
 }

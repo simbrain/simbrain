@@ -198,32 +198,32 @@ val cnnPhotoAlbum = newSim {
     val leftX = 0.0; val rightX = 400.0; val topY = 0.0; val stepY = 350.0
 
     val inputShape = TensorShape(100, 100, 3)
-    val inputTensor = Tensor(inputShape).apply {
+    val inputTensorLayer = TensorLayer(inputShape).apply {
         label = "Input (100×100×3)"; isClamped = true
     }
-    inputTensor.setLocation(leftX, topY)
+    inputTensorLayer.setLocation(leftX, topY)
 
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
-    val conv1Out = Tensor(conv1OutShape).apply {
+    val conv1Out = TensorLayer(conv1OutShape).apply {
         label = "Conv1 ($conv1OutShape)"; activationFunction = TensorActivation.RELU
     }
     conv1Out.setLocation(leftX, topY + stepY)
-    val conv1 = ConvolutionConnector(inputTensor, conv1Out, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
+    val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
     val pool1OutShape = conv1OutShape.poolOutputShape(5, 5)
-    val poolLayer1 = Tensor(pool1OutShape).apply { label = "Pool1 ($pool1OutShape)" }
+    val poolLayer1 = TensorLayer(pool1OutShape).apply { label = "Pool1 ($pool1OutShape)" }
     poolLayer1.setLocation(leftX, topY + stepY * 2)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 5, stride = 5, poolingType = PoolingType.MAX)
 
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val conv2Out = Tensor(conv2OutShape).apply {
+    val conv2Out = TensorLayer(conv2OutShape).apply {
         label = "Conv2 ($conv2OutShape)"; activationFunction = TensorActivation.RELU
     }
     conv2Out.setLocation(leftX, topY + stepY * 3)
     val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     val pool2OutShape = conv2OutShape.poolOutputShape(4, 4)
-    val poolLayer2 = Tensor(pool2OutShape).apply { label = "Pool2 ($pool2OutShape)" }
+    val poolLayer2 = TensorLayer(pool2OutShape).apply { label = "Pool2 ($pool2OutShape)" }
     poolLayer2.setLocation(rightX, topY + stepY * 3)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 4, stride = 4, poolingType = PoolingType.MAX)
 
@@ -287,7 +287,7 @@ val cnnPhotoAlbum = newSim {
 
     // ── CNN model ─────────────────────────────────────────────────────────────
 
-    val cnnModel = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
+    val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
         label = "CNN Photo Album"
         this.trainingSet = trainingSet
         this.testingSet  = testingSet
@@ -306,12 +306,12 @@ val cnnPhotoAlbum = newSim {
         imageWorld.imagePipelineCollection.currentPipeline.let { pipeline ->
             createCoupling(
                 pipeline.getProducer(pipeline::rgbActivations),
-                inputTensor.getConsumer(inputTensor::setActivations)
+                inputTensorLayer.getConsumer(inputTensorLayer::setActivations)
             )
         }
     }
 
-    inputTensor.rgbComposite = true
+    inputTensorLayer.rgbComposite = true
 
     workspace.iterateSuspend(1)
 

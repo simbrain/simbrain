@@ -101,13 +101,13 @@ class NetworkDialogsTest {
         val networkComponent = NetworkComponent("Test", network)
         val networkPanel = NetworkPanel(networkComponent)
 
-        val sourceTensor = Tensor(TensorShape(8, 8, 1)).apply {
+        val sourceTensorLayer = TensorLayer(TensorShape(8, 8, 1)).apply {
             setLocation(100.0, 100.0)
         }
-        network.addNetworkModel(sourceTensor, usePlacementManager = false)
+        network.addNetworkModel(sourceTensorLayer, usePlacementManager = false)
 
         val (convTarget, _) = networkPanel.addConvLayer(
-            sourceTensor,
+            sourceTensorLayer,
             ConvLayerTemplate().apply {
                 kernelSize = 3
                 stride = 1
@@ -125,7 +125,7 @@ class NetworkDialogsTest {
 
         assertEquals(3, networkPanel.undoManager.undoStack.size)
         assertEquals(0, networkPanel.undoManager.redoStack.size)
-        assertEquals(3, network.getModels<Tensor>().size)
+        assertEquals(3, network.getModels<TensorLayer>().size)
         assertEquals(1, network.getModels<ConvolutionConnector>().size)
         assertEquals(1, network.getModels<PoolingConnector>().size)
         assertEquals(1, network.getModels<FlattenConnector>().size)
@@ -140,14 +140,14 @@ class NetworkDialogsTest {
         networkPanel.undoManager.undo() // pool
         assertEquals(1, networkPanel.undoManager.undoStack.size)
         assertEquals(2, networkPanel.undoManager.redoStack.size)
-        assertEquals(2, network.getModels<Tensor>().size)
+        assertEquals(2, network.getModels<TensorLayer>().size)
         assertEquals(1, network.getModels<ConvolutionConnector>().size)
         assertEquals(0, network.getModels<PoolingConnector>().size)
 
         networkPanel.undoManager.undo() // conv
         assertEquals(0, networkPanel.undoManager.undoStack.size)
         assertEquals(3, networkPanel.undoManager.redoStack.size)
-        assertEquals(1, network.getModels<Tensor>().size)
+        assertEquals(1, network.getModels<TensorLayer>().size)
         assertEquals(0, network.getModels<ConvolutionConnector>().size)
 
         networkPanel.undoManager.redo() // conv
@@ -156,7 +156,7 @@ class NetworkDialogsTest {
 
         assertEquals(3, networkPanel.undoManager.undoStack.size)
         assertEquals(0, networkPanel.undoManager.redoStack.size)
-        assertEquals(3, network.getModels<Tensor>().size)
+        assertEquals(3, network.getModels<TensorLayer>().size)
         assertEquals(1, network.getModels<ConvolutionConnector>().size)
         assertEquals(1, network.getModels<PoolingConnector>().size)
         assertEquals(1, network.getModels<FlattenConnector>().size)

@@ -1064,7 +1064,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     fun canCreateConvolutionalNeuralNetwork(): Pair<Boolean, String> {
         val reasons = mutableListOf<String>()
-        val source = networkPanel.selectionManager.filterSelectedSourceModels<Tensor>().firstOrNull()
+        val source = networkPanel.selectionManager.filterSelectedSourceModels<TensorLayer>().firstOrNull()
         val target = networkPanel.selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
         if (source == null) {
             reasons.add("No source Tensor selected (Ctrl+click a Tensor to set as source)")
@@ -1076,23 +1076,23 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             // Check that a path exists through the CNN pipeline
             try {
                 // Verify pipeline can be discovered
-                var currentTensor: Tensor = source
+                var currentTensorLayer: TensorLayer = source
                 var foundFlatten = false
                 val pipelineModels = mutableListOf<NetworkModel>(source)
                 while (true) {
-                    if (currentTensor.outgoingFlattenConnectors.isNotEmpty()) {
-                        val flatten = currentTensor.outgoingFlattenConnectors.first()
+                    if (currentTensorLayer.outgoingFlattenConnectors.isNotEmpty()) {
+                        val flatten = currentTensorLayer.outgoingFlattenConnectors.first()
                         pipelineModels.add(flatten)
                         pipelineModels.add(flatten.target)
                         foundFlatten = true
                         break
                     }
-                    val outgoing = currentTensor.outgoingTensorConnectors
+                    val outgoing = currentTensorLayer.outgoingTensorConnectors
                     if (outgoing.isEmpty()) break
                     val connector = outgoing.first()
                     pipelineModels.add(connector)
                     pipelineModels.add(connector.target)
-                    currentTensor = connector.target
+                    currentTensorLayer = connector.target
                 }
                 if (!foundFlatten) {
                     reasons.add("No Flatten connector found in pipeline from source Tensor")
@@ -1109,7 +1109,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             }
         }
         if (source != null && networkPanel.network.getModels<ConvolutionalNeuralNetwork>().any {
-                it.inputTensor == source
+                it.inputTensorLayer == source
             }) {
             reasons.add("A convolutional neural network already exists for this input Tensor")
         }
@@ -1123,7 +1123,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val (canCreate) = canCreateConvolutionalNeuralNetwork()
 
         if (canCreate) {
-            val input = selectionManager.sourceModels.firstOrNull() as? Tensor
+            val input = selectionManager.sourceModels.firstOrNull() as? TensorLayer
             val output = selectionManager.selectedModels.firstOrNull() as? NeuronArray
 
             if (input != null && output != null) {

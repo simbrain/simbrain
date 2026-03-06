@@ -8,11 +8,11 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `propagate produces output`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         source.activations.fill(1.0)
 
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
 
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         // Set all kernel weights to 1 and biases to 0
@@ -28,8 +28,8 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `shape mismatch throws`() {
-        val source = Tensor(TensorShape(4, 4, 1))
-        val wrongTarget = Tensor(TensorShape(10, 10, 1)) // Wrong shape
+        val source = TensorLayer(TensorShape(4, 4, 1))
+        val wrongTarget = TensorLayer(TensorShape(10, 10, 1)) // Wrong shape
 
         assertThrows<IllegalArgumentException> {
             ConvolutionConnector(source, wrongTarget, kernelSize = 3, numFilters = 1, stride = 1, padding = Padding.VALID)
@@ -38,8 +38,8 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `invalid stride throws IllegalArgumentException`() {
-        val source = Tensor(TensorShape(4, 4, 1))
-        val target = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
+        val target = TensorLayer(TensorShape(4, 4, 1))
 
         assertThrows<IllegalArgumentException> {
             ConvolutionConnector(source, target, kernelSize = 3, numFilters = 1, stride = 0, padding = Padding.SAME)
@@ -48,9 +48,9 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `he initialization produces non-zero weights`() {
-        val source = Tensor(TensorShape(8, 8, 3))
+        val source = TensorLayer(TensorShape(8, 8, 3))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 4)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
         // He initialization should produce non-zero weights
@@ -61,9 +61,9 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `randomize changes weights`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
 
         val before = conv.kernels.copyOf()
@@ -74,9 +74,9 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `delete unwires connectors`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
 
         assertEquals(1, source.outgoingTensorConnectors.size)
@@ -91,9 +91,9 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `hardClear sets kernels to zero but leaves biases unchanged`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
 
         conv.kernels.fill(1.0)
@@ -112,9 +112,9 @@ class ConvolutionConnectorTest {
 
     @Test
     fun `increment and decrement change kernel weights`() {
-        val source = Tensor(TensorShape(4, 4, 1))
+        val source = TensorLayer(TensorShape(4, 4, 1))
         val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
-        val target = Tensor(outputShape)
+        val target = TensorLayer(outputShape)
         val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
 
         conv.kernels.fill(1.0)

@@ -17,20 +17,20 @@ class CnnTrainerTest {
 
         // Input: 4x4x1
         val inputShape = TensorShape(4, 4, 1)
-        val inputTensor = Tensor(inputShape).apply {
+        val inputTensorLayer = TensorLayer(inputShape).apply {
             label = "Input"
             isClamped = true
         }
-        net.addNetworkModelAsync(inputTensor, usePlacementManager = false)
+        net.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
 
         // Conv: 3x3, 2 filters, SAME -> 4x4x2
         val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 2)
-        val convOut = Tensor(convOutShape).apply {
+        val convOut = TensorLayer(convOutShape).apply {
             label = "ConvOut"
             activationFunction = TensorActivation.RELU
         }
         net.addNetworkModelAsync(convOut, usePlacementManager = false)
-        val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val conv = ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         net.addNetworkModelAsync(conv, usePlacementManager = false)
 
         // Flatten: 4x4x2 = 32 -> NeuronArray(32)
@@ -73,7 +73,7 @@ class CnnTrainerTest {
             batchSize = 20
             lossFunction = CnnLossFunction.CrossEntropy
         }
-        val trainer = CnnTrainer(net, inputTensor, outputArray, config)
+        val trainer = CnnTrainer(net, inputTensorLayer, outputArray, config)
         trainer.trainingData = dataset
 
         // Record initial loss
@@ -98,17 +98,17 @@ class CnnTrainerTest {
         val net = Network()
 
         val inputShape = TensorShape(4, 4, 1)
-        val inputTensor = Tensor(inputShape).apply {
+        val inputTensorLayer = TensorLayer(inputShape).apply {
             isClamped = true
         }
-        net.addNetworkModelAsync(inputTensor, usePlacementManager = false)
+        net.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
 
         val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 2)
-        val convOut = Tensor(convOutShape).apply {
+        val convOut = TensorLayer(convOutShape).apply {
             activationFunction = TensorActivation.RELU
         }
         net.addNetworkModelAsync(convOut, usePlacementManager = false)
-        val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val conv = ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         net.addNetworkModelAsync(conv, usePlacementManager = false)
 
         val flatSize = convOutShape.size
@@ -137,11 +137,11 @@ class CnnTrainerTest {
         val config = CnnTrainerConfig().apply {
             lossFunction = CnnLossFunction.CrossEntropy
         }
-        val trainer = CnnTrainer(net, inputTensor, outputArray, config)
+        val trainer = CnnTrainer(net, inputTensorLayer, outputArray, config)
 
         // Clear and run forward + backward
         convOut.clearGradients()
-        inputTensor.clearGradients()
+        inputTensorLayer.clearGradients()
         conv.clearGrads()
 
         trainer.forwardPass(input)
@@ -168,13 +168,13 @@ class CnnTrainerTest {
         val net = Network()
 
         val inputShape = TensorShape(4, 4, 1)
-        val inputTensor = Tensor(inputShape).apply { isClamped = true }
-        net.addNetworkModelAsync(inputTensor, usePlacementManager = false)
+        val inputTensorLayer = TensorLayer(inputShape).apply { isClamped = true }
+        net.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
 
         val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 2)
-        val convOut = Tensor(convOutShape).apply { activationFunction = TensorActivation.RELU }
+        val convOut = TensorLayer(convOutShape).apply { activationFunction = TensorActivation.RELU }
         net.addNetworkModelAsync(convOut, usePlacementManager = false)
-        val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val conv = ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         net.addNetworkModelAsync(conv, usePlacementManager = false)
 
         val flatArray = NeuronArray(convOutShape.size)
@@ -203,7 +203,7 @@ class CnnTrainerTest {
             batchSize = 20
             lossFunction = CnnLossFunction.SSE
         }
-        val trainer = CnnTrainer(net, inputTensor, outputArray, config)
+        val trainer = CnnTrainer(net, inputTensorLayer, outputArray, config)
         trainer.trainingData = TrainingDataset(inputs, targets, 16, 2)
 
         val initialLoss = trainer.trainBatch(0 until 20)
@@ -217,13 +217,13 @@ class CnnTrainerTest {
     fun `trainOnce increments iteration and computes testing accuracy when enabled`() = runBlocking {
         val net = Network()
         val inputShape = TensorShape(4, 4, 1)
-        val inputTensor = Tensor(inputShape).apply { isClamped = true }
-        net.addNetworkModelAsync(inputTensor, usePlacementManager = false)
+        val inputTensorLayer = TensorLayer(inputShape).apply { isClamped = true }
+        net.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
 
         val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 2)
-        val convOut = Tensor(convOutShape).apply { activationFunction = TensorActivation.RELU }
+        val convOut = TensorLayer(convOutShape).apply { activationFunction = TensorActivation.RELU }
         net.addNetworkModelAsync(convOut, usePlacementManager = false)
-        val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val conv = ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
         net.addNetworkModelAsync(conv, usePlacementManager = false)
 
         val flatArray = NeuronArray(convOutShape.size)
@@ -260,7 +260,7 @@ class CnnTrainerTest {
             testConfiguration.enabled = true
             testConfiguration.testFrequency = 1
         }
-        val trainer = CnnTrainer(net, inputTensor, outputArray, config)
+        val trainer = CnnTrainer(net, inputTensorLayer, outputArray, config)
         trainer.trainingData = dataset
         trainer.testingData = dataset
 
@@ -274,7 +274,7 @@ class CnnTrainerTest {
 
     @Test
     fun `flatten backward overwrites stale tensor gradients`() {
-        val source = Tensor(TensorShape(2, 2, 1))
+        val source = TensorLayer(TensorShape(2, 2, 1))
         val target = NeuronArray(4)
         val flatten = FlattenConnector(source, target)
 

@@ -8,7 +8,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.LocatableModel
-import org.simbrain.network.core.Tensor
+import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
@@ -22,9 +22,9 @@ import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
 /**
- * GUI node for a [Tensor]. Shows stacked channel images with navigation buttons.
+ * GUI node for a [TensorLayer]. Shows stacked channel images with navigation buttons.
  */
-class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement(networkPanel) {
+class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : ScreenElement(networkPanel) {
 
     private val interactionBox = TensorInteractionBox(networkPanel)
 
@@ -33,10 +33,10 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     private val imageSize = 100.0
 
     /** Pre-allocated main image (tensor shape is fixed at construction). */
-    private val mainImage = BufferedImage(tensor.shape.width, tensor.shape.height, BufferedImage.TYPE_INT_RGB)
+    private val mainImage = BufferedImage(tensorLayer.shape.width, tensorLayer.shape.height, BufferedImage.TYPE_INT_RGB)
 
     /** Pre-allocated buffer for extracting a single channel's data. */
-    private val channelBuffer = DoubleArray(tensor.shape.height * tensor.shape.width)
+    private val channelBuffer = DoubleArray(tensorLayer.shape.height * tensorLayer.shape.width)
 
     private val activationImage = PImage().apply { mainNode.addChild(this) }
     private val channelLabel = PText("").apply {
@@ -53,7 +53,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     private val thumbnailStripNode = PNode().also { mainNode.addChild(it) }
 
     // --- Pre-allocated thumbnail resources (fixed count = number of channels) ---
-    private val numChannels = tensor.shape.channels
+    private val numChannels = tensorLayer.shape.channels
     private val thumbSize = (imageSize / numChannels).coerceIn(8.0, 20.0)
     private val thumbGap = 1.0
     private val thumbTotalWidth = numChannels * thumbSize + (numChannels - 1) * thumbGap
@@ -62,7 +62,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
     /** Pre-allocated BufferedImages for each thumbnail (written into, never recreated). */
     private val thumbImages = Array(numChannels) {
-        BufferedImage(tensor.shape.width, tensor.shape.height, BufferedImage.TYPE_INT_RGB)
+        BufferedImage(tensorLayer.shape.width, tensorLayer.shape.height, BufferedImage.TYPE_INT_RGB)
     }
 
     /** Pre-allocated PImage nodes for each thumbnail. */
@@ -72,7 +72,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             setBounds(x, thumbStripY, thumbSize, thumbSize)
             addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
                 override fun mouseClicked(event: org.piccolo2d.event.PInputEvent) {
-                    tensor.currentChannel = c
+                    tensorLayer.currentChannel = c
                 }
             })
             thumbnailStripNode.addChild(this)
@@ -103,14 +103,14 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         }
 
     init {
-        val tensorEvents = tensor.events
+        val tensorEvents = tensorLayer.events
         tensorEvents.clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
         tensorEvents.locationChanged.on(dispatcher = Dispatchers.Swing) {
             pullViewPositionFromModel()
             layoutChildren()
         }
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
-            interactionBox.setText(tensor.displayName)
+            interactionBox.setText(tensorLayer.displayName)
         }
         tensorEvents.updated.on {
             tensorEvents.updateGraphics.fire()
@@ -124,7 +124,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         }
 
         addChild(interactionBox)
-        interactionBox.setText(tensor.displayName)
+        interactionBox.setText(tensorLayer.displayName)
 
         pickable = true
         pullViewPositionFromModel()
@@ -137,17 +137,17 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
      * Extract channel [c] into [channelBuffer] without allocation.
      */
     private fun extractChannel(c: Int) {
-        for (h in 0 until tensor.shape.height) {
-            for (w in 0 until tensor.shape.width) {
-                channelBuffer[h * tensor.shape.width + w] = tensor.activations[tensor.shape.index(h, w, c)]
+        for (h in 0 until tensorLayer.shape.height) {
+            for (w in 0 until tensorLayer.shape.width) {
+                channelBuffer[h * tensorLayer.shape.width + w] = tensorLayer.activations[tensorLayer.shape.index(h, w, c)]
             }
         }
     }
 
     private fun updateActivationImage() {
-        if (tensor.thumbnailStripMode) {
+        if (tensorLayer.thumbnailStripMode) {
             renderThumbnailStrip()
-        } else if (tensor.rgbComposite && tensor.shape.channels == 3) {
+        } else if (tensorLayer.rgbComposite && tensorLayer.shape.channels == 3) {
             renderRGBComposite()
         } else {
             renderSingleChannel()
@@ -156,7 +156,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     private fun renderCurrentChannelToMainImage() {
-        val ch = tensor.currentChannel.coerceIn(0, tensor.shape.channels - 1)
+        val ch = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
         extractChannel(ch)
         channelBuffer.writeSimbrainColorImage(mainImage)
         activationImage.image = mainImage
@@ -174,15 +174,15 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     private fun renderRGBComposite() {
         activationImage.removeAllChildren()
         thumbnailStripNode.visible = false
-        val w = tensor.shape.width
-        val h = tensor.shape.height
+        val w = tensorLayer.shape.width
+        val h = tensorLayer.shape.height
         val pixels = (mainImage.raster.dataBuffer as java.awt.image.DataBufferInt).data
         for (py in 0 until h) {
             for (px in 0 until w) {
                 val idx = py * w + px
-                val r = (tensor.activations[tensor.shape.index(py, px, 0)].coerceIn(0.0, 1.0) * 255).toInt()
-                val g = (tensor.activations[tensor.shape.index(py, px, 1)].coerceIn(0.0, 1.0) * 255).toInt()
-                val b = (tensor.activations[tensor.shape.index(py, px, 2)].coerceIn(0.0, 1.0) * 255).toInt()
+                val r = (tensorLayer.activations[tensorLayer.shape.index(py, px, 0)].coerceIn(0.0, 1.0) * 255).toInt()
+                val g = (tensorLayer.activations[tensorLayer.shape.index(py, px, 1)].coerceIn(0.0, 1.0) * 255).toInt()
+                val b = (tensorLayer.activations[tensorLayer.shape.index(py, px, 2)].coerceIn(0.0, 1.0) * 255).toInt()
                 pixels[idx] = (r shl 16) or (g shl 8) or b
             }
         }
@@ -200,7 +200,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         // Update pre-allocated thumbnail pixel data and repaint (no re-assignment needed
         // since writeSimbrainColorImage writes directly into the backing buffer)
         thumbnailStripNode.visible = true
-        val selectedCh = tensor.currentChannel.coerceIn(0, tensor.shape.channels - 1)
+        val selectedCh = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
         for (c in 0 until numChannels) {
             extractChannel(c)
             channelBuffer.writeSimbrainColorImage(thumbImages[c])
@@ -218,7 +218,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     private fun updateChannelLabel() {
-        val inStripMode = tensor.thumbnailStripMode
+        val inStripMode = tensorLayer.thumbnailStripMode
 
         if (inStripMode) {
             // Hide arrow buttons and channel label text in strip mode
@@ -229,10 +229,10 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         }
 
         channelLabel.visible = true
-        channelLabel.text = if (tensor.rgbComposite && tensor.shape.channels == 3) {
+        channelLabel.text = if (tensorLayer.rgbComposite && tensorLayer.shape.channels == 3) {
             "RGB Composite"
         } else {
-            "Ch ${tensor.currentChannel + 1}/${tensor.shape.channels}"
+            "Ch ${tensorLayer.currentChannel + 1}/${tensorLayer.shape.channels}"
         }
 
         val navY = imageSize + 4
@@ -241,7 +241,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             navY
         )
 
-        val showArrows = tensor.shape.channels > 1 && !(tensor.rgbComposite && tensor.shape.channels == 3)
+        val showArrows = tensorLayer.shape.channels > 1 && !(tensorLayer.rgbComposite && tensorLayer.shape.channels == 3)
         prevChannelButton.visible = showArrows
         nextChannelButton.visible = showArrows
         if (showArrows) {
@@ -252,14 +252,14 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     fun nextChannel() {
-        if (!tensor.rgbComposite) {
-            tensor.currentChannel = (tensor.currentChannel + 1) % tensor.shape.channels
+        if (!tensorLayer.rgbComposite) {
+            tensorLayer.currentChannel = (tensorLayer.currentChannel + 1) % tensorLayer.shape.channels
         }
     }
 
     fun previousChannel() {
-        if (!tensor.rgbComposite) {
-            tensor.currentChannel = (tensor.currentChannel - 1 + tensor.shape.channels) % tensor.shape.channels
+        if (!tensorLayer.rgbComposite) {
+            tensorLayer.currentChannel = (tensorLayer.currentChannel - 1 + tensorLayer.shape.channels) % tensorLayer.shape.channels
         }
     }
 
@@ -267,8 +267,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
     private fun pullViewPositionFromModel() {
         val (x, y) = bounds
-        this.globalTranslation = tensor.location -
-                point(tensor.renderWidth / 2, tensor.renderHeight / 2) - point(x, y)
+        this.globalTranslation = tensorLayer.location -
+                point(tensorLayer.renderWidth / 2, tensorLayer.renderHeight / 2) - point(x, y)
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
@@ -280,7 +280,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = createRectangle(x, y, w, h)
-        newBorder.stroke = if (tensor.isClamped) BasicStroke(2f) else DEFAULT_STROKE
+        newBorder.stroke = if (tensorLayer.isClamped) BasicStroke(2f) else DEFAULT_STROKE
         return newBorder
     }
 
@@ -291,8 +291,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     private fun pushBoundsToModel() {
-        tensor.renderWidth = bounds.width
-        tensor.renderHeight = bounds.height
+        tensorLayer.renderWidth = bounds.width
+        tensorLayer.renderHeight = bounds.height
     }
 
     override fun acceptsSourceHandle() = true
@@ -331,35 +331,35 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
             // Add layers (Flow B)
             contextMenu.add(networkPanel.createAction(name = "Add Conv Layer...") {
-                networkPanel.showAddConvLayerDialog(tensor)
+                networkPanel.showAddConvLayerDialog(tensorLayer)
             })
             contextMenu.add(networkPanel.createAction(name = "Add Pool Layer...") {
-                networkPanel.showAddPoolLayerDialog(tensor)
+                networkPanel.showAddPoolLayerDialog(tensorLayer)
             })
             contextMenu.add(networkPanel.createAction(name = "Add Flatten Layer") {
-                networkPanel.addFlattenLayer(tensor)
+                networkPanel.addFlattenLayer(tensorLayer)
             })
             contextMenu.addSeparator()
 
             // Channel navigation & display modes
             // Thumbnail strip toggle
             contextMenu.add(networkPanel.createAction(
-                name = if (tensor.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail Strip"
+                name = if (tensorLayer.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail Strip"
             ) {
-                tensor.thumbnailStripMode = !tensor.thumbnailStripMode
+                tensorLayer.thumbnailStripMode = !tensorLayer.thumbnailStripMode
             })
 
-            if (tensor.shape.channels > 1) {
-                if (!tensor.thumbnailStripMode) {
+            if (tensorLayer.shape.channels > 1) {
+                if (!tensorLayer.thumbnailStripMode) {
                     contextMenu.add(networkPanel.createAction(name = "Next Channel") { nextChannel() })
                     contextMenu.add(networkPanel.createAction(name = "Previous Channel") { previousChannel() })
                 }
 
-                if (tensor.shape.channels == 3) {
+                if (tensorLayer.shape.channels == 3) {
                     contextMenu.add(networkPanel.createAction(
-                        name = if (tensor.rgbComposite) "Show Single Channel" else "Show RGB Composite"
+                        name = if (tensorLayer.rgbComposite) "Show Single Channel" else "Show RGB Composite"
                     ) {
-                        tensor.rgbComposite = !tensor.rgbComposite
+                        tensorLayer.rgbComposite = !tensorLayer.rgbComposite
                     })
                 }
                 contextMenu.addSeparator()
@@ -370,27 +370,27 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             contextMenu.addSeparator()
 
             // Coupling menu
-            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(tensor)
+            val couplingMenu: JMenu = networkPanel.networkComponent.createCouplingMenu(tensorLayer)
             contextMenu.add(couplingMenu)
 
             return contextMenu
         }
 
     override fun createEditDialog(): StandardDialog {
-        return tensor.createEditorDialog()
+        return tensorLayer.createEditorDialog()
     }
 
     override val propertyDialog: StandardDialog
         get() = createEditDialog()
 
-    override val model: Tensor get() = tensor
+    override val model: TensorLayer get() = tensorLayer
 
     inner class TensorInteractionBox(net: NetworkPanel) : InteractionBox(net) {
         override val contextMenu: JPopupMenu
             get() = this@TensorNode.contextMenu
         override val propertyDialog: StandardDialog
             get() = this@TensorNode.propertyDialog
-        override val model: Tensor
-            get() = this@TensorNode.tensor
+        override val model: TensorLayer
+            get() = this@TensorNode.tensorLayer
     }
 }

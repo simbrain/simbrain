@@ -12,7 +12,7 @@ class ConvolutionalNeuralNetworkTest {
     fun `cnn update performs one-iteration forward sweep`() {
         val net = Network()
 
-        val inputTensor = Tensor(TensorShape(2, 2, 1)).apply {
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
             isClamped = true
             setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
         }
@@ -22,12 +22,12 @@ class ConvolutionalNeuralNetworkTest {
         val outputArray = NeuronArray(1).apply {
             biases.fill(0.0)
         }
-        val flatten = FlattenConnector(inputTensor, flatArray)
+        val flatten = FlattenConnector(inputTensorLayer, flatArray)
         val dense = WeightMatrix(flatArray, outputArray).apply {
             setWeights(doubleArrayOf(1.0, 1.0, 1.0, 1.0))
         }
 
-        val cnn = ConvolutionalNeuralNetwork(inputTensor, outputArray)
+        val cnn = ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
         net.addNetworkModelAsync(cnn)
 
         // Contract: one CNN update executes a full input->output forward sweep.
@@ -40,7 +40,7 @@ class ConvolutionalNeuralNetworkTest {
     fun `dialog apply-row inference matches normal network iteration`() {
         val net = Network()
 
-        val inputTensor = Tensor(TensorShape(2, 2, 1)).apply {
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
             isClamped = true
         }
         val flatArray = NeuronArray(4)
@@ -48,7 +48,7 @@ class ConvolutionalNeuralNetworkTest {
             updateRule = SoftmaxRule()
             biases.fill(0.0)
         }
-        FlattenConnector(inputTensor, flatArray)
+        FlattenConnector(inputTensorLayer, flatArray)
         WeightMatrix(flatArray, outputArray).apply {
             // [2x4] matrix in row-major layout as expected by setWeights
             setWeights(
@@ -59,16 +59,16 @@ class ConvolutionalNeuralNetworkTest {
             )
         }
 
-        val cnn = net.addConvolutionalNeuralNetwork(inputTensor, outputArray)
+        val cnn = net.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
         val inputRow = doubleArrayOf(0.1, 0.2, 0.3, 0.4)
 
         // Dialog path: CnnTrainer.forwardPass(row) + sync output to network layer.
-        val dialogTrainer = CnnTrainer(net, inputTensor, outputArray, cnn.trainerConfig)
+        val dialogTrainer = CnnTrainer(net, inputTensorLayer, outputArray, cnn.trainerConfig)
         val dialogOutput = dialogTrainer.forwardPass(inputRow.copyOf())
         outputArray.setActivations(dialogOutput.copyOf())
 
         // Normal path: set input then iterate network once.
-        inputTensor.setActivations(inputRow.copyOf())
+        inputTensorLayer.setActivations(inputRow.copyOf())
         net.update("test")
         val iterateOutput = outputArray.activationArray.copyOf()
 
@@ -82,18 +82,18 @@ class ConvolutionalNeuralNetworkTest {
     fun `normal iteration syncs flatten activations`() {
         val net = Network()
 
-        val inputTensor = Tensor(TensorShape(2, 2, 1)).apply {
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
             isClamped = true
         }
         val flatArray = NeuronArray(4)
         val outputArray = NeuronArray(1)
-        FlattenConnector(inputTensor, flatArray)
+        FlattenConnector(inputTensorLayer, flatArray)
         WeightMatrix(flatArray, outputArray).apply {
             setWeights(doubleArrayOf(1.0, 1.0, 1.0, 1.0))
         }
-        net.addConvolutionalNeuralNetwork(inputTensor, outputArray)
+        net.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
 
-        inputTensor.setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        inputTensorLayer.setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
         net.update("test")
 
         // Output path is updated...

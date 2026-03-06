@@ -153,10 +153,10 @@ class View3DSensor @JvmOverloads constructor(
 
     /**
      * RGB tensor in HWC format (height * width * 3). Values normalized to 0.0-1.0.
-     * Can be coupled directly to a [org.simbrain.network.core.Tensor] with shape (height, width, 3).
+     * Can be coupled directly to a [org.simbrain.network.core.TensorLayer] with shape (height, width, 3).
      */
     @get:Producible(description = "RGB Tensor (HWC)")
-    val rgbTensor: DoubleArray
+    val rgbTensorLayer: DoubleArray
         get() = _rgbTensor
 
     /**

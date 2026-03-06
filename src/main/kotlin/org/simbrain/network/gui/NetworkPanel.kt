@@ -302,7 +302,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is NeuronGroup -> createNode(model)
             is AbstractNeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
-            is Tensor -> createNode(model)
+            is TensorLayer -> createNode(model)
             is FlattenConnector -> createNode(model)
             is TensorConnector -> createNode(model)
             is Connector -> createNode(model)
@@ -343,7 +343,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
-    suspend fun createNode(tensor: Tensor) = addScreenElement { TensorNode(this, tensor) }
+    suspend fun createNode(tensorLayer: TensorLayer) = addScreenElement { TensorNode(this, tensorLayer) }
 
     suspend fun createNode(tensorConnector: TensorConnector) = addScreenElement { TensorConnectorNode(this, tensorConnector) }
 

@@ -60,24 +60,24 @@ val cnnMNIST = newSim {
 
     // Input: 20x20x1
     val inputShape = TensorShape(20, 20, 1)
-    val inputTensor = Tensor(inputShape).apply {
+    val inputTensorLayer = TensorLayer(inputShape).apply {
         label = "Input (20x20x1)"
         isClamped = true
     }
-    inputTensor.setLocation(leftX, topY)
+    inputTensorLayer.setLocation(leftX, topY)
 
     // Conv1: 3x3, 5 filters, SAME → 20x20x5
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 5)
-    val conv1Out = Tensor(conv1OutShape).apply {
+    val conv1Out = TensorLayer(conv1OutShape).apply {
         label = "Conv1 (${conv1OutShape})"
         activationFunction = TensorActivation.RELU
     }
     conv1Out.setLocation(leftX, topY + stepY)
-    val conv1 = ConvolutionConnector(inputTensor, conv1Out, kernelSize = 3, numFilters = 5, stride = 1, padding = Padding.SAME)
+    val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 5, stride = 1, padding = Padding.SAME)
 
     // Pool1: 2x2 → 10x10x5
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
-    val poolLayer1 = Tensor(pool1OutShape).apply {
+    val poolLayer1 = TensorLayer(pool1OutShape).apply {
         label = "Pool1 (${pool1OutShape})"
     }
     poolLayer1.setLocation(leftX, topY + stepY * 2)
@@ -85,7 +85,7 @@ val cnnMNIST = newSim {
 
     // Conv2: 3x3, 8 filters, SAME → 10x10x8
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val conv2Out = Tensor(conv2OutShape).apply {
+    val conv2Out = TensorLayer(conv2OutShape).apply {
         label = "Conv2 (${conv2OutShape})"
         activationFunction = TensorActivation.RELU
     }
@@ -94,7 +94,7 @@ val cnnMNIST = newSim {
 
     // Pool2: 2x2 → 5x5x8
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
-    val poolLayer2 = Tensor(pool2OutShape).apply {
+    val poolLayer2 = TensorLayer(pool2OutShape).apply {
         label = "Pool2 (${pool2OutShape})"
     }
     poolLayer2.setLocation(rightX, topY + stepY * 3)
@@ -121,7 +121,7 @@ val cnnMNIST = newSim {
 
     // --- Create ConvolutionalNeuralNetwork ---
 
-    val cnnModel = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
+    val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
         label = "CNN MNIST"
         this.trainingSet = trainingSet
         this.testingSet = testingSet
@@ -134,7 +134,7 @@ val cnnMNIST = newSim {
 
     // Pre-load input with a random training image
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
-    inputTensor.setActivations(trainingSet.inputs[randomSampleIndex].toDoubleArray())
+    inputTensorLayer.setActivations(trainingSet.inputs[randomSampleIndex].toDoubleArray())
     
     // --- GUI ---
 

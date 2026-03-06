@@ -56,7 +56,7 @@ enum class TensorActivation {
  * [TensorConnector.propagate] is called, which accumulates into [inputs]. During [update], inputs
  * are summed with biases, an activation function is applied, and inputs are cleared.
  */
-class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, AttributeContainer {
+class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, AttributeContainer {
 
     @UserParameter(label = "Activation Function", description = "Element-wise activation", order = 10)
     var activationFunction: TensorActivation = TensorActivation.IDENTITY
@@ -234,7 +234,7 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
         connectors.forEach { it.delete() }
         events.deleted.fire(this).await()
         return buildList {
-            add(this@Tensor)
+            add(this@TensorLayer)
             addAll(connectors)
         }
     }
@@ -254,7 +254,7 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
         @UserParameter(label = "Channels", description = "Number of channels", order = 3)
         var channels = 1
 
-        fun create(): Tensor = Tensor(TensorShape(height, width, channels))
+        fun create(): TensorLayer = TensorLayer(TensorShape(height, width, channels))
 
         override val name = "Tensor"
     }

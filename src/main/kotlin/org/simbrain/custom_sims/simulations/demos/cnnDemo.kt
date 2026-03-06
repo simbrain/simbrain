@@ -62,27 +62,27 @@ val cnnDemo = newSim {
 
     // Input tensor: matches View3DSensor output
     val inputShape = TensorShape(64, 64, 3)
-    val inputTensor = Tensor(inputShape).apply {
+    val inputTensorLayer = TensorLayer(inputShape).apply {
         label = "Input (64x64x3)"
         isClamped = true
     }
-    network.addNetworkModelAsync(inputTensor, usePlacementManager = false)
-    inputTensor.setLocation(0.0, 0.0)
+    network.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
+    inputTensorLayer.setLocation(0.0, 0.0)
 
     // Conv1: 3x3, 8 filters, SAME padding -> output 64x64x8
     val conv1OutputShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val conv1Output = Tensor(conv1OutputShape).apply {
+    val conv1Output = TensorLayer(conv1OutputShape).apply {
         label = "Conv1 (${conv1OutputShape})"
         activationFunction = TensorActivation.RELU
     }
     network.addNetworkModelAsync(conv1Output, usePlacementManager = false)
     conv1Output.setLocation(0.0, 400.0)
-    val conv1 = ConvolutionConnector(inputTensor, conv1Output, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
+    val conv1 = ConvolutionConnector(inputTensorLayer, conv1Output, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
     network.addNetworkModelAsync(conv1, usePlacementManager = false)
 
     // MaxPool1: 2x2 -> output 32x32x8
     val pool1OutputShape = conv1OutputShape.poolOutputShape(2, 2)
-    val pool1Layer = Tensor(pool1OutputShape).apply {
+    val pool1Layer = TensorLayer(pool1OutputShape).apply {
         label = "Pool1 (${pool1OutputShape})"
     }
     network.addNetworkModelAsync(pool1Layer, usePlacementManager = false)
@@ -92,7 +92,7 @@ val cnnDemo = newSim {
 
     // Conv2: 3x3, 16 filters, SAME padding -> output 32x32x16
     val conv2OutputShape = pool1OutputShape.convOutputShape(3, 1, Padding.SAME, 16)
-    val conv2Layer = Tensor(conv2OutputShape).apply {
+    val conv2Layer = TensorLayer(conv2OutputShape).apply {
         label = "Conv2 (${conv2OutputShape})"
         activationFunction = TensorActivation.RELU
     }
@@ -103,7 +103,7 @@ val cnnDemo = newSim {
 
     // MaxPool2: 2x2 -> output 16x16x16
     val pool2OutputShape = conv2OutputShape.poolOutputShape(2, 2)
-    val pool2Layer = Tensor(pool2OutputShape).apply {
+    val pool2Layer = TensorLayer(pool2OutputShape).apply {
         label = "Pool2 (${pool2OutputShape})"
     }
     network.addNetworkModelAsync(pool2Layer, usePlacementManager = false)
@@ -132,8 +132,8 @@ val cnnDemo = newSim {
 
     // --- Coupling: View3DSensor.rgbTensor -> inputTensor.setActivations ---
     with(couplingManager) {
-        view3dSensor.getProducer(View3DSensor::rgbTensor) couple
-                inputTensor.getConsumer(Tensor::setActivations)
+        view3dSensor.getProducer(View3DSensor::rgbTensorLayer) couple
+                inputTensorLayer.getConsumer(TensorLayer::setActivations)
     }
 
     // --- Layout ---

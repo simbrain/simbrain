@@ -27,7 +27,7 @@ import javax.swing.*
 context(NetworkPanel)
 fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
     val cnnNetwork = this
-    val trainer = CnnTrainer(this@NetworkPanel.network, cnnNetwork.inputTensor, cnnNetwork.outputArray, cnnNetwork.trainerConfig).apply {
+    val trainer = CnnTrainer(this@NetworkPanel.network, cnnNetwork.inputTensorLayer, cnnNetwork.outputArray, cnnNetwork.trainerConfig).apply {
         trainingData = cnnNetwork.trainingSet
         testingData = cnnNetwork.testingSet
     }
@@ -57,12 +57,12 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
             cnnNetwork.outputArray.setActivations(output)
             // Also sync the flatten layer
             val flattenTarget = trainer.flattenConnector.target
-            val flatSrc = if (trainer.tensorStages.isNotEmpty()) trainer.tensorStages.last().activations else cnnNetwork.inputTensor.activations
+            val flatSrc = if (trainer.tensorLayerStages.isNotEmpty()) trainer.tensorLayerStages.last().activations else cnnNetwork.inputTensorLayer.activations
             flattenTarget.setActivations(flatSrc.copyOf())
 
             // Fire update events so the GUI repaints
-            cnnNetwork.inputTensor.events.updated.fire()
-            trainer.tensorStages.forEach { it.events.updated.fire() }
+            cnnNetwork.inputTensorLayer.events.updated.fire()
+            trainer.tensorLayerStages.forEach { it.events.updated.fire() }
             flattenTarget.events.updated.fire()
             cnnNetwork.outputArray.events.updated.fire()
 

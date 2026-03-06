@@ -28,7 +28,7 @@ val cnnTrainingDemo = newSim {
 
     // Input: 16x16x1
     val inputShape = TensorShape(16, 16, 1)
-    val inputLayer = Tensor(inputShape).apply {
+    val inputLayer = TensorLayer(inputShape).apply {
         label = "Input Layer"
         isClamped = true
     }
@@ -36,7 +36,7 @@ val cnnTrainingDemo = newSim {
 
     // Conv: 3x3, 8 filters, SAME -> 16x16x8
     val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val convLayer = Tensor(convOutShape).apply {
+    val convLayer = TensorLayer(convOutShape).apply {
         label = "Feature Map"
         activationFunction = TensorActivation.RELU
     }
@@ -47,7 +47,7 @@ val cnnTrainingDemo = newSim {
 
     // MaxPool: 2x2 -> 8x8x8
     val poolOutShape = convOutShape.poolOutputShape(2, 2)
-    val poolOut = Tensor(poolOutShape).apply {
+    val poolOut = TensorLayer(poolOutShape).apply {
         label = "Pooled Layer"
     }
     poolOut.setLocation(-784.9973490798225, 75.65382689571582)

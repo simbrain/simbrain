@@ -9,7 +9,7 @@ class FlattenConnectorTest {
 
     @Test
     fun `constructor requires exact flatten size match`() {
-        val source = Tensor(TensorShape(2, 2, 1))
+        val source = TensorLayer(TensorShape(2, 2, 1))
         val wrongTarget = NeuronArray(3)
 
         assertThrows<IllegalArgumentException> {
@@ -19,7 +19,7 @@ class FlattenConnectorTest {
 
     @Test
     fun `backward requires exact gradient size match`() {
-        val source = Tensor(TensorShape(2, 2, 1))
+        val source = TensorLayer(TensorShape(2, 2, 1))
         val target = NeuronArray(4)
         val flatten = FlattenConnector(source, target)
 
@@ -30,7 +30,7 @@ class FlattenConnectorTest {
 
     @Test
     fun `propagate and backward preserve full tensor ordering`() {
-        val source = Tensor(TensorShape(2, 2, 1))
+        val source = TensorLayer(TensorShape(2, 2, 1))
         val target = NeuronArray(4)
         val flatten = FlattenConnector(source, target)
 

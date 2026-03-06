@@ -203,7 +203,7 @@ private class DenseLayerSnapshot(
 }
 
 /**
- * CNN trainer that auto-discovers the pipeline from an input [Tensor] through
+ * CNN trainer that auto-discovers the pipeline from an input [TensorLayer] through
  * Conv/Pool/Flatten/Dense layers to an output [NeuronArray], and trains using
  * backpropagation with Adam optimizer.
  *
@@ -212,7 +212,7 @@ private class DenseLayerSnapshot(
  */
 class CnnTrainer(
     val network: Network,
-    val inputTensor: Tensor,
+    val inputTensorLayer: TensorLayer,
     val outputArray: NeuronArray,
     val config: CnnTrainerConfig = CnnTrainerConfig()
 ) : CoroutineScope {
@@ -256,7 +256,7 @@ class CnnTrainer(
         }
 
     // Discovered pipeline components (ordered from input to output)
-    internal val tensorStages = mutableListOf<Tensor>()             // tensors after input (conv/pool outputs)
+    internal val tensorLayerStages = mutableListOf<TensorLayer>()             // tensors after input (conv/pool outputs)
     internal val tensorConnectors = mutableListOf<TensorConnector>() // conv and pool connectors in order
     internal lateinit var flattenConnector: FlattenConnector
     private val denseLayers = mutableListOf<DenseLayerSnapshot>()
@@ -402,11 +402,11 @@ class CnnTrainer(
     }
 
     /**
-     * Walk the graph from [inputTensor] through outgoing connectors to discover
+     * Walk the graph from [inputTensorLayer] through outgoing connectors to discover
      * the complete CNN → Flatten → Dense pipeline.
      */
     private fun discoverPipeline() {
-        var currentTensor = inputTensor
+        var currentTensor = inputTensorLayer
 
         // Walk through TensorConnectors (Conv/Pool)
         while (true) {
@@ -425,7 +425,7 @@ class CnnTrainer(
 
             val connector = outgoing.first()
             tensorConnectors.add(connector)
-            tensorStages.add(connector.target)
+            tensorLayerStages.add(connector.target)
             currentTensor = connector.target
         }
 
@@ -467,12 +467,12 @@ class CnnTrainer(
      */
     fun forwardPass(input: DoubleArray): DoubleArray {
         // Set input tensor activations
-        System.arraycopy(input, 0, inputTensor.activations, 0, inputTensor.shape.size)
+        System.arraycopy(input, 0, inputTensorLayer.activations, 0, inputTensorLayer.shape.size)
 
         // Forward through CNN stages
         for (i in tensorConnectors.indices) {
             val connector = tensorConnectors[i]
-            val targetTensor = tensorStages[i]
+            val targetTensor = tensorLayerStages[i]
 
             // Clear target inputs before accumulation
             targetTensor.inputs.fill(0.0)
@@ -490,7 +490,7 @@ class CnnTrainer(
 
         // Flatten: copy last tensor activations into pre-allocated buffer
         check(denseLayers.isNotEmpty()) { "No dense layers found in pipeline" }
-        val src = if (tensorStages.isNotEmpty()) tensorStages.last().activations else inputTensor.activations
+        val src = if (tensorLayerStages.isNotEmpty()) tensorLayerStages.last().activations else inputTensorLayer.activations
         System.arraycopy(src, 0, flattenBuffer, 0, flattenBuffer.size)
 
         // Forward through dense layers
@@ -574,7 +574,7 @@ class CnnTrainer(
         // Backward through CNN stages (reverse order)
         for (i in tensorConnectors.indices.reversed()) {
             val connector = tensorConnectors[i]
-            val targetTensor = tensorStages[i]
+            val targetTensor = tensorLayerStages[i]
 
             // Apply activation derivative to target tensor gradients
             val af = targetTensor.activationFunction
@@ -602,7 +602,7 @@ class CnnTrainer(
         val data = trainingData ?: error("Training data not set")
 
         // Clear all gradients
-        tensorStages.forEach { it.clearGradients() }
+        tensorLayerStages.forEach { it.clearGradients() }
         tensorConnectors.filterIsInstance<ConvolutionConnector>().forEach { it.clearGrads() }
         denseLayers.forEach { it.clearGrads() }
 
@@ -615,9 +615,9 @@ class CnnTrainer(
             val target = data.targets[row].toDoubleArray()
 
             // Clear tensor gradients for each sample
-            tensorStages.forEach { it.clearGradients() }
+            tensorLayerStages.forEach { it.clearGradients() }
             // Clear source tensor gradients for conv backward
-            inputTensor.clearGradients()
+            inputTensorLayer.clearGradients()
 
             val output = forwardPass(input)
             if (config.computeAccuracy) {
@@ -698,12 +698,12 @@ class CnnTrainer(
             layer.clearGrads()
         }
 
-        tensorStages.forEach {
+        tensorLayerStages.forEach {
             it.biases.fill(0.0)
             it.clearGradients()
             it.events.updated.fire()
         }
-        inputTensor.clearGradients()
+        inputTensorLayer.clearGradients()
     }
 
     private fun computeTestError(): Double {

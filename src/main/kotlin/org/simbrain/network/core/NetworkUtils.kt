@@ -30,7 +30,7 @@ fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is NeuronGroup -> 20
     is NeuronCollection -> 30
     is NeuronArray -> 40
-    is Tensor -> 45
+    is TensorLayer -> 45
     is Connector -> 50
     is FlattenConnector -> 52
     is TensorConnector -> 55
@@ -283,11 +283,11 @@ fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
  * This helper is intended for scripting and simulations to avoid forgetting the add step.
  */
 fun Network.addConvolutionalNeuralNetwork(
-    inputTensor: Tensor,
+    inputTensorLayer: TensorLayer,
     outputArray: NeuronArray,
     block: ConvolutionalNeuralNetwork.() -> Unit = { }
 ): ConvolutionalNeuralNetwork {
-    return ConvolutionalNeuralNetwork(inputTensor, outputArray)
+    return ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
         .apply(block)
         .also(::addNetworkModelAsync)
 }

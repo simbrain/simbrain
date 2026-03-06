@@ -15,17 +15,17 @@ import org.simbrain.util.stats.ProbabilityDistribution
  * [Network.update] iteration performs a full forward sweep through the CNN pipeline.
  */
 class ConvolutionalNeuralNetwork(
-    val inputTensor: Tensor,
+    val inputTensorLayer: TensorLayer,
     val outputArray: NeuronArray,
 ) : Subnetwork() {
 
     val trainerConfig = CnnTrainerConfig()
 
-    /** Ordered tensor connectors (conv/pool) discovered by walking from [inputTensor]. */
+    /** Ordered tensor connectors (conv/pool) discovered by walking from [inputTensorLayer]. */
     private val tensorConnectors: List<TensorConnector>
 
     /** Ordered tensor stages (output of each conv/pool connector). */
-    private val tensorStages: List<Tensor>
+    private val tensorLayerStages: List<TensorLayer>
 
     /** The flatten connector bridging the last tensor to the first NeuronArray. */
     private val flattenConnector: FlattenConnector
@@ -42,22 +42,22 @@ class ConvolutionalNeuralNetwork(
     var trainingSet: TrainingDataset = TrainingDataset(
         inputs = mutableListOf(),
         targets = mutableListOf(),
-        inputSize = inputTensor.shape.size,
+        inputSize = inputTensorLayer.shape.size,
         targetSize = outputArray.size
     )
 
     var testingSet: TrainingDataset = TrainingDataset(
         inputs = mutableListOf(),
         targets = mutableListOf(),
-        inputSize = inputTensor.shape.size,
+        inputSize = inputTensorLayer.shape.size,
         targetSize = outputArray.size
     )
 
     init {
         // Discover pipeline by walking the graph from inputTensor
         val connectors = mutableListOf<TensorConnector>()
-        val stages = mutableListOf<Tensor>()
-        var currentTensor = inputTensor
+        val stages = mutableListOf<TensorLayer>()
+        var currentTensor = inputTensorLayer
 
         while (true) {
             val flattenOut = currentTensor.outgoingFlattenConnectors
@@ -75,7 +75,7 @@ class ConvolutionalNeuralNetwork(
             currentTensor = connector.target
         }
         tensorConnectors = connectors
-        tensorStages = stages
+        tensorLayerStages = stages
 
         // Walk WeightMatrix chain from flatten target to outputArray
         val wms = mutableListOf<WeightMatrix>()
@@ -96,9 +96,9 @@ class ConvolutionalNeuralNetwork(
 
         // Register all pipeline elements as children of this subnetwork.
         val pipelineComponents = buildList {
-            add(inputTensor)
+            add(inputTensorLayer)
             addAll(tensorConnectors)
-            addAll(tensorStages)
+            addAll(tensorLayerStages)
             add(flattenConnector)
             add(flattenConnector.target)
             addAll(denseNeuronArrays)
@@ -119,9 +119,9 @@ class ConvolutionalNeuralNetwork(
     override fun update() {
         // Forward through CNN tensor stages (TensorConnector.propagate + Tensor.update)
         for (i in tensorConnectors.indices) {
-            tensorStages[i].inputs.fill(0.0)
+            tensorLayerStages[i].inputs.fill(0.0)
             tensorConnectors[i].propagate()
-            tensorStages[i].update()
+            tensorLayerStages[i].update()
         }
 
         // Flatten + dense layers: use standard Layer accumulate/update cycle.
@@ -137,7 +137,7 @@ class ConvolutionalNeuralNetwork(
             it.heInitialize()
             it.clearGrads()
         }
-        tensorStages.forEach {
+        tensorLayerStages.forEach {
             it.biases.fill(0.0)
             it.clearGradients()
         }
@@ -153,19 +153,19 @@ class ConvolutionalNeuralNetwork(
         // Deep-copy the entire pipeline: create new components with same structure.
 
         // Copy input tensor
-        val newInput = Tensor(inputTensor.shape).apply {
-            System.arraycopy(inputTensor.activations, 0, activations, 0, activations.size)
-            System.arraycopy(inputTensor.biases, 0, biases, 0, biases.size)
-            isClamped = inputTensor.isClamped
-            label = inputTensor.label
-            location = inputTensor.location
+        val newInput = TensorLayer(inputTensorLayer.shape).apply {
+            System.arraycopy(inputTensorLayer.activations, 0, activations, 0, activations.size)
+            System.arraycopy(inputTensorLayer.biases, 0, biases, 0, biases.size)
+            isClamped = inputTensorLayer.isClamped
+            label = inputTensorLayer.label
+            location = inputTensorLayer.location
         }
 
         // Copy tensor stages and connectors
         var prevTensor = newInput
         for (i in tensorConnectors.indices) {
-            val origTensor = tensorStages[i]
-            val newTensor = Tensor(origTensor.shape).apply {
+            val origTensor = tensorLayerStages[i]
+            val newTensorLayer = TensorLayer(origTensor.shape).apply {
                 System.arraycopy(origTensor.biases, 0, biases, 0, biases.size)
                 label = origTensor.label
                 location = origTensor.location
@@ -173,16 +173,16 @@ class ConvolutionalNeuralNetwork(
 
             when (val origConn = tensorConnectors[i]) {
                 is ConvolutionConnector -> {
-                    ConvolutionConnector(prevTensor, newTensor, origConn.kernelSize, origConn.numFilters, origConn.stride, origConn.padding).apply {
+                    ConvolutionConnector(prevTensor, newTensorLayer, origConn.kernelSize, origConn.numFilters, origConn.stride, origConn.padding).apply {
                         System.arraycopy(origConn.kernels, 0, kernels, 0, kernels.size)
                         System.arraycopy(origConn.filterBiases, 0, filterBiases, 0, filterBiases.size)
                     }
                 }
                 is PoolingConnector -> {
-                    PoolingConnector(prevTensor, newTensor, origConn.poolSize, origConn.stride, origConn.poolingType)
+                    PoolingConnector(prevTensor, newTensorLayer, origConn.poolSize, origConn.stride, origConn.poolingType)
                 }
             }
-            prevTensor = newTensor
+            prevTensor = newTensorLayer
         }
 
         // Copy flatten and dense chain

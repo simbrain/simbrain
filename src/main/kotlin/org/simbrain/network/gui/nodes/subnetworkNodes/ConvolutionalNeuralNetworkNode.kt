@@ -30,11 +30,11 @@ class ConvolutionalNeuralNetworkNode(
             })
             addSeparator()
             add(createAction("Add Current Data to Training Set") {
-                cnn.trainingSet.inputs.add(cnn.inputTensor.activations.toMutableList())
+                cnn.trainingSet.inputs.add(cnn.inputTensorLayer.activations.toMutableList())
                 cnn.trainingSet.targets.add(cnn.outputArray.activationArray.toMutableList())
             })
             add(createAction("Add Current Data to Testing Set") {
-                cnn.testingSet.inputs.add(cnn.inputTensor.activations.toMutableList())
+                cnn.testingSet.inputs.add(cnn.inputTensorLayer.activations.toMutableList())
                 cnn.testingSet.targets.add(cnn.outputArray.activationArray.toMutableList())
             })
         }

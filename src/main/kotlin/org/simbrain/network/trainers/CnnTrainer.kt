@@ -22,42 +22,51 @@ import kotlin.math.max
 class CnnTrainerConfig : EditableObject {
     var learningRate by GuiEditable(
         initValue = 0.001,
-        description = "Learning rate used by Adam updates."
+        description = "Learning rate used by Adam updates.",
+        order = 10,
     )
     var beta1 by GuiEditable(
         initValue = 0.9,
-        description = "Exponential decay rate for first-moment estimates in Adam."
+        description = "Exponential decay rate for first-moment estimates in Adam.",
+        order = 20,
     )
     var beta2 by GuiEditable(
         initValue = 0.999,
-        description = "Exponential decay rate for second-moment estimates in Adam."
+        description = "Exponential decay rate for second-moment estimates in Adam.",
+        order = 30,
     )
     var batchSize by GuiEditable(
         initValue = 32,
-        description = "Mini-batch size used for each training iteration."
+        description = "Mini-batch size used for each training iteration.",
+        order = 40,
     )
     var lossFunction: CnnLossFunction by GuiEditable(
         initValue = CnnLossFunction.CrossEntropy,
-        description = "Loss used to train the output layer."
+        description = "Loss used to train the output layer.",
+        order = 50,
     )
     var weightInitializationStrategy: WeightInitializationStrategy by GuiEditable(
         initValue = He(),
         description = "Dense-layer weight initialization strategy. He is the default for CNN training.",
-        showDetails = false
+        showDetails = false,
+        order = 60,
     )
     var stoppingCondition by GuiEditable(
         initValue = SupervisedTrainer.StoppingCondition(),
         description = "Optional automatic stopping conditions used while running.",
-        showDetails = false
+        showDetails = false,
+        order = 70,
     )
     var testConfiguration by GuiEditable(
         initValue = SupervisedTrainer.TestConfiguration().apply { enabled = false },
         description = "Controls periodic evaluation on testing data.",
-        showDetails = false
+        showDetails = false,
+        order = 80,
     )
     var computeAccuracy by GuiEditable(
         initValue = false,
-        description = "Compute classification accuracy when targets are one-hot encoded."
+        description = "Compute classification accuracy when targets are one-hot encoded.",
+        order = 90,
     )
     override val name = "CNN Trainer Config"
 }

@@ -239,12 +239,32 @@ class CnnTrainerControls(
         fun errorDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
         val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
 
+        // Accuracy labels (visible only when computeAccuracy is enabled)
+        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
+
+        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
+
+        fun updateAccuracyVisibility() {
+            val showTraining = trainer.config.computeAccuracy
+            val showTesting = trainer.config.computeAccuracy && trainer.config.testConfiguration.enabled
+            trainingAccuracyLabel.isVisible = showTraining
+            trainingAccuracyValue.isVisible = showTraining
+            testingAccuracyLabel.isVisible = showTesting
+            testingAccuracyValue.isVisible = showTesting
+        }
+        updateAccuracyVisibility()
+
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
             iterationsLabel.text = "" + trainer.iteration
             errorValue.text = "" + trainingStats.trainingError.format(4)
             errorLabel.text = errorDescriptionString()
+            updateAccuracyVisibility()
+            trainingStats.trainingAccuracy?.let { trainingAccuracyValue.text = "${(it * 100).format(1)}%" }
+            trainingStats.testingAccuracy?.let { testingAccuracyValue.text = "${(it * 100).format(1)}%" }
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")

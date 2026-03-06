@@ -32,12 +32,6 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
     private val imageSize = 100.0
 
-    /** Currently visible front channel (index). */
-    private var currentChannel = 0
-
-    /** When true and channels==3, show an RGB composite. */
-    var rgbComposite = false
-
     /** Pre-allocated main image (tensor shape is fixed at construction). */
     private val mainImage = BufferedImage(tensor.shape.width, tensor.shape.height, BufferedImage.TYPE_INT_RGB)
 
@@ -78,9 +72,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             setBounds(x, thumbStripY, thumbSize, thumbSize)
             addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
                 override fun mouseClicked(event: org.piccolo2d.event.PInputEvent) {
-                    currentChannel = c
-                    updateActivationImage()
-                    updateBorder()
+                    tensor.currentChannel = c
                 }
             })
             thumbnailStripNode.addChild(this)
@@ -155,7 +147,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     private fun updateActivationImage() {
         if (tensor.thumbnailStripMode) {
             renderThumbnailStrip()
-        } else if (rgbComposite && tensor.shape.channels == 3) {
+        } else if (tensor.rgbComposite && tensor.shape.channels == 3) {
             renderRGBComposite()
         } else {
             renderSingleChannel()
@@ -164,7 +156,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     private fun renderCurrentChannelToMainImage() {
-        val ch = currentChannel.coerceIn(0, tensor.shape.channels - 1)
+        val ch = tensor.currentChannel.coerceIn(0, tensor.shape.channels - 1)
         extractChannel(ch)
         channelBuffer.writeSimbrainColorImage(mainImage)
         activationImage.image = mainImage
@@ -208,7 +200,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         // Update pre-allocated thumbnail pixel data and repaint (no re-assignment needed
         // since writeSimbrainColorImage writes directly into the backing buffer)
         thumbnailStripNode.visible = true
-        val selectedCh = currentChannel.coerceIn(0, tensor.shape.channels - 1)
+        val selectedCh = tensor.currentChannel.coerceIn(0, tensor.shape.channels - 1)
         for (c in 0 until numChannels) {
             extractChannel(c)
             channelBuffer.writeSimbrainColorImage(thumbImages[c])
@@ -237,10 +229,10 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
         }
 
         channelLabel.visible = true
-        channelLabel.text = if (rgbComposite && tensor.shape.channels == 3) {
+        channelLabel.text = if (tensor.rgbComposite && tensor.shape.channels == 3) {
             "RGB Composite"
         } else {
-            "Ch ${currentChannel + 1}/${tensor.shape.channels}"
+            "Ch ${tensor.currentChannel + 1}/${tensor.shape.channels}"
         }
 
         val navY = imageSize + 4
@@ -249,7 +241,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
             navY
         )
 
-        val showArrows = tensor.shape.channels > 1 && !(rgbComposite && tensor.shape.channels == 3)
+        val showArrows = tensor.shape.channels > 1 && !(tensor.rgbComposite && tensor.shape.channels == 3)
         prevChannelButton.visible = showArrows
         nextChannelButton.visible = showArrows
         if (showArrows) {
@@ -260,18 +252,14 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
     }
 
     fun nextChannel() {
-        if (!rgbComposite) {
-            currentChannel = (currentChannel + 1) % tensor.shape.channels
-            updateActivationImage()
-            updateBorder()
+        if (!tensor.rgbComposite) {
+            tensor.currentChannel = (tensor.currentChannel + 1) % tensor.shape.channels
         }
     }
 
     fun previousChannel() {
-        if (!rgbComposite) {
-            currentChannel = (currentChannel - 1 + tensor.shape.channels) % tensor.shape.channels
-            updateActivationImage()
-            updateBorder()
+        if (!tensor.rgbComposite) {
+            tensor.currentChannel = (tensor.currentChannel - 1 + tensor.shape.channels) % tensor.shape.channels
         }
     }
 
@@ -369,14 +357,9 @@ class TensorNode(networkPanel: NetworkPanel, val tensor: Tensor) : ScreenElement
 
                 if (tensor.shape.channels == 3) {
                     contextMenu.add(networkPanel.createAction(
-                        name = if (rgbComposite) "Show Single Channel" else "Show RGB Composite"
+                        name = if (tensor.rgbComposite) "Show Single Channel" else "Show RGB Composite"
                     ) {
-                        rgbComposite = !rgbComposite
-                        if (rgbComposite) {
-                            tensor.thumbnailStripMode = false
-                        }
-                        updateActivationImage()
-                        updateBorder()
+                        tensor.rgbComposite = !tensor.rgbComposite
                     })
                 }
                 contextMenu.addSeparator()

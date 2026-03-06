@@ -14,6 +14,7 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.imageworld.cnnPhotoAlbum
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
@@ -182,6 +183,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("Attention as gain") { attentionAsGain }
         //item("CNN Demo") { cnnDemo } // Develop into 3d demo
         item("CNN Simple Demo") { cnnTrainingDemo }
+        item("CNN Photo Album (100 x 100)") { cnnPhotoAlbum }
     }
 
     //dir("Testing") {

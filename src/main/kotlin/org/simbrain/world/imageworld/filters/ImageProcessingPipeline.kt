@@ -182,5 +182,29 @@ class ImageProcessingPipeline(
             (color and 0xFF) / 255.0
         }.toDoubleArray()
 
+    /**
+     * Interleaved RGB activations in HWC order: [r₀₀, g₀₀, b₀₀, r₀₁, g₀₁, b₀₁, ...].
+     * Pre-allocated backing field avoids per-iteration allocation.
+     */
+    @Transient
+    private var _rgbActivations: DoubleArray? = null
+
+    @get:Producible(defaultVisibility = false)
+    val rgbActivations: DoubleArray
+        get() {
+            val img = processedImage
+            val size = img.width * img.height
+            val buf = _rgbActivations?.takeIf { it.size == size * 3 }
+                ?: DoubleArray(size * 3).also { _rgbActivations = it }
+            val pixels = img.getRGB(0, 0, img.width, img.height, null, 0, img.width)
+            for (i in pixels.indices) {
+                val p = pixels[i]
+                buf[i * 3]     = ((p ushr 16) and 0xFF) / 255.0
+                buf[i * 3 + 1] = ((p ushr 8) and 0xFF) / 255.0
+                buf[i * 3 + 2] = (p and 0xFF) / 255.0
+            }
+            return buf
+        }
+
     override fun toString() = name
 } 

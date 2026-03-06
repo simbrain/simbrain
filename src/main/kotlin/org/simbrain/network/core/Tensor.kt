@@ -75,6 +75,19 @@ class Tensor(val shape: TensorShape) : LocatableModel(), EditableObject, Attribu
             events.visualPropertiesChanged.fire()
         }
 
+    var rgbComposite = false
+        set(value) {
+            field = value
+            if (value) thumbnailStripMode = false
+            events.visualPropertiesChanged.fire()
+        }
+
+    var currentChannel = 0
+        set(value) {
+            field = value.coerceIn(0, shape.channels - 1)
+            events.visualPropertiesChanged.fire()
+        }
+
     /** Current activations (HWC flat array). */
     val activations = DoubleArray(shape.size)
 

@@ -168,6 +168,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.apache.commons/commons-math3
     implementation(group = "org.apache.commons", name = "commons-math3", version = "3.6.1")
 
+    // https://mvnrepository.com/artifact/org.apache.commons/commons-compress
+    implementation(group = "org.apache.commons", name = "commons-compress", version = "1.28.0")
+
     // jsoup HTML parser library @ https://jsoup.org/
     implementation("org.jsoup:jsoup:1.15.4")
 

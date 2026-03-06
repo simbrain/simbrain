@@ -14,7 +14,6 @@ import java.awt.GridLayout
 import java.io.File
 import javax.swing.*
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 private data class CategorySelection(val categories: List<String>, val maxPerCategory: Int)
 
@@ -58,8 +57,12 @@ private fun showCategorySelectionDialog(
 
         val selected = checkboxes.filter { it.isSelected }.map { it.text }
         if (selected.size < 2) {
-            showWarningDialog("Please select at least 2 categories.")
-            continue
+            val confirm = showWarningConfirmDialog("Please select at least 2 categories.")
+            if (confirm == JOptionPane.YES_OPTION) {
+                continue
+            } else {
+                return null
+            }
         }
         return CategorySelection(
             categories = selected,
@@ -102,13 +105,11 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
     val alreadyCached = extractDir.exists() && extractDir.listFiles()?.isNotEmpty() == true
 
     if (!alreadyCached) {
-        val response = showOptionDialog(
-            "Download Caltech101",
+        val confirm = showWarningConfirmDialog(
             "The Caltech101 dataset (~137 MB) will be downloaded from data.caltech.edu\n" +
-            "and cached locally. This only happens once.",
-            arrayOf("Download", "Cancel")
+            "and cached locally. This only happens once."
         )
-        if (response != 0) return null
+        if (confirm != JOptionPane.OK_OPTION && confirm != JOptionPane.YES_OPTION) return null
     }
 
     val root = fetchZipWithCache(CALTECH101_URL, expectedChecksum = CALTECH101_MD5)
@@ -131,7 +132,7 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
                 .map { it.name }
                 .sorted()
 
-            // ── Category + max-per-category dialog ────────────────────────────
+            // Category + max-per-category dialog
             val selection = showCategorySelectionDialog(
                 allCategories    = allCategories,
                 defaultCategories = DEFAULT_CATEGORIES.filter { it in allCategories },
@@ -151,7 +152,7 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
         }
     }
 
-    // ── Fallback: bundled 40-image sample ────────────────────────────────────
+    // Fallback: bundled 40-image sample
     val fallbackFiles = getFilesWithExtension("simulations/images/Caltech101Sample", "jpg")
     val fallbackCategories = fallbackFiles
         .map { it.nameWithoutExtension.takeWhile { c -> !c.isDigit() } }
@@ -170,7 +171,6 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
         .toSortedMap()
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * CNN Photo Album — trains a small CNN on Caltech101 RGB images.
@@ -192,8 +192,6 @@ val cnnPhotoAlbum = newSim {
 
     val networkComponent = addNetworkComponent("CNN Photo Album")
     val network = networkComponent.network
-
-    // ── CNN architecture ─────────────────────────────────────────────────────
 
     val leftX = 0.0; val rightX = 400.0; val topY = 0.0; val stepY = 350.0
 
@@ -241,8 +239,6 @@ val cnnPhotoAlbum = newSim {
     outputArray.setLocation(rightX, topY)
     WeightMatrix(flatArray, outputArray)
 
-    // ── Image World ───────────────────────────────────────────────────────────
-
     val component = addImageWorld("Image World")
     placeComponent(component, 620, 0, 720, 600)
     val imageWorld = component.world
@@ -253,8 +249,6 @@ val cnnPhotoAlbum = newSim {
     val allFiles: List<File> = categoryNames.flatMap { categoryImages.getValue(it) }
     imageWorld.loadImages(allFiles.toTypedArray())
     imageWorld.setCurrentPipeline("RGB 100×100")
-
-    // ── Build training data ───────────────────────────────────────────────────
 
     val categoryIndices: Map<String, Int> = categoryNames.withIndex().associate { it.value to it.index }
 
@@ -285,8 +279,6 @@ val cnnPhotoAlbum = newSim {
     val trainingSet = TrainingDataset(trainingInputs, trainingTargets, inputShape.size, numClasses)
     val testingSet  = TrainingDataset(testingInputs,  testingTargets,  inputShape.size, numClasses)
 
-    // ── CNN model ─────────────────────────────────────────────────────────────
-
     val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
         label = "CNN Photo Album"
         this.trainingSet = trainingSet
@@ -299,8 +291,6 @@ val cnnPhotoAlbum = newSim {
         testConfiguration.enabled       = true
         testConfiguration.testFrequency = 10
     }
-
-    // ── Coupling: ImageWorld → CNN input ──────────────────────────────────────
 
     with(couplingManager) {
         imageWorld.imagePipelineCollection.currentPipeline.let { pipeline ->

@@ -183,7 +183,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("Attention as gain") { attentionAsGain }
         //item("CNN Demo") { cnnDemo } // Develop into 3d demo
         item("CNN Simple Demo") { cnnTrainingDemo }
-        item("CNN Photo Album (100 x 100)") { cnnPhotoAlbum }
+        item("CNN Object Recognition (100 x 100)") { cnnPhotoAlbum }
     }
 
     //dir("Testing") {

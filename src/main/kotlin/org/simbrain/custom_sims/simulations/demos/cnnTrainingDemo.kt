@@ -6,13 +6,15 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
 import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.place
 import kotlin.random.Random
 
 /**
  * Demo simulation showing a trainable CNN pipeline with synthetic data.
  *
- * Pipeline: Input(16x16x1) -> Conv(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
+ * Pipeline: Input(16x16x1) -> Conv1(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) 
+ *         -> Conv2(3x3, 16 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
  *
  * Three synthetic pattern classes with random positions to demonstrate CNN translation invariance:
  * - Class 0: horizontal line (1 pixel wide, 3-4 pixels long)
@@ -29,49 +31,72 @@ val cnnTrainingDemo = newSim {
     // Input: 16x16x1
     val inputShape = TensorShape(16, 16, 1)
     val inputLayer = TensorLayer(inputShape).apply {
-        label = "Input Layer"
+        label = "Input (16x16x1)"
         isClamped = true
     }
-    inputLayer.setLocation(-786.2994660296812, 398.3040858920673)
+    inputLayer.setLocation(-430.0, 373.0)
 
-    // Conv: 3x3, 8 filters, SAME -> 16x16x8
-    val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val convLayer = TensorLayer(convOutShape).apply {
-        label = "Feature Map"
+    // Conv1: 3x3, 8 filters, SAME -> 16x16x8
+    val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
+    val conv1Layer = TensorLayer(conv1OutShape).apply {
+        label = "Conv1 (${conv1OutShape})"
         activationFunction = TensorActivation.RELU
     }
-    convLayer.setLocation(0.0, 400.0)
-    val conv = ConvolutionConnector(inputLayer, convLayer, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME).apply {
-        label = "Convolution"
+    conv1Layer.setLocation(357.0, 375.0)
+    val conv1 = ConvolutionConnector(inputLayer, conv1Layer, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME).apply {
+        label = "Convolution 1"
     }
 
-    // MaxPool: 2x2 -> 8x8x8
-    val poolOutShape = convOutShape.poolOutputShape(2, 2)
-    val poolOut = TensorLayer(poolOutShape).apply {
-        label = "Pooled Layer"
+    // Pool1: 2x2 -> 8x8x8
+    val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
+    val pool1Layer = TensorLayer(pool1OutShape).apply {
+        label = "Pool1 (${pool1OutShape})"
     }
-    poolOut.setLocation(-784.9973490798225, 75.65382689571582)
-    val pool = PoolingConnector(convLayer, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
-        label = "Pooling"
+    pool1Layer.setLocation(-436.0, 127.0)
+    val pool1 = PoolingConnector(conv1Layer, pool1Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
+        label = "Pooling 1"
     }
 
-    // Flatten: 8x8x8 = 512 -> NeuronArray(512)
-    val flatSize = poolOutShape.size
+    // Conv2: 3x3, 16 filters, SAME -> 8x8x16
+    val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 16)
+    val conv2Layer = TensorLayer(conv2OutShape).apply {
+        label = "Conv2 (${conv2OutShape})"
+        activationFunction = TensorActivation.RELU
+    }
+    conv2Layer.setLocation(391.0, 60.0)
+    val conv2 = ConvolutionConnector(pool1Layer, conv2Layer, kernelSize = 3, numFilters = 16, stride = 1, padding = Padding.SAME).apply {
+        label = "Convolution 2"
+    }
+
+    // Pool2: 2x2 -> 4x4x16
+    val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
+    val pool2Layer = TensorLayer(pool2OutShape).apply {
+        label = "Pool2 (${pool2OutShape})"
+    }
+    pool2Layer.setLocation(-408.0, -80.0)
+    val pool2 = PoolingConnector(conv2Layer, pool2Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
+        label = "Pooling 2"
+    }
+
+    // Flatten: 4x4x16 = 256 -> NeuronArray(256)
+    val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
-        label = "Flattened Layer"
+        label = "Flattened ($flatSize)"
+        gridMode = true
     }
-    flatArray.setLocation(72.39336683145689, -125.50848409739262)
-    val flatten = FlattenConnector(poolOut, flatArray).apply {
+    flatArray.setLocation(412.0, -294.0)
+    val flatten = FlattenConnector(pool2Layer, flatArray).apply {
         label = "Flatten"
     }
 
     // Dense output: 3 classes
     val outputLayer = NeuronArray(3).apply {
         label = "Output Layer"
+        updateRule = SoftmaxRule()
         circleMode = true
         labelArray = arrayOf("Horizontal", "Vertical", "Diagonal")
     }
-    outputLayer.setLocation(-773.5011725522106, -175.7068655854972)
+    outputLayer.setLocation(-430.0, -363.0)
     val dense = WeightMatrix(flatArray, outputLayer).apply {
         label = "Dense Connector"
     }
@@ -177,7 +202,7 @@ val cnnTrainingDemo = newSim {
         testingSet = testDataset
     }
     cnnModel.trainerConfig.apply {
-        learningRate = 0.001
+        learningRate = 0.01
         batchSize = 30
         lossFunction = CnnLossFunction.CrossEntropy
         computeAccuracy = true
@@ -202,12 +227,16 @@ val cnnTrainingDemo = newSim {
         The key feature is **translation invariance**: patterns appear at random positions
         in the 16x16 input images, and the CNN learns to recognize them regardless of 
         where they appear.
+        
+        You can edit the file corresponding to this to get a sense of performance. For example, with just one CNN layer training performance is perfect but it can't generalize at all.
 
         ## Pipeline
         - **Input Layer**: 16x16x1 grayscale patterns
-        - **Convolution Layer**: 3x3 kernel, 8 filters, SAME padding, ReLU
-        - **Pooling Layer**: 2x2 max pool → 8x8x8
-        - **Flatten Layer**: 512 features
+        - **Convolution Layer 1**: 3x3 kernel, 8 filters, SAME padding, ReLU → 16x16x8
+        - **Pooling Layer 1**: 2x2 max pool → 8x8x8
+        - **Convolution Layer 2**: 3x3 kernel, 16 filters, SAME padding, ReLU → 8x8x16
+        - **Pooling Layer 2**: 2x2 max pool → 4x4x16
+        - **Flatten Layer**: 256 features
         - **Output Layer**: 3 output neurons (cross-entropy + softmax)
 
         ## Training Data
@@ -228,6 +257,24 @@ val cnnTrainingDemo = newSim {
            - Browse test samples with the "Inputs" toolbar
            - Click **apply current row as input to network**
            - Watch the output layer neurons show predictions
+        
+        ## Performance Notes
+        Training accuracy typically ranges from 60-80%, varying with random weight 
+        initialization. Try randomizing the network a few times and retraining to see 
+        how high you can get it!
+        
+        **Why doesn't it reach 100%?** Possible causes:
+        - **Small dataset**: Only 30 samples per class may not be enough
+        - **Pattern ambiguity**: Very short lines (3 pixels) can be hard to distinguish
+        - **Network capacity**: May need more filters or a different architecture
+        - **Training dynamics**: Learning rate, batch size, or optimizer settings
+        
+        **Want to improve it?** If interested edit the underlying simulation file. You can try:
+        - Increase training samples (e.g., 100+ per class)
+        - Add more filters to the convolutional layers
+        - Adjust learning rate or batch size in the trainer config
+        - Add data augmentation (rotations, shifts)
+        - Try different weight initialization strategies
         """.trimIndent()
     )
 }

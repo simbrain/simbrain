@@ -180,13 +180,14 @@ val cnnTrainingDemo = newSim {
         learningRate = 0.001
         batchSize = 30
         lossFunction = CnnLossFunction.CrossEntropy
+        computeAccuracy = true
+        testConfiguration.enabled = true
+        testConfiguration.testFrequency = 10
     }
 
     // Pre-load input with a random diagonal training image
     val diagonalSampleIndex = 60 + rng.nextInt(30)
     inputLayer.setActivations(inputs[diagonalSampleIndex].toDoubleArray())
-    
-    // --- GUI ---
 
     place(networkComponent, 0, 0, 850, 730)
     workspace.simpleIterate() // So some activations are shown

@@ -246,7 +246,7 @@ val cnnPhotoAlbum = newSim {
         addOperation(ResizeOperation(100, 100))
     }
 
-    val allFiles: List<File> = categoryNames.flatMap { categoryImages.getValue(it) }
+    val allFiles: List<File> = categoryNames.flatMap { categoryImages.getValue(it) }.shuffled()
     imageWorld.loadImages(allFiles.toTypedArray())
     imageWorld.setCurrentPipeline("RGB 100×100")
 
@@ -288,6 +288,7 @@ val cnnPhotoAlbum = newSim {
         learningRate = 0.001
         batchSize    = 16
         lossFunction = CnnLossFunction.CrossEntropy
+        computeAccuracy = true
         testConfiguration.enabled       = true
         testConfiguration.testFrequency = 10
     }
@@ -335,8 +336,10 @@ val cnnPhotoAlbum = newSim {
         ## How to Use
 
         1. Right-click the **CNN Photo Album** outline → **Train...**
-        2. Click **Run** to train; watch the loss decrease
-        3. Cycle images in the Image World — activations update live via coupling
+        2. Click **Run** to train; watch the loss and accuracy improve
+        3. After training, close the dialog and click **Run** in the main workspace
+        4. Use the left/right arrow buttons in the Image World to cycle through images
+        5. Watch the output neurons update in real-time as different images are shown
 
         ## Credits
 

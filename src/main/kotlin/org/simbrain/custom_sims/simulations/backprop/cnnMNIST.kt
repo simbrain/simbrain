@@ -130,6 +130,9 @@ val cnnMNIST = newSim {
         learningRate = 0.001
         batchSize = 32
         lossFunction = CnnLossFunction.CrossEntropy
+        computeAccuracy = true
+        testConfiguration.enabled = true
+        testConfiguration.testFrequency = 10
     }
 
     // Pre-load input with a random training image

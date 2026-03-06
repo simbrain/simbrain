@@ -26,24 +26,22 @@ val cnnTrainingDemo = newSim {
     val networkComponent = addNetworkComponent("CNN Training")
     val network = networkComponent.network
 
-    // --- Build CNN Pipeline ---
-
     // Input: 16x16x1
     val inputShape = TensorShape(16, 16, 1)
-    val inputTensor = Tensor(inputShape).apply {
+    val inputLayer = Tensor(inputShape).apply {
         label = "Input Layer"
         isClamped = true
     }
-    inputTensor.setLocation(-786.2994660296812, 398.3040858920673)
+    inputLayer.setLocation(-786.2994660296812, 398.3040858920673)
 
     // Conv: 3x3, 8 filters, SAME -> 16x16x8
     val convOutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
-    val convOut = Tensor(convOutShape).apply {
+    val convLayer = Tensor(convOutShape).apply {
         label = "Feature Map"
         activationFunction = TensorActivation.RELU
     }
-    convOut.setLocation(0.0, 400.0)
-    val conv = ConvolutionConnector(inputTensor, convOut, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME).apply {
+    convLayer.setLocation(0.0, 400.0)
+    val conv = ConvolutionConnector(inputLayer, convLayer, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME).apply {
         label = "Convolution"
     }
 
@@ -53,7 +51,7 @@ val cnnTrainingDemo = newSim {
         label = "Pooled Layer"
     }
     poolOut.setLocation(-784.9973490798225, 75.65382689571582)
-    val pool = PoolingConnector(convOut, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
+    val pool = PoolingConnector(convLayer, poolOut, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
         label = "Pooling"
     }
 
@@ -68,17 +66,17 @@ val cnnTrainingDemo = newSim {
     }
 
     // Dense output: 3 classes
-    val outputArray = NeuronArray(3).apply {
+    val outputLayer = NeuronArray(3).apply {
         label = "Output Layer"
         circleMode = true
         labelArray = arrayOf("Horizontal", "Vertical", "Diagonal")
     }
-    outputArray.setLocation(-773.5011725522106, -175.7068655854972)
-    val dense = WeightMatrix(flatArray, outputArray).apply {
+    outputLayer.setLocation(-773.5011725522106, -175.7068655854972)
+    val dense = WeightMatrix(flatArray, outputLayer).apply {
         label = "Dense Connector"
     }
 
-    // --- Generate synthetic training data ---
+    // Generate synthetic training data
 
     val rng = Random(42)
     val inputs = mutableListOf<MutableList<Double>>()
@@ -172,9 +170,8 @@ val cnnTrainingDemo = newSim {
 
     val testDataset = TrainingDataset(testInputs, testTargets, inputSize = imageSize * imageSize, targetSize = 3)
 
-    // --- Create ConvolutionalNeuralNetwork ---
-
-    val cnnModel = network.addConvolutionalNeuralNetwork(inputTensor, outputArray) {
+    // Automatically discovers pipeline from input to output
+    val cnnModel = network.addConvolutionalNeuralNetwork(inputLayer, outputLayer) {
         label = "CNN Classifier"
         trainingSet = dataset
         testingSet = testDataset
@@ -187,7 +184,7 @@ val cnnTrainingDemo = newSim {
 
     // Pre-load input with a random diagonal training image
     val diagonalSampleIndex = 60 + rng.nextInt(30)
-    inputTensor.setActivations(inputs[diagonalSampleIndex].toDoubleArray())
+    inputLayer.setActivations(inputs[diagonalSampleIndex].toDoubleArray())
     
     // --- GUI ---
 

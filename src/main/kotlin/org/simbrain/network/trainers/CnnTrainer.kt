@@ -650,6 +650,8 @@ class CnnTrainer(
 
             adam.update("conv${idx}_kernels", connector.kernels, connector.kernelGrads)
             adam.update("conv${idx}_biases", connector.filterBiases, connector.biasGrads)
+            
+            connector.events.updated.fire()
         }
 
         // Update dense layers
@@ -683,6 +685,7 @@ class CnnTrainer(
         tensorConnectors.filterIsInstance<ConvolutionConnector>().forEach {
             it.heInitialize()
             it.clearGrads()
+            it.events.updated.fire()
         }
 
         // Dense layers follow the shared initialization strategy pattern.

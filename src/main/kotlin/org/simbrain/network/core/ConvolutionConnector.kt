@@ -26,6 +26,9 @@ class ConvolutionConnector(
     val padding: Padding = Padding.SAME
 ) : TensorConnector(source, target) {
 
+    @UserParameter(label = "Increment amount", description = "Amount to increment kernel weights by when using arrow keys.", increment = .1, order = 20)
+    var increment = .1
+
     @UserParameter(label = "Kernel Grid", description = "Show all kernels in a grid", tab = "GUI", order = 50)
     var kernelGridMode = false
         set(value) {
@@ -127,6 +130,25 @@ class ConvolutionConnector(
         for (i in kernels.indices) {
             kernels[i] = (randomizer ?: weightRandomizer).sampleDouble()
         }
+        events.updated.fire()
+    }
+
+    override fun increment() {
+        for (i in kernels.indices) {
+            kernels[i] += increment
+        }
+        events.updated.fire()
+    }
+
+    override fun decrement() {
+        for (i in kernels.indices) {
+            kernels[i] -= increment
+        }
+        events.updated.fire()
+    }
+
+    fun hardClear() {
+        kernels.fill(0.0)
         events.updated.fire()
     }
 

@@ -64,7 +64,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     }
 
     /** Container for kernel grid display. */
-    private val kernelGridGroup = PNode()
+    val kernelGridGroup = PNode()
 
     // --- Pre-allocated resources for ConvolutionConnector visualization ---
 

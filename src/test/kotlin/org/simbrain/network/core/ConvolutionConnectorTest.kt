@@ -88,4 +88,42 @@ class ConvolutionConnectorTest {
         assertEquals(0, source.outgoingTensorConnectors.size)
         assertEquals(0, target.incomingTensorConnectors.size)
     }
+
+    @Test
+    fun `hardClear sets kernels to zero but leaves biases unchanged`() {
+        val source = Tensor(TensorShape(4, 4, 1))
+        val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
+        val target = Tensor(outputShape)
+        val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+
+        conv.kernels.fill(1.0)
+        conv.filterBiases.fill(0.5)
+
+        assertTrue(conv.kernels.all { it == 1.0 })
+        assertTrue(conv.filterBiases.all { it == 0.5 })
+
+        conv.hardClear()
+
+        // Kernels should be zero
+        assertTrue(conv.kernels.all { it == 0.0 })
+        // Biases should be unchanged (following WeightMatrix pattern)
+        assertTrue(conv.filterBiases.all { it == 0.5 })
+    }
+
+    @Test
+    fun `increment and decrement change kernel weights`() {
+        val source = Tensor(TensorShape(4, 4, 1))
+        val outputShape = source.shape.convOutputShape(3, 1, Padding.SAME, 2)
+        val target = Tensor(outputShape)
+        val conv = ConvolutionConnector(source, target, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+
+        conv.kernels.fill(1.0)
+        val before = conv.kernels.copyOf()
+        
+        conv.increment()
+        assertTrue(conv.kernels.all { it > 1.0 })
+        
+        conv.decrement()
+        assertTrue(conv.kernels.contentEquals(before))
+    }
 }

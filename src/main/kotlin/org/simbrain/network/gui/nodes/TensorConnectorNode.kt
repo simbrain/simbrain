@@ -203,6 +203,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             addChild(kernelGridGroup)
             renderKernelImage()
             syncKernelDisplayMode()
+            // Set kernelGridGroup's own bounds so NodeHandle selection handles work
+            kernelGridGroup.getUnionOfChildrenBounds(null)?.let { cb ->
+                kernelGridGroup.setBounds(cb)
+            }
         }
 
         // Wire up events

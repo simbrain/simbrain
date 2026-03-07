@@ -166,6 +166,60 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
         return result
     }
 
+    /**
+     * Fill [buffer] with the values of channel [c] from [activations].
+     */
+    fun getChannel(c: Int, buffer: DoubleArray) {
+        for (h in 0 until shape.height) {
+            for (w in 0 until shape.width) {
+                buffer[h * shape.width + w] = activations[shape.index(h, w, c)]
+            }
+        }
+    }
+
+    /**
+     * Write [source] values into channel [c] of [activations].
+     */
+    fun setChannel(c: Int, source: DoubleArray) {
+        val pixelCount = shape.height * shape.width
+        val len = minOf(source.size, pixelCount)
+        for (i in 0 until len) {
+            val h = i / shape.width
+            val w = i % shape.width
+            activations[shape.index(h, w, c)] = source[i]
+        }
+    }
+
+    // --- Per-channel coupling containers ---
+
+    val channelContainers: List<ChannelContainer> = List(shape.channels) { ChannelContainer(it) }
+
+    override val childrenContainers: List<AttributeContainer> get() = channelContainers
+
+    /**
+     * A lightweight view into a single channel of this tensor's [activations].
+     * Exposes per-channel [Producible] and [Consumable] for coupling.
+     */
+    inner class ChannelContainer(val channelIndex: Int) : AttributeContainer {
+
+        override val id: String get() = "Channel $channelIndex"
+
+        private val buffer = DoubleArray(shape.height * shape.width)
+
+        @get:Producible(description = "Channel values")
+        val values: DoubleArray
+            get() {
+                getChannel(channelIndex, buffer)
+                return buffer
+            }
+
+        @Consumable(description = "Set channel values")
+        fun setValues(source: DoubleArray) {
+            setChannel(channelIndex, source)
+            events.updated.fire()
+        }
+    }
+
     // --- Connector management ---
 
     fun addIncomingConnector(connector: TensorConnector) {

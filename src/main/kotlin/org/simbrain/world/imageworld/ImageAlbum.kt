@@ -274,6 +274,24 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         events.imageUpdate.fire()
     }
 
+    /**
+     * Accept interleaved RGB activations in HWC order: [r₀₀, g₀₀, b₀₀, r₀₁, g₀₁, b₀₁, ...].
+     * The image must already be the correct size (e.g. set via [reset]).
+     */
+    @Consumable
+    fun setRgbActivations(values: DoubleArray) {
+        val image = if (frames.isEmpty()) return else _frames[0]
+        val pixelCount = image.width * image.height
+        val len = minOf(values.size / 3, pixelCount)
+        for (i in 0 until len) {
+            channels[0][i] = values[i * 3]
+            channels[1][i] = values[i * 3 + 1]
+            channels[2][i] = values[i * 3 + 2]
+        }
+        updateImageFromChannels()
+        events.imageUpdate.fire()
+    }
+
     override val id: String
         get() = "Image album"
 }

@@ -12,6 +12,7 @@ import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.addBorder
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Font
@@ -367,6 +368,18 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
             // Randomize
             contextMenu.add(networkPanel.networkActions.randomizeObjectsAction)
+            contextMenu.addSeparator()
+
+            // Add coupled image world submenu
+            val imageWorldMenu = JMenu("Add coupled image world")
+            for (c in 0 until tensorLayer.shape.channels) {
+                imageWorldMenu.add(actionManager.createTensorChannelImageInput(tensorLayer, c))
+            }
+            if (tensorLayer.shape.channels == 3) {
+                imageWorldMenu.addSeparator()
+                imageWorldMenu.add(actionManager.createTensorRgbImageInput(tensorLayer))
+            }
+            contextMenu.add(imageWorldMenu)
             contextMenu.addSeparator()
 
             // Coupling menu

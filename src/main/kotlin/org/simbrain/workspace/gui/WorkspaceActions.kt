@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui
 
+import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
@@ -20,6 +21,7 @@ import org.simbrain.workspace.Producer
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.couplings.CouplingManager
+import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.desktopPane
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
@@ -470,6 +472,61 @@ class WorkspaceActions {
             producer couple consumer
         }
         postActionBlock()
+    }
+
+    /**
+     * Create an image world coupled to a single channel of a [TensorLayer].
+     * The image world is created at the tensor's exact width × height.
+     * Couples pipeline brightness → channel consumer.
+     */
+    fun createTensorChannelImageInput(
+        tensorLayer: TensorLayer,
+        channelIndex: Int,
+        menuTitle: String = "Channel $channelIndex"
+    ) = desktopPane.createAction(
+        name = menuTitle,
+        iconPath = "menu_icons/photo.png",
+        description = "Create image input for channel $channelIndex",
+        coroutineScope = workspace
+    ) {
+        val component = ImageWorldComponent("Image input for ${tensorLayer.id} Ch$channelIndex")
+        workspace.addWorkspaceComponent(component)
+        component.world.resetImageAlbum(tensorLayer.shape.width, tensorLayer.shape.height)
+        val producer = component.world.imagePipelineCollection.currentPipeline
+            .getProducer(ImageProcessingPipeline::brightness)
+        val consumer = tensorLayer.channelContainers[channelIndex]
+            .getConsumer(TensorLayer.ChannelContainer::setValues)
+        with(workspace.couplingManager) {
+            producer couple consumer
+        }
+        tensorLayer.isClamped = true
+    }
+
+    /**
+     * Create an image world coupled to all 3 channels of a [TensorLayer] via RGB.
+     * The image world is created at the tensor's exact width × height.
+     * Couples pipeline rgbActivations → tensor setActivations.
+     */
+    fun createTensorRgbImageInput(
+        tensorLayer: TensorLayer,
+        menuTitle: String = "RGB (all 3 channels)"
+    ) = desktopPane.createAction(
+        name = menuTitle,
+        iconPath = "menu_icons/photo.png",
+        description = "Create RGB image input",
+        coroutineScope = workspace
+    ) {
+        val component = ImageWorldComponent("RGB image input for ${tensorLayer.id}")
+        workspace.addWorkspaceComponent(component)
+        component.world.resetImageAlbum(tensorLayer.shape.width, tensorLayer.shape.height)
+        val producer = component.world.imagePipelineCollection.currentPipeline
+            .getProducer(ImageProcessingPipeline::rgbActivations)
+        val consumer = tensorLayer.getConsumer(TensorLayer::setActivations)
+        with(workspace.couplingManager) {
+            producer couple consumer
+        }
+        tensorLayer.isClamped = true
+        tensorLayer.rgbComposite = true
     }
 
 }

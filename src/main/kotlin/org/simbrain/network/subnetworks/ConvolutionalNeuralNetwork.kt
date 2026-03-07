@@ -89,13 +89,13 @@ class ConvolutionalNeuralNetwork(
         }
         denseWeightMatrices = wms
         denseNeuronArrays = nas
-        allNeuronArrays = buildList {
+        allNeuronArrays = ArrayList<NeuronArray>().apply {
             add(flattenConnector.target as NeuronArray)
             addAll(nas)
         }
 
         // Register all pipeline elements as children of this subnetwork.
-        val pipelineComponents = buildList {
+        val pipelineComponents = ArrayList<NetworkModel>().apply {
             add(inputTensorLayer)
             addAll(tensorConnectors)
             addAll(tensorLayerStages)

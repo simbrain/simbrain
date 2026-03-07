@@ -192,6 +192,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
 
     // --- Per-channel coupling containers ---
 
+    @Transient
     val channelContainers: List<ChannelContainer> = List(shape.channels) { ChannelContainer(it) }
 
     override val childrenContainers: List<AttributeContainer> get() = channelContainers

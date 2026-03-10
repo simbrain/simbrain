@@ -266,6 +266,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 val index = findIndexOfType(SynapseNode::class)
                 canvas.layer.addChild(index + 1, node)
             }
+            is TensorConnectorNode -> {
+                val index = findIndexOfType(SynapseGroupNode::class)
+                canvas.layer.addChild(index + 1, node)
+            }
+            is FlattenConnectorNode -> {
+                val index = findIndexOfType(TensorConnectorNode::class)
+                canvas.layer.addChild(index + 1, node)
+            }
             else -> {
                 canvas.layer.addChild(node)
             }

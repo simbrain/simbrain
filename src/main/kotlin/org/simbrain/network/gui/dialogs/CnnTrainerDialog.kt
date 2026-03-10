@@ -235,34 +235,47 @@ class CnnTrainerControls(
                 }
             }
         })
-        val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
-        fun errorDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
-        val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
+        val trainingLossValue = JLabel(trainer.lastTrainingError.roundToString(4))
+        fun lossDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
+        val trainingLossLabel = labelPanel.addItem("Training ${lossDescriptionString()}", trainingLossValue)
 
-        // Accuracy labels (visible only when computeAccuracy is enabled)
+        val testingLossValue = JLabel("N/A")
+        val testingLossLabel = labelPanel.addItem("Testing ${lossDescriptionString()}", testingLossValue)
+
         val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
 
         val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
-        fun updateAccuracyVisibility() {
-            val showTraining = trainer.config.computeAccuracy
-            val showTesting = trainer.config.computeAccuracy && trainer.config.testConfiguration.enabled
-            trainingAccuracyLabel.isVisible = showTraining
-            trainingAccuracyValue.isVisible = showTraining
-            testingAccuracyLabel.isVisible = showTesting
-            testingAccuracyValue.isVisible = showTesting
+        fun updateLabelVisibility() {
+            val showTestingLoss = trainer.config.testConfiguration.enabled
+            val showTrainingAccuracy = trainer.config.computeAccuracy
+            val showTestingAccuracy = trainer.config.computeAccuracy && trainer.config.testConfiguration.enabled
+            
+            testingLossLabel.isVisible = showTestingLoss
+            testingLossValue.isVisible = showTestingLoss
+            trainingAccuracyLabel.isVisible = showTrainingAccuracy
+            trainingAccuracyValue.isVisible = showTrainingAccuracy
+            testingAccuracyLabel.isVisible = showTestingAccuracy
+            testingAccuracyValue.isVisible = showTestingAccuracy
         }
-        updateAccuracyVisibility()
+        updateLabelVisibility()
 
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + trainingStats.trainingError.format(4)
-            errorLabel.text = errorDescriptionString()
-            updateAccuracyVisibility()
+            trainingLossValue.text = "" + trainingStats.trainingError.format(4)
+            trainingLossLabel.text = "Training ${lossDescriptionString()}"
+            
+            trainingStats.testingError?.let { testingError ->
+                testingLossValue.text = "" + testingError.format(4)
+                testingLossLabel.text = "Testing ${lossDescriptionString()}"
+            }
+            
+            updateLabelVisibility()
+            
             trainingStats.trainingAccuracy?.let { trainingAccuracyValue.text = "${(it * 100).format(1)}%" }
             trainingStats.testingAccuracy?.let { testingAccuracyValue.text = "${(it * 100).format(1)}%" }
         }

@@ -173,7 +173,7 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
 
 
 /**
- * CNN Photo Album — trains a small CNN on Caltech101 RGB images.
+ * CNN Object Detector: trains a small CNN on Caltech101 RGB images.
  *
  * Pipeline: Input(100×100×3) → Conv1(3×3, 4f, SAME, ReLU) → Pool1(5×5, s=5, MAX)
  *         → Conv2(3×3, 8f, SAME, ReLU) → Pool2(4×4, s=4, MAX)
@@ -181,7 +181,7 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
  *
  * N is determined automatically from user selections in the startup dialog.
  */
-val cnnPhotoAlbum = newSim {
+val cnnObjectDetector = newSim {
 
     workspace.clearWorkspace()
 
@@ -190,7 +190,7 @@ val cnnPhotoAlbum = newSim {
     val categoryNames: List<String> = categoryImages.keys.toList()   // sorted
     val numClasses = categoryNames.size
 
-    val networkComponent = addNetworkComponent("CNN Photo Album")
+    val networkComponent = addNetworkComponent("CNN Object Detector")
     val network = networkComponent.network
 
     val leftX = 0.0; val rightX = 400.0; val topY = 0.0; val stepY = 350.0
@@ -240,7 +240,7 @@ val cnnPhotoAlbum = newSim {
     WeightMatrix(flatArray, outputArray)
 
     val component = addImageWorld("Image World")
-    placeComponent(component, 620, 0, 720, 600)
+    placeComponent(component, 591, 0, 360, 300)
     val imageWorld = component.world
     imageWorld.imagePipelineCollection.addPipeline("RGB 100×100") {
         addOperation(ResizeOperation(100, 100))
@@ -280,7 +280,7 @@ val cnnPhotoAlbum = newSim {
     val testingSet  = TrainingDataset(testingInputs,  testingTargets,  inputShape.size, numClasses)
 
     val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
-        label = "CNN Photo Album"
+        label = "Object detection network"
         this.trainingSet = trainingSet
         this.testingSet  = testingSet
     }
@@ -310,7 +310,7 @@ val cnnPhotoAlbum = newSim {
 
     addSidebarInfo(
         """
-        # CNN Photo Album
+        # CNN Object Detector
 
         A convolutional neural network trained on [Caltech101](https://data.caltech.edu/records/mzrjq-6wc02)
         images using full RGB color.

@@ -21,7 +21,7 @@ import kotlin.random.Random
  * - Class 1: vertical line (1 pixel wide, 3-4 pixels long)
  * - Class 2: diagonal line (1 pixel wide, 3-4 pixels long)
  */
-val cnnTrainingDemo = newSim {
+val cnnSimpleLineDetector = newSim {
 
     workspace.clearWorkspace()
 

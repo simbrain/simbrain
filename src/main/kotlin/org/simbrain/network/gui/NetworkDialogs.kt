@@ -122,14 +122,14 @@ internal fun NetworkPanel.addConvLayer(sourceTensorLayer: TensorLayer, template:
         template.kernelSize, template.numFilters, template.stride, template.padding
     )
     network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
-    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
         description = "Add conv layer from ${sourceTensorLayer.id}",
         undo = { network.deleteModels(listOf(targetTensorLayer)) },
         redo = {
             network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
-            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )
@@ -142,14 +142,14 @@ internal fun NetworkPanel.addPoolLayer(sourceTensorLayer: TensorLayer, template:
     targetTensorLayer.shouldBePlaced = false
     val connector = PoolingConnector(sourceTensorLayer, targetTensorLayer, template.poolSize, template.stride, template.poolingType)
     network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
-    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
         description = "Add pool layer from ${sourceTensorLayer.id}",
         undo = { network.deleteModels(listOf(targetTensorLayer)) },
         redo = {
             network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
-            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )
@@ -166,14 +166,14 @@ fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
     targetArray.shouldBePlaced = false
     val connector = FlattenConnector(sourceTensorLayer, targetArray)
     network.addNetworkModelAsync(targetArray, usePlacementManager = false)
-    targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+    targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
     network.addNetworkModelAsync(connector, usePlacementManager = false)
     undoManager.addUndoableAction(
         description = "Add flatten layer from ${sourceTensorLayer.id}",
         undo = { network.deleteModels(listOf(connector, targetArray)) },
         redo = {
             network.addNetworkModel(targetArray, usePlacementManager = false, useAutoAssignedId = false)
-            targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY + 200)
+            targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
         }
     )

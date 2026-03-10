@@ -370,6 +370,14 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             contextMenu.add(networkPanel.networkActions.randomizeObjectsAction)
             contextMenu.addSeparator()
 
+            // Clamp
+            contextMenu.add(networkPanel.createAction(
+                name = if (tensorLayer.isClamped) "Unclamp" else "Clamp"
+            ) {
+                tensorLayer.toggleClamping()
+            })
+            contextMenu.addSeparator()
+
             // Add coupled image world submenu
             val imageWorldMenu = JMenu("Add coupled image world")
             for (c in 0 until tensorLayer.shape.channels) {

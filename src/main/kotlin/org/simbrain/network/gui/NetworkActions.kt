@@ -123,7 +123,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         showNeuronArrayCreationDialog()
     }
     val addTensorAction = networkPanel.createAction(
-        name = "Add tensor...",
+        name = "Add tensor layer...",
         description = "Add a tensor (CNN layer) to the network",
         keyboardShortcut = Shift + 'T'
     ) {

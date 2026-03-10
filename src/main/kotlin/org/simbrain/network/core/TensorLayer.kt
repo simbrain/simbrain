@@ -17,7 +17,7 @@ import kotlin.math.tanh
  * Activation function applied element-wise to tensor activations after input accumulation.
  */
 enum class TensorActivation {
-    IDENTITY {
+    LINEAR {
         override fun apply(x: Double) = x
         override fun derivative(x: Double) = 1.0
     },
@@ -59,7 +59,7 @@ enum class TensorActivation {
 class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, AttributeContainer {
 
     @UserParameter(label = "Activation Function", description = "Element-wise activation", order = 10)
-    var activationFunction: TensorActivation = TensorActivation.IDENTITY
+    var activationFunction: TensorActivation = TensorActivation.LINEAR
 
     @UserParameter(label = "Clamped", description = "If clamped, inputs are ignored during update", order = 20)
     var isClamped = false
@@ -272,6 +272,10 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
             activations[i] = rand.sampleDouble()
         }
         events.updated.fire()
+    }
+
+    override fun toggleClamping() {
+        isClamped = !isClamped
     }
 
     fun clearGradients() {

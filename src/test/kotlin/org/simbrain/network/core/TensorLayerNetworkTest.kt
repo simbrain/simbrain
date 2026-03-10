@@ -98,7 +98,7 @@ class TensorLayerNetworkTest {
         src2.isClamped = true
         src2.activations.fill(5.0)
 
-        target.activationFunction = TensorActivation.IDENTITY
+        target.activationFunction = TensorActivation.LINEAR
 
         // Accumulate inputs from both connectors
         with(net) { target.accumulateInputs() }

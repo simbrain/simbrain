@@ -47,7 +47,7 @@ class TensorLayerTest {
     fun `update with biases`() {
         val net = Network()
         val tensorLayer = TensorLayer(TensorShape(2, 2, 1))
-        tensorLayer.activationFunction = TensorActivation.IDENTITY
+        tensorLayer.activationFunction = TensorActivation.LINEAR
         tensorLayer.biases[0] = 1.0
         tensorLayer.biases[1] = 2.0
         tensorLayer.inputs[0] = 3.0

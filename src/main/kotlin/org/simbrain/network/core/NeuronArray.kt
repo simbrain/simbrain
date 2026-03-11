@@ -159,6 +159,23 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     @Transient
     override var events: NeuronArrayEvents = NeuronArrayEvents()
 
+    @Transient
+    var incomingFlattenConnectors: MutableList<FlattenConnector> = mutableListOf()
+
+    fun addIncomingFlattenConnector(connector: FlattenConnector) {
+        incomingFlattenConnectors.add(connector)
+    }
+
+    fun removeIncomingFlattenConnector(connector: FlattenConnector) {
+        incomingFlattenConnectors.remove(connector)
+    }
+
+    context(Network)
+    override fun accumulateInputs() {
+        super.accumulateInputs()
+        incomingFlattenConnectors.forEach { it.propagate() }
+    }
+
     init {
         randomize()
     }
@@ -279,6 +296,16 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         activations.setColConstant(0, 0.0)
         inputs.setColConstant(0, 0.0)
         events.updated.fire()
+    }
+
+    override suspend fun delete(): List<NetworkModel> {
+        val connectors = LinkedHashSet<NetworkModel>(incomingConnectors + outgoingConnectors + incomingFlattenConnectors)
+        connectors.forEach { it.delete() }
+        events.deleted.fire(this).await()
+        return buildList {
+            add(this@NeuronArray)
+            addAll(connectors)
+        }
     }
 
     fun hardClear() {

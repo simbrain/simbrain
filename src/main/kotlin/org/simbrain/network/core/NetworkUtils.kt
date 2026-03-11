@@ -6,6 +6,7 @@ import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.updaterules.LinearRule
@@ -29,7 +30,10 @@ fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is NeuronGroup -> 20
     is NeuronCollection -> 30
     is NeuronArray -> 40
+    is TensorLayer -> 45
     is Connector -> 50
+    is FlattenConnector -> 52
+    is TensorConnector -> 55
     is SynapseGroup -> 60
     is Subnetwork -> 70
     is Synapse -> 80
@@ -276,6 +280,21 @@ fun Collection<Synapse>.decayStrengthBasedOnLength(decay: DecayFunction) {
 
 fun Synapse.decayStrengthBasedOnLength(decay: DecayFunction) {
     strength *= decay.getScalingFactor(length)
+}
+
+/**
+ * Create and add a [ConvolutionalNeuralNetwork] wrapper around an existing unowned CNN pipeline.
+ *
+ * This helper is intended for scripting and simulations to avoid forgetting the add step.
+ */
+fun Network.addConvolutionalNeuralNetwork(
+    inputTensorLayer: TensorLayer,
+    outputArray: NeuronArray,
+    block: ConvolutionalNeuralNetwork.() -> Unit = { }
+): ConvolutionalNeuralNetwork {
+    return ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+        .apply(block)
+        .also(::addNetworkModelAsync)
 }
 
 /**

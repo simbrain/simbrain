@@ -208,10 +208,18 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
         for (node in outlinedObjects) {
-            if (node is NeuronGroupNode) {
-                node.offset(dx, dy)
-            } else if (node is NeuronArrayNode) {
-                node.offset(dx, dy)
+            when (node) {
+                is NeuronGroupNode -> {
+                    node.offset(dx, dy)
+                }
+
+                is NeuronArrayNode -> {
+                    node.offset(dx, dy)
+                }
+
+                is TensorNode -> {
+                    node.offset(dx, dy)
+                }
             }
         }
         infoTextNode?.offset(dx, dy)

@@ -89,13 +89,15 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         networkPanel
         invalidateFullBounds()
-        weightMatrix.events.colorPreferencesChanged.on {
-            imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
-        }
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()
         renderMatrixToImage()
+    }
+
+    fun updateArrowColorFromPreferences() {
+        imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
+        arrow.updateColorFromPreferences()
     }
 
     /**

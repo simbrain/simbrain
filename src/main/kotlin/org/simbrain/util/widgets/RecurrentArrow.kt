@@ -3,6 +3,7 @@ package org.simbrain.util.widgets
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PArea
 import org.piccolo2d.nodes.PPath
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
@@ -47,6 +48,15 @@ class RecurrentArrow(color: Color) : PNode() {
             strokePaint = color
             transparency = 0.5f
         }.also { addChild(it) }
+
+    /**
+     * Update the arrow color from the current [NetworkPreferences.connectorArrowColor][org.simbrain.network.gui.dialogs.NetworkPreferences.connectorArrowColor].
+     */
+    fun updateColorFromPreferences() {
+        val c = NetworkPreferences.connectorArrowColor
+        arrowTip.paint = c
+        arc.strokePaint = c
+    }
 
     /**
      * Pass in where you want to center the recurrent arrow, and then any additional action to perform

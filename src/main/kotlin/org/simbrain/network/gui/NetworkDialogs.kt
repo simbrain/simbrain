@@ -17,6 +17,7 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
 import java.awt.BorderLayout
@@ -69,6 +70,151 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
     }.also {
         it.title = "Create Activation Sequence"
     }.display()
+}
+
+fun NetworkPanel.showTensorCreationDialog() {
+    TensorLayer.CreationTemplate().createEditorDialog {
+        val tensor = it.create()
+        network.addNetworkModelAsync(tensor)
+        undoManager.addUndoableAction(
+            description = "Create tensor ${tensor.id}",
+            undo = { tensor.delete() },
+            redo = { network.addNetworkModel(tensor, usePlacementManager = false, useAutoAssignedId = false) }
+        )
+    }.also {
+        it.title = "Create Tensor"
+    }.display()
+}
+
+/**
+ * Dialog for adding a convolution layer (target Tensor + ConvolutionConnector) from a source Tensor.
+ */
+fun NetworkPanel.showAddConvLayerDialog(sourceTensorLayer: TensorLayer) {
+    val template = ConvLayerTemplate()
+    template.createEditorDialog {
+        addConvLayer(sourceTensorLayer, it)
+    }.also {
+        it.title = "Add Conv Layer from ${sourceTensorLayer.displayName}"
+    }.display()
+}
+
+/**
+ * Dialog for adding a pooling layer (target Tensor + PoolingConnector) from a source Tensor.
+ */
+fun NetworkPanel.showAddPoolLayerDialog(sourceTensorLayer: TensorLayer) {
+    val template = PoolLayerTemplate()
+    template.createEditorDialog {
+        addPoolLayer(sourceTensorLayer, it)
+    }.also {
+        it.title = "Add Pool Layer from ${sourceTensorLayer.displayName}"
+    }.display()
+}
+
+internal fun NetworkPanel.addConvLayer(sourceTensorLayer: TensorLayer, template: ConvLayerTemplate): Pair<TensorLayer, ConvolutionConnector> {
+    val outputShape = sourceTensorLayer.shape.convOutputShape(
+        template.kernelSize, template.stride, template.padding, template.numFilters
+    )
+    val targetTensorLayer = TensorLayer(outputShape)
+    targetTensorLayer.activationFunction = template.activation
+    targetTensorLayer.shouldBePlaced = false
+    val connector = ConvolutionConnector(
+        sourceTensorLayer, targetTensorLayer,
+        template.kernelSize, template.numFilters, template.stride, template.padding
+    )
+    network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+    network.addNetworkModelAsync(connector, usePlacementManager = false)
+    undoManager.addUndoableAction(
+        description = "Add conv layer from ${sourceTensorLayer.id}",
+        undo = { network.deleteModels(listOf(targetTensorLayer)) },
+        redo = {
+            network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+            network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+        }
+    )
+    return targetTensorLayer to connector
+}
+
+internal fun NetworkPanel.addPoolLayer(sourceTensorLayer: TensorLayer, template: PoolLayerTemplate): Pair<TensorLayer, PoolingConnector> {
+    val outputShape = sourceTensorLayer.shape.poolOutputShape(template.poolSize, template.stride)
+    val targetTensorLayer = TensorLayer(outputShape)
+    targetTensorLayer.shouldBePlaced = false
+    val connector = PoolingConnector(sourceTensorLayer, targetTensorLayer, template.poolSize, template.stride, template.poolingType)
+    network.addNetworkModelAsync(targetTensorLayer, usePlacementManager = false)
+    targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+    network.addNetworkModelAsync(connector, usePlacementManager = false)
+    undoManager.addUndoableAction(
+        description = "Add pool layer from ${sourceTensorLayer.id}",
+        undo = { network.deleteModels(listOf(targetTensorLayer)) },
+        redo = {
+            network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
+            targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+            network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+        }
+    )
+    return targetTensorLayer to connector
+}
+
+/**
+ * Add a flatten layer: creates a NeuronArray sized to the source Tensor's total element count
+ * and a FlattenConnector linking them. No dialog needed since the size is fully determined.
+ */
+fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
+    val flatSize = sourceTensorLayer.shape.size
+    val targetArray = NeuronArray(flatSize)
+    targetArray.shouldBePlaced = false
+    val connector = FlattenConnector(sourceTensorLayer, targetArray)
+    network.addNetworkModelAsync(targetArray, usePlacementManager = false)
+    targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+    network.addNetworkModelAsync(connector, usePlacementManager = false)
+    undoManager.addUndoableAction(
+        description = "Add flatten layer from ${sourceTensorLayer.id}",
+        undo = { network.deleteModels(listOf(connector, targetArray)) },
+        redo = {
+            network.addNetworkModel(targetArray, usePlacementManager = false, useAutoAssignedId = false)
+            targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
+            network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+        }
+    )
+}
+
+/**
+ * Template for convolution layer creation dialog.
+ */
+class ConvLayerTemplate : EditableObject {
+    @UserParameter(label = "Kernel Size", description = "Spatial size of kernel", minimumValue = 1.0, order = 1)
+    var kernelSize = 3
+
+    @UserParameter(label = "Num Filters", description = "Number of output filters", minimumValue = 1.0, order = 2)
+    var numFilters = 16
+
+    @UserParameter(label = "Stride", description = "Convolution stride", minimumValue = 1.0, order = 3)
+    var stride = 1
+
+    @UserParameter(label = "Padding", description = "Padding strategy", order = 4)
+    var padding = Padding.SAME
+
+    @UserParameter(label = "Activation", description = "Activation function for output tensor", order = 5)
+    var activation = TensorActivation.RELU
+
+    override val name = "Convolution Layer"
+}
+
+/**
+ * Template for pooling layer creation dialog.
+ */
+class PoolLayerTemplate : EditableObject {
+    @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", minimumValue = 1.0, order = 1)
+    var poolSize = 2
+
+    @UserParameter(label = "Stride", description = "Pooling stride", minimumValue = 1.0, order = 2)
+    var stride = 2
+
+    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", order = 3)
+    var poolingType = PoolingType.MAX
+
+    override val name = "Pooling Layer"
 }
 
 fun NetworkPanel.showTransformerBlockCreationDialog() {

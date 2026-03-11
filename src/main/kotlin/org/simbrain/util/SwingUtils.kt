@@ -377,6 +377,49 @@ fun showOptionDialog(
     )
 }
 
+/**
+ * Shows a dialog with a scrollable grid of checkboxes and returns the labels of those
+ * that are checked when the user clicks OK, or `null` if the user cancels.
+ *
+ * @param title           Dialog window title.
+ * @param message         Optional explanatory label shown above the checkboxes.
+ * @param items           Full list of item labels to display.
+ * @param defaultSelected Items that should be pre-checked (defaults to all items).
+ * @param columns         Number of columns in the checkbox grid (default 1).
+ */
+fun showCheckboxDialog(
+    title: String,
+    message: String = "",
+    items: List<String>,
+    defaultSelected: List<String> = items,
+    columns: Int = 1
+): List<String>? {
+    val checkboxes = items.map { JCheckBox(it, it in defaultSelected) }
+
+    val numRows = (items.size + columns - 1) / columns
+    val grid = JPanel(GridLayout(numRows, columns, 8, 2))
+    checkboxes.forEach { grid.add(it) }
+    // Pad any empty cells in the last row
+    repeat(numRows * columns - items.size) { grid.add(JLabel()) }
+
+    val content = JPanel(BorderLayout(0, 8))
+    if (message.isNotEmpty()) {
+        content.add(JLabel("<html>$message</html>"), BorderLayout.NORTH)
+    }
+    content.add(JScrollPane(grid).apply {
+        preferredSize = Dimension(columns * 180, minOf(numRows * 26 + 20, 480))
+    }, BorderLayout.CENTER)
+
+    val result = JOptionPane.showConfirmDialog(
+        null, content, title,
+        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+    )
+    return if (result == JOptionPane.OK_OPTION)
+        checkboxes.filter { it.isSelected }.map { it.text }
+    else
+        null
+}
+
 fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
     val textArea = SimbrainTextArea().apply {
         text = message

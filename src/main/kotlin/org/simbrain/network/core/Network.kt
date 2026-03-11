@@ -395,7 +395,7 @@ class Network: CoroutineScope, EditableObject {
                 if (isLastChildOfParent(childToParentMap, model) || parent is SupervisedModel) {
                     parent?.let { parent ->
                         addAll(parent.delete())
-                        // If (1) deleting a supervised model because one of its children models has been deleted or
+                        // If (1) deleting a supervised/cnn model because one of its children models has been deleted or
                         //    (2) deleting a neuron collection because its last node was deleted
                         //  then the child model must be manually deleted
                         if (parent is NeuronCollection || parent is SupervisedModel) {
@@ -457,7 +457,7 @@ class Network: CoroutineScope, EditableObject {
         networkModels.allInUpdatingOrder.filterIsInstance<AbstractNeuronCollection>().forEach { collection ->
             collection.setupNeuronListeners()
         }
-        
+
         idManager = SimpleIdManager ({ cls -> networkModels.getRawModelSet(cls).size + 1 })
         return this
     }

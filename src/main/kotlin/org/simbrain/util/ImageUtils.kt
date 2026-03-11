@@ -66,6 +66,21 @@ fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width *
 }
 
 /**
+ * Write Simbrain color values directly into the backing array of [dest], avoiding all intermediate allocations.
+ * [dest] should be a [BufferedImage.TYPE_INT_RGB] image whose dimensions match the data.
+ */
+fun DoubleArray.writeSimbrainColorImage(dest: BufferedImage) {
+    val pixels = (dest.raster.dataBuffer as DataBufferInt).data
+    val len = min(size, pixels.size)
+    for (i in 0 until len) {
+        pixels[i] = this[i].toSimbrainColor()
+    }
+    if (size < pixels.size) {
+        pixels.fill(Color.lightGray.rgb, size, pixels.size)
+    }
+}
+
+/**
  * Converts a float array to a matrix image as in [DoubleArray.toSimbrainColorImage]
  */
 fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {

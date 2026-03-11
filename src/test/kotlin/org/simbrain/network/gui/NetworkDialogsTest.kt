@@ -4,8 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.*
 
 class NetworkDialogsTest {
 
@@ -94,5 +93,73 @@ class NetworkDialogsTest {
         // This test verifies that the UndoManager correctly maintains the undo and redo stacks
         // and that the undo and redo operations work as expected, which is what the
         // showUndoHistoryDialog's "Go To Selected Point" button would use
+    }
+
+    @Test
+    fun `cnn layer creation actions are undoable and redoable`() = runBlocking {
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        val sourceTensorLayer = TensorLayer(TensorShape(8, 8, 1)).apply {
+            setLocation(100.0, 100.0)
+        }
+        network.addNetworkModel(sourceTensorLayer, usePlacementManager = false)
+
+        val (convTarget, _) = networkPanel.addConvLayer(
+            sourceTensorLayer,
+            ConvLayerTemplate().apply {
+                kernelSize = 3
+                stride = 1
+                numFilters = 2
+            }
+        )
+        val (poolTarget, _) = networkPanel.addPoolLayer(
+            convTarget,
+            PoolLayerTemplate().apply {
+                poolSize = 2
+                stride = 2
+            }
+        )
+        networkPanel.addFlattenLayer(poolTarget)
+
+        assertEquals(3, networkPanel.undoManager.undoStack.size)
+        assertEquals(0, networkPanel.undoManager.redoStack.size)
+        assertEquals(3, network.getModels<TensorLayer>().size)
+        assertEquals(1, network.getModels<ConvolutionConnector>().size)
+        assertEquals(1, network.getModels<PoolingConnector>().size)
+        assertEquals(1, network.getModels<FlattenConnector>().size)
+        assertEquals(1, network.getModels<NeuronArray>().size)
+
+        networkPanel.undoManager.undo() // flatten
+        assertEquals(2, networkPanel.undoManager.undoStack.size)
+        assertEquals(1, networkPanel.undoManager.redoStack.size)
+        assertEquals(0, network.getModels<FlattenConnector>().size)
+        assertEquals(0, network.getModels<NeuronArray>().size)
+
+        networkPanel.undoManager.undo() // pool
+        assertEquals(1, networkPanel.undoManager.undoStack.size)
+        assertEquals(2, networkPanel.undoManager.redoStack.size)
+        assertEquals(2, network.getModels<TensorLayer>().size)
+        assertEquals(1, network.getModels<ConvolutionConnector>().size)
+        assertEquals(0, network.getModels<PoolingConnector>().size)
+
+        networkPanel.undoManager.undo() // conv
+        assertEquals(0, networkPanel.undoManager.undoStack.size)
+        assertEquals(3, networkPanel.undoManager.redoStack.size)
+        assertEquals(1, network.getModels<TensorLayer>().size)
+        assertEquals(0, network.getModels<ConvolutionConnector>().size)
+
+        networkPanel.undoManager.redo() // conv
+        networkPanel.undoManager.redo() // pool
+        networkPanel.undoManager.redo() // flatten
+
+        assertEquals(3, networkPanel.undoManager.undoStack.size)
+        assertEquals(0, networkPanel.undoManager.redoStack.size)
+        assertEquals(3, network.getModels<TensorLayer>().size)
+        assertEquals(1, network.getModels<ConvolutionConnector>().size)
+        assertEquals(1, network.getModels<PoolingConnector>().size)
+        assertEquals(1, network.getModels<FlattenConnector>().size)
+        assertEquals(1, network.getModels<NeuronArray>().size)
     }
 }

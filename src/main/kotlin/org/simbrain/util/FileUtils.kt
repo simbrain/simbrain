@@ -1,14 +1,19 @@
 package org.simbrain.util
 
 import com.Ostermiller.util.CSVParser
+import org.apache.commons.compress.archivers.tar.TarArchiveInputStream
 import org.simbrain.util.widgets.ProgressWindow
-import java.io.BufferedInputStream
-import java.io.File
-import java.io.IOException
-import java.io.StringReader
+import java.io.*
 import java.net.HttpURLConnection
 import java.net.URI
 import java.net.URL
+import java.net.http.HttpClient
+import java.net.http.HttpRequest
+import java.net.http.HttpResponse
+import java.security.DigestOutputStream
+import java.security.MessageDigest
+import java.util.zip.GZIPInputStream
+import java.util.zip.ZipInputStream
 
 /**
  * Root is `src/main/resources`
@@ -194,6 +199,163 @@ fun fetchDataWithCache(urlString: String): String? {
             saveToCache(cacheFile, data)
         }
         return data
+    }
+}
+
+/**
+ * Downloads a zip archive from [url], extracts it (preserving directory structure) into the
+ * system cache directory, and returns the root extraction directory.
+ *
+ * On subsequent calls the zip is not re-downloaded: if the extraction directory already exists
+ * and is non-empty it is returned immediately.
+ *
+ * The zip file itself is deleted after successful extraction to save disk space.
+ *
+ * @param url              URL of the zip archive. Query parameters (e.g. `?download=1`) are
+ *                         stripped when deriving the local directory name.
+ * @param expectedChecksum Optional hex checksum to verify the download. The algorithm is inferred
+ *                         from the digest length: 32 hex chars → MD5, 40 → SHA-1, 64 → SHA-256.
+ *                         If verification fails the partial download is deleted and null is returned.
+ * @return The root extraction directory, or `null` on failure.
+ */
+fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
+    val cacheDir = getSystemCacheDirectory()
+    // Strip query string to get a clean filename for the cache dir name
+    val zipName = URI(url).path.substringAfterLast('/')
+    val extractDir = File(cacheDir, zipName.removeSuffix(".zip"))
+
+    if (extractDir.exists() && extractDir.listFiles()?.isNotEmpty() == true) {
+        return extractDir
+    }
+
+    // Resolve digest algorithm before downloading so we can compute it inline
+    val digest: MessageDigest? = if (expectedChecksum != null) {
+        val algorithm = when (expectedChecksum.length) {
+            32   -> "MD5"
+            40   -> "SHA-1"
+            64   -> "SHA-256"
+            else -> { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return null }
+        }
+        MessageDigest.getInstance(algorithm)
+    } else null
+
+    val zipFile = File(cacheDir, zipName)
+    var progressWindow: ProgressWindow? = null
+    try {
+        val client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.NORMAL)  // follows cross-domain HTTPS→HTTPS redirects
+            .build()
+        val request = HttpRequest.newBuilder(URI.create(url)).GET().build()
+        val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
+
+        if (response.statusCode() != 200) {
+            showWarningDialog("Failed to download $zipName (HTTP ${response.statusCode()})")
+            return null
+        }
+
+        val contentLength = response.headers().firstValueAsLong("Content-Length").orElse(-1L)
+        progressWindow = ProgressWindow(contentLength.toInt(), "Downloading $zipName…")
+
+        response.body().use { input ->
+            // Wrap output in DigestOutputStream when checksum verification is requested,
+            // computing the hash inline during download without a second file read.
+            val fileOut = FileOutputStream(zipFile)
+            val output = if (digest != null) DigestOutputStream(fileOut, digest) else fileOut
+            output.use { out ->
+                val buffer = ByteArray(8192)
+                var bytesRead: Int
+                var total = 0L
+                while (input.read(buffer).also { bytesRead = it } != -1) {
+                    out.write(buffer, 0, bytesRead)
+                    total += bytesRead
+                    progressWindow.setValue(total.coerceAtMost(Int.MAX_VALUE.toLong()).toInt())
+                }
+            }
+        }
+        progressWindow.close()
+    } catch (e: Exception) {
+        progressWindow?.close()
+        showWarningDialog("Error downloading $zipName: ${e.message}")
+        zipFile.delete()
+        return null
+    }
+
+    if (digest != null && expectedChecksum != null) {
+        val actual = digest.digest().joinToString("") { "%02x".format(it) }
+        if (!actual.equals(expectedChecksum, ignoreCase = true)) {
+            showWarningDialog("Checksum mismatch for $zipName.\nExpected: $expectedChecksum\nActual:   $actual")
+            zipFile.delete()
+            return null
+        }
+    }
+
+    try {
+        val canonicalDest = extractDir.canonicalPath + File.separator
+        ZipInputStream(zipFile.inputStream()).use { zip ->
+            var entry = zip.nextEntry
+            while (entry != null) {
+                val outFile = File(extractDir, entry.name)
+                // Guard against Zip Slip: entry names with ../ can escape the destination
+                if (!outFile.canonicalPath.startsWith(canonicalDest)) {
+                    zip.closeEntry()
+                    entry = zip.nextEntry
+                    continue
+                }
+                if (entry.isDirectory) {
+                    outFile.mkdirs()
+                } else {
+                    outFile.parentFile.mkdirs()
+                    FileOutputStream(outFile).use { zip.copyTo(it) }
+                }
+                zip.closeEntry()
+                entry = zip.nextEntry
+            }
+        }
+    } catch (e: Exception) {
+        extractDir.deleteRecursively()
+        showWarningDialog("Error extracting $zipName: ${e.message}")
+        return null
+    } finally {
+        zipFile.delete()
+    }
+
+    return extractDir
+}
+
+/**
+ * Extracts a `.tar.gz` archive into [destDir] using Apache Commons Compress.
+ *
+ * Handles UStar, GNU long names, PAX extended headers, and all standard tar entry types.
+ * Path-traversal entries (names containing `../` that escape [destDir]) are skipped.
+ *
+ * @return `true` on success, `false` on failure (partial output is cleaned up).
+ */
+fun extractTarGz(tarGzFile: File, destDir: File): Boolean {
+    destDir.mkdirs()
+    val canonicalDest = destDir.canonicalPath + File.separator
+    return try {
+        TarArchiveInputStream(GZIPInputStream(tarGzFile.inputStream().buffered())).use { tar ->
+            var entry = tar.nextEntry
+            while (entry != null) {
+                val outFile = File(destDir, entry.name)
+                if (!outFile.canonicalPath.startsWith(canonicalDest)) {
+                    entry = tar.nextEntry
+                    continue
+                }
+                if (entry.isDirectory) {
+                    outFile.mkdirs()
+                } else {
+                    outFile.parentFile?.mkdirs()
+                    FileOutputStream(outFile).use { out -> tar.copyTo(out) }
+                }
+                entry = tar.nextEntry
+            }
+        }
+        true
+    } catch (e: Exception) {
+        destDir.deleteRecursively()
+        showWarningDialog("Error extracting ${tarGzFile.name}: ${e.message}")
+        false
     }
 }
 

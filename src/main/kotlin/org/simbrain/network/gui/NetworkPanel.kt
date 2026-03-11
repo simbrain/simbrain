@@ -189,6 +189,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
+        filterScreenElements<WeightMatrixNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<TensorConnectorNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<FlattenConnectorNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<SmileClassifierNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
 
     }
 
@@ -266,6 +278,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 val index = findIndexOfType(SynapseNode::class)
                 canvas.layer.addChild(index + 1, node)
             }
+            is TensorConnectorNode -> {
+                val index = findIndexOfType(SynapseGroupNode::class)
+                canvas.layer.addChild(index + 1, node)
+            }
+            is FlattenConnectorNode -> {
+                val index = findIndexOfType(TensorConnectorNode::class)
+                canvas.layer.addChild(index + 1, node)
+            }
             else -> {
                 canvas.layer.addChild(node)
             }
@@ -302,6 +322,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is NeuronGroup -> createNode(model)
             is AbstractNeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
+            is TensorLayer -> createNode(model)
+            is FlattenConnector -> createNode(model)
+            is TensorConnector -> createNode(model)
             is Connector -> createNode(model)
             is Subnetwork -> createNode(model)
             is SupervisedModel -> createNode(model)
@@ -339,6 +362,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
+
+    suspend fun createNode(tensorLayer: TensorLayer) = addScreenElement { TensorNode(this, tensorLayer) }
+
+    suspend fun createNode(tensorConnector: TensorConnector) = addScreenElement { TensorConnectorNode(this, tensorConnector) }
+
+    suspend fun createNode(flattenConnector: FlattenConnector) = addScreenElement { FlattenConnectorNode(this, flattenConnector) }
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
 
@@ -423,13 +452,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is ClassifierNetwork -> SmileClassifierNode(this, subnetwork)
+            is ConvolutionalNeuralNetwork -> ConvolutionalNeuralNetworkNode(this, subnetwork)
             else -> SubnetworkNode(this, subnetwork)
         }
 
-        val subnetworkNodes = subnetwork.modelList.allInUpdatingOrder.map {
-            createNode(it)
+        val subnetworkNodes = subnetwork.modelList.allInUpdatingOrder.map { model ->
+            modelNodeMap.getImmediately<ScreenElement>(model) ?: createNode(model)
         }
-        val customInfoNode = subnetwork.customInfo?.let { createNode(it) }
+        val customInfoNode = subnetwork.customInfo?.let { model ->
+            modelNodeMap.getImmediately<ScreenElement>(model) ?: createNode(model)
+        }
         createSubNetwork().apply {
             // Add "sub-nodes" to subnetwork node
             subnetworkNodes.forEach { addNode(it) }
@@ -597,6 +629,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<NeuronArray>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<WeightMatrix>().forEach { it.hardClear() }
+        selectionManager.filterSelectedModels<ConvolutionConnector>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<SynapseGroup>().forEach { it.clear() }
     }
 
@@ -840,14 +873,28 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         events.apply {
             selection.on(Dispatchers.Swing) { old, new ->
                 val (removed, added) = old complement new
-                removed.forEach { NodeHandle.removeSelectionHandleFrom(if (it is WeightMatrixNode) it.imageBox else it) }
+                removed.forEach { 
+                    NodeHandle.removeSelectionHandleFrom(
+                        when (it) {
+                            is WeightMatrixNode -> it.imageBox
+                            is TensorConnectorNode -> if ((it.connector as? ConvolutionConnector)?.kernelGridMode == true) it.kernelGridGroup else it.imageBox
+                            else -> it
+                        }
+                    )
+                }
                 added.forEach {
-                    if (it is InteractionBox) {
-                        NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
-                    } else if (it is WeightMatrixNode) {
-                        NodeHandle.addSelectionHandleTo(it.imageBox)
-                    } else {
-                        NodeHandle.addSelectionHandleTo(it)
+                    when {
+                        it is InteractionBox -> NodeHandle.addSelectionHandleTo(it, NodeHandle.INTERACTION_BOX_SELECTION_STYLE)
+                        it is WeightMatrixNode -> NodeHandle.addSelectionHandleTo(it.imageBox)
+                        it is TensorConnectorNode -> {
+                            val selectionTarget = if ((it.connector as? ConvolutionConnector)?.kernelGridMode == true) {
+                                it.kernelGridGroup
+                            } else {
+                                it.imageBox
+                            }
+                            NodeHandle.addSelectionHandleTo(selectionTarget)
+                        }
+                        else -> NodeHandle.addSelectionHandleTo(it)
                     }
                 }
             }

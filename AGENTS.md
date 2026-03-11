@@ -54,6 +54,9 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 - Prefer Kotlin to Java
 - No author comments
 - Avoid redundant documentation
+- Prefer dialog helpers in `org.simbrain.util.SwingUtils.kt` (e.g. `showWarningDialog`, `showWarningConfirmDialog`, `showInputDialog`) instead of creating new raw `JOptionPane` dialogs
+- If a needed dialog helper does not exist, add a reusable utility in `SwingUtils.kt` rather than duplicating dialog setup in feature code
+- Avoid decorative separator comments like `// ── Section ─────────────────`; use minimal plain comments only when they add clarity
 - Test initialization in each test (not `@BeforeEach`)
 - Use backtick test names: `` `test that something works`() ``
 

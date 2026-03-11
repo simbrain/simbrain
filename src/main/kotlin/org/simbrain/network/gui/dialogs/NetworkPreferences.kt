@@ -74,18 +74,10 @@ object NetworkPreferences: PreferenceHolder() {
     var zeroWeightColor by ColorPreference(Color.LIGHT_GRAY)
 
     @UserParameter(
-        label = "Weight matrix arrow color",
-        description = "Color for arrows indicating weight matrix connections",
-        tab = "Colors",
-        order = 90
-    )
-    var weightMatrixArrowColor by ColorPreference(Color.ORANGE)
-
-    @UserParameter(
         label = "Weight matrix boundary color",
         description = "Color for weight matrix boundaries and outlines",
         tab = "Colors",
-        order = 100
+        order = 90
     )
     var weightMatrixBoundaryColor by ColorPreference(Color.ORANGE)
 
@@ -93,9 +85,17 @@ object NetworkPreferences: PreferenceHolder() {
         label = "Synapse group arrow color",
         description = "Color for arrows indicating synapse group connections",
         tab = "Colors",
-        order = 110
+        order = 100
     )
     var synapseGroupArrowColor by ColorPreference(Color.GREEN)
+
+    @UserParameter(
+        label = "Connector arrow color",
+        description = "Color for arrows on weight matrices, tensor connectors, etc.",
+        tab = "Colors",
+        order = 110
+    )
+    var connectorArrowColor by ColorPreference(Color.ORANGE)
 
     @UserParameter(
         label = "Nudge amount",

@@ -3,6 +3,7 @@ package org.simbrain.util.widgets
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PArea
 import org.piccolo2d.nodes.PPath
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
@@ -26,7 +27,7 @@ import java.awt.geom.Line2D
 class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
     private val thickness = template.thickness
-    private val color: Color = template.color
+    private var color: Color = template.color
     private val headPadding = template.padding.head
     private val tailPadding = template.padding.tail
     private val _lateralOffset = template.lateralOffset
@@ -103,6 +104,15 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     }
 
     /**
+     * Update the arrow color from the current [NetworkPreferences.connectorArrowColor].
+     * The arrowTip paint is updated immediately; the curve strokePaint updates on the next [layout] call.
+     */
+    fun updateColorFromPreferences() {
+        color = NetworkPreferences.connectorArrowColor
+        arrowTip.paint = color
+    }
+
+    /**
      * Given a side of a rectangle bound, find the location of where an arrow tail would go.
      */
     private val Line2D.tailOffset
@@ -121,8 +131,7 @@ annotation class BezierArrowMaker
 @BezierArrowMaker
 class BezierArrowTemplate {
 
-    // Default color for all arrows
-    var color: Color = Color.GREEN
+    var color: Color = NetworkPreferences.connectorArrowColor
 
     var thickness = 20.0f
 

@@ -27,12 +27,6 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      */
     var allowNullEditing = false
 
-    /**
-     * Index list of column classes. Previously overrode [getColumnClass] but this created problems.
-     */
-    val columnClasses: List<Class<*>>
-        get() = columns.map { it.type.clazz() }
-
     override fun getColumnName(col: Int): String {
         return columns[col].name
     }
@@ -129,8 +123,8 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
      * If all columns in [colIndices] are instances of one of the types in [classes], return true
      */
     fun columnsOfType(colIndices: List<Int>, vararg classes: Class<*>): Boolean {
-        return colIndices.all {
-            classes.contains(columnClasses[it])
+        return colIndices.all { idx ->
+            classes.contains(columns[idx].type.clazz())
         }
     }
 

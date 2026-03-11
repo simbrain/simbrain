@@ -192,48 +192,53 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                 }
             }
         })
-        val errorValue = JLabel(trainer.lastTrainingError.roundToString(4))
+        val trainingErrorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
-        val errorLabel = labelPanel.addItem(errorDescriptionString(), errorValue)
+        val trainingErrorLabel = labelPanel.addItem("Training ${errorDescriptionString()}", trainingErrorValue)
         
-        // Add accuracy labels for softmax networks (always create, but conditionally show)
+        val testingErrorValue = JLabel("N/A")
+        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
+        
         val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
         
         val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
         
-        // Function to update accuracy label visibility
-        fun updateAccuracyVisibility() {
-            val shouldShowTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy
-            val shouldShowTestingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && 
+        fun updateLabelVisibility() {
+            val showTestingLoss = supervisedNetwork.trainerConfig.testConfiguration.enabled
+            val showTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy
+            val showTestingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && 
                                            supervisedNetwork.trainerConfig.testConfiguration.enabled
             
-            trainingAccuracyLabel.isVisible = shouldShowTrainingAccuracy
-            trainingAccuracyValue.isVisible = shouldShowTrainingAccuracy
-            testingAccuracyLabel.isVisible = shouldShowTestingAccuracy
-            testingAccuracyValue.isVisible = shouldShowTestingAccuracy
+            testingErrorLabel.isVisible = showTestingLoss
+            testingErrorValue.isVisible = showTestingLoss
+            trainingAccuracyLabel.isVisible = showTrainingAccuracy
+            trainingAccuracyValue.isVisible = showTrainingAccuracy
+            testingAccuracyLabel.isVisible = showTestingAccuracy
+            testingAccuracyValue.isVisible = showTestingAccuracy
         }
         
-        // Set initial visibility
-        updateAccuracyVisibility()
+        updateLabelVisibility()
         
         runTools.add(labelPanel)
 
         trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
             iterationsLabel.text = "" + trainer.iteration
-            errorValue.text = "" + trainingStats.trainingError.format(4)
-            errorLabel.text = errorDescriptionString()
+            trainingErrorValue.text = "" + trainingStats.trainingError.format(4)
+            trainingErrorLabel.text = "Training ${errorDescriptionString()}"
             
-            // Update accuracy visibility (in case configuration changed)
-            updateAccuracyVisibility()
+            trainingStats.testingError?.let { testingError ->
+                testingErrorValue.text = "" + testingError.format(4)
+                testingErrorLabel.text = "Testing ${errorDescriptionString()}"
+            }
             
-            // Update training accuracy value (only when available)
+            updateLabelVisibility()
+            
             trainingStats.trainingAccuracy?.let { accuracy ->
                 trainingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
             }
             
-            // Update testing accuracy value (only when available, keep previous value otherwise)
             trainingStats.testingAccuracy?.let { accuracy ->
                 testingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
             }

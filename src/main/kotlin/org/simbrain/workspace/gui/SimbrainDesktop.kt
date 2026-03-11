@@ -8,8 +8,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
-import org.simbrain.custom_sims.NewSimulation
-import org.simbrain.custom_sims.Simulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.util.*
@@ -473,15 +471,9 @@ object SimbrainDesktop {
 
     private fun createScriptMenu(): JMenu {
         val scriptMenu = JMenu("Simulations")
-        simulations.addToMenu(scriptMenu) { newSimulation: Any? ->
-            if (newSimulation is NewSimulation) {
-                workspace.launch {
-                    newSimulation.run(this@SimbrainDesktop)
-                }
-            } else if (newSimulation is Simulation) {
-                workspace.launch {
-                    newSimulation.instantiate(this@SimbrainDesktop).run()
-                }
+        simulations.addToMenu(scriptMenu) { sim ->
+            workspace.launch {
+                sim.run(this@SimbrainDesktop)
             }
         }
         return scriptMenu

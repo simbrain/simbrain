@@ -15,7 +15,6 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbra
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
-import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
@@ -81,16 +80,12 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Behaviorism") {
         item("Simple operant") { simpleOperant }
         item("Classical conditioning") { classicalConditioning }
-        //item("Operant conditioning") { OperantConditioning() }
         item("Operant with environment") { operantWithEnvironment }
     }
 
     dir("Cognitive maps") {
         item("Agent trails") { kAgentTrails }
-        //item("RandomizedPursuer") { RandomizedPursuer() }
         item("Three object recurrent") { cogMap3Objects }
-        // item("ModularOscillatoryNetwork") {ModularOscillatoryNetwork()}
-        // item("Kuramoto Oscillators") { kuramotoOscillators }
     }
 
     dir("Language models") {
@@ -106,8 +101,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spike responders") { spikeResponderSim }
         item("Spike responders (array)") { spikeResponderSimArray }
         item("STDP") { stdpSim }
-        // item("Hippocampus") { Hippocampus() }
-        // item("Cerebellum") { Cerebellum() }
         item("Spiking Network") { spikingNetworkSimulation }
         item("E/I Balance") { excitatoryInhibitoryBalance }
         //item("Cortical layers") { corticalLayers }
@@ -167,13 +160,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("Braitenberg Program Learning") { braitenbergProgramLearning }
     }
 
-    // dir("Other Demos") {
-    //     item("SRN - Temporal XOR") { srnXORSim }
-    //     item("Deep Net - Mnist") { deepNetSim }
-    //     item("Mnist Images") { mnistSim }
-    //     item("LSTM") { lstmBlock() }
-    // }
-
     dir("Vision") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         //item("Photo album (100 x 100)") { photoAlbumExample }
@@ -185,19 +171,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("CNN Simple Demo") { cnnSimpleLineDetector }
         item("CNN Object Recognition (100 x 100)") { cnnObjectDetector }
     }
-
-    //dir("Testing") {
-    //    // item("Test Sim") { testSim }
-    //    //item("Linked Neuron List") { linkedNeuronList }
-    //    // dir("Defunct?") {
-    //    //     item("ConvertSim") { ConvertSim() }
-    //    //     item("Creatures") { CreaturesSim() }
-    //    //     item("MPFS") { MpfsSOM() }
-    //    //     item("PatternsOfActivity") { PatternsOfActivity() }
-    //    //     item("SORN") { SORN() }
-    //    //     item("Cortical Branching") { CorticalBranching() }
-    //    // }
-    //}
 
 }
 
@@ -226,8 +199,5 @@ suspend fun main(args: Array<String>) {
     } catch (e: NoSuchElementException) {
         throw IllegalArgumentException("Index is out of bound")
     }
-    when (sim) {
-        is NewSimulation -> sim.run(optionString = if(args.size > 1) args[1] else null)
-        is Simulation -> sim.run()
-    }
+    sim.run(optionString = if(args.size > 1) args[1] else null)
 }

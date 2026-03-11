@@ -828,19 +828,32 @@ class TensorWidget<O : EditableObject>(
         createFrom2DArray(slice2D.map { row -> row.toTypedArray() }.toTypedArray())
     }
 
+    private fun createTensorTablePanel(model: BasicDataFrame) = SimbrainTablePanel(
+        model,
+        useDefaultToolbarAndMenu = false,
+        useRowHeaders = false,
+        usePadding = false
+    ).apply {
+        addAction(table.fillAction)
+        addAction(table.zeroFillAction)
+        addAction(table.randomizeAction)
+        addAction(table.editRandomizerAction)
+        addSeparator()
+        addAction(table.createShowEigenValuesAction())
+        addAction(table.showBoxPlotAction)
+        addAction(table.createShowMatrixPlotAction())
+    }
+
     override val widget: JComponent by lazy {
         // header ~25px, each data row ~20px, plus border/insets ~6px, cap at 300
-        val tableHeight = min(25 + descriptor.numRows * 20 + 6, 300)
+        val tableHeight = min(50 + descriptor.numRows * 20 + 6, 300)
         val tableWidth = min(descriptor.numCols * 55 + 30, 500).coerceAtLeast(200)
 
         if (descriptor.numSlices == 1) {
             // Single slice: no tabs needed
             object : JPanel(BorderLayout()) {
                 init {
-                    SimbrainTablePanel(
-                        sliceModels[0], useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                        usePadding = false
-                    ).also { add(it) }
+                    createTensorTablePanel(sliceModels[0]).also { add(it) }
                 }
                 override fun getPreferredSize() = Dimension(tableWidth, tableHeight)
                 override fun getMinimumSize() = preferredSize
@@ -851,10 +864,7 @@ class TensorWidget<O : EditableObject>(
             val totalTabOverhead = tabDepth * 35
 
             fun buildTablePanel(sliceIdx: Int) = JPanel(BorderLayout()).apply {
-                SimbrainTablePanel(
-                    sliceModels[sliceIdx], useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                    usePadding = false
-                ).also { add(it) }
+                createTensorTablePanel(sliceModels[sliceIdx]).also { add(it) }
             }
 
             /**

@@ -297,7 +297,7 @@ val cnnObjectDetector = newSim {
         imageWorld.imagePipelineCollection.currentPipeline.let { pipeline ->
             createCoupling(
                 pipeline.getProducer(pipeline::rgbActivations),
-                inputTensorLayer.getConsumer(inputTensorLayer::setActivations)
+                inputTensorLayer.getConsumer(inputTensorLayer::activations)
             )
         }
     }

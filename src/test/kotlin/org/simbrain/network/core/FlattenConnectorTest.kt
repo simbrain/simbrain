@@ -34,7 +34,7 @@ class FlattenConnectorTest {
         val target = NeuronArray(4)
         val flatten = FlattenConnector(source, target)
 
-        source.setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        source.activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         flatten.propagate()
         assertArrayEquals(doubleArrayOf(1.0, 2.0, 3.0, 4.0), target.inputs.toDoubleArray(), 1e-12)
 

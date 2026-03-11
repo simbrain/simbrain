@@ -3,6 +3,8 @@ package org.simbrain.network.core
 import org.simbrain.network.conv.ConvOps
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.TensorDescriptor
 import org.simbrain.util.stats.ProbabilityDistribution
 import kotlin.math.sqrt
 
@@ -39,8 +41,21 @@ class ConvolutionConnector(
     private val inputChannels = source.shape.channels
     private val kernelArea = kernelSize * kernelSize
 
+    /** Descriptor for how to display kernel weights in the property editor. */
+    val kernelDescriptor get() = TensorDescriptor(
+        intArrayOf(numFilters, inputChannels, kernelSize, kernelSize),
+        arrayOf("Filter", "Channel", "H", "W"),
+        rowAxis = 2, colAxis = 3
+    )
+
     /** Flat kernel weights: [numFilters][inputChannels][kH][kW] */
-    val kernels = DoubleArray(numFilters * inputChannels * kernelArea)
+    var kernels by GuiEditable(
+        initValue = DoubleArray(numFilters * inputChannels * kernelArea),
+        label = "Kernels",
+        tab = "Data",
+        order = 100,
+        tensorDescriptor = ConvolutionConnector::kernelDescriptor
+    )
 
     /** Per-filter biases */
     val filterBiases = DoubleArray(numFilters)

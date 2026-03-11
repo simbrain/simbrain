@@ -198,6 +198,17 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
             }
         }
 
+        // Tensor descriptor takes priority over the default DoubleArray widget
+        if (userParameter.tensorDescriptor != null && userParameter.value is DoubleArray) {
+            val desc = userParameter.tensorDescriptor!!.get(userParameter.baseObject) as TensorDescriptor
+            return TensorWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, DoubleArray>,
+                isConsistent,
+                desc
+            ) as ParameterWidget<O, T>
+        }
+
         return when (userParameter.value) {
 
             is String, is String? -> StringWidget(

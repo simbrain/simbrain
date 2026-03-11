@@ -14,7 +14,7 @@ class ConvolutionalNeuralNetworkTest {
 
         val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
             isClamped = true
-            setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+            activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         }
         val flatArray = NeuronArray(4).apply {
             biases.fill(0.0)
@@ -68,7 +68,7 @@ class ConvolutionalNeuralNetworkTest {
         outputArray.setActivations(dialogOutput.copyOf())
 
         // Normal path: set input then iterate network once.
-        inputTensorLayer.setActivations(inputRow.copyOf())
+        inputTensorLayer.activations = inputRow.copyOf()
         net.update("test")
         val iterateOutput = outputArray.activationArray.copyOf()
 
@@ -123,7 +123,7 @@ class ConvolutionalNeuralNetworkTest {
         val net = Network()
         val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
             isClamped = true
-            setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+            activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         }
         val flatArray = NeuronArray(4).apply { biases.fill(0.0) }
         val outputArray = NeuronArray(1).apply { biases.fill(0.0) }
@@ -145,7 +145,7 @@ class ConvolutionalNeuralNetworkTest {
         val restoredCnn = fromXml.getModelByLabel(ConvolutionalNeuralNetwork::class.java, "FwdCNN")!!
 
         // Set the same input and run forward pass on deserialized network
-        restoredCnn.inputTensorLayer.setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        restoredCnn.inputTensorLayer.activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         fromXml.update("test")
         val afterOutput = restoredCnn.outputArray.activationArray[0]
 
@@ -215,7 +215,7 @@ class ConvolutionalNeuralNetworkTest {
         assertEquals(1, restoredPools.size, "Should have 1 PoolingConnector after deserialization")
 
         // Verify forward pass works on deserialized network
-        restoredCnn.inputTensorLayer.setActivations(DoubleArray(inputShape.size) { 1.0 })
+        restoredCnn.inputTensorLayer.activations = DoubleArray(inputShape.size) { 1.0 }
         fromXml.update("test")
         // Just verify no exception and output is non-trivial
         assertNotNull(restoredCnn.outputArray.activationArray)
@@ -236,7 +236,7 @@ class ConvolutionalNeuralNetworkTest {
         }
         net.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
 
-        inputTensorLayer.setActivations(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        inputTensorLayer.activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
         net.update("test")
 
         // Output path is updated...

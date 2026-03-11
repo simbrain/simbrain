@@ -133,7 +133,7 @@ val cnnDemo = newSim {
     // --- Coupling: View3DSensor.rgbTensor -> inputTensor.setActivations ---
     with(couplingManager) {
         view3dSensor.getProducer(View3DSensor::rgbTensorLayer) couple
-                inputTensorLayer.getConsumer(TensorLayer::setActivations)
+                inputTensorLayer.getConsumer(inputTensorLayer::activations)
     }
 
     // --- Layout ---

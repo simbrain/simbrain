@@ -4,6 +4,8 @@ import org.simbrain.network.events.TensorEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.TensorDescriptor
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
@@ -88,14 +90,37 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
             events.visualPropertiesChanged.fire()
         }
 
+    /** Descriptor for how to display HWC tensor arrays in the property editor. */
+    val hwcDescriptor get() = TensorDescriptor(
+        intArrayOf(shape.height, shape.width, shape.channels),
+        arrayOf("H", "W", "Channel")
+    )
+
     /** Current activations (HWC flat array). */
-    val activations = DoubleArray(shape.size)
+    @set:Consumable(description = "Set activations from external source")
+    var activations by GuiEditable(
+        initValue = DoubleArray(shape.size),
+        label = "Activations",
+        tab = "Data",
+        order = 100,
+        tensorDescriptor = TensorLayer::hwcDescriptor,
+        setter = { newArray ->
+            System.arraycopy(newArray, 0, field, 0, minOf(newArray.size, field.size))
+            baseObject.events.updated.fire()
+        }
+    )
 
     /** Accumulated inputs from incoming connectors (cleared each update). */
     val inputs = DoubleArray(shape.size)
 
     /** Per-element biases. */
-    val biases = DoubleArray(shape.size)
+    var biases by GuiEditable(
+        initValue = DoubleArray(shape.size),
+        label = "Biases",
+        tab = "Data",
+        order = 110,
+        tensorDescriptor = TensorLayer::hwcDescriptor
+    )
 
     /** Gradients for backpropagation (same layout as activations). */
     val gradients = DoubleArray(shape.size)
@@ -146,12 +171,6 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
 
     @get:Producible(description = "Activation array")
     val activationArray: DoubleArray get() = activations
-
-    @Consumable(description = "Set activations from external source")
-    fun setActivations(source: DoubleArray) {
-        System.arraycopy(source, 0, activations, 0, minOf(source.size, activations.size))
-        events.updated.fire()
-    }
 
     /**
      * Extract a single channel as a flat array of size height*width.

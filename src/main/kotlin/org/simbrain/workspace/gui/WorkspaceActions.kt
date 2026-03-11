@@ -521,8 +521,8 @@ class WorkspaceActions {
         component.world.resetImageAlbum(tensorLayer.shape.width, tensorLayer.shape.height)
         val producer = component.world.imagePipelineCollection.currentPipeline
             .getProducer(ImageProcessingPipeline::rgbActivations)
-        val consumer = tensorLayer.getConsumer(TensorLayer::setActivations)
         with(workspace.couplingManager) {
+            val consumer = tensorLayer.getConsumer(tensorLayer::activations)
             producer couple consumer
         }
         tensorLayer.isClamped = true

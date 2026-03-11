@@ -212,7 +212,7 @@ val cnnSimpleLineDetector = newSim {
 
     // Pre-load input with a random diagonal training image
     val diagonalSampleIndex = 60 + rng.nextInt(30)
-    inputLayer.setActivations(inputs[diagonalSampleIndex].toDoubleArray())
+    inputLayer.activations = inputs[diagonalSampleIndex].toDoubleArray()
 
     place(networkComponent, 0, 0, 850, 730)
     workspace.simpleIterate() // So some activations are shown

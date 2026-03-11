@@ -66,6 +66,7 @@ class GuiEditable<O : EditableObject, T>(
     val setter: (GuiEditableSetterContext<O, T>.(T) -> Unit)? = null,
     val useFileChooser: Boolean = false,
     val fileChooserInitialDirectory: String? = null,
+    val tensorDescriptor: KProperty1<O, TensorDescriptor>? = null,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -180,6 +181,7 @@ class GuiEditableGetterContext<O : EditableObject, T> {
 
 context(GuiEditable<O, T>)
 class GuiEditableSetterContext<O : EditableObject, T> {
+    val baseObject get() = this@GuiEditable.baseObject
     var field get() = value
         set(newValue) {
             value = newValue
@@ -796,6 +798,109 @@ class DoubleArrayWidget<O : EditableObject>(
             model.getDoubleColumn(0)
         } else {
             model.getRow<Double>(0).toDoubleArray()
+        }
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.update(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+class TensorWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, DoubleArray>,
+    isConsistent: Boolean,
+    private val descriptor: TensorDescriptor
+) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
+
+    /** One BasicDataFrame per slice (tab). */
+    private val sliceModels: List<BasicDataFrame> = (0 until descriptor.numSlices).map { sliceIdx ->
+        val slice2D = descriptor.extractSlice(parameter.value, sliceIdx)
+        createFrom2DArray(slice2D.map { row -> row.toTypedArray() }.toTypedArray())
+    }
+
+    override val widget: JComponent by lazy {
+        // header ~25px, each data row ~20px, plus border/insets ~6px, cap at 300
+        val tableHeight = min(25 + descriptor.numRows * 20 + 6, 300)
+        val tableWidth = min(descriptor.numCols * 55 + 30, 500).coerceAtLeast(200)
+
+        if (descriptor.numSlices == 1) {
+            // Single slice: no tabs needed
+            object : JPanel(BorderLayout()) {
+                init {
+                    SimbrainTablePanel(
+                        sliceModels[0], useDefaultToolbarAndMenu = false, useRowHeaders = false,
+                        usePadding = false
+                    ).also { add(it) }
+                }
+                override fun getPreferredSize() = Dimension(tableWidth, tableHeight)
+                override fun getMinimumSize() = preferredSize
+            }
+        } else {
+            // Multiple tab axes → nested tab panes; single tab axis → flat tabs
+            val tabDepth = descriptor.tabAxes.size
+            val totalTabOverhead = tabDepth * 35
+
+            fun buildTablePanel(sliceIdx: Int) = JPanel(BorderLayout()).apply {
+                SimbrainTablePanel(
+                    sliceModels[sliceIdx], useDefaultToolbarAndMenu = false, useRowHeaders = false,
+                    usePadding = false
+                ).also { add(it) }
+            }
+
+            /**
+             * Recursively build nested JTabbedPanes.
+             * [tabAxisLevel] is the index into descriptor.tabAxes we're nesting at.
+             * [baseSlice] is the accumulated slice offset from outer tab selections.
+             * [sliceStride] is how many slices each tab at this level spans.
+             */
+            fun buildTabs(tabAxisLevel: Int, baseSlice: Int, sliceStride: Int): JComponent {
+                val axis = descriptor.tabAxes[tabAxisLevel]
+                val axisSize = descriptor.dimensions[axis]
+                val tabbedPane = JTabbedPane()
+                val childStride = sliceStride / axisSize
+
+                for (i in 0 until axisSize) {
+                    val childBase = baseSlice + i * childStride
+                    val label = descriptor.axisLabel(tabAxisLevel, i)
+                    if (tabAxisLevel == tabDepth - 1) {
+                        // Leaf level: add table directly
+                        tabbedPane.addTab(label, buildTablePanel(childBase))
+                    } else {
+                        // Intermediate level: recurse
+                        tabbedPane.addTab(label, buildTabs(tabAxisLevel + 1, childBase, childStride))
+                    }
+                }
+                return tabbedPane
+            }
+
+            object : JPanel(BorderLayout()) {
+                init {
+                    add(buildTabs(0, 0, descriptor.numSlices))
+                }
+                override fun getPreferredSize() = Dimension(tableWidth, tableHeight + totalTabOverhead)
+                override fun getMinimumSize() = preferredSize
+            }
+        }
+    }
+
+    override val value: DoubleArray
+        get() {
+            val result = parameter.value.copyOf()
+            for (sliceIdx in 0 until descriptor.numSlices) {
+                val slice = sliceModels[sliceIdx].get2DDoubleArray()
+                descriptor.writeSlice(result, sliceIdx, slice)
+            }
+            return result
         }
 
     override fun refresh(property: KProperty<*>) {

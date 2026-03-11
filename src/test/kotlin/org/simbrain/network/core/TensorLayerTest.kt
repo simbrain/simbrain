@@ -76,7 +76,7 @@ class TensorLayerTest {
     fun `setActivations coupling`() {
         val tensorLayer = TensorLayer(TensorShape(2, 2, 1))
         val source = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
-        tensorLayer.setActivations(source)
+        tensorLayer.activations = source
         assertArrayEquals(source, tensorLayer.activationArray, 1e-10)
     }
 

@@ -63,6 +63,11 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         arrow.invalidateFullBounds()
     }
 
+    fun updateArrowColorFromPreferences() {
+        arrow.updateColorFromPreferences()
+        layoutChildren()
+    }
+
     override fun layoutChildren() {
         val srcBounds = sourceNode?.globalBounds ?: return
         val tgtBounds = targetNode?.globalBounds ?: return

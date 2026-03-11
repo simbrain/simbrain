@@ -27,7 +27,7 @@ import java.awt.geom.Line2D
 class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
     private val thickness = template.thickness
-    private val color: Color = template.color
+    private var color: Color = template.color
     private val headPadding = template.padding.head
     private val tailPadding = template.padding.tail
     private val _lateralOffset = template.lateralOffset
@@ -101,6 +101,15 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         // 6. call back
         updateEvent(curveModel)
 
+    }
+
+    /**
+     * Update the arrow color from the current [NetworkPreferences.connectorArrowColor].
+     * The arrowTip paint is updated immediately; the curve strokePaint updates on the next [layout] call.
+     */
+    fun updateColorFromPreferences() {
+        color = NetworkPreferences.connectorArrowColor
+        arrowTip.paint = color
     }
 
     /**

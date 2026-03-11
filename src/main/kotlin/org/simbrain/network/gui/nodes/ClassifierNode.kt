@@ -44,6 +44,11 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
     override val propertyDialog: StandardDialog
         get() = with(networkPanel) {smileClassifier.getTrainingDialog()}
 
+    fun updateArrowColorFromPreferences() {
+        arrow.updateColorFromPreferences()
+        layoutChildren()
+    }
+
     override fun layoutChildren() {
         super.layoutChildren()
         arrow.layout(

@@ -339,6 +339,11 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         updateDetailLabel()
     }
 
+    fun updateArrowColorFromPreferences() {
+        arrow.updateColorFromPreferences()
+        layoutChildren()
+    }
+
     override fun layoutChildren() {
         val srcBounds = sourceNode?.globalBounds ?: return
         val tgtBounds = targetNode?.globalBounds ?: return

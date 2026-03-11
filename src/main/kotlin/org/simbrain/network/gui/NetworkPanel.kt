@@ -189,6 +189,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
+        filterScreenElements<WeightMatrixNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<TensorConnectorNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<FlattenConnectorNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
+        filterScreenElements<SmileClassifierNode>().forEach {
+            it.updateArrowColorFromPreferences()
+        }
 
     }
 

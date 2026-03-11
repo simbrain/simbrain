@@ -59,6 +59,14 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
         }
     }.also { addChild(it) }
 
+    fun updateColorFromPreferences() {
+        when (arrow) {
+            is RecurrentArrow -> arrow.updateColorFromPreferences()
+            is BezierArrow -> arrow.updateColorFromPreferences()
+        }
+        layoutChildren()
+    }
+
     override fun layoutChildren() {
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) ->

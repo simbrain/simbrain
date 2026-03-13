@@ -742,6 +742,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
             addSubnetAction("Competitive network") { CompetitiveCreationDialog(networkPanel) },
+            addSubnetAction("Convolutional neural network") { CnnCreationDialog(networkPanel) },
             addSubnetAction("Feed forward network") { FeedForwardCreationDialog(networkPanel) },
             addSubnetAction("Hopfield") { HopfieldCreationDialog(networkPanel) },
             addSubnetAction("Restricted Boltzmann machine") {

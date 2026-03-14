@@ -689,7 +689,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     private fun addSubnetAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(
-        name = name,
+        name = "$name...",
         description = "Add $name to network",
     ) {
         with(createDialog(networkPanel)) {

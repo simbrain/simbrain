@@ -10,6 +10,7 @@ import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
+import org.simbrain.util.toDisplayText
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -32,7 +33,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         class Conv(val template: ConvLayerTemplate = ConvLayerTemplate()) : LayerSpec() {
             override fun description(): String =
                 "Conv: ${template.kernelSize}x${template.kernelSize}, " +
-                        "${template.numFilters} filters, ${template.padding}, ${template.activation}"
+                        "${template.numFilters} filters, ${template.activation.toDisplayText()}"
 
             override fun outputShape(inputShape: TensorShape): TensorShape =
                 inputShape.convOutputShape(template.kernelSize, template.stride, template.padding, template.numFilters)
@@ -40,7 +41,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         class Pool(val template: PoolLayerTemplate = PoolLayerTemplate()) : LayerSpec() {
             override fun description(): String =
-                "Pool: ${template.poolSize}x${template.poolSize} ${template.poolingType}, stride ${template.stride}"
+                "Pool: ${template.poolSize}x${template.poolSize} ${template.poolingType.toDisplayText()}, Stride ${template.stride}"
 
             override fun outputShape(inputShape: TensorShape): TensorShape =
                 inputShape.poolOutputShape(template.poolSize, template.stride)

@@ -460,6 +460,23 @@ fun String.convertCamelCaseToSpaces(useTitleCase: Boolean = false): String {
 }
 
 /**
+ * Converts enum-style identifiers into display text.
+ *
+ * Examples:
+ * - "MAX".toDisplayText() -> "Max"
+ * - "helloWorld".toDisplayText() -> "Hello world"
+ * - "HELLO_WORLD".toDisplayText() -> "Hello world"
+ */
+fun String.toDisplayText(): String {
+    val normalized = lowercase()
+        .split("_")
+        .joinToString(" ") { it.replaceFirstChar { c -> c.titlecase(Locale.getDefault()) } }
+    return normalized.convertCamelCaseToSpaces()
+}
+
+fun Enum<*>.toDisplayText(): String = name.toDisplayText()
+
+/**
  * Generates a "Christmas tree" of input-target pairs in an autoregressive manner from a given string.
  * Each pair consists of a prefix of tokens as input and the next token as the target.
  *

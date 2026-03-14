@@ -21,7 +21,7 @@ class ConvolutionConnector(
     @UserParameter(label = "Kernel Size", description = "Spatial size of convolution kernel", displayOnly = true, order = 1)
     val kernelSize: Int = 3,
     @UserParameter(label = "Num Filters", description = "Number of output filters", displayOnly = true, order = 2)
-    val numFilters: Int = 16,
+    val numFilters: Int = 8,
     @UserParameter(label = "Stride", description = "Convolution stride", displayOnly = true, order = 3)
     val stride: Int = 1,
     @UserParameter(label = "Padding", description = "Padding strategy", displayOnly = true, order = 4)

@@ -374,17 +374,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
                 // Kernel grid toggle
                 contextMenu.add(networkPanel.createAction(
-                    name = if (connector.kernelGridMode) "Show Single Kernel View" else "Show Kernel Grid"
+                    name = if (connector.kernelGridMode) "Single Kernel View" else "Kernel Grid View"
                 ) {
                     connector.kernelGridMode = !connector.kernelGridMode
                 })
-
-                if (!connector.kernelGridMode) {
-                    contextMenu.add(networkPanel.createAction(name = "Next Filter") { nextFilter() })
-                    contextMenu.add(networkPanel.createAction(name = "Previous Filter") { previousFilter() })
-                    contextMenu.add(networkPanel.createAction(name = "Next Input Channel") { nextInputChannel() })
-                    contextMenu.add(networkPanel.createAction(name = "Previous Input Channel") { previousInputChannel() })
-                }
 
                 contextMenu.addSeparator()
                 contextMenu.add(networkPanel.networkActions.randomizeObjectsAction)

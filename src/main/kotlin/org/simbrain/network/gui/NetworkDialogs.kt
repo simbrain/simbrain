@@ -187,7 +187,7 @@ class ConvLayerTemplate : EditableObject {
     var kernelSize = 3
 
     @UserParameter(label = "Num Filters", description = "Number of output filters", minimumValue = 1.0, order = 2)
-    var numFilters = 16
+    var numFilters = 8
 
     @UserParameter(label = "Stride", description = "Convolution stride", minimumValue = 1.0, order = 3)
     var stride = 1

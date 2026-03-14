@@ -222,6 +222,80 @@ class ConvolutionalNeuralNetworkTest {
     }
 
     @Test
+    fun `cnn children registered in childToParentMap`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply { isClamped = true }
+        val flatArray = NeuronArray(4)
+        val outputArray = NeuronArray(1)
+        FlattenConnector(inputTensorLayer, flatArray)
+        WeightMatrix(flatArray, outputArray)
+
+        val cnn = net.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+
+        assertTrue(cnn in net.allModels)
+        assertEquals(cnn, net.childToParentMap[inputTensorLayer])
+        assertEquals(cnn, net.childToParentMap[flatArray])
+        assertEquals(cnn, net.childToParentMap[outputArray])
+    }
+
+    @Test
+    fun `cnn children not double-updated by buffered update`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply {
+            isClamped = true
+            activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
+        }
+        val flatArray = NeuronArray(4).apply { biases.fill(0.0) }
+        val outputArray = NeuronArray(1).apply { biases.fill(0.0) }
+        FlattenConnector(inputTensorLayer, flatArray)
+        WeightMatrix(flatArray, outputArray).apply {
+            setWeights(doubleArrayOf(1.0, 1.0, 1.0, 1.0))
+        }
+        net.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+
+        // One network update should produce the same result as a single forward pass
+        net.update("test")
+        val firstUpdate = outputArray.activationArray[0]
+
+        // Reset and update again
+        inputTensorLayer.activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
+        net.update("test")
+        val secondUpdate = outputArray.activationArray[0]
+
+        // If double-update were happening, the second result would differ
+        assertEquals(firstUpdate, secondUpdate, 1e-10,
+            "Repeated updates should produce consistent results (no double-update)")
+        assertEquals(10.0, firstUpdate, 1e-10)
+    }
+
+    @Test
+    fun `cnn pipeline broken when dense chain has gap`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1))
+        val flatArray = NeuronArray(4)
+        FlattenConnector(inputTensorLayer, flatArray)
+        // No WeightMatrix connecting flatArray to outputArray
+        val outputArray = NeuronArray(1)
+
+        // CNN constructor should throw because it can't walk from flatten target to outputArray
+        assertThrows(NoSuchElementException::class.java) {
+            ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+        }
+    }
+
+    @Test
+    fun `cnn pipeline broken when no flatten found`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1))
+        val outputArray = NeuronArray(4)
+        // No outgoing connectors at all from inputTensorLayer
+
+        assertThrows(IllegalStateException::class.java) {
+            ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+        }
+    }
+
+    @Test
     fun `normal iteration syncs flatten activations`() {
         val net = Network()
 

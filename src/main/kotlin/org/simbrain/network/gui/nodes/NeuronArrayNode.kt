@@ -335,8 +335,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.addSeparator()
 
             val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
-
             contextMenu.add(createSupervisedModelAction)
+            contextMenu.add(networkPanel.networkActions.createConvolutionalNeuralNetworkAction)
 
             val applyInputs: Action = networkPanel.networkActions.createTestInputPanelAction(neuronArray)
             contextMenu.add(applyInputs)

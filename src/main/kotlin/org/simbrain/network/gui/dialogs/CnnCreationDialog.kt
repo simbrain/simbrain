@@ -480,11 +480,9 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         allModels.add(outputArray)
         allModels.add(denseWeights)
 
-        // Add all models to network, then wrap in CNN
-        for (model in allModels) {
-            network.addNetworkModelAsync(model, usePlacementManager = false)
-        }
-
+        // Create the CNN wrapper — it discovers the pipeline from inputLayer to outputArray.
+        // Only the CNN subnetwork is added to the network; its children live in the
+        // subnetwork's modelList and are removed from top-level networkModels.
         addSubnetworkAction(networkPanel) {
             ConvolutionalNeuralNetwork(inputLayer, outputArray)
         }

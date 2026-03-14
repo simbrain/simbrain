@@ -342,6 +342,9 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             })
             contextMenu.addSeparator()
 
+            contextMenu.add(networkPanel.networkActions.createConvolutionalNeuralNetworkAction)
+            contextMenu.addSeparator()
+
             // Channel navigation & display modes
             // Thumbnail strip toggle
             contextMenu.add(networkPanel.createAction(

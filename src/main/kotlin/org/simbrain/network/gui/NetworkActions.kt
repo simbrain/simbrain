@@ -1127,11 +1127,25 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 if (!foundFlatten) {
                     reasons.add("No Flatten connector found in pipeline from source Tensor")
                 } else {
-                    val loose = pipelineModels
+                    // Walk the dense chain from flatten target to verify it reaches the selected target
+                    var currentLayer: Layer = pipelineModels.last() as Layer
+                    while (currentLayer != target) {
+                        val wm = currentLayer.outgoingConnectors
+                            .filterIsInstance<WeightMatrix>().firstOrNull() ?: break
+                        pipelineModels.add(wm)
+                        pipelineModels.add(wm.target)
+                        currentLayer = wm.target
+                    }
+                    val reachesTarget = currentLayer == target
+                    if (!reachesTarget) {
+                        reasons.add("Dense chain from Flatten does not reach the selected target NeuronArray")
+                    }
+
+                    val owned = pipelineModels
                         .distinct()
-                        .filter { it in networkPanel.network.allModels && networkPanel.network.childToParentMap[it] == null }
-                    if (loose.isNotEmpty()) {
-                        reasons.add("CNN wrapper requires an unowned pipeline (current pipeline models are loose top-level models)")
+                        .filter { networkPanel.network.childToParentMap[it] != null }
+                    if (owned.isNotEmpty()) {
+                        reasons.add("Some pipeline models are already owned by another parent")
                     }
                 }
             } catch (e: Exception) {

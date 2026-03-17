@@ -348,26 +348,20 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             // Channel navigation & display modes
             // Thumbnail strip toggle
             contextMenu.add(networkPanel.createAction(
-                name = if (tensorLayer.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail Strip"
+                name = if (tensorLayer.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail View"
             ) {
                 tensorLayer.thumbnailStripMode = !tensorLayer.thumbnailStripMode
             })
 
-            if (tensorLayer.shape.channels > 1) {
-                if (!tensorLayer.thumbnailStripMode) {
-                    contextMenu.add(networkPanel.createAction(name = "Next Channel") { nextChannel() })
-                    contextMenu.add(networkPanel.createAction(name = "Previous Channel") { previousChannel() })
-                }
-
-                if (tensorLayer.shape.channels == 3) {
-                    contextMenu.add(networkPanel.createAction(
-                        name = if (tensorLayer.rgbComposite) "Show Single Channel" else "Show RGB Composite"
+            if (tensorLayer.shape.channels == 3) {
+                contextMenu.add(
+                    networkPanel.createAction(
+                        name = if (tensorLayer.rgbComposite) "Hide RGB Composite" else "Show RGB Composite"
                     ) {
                         tensorLayer.rgbComposite = !tensorLayer.rgbComposite
                     })
-                }
-                contextMenu.addSeparator()
             }
+            contextMenu.addSeparator()
 
             // Randomize
             contextMenu.add(networkPanel.networkActions.randomizeObjectsAction)

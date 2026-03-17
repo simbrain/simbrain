@@ -5,10 +5,10 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
-import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.trainers.createSimpleTensorClassificationDataset
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.place
-import kotlin.random.Random
 
 /**
  * Demo simulation showing a trainable CNN pipeline with synthetic data.
@@ -16,10 +16,7 @@ import kotlin.random.Random
  * Pipeline: Input(16x16x1) -> Conv1(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) 
  *         -> Conv2(3x3, 16 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
  *
- * Three synthetic pattern classes with random positions to demonstrate CNN translation invariance:
- * - Class 0: horizontal line (1 pixel wide, 3-4 pixels long)
- * - Class 1: vertical line (1 pixel wide, 3-4 pixels long)
- * - Class 2: diagonal line (1 pixel wide, 3-4 pixels long)
+ * Three synthetic pattern classes with random positions to demonstrate CNN translation invariance.
  */
 val cnnSimpleLineDetector = newSim {
 
@@ -101,99 +98,13 @@ val cnnSimpleLineDetector = newSim {
         label = "Dense Connector"
     }
 
-    // Generate synthetic training data
-
-    val rng = Random(42)
-    val inputs = mutableListOf<MutableList<Double>>()
-    val targets = mutableListOf<MutableList<Double>>()
-    val imageSize = 16
-
-    // Class 0: horizontal line (1 pixel wide, 3-4 pixels long) at random positions
-    repeat(30) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize)
-        val startCol = rng.nextInt(imageSize - length + 1)
-        for (col in startCol until (startCol + length)) {
-            img[startRow * imageSize + col] = 1.0
-        }
-        inputs.add(img)
-        targets.add(mutableListOf(1.0, 0.0, 0.0))
-    }
-
-    // Class 1: vertical line (1 pixel wide, 3-4 pixels long) at random positions
-    repeat(30) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize - length + 1)
-        val startCol = rng.nextInt(imageSize)
-        for (row in startRow until (startRow + length)) {
-            img[row * imageSize + startCol] = 1.0
-        }
-        inputs.add(img)
-        targets.add(mutableListOf(0.0, 1.0, 0.0))
-    }
-
-    // Class 2: diagonal line (3-4 pixels long) at random positions
-    repeat(30) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize - length + 1)
-        val startCol = rng.nextInt(imageSize - length + 1)
-        for (i in 0 until length) {
-            img[(startRow + i) * imageSize + (startCol + i)] = 1.0
-        }
-        inputs.add(img)
-        targets.add(mutableListOf(0.0, 0.0, 1.0))
-    }
-
-    val dataset = TrainingDataset(inputs, targets, inputSize = imageSize * imageSize, targetSize = 3)
-
-    // --- Generate testing data ---
-
-    val testInputs = mutableListOf<MutableList<Double>>()
-    val testTargets = mutableListOf<MutableList<Double>>()
-
-    // Class 0: horizontal line at different positions (5 test samples)
-    repeat(5) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize)
-        val startCol = rng.nextInt(imageSize - length + 1)
-        for (col in startCol until (startCol + length)) {
-            img[startRow * imageSize + col] = 1.0
-        }
-        testInputs.add(img)
-        testTargets.add(mutableListOf(1.0, 0.0, 0.0))
-    }
-
-    // Class 1: vertical line at different positions (5 test samples)
-    repeat(5) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize - length + 1)
-        val startCol = rng.nextInt(imageSize)
-        for (row in startRow until (startRow + length)) {
-            img[row * imageSize + startCol] = 1.0
-        }
-        testInputs.add(img)
-        testTargets.add(mutableListOf(0.0, 1.0, 0.0))
-    }
-
-    // Class 2: diagonal at different positions (5 test samples)
-    repeat(5) {
-        val img = MutableList(imageSize * imageSize) { 0.0 }
-        val length = rng.nextInt(3, 5)
-        val startRow = rng.nextInt(imageSize - length + 1)
-        val startCol = rng.nextInt(imageSize - length + 1)
-        for (i in 0 until length) {
-            img[(startRow + i) * imageSize + (startCol + i)] = 1.0
-        }
-        testInputs.add(img)
-        testTargets.add(mutableListOf(0.0, 0.0, 1.0))
-    }
-
-    val testDataset = TrainingDataset(testInputs, testTargets, inputSize = imageSize * imageSize, targetSize = 3)
+    val fullDataset = createSimpleTensorClassificationDataset(
+        inputShape = inputShape,
+        nOutputs = 3,
+        samplesPerClass = 35,
+        rngSeed = 42L
+    )
+    val (dataset, testDataset) = splitDataSet(fullDataset, 0.85)
 
     // Automatically discovers pipeline from input to output
     val cnnModel = network.addConvolutionalNeuralNetwork(inputLayer, outputLayer) {
@@ -210,9 +121,10 @@ val cnnSimpleLineDetector = newSim {
         testConfiguration.testFrequency = 10
     }
 
-    // Pre-load input with a random diagonal training image
-    val diagonalSampleIndex = 60 + rng.nextInt(30)
-    inputLayer.activations = inputs[diagonalSampleIndex].toDoubleArray()
+    // Pre-load input with a sample from the third class.
+    val thirdClassIndex = dataset.targets.indexOfFirst { it.getOrNull(2) == 1.0 }.takeIf { it >= 0 } ?: 0
+    val thirdClassSample = dataset.inputs[thirdClassIndex]
+    inputLayer.activations = thirdClassSample.toDoubleArray()
 
     place(networkComponent, 0, 0, 850, 730)
     workspace.simpleIterate() // So some activations are shown
@@ -240,10 +152,10 @@ val cnnSimpleLineDetector = newSim {
         - **Output Layer**: 3 output neurons (cross-entropy + softmax)
 
         ## Training Data
-        Three pattern classes (30 training, 5 test samples each):
-        - **Horizontal**: 1 pixel wide, 3-4 pixels long horizontal line at random positions
-        - **Vertical**: 1 pixel wide, 3-4 pixels long vertical line at random positions  
-        - **Diagonal**: 1 pixel wide, 3-4 pixels long diagonal line at random positions
+        Three pattern classes are generated from reusable tensor-dataset utilities:
+        - **Horizontal** line fragments
+        - **Vertical** line fragments
+        - **Diagonal** line fragments
         
         Each pattern appears at different locations to demonstrate the CNN's ability
         to learn position-invariant features.

@@ -1149,4 +1149,95 @@ class TrainingUtilsTest {
         // Note: We don't assert it's different because with random weights it might be the same value
     }
 
+    @Test
+    fun `simple tensor classification dataset has expected sizes and one hot targets`() {
+        val shape = org.simbrain.network.core.TensorShape(height = 5, width = 4, channels = 1)
+        val dataset = createSimpleTensorClassificationDataset(
+            inputShape = shape,
+            nOutputs = 3,
+            samplesPerClass = 2,
+            rngSeed = 7L
+        )
+
+        assertEquals(6, dataset.size)
+        assertEquals(shape.size, dataset.inputSize)
+        assertEquals(3, dataset.targetSize)
+
+        dataset.inputs.forEach { input ->
+            assertEquals(shape.size, input.size)
+            assertTrue(input.any { it > 0.0 }, "Each sample should contain at least one active pixel")
+        }
+
+        dataset.targets.forEach { target ->
+            assertEquals(1, target.count { it == 1.0 }, "Targets should be one-hot")
+            assertEquals(2, target.count { it == 0.0 }, "Targets should be one-hot")
+        }
+    }
+
+    @Test
+    fun `simple tensor classification dataset is deterministic for a fixed seed`() {
+        val shape = org.simbrain.network.core.TensorShape(height = 6, width = 6, channels = 2)
+
+        val first = createSimpleTensorClassificationDataset(shape, nOutputs = 4, samplesPerClass = 3, rngSeed = 123L)
+        val second = createSimpleTensorClassificationDataset(shape, nOutputs = 4, samplesPerClass = 3, rngSeed = 123L)
+
+        assertEquals(first.inputs, second.inputs)
+        assertEquals(first.targets, second.targets)
+    }
+
+    @Test
+    fun `simple tensor classification dataset draws each class strongly in one channel and ghosts to others`() {
+        val shape = org.simbrain.network.core.TensorShape(height = 7, width = 7, channels = 3)
+        val dataset = createSimpleTensorClassificationDataset(
+            inputShape = shape,
+            nOutputs = 3,
+            samplesPerClass = 1,
+            rngSeed = 42L
+        )
+
+        fun maxByChannel(sample: List<Double>): List<Double> =
+            (0 until shape.channels).map { channel ->
+                (0 until shape.height).maxOf { row ->
+                    (0 until shape.width).maxOf { col ->
+                        sample[shape.index(row, col, channel)]
+                    }
+                }
+            }
+
+        val classChannels = dataset.inputs.map(::maxByChannel)
+
+        assertEquals(listOf(1.0, 0.5, 0.5), classChannels[0])
+        assertEquals(listOf(0.5, 1.0, 0.5), classChannels[1])
+        assertEquals(listOf(0.5, 0.5, 1.0), classChannels[2])
+    }
+
+    @Test
+    fun `simple tensor classification dataset with 100 percent ghosting replicates shapes across all channels`() {
+        val shape = org.simbrain.network.core.TensorShape(height = 7, width = 7, channels = 3)
+        val dataset = createSimpleTensorClassificationDataset(
+            inputShape = shape,
+            nOutputs = 3,
+            samplesPerClass = 1,
+            ghostingPercent = 100,
+            rngSeed = 42L
+        )
+
+        fun strongShapePixels(sample: List<Double>, channel: Int): Set<Pair<Int, Int>> =
+            buildSet {
+                for (row in 0 until shape.height) {
+                    for (col in 0 until shape.width) {
+                        if (sample[shape.index(row, col, channel)] > 0.9) {
+                            add(row to col)
+                        }
+                    }
+                }
+            }
+
+        dataset.inputs.forEach { sample ->
+            val firstChannel = strongShapePixels(sample, 0)
+            assertEquals(firstChannel, strongShapePixels(sample, 1))
+            assertEquals(firstChannel, strongShapePixels(sample, 2))
+        }
+    }
+
 }

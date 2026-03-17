@@ -3,6 +3,8 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnTrainerConfig
 import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.trainers.createSimpleTensorClassificationDataset
+import org.simbrain.network.trainers.splitDataSet
 import org.simbrain.util.copy
 import org.simbrain.util.copyFrom
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -39,21 +41,19 @@ class ConvolutionalNeuralNetwork(
     /** All NeuronArrays in order: flatten target, then dense layers. */
     private val allNeuronArrays: List<NeuronArray>
 
-    var trainingSet: TrainingDataset = TrainingDataset(
-        inputs = mutableListOf(),
-        targets = mutableListOf(),
-        inputSize = inputTensorLayer.shape.size,
-        targetSize = outputArray.size
-    )
+    var trainingSet: TrainingDataset
 
-    var testingSet: TrainingDataset = TrainingDataset(
-        inputs = mutableListOf(),
-        targets = mutableListOf(),
-        inputSize = inputTensorLayer.shape.size,
-        targetSize = outputArray.size
-    )
+    var testingSet: TrainingDataset
 
     init {
+        val initialData = createSimpleTensorClassificationDataset(
+            inputShape = inputTensorLayer.shape,
+            nOutputs = outputArray.size
+        )
+        val (defaultTrainingSet, defaultTestingSet) = splitDataSet(initialData, 0.8)
+        trainingSet = defaultTrainingSet
+        testingSet = defaultTestingSet
+
         // Discover pipeline by walking the graph from inputTensor
         val connectors = mutableListOf<TensorConnector>()
         val stages = mutableListOf<TensorLayer>()

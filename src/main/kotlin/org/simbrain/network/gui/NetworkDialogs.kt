@@ -58,6 +58,38 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
     }.display()
 }
 
+fun NetworkPanel.showAddNeuronArrayDialog(sourceNeuronArray: NeuronArray) {
+    NeuronArray.CreationTemplate().apply {
+        numNodes = (sourceNeuronArray.size / 2).coerceAtLeast(1)
+    }.createEditorDialog {
+        addNeuronArray(sourceNeuronArray, it)
+    }.also {
+        it.title = "Add Neuron Array from ${sourceNeuronArray.displayName}"
+    }.display()
+}
+
+internal fun NetworkPanel.addNeuronArray(
+    sourceNeuronArray: NeuronArray,
+    template: NeuronArray.CreationTemplate
+): Pair<NeuronArray, WeightMatrix> {
+    val targetNeuronArray = template.create()
+    targetNeuronArray.shouldBePlaced = false
+    val connector = WeightMatrix(sourceNeuronArray, targetNeuronArray)
+    network.addNetworkModelAsync(targetNeuronArray, usePlacementManager = false)
+    targetNeuronArray.setLocation(sourceNeuronArray.locationX, sourceNeuronArray.locationY - 400)
+    network.addNetworkModelAsync(connector, usePlacementManager = false)
+    undoManager.addUndoableAction(
+        description = "Add neuron array from ${sourceNeuronArray.id}",
+        undo = { network.deleteModels(listOf(connector, targetNeuronArray)) },
+        redo = {
+            network.addNetworkModel(targetNeuronArray, usePlacementManager = false, useAutoAssignedId = false)
+            targetNeuronArray.setLocation(sourceNeuronArray.locationX, sourceNeuronArray.locationY - 400)
+            network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+        }
+    )
+    return targetNeuronArray to connector
+}
+
 fun NetworkPanel.showActivationSequenceCreationDialog() {
     ActivationSequence.CreationTemplate().createEditorDialog {
         val activationSequence = it.create()

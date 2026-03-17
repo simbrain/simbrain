@@ -1,8 +1,12 @@
 package org.simbrain.network.trainers
 
+import org.simbrain.network.core.TensorShape
 import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
+import kotlin.math.abs
+import kotlin.math.max
 import kotlin.math.min
+import kotlin.random.Random
 
 class TrainingDataset(
     val inputs: MutableList<MutableList<Double>>,
@@ -53,6 +57,16 @@ class TrainingDataset(
     // Helper method to get target row as Matrix (for compatibility during transition)
     fun getTargetRow(index: Int): Matrix = targets[index].toDoubleArray().toColumnVector()
 
+}
+
+private enum class TensorPatternPrimitive {
+    HORIZONTAL,
+    VERTICAL,
+    DIAGONAL_DOWN,
+    DIAGONAL_UP,
+    BOX,
+    PLUS,
+    BLOB
 }
 
 /**
@@ -216,6 +230,175 @@ fun createSimpleBinaryDataset(
         inputs = inputs,
         targets = targets,
         inputSize = nInputs,
+        targetSize = nOutputs
+    )
+}
+
+/**
+ * Creates simple synthetic tensor classification data for CNN-style models.
+ *
+ * Produces `nOutputs * samplesPerClass` samples.
+ *
+ * Inputs are image-like tensors in HWC layout containing simple spatial primitives whose positions
+ * and sizes vary across samples. Each class is assigned a primitive family cyclically from a fixed
+ * set (horizontal, vertical, diagonals, box, plus, blob), and when multiple channels are present
+ * the main pattern is drawn in one primary channel chosen by class index. The same pattern is then
+ * copied to the other channels at reduced intensity according to [ghostingPercent], and a small
+ * amount of random noise is added to the primary channel.
+ *
+ * Targets are one-hot encoded class labels.
+ *
+ * This generator does not guarantee that every class has a globally unique visual pattern. If
+ * `nOutputs` is large relative to the tensor size, number of channels, and primitive families,
+ * classes may become visually similar or overlap.
+ *
+ * Example: if `nOutputs = 10` and `samplesPerClass = 3`, the dataset will contain 30 total samples.
+ * Since there are 7 primitive families, some primitive types will repeat across classes (for example,
+ * the first 7 classes will use 7 different primitive families, and classes 8-10 will wrap around to
+ * the start of that list).
+ */
+fun createSimpleTensorClassificationDataset(
+    inputShape: TensorShape,
+    nOutputs: Int,
+    samplesPerClass: Int = 12,
+    ghostingPercent: Int = 50,
+    rngSeed: Long = 42L,
+): TrainingDataset {
+
+    require(nOutputs >= 1) { "nOutputs must be >= 1" }
+    require(samplesPerClass >= 1) { "samplesPerClass must be >= 1" }
+    require(ghostingPercent in 0..100) { "ghostingPercent must be between 0 and 100" }
+
+    val rng = Random(rngSeed)
+    val inputs = mutableListOf<MutableList<Double>>()
+    val targets = mutableListOf<MutableList<Double>>()
+    val ghostingLevel = ghostingPercent / 100.0
+
+    val primitiveFamilies = listOf(
+        TensorPatternPrimitive.HORIZONTAL,
+        TensorPatternPrimitive.VERTICAL,
+        TensorPatternPrimitive.DIAGONAL_DOWN,
+        TensorPatternPrimitive.DIAGONAL_UP,
+        TensorPatternPrimitive.BOX,
+        TensorPatternPrimitive.PLUS,
+        TensorPatternPrimitive.BLOB
+    )
+
+    fun DoubleArray.setPixel(row: Int, col: Int, channel: Int, value: Double = 1.0) {
+        if (row in 0 until inputShape.height && col in 0 until inputShape.width && channel in 0 until inputShape.channels) {
+            val index = inputShape.index(row, col, channel)
+            this[index] = max(this[index], value)
+        }
+    }
+
+    fun DoubleArray.addNoise(channel: Int) {
+        val noisePoints = max(1, inputShape.size / 200)
+        repeat(noisePoints) {
+            if (rng.nextDouble() < 0.35) {
+                val row = rng.nextInt(inputShape.height)
+                val col = rng.nextInt(inputShape.width)
+                setPixel(row, col, channel, 0.15)
+            }
+        }
+    }
+
+    fun DoubleArray.drawPrimitive(primitive: TensorPatternPrimitive, classIndex: Int) {
+        val channel = if (inputShape.channels == 1) 0 else classIndex % inputShape.channels
+        val minDim = min(inputShape.height, inputShape.width)
+        val length = max(2, minDim / 3)
+        val variableLength = min(minDim, length + rng.nextInt(0, max(1, minDim / 5) + 1))
+        val boxSize = max(2, min(minDim - 1, variableLength))
+        val centerRow = if (inputShape.height <= 2) inputShape.height / 2 else rng.nextInt(1, inputShape.height - 1)
+        val centerCol = if (inputShape.width <= 2) inputShape.width / 2 else rng.nextInt(1, inputShape.width - 1)
+
+        when (primitive) {
+            TensorPatternPrimitive.HORIZONTAL -> {
+                val row = rng.nextInt(inputShape.height)
+                val startCol = rng.nextInt(max(1, inputShape.width - variableLength + 1))
+                repeat(variableLength) { dc -> setPixel(row, startCol + dc, channel) }
+            }
+            TensorPatternPrimitive.VERTICAL -> {
+                val col = rng.nextInt(inputShape.width)
+                val startRow = rng.nextInt(max(1, inputShape.height - variableLength + 1))
+                repeat(variableLength) { dr -> setPixel(startRow + dr, col, channel) }
+            }
+            TensorPatternPrimitive.DIAGONAL_DOWN -> {
+                val diagLength = min(variableLength, minDim)
+                val startRow = rng.nextInt(max(1, inputShape.height - diagLength + 1))
+                val startCol = rng.nextInt(max(1, inputShape.width - diagLength + 1))
+                repeat(diagLength) { d -> setPixel(startRow + d, startCol + d, channel) }
+            }
+            TensorPatternPrimitive.DIAGONAL_UP -> {
+                val diagLength = min(variableLength, minDim)
+                val startRow = if (inputShape.height == diagLength) diagLength - 1 else rng.nextInt(diagLength - 1, inputShape.height)
+                val startCol = rng.nextInt(max(1, inputShape.width - diagLength + 1))
+                repeat(diagLength) { d -> setPixel(startRow - d, startCol + d, channel) }
+            }
+            TensorPatternPrimitive.BOX -> {
+                val half = max(1, boxSize / 2)
+                val top = (centerRow - half).coerceAtLeast(0)
+                val bottom = (centerRow + half).coerceAtMost(inputShape.height - 1)
+                val left = (centerCol - half).coerceAtLeast(0)
+                val right = (centerCol + half).coerceAtMost(inputShape.width - 1)
+                for (col in left..right) {
+                    setPixel(top, col, channel)
+                    setPixel(bottom, col, channel)
+                }
+                for (row in top..bottom) {
+                    setPixel(row, left, channel)
+                    setPixel(row, right, channel)
+                }
+            }
+            TensorPatternPrimitive.PLUS -> {
+                val arm = max(1, variableLength / 2)
+                for (offset in -arm..arm) {
+                    setPixel(centerRow, centerCol + offset, channel)
+                    setPixel(centerRow + offset, centerCol, channel)
+                }
+            }
+            TensorPatternPrimitive.BLOB -> {
+                val radius = max(1, variableLength / 3)
+                for (row in (centerRow - radius)..(centerRow + radius)) {
+                    for (col in (centerCol - radius)..(centerCol + radius)) {
+                        if (abs(row - centerRow) + abs(col - centerCol) <= radius + 1) {
+                            setPixel(row, col, channel)
+                        }
+                    }
+                }
+            }
+        }
+
+        if (inputShape.channels > 1 && ghostingLevel > 0.0) {
+            for (ghostChannel in 0 until inputShape.channels) {
+                if (ghostChannel == channel) continue
+                for (row in 0 until inputShape.height) {
+                    for (col in 0 until inputShape.width) {
+                        val base = this[inputShape.index(row, col, channel)]
+                        if (base > 0.0) {
+                            setPixel(row, col, ghostChannel, base * ghostingLevel)
+                        }
+                    }
+                }
+            }
+        }
+
+        addNoise(channel)
+    }
+
+    repeat(nOutputs) { classIndex ->
+        val primitive = primitiveFamilies[classIndex % primitiveFamilies.size]
+        repeat(samplesPerClass) {
+            val sample = DoubleArray(inputShape.size)
+            sample.drawPrimitive(primitive, classIndex)
+            inputs.add(sample.toMutableList())
+            targets.add(MutableList(nOutputs) { outputIndex -> if (outputIndex == classIndex) 1.0 else 0.0 })
+        }
+    }
+
+    return TrainingDataset(
+        inputs = inputs,
+        targets = targets,
+        inputSize = inputShape.size,
         targetSize = nOutputs
     )
 }

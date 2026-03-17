@@ -136,16 +136,21 @@ class ConvolutionalNeuralNetwork(
         tensorConnectors.filterIsInstance<ConvolutionConnector>().forEach {
             it.heInitialize()
             it.clearGrads()
+            it.events.updated.fire()
         }
         tensorLayerStages.forEach {
             it.biases.fill(0.0)
             it.clearGradients()
+            it.events.updated.fire()
         }
+        inputTensorLayer.clearGradients()
         denseWeightMatrices.forEach {
             config.weightInitializationStrategy.initializeWeights(it)
+            it.events.updated.fire()
         }
         denseNeuronArrays.forEach {
             it.biasArray.fill(0.0)
+            it.events.updated.fire()
         }
     }
 

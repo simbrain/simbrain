@@ -20,7 +20,6 @@ class ConvolutionalNeuralNetworkNode(
         get() = JPopupMenu().apply {
             addDefaultSubnetActions()
             addSeparator()
-            add(createEditAction("Edit ${cnn.displayName}..."))
             add(createAction("Train...") {
                 propertyDialog.run {
                     pack()

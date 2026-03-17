@@ -622,11 +622,49 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
+    fun canConnectSelectedModels(): Pair<Boolean, String> {
+        val reasons = mutableListOf<String>()
+        val sourceNeurons = networkPanel.selectionManager.filterSelectedSourceModels<Neuron>()
+        val targetNeurons = networkPanel.selectionManager.filterSelectedModels<Neuron>()
+        val sourceLayers = networkPanel.selectionManager.filterSelectedSourceModels<Layer>()
+        val targetLayers = networkPanel.selectionManager.filterSelectedModels<Layer>()
+        val sourceTensors = networkPanel.selectionManager.filterSelectedSourceModels<TensorLayer>()
+        val targetTensors = networkPanel.selectionManager.filterSelectedModels<TensorLayer>()
+
+        val hasValidNeuronConnection = sourceNeurons.isNotEmpty() && targetNeurons.isNotEmpty()
+        val hasValidLayerConnection = sourceLayers.isNotEmpty() && targetLayers.isNotEmpty()
+
+        if (!hasValidNeuronConnection && !hasValidLayerConnection) {
+            reasons.add("No valid source and target selections")
+        }
+
+        if (sourceTensors.isNotEmpty() || targetTensors.isNotEmpty()) {
+            reasons.add("TensorLayers require special connectors (use CNN creation dialog)")
+        }
+
+        return reasons.isEmpty() to reasons.joinToString(", ")
+    }
+
     val connectSelectedModels = networkPanel.createAction(
         name = "Connect selected objects...",
         description = "Creates synapse, weight matrix, etc. between selected source and target entities",
     ) {
         connectSelectedModelsDefault()
+    }.also {
+        fun updateAction() {
+            val (canConnect, reason) = canConnectSelectedModels()
+            it.isEnabled = canConnect
+            it.putValue(
+                SHORT_DESCRIPTION,
+                "Create appropriate connection between selected source and target entities"
+                        + if (!canConnect) " (Disabled: $reason)" else ""
+            )
+        }
+
+        updateAction()
+
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     }
 
     val connectWithWeightMatrix = networkPanel.createAction(
@@ -634,6 +672,21 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         // This will automatically connect arrays (which is all this action should be called for) with weight matrices
         connectSelectedModelsDefault()
+    }.also {
+        fun updateAction() {
+            val (canConnect, reason) = canConnectSelectedModels()
+            it.isEnabled = canConnect
+            it.putValue(
+                SHORT_DESCRIPTION,
+                "Connect selected objects with weight matrix"
+                        + if (!canConnect) " (Disabled: $reason)" else ""
+            )
+        }
+
+        updateAction()
+
+        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
     }
 
     val connectWithSynapseGroup = networkPanel.createAction(
@@ -1128,17 +1181,23 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     reasons.add("No Flatten connector found in pipeline from source Tensor")
                 } else {
                     // Walk the dense chain from flatten target to verify it reaches the selected target
-                    var currentLayer: Layer = pipelineModels.last() as Layer
+                    val flattenTarget = pipelineModels.last() as Layer
+                    var currentLayer: Layer = flattenTarget
+                    var denseLayerCount = 0
                     while (currentLayer != target) {
                         val wm = currentLayer.outgoingConnectors
                             .filterIsInstance<WeightMatrix>().firstOrNull() ?: break
                         pipelineModels.add(wm)
                         pipelineModels.add(wm.target)
                         currentLayer = wm.target
+                        denseLayerCount++
                     }
                     val reachesTarget = currentLayer == target
                     if (!reachesTarget) {
                         reasons.add("Dense chain from Flatten does not reach the selected target NeuronArray")
+                    }
+                    if (denseLayerCount == 0) {
+                        reasons.add("No dense layers found in pipeline")
                     }
 
                     val owned = pipelineModels

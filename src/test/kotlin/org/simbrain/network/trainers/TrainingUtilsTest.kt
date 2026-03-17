@@ -1240,4 +1240,29 @@ class TrainingUtilsTest {
         }
     }
 
+    @Test
+    fun `simple tensor classification dataset caps classes for large nOutputs`() {
+        val shape = org.simbrain.network.core.TensorShape(height = 8, width = 8, channels = 1)
+        val nOutputs = 100
+
+        val dataset = createSimpleTensorClassificationDataset(
+            inputShape = shape,
+            nOutputs = nOutputs,
+            samplesPerClass = 10,
+            maxClasses = 20
+        )
+
+        assertEquals(nOutputs, dataset.targetSize)
+        assertEquals(40, dataset.size)
+
+        val classesWithSamples = dataset.targets.map { target -> target.indexOfFirst { it == 1.0 } }.toSet()
+        assertEquals(20, classesWithSamples.size)
+        assertTrue(classesWithSamples.all { it in 0 until 20 })
+
+        dataset.targets.forEach { target ->
+            assertEquals(nOutputs, target.size)
+            assertEquals(1, target.count { it == 1.0 })
+        }
+    }
+
 }

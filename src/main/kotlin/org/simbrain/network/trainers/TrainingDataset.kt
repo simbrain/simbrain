@@ -237,25 +237,21 @@ fun createSimpleBinaryDataset(
 /**
  * Creates simple synthetic tensor classification data for CNN-style models.
  *
- * Produces `nOutputs * samplesPerClass` samples.
+ * Produces samples with image-like tensor inputs containing simple spatial primitives (lines, boxes, etc.)
+ * and one-hot encoded target vectors.
  *
- * Inputs are image-like tensors in HWC layout containing simple spatial primitives whose positions
- * and sizes vary across samples. Each class is assigned a primitive family cyclically from a fixed
- * set (horizontal, vertical, diagonals, box, plus, blob), and when multiple channels are present
- * the main pattern is drawn in one primary channel chosen by class index. The same pattern is then
- * copied to the other channels at reduced intensity according to [ghostingPercent], and a small
- * amount of random noise is added to the primary channel.
+ *  Example: if `nOutputs = 10` and `samplesPerClass = 3`, the dataset will contain 30 total samples.
+ *  Since there are 7 primitive families (lines, blobs, etc.), so some primitive types will repeat across classes (for example,
+ *  the first 7 classes will use 7 different primitive families, and classes 8-10 will wrap around to
+ *  the start of that list).
  *
- * Targets are one-hot encoded class labels.
- *
- * This generator does not guarantee that every class has a globally unique visual pattern. If
- * `nOutputs` is large relative to the tensor size, number of channels, and primitive families,
- * classes may become visually similar or overlap.
- *
- * Example: if `nOutputs = 10` and `samplesPerClass = 3`, the dataset will contain 30 total samples.
- * Since there are 7 primitive families, some primitive types will repeat across classes (for example,
- * the first 7 classes will use 7 different primitive families, and classes 8-10 will wrap around to
- * the start of that list).
+ * @param inputShape Shape of the input tensor (height × width × channels)
+ * @param nOutputs Size of target vectors (number of output neurons)
+ * @param samplesPerClass Number of samples per class (used when nOutputs <= maxClasses)
+ * @param ghostingPercent Intensity (0-100) at which patterns are copied to non-primary channels
+ * @param rngSeed Random seed for reproducibility
+ * @param maxClasses Maximum number of distinct classes to generate. When nOutputs exceeds this,
+ *                   only maxClasses classes are created with reduced samples to avoid slow generation.
  */
 fun createSimpleTensorClassificationDataset(
     inputShape: TensorShape,
@@ -263,11 +259,16 @@ fun createSimpleTensorClassificationDataset(
     samplesPerClass: Int = 12,
     ghostingPercent: Int = 50,
     rngSeed: Long = 42L,
+    maxClasses: Int = 20,
 ): TrainingDataset {
 
     require(nOutputs >= 1) { "nOutputs must be >= 1" }
     require(samplesPerClass >= 1) { "samplesPerClass must be >= 1" }
     require(ghostingPercent in 0..100) { "ghostingPercent must be between 0 and 100" }
+    require(maxClasses >= 1) { "maxClasses must be >= 1" }
+
+    val numClasses = nOutputs.coerceAtMost(maxClasses)
+    val effectiveSamplesPerClass = if (nOutputs > maxClasses) 2 else samplesPerClass
 
     val rng = Random(rngSeed)
     val inputs = mutableListOf<MutableList<Double>>()
@@ -385,9 +386,9 @@ fun createSimpleTensorClassificationDataset(
         addNoise(channel)
     }
 
-    repeat(nOutputs) { classIndex ->
+    repeat(numClasses) { classIndex ->
         val primitive = primitiveFamilies[classIndex % primitiveFamilies.size]
-        repeat(samplesPerClass) {
+        repeat(effectiveSamplesPerClass) {
             val sample = DoubleArray(inputShape.size)
             sample.drawPrimitive(primitive, classIndex)
             inputs.add(sample.toMutableList())

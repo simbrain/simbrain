@@ -6,6 +6,7 @@ import smile.math.matrix.Matrix
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
+import kotlin.math.sqrt
 import kotlin.random.Random
 
 class TrainingDataset(
@@ -404,6 +405,146 @@ fun createSimpleTensorClassificationDataset(
     )
 }
 
+
+enum class ShapeType { CIRCLE, ELLIPSE, SQUARE, RECTANGLE }
+
+/**
+ * Draws a shape into a flat binary image (row-major, 0.0/1.0) of [height] × [width] pixels.
+ *
+ * The shape is placed at the given [centerRow]/[centerCol] with the given size parameter:
+ * - CIRCLE / ELLIPSE: [size] is the radius / semi-major axis (semi-minor = size * [ellipseAspect])
+ * - SQUARE / RECTANGLE: [size] is the half-side (full side = 2 * size)
+ *   For RECTANGLE the height is [size] and width is size * [rectAspect].
+ *
+ * The returned array has length height * width and is compatible with:
+ * - A flat neuron-array input of that size
+ * - A single-channel tensor via TensorShape(height, width, 1)
+ */
+fun drawShape(
+    type: ShapeType,
+    height: Int,
+    width: Int,
+    centerRow: Double,
+    centerCol: Double,
+    size: Double,
+    ellipseAspect: Double = 0.5,
+    rectAspect: Double = 2.0,
+): DoubleArray {
+    val grid = DoubleArray(height * width)
+
+    fun set(row: Int, col: Int) {
+        if (row in 0 until height && col in 0 until width)
+            grid[row * width + col] = 1.0
+    }
+
+    when (type) {
+        ShapeType.CIRCLE -> {
+            for (r in 0 until height)
+                for (c in 0 until width)
+                    if (sqrt((r - centerRow) * (r - centerRow) + (c - centerCol) * (c - centerCol)) <= size)
+                        set(r, c)
+        }
+
+        ShapeType.ELLIPSE -> {
+            val semiMajor = size
+            val semiMinor = size * ellipseAspect
+            for (r in 0 until height)
+                for (c in 0 until width)
+                    if ((c - centerCol) * (c - centerCol) / (semiMajor * semiMajor) +
+                        (r - centerRow) * (r - centerRow) / (semiMinor * semiMinor) <= 1.0)
+                        set(r, c)
+        }
+
+        ShapeType.SQUARE -> {
+            val top = (centerRow - size).toInt().coerceAtLeast(0)
+            val bottom = (centerRow + size).toInt().coerceAtMost(height - 1)
+            val left = (centerCol - size).toInt().coerceAtLeast(0)
+            val right = (centerCol + size).toInt().coerceAtMost(width - 1)
+            for (r in top..bottom)
+                for (c in left..right)
+                    set(r, c)
+        }
+
+        ShapeType.RECTANGLE -> {
+            val halfH = size
+            val halfW = size * rectAspect
+            val top = (centerRow - halfH).toInt().coerceAtLeast(0)
+            val bottom = (centerRow + halfH).toInt().coerceAtMost(height - 1)
+            val left = (centerCol - halfW).toInt().coerceAtLeast(0)
+            val right = (centerCol + halfW).toInt().coerceAtMost(width - 1)
+            for (r in top..bottom)
+                for (c in left..right)
+                    set(r, c)
+        }
+    }
+
+    return grid
+}
+
+/**
+ * Creates a dataset of geometric shapes for categorical perception tasks.
+ *
+ * Each sample pair consists of:
+ * - **Input**: a shape drawn at a random position and random size within [[minSize], [maxSize]]
+ * - **Target**: the same shape type drawn centered in the grid at a fixed canonical [targetSize]
+ *
+ * Both inputs and targets are flat binary images of [height] × [width] pixels, compatible with:
+ * - A flat neuron-array of size height × width
+ * - A single-channel tensor via TensorShape(height, width, 1)
+ *
+ * @param height          Grid height in pixels
+ * @param width           Grid width in pixels
+ * @param samplesPerClass Number of random samples per shape class
+ * @param minSize         Minimum shape size (radius / half-side) for inputs
+ * @param maxSize         Maximum shape size (radius / half-side) for inputs
+ * @param targetSize      Fixed size used for all centered target shapes
+ * @param ellipseAspect   Ratio of semi-minor to semi-major axis for ellipses (< 1.0)
+ * @param rectAspect      Ratio of width half-extent to height half-extent for rectangles (> 1.0)
+ * @param rngSeed         Optional seed for reproducibility
+ */
+fun createShapeDataset(
+    height: Int = 50,
+    width: Int = 50,
+    samplesPerClass: Int = 10,
+    minSize: Double = 5.0,
+    maxSize: Double = 25.0,
+    targetSize: Double = 10.0,
+    ellipseAspect: Double = 0.5,
+    rectAspect: Double = 2.0,
+    rngSeed: Long? = null
+): TrainingDataset {
+    val rng = rngSeed?.let { Random(it) } ?: Random.Default
+    val shapeTypes = ShapeType.entries
+    val inputs = mutableListOf<MutableList<Double>>()
+    val targets = mutableListOf<MutableList<Double>>()
+
+    val centerRow = height / 2.0
+    val centerCol = width / 2.0
+
+    shapeTypes.forEach { type ->
+        val target = drawShape(type, height, width, centerRow, centerCol, targetSize, ellipseAspect, rectAspect)
+
+        repeat(samplesPerClass) {
+            val size = rng.nextDouble(minSize, maxSize)
+            // Keep the shape fully inside the grid
+            val margin = size * if (type == ShapeType.RECTANGLE) rectAspect else 1.0
+            val rMin = margin; val rMax = height - margin
+            val cMin = margin; val cMax = width - margin
+            val cr = if (rMax > rMin) rng.nextDouble(rMin, rMax) else centerRow
+            val cc = if (cMax > cMin) rng.nextDouble(cMin, cMax) else centerCol
+
+            inputs.add(drawShape(type, height, width, cr, cc, size, ellipseAspect, rectAspect).toMutableList())
+            targets.add(target.toMutableList())
+        }
+    }
+
+    return TrainingDataset(
+        inputs = inputs,
+        targets = targets,
+        inputSize = height * width,
+        targetSize = height * width
+    )
+}
 
 /**
  * Shifts the sequence up by removing the first element and padding the end with zeros.

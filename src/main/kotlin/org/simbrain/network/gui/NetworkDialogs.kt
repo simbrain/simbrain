@@ -616,7 +616,7 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
                     append("  shape: ${model.shape}")
                     append("  loc: ${loc(model)}")
                 }
-                is AbstractNeuronCollection -> {
+                is NeuronCollection -> {
                     append("  neurons: ${model.neuronList.size}")
                     append("  loc: ${loc(model)}")
                 }

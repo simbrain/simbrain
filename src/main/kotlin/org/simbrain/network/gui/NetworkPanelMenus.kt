@@ -100,6 +100,8 @@ val NetworkPanel.actionMenu
             add(pruneWeightsAction)
             add(randomizePolarityAction)
             add(exportSimbrainWebFormatAction)
+            addSeparator()
+            add(showNetworkDebugInfoAction)
         }
     }
 

@@ -597,6 +597,86 @@ fun NetworkPanel.showPriorityTableDialog() {
     dialog.display()
 }
 
+fun NetworkPanel.showNetworkDebugInfoDialog() {
+    val sb = StringBuilder()
+
+    fun loc(model: LocatableModel) = "(${model.location.x.toInt()}, ${model.location.y.toInt()})"
+
+    fun appendModel(model: NetworkModel, indent: String = "") {
+        val type = model::class.simpleName ?: "Unknown"
+        val name = model.displayName
+        val line = buildString {
+            append("$indent[$type] $name")
+            when (model) {
+                is NeuronArray -> {
+                    append("  shape: ${model.shapeString}")
+                    append("  loc: ${loc(model)}")
+                }
+                is TensorLayer -> {
+                    append("  shape: ${model.shape}")
+                    append("  loc: ${loc(model)}")
+                }
+                is AbstractNeuronCollection -> {
+                    append("  neurons: ${model.neuronList.size}")
+                    append("  loc: ${loc(model)}")
+                }
+                is WeightMatrix -> {
+                    append("  shape: ${model.weights.nrow()} x ${model.weights.ncol()}")
+                }
+                is SynapseGroup -> {
+                    append("  synapses: ${model.size()}")
+                }
+                is TensorConnector -> {
+                    append("  ${model::class.simpleName}")
+                }
+                is NetworkTextObject -> {
+                    val preview = model.text.replace('\n', ' ').take(40)
+                    append("  \"$preview\"")
+                    append("  loc: ${loc(model)}")
+                }
+                is Connector -> {
+                    // generic fallback for other Connector subclasses
+                }
+                is Neuron -> {
+                    append("  rule: ${model.type}")
+                    append("  loc: ${loc(model)}")
+                }
+            }
+        }
+        sb.appendLine(line)
+    }
+
+    sb.appendLine("=== Network Debug Info ===")
+    sb.appendLine("Time: ${network.timeLabel}  |  Time step: ${network.timeStep}")
+    sb.appendLine()
+
+    val freeNeurons = network.freeNeurons.toList()
+    val freeSynapses = network.freeSynapses.toList()
+    val otherModels = network.allModels.filter { it !is Neuron && it !is Synapse }
+
+    sb.appendLine("--- Models (${network.allModels.size}) ---")
+    otherModels.forEach { model ->
+        appendModel(model)
+        if (model is org.simbrain.network.subnetworks.Subnetwork) {
+            model.modelList.all.forEach { child -> appendModel(child, "  ") }
+        }
+    }
+
+    if (freeNeurons.isNotEmpty()) {
+        sb.appendLine()
+        sb.appendLine("--- Free neurons (${freeNeurons.size}) ---")
+        freeNeurons.forEach { appendModel(it) }
+    }
+
+    if (freeSynapses.isNotEmpty()) {
+        sb.appendLine()
+        sb.appendLine("--- Free synapses (${freeSynapses.size}) ---")
+        freeSynapses.forEach { appendModel(it) }
+    }
+
+    showMessageDialog(sb.toString(), "Network Debug Info", rows = 30, columns = 60)
+}
+
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {
 
     val strategySelector = objectWrapper("Connection Strategy", connectionStrategy)

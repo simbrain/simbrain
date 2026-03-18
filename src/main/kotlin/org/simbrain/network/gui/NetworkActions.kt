@@ -741,6 +741,13 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.showPriorityTableDialog()
     }
 
+    val showNetworkDebugInfoAction = networkPanel.createAction(
+        name = "Show network debug info...",
+        description = "Show debug information about all network models"
+    ) {
+        networkPanel.showNetworkDebugInfoDialog()
+    }
+
     private fun addSubnetAction(name: String, createDialog: (NetworkPanel) -> StandardDialog) = networkPanel.createAction(
         name = "$name...",
         description = "Add $name to network",

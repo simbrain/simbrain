@@ -1,10 +1,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.TensorShape
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 
 
@@ -14,7 +11,7 @@ enum class ShapeType { CIRCLE, ELLIPSE, SQUARE, RECTANGLE }
  * Draws a shape into a flat binary image (row-major, 0.0/1.0) of [height] × [width] pixels.
  *
  * The shape is placed at the given [centerRow]/[centerCol] with the given size parameter:
- * - CIRCLE / ELLIPSE: [size] is the radius / semi-major axis (semi-minor = size * [ellipseAspect])
+ * - CIRCLE / ELLIPSE: [size] is the radius / semi-major axis (vertical); semi-minor (horizontal) = size * [ellipseAspect]
  * - SQUARE / RECTANGLE: [size] is the half-side (full side = 2 * size)
  *   For RECTANGLE the height is [size] and width is size * [rectAspect].
  *
@@ -48,20 +45,21 @@ fun drawShape(
         }
 
         ShapeType.ELLIPSE -> {
+            // Vertical ellipse: semi-major along rows (height), semi-minor along cols (width)
             val semiMajor = size
             val semiMinor = size * ellipseAspect
             for (r in 0 until height)
                 for (c in 0 until width)
-                    if ((c - centerCol) * (c - centerCol) / (semiMajor * semiMajor) +
-                        (r - centerRow) * (r - centerRow) / (semiMinor * semiMinor) <= 1.0)
+                    if ((r - centerRow) * (r - centerRow) / (semiMajor * semiMajor) +
+                        (c - centerCol) * (c - centerCol) / (semiMinor * semiMinor) <= 1.0)
                         set(r, c)
         }
 
         ShapeType.SQUARE -> {
-            val top = (centerRow - size).toInt().coerceAtLeast(0)
-            val bottom = (centerRow + size).toInt().coerceAtMost(height - 1)
-            val left = (centerCol - size).toInt().coerceAtLeast(0)
-            val right = (centerCol + size).toInt().coerceAtMost(width - 1)
+            val top = (centerRow - size).roundToInt().coerceAtLeast(0)
+            val bottom = (centerRow + size).roundToInt().coerceAtMost(height - 1)
+            val left = (centerCol - size).roundToInt().coerceAtLeast(0)
+            val right = (centerCol + size).roundToInt().coerceAtMost(width - 1)
             for (r in top..bottom)
                 for (c in left..right)
                     set(r, c)
@@ -70,10 +68,10 @@ fun drawShape(
         ShapeType.RECTANGLE -> {
             val halfH = size
             val halfW = size * rectAspect
-            val top = (centerRow - halfH).toInt().coerceAtLeast(0)
-            val bottom = (centerRow + halfH).toInt().coerceAtMost(height - 1)
-            val left = (centerCol - halfW).toInt().coerceAtLeast(0)
-            val right = (centerCol + halfW).toInt().coerceAtMost(width - 1)
+            val top = (centerRow - halfH).roundToInt().coerceAtLeast(0)
+            val bottom = (centerRow + halfH).roundToInt().coerceAtMost(height - 1)
+            val left = (centerCol - halfW).roundToInt().coerceAtLeast(0)
+            val right = (centerCol + halfW).roundToInt().coerceAtMost(width - 1)
             for (r in top..bottom)
                 for (c in left..right)
                     set(r, c)
@@ -471,8 +469,8 @@ fun createShapeDataset(
     minSize: Double = 5.0,
     maxSize: Double = 25.0,
     targetSize: Double = 10.0,
-    ellipseAspect: Double = 0.5,
-    rectAspect: Double = 2.0,
+    ellipseAspect: Double = 0.4,
+    rectAspect: Double = 1.8,
     rngSeed: Long? = null
 ): TrainingDataset {
     val rng = rngSeed?.let { Random(it) } ?: Random.Default
@@ -482,8 +480,8 @@ fun createShapeDataset(
 
     val inputCenterRow = height / 2.0
     val inputCenterCol = width / 2.0
-    val targetCenterRow = targetHeight / 2.0
-    val targetCenterCol = targetWidth / 2.0
+    val targetCenterRow = (targetHeight / 2).toDouble()
+    val targetCenterCol = (targetWidth / 2).toDouble()
 
     shapeTypes.forEach { type ->
         val target = drawShape(type, targetHeight, targetWidth, targetCenterRow, targetCenterCol, targetSize, ellipseAspect, rectAspect)

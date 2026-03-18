@@ -153,7 +153,7 @@ val categoricalPerception = newSim {
     // --- CNN Pipeline ---
     // Input(50×50×1) → Conv1(3×3, 8 filters, SAME, ReLU) → Pool1(2×2)
     //               → Conv2(3×3, 16 filters, SAME, ReLU) → Pool2(2×2)
-    //               → Flatten → Bottleneck(BOTTLENECK_SIZE, sigmoid) → Output(2507)
+    //               → Flatten → Bottleneck(BOTTLENECK_SIZE, sigmoid) → Output(56)
     //                                                                         ↑ 49 prototype (7×7) + 7 labels
 
     val inputShape = TensorShape(50, 50, 1)

@@ -218,6 +218,8 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 - Wrap GUI code in `withGui { }` for headless compatibility
 - Always call `workspace.clearWorkspace()` at start
 - Test save/reopen if using custom updates or control panels
+- Control panels should not include a title label or top separator — the panel title is set via `createControlPanel("Title", ...)` and shown in the window frame
+- Use `showMessageDialog(text, title)` from `org.simbrain.util` to display analysis results rather than printing to console or embedding text in the control panel
 
 ## Tips
 

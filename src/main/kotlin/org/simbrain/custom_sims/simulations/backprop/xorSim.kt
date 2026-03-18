@@ -4,7 +4,7 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.trainers.LeCun
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.TrainingDataset
@@ -22,15 +22,11 @@ val xorSim = newSim {
     val networkComponent = addNetworkComponent("XOR")
     val net = networkComponent.network
 
-    val inputLayer = NeuronGroup(2).apply {
+    val inputLayer = net.addNeuronCollection(2).apply {
         isClamped = true
     }
-    val hiddenLayer = NeuronGroup(2).apply {
-        updateRule = SigmoidalRule()
-    }
-    val outputLayer = NeuronGroup(1).apply {
-        updateRule = SigmoidalRule()
-    }
+    val hiddenLayer = net.addNeuronCollection(2) { updateRule = SigmoidalRule() }
+    val outputLayer = net.addNeuronCollection(1) { updateRule = SigmoidalRule() }
     val sg1 = SynapseGroup(inputLayer, hiddenLayer)
     val sg2 = SynapseGroup(hiddenLayer, outputLayer)
     val sm = SupervisedModel(inputLayer, outputLayer).apply {

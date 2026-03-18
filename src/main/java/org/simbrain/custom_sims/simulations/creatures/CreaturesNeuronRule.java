@@ -2,7 +2,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.updaterules.DecayRule;
-// import org.simbrain.network.neurongroups.NeuronGroup;
+// import org.simbrain.network.core.NeuronCollection;
 // import org.simbrain.network.util.BiasedScalarData;
 //
 // /**
@@ -20,7 +20,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //     /**
 //      * Reference to parent lobe.
 //      */
-//     private NeuronGroup parentLobe;
+//     private NeuronCollection parentLobe;
 //
 //     /**
 //      * The threshold at which the neuron will either fire (if state value is

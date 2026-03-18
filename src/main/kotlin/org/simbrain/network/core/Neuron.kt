@@ -263,8 +263,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     /**
      * Accumulate only fanIn (synapse) inputs without adding bias.
-     * Used by NeuronGroup.update() where bias is already added via
-     * AbstractNeuronCollection.accumulateInputs().
+     * Used when bias is already added via NeuronCollection.accumulateInputs().
      */
     context(Network)
     fun accumulateFanInInputs() {

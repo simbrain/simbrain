@@ -26,17 +26,26 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
 
     /**
      * Encodes all parent-child relationships between NetworkModels.
-     * For example, each Neuron in a NeuronGroup is mapped to its to parent NeuronGroup
+     * For example, each Neuron in a NeuronCollection is mapped to its parent NeuronCollection.
      * Needed for undo / redo.
      */
     val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
 
     /**
-     * Whether the GUI should display neuron groups contained in this subnetwork. This will usually be true, but in
-     * cases where a subnetwork has just one neuron group it is redundant to display both. So this flag indicates to the
-     * GUI that neuron groups in this subnetwork need not be displayed.
+     * Whether the GUI should display neuron collections contained in this subnetwork. This will usually be true, but in
+     * cases where a subnetwork has just one neuron collection it is redundant to display both. So this flag indicates to the
+     * GUI that neuron collections in this subnetwork need not be displayed.
      */
     private val displayNeuronGroups = true
+
+    /**
+     * Create a [NeuronCollection] and add both the neurons and the collection to this subnetwork's model list.
+     * This mirrors the main network's pattern where neurons are free models tracked individually.
+     */
+    fun addNeuronCollection(neurons: List<Neuron>): NeuronCollection {
+        neurons.forEach { addModel(it) }
+        return NeuronCollection(neurons).also { addModel(it) }
+    }
 
     fun addModel(model: NetworkModel) {
         modelList.add(model)
@@ -46,7 +55,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             }
         }
         when(model) {
-            is AbstractNeuronCollection -> {
+            is NeuronCollection -> {
                 model.neuronList.forEach { childToParentMap[it] = model }
                 model.neuronList.forEach { n ->
                     n.events.deleted.on(wait = true) { childToParentMap.remove(n) }

@@ -7,9 +7,9 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.nodes.SynapseNode
-import org.simbrain.network.neurongroups.NeuronGroup
 
 class NetworkPanelTest {
     @Test
@@ -33,9 +33,9 @@ class NetworkPanelTest {
             val np = NetworkPanel(nc)
             
             // Create two neuron groups with 10 neurons each
-            val sourceGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it) })
+            val sourceGroup = NeuronCollection(List(10) { Neuron() }.also { net.addNetworkModels(it) })
                 .apply { net.addNetworkModel(this) }
-            val targetGroup = NeuronGroup(List(10) { Neuron() }.also { net.addNetworkModels(it) })
+            val targetGroup = NeuronCollection(List(10) { Neuron() }.also { net.addNetworkModels(it) })
                 .apply { net.addNetworkModel(this) }
             
             // Create a SynapseGroup with Sparse connection strategy

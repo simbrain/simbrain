@@ -8,8 +8,8 @@ import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
 import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
 import org.simbrain.custom_sims.simulations.hebb.signedHammingDistance
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.learningrules.HebbianRule
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.AdditiveRule
 import org.simbrain.util.place
 import org.simbrain.util.randomizeSymmetric
@@ -34,8 +34,7 @@ val hopfieldSimContinuous = newSim {
 
     // Neurons with additive nodes
 
-    val hopfield = NeuronGroup(numNeurons).apply {
-        updateRule = AdditiveRule()
+    val hopfield = network.addNeuronCollection(numNeurons) { updateRule = AdditiveRule() }.apply {
         toggleClamping() // Default to clamping for training
     }
     val wm = WeightMatrix(hopfield, hopfield).apply {
@@ -45,7 +44,7 @@ val hopfieldSimContinuous = newSim {
         weights.randomizeSymmetric()
     }
 
-    network.addNetworkModels(hopfield, wm)
+    network.addNetworkModel(wm)
 
     addSidebarInfo(
         """

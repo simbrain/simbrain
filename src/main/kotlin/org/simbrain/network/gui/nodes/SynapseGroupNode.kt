@@ -30,8 +30,8 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     var interactionBox: SynapseGroupInteractionBox
 
-    val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as AbstractNeuronCollectionNode }
-    val targetNode by lazy { networkPanel.getNode(synapseGroup.target) as AbstractNeuronCollectionNode }
+    val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as NeuronCollectionNode }
+    val targetNode by lazy { networkPanel.getNode(synapseGroup.target) as NeuronCollectionNode }
 
     init {
         // Note the children pnodes to outlined objects are created in

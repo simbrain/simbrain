@@ -3,43 +3,42 @@ package org.simbrain.network.groups
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.neurongroups.SOMGroup
+import org.simbrain.network.subnetworks.SOMNetwork
 
-class SOMGroupTest {
+class SOMNetworkTest {
 
     var net = Network()
-    val SOM = SOMGroup(10)
+    val som = SOMNetwork(5, 10)
 
     init {
-        net.addNetworkModelsAsync(SOM)
+        net.addNetworkModelsAsync(som)
     }
+
     @Test
     fun `Test create function`() {
-        assertEquals(10, SOM.params.numNeurons)
-        assertEquals(SOM.params.initNeighborhoodSize, SOM.neighborhoodSize)
-        assertEquals(SOM.params.initialLearningRate, SOM.learningRate)
-        assertEquals(0.0, SOM.winDistance)
-        assertEquals(0.0, SOM.distance)
-        assertEquals(0.0, SOM.value)
-        assertEquals(null, SOM.winner)
+        assertEquals(10, som.som.neuronList.size)
+        assertEquals(5, som.inputLayer.neuronList.size)
+        assertEquals(som.initNeighborhoodSize, som.neighborhoodSize)
+        assertEquals(som.initialLearningRate, som.somLearningRate)
+        assertEquals(0.0, som.winDistance)
+        assertEquals(null, som.winner)
     }
 
     @Test
     fun `Test copy function`() {
-        val SOM2 = SOM.copy()
-        net.addNetworkModelsAsync(SOM2)
-        // SOMGroup Components
-        assertEquals(SOM.params.numNeurons, SOM2.params.numNeurons)
-        assertEquals(SOM.neighborhoodSize, SOM2.neighborhoodSize)
-        assertEquals(SOM.learningRate, SOM2.learningRate)
-        assertEquals(SOM.distance, SOM2.distance)
-        assertEquals(SOM.value, SOM2.value)
-        assertEquals(SOM.winner, SOM2.winner)
-        // SOMGroup Params
-        assertEquals(SOM.params.initNeighborhoodSize, SOM2.params.initNeighborhoodSize)
-        assertEquals(SOM.params.initialLearningRate, SOM2.params.initialLearningRate)
-        assertEquals(SOM.params.learningDecayRate, SOM2.params.learningDecayRate)
-        assertEquals(SOM.params.neighborhoodDecayAmount, SOM2.params.neighborhoodDecayAmount)
+        val som2 = som.copy()
+        net.addNetworkModelsAsync(som2)
+        // SOMNetwork runtime state
+        assertEquals(som.som.neuronList.size, som2.som.neuronList.size)
+        assertEquals(som.inputLayer.neuronList.size, som2.inputLayer.neuronList.size)
+        assertEquals(som.neighborhoodSize, som2.neighborhoodSize)
+        assertEquals(som.somLearningRate, som2.somLearningRate)
+        assertEquals(som.winner, som2.winner)
+        // SOMNetwork params
+        assertEquals(som.initNeighborhoodSize, som2.initNeighborhoodSize)
+        assertEquals(som.initialLearningRate, som2.initialLearningRate)
+        assertEquals(som.learningDecayRate, som2.learningDecayRate)
+        assertEquals(som.neighborhoodDecayAmount, som2.neighborhoodDecayAmount)
     }
 
     @Test
@@ -47,30 +46,28 @@ class SOMGroupTest {
         repeat(5) {
             net.update()
         }
-        SOM.reset()
-        assertEquals(SOM.params.initNeighborhoodSize, SOM.neighborhoodSize)
-        assertEquals(SOM.params.initialLearningRate, SOM.learningRate)
+        som.reset()
+        assertEquals(som.initNeighborhoodSize, som.neighborhoodSize)
+        assertEquals(som.initialLearningRate, som.somLearningRate)
     }
 
     @Test
     fun `Test decay function`() {
         // Decay = 0.0
-        SOM.params.learningDecayRate = 0.0
-        SOM.params.neighborhoodDecayAmount = 0.0
+        som.learningDecayRate = 0.0
+        som.neighborhoodDecayAmount = 0.0
 
-        assertEquals(SOM.params.initialLearningRate, SOM.learningRate)
-        assertEquals(SOM.params.initNeighborhoodSize, SOM.neighborhoodSize)
+        assertEquals(som.initialLearningRate, som.somLearningRate)
+        assertEquals(som.initNeighborhoodSize, som.neighborhoodSize)
 
         // Decay with default values
-        SOM.params.learningDecayRate = 0.002
-        SOM.params.neighborhoodDecayAmount = 0.05
+        som.learningDecayRate = 0.002
+        som.neighborhoodDecayAmount = 0.05
 
         repeat(3) {
             net.update()
         }
-        assertEquals(99.85, SOM.neighborhoodSize, 0.001)
-        assertEquals(0.05964, SOM.learningRate, 0.00001)
+        assertEquals(99.85, som.neighborhoodSize, 0.001)
+        assertEquals(0.05964, som.somLearningRate, 0.00001)
     }
-
-
 }

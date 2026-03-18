@@ -209,7 +209,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
         for (node in outlinedObjects) {
             when (node) {
-                is NeuronGroupNode -> {
+                is NeuronCollectionNode -> {
                     node.offset(dx, dy)
                 }
 

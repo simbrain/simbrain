@@ -220,7 +220,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             }.let { activations ->
                 // Some update rules apply a rule to source activations before they are multiplied by weights
                 // If the target is a neuron collection we assume all neurons in the collection have the same update rule
-                (target as? AbstractNeuronCollection)?.neuronList?.first()
+                (target as? NeuronCollection)?.neuronList?.first()
                     ?.updateRule?.synapticInputModifier(activations)
                 ?: activations
             }

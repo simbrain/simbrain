@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.AbstractNeuronCollection
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
@@ -317,7 +316,7 @@ fun AbstractAction.toMenuItem() = JCheckBoxMenuItem(this)
  * Helper function for Java classes to create an edit action for a neuron group.
  * Uses the displayName of the group in the action name and handles dialog display.
  */
-fun NetworkPanel.createEditNeuronGroupAction(neuronGroup: AbstractNeuronCollection, getDialog: () -> org.simbrain.util.StandardDialog?): AbstractAction {
+fun NetworkPanel.createEditNeuronGroupAction(neuronGroup: NeuronCollection, getDialog: () -> org.simbrain.util.StandardDialog?): AbstractAction {
     return createAction(name = "Edit ${neuronGroup.displayName}...") {
         getDialog()?.apply {
             pack()

@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.core.NeuronCollection;
 
 /**
  * Emits chemicals "inside" the creature, depending on environmental factors.
@@ -29,7 +29,7 @@ public class CreaturesChemEmitter {
     /**
      * The brain lobe to check. Only relevant if organIsBrain is set to true
      */
-    private NeuronGroup tissue;
+    private NeuronCollection tissue;
 
     // Put a reference to the locus here (once we know how to implement that)
 

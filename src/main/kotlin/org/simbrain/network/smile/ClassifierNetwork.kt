@@ -1,8 +1,8 @@
 package org.simbrain.network.smile
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.ClassificationDatasetEncoding
@@ -36,15 +36,15 @@ class ClassifierNetwork(
      */
     var winner = Integer.MIN_VALUE
 
-    val inputNeuronGroup = NeuronGroup(classifier.trainingData.inputs.first().size).apply {
+    val inputNeuronGroup = addNeuronCollection(List(classifier.trainingData.inputs.first().size) { Neuron() }).apply {
         label = "Input Layer"
         setLayoutBasedOnSize()
-    }.also { addModel(it) }
+    }
 
-    val outputNeuronGroup = NeuronGroup(classifier.numClasses).apply {
+    val outputNeuronGroup = addNeuronCollection(List(classifier.numClasses) { Neuron() }).apply {
         label = "Output Layer"
         setLayoutBasedOnSize()
-    }.also { addModel(it) }
+    }
 
     init {
         label = classifier.name
@@ -76,7 +76,10 @@ class ClassifierNetwork(
      */
     context(Network)
     override fun update() {
-        inputNeuronGroup.update()
+        // Explicitly update input neurons (NeuronCollection has no built-in update)
+        inputNeuronGroup.neuronList.forEach { it.accumulateFanInInputs() }
+        inputNeuronGroup.neuronList.forEach { it.update() }
+        inputNeuronGroup.neuronList.forEach { it.clearInput() }
         if (classifier.model != null) {
             winner = classifier.predict(inputNeuronGroup.activationArray)
             // println("Prediction of ${this.id} is: $winner")

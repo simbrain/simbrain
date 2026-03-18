@@ -8,7 +8,7 @@
 // import org.jetbrains.kotlinx.dl.dataset.embedded.extractImages
 // import org.jetbrains.kotlinx.dl.dataset.embedded.mnist
 // import org.simbrain.custom_sims.*
-// import org.simbrain.network.core.addNeuronGroup
+// import org.simbrain.network.core.addNeuronCollection
 // import org.simbrain.network.layouts.GridLayout
 // import org.simbrain.util.place
 // import org.simbrain.util.point
@@ -30,7 +30,7 @@
 //
 //     val network = networkComponent.network
 //
-//     val pixelNet = network.addNeuronGroup(400, point(-9.25, 95.93)).apply {
+//     val pixelNet = network.addNeuronCollection(400).apply {
 //         label = "Retina"
 //         layout = GridLayout(50.0,50.0)
 //         isClamped = true

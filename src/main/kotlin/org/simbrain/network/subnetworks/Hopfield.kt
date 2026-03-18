@@ -1,10 +1,6 @@
 package org.simbrain.network.subnetworks
 
-import org.simbrain.network.core.InfoText
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.core.XStreamConstructor
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
 import org.simbrain.network.updaterules.BinaryRule
@@ -18,7 +14,7 @@ import org.simbrain.util.stats.distributions.NormalDistribution
  */
 class Hopfield : Subnetwork, UnsupervisedNetwork {
 
-    lateinit var neuronGroup: NeuronGroup
+    lateinit var neuronGroup: NeuronCollection
 
     override val inputLayer
         get() = neuronGroup
@@ -51,18 +47,15 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
 
         this.trainingData = mutableListOf()
 
-        // Create main neuron group
-        neuronGroup = NeuronGroup(numNeurons)
+        // Create main neuron collection
+        val binary = BinaryRule().apply {
+            threshold = 0.0
+            setCeiling(1.0)
+            setFloor(0.0)
+        }
+        neuronGroup = addNeuronCollection(List(numNeurons) { Neuron().apply { updateRule = binary.copy() } })
         neuronGroup.label = "Neurons"
         neuronGroup.location = point(0.0, 0.0)
-        addModel(neuronGroup)
-
-        // Set neuron rule
-        val binary = BinaryRule()
-        binary.threshold = 0.0
-        binary.setCeiling(1.0)
-        binary.setFloor(0.0)
-        neuronGroup.updateRule = binary
         neuronGroup.setIncrement(1.0)
 
         // Connect the neurons together
@@ -147,9 +140,8 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     override fun copy(): Hopfield {
         val copy = Hopfield()
 
-        // Copy neuron group and its properties
-        copy.neuronGroup = neuronGroup.copy()
-        copy.addModel(copy.neuronGroup)
+        // Copy neuron collection and its properties
+        copy.neuronGroup = copy.addNeuronCollection(neuronGroup.neuronList.map(Neuron::copy))
 
         // Copy weight matrix
         copy.weightMatrix = WeightMatrix(copy.neuronGroup, copy.neuronGroup)

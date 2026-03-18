@@ -3,11 +3,11 @@ package org.simbrain.custom_sims.simulations.neuroscience
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.gui.ForceSpikeAction
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.updaterules.IntegrateAndFireRule
@@ -69,8 +69,8 @@ val corticalLayers = newSim {
         timeConstant: Double,
         threshold: Double,
         resistance: Double
-    ): NeuronGroup {
-        return net.addNeuronGroup(numNeurons) {
+    ): NeuronCollection {
+        return net.addNeuronCollection(numNeurons) {
             updateRule = IntegrateAndFireRule().also {
                 it.restingPotential = restingPotential
                 it.timeConstant = timeConstant
@@ -84,7 +84,7 @@ val corticalLayers = newSim {
     }
 
     suspend fun connectLayers(
-        src: NeuronGroup, tar: NeuronGroup,
+        src: NeuronCollection, tar: NeuronCollection,
         sparsity: Double,
     ): SynapseGroup {
         val exRand: ProbabilityDistribution = LogNormalDistribution(exlocation, exscale, false)

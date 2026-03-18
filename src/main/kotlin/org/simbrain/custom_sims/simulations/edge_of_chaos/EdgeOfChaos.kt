@@ -3,12 +3,8 @@ package org.simbrain.custom_sims.simulations.edge_of_chaos
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Direction
 import org.simbrain.network.connections.FixedDegree
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.BinaryRule
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.place
@@ -53,9 +49,8 @@ val edgeOfChaos = newSim("edgeOfChaos") {
     val sgReservoir = connectReservoir(net, reservoir, variance, K, seed)
 
     // Set up sensor nodes
-    val sensorNodes = NeuronGroup(6).apply {
+    val sensorNodes = net.addNeuronCollection(6).apply {
         label = "Sensors"
-        net.addNetworkModelAsync(this)
         setLocation(229.0, 561.0)
         applyLayout()
     }
@@ -201,8 +196,8 @@ val edgeOfChaos = newSim("edgeOfChaos") {
  */
 suspend fun createSensorConnections(
     net: Network,
-    sourceGroup: NeuronGroup,
-    targetGroup: NeuronGroup,
+    sourceGroup: NeuronCollection,
+    targetGroup: NeuronCollection,
     sourceNodeIndices: IntArray,
     sparsity: Double,
     quadrant: Int
@@ -256,20 +251,18 @@ suspend fun createSensorConnections(
 
 const val GRID_SPACE: Int = 25
 
-suspend fun createReservoir(parentNet: Network, x: Int, y: Int, numNeurons: Int): NeuronGroup {
+suspend fun createReservoir(parentNet: Network, x: Int, y: Int, numNeurons: Int): NeuronCollection {
     val layout = GridLayout(GRID_SPACE.toDouble(), GRID_SPACE.toDouble(), sqrt(numNeurons.toDouble()).toInt())
-    val ng = NeuronGroup(numNeurons)
     val thresholdUnit = BinaryRule()
-    ng.updateRule = thresholdUnit
-    parentNet.addNetworkModel(ng)
+    val nc = parentNet.addNeuronCollection(numNeurons) { updateRule = thresholdUnit.copy() }
 
-    ng.layout = layout
-    ng.applyLayout(Point2D.Double(x.toDouble(), y.toDouble()))
-    return ng
+    nc.layout = layout
+    nc.applyLayout(Point2D.Double(x.toDouble(), y.toDouble()))
+    return nc
 }
 
 
-suspend fun connectReservoir(parentNet: Network, res: NeuronGroup, variance: Double, k: Int, seed: Long): SynapseGroup {
+suspend fun connectReservoir(parentNet: Network, res: NeuronCollection, variance: Double, k: Int, seed: Long): SynapseGroup {
     val con = FixedDegree(k, Direction.IN, false, 20.0, false, seed)
 
     val reservoir = SynapseGroup(res, res, con)

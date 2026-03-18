@@ -4,7 +4,6 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.allPropertiesToString
@@ -155,9 +154,12 @@ class SupervisedModelTest {
         val na2 = NeuronArray(2).also { network1.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
         val na3 = NeuronArray(1).also { network1.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
 
-        val ng1 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "layer1" }
-        val ng2 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer2" }
-        val ng3 = NeuronGroup(1).also { network2.addNetworkModelsAsync(it) }.also { it.updateRule = SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }; it.label = "layer3" }
+        val ng1Neurons = List(2) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val ng1 = NeuronCollection(ng1Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.isClamped = true; it.label = "layer1" }
+        val ng2Neurons = List(2) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val ng2 = NeuronCollection(ng2Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.setNeuronType(SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }); it.label = "layer2" }
+        val ng3Neurons = List(1) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val ng3 = NeuronCollection(ng3Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.setNeuronType(SigmoidalRule().apply { type = SigmoidFunctionEnum.ARCTAN }); it.label = "layer3" }
 
         val nawm1 = WeightMatrix(na1, na2).also { network1.addNetworkModelsAsync(it) }.also { it.label = "wm1" }
         val nawm2 = WeightMatrix(na2, na3).also { network1.addNetworkModelsAsync(it) }.also { it.label = "wm2" }
@@ -271,9 +273,12 @@ class SupervisedModelTest {
         backpropNetwork.layerList.forEachIndexed { index, layer -> layer.label = "layer${index + 1}" }
         backpropNetwork.wmList.forEachIndexed { index, wm -> wm.label = "wm${index + 1}" }
 
-        val layer1 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer1"; it.isClamped = true }
-        val layer2 = NeuronGroup(2).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer2"; it.updateRule = SigmoidalRule() }
-        val layer3 = NeuronGroup(1).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer3"; it.updateRule = SigmoidalRule() }
+        val layer1Neurons = List(2) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val layer1 = NeuronCollection(layer1Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer1"; it.isClamped = true }
+        val layer2Neurons = List(2) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val layer2 = NeuronCollection(layer2Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer2"; it.setNeuronType(SigmoidalRule()) }
+        val layer3Neurons = List(1) { Neuron() }.also { network2.addNetworkModelsAsync(it) }
+        val layer3 = NeuronCollection(layer3Neurons).also { network2.addNetworkModelsAsync(it) }.also { it.label = "layer3"; it.setNeuronType(SigmoidalRule()) }
 
         val wm1 = SynapseGroup(layer1, layer2).also { it.label = "wm1"; network2.addNetworkModelsAsync(it) }
         val wm2 = SynapseGroup(layer2, layer3).also { it.label = "wm2"; network2.addNetworkModelsAsync(it) }
@@ -550,19 +555,22 @@ class SupervisedModelTest {
     }
 
     @Test
-    fun `network update should match trainer forward pass after training with NeuronGroup`() = runBlocking {
+    fun `network update should match trainer forward pass after training with NeuronCollection and SynapseGroup`() = runBlocking {
         val network = Network()
 
-        val inputLayer = NeuronGroup(2).also { network.addNetworkModelsAsync(it) }.also { 
+        val inputNeurons = List(2) { Neuron() }.also { network.addNetworkModelsAsync(it) }
+        val inputLayer = NeuronCollection(inputNeurons).also { network.addNetworkModelsAsync(it) }.also {
             it.isClamped = true
             it.label = "Input"
         }
-        val hiddenLayer = NeuronGroup(2).also { network.addNetworkModelsAsync(it) }.also { 
-            it.updateRule = SigmoidalRule()
+        val hiddenNeurons = List(2) { Neuron() }.also { network.addNetworkModelsAsync(it) }
+        val hiddenLayer = NeuronCollection(hiddenNeurons).also { network.addNetworkModelsAsync(it) }.also {
+            it.setNeuronType(SigmoidalRule())
             it.label = "Hidden"
         }
-        val outputLayer = NeuronGroup(1).also { network.addNetworkModelsAsync(it) }.also { 
-            it.updateRule = SigmoidalRule()
+        val outputNeurons = List(1) { Neuron() }.also { network.addNetworkModelsAsync(it) }
+        val outputLayer = NeuronCollection(outputNeurons).also { network.addNetworkModelsAsync(it) }.also {
+            it.setNeuronType(SigmoidalRule())
             it.label = "Output"
         }
 

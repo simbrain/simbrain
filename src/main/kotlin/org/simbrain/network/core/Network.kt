@@ -4,7 +4,6 @@ import kotlinx.coroutines.*
 import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
@@ -75,7 +74,7 @@ class Network: CoroutineScope, EditableObject {
 
     /**
      * Encodes all parent-child relationships between NetworkModels.
-     * For example, each Neuron in a NeuronGroup is mapped to its to parent NeuronGroup
+     * For example, each Neuron in a NeuronCollection is mapped to its parent NeuronCollection.
      * Needed for undo / redo.
      */
     val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
@@ -236,11 +235,8 @@ class Network: CoroutineScope, EditableObject {
     val flatNeuronList: List<Neuron>
         get() = buildList {
             addAll(networkModels.get<Neuron>())
-            for (neuronGroup in networkModels.all.filterIsInstance<NeuronGroup>()) {
-                addAll(neuronGroup.neuronList)
-            }
             for (subnetwork in networkModels.get<Subnetwork>()) {
-                addAll(subnetwork.modelList.get<NeuronGroup>().flatMap { it.neuronList })
+                addAll(subnetwork.modelList.get<Neuron>())
             }
         }
 
@@ -259,11 +255,11 @@ class Network: CoroutineScope, EditableObject {
         }.toList()
 
     /**
-     * Returns a list of all neuron groups including those in subnetworks.
+     * Returns a list of all neuron collections including those in subnetworks.
      */
-    val flatNeuronGroupList: List<NeuronGroup>
+    val flatNeuronCollectionList: List<NeuronCollection>
         get() = sequence {
-            yieldAll(networkModels.get<NeuronGroup>())
+            yieldAll(networkModels.get<NeuronCollection>())
             yieldAll(networkModels.get<Subnetwork>().flatMap { it.modelList.get() })
         }.toList()
 
@@ -288,7 +284,7 @@ class Network: CoroutineScope, EditableObject {
     private fun assignId(model: NetworkModel) {
         model.id = idManager.getAndIncrementId(model.javaClass)
         when (model) {
-            is NeuronGroup -> model.neuronList.forEach { assignId(it) }
+            is NeuronCollection -> model.neuronList.forEach { assignId(it) }
             is SynapseGroup -> model.synapses.forEach { assignId(it) }
             is Subnetwork -> model.modelList.all.forEach { assignId(it) }
         }
@@ -321,7 +317,7 @@ class Network: CoroutineScope, EditableObject {
             }
             val deferred = events.modelAdded.fire(model)
             when(model) {
-                is AbstractNeuronCollection -> {
+                is NeuronCollection -> {
                     model.neuronList.forEach { childToParentMap[it] = model }
                     model.neuronList.forEach { n ->
                         n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
@@ -454,7 +450,7 @@ class Network: CoroutineScope, EditableObject {
         }
         
         // Set up neuron listeners for all neuron collections after deserialization
-        networkModels.allInUpdatingOrder.filterIsInstance<AbstractNeuronCollection>().forEach { collection ->
+        networkModels.allInUpdatingOrder.filterIsInstance<NeuronCollection>().forEach { collection ->
             collection.setupNeuronListeners()
         }
 

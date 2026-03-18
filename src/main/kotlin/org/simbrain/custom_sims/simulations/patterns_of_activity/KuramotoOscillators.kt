@@ -3,12 +3,10 @@ package org.simbrain.custom_sims.simulations.patterns_of_activity
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.updaterules.KuramotoRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.plot.projection.ProjectionComponent
@@ -61,21 +59,16 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     net.timeStep = 0.5
 
     // Main recurrent net
-    val neuronList: MutableList<Neuron> = ArrayList()
-    for (ii in 0..<netSize) {
-        val n = Neuron()
+    val reservoirNet = net.addNeuronCollection(netSize) {
         // Allostatic also works pretty nicely here
-        n.updateRule = KuramotoRule()
+        updateRule = KuramotoRule()
         if (Math.random() < 0.5) {
-            n.polarity = SimbrainConstants.Polarity.EXCITATORY
+            polarity = SimbrainConstants.Polarity.EXCITATORY
         } else {
-            n.polarity = SimbrainConstants.Polarity.INHIBITORY
+            polarity = SimbrainConstants.Polarity.INHIBITORY
         }
-        neuronList.add(n)
-    }
-    val reservoirNet = NeuronGroup(neuronList).apply {
-        layout = HexagonalGridLayout(spacing, spacing, sqrt(neuronList.size.toDouble()).toInt())
-        net.addNetworkModelAsync(this)
+    }.apply {
+        layout = HexagonalGridLayout(spacing, spacing, sqrt(netSize.toDouble()).toInt())
         setLocation(185.0, 50.0)
         applyLayout(-5, -85)
         label = "Reservoir"
@@ -87,22 +80,18 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }
     val recurrentSyns = SynapseGroup(reservoirNet, reservoirNet, connection).apply {
         label = "Synapses"
-        net.addNetworkModelAsync(this)
+        net.addNetworkModel(this)
     }
 
     // Inputs
-    val inputNetwork = net.addNeuronGroup(1.0, 1.0, 3).apply {
+    val inputNetwork = net.addNeuronCollection(3) {
+        updateRule = LinearRule().apply {
+            addNoise = true
+            noiseGenerator = NormalDistribution(0.0, .1)
+        }
+    }.apply {
         setLowerBound(-100.0)
         setUpperBound(100.0)
-        neuronList.forEach { neuron ->
-            // Ensure input neurons use LinearRule, not KuramotoRule
-            if (neuron.updateRule !is LinearRule) {
-                neuron.updateRule = LinearRule()
-            }
-            val linearRule = neuron.updateRule as LinearRule
-            linearRule.addNoise = true
-            linearRule.noiseGenerator = NormalDistribution(0.0, .1)
-        }
         label = "Sensory Neurons"
         layout = LineLayout()
         applyLayout()
@@ -117,7 +106,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
         exRandomizer = NormalDistribution(10.0, 1.0)
     }
     val inputToRes = SynapseGroup(inputNetwork, reservoirNet, sparseExcitatory).apply {
-        net.addNetworkModelAsync(this)
+        net.addNetworkModel(this)
         SwingUtilities.invokeLater { displaySynapses = false }
         randomizeExcitatory()
     }

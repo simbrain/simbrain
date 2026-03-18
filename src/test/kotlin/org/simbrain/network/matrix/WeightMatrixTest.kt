@@ -2,10 +2,7 @@ package org.simbrain.network.matrix
 
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.core.*
 import java.util.List
 
 class WeightMatrixTest {
@@ -90,7 +87,9 @@ class WeightMatrixTest {
     @Test
     fun testArrayToNeuronGroup() {
         na1.setActivations(doubleArrayOf(.5, -.5))
-        val ng = NeuronGroup(2)
+        val ngNeurons = List(2) { Neuron() }
+        val ng = NeuronCollection(ngNeurons)
+        ngNeurons.forEach { net.addNetworkModelAsync(it) }
         val wm2 = WeightMatrix(na1, ng)
         wm2.diagonalize()
         net.addNetworkModelsAsync(List.of(ng, wm2))
@@ -103,9 +102,14 @@ class WeightMatrixTest {
     // @Test
     fun large_matrix_multiplication() {
         val net = Network()
-        val ng1 = NeuronGroup(1000)
-        val ng2 = NeuronGroup(1000)
+        val ng1Neurons = List(1000) { Neuron() }
+        ng1Neurons.forEach { net.addNetworkModelAsync(it) }
+        val ng1 = NeuronCollection(ng1Neurons)
+        val ng2Neurons = List(1000) { Neuron() }
+        ng2Neurons.forEach { net.addNetworkModelAsync(it) }
+        val ng2 = NeuronCollection(ng2Neurons)
         val wm = WeightMatrix(ng1, ng2)
+        net.addNetworkModelsAsync(ng1, ng2, wm)
         wm.weights.add(1.0001)
 
         val start_time = System.currentTimeMillis()

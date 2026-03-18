@@ -1,8 +1,8 @@
 package org.simbrain.network
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.getNetworkXStream
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
@@ -50,7 +50,7 @@ class NetworkComponent : WorkspaceComponent {
             if (m is AttributeContainer) {
                 fireAttributeContainerAdded(m)
             }
-            if (m is NeuronGroup) {
+            if (m is NeuronCollection) {
                 m.neuronList.map { addedContainer ->
                     this.fireAttributeContainerAdded(
                         addedContainer
@@ -64,7 +64,7 @@ class NetworkComponent : WorkspaceComponent {
             if (m is AttributeContainer) {
                 fireAttributeContainerRemoved(m)
             }
-            if (m is NeuronGroup) {
+            if (m is NeuronCollection) {
                 m.neuronList.forEach { removedContainer ->
                     this.fireAttributeContainerRemoved(
                         removedContainer

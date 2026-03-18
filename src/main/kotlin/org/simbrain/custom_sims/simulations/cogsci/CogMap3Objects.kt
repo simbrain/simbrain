@@ -5,8 +5,8 @@ import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.SmellSource
 import org.simbrain.util.place
@@ -34,7 +34,7 @@ val cogMap3Objects = newSim {
     val network = networkComponent.network
 
     // Make reservoir
-    val recurrent = NeuronGroup(numNeurons).apply {
+    val recurrent = network.addNeuronCollection(numNeurons).apply {
         // layout(GridLayout())
         label = "Recurrent"
         // setNeuronType(LinearRule())
@@ -42,16 +42,16 @@ val cogMap3Objects = newSim {
     val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
     weightMatrix.weights.setSpectralRadius(spectralRadius)
-    network.addNetworkModelsAsync(recurrent, weightMatrix)
+    network.addNetworkModel(weightMatrix)
 
     // Inputs to reservoir
-    val inputNetwork = NeuronGroup(3)
-    inputNetwork.setLowerBound(-1.0)
-    inputNetwork.setUpperBound(1.0)
-    inputNetwork.label = "Sensory Neurons"
-    inputNetwork.layout = LineLayout()
-    network.addNetworkModelAsync(inputNetwork)
-    inputNetwork.setLocation(0.0, 751.0)
+    val inputNetwork = network.addNeuronCollection(3).apply {
+        setLowerBound(-1.0)
+        setUpperBound(1.0)
+        label = "Sensory Neurons"
+        layout = LineLayout()
+        setLocation(0.0, 751.0)
+    }
 
     val sparseExcitatory = Sparse(0.7, true, false)
     sparseExcitatory.percentExcitatory = 100.0
@@ -62,7 +62,7 @@ val cogMap3Objects = newSim {
     inputToRes.displaySynapses = false
     inputToRes.label = "Sparse Excitatory"
     inputToRes.randomizeExcitatory()
-    network.addNetworkModelAsync(inputToRes)
+    network.addNetworkModel(inputToRes)
 
     // World
     val dispersion = 100.0

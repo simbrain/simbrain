@@ -23,7 +23,7 @@ val competitiveSim = newSim {
     network.addNetworkModelAsync(competitive)
     competitive.inputLayer.setUpperBound(1.0)
     
-    competitive.competitive.params.learningRate = 0.05
+    competitive.learningRate = 0.05
 
     var winningLabel = ""
     val labelTracker = WinnerLabeler()
@@ -179,10 +179,10 @@ val competitiveSim = newSim {
                 labelTracker.updateWinner(winningLabel, winner)
             }
             addButton("Test") {
-                val savedLearningRate = competitive.competitive.params.learningRate
-                competitive.competitive.params.learningRate = 0.0
+                val savedLearningRate = competitive.learningRate
+                competitive.learningRate = 0.0
                 workspace.iterateSuspend()
-                competitive.competitive.params.learningRate = savedLearningRate
+                competitive.learningRate = savedLearningRate
                 val winner = competitive.competitive.neuronList[competitive.competitive.activationArray.indexOfFirst { it > 0.0 }]
                 labelTracker.updateWinner(winningLabel, winner)
             }

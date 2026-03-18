@@ -9,11 +9,9 @@
 package org.simbrain.network.util
 
 import org.simbrain.network.core.*
-import org.simbrain.util.*
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.component3
-import kotlin.collections.component4
+import org.simbrain.util.component1
+import org.simbrain.util.component2
+import org.simbrain.util.point
 
 /**
  * Directions.
@@ -47,8 +45,8 @@ fun alignNetworkModels(reference: LocatableModel, target: LocatableModel, alignm
  * @param amount    the amount by which to offset the second group
  */
 fun offsetNeuronCollections(
-    reference: AbstractNeuronCollection,
-    target: AbstractNeuronCollection,
+    reference: NeuronCollection,
+    target: NeuronCollection,
     direction: Direction,
     amount: Double
 ) {

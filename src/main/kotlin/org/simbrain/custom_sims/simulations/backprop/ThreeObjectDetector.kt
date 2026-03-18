@@ -1,11 +1,11 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.AbstractNeuronCollection
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.setLabels
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.splitDataSet
@@ -29,23 +29,21 @@ val threeObjectDetector = newSim {
     val networkComponent = addNetworkComponent("Object Detector")
     val net = networkComponent.network
 
-    val inputLayer = NeuronGroup(3).apply {
+    val inputLayer = net.addNeuronCollection(3).apply {
         isClamped = true
         applyLayout(LineLayout())
     }
-    val hiddenLayer = NeuronGroup(5).apply {
-        updateRule = SigmoidalRule()
+    val hiddenLayer = net.addNeuronCollection(5) { updateRule = SigmoidalRule() }.apply {
         applyLayout(LineLayout())
     }
-    val outputLayer = NeuronGroup(3).apply {
-        updateRule = SigmoidalRule()
+    val outputLayer = net.addNeuronCollection(3) { updateRule = SigmoidalRule() }.apply {
         applyLayout(LineLayout())
         setLabels(listOf("Gouda", "Blue", "Fish"))
     }
     val sg1 = SynapseGroup(inputLayer, hiddenLayer)
     val sg2 = SynapseGroup(hiddenLayer, outputLayer)
     val sm = SupervisedModel(inputLayer, outputLayer, trainTestSplit = 1.0)
-    net.addNetworkModels(inputLayer, hiddenLayer, outputLayer, sg1, sg2, sm)
+    net.addNetworkModels(sg1, sg2, sm)
     offsetNetworkModel(inputLayer, hiddenLayer, Direction.NORTH, 150.0)
     offsetNetworkModel(hiddenLayer, outputLayer, Direction.NORTH, 150.0)
     alignNetworkModels(inputLayer, hiddenLayer, Alignment.VERTICAL)
@@ -138,7 +136,7 @@ val threeObjectDetector = newSim {
     sm.trainerConfig.testConfiguration.enabled = true
 
     with(couplingManager) {
-        smellSensor.getProducer(SmellSensor::smellVector) couple inputLayer.getConsumer(AbstractNeuronCollection::setActivations)
+        smellSensor.getProducer(SmellSensor::smellVector) couple inputLayer.getConsumer(NeuronCollection::setActivations)
     }
 
     withGui {

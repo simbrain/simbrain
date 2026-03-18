@@ -3,7 +3,7 @@ package org.simbrain.network.gui
 import org.piccolo2d.PNode
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.network.gui.nodes.AbstractNeuronCollectionNode
+import org.simbrain.network.gui.nodes.NeuronCollectionNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
@@ -15,14 +15,14 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     private val source get() = weightMatrixNode.model.source
     private val sourceNodeBounds get() = with(weightMatrixNode.sourceNode) {
         when (this) {
-            is AbstractNeuronCollectionNode -> outlinedObjects.globalFullBounds
+            is NeuronCollectionNode -> outlinedObjects.globalFullBounds
             else -> this.globalBounds
         }
     }
     private val target get() = weightMatrixNode.model.target
     private val targetNodeBounds get() = with(weightMatrixNode.targetNode) {
         when (this) {
-            is AbstractNeuronCollectionNode -> outlinedObjects.globalFullBounds
+            is NeuronCollectionNode -> outlinedObjects.globalFullBounds
             else -> this.globalBounds
         }
     }

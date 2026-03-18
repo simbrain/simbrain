@@ -90,22 +90,25 @@ val kAgentTrails = newSim {
 
     val network = networkComponent.network
 
-    val sensoryNet = network.addNeuronGroup(3, point(-9.25, 95.93)).apply {
+    val sensoryNet = network.addNeuronCollection(3).apply {
         label = "Sensory"
+        location = point(-9.25, 95.93)
         neuronList.labels = listOf("Cheese", "Flower", "Fish")
         applyLayout(LineLayout())
     }
 
-    val actionNet = network.addNeuronGroup(3, point(0.0, -0.79)).apply {
+    val actionNet = network.addNeuronCollection(3).apply {
         label = "Actions"
+        location = point(0.0, -0.79)
         isClamped = true
         neuronList.labels = listOf("Straight", "Right", "Left")
         applyLayout(LineLayout())
     }
     val (straightNeuron, rightNeuron, leftNeuron) = actionNet.neuronList
 
-    val predictionNet = network.addNeuronGroup(3, point(231.02, 24.74)).apply {
+    val predictionNet = network.addNeuronCollection(3).apply {
         label = "Predicted"
+        location = point(231.02, 24.74)
         applyLayout(LineLayout())
     }
 

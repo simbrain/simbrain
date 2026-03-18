@@ -5,8 +5,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.neurongroups.getWinner
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.workspace.Workspace
@@ -26,19 +24,21 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
     val numNeurons = 3
 
-    val behaviorNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 95.93)).apply {
+    val behaviorNet = network.addNeuronCollection(numNeurons).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
         label = "Behaviors"
         neuronList.labels = listOf("Wiggle: ", "Explore: ", "Spin: ")
         neuronList.forEach { it.auxValue = .33 }
+        setLocation(-9.25, 95.93)
         applyLayout()
     }
 
-    val stimulusNet = network.addNeuronGroup(numNeurons, location = point(-9.25, 295.93)).apply {
+    val stimulusNet = network.addNeuronCollection(numNeurons).apply {
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
         label = "Stimuli"
         setIncrement(1.0)
         neuronList.labels = listOf("Candle", "Flower", "Bell")
+        setLocation(-9.25, 295.93)
         applyLayout()
     }
 
@@ -186,7 +186,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
 }.registerReopenFunction { workspace -> setupOperantWithEnvironmentWorkspace(workspace) }
 
-fun updateBehaviorNetNeuronLabels(behaviorNet: NeuronGroup) {
+fun updateBehaviorNetNeuronLabels(behaviorNet: NeuronCollection) {
     behaviorNet.neuronList.forEach {
         it.label = it.label?.replace(Regex(":.+"), ": ${it.auxValue.format(2)}")
     }
@@ -197,8 +197,8 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
     val random = Random(Random.nextLong())
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
-    val behaviorNet = network.getModelByLabel<NeuronGroup>("Behaviors")
-    val stimulusNet = network.getModelByLabel<NeuronGroup>("Stimuli")
+    val behaviorNet = network.getModelByLabel<NeuronCollection>("Behaviors")
+    val stimulusNet = network.getModelByLabel<NeuronCollection>("Stimuli")
     val rewardNeuron = network.getModelByLabel<Neuron>("Food Pellet")
     val punishNeuron = network.getModelByLabel<Neuron>("Shock")
 

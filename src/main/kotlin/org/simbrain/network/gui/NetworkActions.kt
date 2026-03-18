@@ -11,9 +11,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.neurongroups.BasicNeuronGroupParams
-import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.neurongroups.NeuronGroupParams
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
@@ -692,10 +689,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val connectWithSynapseGroup = networkPanel.createAction(
         name = "Connect selected neuron groups with synapse group",
     ) {
-        selectionManager.connectNeuronGroups()
+        selectionManager.connectNeuronCollections()
     }
 
-    val addGroupAction = addNeuronGroupAction()
+    val addGroupAction = addNeuronCollectionAction()
 
     val clipboardActions
         get() = listOf(copyAction, cutAction, pasteAction, duplicateAction)
@@ -763,30 +760,31 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
     }
 
-    private fun addNeuronGroupAction() = networkPanel.createAction(
-        name = "Add neuron group...",
-        description = "Add a neuron group to network (g)",
+    private fun addNeuronCollectionAction() = networkPanel.createAction(
+        name = "Add neuron collection...",
+        description = "Add a neuron collection to network (g)",
         keyboardShortcut = 'G'
     ) {
-        objectWrapper("Neuron group parameters", BasicNeuronGroupParams() as NeuronGroupParams, showLabeledBorder = false).createEditorDialog {
-            it.editingObject.create().also { group ->
-                group.applyLayout()
-                network.addNetworkModelAsync(group)
-                val neurons = group.neuronList.toList()
-                undoManager.addUndoableAction(
-                    description = "Add neuron group ${group.id}",
-                    undo = { group.delete() },
-                    redo = {
-                        group.neuronList.clear()
-                        group.neuronList.addAll(neurons)
-                        network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)
-                    }
-                )
+        val numNeurons = showNumericInputDialog("Number of neurons", 10) ?: return@createAction
+        val neurons = List(numNeurons) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        val group = NeuronCollection(neurons)
+        group.setLayoutBasedOnSize()
+        group.applyLayout()
+        network.addNetworkModelAsync(group)
+        undoManager.addUndoableAction(
+            description = "Add neuron collection ${group.id}",
+            undo = { group.delete() },
+            redo = {
+                group.neuronList.clear()
+                group.neuronList.addAll(neurons)
+                neurons.forEach { network.addNetworkModelAsync(it, usePlacementManager = false, useAutoAssignedId = false) }
+                network.addNetworkModel(group, usePlacementManager = false, useAutoAssignedId = false)
             }
-        }.apply { title = "Add neuron group" }.display()
+        )
     }
 
-    fun AbstractNeuronCollection.showApplyLayoutDialogAction() = networkPanel.createAction(
+    fun NeuronCollection.showApplyLayoutDialogAction() = networkPanel.createAction(
         name = "Apply layout...",
         description = "Apply a layout to this neuron group (Cmd/Ctrl-L)",
         keyboardShortcut = CmdOrCtrl + 'L'
@@ -1267,8 +1265,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         source.size
     )
 
-    fun createAbstractNeuronCollectionCoupledImageWorld(collection: AbstractNeuronCollection) = actionManager.createImageInput(
-        collection.getConsumer(AbstractNeuronCollection::activationArray),
+    fun createNeuronCollectionCoupledImageWorld(collection: NeuronCollection) = actionManager.createImageInput(
+        collection.getConsumer(NeuronCollection::activationArray),
         collection.size,
         menuTitle = "Add coupled image world",
         postActionBlock = { collection.isClamped = true }
@@ -1280,11 +1278,9 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
     val subnetwork = block()
     networkPanel.network.addNetworkModelAsync(subnetwork)
     val models = subnetwork.modelList.all
-    val neuronGroups = models.filterIsInstance<NeuronGroup>()
-    val neuronCollections = models.filterIsInstance<AbstractNeuronCollection>()
+    val neuronCollections = models.filterIsInstance<NeuronCollection>()
     val synapseGroups = models.filterIsInstance<SynapseGroup>()
 
-    val neuronGroupNeuronsMap = neuronGroups.associateWith { it.neuronList.toList() }
     val neuronCollectionNeuronsMap = neuronCollections.associateWith { it.neuronList.toList() }
     val synapseGroupSynapsesMap = synapseGroups.associateWith { it.synapses.toList() }
 
@@ -1292,11 +1288,6 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
         description = "Add subnetwork ${subnetwork.id}",
         undo = { subnetwork.delete() },
         redo = {
-
-            neuronGroupNeuronsMap.forEach { (group, neurons) ->
-                group.neuronList.clear()
-                group.neuronList.addAll(neurons)
-            }
 
             neuronCollectionNeuronsMap.forEach { (collection, neurons) ->
                 collection.neuronList.clear()

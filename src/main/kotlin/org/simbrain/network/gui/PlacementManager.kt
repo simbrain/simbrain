@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Subnetwork
@@ -61,7 +60,7 @@ class PlacementManager() {
     } else {
         when (model) {
             is Neuron -> point(45, 0)
-            is NeuronGroup -> point(400, 0)
+            is NeuronCollection -> point(400, 0)
             is NeuronArray -> point(300,0)
             is Hopfield -> point(300,0)
             is CompetitiveNetwork -> point(300,0)

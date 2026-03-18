@@ -1,310 +1,308 @@
-package org.simbrain.network.gui.nodes;
+package org.simbrain.network.gui.nodes
 
-import org.simbrain.network.core.AbstractNeuronCollection;
-import org.simbrain.network.core.NeuronCollection;
-import org.simbrain.network.core.SpikingNeuronUpdateRule;
-import org.simbrain.network.core.Synapse;
-import org.simbrain.network.gui.NetworkPanel;
-import org.simbrain.util.ResourceManager;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.workspace.gui.SimbrainDesktop;
-
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.KeyEvent;
-
-import static org.simbrain.network.gui.NetworkDialogsKt.createNeuronGroupDialog;
-import static org.simbrain.network.gui.NetworkPanelMenusKt.createCouplingMenu;
-import static org.simbrain.network.gui.NetworkPanelMenusKt.createEditNeuronCollectionAction;
-import static org.simbrain.network.gui.NetworkPanelUtilsKt.createTooltipTextWithLocation;
+import org.piccolo2d.util.PBounds
+import org.simbrain.network.core.*
+import org.simbrain.network.gui.*
+import org.simbrain.util.*
+import org.simbrain.util.piccolo.Outline
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.Color
+import java.awt.event.ActionEvent
+import java.awt.event.KeyEvent
+import java.util.concurrent.CopyOnWriteArraySet
+import javax.swing.*
 
 /**
- * PNode representation of a {@link NeuronCollection}.
- *
- * @author Jeff Yoshimi
+ * PNode representation of a [NeuronCollection]. Contains an interaction box and
+ * outlined neuron nodes as children. Compare [SubnetworkNode].
  */
-@SuppressWarnings("serial")
-public class NeuronCollectionNode extends AbstractNeuronCollectionNode {
+class NeuronCollectionNode(
+    networkPanel: NetworkPanel,
+    override val model: NeuronCollection
+) : ScreenElement(networkPanel) {
 
-    /**
-     * Reference to represented neuron collection
-     */
-    private final NeuronCollection neuronCollection;
+    val outlinedObjects = Outline()
 
-    /**
-     * Create a Neuron Group PNode.
-     *
-     * @param networkPanel parent panel
-     * @param nc           the neuron collection
-     */
-    public NeuronCollectionNode(NetworkPanel networkPanel, NeuronCollection nc) {
+    private var interactionBox: InteractionBox
 
-        super(networkPanel, nc);
-        this.neuronCollection = nc;
+    val neuronNodes: MutableSet<NeuronNode> = CopyOnWriteArraySet()
 
-        NeuronCollectionInteractionBox interactionBox = new NeuronCollectionInteractionBox(networkPanel);
-        interactionBox.setText(nc.getDisplayName());
-        setInteractionBox(interactionBox);
-    }
+    private var customInfoNode: ScreenElement? = null
 
-    /**
-     * Sync all neuron nodes in the group to the model.
-     */
-    public void pullPositionFromModel() {
-        for (NeuronNode neuronNode : getNeuronNodes()) {
-            neuronNode.pullViewPositionFromModel();
+    private val customMenuItems = mutableListOf<JMenuItem>()
+
+    init {
+        addChild(outlinedObjects)
+
+        interactionBox = NeuronCollectionInteractionBox(networkPanel).apply {
+            setText(model.displayName)
+        }
+        addChild(interactionBox)
+
+        model.events.apply {
+            labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(model.displayName) }
+            locationChanged.on(swingDispatcher) {
+                pullPositionFromModel()
+                outlinedObjects.updateBounds()
+            }
+            shouldUpdateOutline.on(swingDispatcher) { updateOutline() }
         }
     }
 
-    @Override
-    public void offset(double dx, double dy) {
-        super.offset(dx, dy);
+    // --- Neuron node management ---
+
+    fun addNeuronNodes(nodes: Collection<NeuronNode>) {
+        neuronNodes.addAll(nodes)
+        for (node in nodes) {
+            val events = node.neuron.events
+            events.deleted.on { _ ->
+                neuronNodes.remove(node)
+                fireUpdateOutline()
+            }
+            events.locationChanged.on { fireUpdateOutline() }
+            events.labelChanged.on { _, _ -> fireUpdateOutline() }
+        }
+        fireUpdateOutline()
     }
 
-    @Override
-    public AbstractNeuronCollection getModel() {
-        return neuronCollection;
+    fun removeNeuronNode(neuronNode: NeuronNode) {
+        neuronNodes.remove(neuronNode)
     }
 
-    /**
-     * Helper class to create the neuron group property dialog (since it is needed in two places.).
-     *
-     * @return the neuron group property dialog.
-     */
-    public StandardDialog getPropertyDialog() {
-        return createNeuronGroupDialog(getNetworkPanel(), neuronCollection);
+    fun setCustomInfoNode(info: ScreenElement) {
+        customInfoNode = info
+        updateCustomInfoLocation()
+        model.events.customInfoUpdated.on(swingDispatcher) { fireUpdateOutline() }
+        fireUpdateOutline()
     }
 
-    /**
-     * Returns default actions for a context menu.
-     *
-     * @return the default context menu
-     */
-    public JPopupMenu getNCContexMenu() {
+    fun addCustomMenuItem(item: JMenuItem) {
+        customMenuItems.add(item)
+    }
 
-        JPopupMenu menu = new JPopupMenu();
+    // --- Position sync ---
 
-        menu.add(renameAction);
-        menu.add(removeAction);
+    fun pullPositionFromModel() {
+        for (node in neuronNodes) {
+            node.pullViewPositionFromModel()
+        }
+        fireUpdateOutline()
+    }
 
-        menu.addSeparator();
-        
-        // Edit action
-        Action editCollection = createEditNeuronCollectionAction(
-            getNetworkPanel(),
-            neuronCollection,
-            this::getPropertyDialog
-        );
-        menu.add(editCollection);
-        
-        menu.addSeparator();
-        menu.add(getNetworkPanel().getNetworkActions().showApplyLayoutDialogAction(neuronCollection));
+    override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
+        for (node in neuronNodes) {
+            node.offset(dx, dy)
+        }
+        customInfoNode?.offset(dx, dy)
+    }
 
-        // Selection submenu
-        menu.addSeparator();
-        Action selectNeurons = new AbstractAction("Select neurons") {
-            {
-                // Main key binding is in Keybindings.kt. This is here just to force the binding to show in UI.
-                putValue(Action.ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, 0));
+    // --- Selection ---
+
+    fun selectNeurons() {
+        neuronNodes.forEach { it.neuron.select() }
+    }
+
+    fun editNeurons() {
+        neuronNodes.map { it.neuron }.toList().createEditorDialog<Neuron>().display()
+    }
+
+    // --- Outline ---
+
+    private fun updateOutline() {
+        val nodes = HashSet<ScreenElement>(neuronNodes)
+        customInfoNode?.let {
+            nodes.add(it)
+            updateCustomInfoLocation()
+        }
+        outlinedObjects.resetOutlinedNodes(nodes)
+    }
+
+    private fun fireUpdateOutline() {
+        model.events.shouldUpdateOutline.fire()
+    }
+
+    private fun updateCustomInfoLocation() {
+        customInfoNode?.let { info ->
+            val center = model.neuronList.centerLocation
+            val minY = model.neuronList.minY
+            (info.model as LocatableModel).setLocation(center.x, minY - 40)
+        }
+    }
+
+    // --- Layout ---
+
+    override fun layoutChildren() {
+        if (visible) {
+            val bounds = outlinedObjects.fullBounds
+            interactionBox.centerFullBoundsOnPoint(
+                bounds.centerX,
+                bounds.y - interactionBox.fullBounds.height / 2 + 0.5
+            )
+        }
+    }
+
+    override val isDraggable = true
+
+    override fun isIntersecting(bound: PBounds?) = interactionBox.isIntersecting(bound)
+
+    override fun acceptsSourceHandle() = true
+
+    fun getInteractionBox() = interactionBox
+
+    // --- Property dialog ---
+
+    override val propertyDialog: StandardDialog?
+        get() = networkPanel.createNeuronCollectionDialog(model)
+
+    // --- Context menu ---
+
+    override val contextMenu: JPopupMenu
+        get() = JPopupMenu().apply {
+            add(renameAction)
+            add(removeAction)
+            addSeparator()
+
+            add(networkPanel.createEditNeuronCollectionAction(model) { propertyDialog })
+            addSeparator()
+            with(networkPanel.networkActions) {
+                add(model.showApplyLayoutDialogAction())
             }
 
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                selectNeurons();
+            // Selection
+            addSeparator()
+            add(object : AbstractAction("Select neurons") {
+                init { putValue(ACCELERATOR_KEY, KeyStroke.getKeyStroke(KeyEvent.VK_S, 0)) }
+                override fun actionPerformed(e: ActionEvent?) = selectNeurons()
+            })
+            add(object : AbstractAction("Edit neurons...") {
+                override fun actionPerformed(e: ActionEvent?) = editNeurons()
+            })
+            addSeparator()
+            add(object : AbstractAction("Select Incoming Synapses") {
+                override fun actionPerformed(e: ActionEvent?) {
+                    networkPanel.selectionManager.clear()
+                    model.incomingWeights.forEach { it.select() }
+                }
+            })
+            add(object : AbstractAction("Select Outgoing Synapses") {
+                override fun actionPerformed(e: ActionEvent?) {
+                    networkPanel.selectionManager.clear()
+                    model.outgoingWeights.forEach { it.select() }
+                }
+            })
+
+            // Clamping
+            addSeparator()
+            clampNeuronsAction.isEnabled = !model.isAllClamped
+            unclampNeuronsAction.isEnabled = !model.isAllUnclamped
+            add(clampNeuronsAction)
+            add(unclampNeuronsAction)
+
+            // Connect
+            addSeparator()
+            add(networkPanel.networkActions.connectWithWeightMatrix)
+            add(networkPanel.networkActions.connectWithSynapseGroup)
+
+            // Set as source
+            addSeparator()
+            add(object : AbstractAction("Set as Source") {
+                override fun actionPerformed(e: ActionEvent?) {
+                    networkPanel.selectionManager.clear()
+                    networkPanel.selectionManager.set(interactionBox)
+                    networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
+                }
+            })
+            add(object : AbstractAction("Clear Source") {
+                override fun actionPerformed(e: ActionEvent?) {
+                    networkPanel.selectionManager.clearAllSource()
+                }
+            })
+
+            // Custom menu items (from subnetwork specializations)
+            if (customMenuItems.isNotEmpty()) {
+                addSeparator()
+                customMenuItems.forEach { add(it) }
             }
-        };
-        menu.add(selectNeurons);
-        Action editNeurons = new AbstractAction("Edit neurons...") {
 
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                editNeurons();
-            }
-        };
-        menu.add(editNeurons);
-        menu.addSeparator();
-        Action selectIncomingNodes = new AbstractAction("Select Incoming Synapses") {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().getSelectionManager().clear();
-                neuronCollection.getIncomingWeights().forEach(Synapse::select);
-            }
-        };
-        menu.add(selectIncomingNodes);
-        Action selectOutgoingNodes = new AbstractAction("Select Outgoing Synapses") {
-            @Override
-            public void actionPerformed(final ActionEvent event) {
-                getNetworkPanel().getSelectionManager().clear();
-                neuronCollection.getOutgoingWeights().forEach(Synapse::select);
-            }
-        };
-        menu.add(selectOutgoingNodes);
+            // Training / input
+            addSeparator()
+            add(networkPanel.networkActions.createSupervisedModelAction)
+            add(networkPanel.networkActions.createTestInputPanelAction(model))
+            add(networkPanel.networkActions.createAddActivationToInputAction(model))
 
-        // Connect neuron connections
-        menu.addSeparator();
-        menu.add(getNetworkPanel().getNetworkActions().getConnectWithWeightMatrix());
-        menu.add(getNetworkPanel().getNetworkActions().getConnectWithSynapseGroup());
-
-        menu.addSeparator();
-        Action createSupervisedModel = getNetworkPanel().getNetworkActions().getCreateSupervisedModelAction();
-        menu.add(createSupervisedModel);
-        Action testInputs = getNetworkPanel().getNetworkActions().createTestInputPanelAction(neuronCollection);
-        menu.add(testInputs);
-        Action addActivationToInput = getNetworkPanel().getNetworkActions().createAddActivationToInputAction(neuronCollection);
-        menu.add(addActivationToInput);
-
-        // Clamping actions
-        menu.addSeparator();
-        setClampActionsEnabled();
-        menu.add(clampNeuronsAction);
-        menu.add(unclampNeuronsAction);
-
-        menu.addSeparator();
-
-        // Projection Plot Action
-        var plotAction = SimbrainDesktop.INSTANCE.getActionManager().createCoupledPlotMenu(
-                SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getActivationArray"),
-                neuronCollection.getDisplayName() + " Activations",
-                "Plot"
-        );
-        menu.add(plotAction);
-        if (neuronCollection.getNeuronList().stream().findFirst().stream().anyMatch(it -> it.getUpdateRule() instanceof SpikingNeuronUpdateRule<?, ?>)) {
-            plotAction.addSeparator();
-            plotAction.add(
-                    SimbrainDesktop.INSTANCE.getActionManager().createCoupledRasterPlotAction(
-                            SimbrainDesktop.INSTANCE.getWorkspace().getCouplingManager().getProducer(neuronCollection, "getSpikes"),
-                            neuronCollection.getDisplayName() + " Spikes"
+            // Plots
+            addSeparator()
+            with(org.simbrain.workspace.gui.SimbrainDesktop.workspace.couplingManager) {
+                val plotAction = actionManager.createCoupledPlotMenu(
+                    model.getProducer("getActivationArray"),
+                    "${model.displayName} Activations",
+                    "Plot"
+                )
+                add(plotAction)
+                if (model.neuronList.any { it.updateRule is SpikingNeuronUpdateRule<*, *> }) {
+                    plotAction.addSeparator()
+                    plotAction.add(
+                        actionManager.createCoupledRasterPlotAction(
+                            model.getProducer("getSpikes"),
+                            "${model.displayName} Spikes"
+                        )
                     )
-            );
-        }
-        menu.add(getNetworkPanel().getNetworkActions().createAbstractNeuronCollectionCoupledImageWorld(neuronCollection));
-        menu.add(getNetworkPanel().getNetworkActions().createRecordActivationAction(neuronCollection));
+                }
+            }
+            add(networkPanel.networkActions.createNeuronCollectionCoupledImageWorld(model))
+            add(networkPanel.networkActions.createRecordActivationAction(model))
 
-        // Coupling menu
-        menu.addSeparator();
-        JMenu couplingMenu = createCouplingMenu(getNetworkPanel().getNetworkComponent(), neuronCollection);
-        if (couplingMenu != null) {
-            menu.add(couplingMenu);
+            // Couplings
+            addSeparator()
+            networkPanel.networkComponent.createCouplingMenu(model)?.let { add(it) }
         }
 
-        return menu;
+    // --- Interaction box ---
+
+    private inner class NeuronCollectionInteractionBox(net: NetworkPanel) : InteractionBox(net) {
+        init { setPaint(Color(209, 255, 204)) }
+
+        override val propertyDialog get() = this@NeuronCollectionNode.propertyDialog
+        override val model get() = this@NeuronCollectionNode.model
+        override val contextMenu get() = this@NeuronCollectionNode.contextMenu
+        override val toolTipText: String
+            get() = createTooltipTextWithLocation(this@NeuronCollectionNode.model) {
+                "Name: ${(it as NeuronCollection).displayName} (${it.size} neurons)"
+            }
     }
 
-    public NeuronCollection getNeuronCollection() {
-        return neuronCollection;
+    // --- Actions ---
+
+    private val renameAction = object : AbstractAction("Rename Neuron Collection...") {
+        override fun actionPerformed(e: ActionEvent?) {
+            JOptionPane.showInputDialog("Name:", model.label)?.let { model.label = it }
+        }
     }
 
-    /**
-     * Custom interaction box for Neuron Collections.
-     */
-    public class NeuronCollectionInteractionBox extends InteractionBox {
-
-        /**
-         * Color for the neuron collection interaction box
-         */
-        private final Color BOX_COLOR = new Color(209, 255, 204);
-
-        /**
-         * Construct the interaction box
-         */
-        public NeuronCollectionInteractionBox(NetworkPanel net) {
-            super(net);
-            setPaint(BOX_COLOR);
-            //setTransparency(.2f);
+    private val removeAction = object : AbstractAction() {
+        init {
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"))
+            putValue(NAME, "Remove Neuron Collection")
+            putValue(SHORT_DESCRIPTION, "Remove neuron collection")
         }
-
-        @Override
-        public StandardDialog getPropertyDialog() {
-            return NeuronCollectionNode.this.getPropertyDialog();
-        }
-
-        @Override
-        public NeuronCollection getModel() {
-            return NeuronCollectionNode.this.getNeuronCollection();
-        }
-
-        @Override
-        public JPopupMenu getContextMenu() {
-            return getNCContexMenu();
-        }
-
-        @Override
-        public String getToolTipText() {
-            return createTooltipTextWithLocation(getModel(), true, (model) -> {
-                AbstractNeuronCollection collection = (AbstractNeuronCollection) model;
-                return "Name: " + collection.getDisplayName() + " (" + collection.getSize() + " neurons)";
-            });
-        }
-
+        override fun actionPerformed(e: ActionEvent?) = model.deleteBlocking()
     }
 
-    /**
-     * Action for removing this group.
-     */
-    protected Action removeAction = new AbstractAction() {
-
-        {
-            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"));
-            putValue(NAME, "Remove Neuron Collection.");
-            putValue(SHORT_DESCRIPTION, "Remove neuron collection.");
+    private val clampNeuronsAction = object : AbstractAction() {
+        init {
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"))
+            putValue(NAME, "Clamp Neurons")
+            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this collection.")
         }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            neuronCollection.deleteBlocking();
-        }
-    };
-
-    /**
-     * Sets whether the clamping actions are enabled based on whether the neurons are all clamped or not.
-     * <p>
-     * If all neurons are clamped already, then "clamp neurons" is disabled.
-     * <p>
-     * If all neurons are unclamped already, then "unclamp neurons" is disabled.
-     */
-    private void setClampActionsEnabled() {
-        clampNeuronsAction.setEnabled(!neuronCollection.isAllClamped());
-        unclampNeuronsAction.setEnabled(!neuronCollection.isAllUnclamped());
+        override fun actionPerformed(e: ActionEvent?) { model.isClamped = true }
     }
 
-    /**
-     * Action for clamping neurons.
-     */
-    protected Action clampNeuronsAction = new AbstractAction() {
-
-        {
-            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"));
-            putValue(NAME, "Clamp Neurons");
-            putValue(SHORT_DESCRIPTION, "Clamp all neurons in this group.");
+    private val unclampNeuronsAction = object : AbstractAction() {
+        init {
+            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"))
+            putValue(NAME, "Unclamp Neurons")
+            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this collection.")
         }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            neuronCollection.setClamped(true);
-        }
-    };
-
-    /**
-     * Action for unclamping neurons.
-     */
-    protected Action unclampNeuronsAction = new AbstractAction() {
-
-        {
-            putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"));
-            putValue(NAME, "Unclamp Neurons");
-            putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this group.");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent arg0) {
-            neuronCollection.setClamped(false);
-        }
-    };
-
-    @Override
-    public boolean acceptsSourceHandle() {
-        return true;
+        override fun actionPerformed(e: ActionEvent?) { model.isClamped = false }
     }
-
 }

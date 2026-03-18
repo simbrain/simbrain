@@ -3,7 +3,6 @@ package org.simbrain.network.core
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
-import org.simbrain.network.neurongroups.*
 import org.simbrain.network.spikeresponders.ShortTermPlasticity
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
@@ -17,17 +16,17 @@ class NetworkTest {
     private val n1: Neuron
     private val n2: Neuron
     private val s1: Synapse
-    private val ng1: NeuronGroup
-    private val ng2: NeuronGroup
+    private val ng1: NeuronCollection
+    private val ng2: NeuronCollection
     private val na1: NeuronArray
     private val na2: NeuronArray
     private val nc1: NeuronCollection
     private val wm1: WeightMatrix
     private val sg1: SynapseGroup
-    private val softmax: SoftmaxGroup
-    private val som: SOMGroup
-    private val wta: WinnerTakeAll
-    private val competitive: CompetitiveGroup
+    private val ng3: NeuronCollection
+    private val ng4: NeuronCollection
+    private val ng5: NeuronCollection
+    private val ng6: NeuronCollection
 
     // TODO: Other subneworks
     private val bp: BackpropNetwork?
@@ -55,11 +54,13 @@ class NetworkTest {
         nc1 = NeuronCollection(List.of(n1, n2))
         net.addNetworkModelAsync(nc1)
 
-        ng1 = NeuronGroup(10)
-        ng1.label = "neuron_group_1"
+        val ng1Neurons = List(10) { Neuron() }
+        ng1Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng1 = NeuronCollection(ng1Neurons).apply { label = "neuron_group_1" }
         net.addNetworkModelAsync(ng1)
-        ng2 = NeuronGroup(10)
-        ng2.label = "ng2"
+        val ng2Neurons = List(10) { Neuron() }
+        ng2Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng2 = NeuronCollection(ng2Neurons).apply { label = "ng2" }
         net.addNetworkModelAsync(ng2)
 
         sg1 = SynapseGroup(ng1, ng2)
@@ -70,16 +71,20 @@ class NetworkTest {
         wm1 = WeightMatrix(na1, na2)
         net.addNetworkModelsAsync(List.of(na1, na2, wm1))
 
-        softmax = SoftmaxGroup(5)
-        softmax.label = "softmax"
-        som = SOMGroup(5)
-        som.label = "som"
-        competitive = CompetitiveGroup(5)
-        competitive.label = "competitive"
-        wta = WinnerTakeAll(net, 5)
-        wta.label = "wta"
+        val ng3Neurons = List(5) { Neuron() }
+        ng3Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng3 = NeuronCollection(ng3Neurons).apply { label = "ng3" }
+        val ng4Neurons = List(5) { Neuron() }
+        ng4Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng4 = NeuronCollection(ng4Neurons).apply { label = "ng4" }
+        val ng5Neurons = List(5) { Neuron() }
+        ng5Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng5 = NeuronCollection(ng5Neurons).apply { label = "ng5" }
+        val ng6Neurons = List(5) { Neuron() }
+        ng6Neurons.forEach { net.addNetworkModelAsync(it) }
+        ng6 = NeuronCollection(ng6Neurons).apply { label = "ng6" }
 
-        net.addNetworkModelsAsync(softmax, som, competitive, wta)
+        net.addNetworkModelsAsync(ng3, ng4, ng5, ng6)
 
         bp = BackpropNetwork(intArrayOf(3, 5, 4), point(0, 0))
         bp.label = "backprop"
@@ -91,39 +96,36 @@ class NetworkTest {
     @Test
     fun testDeleteObjects() = runBlocking {
         // Neurons and Synapses
+        val initialNeuronCount = net.getModels(Neuron::class.java).size // 42
 
         n1.delete()
-        Assertions.assertEquals(1, net.getModels(Neuron::class.java).size)
+        Assertions.assertEquals(initialNeuronCount - 1, net.getModels(Neuron::class.java).size)
         // Deleting the neuron should also delete the synapse
         Assertions.assertEquals(0, net.getModels(Synapse::class.java).size)
 
-        // Deleting all neurons should delete the neuron collection
-        Assertions.assertEquals(1, net.getModels(NeuronCollection::class.java).size)
+        // Deleting all neurons in nc1 should delete the neuron collection
+        Assertions.assertEquals(7, net.getModels(NeuronCollection::class.java).size) // nc1 + ng1..ng6
         n2.delete()
-        Assertions.assertEquals(0, net.getModels(NeuronCollection::class.java).size)
+        Assertions.assertEquals(6, net.getModels(NeuronCollection::class.java).size) // ng1..ng6
 
-        // Neuron Groups and Synapse Groups
+        // Neuron Collections and Synapse Groups
         ng1.delete()
-        Assertions.assertEquals(1, net.getModels(NeuronGroup::class.java).size)
-        // Deleting the neuron group should also delete the synapse group
+        Assertions.assertEquals(5, net.getModels(NeuronCollection::class.java).size) // ng2 + ng3..ng6
+        // Deleting the neuron collection should also delete the synapse group
         Assertions.assertEquals(0, net.getModels(SynapseGroup::class.java).size)
 
         // Neuron Arrays and WeightMatrices
         na1.delete()
         Assertions.assertEquals(1, net.getModels(NeuronArray::class.java).size)
-        // Deleting the neuron group should also delete the synapse group
+        // Deleting the neuron array should also delete the weight matrix
         Assertions.assertEquals(0, net.getModels(WeightMatrix::class.java).size)
 
-        // Subnets and custom groups
-        Assertions.assertEquals(1, net.getModels(SoftmaxGroup::class.java).size)
-        // TODO: getModels(BackpropNetwork.class) fails, because of how the
-        //  NetworkModelList is created (see NetworkModel.add). But changing that
-        //  breaks things and we don't yet have use cases for getmodels on specific subnets
+        // Additional neuron collections and subnets
         Assertions.assertEquals(2, net.getModels(Subnetwork::class.java).size)
-        softmax.delete()
+        ng3.delete()
         bp!!.delete()
         srn!!.delete()
-        Assertions.assertEquals(0, net.getModels(SoftmaxGroup::class.java).size)
+        Assertions.assertEquals(4, net.getModels(NeuronCollection::class.java).size) // ng2 + ng4..ng6
         Assertions.assertEquals(0, net.getModels(Subnetwork::class.java).size)
     }
 
@@ -131,8 +133,8 @@ class NetworkTest {
     fun getByLabel() {
         Assertions.assertEquals(n1, net.getModelByLabel(Neuron::class.java, "neuron1"))
         Assertions.assertEquals(n2, net.getModelByLabel(Neuron::class.java, "neuron2"))
-        Assertions.assertEquals(ng1, net.getModelByLabel(NeuronGroup::class.java, "neuron_group_1"))
-        Assertions.assertEquals(ng2, net.getModelByLabel(NeuronGroup::class.java, "ng2"))
+        Assertions.assertEquals(ng1, net.getModelByLabel(NeuronCollection::class.java, "neuron_group_1"))
+        Assertions.assertEquals(ng2, net.getModelByLabel(NeuronCollection::class.java, "ng2"))
     }
 
     @Test
@@ -145,12 +147,12 @@ class NetworkTest {
         Assertions.assertNotNull(n1)
         Assertions.assertEquals(1.0, n1.bias)
         Assertions.assertNotNull(fromXml.getModelByLabel(Neuron::class.java, "neuron2"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronGroup::class.java, "neuron_group_1"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronGroup::class.java, "ng2"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(SoftmaxGroup::class.java, "softmax"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(SOMGroup::class.java, "som"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(CompetitiveGroup::class.java, "competitive"))
-        Assertions.assertNotNull(fromXml.getModelByLabel(WinnerTakeAll::class.java, "wta"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "neuron_group_1"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "ng2"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "ng3"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "ng4"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "ng5"))
+        Assertions.assertNotNull(fromXml.getModelByLabel(NeuronCollection::class.java, "ng6"))
         Assertions.assertNotNull(fromXml.getModelByLabel(BackpropNetwork::class.java, "backprop"))
         Assertions.assertNotNull(fromXml.getModelByLabel(SRNNetwork::class.java, "srn"))
     }
@@ -167,41 +169,24 @@ class NetworkTest {
 
     @Test
     fun testNeuronCounts() {
-        // 2 free neurons
-        Assertions.assertEquals(2, net.freeNeurons.size)
+        // All NeuronCollection neurons are free neurons in the network
+        // 2 (n1, n2) + 10 (ng1) + 10 (ng2) + 5*4 (ng3-ng6) = 42
+        Assertions.assertEquals(42, net.freeNeurons.size)
 
-        // Calculate expected total:
-        // 2 free neurons + 
-        // 2 x 10 in each of two neuron groups (ng1, ng2) = 20 +
-        // 4 x 5 in each of four special neuron groups (softmax, som, competitive, wta) = 20
-        // Total = 2 + 20 + 20 = 42
-        // (Note: the 2 in neuron collection are the same as the free neurons)
+        // flatNeuronList includes free neurons + neurons from NeuronCollections (which are the same)
+        // so no double counting. 42 unique neurons.
         Assertions.assertEquals(42, net.flatNeuronList.size)
     }
 
     @Test
     fun testFlatListsComprehensive() {
-        // Test flatNeuronList - manually count all neurons from all sources
-        var expectedNeuronCount = 0
-        
-        // Free neurons (top-level)
-        expectedNeuronCount += net.freeNeurons.size // 2 neurons (n1, n2)
-        
-        // Neurons from neuron groups (NeuronArray are matrix-based, not collections of Neuron objects)
-        expectedNeuronCount += ng1.neuronList.size // 10 neurons
-        expectedNeuronCount += ng2.neuronList.size // 10 neurons
-        
-        // Neurons from special neuron groups
-        expectedNeuronCount += softmax.neuronList.size // 5 neurons
-        expectedNeuronCount += som.neuronList.size // 5 neurons
-        expectedNeuronCount += competitive.neuronList.size // 5 neurons
-        expectedNeuronCount += wta.neuronList.size // 5 neurons
-        
-        // Neurons from subnetworks (BackpropNetwork and SRNNetwork use NeuronArray objects which are matrix-based, 
-        // not collections of individual Neuron objects, so they don't contribute to flatNeuronList)
-        
+        // All NeuronCollection neurons are free neurons, so flatNeuronList = freeNeurons + subnetwork neurons
+        // Since we have no subnetwork NeuronCollections here (BackpropNetwork/SRNNetwork use NeuronArray),
+        // flatNeuronList should equal freeNeurons
+        val expectedNeuronCount = net.freeNeurons.size // 42
+
         Assertions.assertEquals(expectedNeuronCount, net.flatNeuronList.size,
-            "flatNeuronList should include all neurons from free neurons, neuron groups, neuron arrays, and subnetworks")
+            "flatNeuronList should include all neurons")
         
         // Test flatSynapseList - manually count all synapses from all sources
         var expectedSynapseCount = 0
@@ -236,15 +221,15 @@ class NetworkTest {
         Assertions.assertTrue(net.flatNeuronList.containsAll(ng2.neuronList),
             "flatNeuronList should contain all neurons from neuron groups")
         
-        // Verify that special neuron group subtypes are also captured (this was a previous bug)
-        Assertions.assertTrue(net.flatNeuronList.containsAll(softmax.neuronList),
-            "flatNeuronList should contain all neurons from SoftmaxGroup (NeuronGroup subtype)")
-        Assertions.assertTrue(net.flatNeuronList.containsAll(som.neuronList),
-            "flatNeuronList should contain all neurons from SOMGroup (NeuronGroup subtype)")
-        Assertions.assertTrue(net.flatNeuronList.containsAll(competitive.neuronList),
-            "flatNeuronList should contain all neurons from CompetitiveGroup (NeuronGroup subtype)")
-        Assertions.assertTrue(net.flatNeuronList.containsAll(wta.neuronList),
-            "flatNeuronList should contain all neurons from WinnerTakeAll (NeuronGroup subtype)")
+        // Verify that additional neuron groups are also captured
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng3.neuronList),
+            "flatNeuronList should contain all neurons from ng3")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng4.neuronList),
+            "flatNeuronList should contain all neurons from ng4")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng5.neuronList),
+            "flatNeuronList should contain all neurons from ng5")
+        Assertions.assertTrue(net.flatNeuronList.containsAll(ng6.neuronList),
+            "flatNeuronList should contain all neurons from ng6")
         
         // Verify that synapse group synapses are included in flat list
         Assertions.assertTrue(net.flatSynapseList.containsAll(sg1.synapses),

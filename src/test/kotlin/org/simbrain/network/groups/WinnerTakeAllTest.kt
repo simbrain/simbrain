@@ -3,69 +3,61 @@ package org.simbrain.network.groups
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.connect
-import org.simbrain.network.neurongroups.WinnerTakeAll
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.updaterules.WinnerTakeAllRule
 
 class WinnerTakeAllTest {
 
     var net = Network()
-    val wta = WinnerTakeAll(net, 2)
-    val n1 = Neuron()
-    val n2 = Neuron()
+    val source = NeuronArray(2).apply { isClamped = true }
+    val wta = NeuronArray(2).apply {
+        updateRule = WinnerTakeAllRule()
+    }
+    val wm = WeightMatrix(source, wta)
 
     init {
-        with(net) {
-            net.addNetworkModelsAsync(wta, n1, n2)
-            n1.clamped = true
-            n2.clamped = true
-            connect(n1, wta.getNeuron(0), 1.0)
-            connect(n2, wta.getNeuron(1), 1.0)
-        }
+        net.addNetworkModelsAsync(source, wta, wm)
     }
 
     @Test
-    fun `Check that at any time there is just one winner` () {
+    fun `Check that at any time there is just one winner`() {
+        source.activationArray = doubleArrayOf(0.5, 0.3)
         net.update()
-        assertEquals(1, wta.neuronList.count { it.activation > 0.0 })
+        assertEquals(1, wta.activationArray.count { it > 0.0 })
     }
 
     @Test
-    fun `Check that node with most input wins` () {
-        n1.activation = 1.0
-        n2.activation = .9
+    fun `Check that node with most input wins`() {
+        source.activationArray = doubleArrayOf(1.0, 0.9)
         net.update()
-        assertEquals(1.0, wta.getNeuron(0).activation)
-        assertEquals(0.0, wta.getNeuron(1).activation)
-        n1.activation = -1.0
-        n2.activation = 0.2
+        assertEquals(1.0, wta.activationArray[0])
+        assertEquals(0.0, wta.activationArray[1])
+        source.activationArray = doubleArrayOf(-1.0, 0.2)
         net.update()
-        assertEquals(0.0, wta.getNeuron(0).activation)
-        assertEquals(1.0, wta.getNeuron(1).activation)
+        assertEquals(0.0, wta.activationArray[0])
+        assertEquals(1.0, wta.activationArray[1])
     }
 
     @Test
     fun `Check that if equal input a random node wins`() {
-        n1.activation = 1.0
-        n2.activation = 1.0
-        val result = (0..100).map {
+        val winners = (0..100).map {
+            source.activationArray = doubleArrayOf(1.0, 1.0)
             net.update()
-            wta.getWinner()
+            wta.activationArray.indexOfFirst { v -> v > 0.0 }
         }.toSet().size
-        assertEquals(2,result)
+        assertEquals(2, winners)
     }
 
     @Test
-    fun `Check that winning and losing value works` () {
-        wta.params.winValue = 2.0
-        wta.params.loseValue = -.5
-        n1.activation = 1.0
-        n2.activation = .9
+    fun `Check that winning and losing value works`() {
+        (wta.updateRule as WinnerTakeAllRule).apply {
+            winValue = 2.0
+            loseValue = -0.5
+        }
+        source.activationArray = doubleArrayOf(1.0, 0.9)
         net.update()
-        assertEquals(2.0, wta.getNeuron(0).activation)
-        assertEquals(-0.5, wta.getNeuron(1).activation)
+        assertEquals(2.0, wta.activationArray[0])
+        assertEquals(-0.5, wta.activationArray[1])
     }
-
 }
-
-

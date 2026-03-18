@@ -273,4 +273,6 @@ val neuronArrayUpdateRules = listOf(
     NakaRushtonRule::class.java,
     SigmoidalRule::class.java,
     SoftmaxRule::class.java,
+    WinnerTakeAllRule::class.java,
+    NormalizationRule::class.java,
 )

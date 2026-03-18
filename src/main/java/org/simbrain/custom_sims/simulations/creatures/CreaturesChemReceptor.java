@@ -1,6 +1,6 @@
 package org.simbrain.custom_sims.simulations.creatures;
 
-import org.simbrain.network.neurongroups.NeuronGroup;
+import org.simbrain.network.core.NeuronCollection;
 
 /**
  * Chemical receptors can either alter a particular characteristic of a brain
@@ -27,7 +27,7 @@ public class CreaturesChemReceptor {
     /**
      * The brain lobe to target. Only relevant if organIsBrain is set to true
      */
-    private NeuronGroup tissue;
+    private NeuronCollection tissue;
 
     // Put a reference to the locus here (once we know how to implement that)
 

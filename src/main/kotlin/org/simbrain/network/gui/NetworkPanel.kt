@@ -13,11 +13,8 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.MouseEventHandler.MouseCursor
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
-import org.simbrain.network.gui.nodes.neuronGroupNodes.SOMGroupNode
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
-import org.simbrain.network.neurongroups.NeuronGroup
-import org.simbrain.network.neurongroups.SOMGroup
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
@@ -299,8 +296,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         modelNodeMap[node.model] = node
         addNodeOrdered(node)
         node.model.events.selected.on {
-            if (node is NeuronGroupNode) {
-                selectionManager.add(node.interactionBox)
+            if (node is NeuronCollectionNode) {
+                selectionManager.add(node.getInteractionBox())
             } else {
                 selectionManager.add(node)
             }
@@ -319,8 +316,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is ActivationSequence -> createNode(model)
             is TransformerBlock -> createNode(model)
             is NeuronCollection -> createNode(model)
-            is NeuronGroup -> createNode(model)
-            is AbstractNeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
             is TensorLayer -> createNode(model)
             is FlattenConnector -> createNode(model)
@@ -346,21 +341,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         SynapseNode(this, source, target, synapse)
     }
 
-    suspend fun createNode(neuronGroup: AbstractNeuronCollection) = addScreenElement {
-
-        fun createNeuronGroupNode() = when (neuronGroup) {
-            is SOMGroup -> SOMGroupNode(this, neuronGroup)
-            else -> NeuronGroupNode(this, neuronGroup)
-        }
-
-        val neuronNodes = neuronGroup.neuronList.map { neuron -> createNode(neuron) }
-        val customInfoNode = neuronGroup.customInfo?.let { createNode(it) }
-        createNeuronGroupNode().apply {
-            addNeuronNodes(neuronNodes)
-            customInfoNode?.let { setCustomInfoNode(it) }
-        }
-    }
-
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }
 
     suspend fun createNode(tensorLayer: TensorLayer) = addScreenElement { TensorNode(this, tensorLayer) }
@@ -379,9 +359,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(neuronCollection: NeuronCollection) = addScreenElement {
         val neuronNodes = neuronCollection.neuronList.map {
-            modelNodeMap.get<NeuronNode>(it)
+            modelNodeMap.getImmediately<NeuronNode>(it) ?: createNode(it)
         }
-        NeuronCollectionNode(this, neuronCollection).apply { addNeuronNodes(neuronNodes) }
+        val customInfoNode = neuronCollection.customInfo?.let { createNode(it) }
+        NeuronCollectionNode(this, neuronCollection).apply {
+            addNeuronNodes(neuronNodes)
+            customInfoNode?.let { setCustomInfoNode(it) }
+        }
     }
 
     suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
@@ -633,8 +617,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         selectionManager.filterSelectedModels<SynapseGroup>().forEach { it.clear() }
     }
 
-    fun selectNeuronsInNeuronGroups() {
-        selectionManager.filterSelectedModels<AbstractNeuronCollection>()
+    fun selectNeuronsInNeuronCollections() {
+        selectionManager.filterSelectedModels<NeuronCollection>()
             .flatMap { it.neuronList }
             .forEach { it.select() }
         selectionManager.filterSelectedNodes<InteractionBox>().forEach {selectionManager.remove(it) }
@@ -669,7 +653,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     fun connectSelectedModelsCustom() {
 
         // For neuron groups
-        selectionManager.connectNeuronGroups()
+        selectionManager.connectNeuronCollections()
 
         // TODO: Neuron Array case
 
@@ -694,11 +678,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     fun connectFreeWeights(allowSelfConnection: Boolean = false) {
         with(selectionManager) {
             val sourceNeurons = filterSelectedSourceModels<Neuron>() +
-                    filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList } +
-                    filterSelectedSourceModels<NeuronGroup>().flatMap { it.neuronList }
+                    filterSelectedSourceModels<NeuronCollection>().flatMap { it.neuronList }
             val targetNeurons = filterSelectedModels<Neuron>() +
-                    filterSelectedModels<NeuronCollection>().flatMap { it.neuronList } +
-                    filterSelectedModels<NeuronGroup>().flatMap { it.neuronList }
+                    filterSelectedModels<NeuronCollection>().flatMap { it.neuronList }
             val synapses = AllToAll().apply {
                 this.allowSelfConnection = allowSelfConnection
                 this.percentExcitatory = 100.0
@@ -755,9 +737,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      *
      * @retrun false if there source and target neurons did not have a neuron group.
      */
-    fun NetworkSelectionManager.connectNeuronGroups(): List<SynapseGroup> {
-        val sourceCollections = filterSelectedSourceModels(AbstractNeuronCollection::class.java)
-        val targetCollections = filterSelectedModels(AbstractNeuronCollection::class.java)
+    fun NetworkSelectionManager.connectNeuronCollections(): List<SynapseGroup> {
+        val sourceCollections = filterSelectedSourceModels(NeuronCollection::class.java)
+        val targetCollections = filterSelectedModels(NeuronCollection::class.java)
         val synapseGroups = (sourceCollections cartesianProduct targetCollections)
             .filter { (src, tar) ->
                 // Skip if SynapseGroup already exists between source and target
@@ -976,7 +958,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    fun addNeuronGroupAsync(
+    fun addNeuronCollectionAsync(
         numNeurons: Int,
         template: Neuron,
         layout: Layout,
@@ -984,12 +966,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     ) {
         launch {
             val neurons = network.addNeurons(numNeurons) { updateRule = template.updateRule }
-            val ng = NeuronGroup(neurons)
-            ng.layout = layout
-            network.addNetworkModelAsync(ng)
-            ng.applyLayout()
+            val nc = NeuronCollection(neurons)
+            nc.layout = layout
+            network.addNetworkModelAsync(nc)
+            nc.applyLayout()
             if (label.isNotEmpty()) {
-                ng.label = label
+                nc.label = label
             }
             // TODO: Undoable action
         }

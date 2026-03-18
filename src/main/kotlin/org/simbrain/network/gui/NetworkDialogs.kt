@@ -263,7 +263,7 @@ fun NetworkPanel.showTransformerBlockCreationDialog() {
     }.display()
 }
 
-fun NetworkPanel.createNeuronGroupDialog(neuronGroup: AbstractNeuronCollection) = neuronGroup.createEditorDialog()
+fun NetworkPanel.createNeuronCollectionDialog(neuronGroup: NeuronCollection) = neuronGroup.createEditorDialog()
 
 /**
  * Display the provided network in a dialog

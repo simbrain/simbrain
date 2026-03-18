@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 
@@ -39,7 +38,7 @@ object Clipboard {
     fun add(objects: List<NetworkModel>) {
 
         // when copying models that are part of a collection, we don't want to copy those models again
-        val collectionNeurons = objects.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList }.toMutableSet()
+        val collectionNeurons = objects.filterIsInstance<NeuronCollection>().flatMap { it.neuronList }.toMutableSet()
         val collectionSynapses = objects.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toMutableSet()
         val supervisedModelWeightMatrices = objects.filterIsInstance<SupervisedModel>().flatMap { it.weightMatrices }.toMutableSet()
         val supervisedModelSynapseGroups = objects.filterIsInstance<SupervisedModel>().flatMap { it.synapseGroups }.toMutableSet()
@@ -77,7 +76,7 @@ object Clipboard {
             fun Synapse.isStranded(): Boolean {
                 val allNeurons = sourceModels.filterIsInstance<Neuron>().toMutableSet()
                 // Also include neurons from collections that are being copied
-                allNeurons.addAll(sourceModels.filterIsInstance<AbstractNeuronCollection>().flatMap { it.neuronList })
+                allNeurons.addAll(sourceModels.filterIsInstance<NeuronCollection>().flatMap { it.neuronList })
                 return !(allNeurons.contains(this.source) && (allNeurons.contains(this.target)))
             }
 
@@ -113,17 +112,11 @@ object Clipboard {
                             val newText = NetworkTextObject(item)
                             add(newText)
                         }
-                        is NeuronGroup -> {
-                            val copy = item.copy()
-                            neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
-                            add(copy)
-                            layerMappings[item] = copy
-                        }
                         is NeuronCollection -> {
                             val copy = item.copy()
                             neuronMappings.putAll(item.neuronList.zip(copy.neuronList))
-                            add(copy)
-                            addAll(copy.neuronList)
+                            addAll(copy.neuronList) // Add neurons as free models first
+                            add(copy) // Then add the collection wrapper
                             layerMappings[item] = copy
                         }
                         is SupervisedModel -> {
@@ -167,8 +160,8 @@ object Clipboard {
                         is SynapseGroup -> {
                             if (!item.isStranded()) {
                                 val newGroup = SynapseGroup(
-                                    layerMappings[item.source] as AbstractNeuronCollection,
-                                    layerMappings[item.target] as AbstractNeuronCollection,
+                                    layerMappings[item.source] as NeuronCollection,
+                                    layerMappings[item.target] as NeuronCollection,
                                     item.connectionStrategy.copy(),
                                     item.synapses.map { Synapse(neuronMappings[it.source]!!, neuronMappings[it.target]!!, it) }.toMutableList()
                                 )

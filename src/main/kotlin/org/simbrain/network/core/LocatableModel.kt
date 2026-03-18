@@ -8,7 +8,7 @@ import java.awt.geom.Rectangle2D
 /**
  * Model elements that have a location should implement this interface. The location is a center location.
  * Some classes store their location (e.g [Neuron]) directly, while others determine their location based on objects
- * they contain (e.g. [NeuronGroup]).
+ * they contain (e.g. [NeuronCollection]).
  *
  * Kotlin note: java implementing classes must provide getters and setters for vars and getters for vals.
  */

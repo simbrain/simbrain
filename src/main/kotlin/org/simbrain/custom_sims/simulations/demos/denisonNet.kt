@@ -3,7 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.setLabels
 import org.simbrain.util.*
 import org.simbrain.workspace.updater.UpdateCoupling
@@ -69,19 +69,19 @@ val denisonNet = newSim {
     val t2Stimulus = NetworkTextObject("").apply { fontSize = 18 }
     val t2Decision = NetworkTextObject("").apply { fontSize = 18 }
 
-    val sensory1 = net.addNeuronGroup(12).apply {
+    val sensory1 = net.addNeuronCollection(12).apply {
         label = "Sensory"
         setLabels((0..11).map { "${it * 30}°" })
     }
-    val sensory2 = net.addNeuronGroup(12).apply {
+    val sensory2 = net.addNeuronCollection(12).apply {
         label = "Sustained Response"
         setLabels((0..11).map { "${it * 30}°" })
     }
-    val decision = net.addNeuronGroup(2).apply { label = "Decision" }.apply {
+    val decision = net.addNeuronCollection(2).apply { label = "Decision" }.apply {
         setLabels(listOf("Pattern 1", "Pattern 2"))
     }
-    val vaLayer = net.addNeuronGroup(1).apply { label = "Voluntary Attention" }
-    val iaLayer = net.addNeuronGroup(1).apply { label = "Involuntary Attention" }
+    val vaLayer = net.addNeuronCollection(1).apply { label = "Voluntary Attention" }
+    val iaLayer = net.addNeuronCollection(1).apply { label = "Involuntary Attention" }
 
     sensory1.setUpperBound(0.1)
     sensory2.setUpperBound(0.1)

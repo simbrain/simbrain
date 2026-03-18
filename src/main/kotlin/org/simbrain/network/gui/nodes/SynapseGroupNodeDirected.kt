@@ -10,7 +10,7 @@ import javax.swing.SwingUtilities
 
 /**
  * PNode representation of a directed "green arrow" (representing a group of synapses) from one
- * [AbstractNeuronCollectionNode] to another.
+ * [NeuronCollectionNode] to another.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi

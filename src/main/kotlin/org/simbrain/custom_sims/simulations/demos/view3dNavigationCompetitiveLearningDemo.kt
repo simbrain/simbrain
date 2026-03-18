@@ -27,10 +27,10 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
     val competitive = CompetitiveNetwork(inputSize, 8)
     network.addNetworkModelAsync(competitive)
     competitive.inputLayer.setUpperBound(1.0)
-    competitive.competitive.params.learningRate = 0.03
-    competitive.competitive.params.normalizeInputs = true
-    competitive.competitive.params.useLeakyLearning = false
-    competitive.competitive.params.leakyLearningRate = 0.005
+    competitive.learningRate = 0.03
+    competitive.normalizeInputs = true
+    competitive.useLeakyLearning = false
+    competitive.leakyLearningRate = 0.005
 
     var inputMode = "Raw"
     var learningRate = 0.03
@@ -78,21 +78,21 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
             addFormattedNumericTextField("Learning Rate", initValue = learningRate) { value ->
                 learningRate = value
                 if (learningEnabled) {
-                    competitive.competitive.params.learningRate = learningRate
+                    competitive.learningRate = learningRate
                 }
             }
             addCheckBox("Learning Enabled", learningEnabled) { enabled ->
                 learningEnabled = enabled
-                competitive.competitive.params.learningRate = if (enabled) learningRate else 0.0
+                competitive.learningRate = if (enabled) learningRate else 0.0
             }
-            addCheckBox("Normalize Inputs", competitive.competitive.params.normalizeInputs) { checked ->
-                competitive.competitive.params.normalizeInputs = checked
+            addCheckBox("Normalize Inputs", competitive.normalizeInputs) { checked ->
+                competitive.normalizeInputs = checked
             }
-            addCheckBox("Use Leaky Learning", competitive.competitive.params.useLeakyLearning) { checked ->
-                competitive.competitive.params.useLeakyLearning = checked
+            addCheckBox("Use Leaky Learning", competitive.useLeakyLearning) { checked ->
+                competitive.useLeakyLearning = checked
             }
-            addFormattedNumericTextField("Leaky Rate", initValue = competitive.competitive.params.leakyLearningRate) { value ->
-                competitive.competitive.params.leakyLearningRate = value
+            addFormattedNumericTextField("Leaky Rate", initValue = competitive.leakyLearningRate) { value ->
+                competitive.leakyLearningRate = value
             }
             addButton("Randomize Weights") {
                 competitive.randomize()

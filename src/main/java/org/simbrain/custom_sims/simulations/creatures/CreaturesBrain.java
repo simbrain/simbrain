@@ -4,10 +4,10 @@ package org.simbrain.custom_sims.simulations.creatures;
 // import org.simbrain.network.core.Network;
 // import org.simbrain.network.core.Neuron;
 // import org.simbrain.network.core.SynapseGroup;
-// import org.simbrain.network.core.AbstractNeuronCollection;
+// import org.simbrain.network.core.NeuronCollection;
 // import org.simbrain.network.layouts.GridLayout;
 // import org.simbrain.network.layouts.LineLayout;
-// import org.simbrain.network.neurongroups.NeuronGroup;
+// import org.simbrain.network.core.NeuronCollection;
 // import org.simbrain.network.neurongroups.WinnerTakeAll;
 // import org.simbrain.workspace.Consumer;
 // import org.simbrain.workspace.Producer;
@@ -16,7 +16,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 // import java.util.ArrayList;
 // import java.util.List;
 //
-// import static org.simbrain.network.core.NetworkUtilsKt.addNeuronGroup;
+// import static org.simbrain.network.core.NetworkUtilsKt.addNeuronCollection;
 // import static org.simbrain.network.core.NetworkUtilsKt.addSynapseGroup;
 //
 // /**
@@ -30,7 +30,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //     /**
 //      * List of lobes.
 //      */
-//     private List<AbstractNeuronCollection> lobes = new ArrayList();
+//     private List<NeuronCollection> lobes = new ArrayList();
 //
 //     /**
 //      * Reference to the NetworkComponent object this wraps around.
@@ -59,15 +59,15 @@ package org.simbrain.custom_sims.simulations.creatures;
 //
 //     // Helper methods
 //
-//     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName, CreaturesNeuronRule neuronRule) {
-//         NeuronGroup lobe = addNeuronGroup(nc.getNetwork(), x, y, numNeurons, neuronRule);
-//         layoutNeuronGroup(lobe, layoutName);
+//     public NeuronCollection createLobe(double x, double y, int numNeurons, String layoutName, String lobeName, CreaturesNeuronRule neuronRule) {
+//         NeuronCollection lobe = addNeuronCollection(nc.getNetwork(), x, y, numNeurons, neuronRule);
+//         layoutNeuronCollection(lobe, layoutName);
 //         lobe.setLabel(lobeName);
 //         lobes.add(lobe);
 //         return lobe;
 //     }
 //
-//     public NeuronGroup createLobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
+//     public NeuronCollection createLobe(double x, double y, int numNeurons, String layoutName, String lobeName) {
 //         return createLobe(x, y, numNeurons, layoutName, lobeName, new CreaturesNeuronRule());
 //     }
 //
@@ -78,13 +78,13 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         // TODO: Either make the below method public, or copy & paste it to this
 //         // class,
 //         // or call this method in the builder's addWTAGroup method
-//         // builder.layoutNeuronGroup(lobe, x, y, layoutName);
+//         // builder.layoutNeuronCollection(lobe, x, y, layoutName);
 //
 //         lobes.add(lobe);
 //         return lobe;
 //     }
 //
-//     public void nameNeuron(NeuronGroup lobe, int neuronIndex, String name) {
+//     public void nameNeuron(NeuronCollection lobe, int neuronIndex, String name) {
 //         lobe.getNeuronList().get(neuronIndex).setLabel(name);
 //     }
 //
@@ -92,7 +92,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //      * Copies neuron labels from one neuron group to another if they are the same
 //      * size.
 //      */
-//     public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo, int startPasteIndex) {
+//     public void copyLabels(NeuronCollection lobeToCopy, NeuronCollection lobeToPasteTo, int startPasteIndex) {
 //
 //         // Check to see if the lobe labels can be copied first
 //         if (lobeToCopy.size() <= lobeToPasteTo.size() - startPasteIndex) {
@@ -111,7 +111,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         }
 //     }
 //
-//     public void copyLabels(NeuronGroup lobeToCopy, NeuronGroup lobeToPasteTo) {
+//     public void copyLabels(NeuronCollection lobeToCopy, NeuronCollection lobeToPasteTo) {
 //         copyLabels(lobeToCopy, lobeToPasteTo, 0);
 //     }
 //
@@ -119,7 +119,7 @@ package org.simbrain.custom_sims.simulations.creatures;
 //      * A method for coupling the activation of nodes from one lobe to the activation
 //      * of the nodes of another lobe.
 //      */
-//     private void coupleLobes(NeuronGroup producerLobe, NeuronGroup consumerLobe, int index, List<Coupling> list) {
+//     private void coupleLobes(NeuronCollection producerLobe, NeuronCollection consumerLobe, int index, List<Coupling> list) {
 //         // Check to see if the sizes are in safe parameters
 //         if (producerLobe.size() <= consumerLobe.size() - index) {
 //             for (int i = index, j = 0; j < producerLobe.size(); i++, j++) {
@@ -144,13 +144,13 @@ package org.simbrain.custom_sims.simulations.creatures;
 //     /**
 //      * Manually gives a grid layout with a set number of columns to a certain lobe.
 //      */
-//     public void setLobeColumns(NeuronGroup lobe, int numColumns, double gridSpace) {
+//     public void setLobeColumns(NeuronCollection lobe, int numColumns, double gridSpace) {
 //         GridLayout gridLayout = new GridLayout(gridSpace, gridSpace, numColumns);
 //         lobe.setLayout(gridLayout);
 //         lobe.applyLayout(-5, -85);
 //     }
 //
-//     public SynapseGroup createSynapseGroup(NeuronGroup sourceLobe, NeuronGroup targetLobe, String groupName) {
+//     public SynapseGroup createSynapseGroup(NeuronCollection sourceLobe, NeuronCollection targetLobe, String groupName) {
 //         // TODO: Modify this method to take in a CreaturesSynapseRule, and maybe
 //         // have it
 //         // generate a customized ConnectNeurons object to use.
@@ -165,8 +165,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 //
 //     // Methods for building specific pre-fabricated non-mutable lobes
 //
-//     public NeuronGroup buildDriveLobe() {
-//         NeuronGroup lobe = createLobe(0, 0, 12, "grid", "Drive Lobe");
+//     public NeuronCollection buildDriveLobe() {
+//         NeuronCollection lobe = createLobe(0, 0, 12, "grid", "Drive Lobe");
 //         setLobeColumns(lobe, 6, 65);
 //
 //         nameNeuron(lobe, 0, "Pain");
@@ -189,8 +189,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 //
 //     // TODO: Make this a WTA lobe. (Should we use the default WTA subnetwork
 //     // or make our own?)
-//     public NeuronGroup buildStimulusLobe() {
-//         NeuronGroup lobe = createLobe(0, 877.70, 7, "line", "Stimulus Source Lobe");
+//     public NeuronCollection buildStimulusLobe() {
+//         NeuronCollection lobe = createLobe(0, 877.70, 7, "line", "Stimulus Source Lobe");
 //
 //         nameNeuron(lobe, 0, "Toy");
 //         nameNeuron(lobe, 1, "Fish");
@@ -206,8 +206,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 //     }
 //
 //     // TODO: Make this a WTA lobe.
-//     public NeuronGroup buildVerbLobe() {
-//         NeuronGroup lobe = createLobe(0, 182.37, 14, "grid", "Verb Lobe");
+//     public NeuronCollection buildVerbLobe() {
+//         NeuronCollection lobe = createLobe(0, 182.37, 14, "grid", "Verb Lobe");
 //         setLobeColumns(lobe, 7, 60);
 //
 //         nameNeuron(lobe, 0, "Wait");
@@ -231,8 +231,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 //     }
 //
 //     // TODO: Make this a WTA lobe.
-//     public NeuronGroup buildNounLobe() {
-//         NeuronGroup lobe = createLobe(0, 1171.13, 7, "line", "Noun Lobe");
+//     public NeuronCollection buildNounLobe() {
+//         NeuronCollection lobe = createLobe(0, 1171.13, 7, "line", "Noun Lobe");
 //
 //         nameNeuron(lobe, 0, "Toy");
 //         nameNeuron(lobe, 1, "Fish");
@@ -247,8 +247,8 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         return lobe;
 //     }
 //
-//     public NeuronGroup buildSensesLobe() {
-//         NeuronGroup lobe = createLobe(0, 379.61, 14, "grid", "General Senses Lobe");
+//     public NeuronCollection buildSensesLobe() {
+//         NeuronCollection lobe = createLobe(0, 379.61, 14, "grid", "General Senses Lobe");
 //         setLobeColumns(lobe, 7, 75);
 //
 //         nameNeuron(lobe, 0, "Attacked");
@@ -271,20 +271,20 @@ package org.simbrain.custom_sims.simulations.creatures;
 //         return lobe;
 //     }
 //
-//     public NeuronGroup buildPerceptionLobe(NeuronGroup[] lobes) {
+//     public NeuronCollection buildPerceptionLobe(NeuronCollection[] lobes) {
 //         // Get the sum of all neurons in all incoming lobes.
 //         int totalSize = 0;
-//         for (NeuronGroup l : lobes) {
+//         for (NeuronCollection l : lobes) {
 //             totalSize += l.size();
 //         }
 //
 //         // Build that lobe!
-//         NeuronGroup perception = createLobe(591.02, 7.20, totalSize, "grid", "Perception Lobe");
+//         NeuronCollection perception = createLobe(591.02, 7.20, totalSize, "grid", "Perception Lobe");
 //         setLobeColumns(perception, 7, 75);
 //
 //         // Label and connect neurons
 //         int indexPointer = 0;
-//         for (NeuronGroup l : lobes) {
+//         for (NeuronCollection l : lobes) {
 //             // Label
 //             copyLabels(l, perception, indexPointer);
 //
@@ -313,11 +313,11 @@ package org.simbrain.custom_sims.simulations.creatures;
 //      * @param neuronIndex
 //      * @return String
 //      */
-//     public String getNeuronLabel(NeuronGroup lobe, int neuronIndex) {
+//     public String getNeuronLabel(NeuronCollection lobe, int neuronIndex) {
 //         return lobe.getNeuronList().get(neuronIndex).getLabel();
 //     }
 //
-//     private static void layoutNeuronGroup(NeuronGroup ng, String layoutName) {
+//     private static void layoutNeuronCollection(NeuronCollection ng, String layoutName) {
 //         if (layoutName.toLowerCase().contains("line")) {
 //             if (layoutName.equalsIgnoreCase("vertical line")) {
 //                 LineLayout lineLayout = new LineLayout(50.0, LineLayout.LineOrientation.VERTICAL);

@@ -196,7 +196,7 @@ fun computeOrderedUpdatePath(start: Set<Layer>, end: Layer): LinkedHashSet<Layer
                 queue.add(neighbor.source)
             }
         }
-        (currentLayer as? AbstractNeuronCollection)?.incomingSgs?.forEach { neighbor ->
+        (currentLayer as? NeuronCollection)?.incomingSgs?.forEach { neighbor ->
             if (neighbor.source !in visited) {
                 queue.add(neighbor.source)
             }
@@ -213,7 +213,7 @@ fun LinkedHashSet<Layer>.getAllOutgoingConnectors() = map { it.outgoingConnector
     .filter { it.target in this }
     .toMutableList()
 
-fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<AbstractNeuronCollection>()
+fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<NeuronCollection>()
     .map { it.outgoingSg }
     .flatten()
     .filter { it.target in this }
@@ -247,7 +247,7 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
         updateRule.apply(this, dataHolder)
         events.updated.fire()
     }
-    fun AbstractNeuronCollection.updateWithoutClearingInputs() {
+    fun NeuronCollection.updateWithoutClearingInputs() {
         if (isClamped) {
             return
         }
@@ -303,12 +303,16 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
                 inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
                 it.updateWithoutClearingInputs()
             }
-            is AbstractNeuronCollection -> {
+            is NeuronCollection -> {
                 inputsBeforeAccumulation?.write(it.displayName, it.inputs.clone())
                 if (it.incomingSgs.isNotEmpty()) {
                     it.neuronList.forEach { n -> n.accumulateInputs() }
                 } else {
+                    // Accumulate connector (WeightMatrix) inputs
                     it.accumulateInputs()
+                    // The hasDuplicateNeurons guard in accumulateInputs() may skip bias
+                    // when neurons are free. Add bias explicitly for the training path.
+                    it.addInputs(it.biasArray)
                 }
                 inputsAfterAccumulation?.write(it.displayName, it.inputs.clone())
                 it.updateWithoutClearingInputs()
@@ -410,7 +414,7 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
             connectorContext?.write("accumulatedErrorSignalForSource") { layerErrorSignals[wm.source]?.clone() }
         }
         // Synapse groups are updated in the same way but with different data structures
-        (layer as? AbstractNeuronCollection)?.incomingSgs?.forEach { sg ->
+        (layer as? NeuronCollection)?.incomingSgs?.forEach { sg ->
             val sgContext = layerContext?.createMapProbe(sg.displayName)
             val weightDeltas = sg.computeWeightDeltas(processedErrorSignal)
             sgContext?.write("weightDeltas") { weightDeltas.clone() }

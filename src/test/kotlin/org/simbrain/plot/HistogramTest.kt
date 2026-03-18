@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.histogram.HistogramComponent
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.workspace.Workspace
@@ -15,14 +16,15 @@ class HistogramTest {
     val workspace = Workspace()
     val net = Network()
     val nwc = NetworkComponent("Net", net)
-    val ng = NeuronGroup(2).apply {
-        isClamped = true
-    }
+    val ng: NeuronCollection
     val histogram = HistogramModel()
     val hgc = HistogramComponent("Histogram", histogram)
 
     init {
-        net.addNetworkModelsAsync(ng)
+        val ngNeurons = List(2) { Neuron() }
+        ngNeurons.forEach { net.addNetworkModelAsync(it) }
+        ng = NeuronCollection(ngNeurons).apply { isClamped = true }
+        net.addNetworkModelAsync(ng)
         workspace.addWorkspaceComponent(hgc)
         workspace.addWorkspaceComponent(nwc)
         workspace.couplingManager.createCoupling(ng, histogram)

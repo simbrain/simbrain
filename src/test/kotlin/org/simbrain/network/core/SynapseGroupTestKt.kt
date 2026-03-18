@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.learningrules.HebbianRule
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.spikeresponders.RiseAndDecay
 import org.simbrain.network.spikeresponders.SpikeResponder
@@ -20,16 +19,16 @@ class SynapseGroupTestKt {
     private val n1: Neuron
     private val n2: Neuron
     private val n3: Neuron
-    private val sourceGroup: NeuronGroup
-    private val targetGroup: NeuronGroup
+    private val sourceGroup: NeuronCollection
+    private val targetGroup: NeuronCollection
 
     init {
         network = Network()
         n1 = Neuron().apply { network.addNetworkModelAsync(this) }
         n2 = Neuron().apply { network.addNetworkModelAsync(this) }
         n3 = Neuron().apply { network.addNetworkModelAsync(this) }
-        sourceGroup = NeuronGroup(listOf(n1)).apply { network.addNetworkModelAsync(this) }
-        targetGroup = NeuronGroup(listOf(n2, n3)).apply { network.addNetworkModelAsync(this) }
+        sourceGroup = NeuronCollection(listOf(n1)).apply { network.addNetworkModelAsync(this) }
+        targetGroup = NeuronCollection(listOf(n2, n3)).apply { network.addNetworkModelAsync(this) }
     }
 
     private fun createParallelSynapses(
@@ -58,8 +57,8 @@ class SynapseGroupTestKt {
             network.addNetworkModelAsync(this)
             activation = tgtActivation
         }
-        val srcGroup = NeuronGroup(listOf(groupSrc)).apply { network.addNetworkModelAsync(this) }
-        val tgtGroup = NeuronGroup(listOf(groupTgt)).apply { network.addNetworkModelAsync(this) }
+        val srcGroup = NeuronCollection(listOf(groupSrc)).apply { network.addNetworkModelAsync(this) }
+        val tgtGroup = NeuronCollection(listOf(groupTgt)).apply { network.addNetworkModelAsync(this) }
         val sg = SynapseGroup(srcGroup, tgtGroup).apply { network.addNetworkModelAsync(this) }
         val groupSynapse = sg.synapses.first().apply {
             forceSetStrength(strength)
@@ -239,9 +238,9 @@ class SynapseGroupTestKt {
     @Test
     fun `sparse connection strategy increasing and decreasing density works properly`() = runBlocking {
         // Create a larger source and target group for meaningful sparse connections
-        val largeSourceGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+        val largeSourceGroup = NeuronCollection(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
             .apply { network.addNetworkModelAsync(this) }
-        val largeTargetGroup = NeuronGroup(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+        val largeTargetGroup = NeuronCollection(List(10) { Neuron() }.also { network.addNetworkModelsAsync(it) })
             .apply { network.addNetworkModelAsync(this) }
 
         // Start with 10% density
@@ -290,9 +289,9 @@ class SynapseGroupTestKt {
         val looseTargetNeurons = List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) }
 
         // Create neuron groups for synapse group test
-        val sourceGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+        val sourceGroup = NeuronCollection(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
             .apply { network.addNetworkModelAsync(this) }
-        val targetGroup = NeuronGroup(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
+        val targetGroup = NeuronCollection(List(5) { Neuron() }.also { network.addNetworkModelsAsync(it) })
             .apply { network.addNetworkModelAsync(this) }
 
         // Use same seed for both approaches

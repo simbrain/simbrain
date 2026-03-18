@@ -4,7 +4,10 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.connections.DistanceBased
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.*
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.addNeurons
+import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.KuramotoRule
 import org.simbrain.util.decayfunctions.StepDecayFunction
@@ -70,7 +73,7 @@ val cortexKuramoto = newSim {
     var currentNumNodes = 0
 
     // For iterating regions when connecting them
-    var neuronRegionList: MutableList<AbstractNeuronCollection> = mutableListOf()                                       // https://www.educba.com/kotlin-empty-list/, https://stackoverflow.com/questions/46850554/kotlin-unresolved-reference-add-after-converting-from-java-code
+    var neuronRegionList: MutableList<NeuronCollection> = mutableListOf()                                       // https://www.educba.com/kotlin-empty-list/, https://stackoverflow.com/questions/46850554/kotlin-unresolved-reference-add-after-converting-from-java-code
 
     // For holding 11 random numbers of nodes (between 11 and 31 that sum to 219)
     var numNodesList: MutableList<Int> = mutableListOf()

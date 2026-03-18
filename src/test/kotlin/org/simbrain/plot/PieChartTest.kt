@@ -5,7 +5,8 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
-import org.simbrain.network.neurongroups.NeuronGroup
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.piechart.PieChartComponent
 import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.workspace.Workspace
@@ -15,14 +16,15 @@ class PieChartTest {
     val workspace = Workspace()
     val net = Network()
     val nwc = NetworkComponent("Net", net)
-    val ng = NeuronGroup(2).apply {
-        isClamped = true
-    }
+    val ng: NeuronCollection
     val pieChart = PieChartModel()
     val pcc = PieChartComponent("Pie", pieChart)
 
     init {
-        net.addNetworkModelsAsync(ng)
+        val ngNeurons = List(2) { Neuron() }
+        ngNeurons.forEach { net.addNetworkModelAsync(it) }
+        ng = NeuronCollection(ngNeurons).apply { isClamped = true }
+        net.addNetworkModelAsync(ng)
         workspace.addWorkspaceComponent(pcc)
         workspace.addWorkspaceComponent(nwc)
         workspace.couplingManager.createCoupling(ng, pieChart)
@@ -99,7 +101,7 @@ class PieChartTest {
 
         // Iterate the new workspace with new inputs and proportions should change accordingly
         runBlocking { workspace2.openFromZipData(zip) }
-        val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronGroup>().first()
+        val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronCollection>().first()
         savedNg.activationArray = doubleArrayOf(1.5, .5)
         val savedPie = (workspace2.getComponent("Pie") as PieChartComponent).model as PieChartModel
         workspace2.simpleIterate()

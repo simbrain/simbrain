@@ -6,7 +6,6 @@ import com.thoughtworks.xstream.converters.MarshallingContext
 import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
@@ -109,7 +108,7 @@ class NetworkModelList {
         get() = networkModels.values.flatMap { set ->
                 set?.flatMap { item ->
                     when (item) {
-                        is NeuronGroup -> listOf(item) + item.neuronList
+                        is NeuronCollection -> listOf(item) + item.neuronList
                         else -> listOf(item)
                     }
                 } ?: listOf()

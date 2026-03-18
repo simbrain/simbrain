@@ -5,21 +5,20 @@ import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.network.updaterules.LinearRule
-import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
-import org.simbrain.util.*
+import org.simbrain.util.cartesianProduct
 import org.simbrain.util.decayfunctions.DecayFunction
+import org.simbrain.util.distanceTo
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.point
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import java.awt.geom.Point2D
 
 /**
  * Provides an ordering on [NetworkModels] so that the networks are updated and rebuilt in a proper order, for example
@@ -27,8 +26,7 @@ import java.awt.geom.Point2D
  */
 fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is Neuron -> 10
-    is NeuronGroup -> 20
-    is NeuronCollection -> 30
+    is NeuronCollection -> 20
     is NeuronArray -> 40
     is TensorLayer -> 45
     is Connector -> 50
@@ -131,7 +129,7 @@ var List<Neuron?>.labels: List<String>
         this[index]?.let { it.label = label }
     }
 
-fun AbstractNeuronCollection.setLabels(labels: List<String>) {
+fun NeuronCollection.setLabels(labels: List<String>) {
     neuronList.labels = labels
 }
 
@@ -177,27 +175,27 @@ fun Network.connect(source: List<Neuron>, target: List<Neuron>, connectionStrate
     return connectionStrategy.connectNeurons(source, target).also { it.addToNetworkAsync() }
 }
 
-fun Network.connect(source: AbstractNeuronCollection, target: AbstractNeuronCollection, connector: ConnectionStrategy): List<Synapse?> {
+fun Network.connect(source: NeuronCollection, target: NeuronCollection, connector: ConnectionStrategy): List<Synapse?> {
     return connector.connectNeurons(source.neuronList, target.neuronList).also { it.addToNetworkAsync() }
 }
 
 /**
  * Connect input nodes to target nodes with weights initialized to a value.
  */
-fun Network.connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection, value: Double): List<Synapse> {
+fun Network.connectAllToAll(source: NeuronCollection, target: NeuronCollection, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{ it.forceSetStrength(value) }
     return wts
 }
 
-fun Network.connectAllToAll(source: AbstractNeuronCollection, target: AbstractNeuronCollection): List<Synapse> {
+fun Network.connectAllToAll(source: NeuronCollection, target: NeuronCollection): List<Synapse> {
     return AllToAll().connectNeurons(source.neuronList, target.neuronList).also { it.addToNetworkAsync() }
 }
 
 /**
  * Connect a source neuron group to a single target neuron
  */
-fun Network.connectAllToAll(inputs: AbstractNeuronCollection, target: Neuron): List<Synapse> {
+fun Network.connectAllToAll(inputs: NeuronCollection, target: Neuron): List<Synapse> {
     val connector = AllToAll()
     return connector.connectNeurons(inputs.neuronList, listOf(target)).also { it.addToNetworkAsync() }
 }
@@ -205,7 +203,7 @@ fun Network.connectAllToAll(inputs: AbstractNeuronCollection, target: Neuron): L
 /**
  * Connect input nodes to target node with weights initialized to a value.
  */
-fun Network.connectAllToAll(source: AbstractNeuronCollection, target: Neuron, value: Double): List<Synapse> {
+fun Network.connectAllToAll(source: NeuronCollection, target: Neuron, value: Double): List<Synapse> {
     val wts = connectAllToAll(source, target)
     wts.forEach{ wt: Synapse -> wt.forceSetStrength(value) }
     return wts
@@ -235,28 +233,6 @@ fun Network.addSynapseAsync(source: Neuron, target: Neuron, block: Synapse.() ->
     .apply(block)
     .also(this::addNetworkModelAsync)
 
-suspend fun Network.addNeuronGroup(count: Int, location: Point2D? = null, template: Neuron.() -> Unit = { }): NeuronGroup {
-    return NeuronGroup(List(count) {
-        Neuron().apply(template)
-    }).also {
-        addNetworkModel(it, usePlacementManager = false)
-        if (location != null) {
-            val (x, y) = location
-            it.location = point(x, y)
-        }
-    }
-}
-
-@JvmOverloads
-fun Network.addNeuronGroup(x: Double, y: Double, numNeurons: Int, rule: NeuronUpdateRule<*, *> = LinearRule()):
-        NeuronGroup {
-    val ng = NeuronGroup(numNeurons)
-    ng.updateRule = rule
-    addNetworkModelAsync(ng)
-    ng.setLocation(x, y)
-    return ng
-}
-
 suspend fun Network.addNeuronCollection(numNeurons: Int, template: suspend Neuron.() -> Unit = {}) : NeuronCollection {
     val nc = NeuronCollection(addNeurons(numNeurons, template))
     addNetworkModel(nc)
@@ -264,11 +240,11 @@ suspend fun Network.addNeuronCollection(numNeurons: Int, template: suspend Neuro
 }
 
 /**
- * Add a synapse group between a source and target neuron group
+ * Add a synapse group between a source and target neuron collection.
  *
  * @return the new synapse group
  */
-fun Network.addSynapseGroup(source: NeuronGroup, target: NeuronGroup): SynapseGroup {
+fun Network.addSynapseGroup(source: NeuronCollection, target: NeuronCollection): SynapseGroup {
     val sg = SynapseGroup(source, target)
     addNetworkModelAsync(sg)
     return sg
@@ -369,6 +345,38 @@ context(Network) suspend fun <T: NetworkModel> List<T>.addToNetwork(): List<T> {
     return this
 }
 context(Network) fun List<NetworkModel>.addToNetworkAsync() = addNetworkModelsAsync(this)
+
+/**
+ * Returns the neuron in the provided list with the greatest net input or
+ * activation (or a randomly chosen neuron among those that "win").
+ *
+ * @param useActivations if true, use activations instead of net input to determine winner
+ * @return the neuron with the highest net input
+ */
+fun getWinner(neuronList: List<Neuron>, useActivations: Boolean = false): Neuron {
+    if (neuronList.isEmpty()) {
+        throw IllegalArgumentException("There are no winners in an empty neuron list")
+    }
+    val winners: MutableList<Neuron> = ArrayList()
+    var winner = neuronList[0]
+    winners.add(winner)
+    for (n in neuronList) {
+        val winnerVal = if (useActivations) winner.activation else winner.weightedInputs
+        val value = if (useActivations) n.activation else n.weightedInputs
+        if (value == winnerVal) {
+            winners.add(n)
+        } else if (value > winnerVal) {
+            winners.clear()
+            winner = n
+            winners.add(n)
+        }
+    }
+    return if (winners.size == 1) {
+        winner
+    } else {
+        winners[kotlin.random.Random.nextInt(winners.size)]
+    }
+}
 
 suspend fun Network.createLayeredFreeNeurons(topology: List<Int>, _layerNames: List<String>? = null, alignment: Alignment = Alignment.VERTICAL) {
 

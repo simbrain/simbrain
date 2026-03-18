@@ -5,7 +5,7 @@ package org.simbrain.custom_sims.simulations.creatures
 // import org.simbrain.network.core.Neuron
 // import org.simbrain.network.core.Synapse
 // import org.simbrain.network.learningrules.SynapseUpdateRule
-// import org.simbrain.network.neurongroups.NeuronGroup
+// import org.simbrain.network.core.NeuronCollection
 // import org.simbrain.util.SmellSource
 // import org.simbrain.world.odorworld.effectors.Speech
 // import org.simbrain.world.odorworld.effectors.StraightMovement
@@ -54,43 +54,43 @@ package org.simbrain.custom_sims.simulations.creatures
 //     /**
 //      * Reference to drive lobe.
 //      */
-//     private var drives: NeuronGroup? = null
+//     private var drives: NeuronCollection? = null
 //
 //     /**
 //      * Reference to stimulus lobe.
 //      */
-//     private lateinit var stimulus: NeuronGroup
+//     private lateinit var stimulus: NeuronCollection
 //
 //     /**
 //      * Reference to verb lobe.
 //      */
-//     private lateinit var verbs: NeuronGroup
+//     private lateinit var verbs: NeuronCollection
 //
 //     /**
 //      * Reference to noun lobe.
 //      */
-//     private lateinit var nouns: NeuronGroup
+//     private lateinit var nouns: NeuronCollection
 //
 //     /**
 //      * Reference to sensory lobe.
 //      */
-//     private lateinit var senses: NeuronGroup
+//     private lateinit var senses: NeuronCollection
 //
 //     /**
 //      * Reference to perception lobe.
 //      */
-//     private var perception: NeuronGroup? = null
+//     private var perception: NeuronCollection? = null
 //
 //     /**
 //      * Reference to decisions lobe.
 //      */
-//     private lateinit var decisions: NeuronGroup
+//     private lateinit var decisions: NeuronCollection
 //
 //     // private WinnerTakeAll decisions;
 //     /**
 //      * Reference to attention lobe.
 //      */
-//     private lateinit var attention: NeuronGroup
+//     private lateinit var attention: NeuronCollection
 //
 //     /**
 //      * How quickly to approach or avoid objects.
@@ -311,7 +311,7 @@ package org.simbrain.custom_sims.simulations.creatures
 //         connect(nouns.getNeuronByLabel("Mouse"), attention.getNeuronByLabel("Mouse"), CreaturesSynapseRule(), 1.0)
 //
 //         //		// Init Lobe #8: Concepts
-//         //		NeuronGroup concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
+//         //		NeuronCollection concepts = brain.createLobe(1086.94, -21.61, 640, "grid", "Lobe #8: Concepts");
 //         //		brain.setLobeColumns(concepts, 20);
 //         //
 //         //		// Init Concepts to Decisions Dendrite Pathways
@@ -903,7 +903,7 @@ package org.simbrain.custom_sims.simulations.creatures
 //     }
 //
 //     // Was not here before last pull
-//     fun deleteLobe(lobe: NeuronGroup) {
+//     fun deleteLobe(lobe: NeuronCollection) {
 //         lobe.delete()
 //     }
 //

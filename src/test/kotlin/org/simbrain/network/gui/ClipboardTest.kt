@@ -7,7 +7,6 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.point
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.math.matrix.Matrix
@@ -1203,19 +1202,15 @@ class ClipboardTest {
 
     @Test
     fun `test SupervisedModel with SynapseGroup copy paste`() = runBlocking {
-        // Create two neuron arrays
-        val sourceGroup = NeuronGroup(3).apply {
+        // Create two neuron collections
+        val sourceGroup = network.addNeuronCollection(3).apply {
             label = "Source Group"
             location = point(100.0, 100.0)
         }
-        val targetGroup = NeuronGroup(2).apply {
+        val targetGroup = network.addNeuronCollection(2).apply {
             label = "Target Group"
             location = point(100.0, 300.0)
         }
-
-        // Add the arrays to the network
-        network.addNetworkModel(sourceGroup)
-        network.addNetworkModel(targetGroup)
 
         // Create a weight matrix connecting the arrays
         val synapseGroup = SynapseGroup(sourceGroup, targetGroup)
@@ -1247,7 +1242,7 @@ class ClipboardTest {
         val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
 
         // Get initial counts
-        val initialArrayCount = network.getModels<NeuronGroup>().size
+        val initialArrayCount = network.getModels<NeuronCollection>().size
         val initialSynapseGroupCount = network.getModels<SynapseGroup>().size
         val initialSupervisedModelCount = network.getModels<org.simbrain.network.trainers.SupervisedModel>().size
 
@@ -1255,7 +1250,7 @@ class ClipboardTest {
         Clipboard.paste(networkPanel)
 
         // Verify new items were created
-        assertEquals(initialArrayCount + 2, network.getModels<NeuronGroup>().size,
+        assertEquals(initialArrayCount + 2, network.getModels<NeuronCollection>().size,
             "Two new neuron arrays should be created after pasting")
         assertEquals(initialSynapseGroupCount + 1, network.getModels<SynapseGroup>().size,
             "One new weight matrix should be created after pasting")
@@ -1276,8 +1271,8 @@ class ClipboardTest {
             "The pasted supervised model should have a different output layer than the original")
 
         // Get the pasted arrays and weight matrix
-        val pastedSourceArray = pastedSupervisedModel.inputLayer as NeuronGroup
-        val pastedTargetArray = pastedSupervisedModel.outputLayer as NeuronGroup
+        val pastedSourceArray = pastedSupervisedModel.inputLayer as NeuronCollection
+        val pastedTargetArray = pastedSupervisedModel.outputLayer as NeuronCollection
         val pastedSynapseGroup = pastedSupervisedModel.synapseGroups.first()
 
         // Verify the arrays have the same dimensions
@@ -1338,7 +1333,7 @@ class ClipboardTest {
         networkPanel.undoManager.undo()
 
         // Verify that all pasted items were removed
-        assertEquals(initialArrayCount, network.getModels<NeuronGroup>().size,
+        assertEquals(initialArrayCount, network.getModels<NeuronCollection>().size,
             "All pasted neuron arrays should be removed after undo")
         assertEquals(initialSynapseGroupCount, network.getModels<SynapseGroup>().size,
             "All pasted weight matrices should be removed after undo")
@@ -1348,9 +1343,9 @@ class ClipboardTest {
         // Check that pasted items are no longer in the network
         assertFalse(network.getModels<org.simbrain.network.trainers.SupervisedModel>().any { it.id == pastedSupervisedModelId },
             "The pasted supervised model should not be in the network after undo")
-        assertFalse(network.getModels<NeuronGroup>().any { it.id == pastedSourceArrayId },
+        assertFalse(network.getModels<NeuronCollection>().any { it.id == pastedSourceArrayId },
             "The pasted source array should not be in the network after undo")
-        assertFalse(network.getModels<NeuronGroup>().any { it.id == pastedTargetArrayId },
+        assertFalse(network.getModels<NeuronCollection>().any { it.id == pastedTargetArrayId },
             "The pasted target array should not be in the network after undo")
         assertFalse(network.getModels<SynapseGroup>().any { it.id == pastedSynapseGroupId },
             "The pasted weight matrix should not be in the network after undo")
@@ -1359,7 +1354,7 @@ class ClipboardTest {
         networkPanel.undoManager.redo()
 
         // Verify that all items were added back
-        assertEquals(initialArrayCount + 2, network.getModels<NeuronGroup>().size,
+        assertEquals(initialArrayCount + 2, network.getModels<NeuronCollection>().size,
             "All neuron arrays should be added back after redo")
         assertEquals(initialSynapseGroupCount + 1, network.getModels<SynapseGroup>().size,
             "All weight matrices should be added back after redo")
@@ -1369,9 +1364,9 @@ class ClipboardTest {
         // Check that items with the same IDs are back in the network
         assertTrue(network.getModels<org.simbrain.network.trainers.SupervisedModel>().any { it.id == pastedSupervisedModelId },
             "A supervised model with the same ID should be in the network after redo")
-        assertTrue(network.getModels<NeuronGroup>().any { it.id == pastedSourceArrayId },
+        assertTrue(network.getModels<NeuronCollection>().any { it.id == pastedSourceArrayId },
             "A source array with the same ID should be in the network after redo")
-        assertTrue(network.getModels<NeuronGroup>().any { it.id == pastedTargetArrayId },
+        assertTrue(network.getModels<NeuronCollection>().any { it.id == pastedTargetArrayId },
             "A target array with the same ID should be in the network after redo")
         assertTrue(network.getModels<SynapseGroup>().any { it.id == pastedSynapseGroupId },
             "A weight matrix with the same ID should be in the network after redo")
@@ -1379,8 +1374,8 @@ class ClipboardTest {
         // Verify functionality of redone model by testing activation propagation
         // Get the restored components
         val redoSupervisedModel = network.getModels<org.simbrain.network.trainers.SupervisedModel>().first { it.id == pastedSupervisedModelId }
-        val redoSourceArray = network.getModels<NeuronGroup>().first { it.id == pastedSourceArrayId }
-        val redoTargetArray = network.getModels<NeuronGroup>().first { it.id == pastedTargetArrayId }
+        val redoSourceArray = network.getModels<NeuronCollection>().first { it.id == pastedSourceArrayId }
+        val redoTargetArray = network.getModels<NeuronCollection>().first { it.id == pastedTargetArrayId }
         val redoSynapseGroup = network.getModels<SynapseGroup>().first { it.id == pastedSynapseGroupId }
 
         // Verify the weight matrix still connects the proper arrays

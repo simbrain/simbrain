@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.update_actions.BufferedUpdate
 import org.simbrain.network.update_actions.PriorityUpdate
@@ -40,7 +39,7 @@ class NetworkUpdateManager(private val network: Network) {
             // TODO: If added, these should be removed when any corresponding object is removed
             val actionableModels = with(network) {
                 listOf(
-                    getModels<NeuronGroup>(),
+                    getModels<NeuronCollection>(),
                     getModels<NeuronCollection>(),
                     getModels<Subnetwork>(),
                     getModels<SynapseGroup>(),

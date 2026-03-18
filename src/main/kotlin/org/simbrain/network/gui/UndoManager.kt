@@ -4,7 +4,6 @@ import kotlinx.coroutines.awaitAll
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.nodes.*
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import java.util.*
@@ -117,28 +116,14 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     context(NetworkPanel)
     private suspend fun reAddToGroup(model: NetworkModel) {
         when (val parent = childToParentMaps.firstNotNullOfOrNull { it[model] }) {
-            is NeuronGroup -> {
-                (model as? Neuron)?.let { neuron ->
-                    parent.neuronList.add(neuron)
-                    // If the neurongroupnode exists, create neuron nodes for the children and re-add them
-                    (modelNodeMap.getImmediately<NeuronGroupNode>(parent))?.let { neuronGroupNode ->
-                        val neuronNode = createNode(neuron)
-                        neuronGroupNode.addNeuronNodes(listOf(neuronNode))
-                    }
-                }
-            }
-
             is NeuronCollection -> {
                 (model as? Neuron)?.let { neuron ->
                     network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
                     parent.neuronList.add(neuron)
-                    // First check if the NeuronCollectionNode node exists
-                    modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { neuronCollectionNode ->
-                        // Then check if the neuronnode exists
-                        modelNodeMap.getImmediately<NeuronNode>(neuron)?.let { neuronNode ->
-                            // Only then do we add the node back
-                            neuronCollectionNode.addNeuronNodes(listOf(neuronNode))
-                        }
+                    // If the node exists, create neuron nodes for the children and re-add them
+                    modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { collectionNode ->
+                        val neuronNode = modelNodeMap.getImmediately<NeuronNode>(neuron) ?: createNode(neuron)
+                        collectionNode.addNeuronNodes(listOf(neuronNode))
                     }
                 }
             }

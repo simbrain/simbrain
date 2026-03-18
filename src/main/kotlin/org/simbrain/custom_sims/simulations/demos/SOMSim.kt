@@ -63,26 +63,26 @@ val SOMSim = newSim {
             
             addButton("Train") {
                 workspace.iterateSuspend()
-                val winner = SOM.som.winner
+                val winner = SOM.winner
                 if (winner != null) {
                     labelTracker.updateWinner(winningLabel, winner)
                 }
             }
             addButton("Test") {
-                val savedLearningRate = SOM.som.learningRate
-                val savedNeighborhoodSize = SOM.som.neighborhoodSize
-                SOM.som.learningRate = 0.0
+                val savedLearningRate = SOM.somLearningRate
+                val savedNeighborhoodSize = SOM.neighborhoodSize
+                SOM.somLearningRate = 0.0
                 workspace.iterateSuspend()
-                SOM.som.learningRate = savedLearningRate
-                SOM.som.neighborhoodSize = savedNeighborhoodSize
-                val winner = SOM.som.winner
+                SOM.somLearningRate = savedLearningRate
+                SOM.neighborhoodSize = savedNeighborhoodSize
+                val winner = SOM.winner
                 if (winner != null) {
                     labelTracker.updateWinner(winningLabel, winner)
                 }
             }
             addButton("Reset") {
                 SOM.randomize()
-                SOM.som.reset()
+                SOM.reset()
                 labelTracker.clear(SOM.som.neuronList)
             }
         }

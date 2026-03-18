@@ -18,8 +18,8 @@ import smile.math.matrix.Matrix
  * Create new Synapse Groups by specifying a strategy or providing a list of synapses.
  */
 class SynapseGroup @JvmOverloads constructor(
-    val source: AbstractNeuronCollection,
-    val target: AbstractNeuronCollection,
+    val source: NeuronCollection,
+    val target: NeuronCollection,
     var connectionStrategy: ConnectionStrategy = AllToAll(),
     synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {

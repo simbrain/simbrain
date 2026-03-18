@@ -3,7 +3,6 @@ package org.simbrain.workspace
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.network.update_actions.BufferedUpdate
 import org.simbrain.network.update_actions.PriorityUpdate
 
@@ -56,26 +55,34 @@ class PriorityUpdateTest {
         net.updateManager.addAction(PriorityUpdate(net))
 
         // Input group: two neurons with initial activations
-        val inputGroup = NeuronGroup(2).apply {
+        // NeuronCollection.accumulateInputs() distributes WeightMatrix inputs to neurons.
+        // NeuronCollection must run BEFORE its individual neurons at each priority level.
+        // Since updatingOrder is Neuron(10) < NeuronCollection(20), we set neurons to a
+        // higher priority number so the collection runs first.
+        val inputNeurons = List(2) { Neuron().apply { priority = 2 } }
+        val inputGroup = NeuronCollection(inputNeurons).apply {
             priority = 1
             neuronList[0].activation = 1.0
             neuronList[1].activation = -1.0
             isClamped = true
         }
 
-        val hiddenGroup = NeuronGroup(2).apply {
-            priority = 2
+        val hiddenNeurons = List(2) { Neuron().apply { priority = 4 } }
+        val hiddenGroup = NeuronCollection(hiddenNeurons).apply {
+            priority = 3
         }
 
-        val outputGroup = NeuronGroup(2).apply {
+        val outputNeurons = List(2) { Neuron().apply { priority = 6 } }
+        val outputGroup = NeuronCollection(outputNeurons).apply {
             label = "Output"
-            priority = 3
+            priority = 5
         }
 
         // identity matrices
         val wm1 = WeightMatrix(inputGroup, hiddenGroup)
         val wm2 = WeightMatrix(hiddenGroup, outputGroup)
 
+        net.addNetworkModelsAsync(inputNeurons + hiddenNeurons + outputNeurons)
         net.addNetworkModelsAsync(listOf(inputGroup, hiddenGroup, outputGroup, wm1, wm2))
 
         net.update()
@@ -109,19 +116,22 @@ class PriorityUpdateTest {
             isClamped = true
         }
 
-        val hidden = NeuronGroup(2).apply {
+        val hiddenNeurons = List(2) { Neuron().apply { priority = 3 } }
+        val hidden = NeuronCollection(hiddenNeurons).apply {
             priority = 2
         }
 
-        val output = NeuronGroup(2).apply {
+        val outputNeurons = List(2) { Neuron().apply { priority = 5 } }
+        val output = NeuronCollection(outputNeurons).apply {
             label = "Output"
-            priority = 3
+            priority = 4
         }
 
         // identity matrices
         val wm1 = WeightMatrix(input, hidden)
         val wm2 = WeightMatrix(hidden, output)
 
+        net.addNetworkModelsAsync(hiddenNeurons + outputNeurons)
         net.addNetworkModelsAsync(listOf(input, hidden, output, wm1, wm2))
 
         net.update()

@@ -3,10 +3,10 @@ package org.simbrain.custom_sims.simulations.behaviorism
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.addNeuronGroup
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
 import org.simbrain.util.updateAction
@@ -29,11 +29,13 @@ val simpleOperant = newSim("simple operant conditioning") {
     withGui {
         place(nc, 239, 10, 575, 500)
     }
-    val behaviorNet = nc.network.addNeuronGroup(-9.25, 95.93, numNeurons)
-    behaviorNet.label = "Behaviors"
-    behaviorNet.layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
-    behaviorNet.applyLayout(-5, -85)
-    behaviorNet.isClamped = true
+    val behaviorNet = nc.network.addNeuronCollection(numNeurons).apply {
+        label = "Behaviors"
+        layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
+        setLocation(-9.25, 95.93)
+        applyLayout(-5, -85)
+        isClamped = true
+    }
 
     // Use aux values to store firing probabilities
     behaviorNet.getNeuron(0).auxValue = .34
@@ -48,7 +50,7 @@ val simpleOperant = newSim("simple operant conditioning") {
 suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
-    val behaviorNet = network.getModelByLabel<NeuronGroup>("Behaviors")
+    val behaviorNet = network.getModelByLabel<NeuronCollection>("Behaviors")
     val nodeToLabel = HashMap<Neuron, String>()
     nodeToLabel[behaviorNet.getNeuron(0)] = "Wiggle"
     nodeToLabel[behaviorNet.getNeuron(1)] = "Explore"

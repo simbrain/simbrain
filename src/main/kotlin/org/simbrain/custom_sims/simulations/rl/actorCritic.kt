@@ -5,7 +5,6 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.WinnerTakeAll
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.piccolo.TileMap
@@ -110,18 +109,16 @@ val actorCritic = newSim {
 
     mouse.addSensor(gridSensor)
 
-    val sensorNeurons = network.addNeuronGroup(
-        100.0, 100.0, numTilesInADimension * numTilesInADimension
+    val sensorNeurons = network.addNeuronCollection(
+        numTilesInADimension * numTilesInADimension
     ).apply {
         layout = GridLayout(50.0, 50.0)
+        setLocation(100.0, 100.0)
         label = "Sensor nodes"
     }
 
     // Outputs
-    val outputs = WinnerTakeAll(network, 4).apply {
-        network.addNetworkModel(this)
-        params.isUseRandom = true
-        params.randomProb = epsilon
+    val outputs = network.addNeuronCollection(4).apply {
         // Add a little extra spacing between neurons to accommodate labels
         layout = LineLayout(80.0, LineLayout.LineOrientation.HORIZONTAL)
         applyLayout(-5, -85)
@@ -159,12 +156,22 @@ val actorCritic = newSim {
     network.updateManager.addAction(updateAction("RL Update") {
 
         with(network) {
-            sensorNeurons.update()
+            sensorNeurons.neuronList.forEach { it.accumulateFanInInputs() }
+            sensorNeurons.neuronList.forEach { it.update() }
             with(network) {
                 updateNeurons(listOf(value))
                 updateNeurons(listOf(reward))
             }
-            outputs.update()
+            // Manual WTA update for outputs
+            outputs.neuronList.forEach { it.accumulateFanInInputs() }
+            outputs.neuronList.forEach { it.update() }
+            var winner = getWinner(outputs.neuronList, false)
+            if (kotlin.random.Random.nextDouble() < epsilon) {
+                winner = outputs.neuronList.random()
+            }
+            outputs.neuronList.forEach { n ->
+                n.activation = if (n === winner) 1.0 else 0.0
+            }
         }
 
         // aux values are used to store the last activation of the neuron
@@ -352,7 +359,6 @@ val actorCritic = newSim {
                     gamma = tfGamma.text.toDouble()
                     alpha = tfAlpha.text.toDouble()
                     epsilon = tfEpsilon.text.toDouble()
-                    outputs.params.randomProb = epsilon
 
                     this@addButton.isEnabled = false
                     try {

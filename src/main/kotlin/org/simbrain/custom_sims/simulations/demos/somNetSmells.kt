@@ -34,8 +34,8 @@ val somNetSmells = newSim {
         isClamped = false
     }
     
-    somNet.som.params.initialLearningRate = 0.06
-    somNet.som.params.initNeighborhoodSize = 100.0
+    somNet.initialLearningRate = 0.06
+    somNet.initNeighborhoodSize = 100.0
     
     somNet.modelList.get<SynapseGroup>().first().displaySynapses = false
     
@@ -127,7 +127,7 @@ val somNetSmells = newSim {
         objectsWithLabels.forEach { (entity, label) ->
             val distance = mouse.location.distance(entity.location)
             if (distance < proximityRadius) {
-                val winner = somNet.som.neuronList.maxByOrNull { it.activation }
+                val winner = somNet.winner
                 winner?.let { labelTracker.updateWinner(label, it) }
             }
         }
@@ -137,8 +137,8 @@ val somNetSmells = newSim {
         place(networkComponent, 182, 10, 450, 720)
         place(oc, 640, 10, 450, 520)
 
-        val originalLearningRate = somNet.som.params.initialLearningRate
-        val originalNeighborhoodSize = somNet.som.params.initNeighborhoodSize
+        val originalLearningRate = somNet.initialLearningRate
+        val originalNeighborhoodSize = somNet.initNeighborhoodSize
         
         var savedLearningRate = originalLearningRate
         var savedNeighborhoodSize = originalNeighborhoodSize
@@ -149,26 +149,26 @@ val somNetSmells = newSim {
             val freezeLearning = addCheckBox("Freeze Learning", false)
             freezeLearning.addActionListener {
                 if (freezeLearning.isSelected) {
-                    savedLearningRate = somNet.som.learningRate
-                    savedNeighborhoodSize = somNet.som.neighborhoodSize
-                    somNet.som.learningRate = 0.0
-                    somNet.som.neighborhoodSize = 0.0
+                    savedLearningRate = somNet.somLearningRate
+                    savedNeighborhoodSize = somNet.neighborhoodSize
+                    somNet.somLearningRate = 0.0
+                    somNet.neighborhoodSize = 0.0
                 } else {
-                    somNet.som.learningRate = savedLearningRate
-                    somNet.som.neighborhoodSize = savedNeighborhoodSize
+                    somNet.somLearningRate = savedLearningRate
+                    somNet.neighborhoodSize = savedNeighborhoodSize
                 }
-                somNet.som.updateStateInfoText()
-                somNet.som.events.customInfoUpdated.fire()
+                // State info text is updated automatically in updateSOM()
+                somNet.events.customInfoUpdated.fire()
             }
 
             addButton("Reset Learning") {
-                somNet.som.reset()
+                somNet.reset()
                 network.events.updated.fire()
             }
 
             addButton("Reset Network") {
                 somNet.randomize()
-                somNet.som.reset()
+                somNet.reset()
                 labelTracker.clear(somNet.som.neuronList)
                 network.events.updated.fire()
             }

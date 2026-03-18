@@ -91,7 +91,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         get() = biases.toDoubleArray()
 
     /**
-     * see [AbstractNeuronCollection.spikes]
+     * see [NeuronCollection.spikes]
      */
     @get:Producible
     override val spikes: DoubleArray

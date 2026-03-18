@@ -3,12 +3,8 @@ package org.simbrain.custom_sims.simulations.psychology
 import kotlinx.coroutines.delay
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.OneToOne
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.activations
-import org.simbrain.network.core.labels
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.LineLayout
-import org.simbrain.network.neurongroups.NeuronGroup
 import org.simbrain.util.place
 import org.simbrain.util.plus
 import org.simbrain.util.point
@@ -41,41 +37,41 @@ val spiveyNet = newSim {
         fontSize = 18
     }
 
-    val lexicalNodes = NeuronGroup(4).apply {
+    val lexicalNodes = net.addNeuronCollection(4).apply {
         layout = LineLayout()
         applyLayout()
         isClamped = true
         label = "Lexical"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
-    val visualNodes = NeuronGroup(4).apply {
+    val visualNodes = net.addNeuronCollection(4).apply {
         layout = LineLayout()
         applyLayout()
         isClamped = true
         label = "Visual Attention"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
-    val mouseNodes = NeuronGroup(4).apply {
+    val mouseNodes = net.addNeuronCollection(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Mouse"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
 
-    val eyesNodes = NeuronGroup(4).apply {
+    val eyesNodes = net.addNeuronCollection(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Eyes"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
-    val integrationNodes = NeuronGroup(4).apply {
+    val integrationNodes = net.addNeuronCollection(4).apply {
         layout = LineLayout()
         applyLayout()
         label = "Integration"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
 
-    net.addNetworkModels(lexicalNodes, visualNodes, mouseNodes, eyesNodes, integrationNodes, currentStatus)
+    net.addNetworkModel(currentStatus)
     lexicalNodes.location = point(-3.70, 12.64)
     visualNodes.location = point(285.98, 5.92)
     mouseNodes.location = point(438.46, 160.33)
@@ -123,11 +119,14 @@ val spiveyNet = newSim {
 
         // Assume lexical nodes have been updated by a control panel button
         with(net) {
-            lexicalNodes.update()
+            lexicalNodes.neuronList.forEach { it.accumulateFanInInputs() }
+            lexicalNodes.neuronList.forEach { it.update() }
             lexicalNodes.neuronList.normalize()
-            integrationNodes.update()
+            integrationNodes.neuronList.forEach { it.accumulateFanInInputs() }
+            integrationNodes.neuronList.forEach { it.update() }
             visualNodes.neuronList.normalize()
-            mouseNodes.update()
+            mouseNodes.neuronList.forEach { it.accumulateFanInInputs() }
+            mouseNodes.neuronList.forEach { it.update() }
         }
 
         // Eye movements

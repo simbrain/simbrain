@@ -83,7 +83,7 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
 
     /**
      * In subclasses under [NeuronArray] the matrices are basic and computations are performed on those.
-     * In subclasses under [AbstractNeuronCollection], [activationArray] is basic and computations are performed on those.
+     * In subclasses under [NeuronCollection], [activationArray] is basic and computations are performed on those.
      */
     abstract var activations: Matrix
 

@@ -18,7 +18,7 @@ import javax.swing.JLabel
  * Panel for sending inputs from a table to a [Layer].
  */
 fun NetworkPanel.createTestInputPanel(layer: Layer)= createTestInputPanel(layer.inputData) {
-    if (layer is AbstractNeuronCollection && layer.isAllClamped) {
+    if (layer is NeuronCollection && layer.isAllClamped) {
         layer.neuronList.activations = this.table.model.getCurrentDoubleRow()
     } else if (layer is NeuronArray && layer.isClamped) {
         layer.setActivations(this.table.model.getCurrentDoubleRow().toDoubleArray())

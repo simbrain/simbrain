@@ -8,13 +8,24 @@ import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.place
+import org.simbrain.util.runWithProgressWindow
 import org.simbrain.util.showMessageDialog
 import kotlin.math.sqrt
 
 // ── Tunable parameters ────────────────────────────────────────────────────────
 
-/** Number of units in the bottleneck layer. Central to the categoricity analysis. */
-const val BOTTLENECK_SIZE = 5
+/**
+ * Size of the dense representation layer — the primary analysis target.
+ * Sits between the CNN flatten output and the output layer, receiving gradients
+ * from both prototype reconstruction and label prediction.
+ */
+const val REPR_LAYER_SIZE = 16
+
+/** Epochs for stage 1 (prototype sorting only). */
+const val STAGE1_EPOCHS = 500
+
+/** Epochs for stage 2 (add L1 labels). */
+const val STAGE2_EPOCHS = 200
 
 /** Samples generated per shape class (circle, ellipse, square, rectangle). */
 const val SAMPLES_PER_CLASS = 50
@@ -37,16 +48,14 @@ const val NUM_LABEL_UNITS = 7
 // ─────────────────────────────────────────────────────────────────────────────
 
 /**
- * The three training conditions for the categorical perception experiment.
+ * Training conditions for the categorical perception experiment.
  *
- * - NO_LABELS: output = prototype image only; all 7 label units are 0
+ * - NO_LABELS: output = prototype image only; all label units are 0
  * - L1_LABELS: output = prototype image + one-hot L1 label (4 units) + 3 zeros
- * - L2_LABELS: output = prototype image + one-hot L1 label (4 units) + one-hot L2 label (3 units)
  */
 enum class TrainingCondition(val displayName: String) {
     NO_LABELS("Prototype sorting (no labels)"),
-    L1_LABELS("Prototype sorting (L1 labels)"),
-    L2_LABELS("Prototype sorting (L2 labels)");
+    L1_LABELS("Prototype sorting (L1 labels)");
 
     override fun toString() = displayName
 }
@@ -63,25 +72,10 @@ private val L1_INDEX = mapOf(
 )
 
 /**
- * L2 label indices within the 7-unit label block (positions 4–6 of the label block).
- * Superordinate categories:
- *   index 4 = "round"   (CIRCLE, ELLIPSE)
- *   index 5 = "angular" (SQUARE, RECTANGLE)
- *   index 6 = unused (always 0)
- */
-private val L2_INDEX = mapOf(
-    ShapeType.CIRCLE    to 4,
-    ShapeType.ELLIPSE   to 4,
-    ShapeType.SQUARE    to 5,
-    ShapeType.RECTANGLE to 5
-)
-
-/**
  * Builds a label vector of length [NUM_LABEL_UNITS] for a given shape and condition.
  *
  * - NO_LABELS:  all zeros
- * - L1_LABELS:  one-hot at the L1 index for this shape; L2 units = 0
- * - L2_LABELS:  one-hot at the L1 index + one-hot at the L2 index
+ * - L1_LABELS:  one-hot at the L1 index for this shape; remaining units = 0
  */
 private fun buildLabelVector(shape: ShapeType, condition: TrainingCondition): DoubleArray {
     val labels = DoubleArray(NUM_LABEL_UNITS)
@@ -89,10 +83,6 @@ private fun buildLabelVector(shape: ShapeType, condition: TrainingCondition): Do
         TrainingCondition.NO_LABELS -> { /* all zeros */ }
         TrainingCondition.L1_LABELS -> {
             labels[L1_INDEX[shape]!!] = 1.0
-        }
-        TrainingCondition.L2_LABELS -> {
-            labels[L1_INDEX[shape]!!] = 1.0
-            labels[L2_INDEX[shape]!!] = 1.0
         }
     }
     return labels
@@ -151,10 +141,10 @@ val categoricalPerception = newSim {
     val trainSamplesPerClass = trainingSet.inputs.size / ShapeType.entries.size
 
     // --- CNN Pipeline ---
-    // Input(50×50×1) → Conv1(3×3, 8 filters, SAME, ReLU) → Pool1(2×2)
-    //               → Conv2(3×3, 16 filters, SAME, ReLU) → Pool2(2×2)
-    //               → Flatten → Bottleneck(BOTTLENECK_SIZE, sigmoid) → Output(56)
-    //                                                                         ↑ 49 prototype (7×7) + 7 labels
+    // Input(50×50×1) → Conv1(3×3, 4 filters, SAME, ReLU) → Pool1(2×2)
+    //               → Conv2(3×3, 8 filters, SAME, ReLU) → Pool2(2×2)
+    //               → Flatten → ReprLayer(REPR_LAYER_SIZE, sigmoid) ← analysis target
+    //               → Output(56)  [49 prototype (7×7) + 7 labels]
 
     val inputShape = TensorShape(50, 50, 1)
 
@@ -164,13 +154,13 @@ val categoricalPerception = newSim {
         setLocation(-586.0, 160.0)
     }
 
-    val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
+    val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
     val conv1Out = TensorLayer(conv1OutShape).apply {
         label = "Conv1 (${conv1OutShape})"
         activationFunction = TensorActivation.RELU
         setLocation(107.0, -154.0)
     }
-    ConvolutionConnector(inputLayer, conv1Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
+    ConvolutionConnector(inputLayer, conv1Out, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
     val pool1Out = TensorLayer(pool1OutShape).apply {
@@ -179,13 +169,13 @@ val categoricalPerception = newSim {
     }
     PoolingConnector(conv1Out, pool1Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
-    val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 16)
+    val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
         label = "Conv2 (${conv2OutShape})"
         activationFunction = TensorActivation.RELU
         setLocation(918.0, -992.0)
     }
-    ConvolutionConnector(pool1Out, conv2Out, kernelSize = 3, numFilters = 16, stride = 1, padding = Padding.SAME)
+    ConvolutionConnector(pool1Out, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val pool2Out = TensorLayer(pool2OutShape).apply {
@@ -201,12 +191,14 @@ val categoricalPerception = newSim {
     }
     FlattenConnector(pool2Out, flatArray)
 
-    val bottleneck = NeuronArray(BOTTLENECK_SIZE).apply {
-        label = "Bottleneck ($BOTTLENECK_SIZE)"
+    // Primary analysis target: dense representation layer receiving gradients from
+    // both prototype reconstruction and label prediction.
+    val reprLayer = NeuronArray(REPR_LAYER_SIZE).apply {
+        label = "Repr ($REPR_LAYER_SIZE, sigmoid)"
         updateRule = SigmoidalRule()
         setLocation(-586.0, -992.0)
     }
-    WeightMatrix(flatArray, bottleneck)
+    WeightMatrix(flatArray, reprLayer)
 
     // Output: 49 prototype pixels (7×7) + 7 label units
     val protoSize = TARGET_GRID * TARGET_GRID
@@ -215,7 +207,7 @@ val categoricalPerception = newSim {
         setLocation(-586.0, -358.0)
         gridMode = true
     }
-    WeightMatrix(bottleneck, outputArray)
+    WeightMatrix(reprLayer, outputArray)
 
     // --- Output windows (driven by listener, no weight matrices needed) ---
     val imageView = NeuronArray(protoSize).apply {
@@ -261,7 +253,7 @@ val categoricalPerception = newSim {
         return sqrt(sum)
     }
 
-    fun collectBottleneckActivations(): Map<ShapeType, List<DoubleArray>> {
+    fun collectReprActivations(): Map<ShapeType, List<DoubleArray>> {
         val result = mutableMapOf<ShapeType, MutableList<DoubleArray>>()
         ShapeType.entries.forEach { result[it] = mutableListOf() }
 
@@ -270,7 +262,7 @@ val categoricalPerception = newSim {
             val shapeType = ShapeType.entries.getOrNull(classIndex) ?: return@forEachIndexed
             inputLayer.activations = input.toDoubleArray()
             network.update()
-            result[shapeType]!!.add(bottleneck.activationArray.copyOf())
+            result[shapeType]!!.add(reprLayer.activationArray.copyOf())
         }
         return result
     }
@@ -296,11 +288,11 @@ val categoricalPerception = newSim {
     }
 
     fun runAnalysis(): String {
-        val activations = collectBottleneckActivations()
+        val activations = collectReprActivations()
         val sb = StringBuilder()
         sb.appendLine("=== Categoricity Analysis ===")
         sb.appendLine("Condition: ${currentCondition.displayName}")
-        sb.appendLine("Bottleneck size: $BOTTLENECK_SIZE  |  Samples/class: $trainSamplesPerClass")
+        sb.appendLine("Repr layer size: $REPR_LAYER_SIZE  |  Samples/class: $trainSamplesPerClass")
         sb.appendLine()
 
         val types = ShapeType.entries
@@ -342,6 +334,33 @@ val categoricalPerception = newSim {
         return sb.toString()
     }
 
+    // --- Staged training helper ---
+    // Stage 1: prototype sorting only (no labels). Stage 2: add labels.
+    // The key CP result is the *change* in repr-layer geometry between stages.
+
+    val stagedTrainer = CnnTrainer(network, inputLayer, outputArray, cnnModel.trainerConfig)
+
+    fun runStagedTraining(labelCondition: TrainingCondition) {
+        val totalEpochs = STAGE1_EPOCHS + STAGE2_EPOCHS
+        runWithProgressWindow(totalEpochs, "Staged Training") { epoch ->
+            if (epoch == 0) {
+                val (train, _) = buildDatasets(TrainingCondition.NO_LABELS)
+                trainingSet = train
+                cnnModel.trainingSet = train
+                stagedTrainer.trainingData = train
+                currentCondition = TrainingCondition.NO_LABELS
+            } else if (epoch == STAGE1_EPOCHS) {
+                val (train, _) = buildDatasets(labelCondition)
+                trainingSet = train
+                cnnModel.trainingSet = train
+                stagedTrainer.trainingData = train
+                currentCondition = labelCondition
+            }
+            val batchEnd = minOf(cnnModel.trainerConfig.batchSize, trainingSet.size)
+            stagedTrainer.trainBatch(0 until batchEnd)
+        }
+    }
+
     // --- Control panel ---
 
     withGui {
@@ -361,9 +380,15 @@ val categoricalPerception = newSim {
 
             addSeparator()
 
-            addButton("Analyze Bottleneck") {
+            addButton("Run Staged Training") {
+                runStagedTraining(TrainingCondition.L1_LABELS)
+            }
+
+            addSeparator()
+
+            addButton("Analyze Repr Layer") {
                 val result = runAnalysis()
-                showMessageDialog(result, "Bottleneck Analysis")
+                showMessageDialog(result, "Repr Layer Analysis")
             }
         }
     }
@@ -372,97 +397,92 @@ val categoricalPerception = newSim {
         # Categorical Perception
 
         A CNN trained to map shapes at arbitrary positions and sizes to a canonical
-        centered prototype — modeling the perceptual compression underlying categorical
-        perception. The network can be trained under three conditions that differ in
-        what linguistic label information is included in the output targets.
+        centered prototype. The key question is whether adding category labels during
+        training warps the network's internal representations in the way described by
+        Cangelosi, Greco & Harnad (1999): within-category compression and
+        between-category separation (categorical perception effects).
 
         ## Architecture
 
         ```
         Input  (50×50×1)
-          ↓  Conv1  3×3, 8 filters, SAME, ReLU  → ${conv1OutShape}
+          ↓  Conv1  3×3, 4 filters, SAME, ReLU  → ${conv1OutShape}
           ↓  Pool1  2×2 max                      → ${pool1OutShape}
-          ↓  Conv2  3×3, 16 filters, SAME, ReLU → ${conv2OutShape}
+          ↓  Conv2  3×3, 8 filters, SAME, ReLU  → ${conv2OutShape}
           ↓  Pool2  2×2 max                      → ${pool2OutShape}
           ↓  Flatten                             → $flatSize
-          ↓  Bottleneck  $BOTTLENECK_SIZE units, sigmoid   ← analysis target
-          ↓  Output      ${TARGET_GRID * TARGET_GRID + NUM_LABEL_UNITS} units (${TARGET_GRID}×${TARGET_GRID} prototype pixels + 7 labels)
+          ↓  Repr   $REPR_LAYER_SIZE units, sigmoid          ← analysis target
+          ↓  Output ${TARGET_GRID * TARGET_GRID + NUM_LABEL_UNITS} units (${TARGET_GRID}×${TARGET_GRID} prototype + 7 labels)
         ```
+
+        The repr layer receives gradients from both prototype reconstruction and label
+        prediction, making it the layer most likely to show CP warping effects.
 
         ## Training Data
 
         - **Input**: circle, ellipse, square, or rectangle at a random position,
           size uniformly drawn from [$INPUT_MIN_SIZE, $INPUT_MAX_SIZE]
-        - **Target**: same shape type, centered on a ${TARGET_GRID}×${TARGET_GRID} grid at fixed size $TARGET_SIZE,
+        - **Target**: same shape centered on a ${TARGET_GRID}×${TARGET_GRID} grid at fixed size $TARGET_SIZE,
           followed by $NUM_LABEL_UNITS label units (see Training Conditions below)
         - **Samples**: $SAMPLES_PER_CLASS per class × 4 classes = ${SAMPLES_PER_CLASS * 4} total
           (80% train / 20% test)
 
         ## Training Conditions
 
-        Select a condition from the dropdown in the control panel before training.
-        Each condition changes what the network must learn to produce in the 7 label
-        units appended to the 2500-pixel prototype output.
-
         ### Prototype sorting (no labels)
-        All 7 label units are set to 0. The network only learns to produce the
-        centered prototype image. This is the baseline condition with no linguistic
-        influence.
+        All label units are 0. Baseline with no linguistic influence.
 
         ### Prototype sorting (L1 labels)
-        A one-hot L1 (basic-level) label is appended. The 7 label units are:
+        One-hot basic-level label appended: `[CIRCLE, ELLIPSE, SQUARE, RECTANGLE, 0, 0, 0]`
 
-        ```
-        [CIRCLE, ELLIPSE, SQUARE, RECTANGLE, 0, 0, 0]
-        ```
+        ## How to Run the Experiment
 
-        For example, a circle input has label units `[1, 0, 0, 0, 0, 0, 0]`.
-        The network must learn both the prototype image and which of the four
-        basic-level shape categories the input belongs to.
+        ### Option A — Staged training (recommended)
+        Click **Run Staged Training** in the control panel. This replicates the
+        paper's sequential procedure:
 
-        ### Prototype sorting (L2 labels)
-        Both L1 and L2 (superordinate) labels are appended. The 7 label units are:
+        1. **Stage 1** ($STAGE1_EPOCHS epochs): prototype sorting only — repr layer
+           geometry forms around shape similarity alone
+        2. **Analyze Repr Layer** — record baseline within/between distances
+        3. **Stage 2** ($STAGE2_EPOCHS more epochs): label condition added — repr layer
+           is reshaped by the additional categorization pressure
+        4. **Analyze Repr Layer** again — compare to baseline
 
-        ```
-        [CIRCLE, ELLIPSE, SQUARE, RECTANGLE, round, angular, 0]
-        ```
+        The CP effect is the *change*: within-class distances should decrease and
+        between-class distances should increase after the label stage.
 
-        L2 superordinate categories:
-        - **round** (unit 5): active for CIRCLE and ELLIPSE
-        - **angular** (unit 6): active for SQUARE and RECTANGLE
-
-        For example, a circle input has label units `[1, 0, 0, 0, 1, 0, 0]`.
-        The network must learn the prototype image, the basic-level category,
-        and the superordinate category simultaneously.
-
-        This structure mirrors the notebook
-        `CP_network_PT_2500.ipynb` (Shan & Yoshimi), where the output tensor
-        is `[prototype (2500) | L1 labels (4) | L2 labels (3)]`.
-
-        ## What to Do
-
-        1. Select a **Training Condition** from the dropdown in the control panel
-        2. Right-click the **Categorical Perception CNN** outline → **Train...**
-        3. Click **Run** and watch the SSE loss decrease
-        4. Click **Analyze Bottleneck** to measure categorical structure in the
-           bottleneck layer
-        5. Repeat steps 1–4 for each condition to compare how label training
-           affects the geometry of the bottleneck representations
+        ### Option B — Manual staged training
+        1. Set condition to **Prototype sorting (no labels)** in the dropdown
+        2. Right-click the CNN outline → **Train...** → run until loss stabilizes
+        3. Click **Analyze Repr Layer** — this is your baseline
+        4. Switch condition to L1 or L2 in the dropdown (weights are preserved)
+        5. Train again for a smaller number of epochs
+        6. Click **Analyze Repr Layer** — compare to baseline
 
         ## Analysis Metrics
 
-        The **Analyze Bottleneck** button runs all training inputs through the network,
-        collects the $BOTTLENECK_SIZE-unit bottleneck activations, and computes:
+        **Analyze Repr Layer** runs all training inputs through the network,
+        collects the $REPR_LAYER_SIZE-unit repr-layer activations, and computes:
 
-        - **Within-class distance**: mean pairwise Euclidean distance among activations
-          of the same shape type — lower means more compact clusters
-        - **Between-class distance**: mean pairwise distance across shape types —
+        - **Within-class distance**: mean pairwise Euclidean distance within each
+          shape class — lower means more compact clusters
+        - **Between-class distance**: mean pairwise distance across shape classes —
           higher means better separation
-        - **Categoricity ratio**: within / mean(between) — values below 1.0 indicate
+        - **Categoricity ratio**: within / mean(between) — below 1.0 indicates
           good categorical separation
 
-        The key hypothesis is that label training (especially L2) will produce more
-        categorical bottleneck representations — lower within-class distances and
-        higher between-class distances — compared to the no-label baseline.
+        The CP hypothesis predicts that label training will lower within-class
+        distances and raise between-class distances relative to the no-label baseline.
+
+        # Reference
+
+        Cangelosi, A., Greco, A., & Harnad, S. (1999). [From robotic toil to symbolic theft: Grounding transfer from entry-level to higher-level categories](https://pearl.plymouth.ac.uk/cgi/viewcontent.cgi?article=2719&context=secam-research). _Connection Science_, _12_(2), 143–162.
+
+        # Credits
+
+        Tony Liantao Shan
+
+        [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
+
     """.trimIndent())
 }

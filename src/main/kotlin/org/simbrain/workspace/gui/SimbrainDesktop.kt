@@ -507,6 +507,8 @@ object SimbrainDesktop {
         viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.resizeAllWindowsAction))
         viewMenu.add(JMenuItem(actionManager.repositionAllWindowsAction))
+        viewMenu.addSeparator()
+        viewMenu.add(JMenuItem(actionManager.showComponentBoundsAction))
         return viewMenu
     }
 

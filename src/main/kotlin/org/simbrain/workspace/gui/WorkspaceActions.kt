@@ -221,6 +221,13 @@ class WorkspaceActions {
         SimbrainDesktop.resizeAllWindows()
     }
 
+    val showComponentBoundsAction = desktopPane.createAction(
+        name = "Show component bounds...",
+        description = "Show locations and sizes of all workspace components"
+    ) {
+        showMessageDialog(SimbrainDesktop.getComponentBoundsString(), "Component Bounds")
+    }
+
     val runControlActions = listOf(runAction, stopAction)
 
     val openSaveWorkspaceActions = listOf(openWorkspaceAction, saveWorkspaceAction, saveWorkspaceAsAction)

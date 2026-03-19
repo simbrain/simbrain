@@ -39,8 +39,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     var fileChooserForTesting: SFileChooser? = null
     val addNeuronsAction = networkPanel.createAction(
         name = "Add neurons...",
-        description = "Add a set of neurons to the network (n)",
-        keyboardShortcut = KeyCombination('N')
+        description = "Add a set of neurons to the network",
     ) {
         AddNeuronsDialog(networkPanel).display()
     }

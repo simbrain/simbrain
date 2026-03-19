@@ -313,7 +313,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
             val toggleCircleMode: Action = networkPanel.createAction(
                 name = "Toggle circle mode",
-                keyboardShortcut = 'M',
+                keyboardShortcut = CmdOrCtrl + Shift + 'C',
                 description = "Toggle activation rendering mode between circle and image",
             ) {
                 networkPanel.selectionManager

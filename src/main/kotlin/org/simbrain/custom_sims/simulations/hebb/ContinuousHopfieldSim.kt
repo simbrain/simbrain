@@ -36,6 +36,8 @@ val hopfieldSimContinuous = newSim {
 
     val hopfield = network.addNeuronCollection(numNeurons) { updateRule = AdditiveRule() }.apply {
         toggleClamping() // Default to clamping for training
+        setLayoutBasedOnSize()
+        applyLayout()
     }
     val wm = WeightMatrix(hopfield, hopfield).apply {
         learningRule = HebbianRule().apply {

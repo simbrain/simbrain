@@ -38,6 +38,20 @@ class ConvolutionConnector(
             events.visualPropertiesChanged.fire()
         }
 
+    /** Currently selected filter index for kernel visualization. */
+    @Transient
+    var currentFilter = 0
+        set(value) {
+            field = value.coerceIn(0, numFilters - 1)
+        }
+
+    /** Currently selected input channel index for kernel visualization. */
+    @Transient
+    var currentInputChannel = 0
+        set(value) {
+            field = value.coerceIn(0, source.shape.channels - 1)
+        }
+
     private val inputChannels = source.shape.channels
     private val kernelArea = kernelSize * kernelSize
 

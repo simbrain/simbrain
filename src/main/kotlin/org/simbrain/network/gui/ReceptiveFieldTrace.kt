@@ -1,0 +1,231 @@
+package org.simbrain.network.gui
+
+import org.simbrain.network.core.ConvolutionConnector
+import org.simbrain.network.core.PoolingConnector
+import org.simbrain.network.core.TensorLayer
+import org.simbrain.network.gui.nodes.TensorConnectorNode
+import org.simbrain.network.gui.nodes.TensorNode
+import java.awt.Color
+
+/**
+ * A box drawn on a [TensorNode] to visualize the receptive field during hover tracing.
+ *
+ * Coordinates are in tensor space (not pixel space).
+ */
+data class TraceBox(
+    val row: Int,
+    val col: Int,
+    val height: Int,
+    val width: Int,
+    val color: Color
+)
+
+enum class HighlightMode { CELL, ROW, COLUMN }
+
+/**
+ * Highlight info set on a [TensorConnectorNode] during hover tracing.
+ * In single-kernel view, navigates to (filter, inputChannel).
+ * In grid view, highlights a cell, row (all channels for a filter), or column (all filters for a channel).
+ */
+data class ConnectorTraceHighlight(
+    val filter: Int,
+    val inputChannel: Int,
+    val color: Color,
+    val mode: HighlightMode = HighlightMode.CELL
+)
+
+private val traceColors = listOf(
+    Color(255, 200, 0, 180),   // yellow
+    Color(0, 200, 255, 180),   // cyan
+    Color(255, 100, 0, 180),   // orange
+    Color(100, 255, 100, 180), // green
+    Color(200, 100, 255, 180), // purple
+)
+
+private fun traceColor(depth: Int) = traceColors[depth % traceColors.size]
+
+private data class SavedConnector(val connector: ConvolutionConnector, val filter: Int, val inputChannel: Int)
+
+/**
+ * Per-panel trace state. Stored in a WeakHashMap so it doesn't leak if a panel is disposed.
+ */
+private class TraceState {
+    val savedChannels = mutableListOf<Pair<TensorLayer, Int>>()
+    val savedConnectorState = mutableListOf<SavedConnector>()
+    val tracedTensorNodes = mutableListOf<TensorNode>()
+    val tracedConnectorNodes = mutableListOf<TensorConnectorNode>()
+}
+
+private val traceStates = java.util.WeakHashMap<NetworkPanel, TraceState>()
+
+private fun NetworkPanel.traceState() = traceStates.getOrPut(this) { TraceState() }
+
+/**
+ * Computes and distributes a bidirectional receptive field trace from a hover
+ * at position ([hoverH], [hoverW]) on [sourceTensor].
+ */
+fun NetworkPanel.updateReceptiveFieldTrace(sourceTensor: TensorLayer, hoverH: Int, hoverW: Int) {
+    clearReceptiveFieldTrace()
+
+    // Draw a marker on the hovered layer itself
+    val hoveredNode = getNode(sourceTensor) as? TensorNode
+    if (hoveredNode != null) {
+        hoveredNode.traceBoxes.add(TraceBox(hoverH, hoverW, 1, 1, traceColor(0)))
+        traceState().tracedTensorNodes.add(hoveredNode)
+        hoveredNode.repaint()
+    }
+
+    traceForward(sourceTensor, hoverH, hoverW, 0)
+    traceBackward(sourceTensor, hoverH, hoverW, 0)
+}
+
+/**
+ * Clears all trace boxes and connector highlights, reverting temporary channel overrides.
+ */
+fun NetworkPanel.clearReceptiveFieldTrace() {
+    val state = traceState()
+
+    state.savedChannels.forEach { (layer, saved) ->
+        layer.currentChannel = saved
+    }
+    state.savedChannels.clear()
+
+    state.savedConnectorState.forEach { (conn, savedF, savedC) ->
+        conn.currentFilter = savedF
+        conn.currentInputChannel = savedC
+    }
+    state.savedConnectorState.clear()
+
+    state.tracedConnectorNodes.forEach { node ->
+        node.renderKernelImage()
+        node.updateDetailLabel()
+    }
+
+    state.tracedTensorNodes.forEach { node ->
+        node.traceBoxes.clear()
+        node.repaint()
+    }
+    state.tracedTensorNodes.clear()
+
+    state.tracedConnectorNodes.forEach { node ->
+        node.traceHighlight = null
+        node.repaint()
+    }
+    state.tracedConnectorNodes.clear()
+}
+
+private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth: Int) {
+    val state = traceState()
+
+    for (conn in layer.outgoingTensorConnectors) {
+        val (outH, outW, kernelH, kernelW, boxRow, boxCol) = when (conn) {
+            is ConvolutionConnector -> {
+                val outH = (h + conn.padH) / conn.stride
+                val outW = (w + conn.padW) / conn.stride
+                val clampedOutH = outH.coerceIn(0, conn.target.shape.height - 1)
+                val clampedOutW = outW.coerceIn(0, conn.target.shape.width - 1)
+                val boxRow = clampedOutH * conn.stride - conn.padH
+                val boxCol = clampedOutW * conn.stride - conn.padW
+                ForwardResult(clampedOutH, clampedOutW, conn.kernelSize, conn.kernelSize, boxRow, boxCol)
+            }
+            is PoolingConnector -> {
+                val outH = h / conn.stride
+                val outW = w / conn.stride
+                val clampedOutH = outH.coerceIn(0, conn.target.shape.height - 1)
+                val clampedOutW = outW.coerceIn(0, conn.target.shape.width - 1)
+                val boxRow = clampedOutH * conn.stride
+                val boxCol = clampedOutW * conn.stride
+                ForwardResult(clampedOutH, clampedOutW, conn.poolSize, conn.poolSize, boxRow, boxCol)
+            }
+            else -> continue
+        }
+
+        val color = traceColor(depth)
+
+        val sourceNode = getNode(layer) as? TensorNode ?: continue
+        sourceNode.traceBoxes.add(TraceBox(boxRow, boxCol, kernelH, kernelW, color))
+        if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
+        sourceNode.repaint()
+
+        val connNode = getNode(conn) as? TensorConnectorNode
+        if (connNode != null && conn is ConvolutionConnector) {
+            state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
+
+            val displayedChannel = sourceNode.tensorLayer.currentChannel
+            conn.currentInputChannel = displayedChannel
+
+            connNode.traceHighlight = ConnectorTraceHighlight(conn.currentFilter, displayedChannel, color, HighlightMode.COLUMN)
+            connNode.renderKernelImage()
+            connNode.updateDetailLabel()
+            state.tracedConnectorNodes.add(connNode)
+            connNode.repaint()
+        }
+
+        val targetNode = getNode(conn.target) as? TensorNode ?: continue
+        val nextColor = traceColor(depth + 1)
+        if (conn is ConvolutionConnector && !conn.target.rgbComposite) {
+            state.savedChannels.add(conn.target to conn.target.currentChannel)
+            conn.target.currentChannel = conn.currentFilter
+        }
+
+        targetNode.traceBoxes.add(TraceBox(outH, outW, 1, 1, nextColor))
+        if (targetNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(targetNode)
+        targetNode.repaint()
+
+        traceForward(conn.target, outH, outW, depth + 1)
+    }
+}
+
+private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int, depth: Int) {
+    val state = traceState()
+
+    for (conn in layer.incomingTensorConnectors) {
+        val (srcRow, srcCol, boxH, boxW) = when (conn) {
+            is ConvolutionConnector -> {
+                val srcRow = h * conn.stride - conn.padH
+                val srcCol = w * conn.stride - conn.padW
+                BackwardResult(srcRow, srcCol, conn.kernelSize, conn.kernelSize)
+            }
+            is PoolingConnector -> {
+                val srcRow = h * conn.stride
+                val srcCol = w * conn.stride
+                BackwardResult(srcRow, srcCol, conn.poolSize, conn.poolSize)
+            }
+            else -> continue
+        }
+
+        val color = traceColor(depth)
+
+        val sourceNode = getNode(conn.source) as? TensorNode ?: continue
+        sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
+        if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
+        sourceNode.repaint()
+
+        val connNode = getNode(conn) as? TensorConnectorNode
+        if (connNode != null && conn is ConvolutionConnector) {
+            state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
+
+            val displayedChannel = layer.currentChannel
+            conn.currentFilter = displayedChannel
+
+            connNode.traceHighlight = ConnectorTraceHighlight(displayedChannel, conn.currentInputChannel, color, HighlightMode.ROW)
+            connNode.renderKernelImage()
+            connNode.updateDetailLabel()
+            state.tracedConnectorNodes.add(connNode)
+            connNode.repaint()
+        }
+
+        if (conn is PoolingConnector && !conn.source.rgbComposite) {
+            state.savedChannels.add(conn.source to conn.source.currentChannel)
+            conn.source.currentChannel = layer.currentChannel
+        }
+
+        val centerH = (srcRow + boxH / 2).coerceIn(0, conn.source.shape.height - 1)
+        val centerW = (srcCol + boxW / 2).coerceIn(0, conn.source.shape.width - 1)
+
+        traceBackward(conn.source, centerH, centerW, depth + 1)
+    }
+}
+
+private data class ForwardResult(val outH: Int, val outW: Int, val kernelH: Int, val kernelW: Int, val boxRow: Int, val boxCol: Int)
+private data class BackwardResult(val srcRow: Int, val srcCol: Int, val boxH: Int, val boxW: Int)

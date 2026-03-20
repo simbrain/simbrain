@@ -10,10 +10,7 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.ConvolutionConnector
 import org.simbrain.network.core.TensorConnector
-import org.simbrain.network.gui.ArrowDirection
-import org.simbrain.network.gui.ImageBox
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.network.gui.createArrowButton
+import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
@@ -45,9 +42,13 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         font = Font("Arial", Font.PLAIN, 9)
     }
 
-    /** For ConvolutionConnector: current filter and input channel being viewed. */
-    private var currentFilter = 0
-    private var currentInputChannel = 0
+    /** For ConvolutionConnector: delegates to model state. */
+    private var currentFilter: Int
+        get() = (connector as? ConvolutionConnector)?.currentFilter ?: 0
+        set(value) { (connector as? ConvolutionConnector)?.currentFilter = value }
+    private var currentInputChannel: Int
+        get() = (connector as? ConvolutionConnector)?.currentInputChannel ?: 0
+        set(value) { (connector as? ConvolutionConnector)?.currentInputChannel = value }
 
     // Navigation buttons (only created for ConvolutionConnector)
     private val filterPrevButton: PNode? = (connector as? ConvolutionConnector)?.let {
@@ -267,7 +268,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         arrow.invalidateFullBounds()
     }
 
-    private fun renderKernelImage() {
+    /** Trace highlight set by the receptive field tracer. */
+    var traceHighlight: ConnectorTraceHighlight? = null
+
+    fun renderKernelImage() {
         val conv = connector as? ConvolutionConnector ?: return
         val slice = kernelSlice ?: return
         val img = singleKernelImage ?: return
@@ -304,7 +308,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }
     }
 
-    private fun updateDetailLabel() {
+    fun updateDetailLabel() {
         if (connector is ConvolutionConnector) {
             val c = connector
             detailLabel.text = "F${currentFilter + 1}/${c.numFilters} Ch${currentInputChannel + 1}/${c.source.shape.channels}"
@@ -356,6 +360,44 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         )
         super.paint(paintContext)
+    }
+
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        val highlight = traceHighlight ?: return
+        val conv = connector as? ConvolutionConnector ?: return
+        if (conv.kernelGridMode) {
+            val cellPImages = gridCellPImages ?: return
+            val g2 = paintContext.graphics
+            g2.color = highlight.color
+            g2.stroke = BasicStroke(2f)
+            val gridOffset = kernelGridGroup.offset
+
+            val cells = when (highlight.mode) {
+                HighlightMode.ROW -> {
+                    // Highlight all input channels for the given filter
+                    val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
+                    (0 until cellPImages[f].size).map { c -> cellPImages[f][c] }
+                }
+                HighlightMode.COLUMN -> {
+                    // Highlight all filters for the given input channel
+                    val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
+                    (0 until cellPImages.size).map { f -> cellPImages[f][c] }
+                }
+                HighlightMode.CELL -> {
+                    val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
+                    val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
+                    listOf(cellPImages[f][c])
+                }
+            }
+
+            for (cell in cells) {
+                val cellBounds = cell.bounds
+                val drawX = gridOffset.x + cellBounds.x
+                val drawY = gridOffset.y + cellBounds.y
+                g2.drawRect(drawX.toInt(), drawY.toInt(), cellBounds.width.toInt(), cellBounds.height.toInt())
+            }
+        }
     }
 
     override val isDraggable: Boolean = false

@@ -39,7 +39,23 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     /** Pre-allocated buffer for extracting a single channel's data. */
     private val channelBuffer = DoubleArray(tensorLayer.shape.height * tensorLayer.shape.width)
 
-    private val activationImage = PImage().apply { mainNode.addChild(this) }
+    private val activationImage = PImage().apply {
+        mainNode.addChild(this)
+        pickable = true
+        addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
+            override fun mouseMoved(event: org.piccolo2d.event.PInputEvent) {
+                val localPt = event.getPositionRelativeTo(this@apply)
+                val tensorH = (localPt.y / imageSize * tensorLayer.shape.height).toInt()
+                    .coerceIn(0, tensorLayer.shape.height - 1)
+                val tensorW = (localPt.x / imageSize * tensorLayer.shape.width).toInt()
+                    .coerceIn(0, tensorLayer.shape.width - 1)
+                networkPanel.updateReceptiveFieldTrace(tensorLayer, tensorH, tensorW)
+            }
+            override fun mouseExited(event: org.piccolo2d.event.PInputEvent) {
+                networkPanel.clearReceptiveFieldTrace()
+            }
+        })
+    }
     private val channelLabel = PText("").apply {
         font = Font("Arial", Font.PLAIN, 10)
         mainNode.addChild(this)
@@ -90,6 +106,9 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             thumbnailStripNode.addChild(this)
         }
     }
+
+    /** Trace boxes set by the receptive field tracer. */
+    val traceBoxes: MutableList<TraceBox> = mutableListOf()
 
     private val margin = 10.0
 
@@ -313,6 +332,30 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         )
         super.paint(paintContext)
+    }
+
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        if (traceBoxes.isEmpty()) return
+        val g2 = paintContext.graphics
+        val scaleX = imageSize / tensorLayer.shape.width
+        val scaleY = imageSize / tensorLayer.shape.height
+
+        for (box in traceBoxes) {
+            val px = box.col * scaleX
+            val py = box.row * scaleY
+            val pw = box.width * scaleX
+            val ph = box.height * scaleY
+
+            // Semi-transparent fill
+            g2.color = Color(box.color.red, box.color.green, box.color.blue, 60)
+            g2.fillRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+
+            // Border
+            g2.color = box.color
+            g2.stroke = BasicStroke(2f)
+            g2.drawRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+        }
     }
 
     override val contextMenu: JPopupMenu

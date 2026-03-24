@@ -6,6 +6,7 @@ import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.nodes.TensorConnectorNode
 import org.simbrain.network.gui.nodes.TensorNode
 import java.awt.Color
+import java.lang.Math.floorDiv
 
 /**
  * A box drawn on a [TensorNode] to visualize the receptive field during hover tracing.
@@ -60,6 +61,11 @@ private val traceStates = java.util.WeakHashMap<NetworkPanel, TraceState>()
 
 private fun NetworkPanel.traceState() = traceStates.getOrPut(this) { TraceState() }
 
+internal fun centeredTraceIndex(sourceIndex: Int, pad: Int, stride: Int, kernelSize: Int, targetSize: Int): Int {
+    val kernelCenter = kernelSize / 2
+    return floorDiv(sourceIndex + pad - kernelCenter, stride).coerceIn(0, targetSize - 1)
+}
+
 /**
  * Computes and distributes a bidirectional receptive field trace from a hover
  * at position ([hoverH], [hoverW]) on [sourceTensor].
@@ -112,10 +118,8 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth:
     for (conn in layer.outgoingTensorConnectors) {
         val (outH, outW, kernelH, kernelW, boxRow, boxCol) = when (conn) {
             is ConvolutionConnector -> {
-                val outH = (h + conn.padH) / conn.stride
-                val outW = (w + conn.padW) / conn.stride
-                val clampedOutH = outH.coerceIn(0, conn.target.shape.height - 1)
-                val clampedOutW = outW.coerceIn(0, conn.target.shape.width - 1)
+                val clampedOutH = centeredTraceIndex(h, conn.padH, conn.stride, conn.kernelSize, conn.target.shape.height)
+                val clampedOutW = centeredTraceIndex(w, conn.padW, conn.stride, conn.kernelSize, conn.target.shape.width)
                 val boxRow = clampedOutH * conn.stride - conn.padH
                 val boxCol = clampedOutW * conn.stride - conn.padW
                 ForwardResult(clampedOutH, clampedOutW, conn.kernelSize, conn.kernelSize, boxRow, boxCol)

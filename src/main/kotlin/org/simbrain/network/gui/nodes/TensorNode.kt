@@ -3,14 +3,15 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.*
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
@@ -39,7 +40,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     /** Pre-allocated buffer for extracting a single channel's data. */
     private val channelBuffer = DoubleArray(tensorLayer.shape.height * tensorLayer.shape.width)
 
-    private val activationImage = PImage().apply {
+    private val activationImage = SimbrainImage().apply {
         mainNode.addChild(this)
         pickable = true
         addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
@@ -84,7 +85,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     /** Pre-allocated PImage nodes for each thumbnail. */
     private val thumbPImages = Array(numChannels) { c ->
-        PImage(thumbImages[c]).apply {
+        SimbrainImage(thumbImages[c]).apply {
             val x = thumbStartX + c * (thumbSize + thumbGap)
             setBounds(x, thumbStripY, thumbSize, thumbSize)
             addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
@@ -336,25 +337,40 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
-        if (traceBoxes.isEmpty()) return
         val g2 = paintContext.graphics
-        val scaleX = imageSize / tensorLayer.shape.width
-        val scaleY = imageSize / tensorLayer.shape.height
 
-        for (box in traceBoxes) {
-            val px = box.col * scaleX
-            val py = box.row * scaleY
-            val pw = box.width * scaleX
-            val ph = box.height * scaleY
+        // Trace boxes
+        if (traceBoxes.isNotEmpty()) {
+            val scaleX = imageSize / tensorLayer.shape.width
+            val scaleY = imageSize / tensorLayer.shape.height
 
-            // Semi-transparent fill
-            g2.color = Color(box.color.red, box.color.green, box.color.blue, 60)
-            g2.fillRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+            for (box in traceBoxes) {
+                val px = box.col * scaleX
+                val py = box.row * scaleY
+                val pw = box.width * scaleX
+                val ph = box.height * scaleY
 
-            // Border
-            g2.color = box.color
-            g2.stroke = BasicStroke(2f)
-            g2.drawRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+                g2.color = Color(box.color.red, box.color.green, box.color.blue, 60)
+                g2.fillRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+
+                g2.color = box.color
+                g2.stroke = BasicStroke(2f)
+                g2.drawRect(px.toInt(), py.toInt(), pw.toInt().coerceAtLeast(1), ph.toInt().coerceAtLeast(1))
+            }
+        }
+
+        // Numeric overlay (re-extract current channel since channelBuffer may have been
+        // overwritten by thumbnail strip rendering which iterates all channels)
+        if (NetworkPreferences.showNumericOverlays
+            && (!tensorLayer.rgbComposite || tensorLayer.shape.channels != 3)) {
+            extractChannel(tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1))
+            g2.drawNumericOverlay(
+                data = channelBuffer,
+                rows = tensorLayer.shape.height, cols = tensorLayer.shape.width,
+                imageWidth = imageSize, imageHeight = imageSize,
+                scalingFactor = networkPanel.scalingFactor,
+                decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
+            )
         }
     }
 

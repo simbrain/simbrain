@@ -3,7 +3,6 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
@@ -13,6 +12,7 @@ import org.simbrain.network.core.TensorConnector
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.BasicStroke
@@ -87,7 +87,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     }
 
     /** Pre-allocated grid cell PImage nodes: [filter][channel]. */
-    private val gridCellPImages: Array<Array<PImage>>? = (connector as? ConvolutionConnector)?.let { conv ->
+    private val gridCellPImages: Array<Array<SimbrainImage>>? = (connector as? ConvolutionConnector)?.let { conv ->
         val kSize = conv.kernelSize
         val numFilters = conv.numFilters
         val inputChannels = conv.source.shape.channels
@@ -124,7 +124,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             Array(inputChannels) { c ->
                 val x = labelOffset + c * (cellSize + gap)
                 val y = labelOffset + f * (cellSize + gap)
-                val pImage = PImage(gridCellImages!![f][c])
+                val pImage = SimbrainImage(gridCellImages!![f][c])
                 pImage.setBounds(x, y, cellSize, cellSize)
                 kernelGridGroup.addChild(pImage)
 
@@ -364,39 +364,57 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
-        val highlight = traceHighlight ?: return
-        val conv = connector as? ConvolutionConnector ?: return
-        if (conv.kernelGridMode) {
-            val cellPImages = gridCellPImages ?: return
-            val g2 = paintContext.graphics
-            g2.color = highlight.color
-            g2.stroke = BasicStroke(2f)
-            val gridOffset = kernelGridGroup.offset
+        val g2 = paintContext.graphics
+        val conv = connector as? ConvolutionConnector
 
-            val cells = when (highlight.mode) {
-                HighlightMode.ROW -> {
-                    // Highlight all input channels for the given filter
-                    val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
-                    (0 until cellPImages[f].size).map { c -> cellPImages[f][c] }
+        // Trace highlighting
+        val highlight = traceHighlight
+        if (highlight != null && conv != null && conv.kernelGridMode) {
+            val cellPImages = gridCellPImages
+            if (cellPImages != null) {
+                g2.color = highlight.color
+                g2.stroke = BasicStroke(2f)
+                val gridOffset = kernelGridGroup.offset
+
+                val cells = when (highlight.mode) {
+                    HighlightMode.ROW -> {
+                        val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
+                        (0 until cellPImages[f].size).map { c -> cellPImages[f][c] }
+                    }
+                    HighlightMode.COLUMN -> {
+                        val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
+                        (0 until cellPImages.size).map { f -> cellPImages[f][c] }
+                    }
+                    HighlightMode.CELL -> {
+                        val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
+                        val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
+                        listOf(cellPImages[f][c])
+                    }
                 }
-                HighlightMode.COLUMN -> {
-                    // Highlight all filters for the given input channel
-                    val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
-                    (0 until cellPImages.size).map { f -> cellPImages[f][c] }
-                }
-                HighlightMode.CELL -> {
-                    val f = highlight.filter.coerceIn(0, cellPImages.size - 1)
-                    val c = highlight.inputChannel.coerceIn(0, cellPImages[0].size - 1)
-                    listOf(cellPImages[f][c])
+
+                for (cell in cells) {
+                    val cellBounds = cell.bounds
+                    val drawX = gridOffset.x + cellBounds.x
+                    val drawY = gridOffset.y + cellBounds.y
+                    g2.drawRect(drawX.toInt(), drawY.toInt(), cellBounds.width.toInt(), cellBounds.height.toInt())
                 }
             }
+        }
 
-            for (cell in cells) {
-                val cellBounds = cell.bounds
-                val drawX = gridOffset.x + cellBounds.x
-                val drawY = gridOffset.y + cellBounds.y
-                g2.drawRect(drawX.toInt(), drawY.toInt(), cellBounds.width.toInt(), cellBounds.height.toInt())
-            }
+        // Numeric overlay for single kernel view
+        if (NetworkPreferences.showNumericOverlays && conv != null && !conv.kernelGridMode) {
+            val slice = kernelSlice ?: return
+            val kSize = conv.kernelSize
+            val boxOffset = imageBox.offset
+            g2.drawNumericOverlay(
+                data = slice,
+                rows = kSize, cols = kSize,
+                imageWidth = imgSize.toDouble(), imageHeight = imgSize.toDouble(),
+                scalingFactor = networkPanel.scalingFactor,
+                decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
+                offsetX = boxOffset.x,
+                offsetY = boxOffset.y
+            )
         }
     }
 

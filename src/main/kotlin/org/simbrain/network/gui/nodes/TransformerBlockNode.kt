@@ -25,7 +25,7 @@ import javax.swing.*
 class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: TransformerBlock) :
     ArrayLayerNode(networkPanel, transformerBlock) {
 
-    val selfAttentionImage = PImage().apply {
+    val selfAttentionImage = SimbrainImage().apply {
         mainNode.addChild(this)
     }
 
@@ -35,19 +35,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         mainNode.addChild(this)
     }
 
-    val qSequenceImage = PImage().apply {
+    val qSequenceImage = SimbrainImage().apply {
         sequenceGroup.addChild(this)
     }
 
     val qSequenceLabel = sequenceGroup.addLabel("q (${transformerBlock.qStack.shapeString})")
 
-    val kSequenceImage = PImage().apply {
+    val kSequenceImage = SimbrainImage().apply {
         sequenceGroup.addChild(this)
     }
 
     val kSequenceLabel = sequenceGroup.addLabel("k (${transformerBlock.qStack.shapeString})")
 
-    val vSequenceImage = PImage().apply {
+    val vSequenceImage = SimbrainImage().apply {
         sequenceGroup.addChild(this)
     }
 
@@ -57,19 +57,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         mainNode.addChild(this)
     }
 
-    val qMatrixImage = PImage().apply {
+    val qMatrixImage = SimbrainImage().apply {
         matrixGroup.addChild(this)
     }
 
     val qMatrixLabel = matrixGroup.addLabel("Q (${transformerBlock.Q.shapeString})")
 
-    val kMatrixImage = PImage().apply {
+    val kMatrixImage = SimbrainImage().apply {
         matrixGroup.addChild(this)
     }
 
     val kMatrixLabel = matrixGroup.addLabel("K (${transformerBlock.K.shapeString})")
 
-    val vMatrixImage = PImage().apply {
+    val vMatrixImage = SimbrainImage().apply {
         matrixGroup.addChild(this)
     }
 
@@ -79,19 +79,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         mainNode.addChild(this)
     }
 
-    val feedForwardInputImage = PImage().apply {
+    val feedForwardInputImage = SimbrainImage().apply {
         feedForwardGroup.addChild(this)
     }
 
     val feedForwardInputLabel = feedForwardGroup.addLabel("FF Input (${transformerBlock.feedForwardInput.shapeString})")
 
-    val feedForwardHiddenImage = PImage().apply {
+    val feedForwardHiddenImage = SimbrainImage().apply {
         feedForwardGroup.addChild(this)
     }
 
     val feedForwardHiddenLabel = feedForwardGroup.addLabel("FF Hidden (${transformerBlock.feedForwardHidden.shapeString})")
 
-    val feedForwardOutputImage = PImage().apply {
+    val feedForwardOutputImage = SimbrainImage().apply {
         feedForwardGroup.addChild(this)
     }
 
@@ -100,13 +100,13 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     // Track current arrows so they can be removed when updating
     private val currentArrows = mutableListOf<Arrow>()
 
-    val feedForwardW1Image = PImage().apply {
+    val feedForwardW1Image = SimbrainImage().apply {
         feedForwardGroup.addChild(this)
     }
 
     val feedForwardW1Label = feedForwardGroup.addLabel("Input -> Hidden (${transformerBlock.W1.shapeString})")
 
-    val feedForwardW2Image = PImage().apply {
+    val feedForwardW2Image = SimbrainImage().apply {
         feedForwardGroup.addChild(this)
     }
 

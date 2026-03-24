@@ -115,6 +115,14 @@ object NetworkPreferences: PreferenceHolder() {
     var neuronActivationDecimalPlaces by IntegerPreference(1)
 
     @UserParameter(
+        label = "Show numeric overlays",
+        description = "Show numeric values on neuron arrays, weight matrices, tensors, and connectors when zoomed in",
+        tab = "GUI",
+        order = 25
+    )
+    var showNumericOverlays by BooleanPreference(true)
+
+    @UserParameter(
         label = "Tooltip decimal places",
         description = "Number of decimal places to display in neuron tooltips",
         minimumValue = 0.0,

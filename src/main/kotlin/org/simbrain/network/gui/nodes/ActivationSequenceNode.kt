@@ -2,12 +2,12 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.nodes.PImage
 import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
 import org.simbrain.network.gui.*
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
@@ -26,18 +26,18 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     /**
      * Main pixel image for activations.
      */
-    protected val activationImage = PImage().apply {
+    protected val activationImage = SimbrainImage().apply {
         mainNode.addChild(this)
     }
 
     /**
      * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
      */
-    private val spikeImage = PImage().apply {
+    private val spikeImage = SimbrainImage().apply {
         mainNode.addChild(this)
     }
 
-    protected val biasImage = PImage()
+    protected val biasImage = SimbrainImage()
 
     val imageSize = 100.0
 

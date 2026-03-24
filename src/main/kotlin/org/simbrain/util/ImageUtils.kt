@@ -3,8 +3,8 @@ package org.simbrain.util
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightMatrixImageMaxSize
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
-import java.awt.Color
-import java.awt.GraphicsEnvironment
+import java.awt.*
+import java.awt.font.TextLayout
 import java.awt.geom.AffineTransform
 import java.awt.geom.Rectangle2D
 import java.awt.image.*
@@ -12,6 +12,7 @@ import javax.swing.ImageIcon
 import javax.swing.JLabel
 import javax.swing.JPanel
 import kotlin.math.floor
+import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
@@ -355,6 +356,100 @@ fun BufferedImage.getBrightnessArray() = getRGB(0, 0, width, height, null, 0, wi
     red * 0.2126 + green * 0.7152 + blue * 0.0722
 }.toDoubleArray()
 
+
+/**
+ * Minimum on-screen pixel size of a cell before numeric values are drawn.
+ */
+const val NUMERIC_OVERLAY_MIN_CELL_SIZE = 25.0
+
+/**
+ * Draw numeric value labels over a grid of cells. Only cells visible in the current clip are drawn.
+ * Text is rendered as black with a white outline for readability over any background color.
+ * Font size is computed once from a worst-case reference string so that all cells use the same size.
+ */
+fun Graphics2D.drawNumericOverlay(
+    data: DoubleArray,
+    rows: Int,
+    cols: Int,
+    imageWidth: Double,
+    imageHeight: Double,
+    scalingFactor: Double,
+    decimalPlaces: Int,
+    offsetX: Double = 0.0,
+    offsetY: Double = 0.0
+) {
+    val cellWidth = imageWidth / cols
+    val cellHeight = imageHeight / rows
+    val cellScreenSize = min(cellWidth, cellHeight) * scalingFactor
+    if (cellScreenSize < NUMERIC_OVERLAY_MIN_CELL_SIZE) return
+
+    // Determine visible cell range from clip bounds
+    val clip = clipBounds
+    val startCol: Int
+    val endCol: Int
+    val startRow: Int
+    val endRow: Int
+    if (clip != null) {
+        startCol = max(0, ((clip.x - offsetX) / cellWidth).toInt())
+        endCol = min(cols - 1, ((clip.x + clip.width - offsetX) / cellWidth).toInt())
+        startRow = max(0, ((clip.y - offsetY) / cellHeight).toInt())
+        endRow = min(rows - 1, ((clip.y + clip.height - offsetY) / cellHeight).toInt())
+    } else {
+        startCol = 0
+        endCol = cols - 1
+        startRow = 0
+        endRow = rows - 1
+    }
+
+    val frc = fontRenderContext
+
+    // Compute a single font size for the entire grid using a worst-case reference string
+    val refString = "-" + "8".repeat(decimalPlaces + 1) + "." + "8".repeat(decimalPlaces)
+    val targetTextWidth = cellWidth * 0.6
+    val targetTextHeight = cellHeight * 0.6
+    val baseFont = Font("SansSerif", Font.PLAIN, 12)
+    val refLayout = TextLayout(refString, baseFont, frc)
+    val scaleByWidth = if (refLayout.bounds.width > 0) targetTextWidth / refLayout.bounds.width else 1.0
+    val scaleByHeight = if (refLayout.bounds.height > 0) targetTextHeight / refLayout.bounds.height else 1.0
+    val scaleFactor = min(scaleByWidth, scaleByHeight)
+    val fontSize = (12.0 * scaleFactor).toFloat()
+    val scaledFont = baseFont.deriveFont(fontSize)
+
+    // Outline stroke proportional to font size (~15% of font size)
+    val outlineStroke = BasicStroke(fontSize * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+
+    // Use antialiasing for text
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+
+    for (row in startRow..endRow) {
+        for (col in startCol..endCol) {
+            val idx = row * cols + col
+            if (idx >= data.size) continue
+
+            val text = data[idx].format(decimalPlaces)
+            if (text.isEmpty()) continue
+
+            val layout = TextLayout(text, scaledFont, frc)
+            val textBounds = layout.bounds
+
+            // Center in cell
+            val cx = offsetX + col * cellWidth + (cellWidth - textBounds.width) / 2 - textBounds.x
+            val cy = offsetY + row * cellHeight + (cellHeight + textBounds.height) / 2
+
+            val outline = layout.getOutline(AffineTransform.getTranslateInstance(cx, cy))
+
+            // White outline
+            stroke = outlineStroke
+            color = Color.WHITE
+            draw(outline)
+
+            // Black fill
+            color = Color.BLACK
+            fill(outline)
+        }
+    }
+}
 
 fun main() {
     println(graphicalUpperBound(820.0))

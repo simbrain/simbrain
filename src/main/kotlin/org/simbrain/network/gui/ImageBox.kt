@@ -1,9 +1,9 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.piccolo.SimbrainImage
 import java.awt.BasicStroke
 import java.awt.image.BufferedImage
 
@@ -28,7 +28,7 @@ class ImageBox(val width: Int, val height: Int, thickness: Float) : PNode() {
         }
         .also { addChild(it) }
 
-    private val pImage = PImage().also {
+    private val pImage = SimbrainImage().also {
         it.setBounds(0.0, 0.0, width.toDouble(), height.toDouble())
         addChild(it)
     }

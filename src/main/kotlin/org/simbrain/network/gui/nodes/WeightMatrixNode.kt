@@ -131,6 +131,43 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         super.paint(paintContext)
     }
 
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        if (!NetworkPreferences.showNumericOverlays) return
+        val wm = weightMatrix as? WeightMatrix ?: return
+        val matrix = wm.weights
+        val rows: Int
+        val cols: Int
+        val data: DoubleArray
+        if (NetworkPreferences.weightMatrixTargetSource) {
+            rows = matrix.nrow()
+            cols = matrix.ncol()
+            data = matrix.flatten()
+        } else {
+            rows = matrix.ncol()
+            cols = matrix.nrow()
+            // Transpose: read column-major from original matrix
+            data = DoubleArray(rows * cols).also { arr ->
+                for (r in 0 until rows) {
+                    for (c in 0 until cols) {
+                        arr[r * cols + c] = matrix[c, r]
+                    }
+                }
+            }
+        }
+        val g2 = paintContext.graphics
+        val boxOffset = imageBox.offset
+        g2.drawNumericOverlay(
+            data = data,
+            rows = rows, cols = cols,
+            imageWidth = imageWidth.toDouble(), imageHeight = imageHeight.toDouble(),
+            scalingFactor = networkPanel.scalingFactor,
+            decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
+            offsetX = boxOffset.x,
+            offsetY = boxOffset.y
+        )
+    }
+
     override val isDraggable: Boolean = false
 
     override val toolTipText: String

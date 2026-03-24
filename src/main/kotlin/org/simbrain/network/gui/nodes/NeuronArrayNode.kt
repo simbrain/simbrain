@@ -3,7 +3,7 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PImage
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
@@ -11,6 +11,7 @@ import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
@@ -75,18 +76,18 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     /**
      * Main pixel image for activations.
      */
-    protected val activationImage = PImage().apply {
+    protected val activationImage = SimbrainImage().apply {
         imageNodeGroup.addChild(this)
     }
 
     /**
      * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
      */
-    private val spikeImage = PImage().apply {
+    private val spikeImage = SimbrainImage().apply {
         imageNodeGroup.addChild(this)
     }
 
-    protected val biasImage = PImage()
+    protected val biasImage = SimbrainImage()
 
     /**
      * Background for label text, so that background objects don't show up.
@@ -261,6 +262,38 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             } else {
                 renderFlatImages()
             }
+        }
+    }
+
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        if (neuronArray.circleMode) return
+        if (!NetworkPreferences.showNumericOverlays) return
+        val activations = neuronArray.activations.toDoubleArray()
+        val g2 = paintContext.graphics
+        val decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
+
+        if (gridMode) {
+            val len = ceil(sqrt(activations.size.toDouble())).toInt()
+            g2.drawNumericOverlay(
+                data = activations,
+                rows = len, cols = len,
+                imageWidth = imageSize, imageHeight = imageSize,
+                scalingFactor = networkPanel.scalingFactor,
+                decimalPlaces = decimalPlaces,
+                offsetX = activationImage.xOffset,
+                offsetY = activationImage.yOffset
+            )
+        } else {
+            g2.drawNumericOverlay(
+                data = activations,
+                rows = 1, cols = activations.size,
+                imageWidth = imageSize, imageHeight = flatPixelArrayHeight.toDouble(),
+                scalingFactor = networkPanel.scalingFactor,
+                decimalPlaces = decimalPlaces,
+                offsetX = activationImage.xOffset,
+                offsetY = activationImage.yOffset
+            )
         }
     }
 

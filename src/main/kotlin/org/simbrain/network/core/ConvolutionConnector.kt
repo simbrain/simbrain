@@ -24,7 +24,12 @@ class ConvolutionConnector(
     val numFilters: Int = 8,
     @UserParameter(label = "Stride", description = "Convolution stride", displayOnly = true, order = 3)
     val stride: Int = 1,
-    @UserParameter(label = "Padding", description = "Padding strategy", displayOnly = true, order = 4)
+    @UserParameter(
+        label = "Padding",
+        description = "Valid keeps the kernel inside the input with no padding, while Same pads the input so the kernel can extend beyond the original edges.",
+        displayOnly = true,
+        order = 4
+    )
     val padding: Padding = Padding.SAME
 ) : TensorConnector(source, target) {
 

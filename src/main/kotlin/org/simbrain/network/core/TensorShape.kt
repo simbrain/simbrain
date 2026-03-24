@@ -60,6 +60,8 @@ enum class Padding {
     /** No padding - output shrinks. */
     VALID {
         override fun compute(h: Int, w: Int, kernelSize: Int, stride: Int) = 0 to 0
+
+        override fun toString(): String = "Valid (unpadded)"
     },
     /** Pad so output has same spatial dimensions as input (when stride=1). */
     SAME {
@@ -74,6 +76,8 @@ enum class Padding {
             val padW = (totalPadW + 1) / 2
             return padH to padW
         }
+
+        override fun toString(): String = "Same (padded)"
     };
 
     abstract fun compute(h: Int, w: Int, kernelSize: Int, stride: Int): Pair<Int, Int>

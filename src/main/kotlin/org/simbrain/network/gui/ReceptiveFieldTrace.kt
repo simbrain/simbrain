@@ -67,14 +67,6 @@ private fun NetworkPanel.traceState() = traceStates.getOrPut(this) { TraceState(
 fun NetworkPanel.updateReceptiveFieldTrace(sourceTensor: TensorLayer, hoverH: Int, hoverW: Int) {
     clearReceptiveFieldTrace()
 
-    // Draw a marker on the hovered layer itself
-    val hoveredNode = getNode(sourceTensor) as? TensorNode
-    if (hoveredNode != null) {
-        hoveredNode.traceBoxes.add(TraceBox(hoverH, hoverW, 1, 1, traceColor(0)))
-        traceState().tracedTensorNodes.add(hoveredNode)
-        hoveredNode.repaint()
-    }
-
     traceForward(sourceTensor, hoverH, hoverW, 0)
     traceBackward(sourceTensor, hoverH, hoverW, 0)
 }
@@ -167,10 +159,6 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth:
             state.savedChannels.add(conn.target to conn.target.currentChannel)
             conn.target.currentChannel = conn.currentFilter
         }
-
-        targetNode.traceBoxes.add(TraceBox(outH, outW, 1, 1, nextColor))
-        if (targetNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(targetNode)
-        targetNode.repaint()
 
         traceForward(conn.target, outH, outW, depth + 1)
     }

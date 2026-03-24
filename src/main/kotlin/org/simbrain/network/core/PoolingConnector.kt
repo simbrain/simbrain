@@ -21,8 +21,8 @@ class PoolingConnector(
     val poolSize: Int = 2,
     @UserParameter(label = "Stride", description = "Pooling stride", displayOnly = true, order = 2)
     val stride: Int = 2,
-    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", displayOnly = true, order = 3)
-    val poolingType: PoolingType = PoolingType.MAX
+    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", order = 3)
+    var poolingType: PoolingType = PoolingType.MAX
 ) : TensorConnector(source, target) {
 
     /** Indices of max elements for each output position (for future backprop). */

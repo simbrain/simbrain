@@ -224,7 +224,11 @@ class ConvLayerTemplate : EditableObject {
     @UserParameter(label = "Stride", description = "Convolution stride", minimumValue = 1.0, order = 3)
     var stride = 1
 
-    @UserParameter(label = "Padding", description = "Padding strategy", order = 4)
+    @UserParameter(
+        label = "Padding",
+        description = "Valid keeps the kernel inside the input with no padding, while Same pads the input so the kernel can extend beyond the original edges.",
+        order = 4
+    )
     var padding = Padding.SAME
 
     @UserParameter(label = "Activation", description = "Activation function for output tensor", order = 5)

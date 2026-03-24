@@ -3,9 +3,11 @@
  */
 package org.simbrain.util
 
+import kotlinx.coroutines.*
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
+import java.util.concurrent.atomic.AtomicLong
 import kotlin.math.ln
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -223,25 +225,68 @@ fun createMatrix(m: Int, n: Int, binaryOperation: (i: Int, j: Int) -> Double): A
     return matrix
 }
 
-fun computeCorrelationMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
-    computeCorrelation(data[i], data[j])
+/**
+ * Creates a symmetric matrix using coroutines for parallelism. Only computes the upper triangle
+ * and mirrors it, cutting work in half. Rows are processed concurrently on [Dispatchers.Default].
+ *
+ * Supports cancellation via the coroutine scope and reports progress via [onProgress] (0..100).
+ *
+ * @param diagonal the value to place on the diagonal (e.g. 1.0 for correlation)
+ * @param onProgress called with percentage complete (0..100)
+ */
+suspend fun createSymmetricMatrix(
+    n: Int,
+    diagonal: Double = 1.0,
+    onProgress: (Int) -> Unit = {},
+    operation: (i: Int, j: Int) -> Double
+): Array<DoubleArray> = coroutineScope {
+    val matrix = Array(n) { DoubleArray(n) }
+    for (i in 0 until n) {
+        matrix[i][i] = diagonal
+    }
+    val totalPairs = n.toLong() * (n - 1) / 2
+    val completedPairs = AtomicLong(0)
+    (0 until n).map { i ->
+        async(Dispatchers.Default) {
+            for (j in i + 1 until n) {
+                ensureActive()
+                val value = operation(i, j)
+                matrix[i][j] = value
+                matrix[j][i] = value
+                val done = completedPairs.incrementAndGet()
+                if (done % n == 0L) {
+                    onProgress(if (totalPairs > 0) (done * 100 / totalPairs).toInt() else 100)
+                }
+            }
+        }
+    }.awaitAll()
+    matrix
 }
 
-fun computeCovarianceMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
-    computeCovariance(data[i], data[j])
-}
+suspend fun computeCorrelationMatrix(data: Array<DoubleArray>, onProgress: (Int) -> Unit = {}) =
+    createSymmetricMatrix(data.size, onProgress = onProgress) { i, j ->
+        computeCorrelation(data[i], data[j])
+    }
 
-fun computeSimilarityMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
-    data[i].euclideanDistance(data[j])
-}
+suspend fun computeCovarianceMatrix(data: Array<DoubleArray>, onProgress: (Int) -> Unit = {}) =
+    createSymmetricMatrix(data.size, onProgress = onProgress) { i, j ->
+        computeCovariance(data[i], data[j])
+    }
 
-fun computeCosineSimilarityMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
-    smile.math.MathEx.cos(data[i], data[j])
-}
+suspend fun computeSimilarityMatrix(data: Array<DoubleArray>, onProgress: (Int) -> Unit = {}) =
+    createSymmetricMatrix(data.size, diagonal = 0.0, onProgress = onProgress) { i, j ->
+        data[i].euclideanDistance(data[j])
+    }
 
-fun computeDotProductMatrix(data: Array<DoubleArray>) = createMatrix(data.size, data.size) { i, j ->
-    data[i] dot data[j]
-}
+suspend fun computeCosineSimilarityMatrix(data: Array<DoubleArray>, onProgress: (Int) -> Unit = {}) =
+    createSymmetricMatrix(data.size, onProgress = onProgress) { i, j ->
+        smile.math.MathEx.cos(data[i], data[j])
+    }
+
+suspend fun computeDotProductMatrix(data: Array<DoubleArray>, onProgress: (Int) -> Unit = {}) =
+    createSymmetricMatrix(data.size, onProgress = onProgress) { i, j ->
+        data[i] dot data[j]
+    }
 
 fun DoubleArray.outerProduct(other: DoubleArray) = toColumnVector().mt(other.toColumnVector())
 

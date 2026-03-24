@@ -1,99 +1,80 @@
 package org.simbrain.util.widgets
 
+import kotlinx.coroutines.*
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import java.awt.*
-import java.awt.image.BufferedImage
 import javax.swing.*
 import kotlin.math.abs
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.random.Random
 
 /**
  * Produce something like an R Corrplot.
+ *
+ * Paints directly without an off-screen buffer. When placed in a JScrollPane,
+ * only the visible cells are drawn, so it scales to large matrices.
  *
  * @param labels column and row headings
  * @param data the matrix data to represent
  */
 class MatrixPlot(private val labels: List<String>, private val data: Array<DoubleArray>) : JPanel() {
 
-    private val maxCellSize = 100
-    private val minCellSize = 50
-    private var currentCellSize = 50
+    private val cellSize = 50
 
-    private val magnitude = data.flatten().maxOf { abs(it) }
+    private val magnitude = data.flatten().maxOfOrNull { abs(it) }?.coerceAtLeast(1e-12) ?: 1.0
 
     var properties = MatrixPlotProperties()
 
-    private var buffer: BufferedImage? = null
-
     init {
-        adjustCellSize()
-    }
-
-    private fun adjustCellSize() {
-        val frameSize = parent?.width ?: 800  // Assuming default width if parent not yet available
-        currentCellSize = (frameSize / (labels.size + 2)).coerceIn(minCellSize, maxCellSize)
-        val totalSize = (labels.size + 2) * currentCellSize
+        val totalSize = (labels.size + 2) * cellSize
         preferredSize = Dimension(totalSize, totalSize)
-    }
-
-    private fun rebuildBuffer() {
-        // Adjust cell size and other calculations as needed before rebuilding the buffer
-        adjustCellSize()
-
-        val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform
-        val widthScaled = (width * transform.scaleX).toInt()
-        val heightScaled = (height * transform.scaleY).toInt()
-
-        buffer = BufferedImage(widthScaled, heightScaled, BufferedImage.TYPE_INT_ARGB)
-        val g = buffer!!.createGraphics()
-        g.transform = transform
-
-        // Drawing the matrix cells
-        for (i in labels.indices) {
-            for (j in labels.indices) {
-                val value = data[i][j]
-                g.color = Color(value.toSimbrainColor(
-                    if (properties.fixedColorScale) {
-                        properties.minValue..properties.maxValue
-                    } else {
-                        -magnitude..magnitude
-                    }
-                ))
-                g.fillRect(currentCellSize + j * currentCellSize, currentCellSize + i * currentCellSize, currentCellSize, currentCellSize)
-                g.color = Color.BLACK
-                if (currentCellSize >= 40) {
-                    g.drawString("%.2f".format(value), currentCellSize + j * currentCellSize + 10, currentCellSize + i * currentCellSize + 30)
-                }
-            }
-        }
-
-        // Drawing the labels
-        for (i in labels.indices) {
-            g.drawString(labels[i], i * currentCellSize + 10 + currentCellSize, currentCellSize - 10)
-            g.drawString(labels[i], 10, i * currentCellSize + 30 + currentCellSize)
-        }
-
-        g.dispose() // Dispose of the graphics context to release resources
-    }
-
-    private fun shouldRebuildBuffer(): Boolean {
-        val transform = GraphicsEnvironment.getLocalGraphicsEnvironment().defaultScreenDevice.defaultConfiguration.defaultTransform
-        val widthScaled = (width * transform.scaleX).toInt()
-        val heightScaled = (height * transform.scaleY).toInt()
-        return buffer == null ||
-                buffer!!.width != widthScaled ||
-                buffer!!.height != heightScaled // Add other conditions as needed
     }
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
-        if (buffer == null || shouldRebuildBuffer()) { // Check if the buffer needs to be rebuilt
-            rebuildBuffer()
+        val g2 = g as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+
+        val clip = g2.clipBounds ?: Rectangle(0, 0, width, height)
+
+        // Determine visible cell range to avoid painting the entire matrix
+        val colStart = max(0, (clip.x - cellSize) / cellSize - 1)
+        val colEnd = min(labels.size - 1, (clip.x + clip.width) / cellSize)
+        val rowStart = max(0, (clip.y - cellSize) / cellSize - 1)
+        val rowEnd = min(labels.size - 1, (clip.y + clip.height) / cellSize)
+
+        val colorRange = if (properties.fixedColorScale) {
+            properties.minValue..properties.maxValue
+        } else {
+            -magnitude..magnitude
         }
 
-        g.drawImage(buffer, 0, 0, width, height, this)
+        for (i in rowStart..rowEnd) {
+            for (j in colStart..colEnd) {
+                val cx = cellSize + j * cellSize
+                val cy = cellSize + i * cellSize
+                val value = data[i][j]
+                g2.color = Color(value.toSimbrainColor(colorRange))
+                g2.fillRect(cx, cy, cellSize, cellSize)
+                g2.color = Color.BLACK
+                g2.drawString("%.2f".format(value), cx + 5, cy + cellSize / 2 + 5)
+            }
+        }
+
+        // Draw labels only if they intersect the clip region
+        for (i in labels.indices) {
+            val topLabelX = cellSize + i * cellSize + 5
+            if (topLabelX + cellSize >= clip.x && topLabelX <= clip.x + clip.width && clip.y < cellSize) {
+                g2.drawString(labels[i], topLabelX, cellSize - 10)
+            }
+            val leftLabelY = cellSize + i * cellSize + cellSize / 2 + 5
+            if (leftLabelY + 15 >= clip.y && leftLabelY - 15 <= clip.y + clip.height && clip.x < cellSize) {
+                g2.drawString(labels[i], 5, leftLabelY)
+            }
+        }
     }
 
 }
@@ -119,43 +100,104 @@ class MatrixPlotProperties: EditableObject {
 
 class CorrPlotPanel(private val labels: List<String>, private val data: Array<DoubleArray>): JPanel(BorderLayout()) {
 
-    var matrixPlot = MatrixPlot(labels, computeCorrelationMatrix(data))
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private var computeJob: Job? = null
+    private var displayedFunction = "Correlation"
+    private var suppressComboAction = false
 
-    val matrixPlotPanel = JScrollPane(matrixPlot).apply {
+    var matrixPlot: MatrixPlot? = null
+
+    private val progressBar = JProgressBar(0, 100).apply {
+        isStringPainted = true
+        string = "Computing..."
+        isVisible = false
+    }
+
+    private val cancelButton = JButton("Cancel").apply {
+        isVisible = false
+        addActionListener { computeJob?.cancel() }
+    }
+
+    private val progressPanel = JPanel(BorderLayout()).apply {
+        add(progressBar, BorderLayout.CENTER)
+        add(cancelButton, BorderLayout.EAST)
+        isVisible = false
+    }
+
+    val matrixPlotPanel = JScrollPane().apply {
         border = null
         verticalScrollBar.unitIncrement = 10
         horizontalScrollBar.unitIncrement = 10
         minimumSize = Dimension(400, 400)
     }
 
+    private val functionComboBox = JComboBox(
+        arrayOf("Correlation", "Cosine Similarity", "Covariance", "Dot Product", "Euclidean Distance")
+    ).apply {
+        addActionListener {
+            if (suppressComboAction) return@addActionListener
+            val selected = selectedItem as? String ?: return@addActionListener
+            computeAndDisplay(selected)
+        }
+        maximumSize = Dimension(150, preferredSize.height)
+    }
+
     val toolbar = JToolBar().apply {
         isFloatable = false
         add(JLabel("Comparison Function: "))
-        val binaryOperations =
-            arrayOf("Correlation", "Cosine Similarity", "Covariance", "Dot Product", "Euclidean Distance")
-        add(JComboBox(binaryOperations).apply {
-            addActionListener { e ->
-                val functionSelected = (e?.source as? JComboBox<*>)?.selectedItem as? String
-                val newPanel = when (functionSelected) {
-                    "Correlation" -> MatrixPlot(labels, computeCorrelationMatrix(data))
-                    "Covariance" -> MatrixPlot(labels, computeCovarianceMatrix(data))
-                    "Cosine Similarity" -> MatrixPlot(labels, computeCosineSimilarityMatrix(data))
-                    "Euclidean Distance" -> MatrixPlot(labels, computeSimilarityMatrix(data))
-                    "Dot Product" -> MatrixPlot(labels, computeDotProductMatrix(data))
-                    else -> MatrixPlot(labels, computeCorrelationMatrix(data))
-                }
-                matrixPlotPanel.remove(matrixPlot)
-                matrixPlotPanel.viewport.view = newPanel
-                revalidate()
-                matrixPlotPanel.revalidate()
-            }
-            maximumSize = Dimension(150, preferredSize.height)
-        })
+        add(functionComboBox)
     }
 
     init {
+        preferredSize = Dimension(700, 700)
         add(toolbar, BorderLayout.NORTH)
+        add(progressPanel, BorderLayout.SOUTH)
         add(matrixPlotPanel, BorderLayout.CENTER)
+        computeAndDisplay("Correlation")
+    }
+
+    private fun computeAndDisplay(functionName: String) {
+        computeJob?.cancel()
+        progressPanel.isVisible = true
+        progressBar.isVisible = true
+        progressBar.value = 0
+        cancelButton.isVisible = true
+        functionComboBox.isEnabled = false
+
+        computeJob = scope.launch {
+            val onProgress: (Int) -> Unit = { pct ->
+                SwingUtilities.invokeLater {
+                    progressBar.value = pct
+                    progressBar.string = "Computing $functionName... $pct%"
+                }
+            }
+            try {
+                val result = when (functionName) {
+                    "Correlation" -> computeCorrelationMatrix(data, onProgress)
+                    "Covariance" -> computeCovarianceMatrix(data, onProgress)
+                    "Cosine Similarity" -> computeCosineSimilarityMatrix(data, onProgress)
+                    "Euclidean Distance" -> computeSimilarityMatrix(data, onProgress)
+                    "Dot Product" -> computeDotProductMatrix(data, onProgress)
+                    else -> computeCorrelationMatrix(data, onProgress)
+                }
+                matrixPlot = MatrixPlot(labels, result)
+                matrixPlotPanel.viewport.view = matrixPlot
+                displayedFunction = functionName
+                revalidate()
+            } catch (_: CancellationException) {
+                suppressComboAction = true
+                functionComboBox.selectedItem = displayedFunction
+                suppressComboAction = false
+            } finally {
+                progressPanel.isVisible = false
+                functionComboBox.isEnabled = true
+            }
+        }
+    }
+
+    fun cancelComputation() {
+        computeJob?.cancel()
+        scope.cancel()
     }
 }
 

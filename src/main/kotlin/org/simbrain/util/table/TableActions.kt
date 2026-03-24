@@ -583,8 +583,9 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         name = "Show preferences...",
         iconPath = "menu_icons/Tools.png"
     ) {
-        corrPlot.matrixPlot.properties.createEditorDialog {
-            corrPlot.matrixPlot.repaint()
+        val plot = corrPlot.matrixPlot ?: return@createAction
+        plot.properties.createEditorDialog {
+            plot.repaint()
         }.also {
             it.title = "Text World Preferences"
         }.display()

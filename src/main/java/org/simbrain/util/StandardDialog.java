@@ -376,8 +376,8 @@ public class StandardDialog extends GenericJDialog {
      */
     public void makeVisible() {
         pack();
-        setVisible(true);
         setLocationRelativeTo(null);
+        setVisible(true);
     }
 
 }

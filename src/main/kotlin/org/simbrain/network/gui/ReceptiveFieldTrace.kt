@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.core.ConvolutionConnector
 import org.simbrain.network.core.PoolingConnector
 import org.simbrain.network.core.TensorLayer
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.TensorConnectorNode
 import org.simbrain.network.gui.nodes.TensorNode
 import java.awt.Color
@@ -35,15 +36,7 @@ data class ConnectorTraceHighlight(
     val mode: HighlightMode = HighlightMode.CELL
 )
 
-private val traceColors = listOf(
-    Color(255, 200, 0, 180),   // yellow
-    Color(0, 200, 255, 180),   // cyan
-    Color(255, 100, 0, 180),   // orange
-    Color(100, 255, 100, 180), // green
-    Color(200, 100, 255, 180), // purple
-)
-
-private fun traceColor(depth: Int) = traceColors[depth % traceColors.size]
+private fun traceColor() = NetworkPreferences.receptiveFieldTraceColor.withAlpha(180)
 
 private data class SavedConnector(val connector: ConvolutionConnector, val filter: Int, val inputChannel: Int)
 
@@ -73,8 +66,8 @@ internal fun centeredTraceIndex(sourceIndex: Int, pad: Int, stride: Int, kernelS
 fun NetworkPanel.updateReceptiveFieldTrace(sourceTensor: TensorLayer, hoverH: Int, hoverW: Int) {
     clearReceptiveFieldTrace()
 
-    traceForward(sourceTensor, hoverH, hoverW, 0)
-    traceBackward(sourceTensor, hoverH, hoverW, 0)
+    traceForward(sourceTensor, hoverH, hoverW)
+    traceBackward(sourceTensor, hoverH, hoverW)
 }
 
 /**
@@ -112,7 +105,7 @@ fun NetworkPanel.clearReceptiveFieldTrace() {
     state.tracedConnectorNodes.clear()
 }
 
-private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth: Int) {
+private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int) {
     val state = traceState()
 
     for (conn in layer.outgoingTensorConnectors) {
@@ -136,7 +129,7 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth:
             else -> continue
         }
 
-        val color = traceColor(depth)
+        val color = traceColor()
 
         val sourceNode = getNode(layer) as? TensorNode ?: continue
         sourceNode.traceBoxes.add(TraceBox(boxRow, boxCol, kernelH, kernelW, color))
@@ -157,18 +150,16 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int, depth:
             connNode.repaint()
         }
 
-        val targetNode = getNode(conn.target) as? TensorNode ?: continue
-        val nextColor = traceColor(depth + 1)
         if (conn is ConvolutionConnector && !conn.target.rgbComposite) {
             state.savedChannels.add(conn.target to conn.target.currentChannel)
             conn.target.currentChannel = conn.currentFilter
         }
 
-        traceForward(conn.target, outH, outW, depth + 1)
+        traceForward(conn.target, outH, outW)
     }
 }
 
-private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int, depth: Int) {
+private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int) {
     val state = traceState()
 
     for (conn in layer.incomingTensorConnectors) {
@@ -186,7 +177,7 @@ private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int, depth
             else -> continue
         }
 
-        val color = traceColor(depth)
+        val color = traceColor()
 
         val sourceNode = getNode(conn.source) as? TensorNode ?: continue
         sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
@@ -215,9 +206,11 @@ private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int, depth
         val centerH = (srcRow + boxH / 2).coerceIn(0, conn.source.shape.height - 1)
         val centerW = (srcCol + boxW / 2).coerceIn(0, conn.source.shape.width - 1)
 
-        traceBackward(conn.source, centerH, centerW, depth + 1)
+        traceBackward(conn.source, centerH, centerW)
     }
 }
 
 private data class ForwardResult(val outH: Int, val outW: Int, val kernelH: Int, val kernelW: Int, val boxRow: Int, val boxCol: Int)
 private data class BackwardResult(val srcRow: Int, val srcCol: Int, val boxH: Int, val boxW: Int)
+
+private fun Color.withAlpha(alpha: Int) = Color(red, green, blue, alpha)

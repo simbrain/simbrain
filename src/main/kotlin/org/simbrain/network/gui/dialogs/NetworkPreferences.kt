@@ -98,6 +98,14 @@ object NetworkPreferences: PreferenceHolder() {
     var connectorArrowColor by ColorPreference(Color.ORANGE)
 
     @UserParameter(
+        label = "Receptive field trace color",
+        description = "Color used to highlight receptive field traces on tensors and tensor connectors",
+        tab = "Colors",
+        order = 120
+    )
+    var receptiveFieldTraceColor by ColorPreference(Color.ORANGE)
+
+    @UserParameter(
         label = "Nudge amount",
         description = "Distance in pixels to move selected objects when using Shift + arrow keys",
         tab = "GUI",

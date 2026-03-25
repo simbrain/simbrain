@@ -8,6 +8,7 @@ import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.ConvolutionConnector
+import org.simbrain.network.core.PoolingConnector
 import org.simbrain.network.core.TensorConnector
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -224,7 +225,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             updateDetailLabel()
         }
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
-            interactionBox.setText(connector.displayName)
+            interactionBox.setText(connectorDisplayText())
         }
         connectorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             syncKernelDisplayMode()
@@ -237,7 +238,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             arrow.invalidateFullBounds()
         }
 
-        interactionBox.setText(connector.displayName)
+        interactionBox.setText(connectorDisplayText())
         arrow.invalidateFullBounds()
         updateDetailLabel()
     }
@@ -416,6 +417,21 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 offsetY = boxOffset.y
             )
         }
+    }
+
+    /**
+     * Build the text shown on the interaction box, appending size info for convolution and pooling connectors.
+     * Uses the short [name] (e.g. "Pooling") instead of the full id when no custom label is set.
+     */
+    private fun connectorDisplayText(): String {
+        val hasCustomLabel = !connector.label.isNullOrEmpty()
+        val base = if (hasCustomLabel) connector.label!! else connector.name
+        val summary = when (connector) {
+            is ConvolutionConnector -> connector.summaryLabel
+            is PoolingConnector -> connector.summaryLabel
+            else -> null
+        }
+        return if (summary != null) "$base ($summary)" else base
     }
 
     override val isDraggable: Boolean = false

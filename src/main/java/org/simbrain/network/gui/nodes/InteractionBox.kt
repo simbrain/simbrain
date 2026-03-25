@@ -24,7 +24,7 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
      * Padding values for layout
      */
     private val paddingX = 4.0
-    private val paddingY = 0.0
+    private val paddingY = 2.0
     private val kebabPaddingX = 6.0
     private val kebabPaddingY = 2.0
 
@@ -166,7 +166,8 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
      */
     private fun updateLayout() {
         // Calculate total width needed (text + padding + menu + padding)
-        val textBounds = textLabel.bounds
+        // Use fullBounds to account for the 0.8x scale transform applied to the text
+        val textBounds = textLabel.fullBounds
         val menuBounds = kebabMenu.bounds  // Now using regular bounds since we set them explicitly
         val totalWidth = textBounds.width + paddingX + menuBounds.width + paddingX
         val totalHeight = maxOf(textBounds.height, menuBounds.height) + paddingY * 2

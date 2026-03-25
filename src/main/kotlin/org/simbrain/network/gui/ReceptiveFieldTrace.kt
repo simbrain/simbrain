@@ -37,6 +37,7 @@ data class ConnectorTraceHighlight(
 )
 
 private fun traceColor() = NetworkPreferences.receptiveFieldTraceColor.withAlpha(180)
+private fun backwardTraceColor() = NetworkPreferences.backwardTraceColor.withAlpha(180)
 
 private data class SavedConnector(val connector: ConvolutionConnector, val filter: Int, val inputChannel: Int)
 
@@ -60,14 +61,25 @@ internal fun centeredTraceIndex(sourceIndex: Int, pad: Int, stride: Int, kernelS
 }
 
 /**
- * Computes and distributes a bidirectional receptive field trace from a hover
- * at position ([hoverH], [hoverW]) on [sourceTensor].
+ * Computes a receptive field trace from a hover at ([hoverH], [hoverW]) on [sourceTensor].
+ * Forward trace shows the immediate outgoing kernel footprint (one layer).
+ * Backward trace expands the full receptive field through all preceding layers.
  */
 fun NetworkPanel.updateReceptiveFieldTrace(sourceTensor: TensorLayer, hoverH: Int, hoverW: Int) {
     clearReceptiveFieldTrace()
 
+    val state = traceState()
+
+    // Draw origin indicator on the hovered cell
+    val originNode = getNode(sourceTensor) as? TensorNode
+    if (originNode != null) {
+        originNode.traceBoxes.add(TraceBox(hoverH, hoverW, 1, 1, backwardTraceColor()))
+        if (originNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(originNode)
+        originNode.repaint()
+    }
+
     traceForward(sourceTensor, hoverH, hoverW)
-    traceBackward(sourceTensor, hoverH, hoverW)
+    traceBackward(sourceTensor, hoverH, hoverW, 1, 1)
 }
 
 /**
@@ -87,11 +99,6 @@ fun NetworkPanel.clearReceptiveFieldTrace() {
     }
     state.savedConnectorState.clear()
 
-    state.tracedConnectorNodes.forEach { node ->
-        node.renderKernelImage()
-        node.updateDetailLabel()
-    }
-
     state.tracedTensorNodes.forEach { node ->
         node.traceBoxes.clear()
         node.repaint()
@@ -100,6 +107,8 @@ fun NetworkPanel.clearReceptiveFieldTrace() {
 
     state.tracedConnectorNodes.forEach { node ->
         node.traceHighlight = null
+        node.renderKernelImage()
+        node.updateDetailLabel()
         node.repaint()
     }
     state.tracedConnectorNodes.clear()
@@ -155,29 +164,43 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int) {
             conn.target.currentChannel = conn.currentFilter
         }
 
-        traceForward(conn.target, outH, outW)
+        // Show which target cell this maps to (1x1 indicator, no further recursion)
+        val targetNode = getNode(conn.target) as? TensorNode
+        if (targetNode != null) {
+            targetNode.traceBoxes.add(TraceBox(outH, outW, 1, 1, color))
+            if (targetNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(targetNode)
+            targetNode.repaint()
+        }
     }
 }
 
-private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int) {
+private fun NetworkPanel.traceBackward(
+    layer: TensorLayer, row: Int, col: Int, height: Int, width: Int,
+    visited: MutableSet<TensorLayer> = mutableSetOf()
+) {
+    if (!visited.add(layer)) return
     val state = traceState()
 
     for (conn in layer.incomingTensorConnectors) {
         val (srcRow, srcCol, boxH, boxW) = when (conn) {
             is ConvolutionConnector -> {
-                val srcRow = h * conn.stride - conn.padH
-                val srcCol = w * conn.stride - conn.padW
-                BackwardResult(srcRow, srcCol, conn.kernelSize, conn.kernelSize)
+                val srcRow = row * conn.stride - conn.padH
+                val srcCol = col * conn.stride - conn.padW
+                val srcH = (height - 1) * conn.stride + conn.kernelSize
+                val srcW = (width - 1) * conn.stride + conn.kernelSize
+                BackwardResult(srcRow, srcCol, srcH, srcW)
             }
             is PoolingConnector -> {
-                val srcRow = h * conn.stride
-                val srcCol = w * conn.stride
-                BackwardResult(srcRow, srcCol, conn.poolSize, conn.poolSize)
+                val srcRow = row * conn.stride
+                val srcCol = col * conn.stride
+                val srcH = (height - 1) * conn.stride + conn.poolSize
+                val srcW = (width - 1) * conn.stride + conn.poolSize
+                BackwardResult(srcRow, srcCol, srcH, srcW)
             }
             else -> continue
         }
 
-        val color = traceColor()
+        val color = backwardTraceColor()
 
         val sourceNode = getNode(conn.source) as? TensorNode ?: continue
         sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
@@ -203,10 +226,7 @@ private fun NetworkPanel.traceBackward(layer: TensorLayer, h: Int, w: Int) {
             conn.source.currentChannel = layer.currentChannel
         }
 
-        val centerH = (srcRow + boxH / 2).coerceIn(0, conn.source.shape.height - 1)
-        val centerW = (srcCol + boxW / 2).coerceIn(0, conn.source.shape.width - 1)
-
-        traceBackward(conn.source, centerH, centerW)
+        traceBackward(conn.source, srcRow, srcCol, boxH, boxW, visited)
     }
 }
 

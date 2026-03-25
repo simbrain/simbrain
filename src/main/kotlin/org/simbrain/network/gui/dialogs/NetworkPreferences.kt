@@ -106,6 +106,14 @@ object NetworkPreferences: PreferenceHolder() {
     var receptiveFieldTraceColor by ColorPreference(Color.ORANGE)
 
     @UserParameter(
+        label = "Backward trace color",
+        description = "Color used for backward receptive field trace boxes and connector highlights",
+        tab = "Colors",
+        order = 121
+    )
+    var backwardTraceColor by ColorPreference(Color(100, 180, 255))
+
+    @UserParameter(
         label = "Nudge amount",
         description = "Distance in pixels to move selected objects when using Shift + arrow keys",
         tab = "GUI",

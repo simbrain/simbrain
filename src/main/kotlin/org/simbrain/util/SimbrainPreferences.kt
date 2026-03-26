@@ -154,6 +154,13 @@ class ColorPreference(defaultColor: Color): Preference<Color>(defaultColor) {
     override fun serialize(value: Color) = value.rgb.toString()
 }
 
+class EnumPreference<E : Enum<E>>(defaultVal: E, private val enumClass: Class<E>): Preference<E>(defaultVal) {
+    override fun deserialize(value: String): E = java.lang.Enum.valueOf(enumClass, value)
+    override fun serialize(value: E): String = value.name
+}
+
+inline fun <reified E : Enum<E>> EnumPreference(defaultVal: E) = EnumPreference(defaultVal, E::class.java)
+
 class ConnectionStrategyPreference(connectionStrategy: ConnectionStrategy): Preference<ConnectionStrategy>(connectionStrategy) {
     override fun deserialize(value: String): ConnectionStrategy {
         return getSimbrainXStream().fromXML(value) as ConnectionStrategy

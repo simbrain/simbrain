@@ -4,6 +4,7 @@ import org.simbrain.network.core.ConvolutionConnector
 import org.simbrain.network.core.PoolingConnector
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.dialogs.ReceptiveFieldTraceMode
 import org.simbrain.network.gui.nodes.TensorConnectorNode
 import org.simbrain.network.gui.nodes.TensorNode
 import java.awt.Color
@@ -38,6 +39,15 @@ data class ConnectorTraceHighlight(
 
 private fun traceColor() = NetworkPreferences.receptiveFieldTraceColor.withAlpha(180)
 private fun backwardTraceColor() = NetworkPreferences.backwardTraceColor.withAlpha(180)
+
+/**
+ * Whether a trace box should be drawn on [layer] given the current trace mode.
+ * [tracedChannel] is the channel the trace is targeting on that layer.
+ */
+private fun shouldShowTraceBox(layer: TensorLayer, tracedChannel: Int): Boolean {
+    if (NetworkPreferences.receptiveFieldTraceMode != ReceptiveFieldTraceMode.HIGHLIGHT_MATCHED) return true
+    return layer.rgbComposite || layer.currentChannel == tracedChannel
+}
 
 private data class SavedConnector(val connector: ConvolutionConnector, val filter: Int, val inputChannel: Int)
 
@@ -145,12 +155,16 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int) {
         if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
         sourceNode.repaint()
 
+        val mode = NetworkPreferences.receptiveFieldTraceMode
+
         val connNode = getNode(conn) as? TensorConnectorNode
         if (connNode != null && conn is ConvolutionConnector) {
-            state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
-
             val displayedChannel = sourceNode.tensorLayer.currentChannel
-            conn.currentInputChannel = displayedChannel
+
+            if (mode == ReceptiveFieldTraceMode.AUTO_NAVIGATE) {
+                state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
+                conn.currentInputChannel = displayedChannel
+            }
 
             connNode.traceHighlight = ConnectorTraceHighlight(conn.currentFilter, displayedChannel, color, HighlightMode.COLUMN)
             connNode.renderKernelImage()
@@ -160,16 +174,21 @@ private fun NetworkPanel.traceForward(layer: TensorLayer, h: Int, w: Int) {
         }
 
         if (conn is ConvolutionConnector && !conn.target.rgbComposite) {
-            state.savedChannels.add(conn.target to conn.target.currentChannel)
-            conn.target.currentChannel = conn.currentFilter
+            if (mode == ReceptiveFieldTraceMode.AUTO_NAVIGATE) {
+                state.savedChannels.add(conn.target to conn.target.currentChannel)
+                conn.target.currentChannel = conn.currentFilter
+            }
         }
 
         // Show which target cell this maps to (1x1 indicator, no further recursion)
         val targetNode = getNode(conn.target) as? TensorNode
         if (targetNode != null) {
-            targetNode.traceBoxes.add(TraceBox(outH, outW, 1, 1, color))
-            if (targetNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(targetNode)
-            targetNode.repaint()
+            val tracedChannel = if (conn is ConvolutionConnector) conn.currentFilter else layer.currentChannel
+            if (shouldShowTraceBox(conn.target, tracedChannel)) {
+                targetNode.traceBoxes.add(TraceBox(outH, outW, 1, 1, color))
+                if (targetNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(targetNode)
+                targetNode.repaint()
+            }
         }
     }
 }
@@ -201,18 +220,24 @@ private fun NetworkPanel.traceBackward(
         }
 
         val color = backwardTraceColor()
+        val mode = NetworkPreferences.receptiveFieldTraceMode
 
         val sourceNode = getNode(conn.source) as? TensorNode ?: continue
-        sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
-        if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
-        sourceNode.repaint()
+
+        if (shouldShowTraceBox(conn.source, layer.currentChannel)) {
+            sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
+            if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
+            sourceNode.repaint()
+        }
 
         val connNode = getNode(conn) as? TensorConnectorNode
         if (connNode != null && conn is ConvolutionConnector) {
-            state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
-
             val displayedChannel = layer.currentChannel
-            conn.currentFilter = displayedChannel
+
+            if (mode == ReceptiveFieldTraceMode.AUTO_NAVIGATE) {
+                state.savedConnectorState.add(SavedConnector(conn, conn.currentFilter, conn.currentInputChannel))
+                conn.currentFilter = displayedChannel
+            }
 
             connNode.traceHighlight = ConnectorTraceHighlight(displayedChannel, conn.currentInputChannel, color, HighlightMode.ROW)
             connNode.renderKernelImage()
@@ -222,8 +247,10 @@ private fun NetworkPanel.traceBackward(
         }
 
         if (conn is PoolingConnector && !conn.source.rgbComposite) {
-            state.savedChannels.add(conn.source to conn.source.currentChannel)
-            conn.source.currentChannel = layer.currentChannel
+            if (mode == ReceptiveFieldTraceMode.AUTO_NAVIGATE) {
+                state.savedChannels.add(conn.source to conn.source.currentChannel)
+                conn.source.currentChannel = layer.currentChannel
+            }
         }
 
         traceBackward(conn.source, srcRow, srcCol, boxH, boxW, visited)

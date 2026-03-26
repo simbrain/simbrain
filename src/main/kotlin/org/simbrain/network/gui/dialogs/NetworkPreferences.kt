@@ -7,6 +7,18 @@ import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import java.awt.Color
 
+/**
+ * Controls how receptive field trace boxes behave on hover.
+ */
+enum class ReceptiveFieldTraceMode {
+    /** Automatically navigate to the traced channel/filter and show boxes. */
+    AUTO_NAVIGATE,
+    /** Show trace boxes only when the user is already viewing the matching channel. */
+    HIGHLIGHT_MATCHED,
+    /** Always show trace boxes regardless of the currently viewed channel. */
+    HIGHLIGHT_ALL
+}
+
 object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
@@ -112,6 +124,16 @@ object NetworkPreferences: PreferenceHolder() {
         order = 121
     )
     var backwardTraceColor by ColorPreference(Color(100, 180, 255))
+
+    @UserParameter(
+        label = "Receptive field trace mode",
+        description = "AUTO_NAVIGATE flips to the traced channel and shows boxes. " +
+                "HIGHLIGHT_ALL always shows boxes without flipping. " +
+                "HIGHLIGHT_MATCHED shows boxes only when viewing the correct channel.",
+        tab = "Colors",
+        order = 125
+    )
+    var receptiveFieldTraceMode by EnumPreference(ReceptiveFieldTraceMode.AUTO_NAVIGATE)
 
     @UserParameter(
         label = "Nudge amount",

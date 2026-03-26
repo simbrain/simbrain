@@ -27,7 +27,6 @@ val spiveyNet = newSim {
     var competitorIndex = 0
     var timeIndex = 0
     var conditionText = ""
-    var useFeedback = true // if true incorporate feedback from eyes and mouse
 
     // Network
     val networkComponent = addNetworkComponent("Spivey Net")
@@ -161,13 +160,9 @@ val spiveyNet = newSim {
         }
 
         lexicalNodes.activations += (integrationNodes.activations * lexicalNodes.activations)
-        if (useFeedback) {
-            visualNodes.activations += (integrationNodes.activations * visualNodes.activations) +
-                    (eyesNodes.activations * visualNodes.activations) +
-                    (mouseNodes.activations * visualNodes.activations)
-        } else {
-            visualNodes.activations += (integrationNodes.activations * visualNodes.activations)
-        }
+        visualNodes.activations += (integrationNodes.activations * visualNodes.activations) +
+                (eyesNodes.activations * visualNodes.activations) +
+                (mouseNodes.activations * visualNodes.activations)
         lexicalNodes.neuronList.normalize()
         visualNodes.neuronList.normalize()
 
@@ -267,11 +262,7 @@ val spiveyNet = newSim {
             addButton("Rhyme Condition") {
                 applyRhymeCondition()
             }
-            addCheckBox("Use feedback", useFeedback) {
-                useFeedback = it
-            }.apply {
-                toolTipText = "If checked, visual nodes incorporate multiplicative feedback from eyes and mouse"
-            }
+            addSeparator()
             addButton("Iterate") {
                 mouse.drawTrailWithoutRunningWorkspace = true
                 eye.drawTrailWithoutRunningWorkspace = true
@@ -355,38 +346,46 @@ val spiveyNet = newSim {
         There were three main conditions:
         
          1. **Control condition**: candle target and fork competitor. Eyes should go straight to target without being influenced by the competitor,
-            because candle and fork have very different phonemic representations.
-           <img src="//localfiles/simulations/images/visualWorld/Fork.png" alt="Fork icon" height="50">
+            because candle and fork have very different phonemic representations. In this condition eye position should settle on the candle quickly,
+            with little or no dwell time on the fork. The mouse trace should be close to a straight path to the candle, with little or no bulge
+            toward the fork.
          2. **Cohort condition**: candle target and candy competitor. The first four phonemes are the same in "candle" and "candy"
-                and so the mouse motion should be drawn slightly towards "candy", because of their shared initial phonemic representations.
-                <img src="//localfiles/simulations/images/visualWorld/Candy.png" alt="Candy icon" height="50">
+                and so the mouse motion should be drawn slightly towards "candy", because of their shared initial phonemic representations. This
+                should produce the strongest outward bulge in the mouse trace, bending it toward the candy before it returns to the candle.
+                Eye movements should also show the strongest competition here: early in the trial the eyes may be pulled toward or briefly linger on
+                the candy before settling on the candle.
          3. **Rhyming condition**: candle target and handle competitor. There is shared phonemic representation but it is in the final phonemes.
-                Thus the mouse trace should be pulled towards the competitor but not as much as in the cohort condition.
-                <img src="//localfiles/simulations/images/visualWorld/Handle.png" alt="Handle icon" height="50">
+                Thus the mouse trace should be pulled towards the competitor but not as much as in the cohort condition. The trajectory should show
+                a smaller, later bulge toward the handle rather than the stronger early bulge seen in the cohort condition. Eye movements should be
+                less strongly drawn to the handle than in the cohort condition, and any competitor-directed fixation should tend to appear later.
         
         # What to Do
         
         ## Compare conditions
         
+        **To compare mouse traces across conditions, switch directly between `Control`, `Cohort`, and `Rhyming` without pressing `Reset`.**
+        Those condition buttons start a new trial but preserve the existing trails, so multiple trajectories can remain visible together.
+        
         1. Control Condition
         - Click on the `Control condition` button.
         - Click the `iterate` button repeatedly.
-        - Observe the mouse goes straight to the candle.
+        - Observe the mouse goes straight to the candle, with little or no bulge toward the fork.
+        - Observe the eye marker quickly locks on to the candle and usually stays there.
         
         2. Cohort Condition
         - Click on the `Cohort condition` button.
         - Click the `iterate` button repeatedly.
-        - Observe the mouse goes towards the the candle, but is pulled a bit towards candy.
+        - Observe the mouse trace bulges most strongly in this condition, bowing toward the candy before returning to the candle.
+        - Observe the eye marker shows the strongest competition in this condition, often hesitating between candle and candy before committing.
 
         3. Rhyming Condition
         - Click on the `Rhyming condition` button.
         - Click the `iterate` button repeatedly.
-        - Observe the mouse goes towards the the candle, but is pulled a bit towards the handle, but not as much as in the cohort condition, and
-            is pulled more towards the end of the trajectory.
+        - Observe the mouse trace shows a smaller, later bulge toward the handle than the cohort-condition bulge toward candy.
+        - Observe the eye marker mostly favors the candle, with any pull toward handle tending to be weaker and later than in the cohort condition.
         
         You can reset at any time using the `reset button` to erase all the trajectories.
-        You can reset without erasing trajectories by pressing the `Control`, `Cohort`, or `Rhyming` buttons.  
-        You can click the `feedback` button to simulate feedback in a way that is described in (Spivey, 2025).
+        Pressing `Control`, `Cohort`, or `Rhyming` starts over without erasing trajectories, which is the intended way to compare conditions on the same display.  
        
         ## To plot activations 
         

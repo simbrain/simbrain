@@ -80,9 +80,11 @@ fun NetworkPanel.updateReceptiveFieldTrace(sourceTensor: TensorLayer, hoverH: In
 
     val state = traceState()
 
-    // Draw origin indicator on the hovered cell
+    // Draw origin indicator on the hovered cell, using backward trace color only
+    // when there is a backward trace to show (i.e., the layer has incoming connectors).
+    val hasBackwardTrace = sourceTensor.incomingTensorConnectors.isNotEmpty()
     val originNode = getNode(sourceTensor) as? TensorNode
-    if (originNode != null) {
+    if (originNode != null && hasBackwardTrace) {
         originNode.traceBoxes.add(TraceBox(hoverH, hoverW, 1, 1, backwardTraceColor()))
         if (originNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(originNode)
         originNode.repaint()
@@ -224,7 +226,10 @@ private fun NetworkPanel.traceBackward(
 
         val sourceNode = getNode(conn.source) as? TensorNode ?: continue
 
-        if (shouldShowTraceBox(conn.source, layer.currentChannel)) {
+        // Skip drawing the backward trace box on the first layer (no incoming connectors),
+        // mirroring how forward trace has nothing to show on the last layer.
+        val isFirstLayer = conn.source.incomingTensorConnectors.isEmpty()
+        if (!isFirstLayer && shouldShowTraceBox(conn.source, layer.currentChannel)) {
             sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
             if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
             sourceNode.repaint()

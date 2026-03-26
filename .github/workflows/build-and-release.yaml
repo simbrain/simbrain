@@ -334,6 +334,10 @@ jobs:
     if: needs.prepare.outputs.build_windows == 'true'
     runs-on: windows-latest
     environment: windows
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
 
     steps:
       - name: Checkout sources
@@ -344,17 +348,6 @@ jobs:
           choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
           choco install awscli --version=${{ env.AWS_CLI_VERSION }}
           aws --version
-
-      - name: Install Windows SDK
-        run: choco install windows-sdk-10.1
-
-      - name: Install Certificate
-        run: |
-          $base64EncodedCert = "${{ secrets.CERTIFICATE_ENCODED }}"
-          $certBytes = [System.Convert]::FromBase64String($base64EncodedCert)
-          [System.IO.File]::WriteAllBytes("simbrain.p12", $certBytes)
-          $pfxPassword = ConvertTo-SecureString -String "${{ secrets.CERTIFICATE_PASSWORD }}" -AsPlainText -Force
-          Import-PfxCertificate -FilePath "simbrain.p12" -CertStoreLocation Cert:\CurrentUser\My -Password $pfxPassword
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -377,12 +370,32 @@ jobs:
       - name: Build Windows executable
         run: ./gradlew renameWindowsExecutable "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
 
-      - name: Upload artifacts for release
+      - name: Upload unsigned artifact for signing
+        id: upload-unsigned-artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-unsigned-exe
+          path: build/dist/Simbrain*.exe
+          retention-days: 1
+
+      - name: Sign with SignPath
+        id: signpath-signing
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: '${{ vars.SIGNPATH_PROJECT_SLUG }}'
+          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
+          github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'build/signed'
+
+      - name: Upload signed artifacts for release
         if: needs.prepare.outputs.is_release == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: build/dist/Simbrain*.exe
+          path: build/signed/Simbrain*.exe
           retention-days: 1
 
       - name: Configure AWS CLI
@@ -394,7 +407,7 @@ jobs:
       - name: Upload to Cloudflare R2
         shell: pwsh
         run: |
-          $path = '.\build\dist'
+          $path = 'build\signed'
           $files = Get-ChildItem -Path $path -Filter 'Simbrain*.exe'
           if ($files.Count -eq 1) {
             & "C:\Program Files\Amazon\AWSCLIV2\aws" s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com

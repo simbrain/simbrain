@@ -226,10 +226,7 @@ private fun NetworkPanel.traceBackward(
 
         val sourceNode = getNode(conn.source) as? TensorNode ?: continue
 
-        // Skip drawing the backward trace box on the first layer (no incoming connectors),
-        // mirroring how forward trace has nothing to show on the last layer.
-        val isFirstLayer = conn.source.incomingTensorConnectors.isEmpty()
-        if (!isFirstLayer && shouldShowTraceBox(conn.source, layer.currentChannel)) {
+        if (shouldShowTraceBox(conn.source, layer.currentChannel)) {
             sourceNode.traceBoxes.add(TraceBox(srcRow, srcCol, boxH, boxW, color))
             if (sourceNode !in state.tracedTensorNodes) state.tracedTensorNodes.add(sourceNode)
             sourceNode.repaint()

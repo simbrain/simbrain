@@ -130,7 +130,7 @@ object NetworkPreferences: PreferenceHolder() {
         description = "AUTO_NAVIGATE flips to the traced channel and shows boxes. " +
                 "HIGHLIGHT_ALL always shows boxes without flipping. " +
                 "HIGHLIGHT_MATCHED shows boxes only when viewing the correct channel.",
-        tab = "Colors",
+        tab = "GUI",
         order = 125
     )
     var receptiveFieldTraceMode by EnumPreference(ReceptiveFieldTraceMode.AUTO_NAVIGATE)

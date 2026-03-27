@@ -12,6 +12,13 @@ object WorkspacePreferences: PreferenceHolder() {
     var showSimulationInfoByDefault by BooleanPreference(true)
 
     @UserParameter(
+        label = "Show beta simulations",
+        description = "Show beta simulations in the Simulations menu",
+        order = 15
+    )
+    var showBetaSimulations by BooleanPreference(false)
+
+    @UserParameter(
         label = "Show bottom dock by default",
         description = "Show bottom dock by default",
         order = 20

@@ -14,7 +14,9 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
+import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
+import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
@@ -23,6 +25,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5P
 import org.simbrain.custom_sims.simulations.psychology.categoricalPerception
 import org.simbrain.custom_sims.simulations.psychology.heatColdSim
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
+import org.simbrain.custom_sims.simulations.rl.braitenbergProgramLearning
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
@@ -76,7 +79,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Heat-cold illusion") { heatColdSim }
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
-        //item("Temporal attention network") { denisonNet }
+        item("Temporal attention network", beta = true) { denisonNet }
     }
 
     dir("Behaviorism") {
@@ -105,7 +108,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("STDP") { stdpSim }
         item("Spiking Network") { spikingNetworkSimulation }
         item("E/I Balance") { excitatoryInhibitoryBalance }
-        //item("Cortical layers") { corticalLayers }
+        item("Cortical layers", beta = true) { corticalLayers }
          //item("Cortical areas") { cortexKuramoto }
     }
 
@@ -159,7 +162,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Reinforcement learning") {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
-        //item("Braitenberg Program Learning") { braitenbergProgramLearning }
+        item("Braitenberg Program Learning", beta = true) { braitenbergProgramLearning }
     }
 
     dir("Vision") {
@@ -168,7 +171,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("3D View Example") { view3dDemo }
         item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
         item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
-        //item("Attention as gain") { attentionAsGain }
+        item("Attention as gain", beta = true) { attentionAsGain }
         //item("CNN Demo") { cnnDemo } // Develop into 3d demo
         item("CNN Simple Demo") { cnnSimpleLineDetector }
         item("CNN Object Recognition (100 x 100)") { cnnObjectDetector }

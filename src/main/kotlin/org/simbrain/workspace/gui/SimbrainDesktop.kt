@@ -471,11 +471,18 @@ object SimbrainDesktop {
 
     private fun createScriptMenu(): JMenu {
         val scriptMenu = JMenu("Simulations")
-        simulations.addToMenu(scriptMenu) { sim ->
-            workspace.launch {
-                sim.run(this@SimbrainDesktop)
+        scriptMenu.addMenuListener(object : MenuListener {
+            override fun menuSelected(e: MenuEvent) {
+                scriptMenu.removeAll()
+                simulations.addToMenu(scriptMenu) { sim ->
+                    workspace.launch {
+                        sim.run(this@SimbrainDesktop)
+                    }
+                }
             }
-        }
+            override fun menuDeselected(e: MenuEvent) {}
+            override fun menuCanceled(e: MenuEvent) {}
+        })
         return scriptMenu
     }
 

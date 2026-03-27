@@ -551,6 +551,9 @@ if (OperatingSystem.current().isWindows) {
                 "--add-opens=java.base/java.lang=ALL-UNNAMED"
             ).joinToString(" ")
 
+            // Windows Installer requires numeric-only version (X.Y.Z), strip any pre-release suffix
+            val winVersion = project.version.toString().replace(Regex("-.*"), "")
+
             // Set up the jpackage command and its arguments
             executable(jpackagePath)
             args(
@@ -558,7 +561,7 @@ if (OperatingSystem.current().isWindows) {
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
-                "--app-version", project.version,
+                "--app-version", winVersion,
                 "--icon", iconFile,
                 "--java-options", jvmArgs,
                 "--win-menu",
@@ -604,7 +607,8 @@ if (OperatingSystem.current().isWindows) {
         
         doLast {
             val distDir = file(dist)
-            val oldFile = File(distDir, "Simbrain-${project.version}.exe")
+            val winVersion = project.version.toString().replace(Regex("-.*"), "")
+            val oldFile = File(distDir, "Simbrain-${winVersion}.exe")
             val newFile = File(distDir, "Simbrain${versionName}-installer.exe")
 
             if (oldFile.exists()) {

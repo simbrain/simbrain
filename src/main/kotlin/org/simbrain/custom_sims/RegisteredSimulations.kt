@@ -116,6 +116,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Evolve Avoider") { evolveAvoider }
         // item("Evolve Thirsty Cows") { evolveCow }
         item("Evolve grazing cows") { grazingCows }
+        item("Evolve mouse pursuer", beta = true) { evolveMousePursuer }
         // item("Evolve AutoEncoder") { evolveAutoAssociator }
         // item("Evolve Modular (Clune et. al.)") { evolveModularity }
         item("Evolve network") { evolveNetwork }

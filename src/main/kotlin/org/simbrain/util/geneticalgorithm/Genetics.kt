@@ -1,5 +1,37 @@
 package org.simbrain.util.geneticalgorithm
 
+/**
+ * Core abstractions for Simbrain's evolutionary framework.
+ *
+ * This file defines the generic building blocks used across the genetics package:
+ * [Genotype], [Gene], [TopLevelGene], [Chromosome], [EvoSim], [EvaluatorParams],
+ * and the [evaluator] loop that runs selection and reproduction across generations.
+ *
+ * The basic mental model is:
+ * - A [Gene] stores a mutable template for some object.
+ * - A [Chromosome] is a typed list of related genes, such as all input nodes or all connections.
+ * - A [Genotype] groups chromosomes together and provides a source of randomness.
+ * - `express(...)` functions turn genes or chromosomes into runtime objects.
+ * - An [EvoSim] wraps build, mutate, copy, visualization, and evaluation for one candidate.
+ * - [evaluator] repeatedly evaluates a population, keeps the survivors, clones them, and mutates the new copies.
+ *
+ * Chromosomes are mainly an organizational abstraction. They let a genotype keep related genes together as a unit,
+ * preserve type information, and support operations over whole groups of genes such as copying, concatenation,
+ * expression, and random selection. A chromosome can be empty, and its size does not need to stay fixed across
+ * generations. Mutation logic can add or remove genes over time.
+ *
+ * Typical usage is:
+ * 1. Define a genotype class holding one or more chromosomes.
+ * 2. Provide mutation, copy, and expression logic for that genotype.
+ * 3. Wrap the genotype in an [EvoSim].
+ * 4. Configure [EvaluatorParams] and run [evaluator].
+ *
+ * See also:
+ * - [chromosome], sampling helpers, and `express(...)` helpers in [GeneticsUtils.kt][org.simbrain.util.geneticalgorithm.chromosome]
+ * - network-specific genes such as `nodeGene` and `connectionGene` in `NetworkGenetics.kt`
+ * - [EvolveXor.kt][/Users/jyoshimi/gitstuff/simbrainmain/simbrain/src/main/kotlin/org/simbrain/custom_sims/simulations/evolution/EvolveXor.kt]
+ *   for a compact end-to-end example
+ */
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -22,7 +54,9 @@ interface Genotype {
 }
 
 /**
- * Subclasses should provide a domain specific express function
+ * A gene stores a mutable template for one evolvable object.
+ *
+ * Subclasses provide domain-specific copy and expression behavior.
  */
 abstract class Gene<P> {
     abstract val template: P
@@ -34,7 +68,7 @@ abstract class Gene<P> {
 }
 
 /**
- * An interface provides a zero arg express function.
+ * A gene whose expression step does not need an external target object.
  */
 abstract class TopLevelGene<P>: Gene<P>() {
     abstract fun express(): P
@@ -43,15 +77,38 @@ abstract class TopLevelGene<P>: Gene<P>() {
 object TopLevelGeneticsContext
 
 interface EvoSim {
+    /**
+     * Apply mutations to this candidate.
+     */
     fun mutate()
+
+    /**
+     * Build or express the phenotype needed for evaluation.
+     */
     suspend fun build()
+
+    /**
+     * Create a version of this candidate attached to the provided workspace for inspection.
+     */
     fun visualize(workspace: Workspace): EvoSim
+
+    /**
+     * Return an independent copy suitable for the next generation.
+     */
     fun copy(): EvoSim
+
+    /**
+     * Evaluate this candidate and return its fitness or error metric.
+     */
     suspend fun eval(): Double
 }
 
 /**
- * A typed list of Genes, with functions to copy and concatenate.
+ * A typed list of related genes with convenience functions for copying and concatenation.
+ *
+ * In practice, chromosomes are used to keep one part of a genotype together, for example a set of node genes,
+ * connection genes, or rule genes. Chromosomes may be empty, and they may grow or shrink during evolution if the
+ * genotype's mutation logic adds or removes genes.
  */
 class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
 
@@ -70,9 +127,15 @@ class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(g
 data class PopulatingFunctionParams(val seed: Long)
 
 /**
- * The main evolutionary code.
- * Assumes fitness, i.e. bigger numbers are better. For "error", the eval function should return a negative number.
- * Returns all simulations from the last generation of the run.
+ * Run an evolutionary loop over a population of [EvoSim]s.
+ *
+ * Each generation evaluates the population, sorts candidates by score, removes a fraction of the population,
+ * and refills those slots with mutated copies of surviving individuals.
+ *
+ * By default, larger scores are treated as better fitness. If you are minimizing instead, either return values
+ * where lower is better and set [sortDescending] to false, or use the [EvaluatorParams] overload.
+ *
+ * Returns the full final generation.
  *
  * @param populatingFunction initial evolutionary sim
  * @param populationSize stays constant during the run
@@ -118,6 +181,9 @@ suspend fun evaluator(
     population
 }
 
+/**
+ * Run [evaluator] using the user-facing parameter object [EvaluatorParams].
+ */
 suspend fun evaluator(
     evaluatorParams: EvaluatorParams,
     populatingFunction: PopulatingFunctionParams.() -> EvoSim,
@@ -146,6 +212,9 @@ suspend fun evaluator(
     return lastGeneration
 }
 
+/**
+ * Parameters for configuring a standard evolutionary run and its UI helpers.
+ */
 class EvaluatorParams(
     populationSize: Int = 100,
     eliminationRatio: Double = 0.5,

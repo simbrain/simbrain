@@ -4,15 +4,27 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.sampleWithReplacement
-import org.simbrain.util.sampleWithoutReplacement
 import kotlin.math.roundToInt
 import kotlin.random.Random
 import kotlin.reflect.KMutableProperty0
 
+/**
+ * Return one random gene from this chromosome.
+ *
+ * Sampling from a chromosome just means selecting one of the genes in that group at random.
+ * This is useful when a mutation or construction step should act on one existing gene chosen
+ * from a set of related genes.
+ */
 context(Genotype)
 fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
 
+/**
+ * Return one random gene from the provided chromosomes, weighted by chromosome size.
+ *
+ * This treats the input as one combined pool of genes. A larger chromosome contributes more
+ * possible choices because it contains more genes. Empty chromosomes are ignored. Throws if
+ * all chromosomes are empty.
+ */
 context(Genotype)
 fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
     val nonEmptyChromosomes = chromosomes.filter { it.isNotEmpty() }
@@ -28,27 +40,34 @@ fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
     }
 }
 
-context(Genotype)
-fun <P, G : Gene<P>> Chromosome<P, G>.sampleWithReplacement() = sampleWithReplacement(random)
 
-context(Genotype)
-fun <P, G : Gene<P>> Chromosome<P, G>.sampleWithoutReplacement(restartIfExhausted: Boolean = true) =
-    sampleWithoutReplacement(random, restartIfExhausted)
-
+/**
+ * Build a chromosome by repeatedly applying [block] to an initially empty chromosome.
+ *
+ * The [repeat] argument controls how many times the block runs. For example,
+ * `chromosome(2) { add(nodeGene()) }` runs the block twice and adds whatever the
+ * block adds each time. It does not mean "make a chromosome with 2 genes" unless
+ * the block itself adds exactly one gene per iteration.
+ *
+ */
 context(Genotype)
 fun <P, G : Gene<P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
     Chromosome<P, G>(
         listOf()
     ).apply { repeat(repeat) { block(it) } }
 
+
 /**
- * Utility to create network models in a network, given their description as NetworkGenes.
+ * Express each network gene in this chromosome into the target network.
  */
 context(Genotype)
 suspend fun <P : NetworkModel, G : NetworkGene<P>> Network.express(chromosome: Chromosome<P, G>): List<P> {
     return chromosome.map { it.express(this@express) }
 }
 
+/**
+ * Express each top-level gene in this chromosome.
+ */
 context(Genotype)
 fun <P, G : TopLevelGene<P>> express(chromosome: Chromosome<P, G>): List<P> {
     return chromosome.map { it.express() }
@@ -114,6 +133,9 @@ fun <T: Number> Random.mutateProperty(property: KMutableProperty0<T>, delta: T, 
     mutateData()
 }
 
+/**
+ * Execute [block] with the given probability and return its result, otherwise return null.
+ */
 context(Genotype)
 fun <T> withProbability(probability: Double, block: () -> T): T? {
     return if (random.nextDouble() < probability) {

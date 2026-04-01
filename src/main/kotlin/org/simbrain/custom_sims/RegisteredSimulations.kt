@@ -27,6 +27,7 @@ import org.simbrain.custom_sims.simulations.psychology.heatColdSim
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergProgramLearning
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
+import org.simbrain.custom_sims.simulations.rl.tdExperiments
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -164,6 +165,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
         item("Braitenberg Program Learning", beta = true) { braitenbergProgramLearning }
+        item("TD Experiments", beta = true) { tdExperiments }
     }
 
     dir("Vision") {

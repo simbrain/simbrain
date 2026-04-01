@@ -5,6 +5,7 @@ import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -28,26 +29,12 @@ import java.awt.geom.Point2D
  * 2. State-independent actor (bandit): no sensor input, just per-program preferences.
  *    Learns which program is globally best regardless of state.
  *
- *    TODO: Reuse code from BraitnbergRL.
  *    TODO: Possibly remove case 2.
  *    TODO: Checkbox for state dependent wipes weight matrix
  */
 val braitenbergRLPrograms = newSim { optionString ->
 
-    data class Task(
-        val name: String,
-        val cheeseReward: Double,
-        val poisonReward: Double
-    ) {
-        override fun toString() = name
-    }
-
-    val tasks = listOf(
-        Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
-        Task("Seek Both Objects", 1.0, 1.0),
-        Task("Avoid Both Objects", -1.0, -1.0),
-        Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
-    )
+    val tasks = rlTasks
 
     var learningRate = 0.05
     var gamma = 0.95
@@ -73,6 +60,8 @@ val braitenbergRLPrograms = newSim { optionString ->
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
     val sharedDecayFunction = GaussianDecayFunction(150.0)
+    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction)
+    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction)
 
     fun calculateReward(agent: OdorWorldEntity): Double {
         if (sparseReward) {
@@ -88,14 +77,13 @@ val braitenbergRLPrograms = newSim { optionString ->
             return reward
         }
         val distanceToCheese = agent.location.distance(cheese.location)
-        val cheeseReward = 15.0 * sharedDecayFunction.getScalingFactor(distanceToCheese) * cheeseRewardMultiplier
         val distanceToPoison = agent.location.distance(poison.location)
-        val poisonReward = 15.0 * sharedDecayFunction.getScalingFactor(distanceToPoison) * poisonRewardMultiplier
-        return cheeseReward + poisonReward
+        return cheeseRewardConfig.calculateReward(distanceToCheese, cheeseRewardMultiplier) +
+                poisonRewardConfig.calculateReward(distanceToPoison, poisonRewardMultiplier)
     }
 
     fun sample(probabilities: DoubleArray): Int {
-        val r = Math.random()
+        val r = kotlin.random.Random.nextDouble()
         var cumulative = 0.0
         for (i in probabilities.indices) {
             cumulative += probabilities[i]
@@ -108,7 +96,6 @@ val braitenbergRLPrograms = newSim { optionString ->
     val network = networkComponent.network
 
     val activeTextLabel = NetworkTextObject("Active: None").apply { fontSize = 16 }
-    val modeTextLabel = NetworkTextObject("Mode: State-Dependent").apply { fontSize = 14 }
 
     val entityOffset = Point2D.Double(100.0, 100.0)
     val agent = oc.world.addEntity(entityOffset.x, entityOffset.y, EntityType.Circle).apply {
@@ -190,7 +177,9 @@ val braitenbergRLPrograms = newSim { optionString ->
     programArray.setLocation(452.0, 135.0)
 
     // Weight matrix: sensors → programs (the actor weights for state-dependent mode)
-    val actorWeightMatrix = WeightMatrix(sensorCollection, programArray)
+    val actorWeightMatrix = WeightMatrix(sensorCollection, programArray).apply {
+        hardClear() // start with zero matrix
+    }
     network.addNetworkModelAsync(actorWeightMatrix)
 
     // Critic and TD error neurons
@@ -204,7 +193,6 @@ val braitenbergRLPrograms = newSim { optionString ->
     }
 
     network.addNetworkModels(activeTextLabel)
-    network.addNetworkModels(modeTextLabel)
 
     // Couplings
     val cheeseLeftSensor = agent.getSensor("Cheese left")
@@ -318,22 +306,14 @@ val braitenbergRLPrograms = newSim { optionString ->
         previousValue = currentValue
     }
 
-    fun respawnObject(obj: OdorWorldEntity, minSeparation: Double = 100.0) {
-        var newLoc: Point2D
-        do {
-            newLoc = Point2D.Double((100..600).random().toDouble(), (100..600).random().toDouble())
-        } while (world.entityList.any { it !== obj && newLoc.distance(it.location) < minSeparation })
-        obj.location = newLoc
-    }
-
     agent.events.collided.on { collidedWith ->
         if (collidedWith === cheese) {
             justHitCheese = true
-            respawnObject(collidedWith)
+            respawnObject(world, collidedWith)
         }
         if (collidedWith === poison) {
             justHitPoison = true
-            respawnObject(collidedWith)
+            respawnObject(world, collidedWith)
         }
     }
 
@@ -363,8 +343,7 @@ val braitenbergRLPrograms = newSim { optionString ->
         place(networkComponent, 320, 10, 650, 450)
         place(oc, 970, 10, 500, 500)
 
-        activeTextLabel.location = point(50.0, -50.0)
-        modeTextLabel.location = point(50.0, -70.0)
+        activeTextLabel.location = point(50.0, -70.0)
 
         createControlPanel("Control Panel", 0, 10) {
 
@@ -382,7 +361,6 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             addCheckBox("State-Dependent Actor", stateDependent) { enabled ->
                 stateDependent = enabled
-                modeTextLabel.text = if (enabled) "Mode: State-Dependent" else "Mode: Bandit"
                 resetLearning()
                 if (enabled) {
                     addWeightMatrix()

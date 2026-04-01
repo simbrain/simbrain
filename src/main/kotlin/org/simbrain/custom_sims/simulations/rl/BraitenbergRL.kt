@@ -22,7 +22,6 @@ import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
 
-// Configuration for proximity-based rewards using configurable decay functions
 class RewardConfig(
     private val label: String,
     initDecayFunction: DecayFunction = GaussianDecayFunction(150.0)
@@ -46,6 +45,28 @@ class RewardConfig(
     }
 }
 
+data class Task(
+    val name: String,
+    val cheeseReward: Double,
+    val poisonReward: Double
+) {
+    override fun toString() = name
+}
+
+val rlTasks = listOf(
+    Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
+    Task("Seek Both Objects", 1.0, 1.0),
+    Task("Avoid Both Objects", -1.0, -1.0),
+    Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
+)
+
+fun respawnObject(world: org.simbrain.world.odorworld.OdorWorld, obj: OdorWorldEntity, minSeparation: Double = 100.0) {
+    var newLoc: Point2D
+    do {
+        newLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+    } while (world.entityList.any { it !== obj && newLoc.distance(it.location) < minSeparation })
+    obj.location = newLoc
+}
 
 /**
  * Using actor-critic to train a Braitenberg vehicle.
@@ -55,23 +76,7 @@ class RewardConfig(
  */
 val braitenbergRL = newSim { optionString ->
 
-    // Task configuration data class
-    data class Task(
-        val name: String,
-        val cheeseReward: Double,
-        val poisonReward: Double
-    ) {
-        override fun toString() = name
-    }
-
-    // Define available tasks
-    val tasks = listOf(
-        Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
-        Task("Seek Both Objects", 1.0, 1.0),
-        Task("Avoid Both Objects", -1.0, -1.0),
-        Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
-    )
-
+    val tasks = rlTasks
 
     var learningRate = 0.05
     var gamma = 0.95
@@ -106,31 +111,6 @@ val braitenbergRL = newSim { optionString ->
 
     val poison = oc.world.addEntity(398, 335, EntityType.Poison)
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
-
-    // Configuration for proximity-based rewards using configurable decay functions
-    class RewardConfig(
-        private val label: String,
-        initDecayFunction: DecayFunction = GaussianDecayFunction(150.0)
-    ) : EditableObject {
-        override val name = label
-
-        @UserParameter(label = "Max Reward", description = "Maximum reward magnitude", order = 1)
-        var maxReward: Double = 15.0
-
-        @UserParameter(label = "Decay Function", showDetails = false, order = 2)
-        var decayFunction: DecayFunction = initDecayFunction
-
-        fun calculateReward(distance: Double, multiplier: Double): Double {
-            return maxReward * decayFunction.getScalingFactor(distance) * multiplier
-        }
-
-        fun getSummary(): String {
-            val typeName = decayFunction.name
-            val disp = decayFunction.dispersion.toInt()
-            return "$typeName (max=${"%.1f".format(maxReward)}, disp=$disp)"
-        }
-    }
-
 
     fun calculateReward(agent: OdorWorldEntity): Pair<Double, Double> {
         val distanceToCheese = agent.location.distance(cheese.location)
@@ -528,28 +508,10 @@ val braitenbergRL = newSim { optionString ->
         }
     }
 
-    // Respawn an object at a new location far from all other objects
-    fun respawnObject(obj: OdorWorldEntity, minSeparation: Double = 100.0) {
-        val objName = getObjectName(obj)
-        val oldLoc = obj.location
-
-        // Generate new location far from all other entities
-        var newLoc: Point2D
-        do {
-            newLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
-        } while (world.entityList.any { it !== obj && newLoc.distance(it.location) < minSeparation })
-
-        obj.location = newLoc
-        respawnCountPerTrial++
-
-        // Log respawning event
-        //println("[Respawn] $objName: Collision detected | Old=(${oldLoc.x.toInt()},${oldLoc.y.toInt()}) → New=(${newLoc.x.toInt()},${newLoc.y.toInt()}) | AgentDist=${"%.1f".format(newLoc.distance(agent.location))}px")
-    }
-
     agent.events.collided.on { collidedWith ->
         if (collidedWith === cheese || collidedWith === poison) {
-            //println("[Collision] Agent collided with ${getObjectName(collidedWith).uppercase()}")
-            respawnObject(collidedWith)
+            respawnCountPerTrial++
+            respawnObject(world, collidedWith)
         }
     }
 

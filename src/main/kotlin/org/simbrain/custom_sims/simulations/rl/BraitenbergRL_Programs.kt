@@ -16,7 +16,11 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.geom.Point2D
 
 /**
- * Two TD learning experiments comparing actor architectures:
+ * Analysis of RL-trained Braitenberg vehicles (for comparison with [braitenbergRL])
+ * where they are trained using "programs", that is, single nodes which, when active, produce
+ * the weights appropriate to a task
+ *
+ * Two cases are included:
  *
  * 1. State-dependent actor: sensors feed into actor weights, softmax over programs.
  *    Learns WHICH program to use based on what the agent currently sees.
@@ -24,10 +28,11 @@ import java.awt.geom.Point2D
  * 2. State-independent actor (bandit): no sensor input, just per-program preferences.
  *    Learns which program is globally best regardless of state.
  *
- * Both use a proper sensor-based critic (V = w·sensors) and softmax policy
- * following Sutton & Barto's actor-critic framework.
+ *    TODO: Reuse code from BraitnbergRL.
+ *    TODO: Possibly remove case 2.
+ *    TODO: Checkbox for state dependent wipes weight matrix
  */
-val tdExperiments = newSim { optionString ->
+val braitenbergRLPrograms = newSim { optionString ->
 
     data class Task(
         val name: String,
@@ -51,7 +56,7 @@ val tdExperiments = newSim { optionString ->
     var poisonRewardMultiplier = -1.0
     var learningEnabled = true
     var sparseReward = false
-    var temperature = 1.0
+    var temperature = .01
     var stateDependent = true
 
     // Sparse reward flags set by collision events
@@ -128,16 +133,16 @@ val tdExperiments = newSim { optionString ->
 
     // Sensor input neurons wrapped in a NeuronCollection
     val cheeseLeftInput = runBlocking {
-        network.addNeuron(0, 150).apply { label = "Cheese (L)"; clamped = true }
+        network.addNeuron(-71, 193).apply { label = "Cheese (L)"; clamped = true }
     }
     val cheeseRightInput = runBlocking {
-        network.addNeuron(50, 150).apply { label = "Cheese (R)"; clamped = true }
+        network.addNeuron(4, 193).apply { label = "Cheese (R)"; clamped = true }
     }
     val poisonLeftInput = runBlocking {
-        network.addNeuron(100, 150).apply { label = "Poison (L)"; clamped = true }
+        network.addNeuron(75, 193).apply { label = "Poison (L)"; clamped = true }
     }
     val poisonRightInput = runBlocking {
-        network.addNeuron(150, 150).apply { label = "Poison (R)"; clamped = true }
+        network.addNeuron(151, 193).apply { label = "Poison (R)"; clamped = true }
     }
 
     val sensorNeurons = listOf(cheeseLeftInput, cheeseRightInput, poisonLeftInput, poisonRightInput)
@@ -146,15 +151,15 @@ val tdExperiments = newSim { optionString ->
 
     // Motor neurons
     val straight = runBlocking {
-        network.addNeuron(50, 0).apply {
+        network.addNeuron(39, 5).apply {
             label = "Speed"; activation = 0.0; clamped = false; bias = 0.5; upperBound = 3.0
         }
     }
     val leftTurn = runBlocking {
-        network.addNeuron(0, 0).apply { label = "Left"; lowerBound = -200.0; upperBound = 200.0 }
+        network.addNeuron(-10, 5).apply { label = "Left"; lowerBound = -200.0; upperBound = 200.0 }
     }
     val rightTurn = runBlocking {
-        network.addNeuron(100, 0).apply { label = "Right"; lowerBound = -200.0; upperBound = 200.0 }
+        network.addNeuron(89, 5).apply { label = "Right"; lowerBound = -200.0; upperBound = 200.0 }
     }
 
     // Actor synapses (set by the active program)
@@ -182,16 +187,16 @@ val tdExperiments = newSim { optionString ->
         labelArray = programNames.toTypedArray()
     }
     network.addNetworkModelAsync(programArray)
-    programArray.setLocation(300.0, 100.0)
+    programArray.setLocation(452.0, 135.0)
 
     // Weight matrix: sensors → programs (the actor weights for state-dependent mode)
     val actorWeightMatrix = WeightMatrix(sensorCollection, programArray)
     network.addNetworkModelAsync(actorWeightMatrix)
 
     // Critic and TD error neurons
-    val rewardNeuron = network.addNeuron(450, 50).apply { clamped = true; label = "Reward" }
-    val valueNeuron = network.addNeuron(500, 50).apply { label = "Value"; upperBound = 100.0; lowerBound = -100.0 }
-    val tdErrorNeuron = network.addNeuron(550, 50).apply { label = "TD Error"; upperBound = 100.0; lowerBound = -100.0 }
+    val rewardNeuron = network.addNeuron(205, 3).apply { clamped = true; label = "Reward" }
+    val valueNeuron = network.addNeuron(255, 3).apply { label = "Value"; upperBound = 100.0; lowerBound = -100.0 }
+    val tdErrorNeuron = network.addNeuron(305, 3).apply { label = "TD Error"; upperBound = 100.0; lowerBound = -100.0 }
 
     // Critic weights: sensors → value
     val criticWeights = sensorNeurons.map { sensorNeuron ->

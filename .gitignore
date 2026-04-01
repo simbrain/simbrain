@@ -25,3 +25,4 @@ out/*
 
 .cache
 simulation_outputs/
+.cursor/

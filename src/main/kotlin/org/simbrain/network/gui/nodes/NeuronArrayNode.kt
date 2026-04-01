@@ -59,6 +59,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         if (!neuronArray.circleMode) return
         val ncol = if (neuronArray.gridMode) {
             ceil(sqrt(neuronArray.size.toDouble())).toInt()
+        } else if (neuronArray.verticalLayout) {
+            1
         } else {
             neuronArray.size
         }
@@ -142,6 +144,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         events.visualPropertiesChanged.on(Dispatchers.Swing) {
             gridMode = neuronArray.gridMode
             showBias = neuronArray.isShowBias
+            layoutNeuronCircles()
             networkPanel.network.events.zoomToFitPage.fire()
         }
         gridMode = neuronArray.gridMode
@@ -212,28 +215,29 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
 
         fun renderFlatImages() {
-            val img = activations.toSimbrainColorImage(activations.size, 1)
+            val vertical = neuronArray.verticalLayout
+            val imgWidth = if (vertical) 1 else activations.size
+            val imgHeight = if (vertical) activations.size else 1
+            val boundsW = if (vertical) flatPixelArrayHeight.toDouble() else imageSize
+            val boundsH = if (vertical) imageSize else flatPixelArrayHeight.toDouble()
+
+            val img = activations.toSimbrainColorImage(imgWidth, imgHeight)
             activationImage.image = img
-            activationImage.setBounds(
-                0.0, 0.0,
-                imageSize, flatPixelArrayHeight.toDouble()
-            )
+            activationImage.setBounds(0.0, 0.0, boundsW, boundsH)
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
                 val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
-                spikeImage.image = spikes.toOverlay(activations.size, 1, NetworkPreferences.spikingColor)
-                spikeImage.setBounds(
-                    0.0, 0.0,
-                    imageSize, flatPixelArrayHeight.toDouble()
-                )
+                spikeImage.image = spikes.toOverlay(imgWidth, imgHeight, NetworkPreferences.spikingColor)
+                spikeImage.setBounds(0.0, 0.0, boundsW, boundsH)
                 spikeImage.addBorder()
             }
             if (showBias) {
-                biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(activations.size, 1)
-                biasImage.setBounds(
-                    0.0, flatPixelArrayHeight.toDouble() + margin,
-                    imageSize, flatPixelArrayHeight.toDouble()
-                )
+                biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(imgWidth, imgHeight)
+                if (vertical) {
+                    biasImage.setBounds(boundsW + margin, 0.0, boundsW, boundsH)
+                } else {
+                    biasImage.setBounds(0.0, boundsH + margin, boundsW, boundsH)
+                }
                 biasImage.addBorder()
             }
         }
@@ -285,10 +289,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 offsetY = activationImage.yOffset
             )
         } else {
+            val vertical = neuronArray.verticalLayout
             g2.drawNumericOverlay(
                 data = activations,
-                rows = 1, cols = activations.size,
-                imageWidth = imageSize, imageHeight = flatPixelArrayHeight.toDouble(),
+                rows = if (vertical) activations.size else 1,
+                cols = if (vertical) 1 else activations.size,
+                imageWidth = if (vertical) flatPixelArrayHeight.toDouble() else imageSize,
+                imageHeight = if (vertical) imageSize else flatPixelArrayHeight.toDouble(),
                 scalingFactor = networkPanel.scalingFactor,
                 decimalPlaces = decimalPlaces,
                 offsetX = activationImage.xOffset,

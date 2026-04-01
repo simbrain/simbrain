@@ -51,17 +51,10 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         }
 
     fun rotateNode() {
-        (layer as? NeuronArray)?.let { neuronArray ->
+        // Clear any existing rotation (e.g. from legacy serialized state)
+        if (mainNode.rotation != 0.0) {
             val centerLocation = mainNode.bounds.center2D
-            val currentRadian = mainNode.rotation
-            if (neuronArray.verticalLayout && mainNode.rotation != Math.PI / 2) {
-                val targetRadian = Math.PI / 2
-                mainNode.rotateAboutPoint(targetRadian - currentRadian, centerLocation)
-            }
-            if (!neuronArray.verticalLayout && mainNode.rotation != 0.0) {
-                val targetRadian = 0.0
-                mainNode.rotateAboutPoint(targetRadian - currentRadian, centerLocation)
-            }
+            mainNode.rotateAboutPoint(-mainNode.rotation, centerLocation)
         }
         updateBorder()
     }

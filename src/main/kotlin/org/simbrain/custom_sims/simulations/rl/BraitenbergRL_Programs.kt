@@ -60,8 +60,8 @@ val braitenbergRLPrograms = newSim { optionString ->
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
     val sharedDecayFunction = GaussianDecayFunction(150.0)
-    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction)
-    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction)
+    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 1.0 }
+    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 1.0 }
 
     fun calculateReward(agent: OdorWorldEntity): Double {
         if (sparseReward) {
@@ -139,7 +139,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     // Motor neurons
     val straight = runBlocking {
         network.addNeuron(39, 5).apply {
-            label = "Speed"; activation = 0.0; clamped = false; bias = 0.5; upperBound = 3.0
+            label = "Speed"; activation = 0.0; clamped = false; bias = 2.0; upperBound = 10.0
         }
     }
     val leftTurn = runBlocking {
@@ -214,6 +214,9 @@ val braitenbergRLPrograms = newSim { optionString ->
     network.freeSynapses.forEach { s -> s.strength = 0.0 }
 
     var previousValue = 0.0
+    var previousProgram = -1
+    var previousProbabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
+    var previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
 
     // In bandit mode, preferences are stored as programArray biases
     // (SoftmaxRule uses inputs + biases, so with no weight matrix, biases alone drive softmax)
@@ -263,47 +266,51 @@ val braitenbergRLPrograms = newSim { optionString ->
             probabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
         }
 
+        // Sample the program to run next step
         val activeProgram = sample(probabilities)
-        activeTextLabel.text = "Active: ${programNames[activeProgram]} (p=${"%.2f".format(probabilities[activeProgram])})"
+        activeTextLabel.text = "Active: ${programNames[activeProgram]}"
 
         applyProgram(activeProgram)
 
-        // Reward
+        // Reward reflects the outcome of the previous program's action
         rewardNeuron.activation = calculateReward(agent)
 
-        // Critic: V(s) from sensors
+        // Critic: V(s') is the current value; V(s) was stored as previousValue
         val currentValue = valueNeuron.activation
         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
         tdErrorNeuron.activation = tdError
 
-        if (learningEnabled) {
-            // Update critic weights: w_c += α * δ * sensor
+        // Only update if a previous program was active (skip first step)
+        if (learningEnabled && previousProgram >= 0) {
+            // Update critic weights using previous sensor state: w_c += α * δ * s(t-1)
             criticWeights.forEachIndexed { j, syn ->
-                syn.strength += learningRate * tdError * sensorValues[j]
+                syn.strength += learningRate * tdError * previousSensorValues[j]
             }
 
-            // Update actor using policy gradient: ∇ln(π) * δ
+            // Update actor using policy gradient with previous step's action and state
             if (stateDependent) {
-                // Update weight matrix: Δw[i][j] += α * δ * sensor[j] * (1{i=chosen} - π(i))
-                // WeightMatrix is target-source format: weights[programIndex, sensorIndex]
+                // Δw[i][j] += α * δ * s(t-1)[j] * (1{i=prevChosen} - π(t-1)(i))
                 for (i in 0 until numPrograms) {
-                    val indicator = if (i == activeProgram) 1.0 else 0.0
-                    for (j in sensorValues.indices) {
-                        actorWeightMatrix.weights[i, j] += learningRate * tdError * sensorValues[j] * (indicator - probabilities[i])
+                    val indicator = if (i == previousProgram) 1.0 else 0.0
+                    for (j in previousSensorValues.indices) {
+                        actorWeightMatrix.weights[i, j] += learningRate * tdError * previousSensorValues[j] * (indicator - previousProbabilities[i])
                     }
                 }
                 actorWeightMatrix.events.updated.fire()
             } else {
-                // Bandit: update biases on programArray (no sensor input)
+                // Bandit: update biases using previous step's action
                 val biases = programArray.biases
                 for (i in 0 until numPrograms) {
-                    val indicator = if (i == activeProgram) 1.0 else 0.0
-                    biases[i, 0] = biases[i, 0] + learningRate * tdError * (indicator - probabilities[i])
+                    val indicator = if (i == previousProgram) 1.0 else 0.0
+                    biases[i, 0] = biases[i, 0] + learningRate * tdError * (indicator - previousProbabilities[i])
                 }
             }
         }
 
         previousValue = currentValue
+        previousProgram = activeProgram
+        previousProbabilities = probabilities
+        previousSensorValues = sensorValues
     }
 
     agent.events.collided.on { collidedWith ->
@@ -323,6 +330,9 @@ val braitenbergRLPrograms = newSim { optionString ->
         programArray.biases.fill(0.0)
         criticWeights.forEach { it.strength = 0.0 }
         previousValue = 0.0
+        previousProgram = -1
+        previousProbabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
+        previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
         valueNeuron.activation = 0.0
         tdErrorNeuron.activation = 0.0
     }
@@ -381,6 +391,10 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             addFormattedNumericTextField("Temperature", initValue = temperature) {
                 temperature = it.coerceAtLeast(0.01)
+            }
+
+            addFormattedNumericTextField("Speed Bias", initValue = straight.bias) {
+                straight.bias = it
             }
 
             addFormattedNumericTextField("Weight Strength", initValue = programWeightStrength) {

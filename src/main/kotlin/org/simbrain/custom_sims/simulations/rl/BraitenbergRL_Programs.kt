@@ -1,7 +1,7 @@
 package org.simbrain.custom_sims.simulations.rl
 
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -21,30 +21,22 @@ import java.awt.geom.Point2D
  * where they are trained using "programs", that is, single nodes which, when active, produce
  * the weights appropriate to a task
  *
- * Two cases are included:
- *
- * 1. State-dependent actor: sensors feed into actor weights, softmax over programs.
- *    Learns WHICH program to use based on what the agent currently sees.
- *
- * 2. State-independent actor (bandit): no sensor input, just per-program preferences.
- *    Learns which program is globally best regardless of state.
- *
- *    TODO: Possibly remove case 2.
- *    TODO: Checkbox for state dependent wipes weight matrix
+ * Programs set the turn weights directly, while a learned sensor-to-program preference matrix
+ * determines which program is selected by softmax on each step.
  */
 val braitenbergRLPrograms = newSim { optionString ->
 
     val tasks = rlTasks
 
     var learningRate = 0.05
+    var actorLearningRate = 0.5
     var gamma = 0.95
     var programWeightStrength = 20.0
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
     var learningEnabled = true
     var sparseReward = false
-    var temperature = .01
-    var stateDependent = true
+    var temperature = 0.5
 
     // Sparse reward flags set by collision events
     var justHitCheese = false
@@ -59,9 +51,9 @@ val braitenbergRLPrograms = newSim { optionString ->
     val poison = oc.world.addEntity(398, 335, EntityType.Poison)
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
-    val sharedDecayFunction = GaussianDecayFunction(150.0)
-    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 1.0 }
-    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 1.0 }
+    val sharedDecayFunction = GaussianDecayFunction(75.0)
+    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
+    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
 
     fun calculateReward(agent: OdorWorldEntity): Double {
         if (sparseReward) {
@@ -164,7 +156,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     )
     val numPrograms = programNames.size
 
-    val softmaxRule = SoftmaxRule().apply { this.temperature = 1.0 }
+    val softmaxRule = SoftmaxRule().apply { this.temperature = temperature }
 
     val programArray = NeuronArray(numPrograms).apply {
         label = "Programs"
@@ -176,7 +168,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     network.addNetworkModelAsync(programArray)
     programArray.setLocation(452.0, 135.0)
 
-    // Weight matrix: sensors → programs (the actor weights for state-dependent mode)
+    // Weight matrix: sensors → programs (the learned program preferences)
     val actorWeightMatrix = WeightMatrix(sensorCollection, programArray).apply {
         hardClear() // start with zero matrix
     }
@@ -215,11 +207,8 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     var previousValue = 0.0
     var previousProgram = -1
-    var previousProbabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
     var previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
-
-    // In bandit mode, preferences are stored as programArray biases
-    // (SoftmaxRule uses inputs + biases, so with no weight matrix, biases alone drive softmax)
+    var stuckCounter = 0
 
     fun applyProgram(programIndex: Int) {
         when (programIndex) {
@@ -254,12 +243,24 @@ val braitenbergRLPrograms = newSim { optionString ->
 
         val sensorValues = sensorNeurons.map { it.activation }.toDoubleArray()
 
+        // Respawn agent if it has been stuck with near-zero sensor input for too long
+        if (sensorValues.sum() < 0.01) {
+            stuckCounter++
+            if (stuckCounter > 200) {
+                agent.location = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
+                agent.heading = (0..360).random().toDouble()
+                stuckCounter = 0
+                previousValue = 0.0
+                previousProgram = -1
+            }
+        } else {
+            stuckCounter = 0
+        }
+
         // Sync softmax temperature from the control panel
         softmaxRule.temperature = temperature
 
-        // SoftmaxRule already computed probabilities from weighted inputs + biases
-        // State-dependent: weight matrix provides inputs, biases are 0
-        // Bandit: no weight matrix, biases alone drive softmax
+        // SoftmaxRule computes program probabilities from the learned sensor-to-program preferences.
         var probabilities = programArray.activations.toDoubleArray()
         // First iteration before network update, use uniform
         if (probabilities.sum() < 1e-6) {
@@ -287,29 +288,16 @@ val braitenbergRLPrograms = newSim { optionString ->
                 syn.strength += learningRate * tdError * previousSensorValues[j]
             }
 
-            // Update actor using policy gradient with previous step's action and state
-            if (stateDependent) {
-                // Δw[i][j] += α * δ * s(t-1)[j] * (1{i=prevChosen} - π(t-1)(i))
-                for (i in 0 until numPrograms) {
-                    val indicator = if (i == previousProgram) 1.0 else 0.0
-                    for (j in previousSensorValues.indices) {
-                        actorWeightMatrix.weights[i, j] += learningRate * tdError * previousSensorValues[j] * (indicator - previousProbabilities[i])
-                    }
-                }
-                actorWeightMatrix.events.updated.fire()
-            } else {
-                // Bandit: update biases using previous step's action
-                val biases = programArray.biases
-                for (i in 0 until numPrograms) {
-                    val indicator = if (i == previousProgram) 1.0 else 0.0
-                    biases[i, 0] = biases[i, 0] + learningRate * tdError * (indicator - previousProbabilities[i])
-                }
+            // Simple TD actor update: strengthen or weaken the chosen program's preference weights
+            // using the previous state's sensor activations.
+            for (j in previousSensorValues.indices) {
+                actorWeightMatrix.weights[previousProgram, j] += actorLearningRate * tdError * previousSensorValues[j]
             }
+            actorWeightMatrix.events.updated.fire()
         }
 
         previousValue = currentValue
         previousProgram = activeProgram
-        previousProbabilities = probabilities
         previousSensorValues = sensorValues
     }
 
@@ -327,26 +315,13 @@ val braitenbergRLPrograms = newSim { optionString ->
     fun resetLearning() {
         actorWeightMatrix.hardClear()
         programArray.clear()
-        programArray.biases.fill(0.0)
         criticWeights.forEach { it.strength = 0.0 }
         previousValue = 0.0
         previousProgram = -1
-        previousProbabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
         previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
+        stuckCounter = 0
         valueNeuron.activation = 0.0
         tdErrorNeuron.activation = 0.0
-    }
-
-    fun removeWeightMatrix() {
-        sensorCollection.removeOutgoingConnector(actorWeightMatrix)
-        programArray.removeIncomingConnector(actorWeightMatrix)
-        actorWeightMatrix.events.deleted.fire(actorWeightMatrix)
-    }
-
-    fun addWeightMatrix() {
-        sensorCollection.addOutgoingConnector(actorWeightMatrix)
-        programArray.addIncomingConnector(actorWeightMatrix)
-        network.addNetworkModelAsync(actorWeightMatrix)
     }
 
     withGui {
@@ -369,20 +344,14 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             addCheckBox("Sparse Reward (collision only)", sparseReward) { sparseReward = it }
 
-            addCheckBox("State-Dependent Actor", stateDependent) { enabled ->
-                stateDependent = enabled
-                resetLearning()
-                if (enabled) {
-                    addWeightMatrix()
-                } else {
-                    launch { removeWeightMatrix() }
-                }
-            }
-
             addSeparator()
 
-            addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+            addFormattedNumericTextField("Critic Learning Rate", initValue = learningRate) {
                 learningRate = it
+            }
+
+            addFormattedNumericTextField("Actor Learning Rate", initValue = actorLearningRate) {
+                actorLearningRate = it
             }
 
             addFormattedNumericTextField("Gamma", initValue = gamma) {
@@ -409,11 +378,58 @@ val braitenbergRLPrograms = newSim { optionString ->
         }
     }
 
+    // Headless mode
+    var maxIterations: Int? = null
+    var currentIteration = 0
+
+    if (optionString?.isNotEmpty() == true) {
+        val options = JSONObject(optionString)
+
+        if (options.has("taskIndex")) {
+            val taskIndex = options.getInt("taskIndex")
+            if (taskIndex in tasks.indices) {
+                val task = tasks[taskIndex]
+                cheeseRewardMultiplier = task.cheeseReward
+                poisonRewardMultiplier = task.poisonReward
+                println("Task set to: ${task.name}")
+            }
+        }
+        if (options.has("learningRate")) learningRate = options.getDouble("learningRate")
+        if (options.has("actorLearningRate")) actorLearningRate = options.getDouble("actorLearningRate")
+        if (options.has("gamma")) gamma = options.getDouble("gamma")
+        if (options.has("temperature")) temperature = options.getDouble("temperature").coerceAtLeast(0.01)
+        if (options.has("maxIterations")) {
+            maxIterations = options.getInt("maxIterations")
+            println("Max iterations: $maxIterations, temperature=$temperature, lr=$learningRate, actorLR=$actorLearningRate")
+        }
+
+        maxIterations?.let { max ->
+            println("=== Starting Headless Simulation ===")
+            workspace.addUpdateAction("Headless iteration counter") {
+                currentIteration++
+                if (currentIteration % 1000 == 0) {
+                    val activations = programArray.activations.toDoubleArray()
+                    println("Iter $currentIteration | probs=[${activations.map { "%.3f".format(it) }.joinToString(",")}] | reward=${"%.3f".format(rewardNeuron.activation)} | tdErr=${"%.3f".format(tdErrorNeuron.activation)}")
+                }
+                if (currentIteration >= max) {
+                    val activations = programArray.activations.toDoubleArray()
+                    println("\n=== Final Results (iter $currentIteration) ===")
+                    programNames.forEachIndexed { i, name -> println("  [$i] $name: ${"%.4f".format(activations[i])}") }
+                    val winner = activations.indices.maxByOrNull { activations[it] }!!
+                    println("Winner: ${programNames[winner]} (index $winner)")
+                    workspace.stop()
+                }
+            }
+            runBlocking { workspace.iterateSuspend(max) }
+            println("=== Simulation Complete ===")
+        }
+    }
+
     addSidebarInfo(
         """
-    # TD Experiments: Actor-Critic Architectures
+    # Braitenberg Program Learning
 
-    Two experiments comparing actor architectures for program selection, following Sutton & Barto's actor-critic framework (Chapters 6 & 13).
+    A program-based actor-critic experiment using discrete Braitenberg controllers.
 
     ## The Setup
 
@@ -423,30 +439,20 @@ val braitenbergRLPrograms = newSim { optionString ->
     - **Avoid Both Objects**: flee everything
     - **Seek Poison, Avoid Cheese**: approach poison, flee cheese
 
-    The agent selects programs using a **softmax policy** (programs show their selection probability). The program activations show π(program|state) — the probability of selecting each program.
+    The agent selects programs using a **softmax policy**. The program activations show the current probability of selecting each program.
 
-    ## Experiment 1: State-Dependent Actor
-
-    The actor computes preferences from sensor inputs via a **weight matrix** (visible in the network):
+    The actor computes preferences from sensor inputs via a **weight matrix**:
     ```
     preference[i] = Σ w[i][j] × sensor[j]
     ```
-    The NeuronArray applies softmax to get probabilities. This allows state-dependent decisions: "when I see cheese nearby, prefer the seek-cheese program."
+    The NeuronArray applies softmax to get probabilities. The selected program then sets the turn weights for that step.
 
-    The actor update follows the policy gradient theorem:
+    The actor uses a simple TD-style update on the chosen program:
     ```
-    Δw[i][j] = α × δ × sensor[j] × (1{i=chosen} - π(i))
+    Δw[chosen,j] = α × δ × sensor[j]
     ```
 
-    ## Experiment 2: State-Independent (Bandit)
-
-    The actor has one preference value per program with no sensor input:
-    ```
-    Δpref[i] = α × δ × (1{i=chosen} - π(i))
-    ```
-    This learns which program is globally best, like a multi-armed bandit. It cannot adapt behavior based on what the agent sees.
-
-    ## Critic (Both Experiments)
+    ## Critic
 
     The critic maps sensors to value: `V(s) = Σ w_c[j] × sensor[j]`. This is a proper state-based value estimate — "how good is it to be HERE?" TD error: `δ = r + γV(s') - V(s)`.
 
@@ -454,7 +460,8 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     Controls the softmax sharpness:
     - **Low (e.g. 0.1)**: nearly greedy — exploits the best program
-    - **1.0**: standard softmax
+    - **0.5**: good starting point for this simulation
+    - **1.0**: softer exploration
     - **High (e.g. 5.0)**: nearly uniform — explores all programs equally
 
     ## Reward Modes
@@ -462,14 +469,25 @@ val braitenbergRLPrograms = newSim { optionString ->
     - **Continuous** (default): proximity-based Gaussian reward, always provides a gradient signal
     - **Sparse**: reward ONLY on collision with cheese (+1) or poison (-1). This is the classic Sutton & Barto scenario where TD must propagate value backward from distant rewards.
 
-    ## What to Try
+    ## What The Investigation Found
 
-    1. Run with continuous reward + state-dependent actor — should learn quickly
-    2. Switch to sparse reward — much harder, TD error must build the value gradient over time
-    3. Switch to bandit mode — can it still learn? Compare learning speed
-    4. Try sparse + bandit — the hardest combination
+    Headless testing found several real implementation issues, and those were fixed:
+    - reward scale mismatch
+    - softmax temperature initialization bug
+    - unnecessary policy-gradient / bandit bookkeeping for the current design
 
-    The program nodes display selection probabilities (not binary activations). Early on they should be near 0.25 each (uniform), then shift toward the correct program.
+    After those fixes, a simpler TD-style actor was implemented. That version is cleaner and somewhat better, but repeated runs still do not reliably learn all four tasks.
+
+    The current conclusion is that the remaining difficulty appears to be **structural**:
+    - each action is a whole bundled Braitenberg program
+    - states often contain mixed cheese and poison evidence
+    - one TD error must reinforce or punish the entire bundled behavior
+
+    This makes credit assignment much harder than in `BraitenbergRL.kt`, where TD updates direct sensor-to-motor weights.
+
+    ## Reading the Display
+
+    The program nodes display probabilities, not binary activations. In successful runs one program becomes dominant. In many runs the probabilities stay ambiguous, spike briefly, or drift back toward uniform.
 
     """.trimIndent()
     )

@@ -125,6 +125,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
         // item("Evolve Mouse (Sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }
         item("Evolve XOR") { evolveXor }
+        item("Evolve XOR (Slot DSL)", beta = true) { evolveXorSlot }
+        item("Evolve XOR (Paired)", beta = true) { evolveXorPaired }
+        item("Evolve grazing cows (Slot DSL)", beta = true) { grazingCowsSlot }
     }
 
     dir("Competitive") {

@@ -1,13 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -28,75 +23,49 @@ val evolveXor = newSim {
         seed = 42
     )
 
-    class XorGenotype(seed: Long = Random.nextLong()) : Genotype {
+    class XorGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
 
-        override val random: Random = Random(seed)
+        val inputs by nodeChromosome(2) { clamped = true; upperBound = 1.0; lowerBound = -1.0 }
+        val hidden by nodeChromosome(2) { upperBound = 1.0; lowerBound = -1.0 }
+        val output by nodeChromosome(1) { upperBound = 1.0; lowerBound = -1.0 }
+        val connections by connectionChromosome()
 
-        var inputLayerChromosome = chromosome(2) { add(nodeGene { clamped = true; upperBound = 1.0; lowerBound = -1.0 }) }
-        var hiddenLayerChromosome = chromosome(2) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
-        var outputLayerChromosome = chromosome(1) { add(nodeGene { upperBound = 1.0; lowerBound = -1.0 }) }
-        var connectionChromosome = chromosome(1) {
-            createGene(inputLayerChromosome to hiddenLayerChromosome) {
+        init {
+            connections.addConnection(inputs to hidden) {
                 strength = random.nextDouble(-1.0, 1.0)
             }
-            createGene(hiddenLayerChromosome to outputLayerChromosome) {
+            connections.addConnection(hidden to output) {
                 strength = random.nextDouble(-1.0, 1.0)
             }
         }
 
-        inner class Phenotype(
-            val inputs: NeuronCollection,
-            val hiddens: NeuronCollection,
-            val outputs: NeuronCollection,
-            val connections: List<Synapse>
-        )
+        override fun createNew(seed: Long) = XorGenotype(seed)
 
-        suspend fun expressWith(network: Network): Phenotype {
-            return Phenotype(
-                NeuronCollection(network.express(inputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "input" },
-                NeuronCollection(network.express(hiddenLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "hidden" },
-                NeuronCollection(network.express(outputLayerChromosome)).also { network.addNetworkModelAsync(it); it.label = "output" },
-                network.express(connectionChromosome)
-            )
-        }
-
-        fun copy() = XorGenotype(random.nextLong()).apply {
-            val current = this@XorGenotype
-            val new = this@apply
-
-            new.inputLayerChromosome = current.inputLayerChromosome.copy()
-            new.hiddenLayerChromosome = current.hiddenLayerChromosome.copy()
-            new.outputLayerChromosome = current.outputLayerChromosome.copy()
-            new.connectionChromosome = current.connectionChromosome.copy()
-        }
-
-        fun mutate() {
-            hiddenLayerChromosome.forEach {
+        override fun mutate() {
+            hidden.genes.forEach {
                 it.mutate {
                     bias += random.nextDouble(-1.0, 1.0)
                 }
             }
 
-            connectionChromosome.forEach {
+            connections.genes.forEach {
                 it.mutate {
                     strength += random.nextDouble(-1.0, 1.0)
                 }
             }
 
             withProbability(0.25) {
-                connectionChromosome.createGene(
-                    inputLayerChromosome to hiddenLayerChromosome,
-                    hiddenLayerChromosome to outputLayerChromosome
+                connections.addConnection(
+                    inputs to hidden,
+                    hidden to output
                 ) { strength = random.nextDouble(-1.0, 1.0) }
             }
 
             // Add a new hidden unit
             if (random.nextDouble() < 0.1) {
-                hiddenLayerChromosome.add(nodeGene())
+                hidden.addGene(nodeGene())
             }
-
         }
-
     }
 
     class XorSim(
@@ -108,25 +77,28 @@ val evolveXor = newSim {
 
         val network = networkComponent.network
 
-        private val _phenotype = CompletableDeferred<XorGenotype.Phenotype>()
-        val phenotype: Deferred<XorGenotype.Phenotype> by this::_phenotype
+        private var built = false
 
         override fun mutate() {
             xorGenotype.mutate()
         }
 
         override suspend fun build() {
-            if (!_phenotype.isCompleted) {
-                _phenotype.complete(xorGenotype.expressWith(network))
+            if (!built) {
+                xorGenotype.expressAll(network)
+                xorGenotype.inputs.neurons.label = "input"
+                xorGenotype.hidden.neurons.label = "hidden"
+                xorGenotype.output.neurons.label = "output"
+                built = true
             }
         }
 
         override fun visualize(workspace: Workspace): XorSim {
-            return XorSim(xorGenotype.copy(), workspace)
+            return XorSim(xorGenotype.copyGenotype() as XorGenotype, workspace)
         }
 
         override fun copy(): EvoSim {
-            return XorSim(xorGenotype.copy(), Workspace())
+            return XorSim(xorGenotype.copyGenotype() as XorGenotype, Workspace())
         }
 
         override suspend fun eval(): Double {
@@ -139,10 +111,10 @@ val evolveXor = newSim {
             )
 
             return testData.sumOf { (input, output) ->
-                phenotype.await().inputs.neuronList.activations = input
+                xorGenotype.inputs.neurons.neuronList.activations = input
                 // Iterate more each run if allowing recurrent connections
                 workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
-                val error = (phenotype.await().outputs.neuronList.activations sse output)
+                val error = (xorGenotype.output.neurons.neuronList.activations sse output)
                 error
             }
         }
@@ -157,11 +129,11 @@ val evolveXor = newSim {
         lastGeneration.take(1).forEach {
             with(it.visualize(workspace) as XorSim) {
                 build()
-                val phenotype = this.phenotype.await()
-                phenotype.inputs.neuronList.forEach { it.increment = 1.0 }
-                phenotype.inputs.location = point( 0, 150)
-                phenotype.hiddens.location = point( 0, 60)
-                phenotype.outputs.location = point(0, -25)
+                val genotype = this.xorGenotype
+                genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
+                genotype.inputs.neurons.location = point( 0, 150)
+                genotype.hidden.neurons.location = point( 0, 60)
+                genotype.output.neurons.location = point(0, -25)
                 withGui {
                     place(networkComponent, 340, 10, 384, 480)
                 }
@@ -179,47 +151,47 @@ val evolveXor = newSim {
         }
 
         addSidebarInfo(
-        """ 
+        """
         # Evolving A Network for XOR
-        
-        This is a simulation of the evolution of a neural network evolving to solve the XOR problem using an evolutionary framework in Simbrain. 
-        
+
+        This is a simulation of the evolution of a neural network evolving to solve the XOR problem using an evolutionary framework in Simbrain.
+
         # Simulation Details
-        
+
         This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the `maximum generation`. The
-        goal of this simulation is to evolve until it is as close as possible to the `target error`. 
-        
+        goal of this simulation is to evolve until it is as close as possible to the `target error`.
+
         In this simulation, the `target error` is calculated as the difference between the existing dataset (i.e., neuron groups) and the actual solution to the XOR problem.
-        
+
         For a comprehensive look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
-        
+
         ## Evolutionary Process
-        
-        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation is created with a three-layer network of the XOR solution and a preset amount of 
+
+        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation is created with a three-layer network of the XOR solution and a preset amount of
         connections (`1` per layer). Within each generation, the simulation will iterate until the specified value while the fitness of each simulation is calculated and recorded.
-        
+
         Then after each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations
-        will have mutations, where the simulation develops new neurons in the hidden layer (`10%` chance), connections between neuron layers (`25%` chance), changes in neuron biases and weight strengths. 
-        
-        After each generation, a percentage of the top performer(s) is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has 
-        reached the `target error` or lower, or when the evolutionary process ends. 
-        
-        # What to Do    
-            
+        will have mutations, where the simulation develops new neurons in the hidden layer (`10%` chance), connections between neuron layers (`25%` chance), changes in neuron biases and weight strengths.
+
+        After each generation, a percentage of the top performer(s) is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has
+        reached the `target error` or lower, or when the evolutionary process ends.
+
+        # What to Do
+
         In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. Below are the steps to evolving the simulation:
-        
+
         1) Specify the parameters of the simulation.
-        
+
         2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
-        
+
         3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
- 
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
+
         Kanly Thao
-        
+
         """.trimIndent()
         )
 

@@ -1,13 +1,13 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.Synapse
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
@@ -43,81 +43,42 @@ val grazingCows = newSim { optionString ->
     // If not, use min to compute group level fitness across cows
     var useAverage = false
 
-    class CowGenotype(seed: Long = Random.nextLong()) : Genotype {
-        override val random: Random = Random(seed)
-        var inputChromosome = chromosome(1) {
-            // Dandelion and cow sensors
-            repeat(6) {
-                add(nodeGene { clamped = true })
-            }
-            // Won't get coupled to. Serves as an initial "drive" neuron
-            add(nodeGene { clamped = true; activation = 1.0 })
-        }
-        var hiddenChromosome = chromosome(2) { add(nodeGene()) }
-        var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
-        var connectionChromosome = chromosome(1) {
+    class CowGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+
+        // 6 sensor neurons (3 dandelion + 3 cow) + 1 drive neuron
+        val inputs by nodeChromosome(7) { clamped = true }
+        val hidden by nodeChromosome(2)
+        val outputs by nodeChromosome(3) { upperBound = 10.0; lowerBound = -10.0 }
+        val connections by connectionChromosome()
+
+        init {
+            // Set drive neuron activation
+            inputs.genes.last().template.activation = 1.0
+            // Random initial connections
             repeat(3) {
-                add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
-                add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
+                connections.chromosome.add(connectionGene(inputs.genes.random(random), hidden.genes.random(random)))
+                connections.chromosome.add(connectionGene(hidden.genes.random(random), outputs.genes.random(random)))
             }
-            // Force an initial "drive"
-            add(connectionGene(inputChromosome[3], hiddenChromosome.sampleOne()))
+            // Extra drive connection
+            connections.chromosome.add(connectionGene(inputs.genes[3], hidden.genes.random(random)))
         }
 
-        inner class Phenotype(
-            val inputs: NeuronCollection,
-            val hiddens: NeuronCollection,
-            val outputs: NeuronCollection,
-            val connections: List<Synapse>
-        )
+        override fun createNew(seed: Long) = CowGenotype(seed)
 
-        suspend fun expressWith(network: Network): Phenotype {
-            return Phenotype(
-                NeuronCollection(network.express(inputChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "input"
-                },
-                NeuronCollection(network.express(hiddenChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "hidden"
-                },
-                NeuronCollection(network.express(outputChromosome)).also {
-                    network.addNetworkModelAsync(it); it.label = "output"
-                },
-                network.express(connectionChromosome)
-            )
-        }
+        override fun mutate() {
+            hidden.genes.forEach { it.mutate { bias += random.nextDouble(-1.0, 1.0) } }
+            connections.genes.forEach { it.mutate { strength += random.nextDouble(-1.0, 1.0) } }
 
-        fun copy() = CowGenotype(random.nextLong()).apply {
-            val current = this@CowGenotype
-            val new = this@apply
-            new.inputChromosome = current.inputChromosome.copy()
-            new.hiddenChromosome = current.hiddenChromosome.copy()
-            new.outputChromosome = current.outputChromosome.copy()
-            new.connectionChromosome = current.connectionChromosome.copy()
-        }
-
-        fun mutate() {
-            hiddenChromosome.forEach {
-                it.mutate {
-                    bias += random.nextDouble(-1.0, 1.0)
-                }
-            }
-            connectionChromosome.forEach {
-                it.mutate {
-                    strength += random.nextDouble(-1.0, 1.0)
-                }
-            }
-
-            val existingPairs = connectionChromosome.map { it.source to it.target }.toSet()
+            val existingPairs = connections.genes.map { it.source to it.target }.toSet()
             val availableConnections =
-                ((inputChromosome + hiddenChromosome + outputChromosome) cartesianProduct (hiddenChromosome + outputChromosome)) - existingPairs
+                ((inputs.chromosome + hidden.chromosome + outputs.chromosome) cartesianProduct (hidden.chromosome + outputs.chromosome)) - existingPairs
             if (random.nextDouble() < 0.25 && availableConnections.isNotEmpty()) {
                 val (source, target) = availableConnections.sampleOne(random)
-                connectionChromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
+                connections.chromosome.add(connectionGene(source, target) { strength = random.nextDouble(-1.0, 1.0) })
             }
 
-            // Make hidden layer larger
             if (random.nextDouble() < 0.1) {
-                hiddenChromosome.add(nodeGene())
+                hidden.addGene(nodeGene())
             }
         }
     }
@@ -146,10 +107,8 @@ val grazingCows = newSim { optionString ->
 
         val random = Random(cowGenotypes.first().random.nextInt())
 
-        val cowFitnesses = mutableMapOf<CowGenotype.Phenotype, Double>()
-
-        private val _cowPhenotypes = CompletableDeferred<List<CowGenotype.Phenotype>>()
-        val cowPhenotypes: Deferred<List<CowGenotype.Phenotype>> get() = _cowPhenotypes
+        val cowFitnesses = mutableMapOf<Int, Double>()
+        private var built = false
 
         val odorWorld = OdorWorldComponent("Odor World 1").also {
             workspace.addWorkspaceComponent(it)
@@ -199,7 +158,7 @@ val grazingCows = newSim { optionString ->
 
         init {
             // Central flower sensor to determine when the flower is actually found.
-            entities.forEach{
+            entities.forEach {
                 it.addSensor(
                     ObjectSensor(EntityType.Dandelions, radius = 0.0).apply {
                         label = "centralFlowerSensor"
@@ -215,37 +174,29 @@ val grazingCows = newSim { optionString ->
                         EntityType.Dandelions, doubleArrayOf(1.0))
                 }
             }
-            workspace.launch {
-                (cowPhenotypes.await() zip entities).forEach { (phenotype, entity) ->
-                    addUpdateActions(phenotype, entity)
-                }
-            }
-        }
-
-        fun addUpdateActions(cow: CowGenotype.Phenotype, entity: OdorWorldEntity) {
-
-            fun addFitness(fitnessDelta: Double) {
-                cowFitnesses[cow] = (cowFitnesses[cow] ?: 0.0) + fitnessDelta
-            }
-            addFitness(0.0) // To initialize fitness
-
-            addFindFlowerAction(workspace, entity) { addFitness(1.0) }
         }
 
         override suspend fun build() {
-            if (!_cowPhenotypes.isCompleted) {
-                // Express the genotypes
-                _cowPhenotypes.complete(
-                    cowGenotypes.zip(networks).map { (genotype, network) -> genotype.expressWith(network) })
-                // Make couplings
+            if (!built) {
+                // Express genotypes into networks
+                cowGenotypes.zip(networks).forEach { (genotype, network) ->
+                    genotype.expressAll(network)
+                }
+                // Couplings
                 with(workspace.couplingManager) {
-                    val cows = _cowPhenotypes.await()
-                    (0..cows.lastIndex).map { i ->
-                        val cow = cows[i]
-                        (dandelionSensors[i] + cowSensors[i]) couple cow.inputs.neuronList
-                        cow.outputs.neuronList couple effectors[i]
+                    cowGenotypes.indices.forEach { i ->
+                        (dandelionSensors[i] + cowSensors[i]) couple cowGenotypes[i].inputs.neurons.neuronList
+                        cowGenotypes[i].outputs.neurons.neuronList couple effectors[i]
                     }
                 }
+                // Fitness tracking
+                cowGenotypes.indices.forEach { i ->
+                    cowFitnesses[i] = 0.0
+                    addFindFlowerAction(workspace, entities[i]) { delta ->
+                        cowFitnesses[i] = (cowFitnesses[i] ?: 0.0) + delta
+                    }
+                }
+                built = true
             }
         }
 
@@ -253,9 +204,9 @@ val grazingCows = newSim { optionString ->
             cowGenotypes.forEach { it.mutate() }
         }
 
-        override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copy() }, workspace)
+        override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copyGenotype() as CowGenotype }, workspace)
 
-        override fun copy() = CowSim(cowGenotypes.map { it.copy() }, Workspace())
+        override fun copy() = CowSim(cowGenotypes.map { it.copyGenotype() as CowGenotype })
 
         override suspend fun eval(): Double {
             build()
@@ -307,10 +258,10 @@ val grazingCows = newSim { optionString ->
                             place(net, 768, 10 + i * 282, 326, 282)
                         }
                     }
-                    cowPhenotypes.await().forEach {
-                        it.inputs.location = point(0, 150)
-                        it.hiddens.location = point(0, 60)
-                        it.outputs.location = point(0, -25)
+                    cowGenotypes.forEach { g ->
+                        g.inputs.neurons.location = point(0, 150)
+                        g.hidden.neurons.location = point(0, 60)
+                        g.outputs.neurons.location = point(0, -25)
                     }
                     if (desktop == null) {
                         workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)

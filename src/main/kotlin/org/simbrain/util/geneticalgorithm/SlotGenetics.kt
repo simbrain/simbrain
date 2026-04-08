@@ -67,7 +67,7 @@ class LinkedChromosomeSlot<G : TopLevelGene<*>>(
 class CollectionLinkedSlot<G : TopLevelGene<*>>(
     var gene: G,
     val createDefault: () -> G,
-    val applyToCollection: (NeuronCollection, Any?) -> Unit
+    val applyToCollection: (NeuronCollection, Any?, Network) -> Unit
 ) : EvolutionSlot {
 
     @Suppress("UNCHECKED_CAST")
@@ -86,10 +86,10 @@ class CollectionLinkedSlot<G : TopLevelGene<*>>(
  * After expression: access [neurons] for wiring/evaluation.
  */
 class NodeChromosomeSlot(
-    val chromosome: Chromosome<Neuron, NodeGene>
+    internal val chromosome: Chromosome<Neuron, NodeGene>
 ) : EvolutionSlot {
 
-    val genes: MutableList<NodeGene> get() = chromosome
+    val genes: List<NodeGene> get() = chromosome
 
     private var _neurons: NeuronCollection? = null
     val neurons: NeuronCollection
@@ -108,7 +108,7 @@ class NodeChromosomeSlot(
         }
         _neurons = NeuronCollection(expressed).also { network.addNetworkModelAsync(it) }
         for (slot in collectionLinked) {
-            slot.applyToCollection(_neurons!!, slot.express())
+            slot.applyToCollection(_neurons!!, slot.express(), network)
         }
         return _neurons!!
     }
@@ -122,12 +122,12 @@ class NodeChromosomeSlot(
  * After expression: access [synapses] for inspection.
  */
 class ConnectionChromosomeSlot(
-    val chromosome: Chromosome<Synapse, ConnectionGene>
+    internal val chromosome: Chromosome<Synapse, ConnectionGene>
 ) : EvolutionSlot {
 
     override val processingOrder: Int get() = 10
 
-    val genes: MutableList<ConnectionGene> get() = chromosome
+    val genes: List<ConnectionGene> get() = chromosome
 
     private var _synapses: List<Synapse>? = null
     val synapses: List<Synapse>
@@ -144,18 +144,6 @@ class ConnectionChromosomeSlot(
     }
 
     override fun copySlot() = ConnectionChromosomeSlot(chromosome.copy())
-}
-
-// Standalone addConnection for genotypes without linked chromosomes
-context(Genotype)
-fun ConnectionChromosomeSlot.addConnection(
-    vararg layerPairs: Pair<NodeChromosomeSlot, NodeChromosomeSlot>,
-    init: Synapse.() -> Unit = {}
-): ConnectionGene? {
-    return chromosome.createGene(
-        *layerPairs.map { (s, t) -> s.chromosome to t.chromosome }.toTypedArray(),
-        synapseGeneTemplate = init
-    )
 }
 
 // --- Property delegation ---
@@ -247,7 +235,7 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
         val slot = CollectionLinkedSlot(
             gene = default(),
             createDefault = default,
-            applyToCollection = { neurons, expressed ->
+            applyToCollection = { neurons, expressed, _ ->
                 (expressed as LayoutGeneWrapper).express().layoutNeurons(neurons.neuronList)
             }
         )
@@ -264,10 +252,10 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
         val slot = CollectionLinkedSlot(
             gene = default(),
             createDefault = default,
-            applyToCollection = { neurons, expressed ->
+            applyToCollection = { neurons, expressed, network ->
                 (expressed as ConnectionStrategyGeneWrapper).connectionStrategy
                     .connectNeurons(neurons.neuronList, neurons.neuronList)
-                    // TODO: addToNetwork needs network reference — fix during sim migration
+                    .addToNetworkAsync(network)
             }
         )
         return PropertyDelegateProvider { _, property ->

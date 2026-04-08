@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -8,7 +7,8 @@ import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.*
+import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.labels
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -105,100 +105,78 @@ val evolveMousePursuer = newSim { optionString ->
 
     val mouseParams = MouseEvolutionParameters()
 
-    class MousePhenotype(
-        val inputs: List<Neuron>,
-        val hidden: List<Neuron>,
-        val outputs: List<Neuron>,
-        val connections: List<Synapse>
-    )
+    class MouseGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
 
-    class MouseGenotype(seed: Long = Random.nextLong()) : Genotype {
+        val inputs by nodeChromosome(3) { clamped = true }
+        val hidden by nodeChromosome(1)
+        val outputs by nodeChromosome(3)
+        val connections by connectionChromosome()
 
-        override val random: Random = Random(seed)
+        init {
+            // Configure individual input genes
+            inputs.genes[0].mutate { label = "Cheese Left" }
+            inputs.genes[1].mutate { label = "Cheese Right" }
+            inputs.genes[2].mutate { label = "Hunger"; lowerBound = 0.0; upperBound = 1.0 }
 
-        var inputChromosome = chromosome(1) {
-            add(nodeGene { clamped = true; label = "Cheese Left" })
-            add(nodeGene { clamped = true; label = "Cheese Right" })
-            add(nodeGene { clamped = true; label = "Hunger"; lowerBound = 0.0; upperBound = 1.0 })
-        }
+            // Configure hidden gene
+            hidden.genes[0].mutate { label = "Hidden 1" }
 
-        var hiddenChromosome = chromosome(1) {
-            add(nodeGene { label = "Hidden 1" })
-        }
+            // Configure output genes
+            outputs.genes[0].mutate { label = "Speed"; lowerBound = -10.0; upperBound = 10.0; bias = 0.5 }
+            outputs.genes[1].mutate { label = "Left"; lowerBound = -200.0; upperBound = 200.0 }
+            outputs.genes[2].mutate { label = "Right"; lowerBound = -200.0; upperBound = 200.0 }
 
-        var outputChromosome = chromosome(1) {
-            add(nodeGene { label = "Speed"; lowerBound = -10.0; upperBound = 10.0; bias = 0.5 })
-            add(nodeGene { label = "Left"; lowerBound = -200.0; upperBound = 200.0 })
-            add(nodeGene { label = "Right"; lowerBound = -200.0; upperBound = 200.0 })
-        }
-
-        var connectionChromosome = chromosome(1) {
             // Braitenberg scaffold with a single internal hunger input.
-            add(connectionGene(inputChromosome[0], outputChromosome[1]) { strength = 10.0 })
-            add(connectionGene(inputChromosome[1], outputChromosome[2]) { strength = 10.0 })
-            add(connectionGene(inputChromosome[0], outputChromosome[0]) { strength = 1.5 })
-            add(connectionGene(inputChromosome[1], outputChromosome[0]) { strength = 1.5 })
-            add(connectionGene(inputChromosome[2], outputChromosome[0]) { strength = 1.5 })
-            add(connectionGene(inputChromosome[2], hiddenChromosome[0]) { strength = 0.5 })
-            add(connectionGene(hiddenChromosome[0], outputChromosome[1]) { strength = 0.25 })
-            add(connectionGene(hiddenChromosome[0], outputChromosome[2]) { strength = 0.25 })
+            connections.addGene(connectionGene(inputs.genes[0], outputs.genes[1]) { strength = 10.0 })
+            connections.addGene(connectionGene(inputs.genes[1], outputs.genes[2]) { strength = 10.0 })
+            connections.addGene(connectionGene(inputs.genes[0], outputs.genes[0]) { strength = 1.5 })
+            connections.addGene(connectionGene(inputs.genes[1], outputs.genes[0]) { strength = 1.5 })
+            connections.addGene(connectionGene(inputs.genes[2], outputs.genes[0]) { strength = 1.5 })
+            connections.addGene(connectionGene(inputs.genes[2], hidden.genes[0]) { strength = 0.5 })
+            connections.addGene(connectionGene(hidden.genes[0], outputs.genes[1]) { strength = 0.25 })
+            connections.addGene(connectionGene(hidden.genes[0], outputs.genes[2]) { strength = 0.25 })
         }
 
-        suspend fun expressWith(network: Network): MousePhenotype {
-            val inputs = network.express(inputChromosome)
-            val hidden = network.express(hiddenChromosome)
-            val outputs = network.express(outputChromosome)
-            inputs.labels = listOf("Cheese Left", "Cheese Right", "Hunger")
-            outputs.labels = listOf("Speed", "Left", "Right")
-            val connections = network.express(connectionChromosome)
-            return MousePhenotype(inputs, hidden, outputs, connections)
-        }
+        override fun createNew(seed: Long) = MouseGenotype(seed)
 
-        fun copy(): MouseGenotype = MouseGenotype(random.nextLong()).also { copied ->
-            copied.inputChromosome = inputChromosome.copy()
-            copied.hiddenChromosome = hiddenChromosome.copy()
-            copied.outputChromosome = outputChromosome.copy()
-            copied.connectionChromosome = connectionChromosome.copy()
-        }
-
-        fun mutate() {
-            hiddenChromosome.forEach {
+        override fun mutate() {
+            hidden.genes.forEach {
                 it.mutate {
                     bias += random.nextDouble(-0.2, 0.2)
                 }
             }
 
-            outputChromosome.forEach {
+            outputs.genes.forEach {
                 it.mutate {
                     bias += random.nextDouble(-0.1, 0.1)
                 }
             }
 
-            connectionChromosome.forEach {
+            connections.genes.forEach {
                 it.mutate {
                     strength += random.nextDouble(-0.5, 0.5)
                 }
             }
 
-            val existingPairs = connectionChromosome.map { it.source to it.target }.toSet()
+            val existingPairs = connections.genes.map { it.source to it.target }.toSet()
             val availablePairs =
-                (inputChromosome + hiddenChromosome).flatMap { source ->
-                    (hiddenChromosome + outputChromosome).map { target -> source to target }
+                (inputs.genes + hidden.genes).flatMap { source ->
+                    (hidden.genes + outputs.genes).map { target -> source to target }
                 } - existingPairs
             if (random.nextDouble() < 0.25 && availablePairs.isNotEmpty()) {
                 val (source, target) = availablePairs.random(random)
-                connectionChromosome.add(connectionGene(source, target) {
+                connections.addGene(connectionGene(source, target) {
                     strength = random.nextDouble(-1.0, 1.0)
                 })
             }
 
             if (random.nextDouble() < 0.15) {
-                val newHidden = nodeGene { label = "Hidden ${hiddenChromosome.size + 1}" }
-                hiddenChromosome.add(newHidden)
-                connectionChromosome.add(connectionGene(inputChromosome.random(random), newHidden) {
+                val newHidden = nodeGene { label = "Hidden ${hidden.genes.size + 1}" }
+                hidden.addGene(newHidden)
+                connections.addGene(connectionGene(inputs.genes.random(random), newHidden) {
                     strength = random.nextDouble(-1.0, 1.0)
                 })
-                connectionChromosome.add(connectionGene(newHidden, outputChromosome.random(random)) {
+                connections.addGene(connectionGene(newHidden, outputs.genes.random(random)) {
                     strength = random.nextDouble(-1.0, 1.0)
                 })
             }
@@ -239,7 +217,7 @@ val evolveMousePursuer = newSim { optionString ->
         val networkComponent = NetworkComponent("Network").also(workspace::addWorkspaceComponent)
         val network = networkComponent.network
 
-        private val phenotypeDeferred = CompletableDeferred<MousePhenotype>()
+        private var built = false
 
         val odorWorldComponent = OdorWorldComponent("Odor World").also(workspace::addWorkspaceComponent)
         val odorWorld = odorWorldComponent.world.apply {
@@ -311,11 +289,10 @@ val evolveMousePursuer = newSim { optionString ->
 
         private fun addUpdateActions() {
             workspace.addUpdateAction("update mouse fitness") {
-                val phenotype = phenotypeDeferred.await()
                 val speed = abs(mouse.speed)
                 val turning = abs(mouse.dtheta)
-                val outputActivity = phenotype.outputs.sumOf { abs(it.activation) }
-                val hiddenActivity = phenotype.hidden.sumOf { abs(it.activation) }
+                val outputActivity = genotype.outputs.neurons.neuronList.sumOf { abs(it.activation) }
+                val hiddenActivity = genotype.hidden.neurons.neuronList.sumOf { abs(it.activation) }
 
                 simState.movement = speed + turning
                 simState.activationCost = outputActivity + hiddenActivity
@@ -335,7 +312,7 @@ val evolveMousePursuer = newSim { optionString ->
                         mouse.isEffectorsEnabled = false
                         mouse.speed = 0.0
                         mouse.dtheta = 0.0
-                        phenotype.outputs.forEach { it.activation = 0.0 }
+                        genotype.outputs.neurons.neuronList.forEach { it.activation = 0.0 }
                     } else {
                         mouse.isEffectorsEnabled = true
                     }
@@ -346,7 +323,7 @@ val evolveMousePursuer = newSim { optionString ->
                     simState.fitness += shapingReward
                 }
 
-                phenotype.inputs[2].activation = simState.hunger
+                genotype.inputs.neurons.neuronList[2].activation = simState.hunger
             }
         }
 
@@ -355,15 +332,17 @@ val evolveMousePursuer = newSim { optionString ->
         }
 
         override suspend fun build() {
-            if (!phenotypeDeferred.isCompleted) {
-                phenotypeDeferred.complete(genotype.expressWith(network))
-                val phenotype = phenotypeDeferred.await()
+            if (!built) {
+                genotype.expressAll(network)
+                genotype.inputs.neurons.neuronList.labels = listOf("Cheese Left", "Cheese Right", "Hunger")
+                genotype.outputs.neurons.neuronList.labels = listOf("Speed", "Left", "Right")
                 with(workspace.couplingManager) {
-                    mouse.sensors.filterIsInstance<ObjectSensor>() couple phenotype.inputs.take(2)
-                    phenotype.outputs couple mouse.effectors
+                    mouse.sensors.filterIsInstance<ObjectSensor>() couple genotype.inputs.neurons.neuronList.take(2)
+                    genotype.outputs.neurons.neuronList couple mouse.effectors
                 }
+                built = true
             }
-            phenotypeDeferred.await().inputs[2].activation = simState.hunger
+            genotype.inputs.neurons.neuronList[2].activation = simState.hunger
         }
 
         override suspend fun eval(): Double {
@@ -373,23 +352,22 @@ val evolveMousePursuer = newSim { optionString ->
         }
 
         override fun visualize(workspace: Workspace): EvoSim {
-            return EvolveMousePursuerSim(genotype.copy(), workspace, random.nextLong())
+            return EvolveMousePursuerSim(genotype.copyGenotype() as MouseGenotype, workspace, random.nextLong())
         }
 
         override fun copy(): EvoSim {
-            return EvolveMousePursuerSim(genotype.copy(), Workspace(), random.nextLong())
+            return EvolveMousePursuerSim(genotype.copyGenotype() as MouseGenotype, Workspace(), random.nextLong())
         }
 
         suspend fun showWinner() {
             build()
-            val phenotype = phenotypeDeferred.await()
-            phenotype.inputs.forEachIndexed { index, neuron ->
+            genotype.inputs.neurons.neuronList.forEachIndexed { index, neuron ->
                 neuron.location = point(index * 120.0, 180.0)
             }
-            phenotype.hidden.forEachIndexed { index, neuron ->
+            genotype.hidden.neurons.neuronList.forEachIndexed { index, neuron ->
                 neuron.location = point(index * 120.0, 80.0)
             }
-            phenotype.outputs.forEachIndexed { index, neuron ->
+            genotype.outputs.neurons.neuronList.forEachIndexed { index, neuron ->
                 neuron.location = point(index * 120.0, -20.0)
             }
 

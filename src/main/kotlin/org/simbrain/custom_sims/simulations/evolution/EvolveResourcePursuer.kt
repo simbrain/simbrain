@@ -372,8 +372,8 @@ val evolveResourcePursuer = newSim { optionString ->
                 evaluatorParams = evaluatorParams,
                 populatingFunction = { EvolveResourcePursuerSim(seed = seed) }
             )
-            lastGeneration.take(1).forEach {
-                with(it.visualize(workspace) as EvolveResourcePursuerSim) {
+            lastGeneration.take(1).forEach { best ->
+                with(best.visualize(workspace) as EvolveResourcePursuerSim) {
                     build()
                     val genotype = this.evolvePursuerGenotype
                     genotype.drives.neurons.location = point(-150, 150)
@@ -385,6 +385,48 @@ val evolveResourcePursuer = newSim { optionString ->
                     alignNetworkModels(genotype.inputs.neurons, genotype.hidden.neurons, Alignment.VERTICAL)
                     alignNetworkModels(genotype.hidden.neurons, genotype.outputs.neurons, Alignment.VERTICAL)
 
+                    val allNodes = genotype.inputs.genes + genotype.drives.genes +
+                        genotype.hidden.genes + genotype.outputs.genes
+                    fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+
+                    val genomeDisplay = genotype.geneticsDisplay(precision = 3) {
+                        display(genotype.inputs, noDefaults = true) {
+                            header(formatted("Node") { nodeIndex(it) })
+                            +template(Neuron::clamped)
+                        }
+                        display(genotype.drives, noDefaults = true) {
+                            header(formatted("node") { nodeIndex(it) })
+                            +template(Neuron::label)
+                        }
+                        display(genotype.hidden) {
+                            header(formatted("node") { nodeIndex(it) })
+                        }
+                        display(genotype.outputs) {
+                            header(formatted("node") { nodeIndex(it) })
+                            +template(Neuron::upperBound)
+                            +template(Neuron::lowerBound)
+                        }
+                        display(genotype.connections) {
+                            +formatted("in") { nodeIndex(it.source) }
+                            +formatted("out") { nodeIndex(it.target) }
+                            +template(Synapse::strength)
+                        }
+                        display(genotype.hiddenRules) {
+                            +formatted("updateRule") { it.template.updateRule.name }
+                        }
+                        display(genotype.synapseRules) {
+                            +formatted("learningRule") { it.template.learningRule.name }
+                        }
+                        display(genotype.hiddenLayout) {
+                            +template(LayoutGeneWrapper::layoutType)
+                            +template(LayoutGeneWrapper::hSpacing)
+                            +template(LayoutGeneWrapper::vSpacing)
+                        }
+                        display(genotype.hiddenConnectionStrategy) {
+                            +formatted("connectionStrategy") { it.template.connectionStrategy.tooltipText() }
+                        }
+                    }
+
                     val energyTextObject = NetworkTextObject(simState.generateEnergyText())
                     networkComponent.network.addNetworkModelsAsync(energyTextObject)
                     workspace.addUpdateAction("update energy text") {
@@ -395,6 +437,7 @@ val evolveResourcePursuer = newSim { optionString ->
                         place(networkComponent, 390, 10, 380, 600)
                         place(odorWorldComponent, 770, 10, 620, 600)
                         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
+                        showGeneDisplay(genomeDisplay)
                     }
                     if (desktop == null) {
                         workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)

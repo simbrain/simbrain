@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -126,16 +127,36 @@ val evolveXor = newSim {
             evaluatorParams,
             populatingFunction = { XorSim(XorGenotype(seed = seed)) }
         )
-        lastGeneration.take(1).forEach {
-            with(it.visualize(workspace) as XorSim) {
+        lastGeneration.take(1).forEach { best ->
+            with(best.visualize(workspace) as XorSim) {
                 build()
                 val genotype = this.xorGenotype
                 genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
                 genotype.inputs.neurons.location = point( 0, 150)
                 genotype.hidden.neurons.location = point( 0, 60)
                 genotype.output.neurons.location = point(0, -25)
+                val allNodes = genotype.inputs.genes + genotype.hidden.genes + genotype.output.genes
+                fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+
+                val genomeDisplay = genotype.geneticsDisplay {
+                    display(genotype.inputs) {
+                        header(formatted("node") { nodeIndex(it) })
+                    }
+                    display(genotype.hidden) {
+                        header(formatted("node") { nodeIndex(it) })
+                    }
+                    display(genotype.output) {
+                        header(formatted("node") { nodeIndex(it) })
+                    }
+                    display(genotype.connections) {
+                        +formatted("in") { nodeIndex(it.source) }
+                        +formatted("out") { nodeIndex(it.target) }
+                        +template(Synapse::strength)
+                    }
+                }
                 withGui {
                     place(networkComponent, 340, 10, 384, 480)
+                    showGeneDisplay(genomeDisplay)
                 }
             }
         }

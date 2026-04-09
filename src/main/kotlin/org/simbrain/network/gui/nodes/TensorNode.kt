@@ -131,7 +131,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             layoutChildren()
         }
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
-            interactionBox.setText(tensorLayer.displayName)
+            interactionBox.setText(tensorDisplayText())
         }
         tensorEvents.updated.on {
             tensorEvents.updateGraphics.fire()
@@ -145,7 +145,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
 
         addChild(interactionBox)
-        interactionBox.setText(tensorLayer.displayName)
+        interactionBox.setText(tensorDisplayText())
 
         pickable = true
         pullViewPositionFromModel()
@@ -184,6 +184,15 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         activationImage.setBounds(0.0, 0.0, imageSize, imageSize)
         activationImage.addBorder()
         activationImage.visible = true
+    }
+
+    /**
+     * Build the text shown on the interaction box, appending shape info when it is not already present.
+     */
+    private fun tensorDisplayText(): String {
+        val base = tensorLayer.displayName
+        val shapeSummary = tensorLayer.shape.toString()
+        return if (base.contains(shapeSummary)) base else "$base ($shapeSummary)"
     }
 
     private fun renderSingleChannel() {

@@ -189,7 +189,7 @@ class ConvolutionConnector(
     override val name: String get() = "Convolution"
 
     /** Short summary shown on the connector node in the GUI. */
-    val summaryLabel: String get() = "${kernelSize}x${kernelSize}"
+    val summaryLabel: String get() = "${numFilters}x${inputChannels}x${kernelSize}x${kernelSize}"
 
     override fun toString(): String =
         "$displayName (Conv ${kernelSize}x${kernelSize}, ${inputChannels}->$numFilters)"

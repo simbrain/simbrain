@@ -75,7 +75,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Psychology") {
-        item("Categorical perception") { categoricalPerception }
+        item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }

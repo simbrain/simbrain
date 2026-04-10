@@ -218,7 +218,7 @@ val evolveNetwork = newSim {
             display(genotype.nodes) {
                 header(formatted("node") { nodeIndex(it) })
             }
-            display(genotype.connections) {
+            display(genotype.connections, noDefaults = true) {
                 +formatted("in") { nodeIndex(it.source) }
                 +formatted("out") { nodeIndex(it.target) }
                 +template(Synapse::strength)
@@ -232,7 +232,9 @@ val evolveNetwork = newSim {
     }
 
     suspend fun runSim() {
-        val genomeDisplay = EvolveNetworkGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+        val genomeDisplay = EvolveNetworkGenotype().let {
+            it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
+        }
         withGui { showGeneDisplay(genomeDisplay) }
 
         val lastGeneration = evaluator(

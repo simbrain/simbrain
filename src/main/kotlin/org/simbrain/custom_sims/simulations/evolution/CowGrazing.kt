@@ -9,7 +9,6 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
@@ -239,7 +238,6 @@ val grazingCows = newSim { optionString ->
             display(genotype.connections) {
                 +formatted("in") { nodeIndex(it.source) }
                 +formatted("out") { nodeIndex(it.target) }
-                +template(Synapse::strength)
             }
         }
     }
@@ -252,7 +250,9 @@ val grazingCows = newSim { optionString ->
                     setLocationRelativeTo(null)
                 }
             }
-            val genomeDisplays = List(numCows) { CowGenotype().let { g -> g.geneticsDisplay(block = displayBlock(g)) } }
+            val genomeDisplays = List(numCows) { CowGenotype().let { g ->
+                g.geneticsDisplay(metricLabel = "Fitness", block = displayBlock(g))
+            } }
             withGui {
                 genomeDisplays.forEachIndexed { i, panel ->
                     showGeneDisplay(panel, y = 400 + i * 320, title = "Cow ${i + 1} Genome")

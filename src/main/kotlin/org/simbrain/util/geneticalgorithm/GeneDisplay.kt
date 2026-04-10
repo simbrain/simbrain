@@ -204,7 +204,8 @@ private val CARD_BG = Color(250, 250, 250)
 
 class GeneDisplayPanel(
     sections: List<ChromosomeDisplaySection<*>>,
-    internal var metadata: SimMetadata? = null
+    internal var metadata: SimMetadata? = null,
+    internal var metricLabel: String = "Score"
 ) : JPanel(GridBagLayout()) {
 
     init {
@@ -259,12 +260,12 @@ class GeneDisplayPanel(
             isOpaque = false
             add(JLabel("Genome").apply { font = TITLE_FONT })
             metadata?.let { meta ->
-                add(JLabel("id ${meta.id}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                add(JLabel("Genome ${meta.id}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
                 meta.parentId?.let { pid ->
-                    add(JLabel("← $pid").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                    add(JLabel("Parent $pid").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
                 }
-                add(JLabel("gen ${meta.generation}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
-                add(JLabel("fitness ${meta.fitness.format(4)}").apply { font = VALUE_FONT })
+                add(JLabel("Generation ${meta.generation}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                add(JLabel("$metricLabel ${meta.fitness.format(4)}").apply { font = VALUE_FONT })
             }
         }
     }
@@ -339,9 +340,12 @@ class GeneDisplayPanel(
 
 fun SlotGenotype.geneticsDisplay(
     precision: Int = 4,
+    metricLabel: String = "Score",
     block: GeneDisplayBuilder.() -> Unit
 ): GeneDisplayPanel {
-    return GeneDisplayBuilder(this, precision).apply(block).build()
+    return GeneDisplayBuilder(this, precision).apply(block).build().also {
+        it.metricLabel = metricLabel
+    }
 }
 
 /**
@@ -351,9 +355,11 @@ fun GeneDisplayPanel.refreshFrom(
     genotype: SlotGenotype,
     precision: Int = 4,
     metadata: SimMetadata? = this.metadata,
+    metricLabel: String = this.metricLabel,
     block: GeneDisplayBuilder.() -> Unit
 ) {
     val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
+    this.metricLabel = metricLabel
     refresh(newSections, metadata)
 }
 

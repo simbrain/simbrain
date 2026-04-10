@@ -390,7 +390,6 @@ val evolveResourcePursuer = newSim { optionString ->
             display(genotype.connections) {
                 +formatted("in") { nodeIndex(it.source) }
                 +formatted("out") { nodeIndex(it.target) }
-                +template(Synapse::strength)
             }
             display(genotype.hiddenRules) {
                 +formatted("updateRule") { it.template.updateRule.name }
@@ -410,7 +409,13 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     suspend fun runSim() {
-        val genomeDisplay = EvolvePursuerGenotype().let { it.geneticsDisplay(precision = 3, block = displayBlock(it)) }
+        val genomeDisplay = EvolvePursuerGenotype().let {
+            it.geneticsDisplay(
+                precision = 3,
+                metricLabel = evaluatorParams.stoppingCondition.name,
+                block = displayBlock(it)
+            )
+        }
         withGui { showGeneDisplay(genomeDisplay) }
 
         withContext(workspace.coroutineContext) {

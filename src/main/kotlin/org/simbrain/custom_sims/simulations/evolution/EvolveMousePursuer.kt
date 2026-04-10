@@ -9,7 +9,6 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.labels
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
@@ -413,14 +412,15 @@ val evolveMousePursuer = newSim { optionString ->
             display(genotype.connections) {
                 +formatted("in") { nodeIndex(it.source) }
                 +formatted("out") { nodeIndex(it.target) }
-                +template(Synapse::strength)
             }
         }
     }
 
     suspend fun runEvolution() {
         withContext(workspace.coroutineContext) {
-            val genomeDisplay = MouseGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+            val genomeDisplay = MouseGenotype().let {
+                it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
+            }
             withGui { showGeneDisplay(genomeDisplay) }
 
             val lastGeneration = evaluator(

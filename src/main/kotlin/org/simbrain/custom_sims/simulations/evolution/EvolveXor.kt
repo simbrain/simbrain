@@ -3,7 +3,6 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -138,13 +137,14 @@ val evolveXor = newSim {
             display(genotype.connections) {
                 +formatted("in") { nodeIndex(it.source) }
                 +formatted("out") { nodeIndex(it.target) }
-                +template(Synapse::strength)
             }
         }
     }
 
     suspend fun runSim() {
-        val genomeDisplay = XorGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+        val genomeDisplay = XorGenotype().let {
+            it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
+        }
         withGui { showGeneDisplay(genomeDisplay) }
 
         val lastGeneration = evaluator(

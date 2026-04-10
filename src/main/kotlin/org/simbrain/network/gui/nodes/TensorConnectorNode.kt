@@ -3,7 +3,6 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -16,10 +15,7 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
-import java.awt.BasicStroke
-import java.awt.Color
-import java.awt.Font
-import java.awt.RenderingHints
+import java.awt.*
 import java.awt.image.BufferedImage
 import javax.swing.JPopupMenu
 
@@ -130,7 +126,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 kernelGridGroup.addChild(pImage)
 
                 // Thin border
-                val border = PPath.createRectangle(x, y, cellSize, cellSize)
+                val border = createRectangle(x, y, cellSize, cellSize)
                 border.paint = null
                 border.strokePaint = Color.GRAY
                 border.stroke = BasicStroke(0.5f)
@@ -309,6 +305,51 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }
     }
 
+    private fun drawSingleKernelNumericOverlay(g2: Graphics2D, conv: ConvolutionConnector) {
+        val slice = kernelSlice ?: return
+        val kSize = conv.kernelSize
+        val boxOffset = imageBox.offset
+        g2.drawNumericOverlay(
+            data = slice,
+            rows = kSize, cols = kSize,
+            imageWidth = imgSize.toDouble(), imageHeight = imgSize.toDouble(),
+            scalingFactor = networkPanel.scalingFactor,
+            decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
+            offsetX = boxOffset.x,
+            offsetY = boxOffset.y
+        )
+    }
+
+    private fun drawKernelGridNumericOverlay(g2: Graphics2D, conv: ConvolutionConnector) {
+        val slice = kernelSlice ?: return
+        val cellPImages = gridCellPImages ?: return
+        val inputChannels = conv.source.shape.channels
+        val kernelArea = conv.kernelSize * conv.kernelSize
+        val gridOffset = kernelGridGroup.offset
+
+        for (f in 0 until conv.numFilters) {
+            for (c in 0 until inputChannels) {
+                val filterOffset = f * inputChannels * kernelArea + c * kernelArea
+                for (i in 0 until kernelArea) {
+                    slice[i] = conv.kernels[filterOffset + i]
+                }
+
+                val cellBounds = cellPImages[f][c].bounds
+                g2.drawNumericOverlay(
+                    data = slice,
+                    rows = conv.kernelSize,
+                    cols = conv.kernelSize,
+                    imageWidth = cellBounds.width,
+                    imageHeight = cellBounds.height,
+                    scalingFactor = networkPanel.scalingFactor,
+                    decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
+                    offsetX = gridOffset.x + cellBounds.x,
+                    offsetY = gridOffset.y + cellBounds.y
+                )
+            }
+        }
+    }
+
     fun updateDetailLabel() {
         if (connector is ConvolutionConnector) {
             val c = connector
@@ -402,20 +443,12 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             }
         }
 
-        // Numeric overlay for single kernel view
-        if (NetworkPreferences.showNumericOverlays && conv != null && !conv.kernelGridMode) {
-            val slice = kernelSlice ?: return
-            val kSize = conv.kernelSize
-            val boxOffset = imageBox.offset
-            g2.drawNumericOverlay(
-                data = slice,
-                rows = kSize, cols = kSize,
-                imageWidth = imgSize.toDouble(), imageHeight = imgSize.toDouble(),
-                scalingFactor = networkPanel.scalingFactor,
-                decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
-                offsetX = boxOffset.x,
-                offsetY = boxOffset.y
-            )
+        if (NetworkPreferences.showNumericOverlays && conv != null) {
+            if (conv.kernelGridMode) {
+                drawKernelGridNumericOverlay(g2, conv)
+            } else {
+                drawSingleKernelNumericOverlay(g2, conv)
+            }
         }
     }
 

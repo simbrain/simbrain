@@ -23,7 +23,7 @@ class SupervisedTrainerTest {
         }
     }
     
-    // ========== StoppingCondition Tests ==========
+    // StoppingCondition tests.
     
     @Test
     fun `test maxIterations stops training`() {

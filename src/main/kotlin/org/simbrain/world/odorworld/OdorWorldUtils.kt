@@ -100,9 +100,7 @@ fun OdorWorld.addDefaultEntities() {
     }
 }
 
-// ============================================================================
-// Entity Image Utilities
-// ============================================================================
+// Entity image utilities.
 
 /**
  * Thread-safe cache for entity images to avoid repeated resource loading.

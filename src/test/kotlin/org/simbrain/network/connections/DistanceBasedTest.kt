@@ -14,9 +14,7 @@ import org.simbrain.util.decayfunctions.StepDecayFunction
 class DistanceBasedTest {
     val network = Network()
 
-    // ========================================
-    // Basic DistanceBased Tests
-    // ========================================
+    // Basic DistanceBased tests.
 
     @Test
     fun `strategy created with the same seed should produce the same pattern`() {
@@ -80,9 +78,7 @@ class DistanceBasedTest {
         }
     }
 
-    // ========================================
-    // radialGaussianStyle Adapter Tests
-    // ========================================
+    // radialGaussianStyle adapter tests.
 
     @Test
     fun `radialGaussianStyle with distConst 0 should make no connections`() {
@@ -244,9 +240,7 @@ class DistanceBasedTest {
         assertTrue(syns.all { it.strength < 0 })
     }
 
-    // ========================================
-    // radialProbabilisticStyle Adapter Tests
-    // ========================================
+    // radialProbabilisticStyle adapter tests.
 
     @Test
     fun `radialProbabilisticStyle should produce same pattern with same seed`() {
@@ -385,9 +379,7 @@ class DistanceBasedTest {
         }
     }
 
-    // ========================================
-    // StepDecayFunction Tests
-    // ========================================
+    // StepDecayFunction tests.
 
     @Test
     fun `StepDecayFunction should return baseMultiplier inside radius`() {
@@ -403,9 +395,7 @@ class DistanceBasedTest {
         assertEquals(0.0, step.getScalingFactor(200.0))
     }
 
-    // ========================================
-    // GaussianDecayFunction baseMultiplier Tests
-    // ========================================
+    // GaussianDecayFunction baseMultiplier tests.
 
     @Test
     fun `GaussianDecayFunction baseMultiplier should scale output`() {

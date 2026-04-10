@@ -40,8 +40,6 @@ val isopodSim = newSim { optionString ->
     // Clear the workspace
     workspace.clearWorkspace()
 
-    // ----- Network construction ------
-
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
     var noiseSource = NormalDistribution(noiseMean, noiseStdDev)
@@ -98,8 +96,6 @@ val isopodSim = newSim { optionString ->
             height = 400
         }
     }
-
-    // ----- Build 2d World ------
 
     val odorWorldComponent = addOdorWorldComponent("World")
     val odorWorld = odorWorldComponent.world
@@ -195,8 +191,6 @@ val isopodSim = newSim { optionString ->
         }
         isopod.select()
     }
-
-    // ----- Make Couplings ------
 
     with(couplingManager) {
         neuronStraight couple straightMovement
@@ -505,4 +499,3 @@ val isopodSim = newSim { optionString ->
     }
 
 }
-

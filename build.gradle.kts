@@ -708,9 +708,7 @@ tasks.register<Zip>("createZip") {
     }
 }
 
-// ============================================================
-// AppImage Build Configuration
-// ============================================================
+// AppImage build configuration.
 
 val appImageDir = "${buildDir}/appimage"
 val appDirPath = "${appImageDir}/Simbrain.AppDir"

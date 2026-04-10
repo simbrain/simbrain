@@ -3,6 +3,7 @@ package org.simbrain.util.geneticalgorithm
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.format
+import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.*
 import java.awt.geom.RoundRectangle2D
 import javax.swing.*
@@ -157,6 +158,8 @@ class GeneDisplayBuilder(
     private fun findSlotName(slot: EvolutionSlot): String? =
         genotype.slotEntries.firstOrNull { it.second.slot === slot }?.first
 
+    internal fun buildSections(): List<ChromosomeDisplaySection<*>> = sections.toList()
+
     fun build(): GeneDisplayPanel = GeneDisplayPanel(sections)
 }
 
@@ -200,13 +203,25 @@ private val CARD_BORDER_COLOR = Color(180, 180, 180)
 private val CARD_BG = Color(250, 250, 250)
 
 class GeneDisplayPanel(
-    private val sections: List<ChromosomeDisplaySection<*>>
+    sections: List<ChromosomeDisplaySection<*>>
 ) : JPanel(GridBagLayout()) {
 
     init {
         border = EmptyBorder(8, 12, 8, 12)
         background = Color.WHITE
+        renderSections(sections)
+    }
 
+    fun refresh(sections: List<ChromosomeDisplaySection<*>>) {
+        SwingUtilities.invokeLater {
+            removeAll()
+            renderSections(sections)
+            revalidate()
+            repaint()
+        }
+    }
+
+    private fun renderSections(sections: List<ChromosomeDisplaySection<*>>) {
         val gbc = GridBagConstraints()
 
         // Title spanning both columns
@@ -312,19 +327,30 @@ fun SlotGenotype.geneticsDisplay(
     return GeneDisplayBuilder(this, precision).apply(block).build()
 }
 
-fun showGeneDisplay(panel: GeneDisplayPanel) {
-    SwingUtilities.invokeLater {
-        val scrollPane = JScrollPane(panel).apply {
-            preferredSize = Dimension(800, 300)
-            border = EmptyBorder(4, 4, 4, 4)
-            background = Color.WHITE
-            viewport.background = Color.WHITE
-        }
-        JFrame("Genome Display").apply {
-            contentPane.add(scrollPane)
-            pack()
-            setLocationRelativeTo(null)
-            isVisible = true
-        }
+/**
+ * Re-run the display DSL on a (possibly different) genotype and refresh an existing panel.
+ */
+fun GeneDisplayPanel.refreshFrom(
+    genotype: SlotGenotype,
+    precision: Int = 4,
+    block: GeneDisplayBuilder.() -> Unit
+) {
+    val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
+    refresh(newSections)
+}
+
+fun SimbrainDesktop.showGeneDisplay(panel: GeneDisplayPanel, x: Int = 5, y: Int = 400) {
+    val scrollPane = JScrollPane(panel).apply {
+        preferredSize = Dimension(800, 300)
+        border = EmptyBorder(4, 4, 4, 4)
+        background = Color.WHITE
+        viewport.background = Color.WHITE
     }
+    val frame = JInternalFrame("Genome Display", true, true).apply {
+        contentPane.add(scrollPane)
+        pack()
+        setLocation(x, y)
+        isVisible = true
+    }
+    addInternalFrame(frame)
 }

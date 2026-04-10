@@ -122,11 +122,38 @@ val evolveXor = newSim {
 
     }
 
+    fun displayBlock(genotype: XorGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.inputs.genes + genotype.hidden.genes + genotype.output.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.inputs) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.hidden) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.output) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.connections) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+                +template(Synapse::strength)
+            }
+        }
+    }
+
     suspend fun runSim() {
+        val genomeDisplay = XorGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+        withGui { showGeneDisplay(genomeDisplay) }
+
         val lastGeneration = evaluator(
             evaluatorParams,
             populatingFunction = { XorSim(XorGenotype(seed = seed)) }
-        )
+        ) {
+            val bestGenotype = (best as XorSim).xorGenotype
+            genomeDisplay.refreshFrom(bestGenotype, block = displayBlock(bestGenotype))
+        }
         lastGeneration.take(1).forEach { best ->
             with(best.visualize(workspace) as XorSim) {
                 build()
@@ -135,28 +162,9 @@ val evolveXor = newSim {
                 genotype.inputs.neurons.location = point( 0, 150)
                 genotype.hidden.neurons.location = point( 0, 60)
                 genotype.output.neurons.location = point(0, -25)
-                val allNodes = genotype.inputs.genes + genotype.hidden.genes + genotype.output.genes
-                fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
-
-                val genomeDisplay = genotype.geneticsDisplay {
-                    display(genotype.inputs) {
-                        header(formatted("node") { nodeIndex(it) })
-                    }
-                    display(genotype.hidden) {
-                        header(formatted("node") { nodeIndex(it) })
-                    }
-                    display(genotype.output) {
-                        header(formatted("node") { nodeIndex(it) })
-                    }
-                    display(genotype.connections) {
-                        +formatted("in") { nodeIndex(it.source) }
-                        +formatted("out") { nodeIndex(it.target) }
-                        +template(Synapse::strength)
-                    }
-                }
+                genomeDisplay.refreshFrom(genotype, block = displayBlock(genotype))
                 withGui {
                     place(networkComponent, 340, 10, 384, 480)
-                    showGeneDisplay(genomeDisplay)
                 }
             }
         }

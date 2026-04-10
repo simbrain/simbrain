@@ -73,7 +73,13 @@ fun <P, G : TopLevelGene<P>> express(chromosome: Chromosome<P, G>): List<P> {
     return chromosome.map { it.express() }
 }
 
-data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Double>) {
+data class GenerationFitnessPair(
+    val generation: Int,
+    val fitnessScores: List<Double>,
+    val population: List<EvoSim> = emptyList()
+) {
+
+    val best get() = population.first()
 
     /**
      * Example: give it 5 and it returns the 5th percentile. 0 for the best.

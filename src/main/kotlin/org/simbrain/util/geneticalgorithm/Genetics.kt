@@ -175,7 +175,7 @@ suspend fun evaluator(
                     mutate()
                 }
             })
-        val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second })
+        val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second }, agentFitnessPair.map { it.first })
         peek(generationFitnessPair)
     } while (!stoppingFunction(generationFitnessPair))
     population

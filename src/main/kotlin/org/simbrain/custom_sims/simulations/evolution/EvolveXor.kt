@@ -152,7 +152,7 @@ val evolveXor = newSim {
             populatingFunction = { XorSim(XorGenotype(seed = seed)) }
         ) {
             val bestGenotype = (best as XorSim).xorGenotype
-            genomeDisplay.refreshFrom(bestGenotype, block = displayBlock(bestGenotype))
+            genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
         }
         lastGeneration.take(1).forEach { best ->
             with(best.visualize(workspace) as XorSim) {

@@ -148,36 +148,43 @@ suspend fun evaluator(
     populatingFunction: PopulatingFunctionParams.() -> EvoSim,
     populationSize: Int,
     eliminationRatio: Double,
-    stoppingFunction: GenerationFitnessPair.() -> Boolean,
-    peek: GenerationFitnessPair.() -> Unit = {},
+    stoppingFunction: GenerationState.() -> Boolean,
+    peek: GenerationState.() -> Unit = {},
     sortDescending: Boolean = true,
     seed: Long = Random.nextLong(),
     random: Random = Random(seed)
 ): List<EvoSim> = coroutineScope {
     var generation = 0
+    var nextId = 0
     val populatingFunctionParams = PopulatingFunctionParams(seed)
     var population = List(populationSize) { populatingFunction(populatingFunctionParams) }
+    var metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
+    lateinit var generationState: GenerationState
     do {
         generation++
         val fitnessScores = population.map { async { it.eval() } }.awaitAll()
-        val agentFitnessPair = (population zip fitnessScores).shuffled(random).let {
-            if (sortDescending) {
-                it.sortedByDescending { it.second }
-            } else {
-                it.sortedBy { it.second }
-            }
+        val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
+            simMeta.first to simMeta.second.copy(fitness = fitness)
         }
-        val eliminationCount = (agentFitnessPair.size * eliminationRatio).roundToInt()
-        val survivors = agentFitnessPair.take(populationSize - eliminationCount).map { (sim) -> sim }
-        population = (survivors.map { it.copy() } + survivors.sampleWithReplacement(random).take(eliminationCount)
-            .toList().map {
-                it.copy().apply {
-                    mutate()
-                }
-            })
-        val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second }, agentFitnessPair.map { it.first })
-        peek(generationFitnessPair)
-    } while (!stoppingFunction(generationFitnessPair))
+        val sorted = scored.shuffled(random).let {
+            if (sortDescending) it.sortedByDescending { it.second.fitness }
+            else it.sortedBy { it.second.fitness }
+        }
+        generationState = GenerationState(generation, sorted)
+        peek(generationState)
+
+        val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
+        val survivors = sorted.take(populationSize - eliminationCount)
+        val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
+            val childId = nextId++
+            sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
+        }
+        val nextGen = survivors.map { (sim, meta) ->
+            sim.copy() to meta
+        } + offspring
+        population = nextGen.map { it.first }
+        metadata = nextGen.map { it.second }
+    } while (!stoppingFunction(generationState))
     population
 }
 
@@ -187,7 +194,7 @@ suspend fun evaluator(
 suspend fun evaluator(
     evaluatorParams: EvaluatorParams,
     populatingFunction: PopulatingFunctionParams.() -> EvoSim,
-    peek: GenerationFitnessPair.() -> Unit = {}
+    peek: GenerationState.() -> Unit = {}
 ): List<EvoSim> {
     val lastGeneration = evaluator(
         populatingFunction = populatingFunction,
@@ -322,10 +329,10 @@ class EvaluatorParams(
         }
     }
 
-    fun updateProgressWindow(generationFitnessPair: GenerationFitnessPair) {
+    fun updateProgressWindow(state: GenerationState) {
         progressWindow?.apply {
-            text = getProgressText(generationFitnessPair.nthPercentileFitness(evalutationPercentile).format(3), generationFitnessPair.generation)
-            value = generationFitnessPair.generation
+            text = getProgressText(state.nthPercentileFitness(evalutationPercentile).format(3), state.generation)
+            value = state.generation
         }
     }
 

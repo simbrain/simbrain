@@ -203,7 +203,8 @@ private val CARD_BORDER_COLOR = Color(180, 180, 180)
 private val CARD_BG = Color(250, 250, 250)
 
 class GeneDisplayPanel(
-    sections: List<ChromosomeDisplaySection<*>>
+    sections: List<ChromosomeDisplaySection<*>>,
+    internal var metadata: SimMetadata? = null
 ) : JPanel(GridBagLayout()) {
 
     init {
@@ -212,7 +213,8 @@ class GeneDisplayPanel(
         renderSections(sections)
     }
 
-    fun refresh(sections: List<ChromosomeDisplaySection<*>>) {
+    fun refresh(sections: List<ChromosomeDisplaySection<*>>, metadata: SimMetadata? = this.metadata) {
+        this.metadata = metadata
         SwingUtilities.invokeLater {
             removeAll()
             renderSections(sections)
@@ -224,11 +226,11 @@ class GeneDisplayPanel(
     private fun renderSections(sections: List<ChromosomeDisplaySection<*>>) {
         val gbc = GridBagConstraints()
 
-        // Title spanning both columns
+        // Title row with metadata
         gbc.gridx = 0; gbc.gridy = 0; gbc.gridwidth = 2
         gbc.anchor = GridBagConstraints.WEST
         gbc.insets = Insets(0, 0, 6, 0)
-        add(JLabel("Genome").apply { font = TITLE_FONT }, gbc)
+        add(buildTitlePanel(), gbc)
 
         gbc.gridwidth = 1
         for ((i, section) in sections.withIndex()) {
@@ -249,6 +251,21 @@ class GeneDisplayPanel(
             gbc.fill = GridBagConstraints.HORIZONTAL
             gbc.weightx = 1.0
             add(buildCardsPanel(section), gbc)
+        }
+    }
+
+    private fun buildTitlePanel(): JPanel {
+        return JPanel(FlowLayout(FlowLayout.LEFT, 8, 0)).apply {
+            isOpaque = false
+            add(JLabel("Genome").apply { font = TITLE_FONT })
+            metadata?.let { meta ->
+                add(JLabel("id ${meta.id}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                meta.parentId?.let { pid ->
+                    add(JLabel("← $pid").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                }
+                add(JLabel("gen ${meta.generation}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                add(JLabel("fitness ${meta.fitness.format(4)}").apply { font = VALUE_FONT })
+            }
         }
     }
 
@@ -333,10 +350,11 @@ fun SlotGenotype.geneticsDisplay(
 fun GeneDisplayPanel.refreshFrom(
     genotype: SlotGenotype,
     precision: Int = 4,
+    metadata: SimMetadata? = this.metadata,
     block: GeneDisplayBuilder.() -> Unit
 ) {
     val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
-    refresh(newSections)
+    refresh(newSections, metadata)
 }
 
 fun SimbrainDesktop.showGeneDisplay(panel: GeneDisplayPanel, x: Int = 5, y: Int = 400) {

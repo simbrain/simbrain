@@ -357,14 +357,14 @@ fun GeneDisplayPanel.refreshFrom(
     refresh(newSections, metadata)
 }
 
-fun SimbrainDesktop.showGeneDisplay(panel: GeneDisplayPanel, x: Int = 5, y: Int = 400) {
+fun SimbrainDesktop.showGeneDisplay(panel: GeneDisplayPanel, x: Int = 5, y: Int = 400, title: String = "Genome Display") {
     val scrollPane = JScrollPane(panel).apply {
         preferredSize = Dimension(800, 300)
         border = EmptyBorder(4, 4, 4, 4)
         background = Color.WHITE
         viewport.background = Color.WHITE
     }
-    val frame = JInternalFrame("Genome Display", true, true).apply {
+    val frame = JInternalFrame(title, true, true).apply {
         contentPane.add(scrollPane)
         pack()
         setLocation(x, y)

@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.bound
 import org.simbrain.network.core.lengths
@@ -210,14 +211,41 @@ val evolveNetwork = newSim {
 
     }
 
+    fun displayBlock(genotype: EvolveNetworkGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.nodes.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.nodes) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.connections) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+                +template(Synapse::strength)
+            }
+            display(genotype.layout) {
+                +template(LayoutGeneWrapper::layoutType)
+                +template(LayoutGeneWrapper::hSpacing)
+                +template(LayoutGeneWrapper::vSpacing)
+            }
+        }
+    }
+
     suspend fun runSim() {
+        val genomeDisplay = EvolveNetworkGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+        withGui { showGeneDisplay(genomeDisplay) }
+
         val lastGeneration = evaluator(
             evaluatorParams,
             populatingFunction = { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
-        )
+        ) {
+            val bestGenotype = (best as EvolveNetworkSim).evolveNetworkGenotype
+            genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
+        }
         lastGeneration.take(1).forEach {
             with(it.visualize(workspace) as EvolveNetworkSim) {
                 build()
+                genomeDisplay.refreshFrom(evolveNetworkGenotype, block = displayBlock(evolveNetworkGenotype))
                 withGui {
                     place(networkComponent, 340, 10, 384, 480)
                 }

@@ -8,6 +8,8 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
@@ -220,12 +222,40 @@ val grazingCows = newSim { optionString ->
         }
     }
 
+    fun displayBlock(genotype: CowGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.inputs.genes + genotype.hidden.genes + genotype.outputs.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.inputs, noDefaults = true) {
+                header(formatted("node") { nodeIndex(it) })
+                +template(Neuron::clamped)
+            }
+            display(genotype.hidden) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.outputs) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.connections) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+                +template(Synapse::strength)
+            }
+        }
+    }
+
     suspend fun runSim() {
         withContext(workspace.coroutineContext) {
             val progressWindow = withGui {
                 ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
                     minimumSize = Dimension(300, 100)
                     setLocationRelativeTo(null)
+                }
+            }
+            val genomeDisplays = List(numCows) { CowGenotype().let { g -> g.geneticsDisplay(block = displayBlock(g)) } }
+            withGui {
+                genomeDisplays.forEachIndexed { i, panel ->
+                    showGeneDisplay(panel, y = 400 + i * 320, title = "Cow ${i + 1} Genome")
                 }
             }
             val cowSims = evaluator(
@@ -245,6 +275,10 @@ val grazingCows = newSim { optionString ->
                             value = generation
                         }
                     }
+                    val bestCowGenotypes = (best as CowSim).cowGenotypes
+                    bestCowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
+                        panel.refreshFrom(genotype, metadata = bestMetadata, block = displayBlock(genotype))
+                    }
                 }
             )
             cowSims.take(1).forEach {
@@ -262,6 +296,9 @@ val grazingCows = newSim { optionString ->
                         g.inputs.neurons.location = point(0, 150)
                         g.hidden.neurons.location = point(0, 60)
                         g.outputs.neurons.location = point(0, -25)
+                    }
+                    cowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
+                        panel.refreshFrom(genotype, block = displayBlock(genotype))
                     }
                     if (desktop == null) {
                         workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)

@@ -8,6 +8,8 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.labels
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
@@ -393,17 +395,47 @@ val evolveMousePursuer = newSim { optionString ->
         }
     }
 
+    fun displayBlock(genotype: MouseGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.inputs.genes + genotype.hidden.genes + genotype.outputs.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.inputs, noDefaults = true) {
+                header(formatted("node") { nodeIndex(it) })
+                +template(Neuron::label)
+            }
+            display(genotype.hidden) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.outputs, noDefaults = true) {
+                header(formatted("node") { nodeIndex(it) })
+                +template(Neuron::label)
+            }
+            display(genotype.connections) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+                +template(Synapse::strength)
+            }
+        }
+    }
+
     suspend fun runEvolution() {
         withContext(workspace.coroutineContext) {
+            val genomeDisplay = MouseGenotype().let { it.geneticsDisplay(block = displayBlock(it)) }
+            withGui { showGeneDisplay(genomeDisplay) }
+
             val lastGeneration = evaluator(
                 evaluatorParams = evaluatorParams,
                 populatingFunction = { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
             ) {
                 evaluatorParams.updateProgressWindow(this)
+                val bestGenotype = (best as EvolveMousePursuerSim).genotype
+                genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
             }
 
             lastGeneration.take(1).forEach {
-                (it.visualize(workspace) as EvolveMousePursuerSim).showWinner()
+                val sim = it.visualize(workspace) as EvolveMousePursuerSim
+                genomeDisplay.refreshFrom(sim.genotype, block = displayBlock(sim.genotype))
+                sim.showWinner()
             }
         }
     }

@@ -69,37 +69,22 @@ val evolveXor = newSim {
     }
 
     class XorSim(
-        val xorGenotype: XorGenotype = XorGenotype(),
-        val workspace: Workspace = Workspace()
-    ) : EvoSim {
+        genotype: XorGenotype = XorGenotype(),
+        workspace: Workspace = Workspace()
+    ) : SlotEvoSim<XorGenotype>(genotype, workspace) {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
 
         val network = networkComponent.network
 
-        private var built = false
-
-        override fun mutate() {
-            xorGenotype.mutate()
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
+            genotype.inputs.neurons.label = "input"
+            genotype.hidden.neurons.label = "hidden"
+            genotype.output.neurons.label = "output"
         }
 
-        override suspend fun build() {
-            if (!built) {
-                xorGenotype.expressAll(network)
-                xorGenotype.inputs.neurons.label = "input"
-                xorGenotype.hidden.neurons.label = "hidden"
-                xorGenotype.output.neurons.label = "output"
-                built = true
-            }
-        }
-
-        override fun visualize(workspace: Workspace): XorSim {
-            return XorSim(xorGenotype.copyGenotype() as XorGenotype, workspace)
-        }
-
-        override fun copy(): EvoSim {
-            return XorSim(xorGenotype.copyGenotype() as XorGenotype, Workspace())
-        }
+        override fun create(genotype: XorGenotype, workspace: Workspace) = XorSim(genotype, workspace)
 
         override suspend fun eval(): Double {
             build()
@@ -111,10 +96,10 @@ val evolveXor = newSim {
             )
 
             return testData.sumOf { (input, output) ->
-                xorGenotype.inputs.neurons.neuronList.activations = input
+                genotype.inputs.neurons.neuronList.activations = input
                 // Iterate more each run if allowing recurrent connections
                 workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
-                val error = (xorGenotype.output.neurons.neuronList.activations sse output)
+                val error = (genotype.output.neurons.neuronList.activations sse output)
                 error
             }
         }
@@ -142,30 +127,27 @@ val evolveXor = newSim {
     }
 
     suspend fun runSim() {
-        val genomeDisplay = XorGenotype().let {
-            it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
-        }
+        val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
 
-        val lastGeneration = evaluator(
-            evaluatorParams,
-            populatingFunction = { XorSim(XorGenotype(seed = seed)) }
-        ) {
-            val bestGenotype = (best as XorSim).xorGenotype
-            genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
-        }
-        lastGeneration.take(1).forEach { best ->
-            with(best.visualize(workspace) as XorSim) {
-                build()
-                val genotype = this.xorGenotype
-                genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
-                genotype.inputs.neurons.location = point( 0, 150)
-                genotype.hidden.neurons.location = point( 0, 60)
-                genotype.output.neurons.location = point(0, -25)
-                genomeDisplay.refreshFrom(genotype, block = displayBlock(genotype))
-                withGui {
-                    place(networkComponent, 340, 10, 384, 480)
-                }
+        val runner = EvolutionRunner(evaluatorParams) { XorSim(XorGenotype(seed = seed)) }
+
+        genomeDisplay.bind(runner)
+        evaluatorParams.bindProgressWindow(runner)
+
+        val result = runner.run()
+        evaluatorParams.closeProgressWindow()
+
+        with(result.best.visualize(workspace) as XorSim) {
+            build()
+            val genotype = this.genotype
+            genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
+            genotype.inputs.neurons.location = point( 0, 150)
+            genotype.hidden.neurons.location = point( 0, 60)
+            genotype.output.neurons.location = point(0, -25)
+            genomeDisplay.refreshFrom(genotype)
+            withGui {
+                place(networkComponent, 340, 10, 384, 480)
             }
         }
     }

@@ -207,18 +207,16 @@ val evolveMousePursuer = newSim { optionString ->
     }
 
     class EvolveMousePursuerSim(
-        val genotype: MouseGenotype = MouseGenotype(),
-        val workspace: Workspace = Workspace(),
+        genotype: MouseGenotype = MouseGenotype(),
+        workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong()
-    ) : EvoSim {
+    ) : SlotEvoSim<MouseGenotype>(genotype, workspace) {
 
         private val random = Random(seed)
         val simState = SimState()
 
         val networkComponent = NetworkComponent("Network").also(workspace::addWorkspaceComponent)
         val network = networkComponent.network
-
-        private var built = false
 
         val odorWorldComponent = OdorWorldComponent("Odor World").also(workspace::addWorkspaceComponent)
         val odorWorld = odorWorldComponent.world.apply {
@@ -328,36 +326,24 @@ val evolveMousePursuer = newSim { optionString ->
             }
         }
 
-        override fun mutate() {
-            genotype.mutate()
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
+            genotype.inputs.neurons.neuronList.labels = listOf("Cheese Left", "Cheese Right", "Hunger")
+            genotype.outputs.neurons.neuronList.labels = listOf("Speed", "Left", "Right")
+            with(workspace.couplingManager) {
+                mouse.sensors.filterIsInstance<ObjectSensor>() couple genotype.inputs.neurons.neuronList.take(2)
+                genotype.outputs.neurons.neuronList couple mouse.effectors
+            }
         }
 
-        override suspend fun build() {
-            if (!built) {
-                genotype.expressAll(network)
-                genotype.inputs.neurons.neuronList.labels = listOf("Cheese Left", "Cheese Right", "Hunger")
-                genotype.outputs.neurons.neuronList.labels = listOf("Speed", "Left", "Right")
-                with(workspace.couplingManager) {
-                    mouse.sensors.filterIsInstance<ObjectSensor>() couple genotype.inputs.neurons.neuronList.take(2)
-                    genotype.outputs.neurons.neuronList couple mouse.effectors
-                }
-                built = true
-            }
-            genotype.inputs.neurons.neuronList[2].activation = simState.hunger
-        }
+        override fun create(genotype: MouseGenotype, workspace: Workspace) =
+            EvolveMousePursuerSim(genotype, workspace, random.nextLong())
 
         override suspend fun eval(): Double {
             build()
+            genotype.inputs.neurons.neuronList[2].activation = simState.hunger
             workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
             return simState.fitness
-        }
-
-        override fun visualize(workspace: Workspace): EvoSim {
-            return EvolveMousePursuerSim(genotype.copyGenotype() as MouseGenotype, workspace, random.nextLong())
-        }
-
-        override fun copy(): EvoSim {
-            return EvolveMousePursuerSim(genotype.copyGenotype() as MouseGenotype, Workspace(), random.nextLong())
         }
 
         suspend fun showWinner() {
@@ -418,25 +404,20 @@ val evolveMousePursuer = newSim { optionString ->
 
     suspend fun runEvolution() {
         withContext(workspace.coroutineContext) {
-            val genomeDisplay = MouseGenotype().let {
-                it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
-            }
+            val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
             withGui { showGeneDisplay(genomeDisplay) }
 
-            val lastGeneration = evaluator(
-                evaluatorParams = evaluatorParams,
-                populatingFunction = { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
-            ) {
-                evaluatorParams.updateProgressWindow(this)
-                val bestGenotype = (best as EvolveMousePursuerSim).genotype
-                genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
-            }
+            val runner = EvolutionRunner(evaluatorParams) { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
 
-            lastGeneration.take(1).forEach {
-                val sim = it.visualize(workspace) as EvolveMousePursuerSim
-                genomeDisplay.refreshFrom(sim.genotype, block = displayBlock(sim.genotype))
-                sim.showWinner()
-            }
+            genomeDisplay.bind(runner)
+            evaluatorParams.bindProgressWindow(runner)
+
+            val result = runner.run()
+            evaluatorParams.closeProgressWindow()
+
+            val sim = result.best.visualize(workspace) as EvolveMousePursuerSim
+            genomeDisplay.refreshFrom(sim.genotype)
+            sim.showWinner()
         }
     }
 
@@ -447,7 +428,6 @@ val evolveMousePursuer = newSim { optionString ->
         controlPanel.addAnnotatedPropertyEditor(propertyEditor)
         evaluatorParams.addControlPanelButton("Evolve") {
             workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
             propertyEditor.commitChanges()
             runEvolution()
         }

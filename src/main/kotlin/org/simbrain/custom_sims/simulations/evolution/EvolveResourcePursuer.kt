@@ -2,7 +2,6 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -263,10 +262,10 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     class EvolveResourcePursuerSim(
-        val evolvePursuerGenotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
-        val workspace: Workspace = Workspace(),
+        genotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
+        workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong(),
-    ) : EvoSim {
+    ) : SlotEvoSim<EvolvePursuerGenotype>(genotype, workspace) {
 
         val simState = SimState(
             seed = seed
@@ -276,8 +275,6 @@ val evolveResourcePursuer = newSim { optionString ->
             .also { workspace.addWorkspaceComponent(it) }
 
         val network = networkComponent.network
-
-        private var built = false
 
         val odorWorldComponent = OdorWorldComponent("Odor World").also {
             workspace.addWorkspaceComponent(it)
@@ -326,37 +323,24 @@ val evolveResourcePursuer = newSim { optionString ->
             evolvedAgent.addDefaultEffectors()
             evolvedAgent.addSensor(centerLakeSensor)
 
-            addActions(workspace, evolvePursuerGenotype, evolvedAgent, simState)
+            addActions(workspace, genotype, evolvedAgent, simState)
         }
 
-        override fun mutate() {
-            evolvePursuerGenotype.mutate()
-        }
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
+            genotype.drives.neurons.label = "drives"
+            genotype.inputs.neurons.label = "inputs"
+            genotype.inputs.neurons.neuronList.labels = listOf("Left", "Center", "Right")
+            genotype.outputs.neurons.label = "outputs"
+            genotype.outputs.neurons.neuronList.labels = listOf("Straight", "Left", "Right")
 
-        override suspend fun build() {
-            if (!built) {
-                evolvePursuerGenotype.expressAll(network)
-                evolvePursuerGenotype.drives.neurons.label = "drives"
-                evolvePursuerGenotype.inputs.neurons.label = "inputs"
-                evolvePursuerGenotype.inputs.neurons.neuronList.labels = listOf("Left", "Center", "Right")
-                evolvePursuerGenotype.outputs.neurons.label = "outputs"
-                evolvePursuerGenotype.outputs.neurons.neuronList.labels = listOf("Straight", "Left", "Right")
-
-                with(workspace.couplingManager) {
-                    sensors couple evolvePursuerGenotype.inputs.neurons.neuronList
-                    evolvePursuerGenotype.outputs.neurons.neuronList couple evolvedAgent.effectors
-                }
-                built = true
+            with(workspace.couplingManager) {
+                sensors couple genotype.inputs.neurons.neuronList
+                genotype.outputs.neurons.neuronList couple evolvedAgent.effectors
             }
         }
 
-        override fun visualize(workspace: Workspace): EvolveResourcePursuerSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copyGenotype() as EvolvePursuerGenotype, workspace)
-        }
-
-        override fun copy(): EvoSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copyGenotype() as EvolvePursuerGenotype, Workspace())
-        }
+        override fun create(genotype: EvolvePursuerGenotype, workspace: Workspace) = EvolveResourcePursuerSim(genotype, workspace)
 
         override suspend fun eval(): Double {
             build()
@@ -409,53 +393,44 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     suspend fun runSim() {
-        val genomeDisplay = EvolvePursuerGenotype().let {
-            it.geneticsDisplay(
-                precision = 3,
-                metricLabel = evaluatorParams.stoppingCondition.name,
-                block = displayBlock(it)
-            )
-        }
+        val genomeDisplay = geneDisplayPanel(precision = 3, displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
 
-        withContext(workspace.coroutineContext) {
-            val lastGeneration = evaluator(
-                evaluatorParams = evaluatorParams,
-                populatingFunction = { EvolveResourcePursuerSim(seed = seed) }
-            ) {
-                val bestGenotype = (best as EvolveResourcePursuerSim).evolvePursuerGenotype
-                genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
+        val runner = EvolutionRunner(evaluatorParams) { EvolveResourcePursuerSim(seed = seed) }
+
+        genomeDisplay.bind(runner)
+        evaluatorParams.bindProgressWindow(runner)
+
+        val result = runner.run()
+        evaluatorParams.closeProgressWindow()
+
+        with(result.best.visualize(workspace) as EvolveResourcePursuerSim) {
+            build()
+            val genotype = this.genotype
+            genotype.drives.neurons.location = point(-150, 150)
+            genotype.inputs.neurons.location = point(0, 150)
+
+            offsetNeuronCollections(genotype.inputs.neurons, genotype.hidden.neurons, Direction.NORTH, 100.0)
+            offsetNeuronCollections(genotype.hidden.neurons, genotype.outputs.neurons, Direction.NORTH, 100.0)
+
+            alignNetworkModels(genotype.inputs.neurons, genotype.hidden.neurons, Alignment.VERTICAL)
+            alignNetworkModels(genotype.hidden.neurons, genotype.outputs.neurons, Alignment.VERTICAL)
+
+            genomeDisplay.refreshFrom(genotype)
+
+            val energyTextObject = NetworkTextObject(simState.generateEnergyText())
+            networkComponent.network.addNetworkModelsAsync(energyTextObject)
+            workspace.addUpdateAction("update energy text") {
+                energyTextObject.text = simState.generateEnergyText()
             }
-            lastGeneration.take(1).forEach { best ->
-                with(best.visualize(workspace) as EvolveResourcePursuerSim) {
-                    build()
-                    val genotype = this.evolvePursuerGenotype
-                    genotype.drives.neurons.location = point(-150, 150)
-                    genotype.inputs.neurons.location = point(0, 150)
-
-                    offsetNeuronCollections(genotype.inputs.neurons, genotype.hidden.neurons, Direction.NORTH, 100.0)
-                    offsetNeuronCollections(genotype.hidden.neurons, genotype.outputs.neurons, Direction.NORTH, 100.0)
-
-                    alignNetworkModels(genotype.inputs.neurons, genotype.hidden.neurons, Alignment.VERTICAL)
-                    alignNetworkModels(genotype.hidden.neurons, genotype.outputs.neurons, Alignment.VERTICAL)
-
-                    genomeDisplay.refreshFrom(genotype, block = displayBlock(genotype))
-
-                    val energyTextObject = NetworkTextObject(simState.generateEnergyText())
-                    networkComponent.network.addNetworkModelsAsync(energyTextObject)
-                    workspace.addUpdateAction("update energy text") {
-                        energyTextObject.text = simState.generateEnergyText()
-                    }
-                    energyTextObject.location = point(-160, -20)
-                    withGui {
-                        place(networkComponent, 390, 10, 380, 600)
-                        place(odorWorldComponent, 770, 10, 620, 600)
-                        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
-                    }
-                    if (desktop == null) {
-                        workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
-                    }
-                }
+            energyTextObject.location = point(-160, -20)
+            withGui {
+                place(networkComponent, 390, 10, 380, 600)
+                place(odorWorldComponent, 770, 10, 620, 600)
+                (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
+            }
+            if (desktop == null) {
+                workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
             }
         }
 

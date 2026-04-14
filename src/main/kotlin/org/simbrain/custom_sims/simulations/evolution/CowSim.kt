@@ -283,32 +283,29 @@ val evolveCow = newSim {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)
         }
-        val cowSims = evaluator(
+        val runner = EvolutionRunner(
             populatingFunction = { CowSim() },
             populationSize = 100,
             eliminationRatio = 0.5,
-            stoppingFunction = {
-                nthPercentileFitness(10) > -1000 || generation > maxGenerations
-            },
-            peek = {
-                listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                    "$it: ${nthPercentileFitness(it).format(3)}"
-                }.also {
-                    println("[$generation] $it")
-                    progressWindow.text = "5th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
-                    progressWindow.value = generation
-                }
-            }
+            stoppingFunction = { nthPercentileFitness(10) > -1000 || generation > maxGenerations },
         )
-        cowSims.take(1).forEach {
-            with(it.visualize(workspace) as CowSim) {
-                build()
-                cowPhenotypes.await().forEach {
-                    it.inputs.location = point( 0, 150)
-                    it.hiddens.location = point( 0, 60)
-                    it.outputs.location = point(0, -25)
-                    it.drives.location = point(200, 60)
-                }
+        runner.onState { state ->
+            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                "$it: ${state.nthPercentileFitness(it).format(3)}"
+            }.also {
+                println("[${state.generation}] $it")
+                progressWindow.text = "5th Percentile Fitness: ${state.nthPercentileFitness(10).format(3)}"
+                progressWindow.value = state.generation
+            }
+        }
+        val result = runner.run()
+        with(result.best.visualize(workspace) as CowSim) {
+            build()
+            cowPhenotypes.await().forEach {
+                it.inputs.location = point( 0, 150)
+                it.hiddens.location = point( 0, 60)
+                it.outputs.location = point(0, -25)
+                it.drives.location = point(200, 60)
             }
         }
         progressWindow.close()

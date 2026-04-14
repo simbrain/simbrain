@@ -32,9 +32,11 @@ package org.simbrain.util.geneticalgorithm
  * - [EvolveXor.kt][/Users/jyoshimi/gitstuff/simbrainmain/simbrain/src/main/kotlin/org/simbrain/custom_sims/simulations/evolution/EvolveXor.kt]
  *   for a compact end-to-end example
  */
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.filterNotNull
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.format
@@ -104,6 +106,45 @@ interface EvoSim {
 }
 
 /**
+ * Base class for evolution simulations backed by a [SlotGenotype].
+ *
+ * Subclasses implement [onBuild] (called at most once) and [create] (factory for copies).
+ * Boilerplate for idempotent build, copy/visualize, and mutation delegation is handled here.
+ */
+abstract class SlotEvoSim<G : SlotGenotype>(
+    val genotype: G,
+    val workspace: Workspace = Workspace()
+) : EvoSim {
+
+    private var built = false
+
+    final override suspend fun build() {
+        if (!built) {
+            onBuild()
+            built = true
+        }
+    }
+
+    /**
+     * Express the genotype into the workspace. Called exactly once.
+     */
+    protected abstract suspend fun onBuild()
+
+    /**
+     * Factory method: create a new sim instance with the given genotype and workspace.
+     */
+    protected abstract fun create(genotype: G, workspace: Workspace): SlotEvoSim<G>
+
+    override fun mutate() { genotype.mutate() }
+
+    @Suppress("UNCHECKED_CAST")
+    override fun copy(): EvoSim = create(genotype.copyGenotype() as G, Workspace())
+
+    @Suppress("UNCHECKED_CAST")
+    override fun visualize(workspace: Workspace): EvoSim = create(genotype.copyGenotype() as G, workspace)
+}
+
+/**
  * A typed list of related genes with convenience functions for copying and concatenation.
  *
  * In practice, chromosomes are used to keep one part of a genotype together, for example a set of node genes,
@@ -127,22 +168,96 @@ class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(g
 data class PopulatingFunctionParams(val seed: Long)
 
 /**
- * Run an evolutionary loop over a population of [EvoSim]s.
+ * Runs an evolutionary loop, publishing [GenerationState] to a [StateFlow] each generation.
  *
- * Each generation evaluates the population, sorts candidates by score, removes a fraction of the population,
- * and refills those slots with mutated copies of surviving individuals.
- *
- * By default, larger scores are treated as better fitness. If you are minimizing instead, either return values
- * where lower is better and set [sortDescending] to false, or use the [EvaluatorParams] overload.
- *
- * Returns the full final generation.
- *
- * @param populatingFunction initial evolutionary sim
- * @param populationSize stays constant during the run
- * @param eliminationRatio how many sims to eliminate each generation.
- * @param stoppingFunction a function that determines when to stop running the sim. Generally check a generation
- * number and for fitness.
- * @param peek code to run each iteration, for example to update a progress bar
+ * Subscribers collect from [state] to observe progress (gene display, progress bars, logging).
+ * Call [run] to start evolution; it suspends until the stopping condition is met and returns
+ * the final [GenerationState].
+ */
+class EvolutionRunner(
+    val populatingFunction: PopulatingFunctionParams.() -> EvoSim,
+    val populationSize: Int,
+    val eliminationRatio: Double,
+    val stoppingFunction: GenerationState.() -> Boolean,
+    val sortDescending: Boolean = true,
+    val seed: Long = Random.nextLong(),
+) {
+    constructor(
+        evaluatorParams: EvaluatorParams,
+        populatingFunction: PopulatingFunctionParams.() -> EvoSim
+    ) : this(
+        populatingFunction = populatingFunction,
+        populationSize = evaluatorParams.populationSize,
+        eliminationRatio = evaluatorParams.eliminationRatio,
+        stoppingFunction = {
+            evaluatorParams.stoppingCondition.shouldStop(
+                nthPercentileFitness(evaluatorParams.evalutationPercentile),
+                evaluatorParams.targetMetric
+            ) || generation > evaluatorParams.maxGenerations
+        },
+        sortDescending = evaluatorParams.stoppingCondition == EvaluatorParams.StoppingCondition.Fitness,
+        seed = evaluatorParams.seed.toLong()
+    )
+    private val _state = MutableStateFlow<GenerationState?>(null)
+    val state: StateFlow<GenerationState?> = _state.asStateFlow()
+
+    private val subscribers = mutableListOf<suspend (GenerationState) -> Unit>()
+
+    /**
+     * Register a callback that runs for each generation state.
+     * Subscribers are launched as coroutines when [run] starts and cancelled when it completes.
+     */
+    fun onState(block: suspend (GenerationState) -> Unit) {
+        subscribers.add(block)
+    }
+
+    suspend fun run(): GenerationState = coroutineScope {
+        val subscriberJob = Job()
+        for (sub in subscribers) {
+            launch(subscriberJob) {
+                state.filterNotNull().collect { sub(it) }
+            }
+        }
+        val random = Random(seed)
+        var generation = 0
+        var nextId = 0
+        val populatingFunctionParams = PopulatingFunctionParams(seed)
+        var population = List(populationSize) { populatingFunction(populatingFunctionParams) }
+        var metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
+        lateinit var generationState: GenerationState
+        do {
+            generation++
+            val fitnessScores = population.map { async { it.eval() } }.awaitAll()
+            val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
+                simMeta.first to simMeta.second.copy(fitness = fitness)
+            }
+            val sorted = scored.shuffled(random).let {
+                if (sortDescending) it.sortedByDescending { it.second.fitness }
+                else it.sortedBy { it.second.fitness }
+            }
+            generationState = GenerationState(generation, sorted)
+            _state.value = generationState
+
+            val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
+            val survivors = sorted.take(populationSize - eliminationCount)
+            val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
+                val childId = nextId++
+                sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
+            }
+            val nextGen = survivors.map { (sim, meta) ->
+                sim.copy() to meta
+            } + offspring
+            population = nextGen.map { it.first }
+            metadata = nextGen.map { it.second }
+        } while (!stoppingFunction(generationState))
+        subscriberJob.cancel()
+        generationState
+    }
+}
+
+/**
+ * Convenience: run an evolutionary loop with a callback-style [peek].
+ * Prefer [EvolutionRunner] for new code.
  */
 suspend fun evaluator(
     populatingFunction: PopulatingFunctionParams.() -> EvoSim,
@@ -153,7 +268,7 @@ suspend fun evaluator(
     sortDescending: Boolean = true,
     seed: Long = Random.nextLong(),
     random: Random = Random(seed)
-): List<EvoSim> = coroutineScope {
+): GenerationState = coroutineScope {
     var generation = 0
     var nextId = 0
     val populatingFunctionParams = PopulatingFunctionParams(seed)
@@ -185,18 +300,19 @@ suspend fun evaluator(
         population = nextGen.map { it.first }
         metadata = nextGen.map { it.second }
     } while (!stoppingFunction(generationState))
-    population
+    generationState
 }
 
 /**
- * Run [evaluator] using the user-facing parameter object [EvaluatorParams].
+ * Convenience: run [evaluator] using the user-facing parameter object [EvaluatorParams].
+ * Prefer [EvolutionRunner] for new code.
  */
 suspend fun evaluator(
     evaluatorParams: EvaluatorParams,
     populatingFunction: PopulatingFunctionParams.() -> EvoSim,
     peek: GenerationState.() -> Unit = {}
-): List<EvoSim> {
-    val lastGeneration = evaluator(
+): GenerationState {
+    val result = evaluator(
         populatingFunction = populatingFunction,
         populationSize = evaluatorParams.populationSize,
         eliminationRatio = evaluatorParams.eliminationRatio,
@@ -216,7 +332,7 @@ suspend fun evaluator(
         seed = evaluatorParams.seed.toLong()
     )
     evaluatorParams.closeProgressWindow()
-    return lastGeneration
+    return result
 }
 
 /**
@@ -338,6 +454,22 @@ class EvaluatorParams(
 
     fun closeProgressWindow() {
         progressWindow?.close()
+    }
+
+    /**
+     * Bind the progress window to an [EvolutionRunner], auto-updating each generation.
+     * Also prints percentile stats to console. Closes the window when evolution completes.
+     */
+    fun bindProgressWindow(runner: EvolutionRunner) {
+        addProgressWindow()
+        runner.onState { state ->
+            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                "$it: ${state.nthPercentileFitness(it).format(3)}"
+            }.also {
+                println("[${state.generation}] $it")
+            }
+            updateProgressWindow(state)
+        }
     }
 
     /**

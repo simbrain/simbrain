@@ -250,59 +250,56 @@ val grazingCows = newSim { optionString ->
                     setLocationRelativeTo(null)
                 }
             }
-            val genomeDisplays = List(numCows) { CowGenotype().let { g ->
-                g.geneticsDisplay(metricLabel = "Fitness", block = displayBlock(g))
-            } }
+            val genomeDisplays = List(numCows) { geneDisplayPanel(displayBlock = ::displayBlock) }
             withGui {
                 genomeDisplays.forEachIndexed { i, panel ->
                     showGeneDisplay(panel, y = 400 + i * 320, title = "Cow ${i + 1} Genome")
                 }
             }
-            val cowSims = evaluator(
+            val runner = EvolutionRunner(
                 populatingFunction = { CowSim() },
                 populationSize = populationSize,
                 eliminationRatio = eliminationRatio,
-                stoppingFunction = {
-                    nthPercentileFitness(10) > 400 || generation > maxGenerations
-                },
-                peek = {
-                    listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                        "$it: ${nthPercentileFitness(it).format(3)}"
-                    }.also {
-                        println("[$generation] $it")
-                        progressWindow?.apply {
-                            text = "10th Percentile Fitness: ${nthPercentileFitness(10).format(3)}"
-                            value = generation
-                        }
-                    }
-                    val bestCowGenotypes = (best as CowSim).cowGenotypes
-                    bestCowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
-                        panel.refreshFrom(genotype, metadata = bestMetadata, block = displayBlock(genotype))
+                stoppingFunction = { nthPercentileFitness(10) > 400 || generation > maxGenerations },
+            )
+            genomeDisplays.forEachIndexed { i, panel ->
+                panel.bind(runner) { state ->
+                    val g = (state.best as CowSim).cowGenotypes[i]
+                    g to displayBlock(g)
+                }
+            }
+            runner.onState { state ->
+                listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                    "$it: ${state.nthPercentileFitness(it).format(3)}"
+                }.also {
+                    println("[${state.generation}] $it")
+                    progressWindow?.apply {
+                        text = "10th Percentile Fitness: ${state.nthPercentileFitness(10).format(3)}"
+                        value = state.generation
                     }
                 }
-            )
-            cowSims.take(1).forEach {
-                with(it.visualize(workspace) as CowSim) {
-                    build()
-                    withGui {
-                        workspace.componentList.filterIsInstance<OdorWorldComponent>().first().apply {
-                            place(this, 280, 10, 476, 432)
-                        }
-                        workspace.componentList.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
-                            place(net, 768, 10 + i * 282, 326, 282)
-                        }
+            }
+            val result = runner.run()
+            with(result.best.visualize(workspace) as CowSim) {
+                build()
+                withGui {
+                    workspace.componentList.filterIsInstance<OdorWorldComponent>().first().apply {
+                        place(this, 280, 10, 476, 432)
                     }
-                    cowGenotypes.forEach { g ->
-                        g.inputs.neurons.location = point(0, 150)
-                        g.hidden.neurons.location = point(0, 60)
-                        g.outputs.neurons.location = point(0, -25)
+                    workspace.componentList.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
+                        place(net, 768, 10 + i * 282, 326, 282)
                     }
-                    cowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
-                        panel.refreshFrom(genotype, block = displayBlock(genotype))
-                    }
-                    if (desktop == null) {
-                        workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
-                    }
+                }
+                cowGenotypes.forEach { g ->
+                    g.inputs.neurons.location = point(0, 150)
+                    g.hidden.neurons.location = point(0, 60)
+                    g.outputs.neurons.location = point(0, -25)
+                }
+                cowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
+                    panel.refreshFrom(genotype)
+                }
+                if (desktop == null) {
+                    workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
                 }
             }
             progressWindow?.close()

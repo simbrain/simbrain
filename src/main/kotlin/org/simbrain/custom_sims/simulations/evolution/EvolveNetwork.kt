@@ -135,34 +135,19 @@ val evolveNetwork = newSim {
     }
 
     class EvolveNetworkSim(
-        val evolveNetworkGenotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
-        val workspace: Workspace = Workspace()
-    ) : EvoSim {
+        genotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
+        workspace: Workspace = Workspace()
+    ) : SlotEvoSim<EvolveNetworkGenotype>(genotype, workspace) {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
 
         val network = networkComponent.network
 
-        private var built = false
-
-        override fun mutate() {
-            evolveNetworkGenotype.mutate()
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
         }
 
-        override suspend fun build() {
-            if (!built) {
-                evolveNetworkGenotype.expressAll(network)
-                built = true
-            }
-        }
-
-        override fun visualize(workspace: Workspace): EvolveNetworkSim {
-            return EvolveNetworkSim(evolveNetworkGenotype.copyGenotype() as EvolveNetworkGenotype, workspace)
-        }
-
-        override fun copy(): EvoSim {
-            return EvolveNetworkSim(evolveNetworkGenotype.copyGenotype() as EvolveNetworkGenotype, Workspace())
-        }
+        override fun create(genotype: EvolveNetworkGenotype, workspace: Workspace) = EvolveNetworkSim(genotype, workspace)
 
         override suspend fun eval(): Double {
             build()
@@ -176,27 +161,27 @@ val evolveNetwork = newSim {
 
             // Number of nodes
             if (networkParams.useNumNodes) {
-                totalError += abs(evolveNetworkGenotype.nodes.neurons.neuronList.size - networkParams.targetNumNodes)
+                totalError += abs(genotype.nodes.neurons.neuronList.size - networkParams.targetNumNodes)
             }
 
             // Num Weights
             if (networkParams.useNumWeights) {
-                totalError += abs(evolveNetworkGenotype.connections.synapses.size - networkParams.targetNumWeights)
+                totalError += abs(genotype.connections.synapses.size - networkParams.targetNumWeights)
             }
 
             // Average activation
             if (networkParams.useAverageActivation) {
-                totalError += abs(evolveNetworkGenotype.nodes.neurons.neuronList.activations.average() - networkParams.targetAverageActivation)
+                totalError += abs(genotype.nodes.neurons.neuronList.activations.average() - networkParams.targetAverageActivation)
             }
 
             // Total Activation
             if (networkParams.useTotalActivation) {
-                totalError += abs(evolveNetworkGenotype.nodes.neurons.neuronList.activations.sum() - networkParams.targetTotalActivation)
+                totalError += abs(genotype.nodes.neurons.neuronList.activations.sum() - networkParams.targetTotalActivation)
             }
 
             // Average length of connections
             if (networkParams.useAverageConnectionLength) {
-                totalError += abs(evolveNetworkGenotype.connections.synapses.lengths.average() - networkParams.targetAverageConnectionLength)
+                totalError += abs(genotype.connections.synapses.lengths.average() - networkParams.targetAverageConnectionLength)
             }
 
             // "Area" spanned by nodes
@@ -232,25 +217,23 @@ val evolveNetwork = newSim {
     }
 
     suspend fun runSim() {
-        val genomeDisplay = EvolveNetworkGenotype().let {
-            it.geneticsDisplay(metricLabel = evaluatorParams.stoppingCondition.name, block = displayBlock(it))
-        }
+        val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
 
-        val lastGeneration = evaluator(
-            evaluatorParams,
-            populatingFunction = { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
-        ) {
-            val bestGenotype = (best as EvolveNetworkSim).evolveNetworkGenotype
-            genomeDisplay.refreshFrom(bestGenotype, metadata = bestMetadata, block = displayBlock(bestGenotype))
-        }
-        lastGeneration.take(1).forEach {
-            with(it.visualize(workspace) as EvolveNetworkSim) {
-                build()
-                genomeDisplay.refreshFrom(evolveNetworkGenotype, block = displayBlock(evolveNetworkGenotype))
-                withGui {
-                    place(networkComponent, 340, 10, 384, 480)
-                }
+        val runner = EvolutionRunner(evaluatorParams) { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
+
+        genomeDisplay.bind(runner)
+        evaluatorParams.bindProgressWindow(runner)
+
+        val result = runner.run()
+        evaluatorParams.closeProgressWindow()
+
+        with(result.best.visualize(workspace) as EvolveNetworkSim) {
+            build()
+            val genotype = this.genotype
+            genomeDisplay.refreshFrom(genotype)
+            withGui {
+                place(networkComponent, 340, 10, 384, 480)
             }
         }
     }
@@ -266,7 +249,6 @@ val evolveNetwork = newSim {
         controlPanel.addSeparator()
         evaluatorParams.addControlPanelButton("Evolve") {
             workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
             propertyEditor.commitChanges()
             println(networkParams.allPropertiesToString())
             runSim()

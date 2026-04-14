@@ -203,9 +203,10 @@ private val CARD_BORDER_COLOR = Color(180, 180, 180)
 private val CARD_BG = Color(250, 250, 250)
 
 class GeneDisplayPanel(
-    sections: List<ChromosomeDisplaySection<*>>,
+    sections: List<ChromosomeDisplaySection<*>> = emptyList(),
     internal var metadata: SimMetadata? = null,
-    internal var metricLabel: String = "Score"
+    internal var metricLabel: String = "Score",
+    private val renderer: ((SlotGenotype) -> List<ChromosomeDisplaySection<*>>)? = null
 ) : JPanel(GridBagLayout()) {
 
     init {
@@ -221,6 +222,25 @@ class GeneDisplayPanel(
             renderSections(sections)
             revalidate()
             repaint()
+        }
+    }
+
+    /**
+     * Refresh with a new genotype, using the baked-in renderer.
+     */
+    fun refreshFrom(genotype: SlotGenotype, metadata: SimMetadata? = this.metadata) {
+        val sections = renderer?.invoke(genotype) ?: error("No renderer — use the factory function geneDisplayPanel()")
+        refresh(sections, metadata)
+    }
+
+    /**
+     * Bind to an [EvolutionRunner], auto-refreshing from the best [SlotEvoSim]'s genotype each generation.
+     */
+    fun bind(runner: EvolutionRunner) {
+        require(renderer != null) { "No renderer — use the factory function geneDisplayPanel()" }
+        runner.onState { state ->
+            val g = (state.best as SlotEvoSim<*>).genotype
+            refreshFrom(g, state.bestMetadata)
         }
     }
 
@@ -336,7 +356,23 @@ class GeneDisplayPanel(
     }
 }
 
-// --- Extension on SlotGenotype ---
+// --- Factory and extensions ---
+
+/**
+ * Create a [GeneDisplayPanel] with a baked-in rendering recipe.
+ * The panel can then [bind][GeneDisplayPanel.bind] to a runner or [refreshFrom][GeneDisplayPanel.refreshFrom]
+ * with just a genotype — no display block needed at the call site.
+ */
+@Suppress("UNCHECKED_CAST")
+fun <G : SlotGenotype> geneDisplayPanel(
+    precision: Int = 4,
+    displayBlock: (G) -> GeneDisplayBuilder.() -> Unit
+): GeneDisplayPanel {
+    return GeneDisplayPanel(renderer = { genotype ->
+        val g = genotype as G
+        GeneDisplayBuilder(g, precision).apply(displayBlock(g)).buildSections()
+    })
+}
 
 fun SlotGenotype.geneticsDisplay(
     precision: Int = 4,
@@ -345,6 +381,23 @@ fun SlotGenotype.geneticsDisplay(
 ): GeneDisplayPanel {
     return GeneDisplayBuilder(this, precision).apply(block).build().also {
         it.metricLabel = metricLabel
+    }
+}
+
+/**
+ * Bind this panel to an [EvolutionRunner], auto-refreshing each generation.
+ * The [extract] lambda maps generation state to the genotype and display block to render.
+ * Use [GeneDisplayPanel.bind] (no-arg) with a panel from [geneDisplayPanel] for simpler usage.
+ */
+fun GeneDisplayPanel.bind(
+    runner: EvolutionRunner,
+    precision: Int = 4,
+    extract: (GenerationState) -> Pair<SlotGenotype, GeneDisplayBuilder.() -> Unit>
+) {
+    runner.onState { state ->
+        val (genotype, block) = extract(state)
+        val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
+        refresh(newSections, state.bestMetadata)
     }
 }
 

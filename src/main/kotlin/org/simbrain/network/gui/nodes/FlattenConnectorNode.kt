@@ -69,9 +69,15 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
     }
 
     override fun layoutChildren() {
-        val srcBounds = sourceNode?.globalBounds ?: return
-        val tgtBounds = targetNode?.globalBounds ?: return
-        arrow.layout(srcBounds.outlines, tgtBounds.outlines, false)
+        val srcBodyBounds = sourceNode?.globalBounds ?: return
+        val tgtBodyBounds = targetNode?.globalBounds ?: return
+        val srcTopBounds = sourceNode?.globalFullBounds ?: return
+        val tgtTopBounds = targetNode?.globalFullBounds ?: return
+        arrow.layout(
+            directionalOutlines(srcTopBounds, srcBodyBounds),
+            directionalOutlines(tgtTopBounds, tgtBodyBounds),
+            false
+        )
     }
 
     override val isDraggable: Boolean = false

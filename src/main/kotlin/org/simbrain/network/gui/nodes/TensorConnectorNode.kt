@@ -391,9 +391,15 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     }
 
     override fun layoutChildren() {
-        val srcBounds = sourceNode?.globalBounds ?: return
-        val tgtBounds = targetNode?.globalBounds ?: return
-        arrow.layout(srcBounds.outlines, tgtBounds.outlines, false)
+        val srcBodyBounds = sourceNode?.globalBounds ?: return
+        val tgtBodyBounds = targetNode?.globalBounds ?: return
+        val srcTopBounds = sourceNode?.globalFullBounds ?: return
+        val tgtTopBounds = targetNode?.globalFullBounds ?: return
+        arrow.layout(
+            directionalOutlines(srcTopBounds, srcBodyBounds),
+            directionalOutlines(tgtTopBounds, tgtBodyBounds),
+            false
+        )
     }
 
     override fun paint(paintContext: PPaintContext) {

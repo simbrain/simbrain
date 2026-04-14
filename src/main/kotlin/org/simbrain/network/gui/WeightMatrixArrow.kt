@@ -19,11 +19,23 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
             else -> this.globalBounds
         }
     }
+    private val sourceNodeOutlines get() = with(weightMatrixNode.sourceNode) {
+        when (this) {
+            is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
+            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
+        }
+    }
     private val target get() = weightMatrixNode.model.target
     private val targetNodeBounds get() = with(weightMatrixNode.targetNode) {
         when (this) {
             is NeuronCollectionNode -> outlinedObjects.globalFullBounds
             else -> this.globalBounds
+        }
+    }
+    private val targetNodeOutlines get() = with(weightMatrixNode.targetNode) {
+        when (this) {
+            is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
+            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
         }
     }
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
@@ -73,7 +85,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                 weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
                 weightMatrixNode.interactionBox.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - weightMatrixNode.interactionBox.fullBounds.height / 2.0)
             }
-            is BezierArrow -> arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional())
+            is BezierArrow -> arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
         }
     }
 }

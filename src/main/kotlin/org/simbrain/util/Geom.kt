@@ -148,6 +148,31 @@ val Rectangle2D.vertices get() = RectangleVertices(
 
 val Rectangle2D.outlines get() = vertices.sides
 
+/**
+ * Build attachment outlines using [topBounds] for the top edge and [sideBounds] for the lateral and bottom edges.
+ *
+ * This is useful for nodes whose interaction box extends above the main body: vertical arrows can hit the visible
+ * top border, while left/right arrows still attach to the tighter body bounds.
+ */
+fun directionalOutlines(topBounds: Rectangle2D, sideBounds: Rectangle2D): RectangleSides = RectangleSides(
+    line(
+        point(topBounds.x + topBounds.width, topBounds.y),
+        point(topBounds.x, topBounds.y)
+    ),
+    line(
+        point(sideBounds.x + sideBounds.width, sideBounds.y + sideBounds.height),
+        point(sideBounds.x + sideBounds.width, sideBounds.y)
+    ),
+    line(
+        point(sideBounds.x, sideBounds.y + sideBounds.height),
+        point(sideBounds.x + sideBounds.width, sideBounds.y + sideBounds.height)
+    ),
+    line(
+        point(sideBounds.x, sideBounds.y),
+        point(sideBounds.x, sideBounds.y + sideBounds.height)
+    )
+)
+
 fun Rectangle2D.expandBy(vector: Point2D): Rectangle2D {
     val (width, height) = width + vector.x to height + vector.y
     val x = if (vector.x < 0) x - vector.x else x

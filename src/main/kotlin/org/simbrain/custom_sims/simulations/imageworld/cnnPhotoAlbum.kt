@@ -197,7 +197,7 @@ val cnnObjectDetector = newSim {
 
     val inputShape = TensorShape(100, 100, 3)
     val inputTensorLayer = TensorLayer(inputShape).apply {
-        label = "Input (100×100×3)"; isClamped = true
+        label = "Input"; isClamped = true
     }
     inputTensorLayer.setLocation(leftX, topY)
 

@@ -402,6 +402,8 @@ val evolveMousePursuer = newSim { optionString ->
         }
     }
 
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
     suspend fun runEvolution() {
         withContext(workspace.coroutineContext) {
             val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
@@ -410,10 +412,9 @@ val evolveMousePursuer = newSim { optionString ->
             val runner = EvolutionRunner(evaluatorParams) { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
 
             genomeDisplay.bind(runner)
-            evaluatorParams.bindProgressWindow(runner)
+            controlPanel.bind(runner)
 
             val result = runner.run()
-            evaluatorParams.closeProgressWindow()
 
             val sim = result.best.visualize(workspace) as EvolveMousePursuerSim
             genomeDisplay.refreshFrom(sim.genotype)
@@ -423,10 +424,10 @@ val evolveMousePursuer = newSim { optionString ->
 
     withGui {
         workspace.clearWorkspace()
-        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        val panel = controlPanel.show(this, "Control Panel", 5, 10)
         val propertyEditor = AnnotatedPropertyEditor(mouseParams)
-        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
-        evaluatorParams.addControlPanelButton("Evolve") {
+        panel.addAnnotatedPropertyEditor(propertyEditor)
+        controlPanel.addButton("Evolve") {
             workspace.removeAllComponents()
             propertyEditor.commitChanges()
             runEvolution()

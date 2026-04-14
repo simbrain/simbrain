@@ -289,7 +289,7 @@ val evolveCow = newSim {
             eliminationRatio = 0.5,
             stoppingFunction = { nthPercentileFitness(10) > -1000 || generation > maxGenerations },
         )
-        runner.onState { state ->
+        runner.onGeneration { state ->
             listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                 "$it: ${state.nthPercentileFitness(it).format(3)}"
             }.also {

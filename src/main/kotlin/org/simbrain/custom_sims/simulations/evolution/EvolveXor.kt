@@ -126,6 +126,8 @@ val evolveXor = newSim {
         }
     }
 
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
     suspend fun runSim() {
         val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
@@ -133,10 +135,9 @@ val evolveXor = newSim {
         val runner = EvolutionRunner(evaluatorParams) { XorSim(XorGenotype(seed = seed)) }
 
         genomeDisplay.bind(runner)
-        evaluatorParams.bindProgressWindow(runner)
+        controlPanel.bind(runner)
 
         val result = runner.run()
-        evaluatorParams.closeProgressWindow()
 
         with(result.best.visualize(workspace) as XorSim) {
             build()
@@ -154,10 +155,9 @@ val evolveXor = newSim {
 
     withGui {
         workspace.clearWorkspace()
-        evaluatorParams.createControlPanel("Control Panel", 5, 10)
-        evaluatorParams.addControlPanelButton("Evolve") {
+        val panel = controlPanel.show(this, "Control Panel", 5, 10)
+        controlPanel.addButton("Evolve") {
             workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
             runSim()
         }
 

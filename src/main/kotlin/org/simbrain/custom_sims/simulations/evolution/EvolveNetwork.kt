@@ -216,6 +216,8 @@ val evolveNetwork = newSim {
         }
     }
 
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
     suspend fun runSim() {
         val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
@@ -223,10 +225,9 @@ val evolveNetwork = newSim {
         val runner = EvolutionRunner(evaluatorParams) { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
 
         genomeDisplay.bind(runner)
-        evaluatorParams.bindProgressWindow(runner)
+        controlPanel.bind(runner)
 
         val result = runner.run()
-        evaluatorParams.closeProgressWindow()
 
         with(result.best.visualize(workspace) as EvolveNetworkSim) {
             build()
@@ -240,14 +241,14 @@ val evolveNetwork = newSim {
 
     withGui {
         workspace.clearWorkspace()
-        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        val panel = controlPanel.show(this, "Control Panel", 5, 10)
 
-        controlPanel.addSeparator()
+        panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(networkParams)
-        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
+        panel.addAnnotatedPropertyEditor(propertyEditor)
 
-        controlPanel.addSeparator()
-        evaluatorParams.addControlPanelButton("Evolve") {
+        panel.addSeparator()
+        controlPanel.addButton("Evolve") {
             workspace.removeAllComponents()
             propertyEditor.commitChanges()
             println(networkParams.allPropertiesToString())

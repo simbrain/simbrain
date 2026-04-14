@@ -37,17 +37,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.filterNotNull
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.format
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement
-import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.gui.SimbrainDesktop
-import java.awt.event.ActionEvent
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
@@ -202,13 +195,21 @@ class EvolutionRunner(
     val state: StateFlow<GenerationState?> = _state.asStateFlow()
 
     private val subscribers = mutableListOf<suspend (GenerationState) -> Unit>()
+    private val completionCallbacks = mutableListOf<() -> Unit>()
 
     /**
      * Register a callback that runs for each generation state.
      * Subscribers are launched as coroutines when [run] starts and cancelled when it completes.
      */
-    fun onState(block: suspend (GenerationState) -> Unit) {
+    fun onGeneration(block: suspend (GenerationState) -> Unit) {
         subscribers.add(block)
+    }
+
+    /**
+     * Register a callback that runs once when the evolution run completes.
+     */
+    fun onComplete(block: () -> Unit) {
+        completionCallbacks.add(block)
     }
 
     suspend fun run(): GenerationState = coroutineScope {
@@ -251,89 +252,11 @@ class EvolutionRunner(
             metadata = nextGen.map { it.second }
         } while (!stoppingFunction(generationState))
         subscriberJob.cancel()
+        completionCallbacks.forEach { it() }
         generationState
     }
 }
 
-/**
- * Convenience: run an evolutionary loop with a callback-style [peek].
- * Prefer [EvolutionRunner] for new code.
- */
-suspend fun evaluator(
-    populatingFunction: PopulatingFunctionParams.() -> EvoSim,
-    populationSize: Int,
-    eliminationRatio: Double,
-    stoppingFunction: GenerationState.() -> Boolean,
-    peek: GenerationState.() -> Unit = {},
-    sortDescending: Boolean = true,
-    seed: Long = Random.nextLong(),
-    random: Random = Random(seed)
-): GenerationState = coroutineScope {
-    var generation = 0
-    var nextId = 0
-    val populatingFunctionParams = PopulatingFunctionParams(seed)
-    var population = List(populationSize) { populatingFunction(populatingFunctionParams) }
-    var metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
-    lateinit var generationState: GenerationState
-    do {
-        generation++
-        val fitnessScores = population.map { async { it.eval() } }.awaitAll()
-        val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
-            simMeta.first to simMeta.second.copy(fitness = fitness)
-        }
-        val sorted = scored.shuffled(random).let {
-            if (sortDescending) it.sortedByDescending { it.second.fitness }
-            else it.sortedBy { it.second.fitness }
-        }
-        generationState = GenerationState(generation, sorted)
-        peek(generationState)
-
-        val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
-        val survivors = sorted.take(populationSize - eliminationCount)
-        val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
-            val childId = nextId++
-            sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
-        }
-        val nextGen = survivors.map { (sim, meta) ->
-            sim.copy() to meta
-        } + offspring
-        population = nextGen.map { it.first }
-        metadata = nextGen.map { it.second }
-    } while (!stoppingFunction(generationState))
-    generationState
-}
-
-/**
- * Convenience: run [evaluator] using the user-facing parameter object [EvaluatorParams].
- * Prefer [EvolutionRunner] for new code.
- */
-suspend fun evaluator(
-    evaluatorParams: EvaluatorParams,
-    populatingFunction: PopulatingFunctionParams.() -> EvoSim,
-    peek: GenerationState.() -> Unit = {}
-): GenerationState {
-    val result = evaluator(
-        populatingFunction = populatingFunction,
-        populationSize = evaluatorParams.populationSize,
-        eliminationRatio = evaluatorParams.eliminationRatio,
-        stoppingFunction = {
-            evaluatorParams.stoppingCondition.shouldStop(nthPercentileFitness(evaluatorParams.evalutationPercentile), evaluatorParams.targetMetric) || generation > evaluatorParams.maxGenerations
-        },
-        sortDescending = evaluatorParams.stoppingCondition == EvaluatorParams.StoppingCondition.Fitness,
-        peek = {
-            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                "$it: ${nthPercentileFitness(it).format(3)}"
-            }.also {
-                println("[$generation] $it")
-                evaluatorParams.updateProgressWindow(this)
-            }
-            peek()
-        },
-        seed = evaluatorParams.seed.toLong()
-    )
-    evaluatorParams.closeProgressWindow()
-    return result
-}
 
 /**
  * Parameters for configuring a standard evolutionary run and its UI helpers.
@@ -404,73 +327,6 @@ class EvaluatorParams(
         description = "Random seed that can be used for replicability",
         order = 70
     )
-
-    private var controlPanel: ControlPanelKt? = null
-
-    private var editor: AnnotatedPropertyEditor<EvaluatorParams>? = null
-
-    private var progressWindow: ProgressWindow? = null
-
-    context(SimbrainDesktop)
-    fun createControlPanel(name: String, x: Int, y: Int) = if (controlPanel == null) {
-        controlPanel = createControlPanel(name, x, y) {
-            editor = AnnotatedPropertyEditor(this@EvaluatorParams)
-            addAnnotatedPropertyEditor(editor!!)
-        }
-        controlPanel!!
-    } else {
-        controlPanel!!
-    }
-
-    private fun getProgressText(metricsString: String, generation: Int) =
-        """
-            <html>
-                Generation: $generation<br />
-                $evalutationPercentile Percentile ${stoppingCondition.name}: $metricsString
-            </html>
-        """.trimIndent()
-
-    context(SimbrainDesktop)
-    fun addControlPanelButton(text: String, block: suspend (ActionEvent) -> Unit) {
-        controlPanel!!.addButton(text) {
-            editor!!.commitChanges()
-            block(it)
-        }
-    }
-
-    fun addProgressWindow() {
-        progressWindow = ProgressWindow(maxGenerations, getProgressText("", 0)).apply {
-            minimumSize = java.awt.Dimension(300, 100)
-            setLocationRelativeTo(null)
-        }
-    }
-
-    fun updateProgressWindow(state: GenerationState) {
-        progressWindow?.apply {
-            text = getProgressText(state.nthPercentileFitness(evalutationPercentile).format(3), state.generation)
-            value = state.generation
-        }
-    }
-
-    fun closeProgressWindow() {
-        progressWindow?.close()
-    }
-
-    /**
-     * Bind the progress window to an [EvolutionRunner], auto-updating each generation.
-     * Also prints percentile stats to console. Closes the window when evolution completes.
-     */
-    fun bindProgressWindow(runner: EvolutionRunner) {
-        addProgressWindow()
-        runner.onState { state ->
-            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                "$it: ${state.nthPercentileFitness(it).format(3)}"
-            }.also {
-                println("[${state.generation}] $it")
-            }
-            updateProgressWindow(state)
-        }
-    }
 
     /**
      * Use error when the evolutionary algorithm is trying to minimize a value, and fitness when it is trying to maximize a value.

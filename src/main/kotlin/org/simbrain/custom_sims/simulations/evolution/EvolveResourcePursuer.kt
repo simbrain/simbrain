@@ -392,6 +392,8 @@ val evolveResourcePursuer = newSim { optionString ->
         }
     }
 
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
     suspend fun runSim() {
         val genomeDisplay = geneDisplayPanel(precision = 3, displayBlock = ::displayBlock)
         withGui { showGeneDisplay(genomeDisplay) }
@@ -399,10 +401,9 @@ val evolveResourcePursuer = newSim { optionString ->
         val runner = EvolutionRunner(evaluatorParams) { EvolveResourcePursuerSim(seed = seed) }
 
         genomeDisplay.bind(runner)
-        evaluatorParams.bindProgressWindow(runner)
+        controlPanel.bind(runner)
 
         val result = runner.run()
-        evaluatorParams.closeProgressWindow()
 
         with(result.best.visualize(workspace) as EvolveResourcePursuerSim) {
             build()
@@ -438,16 +439,15 @@ val evolveResourcePursuer = newSim { optionString ->
 
     withGui {
         workspace.clearWorkspace()
-        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
-        controlPanel.addSeparator()
+        val panel = controlPanel.show(this, "Control Panel", 5, 10)
+        panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(evolutionParams)
-        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
-        evaluatorParams.addControlPanelButton("Evolve") {
+        panel.addAnnotatedPropertyEditor(propertyEditor)
+        controlPanel.addButton("Evolve") {
             workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
             runSim()
         }
-        controlPanel.addButton("Load Workspace") {
+        panel.addButton("Load Workspace") {
             val loadOk = loadWorkspaceZipFromFileChooser()
             if (loadOk) {
 

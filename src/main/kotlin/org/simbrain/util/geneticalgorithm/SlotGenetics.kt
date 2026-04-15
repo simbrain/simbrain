@@ -35,14 +35,14 @@ interface EvolutionSlot {
 }
 
 /**
- * A chromosome of [TopLevelGene]s linked to a network slot (node or connection).
+ * A chromosome of [Gene]s linked to a network slot (node or connection).
  * Kept in sync: adding a gene to the network slot auto-adds a default here,
  * and expression auto-applies these genes to the expressed network objects (per-element).
  *
  * Declared via [SlotGenotype.neuronRuleChromosome], [SlotGenotype.synapseRuleChromosome], etc.
  * Linkage established by passing a `::target` property reference.
  */
-class LinkedChromosomeSlot<G : TopLevelGene<*>>(
+class LinkedChromosomeSlot<G : Gene<Unit, *>>(
     val genes: MutableList<G>,
     val createDefault: () -> G,
     val applyOnExpress: (Any, Any?) -> Unit
@@ -59,12 +59,12 @@ class LinkedChromosomeSlot<G : TopLevelGene<*>>(
 }
 
 /**
- * A single [TopLevelGene] linked to a network slot, applied to the whole expressed
+ * A single [Gene] linked to a network slot, applied to the whole expressed
  * collection (not per-element). Used for layout genes, connection strategy genes, etc.
  *
  * Declared via [SlotGenotype.layoutChromosome], [SlotGenotype.connectionStrategyChromosome], etc.
  */
-class CollectionLinkedSlot<G : TopLevelGene<*>>(
+class CollectionLinkedSlot<G : Gene<Unit, *>>(
     var gene: G,
     val createDefault: () -> G,
     val applyToCollection: (NeuronCollection, Any?, Network) -> Unit
@@ -77,7 +77,7 @@ class CollectionLinkedSlot<G : TopLevelGene<*>>(
         applyToCollection = applyToCollection
     )
 
-    fun express() = gene.express()
+    suspend fun express() = gene.express(Unit)
 }
 
 /**
@@ -103,7 +103,7 @@ class NodeChromosomeSlot(
         val expressed = chromosome.map { it.express(network) }
         for (linkedSlot in linked) {
             expressed.zip(linkedSlot.genes).forEach { (neuron, gene) ->
-                linkedSlot.applyOnExpress(neuron, gene.express())
+                linkedSlot.applyOnExpress(neuron, gene.express(Unit))
             }
         }
         _neurons = NeuronCollection(expressed).also { network.addNetworkModelAsync(it) }
@@ -137,7 +137,7 @@ class ConnectionChromosomeSlot(
         _synapses = chromosome.map { it.express(network) }
         for (linkedSlot in linked) {
             _synapses!!.zip(linkedSlot.genes).forEach { (synapse, gene) ->
-                linkedSlot.applyOnExpress(synapse, gene.express())
+                linkedSlot.applyOnExpress(synapse, gene.express(Unit))
             }
         }
         return _synapses!!
@@ -264,7 +264,7 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
         }
     }
 
-    private fun <G : TopLevelGene<*>> linkedChromosomeSlot(
+    private fun <G : Gene<Unit, *>> linkedChromosomeSlot(
         targetName: String,
         targetSizeProvider: () -> Int,
         createDefault: () -> G,
@@ -311,7 +311,7 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
         for (name in pairedNames) {
             val pairedSlot = slotEntries.first { it.first == name }.second.slot as LinkedChromosomeSlot<*>
             @Suppress("UNCHECKED_CAST")
-            (pairedSlot as LinkedChromosomeSlot<TopLevelGene<*>>).genes.add(pairedSlot.createDefault())
+            (pairedSlot as LinkedChromosomeSlot<Gene<Unit, *>>).genes.add(pairedSlot.createDefault())
         }
     }
 

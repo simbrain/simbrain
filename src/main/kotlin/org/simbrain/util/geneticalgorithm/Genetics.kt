@@ -4,7 +4,7 @@ package org.simbrain.util.geneticalgorithm
  * Core abstractions for Simbrain's evolutionary framework.
  *
  * This file defines the generic building blocks used across the genetics package:
- * [Genotype], [Gene], [TopLevelGene], [Chromosome], [SlotEvoSim], [EvaluatorParams],
+ * [Genotype], [Gene], [Chromosome], [SlotEvoSim], [EvaluatorParams],
  * and the [evaluator] loop that runs selection and reproduction across generations.
  *
  * The basic mental model is:
@@ -51,25 +51,22 @@ interface Genotype {
 /**
  * A gene stores a mutable template for one evolvable object.
  *
+ * The context type [C] determines what the gene needs to express itself:
+ * - [Unit] for self-contained genes (layouts, rules)
+ * - [Network][org.simbrain.network.core.Network] for network genes (nodes, connections)
+ * - [OdorWorldEntity][org.simbrain.world.odorworld.entities.OdorWorldEntity] for sensor/effector genes
+ *
  * Subclasses provide domain-specific copy and expression behavior.
  */
-abstract class Gene<P> {
+abstract class Gene<C, P> {
     abstract val template: P
-    abstract fun copy(): Gene<P>
+    abstract fun copy(): Gene<C, P>
+    abstract suspend fun express(context: C): P
 
     fun mutate(block: P.() -> Unit) {
         template.apply(block)
     }
 }
-
-/**
- * A gene whose expression step does not need an external target object.
- */
-abstract class TopLevelGene<P>: Gene<P>() {
-    abstract fun express(): P
-}
-
-object TopLevelGeneticsContext
 
 /**
  * Base class for evolution simulations backed by a [SlotGenotype].
@@ -123,12 +120,12 @@ abstract class SlotEvoSim<G : SlotGenotype>(
  * connection genes, or rule genes. Chromosomes may be empty, and they may grow or shrink during evolution if the
  * genotype's mutation logic adds or removes genes.
  */
-class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
+class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
 
     /**
      * Provides a copy of the chromosome.
      */
-    fun copy() = Chromosome(map { it.copy() as G })
+    fun copy() = Chromosome(map { @Suppress("UNCHECKED_CAST") (it.copy() as G) })
 
     /**
      * Provides the ability to concatenate chromsomes. See usages.

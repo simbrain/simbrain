@@ -35,7 +35,7 @@ sealed class GeneColumn<G>(val label: String) {
     abstract fun getValue(gene: G): String
 }
 
-private class TemplateColumn<G : Gene<T>, T>(
+private class TemplateColumn<G : Gene<*, T>, T>(
     label: String,
     val extractor: (G) -> Any?,
     val precision: Int?
@@ -54,7 +54,7 @@ private class FormattedColumn<G>(label: String, val formatter: (G) -> Any?) : Ge
 
 // --- Column config (the receiver for display() blocks) ---
 
-class GeneColumnConfig<G : Gene<T>, T> internal constructor(
+class GeneColumnConfig<G : Gene<*, T>, T> internal constructor(
     private val defaultColumns: List<GeneColumn<G>> = emptyList(),
     private val defaultPrecision: Int
 ) {
@@ -88,7 +88,7 @@ class GeneColumnConfig<G : Gene<T>, T> internal constructor(
 
 // --- Display section (one per chromosome) ---
 
-class ChromosomeDisplaySection<G : Gene<*>>(
+class ChromosomeDisplaySection<G : Gene<*, *>>(
     val label: String,
     val typeName: String,
     val genes: List<G>,
@@ -135,7 +135,7 @@ class GeneDisplayBuilder(
         sections.add(ChromosomeDisplaySection(name, "ConnectionChromosome", slot.genes, config.resolve()))
     }
 
-    fun <G : TopLevelGene<T>, T> display(
+    fun <G : Gene<Unit, T>, T> display(
         slot: LinkedChromosomeSlot<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
     ) {
@@ -145,7 +145,7 @@ class GeneDisplayBuilder(
         sections.add(ChromosomeDisplaySection(name, "LinkedChromosome", slot.genes, config.resolve()))
     }
 
-    fun <G : TopLevelGene<T>, T> display(
+    fun <G : Gene<Unit, T>, T> display(
         slot: CollectionLinkedSlot<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
     ) {
@@ -307,7 +307,7 @@ class GeneDisplayPanel(
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun <G : Gene<*>> buildCardsPanel(section: ChromosomeDisplaySection<G>): JPanel {
+    private fun <G : Gene<*, *>> buildCardsPanel(section: ChromosomeDisplaySection<G>): JPanel {
         val columns = section.columns as List<GeneColumn<G>>
 
         val panel = JPanel(FlowLayout(FlowLayout.LEFT, 3, 0)).apply {
@@ -329,7 +329,7 @@ class GeneDisplayPanel(
         return panel
     }
 
-    private fun <G : Gene<*>> buildCard(gene: G, columns: List<GeneColumn<G>>): JPanel {
+    private fun <G : Gene<*, *>> buildCard(gene: G, columns: List<GeneColumn<G>>): JPanel {
         val card = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = CompoundBorder(

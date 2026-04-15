@@ -4,7 +4,6 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.withTimeout
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.layouts.GridLayout
@@ -23,12 +22,7 @@ import org.simbrain.util.sampleOne
 import kotlin.reflect.KClass
 import kotlin.reflect.full.createInstance
 
-abstract class NetworkGene<P : NetworkModel> : Gene<P>() {
-    abstract suspend fun express(network: Network): P
-
-}
-
-class NodeGene(override val template: Neuron) : NetworkGene<Neuron>() {
+class NodeGene(override val template: Neuron) : Gene<Network, Neuron>() {
 
     private val _expressedNeuron = CompletableDeferred<Neuron>()
 
@@ -39,8 +33,8 @@ class NodeGene(override val template: Neuron) : NetworkGene<Neuron>() {
         listeners.add(block)
     }
 
-    override suspend fun express(network: Network) = Neuron(template).also {
-        network.addNetworkModelAsync(it)
+    override suspend fun express(context: Network) = Neuron(template).also {
+        context.addNetworkModelAsync(it)
         expressedNeuron.complete(it)
     }
 
@@ -55,7 +49,7 @@ class NodeGene(override val template: Neuron) : NetworkGene<Neuron>() {
  * associated node genes are expressed first.
  */
 class ConnectionGene(override val template: Synapse, val source: NodeGene, val target: NodeGene) :
-    NetworkGene<Synapse>() {
+    Gene<Network, Synapse>() {
 
     private lateinit var copiedSource: NodeGene
     private lateinit var copiedTarget: NodeGene
@@ -65,10 +59,10 @@ class ConnectionGene(override val template: Synapse, val source: NodeGene, val t
         target.onCopied { copiedTarget = it }
     }
 
-    override suspend fun express(network: Network) =
+    override suspend fun express(context: Network) =
         with(withTimeout(1000) { source.expressedNeuron.await() } to withTimeout(1000) { target.expressedNeuron.await() }) {
             val (source, target) = this
-            Synapse(source, target, template).also { network.addNetworkModelAsync(it) }
+            Synapse(source, target, template).also { context.addNetworkModelAsync(it) }
         }
 
     override fun copy(): ConnectionGene {
@@ -108,13 +102,13 @@ class SynapseRuleGeneWrapper(var learningRule: SynapseUpdateRule<*, *>) {
     fun copy() = SynapseRuleGeneWrapper(learningRule.copy())
 }
 
-class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<LayoutGeneWrapper>() {
+class LayoutGene(override val template: LayoutGeneWrapper) : Gene<Unit, LayoutGeneWrapper>() {
 
     private val _expressedLayout = CompletableDeferred<LayoutGeneWrapper>()
 
     val expressedLayout by this::_expressedLayout
 
-    override fun express() = template.copy().also {
+    override suspend fun express(context: Unit) = template.copy().also {
         expressedLayout.complete(it)
     }
 
@@ -124,13 +118,13 @@ class LayoutGene(override val template: LayoutGeneWrapper) : TopLevelGene<Layout
 
 }
 
-class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrapper) : TopLevelGene<ConnectionStrategyGeneWrapper>() {
+class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrapper) : Gene<Unit, ConnectionStrategyGeneWrapper>() {
 
     private val _expressedConnectionStrategy = CompletableDeferred<ConnectionStrategyGeneWrapper>()
 
     val expressedConnectionStrategy by this::_expressedConnectionStrategy
 
-    override fun express() = template.copy().also {
+    override suspend fun express(context: Unit) = template.copy().also {
         expressedConnectionStrategy.complete(it)
     }
 
@@ -140,13 +134,13 @@ class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrappe
 
 }
 
-class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : TopLevelGene<NeuronRuleGeneWrapper>() {
+class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : Gene<Unit, NeuronRuleGeneWrapper>() {
 
     private val _expressedNeuronRule = CompletableDeferred<NeuronRuleGeneWrapper>()
 
     val expressedNeuronRule by this::_expressedNeuronRule
 
-    override fun express() = template.copy().also {
+    override suspend fun express(context: Unit) = template.copy().also {
         expressedNeuronRule.complete(it)
     }
 
@@ -156,13 +150,13 @@ class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : TopLevelGen
 
 }
 
-class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : TopLevelGene<SynapseRuleGeneWrapper>() {
+class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : Gene<Unit, SynapseRuleGeneWrapper>() {
 
     private val _expressedSynapseRule = CompletableDeferred<SynapseRuleGeneWrapper>()
 
     val expressedSynapseRule by this::_expressedSynapseRule
 
-    override fun express() = template.copy().also {
+    override suspend fun express(context: Unit) = template.copy().also {
         expressedSynapseRule.complete(it)
     }
 

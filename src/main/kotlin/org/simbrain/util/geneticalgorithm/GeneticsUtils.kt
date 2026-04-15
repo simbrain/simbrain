@@ -1,7 +1,5 @@
 package org.simbrain.util.geneticalgorithm
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.roundToInt
@@ -16,7 +14,7 @@ import kotlin.reflect.KMutableProperty0
  * from a set of related genes.
  */
 context(Genotype)
-fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
+fun <P, G : Gene<*, P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
 
 /**
  * Return one random gene from the provided chromosomes, weighted by chromosome size.
@@ -26,7 +24,7 @@ fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
  * all chromosomes are empty.
  */
 context(Genotype)
-fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
+fun <P, G : Gene<*, P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
     val nonEmptyChromosomes = chromosomes.filter { it.isNotEmpty() }
     if (nonEmptyChromosomes.isEmpty()) {
         throw NoSuchElementException()
@@ -51,26 +49,18 @@ fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
  *
  */
 context(Genotype)
-fun <P, G : Gene<P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
+fun <P, G : Gene<*, P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
     Chromosome<P, G>(
         listOf()
     ).apply { repeat(repeat) { block(it) } }
 
 
 /**
- * Express each network gene in this chromosome into the target network.
+ * Express each gene in this chromosome using the given context.
  */
 context(Genotype)
-suspend fun <P : NetworkModel, G : NetworkGene<P>> Network.express(chromosome: Chromosome<P, G>): List<P> {
-    return chromosome.map { it.express(this@express) }
-}
-
-/**
- * Express each top-level gene in this chromosome.
- */
-context(Genotype)
-fun <P, G : TopLevelGene<P>> express(chromosome: Chromosome<P, G>): List<P> {
-    return chromosome.map { it.express() }
+suspend fun <C, P, G : Gene<C, P>> express(chromosome: Chromosome<P, G>, context: C): List<P> {
+    return chromosome.map { it.express(context) }
 }
 
 data class SimMetadata(

@@ -4,7 +4,7 @@ package org.simbrain.util.geneticalgorithm
  * Core abstractions for Simbrain's evolutionary framework.
  *
  * This file defines the generic building blocks used across the genetics package:
- * [Genotype], [Gene], [TopLevelGene], [Chromosome], [EvoSim], [EvaluatorParams],
+ * [Genotype], [Gene], [TopLevelGene], [Chromosome], [SlotEvoSim], [EvaluatorParams],
  * and the [evaluator] loop that runs selection and reproduction across generations.
  *
  * The basic mental model is:
@@ -12,7 +12,7 @@ package org.simbrain.util.geneticalgorithm
  * - A [Chromosome] is a typed list of related genes, such as all input nodes or all connections.
  * - A [Genotype] groups chromosomes together and provides a source of randomness.
  * - `express(...)` functions turn genes or chromosomes into runtime objects.
- * - An [EvoSim] wraps build, mutate, copy, visualization, and evaluation for one candidate.
+ * - An [SlotEvoSim] wraps build, mutate, copy, visualization, and evaluation for one candidate.
  * - [evaluator] repeatedly evaluates a population, keeps the survivors, clones them, and mutates the new copies.
  *
  * Chromosomes are mainly an organizational abstraction. They let a genotype keep related genes together as a unit,
@@ -23,7 +23,7 @@ package org.simbrain.util.geneticalgorithm
  * Typical usage is:
  * 1. Define a genotype class holding one or more chromosomes.
  * 2. Provide mutation, copy, and expression logic for that genotype.
- * 3. Wrap the genotype in an [EvoSim].
+ * 3. Wrap the genotype in an [SlotEvoSim].
  * 4. Configure [EvaluatorParams] and run [evaluator].
  *
  * See also:
@@ -71,47 +71,21 @@ abstract class TopLevelGene<P>: Gene<P>() {
 
 object TopLevelGeneticsContext
 
-interface EvoSim {
-    /**
-     * Apply mutations to this candidate.
-     */
-    fun mutate()
-
-    /**
-     * Build or express the phenotype needed for evaluation.
-     */
-    suspend fun build()
-
-    /**
-     * Create a version of this candidate attached to the provided workspace for inspection.
-     */
-    fun visualize(workspace: Workspace): EvoSim
-
-    /**
-     * Return an independent copy suitable for the next generation.
-     */
-    fun copy(): EvoSim
-
-    /**
-     * Evaluate this candidate and return its fitness or error metric.
-     */
-    suspend fun eval(): Double
-}
-
 /**
  * Base class for evolution simulations backed by a [SlotGenotype].
  *
- * Subclasses implement [onBuild] (called at most once) and [create] (factory for copies).
+ * Subclasses implement [onBuild] (called at most once), [create] (factory for copies),
+ * and [eval] (fitness evaluation).
  * Boilerplate for idempotent build, copy/visualize, and mutation delegation is handled here.
  */
 abstract class SlotEvoSim<G : SlotGenotype>(
     val genotype: G,
     val workspace: Workspace = Workspace()
-) : EvoSim {
+) {
 
     private var built = false
 
-    final override suspend fun build() {
+    suspend fun build() {
         if (!built) {
             onBuild()
             built = true
@@ -128,13 +102,18 @@ abstract class SlotEvoSim<G : SlotGenotype>(
      */
     protected abstract fun create(genotype: G, workspace: Workspace): SlotEvoSim<G>
 
-    override fun mutate() { genotype.mutate() }
+    /**
+     * Evaluate this candidate and return its fitness or error metric.
+     */
+    abstract suspend fun eval(): Double
+
+    fun mutate() { genotype.mutate() }
 
     @Suppress("UNCHECKED_CAST")
-    override fun copy(): EvoSim = create(genotype.copyGenotype() as G, Workspace())
+    fun copy(): SlotEvoSim<*> = create(genotype.copyGenotype() as G, Workspace())
 
     @Suppress("UNCHECKED_CAST")
-    override fun visualize(workspace: Workspace): EvoSim = create(genotype.copyGenotype() as G, workspace)
+    fun visualize(workspace: Workspace): SlotEvoSim<*> = create(genotype.copyGenotype() as G, workspace)
 }
 
 /**
@@ -168,7 +147,7 @@ data class PopulatingFunctionParams(val seed: Long)
  * the final [GenerationState].
  */
 class EvolutionRunner(
-    val populatingFunction: PopulatingFunctionParams.() -> EvoSim,
+    val populatingFunction: PopulatingFunctionParams.() -> SlotEvoSim<*>,
     val populationSize: Int,
     val eliminationRatio: Double,
     val stoppingFunction: GenerationState.() -> Boolean,
@@ -177,7 +156,7 @@ class EvolutionRunner(
 ) {
     constructor(
         evaluatorParams: EvaluatorParams,
-        populatingFunction: PopulatingFunctionParams.() -> EvoSim
+        populatingFunction: PopulatingFunctionParams.() -> SlotEvoSim<*>
     ) : this(
         populatingFunction = populatingFunction,
         populationSize = evaluatorParams.populationSize,

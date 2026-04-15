@@ -82,7 +82,7 @@ data class SimMetadata(
 
 data class GenerationState(
     val generation: Int,
-    val population: List<Pair<EvoSim, SimMetadata>>
+    val population: List<Pair<SlotEvoSim<*>, SimMetadata>>
 ) {
 
     val fitnessScores get() = population.map { it.second.fitness }

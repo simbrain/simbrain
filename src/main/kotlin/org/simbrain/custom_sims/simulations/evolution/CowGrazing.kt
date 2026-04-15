@@ -84,6 +84,25 @@ val grazingCows = newSim { optionString ->
         }
     }
 
+    class CowGroupGenotype private constructor(
+        seed: Long,
+        val cows: List<CowGenotype>
+    ) : SlotGenotype(seed) {
+
+        constructor(seed: Long = Random.nextLong(), numCows: Int = 2) : this(
+            seed, List(numCows) { CowGenotype(Random(seed).nextLong()) }
+        )
+
+        override fun mutate() = cows.forEach { it.mutate() }
+
+        override fun createNew(seed: Long) = CowGroupGenotype(seed, cows.size)
+
+        override fun copyGenotype() = CowGroupGenotype(
+            random.nextLong(),
+            cows.map { it.copyGenotype() as CowGenotype }
+        )
+    }
+
     // What to do when a cow finds flower
     fun addFindFlowerAction(workspace: Workspace, entity: OdorWorldEntity, fitnessLambda: (Double) -> Unit = {}) {
         val world = entity.world
@@ -102,14 +121,13 @@ val grazingCows = newSim { optionString ->
 
 
     class CowSim(
-        val cowGenotypes: List<CowGenotype> = List(numCows) { CowGenotype() },
-        val workspace: Workspace = Workspace()
-    ) : EvoSim {
+        genotype: CowGroupGenotype = CowGroupGenotype(numCows = numCows),
+        workspace: Workspace = Workspace()
+    ) : SlotEvoSim<CowGroupGenotype>(genotype, workspace) {
 
-        val random = Random(cowGenotypes.first().random.nextInt())
+        val cowGenotypes get() = genotype.cows
 
         val cowFitnesses = mutableMapOf<Int, Double>()
-        private var built = false
 
         val odorWorld = OdorWorldComponent("Odor World 1").also {
             workspace.addWorkspaceComponent(it)
@@ -177,37 +195,25 @@ val grazingCows = newSim { optionString ->
             }
         }
 
-        override suspend fun build() {
-            if (!built) {
-                // Express genotypes into networks
-                cowGenotypes.zip(networks).forEach { (genotype, network) ->
-                    genotype.expressAll(network)
-                }
-                // Couplings
-                with(workspace.couplingManager) {
-                    cowGenotypes.indices.forEach { i ->
-                        (dandelionSensors[i] + cowSensors[i]) couple cowGenotypes[i].inputs.neurons.neuronList
-                        cowGenotypes[i].outputs.neurons.neuronList couple effectors[i]
-                    }
-                }
-                // Fitness tracking
+        override suspend fun onBuild() {
+            cowGenotypes.zip(networks).forEach { (genotype, network) ->
+                genotype.expressAll(network)
+            }
+            with(workspace.couplingManager) {
                 cowGenotypes.indices.forEach { i ->
-                    cowFitnesses[i] = 0.0
-                    addFindFlowerAction(workspace, entities[i]) { delta ->
-                        cowFitnesses[i] = (cowFitnesses[i] ?: 0.0) + delta
-                    }
+                    (dandelionSensors[i] + cowSensors[i]) couple cowGenotypes[i].inputs.neurons.neuronList
+                    cowGenotypes[i].outputs.neurons.neuronList couple effectors[i]
                 }
-                built = true
+            }
+            cowGenotypes.indices.forEach { i ->
+                cowFitnesses[i] = 0.0
+                addFindFlowerAction(workspace, entities[i]) { delta ->
+                    cowFitnesses[i] = (cowFitnesses[i] ?: 0.0) + delta
+                }
             }
         }
 
-        override fun mutate() {
-            cowGenotypes.forEach { it.mutate() }
-        }
-
-        override fun visualize(workspace: Workspace) = CowSim(cowGenotypes.map { it.copyGenotype() as CowGenotype }, workspace)
-
-        override fun copy() = CowSim(cowGenotypes.map { it.copyGenotype() as CowGenotype })
+        override fun create(genotype: CowGroupGenotype, workspace: Workspace) = CowSim(genotype, workspace)
 
         override suspend fun eval(): Double {
             build()
@@ -257,7 +263,7 @@ val grazingCows = newSim { optionString ->
                 }
             }
             val runner = EvolutionRunner(
-                populatingFunction = { CowSim() },
+                populatingFunction = { CowSim(CowGroupGenotype(numCows = numCows)) },
                 populationSize = populationSize,
                 eliminationRatio = eliminationRatio,
                 stoppingFunction = { nthPercentileFitness(10) > 400 || generation > maxGenerations },

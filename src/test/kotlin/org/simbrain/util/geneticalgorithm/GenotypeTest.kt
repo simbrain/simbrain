@@ -7,11 +7,11 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.updaterules.DecayRule
 import kotlin.random.Random
 
-class SlotGeneticsTest {
+class GenotypeTest {
 
     // --- Test genotypes ---
 
-    class TestGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class TestGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
         val inputs by nodeChromosome(2) { clamped = true }
         val hidden by nodeChromosome(3)
         val outputs by nodeChromosome(1)
@@ -34,7 +34,7 @@ class SlotGeneticsTest {
         fun testAddConnection() = connections.addConnection(inputs to hidden)
     }
 
-    class LinkedTestGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class LinkedTestGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
         val hidden by nodeChromosome(3)
         val outputs by nodeChromosome(1)
         val connections by connectionChromosome()
@@ -55,7 +55,7 @@ class SlotGeneticsTest {
         fun testAddConnection() = connections.addConnection(hidden to outputs)
     }
 
-    class MultiLinkedGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class MultiLinkedGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
         val hidden by nodeChromosome(2)
         val connections by connectionChromosome()
         val hiddenRules by neuronRuleChromosome(::hidden)
@@ -67,12 +67,12 @@ class SlotGeneticsTest {
         fun testAddHiddenGene(gene: NodeGene) = hidden.addGene(gene)
     }
 
-    // ===== Slot declaration =====
+    // ===== Gene group declaration =====
 
     @Test
-    fun `slots are registered in declaration order`() {
+    fun `gene groups are registered in declaration order`() {
         val genotype = TestGenotype(42)
-        val names = genotype.slotEntries.map { it.first }
+        val names = genotype.geneGroups.map { it.first }
         assertEquals(listOf("inputs", "hidden", "outputs", "connections"), names)
     }
 
@@ -184,11 +184,11 @@ class SlotGeneticsTest {
     // ===== Processing order =====
 
     @Test
-    fun `connection slots have higher processing order than node slots`() {
+    fun `connection groups have higher processing order than node groups`() {
         val genotype = TestGenotype(42)
-        val nodeSlot = genotype.slotEntries.first { it.first == "hidden" }.second.slot
-        val connSlot = genotype.slotEntries.first { it.first == "connections" }.second.slot
-        assertTrue(nodeSlot.processingOrder < connSlot.processingOrder)
+        val nodeGroup = genotype.geneGroups.first { it.first == "hidden" }.second.group
+        val connGroup = genotype.geneGroups.first { it.first == "connections" }.second.group
+        assertTrue(nodeGroup.processingOrder < connGroup.processingOrder)
     }
 
     // ===== Linked Chromosomes =====

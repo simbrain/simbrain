@@ -98,13 +98,13 @@ class ChromosomeDisplaySection<G : Gene<*, *>>(
 // --- Builder ---
 
 class GeneDisplayBuilder(
-    private val genotype: SlotGenotype,
+    private val genotype: Genotype,
     private val defaultPrecision: Int = 4
 ) {
     private val sections = mutableListOf<ChromosomeDisplaySection<*>>()
 
     fun display(
-        slot: NodeChromosomeSlot,
+        slot: NodeGeneGroup,
         noDefaults: Boolean = false,
         block: GeneColumnConfig<NodeGene, Neuron>.() -> Unit = {}
     ) {
@@ -115,12 +115,12 @@ class GeneDisplayBuilder(
             defaultPrecision = defaultPrecision
         )
         config.block()
-        val name = findSlotName(slot) ?: "nodes"
+        val name = findGroupName(slot) ?: "nodes"
         sections.add(ChromosomeDisplaySection(name, "NodeChromosome", slot.genes, config.resolve()))
     }
 
     fun display(
-        slot: ConnectionChromosomeSlot,
+        slot: ConnectionGeneGroup,
         noDefaults: Boolean = false,
         block: GeneColumnConfig<ConnectionGene, Synapse>.() -> Unit = {}
     ) {
@@ -131,32 +131,32 @@ class GeneDisplayBuilder(
             defaultPrecision = defaultPrecision
         )
         config.block()
-        val name = findSlotName(slot) ?: "connections"
+        val name = findGroupName(slot) ?: "connections"
         sections.add(ChromosomeDisplaySection(name, "ConnectionChromosome", slot.genes, config.resolve()))
     }
 
     fun <G : Gene<Unit, T>, T> display(
-        slot: LinkedChromosomeSlot<G>,
+        slot: LinkedGeneGroup<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
     ) {
         val config = GeneColumnConfig<G, T>(defaultPrecision = defaultPrecision)
         config.block()
-        val name = findSlotName(slot) ?: "linked"
+        val name = findGroupName(slot) ?: "linked"
         sections.add(ChromosomeDisplaySection(name, "LinkedChromosome", slot.genes, config.resolve()))
     }
 
     fun <G : Gene<Unit, T>, T> display(
-        slot: CollectionLinkedSlot<G>,
+        slot: CollectionGeneGroup<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
     ) {
         val config = GeneColumnConfig<G, T>(defaultPrecision = defaultPrecision)
         config.block()
-        val name = findSlotName(slot) ?: "collection"
+        val name = findGroupName(slot) ?: "collection"
         sections.add(ChromosomeDisplaySection(name, "CollectionLinked", listOf(slot.gene), config.resolve()))
     }
 
-    private fun findSlotName(slot: EvolutionSlot): String? =
-        genotype.slotEntries.firstOrNull { it.second.slot === slot }?.first
+    private fun findGroupName(geneGroup: GeneGroup): String? =
+        genotype.geneGroups.firstOrNull { it.second.group === geneGroup }?.first
 
     internal fun buildSections(): List<ChromosomeDisplaySection<*>> = sections.toList()
 
@@ -206,7 +206,7 @@ class GeneDisplayPanel(
     sections: List<ChromosomeDisplaySection<*>> = emptyList(),
     internal var metadata: SimMetadata? = null,
     internal var metricLabel: String = "Score",
-    private val renderer: ((SlotGenotype) -> List<ChromosomeDisplaySection<*>>)? = null
+    private val renderer: ((Genotype) -> List<ChromosomeDisplaySection<*>>)? = null
 ) : JPanel(GridBagLayout()) {
 
     init {
@@ -228,18 +228,18 @@ class GeneDisplayPanel(
     /**
      * Refresh with a new genotype, using the baked-in renderer.
      */
-    fun refreshFrom(genotype: SlotGenotype, metadata: SimMetadata? = this.metadata) {
+    fun refreshFrom(genotype: Genotype, metadata: SimMetadata? = this.metadata) {
         val sections = renderer?.invoke(genotype) ?: error("No renderer — use the factory function geneDisplayPanel()")
         refresh(sections, metadata)
     }
 
     /**
-     * Bind to an [EvolutionRunner], auto-refreshing from the best [SlotEvoSim]'s genotype each generation.
+     * Bind to an [EvolutionRunner], auto-refreshing from the best [EvoSim]'s genotype each generation.
      */
     fun bind(runner: EvolutionRunner) {
         require(renderer != null) { "No renderer — use the factory function geneDisplayPanel()" }
         runner.onGeneration { state ->
-            val g = (state.best as SlotEvoSim<*>).genotype
+            val g = state.best.genotype
             refreshFrom(g, state.bestMetadata)
         }
     }
@@ -364,7 +364,7 @@ class GeneDisplayPanel(
  * with just a genotype — no display block needed at the call site.
  */
 @Suppress("UNCHECKED_CAST")
-fun <G : SlotGenotype> geneDisplayPanel(
+fun <G : Genotype> geneDisplayPanel(
     precision: Int = 4,
     displayBlock: (G) -> GeneDisplayBuilder.() -> Unit
 ): GeneDisplayPanel {
@@ -374,7 +374,7 @@ fun <G : SlotGenotype> geneDisplayPanel(
     })
 }
 
-fun SlotGenotype.geneticsDisplay(
+fun Genotype.geneticsDisplay(
     precision: Int = 4,
     metricLabel: String = "Score",
     block: GeneDisplayBuilder.() -> Unit
@@ -392,7 +392,7 @@ fun SlotGenotype.geneticsDisplay(
 fun GeneDisplayPanel.bind(
     runner: EvolutionRunner,
     precision: Int = 4,
-    extract: (GenerationState) -> Pair<SlotGenotype, GeneDisplayBuilder.() -> Unit>
+    extract: (GenerationState) -> Pair<Genotype, GeneDisplayBuilder.() -> Unit>
 ) {
     runner.onGeneration { state ->
         val (genotype, block) = extract(state)
@@ -405,7 +405,7 @@ fun GeneDisplayPanel.bind(
  * Re-run the display DSL on a (possibly different) genotype and refresh an existing panel.
  */
 fun GeneDisplayPanel.refreshFrom(
-    genotype: SlotGenotype,
+    genotype: Genotype,
     precision: Int = 4,
     metadata: SimMetadata? = this.metadata,
     metricLabel: String = this.metricLabel,

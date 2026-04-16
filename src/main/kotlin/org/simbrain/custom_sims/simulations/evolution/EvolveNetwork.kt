@@ -87,7 +87,7 @@ val evolveNetwork = newSim {
     }
     val networkParams = NetworkParameters()
 
-    class EvolveNetworkGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class EvolveNetworkGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
         val nodes by nodeChromosome(2) { upperBound = 10.0; lowerBound = -10.0 }
         val connections by connectionChromosome()
@@ -137,7 +137,7 @@ val evolveNetwork = newSim {
     class EvolveNetworkSim(
         genotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
         workspace: Workspace = Workspace()
-    ) : SlotEvoSim<EvolveNetworkGenotype>(genotype, workspace) {
+    ) : EvoSim<EvolveNetworkGenotype>(genotype, workspace) {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
 

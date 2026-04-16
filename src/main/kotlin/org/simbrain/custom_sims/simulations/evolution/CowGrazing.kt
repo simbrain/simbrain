@@ -44,7 +44,7 @@ val grazingCows = newSim { optionString ->
     // If not, use min to compute group level fitness across cows
     var useAverage = false
 
-    class CowGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class CowGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
         // 6 sensor neurons (3 dandelion + 3 cow) + 1 drive neuron
         val inputs by nodeChromosome(7) { clamped = true }
@@ -87,7 +87,7 @@ val grazingCows = newSim { optionString ->
     class CowGroupGenotype private constructor(
         seed: Long,
         val cows: List<CowGenotype>
-    ) : SlotGenotype(seed) {
+    ) : Genotype(seed) {
 
         constructor(seed: Long = Random.nextLong(), numCows: Int = 2) : this(
             seed, List(numCows) { CowGenotype(Random(seed).nextLong()) }
@@ -123,7 +123,7 @@ val grazingCows = newSim { optionString ->
     class CowSim(
         genotype: CowGroupGenotype = CowGroupGenotype(numCows = numCows),
         workspace: Workspace = Workspace()
-    ) : SlotEvoSim<CowGroupGenotype>(genotype, workspace) {
+    ) : EvoSim<CowGroupGenotype>(genotype, workspace) {
 
         val cowGenotypes get() = genotype.cows
 

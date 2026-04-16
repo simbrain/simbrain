@@ -106,7 +106,7 @@ val evolveMousePursuer = newSim { optionString ->
 
     val mouseParams = MouseEvolutionParameters()
 
-    class MouseGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class MouseGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
         val inputs by nodeChromosome(3) { clamped = true }
         val hidden by nodeChromosome(1)
@@ -210,7 +210,7 @@ val evolveMousePursuer = newSim { optionString ->
         genotype: MouseGenotype = MouseGenotype(),
         workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong()
-    ) : SlotEvoSim<MouseGenotype>(genotype, workspace) {
+    ) : EvoSim<MouseGenotype>(genotype, workspace) {
 
         private val random = Random(seed)
         val simState = SimState()

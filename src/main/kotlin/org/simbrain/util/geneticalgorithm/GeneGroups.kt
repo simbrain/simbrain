@@ -8,47 +8,34 @@ import kotlin.random.Random
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 
-// ======================================================================
-// Slot-Based Evolution DSL
-//
-// A "slot" holds both the gene-level view (for mutation) and the
-// phenotype-level view (after expression) of an evolvable component.
-//
-// Slots are declared as `val` delegated properties on a SlotGenotype subclass.
-// The delegation handles registration, and the base class provides:
-// - Automatic copy with correct dependency ordering
-// - Expression with linked chromosome resolution
-// - Gene addition that auto-adds to linked chromosomes
-// ======================================================================
+// --- Gene group types ---
 
-// --- Slot types ---
-
-interface EvolutionSlot {
+interface GeneGroup {
     /**
      * Determines copy and expression ordering. Lower values are processed first.
      * Same convention as [updatingOrder] in NetworkUtils.kt.
-     * - 0: independent slots (nodes, linked chromosomes, collection-linked slots)
-     * - 10: dependent slots (connections — need nodes copied first for onCopied listeners)
+     * - 0: independent groups (nodes, linked chromosomes, collection-linked groups)
+     * - 10: dependent groups (connections — need nodes copied first for onCopied listeners)
      */
     val processingOrder: Int get() = 0
-    fun copySlot(): EvolutionSlot
+    fun copy(): GeneGroup
 }
 
 /**
- * A chromosome of [Gene]s linked to a network slot (node or connection).
- * Kept in sync: adding a gene to the network slot auto-adds a default here,
+ * A chromosome of [Gene]s linked to a node or connection gene group.
+ * Kept in sync: adding a gene to the target group auto-adds a default here,
  * and expression auto-applies these genes to the expressed network objects (per-element).
  *
- * Declared via [SlotGenotype.neuronRuleChromosome], [SlotGenotype.synapseRuleChromosome], etc.
+ * Declared via [Genotype.neuronRuleChromosome], [Genotype.synapseRuleChromosome], etc.
  * Linkage established by passing a `::target` property reference.
  */
-class LinkedChromosomeSlot<G : Gene<Unit, *>>(
+class LinkedGeneGroup<G : Gene<Unit, *>>(
     val genes: MutableList<G>,
     val createDefault: () -> G,
     val applyOnExpress: (Any, Any?) -> Unit
-) : EvolutionSlot {
+) : GeneGroup {
 
-    override fun copySlot() = LinkedChromosomeSlot(
+    override fun copy() = LinkedGeneGroup(
         genes = genes.map {
             @Suppress("UNCHECKED_CAST")
             it.copy() as G
@@ -59,19 +46,19 @@ class LinkedChromosomeSlot<G : Gene<Unit, *>>(
 }
 
 /**
- * A single [Gene] linked to a network slot, applied to the whole expressed
+ * A single [Gene] linked to a node gene group, applied to the whole expressed
  * collection (not per-element). Used for layout genes, connection strategy genes, etc.
  *
- * Declared via [SlotGenotype.layoutChromosome], [SlotGenotype.connectionStrategyChromosome], etc.
+ * Declared via [Genotype.layoutChromosome], [Genotype.connectionStrategyChromosome], etc.
  */
-class CollectionLinkedSlot<G : Gene<Unit, *>>(
+class CollectionGeneGroup<G : Gene<Unit, *>>(
     var gene: G,
     val createDefault: () -> G,
     val applyToCollection: (NeuronCollection, Any?, Network) -> Unit
-) : EvolutionSlot {
+) : GeneGroup {
 
     @Suppress("UNCHECKED_CAST")
-    override fun copySlot() = CollectionLinkedSlot(
+    override fun copy() = CollectionGeneGroup(
         gene = gene.copy() as G,
         createDefault = createDefault,
         applyToCollection = applyToCollection
@@ -85,9 +72,9 @@ class CollectionLinkedSlot<G : Gene<Unit, *>>(
  * Before expression: access [genes] for mutation.
  * After expression: access [neurons] for wiring/evaluation.
  */
-class NodeChromosomeSlot(
+class NodeGeneGroup(
     internal val chromosome: Chromosome<Neuron, NodeGene>
-) : EvolutionSlot {
+) : GeneGroup {
 
     val genes: List<NodeGene> get() = chromosome
 
@@ -97,8 +84,8 @@ class NodeChromosomeSlot(
 
     suspend fun express(
         network: Network,
-        linked: List<LinkedChromosomeSlot<*>> = emptyList(),
-        collectionLinked: List<CollectionLinkedSlot<*>> = emptyList()
+        linked: List<LinkedGeneGroup<*>> = emptyList(),
+        collectionLinked: List<CollectionGeneGroup<*>> = emptyList()
     ): NeuronCollection {
         val expressed = chromosome.map { it.express(network) }
         for (linkedSlot in linked) {
@@ -113,7 +100,7 @@ class NodeChromosomeSlot(
         return _neurons!!
     }
 
-    override fun copySlot() = NodeChromosomeSlot(chromosome.copy())
+    override fun copy() = NodeGeneGroup(chromosome.copy())
 }
 
 /**
@@ -121,9 +108,9 @@ class NodeChromosomeSlot(
  * Before expression: access [genes] for mutation.
  * After expression: access [synapses] for inspection.
  */
-class ConnectionChromosomeSlot(
+class ConnectionGeneGroup(
     internal val chromosome: Chromosome<Synapse, ConnectionGene>
-) : EvolutionSlot {
+) : GeneGroup {
 
     override val processingOrder: Int get() = 10
 
@@ -133,7 +120,7 @@ class ConnectionChromosomeSlot(
     val synapses: List<Synapse>
         get() = _synapses ?: error("Not expressed yet — call express() in your build block")
 
-    suspend fun express(network: Network, linked: List<LinkedChromosomeSlot<*>> = emptyList()): List<Synapse> {
+    suspend fun express(network: Network, linked: List<LinkedGeneGroup<*>> = emptyList()): List<Synapse> {
         _synapses = chromosome.map { it.express(network) }
         for (linkedSlot in linked) {
             _synapses!!.zip(linkedSlot.genes).forEach { (synapse, gene) ->
@@ -143,21 +130,21 @@ class ConnectionChromosomeSlot(
         return _synapses!!
     }
 
-    override fun copySlot() = ConnectionChromosomeSlot(chromosome.copy())
+    override fun copy() = ConnectionGeneGroup(chromosome.copy())
 }
 
 // --- Property delegation ---
 
-class SlotDelegate<S : EvolutionSlot>(var slot: S) : ReadOnlyProperty<Any?, S> {
-    override fun getValue(thisRef: Any?, property: KProperty<*>): S = slot
+class GeneGroupDelegate<S : GeneGroup>(var group: S) : ReadOnlyProperty<Any?, S> {
+    override fun getValue(thisRef: Any?, property: KProperty<*>): S = group
 }
 
-// --- SlotGenotype ---
+// --- Genotype ---
 
 /**
- * Base class for genotypes using the slot DSL.
+ * Base class for genotypes using the gene group DSL.
  *
- * Declare slots as `val` delegated properties:
+ * Declare gene groups as `val` delegated properties:
  * ```
  * val inputs by nodeChromosome(2) { clamped = true }
  * val hidden by nodeChromosome(5)
@@ -167,49 +154,49 @@ class SlotDelegate<S : EvolutionSlot>(var slot: S) : ReadOnlyProperty<Any?, S> {
  * ```
  *
  * The base class provides:
- * - Automatic [copyGenotype] with dependency-ordered slot copying
+ * - Automatic [copyGenotype] with dependency-ordered gene group copying
  * - [expressAll] that expresses in dependency order with linked chromosome resolution
  * - [addGene]/[addConnection] that auto-adds to linked chromosomes
  */
-abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
+abstract class Genotype(seed: Long = Random.nextLong()) {
 
-    override val random: Random = Random(seed)
+    val random: Random = Random(seed)
 
-    internal val slotEntries = mutableListOf<Pair<String, SlotDelegate<*>>>()
+    internal val geneGroups = mutableListOf<Pair<String, GeneGroupDelegate<*>>>()
 
-    // Linkages: network slot name → list of per-element linked chromosome names
-    private val linkedSlots = mutableMapOf<String, MutableList<String>>()
-    // Linkages: network slot name → list of collection-level linked slot names
-    private val collectionLinkedSlots = mutableMapOf<String, MutableList<String>>()
+    // Linkages: gene group name → list of per-element linked chromosome names
+    private val linkedGroups = mutableMapOf<String, MutableList<String>>()
+    // Linkages: gene group name → list of collection-level linked gene group names
+    private val collectionLinkedGroups = mutableMapOf<String, MutableList<String>>()
 
-    // -- Slot creation --
+    // -- Gene group creation --
 
     protected fun nodeChromosome(
         size: Int,
         init: Neuron.() -> Unit = {}
-    ): PropertyDelegateProvider<Any?, SlotDelegate<NodeChromosomeSlot>> {
+    ): PropertyDelegateProvider<Any?, GeneGroupDelegate<NodeGeneGroup>> {
         val genes = (0 until size).map { nodeGene(init) }
-        val slot = NodeChromosomeSlot(Chromosome(genes))
+        val slot = NodeGeneGroup(Chromosome(genes))
         return PropertyDelegateProvider { _, property ->
-            SlotDelegate(slot).also { slotEntries.add(property.name to it) }
+            GeneGroupDelegate(slot).also { geneGroups.add(property.name to it) }
         }
     }
 
-    protected fun connectionChromosome(): PropertyDelegateProvider<Any?, SlotDelegate<ConnectionChromosomeSlot>> {
-        val slot = ConnectionChromosomeSlot(Chromosome(emptyList()))
+    protected fun connectionChromosome(): PropertyDelegateProvider<Any?, GeneGroupDelegate<ConnectionGeneGroup>> {
+        val slot = ConnectionGeneGroup(Chromosome(emptyList()))
         return PropertyDelegateProvider { _, property ->
-            SlotDelegate(slot).also { slotEntries.add(property.name to it) }
+            GeneGroupDelegate(slot).also { geneGroups.add(property.name to it) }
         }
     }
 
     // --- Linked chromosome helpers ---
 
     protected fun neuronRuleChromosome(
-        target: KProperty0<NodeChromosomeSlot>,
+        target: KProperty0<NodeGeneGroup>,
         defaultRule: () -> NeuronRuleGene = { neuronRuleGene(DecayRule()) }
-    ) = linkedChromosomeSlot(
+    ) = linkedGeneGroup(
         targetName = target.name,
-        targetSizeProvider = { (slotEntries.first { it.first == target.name }.second.slot as NodeChromosomeSlot).chromosome.size },
+        targetSizeProvider = { (geneGroups.first { it.first == target.name }.second.group as NodeGeneGroup).chromosome.size },
         createDefault = defaultRule,
         applyOnExpress = { neuron, expressed ->
             (neuron as Neuron).updateRule = (expressed as NeuronRuleGeneWrapper).updateRule.copy()
@@ -217,11 +204,11 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
     )
 
     protected fun synapseRuleChromosome(
-        target: KProperty0<ConnectionChromosomeSlot>,
+        target: KProperty0<ConnectionGeneGroup>,
         defaultRule: () -> SynapseRuleGene = { synapseRuleGene() }
-    ) = linkedChromosomeSlot(
+    ) = linkedGeneGroup(
         targetName = target.name,
-        targetSizeProvider = { (slotEntries.first { it.first == target.name }.second.slot as ConnectionChromosomeSlot).chromosome.size },
+        targetSizeProvider = { (geneGroups.first { it.first == target.name }.second.group as ConnectionGeneGroup).chromosome.size },
         createDefault = defaultRule,
         applyOnExpress = { synapse, expressed ->
             (synapse as Synapse).learningRule = (expressed as SynapseRuleGeneWrapper).learningRule.copy()
@@ -229,10 +216,10 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
     )
 
     protected fun layoutChromosome(
-        target: KProperty0<NodeChromosomeSlot>,
+        target: KProperty0<NodeGeneGroup>,
         default: () -> LayoutGene = { layoutGene() }
-    ): PropertyDelegateProvider<Any?, SlotDelegate<CollectionLinkedSlot<LayoutGene>>> {
-        val slot = CollectionLinkedSlot(
+    ): PropertyDelegateProvider<Any?, GeneGroupDelegate<CollectionGeneGroup<LayoutGene>>> {
+        val slot = CollectionGeneGroup(
             gene = default(),
             createDefault = default,
             applyToCollection = { neurons, expressed, _ ->
@@ -240,16 +227,16 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
             }
         )
         return PropertyDelegateProvider { _, property ->
-            collectionLinkedSlots.getOrPut(target.name) { mutableListOf() }.add(property.name)
-            SlotDelegate(slot).also { slotEntries.add(property.name to it) }
+            collectionLinkedGroups.getOrPut(target.name) { mutableListOf() }.add(property.name)
+            GeneGroupDelegate(slot).also { geneGroups.add(property.name to it) }
         }
     }
 
     protected fun connectionStrategyChromosome(
-        target: KProperty0<NodeChromosomeSlot>,
+        target: KProperty0<NodeGeneGroup>,
         default: () -> ConnectionStrategyGene = { connectionStrategyGene() }
-    ): PropertyDelegateProvider<Any?, SlotDelegate<CollectionLinkedSlot<ConnectionStrategyGene>>> {
-        val slot = CollectionLinkedSlot(
+    ): PropertyDelegateProvider<Any?, GeneGroupDelegate<CollectionGeneGroup<ConnectionStrategyGene>>> {
+        val slot = CollectionGeneGroup(
             gene = default(),
             createDefault = default,
             applyToCollection = { neurons, expressed, network ->
@@ -259,42 +246,42 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
             }
         )
         return PropertyDelegateProvider { _, property ->
-            collectionLinkedSlots.getOrPut(target.name) { mutableListOf() }.add(property.name)
-            SlotDelegate(slot).also { slotEntries.add(property.name to it) }
+            collectionLinkedGroups.getOrPut(target.name) { mutableListOf() }.add(property.name)
+            GeneGroupDelegate(slot).also { geneGroups.add(property.name to it) }
         }
     }
 
-    private fun <G : Gene<Unit, *>> linkedChromosomeSlot(
+    private fun <G : Gene<Unit, *>> linkedGeneGroup(
         targetName: String,
         targetSizeProvider: () -> Int,
         createDefault: () -> G,
         applyOnExpress: (Any, Any?) -> Unit
-    ): PropertyDelegateProvider<Any?, SlotDelegate<LinkedChromosomeSlot<G>>> {
-        val slot = LinkedChromosomeSlot(mutableListOf(), createDefault, applyOnExpress)
+    ): PropertyDelegateProvider<Any?, GeneGroupDelegate<LinkedGeneGroup<G>>> {
+        val slot = LinkedGeneGroup(mutableListOf(), createDefault, applyOnExpress)
         return PropertyDelegateProvider { _, property ->
-            linkedSlots.getOrPut(targetName) { mutableListOf() }.add(property.name)
+            linkedGroups.getOrPut(targetName) { mutableListOf() }.add(property.name)
             val currentSize = targetSizeProvider()
             repeat(currentSize) {
                 slot.genes.add(slot.createDefault())
             }
-            SlotDelegate(slot).also { slotEntries.add(property.name to it) }
+            GeneGroupDelegate(slot).also { geneGroups.add(property.name to it) }
         }
     }
 
     // --- Gene addition (auto-adds to linked chromosomes) ---
 
-    fun NodeChromosomeSlot.addGene(gene: NodeGene) {
+    fun NodeGeneGroup.addGene(gene: NodeGene) {
         chromosome.add(gene)
         addLinkedDefaults(this)
     }
 
-    fun ConnectionChromosomeSlot.addGene(gene: ConnectionGene) {
+    fun ConnectionGeneGroup.addGene(gene: ConnectionGene) {
         chromosome.add(gene)
         addLinkedDefaults(this)
     }
 
-    fun ConnectionChromosomeSlot.addConnection(
-        vararg layerPairs: Pair<NodeChromosomeSlot, NodeChromosomeSlot>,
+    fun ConnectionGeneGroup.addConnection(
+        vararg layerPairs: Pair<NodeGeneGroup, NodeGeneGroup>,
         init: Synapse.() -> Unit = {}
     ): ConnectionGene? {
         val gene = chromosome.createGene(
@@ -305,58 +292,58 @@ abstract class SlotGenotype(seed: Long = Random.nextLong()) : Genotype {
         return gene
     }
 
-    private fun addLinkedDefaults(slot: EvolutionSlot) {
-        val slotName = slotEntries.firstOrNull { it.second.slot === slot }?.first ?: return
-        val pairedNames = linkedSlots[slotName] ?: return
+    private fun addLinkedDefaults(slot: GeneGroup) {
+        val slotName = geneGroups.firstOrNull { it.second.group === slot }?.first ?: return
+        val pairedNames = linkedGroups[slotName] ?: return
         for (name in pairedNames) {
-            val pairedSlot = slotEntries.first { it.first == name }.second.slot as LinkedChromosomeSlot<*>
+            val pairedSlot = geneGroups.first { it.first == name }.second.group as LinkedGeneGroup<*>
             @Suppress("UNCHECKED_CAST")
-            (pairedSlot as LinkedChromosomeSlot<Gene<Unit, *>>).genes.add(pairedSlot.createDefault())
+            (pairedSlot as LinkedGeneGroup<Gene<Unit, *>>).genes.add(pairedSlot.createDefault())
         }
     }
 
     // --- Auto-copy ---
 
-    abstract fun createNew(seed: Long): SlotGenotype
+    abstract fun createNew(seed: Long): Genotype
 
     abstract fun mutate()
 
-    open fun copyGenotype(): SlotGenotype {
+    open fun copyGenotype(): Genotype {
         val new = createNew(random.nextLong())
 
-        fun replaceSlot(name: String, copied: EvolutionSlot) {
-            val target = new.slotEntries.first { it.first == name }.second
+        fun replaceSlot(name: String, copied: GeneGroup) {
+            val target = new.geneGroups.first { it.first == name }.second
             @Suppress("UNCHECKED_CAST")
-            (target as SlotDelegate<EvolutionSlot>).slot = copied
+            (target as GeneGroupDelegate<GeneGroup>).group = copied
         }
 
-        for ((name, delegate) in slotEntries.sortedBy { it.second.slot.processingOrder }) {
-            replaceSlot(name, delegate.slot.copySlot())
+        for ((name, delegate) in geneGroups.sortedBy { it.second.group.processingOrder }) {
+            replaceSlot(name, delegate.group.copy())
         }
         return new
     }
 
     // --- Expression with linked chromosome resolution ---
 
-    private fun resolveLinked(slotName: String): List<LinkedChromosomeSlot<*>> {
-        val names = linkedSlots[slotName] ?: return emptyList()
+    private fun resolveLinked(slotName: String): List<LinkedGeneGroup<*>> {
+        val names = linkedGroups[slotName] ?: return emptyList()
         return names.map { name ->
-            slotEntries.first { it.first == name }.second.slot as LinkedChromosomeSlot<*>
+            geneGroups.first { it.first == name }.second.group as LinkedGeneGroup<*>
         }
     }
 
-    private fun resolveCollectionLinked(slotName: String): List<CollectionLinkedSlot<*>> {
-        val names = collectionLinkedSlots[slotName] ?: return emptyList()
+    private fun resolveCollectionLinked(slotName: String): List<CollectionGeneGroup<*>> {
+        val names = collectionLinkedGroups[slotName] ?: return emptyList()
         return names.map { name ->
-            slotEntries.first { it.first == name }.second.slot as CollectionLinkedSlot<*>
+            geneGroups.first { it.first == name }.second.group as CollectionGeneGroup<*>
         }
     }
 
     suspend fun expressAll(network: Network) {
-        for ((name, delegate) in slotEntries.sortedBy { it.second.slot.processingOrder }) {
-            when (val slot = delegate.slot) {
-                is NodeChromosomeSlot -> slot.express(network, resolveLinked(name), resolveCollectionLinked(name))
-                is ConnectionChromosomeSlot -> slot.express(network, resolveLinked(name))
+        for ((name, delegate) in geneGroups.sortedBy { it.second.group.processingOrder }) {
+            when (val slot = delegate.group) {
+                is NodeGeneGroup -> slot.express(network, resolveLinked(name), resolveCollectionLinked(name))
+                is ConnectionGeneGroup -> slot.express(network, resolveLinked(name))
             }
         }
     }

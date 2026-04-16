@@ -97,7 +97,7 @@ val evolveResourcePursuer = newSim { optionString ->
     }
     val evolutionParams = EvolutionParameters()
 
-    class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
         val inputs by nodeChromosome(3) { clamped = true }
         val drives by nodeChromosome(2) { clamped = true; upperBound = 100.0; lowerBound = 0.0 }
@@ -265,7 +265,7 @@ val evolveResourcePursuer = newSim { optionString ->
         genotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
         workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong(),
-    ) : SlotEvoSim<EvolvePursuerGenotype>(genotype, workspace) {
+    ) : EvoSim<EvolvePursuerGenotype>(genotype, workspace) {
 
         val simState = SimState(
             seed = seed

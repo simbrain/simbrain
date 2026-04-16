@@ -30,7 +30,7 @@ val evolveCow = newSim {
     val maxGenerations = 50
     val iterationsPerRun = 2000
 
-    class CowGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class CowGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
         val inputs by nodeChromosome(3) { clamped = true }
         val hidden by nodeChromosome(2)
         val outputs by nodeChromosome(3) { upperBound = 10.0; lowerBound = -10.0 }
@@ -82,7 +82,7 @@ val evolveCow = newSim {
     class CowGroupGenotype private constructor(
         seed: Long,
         val cows: List<CowGenotype>
-    ) : SlotGenotype(seed) {
+    ) : Genotype(seed) {
 
         constructor(seed: Long = Random.nextLong(), numCows: Int = 2) : this(
             seed, List(numCows) { CowGenotype(Random(seed).nextLong()) }
@@ -101,7 +101,7 @@ val evolveCow = newSim {
     class CowSim(
         genotype: CowGroupGenotype = CowGroupGenotype(),
         workspace: Workspace = Workspace()
-    ) : SlotEvoSim<CowGroupGenotype>(genotype, workspace) {
+    ) : EvoSim<CowGroupGenotype>(genotype, workspace) {
 
         val cowGenotypes get() = genotype.cows
 

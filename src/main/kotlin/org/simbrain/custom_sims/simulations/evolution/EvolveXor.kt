@@ -23,7 +23,7 @@ val evolveXor = newSim {
         seed = 42
     )
 
-    class XorGenotype(seed: Long = Random.nextLong()) : SlotGenotype(seed) {
+    class XorGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
         val inputs by nodeChromosome(2) { clamped = true; upperBound = 1.0; lowerBound = -1.0 }
         val hidden by nodeChromosome(2) { upperBound = 1.0; lowerBound = -1.0 }
@@ -71,7 +71,7 @@ val evolveXor = newSim {
     class XorSim(
         genotype: XorGenotype = XorGenotype(),
         workspace: Workspace = Workspace()
-    ) : SlotEvoSim<XorGenotype>(genotype, workspace) {
+    ) : EvoSim<XorGenotype>(genotype, workspace) {
 
         val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
 

@@ -1,5 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -7,6 +9,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.activations
 import org.simbrain.network.core.bound
 import org.simbrain.network.core.lengths
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -136,10 +139,13 @@ val evolveNetwork = newSim {
 
     class EvolveNetworkSim(
         genotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
-        workspace: Workspace = Workspace()
-    ) : EvoSim<EvolveNetworkGenotype>(genotype, workspace) {
+        workspace: Workspace = Workspace(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<EvolveNetworkGenotype>(genotype, workspace, metadata) {
 
-        val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
+        val networkComponent = NetworkComponent("${metadata.namePrefix}network").also {
+            workspace.addWorkspaceComponent(it)
+        }
 
         val network = networkComponent.network
 
@@ -147,7 +153,8 @@ val evolveNetwork = newSim {
             genotype.expressAll(network)
         }
 
-        override fun create(genotype: EvolveNetworkGenotype, workspace: Workspace) = EvolveNetworkSim(genotype, workspace)
+        override fun create(genotype: EvolveNetworkGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            EvolveNetworkSim(genotype, workspace, metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -218,42 +225,72 @@ val evolveNetwork = newSim {
 
     val controlPanel = EvolutionControlPanel(evaluatorParams)
 
-    suspend fun runSim() {
-        val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
-        withGui { showGeneDisplay(genomeDisplay) }
-
-        val runner = EvolutionRunner(evaluatorParams) { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
-
-        genomeDisplay.bind(runner)
-        controlPanel.bind(runner)
-
-        val result = runner.run()
-
-        with(result.best.visualize(workspace) as EvolveNetworkSim) {
-            build()
-            val genotype = this.genotype
-            genomeDisplay.refreshFrom(genotype)
-            withGui {
-                place(networkComponent, 340, 10, 384, 480)
-            }
-        }
-    }
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10)
+        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
 
         panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(networkParams)
         panel.addAnnotatedPropertyEditor(propertyEditor)
-
         panel.addSeparator()
-        controlPanel.addButton("Evolve") {
-            workspace.removeAllComponents()
-            propertyEditor.commitChanges()
-            println(networkParams.allPropertiesToString())
-            runSim()
+
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
         }
+
+        suspend fun openTrainer() {
+            trainerDialog?.takeIf { it.isDisplayable }?.let {
+                it.toFront()
+                return
+            }
+
+            val activeSession = session ?: run {
+                workspace.removeAllComponents()
+                propertyEditor.commitChanges()
+                println(networkParams.allPropertiesToString())
+                val runner = EvolutionRunner(evaluatorParams) { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
+                val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
+                genomeDisplay.bind(runner)
+                val history = ExpressionHistory()
+
+                suspend fun expressBest() {
+                    val state = runner.generationState ?: return
+                    history.minimizeAll()
+                    with(state.best.visualize(workspace, state.bestMetadata) as EvolveNetworkSim) {
+                        build()
+                        genomeDisplay.refreshFrom(genotype)
+                        withGui {
+                            place(networkComponent, 340, 10, 384, 480)
+                        }
+                        history.add(ExpressionEntry.forComponents(
+                            workspace, listOf(networkComponent), state.historyLabel(evaluatorParams)
+                        ))
+                    }
+                }
+
+                runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                EvolutionTrainerSession(
+                    runner = runner,
+                    evaluatorParams = evaluatorParams,
+                    extras = listOf(genomeDisplay),
+                    onExpress = ::expressBest,
+                    history = history
+                ).also { session = it }
+            }
+
+            trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                addCloseTask { trainerDialog = null }
+                makeVisible()
+            }
+        }
+
+        controlPanel.addButton("Open Trainer") { openTrainer() }
 
         addSidebarInfo(
         """

@@ -1,6 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -70,6 +71,10 @@ data class SimMetadata(
     val fitness: Double
 )
 
+/** `"Gen N: "` if metadata is available, `""` otherwise. Use to prefix workspace component names
+ * so expressed genomes are visually distinguishable from one another. */
+val SimMetadata?.namePrefix: String get() = this?.let { "Gen ${it.generation}: " } ?: ""
+
 data class GenerationState(
     val generation: Int,
     val population: List<Pair<EvoSim<*>, SimMetadata>>
@@ -88,6 +93,10 @@ data class GenerationState(
     fun nthPercentileFitness(nth: Int) = nthPercentileFitness(nth.toDouble())
 
     fun nthPercentileFitness(nth: Double) = fitnessScores[(fitnessScores.lastIndex * nth / 100).roundToInt()]
+
+    /** Shared history-row label: `"Gen N  |  <Metric>: <value>"`. */
+    fun historyLabel(params: EvaluatorParams): String =
+        "Gen $generation  |  ${params.stoppingCondition.name}: ${bestMetadata.fitness.format(4)}"
 
 }
 

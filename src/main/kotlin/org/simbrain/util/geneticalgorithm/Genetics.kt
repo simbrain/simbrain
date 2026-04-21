@@ -33,10 +33,8 @@ package org.simbrain.util.geneticalgorithm
  *   for a compact end-to-end example
  */
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.channels.Channel
+import org.simbrain.util.Events
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement
@@ -73,7 +71,12 @@ abstract class Gene<C, P> {
  */
 abstract class EvoSim<G : Genotype>(
     val genotype: G,
-    val workspace: Workspace = Workspace()
+    val workspace: Workspace = Workspace(),
+    /**
+     * Optional context for this sim. Set by [visualize] so sims can use generation/fitness/id
+     * in component names at construction time. `null` for evolution-loop clones.
+     */
+    val metadata: SimMetadata? = null
 ) {
 
     private var built = false
@@ -92,8 +95,10 @@ abstract class EvoSim<G : Genotype>(
 
     /**
      * Factory method: create a new sim instance with the given genotype and workspace.
+     * The [metadata] parameter is `null` for internal evolution clones (via [copy]) and set
+     * by [visualize] callers so the sim can give its components contextual names.
      */
-    protected abstract fun create(genotype: G, workspace: Workspace): EvoSim<G>
+    protected abstract fun create(genotype: G, workspace: Workspace, metadata: SimMetadata?): EvoSim<G>
 
     /**
      * Evaluate this candidate and return its fitness or error metric.
@@ -103,10 +108,11 @@ abstract class EvoSim<G : Genotype>(
     fun mutate() { genotype.mutate() }
 
     @Suppress("UNCHECKED_CAST")
-    fun copy(): EvoSim<*> = create(genotype.copyGenotype() as G, Workspace())
+    fun copy(): EvoSim<*> = create(genotype.copyGenotype() as G, Workspace(), null)
 
     @Suppress("UNCHECKED_CAST")
-    fun visualize(workspace: Workspace): EvoSim<*> = create(genotype.copyGenotype() as G, workspace)
+    fun visualize(workspace: Workspace, metadata: SimMetadata? = null): EvoSim<*> =
+        create(genotype.copyGenotype() as G, workspace, metadata)
 }
 
 /**
@@ -132,12 +138,30 @@ class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayLis
 
 data class PopulatingFunctionParams(val seed: Long)
 
+class EvolutionEvents : Events() {
+    val beginEvolution = NoArgEvent()
+    val endEvolution = NoArgEvent()
+    /** Fires after [endEvolution] when the stopping condition was met (not when the user paused). */
+    val targetReached = NoArgEvent()
+    val generationUpdated = OneArgEvent<GenerationState>()
+}
+
 /**
- * Runs an evolutionary loop, publishing [GenerationState] to a [StateFlow] each generation.
+ * Runs an evolutionary loop with pause/resume/step support.
  *
- * Subscribers collect from [state] to observe progress (gene display, progress bars, logging).
- * Call [run] to start evolution; it suspends until the stopping condition is met and returns
- * the final [GenerationState].
+ * Uses a channel-based task queue (same pattern as [SupervisedTrainer][org.simbrain.network.trainers.SupervisedTrainer])
+ * to serialize control actions. Each generation completes fully before the next task is processed,
+ * so pause/stop never interrupts a mid-generation evaluation.
+ *
+ * Usage:
+ * ```
+ * val runner = EvolutionRunner(evaluatorParams) { MySim(seed = seed) }
+ * runner.events.generationUpdated.on { state -> updateDisplay(state) }
+ * runner.startEvolving()   // continuous
+ * runner.stopEvolving()    // pause
+ * runner.evolveOnce()      // single step
+ * runner.startEvolving()   // resume
+ * ```
  */
 class EvolutionRunner(
     val populatingFunction: PopulatingFunctionParams.() -> EvoSim<*>,
@@ -146,7 +170,11 @@ class EvolutionRunner(
     val stoppingFunction: GenerationState.() -> Boolean,
     val sortDescending: Boolean = true,
     val seed: Long = Random.nextLong(),
-) {
+) : CoroutineScope {
+
+    private val job = SupervisorJob()
+    override val coroutineContext = Dispatchers.Default + job
+
     constructor(
         evaluatorParams: EvaluatorParams,
         populatingFunction: PopulatingFunctionParams.() -> EvoSim<*>
@@ -163,69 +191,131 @@ class EvolutionRunner(
         sortDescending = evaluatorParams.stoppingCondition == EvaluatorParams.StoppingCondition.Fitness,
         seed = evaluatorParams.seed.toLong()
     )
-    private val _state = MutableStateFlow<GenerationState?>(null)
-    val state: StateFlow<GenerationState?> = _state.asStateFlow()
 
-    private val subscribers = mutableListOf<suspend (GenerationState) -> Unit>()
-    private val completionCallbacks = mutableListOf<() -> Unit>()
+    val events = EvolutionEvents()
 
-    /**
-     * Register a callback that runs for each generation state.
-     * Subscribers are launched as coroutines when [run] starts and cancelled when it completes.
-     */
-    fun onGeneration(block: suspend (GenerationState) -> Unit) {
-        subscribers.add(block)
+    var generation = 0
+        private set
+
+    var isRunning = false
+        private set
+
+    var generationState: GenerationState? = null
+        private set
+
+    private var population: List<EvoSim<*>> = emptyList()
+    private var metadata: List<SimMetadata> = emptyList()
+    private var nextId = 0
+    private var random = Random(seed)
+    private var initialized = false
+    private var stoppedByTarget = false
+
+    private val processorChannel = Channel<Pair<EvolutionTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
+
+    sealed class EvolutionTask {
+        object Start : EvolutionTask()
+        object Evolve : EvolutionTask()
+        object Stop : EvolutionTask()
     }
 
-    /**
-     * Register a callback that runs once when the evolution run completes.
-     */
-    fun onComplete(block: () -> Unit) {
-        completionCallbacks.add(block)
-    }
-
-    suspend fun run(): GenerationState = coroutineScope {
-        val subscriberJob = Job()
-        for (sub in subscribers) {
-            launch(subscriberJob) {
-                state.filterNotNull().collect { sub(it) }
+    init {
+        launch {
+            for ((task, signal) in processorChannel) {
+                when (task) {
+                    EvolutionTask.Start -> startHandler()
+                    EvolutionTask.Evolve -> evolveOnceHandler()
+                    EvolutionTask.Stop -> stopHandler()
+                }
+                signal.complete(Unit)
             }
         }
-        val random = Random(seed)
-        var generation = 0
-        var nextId = 0
-        val populatingFunctionParams = PopulatingFunctionParams(seed)
-        var population = List(populationSize) { populatingFunction(populatingFunctionParams) }
-        var metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
-        lateinit var generationState: GenerationState
-        do {
-            generation++
-            val fitnessScores = population.map { async { it.eval() } }.awaitAll()
-            val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
-                simMeta.first to simMeta.second.copy(fitness = fitness)
-            }
-            val sorted = scored.shuffled(random).let {
-                if (sortDescending) it.sortedByDescending { it.second.fitness }
-                else it.sortedBy { it.second.fitness }
-            }
-            generationState = GenerationState(generation, sorted)
-            _state.value = generationState
+    }
 
-            val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
-            val survivors = sorted.take(populationSize - eliminationCount)
-            val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
-                val childId = nextId++
-                sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
+    private suspend fun submitTask(task: EvolutionTask): CompletableDeferred<Unit> {
+        val signal = CompletableDeferred<Unit>()
+        processorChannel.send(task to signal)
+        return signal
+    }
+
+    suspend fun startEvolving() {
+        submitTask(EvolutionTask.Start).await()
+    }
+
+    suspend fun stopEvolving() {
+        submitTask(EvolutionTask.Stop).await()
+    }
+
+    suspend fun evolveOnce() {
+        submitTask(EvolutionTask.Evolve).await()
+    }
+
+    private fun initPopulation() {
+        if (!initialized) {
+            random = Random(seed)
+            generation = 0
+            nextId = 0
+            val params = PopulatingFunctionParams(seed)
+            population = List(populationSize) { populatingFunction(params) }
+            metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
+            initialized = true
+        }
+    }
+
+    private suspend fun startHandler() {
+        isRunning = true
+        events.beginEvolution.fire().await()
+        submitTask(EvolutionTask.Evolve)
+    }
+
+    private suspend fun evolveOnceHandler() {
+        initPopulation()
+        generation++
+
+        val fitnessScores = coroutineScope {
+            population.map { async { it.eval() } }.awaitAll()
+        }
+        val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
+            simMeta.first to simMeta.second.copy(fitness = fitness)
+        }
+        val sorted = scored.shuffled(random).let {
+            if (sortDescending) it.sortedByDescending { it.second.fitness }
+            else it.sortedBy { it.second.fitness }
+        }
+        val state = GenerationState(generation, sorted)
+        generationState = state
+        events.generationUpdated.fire(state).await()
+
+        val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
+        val survivors = sorted.take(populationSize - eliminationCount)
+        val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
+            val childId = nextId++
+            sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
+        }
+        val nextGen = survivors.map { (sim, meta) ->
+            sim.copy() to meta
+        } + offspring
+        population = nextGen.map { it.first }
+        metadata = nextGen.map { it.second }
+
+        if (isRunning) {
+            if (stoppingFunction(state)) {
+                stoppedByTarget = true
+                submitTask(EvolutionTask.Stop)
+            } else {
+                submitTask(EvolutionTask.Evolve)
             }
-            val nextGen = survivors.map { (sim, meta) ->
-                sim.copy() to meta
-            } + offspring
-            population = nextGen.map { it.first }
-            metadata = nextGen.map { it.second }
-        } while (!stoppingFunction(generationState))
-        subscriberJob.cancel()
-        completionCallbacks.forEach { it() }
-        generationState
+        } else {
+            submitTask(EvolutionTask.Stop)
+        }
+    }
+
+    private suspend fun stopHandler() {
+        isRunning = false
+        events.endEvolution.fire().await()
+        if (stoppedByTarget) {
+            stoppedByTarget = false
+            events.targetReached.fire()
+        }
     }
 }
 

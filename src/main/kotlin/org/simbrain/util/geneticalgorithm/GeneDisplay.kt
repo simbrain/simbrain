@@ -238,7 +238,7 @@ class GeneDisplayPanel(
      */
     fun bind(runner: EvolutionRunner) {
         require(renderer != null) { "No renderer — use the factory function geneDisplayPanel()" }
-        runner.onGeneration { state ->
+        runner.events.generationUpdated.on { state ->
             val g = state.best.genotype
             refreshFrom(g, state.bestMetadata)
         }
@@ -394,7 +394,7 @@ fun GeneDisplayPanel.bind(
     precision: Int = 4,
     extract: (GenerationState) -> Pair<Genotype, GeneDisplayBuilder.() -> Unit>
 ) {
-    runner.onGeneration { state ->
+    runner.events.generationUpdated.on { state ->
         val (genotype, block) = extract(state)
         val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
         refresh(newSections, state.bestMetadata)

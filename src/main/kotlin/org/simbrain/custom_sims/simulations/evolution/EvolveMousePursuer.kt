@@ -1,8 +1,9 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.swing.Swing
 import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -10,6 +11,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.labels
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.format
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -209,16 +211,17 @@ val evolveMousePursuer = newSim { optionString ->
     class EvolveMousePursuerSim(
         genotype: MouseGenotype = MouseGenotype(),
         workspace: Workspace = Workspace(),
-        seed: Long = Random.nextLong()
-    ) : EvoSim<MouseGenotype>(genotype, workspace) {
+        seed: Long = Random.nextLong(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<MouseGenotype>(genotype, workspace, metadata) {
 
         private val random = Random(seed)
         val simState = SimState()
 
-        val networkComponent = NetworkComponent("Network").also(workspace::addWorkspaceComponent)
+        val networkComponent = NetworkComponent("${metadata.namePrefix}Network").also(workspace::addWorkspaceComponent)
         val network = networkComponent.network
 
-        val odorWorldComponent = OdorWorldComponent("Odor World").also(workspace::addWorkspaceComponent)
+        val odorWorldComponent = OdorWorldComponent("${metadata.namePrefix}Odor World").also(workspace::addWorkspaceComponent)
         val odorWorld = odorWorldComponent.world.apply {
             launch {
                 isObjectsBlockMovement = true
@@ -336,8 +339,8 @@ val evolveMousePursuer = newSim { optionString ->
             }
         }
 
-        override fun create(genotype: MouseGenotype, workspace: Workspace) =
-            EvolveMousePursuerSim(genotype, workspace, random.nextLong())
+        override fun create(genotype: MouseGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            EvolveMousePursuerSim(genotype, workspace, random.nextLong(), metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -404,34 +407,66 @@ val evolveMousePursuer = newSim { optionString ->
 
     val controlPanel = EvolutionControlPanel(evaluatorParams)
 
-    suspend fun runEvolution() {
-        withContext(workspace.coroutineContext) {
-            val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
-            withGui { showGeneDisplay(genomeDisplay) }
-
-            val runner = EvolutionRunner(evaluatorParams) { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
-
-            genomeDisplay.bind(runner)
-            controlPanel.bind(runner)
-
-            val result = runner.run()
-
-            val sim = result.best.visualize(workspace) as EvolveMousePursuerSim
-            genomeDisplay.refreshFrom(sim.genotype)
-            sim.showWinner()
-        }
-    }
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10)
+        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
         val propertyEditor = AnnotatedPropertyEditor(mouseParams)
         panel.addAnnotatedPropertyEditor(propertyEditor)
-        controlPanel.addButton("Evolve") {
-            workspace.removeAllComponents()
-            propertyEditor.commitChanges()
-            runEvolution()
+
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
         }
+
+        suspend fun openTrainer() {
+            trainerDialog?.takeIf { it.isDisplayable }?.let {
+                it.toFront()
+                return
+            }
+
+            val activeSession = session ?: run {
+                workspace.removeAllComponents()
+                propertyEditor.commitChanges()
+                val runner = EvolutionRunner(evaluatorParams) { EvolveMousePursuerSim(seed = evaluatorParams.seed.toLong()) }
+                val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
+                genomeDisplay.bind(runner)
+                val history = ExpressionHistory()
+
+                suspend fun expressBest() {
+                    val state = runner.generationState ?: return
+                    history.minimizeAll()
+                    val before = workspace.componentList.toSet()
+                    val sim = state.best.visualize(workspace, state.bestMetadata) as EvolveMousePursuerSim
+                    genomeDisplay.refreshFrom(sim.genotype)
+                    sim.showWinner()
+                    val newComponents = workspace.componentList.filter { it !in before }
+                    history.add(ExpressionEntry.forComponents(
+                        workspace, newComponents, state.historyLabel(evaluatorParams)
+                    ))
+                }
+
+                runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                EvolutionTrainerSession(
+                    runner = runner,
+                    evaluatorParams = evaluatorParams,
+                    extras = listOf(genomeDisplay),
+                    onExpress = ::expressBest,
+                    history = history
+                ).also { session = it }
+            }
+
+            trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                addCloseTask { trainerDialog = null }
+                makeVisible()
+            }
+        }
+
+        controlPanel.addButton("Open Trainer") { openTrainer() }
     }
 
     addSidebarInfo(

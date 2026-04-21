@@ -100,8 +100,9 @@ val evolveCow = newSim {
 
     class CowSim(
         genotype: CowGroupGenotype = CowGroupGenotype(),
-        workspace: Workspace = Workspace()
-    ) : EvoSim<CowGroupGenotype>(genotype, workspace) {
+        workspace: Workspace = Workspace(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<CowGroupGenotype>(genotype, workspace, metadata) {
 
         val cowGenotypes get() = genotype.cows
 
@@ -217,7 +218,8 @@ val evolveCow = newSim {
             }
         }
 
-        override fun create(genotype: CowGroupGenotype, workspace: Workspace) = CowSim(genotype, workspace)
+        override fun create(genotype: CowGroupGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            CowSim(genotype, workspace, metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -238,7 +240,7 @@ val evolveCow = newSim {
             eliminationRatio = 0.5,
             stoppingFunction = { nthPercentileFitness(10) > -1000 || generation > maxGenerations },
         )
-        runner.onGeneration { state ->
+        runner.events.generationUpdated.on { state ->
             listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                 "$it: ${state.nthPercentileFitness(it).format(3)}"
             }.also {
@@ -247,16 +249,20 @@ val evolveCow = newSim {
                 progressWindow.value = state.generation
             }
         }
-        val result = runner.run()
-        with(result.best.visualize(workspace) as CowSim) {
-            build()
-            cowGenotypes.forEach { g ->
-                g.inputs.neurons.location = point(0, 150)
-                g.hidden.neurons.location = point(0, 60)
-                g.outputs.neurons.location = point(0, -25)
-                g.drives.neurons.location = point(200, 60)
+        runner.events.endEvolution.on {
+            runner.generationState?.let { state ->
+                with(state.best.visualize(workspace) as CowSim) {
+                    build()
+                    cowGenotypes.forEach { g ->
+                        g.inputs.neurons.location = point(0, 150)
+                        g.hidden.neurons.location = point(0, 60)
+                        g.outputs.neurons.location = point(0, -25)
+                        g.drives.neurons.location = point(200, 60)
+                    }
+                }
             }
+            progressWindow.close()
         }
-        progressWindow.close()
+        runner.startEvolving()
     }
 }

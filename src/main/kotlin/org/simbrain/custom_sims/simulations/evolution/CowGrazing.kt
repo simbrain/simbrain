@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
@@ -12,7 +13,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.geneticalgorithm.*
-import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -21,7 +21,6 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.getRandomLocation
 import org.simbrain.world.odorworld.sensors.ObjectSensor
-import java.awt.Dimension
 import java.io.File
 import java.io.FileInputStream
 import java.text.SimpleDateFormat
@@ -122,14 +121,15 @@ val grazingCows = newSim { optionString ->
 
     class CowSim(
         genotype: CowGroupGenotype = CowGroupGenotype(numCows = numCows),
-        workspace: Workspace = Workspace()
-    ) : EvoSim<CowGroupGenotype>(genotype, workspace) {
+        workspace: Workspace = Workspace(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<CowGroupGenotype>(genotype, workspace, metadata) {
 
         val cowGenotypes get() = genotype.cows
 
         val cowFitnesses = mutableMapOf<Int, Double>()
 
-        val odorWorld = OdorWorldComponent("Odor World 1").also {
+        val odorWorld = OdorWorldComponent("${metadata.namePrefix}Odor World 1").also {
             workspace.addWorkspaceComponent(it)
         }.world.apply {
             launch {
@@ -142,7 +142,7 @@ val grazingCows = newSim { optionString ->
         }
 
         val networks = List(cowGenotypes.size) { index ->
-            NetworkComponent("Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
+            NetworkComponent("${metadata.namePrefix}Network ${index + 1}").also { workspace.addWorkspaceComponent(it) }.network
         }
         val entities = runBlocking {
             List(cowGenotypes.size) { i ->
@@ -213,7 +213,8 @@ val grazingCows = newSim { optionString ->
             }
         }
 
-        override fun create(genotype: CowGroupGenotype, workspace: Workspace) = CowSim(genotype, workspace)
+        override fun create(genotype: CowGroupGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            CowSim(genotype, workspace, metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -248,72 +249,48 @@ val grazingCows = newSim { optionString ->
         }
     }
 
-    suspend fun runSim() {
-        withContext(workspace.coroutineContext) {
-            val progressWindow = withGui {
-                ProgressWindow(maxGenerations, "10th Percentile Fitness:").apply {
-                    minimumSize = Dimension(300, 100)
-                    setLocationRelativeTo(null)
-                }
+    fun buildRunner() = EvolutionRunner(
+        populatingFunction = { CowSim(CowGroupGenotype(numCows = numCows)) },
+        populationSize = populationSize,
+        eliminationRatio = eliminationRatio,
+        stoppingFunction = { nthPercentileFitness(10) > 400 || generation > maxGenerations },
+    )
+
+    suspend fun runHeadless() {
+        val runner = buildRunner()
+        runner.events.generationUpdated.on { state ->
+            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
+                "$it: ${state.nthPercentileFitness(it).format(3)}"
+            }.also {
+                println("[${state.generation}] $it")
             }
-            val genomeDisplays = List(numCows) { geneDisplayPanel(displayBlock = ::displayBlock) }
-            withGui {
-                genomeDisplays.forEachIndexed { i, panel ->
-                    showGeneDisplay(panel, y = 400 + i * 320, title = "Cow ${i + 1} Genome")
-                }
-            }
-            val runner = EvolutionRunner(
-                populatingFunction = { CowSim(CowGroupGenotype(numCows = numCows)) },
-                populationSize = populationSize,
-                eliminationRatio = eliminationRatio,
-                stoppingFunction = { nthPercentileFitness(10) > 400 || generation > maxGenerations },
-            )
-            genomeDisplays.forEachIndexed { i, panel ->
-                panel.bind(runner) { state ->
-                    val g = (state.best as CowSim).cowGenotypes[i]
-                    g to displayBlock(g)
-                }
-            }
-            runner.onGeneration { state ->
-                listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                    "$it: ${state.nthPercentileFitness(it).format(3)}"
-                }.also {
-                    println("[${state.generation}] $it")
-                    progressWindow?.apply {
-                        text = "10th Percentile Fitness: ${state.nthPercentileFitness(10).format(3)}"
-                        value = state.generation
+        }
+        runner.events.endEvolution.on {
+            runner.generationState?.let { state ->
+                with(state.best.visualize(workspace) as CowSim) {
+                    build()
+                    cowGenotypes.forEach { g ->
+                        g.inputs.neurons.location = point(0, 150)
+                        g.hidden.neurons.location = point(0, 60)
+                        g.outputs.neurons.location = point(0, -25)
                     }
-                }
-            }
-            val result = runner.run()
-            with(result.best.visualize(workspace) as CowSim) {
-                build()
-                withGui {
-                    workspace.componentList.filterIsInstance<OdorWorldComponent>().first().apply {
-                        place(this, 280, 10, 476, 432)
-                    }
-                    workspace.componentList.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
-                        place(net, 768, 10 + i * 282, 326, 282)
-                    }
-                }
-                cowGenotypes.forEach { g ->
-                    g.inputs.neurons.location = point(0, 150)
-                    g.hidden.neurons.location = point(0, 60)
-                    g.outputs.neurons.location = point(0, -25)
-                }
-                cowGenotypes.zip(genomeDisplays).forEach { (genotype, panel) ->
-                    panel.refreshFrom(genotype)
-                }
-                if (desktop == null) {
                     workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
                 }
             }
-            progressWindow?.close()
         }
+        runner.startEvolving()
     }
+
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
 
     withGui {
         workspace.clearWorkspace()
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
+        }
         createControlPanel("Control Panel", 5, 10) {
 
             val numCowsTf = addTextField("Number of cows", "" + numCows)
@@ -323,15 +300,84 @@ val grazingCows = newSim { optionString ->
             val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
             val useAverageCB = addCheckBox("Use mean group fitness (else min)", useAverage)
 
-            addButton("Evolve") {
-                workspace.removeAllComponents()
-                numCows = numCowsTf.text.toInt();
-                maxGenerations = maxGenTf.text.toInt()
-                iterationsPerRun = iterationsPerRunTf.text.toInt()
-                populationSize = populationSizeTf.text.toInt()
-                eliminationRatio = eliminationRatioTf.text.toDouble()
-                useAverage = useAverageCB.isSelected()
-                runSim()
+            addButton("Open Trainer") {
+                trainerDialog?.takeIf { it.isDisplayable }?.let {
+                    it.toFront()
+                    return@addButton
+                }
+
+                val activeSession = session ?: run {
+                    numCows = numCowsTf.text.toInt()
+                    maxGenerations = maxGenTf.text.toInt()
+                    iterationsPerRun = iterationsPerRunTf.text.toInt()
+                    populationSize = populationSizeTf.text.toInt()
+                    eliminationRatio = eliminationRatioTf.text.toDouble()
+                    useAverage = useAverageCB.isSelected()
+                    workspace.removeAllComponents()
+
+                    val evaluatorParams = EvaluatorParams(
+                        populationSize = populationSize,
+                        eliminationRatio = eliminationRatio,
+                        iterationsPerRun = iterationsPerRun,
+                        maxGenerations = maxGenerations,
+                        stoppingCondition = EvaluatorParams.StoppingCondition.Fitness,
+                        targetMetric = 400.0
+                    )
+                    val runner = buildRunner()
+                    val genomeDisplays = List(numCows) { geneDisplayPanel(displayBlock = ::displayBlock) }
+                    genomeDisplays.forEachIndexed { i, panel ->
+                        panel.bind(runner) { state ->
+                            val g = (state.best as CowSim).cowGenotypes[i]
+                            g to displayBlock(g)
+                        }
+                    }
+                    val history = ExpressionHistory()
+
+                    suspend fun expressBest() {
+                        val state = runner.generationState ?: return
+                        history.minimizeAll()
+                        val before = workspace.componentList.toSet()
+                        with(state.best.visualize(workspace, state.bestMetadata) as CowSim) {
+                            build()
+                            cowGenotypes.forEach { g ->
+                                g.inputs.neurons.location = point(0, 150)
+                                g.hidden.neurons.location = point(0, 60)
+                                g.outputs.neurons.location = point(0, -25)
+                            }
+                            cowGenotypes.zip(genomeDisplays).forEach { (g, p) -> p.refreshFrom(g) }
+                        }
+                        val newComponents = workspace.componentList.filter { it !in before }
+
+                        withGui {
+                            newComponents.filterIsInstance<OdorWorldComponent>().firstOrNull()?.let {
+                                place(it, 280, 10, 476, 432)
+                            }
+                            newComponents.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
+                                place(net, 768, 10 + i * 282, 326, 282)
+                            }
+                        }
+
+                        history.add(ExpressionEntry.forComponents(
+                            workspace, newComponents, state.historyLabel(evaluatorParams)
+                        ))
+                    }
+
+                    runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                    EvolutionTrainerSession(
+                        runner = runner,
+                        evaluatorParams = evaluatorParams,
+                        extras = genomeDisplays,
+                        title = "Evolution Trainer (Cows)",
+                        onExpress = ::expressBest,
+                        history = history
+                    ).also { session = it }
+                }
+
+                trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                    addCloseTask { trainerDialog = null }
+                    makeVisible()
+                }
             }
 
             addButton("Load file") {
@@ -415,7 +461,7 @@ val grazingCows = newSim { optionString ->
         if (options.size > 5) {
             useAverage = options[5].toBoolean()
         }
-        runSim()
+        runHeadless()
     }
 
 }

@@ -1,9 +1,12 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.activations
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
 import org.simbrain.util.point
@@ -70,10 +73,13 @@ val evolveXor = newSim {
 
     class XorSim(
         genotype: XorGenotype = XorGenotype(),
-        workspace: Workspace = Workspace()
-    ) : EvoSim<XorGenotype>(genotype, workspace) {
+        workspace: Workspace = Workspace(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<XorGenotype>(genotype, workspace, metadata) {
 
-        val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
+        val networkComponent = NetworkComponent("${metadata.namePrefix}network").also {
+            workspace.addWorkspaceComponent(it)
+        }
 
         val network = networkComponent.network
 
@@ -84,7 +90,8 @@ val evolveXor = newSim {
             genotype.output.neurons.label = "output"
         }
 
-        override fun create(genotype: XorGenotype, workspace: Workspace) = XorSim(genotype, workspace)
+        override fun create(genotype: XorGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            XorSim(genotype, workspace, metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -128,38 +135,72 @@ val evolveXor = newSim {
 
     val controlPanel = EvolutionControlPanel(evaluatorParams)
 
-    suspend fun runSim() {
-        val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
-        withGui { showGeneDisplay(genomeDisplay) }
-
-        val runner = EvolutionRunner(evaluatorParams) { XorSim(XorGenotype(seed = seed)) }
-
-        genomeDisplay.bind(runner)
-        controlPanel.bind(runner)
-
-        val result = runner.run()
-
-        with(result.best.visualize(workspace) as XorSim) {
-            build()
-            val genotype = this.genotype
-            genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
-            genotype.inputs.neurons.location = point( 0, 150)
-            genotype.hidden.neurons.location = point( 0, 60)
-            genotype.output.neurons.location = point(0, -25)
-            genomeDisplay.refreshFrom(genotype)
-            withGui {
-                place(networkComponent, 340, 10, 384, 480)
-            }
-        }
-    }
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10)
-        controlPanel.addButton("Evolve") {
-            workspace.removeAllComponents()
-            runSim()
+        controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
         }
+
+        suspend fun openTrainer() {
+            trainerDialog?.takeIf { it.isDisplayable }?.let {
+                it.toFront()
+                return
+            }
+
+            val activeSession = session ?: run {
+                workspace.removeAllComponents()
+                val runner = EvolutionRunner(evaluatorParams) { XorSim(XorGenotype(seed = seed)) }
+                val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
+                genomeDisplay.bind(runner)
+                val history = ExpressionHistory()
+
+                suspend fun expressBest() {
+                    val state = runner.generationState ?: return
+                    history.minimizeAll()
+                    with(state.best.visualize(workspace, state.bestMetadata) as XorSim) {
+                        build()
+                        val genotype = this.genotype
+                        genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }
+                        genotype.inputs.neurons.location = point(0, 150)
+                        genotype.hidden.neurons.location = point(0, 60)
+                        genotype.output.neurons.location = point(0, -25)
+                        genomeDisplay.refreshFrom(genotype)
+                        withGui {
+                            place(networkComponent, 340, 10, 384, 480)
+                        }
+                        history.add(ExpressionEntry.forComponents(
+                            workspace, listOf(networkComponent), state.historyLabel(evaluatorParams)
+                        ))
+                    }
+                }
+
+                runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                EvolutionTrainerSession(
+                    runner = runner,
+                    evaluatorParams = evaluatorParams,
+                    extras = listOf(genomeDisplay),
+                    onExpress = ::expressBest,
+                    history = history
+                ).also { session = it }
+            }
+
+            trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                addCloseTask { trainerDialog = null }
+                makeVisible()
+            }
+        }
+
+        controlPanel.addButton("Open Trainer") { openTrainer() }
+
+        openTrainer()
 
         addSidebarInfo(
         """

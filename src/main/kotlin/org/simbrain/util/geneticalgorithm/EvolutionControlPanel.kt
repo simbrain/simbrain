@@ -33,14 +33,27 @@ class EvolutionControlPanel(val evaluatorParams: EvaluatorParams) {
     private var panel: ControlPanelKt? = null
 
     /**
-     * Show the control panel on the desktop with an [AnnotatedPropertyEditor] for the evaluator params.
+     * Show the control panel on the desktop.
+     *
+     * By default embeds an [AnnotatedPropertyEditor] for the evaluator params. Pass
+     * `addParamsEditor = false` when the caller's trainer dialog already owns param editing
+     * (see `EvolutionTrainerControls`'s Props button) — avoids a duplicate editor that can
+     * drift out of sync.
+     *
      * Must be called inside a `withGui` block where `this` is [SimbrainDesktop].
-     * Returns the [ControlPanelKt] so callers can add extra widgets (separators, property editors, etc.).
+     * Returns the [ControlPanelKt] so callers can add extra widgets.
      */
-    fun show(desktop: SimbrainDesktop, name: String, x: Int, y: Int): ControlPanelKt {
-        val paramsEditor = AnnotatedPropertyEditor(evaluatorParams)
+    fun show(
+        desktop: SimbrainDesktop,
+        name: String,
+        x: Int,
+        y: Int,
+        addParamsEditor: Boolean = true
+    ): ControlPanelKt {
         val cp = desktop.createControlPanel(name, x, y) {
-            addAnnotatedPropertyEditor(paramsEditor)
+            if (addParamsEditor) {
+                addAnnotatedPropertyEditor(AnnotatedPropertyEditor(evaluatorParams))
+            }
         }
         panel = cp
         return cp
@@ -59,20 +72,20 @@ class EvolutionControlPanel(val evaluatorParams: EvaluatorParams) {
 
     /**
      * Bind a progress window to the [EvolutionRunner], automatically updating each generation
-     * and closing when evolution completes via [EvolutionRunner.onComplete].
+     * and closing when evolution completes via [EvolutionEvents.endEvolution].
      */
     fun bind(runner: EvolutionRunner) {
         val pw = ProgressWindow(evaluatorParams.maxGenerations, "Progress").apply {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)
         }
-        runner.onGeneration { state ->
+        runner.events.generationUpdated.on { state ->
             val metricName = evaluatorParams.stoppingCondition.name
             val value = state.nthPercentileFitness(evaluatorParams.evalutationPercentile)
             pw.text = "$metricName: ${value.format(4)}"
             pw.value = state.generation
         }
-        runner.onComplete {
+        runner.events.endEvolution.on {
             pw.close()
         }
     }

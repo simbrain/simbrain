@@ -440,7 +440,7 @@ val evolveMousePursuer = newSim { optionString ->
                     val state = runner.generationState ?: return
                     history.minimizeAll()
                     val before = workspace.componentList.toSet()
-                    val sim = state.best.visualize(workspace, state.bestMetadata) as EvolveMousePursuerSim
+                    val sim = state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveMousePursuerSim
                     genomeDisplay.refreshFrom(sim.genotype)
                     sim.showWinner()
                     val newComponents = workspace.componentList.filter { it !in before }

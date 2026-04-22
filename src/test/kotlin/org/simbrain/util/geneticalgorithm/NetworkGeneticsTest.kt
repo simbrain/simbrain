@@ -6,7 +6,7 @@ import kotlin.random.Random
 class NetworkGeneticsTest {
 
     @Test
-    fun `test run one`() {
+    fun `runOne keeps outcomes roughly balanced with equal weights`() {
         var count = 100
         val expected = count
         repeat(100) {

@@ -6,15 +6,15 @@ import org.simbrain.network.updaterules.BinaryRule
 class GeneticUtilsTest {
 
     @Test
-    fun `test mutate type`() {
-        class MyGenotype: Genotype(40L) {
+    fun `mutateType leaves rule unchanged when probability is zero`() {
+        class BinaryRuleGenotype : Genotype(40L) {
             val gene = neuronRuleGene(BinaryRule())
-            override fun createNew(seed: Long) = MyGenotype()
+            override fun createNew(seed: Long) = BinaryRuleGenotype()
             override fun mutate() {
                 gene.mutateType(probabilityOfChange = 0.0)
             }
         }
-        val genotype = MyGenotype()
+        val genotype = BinaryRuleGenotype()
         genotype.mutate()
         assert(genotype.gene.template.updateRule is BinaryRule)
     }

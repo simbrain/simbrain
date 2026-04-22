@@ -43,20 +43,40 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
- * A gene stores a mutable template for one evolvable object.
+ * A gene stores the information needed to build one evolvable object.
  *
- * The context type [C] determines what the gene needs to express itself:
- * - [Unit] for self-contained genes (layouts, rules)
- * - [Network][org.simbrain.network.core.Network] for network genes (nodes, connections)
- * - [OdorWorldEntity][org.simbrain.world.odorworld.entities.OdorWorldEntity] for sensor/effector genes
+ * [P] is the phenotype type: the kind of object this gene ultimately produces when it is expressed.
+ * In practice, [template] is usually a mutable "prototype" or template phenotype that gets copied and then placed
+ * into some larger structure. This is similar to gene expression in biology: the gene does not directly *become* the
+ * final object in the simulation, it helps produce one.
  *
- * Subclasses provide domain-specific copy and expression behavior.
+ * [C] is the context needed for expression. Expression often means writing the phenotype into that context:
+ * - [Unit] for self-contained genes that do not need any outside object
+ * - [Network][org.simbrain.network.core.Network] for genes that create or attach things to a network
+ * - [OdorWorldEntity][org.simbrain.world.odorworld.entities.OdorWorldEntity] for genes that add sensors or effectors
+ *
+ * Example:
+ * a neuron gene might keep a template neuron as [template], then [express] by copying that neuron into a target
+ * [Network][org.simbrain.network.core.Network].
+ *
+ * Subclasses define the domain-specific details of how templates are copied, mutated, and expressed.
  */
 abstract class Gene<C, P> {
+    /** The mutable template or prototype used to produce phenotype objects during expression. */
     abstract val template: P
+
+    /** Return an independent copy of this gene, including an appropriate copy of its template state. */
     abstract fun copy(): Gene<C, P>
+
+    /**
+     * Express this gene in the provided [context] and return the resulting phenotype object.
+     *
+     * Depending on the subtype, this may create a new object, copy [template], attach the result to [context],
+     * or otherwise modify [context] as part of expression.
+     */
     abstract suspend fun express(context: C): P
 
+    /** Mutate the [template] in place by applying the provided edit block. */
     fun mutate(block: P.() -> Unit) {
         template.apply(block)
     }
@@ -65,22 +85,41 @@ abstract class Gene<C, P> {
 /**
  * Base class for evolution simulations backed by a [Genotype].
  *
- * Subclasses implement [onBuild] (called at most once), [create] (factory for copies),
- * and [eval] (fitness evaluation).
- * Boilerplate for idempotent build, copy/visualize, and mutation delegation is handled here.
+ * An [EvoSim] wraps one candidate solution in the evolutionary process.
+ * The [genotype] stores the inherited structure and parameters, while the [workspace] holds the concrete components
+ * built from that genotype for visualization or evaluation.
+ *
+ * Subclasses provide three main pieces:
+ * - [onBuild] to express the genotype into the workspace
+ * - [create] factory method to create a new evosim
+ * - [eval] to evaluate the built sim and return a score
+ *
+ * This base class handles common behaviors such as:
+ * - building only once even if [build] is called repeatedly
+ * - delegating mutation to the genotype
+ * - creating copied sims for evolution or visualization
  */
 abstract class EvoSim<G : Genotype>(
     val genotype: G,
+
     val workspace: Workspace = Workspace(),
+
     /**
-     * Optional context for this sim. Set by [visualize] so sims can use generation/fitness/id
-     * in component names at construction time. `null` for evolution-loop clones.
+     * Optional metadata describing this candidate in the evolutionary run.
+     *
+     * This is typically set by [createDisplayCopy] so a sim can use information such as generation, fitness, or id
+     * when naming components. It is usually `null` for internal clones created by the evolution loop.
      */
     val metadata: SimMetadata? = null
 ) {
 
     private var built = false
 
+    /**
+     * Build this sim if it has not already been built.
+     *
+     * Repeated calls are safe: after the first successful build, later calls do nothing.
+     */
     suspend fun build() {
         if (!built) {
             onBuild()
@@ -89,14 +128,15 @@ abstract class EvoSim<G : Genotype>(
     }
 
     /**
-     * Express the genotype into the workspace. Called exactly once.
+     * Express the genotype into the [workspace].
+     *
+     * This is where subclasses typically create components, add them to the workspace, and connect them together.
+     * It is invoked by [build] and should assume the sim has not been built yet.
      */
     protected abstract suspend fun onBuild()
 
     /**
-     * Factory method: create a new sim instance with the given genotype and workspace.
-     * The [metadata] parameter is `null` for internal evolution clones (via [copy]) and set
-     * by [visualize] callers so the sim can give its components contextual names.
+     * Factory method for producing another sim of the same concrete type.
      */
     protected abstract fun create(genotype: G, workspace: Workspace, metadata: SimMetadata?): EvoSim<G>
 
@@ -105,13 +145,16 @@ abstract class EvoSim<G : Genotype>(
      */
     abstract suspend fun eval(): Double
 
+    /** Mutate this candidate by delegating to its [genotype]. */
     fun mutate() { genotype.mutate() }
 
+    /** Return a copy of this sim with a copied genotype, a fresh workspace, and no [metadata]. */
     @Suppress("UNCHECKED_CAST")
     fun copy(): EvoSim<*> = create(genotype.copyGenotype() as G, Workspace(), null)
 
+    /** Copy this sim into a provided [workspace], optionally annotated with [metadata]. This is done when the evosim is displayed in the "main" workspace. */
     @Suppress("UNCHECKED_CAST")
-    fun visualize(workspace: Workspace, metadata: SimMetadata? = null): EvoSim<*> =
+    fun createDisplayCopy(workspace: Workspace, metadata: SimMetadata? = null): EvoSim<*> =
         create(genotype.copyGenotype() as G, workspace, metadata)
 }
 
@@ -134,7 +177,6 @@ class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayLis
      */
     operator fun plus(other: Chromosome<P, G>) = Chromosome(buildList { addAll(this@Chromosome); addAll(other); })
 }
-
 
 data class PopulatingFunctionParams(val seed: Long)
 

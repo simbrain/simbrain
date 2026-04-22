@@ -164,7 +164,7 @@ val evolveXor = newSim {
                 suspend fun expressBest() {
                     val state = runner.generationState ?: return
                     history.minimizeAll()
-                    with(state.best.visualize(workspace, state.bestMetadata) as XorSim) {
+                    with(state.best.createDisplayCopy(workspace, state.bestMetadata) as XorSim) {
                         build()
                         val genotype = this.genotype
                         genotype.inputs.neurons.neuronList.forEach { it.increment = 1.0 }

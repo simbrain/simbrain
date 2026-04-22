@@ -403,7 +403,7 @@ val evolveResourcePursuer = newSim { optionString ->
         val runner = EvolutionRunner(evaluatorParams) { EvolveResourcePursuerSim(seed = seed) }
         runner.events.endEvolution.on {
             runner.generationState?.let { state ->
-                with(state.best.visualize(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
+                with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
                     build()
                     val genotype = this.genotype
                     genotype.drives.neurons.location = point(-150, 150)
@@ -449,7 +449,7 @@ val evolveResourcePursuer = newSim { optionString ->
                     val state = runner.generationState ?: return
                     history.minimizeAll()
                     val before = workspace.componentList.toSet()
-                    with(state.best.visualize(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
+                    with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
                         build()
                         val genotype = this.genotype
                         genotype.drives.neurons.location = point(-150, 150)

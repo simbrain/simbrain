@@ -251,7 +251,7 @@ val evolveCow = newSim {
         }
         runner.events.endEvolution.on {
             runner.generationState?.let { state ->
-                with(state.best.visualize(workspace) as CowSim) {
+                with(state.best.createDisplayCopy(workspace) as CowSim) {
                     build()
                     cowGenotypes.forEach { g ->
                         g.inputs.neurons.location = point(0, 150)

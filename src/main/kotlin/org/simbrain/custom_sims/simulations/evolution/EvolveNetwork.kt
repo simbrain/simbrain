@@ -261,7 +261,7 @@ val evolveNetwork = newSim {
                 suspend fun expressBest() {
                     val state = runner.generationState ?: return
                     history.minimizeAll()
-                    with(state.best.visualize(workspace, state.bestMetadata) as EvolveNetworkSim) {
+                    with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveNetworkSim) {
                         build()
                         genomeDisplay.refreshFrom(genotype)
                         withGui {

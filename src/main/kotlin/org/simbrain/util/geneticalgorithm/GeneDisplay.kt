@@ -3,35 +3,29 @@ package org.simbrain.util.geneticalgorithm
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.format
-import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.*
 import java.awt.geom.RoundRectangle2D
-import javax.swing.*
+import javax.swing.BoxLayout
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import javax.swing.border.AbstractBorder
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 import kotlin.reflect.KProperty1
 
-// ======================================================================
-// Gene Display DSL
-//
-// Renders a genome visualization using plain Swing.
-// Each chromosome is displayed as a horizontal row of vertical gene cards,
-// with a section label on the left.
-//
-// Usage:
-//   genotype.geneticsDisplay {
-//       display(hidden)
-//       display(connections) {
-//           +template(Synapse::strength)
-//           +formatted("In") { nodeIndex(it.source) }
-//       }
-//   }
-// ======================================================================
+/**
+ * Tools for viewing genotypes.
+ *
+ * Each displayed chromosome appears as a row. Each gene is displayed as one "card" in this row.
+ *
+ */
 
-// --- Column abstraction ---
-
+/**
+ * A column shown on each gene card in the display.
+ */
 sealed class GeneColumn<G>(val label: String) {
+
     abstract fun getValue(gene: G): String
 }
 
@@ -52,8 +46,12 @@ private class FormattedColumn<G>(label: String, val formatter: (G) -> Any?) : Ge
     override fun getValue(gene: G) = formatter(gene)?.toString() ?: ""
 }
 
-// --- Column config (the receiver for display() blocks) ---
-
+/**
+ * Builds the columns for a displayed gene group.
+ *
+ * Use [template] to show a template property, [formatted] for custom text,
+ * `+` to add a column, and `-` to remove a default template column.
+ */
 class GeneColumnConfig<G : Gene<*, T>, T> internal constructor(
     private val defaultColumns: List<GeneColumn<G>> = emptyList(),
     private val defaultPrecision: Int
@@ -62,20 +60,35 @@ class GeneColumnConfig<G : Gene<*, T>, T> internal constructor(
     private val added = mutableListOf<GeneColumn<G>>()
     private val removed = mutableSetOf<String>()
 
+    /**
+     * Create a column from a property on the gene template.
+     */
     fun <V> template(prop: KProperty1<T, V>, precision: Int? = null): GeneColumn<G> =
         TemplateColumn(prop.name, { prop.get(it.template) }, precision ?: defaultPrecision)
 
+    /**
+     * Create a column whose value is computed from the gene.
+     */
     fun formatted(label: String, block: (G) -> Any?): GeneColumn<G> =
         FormattedColumn(label, block)
 
+    /**
+     * Add a column to the front of the card, before default columns.
+     */
     fun header(column: GeneColumn<G>) {
         headers.add(column)
     }
 
+    /**
+     * Add this column to the display.
+     */
     operator fun GeneColumn<G>.unaryPlus() {
         added.add(this)
     }
 
+    /**
+     * Remove a default template column by property name.
+     */
     operator fun KProperty1<T, *>.unaryMinus() {
         removed.add(this.name)
     }
@@ -86,8 +99,9 @@ class GeneColumnConfig<G : Gene<*, T>, T> internal constructor(
     }
 }
 
-// --- Display section (one per chromosome) ---
-
+/**
+ * The data needed to render one chromosome row in the panel.
+ */
 class ChromosomeDisplaySection<G : Gene<*, *>>(
     val label: String,
     val typeName: String,
@@ -95,14 +109,22 @@ class ChromosomeDisplaySection<G : Gene<*, *>>(
     val columns: List<GeneColumn<G>>
 )
 
-// --- Builder ---
-
+/**
+ * Builds the sections used by [GeneDisplayPanel].
+ *
+ * Each `display(...)` call adds one chromosome or gene group to the panel.
+ */
 class GeneDisplayBuilder(
     private val genotype: Genotype,
     private val defaultPrecision: Int = 4
 ) {
     private val sections = mutableListOf<ChromosomeDisplaySection<*>>()
 
+    /**
+     * Display a group of node genes.
+     *
+     * By default this includes a `bias` column unless [noDefaults] is true.
+     */
     fun display(
         slot: NodeGeneGroup,
         noDefaults: Boolean = false,
@@ -119,6 +141,11 @@ class GeneDisplayBuilder(
         sections.add(ChromosomeDisplaySection(name, "NodeChromosome", slot.genes, config.resolve()))
     }
 
+    /**
+     * Display a group of connection genes.
+     *
+     * By default this includes a `strength` column unless [noDefaults] is true.
+     */
     fun display(
         slot: ConnectionGeneGroup,
         noDefaults: Boolean = false,
@@ -135,6 +162,9 @@ class GeneDisplayBuilder(
         sections.add(ChromosomeDisplaySection(name, "ConnectionChromosome", slot.genes, config.resolve()))
     }
 
+    /**
+     * Display a linked gene group.
+     */
     fun <G : Gene<Unit, T>, T> display(
         slot: LinkedGeneGroup<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
@@ -145,6 +175,9 @@ class GeneDisplayBuilder(
         sections.add(ChromosomeDisplaySection(name, "LinkedChromosome", slot.genes, config.resolve()))
     }
 
+    /**
+     * Display a collection gene group containing a single gene.
+     */
     fun <G : Gene<Unit, T>, T> display(
         slot: CollectionGeneGroup<G>,
         block: GeneColumnConfig<G, T>.() -> Unit = {}
@@ -158,13 +191,20 @@ class GeneDisplayBuilder(
     private fun findGroupName(geneGroup: GeneGroup): String? =
         genotype.geneGroups.firstOrNull { it.second.group === geneGroup }?.first
 
+    /**
+     * Build the configured sections without creating a panel yet.
+     */
     internal fun buildSections(): List<ChromosomeDisplaySection<*>> = sections.toList()
 
+    /**
+     * Build a panel from the currently configured sections.
+     */
     fun build(): GeneDisplayPanel = GeneDisplayPanel(sections)
 }
 
-// --- Rounded border ---
-
+/**
+ * Rounded border used for each gene card.
+ */
 private class RoundedBorder(
     private val radius: Int,
     private val borderColor: Color,
@@ -191,8 +231,6 @@ private class RoundedBorder(
     override fun isBorderOpaque() = false
 }
 
-// --- Swing renderer ---
-
 private val LABEL_COLOR = Color(100, 100, 100)
 private val VALUE_FONT = Font("SansSerif", Font.BOLD, 11)
 private val LABEL_FONT = Font("SansSerif", Font.PLAIN, 10)
@@ -202,6 +240,9 @@ private val TITLE_FONT = Font("SansSerif", Font.BOLD, 14)
 private val CARD_BORDER_COLOR = Color(180, 180, 180)
 private val CARD_BG = Color(250, 250, 250)
 
+/**
+ * Swing panel that renders chromosome sections as labeled rows of gene cards.
+ */
 class GeneDisplayPanel(
     sections: List<ChromosomeDisplaySection<*>> = emptyList(),
     internal var metadata: SimMetadata? = null,
@@ -215,6 +256,9 @@ class GeneDisplayPanel(
         renderSections(sections)
     }
 
+    /**
+     * Replace the current sections and optional metadata.
+     */
     fun refresh(sections: List<ChromosomeDisplaySection<*>>, metadata: SimMetadata? = this.metadata) {
         this.metadata = metadata
         SwingUtilities.invokeLater {
@@ -356,8 +400,6 @@ class GeneDisplayPanel(
     }
 }
 
-// --- Factory and extensions ---
-
 /**
  * Create a [GeneDisplayPanel] with a baked-in rendering recipe.
  * The panel can then [bind][GeneDisplayPanel.bind] to a runner or [refreshFrom][GeneDisplayPanel.refreshFrom]
@@ -374,6 +416,20 @@ fun <G : Genotype> geneDisplayPanel(
     })
 }
 
+/**
+ * Build a gene display panel for this genotype using the display DSL.
+ *
+ * Example:
+ * ```kotlin
+ * genotype.geneticsDisplay {
+ *     display(hidden)
+ *     display(connections) {
+ *         +template(Synapse::strength)
+ *         +formatted("In") { nodeIndex(it.source) }
+ *     }
+ * }
+ * ```
+ */
 fun Genotype.geneticsDisplay(
     precision: Int = 4,
     metricLabel: String = "Score",
@@ -414,20 +470,4 @@ fun GeneDisplayPanel.refreshFrom(
     val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
     this.metricLabel = metricLabel
     refresh(newSections, metadata)
-}
-
-fun SimbrainDesktop.showGeneDisplay(panel: GeneDisplayPanel, x: Int = 5, y: Int = 400, title: String = "Genome Display") {
-    val scrollPane = JScrollPane(panel).apply {
-        preferredSize = Dimension(800, 300)
-        border = EmptyBorder(4, 4, 4, 4)
-        background = Color.WHITE
-        viewport.background = Color.WHITE
-    }
-    val frame = JInternalFrame(title, true, true).apply {
-        contentPane.add(scrollPane)
-        pack()
-        setLocation(x, y)
-        isVisible = true
-    }
-    addInternalFrame(frame)
 }

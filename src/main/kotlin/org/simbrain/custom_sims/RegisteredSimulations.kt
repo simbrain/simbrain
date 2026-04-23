@@ -171,6 +171,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         //item("Photo album (100 x 100)") { photoAlbumExample }
         //item("3D View Example") { view3dDemo }
         item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
+        item("3D Object Recognition") { objectRecognition3D }
         item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
         item("Attention as gain", beta = true) { attentionAsGain }
         //item("CNN Demo") { cnnDemo } // Develop into 3d demo

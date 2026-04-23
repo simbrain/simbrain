@@ -206,7 +206,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     network.freeSynapses.forEach { s -> s.strength = 0.0 }
 
     var previousValue = 0.0
-    var previousWinningProgram = -1
+    var previousActiveProgram = -1
     var previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
     var stuckCounter = 0
 
@@ -251,7 +251,7 @@ val braitenbergRLPrograms = newSim { optionString ->
                 agent.heading = (0..360).random().toDouble()
                 stuckCounter = 0
                 previousValue = 0.0
-                previousWinningProgram = -1
+                previousActiveProgram = -1
             }
         } else {
             stuckCounter = 0
@@ -267,8 +267,6 @@ val braitenbergRLPrograms = newSim { optionString ->
             probabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
         }
 
-        val winningProgram = probabilities.indices.maxByOrNull { probabilities[it] } ?: 0
-
         // Sample the program to run next step
         val activeProgram = sample(probabilities)
         activeTextLabel.text = "Active: ${programNames[activeProgram]}"
@@ -283,8 +281,8 @@ val braitenbergRLPrograms = newSim { optionString ->
         val tdError = rewardNeuron.activation + gamma * currentValue - previousValue
         tdErrorNeuron.activation = tdError
 
-        // Only update if a previous winning program was active (skip first step)
-        if (learningEnabled && previousWinningProgram >= 0) {
+        // Only update if a previous program was active (skip first step)
+        if (learningEnabled && previousActiveProgram >= 0) {
             // Update critic weights using previous sensor state: w_c += α * δ * s(t-1)
             criticWeights.forEachIndexed { j, syn ->
                 syn.strength += learningRate * tdError * previousSensorValues[j]
@@ -292,17 +290,18 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             // Simple TD actor update: strengthen or weaken the chosen program's preference weights
             // using the previous state's sensor activations.
-            // Update only the preference weights projecting to the winning program node
-            // from the previous step.
+
+            // Update only the preference weights projecting to the program that was actually
+            // sampled and executed on the previous step.
             for (j in previousSensorValues.indices) {
-                actorWeightMatrix.weights[previousWinningProgram, j] +=
+                actorWeightMatrix.weights[previousActiveProgram, j] +=
                     actorLearningRate * tdError * previousSensorValues[j]
             }
             actorWeightMatrix.events.updated.fire()
         }
 
         previousValue = currentValue
-        previousWinningProgram = winningProgram
+        previousActiveProgram = activeProgram
         previousSensorValues = sensorValues
     }
 
@@ -322,7 +321,7 @@ val braitenbergRLPrograms = newSim { optionString ->
         programArray.clear()
         criticWeights.forEach { it.strength = 0.0 }
         previousValue = 0.0
-        previousWinningProgram = -1
+        previousActiveProgram = -1
         previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
         stuckCounter = 0
         valueNeuron.activation = 0.0
@@ -330,12 +329,12 @@ val braitenbergRLPrograms = newSim { optionString ->
     }
 
     withGui {
-        place(networkComponent, 320, 10, 650, 450)
-        place(oc, 970, 10, 500, 500)
+        place(networkComponent, 342, 14, 523, 493)
+        place(oc, 865, 14, 504, 497)
 
         activeTextLabel.location = point(50.0, -70.0)
 
-        createControlPanel("Control Panel", 0, 10) {
+        val controlPanel = createControlPanel("Control Panel", 0, 10) {
 
             addLabel("Task:")
             addComboBox("", tasks, tasks[0]) { selectedTask ->
@@ -381,6 +380,7 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             swingInvokeLater { pack() }
         }
+        controlPanel.setBounds(0, 10, 347, 506)
     }
 
     // Headless mode

@@ -23,11 +23,11 @@ class TrainingDatasetUtilsTest {
     }
 
     @Test
-    fun `ellipse is wider than tall with default aspect`() {
+    fun `ellipse is taller than wide with default aspect`() {
         val grid = drawShape(ShapeType.ELLIPSE, 50, 50, centerRow = 25.0, centerCol = 25.0, size = 10.0)
-        assertEquals(1.0, grid[25 * 50 + 34])
         assertEquals(1.0, grid[30 * 50 + 25])
-        assertEquals(0.0, grid[31 * 50 + 25])
+        assertEquals(1.0, grid[34 * 50 + 25])
+        assertEquals(0.0, grid[25 * 50 + 31])
     }
 
     @Test

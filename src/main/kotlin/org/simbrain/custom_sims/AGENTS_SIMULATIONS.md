@@ -151,21 +151,62 @@ with(couplingManager) {
 
 ## Documentation
 
+Simulation documentation may be added with `addSidebarInfo(...)` or a doc viewer when appropriate. Use one coherent documentation block per simulation and follow the standard template below unless there is a clear reason to deviate.
+
 ```kotlin
 addSidebarInfo("""
     # Simulation Title
     Brief description.
     
-    # What to Do
-    1. Click Run
-    2. Observe...
+    # Simulation Details
+    Technical details...
     
-    # Details
-    Explanation...
+    # What to Do
+    1. Click `Run`
+    2. Observe...
 """, width = 300, initiallyOpened = true)
 ```
 
 Supports markdown, LaTeX math, code blocks.
+
+Good examples to study:
+- `psychology/spiveyNet.kt`
+- the reservoir simulations
+
+Standard template and intent:
+
+- `# Simulation Name`
+  Brief explanation of the simulation. Be clear and concise. Length depends on the simulation: paper-based models may need more context; simpler sims may only need a few sentences.
+- `# Simulation Details`
+  Technical background and specifics of the simulation. Use `##` subsections when needed.
+- `# What to Do`
+  Explain how to run the simulation and what the user should try. Use `##` subsections for demos, experiments, or exploration paths when helpful.
+- `# Links`
+  Optional. Include links to demos or related material, with one or two sentences explaining what each link shows.
+- `# References`
+  Optional. Include when relevant. Use APA style, and embed the link in the paper title.
+- `# Credits`
+  Optional. List contributors one per line, in alphabetical order by name when contribution order is otherwise equal. Embed links to personal sites when available.
+
+Guidance for section content:
+- Background can go in the introduction or in a `##` subsection if it is needed to understand the simulation.
+- Shared background does not need to be repeated in every simulation. If one simulation in a directory establishes the context, later simulations can refer back to it.
+- Not all background belongs in the intro; some background fits better in `# Simulation Details`.
+
+Do **not** add a separate `Architecture`, `Pipeline`, or component-by-component structure section by default. In most simulations the network or processing structure is already visually clear in the workspace, so listing it again is usually redundant.
+
+Only include a structure/architecture explanation if it is genuinely important for understanding the simulation and is not already obvious from the visual layout. If you think such a section would materially help, explain why and check with the user before adding it.
+
+Style notes:
+- When discussing a specific configuration, button, neuron, number, simulation, or section, use inline code.
+- Italicize paper titles.
+- Use APA in-text citations and references.
+- Prefer linking first mentions to relevant docs pages when useful, for example `[ImageWorld](https://docs.simbrain.net/docs/worlds/imageworld.html)`.
+
+Markdown reminders:
+- `_word_` or `*word*` for italics
+- `__word__` or `**word**` for bold
+- `` `word` `` for inline code
 
 ### Adding Images to Documentation
 
@@ -212,7 +253,6 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 ## Best Practices
 
 - Start with a template - find similar simulation and copy
-- In simulation docs, prefer linking first mentions to relevant docs pages (e.g., [ImageWorld](https://docs.simbrain.net/docs/worlds/imageworld.html)) instead of using bold text
 - Do not use code comment separators of any kind (for example `// ----- Section -----`, `// --- Section ---`, `// ========`, or `// ── Section ─────────────────`)
 - Batch add neurons: `network.addNeurons(List(100) { Neuron() })`
 - Get layout coordinates by arranging manually in GUI first

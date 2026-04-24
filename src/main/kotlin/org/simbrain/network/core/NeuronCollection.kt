@@ -189,7 +189,7 @@ class NeuronCollection : Layer, CopyableObject {
     override val updateRule: NeuronUpdateRule<*, *>
         get() = neuronList.firstNotNullOf { it.updateRule }
 
-    // --- Constructors ---
+    // Constructors
 
     constructor(): super()
 
@@ -197,7 +197,7 @@ class NeuronCollection : Layer, CopyableObject {
         addNeurons(neurons.sortLeftRightTopBottom())
     }
 
-    // --- Neuron management ---
+    // Neuron management
 
     fun offset(offsetX: Double, offsetY: Double) {
         for (neuron in neuronList) {
@@ -237,7 +237,7 @@ class NeuronCollection : Layer, CopyableObject {
 
     fun containsNeuron(n: Neuron?): Boolean = neuronList.contains(n)
 
-    // --- Update rule ---
+    // Update rule
 
     fun setNeuronType(base: NeuronUpdateRule<*, *>) {
         neuronList.forEach(Consumer { n: Neuron -> n.updateRule = base.copy() })
@@ -257,7 +257,7 @@ class NeuronCollection : Layer, CopyableObject {
         }
     }
 
-    // --- Randomization ---
+    // Randomization
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         neuronList.forEach { it.randomize(randomizer) }
@@ -288,13 +288,13 @@ class NeuronCollection : Layer, CopyableObject {
         }
     }
 
-    // --- Synapse group management ---
+    // Synapse group management
 
     fun removeIncomingSg(sg: SynapseGroup): Boolean = incomingSgs.remove(sg)
 
     fun removeOutgoingSg(sg: SynapseGroup): Boolean = outgoingSg.remove(sg)
 
-    // --- Delete ---
+    // Delete
 
     override suspend fun delete(): List<NetworkModel> {
         return buildList {
@@ -306,7 +306,7 @@ class NeuronCollection : Layer, CopyableObject {
         }
     }
 
-    // --- Accumulate inputs ---
+    // Accumulate inputs
 
     context(Network)
     override fun accumulateInputs() {
@@ -326,7 +326,7 @@ class NeuronCollection : Layer, CopyableObject {
         }
     }
 
-    // --- Clamping ---
+    // Clamping
 
     var isAllClamped: Boolean
         get() = neuronList.none { !it.clamped }
@@ -349,7 +349,7 @@ class NeuronCollection : Layer, CopyableObject {
         for (neuron in neuronList) { neuron.increment = increment }
     }
 
-    // --- Labels ---
+    // Labels
 
     fun getLabelsOfActiveNeurons(threshold: Double): String {
         val strBuilder = StringBuilder("")
@@ -420,7 +420,7 @@ class NeuronCollection : Layer, CopyableObject {
         neuronList.forEach { it.toggleClamping() }
     }
 
-    // --- Layout ---
+    // Layout
 
     @JvmOverloads
     fun setLayoutBasedOnSize(initialPosition: Point2D = point(0, 0)) {
@@ -458,13 +458,13 @@ class NeuronCollection : Layer, CopyableObject {
         applyLayout(location)
     }
 
-    // --- Convenience layout method ---
+    // Convenience layout method
 
     fun layout(layout: Layout) {
         layout.layoutNeurons(neuronList)
     }
 
-    // --- Duplicate detection ---
+    // Duplicate detection
 
     val summedNeuronHash: Int
         get() = neuronList.stream().mapToInt { obj: Neuron -> obj.hashCode() }.sum()
@@ -480,7 +480,7 @@ class NeuronCollection : Layer, CopyableObject {
         return true
     }
 
-    // --- Backprop ---
+    // Backprop
 
     override fun processError(
         error: Matrix,
@@ -504,12 +504,12 @@ class NeuronCollection : Layer, CopyableObject {
         return error
     }
 
-    // --- Custom info ---
+    // Custom info
 
     open val customInfo: NetworkModel?
         get() = null
 
-    // --- Serialization ---
+    // Serialization
 
     override suspend fun afterRestore(context: Any?) {
         super.afterRestore(context)
@@ -518,7 +518,7 @@ class NeuronCollection : Layer, CopyableObject {
         neuronList.addAll(sortedNeuronList)
     }
 
-    // --- Copy ---
+    // Copy
 
     override fun copy(): NeuronCollection {
         return NeuronCollection(neuronList.map(Neuron::copy)).also {

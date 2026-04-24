@@ -33,7 +33,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
 
     lateinit var weights: SynapseGroup
 
-    // --- Competitive params ---
+    // Competitive params
 
     @UserParameter(label = "Update method", order = 30)
     var updateMethod = UpdateMethod.RUMM_ZIPSER

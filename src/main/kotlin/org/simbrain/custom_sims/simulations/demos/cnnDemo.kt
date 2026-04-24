@@ -17,7 +17,7 @@ val cnnDemo = newSim {
 
     workspace.clearWorkspace()
 
-    // --- OdorWorld ---
+    // OdorWorld
     val odorWorldComponent = addOdorWorldComponent("Odor World")
     val odorWorld = odorWorldComponent.world
     odorWorld.apply {
@@ -56,7 +56,7 @@ val cnnDemo = newSim {
     odorWorld.addEntity(300, 150, EntityType.Flower).name = "Flower"
     odorWorld.addEntity(200, 350, EntityType.Cow).name = "Cow"
 
-    // --- Network ---
+    // Network
     val networkComponent = addNetworkComponent("CNN")
     val network = networkComponent.network
 
@@ -130,13 +130,13 @@ val cnnDemo = newSim {
     val dense = WeightMatrix(flattenArray, outputArray)
     network.addNetworkModelAsync(dense, usePlacementManager = false)
 
-    // --- Coupling: View3DSensor.rgbTensor -> inputTensor.setActivations ---
+    // Coupling: View3DSensor.rgbTensor -> inputTensor.setActivations
     with(couplingManager) {
         view3dSensor.getProducer(View3DSensor::rgbTensorLayer) couple
                 inputTensorLayer.getConsumer(inputTensorLayer::activations)
     }
 
-    // --- Layout ---
+    // Layout
     place(odorWorldComponent, 0, 0, 400, 400)
     place(networkComponent, 410, 0, 500, 800)
 

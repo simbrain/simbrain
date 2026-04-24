@@ -70,7 +70,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     /** Container for thumbnail strip nodes. */
     private val thumbnailStripNode = PNode().also { mainNode.addChild(it) }
 
-    // --- Pre-allocated thumbnail resources (fixed count = number of channels) ---
+    // Pre-allocated thumbnail resources (fixed count = number of channels)
     private val numChannels = tensorLayer.shape.channels
     private val thumbSize = (imageSize / numChannels).coerceIn(8.0, 20.0)
     private val thumbGap = 1.0
@@ -284,7 +284,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
     }
 
-    // --- Position management ---
+    // Position management
 
     private fun pullViewPositionFromModel() {
         val (x, y) = bounds

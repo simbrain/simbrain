@@ -798,9 +798,7 @@ val braitenbergRL = newSim { optionString ->
     )
 
     /*
-     * ============================================================================
-     * HEADLESS MODE DOCUMENTATION
-     * ============================================================================
+     * Headless mode documentation
      *
      * SAMPLE TERMINAL COMMANDS:
      *

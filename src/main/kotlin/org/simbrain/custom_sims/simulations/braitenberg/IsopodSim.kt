@@ -40,7 +40,7 @@ val isopodSim = newSim { optionString ->
     // Clear the workspace
     workspace.clearWorkspace()
 
-    // ----- Network construction ------
+    // Network construction
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
@@ -99,7 +99,7 @@ val isopodSim = newSim { optionString ->
         }
     }
 
-    // ----- Build 2d World ------
+    // Build 2d World
 
     val odorWorldComponent = addOdorWorldComponent("World")
     val odorWorld = odorWorldComponent.world
@@ -196,7 +196,7 @@ val isopodSim = newSim { optionString ->
         isopod.select()
     }
 
-    // ----- Make Couplings ------
+    // Make Couplings
 
     with(couplingManager) {
         neuronStraight couple straightMovement

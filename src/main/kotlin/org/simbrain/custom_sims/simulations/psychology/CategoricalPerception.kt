@@ -12,7 +12,7 @@ import org.simbrain.util.runWithProgressWindow
 import org.simbrain.util.showMessageDialog
 import kotlin.math.sqrt
 
-// ── Tunable parameters ────────────────────────────────────────────────────────
+// Tunable parameters
 
 /**
  * Size of the dense representation layer — the primary analysis target.
@@ -44,8 +44,6 @@ const val TARGET_SIZE = 2.0
 
 /** Number of label units appended to each output target (4 L1 + 3 L2). */
 const val NUM_LABEL_UNITS = 7
-
-// ─────────────────────────────────────────────────────────────────────────────
 
 /**
  * Training conditions for the categorical perception experiment.
@@ -115,7 +113,7 @@ val categoricalPerception = newSim {
     val networkComponent = addNetworkComponent("Categorical Perception")
     val network = networkComponent.network
 
-    // --- Base Dataset (no labels) ---
+    // Base Dataset (no labels)
     // Input: 50×50 binary image; Target: 7×7 binary prototype image (no padding)
     val baseDataset = createShapeDataset(
         height = 50,
@@ -140,7 +138,7 @@ val categoricalPerception = newSim {
 
     val trainSamplesPerClass = trainingSet.inputs.size / ShapeType.entries.size
 
-    // --- CNN Pipeline ---
+    // CNN Pipeline
     // Input(50×50×1) → Conv1(3×3, 4 filters, SAME, ReLU) → Pool1(2×2)
     //               → Conv2(3×3, 8 filters, SAME, ReLU) → Pool2(2×2)
     //               → Flatten → ReprLayer(REPR_LAYER_SIZE, sigmoid) ← analysis target
@@ -209,7 +207,7 @@ val categoricalPerception = newSim {
     }
     WeightMatrix(reprLayer, outputArray)
 
-    // --- Output windows (driven by listener, no weight matrices needed) ---
+    // Output windows (driven by listener, no weight matrices needed)
     val imageView = NeuronArray(protoSize).apply {
         label = "Image (7×7)"
         gridMode = true
@@ -245,7 +243,7 @@ val categoricalPerception = newSim {
 
     inputLayer.activations = trainingSet.inputs[0].toDoubleArray()
 
-    // --- Analysis functions ---
+    // Analysis functions
 
     fun euclidean(a: DoubleArray, b: DoubleArray): Double {
         var sum = 0.0
@@ -334,7 +332,7 @@ val categoricalPerception = newSim {
         return sb.toString()
     }
 
-    // --- Staged training helper ---
+    // Staged training helper
     // Stage 1: prototype sorting only (no labels). Stage 2: add labels.
     // The key CP result is the *change* in repr-layer geometry between stages.
 
@@ -361,7 +359,7 @@ val categoricalPerception = newSim {
         }
     }
 
-    // --- Control panel ---
+    // Control panel
 
     withGui {
         place(networkComponent, 300, 0, 940, 677)

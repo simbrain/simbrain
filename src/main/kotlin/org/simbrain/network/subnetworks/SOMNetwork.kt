@@ -36,7 +36,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
 
     override var testingData: MutableList<MutableList<Double>> = mutableListOf()
 
-    // --- SOM params ---
+    // SOM params
 
     var initialLearningRate: Double by GuiEditable(
         label = "Initial learning rate",
@@ -66,7 +66,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         order = 100
     )
 
-    // --- SOM runtime state ---
+    // SOM runtime state
 
     var neighborhoodSize = 100.0
     var somLearningRate = 0.06

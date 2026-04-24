@@ -1,12 +1,18 @@
 package org.simbrain.network.gui.dialogs
 
-import org.simbrain.network.connections.*
+import org.simbrain.network.connections.ConnectionsResult
+import org.simbrain.network.connections.Sparse
+import org.simbrain.network.connections.createAllToAllSynapses
+import org.simbrain.network.connections.createSparseSynapses
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.SwitchableChangeListener
 import org.simbrain.util.SwitchablePropertyChangeListener
 import org.simbrain.util.Utils
-import java.awt.*
+import java.awt.FlowLayout
+import java.awt.GridBagConstraints
+import java.awt.GridBagLayout
+import java.awt.Insets
 import java.awt.event.ActionEvent
 import java.awt.event.ActionListener
 import java.awt.event.FocusEvent
@@ -214,7 +220,6 @@ class SparsePanel(
      */
     private fun addChangeListeners() {
 
-        // *********************************************************************
         // Slider
         sliderListener = object : SwitchableChangeListener() {
             override fun stateChanged(e: ChangeEvent) {

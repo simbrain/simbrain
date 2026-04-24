@@ -96,7 +96,7 @@ private const val MAX_PER_CATEGORY = 50
  */
 private fun loadCategoryImages(): Map<String, List<File>>? {
 
-    // ── Locate or download the dataset ───────────────────────────────────────
+    // Locate or download the dataset
 
     val extractDir = File(
         org.simbrain.util.getSystemCacheDirectory(),
@@ -185,7 +185,7 @@ val cnnObjectDetector = newSim {
 
     workspace.clearWorkspace()
 
-    // ── Load dataset (may show confirmation + checkbox dialogs) ───────────────
+    // Load dataset (may show confirmation + checkbox dialogs)
     val categoryImages = loadCategoryImages() ?: return@newSim
     val categoryNames: List<String> = categoryImages.keys.toList()   // sorted
     val numClasses = categoryNames.size

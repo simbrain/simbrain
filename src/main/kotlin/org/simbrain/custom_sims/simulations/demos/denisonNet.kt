@@ -12,9 +12,7 @@ import kotlin.random.Random
 
 enum class Layer {S1, S2, DECISION, VA, IA}
 
-// ------------------------------------------
 // MATLAB-style prefilter implementation
-// ------------------------------------------
 fun prefilter(
     xHistory: List<DoubleArray>, // past activations (each entry = S1 activations at a timestep)
     w: DoubleArray,              // temporal kernel
@@ -56,9 +54,7 @@ fun prefilter(
     return DoubleArray(numNeurons) { i -> inp[i][0] - inp[i][1] }
 }
 
-// ------------------------------------------
 // Main simulation definition
-// ------------------------------------------
 val denisonNet = newSim {
     workspace.clearWorkspace()
     val netComponent = addNetworkComponent("Denison Net")

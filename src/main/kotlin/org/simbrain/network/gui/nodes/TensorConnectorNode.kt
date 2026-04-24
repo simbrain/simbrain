@@ -68,7 +68,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     /** Container for kernel grid display. */
     val kernelGridGroup = PNode()
 
-    // --- Pre-allocated resources for ConvolutionConnector visualization ---
+    // Pre-allocated resources for ConvolutionConnector visualization
 
     /** Pre-allocated buffer for extracting a single kernel slice. */
     private val kernelSlice: DoubleArray? = (connector as? ConvolutionConnector)?.let {

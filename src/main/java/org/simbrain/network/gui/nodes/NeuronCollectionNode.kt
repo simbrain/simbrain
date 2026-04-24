@@ -49,7 +49,7 @@ class NeuronCollectionNode(
         }
     }
 
-    // --- Neuron node management ---
+    // Neuron node management
 
     fun addNeuronNodes(nodes: Collection<NeuronNode>) {
         neuronNodes.addAll(nodes)
@@ -80,7 +80,7 @@ class NeuronCollectionNode(
         customMenuItems.add(item)
     }
 
-    // --- Position sync ---
+    // Position sync
 
     fun pullPositionFromModel() {
         for (node in neuronNodes) {
@@ -96,7 +96,7 @@ class NeuronCollectionNode(
         customInfoNode?.offset(dx, dy)
     }
 
-    // --- Selection ---
+    // Selection
 
     fun selectNeurons() {
         neuronNodes.forEach { it.neuron.select() }
@@ -106,7 +106,7 @@ class NeuronCollectionNode(
         neuronNodes.map { it.neuron }.toList().createEditorDialog<Neuron>().display()
     }
 
-    // --- Outline ---
+    // Outline
 
     private fun updateOutline() {
         val nodes = HashSet<ScreenElement>(neuronNodes)
@@ -129,7 +129,7 @@ class NeuronCollectionNode(
         }
     }
 
-    // --- Layout ---
+    // Layout
 
     override fun layoutChildren() {
         if (visible) {
@@ -149,12 +149,12 @@ class NeuronCollectionNode(
 
     fun getInteractionBox() = interactionBox
 
-    // --- Property dialog ---
+    // Property dialog
 
     override val propertyDialog: StandardDialog?
         get() = networkPanel.createNeuronCollectionDialog(model)
 
-    // --- Context menu ---
+    // Context menu
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -257,7 +257,7 @@ class NeuronCollectionNode(
             networkPanel.networkComponent.createCouplingMenu(model)?.let { add(it) }
         }
 
-    // --- Interaction box ---
+    // Interaction box
 
     private inner class NeuronCollectionInteractionBox(net: NetworkPanel) : InteractionBox(net) {
         init { setPaint(Color(209, 255, 204)) }
@@ -271,7 +271,7 @@ class NeuronCollectionNode(
             }
     }
 
-    // --- Actions ---
+    // Actions
 
     private val renameAction = object : AbstractAction("Rename Neuron Collection...") {
         override fun actionPerformed(e: ActionEvent?) {

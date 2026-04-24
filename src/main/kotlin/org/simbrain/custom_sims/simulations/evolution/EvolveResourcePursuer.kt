@@ -1,6 +1,9 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import org.json.JSONObject
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -93,171 +96,91 @@ val evolveResourcePursuer = newSim { optionString ->
     }
     val evolutionParams = EvolutionParameters()
 
-    class EvolvePursuerPhenotype(
-        val driveNeurons: NeuronCollection,
-        val inputNeurons: NeuronCollection,
-        val hiddenNeurons: NeuronCollection,
-        val outputNeurons: NeuronCollection,
-        val connections: List<Synapse>
-    ) {
-        val hungerNeuron get() = driveNeurons.neuronList.first()
-    }
+    class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
-    class EvolvePursuerGenotype(seed: Long = Random.nextLong()) : Genotype {
+        val inputs by nodeChromosome(3) { clamped = true }
+        val drives by nodeChromosome(2) { clamped = true; upperBound = 100.0; lowerBound = 0.0 }
+        val hidden by nodeChromosome(2)
+        val outputs by nodeChromosome(3) { upperBound = 10.0; lowerBound = -10.0 }
+        val connections by connectionChromosome()
+        val synapseRules by synapseRuleChromosome(::connections)
+        val hiddenRules by neuronRuleChromosome(::hidden) { neuronRuleGene(DecayRule()) }
+        val hiddenLayout by layoutChromosome(::hidden)
+        val hiddenConnectionStrategy by connectionStrategyChromosome(::hidden)
 
-        override val random: Random = Random(seed)
+        init {
+            // Label the hunger drive neuron
+            drives.genes[0].mutate { label = "Hunger" }
 
-        var inputChromosome = chromosome(3) {
-            add(nodeGene { clamped = true })
-        }
-        var driveChromosome = chromosome(1) {
-            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0; label = "Hunger" })
-            add(nodeGene { clamped = true; upperBound = 100.0; lowerBound = 0.0 })
-        }
-        var hiddenChromosome = chromosome(2) { add(nodeGene()) }
-        var outputChromosome = chromosome(3) { add(nodeGene { upperBound = 10.0; lowerBound = -10.0 }) }
-        var connectionChromosome = chromosome(1) {
+            // Initial connections
             repeat(3) {
-                add(connectionGene(inputChromosome.sampleOne(), hiddenChromosome.sampleOne()))
-                add(connectionGene(hiddenChromosome.sampleOne(), outputChromosome.sampleOne()))
+                connections.addGene(connectionGene(inputs.genes.random(random), hidden.genes.random(random)))
+                connections.addGene(connectionGene(hidden.genes.random(random), outputs.genes.random(random)))
             }
-            val hungerGene = driveChromosome.first()
-            add(connectionGene(hungerGene, hiddenChromosome.sampleOne()))
-        }
-        var synapseRuleChromosome = chromosome(connectionChromosome.size) {
-            add(synapseRuleGene())
-        }
-        var layoutChromosome = chromosome(1) {
-            add(layoutGene())
-        }
-        var connectionStrategyChromosome = chromosome(1) {
-            add(connectionStrategyGene())
-        }
-        var hiddenUpdateRuleChromosome = chromosome(hiddenChromosome.size) {
-            add(neuronRuleGene(DecayRule()))
+            val hungerGene = drives.genes[0]
+            connections.addGene(connectionGene(hungerGene, hidden.genes.random(random)))
         }
 
-        suspend fun expressWith(network: Network): EvolvePursuerPhenotype {
-            val driveNeurons = NeuronCollection(network.express(driveChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "drives"
-            }
-            val inputNeurons = NeuronCollection(network.express(inputChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "inputs"
-            }
-            inputNeurons.neuronList.labels = listOf("Left", "Center", "Right")
+        override fun createNew(seed: Long) = EvolvePursuerGenotype(seed)
 
-            val hiddenNeurons = NeuronCollection(network.express(hiddenChromosome)).also {
-                network.addNetworkModelAsync(it);
-            }
-            val outputNeurons = NeuronCollection(network.express(outputChromosome)).also {
-                network.addNetworkModelAsync(it); it.label = "outputs"
-            }
-            outputNeurons.neuronList.labels = listOf("Straight", "Left", "Right")
-
-            val connections = network.express(connectionChromosome)
-            val layout = express(layoutChromosome).first().express()
-            layout.layoutNeurons(hiddenNeurons.neuronList)
-
-            val synapseRules = express(synapseRuleChromosome)
-            connections.zip(synapseRules).forEach { (connection, rule) ->
-                connection.learningRule = rule.learningRule
-            }
-
-            val connectionStrategyWrapper = express(connectionStrategyChromosome).first()
-            connectionStrategyWrapper.connectionStrategy.connectNeurons(
-                hiddenNeurons.neuronList,
-                hiddenNeurons.neuronList
-            ).addToNetwork(network)
-            hiddenNeurons.label = "${connectionStrategyWrapper.connectionStrategy}"
-
-            val hiddenUpdateRules = express(hiddenUpdateRuleChromosome)
-            hiddenNeurons.neuronList.zip(hiddenUpdateRules).forEach { (neuron, rule) ->
-                neuron.updateRule = rule.updateRule
-            }
-
-            return EvolvePursuerPhenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections)
-        }
-
-        fun copy() = EvolvePursuerGenotype(random.nextLong()).apply {
-            val current = this@EvolvePursuerGenotype
-            val new = this@apply
-
-            new.driveChromosome = current.driveChromosome.copy()
-            new.inputChromosome = current.inputChromosome.copy()
-            new.hiddenChromosome = current.hiddenChromosome.copy()
-            new.outputChromosome = current.outputChromosome.copy()
-            new.connectionChromosome = current.connectionChromosome.copy()
-            new.synapseRuleChromosome = current.synapseRuleChromosome.copy()
-            new.layoutChromosome = current.layoutChromosome.copy()
-            new.connectionStrategyChromosome = current.connectionStrategyChromosome.copy()
-            new.hiddenUpdateRuleChromosome = current.hiddenUpdateRuleChromosome.copy()
-        }
-
-        fun mutate() {
+        override fun mutate() {
 
             // Mutate bias
-            hiddenChromosome.forEach {
+            hidden.genes.forEach {
                 it.mutate {
                     bias += random.nextDouble(-.1, .1)
                 }
             }
 
             // Mutate weights
-            connectionChromosome.forEach {
+            connections.genes.forEach {
                 it.mutate {
-                    strength +=  random.nextDouble(-.1, .1)
+                    strength += random.nextDouble(-.1, .1)
                 }
             }
 
             // Mutate learning rule
             if (evolutionParams.useLearningRuleGenes) {
-                synapseRuleChromosome.forEach {
+                synapseRules.genes.forEach {
                     it.mutateParam()
                     it.mutateType()
                 }
             }
 
-            // Add new connections
-            val newConnectionGene = withProbability(0.25) {
-                connectionChromosome.createGene(
-                    inputChromosome + driveChromosome to hiddenChromosome,
-                    hiddenChromosome to outputChromosome
+            // Add new connections (linked synapseRules auto-adds via addLinkedDefaults)
+            withProbability(0.25) {
+                connections.addConnection(
+                    inputs to hidden,
+                    drives to hidden,
+                    hidden to outputs
                 ) { strength = random.nextDouble(-1.0, 1.0) }
             }
-            if (newConnectionGene != null) {
-                synapseRuleChromosome.add(synapseRuleGene())
-            }
 
-            // Add a new hidden unit
+            // Add a new hidden unit (linked hiddenRules auto-adds via addLinkedDefaults)
             if (random.nextDouble() < 0.5) {
-                hiddenChromosome.add(nodeGene())
-                hiddenUpdateRuleChromosome.add(neuronRuleGene(DecayRule()))
+                hidden.addGene(nodeGene())
             }
 
             // Mutate layout of hidden layer
             if (evolutionParams.useLayoutGene) {
                 if (random.nextDouble() < 0.1) {
-                    layoutChromosome.forEach {
-                        it.mutateParam()
-                        it.mutateType()
-                    }
+                    hiddenLayout.gene.mutateParam()
+                    hiddenLayout.gene.mutateType()
                 }
             }
 
             // Mutate connection strategy
             if (evolutionParams.useConnectionStrategyGene) {
                 if (random.nextDouble() < 0.1) {
-                    connectionStrategyChromosome.forEach {
-                        it.mutateParam()
-                        it.mutateType()
-                    }
+                    hiddenConnectionStrategy.gene.mutateParam()
+                    hiddenConnectionStrategy.gene.mutateType()
                 }
             }
 
             // Mutate update rule
             if (evolutionParams.useHiddenLayerUpdateRuleGene) {
                 if (random.nextDouble() < 0.1) {
-                    hiddenUpdateRuleChromosome.forEach {
+                    hiddenRules.genes.forEach {
                         it.mutateParam(mutateBounds = false)
                         it.mutateStandardTypes()
                     }
@@ -291,7 +214,7 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
 
-    fun addActions(workspace: Workspace, phenotype: Deferred<EvolvePursuerPhenotype>, evolvedAgent: OdorWorldEntity, simState: SimState) {
+    fun addActions(workspace: Workspace, genotype: EvolvePursuerGenotype, evolvedAgent: OdorWorldEntity, simState: SimState) {
 
         var calories by simState::calories
         var totalActivation by simState::totalActivation
@@ -299,26 +222,24 @@ val evolveResourcePursuer = newSim { optionString ->
         var fitness by simState::fitness
 
         workspace.addUpdateAction("update energy") {
-            with(phenotype.await()) {
-                val outputsActivations =
-                    outputNeurons.activationArray.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
-                val allActivations =
-                    (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
-                movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
-                totalActivation = outputsActivations + allActivations
-                calories = simState.computeCalories()
-                hungerNeuron.activation += 10.0 / evaluatorParams.iterationsPerRun
-                fitness = calories - hungerNeuron.activation * 4
-            }
+            val outputsActivations =
+                genotype.outputs.neurons.activationArray.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+            val allActivations =
+                (genotype.inputs.neurons.neuronList + genotype.hidden.neurons.neuronList).activations.sumOf { abs(it) } * 2
+            movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
+            totalActivation = outputsActivations + allActivations
+            calories = simState.computeCalories()
+            genotype.drives.neurons.neuronList.first().activation += 10.0 / evaluatorParams.iterationsPerRun
+            fitness = calories - genotype.drives.neurons.neuronList.first().activation * 4
         }
 
 
         // What to do when a cow finds food
         workspace.addUpdateAction("food $foodTileType found") {
-            val hungerNeuron = phenotype.await().hungerNeuron
+            val hungerNeuron = genotype.drives.neurons.neuronList.first()
             val odorWorld = (workspace.componentList.first { it is OdorWorldComponent } as OdorWorldComponent).world
             with(odorWorld) {
-                val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center Food Sensor" } as TileSensor
+                val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center food sensor" } as TileSensor
                 val lakeLayer = tileMap.getLayer("Food Layer")
                 centerLakeSensor.let { sensor ->
                     // Food found
@@ -340,23 +261,23 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     class EvolveResourcePursuerSim(
-        val evolvePursuerGenotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
-        val workspace: Workspace = Workspace(),
+        genotype: EvolvePursuerGenotype = EvolvePursuerGenotype(),
+        workspace: Workspace = Workspace(),
         seed: Long = Random.nextLong(),
-    ) : EvoSim {
+        metadata: SimMetadata? = null
+    ) : EvoSim<EvolvePursuerGenotype>(genotype, workspace, metadata) {
 
         val simState = SimState(
             seed = seed
         )
 
-        val networkComponent = NetworkComponent("Network")
-            .also { workspace.addWorkspaceComponent(it) }
+        val networkComponent = NetworkComponent("${metadata.namePrefix}Network").also {
+            workspace.addWorkspaceComponent(it)
+        }
 
         val network = networkComponent.network
 
-        val phenotypeDeferred = CompletableDeferred<EvolvePursuerPhenotype>()
-
-        val odorWorldComponent = OdorWorldComponent("Odor World").also {
+        val odorWorldComponent = OdorWorldComponent("${metadata.namePrefix}Odor World").also {
             workspace.addWorkspaceComponent(it)
         }
         val odorWorld = odorWorldComponent.world.apply {
@@ -403,33 +324,25 @@ val evolveResourcePursuer = newSim { optionString ->
             evolvedAgent.addDefaultEffectors()
             evolvedAgent.addSensor(centerLakeSensor)
 
-            addActions(workspace, phenotypeDeferred, evolvedAgent, simState)
+            addActions(workspace, genotype, evolvedAgent, simState)
         }
 
-        override fun mutate() {
-            evolvePursuerGenotype.mutate()
-        }
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
+            genotype.drives.neurons.label = "drives"
+            genotype.inputs.neurons.label = "inputs"
+            genotype.inputs.neurons.neuronList.labels = listOf("Left", "Center", "Right")
+            genotype.outputs.neurons.label = "outputs"
+            genotype.outputs.neurons.neuronList.labels = listOf("Straight", "Left", "Right")
 
-        override suspend fun build() {
-            if (!phenotypeDeferred.isCompleted) {
-                // Express the genotypes
-                phenotypeDeferred.complete(evolvePursuerGenotype.expressWith(network))
-                // Make couplings
-                val agent = phenotypeDeferred.await()
-                with(workspace.couplingManager) {
-                    sensors couple agent.inputNeurons.neuronList
-                    agent.outputNeurons.neuronList couple evolvedAgent.effectors
-                }
+            with(workspace.couplingManager) {
+                sensors couple genotype.inputs.neurons.neuronList
+                genotype.outputs.neurons.neuronList couple evolvedAgent.effectors
             }
         }
 
-        override fun visualize(workspace: Workspace): EvolveResourcePursuerSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), workspace)
-        }
-
-        override fun copy(): EvoSim {
-            return EvolveResourcePursuerSim(evolvePursuerGenotype.copy(), Workspace())
-        }
+        override fun create(genotype: EvolvePursuerGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            EvolveResourcePursuerSim(genotype, workspace, metadata = metadata)
 
         override suspend fun eval(): Double {
             build()
@@ -439,59 +352,155 @@ val evolveResourcePursuer = newSim { optionString ->
 
     }
 
-    suspend fun runSim() {
-        withContext(workspace.coroutineContext) {
-            val lastGeneration = evaluator(
-                evaluatorParams = evaluatorParams,
-                populatingFunction = { EvolveResourcePursuerSim(seed = seed) }
-            )
-            lastGeneration.take(1).forEach {
-                with(it.visualize(workspace) as EvolveResourcePursuerSim) {
+    fun displayBlock(genotype: EvolvePursuerGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.inputs.genes + genotype.drives.genes +
+            genotype.hidden.genes + genotype.outputs.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.inputs, noDefaults = true) {
+                header(formatted("Node") { nodeIndex(it) })
+                +template(Neuron::clamped)
+            }
+            display(genotype.drives, noDefaults = true) {
+                header(formatted("node") { nodeIndex(it) })
+                +template(Neuron::label)
+            }
+            display(genotype.hidden) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.outputs) {
+                header(formatted("node") { nodeIndex(it) })
+                +template(Neuron::upperBound)
+                +template(Neuron::lowerBound)
+            }
+            display(genotype.connections) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+            }
+            display(genotype.hiddenRules) {
+                +formatted("updateRule") { it.template.updateRule.name }
+            }
+            display(genotype.synapseRules) {
+                +formatted("learningRule") { it.template.learningRule.name }
+            }
+            display(genotype.hiddenLayout) {
+                +template(LayoutGeneWrapper::layoutType)
+                +template(LayoutGeneWrapper::hSpacing)
+                +template(LayoutGeneWrapper::vSpacing)
+            }
+            display(genotype.hiddenConnectionStrategy) {
+                +formatted("connectionStrategy") { it.template.connectionStrategy.tooltipText() }
+            }
+        }
+    }
+
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
+
+    suspend fun runHeadless() {
+        val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveResourcePursuerSim(seed = seed) }
+        runner.events.endEvolution.on {
+            runner.generationState?.let { state ->
+                with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
                     build()
-                    val phenotype = this.phenotypeDeferred.await()
-                    phenotype.apply {
-                        driveNeurons.location = point(-150, 150)
-                        inputNeurons.location = point(0, 150)
-
-                        offsetNeuronCollections(inputNeurons, hiddenNeurons, Direction.NORTH, 100.0)
-                        offsetNeuronCollections(hiddenNeurons, outputNeurons, Direction.NORTH, 100.0)
-
-                        alignNetworkModels(inputNeurons, hiddenNeurons, Alignment.VERTICAL)
-                        alignNetworkModels(hiddenNeurons, outputNeurons, Alignment.VERTICAL)
-                    }
-
-                    val energyTextObject = NetworkTextObject(simState.generateEnergyText())
-                    networkComponent.network.addNetworkModelsAsync(energyTextObject)
-                    workspace.addUpdateAction("update energy text") {
-                        energyTextObject.text = simState.generateEnergyText()
-                    }
-                    energyTextObject.location = point(-160, -20)
-                    withGui {
-                        place(networkComponent, 390, 10, 380, 600)
-                        place(odorWorldComponent, 770, 10, 620, 600)
-                        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
-                    }
-                    if (desktop == null) {
-                        workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
-                    }
+                    val genotype = this.genotype
+                    genotype.drives.neurons.location = point(-150, 150)
+                    genotype.inputs.neurons.location = point(0, 150)
+                    offsetNeuronCollections(genotype.inputs.neurons, genotype.hidden.neurons, Direction.NORTH, 100.0)
+                    offsetNeuronCollections(genotype.hidden.neurons, genotype.outputs.neurons, Direction.NORTH, 100.0)
+                    alignNetworkModels(genotype.inputs.neurons, genotype.hidden.neurons, Alignment.VERTICAL)
+                    alignNetworkModels(genotype.hidden.neurons, genotype.outputs.neurons, Alignment.VERTICAL)
+                    workspace.save(File("evolved_${SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(Date())}.zip"), headless = true)
                 }
             }
         }
-
+        runner.startEvolving()
     }
 
     withGui {
         workspace.clearWorkspace()
-        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
-        controlPanel.addSeparator()
+        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+        panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(evolutionParams)
-        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
-        evaluatorParams.addControlPanelButton("Evolve") {
-            workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
-            runSim()
+        panel.addAnnotatedPropertyEditor(propertyEditor)
+
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
         }
-        controlPanel.addButton("Load Workspace") {
+
+        suspend fun openTrainer() {
+            trainerDialog?.takeIf { it.isDisplayable }?.let {
+                it.toFront()
+                return
+            }
+
+            val activeSession = session ?: run {
+                workspace.removeAllComponents()
+                val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveResourcePursuerSim(seed = seed) }
+                val genomeDisplay = geneDisplayPanel(precision = 3, displayBlock = ::displayBlock)
+                genomeDisplay.bind(runner)
+                val history = ExpressionHistory()
+
+                suspend fun expressBest() {
+                    val state = runner.generationState ?: return
+                    history.minimizeAll()
+                    val before = workspace.componentList.toSet()
+                    with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
+                        build()
+                        val genotype = this.genotype
+                        genotype.drives.neurons.location = point(-150, 150)
+                        genotype.inputs.neurons.location = point(0, 150)
+
+                        offsetNeuronCollections(genotype.inputs.neurons, genotype.hidden.neurons, Direction.NORTH, 100.0)
+                        offsetNeuronCollections(genotype.hidden.neurons, genotype.outputs.neurons, Direction.NORTH, 100.0)
+
+                        alignNetworkModels(genotype.inputs.neurons, genotype.hidden.neurons, Alignment.VERTICAL)
+                        alignNetworkModels(genotype.hidden.neurons, genotype.outputs.neurons, Alignment.VERTICAL)
+
+                        genomeDisplay.refreshFrom(genotype)
+
+                        val energyTextObject = NetworkTextObject(simState.generateEnergyText())
+                        networkComponent.network.addNetworkModelsAsync(energyTextObject)
+                        workspace.addUpdateAction("update energy text") {
+                            energyTextObject.text = simState.generateEnergyText()
+                        }
+                        energyTextObject.location = point(-160, -20)
+                        withGui {
+                            place(networkComponent, 390, 10, 380, 600)
+                            place(odorWorldComponent, 770, 10, 620, 600)
+                            (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
+                        }
+                    }
+                    val newComponents = workspace.componentList.filter { it !in before }
+                    history.add(ExpressionEntry.forComponents(
+                        workspace, newComponents, state.historyLabel(evaluatorParams)
+                    ))
+                }
+
+                runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                EvolutionTrainerSession(
+                    runner = runner,
+                    evaluatorParams = evaluatorParams,
+                    extras = listOf(genomeDisplay),
+                    onExpress = ::expressBest,
+                    history = history
+                ).also { session = it }
+            }
+
+            trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                addCloseTask { trainerDialog = null }
+                makeVisible()
+            }
+        }
+
+        controlPanel.addButton("Open Trainer") { openTrainer() }
+
+        panel.addButton("Load Workspace") {
             val loadOk = loadWorkspaceZipFromFileChooser()
             if (loadOk) {
 
@@ -517,8 +526,6 @@ val evolveResourcePursuer = newSim { optionString ->
 
                 val energyTextObject = network.getModels<NetworkTextObject>().first()
 
-                val phenotype = CompletableDeferred(EvolvePursuerPhenotype(driveNeurons, inputNeurons, hiddenNeurons, outputNeurons, connections))
-
                 val odorWorldComponent = workspace.componentList
                     .filterIsInstance<OdorWorldComponent>()
                     .first()
@@ -527,7 +534,41 @@ val evolveResourcePursuer = newSim { optionString ->
 
                 val evolvedAgent = odorWorld.entityList.first { it.entityType == EntityType.Cow }
 
-                addActions(workspace, phenotype, evolvedAgent, simState)
+                // For load case, use the raw update actions directly
+                var calories by simState::calories
+                var totalActivation by simState::totalActivation
+                var movement by simState::movement
+                var fitness by simState::fitness
+
+                workspace.addUpdateAction("update energy") {
+                    val outputsActivations =
+                        outputNeurons.activationArray.sumOf { 1.2.pow(if (it < 0) it * -2 else it) - 1 }
+                    val allActivations =
+                        (inputNeurons.neuronList + hiddenNeurons.neuronList).activations.sumOf { abs(it) } * 2
+                    movement = abs(evolvedAgent.speed * 3) + abs(evolvedAgent.dtheta * 2)
+                    totalActivation = outputsActivations + allActivations
+                    calories = simState.computeCalories()
+                    driveNeurons.neuronList.first().activation += 10.0 / evaluatorParams.iterationsPerRun
+                    fitness = calories - driveNeurons.neuronList.first().activation * 4
+                }
+
+                workspace.addUpdateAction("food $foodTileType found") {
+                    val hungerNeuron = driveNeurons.neuronList.first()
+                    with(odorWorld) {
+                        val centerLakeSensor = evolvedAgent.sensors.first { it is TileSensor && it.label == "Center food sensor" } as TileSensor
+                        val lakeLayer = tileMap.getLayer("Food Layer")
+                        centerLakeSensor.let { sensor ->
+                            if (sensor.currentValue > 0.5) {
+                                hungerNeuron.activation = 0.0
+                                calories += 100.0
+                                tileMap.clear(lakeLayer)
+                                with(simState) {
+                                    makeFoodPatch(2..8)
+                                }
+                            }
+                        }
+                    }
+                }
 
                 workspace.addUpdateAction("update energy text") {
                     energyTextObject.text = simState.generateEnergyText()
@@ -543,64 +584,64 @@ val evolveResourcePursuer = newSim { optionString ->
     }
 
     addSidebarInfo(
-        """ 
+        """
         # Evolving A Resource Pursuer
-        
+
         This is a simulation of the evolution of a neural network that is coupled to an agent in an odor world that contains food resources. The neural network will evolve
         to optimize its foraging strategy within the limitations of caloric expenditure and gain using an evolutionary framework in Simbrain.
-        
+
         # Simulation Details
-        
+
         This simulation simulates the evolution of a neural network until the `target fitness` in the control panel is met, exceeded, or when it has reached the `maximum generation`. The
-        goal of this simulation is to evolve until it is as close as possible to the `target fitness`. 
-        
-        In simple terms, the fitness is calculated as `calories(t) - hunger(t)` where `calories` is calculated as `totalActivation(t) + Movement(t)`. 
-        
-        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive 
-        look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/). To see example simulations that were made during a SURF project, 
+        goal of this simulation is to evolve until it is as close as possible to the `target fitness`.
+
+        In simple terms, the fitness is calculated as `calories(t) - hunger(t)` where `calories` is calculated as `totalActivation(t) + Movement(t)`.
+
+        For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. Whereas for a comprehensive
+        look into how evolutionary simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/). To see example simulations that were made during a SURF project,
         see [here](https://tbmvthao.github.io/SampleEvosims/).
-        
+
         ## Evolutionary Process
-        
-        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with a three-layer network (`3` input neurons, `2` hidden neurons, and `3` output 
+
+        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with a three-layer network (`3` input neurons, `2` hidden neurons, and `3` output
         neurons), a `Hunger` neuron, and a preset amount of connections (`3` per layer). Within each generation, a simulation will iterate until the specified value while the fitness of each simulation is calculated
         and recorded. As a simulation iterates, `400` calories are added when the agent obtains food and the `Hunger` neuron's activation is increased by `10` at each iteration. Hunger will reset to `0` when the agent
         obtains food and new food is repopulated at a random location in the odor world.
-        
-        After each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations will have 
-        mutations, where the simulation develops new connections between neuron layers (`25%` chance), new neurons in the hidden layer (`50%` chance), changes in neuron biases and weight strengths. If the any of the 
+
+        After each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations will have
+        mutations, where the simulation develops new connections between neuron layers (`25%` chance), new neurons in the hidden layer (`50%` chance), changes in neuron biases and weight strengths. If the any of the
         other genes are active, they will also produce other possible mutations:
-        
+
         1) Changes in `learning rule` for weights (`10%` chance)
-        
+
         2) Changes in `connection strategy` (`10%` chance)
-        
+
         3) Changes in `update rule` for hidden neurons (`10%` chance)
-        
-        4) Changes in the `layout` of the hidden layer (`10%` chance) 
-        
-        Then a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the 
-        `target fitness` or better, or when the evolutionary process ends. 
+
+        4) Changes in the `layout` of the hidden layer (`10%` chance)
+
+        Then a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the
+        `target fitness` or better, or when the evolutionary process ends.
 
         # What to Do
-        
+
         In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. As mentioned before, there are genes that can be activated to allow
         the simulation to have additional mutations. Click on the dropdown box next to the gene you want active, and change it to `Yes`. Below are the steps to evolving the simulation:
-        
+
         1) Specify the parameters of the simulation.
-            
-            - The addition of more mutations. 
-        
+
+            - The addition of more mutations.
+
         2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
-        
+
         3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
- 
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
+
         Kanly Thao
-        
+
         """.trimIndent()
     )
 
@@ -611,12 +652,12 @@ val evolveResourcePursuer = newSim { optionString ->
         evaluatorParams.iterationsPerRun = options.optInt("iterationsPerRun", evaluatorParams.iterationsPerRun)
         evaluatorParams.populationSize = options.optInt("populationSize", evaluatorParams.populationSize)
         evaluatorParams.eliminationRatio = options.optDouble("eliminationRatio", evaluatorParams.eliminationRatio)
-        evaluatorParams.evalutationPercentile = options.optInt("evaluationPercentile", evaluatorParams.evalutationPercentile)
+        evaluatorParams.evaluationPercentile = options.optInt("evaluationPercentile", evaluatorParams.evaluationPercentile)
         evolutionParams.useLayoutGene = options.optBoolean("useLayoutGene", evolutionParams.useLayoutGene)
         evolutionParams.useLearningRuleGenes = options.optBoolean("useLearningRuleGenes", evolutionParams.useLearningRuleGenes)
         evolutionParams.useConnectionStrategyGene = options.optBoolean("useConnectionStrategyGene", evolutionParams.useConnectionStrategyGene)
         evolutionParams.useHiddenLayerUpdateRuleGene = options.optBoolean("useHiddenLayerUpdateRuleGene", evolutionParams.useHiddenLayerUpdateRuleGene)
-        runSim()
+        runHeadless()
     }
 
 }

@@ -1,12 +1,15 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Deferred
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.*
-import org.simbrain.network.layouts.Layout
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.activations
+import org.simbrain.network.core.bound
+import org.simbrain.network.core.lengths
+import org.simbrain.util.StandardDialog
 import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.geneticalgorithm.*
 import org.simbrain.util.place
@@ -87,54 +90,32 @@ val evolveNetwork = newSim {
     }
     val networkParams = NetworkParameters()
 
-    class EvolveNetworkGenotype(seed: Long = Random.nextLong()) : Genotype {
+    class EvolveNetworkGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
-        override val random: Random = Random(seed)
+        val nodes by nodeChromosome(2) { upperBound = 10.0; lowerBound = -10.0 }
+        val connections by connectionChromosome()
+        val layout by layoutChromosome(::nodes)
 
-        var layoutChromosome = chromosome(1) { add(layoutGene()) }
-        var nodeChromosome = chromosome(2) {
-            add(nodeGene { upperBound = 10.0; lowerBound = -10.0 })
-        }
-        var connectionChromosome = chromosome<Synapse, ConnectionGene>()
-
-        inner class Phenotype(
-            val layout: Layout,
-            val nodes: List<Neuron>,
-            val connections: List<Synapse>
-        )
-
-        suspend fun expressWith(network: Network): Phenotype {
-            val layout = express(layoutChromosome).first().express()
-            val nodes = network.express(nodeChromosome)
-            val connections = network.express(connectionChromosome)
-            layout.layoutNeurons(nodes)
-            return Phenotype(layout, nodes, connections)
-        }
-
-        fun copy() = EvolveNetworkGenotype(random.nextLong()).apply {
-            val current = this@EvolveNetworkGenotype
-            val new = this@apply
-
-            new.layoutChromosome = current.layoutChromosome.copy()
-            new.nodeChromosome = current.nodeChromosome.copy()
-            new.connectionChromosome = current.connectionChromosome.copy()
-        }
-
-        fun mutate() {
-
-            // Mutate layout
-            layoutChromosome.forEach {
-                it.mutateParam()
-                it.mutateType()
+        init {
+            connections.addConnection(nodes to nodes) {
+                strength = random.nextDouble(-1.0, 1.0)
             }
+        }
+
+        override fun createNew(seed: Long) = EvolveNetworkGenotype(seed)
+
+        override fun mutate() {
+            // Mutate layout
+            layout.gene.mutateParam()
+            layout.gene.mutateType()
 
             // Add nodes
             if (random.nextDouble() < 0.1) {
-                nodeChromosome.add(nodeGene())
+                nodes.addGene(nodeGene())
             }
 
             // Mutate biases
-            nodeChromosome.forEach {
+            nodes.genes.forEach {
                 it.mutate {
                     bias += random.nextDouble(-1.0, 1.0)
                 }
@@ -142,54 +123,41 @@ val evolveNetwork = newSim {
 
             // Add new connections
             withProbability(0.25) {
-                connectionChromosome.createGene(
-                    nodeChromosome to nodeChromosome
+                connections.addConnection(
+                    nodes to nodes
                 ) { strength = random.nextDouble(-1.0, 1.0) }
             }
 
             // Mutate strengths
-            connectionChromosome.forEach {
+            connections.genes.forEach {
                 it.mutate {
                     strength += random.nextDouble(-1.0, 1.0)
                 }
             }
         }
-
     }
 
     class EvolveNetworkSim(
-        val evolveNetworkGenotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
-        val workspace: Workspace = Workspace()
-    ) : EvoSim {
+        genotype: EvolveNetworkGenotype = EvolveNetworkGenotype(),
+        workspace: Workspace = Workspace(),
+        metadata: SimMetadata? = null
+    ) : EvoSim<EvolveNetworkGenotype>(genotype, workspace, metadata) {
 
-        val networkComponent = NetworkComponent("network 1").also { workspace.addWorkspaceComponent(it) }
+        val networkComponent = NetworkComponent("${metadata.namePrefix}network").also {
+            workspace.addWorkspaceComponent(it)
+        }
 
         val network = networkComponent.network
 
-        private val _phenotype = CompletableDeferred<EvolveNetworkGenotype.Phenotype>()
-        val phenotype: Deferred<EvolveNetworkGenotype.Phenotype> by this::_phenotype
-
-        override fun mutate() {
-            evolveNetworkGenotype.mutate()
+        override suspend fun onBuild() {
+            genotype.expressAll(network)
         }
 
-        override suspend fun build() {
-            if (!_phenotype.isCompleted) {
-                _phenotype.complete(evolveNetworkGenotype.expressWith(network))
-            }
-        }
-
-        override fun visualize(workspace: Workspace): EvolveNetworkSim {
-            return EvolveNetworkSim(evolveNetworkGenotype.copy(), workspace)
-        }
-
-        override fun copy(): EvoSim {
-            return EvolveNetworkSim(evolveNetworkGenotype.copy(), Workspace())
-        }
+        override fun create(genotype: EvolveNetworkGenotype, workspace: Workspace, metadata: SimMetadata?) =
+            EvolveNetworkSim(genotype, workspace, metadata)
 
         override suspend fun eval(): Double {
             build()
-            val phenotype = phenotype.await()
 
             // Iterate network to stabilize network
             repeat(evaluatorParams.iterationsPerRun) { network.bufferedUpdate() }
@@ -200,27 +168,27 @@ val evolveNetwork = newSim {
 
             // Number of nodes
             if (networkParams.useNumNodes) {
-                totalError += abs(phenotype.nodes.size - networkParams.targetNumNodes)
+                totalError += abs(genotype.nodes.neurons.neuronList.size - networkParams.targetNumNodes)
             }
 
             // Num Weights
             if (networkParams.useNumWeights) {
-                totalError += abs(phenotype.connections.size - networkParams.targetNumWeights)
+                totalError += abs(genotype.connections.synapses.size - networkParams.targetNumWeights)
             }
 
             // Average activation
             if (networkParams.useAverageActivation) {
-                totalError += abs(phenotype.nodes.activations.average() - networkParams.targetAverageActivation)
+                totalError += abs(genotype.nodes.neurons.neuronList.activations.average() - networkParams.targetAverageActivation)
             }
 
             // Total Activation
             if (networkParams.useTotalActivation) {
-                totalError += abs(phenotype.nodes.activations.sum() - networkParams.targetTotalActivation)
+                totalError += abs(genotype.nodes.neurons.neuronList.activations.sum() - networkParams.targetTotalActivation)
             }
 
             // Average length of connections
             if (networkParams.useAverageConnectionLength) {
-                totalError += abs(phenotype.connections.lengths.average() - networkParams.targetAverageConnectionLength)
+                totalError += abs(genotype.connections.synapses.lengths.average() - networkParams.targetAverageConnectionLength)
             }
 
             // "Area" spanned by nodes
@@ -235,88 +203,145 @@ val evolveNetwork = newSim {
 
     }
 
-    suspend fun runSim() {
-        val lastGeneration = evaluator(
-            evaluatorParams,
-            populatingFunction = { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
-        )
-        lastGeneration.take(1).forEach {
-            with(it.visualize(workspace) as EvolveNetworkSim) {
-                build()
-                withGui {
-                    place(networkComponent, 340, 10, 384, 480)
-                }
+    fun displayBlock(genotype: EvolveNetworkGenotype): GeneDisplayBuilder.() -> Unit {
+        val allNodes = genotype.nodes.genes
+        fun nodeIndex(gene: NodeGene) = allNodes.indexOf(gene).let { if (it >= 0) it + 1 else "?" }
+        return {
+            display(genotype.nodes) {
+                header(formatted("node") { nodeIndex(it) })
+            }
+            display(genotype.connections, noDefaults = true) {
+                +formatted("in") { nodeIndex(it.source) }
+                +formatted("out") { nodeIndex(it.target) }
+                +template(Synapse::strength)
+            }
+            display(genotype.layout) {
+                +template(LayoutGeneWrapper::layoutType)
+                +template(LayoutGeneWrapper::hSpacing)
+                +template(LayoutGeneWrapper::vSpacing)
             }
         }
     }
 
+    val controlPanel = EvolutionControlPanel(evaluatorParams)
+
+    var trainerDialog: StandardDialog? = null
+    var session: EvolutionTrainerSession? = null
+
     withGui {
         workspace.clearWorkspace()
-        val controlPanel = evaluatorParams.createControlPanel("Control Panel", 5, 10)
+        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
 
-        controlPanel.addSeparator()
+        panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(networkParams)
-        controlPanel.addAnnotatedPropertyEditor(propertyEditor)
+        panel.addAnnotatedPropertyEditor(propertyEditor)
+        panel.addSeparator()
 
-        controlPanel.addSeparator()
-        evaluatorParams.addControlPanelButton("Evolve") {
-            workspace.removeAllComponents()
-            evaluatorParams.addProgressWindow()
-            propertyEditor.commitChanges()
-            println(networkParams.allPropertiesToString())
-            runSim()
+        workspace.events.workspaceCleared.on(Dispatchers.Swing) {
+            trainerDialog?.dispose()
+            trainerDialog = null
+            session = null
         }
 
+        suspend fun openTrainer() {
+            trainerDialog?.takeIf { it.isDisplayable }?.let {
+                it.toFront()
+                return
+            }
+
+            val activeSession = session ?: run {
+                workspace.removeAllComponents()
+                propertyEditor.commitChanges()
+                println(networkParams.allPropertiesToString())
+                val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
+                val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
+                genomeDisplay.bind(runner)
+                val history = ExpressionHistory()
+
+                suspend fun expressBest() {
+                    val state = runner.generationState ?: return
+                    history.minimizeAll()
+                    with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveNetworkSim) {
+                        build()
+                        genomeDisplay.refreshFrom(genotype)
+                        withGui {
+                            place(networkComponent, 340, 10, 384, 480)
+                        }
+                        history.add(ExpressionEntry.forComponents(
+                            workspace, listOf(networkComponent), state.historyLabel(evaluatorParams)
+                        ))
+                    }
+                }
+
+                runner.events.targetReached.on(Dispatchers.Default) { expressBest() }
+
+                EvolutionTrainerSession(
+                    runner = runner,
+                    evaluatorParams = evaluatorParams,
+                    extras = listOf(genomeDisplay),
+                    onExpress = ::expressBest,
+                    history = history
+                ).also { session = it }
+            }
+
+            trainerDialog = createEvolutionTrainerDialog(activeSession).apply {
+                addCloseTask { trainerDialog = null }
+                makeVisible()
+            }
+        }
+
+        controlPanel.addButton("Open Trainer") { openTrainer() }
+
         addSidebarInfo(
-        """ 
+        """
         # Evolving A Network
-        
-        This is a simulation of the evolution of a network towards a or, multiple target qualities using an evolutionary framework in Simbrain. 
-        
+
+        This is a simulation of the evolution of a network towards a or, multiple target qualities using an evolutionary framework in Simbrain.
+
         # Simulation Details
-        
-        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the `maximum generation`. 
-        The goal of this simulation is to evolve until it is as close as possible to the `target error`. 
-        
-        The `target error` is calculated as the total sum error of the target qualities (e.g., `Target Num of Nodes` `Target Num of Weights`, etc). Each target quality error is 
+
+        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the `maximum generation`.
+        The goal of this simulation is to evolve until it is as close as possible to the `target error`.
+
+        The `target error` is calculated as the total sum error of the target qualities (e.g., `Target Num of Nodes` `Target Num of Weights`, etc). Each target quality error is
         calculated as the difference between current active quality vs active target quality.
-        
+
         The target qualities are explained in the tooltip. To see their explanations, hover over them in the control panel. For a comprehensive look into how evolutionary simulations
         are developed in Simbrain.
-        
+
         ## Evolutionary Process
-        
-        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with `2` neurons. Within each generation, the simulation will iterate until 
+
+        The evolutionary process begins with a starting `population size` of simulations. In generation `0`, each simulation starts with `2` neurons. Within each generation, the simulation will iterate until
         the specified value while the fitness of each simulation is calculated and recorded.
-        
-        Then after each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations 
+
+        Then after each generation, a percentage of the population is eliminated (e.g., `elimination ratio`) and repopulated with new simulations. During this process of reproduction, some of the new simulations
         will have mutations, where the simulation develops new connections between neuron layers (`25%` chance), new hidden neurons (`10%` chance), changes in neurons biases and weight strengths, and the physical layout
-        of the neurons.  
-        
-        After each generation, a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has reached the 
-        `target error` or lower, or when the evolutionary process ends. 
-        
-        # What to Do    
-            
-        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works and what your target qualities are. 
+        of the neurons.
+
+        After each generation, a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has reached the
+        `target error` or lower, or when the evolutionary process ends.
+
+        # What to Do
+
+        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works and what your target qualities are.
         Below are the steps to evolving the simulation:
-        
+
         1) Specify the parameters of the simulation.
-            
+
             - The addition of more target qualities.
-        
+
             - Setting the target value(s).
-        
+
         2) After confirming all the default and target values are what you want, click on the `Evolve` button to start the simulation.
-        
+
         3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
- 
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
+
         Kanly Thao
-        
+
         """.trimIndent()
         )
     }

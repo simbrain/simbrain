@@ -6,12 +6,11 @@ import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
+import org.jfree.chart.plot.ValueMarker
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
-import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JButton
-import javax.swing.JComboBox
 import javax.swing.JPanel
 import kotlin.math.max
 import kotlin.math.min
@@ -28,6 +27,13 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
     private var deleteButton: JButton? = null
 
     private var addButton: JButton? = null
+
+    /**
+     * Range markers tracked so their values participate in [updateChartSettings] auto-range
+     * computation. Use [addRangeMarker] / [removeRangeMarker] instead of adding to the plot
+     * directly so the axis range expands to keep markers visible.
+     */
+    private val rangeMarkers = mutableListOf<ValueMarker>()
 
     init {
         preferredSize = PREFERRED_SIZE
@@ -76,8 +82,12 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
         if (timeSeriesModel.isAutoRange) {
 
-            val min = timeSeriesModel.timeSeriesList.minOfOrNull { it.series.minY } ?: 0.0
-            val max = timeSeriesModel.timeSeriesList.maxOfOrNull { it.series.maxY } ?: 0.0
+            val dataMin = timeSeriesModel.timeSeriesList.minOfOrNull { it.series.minY } ?: 0.0
+            val dataMax = timeSeriesModel.timeSeriesList.maxOfOrNull { it.series.maxY } ?: 0.0
+            val markerMin = rangeMarkers.minOfOrNull { it.value } ?: dataMin
+            val markerMax = rangeMarkers.maxOfOrNull { it.value } ?: dataMax
+            val min = min(dataMin, markerMin)
+            val max = max(dataMax, markerMax)
 
             val (lower, upper) = listOf(
                 if (timeSeriesModel.useAutoRangeMaximumLowerBound) {
@@ -94,12 +104,61 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
             val delta = max(upper - lower, DEFAULT_AUTO_RANGE_MINIMUM_SIZE)
 
-            chart.xyPlot.rangeAxis.setRange(lower - DEFAULT_LOWER_MARGIN * delta, upper + DEFAULT_UPPER_MARGIN * delta)
+            // Give markers extra headroom on the side they occupy so their labels aren't clipped
+            val upperMargin = if (rangeMarkers.any { it.value >= dataMax }) {
+                DEFAULT_UPPER_MARGIN + MARKER_LABEL_MARGIN
+            } else DEFAULT_UPPER_MARGIN
+            val lowerMargin = if (rangeMarkers.any { it.value <= dataMin }) {
+                DEFAULT_LOWER_MARGIN + MARKER_LABEL_MARGIN
+            } else DEFAULT_LOWER_MARGIN
+
+            setRangeIfChanged(lower - lowerMargin * delta, upper + upperMargin * delta)
 
         } else {
             chart.xyPlot.rangeAxis.isAutoRange = false
-            chart.xyPlot.rangeAxis.setRange(timeSeriesModel.rangeLowerBound, timeSeriesModel.rangeUpperBound)
+            setRangeIfChanged(timeSeriesModel.rangeLowerBound, timeSeriesModel.rangeUpperBound)
         }
+    }
+
+    /**
+     * `rangeAxis.setRange` unconditionally emits an AxisChangeEvent → plot redraw → progress listener →
+     * back here. Skip the call when bounds haven't moved so we don't feed that loop every frame.
+     */
+    private fun setRangeIfChanged(lower: Double, upper: Double) {
+        val axis = chart.xyPlot.rangeAxis
+        val current = axis.range
+        if (current.lowerBound != lower || current.upperBound != upper) {
+            axis.setRange(lower, upper)
+        }
+    }
+
+    /**
+     * Add a horizontal range marker whose value is included in the auto-range computation, so the
+     * axis stays expanded enough to keep the marker visible.
+     */
+    fun addRangeMarker(marker: ValueMarker) {
+        rangeMarkers.add(marker)
+        chart.xyPlot.addRangeMarker(marker)
+        updateChartSettings()
+    }
+
+    fun removeRangeMarker(marker: ValueMarker) {
+        rangeMarkers.remove(marker)
+        chart.xyPlot.removeRangeMarker(marker)
+        updateChartSettings()
+    }
+
+    /**
+     * Add a vertical domain marker. Domain markers do not participate in auto-range — the x-axis
+     * is driven by [TimeSeriesModel.fixedWidth] / [TimeSeriesModel.windowSize] — so the marker can
+     * sit far beyond the current data without squashing the visible data.
+     */
+    fun addDomainMarker(marker: ValueMarker) {
+        chart.xyPlot.addDomainMarker(marker)
+    }
+
+    fun removeDomainMarker(marker: ValueMarker) {
+        chart.xyPlot.removeDomainMarker(marker)
     }
 
 
@@ -142,5 +201,8 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
     companion object {
         private val PREFERRED_SIZE = Dimension(500, 400)
+        /** Extra fractional margin added to the auto-range when a marker sits at the data boundary,
+         * so the marker's label has room to render without being clipped by the axis. */
+        private const val MARKER_LABEL_MARGIN = 0.1
     }
 }

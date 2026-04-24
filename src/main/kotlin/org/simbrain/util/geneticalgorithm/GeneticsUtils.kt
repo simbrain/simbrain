@@ -1,8 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.util.UserParameter
+import org.simbrain.util.format
 import org.simbrain.util.propertyeditor.GuiEditable
 import kotlin.math.roundToInt
 import kotlin.random.Random
@@ -16,7 +15,7 @@ import kotlin.reflect.KMutableProperty0
  * from a set of related genes.
  */
 context(Genotype)
-fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
+fun <P, G : Gene<*, P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
 
 /**
  * Return one random gene from the provided chromosomes, weighted by chromosome size.
@@ -26,7 +25,7 @@ fun <P, G : Gene<P>> Chromosome<P, G>.sample() = this[random.nextInt(size)]
  * all chromosomes are empty.
  */
 context(Genotype)
-fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
+fun <P, G : Gene<*, P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
     val nonEmptyChromosomes = chromosomes.filter { it.isNotEmpty() }
     if (nonEmptyChromosomes.isEmpty()) {
         throw NoSuchElementException()
@@ -51,29 +50,41 @@ fun <P, G : Gene<P>> sampleFrom(vararg chromosomes: Chromosome<P, G>): G {
  *
  */
 context(Genotype)
-fun <P, G : Gene<P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
+fun <P, G : Gene<*, P>> chromosome(repeat: Int = 0, block: Chromosome<P, G>.(index: Int) -> Unit = { }) =
     Chromosome<P, G>(
         listOf()
     ).apply { repeat(repeat) { block(it) } }
 
 
 /**
- * Express each network gene in this chromosome into the target network.
+ * Express each gene in this chromosome using the given context.
  */
 context(Genotype)
-suspend fun <P : NetworkModel, G : NetworkGene<P>> Network.express(chromosome: Chromosome<P, G>): List<P> {
-    return chromosome.map { it.express(this@express) }
+suspend fun <C, P, G : Gene<C, P>> express(chromosome: Chromosome<P, G>, context: C): List<P> {
+    return chromosome.map { it.express(context) }
 }
 
-/**
- * Express each top-level gene in this chromosome.
- */
-context(Genotype)
-fun <P, G : TopLevelGene<P>> express(chromosome: Chromosome<P, G>): List<P> {
-    return chromosome.map { it.express() }
-}
+data class SimMetadata(
+    val id: Int,
+    val parentId: Int?,
+    val generation: Int,
+    val fitness: Double
+)
 
-data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Double>) {
+/** `"Gen N: "` if metadata is available, `""` otherwise. Use to prefix workspace component names
+ * so expressed genomes are visually distinguishable from one another. */
+val SimMetadata?.namePrefix: String get() = this?.let { "Gen ${it.generation}: " } ?: ""
+
+data class GenerationState(
+    val generation: Int,
+    val population: List<Pair<EvoSim<*>, SimMetadata>>
+) {
+
+    val fitnessScores get() = population.map { it.second.fitness }
+
+    val best get() = population.first().first
+
+    val bestMetadata get() = population.first().second
 
     /**
      * Example: give it 5 and it returns the 5th percentile. 0 for the best.
@@ -82,6 +93,10 @@ data class GenerationFitnessPair(val generation: Int, val fitnessScores: List<Do
     fun nthPercentileFitness(nth: Int) = nthPercentileFitness(nth.toDouble())
 
     fun nthPercentileFitness(nth: Double) = fitnessScores[(fitnessScores.lastIndex * nth / 100).roundToInt()]
+
+    /** Shared history-row label: `"Gen N  |  <Metric>: <value>"`. */
+    fun historyLabel(params: EvaluatorParams): String =
+        "Gen $generation  |  ${params.stoppingCondition.name}: ${bestMetadata.fitness.format(4)}"
 
 }
 

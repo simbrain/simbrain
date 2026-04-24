@@ -94,9 +94,10 @@ fun showDirectorySelectionDialog(approveButtonText: String = "Select Folder"): S
 fun <T : JComponent> T.displayInDialog(
     isModal: Boolean = true,
     parent: Component? = null,
+    title: String = "Dialog",
     block: T.() -> Unit = {}
 ): StandardDialog {
-    val dialog = StandardDialog(getParentFrame(parent) as Frame?, "Dialog")
+    val dialog = StandardDialog(getParentFrame(parent) as Frame?, title)
     
     dialog.contentPane = this
     dialog.defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE

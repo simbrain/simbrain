@@ -4,7 +4,7 @@ package org.simbrain.util.geneticalgorithm
  * Core abstractions for Simbrain's evolutionary framework.
  *
  * This file defines the generic building blocks used across the genetics package:
- * [Genotype], [Gene], [TopLevelGene], [Chromosome], [EvoSim], [EvaluatorParams],
+ * [Genotype], [Gene], [Chromosome], [EvoSim], [EvaluatorParams],
  * and the [evaluator] loop that runs selection and reproduction across generations.
  *
  * The basic mental model is:
@@ -29,78 +29,132 @@ package org.simbrain.util.geneticalgorithm
  * See also:
  * - [chromosome], sampling helpers, and `express(...)` helpers in [GeneticsUtils.kt][org.simbrain.util.geneticalgorithm.chromosome]
  * - network-specific genes such as `nodeGene` and `connectionGene` in `NetworkGenetics.kt`
- * - [EvolveXor.kt][/Users/jyoshimi/gitstuff/simbrainmain/simbrain/src/main/kotlin/org/simbrain/custom_sims/simulations/evolution/EvolveXor.kt]
- *   for a compact end-to-end example
+ * - `EvolveXor.kt` for a compact end-to-end example
  */
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.format
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import kotlinx.coroutines.*
+import kotlinx.coroutines.channels.Channel
+import org.simbrain.util.Events
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement
-import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.gui.SimbrainDesktop
-import java.awt.event.ActionEvent
 import kotlin.math.roundToInt
 import kotlin.random.Random
 
-interface Genotype {
-    val random: Random
-}
-
 /**
- * A gene stores a mutable template for one evolvable object.
+ * A gene stores the information needed to build one evolvable object.
  *
- * Subclasses provide domain-specific copy and expression behavior.
+ * [P] is the phenotype type: the kind of object this gene ultimately produces when it is expressed.
+ * In practice, [template] is usually a mutable "prototype" or template phenotype that gets copied and then placed
+ * into some larger structure. This is similar to gene expression in biology: the gene does not directly *become* the
+ * final object in the simulation, it helps produce one.
+ *
+ * [C] is the context needed for expression. Expression often means writing the phenotype into that context:
+ * - [Unit] for self-contained genes that do not need any outside object
+ * - [Network][org.simbrain.network.core.Network] for genes that create or attach things to a network
+ * - [OdorWorldEntity][org.simbrain.world.odorworld.entities.OdorWorldEntity] for genes that add sensors or effectors
+ *
+ * Example:
+ * a neuron gene might keep a template neuron as [template], then [express] by copying that neuron into a target
+ * [Network][org.simbrain.network.core.Network].
+ *
+ * Subclasses define the domain-specific details of how templates are copied, mutated, and expressed.
  */
-abstract class Gene<P> {
+abstract class Gene<C, P> {
+    /** The mutable template or prototype used to produce phenotype objects during expression. */
     abstract val template: P
-    abstract fun copy(): Gene<P>
 
+    /** Return an independent copy of this gene, including an appropriate copy of its template state. */
+    abstract fun copy(): Gene<C, P>
+
+    /**
+     * Express this gene in the provided [context] and return the resulting phenotype object.
+     *
+     * Depending on the subtype, this may create a new object, copy [template], attach the result to [context],
+     * or otherwise modify [context] as part of expression.
+     */
+    abstract suspend fun express(context: C): P
+
+    /** Mutate the [template] in place by applying the provided edit block. */
     fun mutate(block: P.() -> Unit) {
         template.apply(block)
     }
 }
 
 /**
- * A gene whose expression step does not need an external target object.
+ * Base class for evolution simulations backed by a [Genotype].
+ *
+ * An [EvoSim] wraps one candidate solution in the evolutionary process.
+ * The [genotype] stores the inherited structure and parameters, while the [workspace] holds the concrete components
+ * built from that genotype for visualization or evaluation.
+ *
+ * Subclasses provide three main pieces:
+ * - [onBuild] to express the genotype into the workspace
+ * - [create] factory method to create a new evosim
+ * - [eval] to evaluate the built sim and return a score
+ *
+ * This base class handles common behaviors such as:
+ * - building only once even if [build] is called repeatedly
+ * - delegating mutation to the genotype
+ * - creating copied sims for evolution or visualization
  */
-abstract class TopLevelGene<P>: Gene<P>() {
-    abstract fun express(): P
-}
+abstract class EvoSim<G : Genotype>(
+    val genotype: G,
 
-object TopLevelGeneticsContext
-
-interface EvoSim {
-    /**
-     * Apply mutations to this candidate.
-     */
-    fun mutate()
+    val workspace: Workspace = Workspace(),
 
     /**
-     * Build or express the phenotype needed for evaluation.
+     * Optional metadata describing this candidate in the evolutionary run.
+     *
+     * This is typically set by [createDisplayCopy] so a sim can use information such as generation, fitness, or id
+     * when naming components. It is usually `null` for internal clones created by the evolution loop.
      */
-    suspend fun build()
+    val metadata: SimMetadata? = null
+) {
+
+    private var built = false
 
     /**
-     * Create a version of this candidate attached to the provided workspace for inspection.
+     * Build this sim if it has not already been built.
+     *
+     * Repeated calls are safe: after the first successful build, later calls do nothing.
      */
-    fun visualize(workspace: Workspace): EvoSim
+    suspend fun build() {
+        if (!built) {
+            onBuild()
+            built = true
+        }
+    }
 
     /**
-     * Return an independent copy suitable for the next generation.
+     * Express the genotype into the [workspace].
+     *
+     * This is where subclasses typically create components, add them to the workspace, and connect them together.
+     * It is invoked by [build] and should assume the sim has not been built yet.
      */
-    fun copy(): EvoSim
+    protected abstract suspend fun onBuild()
+
+    /**
+     * Factory method for producing another sim of the same concrete type.
+     */
+    protected abstract fun create(genotype: G, workspace: Workspace, metadata: SimMetadata?): EvoSim<G>
 
     /**
      * Evaluate this candidate and return its fitness or error metric.
      */
-    suspend fun eval(): Double
+    abstract suspend fun eval(): Double
+
+    /** Mutate this candidate by delegating to its [genotype]. */
+    fun mutate() { genotype.mutate() }
+
+    /** Return a copy of this sim with a copied genotype, a fresh workspace, and no [metadata]. */
+    @Suppress("UNCHECKED_CAST")
+    fun copy(): EvoSim<*> = create(genotype.copy() as G, Workspace(), null)
+
+    /** Copy this sim into a provided [workspace], optionally annotated with [metadata]. This is done when the evosim is displayed in the "main" workspace. */
+    @Suppress("UNCHECKED_CAST")
+    fun createDisplayCopy(workspace: Workspace, metadata: SimMetadata? = null): EvoSim<*> =
+        create(genotype.copy() as G, workspace, metadata)
 }
 
 /**
@@ -110,12 +164,12 @@ interface EvoSim {
  * connection genes, or rule genes. Chromosomes may be empty, and they may grow or shrink during evolution if the
  * genotype's mutation logic adds or removes genes.
  */
-class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
+class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayList(genes) {
 
     /**
      * Provides a copy of the chromosome.
      */
-    fun copy() = Chromosome(map { it.copy() as G })
+    fun copy() = Chromosome(map { @Suppress("UNCHECKED_CAST") (it.copy() as G) })
 
     /**
      * Provides the ability to concatenate chromsomes. See usages.
@@ -123,94 +177,186 @@ class Chromosome<P, G : Gene<P>>(genes: List<G>) : MutableList<G> by ArrayList(g
     operator fun plus(other: Chromosome<P, G>) = Chromosome(buildList { addAll(this@Chromosome); addAll(other); })
 }
 
-
-data class PopulatingFunctionParams(val seed: Long)
-
-/**
- * Run an evolutionary loop over a population of [EvoSim]s.
- *
- * Each generation evaluates the population, sorts candidates by score, removes a fraction of the population,
- * and refills those slots with mutated copies of surviving individuals.
- *
- * By default, larger scores are treated as better fitness. If you are minimizing instead, either return values
- * where lower is better and set [sortDescending] to false, or use the [EvaluatorParams] overload.
- *
- * Returns the full final generation.
- *
- * @param populatingFunction initial evolutionary sim
- * @param populationSize stays constant during the run
- * @param eliminationRatio how many sims to eliminate each generation.
- * @param stoppingFunction a function that determines when to stop running the sim. Generally check a generation
- * number and for fitness.
- * @param peek code to run each iteration, for example to update a progress bar
- */
-suspend fun evaluator(
-    populatingFunction: PopulatingFunctionParams.() -> EvoSim,
-    populationSize: Int,
-    eliminationRatio: Double,
-    stoppingFunction: GenerationFitnessPair.() -> Boolean,
-    peek: GenerationFitnessPair.() -> Unit = {},
-    sortDescending: Boolean = true,
-    seed: Long = Random.nextLong(),
-    random: Random = Random(seed)
-): List<EvoSim> = coroutineScope {
-    var generation = 0
-    val populatingFunctionParams = PopulatingFunctionParams(seed)
-    var population = List(populationSize) { populatingFunction(populatingFunctionParams) }
-    do {
-        generation++
-        val fitnessScores = population.map { async { it.eval() } }.awaitAll()
-        val agentFitnessPair = (population zip fitnessScores).shuffled(random).let {
-            if (sortDescending) {
-                it.sortedByDescending { it.second }
-            } else {
-                it.sortedBy { it.second }
-            }
-        }
-        val eliminationCount = (agentFitnessPair.size * eliminationRatio).roundToInt()
-        val survivors = agentFitnessPair.take(populationSize - eliminationCount).map { (sim) -> sim }
-        population = (survivors.map { it.copy() } + survivors.sampleWithReplacement(random).take(eliminationCount)
-            .toList().map {
-                it.copy().apply {
-                    mutate()
-                }
-            })
-        val generationFitnessPair = GenerationFitnessPair(generation, agentFitnessPair.map { it.second })
-        peek(generationFitnessPair)
-    } while (!stoppingFunction(generationFitnessPair))
-    population
+class EvolutionEvents : Events() {
+    val beginEvolution = NoArgEvent()
+    val endEvolution = NoArgEvent()
+    /** Fires after [endEvolution] when the stopping condition was met (not when the user paused). */
+    val targetReached = NoArgEvent()
+    val generationUpdated = OneArgEvent<GenerationState>()
 }
 
 /**
- * Run [evaluator] using the user-facing parameter object [EvaluatorParams].
+ * Runs an evolutionary loop with pause/resume/step support.
+ *
+ * Uses a channel-based task queue (same pattern as [SupervisedTrainer][org.simbrain.network.trainers.SupervisedTrainer])
+ * to serialize control actions. Each generation completes fully before the next task is processed,
+ * so pause/stop never interrupts a mid-generation evaluation.
+ *
+ * Usage:
+ * ```
+ * val runner = EvolutionRunner(evaluatorParams) { seed -> MySim(seed = seed) }
+ * runner.events.generationUpdated.on { state -> updateDisplay(state) }
+ * runner.startEvolving()   // continuous
+ * runner.stopEvolving()    // pause
+ * runner.evolveOnce()      // single step
+ * runner.startEvolving()   // resume
+ * ```
  */
-suspend fun evaluator(
-    evaluatorParams: EvaluatorParams,
-    populatingFunction: PopulatingFunctionParams.() -> EvoSim,
-    peek: GenerationFitnessPair.() -> Unit = {}
-): List<EvoSim> {
-    val lastGeneration = evaluator(
+class EvolutionRunner(
+    val populatingFunction: (seed: Long) -> EvoSim<*>,
+    val populationSize: Int,
+    val eliminationRatio: Double,
+    val stoppingFunction: GenerationState.() -> Boolean,
+    val sortDescending: Boolean = true,
+    val seed: Long = Random.nextLong(),
+) : CoroutineScope {
+
+    private val job = SupervisorJob()
+    override val coroutineContext = Dispatchers.Default + job
+
+    constructor(
+        evaluatorParams: EvaluatorParams,
+        populatingFunction: (seed: Long) -> EvoSim<*>
+    ) : this(
         populatingFunction = populatingFunction,
         populationSize = evaluatorParams.populationSize,
         eliminationRatio = evaluatorParams.eliminationRatio,
         stoppingFunction = {
-            evaluatorParams.stoppingCondition.shouldStop(nthPercentileFitness(evaluatorParams.evalutationPercentile), evaluatorParams.targetMetric) || generation > evaluatorParams.maxGenerations
+            evaluatorParams.stoppingCondition.shouldStop(
+                nthPercentileFitness(evaluatorParams.evaluationPercentile),
+                evaluatorParams.targetMetric
+            ) || generation > evaluatorParams.maxGenerations
         },
         sortDescending = evaluatorParams.stoppingCondition == EvaluatorParams.StoppingCondition.Fitness,
-        peek = {
-            listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
-                "$it: ${nthPercentileFitness(it).format(3)}"
-            }.also {
-                println("[$generation] $it")
-                evaluatorParams.updateProgressWindow(this)
-            }
-            peek()
-        },
         seed = evaluatorParams.seed.toLong()
     )
-    evaluatorParams.closeProgressWindow()
-    return lastGeneration
+
+    val events = EvolutionEvents()
+
+    var generation = 0
+        private set
+
+    var isRunning = false
+        private set
+
+    var generationState: GenerationState? = null
+        private set
+
+    private var population: List<EvoSim<*>> = emptyList()
+    private var metadata: List<SimMetadata> = emptyList()
+    private var nextId = 0
+    private var random = Random(seed)
+    private var initialized = false
+    private var stoppedByTarget = false
+
+    private val processorChannel = Channel<Pair<EvolutionTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
+
+    sealed class EvolutionTask {
+        object Start : EvolutionTask()
+        object Evolve : EvolutionTask()
+        object Stop : EvolutionTask()
+    }
+
+    init {
+        launch {
+            for ((task, signal) in processorChannel) {
+                when (task) {
+                    EvolutionTask.Start -> startHandler()
+                    EvolutionTask.Evolve -> evolveOnceHandler()
+                    EvolutionTask.Stop -> stopHandler()
+                }
+                signal.complete(Unit)
+            }
+        }
+    }
+
+    private suspend fun submitTask(task: EvolutionTask): CompletableDeferred<Unit> {
+        val signal = CompletableDeferred<Unit>()
+        processorChannel.send(task to signal)
+        return signal
+    }
+
+    suspend fun startEvolving() {
+        submitTask(EvolutionTask.Start).await()
+    }
+
+    suspend fun stopEvolving() {
+        submitTask(EvolutionTask.Stop).await()
+    }
+
+    suspend fun evolveOnce() {
+        submitTask(EvolutionTask.Evolve).await()
+    }
+
+    private fun initPopulation() {
+        if (!initialized) {
+            random = Random(seed)
+            generation = 0
+            nextId = 0
+            population = List(populationSize) { populatingFunction(seed) }
+            metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
+            initialized = true
+        }
+    }
+
+    private suspend fun startHandler() {
+        isRunning = true
+        events.beginEvolution.fire().await()
+        submitTask(EvolutionTask.Evolve)
+    }
+
+    private suspend fun evolveOnceHandler() {
+        initPopulation()
+        generation++
+
+        val fitnessScores = coroutineScope {
+            population.map { async { it.eval() } }.awaitAll()
+        }
+        val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
+            simMeta.first to simMeta.second.copy(fitness = fitness)
+        }
+        val sorted = scored.shuffled(random).let {
+            if (sortDescending) it.sortedByDescending { it.second.fitness }
+            else it.sortedBy { it.second.fitness }
+        }
+        val state = GenerationState(generation, sorted)
+        generationState = state
+        events.generationUpdated.fire(state).await()
+
+        val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
+        val survivors = sorted.take(populationSize - eliminationCount)
+        val offspring = survivors.sampleWithReplacement(random).take(eliminationCount).toList().map { (sim, meta) ->
+            val childId = nextId++
+            sim.copy().apply { mutate() } to SimMetadata(id = childId, parentId = meta.id, generation = generation, fitness = 0.0)
+        }
+        val nextGen = survivors.map { (sim, meta) ->
+            sim.copy() to meta
+        } + offspring
+        population = nextGen.map { it.first }
+        metadata = nextGen.map { it.second }
+
+        if (isRunning) {
+            if (stoppingFunction(state)) {
+                stoppedByTarget = true
+                submitTask(EvolutionTask.Stop)
+            } else {
+                submitTask(EvolutionTask.Evolve)
+            }
+        } else {
+            submitTask(EvolutionTask.Stop)
+        }
+    }
+
+    private suspend fun stopHandler() {
+        isRunning = false
+        events.endEvolution.fire().await()
+        if (stoppedByTarget) {
+            stoppedByTarget = false
+            events.targetReached.fire()
+        }
+    }
 }
+
 
 /**
  * Parameters for configuring a standard evolutionary run and its UI helpers.
@@ -229,7 +375,7 @@ class EvaluatorParams(
     var populationSize by GuiEditable(
         initValue = populationSize,
         description = "Number of simulations spawned per generation",
-        min = 0,
+        min = 1,
         order = 0
     )
 
@@ -267,7 +413,7 @@ class EvaluatorParams(
         order = 50
     )
 
-    var evalutationPercentile by GuiEditable(
+    var evaluationPercentile by GuiEditable(
         initValue = evaluationPercentile,
         label = "Evaluation percentile",
         description = "When deciding whether to stop the simulation, consider current ${stoppingCondition.name.lowercase()} in this percentile of the population",
@@ -281,57 +427,6 @@ class EvaluatorParams(
         description = "Random seed that can be used for replicability",
         order = 70
     )
-
-    private var controlPanel: ControlPanelKt? = null
-
-    private var editor: AnnotatedPropertyEditor<EvaluatorParams>? = null
-
-    private var progressWindow: ProgressWindow? = null
-
-    context(SimbrainDesktop)
-    fun createControlPanel(name: String, x: Int, y: Int) = if (controlPanel == null) {
-        controlPanel = createControlPanel(name, x, y) {
-            editor = AnnotatedPropertyEditor(this@EvaluatorParams)
-            addAnnotatedPropertyEditor(editor!!)
-        }
-        controlPanel!!
-    } else {
-        controlPanel!!
-    }
-
-    private fun getProgressText(metricsString: String, generation: Int) =
-        """
-            <html>
-                Generation: $generation<br />
-                $evalutationPercentile Percentile ${stoppingCondition.name}: $metricsString
-            </html>
-        """.trimIndent()
-
-    context(SimbrainDesktop)
-    fun addControlPanelButton(text: String, block: suspend (ActionEvent) -> Unit) {
-        controlPanel!!.addButton(text) {
-            editor!!.commitChanges()
-            block(it)
-        }
-    }
-
-    fun addProgressWindow() {
-        progressWindow = ProgressWindow(maxGenerations, getProgressText("", 0)).apply {
-            minimumSize = java.awt.Dimension(300, 100)
-            setLocationRelativeTo(null)
-        }
-    }
-
-    fun updateProgressWindow(generationFitnessPair: GenerationFitnessPair) {
-        progressWindow?.apply {
-            text = getProgressText(generationFitnessPair.nthPercentileFitness(evalutationPercentile).format(3), generationFitnessPair.generation)
-            value = generationFitnessPair.generation
-        }
-    }
-
-    fun closeProgressWindow() {
-        progressWindow?.close()
-    }
 
     /**
      * Use error when the evolutionary algorithm is trying to minimize a value, and fitness when it is trying to maximize a value.

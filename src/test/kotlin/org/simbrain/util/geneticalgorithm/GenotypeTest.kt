@@ -1,0 +1,272 @@
+package org.simbrain.util.geneticalgorithm
+
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import org.simbrain.network.core.Network
+import org.simbrain.network.updaterules.DecayRule
+import kotlin.random.Random
+
+class GenotypeTest {
+
+    // Small helper genotypes keep the tests focused on one behavior at a time.
+    class BasicGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
+        val inputs by nodeChromosome(2) { clamped = true }
+        val hidden by nodeChromosome(3)
+        val outputs by nodeChromosome(1)
+        val connections by connectionChromosome()
+
+        init {
+            connections.addConnection(inputs to hidden)
+            connections.addConnection(hidden to outputs)
+        }
+
+        override fun createNew(seed: Long) = BasicGenotype(seed)
+
+        override fun mutate() {
+            hidden.genes.forEach { it.mutate { bias += random.nextDouble(-1.0, 1.0) } }
+            connections.genes.forEach { it.mutate { strength += random.nextDouble(-1.0, 1.0) } }
+        }
+
+        // Expose member extensions for testing from outside
+        fun addHiddenGene(gene: NodeGene) = hidden.addGene(gene)
+        fun addConnection() = connections.addConnection(inputs to hidden)
+    }
+
+    class LinkedRuleGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
+        val hidden by nodeChromosome(3)
+        val outputs by nodeChromosome(1)
+        val connections by connectionChromosome()
+        val hiddenRules by neuronRuleChromosome(::hidden)
+        val connectionRules by synapseRuleChromosome(::connections)
+
+        init {
+            connections.addConnection(hidden to outputs)
+        }
+
+        override fun createNew(seed: Long) = LinkedRuleGenotype(seed)
+
+        override fun mutate() {
+            hiddenRules.genes.forEach { it.mutateParam(mutateBounds = false) }
+        }
+
+        fun addHiddenGene(gene: NodeGene) = hidden.addGene(gene)
+        fun addConnection() = connections.addConnection(hidden to outputs)
+    }
+
+    class MultiLinkedGroupGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
+        val hidden by nodeChromosome(2)
+        val connections by connectionChromosome()
+        val hiddenRules by neuronRuleChromosome(::hidden)
+        val hiddenLayout by layoutChromosome(::hidden)
+
+        override fun createNew(seed: Long) = MultiLinkedGroupGenotype(seed)
+        override fun mutate() {}
+
+        fun addHiddenGene(gene: NodeGene) = hidden.addGene(gene)
+    }
+
+    @Test
+    fun `gene groups are registered in declaration order`() {
+        val genotype = BasicGenotype(42)
+        val names = genotype.geneGroups.map { it.first }
+        assertEquals(listOf("inputs", "hidden", "outputs", "connections"), names)
+    }
+
+    @Test
+    fun `node chromosome creates correct number of genes`() {
+        val genotype = BasicGenotype(42)
+        assertEquals(2, genotype.inputs.genes.size)
+        assertEquals(3, genotype.hidden.genes.size)
+        assertEquals(1, genotype.outputs.genes.size)
+    }
+
+    @Test
+    fun `node gene init block is applied`() {
+        val genotype = BasicGenotype(42)
+        assertTrue(genotype.inputs.genes.all { it.template.clamped })
+        assertFalse(genotype.hidden.genes.any { it.template.clamped })
+    }
+
+    @Test
+    fun `initial connections are created`() {
+        val genotype = BasicGenotype(42)
+        assertEquals(2, genotype.connections.genes.size)
+    }
+
+    @Test
+    fun `expressAll creates neurons and synapses`() = runBlocking {
+        val genotype = BasicGenotype(42)
+        val network = Network()
+        genotype.expressAll(network)
+
+        assertEquals(2, genotype.inputs.neurons.neuronList.size)
+        assertEquals(3, genotype.hidden.neurons.neuronList.size)
+        assertEquals(1, genotype.outputs.neurons.neuronList.size)
+        assertEquals(2, genotype.connections.synapses.size)
+    }
+
+    @Test
+    fun `neurons are not accessible before expression`() {
+        val genotype = BasicGenotype(42)
+        assertThrows(IllegalStateException::class.java) {
+            genotype.inputs.neurons
+        }
+    }
+
+    @Test
+    fun `copyGenotype creates independent copy`() {
+        val original = BasicGenotype(42)
+        original.mutate()
+        val copy = original.copy() as BasicGenotype
+
+        assertEquals(original.hidden.genes.size, copy.hidden.genes.size)
+        assertEquals(original.connections.genes.size, copy.connections.genes.size)
+
+        val originalBias = original.hidden.genes[0].template.bias
+        copy.mutate()
+        assertEquals(originalBias, original.hidden.genes[0].template.bias)
+    }
+
+    @Test
+    fun `copied connections reference copied nodes`() = runBlocking {
+        val original = BasicGenotype(42)
+        val copy = original.copy() as BasicGenotype
+
+        val net1 = Network()
+        val net2 = Network()
+        original.expressAll(net1)
+        copy.expressAll(net2)
+
+        val originalNeurons = net1.flatNeuronList
+        val copyNeurons = net2.flatNeuronList
+        assertTrue(originalNeurons.none { it in copyNeurons })
+
+        copy.connections.synapses.forEach { synapse ->
+            assertTrue(synapse.source in copyNeurons)
+            assertTrue(synapse.target in copyNeurons)
+        }
+    }
+
+    @Test
+    fun `addGene increases chromosome size`() {
+        val genotype = BasicGenotype(42)
+        val sizeBefore = genotype.hidden.genes.size
+        genotype.addHiddenGene(nodeGene())
+        assertEquals(sizeBefore + 1, genotype.hidden.genes.size)
+    }
+
+    @Test
+    fun `addConnection increases connection count`() {
+        val genotype = BasicGenotype(42)
+        val sizeBefore = genotype.connections.genes.size
+        genotype.addConnection()
+        assertEquals(sizeBefore + 1, genotype.connections.genes.size)
+    }
+
+    @Test
+    fun `genes list is read-only from outside`() {
+        val genotype = BasicGenotype(42)
+        // External callers should only see the immutable view of the chromosome genes.
+        val genes: List<NodeGene> = genotype.hidden.genes
+        assertNotNull(genes)
+    }
+
+    @Test
+    fun `connection groups have higher processing order than node groups`() {
+        val genotype = BasicGenotype(42)
+        val nodeGroup = genotype.geneGroups.first { it.first == "hidden" }.second.group
+        val connGroup = genotype.geneGroups.first { it.first == "connections" }.second.group
+        assertTrue(nodeGroup.processingOrder < connGroup.processingOrder)
+    }
+
+    @Test
+    fun `linked chromosome is populated to match target size`() {
+        val genotype = LinkedRuleGenotype(42)
+        assertEquals(genotype.hidden.genes.size, genotype.hiddenRules.genes.size)
+        assertEquals(genotype.connections.genes.size, genotype.connectionRules.genes.size)
+    }
+
+    @Test
+    fun `addGene auto-adds to linked chromosome`() {
+        val genotype = LinkedRuleGenotype(42)
+        val rulesBefore = genotype.hiddenRules.genes.size
+        genotype.addHiddenGene(nodeGene())
+        assertEquals(rulesBefore + 1, genotype.hiddenRules.genes.size)
+    }
+
+    @Test
+    fun `addConnection auto-adds to linked chromosome`() {
+        val genotype = LinkedRuleGenotype(42)
+        val rulesBefore = genotype.connectionRules.genes.size
+        genotype.addConnection()
+        assertEquals(rulesBefore + 1, genotype.connectionRules.genes.size)
+    }
+
+    @Test
+    fun `linked genes are typed`() {
+        val genotype = LinkedRuleGenotype(42)
+        val rule: NeuronRuleGene = genotype.hiddenRules.genes[0]
+        val synapseRule: SynapseRuleGene = genotype.connectionRules.genes[0]
+        assertNotNull(rule.template)
+        assertNotNull(synapseRule.template)
+    }
+
+    @Test
+    fun `linked chromosomes are applied during expression`() = runBlocking {
+        val genotype = LinkedRuleGenotype(42)
+        val network = Network()
+        genotype.expressAll(network)
+
+        genotype.hidden.neurons.neuronList.forEach { neuron ->
+            assertTrue(neuron.updateRule is DecayRule)
+        }
+    }
+
+    @Test
+    fun `copy preserves linked chromosomes`() {
+        val genotype = LinkedRuleGenotype(42)
+        genotype.addHiddenGene(nodeGene())
+        val copy = genotype.copy() as LinkedRuleGenotype
+
+        assertEquals(genotype.hiddenRules.genes.size, copy.hiddenRules.genes.size)
+        assertEquals(genotype.connectionRules.genes.size, copy.connectionRules.genes.size)
+    }
+
+    @Test
+    fun `copied linked chromosomes are independent`() {
+        val original = LinkedRuleGenotype(42)
+        val copy = original.copy() as LinkedRuleGenotype
+
+        copy.addHiddenGene(nodeGene())
+        assertNotEquals(original.hiddenRules.genes.size, copy.hiddenRules.genes.size)
+    }
+
+    @Test
+    fun `mutating linked genes on copy does not affect original`() {
+        val original = LinkedRuleGenotype(42)
+        val copy = original.copy() as LinkedRuleGenotype
+
+        val originalRule = original.hiddenRules.genes[0].template.updateRule
+        copy.mutate()
+        assertEquals(originalRule, original.hiddenRules.genes[0].template.updateRule)
+    }
+
+    @Test
+    fun `multiple per-element linked chromosomes sync on addGene`() {
+        val genotype = MultiLinkedGroupGenotype(42)
+        val rulesBefore = genotype.hiddenRules.genes.size
+        genotype.addHiddenGene(nodeGene())
+        assertEquals(rulesBefore + 1, genotype.hiddenRules.genes.size)
+    }
+
+    @Test
+    fun `layout is applied during expression`() = runBlocking {
+        val genotype = MultiLinkedGroupGenotype(42)
+        val network = Network()
+        genotype.expressAll(network)
+
+        val positions = genotype.hidden.neurons.neuronList.map { it.x }
+        assertTrue(positions.toSet().size > 1 || genotype.hidden.genes.size == 1)
+    }
+}

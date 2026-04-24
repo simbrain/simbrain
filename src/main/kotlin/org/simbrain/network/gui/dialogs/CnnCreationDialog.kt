@@ -23,7 +23,7 @@ import javax.swing.event.DocumentListener
  */
 class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog() {
 
-    // --- Layer spec models ---
+    // Layer spec models
 
     private sealed class LayerSpec {
         /** Short description of the layer parameters (no output shape). */
@@ -53,15 +53,15 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     private val tensorLayers = mutableListOf<LayerSpec>()
     private val denseLayers = mutableListOf<DenseLayerSpec>()
 
-    // --- Input shape fields ---
+    // Input shape fields
     private val heightField = JTextField("28", 4)
     private val widthField = JTextField("28", 4)
     private val channelsField = JTextField("1", 3)
 
-    // --- Output field ---
+    // Output field
     private val outputNeuronsField = JTextField("10", 4)
 
-    // --- Layer list displays ---
+    // Layer list displays
     // Columns: index | description | -> | H | x | W | x | C | Edit | up | down | Remove
     private val tensorLayerListPanel = JPanel(MigLayout(
         "fillx, ins 0, gapy 4",
@@ -78,7 +78,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         val mainPanel = JPanel(MigLayout("fillx, ins 10, wrap", "[grow,fill]"))
 
-        // --- Input shape section ---
+        // Input shape section
         val inputPanel = JPanel(MigLayout("ins 0", "[][][][][][]"))
         inputPanel.add(JLabel("Input Shape:"))
         inputPanel.add(JLabel("H:"))
@@ -99,7 +99,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         widthField.document.addDocumentListener(shapeChangeListener)
         channelsField.document.addDocumentListener(shapeChangeListener)
 
-        // --- Tensor layers section ---
+        // Tensor layers section
         val tensorSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
             border = BorderFactory.createTitledBorder("Tensor Layers (Conv / Pool)")
         }
@@ -121,10 +121,10 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         tensorSection.add(tensorButtonPanel)
         mainPanel.add(tensorSection)
 
-        // --- Flatten label ---
+        // Flatten label
         mainPanel.add(flattenLabel, "gaptop 5, gapbottom 5")
 
-        // --- Dense layers section ---
+        // Dense layers section
         val denseSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
             border = BorderFactory.createTitledBorder("Dense Layers")
         }
@@ -143,7 +143,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         denseSection.add(denseButtonPanel)
         mainPanel.add(denseSection)
 
-        // --- Output section ---
+        // Output section
         val outputPanel = JPanel(MigLayout("ins 0", "[][]"))
         outputPanel.add(JLabel("Output Neurons:"))
         outputPanel.add(outputNeuronsField)
@@ -172,7 +172,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         }
     }
 
-    // --- Tensor layer management ---
+    // Tensor layer management
 
     private fun addTensorLayer(spec: LayerSpec) {
         tensorLayers.add(spec)
@@ -213,7 +213,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         }
     }
 
-    // --- Dense layer management ---
+    // Dense layer management
 
     private fun addDenseLayer(spec: DenseLayerSpec) {
         denseLayers.add(spec)

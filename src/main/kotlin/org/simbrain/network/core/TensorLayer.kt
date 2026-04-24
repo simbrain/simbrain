@@ -160,14 +160,14 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
 
     override val name: String get() = displayName
 
-    // --- Indexed access ---
+    // Indexed access
 
     operator fun get(h: Int, w: Int, c: Int): Double = activations[shape.index(h, w, c)]
     operator fun set(h: Int, w: Int, c: Int, value: Double) {
         activations[shape.index(h, w, c)] = value
     }
 
-    // --- Producible / Consumable for coupling ---
+    // Producible / Consumable for coupling
 
     @get:Producible(description = "Activation array")
     val activationArray: DoubleArray get() = activations
@@ -209,7 +209,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
         }
     }
 
-    // --- Per-channel coupling containers ---
+    // Per-channel coupling containers
 
     @Transient
     val channelContainers: List<ChannelContainer> = List(shape.channels) { ChannelContainer(it) }
@@ -240,7 +240,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
         }
     }
 
-    // --- Connector management ---
+    // Connector management
 
     fun addIncomingConnector(connector: TensorConnector) {
         incomingTensorConnectors.add(connector)
@@ -266,7 +266,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
         outgoingFlattenConnectors.remove(connector)
     }
 
-    // --- Update ---
+    // Update
 
     context(Network)
     override fun accumulateInputs() {

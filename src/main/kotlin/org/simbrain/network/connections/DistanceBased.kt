@@ -263,10 +263,10 @@ private fun getDecayForPolarity(
     }
 }
 
-// Adapter functions for migrating from deprecated connection strategies.
+// Adapter functions for migrating from deprecated connection strategies
 
-// Default constants for polarity-based connection probabilities.
-// These were originally defined in RadialGaussian and are preserved for compatibility.
+// Default constants for polarity-based connection probabilities
+// These were originally defined in RadialGaussian and are preserved for compatibility
 
 /** Default connection probability multiplier for Excitatory → Excitatory connections */
 const val DEFAULT_EE_CONST = 0.2

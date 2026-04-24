@@ -147,6 +147,8 @@ object ConvOps {
         }
     }
 
+    // Backward functions for backpropagation
+
     /**
      * Backward pass for conv2d: computes gradient w.r.t. input.
      * For each output gradient element, distributes it back to the input positions

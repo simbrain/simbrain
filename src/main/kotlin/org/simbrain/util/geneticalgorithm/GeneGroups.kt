@@ -8,7 +8,7 @@ import kotlin.random.Random
 import kotlin.reflect.KProperty
 import kotlin.reflect.KProperty0
 
-// --- Gene group types ---
+// Gene group types
 
 interface GeneGroup {
     /**
@@ -133,13 +133,13 @@ class ConnectionGeneGroup(
     override fun copy() = ConnectionGeneGroup(chromosome.copy())
 }
 
-// --- Property delegation ---
+// Property delegation
 
 class GeneGroupDelegate<S : GeneGroup>(var group: S) : ReadOnlyProperty<Any?, S> {
     override fun getValue(thisRef: Any?, property: KProperty<*>): S = group
 }
 
-// --- Genotype ---
+// Genotype
 
 /**
  * Base class for genotypes using the gene group DSL.
@@ -169,7 +169,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
     // Linkages: gene group name → list of collection-level linked gene group names
     private val collectionLinkedGroups = mutableMapOf<String, MutableList<String>>()
 
-    // -- Gene group creation --
+    // Gene group creation
 
     protected fun nodeChromosome(
         size: Int,
@@ -189,7 +189,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
         }
     }
 
-    // --- Linked chromosome helpers ---
+    // Linked chromosome helpers
 
     protected fun neuronRuleChromosome(
         target: KProperty0<NodeGeneGroup>,
@@ -268,7 +268,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
         }
     }
 
-    // --- Gene addition (auto-adds to linked chromosomes) ---
+    // Gene addition (auto-adds to linked chromosomes)
 
     fun NodeGeneGroup.addGene(gene: NodeGene) {
         chromosome.add(gene)
@@ -302,7 +302,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
         }
     }
 
-    // --- Auto-copy ---
+    // Auto-copy
 
     abstract fun createNew(seed: Long): Genotype
 
@@ -323,7 +323,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
         return new
     }
 
-    // --- Expression with linked chromosome resolution ---
+    // Expression with linked chromosome resolution
 
     private fun resolveLinked(slotName: String): List<LinkedGeneGroup<*>> {
         val names = linkedGroups[slotName] ?: return emptyList()

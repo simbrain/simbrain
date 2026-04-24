@@ -29,6 +29,8 @@ val testSim = newSim {
 
     workspace.clearWorkspace()
 
+    // Network construction
+
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
 
@@ -80,6 +82,8 @@ val testSim = newSim {
             height = 400
         }
     }
+
+    // Build 2d World
 
     val odorWorldComponent = addOdorWorldComponent("Test")
     val odorWorld = odorWorldComponent.world
@@ -139,6 +143,8 @@ val testSim = newSim {
         }
     }
 
+    // Make Couplings
+
     with(couplingManager) {
         straightNeuron couple straightMovement
         leftNeuron couple turnLeft
@@ -175,8 +181,7 @@ val testSim = newSim {
 
 
     // TODO: For reservoir
-    // Train network.
-    //
+    // Train network
     // val initialLearning = networkUpdateAction("Learning") {
     //     neuronList1.forEach { n -> n.randomizeBias(0.0, 1.0) }
     //     region1_to_2_weights.forEach { w -> w.strength += .1 * Math.random() }

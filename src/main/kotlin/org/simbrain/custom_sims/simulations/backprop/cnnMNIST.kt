@@ -26,7 +26,7 @@ val cnnMNIST = newSim {
     val networkComponent = addNetworkComponent("CNN MNIST")
     val network = networkComponent.network
 
-    // --- Load data ---
+    // Load data
 
     val trainInputsCSV =
         fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv") ?: return@newSim
@@ -50,7 +50,7 @@ val cnnMNIST = newSim {
         targetSize = 10,
     )
 
-    // --- Build CNN Pipeline ---
+    // Build CNN Pipeline
 
     // Compact U-shaped layout coordinates
     val leftX = 0.0
@@ -119,7 +119,7 @@ val cnnMNIST = newSim {
     outputArray.setLocation(rightX, topY)
     val dense = WeightMatrix(flatArray, outputArray)
 
-    // --- Create ConvolutionalNeuralNetwork ---
+    // Create ConvolutionalNeuralNetwork
 
     val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
         label = "CNN MNIST"
@@ -139,7 +139,7 @@ val cnnMNIST = newSim {
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
     inputTensorLayer.activations = trainingSet.inputs[randomSampleIndex].toDoubleArray()
     
-    // --- GUI ---
+    // GUI
 
     place(networkComponent, 0, 0, 600, 800)
     workspace.simpleIterate()

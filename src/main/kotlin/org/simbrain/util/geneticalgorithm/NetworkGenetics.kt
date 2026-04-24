@@ -24,9 +24,7 @@ import kotlin.reflect.full.createInstance
 
 class NodeGene(override val template: Neuron) : Gene<Network, Neuron>() {
 
-    private val _expressedNeuron = CompletableDeferred<Neuron>()
-
-    val expressedNeuron by this::_expressedNeuron
+    val expressedNeuron = CompletableDeferred<Neuron>()
 
     private val listeners = mutableListOf<(NodeGene) -> Unit>()
     fun onCopied(block: (NodeGene) -> Unit) {
@@ -60,10 +58,15 @@ class ConnectionGene(override val template: Synapse, val source: NodeGene, val t
     }
 
     override suspend fun express(context: Network) =
-        with(withTimeout(1000) { source.expressedNeuron.await() } to withTimeout(1000) { target.expressedNeuron.await() }) {
+        with(withTimeout(EXPRESSION_TIMEOUT_MS) { source.expressedNeuron.await() } to withTimeout(EXPRESSION_TIMEOUT_MS) { target.expressedNeuron.await() }) {
             val (source, target) = this
             Synapse(source, target, template).also { context.addNetworkModelAsync(it) }
         }
+
+    companion object {
+        /** Safety net: if the source/target node genes are never expressed, fail fast instead of hanging. */
+        private const val EXPRESSION_TIMEOUT_MS = 1000L
+    }
 
     override fun copy(): ConnectionGene {
         return ConnectionGene(Synapse(source.template, target.template, template), copiedSource, copiedTarget)
@@ -104,9 +107,7 @@ class SynapseRuleGeneWrapper(var learningRule: SynapseUpdateRule<*, *>) {
 
 class LayoutGene(override val template: LayoutGeneWrapper) : Gene<Unit, LayoutGeneWrapper>() {
 
-    private val _expressedLayout = CompletableDeferred<LayoutGeneWrapper>()
-
-    val expressedLayout by this::_expressedLayout
+    val expressedLayout = CompletableDeferred<LayoutGeneWrapper>()
 
     override suspend fun express(context: Unit) = template.copy().also {
         expressedLayout.complete(it)
@@ -120,9 +121,7 @@ class LayoutGene(override val template: LayoutGeneWrapper) : Gene<Unit, LayoutGe
 
 class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrapper) : Gene<Unit, ConnectionStrategyGeneWrapper>() {
 
-    private val _expressedConnectionStrategy = CompletableDeferred<ConnectionStrategyGeneWrapper>()
-
-    val expressedConnectionStrategy by this::_expressedConnectionStrategy
+    val expressedConnectionStrategy = CompletableDeferred<ConnectionStrategyGeneWrapper>()
 
     override suspend fun express(context: Unit) = template.copy().also {
         expressedConnectionStrategy.complete(it)
@@ -136,9 +135,7 @@ class ConnectionStrategyGene(override val template: ConnectionStrategyGeneWrappe
 
 class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : Gene<Unit, NeuronRuleGeneWrapper>() {
 
-    private val _expressedNeuronRule = CompletableDeferred<NeuronRuleGeneWrapper>()
-
-    val expressedNeuronRule by this::_expressedNeuronRule
+    val expressedNeuronRule = CompletableDeferred<NeuronRuleGeneWrapper>()
 
     override suspend fun express(context: Unit) = template.copy().also {
         expressedNeuronRule.complete(it)
@@ -152,9 +149,7 @@ class NeuronRuleGene(override val template: NeuronRuleGeneWrapper) : Gene<Unit, 
 
 class SynapseRuleGene(override val template: SynapseRuleGeneWrapper) : Gene<Unit, SynapseRuleGeneWrapper>() {
 
-    private val _expressedSynapseRule = CompletableDeferred<SynapseRuleGeneWrapper>()
-
-    val expressedSynapseRule by this::_expressedSynapseRule
+    val expressedSynapseRule = CompletableDeferred<SynapseRuleGeneWrapper>()
 
     override suspend fun express(context: Unit) = template.copy().also {
         expressedSynapseRule.complete(it)
@@ -196,7 +191,6 @@ fun LayoutGene.mutateType() = mutate {
     when (random.nextDouble()) {
         in 0.0..0.5 -> layoutType = GridLayout()
         in 0.5..1.0 -> layoutType = HexagonalGridLayout()
-        // in 0.1..0.15 -> layout = LineLayout()
     }
 }
 
@@ -267,7 +261,6 @@ fun NeuronRuleGene.mutateParam(
             }
         }
 
-        // TODO: More cases
         when (this) {
             is LinearRule -> {
                 changeParam{clippingType = LinearRule.ClippingType.entries.sampleOne()}

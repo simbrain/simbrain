@@ -96,9 +96,9 @@ val grazingCows = newSim { optionString ->
 
         override fun createNew(seed: Long) = CowGroupGenotype(seed, cows.size)
 
-        override fun copyGenotype() = CowGroupGenotype(
+        override fun copy() = CowGroupGenotype(
             random.nextLong(),
-            cows.map { it.copyGenotype() as CowGenotype }
+            cows.map { it.copy() as CowGenotype }
         )
     }
 

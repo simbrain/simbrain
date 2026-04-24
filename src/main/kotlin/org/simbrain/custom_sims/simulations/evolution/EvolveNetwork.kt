@@ -253,7 +253,7 @@ val evolveNetwork = newSim {
                 workspace.removeAllComponents()
                 propertyEditor.commitChanges()
                 println(networkParams.allPropertiesToString())
-                val runner = EvolutionRunner(evaluatorParams) { EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
+                val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveNetworkSim(EvolveNetworkGenotype(seed = seed)) }
                 val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
                 genomeDisplay.bind(runner)
                 val history = ExpressionHistory()

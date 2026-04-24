@@ -81,7 +81,7 @@ class EvolutionControlPanel(val evaluatorParams: EvaluatorParams) {
         }
         runner.events.generationUpdated.on { state ->
             val metricName = evaluatorParams.stoppingCondition.name
-            val value = state.nthPercentileFitness(evaluatorParams.evalutationPercentile)
+            val value = state.nthPercentileFitness(evaluatorParams.evaluationPercentile)
             pw.text = "$metricName: ${value.format(4)}"
             pw.value = state.generation
         }

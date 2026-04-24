@@ -22,18 +22,18 @@ import kotlin.reflect.KProperty1
  */
 
 /**
- * A column shown on each gene card in the display.
+ * A field shown on each gene card in the display.
  */
-sealed class GeneColumn<G>(val label: String) {
+sealed class GeneField<G>(val label: String) {
 
     abstract fun getValue(gene: G): String
 }
 
-private class TemplateColumn<G : Gene<*, T>, T>(
+private class TemplateField<G : Gene<*, T>, T>(
     label: String,
     val extractor: (G) -> Any?,
     val precision: Int?
-) : GeneColumn<G>(label) {
+) : GeneField<G>(label) {
     override fun getValue(gene: G): String {
         val raw = extractor(gene)
         if (raw is Double && precision != null) return raw.format(precision)
@@ -42,59 +42,59 @@ private class TemplateColumn<G : Gene<*, T>, T>(
     }
 }
 
-private class FormattedColumn<G>(label: String, val formatter: (G) -> Any?) : GeneColumn<G>(label) {
+private class FormattedField<G>(label: String, val formatter: (G) -> Any?) : GeneField<G>(label) {
     override fun getValue(gene: G) = formatter(gene)?.toString() ?: ""
 }
 
 /**
- * Builds the columns for a displayed gene group.
+ * Builds the fields shown on each gene card in a section.
  *
  * Use [template] to show a template property, [formatted] for custom text,
- * `+` to add a column, and `-` to remove a default template column.
+ * `+` to add a field, and `-` to remove a default template field.
  */
-class GeneColumnConfig<G : Gene<*, T>, T> internal constructor(
-    private val defaultColumns: List<GeneColumn<G>> = emptyList(),
+class GeneCardConfig<G : Gene<*, T>, T> internal constructor(
+    private val defaultFields: List<GeneField<G>> = emptyList(),
     private val defaultPrecision: Int
 ) {
-    private val headers = mutableListOf<GeneColumn<G>>()
-    private val added = mutableListOf<GeneColumn<G>>()
+    private val headers = mutableListOf<GeneField<G>>()
+    private val added = mutableListOf<GeneField<G>>()
     private val removed = mutableSetOf<String>()
 
     /**
-     * Create a column from a property on the gene template.
+     * Create a field from a property on the gene template.
      */
-    fun <V> template(prop: KProperty1<T, V>, precision: Int? = null): GeneColumn<G> =
-        TemplateColumn(prop.name, { prop.get(it.template) }, precision ?: defaultPrecision)
+    fun <V> template(prop: KProperty1<T, V>, precision: Int? = null): GeneField<G> =
+        TemplateField(prop.name, { prop.get(it.template) }, precision ?: defaultPrecision)
 
     /**
-     * Create a column whose value is computed from the gene.
+     * Create a field whose value is computed from the gene.
      */
-    fun formatted(label: String, block: (G) -> Any?): GeneColumn<G> =
-        FormattedColumn(label, block)
+    fun formatted(label: String, block: (G) -> Any?): GeneField<G> =
+        FormattedField(label, block)
 
     /**
-     * Add a column to the front of the card, before default columns.
+     * Add a field to the front of the card, before default fields.
      */
-    fun header(column: GeneColumn<G>) {
-        headers.add(column)
+    fun header(field: GeneField<G>) {
+        headers.add(field)
     }
 
     /**
-     * Add this column to the display.
+     * Add this field to the display.
      */
-    operator fun GeneColumn<G>.unaryPlus() {
+    operator fun GeneField<G>.unaryPlus() {
         added.add(this)
     }
 
     /**
-     * Remove a default template column by property name.
+     * Remove a default template field by property name.
      */
     operator fun KProperty1<T, *>.unaryMinus() {
         removed.add(this.name)
     }
 
-    internal fun resolve(): List<GeneColumn<G>> {
-        val defaults = defaultColumns.filter { it.label !in removed }
+    internal fun resolve(): List<GeneField<G>> {
+        val defaults = defaultFields.filter { it.label !in removed }
         return headers + defaults + added
     }
 }
@@ -106,7 +106,7 @@ class ChromosomeDisplaySection<G : Gene<*, *>>(
     val label: String,
     val typeName: String,
     val genes: List<G>,
-    val columns: List<GeneColumn<G>>
+    val fields: List<GeneField<G>>
 )
 
 /**
@@ -123,17 +123,17 @@ class GeneDisplayBuilder(
     /**
      * Display a group of node genes.
      *
-     * By default this includes a `bias` column unless [noDefaults] is true.
+     * By default this includes a `bias` field unless [noDefaults] is true.
      */
     fun display(
         slot: NodeGeneGroup,
         noDefaults: Boolean = false,
-        block: GeneColumnConfig<NodeGene, Neuron>.() -> Unit = {}
+        block: GeneCardConfig<NodeGene, Neuron>.() -> Unit = {}
     ) {
         val defaults = if (noDefaults) emptyList()
-            else listOf(TemplateColumn<NodeGene, Neuron>("bias", { it.template.bias }, defaultPrecision))
-        val config = GeneColumnConfig<NodeGene, Neuron>(
-            defaultColumns = defaults,
+            else listOf(TemplateField<NodeGene, Neuron>("bias", { it.template.bias }, defaultPrecision))
+        val config = GeneCardConfig<NodeGene, Neuron>(
+            defaultFields = defaults,
             defaultPrecision = defaultPrecision
         )
         config.block()
@@ -144,17 +144,17 @@ class GeneDisplayBuilder(
     /**
      * Display a group of connection genes.
      *
-     * By default this includes a `strength` column unless [noDefaults] is true.
+     * By default this includes a `strength` field unless [noDefaults] is true.
      */
     fun display(
         slot: ConnectionGeneGroup,
         noDefaults: Boolean = false,
-        block: GeneColumnConfig<ConnectionGene, Synapse>.() -> Unit = {}
+        block: GeneCardConfig<ConnectionGene, Synapse>.() -> Unit = {}
     ) {
         val defaults = if (noDefaults) emptyList()
-            else listOf(TemplateColumn<ConnectionGene, Synapse>("strength", { it.template.strength }, defaultPrecision))
-        val config = GeneColumnConfig<ConnectionGene, Synapse>(
-            defaultColumns = defaults,
+            else listOf(TemplateField<ConnectionGene, Synapse>("strength", { it.template.strength }, defaultPrecision))
+        val config = GeneCardConfig<ConnectionGene, Synapse>(
+            defaultFields = defaults,
             defaultPrecision = defaultPrecision
         )
         config.block()
@@ -167,9 +167,9 @@ class GeneDisplayBuilder(
      */
     fun <G : Gene<Unit, T>, T> display(
         slot: LinkedGeneGroup<G>,
-        block: GeneColumnConfig<G, T>.() -> Unit = {}
+        block: GeneCardConfig<G, T>.() -> Unit = {}
     ) {
-        val config = GeneColumnConfig<G, T>(defaultPrecision = defaultPrecision)
+        val config = GeneCardConfig<G, T>(defaultPrecision = defaultPrecision)
         config.block()
         val name = findGroupName(slot) ?: "linked"
         sections.add(ChromosomeDisplaySection(name, "LinkedChromosome", slot.genes, config.resolve()))
@@ -180,9 +180,9 @@ class GeneDisplayBuilder(
      */
     fun <G : Gene<Unit, T>, T> display(
         slot: CollectionGeneGroup<G>,
-        block: GeneColumnConfig<G, T>.() -> Unit = {}
+        block: GeneCardConfig<G, T>.() -> Unit = {}
     ) {
-        val config = GeneColumnConfig<G, T>(defaultPrecision = defaultPrecision)
+        val config = GeneCardConfig<G, T>(defaultPrecision = defaultPrecision)
         config.block()
         val name = findGroupName(slot) ?: "collection"
         sections.add(ChromosomeDisplaySection(name, "CollectionLinked", listOf(slot.gene), config.resolve()))
@@ -352,13 +352,13 @@ class GeneDisplayPanel(
 
     @Suppress("UNCHECKED_CAST")
     private fun <G : Gene<*, *>> buildCardsPanel(section: ChromosomeDisplaySection<G>): JPanel {
-        val columns = section.columns as List<GeneColumn<G>>
+        val fields = section.fields as List<GeneField<G>>
 
         val panel = JPanel(FlowLayout(FlowLayout.LEFT, 3, 0)).apply {
             isOpaque = false
         }
 
-        if (section.genes.isEmpty() || columns.isEmpty()) {
+        if (section.genes.isEmpty() || fields.isEmpty()) {
             panel.add(JLabel("(empty)").apply {
                 font = LABEL_FONT
                 foreground = LABEL_COLOR
@@ -367,13 +367,13 @@ class GeneDisplayPanel(
         }
 
         for (gene in section.genes) {
-            panel.add(buildCard(gene, columns))
+            panel.add(buildCard(gene, fields))
         }
 
         return panel
     }
 
-    private fun <G : Gene<*, *>> buildCard(gene: G, columns: List<GeneColumn<G>>): JPanel {
+    private fun <G : Gene<*, *>> buildCard(gene: G, fields: List<GeneField<G>>): JPanel {
         val card = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             border = CompoundBorder(
@@ -383,10 +383,10 @@ class GeneDisplayPanel(
             isOpaque = false
         }
 
-        for (col in columns) {
-            val value = col.getValue(gene)
+        for (field in fields) {
+            val value = field.getValue(gene)
             val line = JPanel(FlowLayout(FlowLayout.LEFT, 3, 0)).apply { isOpaque = false }
-            line.add(JLabel(col.label).apply {
+            line.add(JLabel(field.label).apply {
                 font = LABEL_FONT
                 foreground = LABEL_COLOR
             })

@@ -502,8 +502,8 @@ val evolveMousePursuer = newSim { optionString ->
         evaluatorParams.iterationsPerRun = options.optInt("iterationsPerRun", evaluatorParams.iterationsPerRun)
         evaluatorParams.maxGenerations = options.optInt("maxGenerations", evaluatorParams.maxGenerations)
         evaluatorParams.targetMetric = options.optDouble("targetMetric", evaluatorParams.targetMetric)
-        evaluatorParams.evalutationPercentile =
-            options.optInt("evaluationPercentile", evaluatorParams.evalutationPercentile)
+        evaluatorParams.evaluationPercentile =
+            options.optInt("evaluationPercentile", evaluatorParams.evaluationPercentile)
         evaluatorParams.seed = options.optInt("seed", evaluatorParams.seed)
 
         mouseParams.useEnergyModel = options.optBoolean("useEnergyModel", mouseParams.useEnergyModel)

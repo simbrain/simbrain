@@ -118,7 +118,7 @@ class GenotypeTest {
     fun `copyGenotype creates independent copy`() {
         val original = BasicGenotype(42)
         original.mutate()
-        val copy = original.copyGenotype() as BasicGenotype
+        val copy = original.copy() as BasicGenotype
 
         assertEquals(original.hidden.genes.size, copy.hidden.genes.size)
         assertEquals(original.connections.genes.size, copy.connections.genes.size)
@@ -131,7 +131,7 @@ class GenotypeTest {
     @Test
     fun `copied connections reference copied nodes`() = runBlocking {
         val original = BasicGenotype(42)
-        val copy = original.copyGenotype() as BasicGenotype
+        val copy = original.copy() as BasicGenotype
 
         val net1 = Network()
         val net2 = Network()
@@ -227,7 +227,7 @@ class GenotypeTest {
     fun `copy preserves linked chromosomes`() {
         val genotype = LinkedRuleGenotype(42)
         genotype.addHiddenGene(nodeGene())
-        val copy = genotype.copyGenotype() as LinkedRuleGenotype
+        val copy = genotype.copy() as LinkedRuleGenotype
 
         assertEquals(genotype.hiddenRules.genes.size, copy.hiddenRules.genes.size)
         assertEquals(genotype.connectionRules.genes.size, copy.connectionRules.genes.size)
@@ -236,7 +236,7 @@ class GenotypeTest {
     @Test
     fun `copied linked chromosomes are independent`() {
         val original = LinkedRuleGenotype(42)
-        val copy = original.copyGenotype() as LinkedRuleGenotype
+        val copy = original.copy() as LinkedRuleGenotype
 
         copy.addHiddenGene(nodeGene())
         assertNotEquals(original.hiddenRules.genes.size, copy.hiddenRules.genes.size)
@@ -245,7 +245,7 @@ class GenotypeTest {
     @Test
     fun `mutating linked genes on copy does not affect original`() {
         val original = LinkedRuleGenotype(42)
-        val copy = original.copyGenotype() as LinkedRuleGenotype
+        val copy = original.copy() as LinkedRuleGenotype
 
         val originalRule = original.hiddenRules.genes[0].template.updateRule
         copy.mutate()

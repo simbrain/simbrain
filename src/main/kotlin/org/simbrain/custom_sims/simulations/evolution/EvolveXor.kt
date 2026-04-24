@@ -156,7 +156,7 @@ val evolveXor = newSim {
 
             val activeSession = session ?: run {
                 workspace.removeAllComponents()
-                val runner = EvolutionRunner(evaluatorParams) { XorSim(XorGenotype(seed = seed)) }
+                val runner = EvolutionRunner(evaluatorParams) { seed -> XorSim(XorGenotype(seed = seed)) }
                 val genomeDisplay = geneDisplayPanel(displayBlock = ::displayBlock)
                 genomeDisplay.bind(runner)
                 val history = ExpressionHistory()

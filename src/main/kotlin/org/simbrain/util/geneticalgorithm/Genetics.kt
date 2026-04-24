@@ -29,8 +29,7 @@ package org.simbrain.util.geneticalgorithm
  * See also:
  * - [chromosome], sampling helpers, and `express(...)` helpers in [GeneticsUtils.kt][org.simbrain.util.geneticalgorithm.chromosome]
  * - network-specific genes such as `nodeGene` and `connectionGene` in `NetworkGenetics.kt`
- * - [EvolveXor.kt][/Users/jyoshimi/gitstuff/simbrainmain/simbrain/src/main/kotlin/org/simbrain/custom_sims/simulations/evolution/EvolveXor.kt]
- *   for a compact end-to-end example
+ * - `EvolveXor.kt` for a compact end-to-end example
  */
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
@@ -150,12 +149,12 @@ abstract class EvoSim<G : Genotype>(
 
     /** Return a copy of this sim with a copied genotype, a fresh workspace, and no [metadata]. */
     @Suppress("UNCHECKED_CAST")
-    fun copy(): EvoSim<*> = create(genotype.copyGenotype() as G, Workspace(), null)
+    fun copy(): EvoSim<*> = create(genotype.copy() as G, Workspace(), null)
 
     /** Copy this sim into a provided [workspace], optionally annotated with [metadata]. This is done when the evosim is displayed in the "main" workspace. */
     @Suppress("UNCHECKED_CAST")
     fun createDisplayCopy(workspace: Workspace, metadata: SimMetadata? = null): EvoSim<*> =
-        create(genotype.copyGenotype() as G, workspace, metadata)
+        create(genotype.copy() as G, workspace, metadata)
 }
 
 /**
@@ -178,8 +177,6 @@ class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayLis
     operator fun plus(other: Chromosome<P, G>) = Chromosome(buildList { addAll(this@Chromosome); addAll(other); })
 }
 
-data class PopulatingFunctionParams(val seed: Long)
-
 class EvolutionEvents : Events() {
     val beginEvolution = NoArgEvent()
     val endEvolution = NoArgEvent()
@@ -197,7 +194,7 @@ class EvolutionEvents : Events() {
  *
  * Usage:
  * ```
- * val runner = EvolutionRunner(evaluatorParams) { MySim(seed = seed) }
+ * val runner = EvolutionRunner(evaluatorParams) { seed -> MySim(seed = seed) }
  * runner.events.generationUpdated.on { state -> updateDisplay(state) }
  * runner.startEvolving()   // continuous
  * runner.stopEvolving()    // pause
@@ -206,7 +203,7 @@ class EvolutionEvents : Events() {
  * ```
  */
 class EvolutionRunner(
-    val populatingFunction: PopulatingFunctionParams.() -> EvoSim<*>,
+    val populatingFunction: (seed: Long) -> EvoSim<*>,
     val populationSize: Int,
     val eliminationRatio: Double,
     val stoppingFunction: GenerationState.() -> Boolean,
@@ -219,14 +216,14 @@ class EvolutionRunner(
 
     constructor(
         evaluatorParams: EvaluatorParams,
-        populatingFunction: PopulatingFunctionParams.() -> EvoSim<*>
+        populatingFunction: (seed: Long) -> EvoSim<*>
     ) : this(
         populatingFunction = populatingFunction,
         populationSize = evaluatorParams.populationSize,
         eliminationRatio = evaluatorParams.eliminationRatio,
         stoppingFunction = {
             evaluatorParams.stoppingCondition.shouldStop(
-                nthPercentileFitness(evaluatorParams.evalutationPercentile),
+                nthPercentileFitness(evaluatorParams.evaluationPercentile),
                 evaluatorParams.targetMetric
             ) || generation > evaluatorParams.maxGenerations
         },
@@ -296,8 +293,7 @@ class EvolutionRunner(
             random = Random(seed)
             generation = 0
             nextId = 0
-            val params = PopulatingFunctionParams(seed)
-            population = List(populationSize) { populatingFunction(params) }
+            population = List(populationSize) { populatingFunction(seed) }
             metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
             initialized = true
         }
@@ -379,7 +375,7 @@ class EvaluatorParams(
     var populationSize by GuiEditable(
         initValue = populationSize,
         description = "Number of simulations spawned per generation",
-        min = 0,
+        min = 1,
         order = 0
     )
 
@@ -417,7 +413,7 @@ class EvaluatorParams(
         order = 50
     )
 
-    var evalutationPercentile by GuiEditable(
+    var evaluationPercentile by GuiEditable(
         initValue = evaluationPercentile,
         label = "Evaluation percentile",
         description = "When deciding whether to stop the simulation, consider current ${stoppingCondition.name.lowercase()} in this percentile of the population",

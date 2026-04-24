@@ -154,7 +154,7 @@ class GeneGroupDelegate<S : GeneGroup>(var group: S) : ReadOnlyProperty<Any?, S>
  * ```
  *
  * The base class provides:
- * - Automatic [copyGenotype] with dependency-ordered gene group copying
+ * - Automatic [copy] with dependency-ordered gene group copying
  * - [expressAll] that expresses in dependency order with linked chromosome resolution
  * - [addGene]/[addConnection] that auto-adds to linked chromosomes
  */
@@ -308,7 +308,7 @@ abstract class Genotype(seed: Long = Random.nextLong()) {
 
     abstract fun mutate()
 
-    open fun copyGenotype(): Genotype {
+    open fun copy(): Genotype {
         val new = createNew(random.nextLong())
 
         fun replaceSlot(name: String, copied: GeneGroup) {

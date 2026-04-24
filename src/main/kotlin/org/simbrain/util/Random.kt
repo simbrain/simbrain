@@ -34,7 +34,7 @@ fun <T> List<T>.sampleWithReplacement(
     random: Random = Random(Random.nextLong())
 ) = sequence {
     while (true) {
-        yield(this@sampleWithReplacement[random.nextInt(lastIndex)])
+        yield(this@sampleWithReplacement[random.nextInt(size)])
     }
 }
 

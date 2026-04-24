@@ -400,7 +400,7 @@ val evolveResourcePursuer = newSim { optionString ->
     var session: EvolutionTrainerSession? = null
 
     suspend fun runHeadless() {
-        val runner = EvolutionRunner(evaluatorParams) { EvolveResourcePursuerSim(seed = seed) }
+        val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveResourcePursuerSim(seed = seed) }
         runner.events.endEvolution.on {
             runner.generationState?.let { state ->
                 with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
@@ -440,7 +440,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
             val activeSession = session ?: run {
                 workspace.removeAllComponents()
-                val runner = EvolutionRunner(evaluatorParams) { EvolveResourcePursuerSim(seed = seed) }
+                val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveResourcePursuerSim(seed = seed) }
                 val genomeDisplay = geneDisplayPanel(precision = 3, displayBlock = ::displayBlock)
                 genomeDisplay.bind(runner)
                 val history = ExpressionHistory()
@@ -652,7 +652,7 @@ val evolveResourcePursuer = newSim { optionString ->
         evaluatorParams.iterationsPerRun = options.optInt("iterationsPerRun", evaluatorParams.iterationsPerRun)
         evaluatorParams.populationSize = options.optInt("populationSize", evaluatorParams.populationSize)
         evaluatorParams.eliminationRatio = options.optDouble("eliminationRatio", evaluatorParams.eliminationRatio)
-        evaluatorParams.evalutationPercentile = options.optInt("evaluationPercentile", evaluatorParams.evalutationPercentile)
+        evaluatorParams.evaluationPercentile = options.optInt("evaluationPercentile", evaluatorParams.evaluationPercentile)
         evolutionParams.useLayoutGene = options.optBoolean("useLayoutGene", evolutionParams.useLayoutGene)
         evolutionParams.useLearningRuleGenes = options.optBoolean("useLearningRuleGenes", evolutionParams.useLearningRuleGenes)
         evolutionParams.useConnectionStrategyGene = options.optBoolean("useConnectionStrategyGene", evolutionParams.useConnectionStrategyGene)

@@ -116,7 +116,7 @@ class EvolutionTrainerControls(
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Generation:", generationLabel)
         val metricName = evaluatorParams.stoppingCondition.name
-        labelPanel.addItem("$metricName (${evaluatorParams.evalutationPercentile}th pct):", metricLabel)
+        labelPanel.addItem("$metricName (${evaluatorParams.evaluationPercentile}th pct):", metricLabel)
         runTools.add(labelPanel, "span")
 
         val plot = FitnessTimeSeries(runner, evaluatorParams)
@@ -133,7 +133,7 @@ class EvolutionTrainerControls(
 
         runner.events.generationUpdated.on(Dispatchers.Swing) { state ->
             generationLabel.text = state.generation.toString()
-            val value = state.nthPercentileFitness(evaluatorParams.evalutationPercentile)
+            val value = state.nthPercentileFitness(evaluatorParams.evaluationPercentile)
             metricLabel.text = value.format(4)
         }
     }
@@ -163,7 +163,7 @@ class FitnessTimeSeries(runner: EvolutionRunner, evaluatorParams: EvaluatorParam
         graphPanel.removeAllButtonsFromToolBar()
         add(graphPanel, "grow, push")
 
-        model.addTimeSeries("${evaluatorParams.evalutationPercentile}th pct")
+        model.addTimeSeries("${evaluatorParams.evaluationPercentile}th pct")
 
         val targetMarker = ValueMarker(evaluatorParams.targetMetric).apply {
             paint = Color.RED
@@ -192,7 +192,7 @@ class FitnessTimeSeries(runner: EvolutionRunner, evaluatorParams: EvaluatorParam
         graphPanel.addDomainMarker(maxGenMarker)
 
         runner.events.generationUpdated.on(Dispatchers.Swing) { state ->
-            val value = state.nthPercentileFitness(evaluatorParams.evalutationPercentile)
+            val value = state.nthPercentileFitness(evaluatorParams.evaluationPercentile)
             model.addData(0, state.generation.toDouble(), value)
             if (targetMarker.value != evaluatorParams.targetMetric) {
                 targetMarker.value = evaluatorParams.targetMetric

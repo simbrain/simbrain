@@ -74,17 +74,27 @@ val actorCritic = newSim {
         isShowSensorsAndEffectors = false
     }
     val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.Swiss)
+    val poison = world.addEntity(gridSize / 2, mouseHomeLocation, EntityType.Poison)
 
     fun resetMouse() {
         mouse.setLocation(mouseHomeLocation, mouseHomeLocation)
         mouse.heading = 90.0
     }
 
+    var cheeseReward = 1.0
+    var poisonReward = -1.0
+
     val cheeseSensor = ObjectSensor().apply {
         label = "Cheese sensor"
         decayFunction = StepDecayFunction()
         decayFunction.dispersion = gridSize / 2.0
-        // showDispersion = true
+        mouse.addSensor(this)
+    }
+
+    val poisonSensor = ObjectSensor(EntityType.Poison).apply {
+        label = "Poison sensor"
+        decayFunction = StepDecayFunction()
+        decayFunction.dispersion = gridSize / 2.0
         mouse.addSensor(this)
     }
 
@@ -141,7 +151,6 @@ val actorCritic = newSim {
     actorWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
 
     val gridCoupling = couplingManager.createCoupling(gridSensor, sensorNeurons)
-    val rewardCoupling = couplingManager.createCoupling(mouse.getSensor("Cheese sensor"), reward)
 
     // Time Series
     val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries("Reward, TD Error", seriesNames = listOf("Reward", "Value", "TD Error"))
@@ -246,7 +255,9 @@ val actorCritic = newSim {
     workspace.updater.updateManager.clear()
     workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
     workspace.updater.updateManager.addAction(UpdateCoupling(gridCoupling))
-    workspace.updater.updateManager.addAction(UpdateCoupling(rewardCoupling))
+    workspace.updater.updateManager.addAction(updateAction("Update Reward") {
+        reward.activation = cheeseSensor.currentValue * cheeseReward + poisonSensor.currentValue * poisonReward
+    })
     workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
     workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
         outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
@@ -292,11 +303,11 @@ val actorCritic = newSim {
     """
     # Actor Critic
 
-    This simulation models an agent that learns the location of rewarding stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning). Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it. It also learns to value the state it's in right before it gets the cheese, and will reinforce actions that lead to that state. In this way it slowly learns a path to the cheese. In the default case of a `5x5` world, after about `15` trials it should be able to do a pretty good job of finding the cheese. Once it learns this, you can move the cheese a little and observe it "looking" for the cheese in the location where it initially learned it to be.
+    This simulation models an agent that learns the location of rewarding and aversive stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning). Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it. When it encounters the poison it receives negative reward and learns to avoid it. It also learns to value states leading to reward and devalue states leading to punishment. In this way it slowly learns a path to the cheese while avoiding the poison. In the default case of a `5x5` world, after about `15` trials it should be able to do a pretty good job of finding the cheese. Once it learns this, you can move the cheese or poison and observe how it adapts. However you set up the cheese or poison (and you can also just delete one of them) it will build up a kind of map of the space into good and bad regions and move through the space in a predictable way.
     
     To get an immediate feel for the simulation, click the `Run` button.
     
-    The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to how much value they have. Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed.
+    The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to positive value (near rewards like cheese) and red proportional to negative value (near punishments like poison). Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed. Similarly, red regions form around the poison as the agent learns to avoid it.  
         
     A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how `reward`, `value`, and `TD error` unfold as the simulation runs.
        
@@ -322,7 +333,7 @@ val actorCritic = newSim {
     
     The following parameters can be used to control how the agent learns. The parameters are:
     
-    1) `Trials`: Determines how many trials the simulation will run before stopping. A trial ends when it reaches the cheese. 
+    1) `Trials`: Determines how many trials the simulation will run before stopping. A trial ends when the agent reaches the cheese. 
     2) `Discount Factor (gamma)`: Determines how "future oriented" the agent is. Range is from `0`-`1`.
         
         - A lower gamma makes the agent short-sighted; higher gamma leads to longer-term planning. With gamma near `1`, the agent learns to value chains of actions that lead to reward.
@@ -334,30 +345,27 @@ val actorCritic = newSim {
     
     4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions. Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
     
-    5) `Reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior; negative values create aversive learning and produce red tiles in the value overlay.
+    5) `Cheese Reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior.
+    
+    6) `Poison Reward`: The value received when the agent reaches the poison. Negative values create aversive learning and produce red tiles in the value overlay.
     
     ## Time Series
     
-    1) `Reward` (red time series): This increases when the agent is on top of the cheese.
-    2) `Value` (green time series): This increases when the agent expects a reward.
-    3) `TD Error` (blue time series): This is the signal mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them.
+    1) `Reward` (red time series): Positive when the agent is on the cheese, negative when on the poison.
+    2) `Value` (green time series): Increases when the agent expects reward, decreases when it expects punishment.
+    3) `TD Error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them.
     
     # What to Do
     
     First, click the `run` button in the control panel on the left side of the screen. You can also just click the main desktop run but it won't automatically reset the mouse location each time it gets cheese and run through the trials (The desktop run button can be useful to just see what it does when not reset: which is to learn to just stay near cheese and eat away!).
    
-    Observe the agent's actions. It should figure out how to reach the cheese at the end of the first set of trials. The green location coloring gives you a sense of how it builds up a map of which states are valuable
+    Observe the agent's actions. It should figure out how to reach the cheese while avoiding the poison at the end of the first set of trials. The green and red location coloring gives you a sense of how it builds up a map of which states are valuable (green) and which are aversive (red).
     
-    You can move the cheese around as you run trials, and see how it will follow old "trails" and build new ones. For example, after it learns to find the cheese in the upper left, you can pull the cheese
-    down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. 
-  You can make it learn to follow an arbitrary pattern to find the cheese.
-     
+    You can move the cheese or poison around as you run trials, and see how it will follow old "trails" and build new ones. For example, after it learns to find the cheese in the upper left, you can pull the cheese down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. You can make it learn to follow an arbitrary pattern to find the cheese.
     
-    You can also add additional cheese stimuli (just right click in odor world and select `add entity`. It's the default option). Then you can set up a little world.
-     
-    You can also change the reward value to something negative, and now it will start to avoid cheese and places where you have put cheese.
+    It's easy to delete, move, or add additional cheese and poison entities to create customized environments (right click in odor world and select `add entity`). Watch how the world gets populated with "good" (green) and "bad" (red) regions or trails as the agent learns. You can also easily delete cheeses or poisons. 
     
-    You can also study the time series plot to get a better sense of how reward, value and td error work together.  After it has learned where the cheese is, you can keep training it, but move where the cheese is. Observe how it perseverates on old locations.
+    You can also study the time series plot to get a better sense of how reward, value and td error work together. After the agent has learned, try moving the cheese or poison and observe how it perseverates on old locations before adapting.
      
     ## Experimenting With Parameter Values
     
@@ -406,7 +414,8 @@ val actorCritic = newSim {
             val tfGamma = addTextField("Discount (gamma)", "" + gamma)
             val tfAlpha = addTextField("Alpha", "" + alpha)
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
-            val tfReward = addTextField("Reward", "" + cheeseSensor.baseValue)
+            val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
+            val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)
@@ -417,7 +426,8 @@ val actorCritic = newSim {
                     gamma = tfGamma.text.toDouble()
                     alpha = tfAlpha.text.toDouble()
                     epsilon = tfEpsilon.text.toDouble()
-                    cheeseSensor.baseValue = tfReward.text.toDouble()
+                    cheeseReward = tfCheeseReward.text.toDouble()
+                    poisonReward = tfPoisonReward.text.toDouble()
 
                     this@addButton.isEnabled = false
                     try {

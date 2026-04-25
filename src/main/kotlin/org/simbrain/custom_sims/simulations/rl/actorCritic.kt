@@ -137,7 +137,6 @@ val actorCritic = newSim {
 
     // Set up connections
     val valueWts: List<Synapse> = network.connectAllToAll(sensorNeurons, value, 0.0)
-    valueWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
     val actorWts: List<Synapse> = network.connectAllToAll(sensorNeurons, outputs, 0.0)
     actorWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
 
@@ -335,6 +334,8 @@ val actorCritic = newSim {
     
     4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions. Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
     
+    5) `Reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior; negative values create aversive learning and produce red tiles in the value overlay.
+    
     ## Time Series
     
     1) `Reward` (red time series): This increases when the agent is on top of the cheese.
@@ -343,15 +344,21 @@ val actorCritic = newSim {
     
     # What to Do
     
-    1) Click the `run` button in the control panel on the left side of the screen.
-    2) Observe the agent's actions. It should figure out how to reach the cheese at the end of the run.
-    3) Open the hidden time series plot that contains `reward`, `value`, and `TD error`.
-    4) Now, keep training the agent. As you continue to run trials, it will increase `value`, make `reward` more frequent, and reduce `TD Error`.     
-    5) After it has learned where the cheese is, you can keep training it, but move where the cheese is. Observe how it perseverates on old locations. 
-    6) After it learns to find the cheese in the upper left, you can pull the cheese
-    down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. 
-    You can eventually make it learn to follow an arbitrary pattern to find the cheese.
+    First, click the `run` button in the control panel on the left side of the screen. You can also just click the main desktop run but it won't automatically reset the mouse location each time it gets cheese and run through the trials (The desktop run button can be useful to just see what it does when not reset: which is to learn to just stay near cheese and eat away!).
+   
+    Observe the agent's actions. It should figure out how to reach the cheese at the end of the first set of trials. The green location coloring gives you a sense of how it builds up a map of which states are valuable
     
+    You can move the cheese around as you run trials, and see how it will follow old "trails" and build new ones. For example, after it learns to find the cheese in the upper left, you can pull the cheese
+    down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. 
+  You can make it learn to follow an arbitrary pattern to find the cheese.
+     
+    
+    You can also add additional cheese stimuli (just right click in odor world and select `add entity`. It's the default option). Then you can set up a little world.
+     
+    You can also change the reward value to something negative, and now it will start to avoid cheese and places where you have put cheese.
+    
+    You can also study the time series plot to get a better sense of how reward, value and td error work together.  After it has learned where the cheese is, you can keep training it, but move where the cheese is. Observe how it perseverates on old locations.
+     
     ## Experimenting With Parameter Values
     
     You can change the agent's learning behavior by changing the parameters of the simulation and then follow the steps above again to see the impacts of the changes on the simulation.
@@ -399,6 +406,7 @@ val actorCritic = newSim {
             val tfGamma = addTextField("Discount (gamma)", "" + gamma)
             val tfAlpha = addTextField("Alpha", "" + alpha)
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
+            val tfReward = addTextField("Reward", "" + cheeseSensor.baseValue)
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)
@@ -409,6 +417,7 @@ val actorCritic = newSim {
                     gamma = tfGamma.text.toDouble()
                     alpha = tfAlpha.text.toDouble()
                     epsilon = tfEpsilon.text.toDouble()
+                    cheeseSensor.baseValue = tfReward.text.toDouble()
 
                     this@addButton.isEnabled = false
                     try {

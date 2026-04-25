@@ -52,7 +52,6 @@ abstract class SensorWithRelativeLocation(
         order = 10
     )
     var baseValue = 1.0
-        protected set
 
     /**
      * Should the sensor node show a label on top.

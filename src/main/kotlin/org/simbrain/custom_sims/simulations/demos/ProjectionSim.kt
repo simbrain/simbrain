@@ -12,13 +12,12 @@ import org.simbrain.util.showNumericInputDialog
  */
 val recurrentNetArrayBased = newSim {
 
+    val numNeurons = showNumericInputDialog("Size of Neuron Array:", 100) ?:return@newSim
+
     // Basic setup
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network
-
-    // Add a self-connected neuron array to the network
-    val numNeurons = showNumericInputDialog("Size of Neuron Array:", 100) ?:return@newSim
     val neuronArray = NeuronArray(numNeurons)
     val weightMatrix = WeightMatrix(neuronArray, neuronArray)
     weightMatrix.randomize()

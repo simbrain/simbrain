@@ -262,6 +262,39 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 - Control panels should not include a title label or top separator — the panel title is set via `createControlPanel("Title", ...)` and shown in the window frame
 - Use `showMessageDialog(text, title)` from `org.simbrain.util` to display analysis results rather than printing to console or embedding text in the control panel
 
+## Custom Overlays
+
+Simulations can add custom graphics overlays to component canvases using Piccolo2D's `PNode`. This allows flexible visualization of simulation-specific data like learned weights, activation patterns, or annotations.
+
+**OdorWorld overlay example** (from `rl/actorCritic.kt`):
+```kotlin
+val overlay = object : PNode() {
+    override fun paint(paintContext: PPaintContext) {
+        val graphics = paintContext.graphics
+        // Custom drawing code using graphics
+    }
+}.apply {
+    pickable = false
+    setBounds(0.0, 0.0, world.width, world.height)
+}
+
+withGui {
+    (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).apply {
+        worldPanel.canvas.layer.addChild(world.tileMap.layers.size, overlay)
+    }
+}
+```
+
+**Network overlay** (similar pattern):
+```kotlin
+withGui {
+    val networkPanel = getNetworkPanel(networkComponent)
+    networkPanel.canvas.layer.addChild(overlay)
+}
+```
+
+The overlay's `paint` method is called each time the canvas repaints, allowing dynamic visualization that updates with the simulation.
+
 ## Tips
 
 **Image Worlds:** Album starts with blank canvas at index 0, delete if unwanted

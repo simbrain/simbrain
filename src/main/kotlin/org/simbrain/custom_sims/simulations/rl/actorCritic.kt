@@ -1,6 +1,8 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.launch
+import org.piccolo2d.PNode
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
@@ -15,9 +17,12 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.awt.BasicStroke
+import java.awt.Color
 import java.util.function.Consumer
 import javax.swing.JLabel
 import kotlin.math.cos
+import kotlin.math.max
 import kotlin.math.sin
 
 val actorCritic = newSim {
@@ -66,6 +71,7 @@ val actorCritic = newSim {
 
     val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.Mouse).apply {
         heading = 90.0
+        isShowSensorsAndEffectors = false
     }
     val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.Swiss)
 
@@ -130,10 +136,10 @@ val actorCritic = newSim {
     }
 
     // Set up connections
-    val wts: List<Synapse> = network.connectAllToAll(sensorNeurons, value, 0.0)
-    wts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
-    val wts2: List<Synapse> = network.connectAllToAll(sensorNeurons, outputs, 0.0)
-    wts2.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
+    val valueWts: List<Synapse> = network.connectAllToAll(sensorNeurons, value, 0.0)
+    valueWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
+    val actorWts: List<Synapse> = network.connectAllToAll(sensorNeurons, outputs, 0.0)
+    actorWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
 
     val gridCoupling = couplingManager.createCoupling(gridSensor, sensorNeurons)
     val rewardCoupling = couplingManager.createCoupling(mouse.getSensor("Cheese sensor"), reward)
@@ -150,6 +156,43 @@ val actorCritic = newSim {
     val rewardPlot = couplingManager.createCoupling(reward, rewardSeries)
     val valuePlot = couplingManager.createCoupling(value, valueSeries)
     val errorPlot = couplingManager.createCoupling(tdError, tdErrorSeries)
+
+    /**
+     * Draws a color overlay on tiles based on learned value weights. Green indicates positive value, red indicates negative, with alpha proportional to magnitude.
+     */
+    val valueOverlay = object : PNode() {
+        private val tileStroke = BasicStroke(1f)
+        private val borderColor = Color(255, 255, 255, 35)
+
+        override fun paint(paintContext: PPaintContext) {
+            val graphics = paintContext.graphics
+            val values = valueWts.map { it.strength }
+            if (values.isEmpty()) return
+
+            val maxMagnitude = max(values.maxOfOrNull { kotlin.math.abs(it) } ?: 0.0, 1e-9)
+
+            for (row in 0 until numTilesInADimension) {
+                for (col in 0 until numTilesInADimension) {
+                    val tileIndex = col + row * numTilesInADimension
+                    val normalizedValue = (values.getOrElse(tileIndex) { 0.0 } / maxMagnitude).coerceIn(-1.0, 1.0)
+                    val alpha = (140 * kotlin.math.abs(normalizedValue)).toInt().coerceIn(0, 255)
+                    graphics.color = if (normalizedValue >= 0) {
+                        Color(70, 185, 120, alpha)
+                    } else {
+                        Color(225, 110, 110, alpha)
+                    }
+                    graphics.fillRect(col * gridSize, row * gridSize, gridSize, gridSize)
+
+                    graphics.color = borderColor
+                    graphics.stroke = tileStroke
+                    graphics.drawRect(col * gridSize, row * gridSize, gridSize, gridSize)
+                }
+            }
+        }
+    }.apply {
+        pickable = false
+        setBounds(0.0, 0.0, world.width, world.height)
+    }
 
     // Network Update
     network.updateManager.clear()
@@ -252,9 +295,13 @@ val actorCritic = newSim {
 
     This simulation models an agent that learns the location of rewarding stimuli using [reinforcement learning](https://en.wikipedia.org/wiki/Reinforcement_learning). Each time you press `run` a simulation is run. The agent (the mouse) initially takes random actions. But when it finds the cheese it is rewarded, and it reinforces the action of moving towards the cheese next time it is near it. It also learns to value the state it's in right before it gets the cheese, and will reinforce actions that lead to that state. In this way it slowly learns a path to the cheese. In the default case of a `5x5` world, after about `15` trials it should be able to do a pretty good job of finding the cheese. Once it learns this, you can move the cheese a little and observe it "looking" for the cheese in the location where it initially learned it to be.
     
-    Tip: To get the simulation to run faster, minimize the network window.
+    To get an immediate feel for the simulation, click the `Run` button.
     
-    Tip: A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how `reward`, `value`, and `TD error` unfold as the simulation runs.
+    The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to how much value they have. Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed.
+        
+    A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how `reward`, `value`, and `TD error` unfold as the simulation runs.
+       
+    Tip: To get the simulation to run faster, minimize the network window or make the weights in the network invisible (network > view > toggle weight visibility)
        
     # Simulation Details
 
@@ -316,11 +363,11 @@ val actorCritic = newSim {
     
     # References
     
-    1) Sutton, R. S. (1995). [Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper_files/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html) _Neural Information Processing Systems_; MIT Press.
+    Doya, K. (2007). [Reinforcement learning: Computational theory and biological mechanisms.](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.
     
-    2) Tanaka, S. C., Schweighofer, N., Asahi, S., Shishida, K., Okamoto, Y., Yamawaki, S., & Doya, K. (2007). [Serotonin Differentially Regulates Short- and Long-Term Prediction of Rewards in the Ventral and Dorsal Striatum.](https://doi.org/10.1371/journal.pone.0001333) _PLoS ONE_, _2_(12), e1333.
+    Sutton, R. S. (1995). [Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper_files/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html) _Neural Information Processing Systems_. MIT Press.
     
-    3) Doya, K. (2007). [Reinforcement learning: Computational theory and biological mechanisms.](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.
+    Tanaka, S. C., Schweighofer, N., Asahi, S., Shishida, K., Okamoto, Y., Yamawaki, S., & Doya, K. (2007). [Serotonin Differentially Regulates Short- and Long-Term Prediction of Rewards in the Ventral and Dorsal Striatum.](https://doi.org/10.1371/journal.pone.0001333) _PLoS ONE_, _2_(12), e1333.
     
     # Credits
     
@@ -340,7 +387,10 @@ val actorCritic = newSim {
         place(networkComponent,240, 10, 520, 600)
         place(odorWorldComponent, 760, 10, 500, 500)
         place(plot, 760, 590, 520, 300)
-        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).zoomToFitSize(500, 500)
+        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).apply {
+            worldPanel.canvas.layer.addChild(world.tileMap.layers.size, valueOverlay)
+            zoomToFitSize(500, 500)
+        }
 
         // Control panel
         createControlPanel("RL Controls", 10, 10) {

@@ -19,6 +19,7 @@ import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.Graphics2D
 import java.util.function.Consumer
 import javax.swing.JLabel
 import kotlin.math.cos
@@ -165,6 +166,8 @@ val actorCritic = newSim {
     val valuePlot = couplingManager.createCoupling(value, valueSeries)
     val errorPlot = couplingManager.createCoupling(tdError, tdErrorSeries)
 
+    var showValues = false
+
     /**
      * Draws a color overlay on tiles based on learned value weights. Green indicates positive value, red indicates negative, with alpha proportional to magnitude.
      */
@@ -173,7 +176,7 @@ val actorCritic = newSim {
         private val borderColor = Color(255, 255, 255, 35)
 
         override fun paint(paintContext: PPaintContext) {
-            val graphics = paintContext.graphics
+            val graphics = paintContext.graphics as Graphics2D
             val values = valueWts.map { it.strength }
             if (values.isEmpty()) return
 
@@ -182,7 +185,8 @@ val actorCritic = newSim {
             for (row in 0 until numTilesInADimension) {
                 for (col in 0 until numTilesInADimension) {
                     val tileIndex = col + row * numTilesInADimension
-                    val normalizedValue = (values.getOrElse(tileIndex) { 0.0 } / maxMagnitude).coerceIn(-1.0, 1.0)
+                    val tileValue = values.getOrElse(tileIndex) { 0.0 }
+                    val normalizedValue = (tileValue / maxMagnitude).coerceIn(-1.0, 1.0)
                     val alpha = (140 * kotlin.math.abs(normalizedValue)).toInt().coerceIn(0, 255)
                     graphics.color = if (normalizedValue >= 0) {
                         Color(70, 185, 120, alpha)
@@ -195,6 +199,18 @@ val actorCritic = newSim {
                     graphics.stroke = tileStroke
                     graphics.drawRect(col * gridSize, row * gridSize, gridSize, gridSize)
                 }
+            }
+
+            if (showValues) {
+                graphics.drawNumericOverlay(
+                    data = values.toDoubleArray(),
+                    rows = numTilesInADimension,
+                    cols = numTilesInADimension,
+                    imageWidth = world.width,
+                    imageHeight = world.height,
+                    scalingFactor = 1.0,
+                    decimalPlaces = 2
+                )
             }
         }
     }.apply {
@@ -352,8 +368,8 @@ val actorCritic = newSim {
     ## Time Series
     
     1) `Reward` (red time series): Positive when the agent is on the cheese, negative when on the poison.
-    2) `Value` (green time series): Increases when the agent expects reward, decreases when it expects punishment.
-    3) `TD Error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them.
+    2) `Value` (green time series): Increases when the agent expects reward, decreases when it expects punishment. This basically tracks the color values on the world.
+    3) `TD Error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them. Updates happen for the location where the agent was at during the last time step. To get a feel for this, you can move the mouse directly from a neutral square to the cheese or poison, and update with the step button, and see that square turn green or red, reflecting the fact that being in that square led to something good or bad.
     
     # What to Do
     
@@ -365,7 +381,9 @@ val actorCritic = newSim {
     
     It's easy to delete, move, or add additional cheese and poison entities to create customized environments (right click in odor world and select `add entity`). Watch how the world gets populated with "good" (green) and "bad" (red) regions or trails as the agent learns. You can also easily delete cheeses or poisons. 
     
-    You can also study the time series plot to get a better sense of how reward, value and td error work together. After the agent has learned, try moving the cheese or poison and observe how it perseverates on old locations before adapting.
+    You can also study the time series plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place. 
+    
+    After the agent has learned, try moving the cheese or poison and observe how it perseverates on old locations before adapting.
      
     ## Experimenting With Parameter Values
     
@@ -373,8 +391,7 @@ val actorCritic = newSim {
     
     - By making epsilon higher, like `0.8`, it should move randomly. Then try making it low, or take it all the way to `0`. 
         At `0` it will follow the same path every time, reflecting what it's learned.
-    - Higher gamma encourages longer-term thinking. At `0` it only learns one step ahead, and it will never learn the full path. 
-        As it approaches 1 it thinks more and more long term and will learn the path, but as gamma is higher it takes longer to learn. 
+    - Higher gamma encourages longer-term thinking. At `0` it only learns one step ahead, and it will never learn the full path. As it approaches 1 it thinks more and more long term and will learn the path, but as gamma is higher it takes longer to learn. 
     
     # References
     
@@ -416,6 +433,10 @@ val actorCritic = newSim {
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
             val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
+            addCheckBox("Show Values", showValues) {
+                showValues = it
+                odorWorldComponent.world.events.updated.fire()
+            }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)
@@ -442,6 +463,7 @@ val actorCritic = newSim {
                             progressLabel.text = "Status: Running Trial $i of $numTrials"
                             goalAchieved = false
                             network.clearActivations()
+                            value.auxValue = 0.0
                             resetMouse()
 
                             workspace.iterateWhile {
@@ -465,6 +487,15 @@ val actorCritic = newSim {
                 goalAchieved = true
                 stop = true
                 progressLabel.text = "Status: Stopped"
+            }
+
+            addButton("Reset") {
+                valueWts.forEach { it.strength = 0.0 }
+                actorWts.forEach { it.strength = 0.0 }
+                network.clearActivations()
+                value.auxValue = 0.0
+                resetMouse()
+                progressLabel.text = "Status: Reset"
             }
         }
     }

@@ -8,6 +8,9 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
 import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.world.odorworld.behaviors.NoOpBehavior
+import org.simbrain.world.odorworld.behaviors.NpcBehavior
+import org.simbrain.world.odorworld.behaviors.SteeringDebugInfo
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
@@ -148,6 +151,36 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     val manualMovement = ManualMovement()
 
+    /**
+     * NPC behavior. Runs each tick before [applyMovement] and writes to [movement]
+     * (speed and dtheta). Defaults to a no-op so manual or coupling-driven movement is unaffected.
+     */
+    @UserParameter(
+        label = "Behavior",
+        description = "Programmatic NPC behavior (Pursue, Evade, Wander, ...) that drives movement each tick",
+        tab = "Behavior",
+        order = 10
+    )
+    var behavior: NpcBehavior = NoOpBehavior()
+
+    var showSteeringDebug by GuiEditable(
+        initValue = false,
+        label = "Show Steering Debug",
+        description = "Draw the per-candidate scores and obstacle feeler hits used by the NPC behavior",
+        tab = "Behavior",
+        order = 20
+    )
+
+    @Transient
+    var steeringDebug: SteeringDebugInfo? = null
+
+    /**
+     * True if the previous [applyMovement] tried to move (speed > 0) but progressed less than
+     * 10% of intended due to collision. Used by NPC behaviors to escalate ray density / jitter.
+     */
+    @Transient
+    var wasStuckLastTick: Boolean = false
+
     @Deprecated("Use world", ReplaceWith("world"))
     val parentWorld
         get() = world
@@ -163,7 +196,15 @@ class OdorWorldEntity @JvmOverloads constructor(
             heading += dtheta
         }
 
-        if (speed == 0.0) return
+        if (speed == 0.0) {
+            wasStuckLastTick = false
+            steeringDebug?.let {
+                it.actualDx = 0.0
+                it.actualDy = 0.0
+                it.collided = false
+            }
+            return
+        }
 
         val (dx, dy) = velocity
 
@@ -188,8 +229,10 @@ class OdorWorldEntity @JvmOverloads constructor(
             .minByOrNull { it.value.dy }
             ?.apply { events.collided.fire(key) }?.value?.dy ?: 0.0
 
-        val newX = x + (dx - distanceXShortenBy * directionX)
-        val newY = y + (dy - distanceYShortenBy * directionY)
+        val effectiveDx = dx - distanceXShortenBy * directionX
+        val effectiveDy = dy - distanceYShortenBy * directionY
+        val newX = x + effectiveDx
+        val newY = y + effectiveDy
 
         location = if (world.wrapAround) {
             val maxXLocation = world.width
@@ -199,9 +242,17 @@ class OdorWorldEntity @JvmOverloads constructor(
             point(newX, newY)
         }
 
+        val effectiveSpeed = kotlin.math.sqrt(effectiveDx * effectiveDx + effectiveDy * effectiveDy)
+        wasStuckLastTick = effectiveSpeed < speed * 0.1
+        steeringDebug?.let {
+            it.actualDx = effectiveDx
+            it.actualDy = effectiveDy
+            it.collided = distanceXShortenBy > 0.0 || distanceYShortenBy > 0.0
+        }
     }
 
     fun update() {
+        behavior.update(this)
         applyMovement()
         if (isSensorsEnabled) {
             sensors.forEach { it.update(this) }

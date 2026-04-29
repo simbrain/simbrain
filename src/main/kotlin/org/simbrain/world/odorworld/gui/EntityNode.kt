@@ -8,6 +8,7 @@ import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
+import org.simbrain.util.toRadian
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -17,10 +18,19 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.getCurrentImage
 import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
+import java.awt.BasicStroke
+import java.awt.Color
+import java.awt.Font
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 import java.util.stream.Collectors
 import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
+import kotlin.math.abs
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.sqrt
 
 /**
  * Piccolo representation of an [OdorWorldEntity].
@@ -66,6 +76,91 @@ class EntityNode(
     private val sprite = EntitySprite()
 
     /**
+     * Overlay that draws per-candidate context-steering rays plus wall feeler hits.
+     * Visible only when [OdorWorldEntity.showSteeringDebug] is true.
+     */
+    private inner class SteeringDebugNode : PNode() {
+        init {
+            pickable = false
+            val r = 200.0
+            setBounds(-r, -r, 2 * r, 2 * r)
+        }
+
+        override fun paint(paintContext: PPaintContext) {
+            if (!entity.showSteeringDebug) return
+            val info = entity.steeringDebug ?: return
+            val g = paintContext.graphics
+            val n = info.scores.size
+            val originalStroke = g.stroke
+            val originalColor = g.color
+            val originalFont = g.font
+
+            if (n > 0) {
+                val maxAbs = info.scores.maxOf { abs(it) }.coerceAtLeast(1e-3)
+                val baseLen = 8.0
+                val rangeLen = 60.0
+
+                for (k in 0 until n) {
+                    val angle = info.headings[k]
+                    val rad = angle.toRadian()
+                    val dirX = cos(rad)
+                    val dirY = -sin(rad)
+                    val s = info.scores[k]
+                    val len = baseLen + rangeLen * (abs(s) / maxAbs).coerceIn(0.0, 1.0)
+                    val isChosen = angle == info.chosenHeading
+                    g.color = when {
+                        isChosen -> Color(255, 220, 0)
+                        s >= 0 -> Color(0, 200, 0, 180)
+                        else -> Color(220, 60, 60, 180)
+                    }
+                    g.stroke = BasicStroke(if (isChosen) 3f else 1.2f)
+                    g.draw(Line2D.Double(0.0, 0.0, dirX * len, dirY * len))
+                }
+
+                g.color = Color(255, 0, 255, 200)
+                g.stroke = BasicStroke(1.5f)
+                for (k in 0 until n) {
+                    val dist = info.obstacleDistances[k]
+                    if (dist < info.feelerLength) {
+                        val rad = info.headings[k].toRadian()
+                        val hx = cos(rad) * dist
+                        val hy = -sin(rad) * dist
+                        g.draw(Ellipse2D.Double(hx - 2.5, hy - 2.5, 5.0, 5.0))
+                    }
+                }
+            }
+
+            // Status text (behavior decision + actual movement + collision/stuck flags)
+            val intendedV = info.intendedSpeed
+            val actualV = sqrt(info.actualDx * info.actualDx + info.actualDy * info.actualDy)
+            val lines = mutableListOf<Pair<String, Color>>()
+            if (info.behaviorNotes.isNotEmpty()) lines.add(info.behaviorNotes to Color.WHITE)
+            lines.add("speed: %.2f → %.2f".format(intendedV, actualV) to Color.WHITE)
+            if (info.collided) lines.add("COLLIDED" to Color(255, 120, 120))
+            if (entity.wasStuckLastTick) lines.add("STUCK (no progress)" to Color(255, 120, 120))
+
+            g.font = Font("SansSerif", Font.PLAIN, 9)
+            val fm = g.fontMetrics
+            var ty = entity.height / 2 + fm.ascent + 2
+            for ((text, color) in lines) {
+                val w = fm.stringWidth(text)
+                val tx = -w / 2.0
+                g.color = Color(0, 0, 0, 150)
+                g.fillRect((tx - 2).toInt(), (ty - fm.ascent).toInt(), w + 4, fm.height)
+                g.color = color
+                g.drawString(text, tx.toFloat(), ty.toFloat())
+                ty += fm.height
+            }
+
+            g.stroke = originalStroke
+            g.color = originalColor
+            g.font = originalFont
+        }
+    }
+
+    private val steeringDebugNode = SteeringDebugNode()
+
+    /**
      * Represents path taken by the agent, if [OdorWorldEntity.isShowTrail] is turned on
      */
     var trail: PPath = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
@@ -86,6 +181,7 @@ class EntityNode(
      */
     init {
         addChild(sprite)
+        addChild(steeringDebugNode)
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
@@ -237,6 +333,7 @@ class EntityNode(
         setOffset(entity.x, entity.y)
         // Repaint sprite to show updated heading/animation frame
         sprite.repaint()
+        if (entity.showSteeringDebug) steeringDebugNode.repaint()
         if (entity.isShowTrail && (SimbrainDesktop.workspace.updater.isRunning || entity.drawTrailWithoutRunningWorkspace)) {
             if (isCrossingBorder) {
                 trail.moveTo(entity.x, entity.y)

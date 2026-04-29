@@ -46,6 +46,52 @@ fun Point2D.wrapAroundDistanceTo(other: Point2D, worldWidth: Double, worldHeight
     return sqrt(dx * dx + dy * dy)
 }
 
+/**
+ * Shortest vector from this point to [other] on a torus of the given size.
+ * The returned vector's direction is the shortest path; magnitude equals [wrapAroundDistanceTo].
+ */
+fun Point2D.wrapAroundVectorTo(other: Point2D, worldWidth: Double, worldHeight: Double): Point2D {
+    var dx = other.x - this.x
+    var dy = other.y - this.y
+    if (dx > worldWidth / 2) dx -= worldWidth else if (dx < -worldWidth / 2) dx += worldWidth
+    if (dy > worldHeight / 2) dy -= worldHeight else if (dy < -worldHeight / 2) dy += worldHeight
+    return point(dx, dy)
+}
+
+/**
+ * Distance from ([startX], [startY]) along unit direction ([dirX], [dirY]) to the first
+ * intersection with the AABB at top-left ([boxX], [boxY]) and size ([boxW] x [boxH]).
+ * Returns [maxDist] if the box is not hit within that range, or 0.0 if the ray origin is
+ * already inside the box. Uses the standard slab method.
+ */
+fun rayVsAabb(
+    startX: Double, startY: Double, dirX: Double, dirY: Double,
+    boxX: Double, boxY: Double, boxW: Double, boxH: Double,
+    maxDist: Double
+): Double {
+    var tmin = Double.NEGATIVE_INFINITY
+    var tmax = Double.POSITIVE_INFINITY
+    if (abs(dirX) < 1e-12) {
+        if (startX < boxX || startX > boxX + boxW) return maxDist
+    } else {
+        val tx1 = (boxX - startX) / dirX
+        val tx2 = (boxX + boxW - startX) / dirX
+        tmin = max(tmin, min(tx1, tx2))
+        tmax = min(tmax, max(tx1, tx2))
+    }
+    if (abs(dirY) < 1e-12) {
+        if (startY < boxY || startY > boxY + boxH) return maxDist
+    } else {
+        val ty1 = (boxY - startY) / dirY
+        val ty2 = (boxY + boxH - startY) / dirY
+        tmin = max(tmin, min(ty1, ty2))
+        tmax = min(tmax, max(ty1, ty2))
+    }
+    if (tmax < 0.0 || tmin > tmax) return maxDist
+    if (tmin < 0.0) return 0.0
+    return min(tmin, maxDist)
+}
+
 operator fun Point2D.unaryMinus() = point(-x, -y)
 
 operator fun Point2D.plus(vector: Point2D) = point(this.x + vector.x, this.y + vector.y)

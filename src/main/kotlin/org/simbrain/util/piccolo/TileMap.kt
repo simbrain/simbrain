@@ -297,6 +297,77 @@ class TileMap(width: Int, height: Int) {
     fun pixelToGridCoordinate(p: Point2D) = pixelToGridCoordinate(p.x, p.y)
 
     /**
+     * Whether the given pixel location lies on a non-empty tile in any blocking layer.
+     * Out-of-bounds positions return false; wrap-around is the caller's responsibility.
+     */
+    fun isBlockedAtPixel(x: Double, y: Double): Boolean {
+        val gridX = (x / tileWidth).toInt()
+        val gridY = (y / tileHeight).toInt()
+        if (gridX < 0 || gridY < 0 || gridX >= width || gridY >= height) return false
+        return layers.any { it.blocking && it[gridX, gridY] != 0 }
+    }
+
+    /**
+     * Whether the AABB of half-size ([halfW], [halfH]) centered at ([cx], [cy]) overlaps any
+     * blocked tile in any blocking layer. Used for agent-aware raycasting (Minkowski expansion).
+     */
+    fun isAreaBlocked(cx: Double, cy: Double, halfW: Double, halfH: Double, wrapAround: Boolean = false): Boolean {
+        if (halfW <= 0.0 && halfH <= 0.0) return isBlockedAtPixel(cx, cy)
+        val gx0 = ((cx - halfW) / tileWidth).toInt()
+        val gx1 = ((cx + halfW) / tileWidth).toInt()
+        val gy0 = ((cy - halfH) / tileHeight).toInt()
+        val gy1 = ((cy + halfH) / tileHeight).toInt()
+        for (gy in gy0..gy1) {
+            for (gx in gx0..gx1) {
+                val tx: Int
+                val ty: Int
+                if (wrapAround) {
+                    tx = ((gx % width) + width) % width
+                    ty = ((gy % height) + height) % height
+                } else {
+                    if (gx < 0 || gy < 0 || gx >= width || gy >= height) continue
+                    tx = gx; ty = gy
+                }
+                if (layers.any { it.blocking && it[tx, ty] != 0 }) return true
+            }
+        }
+        return false
+    }
+
+    /**
+     * Cast a ray from [start] in unit direction ([dirX], [dirY]) and return the distance to the
+     * first blocked tile, or [maxDist] if nothing is hit. When [wrapAround] is false, the map
+     * boundary itself counts as a hit; when true, samples wrap to the opposite edge.
+     *
+     * If [agentHalfWidth] / [agentHalfHeight] are non-zero, the check accounts for an
+     * axis-aligned agent of that half-size (Minkowski expansion), so the returned distance is
+     * how far the agent's *center* can travel before its *edge* contacts a blocking tile.
+     */
+    fun raycastBlocked(
+        start: Point2D, dirX: Double, dirY: Double, maxDist: Double,
+        wrapAround: Boolean = false,
+        agentHalfWidth: Double = 0.0,
+        agentHalfHeight: Double = 0.0
+    ): Double {
+        val step = tileWidth / 4.0
+        var dist = step
+        while (dist <= maxDist) {
+            var px = start.x + dirX * dist
+            var py = start.y + dirY * dist
+            if (wrapAround) {
+                px = ((px % mapWidth) + mapWidth) % mapWidth
+                py = ((py % mapHeight) + mapHeight) % mapHeight
+            } else if (px - agentHalfWidth < 0 || py - agentHalfHeight < 0 ||
+                px + agentHalfWidth >= mapWidth || py + agentHalfHeight >= mapHeight) {
+                return dist
+            }
+            if (isAreaBlocked(px, py, agentHalfWidth, agentHalfHeight, wrapAround)) return dist
+            dist += step
+        }
+        return maxDist
+    }
+
+    /**
      * Get layer by name.
      */
     fun getLayer(name: String) =

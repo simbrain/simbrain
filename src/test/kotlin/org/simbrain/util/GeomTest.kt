@@ -53,6 +53,114 @@ class GeomTest {
         assertEquals(0.0, distance, 0.001)
     }
 
+    // Wrap-around vector tests
+
+    @Test
+    fun `wrap around vector when direct is shorter returns direct vector`() {
+        val p1 = point(100.0, 100.0)
+        val p2 = point(120.0, 100.0)
+        val v = p1.wrapAroundVectorTo(p2, 300.0, 300.0)
+        assertEquals(20.0, v.x, 0.001)
+        assertEquals(0.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `wrap around vector across right edge points the short way`() {
+        // From x=10 to x=290 in 300 wide: direct +280 vs wrapped -20. Wrap wins.
+        val p1 = point(10.0, 150.0)
+        val p2 = point(290.0, 150.0)
+        val v = p1.wrapAroundVectorTo(p2, 300.0, 300.0)
+        assertEquals(-20.0, v.x, 0.001)
+        assertEquals(0.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `wrap around vector across left edge points the short way`() {
+        // From x=290 to x=10 in 300 wide: direct -280 vs wrapped +20. Wrap wins.
+        val p1 = point(290.0, 150.0)
+        val p2 = point(10.0, 150.0)
+        val v = p1.wrapAroundVectorTo(p2, 300.0, 300.0)
+        assertEquals(20.0, v.x, 0.001)
+        assertEquals(0.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `wrap around vector across both axes`() {
+        val p1 = point(10.0, 10.0)
+        val p2 = point(290.0, 290.0)
+        val v = p1.wrapAroundVectorTo(p2, 300.0, 300.0)
+        assertEquals(-20.0, v.x, 0.001)
+        assertEquals(-20.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `wrap around vector for same point is zero`() {
+        val p = point(150.0, 150.0)
+        val v = p.wrapAroundVectorTo(p, 300.0, 300.0)
+        assertEquals(0.0, v.x, 0.001)
+        assertEquals(0.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `wrap around vector magnitude matches wrap around distance`() {
+        val p1 = point(10.0, 10.0)
+        val p2 = point(290.0, 290.0)
+        val v = p1.wrapAroundVectorTo(p2, 300.0, 300.0)
+        val d = p1.wrapAroundDistanceTo(p2, 300.0, 300.0)
+        assertEquals(d, v.magnitude, 0.001)
+    }
+
+    // rayVsAabb tests
+
+    @Test
+    fun `rayVsAabb hits axis-aligned box dead on`() {
+        // Ray from (0, 50) heading right; box at x=100..150, y=0..100.
+        val d = rayVsAabb(0.0, 50.0, 1.0, 0.0, 100.0, 0.0, 50.0, 100.0, 1000.0)
+        assertEquals(100.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb misses box returns maxDist`() {
+        // Ray from (0, 200) heading right; box at x=100..150, y=0..100. Misses (above box).
+        val d = rayVsAabb(0.0, 200.0, 1.0, 0.0, 100.0, 0.0, 50.0, 100.0, 1000.0)
+        assertEquals(1000.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb origin inside box returns zero`() {
+        val d = rayVsAabb(110.0, 50.0, 1.0, 0.0, 100.0, 0.0, 50.0, 100.0, 1000.0)
+        assertEquals(0.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb pointing away from box returns maxDist`() {
+        // Ray at x=200 heading right (+x); box behind us at x=100..150.
+        val d = rayVsAabb(200.0, 50.0, 1.0, 0.0, 100.0, 0.0, 50.0, 100.0, 1000.0)
+        assertEquals(1000.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb axis-aligned vertical ray hits box`() {
+        // Ray from (50, 0) heading down (+y); box at y=100..150 spanning x=0..100.
+        val d = rayVsAabb(50.0, 0.0, 0.0, 1.0, 0.0, 100.0, 100.0, 50.0, 1000.0)
+        assertEquals(100.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb axis-aligned ray that doesn't overlap slab returns maxDist`() {
+        // Ray from (200, 0) heading down. Box at y=100..150, x=0..100. Vertical ray's x=200
+        // is outside the box's x range, so it never enters.
+        val d = rayVsAabb(200.0, 0.0, 0.0, 1.0, 0.0, 100.0, 100.0, 50.0, 1000.0)
+        assertEquals(1000.0, d, 0.001)
+    }
+
+    @Test
+    fun `rayVsAabb hit beyond maxDist clamps to maxDist`() {
+        // Hit would be at distance 100 but maxDist is 50.
+        val d = rayVsAabb(0.0, 50.0, 1.0, 0.0, 100.0, 0.0, 50.0, 100.0, 50.0)
+        assertEquals(50.0, d, 0.001)
+    }
+
     @Test
     fun `p(0, 1)v(0, 2) and p(1, 0)v(2, 0) should intersect at t = 0_5`() {
         val line1 = point(0, 1).withVector(2, 0)

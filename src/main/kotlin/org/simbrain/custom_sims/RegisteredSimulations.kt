@@ -66,6 +66,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Isopod simulation") { isopodSim }
     }
 
+    dir("NPC Behaviors") {
+        item("Steering demo") { npcSteeringDemo }
+    }
+
     dir("Reservoir networks") {
         item("Edge of chaos bit stream") { edgeOfChaosBitStream }
         item("Edge of chaos embodied") { edgeOfChaos }

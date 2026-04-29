@@ -35,7 +35,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     var cheeseRewardMultiplier = 1.0
     var poisonRewardMultiplier = -1.0
     var learningEnabled = true
-    var sparseReward = false
+    var sparseReward = true
     var temperature = 0.5
 
     // Sparse reward flags set by collision events
@@ -210,6 +210,11 @@ val braitenbergRLPrograms = newSim { optionString ->
     var previousSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
     var stuckCounter = 0
 
+    // Commitment mechanism: lock in a program when sensors activate, release on outcome
+    var committedProgram = -1
+    var commitmentSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
+    val sensorActivationThreshold = 0.1
+
     fun applyProgram(programIndex: Int) {
         when (programIndex) {
             0 -> {
@@ -242,6 +247,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     workspace.addUpdateAction("TD Experiments") {
 
         val sensorValues = sensorNeurons.map { it.activation }.toDoubleArray()
+        val sensorsActive = sensorValues.sum() > sensorActivationThreshold
 
         // Respawn agent if it has been stuck with near-zero sensor input for too long
         if (sensorValues.sum() < 0.01) {
@@ -252,6 +258,7 @@ val braitenbergRLPrograms = newSim { optionString ->
                 stuckCounter = 0
                 previousValue = 0.0
                 previousActiveProgram = -1
+                committedProgram = -1
             }
         } else {
             stuckCounter = 0
@@ -267,9 +274,20 @@ val braitenbergRLPrograms = newSim { optionString ->
             probabilities = DoubleArray(numPrograms) { 1.0 / numPrograms }
         }
 
-        // Sample the program to run next step
-        val activeProgram = sample(probabilities)
-        activeTextLabel.text = "Active: ${programNames[activeProgram]}"
+        // Commitment mechanism: choose a program when sensors activate and stick with it
+        val activeProgram: Int
+        if (committedProgram >= 0) {
+            activeProgram = committedProgram
+        } else if (sensorsActive) {
+            activeProgram = sample(probabilities)
+            committedProgram = activeProgram
+            commitmentSensorValues = sensorValues.copyOf()
+        } else {
+            activeProgram = sample(probabilities)
+        }
+
+        val commitStatus = if (committedProgram >= 0) " (Committed)" else ""
+        activeTextLabel.text = "Active: ${programNames[activeProgram]}$commitStatus"
 
         applyProgram(activeProgram)
 
@@ -305,14 +323,18 @@ val braitenbergRLPrograms = newSim { optionString ->
         previousSensorValues = sensorValues
     }
 
+    val minObjectSeparation = 200.0
+
     agent.events.collided.on { collidedWith ->
         if (collidedWith === cheese) {
             justHitCheese = true
-            respawnObject(world, collidedWith)
+            respawnObject(world, collidedWith, minObjectSeparation)
+            committedProgram = -1
         }
         if (collidedWith === poison) {
             justHitPoison = true
-            respawnObject(world, collidedWith)
+            respawnObject(world, collidedWith, minObjectSeparation)
+            committedProgram = -1
         }
     }
 
@@ -326,6 +348,8 @@ val braitenbergRLPrograms = newSim { optionString ->
         stuckCounter = 0
         valueNeuron.activation = 0.0
         tdErrorNeuron.activation = 0.0
+        committedProgram = -1
+        commitmentSensorValues = DoubleArray(sensorNeurons.size) { 0.0 }
     }
 
     withGui {
@@ -468,6 +492,10 @@ val braitenbergRLPrograms = newSim { optionString ->
     - **0.5**: good starting point for this simulation
     - **1.0**: softer exploration
     - **High (e.g. 5.0)**: nearly uniform — explores all programs equally
+
+    ## Program Commitment
+
+    To improve credit assignment, the agent **commits** to a program when sensors detect an object. Once committed, the agent keeps using that same program until an outcome occurs (eating cheese/poison) or it is forced to respawn. The display shows `(Committed)` when locked in. This ensures the program responsible for the approach behavior receives the reward or punishment when the object is reached.
 
     ## Reward Modes
 

@@ -149,6 +149,24 @@ with(couplingManager) {
 }
 ```
 
+**Control Panels:**
+```kotlin
+withGui {
+    createControlPanel("Control Panel", x, y) {
+        addCheckBox("Label", initialValue) { checked -> /* handler */ }
+        addFormattedNumericTextField("Label", initValue) { value -> /* handler */ }
+        addSlider("Label", min, max, initial, tickSpacing) { value -> /* handler */ }
+        addButton("Label") { /* handler */ }
+        addComboBox("Label", options, selected) { value -> /* handler */ }
+        addComponent(customSwingComponent)
+        addSeparator()
+        addLabel("Text")
+    }
+}
+```
+
+Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
+
 ## Documentation
 
 Simulation documentation may be added with `addSidebarInfo(...)` or a doc viewer when appropriate. Use one coherent documentation block per simulation and follow the standard template below unless there is a clear reason to deviate.

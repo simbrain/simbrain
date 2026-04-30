@@ -333,7 +333,7 @@ class EntityNode(
         setOffset(entity.x, entity.y)
         // Repaint sprite to show updated heading/animation frame
         sprite.repaint()
-        if (entity.showSteeringDebug) steeringDebugNode.repaint()
+        steeringDebugNode.repaint()
         if (entity.isShowTrail && (SimbrainDesktop.workspace.updater.isRunning || entity.drawTrailWithoutRunningWorkspace)) {
             if (isCrossingBorder) {
                 trail.moveTo(entity.x, entity.y)

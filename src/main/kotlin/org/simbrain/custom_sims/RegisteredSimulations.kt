@@ -67,7 +67,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("NPC Behaviors") {
-        item("Steering demo") { npcSteeringDemo }
+        item("NPC Basic Demo") { npcSteeringDemo }
     }
 
     dir("Reservoir networks") {

@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.entities.vectorTo
 import org.simbrain.world.odorworld.sensors.SmellSensor
 
 class OdorWorldEntityTest {
@@ -124,5 +125,28 @@ class OdorWorldEntityTest {
         assertEquals(sensor.radius, sensor.computeRelativeLocation(agent).x)
         assertEquals(agent.x + sensor.radius, sensor.computeAbsoluteLocation(agent).x)
     }
-    
+
+    @Test
+    fun `vectorTo without wrap returns the direct vector`() {
+        world.wrapAround = false
+        val agent = OdorWorldEntity(world)
+        agent.location = point(100.0, 100.0)
+        val v = agent.vectorTo(point(150.0, 130.0))
+        assertEquals(50.0, v.x, 0.001)
+        assertEquals(30.0, v.y, 0.001)
+    }
+
+    @Test
+    fun `vectorTo with wrap takes the short way around the boundary`() {
+        world.wrapAround = true
+        val agent = OdorWorldEntity(world)
+        agent.location = point(10.0, 10.0)
+        val w = world.width
+        val h = world.height
+        val v = agent.vectorTo(point(w - 10.0, h - 10.0))
+        // From (10,10) to (w-10, h-10): direct delta is (w-20, h-20) but wrapped is (-20, -20).
+        assertEquals(-20.0, v.x, 0.001)
+        assertEquals(-20.0, v.y, 0.001)
+    }
+
 }

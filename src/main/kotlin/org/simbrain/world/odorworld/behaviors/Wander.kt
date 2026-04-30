@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.behaviors
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.shortestAngleDelta
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.abs
 import kotlin.random.Random

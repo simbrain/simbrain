@@ -19,6 +19,13 @@ fun Double.toRadian() = Math.toRadians(this)
 fun Int.toDegrees() = Math.toDegrees(this.toDouble())
 fun Double.toDegrees() = Math.toDegrees(this)
 
+/**
+ * Returns the signed shortest angular delta in degrees, in (-180, 180].
+ */
+fun shortestAngleDelta(from: Double, to: Double): Double {
+    return ((to - from) % 360.0 + 540.0) % 360.0 - 180.0
+}
+
 
 data class IntPoint(val x: Int, val y: Int) {
     fun toPoint2D() = point(x, y)

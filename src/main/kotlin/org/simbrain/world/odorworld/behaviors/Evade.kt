@@ -6,6 +6,7 @@ import org.simbrain.util.point
 import org.simbrain.util.wrapAroundDistanceTo
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.entities.vectorTo
 import kotlin.math.max
 import kotlin.random.Random
 

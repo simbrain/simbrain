@@ -1,12 +1,11 @@
 package org.simbrain.world.odorworld.behaviors
 
-import org.simbrain.util.minus
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.rayVsAabb
+import org.simbrain.util.shortestAngleDelta
 import org.simbrain.util.toRadian
 import org.simbrain.util.wrapAroundVectorTo
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.max
 import kotlin.math.sin
@@ -195,20 +194,3 @@ object Steering {
     }
 }
 
-/**
- * Returns the signed shortest angular delta in degrees, in (-180, 180].
- */
-fun shortestAngleDelta(from: Double, to: Double): Double {
-    return ((to - from) % 360.0 + 540.0) % 360.0 - 180.0
-}
-
-/**
- * Vector from this entity's location to [other], using wrap-around when the world has it on.
- */
-fun OdorWorldEntity.vectorTo(other: Point2D): Point2D {
-    return if (world.wrapAround) {
-        location.wrapAroundVectorTo(other, world.width, world.height)
-    } else {
-        other - location
-    }
-}

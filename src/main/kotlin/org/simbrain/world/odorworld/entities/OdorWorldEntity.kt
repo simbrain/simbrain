@@ -496,3 +496,14 @@ class OdorWorldEntity @JvmOverloads constructor(
     val locationArray
         get() = doubleArrayOf(x, y)
 }
+
+/**
+ * Vector from this entity's location to [other], using wrap-around when the world has it on.
+ */
+fun OdorWorldEntity.vectorTo(other: Point2D): Point2D {
+    return if (world.wrapAround) {
+        location.wrapAroundVectorTo(other, world.width, world.height)
+    } else {
+        other - location
+    }
+}

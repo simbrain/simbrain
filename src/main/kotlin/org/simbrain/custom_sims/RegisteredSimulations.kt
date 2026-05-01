@@ -94,6 +94,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Cognitive maps") {
         item("Agent trails") { kAgentTrails }
+        item("Field image (sensors)", beta = true) { fieldImageDemo }
+        item("Field image (place cells)", beta = true) { fieldImagePlaceCellsDemo }
         item("Three object recurrent") { cogMap3Objects }
     }
 

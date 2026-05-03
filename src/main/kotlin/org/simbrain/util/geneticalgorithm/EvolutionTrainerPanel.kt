@@ -273,7 +273,6 @@ class ExpressionHistoryPanel(private val history: ExpressionHistory) : JPanel() 
 
     init {
         layout = BorderLayout()
-        border = BorderFactory.createTitledBorder("Expressed genomes")
         val scroll = JScrollPane(listPanel).apply {
             verticalScrollBarPolicy = ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED
             horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER
@@ -335,7 +334,22 @@ class EvolutionTrainerSession(
     val title: String = "Evolution Trainer"
 ) {
     val controls = EvolutionTrainerControls(runner, evaluatorParams, onExpress)
-    val historyPanel = history?.let { ExpressionHistoryPanel(it) }
+    val historyPanel: DetailTrianglePanel? = history?.let { h ->
+        DetailTrianglePanel(
+            contentPanel = ExpressionHistoryPanel(h),
+            defaultOpen = false,
+            upLabel = "Expressed genomes",
+            downLabel = "Expressed genomes"
+        ).also { panel ->
+            var openedOnce = false
+            h.events.changed.on(Dispatchers.Swing) {
+                if (!openedOnce && h.entries.isNotEmpty()) {
+                    openedOnce = true
+                    panel.setOpen(true)
+                }
+            }
+        }
+    }
     val extraScrollPanes: List<JScrollPane> = extras.map { extra ->
         JScrollPane(extra).apply {
             horizontalScrollBarPolicy = ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED

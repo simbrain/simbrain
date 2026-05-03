@@ -524,6 +524,14 @@ class DetailTrianglePanel @JvmOverloads constructor(
         add(contentPanel, BorderLayout.CENTER)
     }
 
+    fun setOpen(open: Boolean) {
+        if (detailTriangle.isDown == open) return
+        detailTriangle.setState(open)
+        contentPanel.isVisible = open
+        repaint()
+        SwingUtilities.getWindowAncestor(this)?.pack()
+    }
+
 }
 
 fun <C: JComponent> C.createApplyPanel(commitAction: suspend C.() -> Unit): JPanel {

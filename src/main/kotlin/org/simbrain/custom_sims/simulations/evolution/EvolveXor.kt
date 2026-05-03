@@ -200,8 +200,6 @@ val evolveXor = newSim {
 
         controlPanel.addButton("Open Trainer") { openTrainer() }
 
-        openTrainer()
-
         addSidebarInfo(
         """
         # Evolving A Network for XOR

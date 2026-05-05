@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.json.JSONObject
@@ -281,7 +280,7 @@ val evolveResourcePursuer = newSim { optionString ->
             workspace.addWorkspaceComponent(it)
         }
         val odorWorld = odorWorldComponent.world.apply {
-            launch {
+            runBlocking {
                 with(tileMap) {
                     updateMapSize(24, 24)
                     fill("Grass1")
@@ -315,7 +314,7 @@ val evolveResourcePursuer = newSim { optionString ->
         }.also { evolvedAgent.addSensor(it) }
 
         init {
-            workspace.launch {
+            runBlocking {
                 with(simState) {
                     odorWorld.makeFoodPatch()
                 }

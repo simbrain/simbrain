@@ -83,14 +83,15 @@ class EvolutionTrainerControls(
 
     private val expressAction = onExpress?.let { express ->
         createAction(
-            name = "Express best",
+            name = "Express current best",
             description = "Visualize the current best genome in the workspace",
-            iconPath = "menu_icons/Build.gif",
+            iconPath = "menu_icons/Trophy.png",
             coroutineContext = Dispatchers.Default
         ) {
             express()
         }
     }
+    val expressButton: JButton? = expressAction?.let(::JButton)
 
     init {
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -111,7 +112,9 @@ class EvolutionTrainerControls(
             }
         )
         runTools.add(JButton(propsAction))
-        expressAction?.let { runTools.add(JButton(it), "wrap") } ?: runTools.add(JPanel(), "wrap")
+        runTools.add(JPanel(MigLayout("ins 0, gap 0px 0px")).apply {
+            expressButton?.let { add(it) }
+        }, "wrap")
 
         val labelPanel = LabelledItemPanel()
         labelPanel.addItem("Generation:", generationLabel)
@@ -333,13 +336,18 @@ class EvolutionTrainerSession(
     val history: ExpressionHistory? = null,
     val title: String = "Evolution Trainer"
 ) {
-    val controls = EvolutionTrainerControls(runner, evaluatorParams, onExpress)
+    val controls = EvolutionTrainerControls(
+        runner = runner,
+        evaluatorParams = evaluatorParams,
+        onExpress = onExpress
+    )
     val historyPanel: DetailTrianglePanel? = history?.let { h ->
         DetailTrianglePanel(
             contentPanel = ExpressionHistoryPanel(h),
             defaultOpen = false,
             upLabel = "Expressed genomes",
-            downLabel = "Expressed genomes"
+            downLabel = "Expressed genomes",
+            topPanelComponent = controls.expressButton
         ).also { panel ->
             var openedOnce = false
             h.events.changed.on(Dispatchers.Swing) {
@@ -371,12 +379,28 @@ fun SimbrainDesktop.createEvolutionTrainerDialog(session: EvolutionTrainerSessio
         modalityType = Dialog.ModalityType.MODELESS
         val content = JPanel(MigLayout("ins 10, wrap, fill"))
         content.add(session.controls, "growx")
-        session.historyPanel?.let { content.add(it, "growx") }
-        session.extraScrollPanes.forEach { content.add(it, "grow, push") }
+        session.historyPanel?.let { content.add(it.withTopSeparator(), "growx") }
+        session.extraScrollPanes.forEach { pane -> content.add(pane.withTopSeparator(), "grow, push") }
         contentPane = content
         setAsDoneDialog()
         addCloseTask {
             session.runner.launch { session.runner.stopEvolving() }
         }
+    }
+}
+
+private fun JComponent.withTopSeparator(): JPanel {
+    return JPanel(BorderLayout()).apply {
+        border = BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(
+                1,
+                0,
+                0,
+                0,
+                UIManager.getColor("Separator.foreground") ?: Color.LIGHT_GRAY
+            ),
+            BorderFactory.createEmptyBorder(6, 0, 0, 0)
+        )
+        add(this@withTopSeparator, BorderLayout.CENTER)
     }
 }

@@ -85,7 +85,7 @@ val evolveCow = newSim {
     ) : Genotype(seed) {
 
         constructor(seed: Long = Random.nextLong(), numCows: Int = 2) : this(
-            seed, List(numCows) { CowGenotype(Random(seed).nextLong()) }
+            seed, Random(seed).let { random -> List(numCows) { CowGenotype(random.nextLong()) } }
         )
 
         override fun mutate() = cows.forEach { it.mutate() }

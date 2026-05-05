@@ -35,13 +35,18 @@ import kotlin.random.Random
 val grazingCows = newSim { optionString ->
 
     var numCows = 2
-    var maxGenerations = 50
-    var iterationsPerRun = 2000
-    var populationSize = 100
-    var eliminationRatio = .5
     var numFlowers = 10
     // If not, use min to compute group level fitness across cows
     var useAverage = false
+    val evaluatorParams = EvaluatorParams(
+        populationSize = 100,
+        eliminationRatio = 0.5,
+        iterationsPerRun = 2000,
+        maxGenerations = 50,
+        evaluationPercentile = 10,
+        stoppingCondition = EvaluatorParams.StoppingCondition.Fitness,
+        targetMetric = 150.0
+    )
 
     class CowGenotype(seed: Long = Random.nextLong()) : Genotype(seed) {
 
@@ -89,7 +94,7 @@ val grazingCows = newSim { optionString ->
     ) : Genotype(seed) {
 
         constructor(seed: Long = Random.nextLong(), numCows: Int = 2) : this(
-            seed, List(numCows) { CowGenotype(Random(seed).nextLong()) }
+            seed, Random(seed).let { random -> List(numCows) { CowGenotype(random.nextLong()) } }
         )
 
         override fun mutate() = cows.forEach { it.mutate() }
@@ -218,7 +223,7 @@ val grazingCows = newSim { optionString ->
 
         override suspend fun eval(): Double {
             build()
-            workspace.iterateSuspend(iterationsPerRun)
+            workspace.iterateSuspend(evaluatorParams.iterationsPerRun)
             // Determine a fitness for the sim based on the fitness of each cow
             return if (useAverage) {
                 cowFitnesses.values.average()
@@ -250,10 +255,8 @@ val grazingCows = newSim { optionString ->
     }
 
     fun buildRunner() = EvolutionRunner(
-        populatingFunction = { CowSim(CowGroupGenotype(numCows = numCows)) },
-        populationSize = populationSize,
-        eliminationRatio = eliminationRatio,
-        stoppingFunction = { nthPercentileFitness(10) > 400 || generation > maxGenerations },
+        evaluatorParams = evaluatorParams,
+        populatingFunction = { seed -> CowSim(CowGroupGenotype(seed = seed, numCows = numCows)) }
     )
 
     suspend fun runHeadless() {
@@ -294,10 +297,6 @@ val grazingCows = newSim { optionString ->
         createControlPanel("Control Panel", 5, 10) {
 
             val numCowsTf = addTextField("Number of cows", "" + numCows)
-            val maxGenTf = addTextField("Max Generations", "" + maxGenerations)
-            val iterationsPerRunTf = addTextField("Num iterations per generation", "" + iterationsPerRun)
-            val populationSizeTf = addTextField("Population size", "" + populationSize)
-            val eliminationRatioTf = addTextField("Elimination ratio", "" + eliminationRatio)
             val useAverageCB = addCheckBox("Use mean group fitness (else min)", useAverage)
 
             addButton("Open Trainer") {
@@ -308,21 +307,9 @@ val grazingCows = newSim { optionString ->
 
                 val activeSession = session ?: run {
                     numCows = numCowsTf.text.toInt()
-                    maxGenerations = maxGenTf.text.toInt()
-                    iterationsPerRun = iterationsPerRunTf.text.toInt()
-                    populationSize = populationSizeTf.text.toInt()
-                    eliminationRatio = eliminationRatioTf.text.toDouble()
                     useAverage = useAverageCB.isSelected()
                     workspace.removeAllComponents()
 
-                    val evaluatorParams = EvaluatorParams(
-                        populationSize = populationSize,
-                        eliminationRatio = eliminationRatio,
-                        iterationsPerRun = iterationsPerRun,
-                        maxGenerations = maxGenerations,
-                        stoppingCondition = EvaluatorParams.StoppingCondition.Fitness,
-                        targetMetric = 400.0
-                    )
                     val runner = buildRunner()
                     val genomeDisplays = List(numCows) { geneDisplayPanel(displayBlock = ::displayBlock) }
                     genomeDisplays.forEachIndexed { i, panel ->
@@ -430,17 +417,19 @@ val grazingCows = newSim { optionString ->
 
         # What to Do
         
-        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. Below are the steps to evolving the simulation:
+        In this simulation, similar to the other evolutionary simulations, the control panel sets cow-specific options and the trainer controls the evolutionary process. Below are the steps to evolving the simulation:
         
         1) Specify the parameters of the simulation.
         
             - Number of agents (e.g., cows)
             
             - Use of mean group target fitness (`50th` percentile) vs default fitness (`10th` percentile)
+
+            - Evolution parameters in the trainer properties dialog
         
-        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        2) After confirming the parameters are what you want, click on the `Open Trainer` button.
         
-        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+        3) Use the trainer's run controls to start evolution. It can take a while depending on your configuration.
 
         # Credits
  
@@ -454,10 +443,10 @@ val grazingCows = newSim { optionString ->
     if (optionString?.isNotEmpty() == true) {
         val options = optionString.split(":")
         numCows = options[0].toInt()
-        maxGenerations = options[1].toInt()
-        iterationsPerRun = options[2].toInt()
-        populationSize = options[3].toInt()
-        eliminationRatio = options[4].toDouble()
+        evaluatorParams.maxGenerations = options[1].toInt()
+        evaluatorParams.iterationsPerRun = options[2].toInt()
+        evaluatorParams.populationSize = options[3].toInt()
+        evaluatorParams.eliminationRatio = options[4].toDouble()
         if (options.size > 5) {
             useAverage = options[5].toBoolean()
         }

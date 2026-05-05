@@ -422,7 +422,6 @@ val evolveResourcePursuer = newSim { optionString ->
     withGui {
         workspace.clearWorkspace()
         val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
-        panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(evolutionParams)
         panel.addAnnotatedPropertyEditor(propertyEditor)
 

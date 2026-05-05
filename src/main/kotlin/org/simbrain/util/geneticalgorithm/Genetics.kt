@@ -293,7 +293,7 @@ class EvolutionRunner(
             random = Random(seed)
             generation = 0
             nextId = 0
-            population = List(populationSize) { populatingFunction(seed) }
+            population = List(populationSize) { populatingFunction(random.nextLong()) }
             metadata = population.map { SimMetadata(id = nextId++, parentId = null, generation = 0, fitness = 0.0) }
             initialized = true
         }

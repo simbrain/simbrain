@@ -182,10 +182,12 @@ addSidebarInfo("""
     # What to Do
     1. Click `Run`
     2. Observe...
-""", width = 300, initiallyOpened = true)
+""", width = 300)
 ```
 
 Supports markdown, LaTeX math, code blocks.
+
+Do not set `initiallyOpened` on `addSidebarInfo(...)` unless a simulation has a specific reason to override the application default. The default comes from `WorkspacePreferences.showSimulationInfoByDefault`, so ordinary simulations should leave the info dock open/closed according to the user's workspace preference.
 
 Good examples to study:
 - `psychology/spiveyNet.kt`

@@ -5,12 +5,14 @@ import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
+import org.simbrain.util.updateAction
 import org.simbrain.util.widgets.FieldImagePanel
 import org.simbrain.world.odorworld.OdorWorldPreferences
 import org.simbrain.world.odorworld.behaviors.Evade
 import org.simbrain.world.odorworld.behaviors.Pursue
 import org.simbrain.world.odorworld.behaviors.Wander
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.View3DSensor
 import java.awt.BorderLayout
 import java.awt.Color
@@ -18,6 +20,9 @@ import java.awt.Dimension
 import java.awt.Graphics
 import java.io.File
 import javax.swing.*
+import kotlin.math.cos
+import kotlin.math.sin
+import kotlin.math.tan
 
 val fieldImageDemo = newSim {
 
@@ -76,11 +81,6 @@ val fieldImageDemo = newSim {
     odorWorld.addEntity(220, 200, EntityType.Pansy).apply { name = "Pansy" }
     odorWorld.addEntity(220, 380, EntityType.Tulip).apply { name = "Tulip" }
 
-    val swissSensor = mouse.addObjectSensor(EntityType.Swiss, 50.0, 0.0, 200.0).apply { label = "Swiss" }
-    val pansySensor = mouse.addObjectSensor(EntityType.Pansy, 50.0, 30.0, 200.0).apply { label = "Pansy" }
-    val tulipSensor = mouse.addObjectSensor(EntityType.Tulip, 50.0, -30.0, 200.0).apply { label = "Tulip" }
-    val fishSensor = mouse.addObjectSensor(EntityType.Fish, 50.0, 60.0, 200.0).apply { label = "Fish" }
-
     val networkComponent = addNetworkComponent("Sensor Network")
     val network = networkComponent.network
 
@@ -96,21 +96,76 @@ val fieldImageDemo = newSim {
     sensorNeurons.neuronList[2].label = "Tulip"
     sensorNeurons.neuronList[3].label = "Fish"
 
-    with(couplingManager) {
-        swissSensor couple sensorNeurons.neuronList[0]
-        pansySensor couple sensorNeurons.neuronList[1]
-        tulipSensor couple sensorNeurons.neuronList[2]
-        fishSensor couple sensorNeurons.neuronList[3]
+    val objectClassReadouts = listOf(
+        EntityType.Swiss to sensorNeurons.neuronList[0],
+        EntityType.Pansy to sensorNeurons.neuronList[1],
+        EntityType.Tulip to sensorNeurons.neuronList[2],
+        EntityType.Fish to sensorNeurons.neuronList[3]
+    )
+
+    fun projectedVisionActivation(entity: OdorWorldEntity): Double {
+        val cameraPos = view3dSensor.computeAbsoluteLocation(mouse)
+        var dx = entity.x - cameraPos.x
+        var dy = entity.y - cameraPos.y
+
+        if (odorWorld.wrapAround) {
+            if (dx > odorWorld.width / 2) dx -= odorWorld.width
+            else if (dx < -odorWorld.width / 2) dx += odorWorld.width
+            if (dy > odorWorld.height / 2) dy -= odorWorld.height
+            else if (dy < -odorWorld.height / 2) dy += odorWorld.height
+        }
+
+        val heading = Math.toRadians(mouse.heading)
+        val dirX = cos(heading)
+        val dirY = -sin(heading)
+        val planeScale = tan(Math.toRadians(view3dSensor.fov / 2))
+        val planeX = -dirY * planeScale
+        val planeY = dirX * planeScale
+        val invDet = 1.0 / (planeX * dirY - dirX * planeY)
+        val transformX = invDet * (dirY * dx - dirX * dy)
+        val transformY = invDet * (-planeY * dx + planeX * dy)
+
+        if (transformY <= 0.1 || transformY >= view3dSensor.viewDistance) return 0.0
+
+        val screenWidth = view3dSensor.outputWidth
+        val screenHeight = view3dSensor.outputHeight
+        val spriteScreenX = ((screenWidth / 2.0) * (1 + transformX / transformY)).toInt()
+        val spriteWidth = ((entity.entityType.width * screenHeight) / transformY).toInt()
+            .coerceIn(1, screenWidth * 4)
+        val drawStartX = (spriteScreenX - spriteWidth / 2).coerceIn(0, screenWidth)
+        val drawEndX = (spriteScreenX + spriteWidth / 2).coerceIn(0, screenWidth)
+
+        if (drawStartX >= drawEndX) return 0.0
+
+        return (1.0 - transformY / view3dSensor.viewDistance).coerceIn(0.0, 1.0)
     }
+
+    /**
+     * Iterate through world entities and compute a plausible sensor activation for each object class
+     * relative to the 3D vision sensor. This directly primes the sensor neurons for the field image.
+     */
+    fun updateSensorNeuronsFromVisibleObjects() {
+        objectClassReadouts.forEach { (entityType, neuron) ->
+            neuron.activation = odorWorld.entityList
+                .asSequence()
+                .filter { it != mouse && it.entityType == entityType }
+                .maxOfOrNull(::projectedVisionActivation) ?: 0.0
+        }
+    }
+
+    workspace.addUpdateAction(updateAction("Update visible object readout") {
+        updateSensorNeuronsFromVisibleObjects()
+    })
 
     addSidebarInfo(
         """
         # Field Image Demo (Sensors)
 
         First in a planned series of "field image" simulations. This one is the
-        simplest case: the field image just visualizes the mouse's sensor
-        activations directly, so the labels you see (`Swiss`, `Pansy`, `Tulip`,
-        `Fish`) map one-to-one onto what is currently being detected.
+        simplest case: the field image visualizes a direct readout of object
+        classes visible in the mouse's 3D camera, so the labels you see
+        (`Swiss`, `Pansy`, `Tulip`, `Fish`) map one-to-one onto what is
+        currently in view.
 
         Later simulations in the series will replace the sensor inputs with the
         latent activations of a recurrent or trained network, where the labels
@@ -118,39 +173,36 @@ val fieldImageDemo = newSim {
 
         # Simulation Details
 
-        ## Sensors
+        ## Toy Vision Readout
 
-        The mouse from the `NPC Basic Demo` carries four `ObjectSensor`s
-        (`Swiss`, `Pansy`, `Tulip`, `Fish`) at slightly different angles. Each is
-        coupled to a single neuron in the `Sensors` collection.
+        The mouse from the `NPC Basic Demo` carries a `View3DSensor`, and the
+        four neurons in the `Sensors` collection are set directly from that
+        camera geometry. On each update, objects are projected into the same
+        camera frustum used by the `Mouse 3D View`; if a `Swiss`, `Pansy`,
+        `Tulip`, or `Fish` would appear on screen, the corresponding neuron is
+        activated according to its distance from the camera.
 
-        ## Field Image
-
-        The `FieldImagePanel` (in `org.simbrain.util.widgets`) draws above-threshold
-        nodes only. The most active node is centered, largest, and most saturated.
-        Less active nodes are placed radially around it: smaller, more grey, and
-        farther from the center as their activation drops. Nodes below the
-        threshold are not drawn. Resize the window to scale the image.
-
-        Because the panel just consumes a `() -> List<Pair<String, Double>>` of
-        labels and activations, the same widget will be reused for the latent
-        versions in the rest of the series.
+        This is intentionally not a general-purpose vision model. It is a
+        simple, hand-coded object-class readout for a toy demo, chosen so the
+        field image matches the rendered 3D view.
+        It is not meant to be a plausible cognitive model. The goal is to start
+        experimenting with how this kind of graphical display could be used to
+        show a simple, momentary field of salient contents.
 
         # What to Do
 
-        1. Press `Run`. As the mouse hunts the cheeses and brushes past flowers
-           or the fish, the corresponding label fades in and out of the field
-           image.
-        2. Drag a `Pansy` or `Tulip` close to the mouse to make that label win.
-        3. Adjust `Threshold` to control how aggressively the field image hides
-           quiet sensors (try `0.05` and `0.3`).
+        Press `Run` and watch as the agent moves around. A plausible "field of
+        consciousness" is shown in the field panel, with labels appearing and
+        fading as objects enter and leave the mouse's 3D view. The mouse and
+        several objects use NPC behaviors, so the scene produces decent motion
+        to watch without manual setup. Adjust `Threshold` on the field display
+        to control how much activity is allowed into the field.
 
         # Credits
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         """.trimIndent(),
-        width = 320,
-        initiallyOpened = true
+        width = 320
     )
 
     withGui {
@@ -208,6 +260,7 @@ val fieldImageDemo = newSim {
         addInternalFrame(fieldFrame)
 
         view3dSensor.update(mouse)
+        updateSensorNeuronsFromVisibleObjects()
 
         Timer(50) {
             viewPanel.repaint()

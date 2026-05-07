@@ -71,6 +71,7 @@ val fieldImagePlaceCellsDemo = newSim {
             driftDegreesPerTick = 8.0
         }
     }
+    mouse.select()
 
     val networkComponent = addNetworkComponent("Place Cell Network")
     val network = networkComponent.network
@@ -95,7 +96,24 @@ val fieldImagePlaceCellsDemo = newSim {
     val recurrent = network.connect(placeCells.neuronList, placeCells.neuronList, localStrategy)
     recurrent.forEach { it.forceSetStrength(0.1) }
 
+    val bugReadoutMax = 1.8
+    val bugReadout = network.addNeuronCollection(1) {
+        upperBound = bugReadoutMax
+        lowerBound = 0.0
+    }
+    bugReadout.label = "Object Readout"
+    bugReadout.neuronList[0].label = "bug"
+    bugReadout.applyLayout(0, 360)
+
+    val bugSensor = mouse.addObjectSensor(EntityType.Isopod, 0.0, 0.0, 160.0).apply {
+        label = "Bug"
+        baseValue = bugReadoutMax
+    }
+
     couplingManager.createCoupling(gridSensor, placeCells)
+    with(couplingManager) {
+        bugSensor couple bugReadout.neuronList[0]
+    }
 
     addSidebarInfo(
         """
@@ -131,30 +149,36 @@ val fieldImagePlaceCellsDemo = newSim {
 
         ## NPC Behavior
 
-        A `Mouse` pursues an `Isopod`. The isopod uses `Wander` rather than
+        A `Mouse` pursues a bug, implemented as an `Isopod` entity. The bug uses `Wander` rather than
         `Evade`, so it meanders rather than actively fleeing — this lets the
         mouse stay in close pursuit instead of stalling out at the edges of
         the world. The terrain (trees, ponds, fenced gardens) still blocks
         movement, so the chase falls into a small repertoire of paths and the
-        same place-cell labels recur in the field image.
+        same place-cell labels recur in the field image. The mouse is selected
+        by default because the field image reflects the mouse's point of view.
+
+        The field image also includes a `bug` readout from a simple object
+        sensor. This is a small example of aggregating multiple neuron
+        collections into one field display. The `bug` readout can become
+        stronger than the place-cell activations, so it can dominate the field
+        when the mouse gets close.
 
         # What to Do
 
         1. Press `Run`. The field image will show the mouse's current cell at
            the center, with neighboring cells dimly haloed around it.
-        2. Watch how the active label changes as the mouse chases the isopod.
+        2. Watch how the active label changes as the mouse chases the bug.
            After a few laps the labels fall into a small recurring set.
         3. Adjust `Threshold` to widen or narrow the visible halo.
         4. Try right-clicking the mouse and pressing `Properties` to bump up
-           `Pursue.maxSpeed`, or drag the isopod to a new location to seed a
+           `Pursue.maxSpeed`, or drag the bug to a new location to seed a
            different chase path.
 
         # Credits
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         """.trimIndent(),
-        width = 320,
-        initiallyOpened = false
+        width = 320
     )
 
     withGui {
@@ -162,7 +186,10 @@ val fieldImagePlaceCellsDemo = newSim {
         place(networkComponent, 512, 1, 476, 582)
 
         val fieldPanel = FieldImagePanel(
-            source = { placeCells.neuronList.map { (it.label ?: "?") to it.activation } }
+            source = {
+                placeCells.neuronList.map { (it.label ?: "?") to it.activation } +
+                    bugReadout.neuronList.map { (it.label ?: "?") to it.activation }
+            }
         ).apply {
             preferredSize = Dimension(517, 540)
             maxItems = 9

@@ -1,6 +1,9 @@
 package org.simbrain.custom_sims.simulations.demos
 
-import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.addNetworkComponent
+import org.simbrain.custom_sims.addOdorWorldComponent
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.piccolo.loadTileMap
@@ -66,7 +69,7 @@ val fieldImageDemo = newSim {
             visionRange = 300.0
         }
     }
-    odorWorld.addEntity(60, 440, EntityType.Swiss).apply {
+    odorWorld.addEntity(180, 440, EntityType.Swiss).apply {
         name = "Swiss B"
         behavior = Evade().apply {
             threatType = EntityType.Mouse
@@ -87,6 +90,7 @@ val fieldImageDemo = newSim {
     val sensorNeurons = network.addNeuronCollection(4) {
         upperBound = 1.0
         lowerBound = 0.0
+        clamped = true
     }
     sensorNeurons.label = "Sensors"
     sensorNeurons.layout = GridLayout()
@@ -181,6 +185,13 @@ val fieldImageDemo = newSim {
         camera frustum used by the `Mouse 3D View`; if a `Swiss`, `Pansy`,
         `Tulip`, or `Fish` would appear on screen, the corresponding neuron is
         activated according to its distance from the camera.
+
+        The readout is currently type-level rather than object-level. There is
+        one `Swiss` neuron, not separate neurons for `Swiss A` and `Swiss B`, so
+        multiple visible objects of the same type are collapsed into a single
+        label using the strongest visible activation. The two `Swiss` objects
+        are placed far apart to make this limitation less distracting during
+        ordinary runs.
 
         This is intentionally not a general-purpose vision model. It is a
         simple, hand-coded object-class readout for a toy demo, chosen so the

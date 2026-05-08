@@ -58,7 +58,56 @@ abstract class Tokenizer<T: CopyableObject>: CopyableObject {
     abstract fun tokenize(text: String): List<TokenizerResult>
     abstract fun joinTokens(tokens: List<String>): String
 
-    override fun getTypeList() = listOf(SimpleTokenizer::class.java, BytePairTokenizer::class.java)
+    override fun getTypeList() = listOf(SimpleTokenizer::class.java, CharacterTokenizer::class.java, BytePairTokenizer::class.java)
+}
+
+/**
+ * Tokenizes one character at a time. Useful for character-level language models and
+ * NETtalk-style letter-to-phoneme tasks.
+ */
+class CharacterTokenizer(
+    includeWhitespace: Boolean = true,
+    includePunctuation: Boolean = true,
+    lowercase: Boolean = true
+) : Tokenizer<CharacterTokenizer>() {
+
+    var includeWhitespace by GuiEditable(
+        initValue = includeWhitespace,
+        description = "If true, whitespace characters are emitted as tokens.",
+        order = 10
+    )
+
+    var includePunctuation by GuiEditable(
+        initValue = includePunctuation,
+        description = "If true, punctuation characters are emitted as tokens.",
+        order = 20
+    )
+
+    var lowercase by GuiEditable(
+        initValue = lowercase,
+        description = "If true, letters are lowercased before being emitted.",
+        order = 30
+    )
+
+    override fun tokenize(text: String): List<TokenizerResult> {
+        val results = mutableListOf<TokenizerResult>()
+        for (i in text.indices) {
+            val c = text[i]
+            val keep = when {
+                c.isLetterOrDigit() -> true
+                c.isWhitespace() -> includeWhitespace
+                else -> includePunctuation
+            }
+            if (!keep) continue
+            val tok = if (lowercase) c.lowercaseChar().toString() else c.toString()
+            results.add(TokenizerResult(tok, i, i))
+        }
+        return results
+    }
+
+    override fun joinTokens(tokens: List<String>): String = tokens.joinToString("")
+
+    override fun copy(): CharacterTokenizer = CharacterTokenizer(includeWhitespace, includePunctuation, lowercase)
 }
 
 class SimpleTokenizer(

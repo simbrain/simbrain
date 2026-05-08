@@ -1,8 +1,10 @@
 package org.simbrain.network
 
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.WorkspaceComponent
@@ -82,7 +84,17 @@ class NetworkComponent : WorkspaceComponent {
     }
 
     override val attributeContainers: List<AttributeContainer>
-        get() = network.allModelsDeep.filterIsInstance<AttributeContainer>()
+        get() {
+            val result = mutableListOf<AttributeContainer>()
+            fun collect(models: Iterable<NetworkModel>) {
+                for (model in models) {
+                    if (model is AttributeContainer) result.add(model)
+                    if (model is Subnetwork) collect(model.modelList.deepAll)
+                }
+            }
+            collect(network.allModelsDeep)
+            return result
+        }
 
     override fun save(output: OutputStream, format: String?) {
         getNetworkXStream().toXML(network, output)

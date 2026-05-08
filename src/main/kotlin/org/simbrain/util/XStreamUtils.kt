@@ -79,6 +79,27 @@ fun getSimbrainXStream(): XStream {
 }
 
 /**
+ * If [obj]'s class declares a `readResolve()` method, invoke it (via reflection, ignoring
+ * access modifiers) and return whatever it returns. Otherwise return [obj] unchanged.
+ *
+ * Mirrors the behavior of `ObjectInputStream.readObject` for the standard Java
+ * serialization protocol — only the runtime class's own declared method is considered,
+ * not inherited ones, matching JLS rules.
+ */
+private fun invokeReadResolveIfPresent(obj: Any): Any {
+    return try {
+        val method = obj::class.java.getDeclaredMethod("readResolve")
+        method.isAccessible = true
+        method.invoke(obj) ?: obj
+    } catch (_: NoSuchMethodException) {
+        obj
+    } catch (e: Exception) {
+        System.err.println("readResolve on ${obj::class.java.name} threw: ${e.message}")
+        obj
+    }
+}
+
+/**
  * XStream support for Kotlin classes that require a constructor call. Which constructor to use can be specified by
  * [XStreamConstructor].
  *
@@ -246,7 +267,12 @@ fun createConstructorCallingConverter(
 
             objectCompletedEvent.objectCompleted.fireAndBlock(convertedObject)
 
-            return convertedObject
+            // XStream's standard ReflectionConverter invokes readResolve via Java's
+            // serialization machinery, but our custom unmarshal bypasses that path.
+            // Invoke it explicitly so classes can re-wire transient listeners, recreate
+            // coroutine scopes, etc. — without this, anything depending on readResolve
+            // (event listeners, channels, etc.) silently fails after deserialization.
+            return invokeReadResolveIfPresent(convertedObject)
         }
 
         override fun canConvert(type: Class<*>?): Boolean {

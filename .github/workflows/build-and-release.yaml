@@ -148,6 +148,9 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
+      - name: Install eSpeak-ng build deps
+        run: sudo apt-get update && sudo apt-get install -y cmake
+
       - name: Generate build info
         run: |
           echo "BUILD_NUMBER=${{ github.run_number }}" >> $GITHUB_ENV
@@ -214,10 +217,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Install AppImage dependencies
+      - name: Install AppImage and eSpeak-ng build deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2
+          sudo apt-get install -y libfuse2 cmake
 
       - name: Generate build info
         run: |
@@ -285,10 +288,10 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
 
-      - name: Install AppImage dependencies
+      - name: Install AppImage and eSpeak-ng build deps
         run: |
           sudo apt-get update
-          sudo apt-get install -y libfuse2
+          sudo apt-get install -y libfuse2 cmake
 
       - name: Generate build info
         run: |
@@ -357,6 +360,12 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
+
+      - name: Verify eSpeak-ng build deps
+        shell: pwsh
+        run: |
+          cmake --version
+          if ($LASTEXITCODE -ne 0) { throw "cmake not found on PATH; required for buildEspeakNg" }
 
       - name: Generate build info
         shell: pwsh
@@ -435,7 +444,7 @@ jobs:
       - name: Install Dependencies
         run: |
           brew update
-          brew install jq
+          brew install jq cmake
 
       - name: Setup Apple Certificate
         env:
@@ -487,10 +496,9 @@ jobs:
         run: |
           ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
-          mkdir -p build/main
-          cp build/libs/Simbrain.jar build/main/Simbrain.jar
-          cp -r simulations build/main/simulations
-          cp LICENSE build/main/License.txt
+          # buildDistribution copies the (now-signed) Simbrain.jar plus simulations,
+          # scripts, LICENSE, and the bundled eSpeak-ng build into build/main/.
+          ./gradlew buildDistribution -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 
@@ -536,7 +544,7 @@ jobs:
       - name: Install Dependencies
         run: |
           brew update
-          brew install jq
+          brew install jq cmake
 
       - name: Setup Apple Certificate
         env:
@@ -588,10 +596,9 @@ jobs:
         run: |
           ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./etc/sign_mac_jar.sh
-          mkdir -p build/main
-          cp build/libs/Simbrain.jar build/main/Simbrain.jar
-          cp -r simulations build/main/simulations
-          cp LICENSE build/main/License.txt
+          # buildDistribution copies the (now-signed) Simbrain.jar plus simulations,
+          # scripts, LICENSE, and the bundled eSpeak-ng build into build/main/.
+          ./gradlew buildDistribution -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 

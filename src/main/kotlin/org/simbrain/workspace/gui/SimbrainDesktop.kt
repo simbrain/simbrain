@@ -838,7 +838,8 @@ object SimbrainDesktop {
             val progressWindow = ProgressWindow(100, "Loading workspace...")
             progressWindow.minimumSize = Dimension(300, 100)
             progressWindow.setLocationRelativeTo(null)
-            
+            progressWindow.isAlwaysOnTop = true
+
             try {
                 workspace.openWorkspace(simFile, useDesktop = true) { current, total ->
                     swingInvokeLater {

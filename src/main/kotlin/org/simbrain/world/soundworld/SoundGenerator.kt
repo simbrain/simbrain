@@ -9,20 +9,36 @@ import javax.sound.sampled.SourceDataLine
 
 abstract class SoundGenerator: AttributeContainer, EditableObject, AutoCloseable {
 
-    val sampleRate get() = 44100f
+    open val sampleRate: Float get() = 44100f
 
-    protected val format = AudioFormat(sampleRate, 16, 1, true, false)
-    private val lineInfo = DataLine.Info(SourceDataLine::class.java, format)
-    protected val line = (AudioSystem.getLine(lineInfo) as SourceDataLine).also {
-        it.open(format)
-        it.start()
+    protected open val format: AudioFormat get() = AudioFormat(sampleRate, 16, 1, true, false)
+
+    /**
+     * Lazily-opened native audio line. Marked transient so XStream doesn't try to traverse
+     * into JDK-internal `DirectAudioDevice` types (which fail under Java 17 modular access
+     * rules). Re-opens automatically on first access after deserialization.
+     */
+    @Transient
+    private var _line: SourceDataLine? = null
+
+    protected val line: SourceDataLine
+        get() = _line ?: openLine().also { _line = it }
+
+    private fun openLine(): SourceDataLine {
+        val info = DataLine.Info(SourceDataLine::class.java, format)
+        return (AudioSystem.getLine(info) as SourceDataLine).also {
+            it.open(format)
+            it.start()
+        }
     }
 
-
     override fun close() {
-        line.drain() // Ensure all data is played
-        line.stop()
-        line.close()
+        _line?.let {
+            try { it.drain() } catch (_: Exception) {}
+            try { it.stop() } catch (_: Exception) {}
+            try { it.close() } catch (_: Exception) {}
+        }
+        _line = null
     }
 
 }

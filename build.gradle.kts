@@ -1,6 +1,7 @@
 import org.gradle.internal.os.OperatingSystem
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import java.io.ByteArrayOutputStream
+import java.security.MessageDigest
 import java.time.Duration
 
 /**
@@ -211,6 +212,9 @@ dependencies {
     // https://mvnrepository.com/artifact/org.json/json
     implementation("org.json:json:20240303")
 
+    // JNA — calls into bundled libespeak-ng from PhonemeSynthesizer.
+    implementation("net.java.dev.jna:jna:5.14.0")
+
 }
 
 tasks.test {
@@ -338,6 +342,7 @@ sourceSets {
 tasks.register<Copy>("buildDistribution") {
     dependsOn("shadowJar")
     dependsOn("generateBuildInfo")
+    dependsOn("buildEspeakNg")
 
     doFirst {
         from("${buildDir}/libs/Simbrain.jar")
@@ -351,6 +356,12 @@ tasks.register<Copy>("buildDistribution") {
 
     from("scripts") {
         into("scripts")
+    }
+
+    // Bundle eSpeak-ng for the host platform alongside Simbrain.jar.
+    // jpackage on macOS picks this up via --input; the shadow zip ships it next to the jar.
+    from(espeakNgInstallDir) {
+        into("espeak-ng")
     }
 
     from("LICENSE")
@@ -708,6 +719,210 @@ tasks.register<Zip>("createZip") {
     }
 }
 
+// eSpeak-ng bundling.
+//
+// Builds the eSpeak-ng phoneme synthesizer from source for the host platform so it can be
+// shipped inside the Simbrain distribution. PhonemeSynthesizer dlopens libespeak-ng via JNA
+// and drives it through espeak_Synth, so the trimmed flags drop unused features (audio
+// output backend, async pipeline, MBROLA) we don't invoke.
+//
+// Tasks:
+//   fetchEspeakNgSource — downloads + verifies the source tarball
+//   buildEspeakNg       — runs cmake/make for the host platform; outputs to
+//                         build/espeak-ng/<platform>/{bin,lib,share}
+//
+// `buildEspeakNg` is opt-in for plain `./gradlew run` — Simbrain dev startup doesn't pay the
+// build cost. If the lib isn't present at runtime, audio is disabled with a one-line warning.
+// Distribution tasks (buildDistribution, jpackageMacOS, prepareAppDir) depend on this so
+// release artifacts always include the bundled lib.
+
+val espeakNgVersion = "1.52.0"
+val espeakNgSha256 = "bb4338102ff3b49a81423da8a1a158b420124b055b60fa76cfb4b18677130a23"
+val espeakNgSourceUrl =
+    "https://github.com/espeak-ng/espeak-ng/archive/refs/tags/${espeakNgVersion}.tar.gz"
+
+val espeakNgPlatform: String = run {
+    val osArch = System.getProperty("os.arch").lowercase()
+    val arch = when {
+        osArch == "aarch64" || osArch == "arm64" -> "arm64"
+        osArch == "amd64" || osArch == "x86_64" -> "x64"
+        else -> osArch
+    }
+    when {
+        OperatingSystem.current().isMacOsX -> "macos-$arch"
+        OperatingSystem.current().isLinux -> "linux-$arch"
+        OperatingSystem.current().isWindows -> "windows-$arch"
+        else -> "unknown-$arch"
+    }
+}
+
+val espeakNgSourceArchive = file("${buildDir}/espeak-ng-src/espeak-ng-${espeakNgVersion}.tar.gz")
+val espeakNgSourceDir = file("${buildDir}/espeak-ng-src/espeak-ng-${espeakNgVersion}")
+val espeakNgInstallDir = file("${buildDir}/espeak-ng/${espeakNgPlatform}")
+
+tasks.register("fetchEspeakNgSource") {
+    outputs.dir(espeakNgSourceDir)
+
+    doLast {
+        if (espeakNgSourceDir.exists() && File(espeakNgSourceDir, "CMakeLists.txt").exists()) {
+            return@doLast
+        }
+        espeakNgSourceArchive.parentFile.mkdirs()
+        if (!espeakNgSourceArchive.exists()) {
+            println("Downloading eSpeak-ng ${espeakNgVersion} source...")
+            ant.withGroovyBuilder {
+                "get"("src" to espeakNgSourceUrl, "dest" to espeakNgSourceArchive, "verbose" to true)
+            }
+        }
+        val actualSha = MessageDigest.getInstance("SHA-256")
+            .digest(espeakNgSourceArchive.readBytes())
+            .joinToString("") { byte -> "%02x".format(byte) }
+        if (actualSha != espeakNgSha256) {
+            espeakNgSourceArchive.delete()
+            throw GradleException(
+                "eSpeak-ng tarball SHA-256 mismatch.\n" +
+                "  expected: $espeakNgSha256\n" +
+                "  actual:   $actualSha"
+            )
+        }
+        espeakNgSourceDir.deleteRecursively()
+        exec {
+            workingDir = espeakNgSourceArchive.parentFile
+            commandLine("tar", "-xzf", espeakNgSourceArchive.absolutePath)
+        }
+    }
+}
+
+tasks.register("buildEspeakNg") {
+    dependsOn("fetchEspeakNgSource")
+
+    val installedBinary = if (OperatingSystem.current().isWindows) {
+        File(espeakNgInstallDir, "bin/espeak-ng.exe")
+    } else {
+        File(espeakNgInstallDir, "bin/espeak-ng")
+    }
+    outputs.dir(espeakNgInstallDir)
+
+    doLast {
+        if (installedBinary.exists()) {
+            println("eSpeak-ng already built at ${espeakNgInstallDir.absolutePath}, skipping.")
+            return@doLast
+        }
+
+        val cmakeAvailable = try {
+            exec {
+                commandLine("cmake", "--version")
+                standardOutput = ByteArrayOutputStream()
+                errorOutput = ByteArrayOutputStream()
+            }
+            true
+        } catch (_: Exception) {
+            false
+        }
+        if (!cmakeAvailable) {
+            throw GradleException(
+                "cmake is required to build eSpeak-ng but was not found on PATH.\n" +
+                "  macOS:   brew install cmake\n" +
+                "  Linux:   apt install cmake  (or your distro's equivalent)\n" +
+                "  Windows: install CMake from https://cmake.org/download/"
+            )
+        }
+
+        espeakNgInstallDir.deleteRecursively()
+        espeakNgInstallDir.mkdirs()
+
+        val buildDir = File(espeakNgSourceDir, "build-${espeakNgPlatform}")
+        buildDir.deleteRecursively()
+        buildDir.mkdirs()
+
+        val cmakeArgs = mutableListOf(
+            "cmake",
+            "-S", espeakNgSourceDir.absolutePath,
+            "-B", buildDir.absolutePath,
+            "-DCMAKE_BUILD_TYPE=Release",
+            "-DCMAKE_INSTALL_PREFIX=${espeakNgInstallDir.absolutePath}",
+            // Shared so we can dlopen libespeak-ng via JNA from PhonemeSynthesizer.
+            "-DBUILD_SHARED_LIBS=ON",
+            "-DUSE_ASYNC=OFF",
+            "-DUSE_MBROLA=OFF",
+            "-DUSE_LIBPCAUDIO=OFF",
+            "-DUSE_SPEECHPLAYER=ON",
+            "-DUSE_KLATT=ON",
+            "-DEXTRA_cmn=OFF",
+            "-DEXTRA_ru=OFF"
+        )
+        if (OperatingSystem.current().isMacOsX) {
+            val target = if (System.getProperty("os.arch").lowercase().let { it == "aarch64" || it == "arm64" }) {
+                "arm64"
+            } else {
+                "x86_64"
+            }
+            cmakeArgs += "-DCMAKE_OSX_ARCHITECTURES=$target"
+        }
+
+        println("Configuring eSpeak-ng (cmake)...")
+        exec { commandLine(cmakeArgs) }
+
+        val cpuCount = Runtime.getRuntime().availableProcessors()
+        println("Building eSpeak-ng (cmake --build, $cpuCount jobs)...")
+        exec {
+            commandLine(
+                "cmake", "--build", buildDir.absolutePath,
+                "--config", "Release",
+                "--parallel", cpuCount.toString()
+            )
+        }
+
+        println("Installing eSpeak-ng to ${espeakNgInstallDir.absolutePath}...")
+        exec {
+            commandLine(
+                "cmake", "--install", buildDir.absolutePath,
+                "--config", "Release"
+            )
+        }
+
+        // Drop pieces we don't ship (headers, pkgconfig, .a archives).
+        File(espeakNgInstallDir, "include").deleteRecursively()
+        File(espeakNgInstallDir, "lib/pkgconfig").deleteRecursively()
+        File(espeakNgInstallDir, "lib").listFiles()
+            ?.filter { it.extension == "a" }
+            ?.forEach { it.delete() }
+
+        if (OperatingSystem.current().isMacOsX) {
+            // CMake's install step already sets `@rpath/libespeak-ng.1.dylib` as the dylib's
+            // install_name and binary's load reference. It also bakes the absolute install
+            // prefix as an LC_RPATH on the binary — replace that with @loader_path so the
+            // binary works after the install dir is relocated into the app bundle.
+            exec {
+                commandLine(
+                    "install_name_tool", "-add_rpath",
+                    "@loader_path/../lib", installedBinary.absolutePath
+                )
+                isIgnoreExitValue = true  // tolerate already-present
+            }
+            exec {
+                commandLine(
+                    "install_name_tool", "-delete_rpath",
+                    File(espeakNgInstallDir, "lib").absolutePath,
+                    installedBinary.absolutePath
+                )
+                isIgnoreExitValue = true  // tolerate not-present
+            }
+        }
+        // No equivalent Linux rpath fixup: JNA loads the .so by absolute path, so the
+        // binary's inability to find sibling lib/ when run standalone doesn't affect runtime
+        // audio. If you want `bin/espeak-ng` to work as a debug aid inside the AppImage,
+        // patchelf the binary with `--set-rpath '$ORIGIN/../lib'` or set LD_LIBRARY_PATH.
+
+        if (!installedBinary.exists()) {
+            throw GradleException(
+                "eSpeak-ng build completed but ${installedBinary.absolutePath} is missing."
+            )
+        }
+        println("eSpeak-ng built successfully.")
+    }
+}
+
 // AppImage build configuration.
 
 val appImageDir = "${buildDir}/appimage"
@@ -790,7 +1005,7 @@ tasks.register("downloadAppImageTool") {
  * Creates the AppDir structure with all required files
  */
 tasks.register("prepareAppDir") {
-    dependsOn("shadowJar", "downloadJreForAppImage", "generateBuildInfo")
+    dependsOn("shadowJar", "downloadJreForAppImage", "generateBuildInfo", "buildEspeakNg")
 
     val jreDir = file("${buildDir}/jre-${appImageArch}")
     val appDir = file(appDirPath)
@@ -812,6 +1027,14 @@ tasks.register("prepareAppDir") {
             from("${buildDir}/libs/Simbrain.jar")
             into("${appDir}/usr/lib")
         }
+
+        // Copy bundled eSpeak-ng. AppRun cd's into ${APPDIR}/usr, so placing it at
+        // usr/espeak-ng matches the runtime resolver's `${cwd}/espeak-ng` lookup.
+        copy {
+            from(espeakNgInstallDir)
+            into("${appDir}/usr/espeak-ng")
+        }
+        file("${appDir}/usr/espeak-ng/bin/espeak-ng").setExecutable(true, false)
 
         // Copy simulations folder
         copy {

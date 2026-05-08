@@ -279,7 +279,30 @@ class TextUtilsTest {
 
     }
 
+    @Test
+    fun `CharacterTokenizer emits one token per character`() {
+        val tokens = CharacterTokenizer().tokenize("Cat!")
+        assertEquals(listOf("c", "a", "t", "!"), tokens.map { it.token })
+        assertEquals(0, tokens.first().start)
+        assertEquals(3, tokens.last().start)
+    }
 
+    @Test
+    fun `CharacterTokenizer respects whitespace and punctuation flags`() {
+        val keepAll = CharacterTokenizer(includeWhitespace = true, includePunctuation = true)
+            .tokenize("a b!").map { it.token }
+        assertEquals(listOf("a", " ", "b", "!"), keepAll)
+
+        val lettersOnly = CharacterTokenizer(includeWhitespace = false, includePunctuation = false)
+            .tokenize("a b!").map { it.token }
+        assertEquals(listOf("a", "b"), lettersOnly)
+    }
+
+    @Test
+    fun `CharacterTokenizer joinTokens concatenates`() {
+        val t = CharacterTokenizer()
+        assertEquals("hello", t.joinTokens(listOf("h", "e", "l", "l", "o")))
+    }
 
 }
 

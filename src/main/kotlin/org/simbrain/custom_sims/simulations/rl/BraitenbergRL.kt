@@ -3,10 +3,7 @@ package org.simbrain.custom_sims.simulations.rl
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapse
-import org.simbrain.network.core.addSynapseAsync
+import org.simbrain.network.core.*
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
@@ -17,10 +14,16 @@ import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
+import java.awt.*
 import java.awt.geom.Point2D
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
+import javax.swing.JButton
+import javax.swing.JInternalFrame
+import javax.swing.JPanel
+import javax.swing.event.InternalFrameAdapter
+import javax.swing.event.InternalFrameEvent
 
 class RewardConfig(
     private val label: String,
@@ -66,6 +69,148 @@ fun respawnObject(world: org.simbrain.world.odorworld.OdorWorld, obj: OdorWorldE
         newLoc = Point2D.Double((100..500).random().toDouble(), (100..500).random().toDouble())
     } while (world.entityList.any { it !== obj && newLoc.distance(it.location) < minSeparation })
     obj.location = newLoc
+}
+
+private data class WeightSpace(
+    val label: String,
+    val leftWeight: Synapse,
+    val rightWeight: Synapse
+)
+
+private class BraitenbergWeightSpacePanel(
+    private val spaces: List<WeightSpace>
+) : JPanel() {
+
+    private val trajectories = spaces.map { mutableListOf<Point2D.Double>() }
+    private val maxTrajectoryPoints = 2000
+
+    init {
+        preferredSize = Dimension(720, 360)
+        minimumSize = Dimension(520, 280)
+        background = Color.WHITE
+        recordCurrentWeights()
+    }
+
+    fun recordCurrentWeights() {
+        spaces.forEachIndexed { index, space ->
+            trajectories[index].add(Point2D.Double(space.leftWeight.strength, space.rightWeight.strength))
+            if (trajectories[index].size > maxTrajectoryPoints) {
+                trajectories[index].removeAt(0)
+            }
+        }
+    }
+
+    fun resetTrajectories() {
+        trajectories.forEach { it.clear() }
+        recordCurrentWeights()
+    }
+
+    override fun paintComponent(g: Graphics) {
+        super.paintComponent(g)
+        val g2 = g.create() as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+
+        val top = 34
+        val bottom = 58
+        val sideGap = 40
+        val plotGap = 34
+        val plotWidth = ((width - sideGap * 2 - plotGap) / spaces.size).coerceAtLeast(160)
+        val plotHeight = (height - top - bottom).coerceAtLeast(160)
+        val squareSize = minOf(plotWidth, plotHeight)
+        val startY = top + (plotHeight - squareSize) / 2
+
+        spaces.forEachIndexed { index, space ->
+            val startX = sideGap + index * (plotWidth + plotGap) + (plotWidth - squareSize) / 2
+            drawWeightSpace(g2, space, trajectories[index], startX, startY, squareSize)
+        }
+
+        g2.dispose()
+    }
+
+    private fun drawWeightSpace(
+        g2: Graphics2D,
+        space: WeightSpace,
+        trajectory: List<Point2D.Double>,
+        x: Int,
+        y: Int,
+        size: Int
+    ) {
+        val leftMin = space.leftWeight.lowerBound
+        val leftMax = space.leftWeight.upperBound
+        val rightMin = space.rightWeight.lowerBound
+        val rightMax = space.rightWeight.upperBound
+        val leftValue = space.leftWeight.strength
+        val rightValue = space.rightWeight.strength
+
+        g2.color = Color(246, 248, 250)
+        g2.fillRect(x, y, size, size)
+
+        g2.color = Color(210, 218, 226)
+        g2.stroke = BasicStroke(1f)
+        g2.drawLine(x, y, x + size, y + size)
+
+        g2.color = Color(226, 239, 228)
+        val pursuingLabel = "mostly pursuing"
+        drawCenteredString(g2, pursuingLabel, x + (size * 0.86).toInt(), y + (size * 0.18).toInt())
+        g2.color = Color(241, 229, 229)
+        val avoidingLabel = "mostly avoiding"
+        drawCenteredString(g2, avoidingLabel, x + (size * 0.14).toInt(), y + (size * 0.82).toInt())
+
+        g2.color = Color(55, 65, 81)
+        g2.stroke = BasicStroke(1.5f)
+        g2.drawRect(x, y, size, size)
+
+        g2.font = font.deriveFont(Font.BOLD, 14f)
+        drawCenteredString(g2, space.label, x + size / 2, y - 12)
+
+        g2.font = font.deriveFont(Font.PLAIN, 11f)
+        g2.color = Color(85, 85, 85)
+        g2.drawString("left weight", x + size / 2 - 28, y + size + 28)
+        g2.rotate(-Math.PI / 2, (x - 26).toDouble(), (y + size / 2).toDouble())
+        drawCenteredString(g2, "right weight", x - 26, y + size / 2)
+        g2.rotate(Math.PI / 2, (x - 26).toDouble(), (y + size / 2).toDouble())
+
+        g2.drawString("%.1f".format(leftMin), x - 4, y + size + 14)
+        drawRightAlignedString(g2, "%.1f".format(leftMax), x + size, y + size + 14)
+        drawRightAlignedString(g2, "%.1f".format(rightMin), x - 8, y + size + 4)
+        drawRightAlignedString(g2, "%.1f".format(rightMax), x - 8, y + 4)
+
+        g2.color = Color(33, 102, 172, 105)
+        g2.stroke = BasicStroke(1.4f)
+        trajectory.zipWithNext().forEach { (from, to) ->
+            val fromX = mapWeightToPixel(from.x, leftMin, leftMax, x, size)
+            val fromY = mapWeightToPixel(from.y, rightMin, rightMax, y + size, -size)
+            val toX = mapWeightToPixel(to.x, leftMin, leftMax, x, size)
+            val toY = mapWeightToPixel(to.y, rightMin, rightMax, y + size, -size)
+            g2.drawLine(fromX, fromY, toX, toY)
+        }
+
+        val px = mapWeightToPixel(leftValue, leftMin, leftMax, x, size)
+        val py = mapWeightToPixel(rightValue, rightMin, rightMax, y + size, -size)
+        g2.color = Color(33, 102, 172)
+        g2.fillOval(px - 5, py - 5, 10, 10)
+        g2.color = Color.WHITE
+        g2.drawOval(px - 5, py - 5, 10, 10)
+
+        g2.color = Color(45, 55, 72)
+        val valueText = "(${ "%.2f".format(leftValue) }, ${ "%.2f".format(rightValue) })"
+        drawCenteredString(g2, valueText, x + size / 2, y + size + 44)
+    }
+
+    private fun mapWeightToPixel(value: Double, min: Double, max: Double, origin: Int, extent: Int): Int {
+        val normalized = if (max == min) 0.5 else ((value - min) / (max - min)).coerceIn(0.0, 1.0)
+        return origin + (normalized * extent).toInt()
+    }
+
+    private fun drawCenteredString(g2: Graphics2D, text: String, centerX: Int, baselineY: Int) {
+        val metrics: FontMetrics = g2.fontMetrics
+        g2.drawString(text, centerX - metrics.stringWidth(text) / 2, baselineY)
+    }
+
+    private fun drawRightAlignedString(g2: Graphics2D, text: String, rightX: Int, baselineY: Int) {
+        val metrics: FontMetrics = g2.fontMetrics
+        g2.drawString(text, rightX - metrics.stringWidth(text), baselineY)
+    }
 }
 
 /**
@@ -227,10 +372,22 @@ val braitenbergRL = newSim { optionString ->
     val actorSynapses = mutableListOf<org.simbrain.network.core.Synapse>()
 
     // Actor synapses: only 4 trainable connections based on Braitenberg vehicle design
-    val cheeseLeftToLeftTurn = network.addSynapseAsync(cheeseLeftInput, leftTurn)
-    val cheeseRightToRightTurn = network.addSynapseAsync(cheeseRightInput, rightTurn)
-    val poisonLeftToLeftTurn = network.addSynapseAsync(poisonLeftInput, leftTurn)
-    val poisonRightToRightTurn = network.addSynapseAsync(poisonRightInput, rightTurn)
+    val cheeseLeftToLeftTurn = network.addSynapseAsync(cheeseLeftInput, leftTurn).apply {
+        lowerBound = -50.0
+        upperBound = 50.0
+    }
+    val cheeseRightToRightTurn = network.addSynapseAsync(cheeseRightInput, rightTurn).apply {
+        lowerBound = -50.0
+        upperBound = 50.0
+    }
+    val poisonLeftToLeftTurn = network.addSynapseAsync(poisonLeftInput, leftTurn).apply {
+        lowerBound = -50.0
+        upperBound = 50.0
+    }
+    val poisonRightToRightTurn = network.addSynapseAsync(poisonRightInput, rightTurn).apply {
+        lowerBound = -50.0
+        upperBound = 50.0
+    }
 
     // Add actor synapses to list for learning
     actorSynapses.addAll(listOf(
@@ -302,8 +459,30 @@ val braitenbergRL = newSim { optionString ->
         s.strength = 0.0
     }
 
+    var weightSpacePanel: BraitenbergWeightSpacePanel? = null
+    var weightSpaceFrame: JInternalFrame? = null
+
+    fun repaintWeightSpacePanel() {
+        weightSpacePanel?.takeIf { it.isDisplayable }?.let { panel ->
+            swingInvokeLater {
+                panel.recordCurrentWeights()
+                panel.repaint()
+            }
+        }
+    }
+
+    fun resetWeightSpaceTrajectories() {
+        weightSpacePanel?.takeIf { it.isDisplayable }?.let { panel ->
+            swingInvokeLater {
+                panel.resetTrajectories()
+                panel.repaint()
+            }
+        }
+    }
+
     // Track previous value for TD error calculation
     var previousValue = 0.0
+    var stepsSinceCollision = 0
 
     // Variables for headless mode features
     var currentIteration = 0
@@ -422,6 +601,11 @@ val braitenbergRL = newSim { optionString ->
         }
     }
 
+    fun resetVehicle() {
+        agent.location = Point2D.Double((50..500).random().toDouble(), (50..500).random().toDouble())
+        agent.heading = (0..360).random().toDouble()
+    }
+
     workspace.addUpdateAction("Update RL metrics and learning") {
         // Increment iteration counter
         currentIteration++
@@ -429,6 +613,13 @@ val braitenbergRL = newSim { optionString ->
         // Check parameter schedule for changes
         parameterSchedule.filter { it.first == currentIteration }.forEach { (_, params) ->
             applyParameterChanges(params)
+        }
+
+        stepsSinceCollision++
+        if (stepsSinceCollision > 1000) {
+            resetVehicle()
+            stepsSinceCollision = 0
+            previousValue = 0.0
         }
 
         // Calculate current reward
@@ -468,6 +659,8 @@ val braitenbergRL = newSim { optionString ->
         // Append CSV row if CSV output is enabled
         appendCsvRow()
 
+        repaintWeightSpacePanel()
+
         // Check if max iterations reached
         maxIterations?.let { max ->
             if (currentIteration >= max) {
@@ -485,11 +678,6 @@ val braitenbergRL = newSim { optionString ->
             EntityType.Poison -> "Poison"
             else -> entity.entityType.name
         }
-    }
-
-    fun resetVehicle() {
-        agent.location = Point2D.Double((50..500).random().toDouble(), (50..500).random().toDouble())
-        agent.heading = (0..360).random().toDouble()
     }
 
     // Reset all objects to random locations far from each other
@@ -512,6 +700,7 @@ val braitenbergRL = newSim { optionString ->
         if (collidedWith === cheese || collidedWith === poison) {
             respawnCountPerTrial++
             respawnObject(world, collidedWith)
+            stepsSinceCollision = 0
         }
     }
 
@@ -525,7 +714,14 @@ val braitenbergRL = newSim { optionString ->
         place(networkComponent, 320, 10, 360, 400)
         place(oc, 670, 10, 415, 415)
         place(plot, 320, 410, 500, 300)
-        swingInvokeLater { oc.getDesktopComponentAs<OdorWorldDesktopComponent>().worldPanel.scalingFactor = 0.1 }
+        val plotFrame = getDesktopComponent(plot).parentFrame
+        if (plotFrame is JInternalFrame) {
+            plotFrame.isClosable = false
+        }
+        swingInvokeLater {
+            oc.getDesktopComponentAs<OdorWorldDesktopComponent>().worldPanel.scalingFactor = 0.1
+            plotFrame.setIcon(true)
+        }
 
         // Combined control panel
         createControlPanel("Control Panel", 0, 10) {
@@ -541,6 +737,21 @@ val braitenbergRL = newSim { optionString ->
             taskComboBox.toolTipText = "Select the learning task: which objects to seek or avoid"
 
             addSeparator()
+
+            val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+                learningRate = it
+            }
+            lrField.toolTipText = "Step size for weight updates (higher = faster but less stable)"
+
+            val gammaField = addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
+                gamma = it
+            }
+            gammaField.toolTipText = "Importance of future rewards (0-1, higher = more farsighted)"
+
+            val speedBiasField = addFormattedNumericTextField("Speed Bias", initValue = straight.bias) {
+                straight.bias = it
+            }
+            speedBiasField.toolTipText = "Base forward speed (higher = faster default movement)"
 
             val learningCheckbox = addCheckBox("Learning Enabled", learningEnabled) { enabled ->
                 learningEnabled = enabled
@@ -563,35 +774,6 @@ val braitenbergRL = newSim { optionString ->
 
             addSeparator()
 
-            val resetButton = addButton("Reset") {
-                network.freeSynapses.forEach { s ->
-                    s.strength = 0.0
-                }
-                speedSynapses.forEach { s ->
-                    s.strength = -1.0
-                }
-            }
-            resetButton.toolTipText = "Reset all weights to initial values"
-
-            addSeparator()
-
-            val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
-                learningRate = it
-            }
-            lrField.toolTipText = "Step size for weight updates (higher = faster but less stable)"
-
-            val gammaField = addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
-                gamma = it
-            }
-            gammaField.toolTipText = "Importance of future rewards (0-1, higher = more farsighted)"
-
-            val speedBiasField = addFormattedNumericTextField("Speed Bias", initValue = straight.bias) {
-                straight.bias = it
-            }
-            speedBiasField.toolTipText = "Base forward speed (higher = faster default movement)"
-
-            addSeparator()
-
             // Helper to get decay function summary
             fun getDecaySummary(): String {
                 val df = sharedDecayFunction
@@ -610,6 +792,88 @@ val braitenbergRL = newSim { optionString ->
                 }.display()
             }
             decayEditButton.toolTipText = "Configure decay function for all sensors and rewards"
+
+            lateinit var weightSpaceButton: JButton
+
+            fun showWeightSpaceFrame() {
+                val existingFrame = weightSpaceFrame?.takeIf { it.isDisplayable }
+                val frame = existingFrame ?: run {
+                    val panel = BraitenbergWeightSpacePanel(
+                        listOf(
+                            WeightSpace("Cheese", cheeseLeftToLeftTurn, cheeseRightToRightTurn),
+                            WeightSpace("Poison", poisonLeftToLeftTurn, poisonRightToRightTurn)
+                        )
+                    )
+                    weightSpacePanel = panel
+                    JInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
+                        layout = BorderLayout()
+                        add(panel, BorderLayout.CENTER)
+                        setBounds(165, 155, 760, 420)
+                        defaultCloseOperation = JInternalFrame.DISPOSE_ON_CLOSE
+                        addInternalFrameListener(object : InternalFrameAdapter() {
+                            override fun internalFrameClosed(e: InternalFrameEvent) {
+                                weightSpacePanel = null
+                                weightSpaceFrame = null
+                                weightSpaceButton.text = "Show Weight Space"
+                            }
+                        })
+                        isVisible = true
+                    }.also {
+                        weightSpaceFrame = it
+                        addInternalFrame(it)
+                    }
+                }
+                frame.isIcon = false
+                frame.toFront()
+                frame.isSelected = true
+                repaintWeightSpacePanel()
+                weightSpaceButton.text = "Hide Weight Space"
+            }
+
+            fun hideWeightSpaceFrame() {
+                weightSpaceFrame?.takeIf { it.isDisplayable }?.let { it.isIcon = true }
+                weightSpaceButton.text = "Show Weight Space"
+            }
+
+            weightSpaceButton = addButton("Show Weight Space") {
+                val frame = weightSpaceFrame?.takeIf { it.isDisplayable }
+                if (frame != null && !frame.isIcon) {
+                    hideWeightSpaceFrame()
+                } else {
+                    showWeightSpaceFrame()
+                }
+            }
+            weightSpaceButton.toolTipText = "Open a live display of cheese and poison actor weights"
+
+            val timeSeriesButton = addButton("Show Time Series") {
+                if (plotFrame is JInternalFrame && !plotFrame.isIcon) {
+                    plotFrame.setIcon(true)
+                    this@addButton.text = "Show Time Series"
+                } else {
+                    plotFrame.setIcon(false)
+                    plotFrame.toFront()
+                    this@addButton.text = "Hide Time Series"
+                }
+            }
+            timeSeriesButton.toolTipText = "Show reward, value, and TD error time series"
+
+            addSeparator()
+
+            val randomResetButton = addButton("Reset (Random Weights)") {
+                network.freeSynapses.forEach { s ->
+                    s.strength = s.lowerBound + Math.random() * (s.upperBound - s.lowerBound)
+                }
+                resetWeightSpaceTrajectories()
+            }
+            randomResetButton.toolTipText = "Randomize all weights within their current bounds"
+
+            val zeroResetButton = addButton("Reset (0 Weights)") {
+                network.freeSynapses.forEach { s ->
+                    s.strength = 0.0
+                }
+                resetWeightSpaceTrajectories()
+            }
+            zeroResetButton.toolTipText = "Set all weights to zero"
 
             swingInvokeLater { pack() }
         }
@@ -670,6 +934,7 @@ val braitenbergRL = newSim { optionString ->
     4. Click the workspace run button to start learning
     5. Watch the vehicle move around the environment as it learns
     6. Observe the `Reward, Value, TD Error` plot to monitor learning progress
+    7. Click `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
 
     You can stop and examine weights at any time, then continue. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
 
@@ -681,6 +946,7 @@ val braitenbergRL = newSim { optionString ->
     - The `Value` trace showing the critic's learned predictions
     - The `TD Error` showing the learning signal
     - The network weights updating in real-time
+    - The `Show Weight Space` display, where each point shows the current left and right turn weights for cheese or poison. Points above the anti-diagonal indicate mostly pursuing behavior; points below it indicate mostly avoiding behavior.
 
     You can adjust parameters to see their effects:
 

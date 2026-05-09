@@ -343,6 +343,22 @@ fun showWarningDialog(message: String) {
     JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
 }
 
+/**
+ * Like [showWarningDialog], but renders the message in a non-editable [JTextArea] so the user
+ * can select and copy the text (e.g. to copy a command embedded in the message).
+ */
+fun showCopyableWarningDialog(message: String) {
+    val textArea = JTextArea(message).apply {
+        isEditable = false
+        isOpaque = false
+        font = UIManager.getFont("Label.font")
+        border = null
+    }
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, textArea, "Warning!", JOptionPane.WARNING_MESSAGE)
+}
+
 fun showWarningConfirmDialog(message: String): Int {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true

@@ -3,7 +3,7 @@ package org.simbrain.world.soundworld
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.util.UserParameter
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showCopyableWarningDialog
 import org.simbrain.workspace.Consumable
 import java.util.concurrent.atomic.AtomicBoolean
 import javax.sound.sampled.AudioFormat
@@ -21,7 +21,7 @@ fun warnIfEspeakUnavailable() {
     if (EspeakRuntime.ensureInitialized()) return
     if (!espeakWarningShown.compareAndSet(false, true)) return
     val message = EspeakRuntime.errorMessage ?: "Phoneme audio is not available."
-    SwingUtilities.invokeLater { showWarningDialog(message) }
+    SwingUtilities.invokeLater { showCopyableWarningDialog(message) }
 }
 
 /**

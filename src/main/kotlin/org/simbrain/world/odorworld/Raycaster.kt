@@ -199,6 +199,7 @@ class Raycaster(private val screenWidth: Int, private val screenHeight: Int) {
 
                     // Iterate through layers from bottom to top
                     for (layer in tileMap.layers) {
+                        if (!layer.visible) continue
                         val gid = layer[tileX, tileY]
                         if (gid > 0) {
                             val tileImage = tileMap.tileImage(gid)

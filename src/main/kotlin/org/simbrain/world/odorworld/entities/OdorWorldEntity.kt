@@ -120,6 +120,21 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.trailVisibilityChanged.fire(value, oldValue)
         }
 
+    var distancePerAnimationFrame by GuiEditable(
+        initValue = 10.0,
+        label = "Distance per animation frame",
+        description = "Number of pixels the sprite must move before the next frame in the sprite animation is used",
+        min = 0.1,
+        increment = 1.0,
+        order = 50,
+        setter = {
+            field = it.coerceAtLeast(0.1)
+        },
+        onUpdate = {
+            showWidget(widgetValue(OdorWorldEntity::entityType).hasMultipleAnimationFrames())
+        }
+    )
+
     var drawTrailWithoutRunningWorkspace by GuiEditable(
         initValue = false,
         description = "Draw trials even when the workspace is not running",
@@ -452,9 +467,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         val numFrames = entityType.imageBasePaths.firstOrNull()?.size ?: 1
         if (numFrames <= 1) return 0
 
-        animationFrameAccumulator += speed / 5.0
+        animationFrameAccumulator += speed / distancePerAnimationFrame
         var framesAdvanced = 0
         while (animationFrameAccumulator >= 1.0) {
+            println(distancePerAnimationFrame)
             animationFrame = (animationFrame + 1) % numFrames
             animationFrameAccumulator -= 1.0
             framesAdvanced++
@@ -506,4 +522,8 @@ fun OdorWorldEntity.vectorTo(other: Point2D): Point2D {
     } else {
         other - location
     }
+}
+
+private fun EntityType.hasMultipleAnimationFrames(): Boolean {
+    return (imageBasePaths.firstOrNull()?.size ?: 1) > 1
 }

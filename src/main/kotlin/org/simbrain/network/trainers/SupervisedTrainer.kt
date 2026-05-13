@@ -12,6 +12,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
+import kotlin.math.sqrt
 import kotlin.random.Random
 import kotlin.reflect.KFunction
 
@@ -132,6 +133,26 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     private var batchAccuracySum = 0.0
     private var batchSampleCount = 0
 
+    /**
+     * RMS of the optimizer's per-parameter update from the most recent training iteration.
+     * Computed across all weights, synapse-group weights, and biases that were updated.
+     */
+    var lastEffectiveStepSize: Double? = null
+        private set
+
+    private var stepSquaredSum = 0.0
+    private var stepParamCount = 0
+
+    private fun recordOptimizerUpdate(update: Matrix) {
+        for (i in 0 until update.nrow()) {
+            for (j in 0 until update.ncol()) {
+                val v = update[i, j]
+                stepSquaredSum += v * v
+            }
+        }
+        stepParamCount += update.nrow() * update.ncol()
+    }
+
     var isRunning = false
 
     private var stoppingConditionReached = false
@@ -197,10 +218,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 
     private suspend fun trainOnceHandler() {
         iteration++
-        
+
         // Reset batch accuracy accumulators
         batchAccuracySum = 0.0
         batchSampleCount = 0
+        stepSquaredSum = 0.0
+        stepParamCount = 0
         
         with(config.updateType) {
             lastTrainingError = when (this) {
@@ -228,6 +251,8 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         } else {
             null
         }
+
+        lastEffectiveStepSize = if (stepParamCount > 0) sqrt(stepSquaredSum / stepParamCount) else null
         
         val shouldComputeTest = config.testConfiguration.enabled && supervisedNetwork.testingSet.size > 0 && 
                                 iteration % config.testConfiguration.testFrequency == 0
@@ -250,7 +275,8 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             trainingError = lastTrainingError,
             testingError = testError,
             trainingAccuracy = lastTrainingAccuracy,
-            testingAccuracy = testAccuracy
+            testingAccuracy = testAccuracy,
+            effectiveStepSize = lastEffectiveStepSize
         )
         events.errorUpdated.fire(trainingStats).await()
         if (isRunning) {
@@ -344,9 +370,17 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             wm.displayName to delta
         }
 
+        // accumulateBackprop sums per-row deltas. Average them here so the optimizer sees a
+        // per-sample-equivalent gradient, regardless of batch size. Adam-family optimizers are
+        // scale-invariant (the constant cancels in m̂/√v̂), but non-normalizing optimizers like
+        // Momentum need this averaging to stay stable as batch size changes. CnnTrainer already
+        // does the same scaling.
+        val batchScale = 1.0 / rowRange.count().coerceAtLeast(1)
+
         weightAccumulator.forEach { (wm, delta) ->
-            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta)
+            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta.clone().mul(batchScale))
             weightAccumulatorContext?.write("delta_${wm.displayName}") { weightsDelta.clone() }
+            recordOptimizerUpdate(weightsDelta)
 
             wm.weights.add(weightsDelta)
             weightAccumulatorContext?.write("weights_${wm.displayName}") { wm.weights.clone() }
@@ -360,8 +394,9 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 
         synapseGroupAccumulator.forEach { (sg, delta) ->
             val weightMatrix = sg.getWeightMatrix()
-            val delta = config.optimizer.computeDelta(weightMatrix, delta)
+            val delta = config.optimizer.computeDelta(weightMatrix, delta.clone().mul(batchScale))
             weightAccumulatorContext?.write("delta_${sg.displayName}") { delta.clone() }
+            recordOptimizerUpdate(delta)
 
             sg.setWeightMatrix(weightMatrix.add(delta))
             weightAccumulatorContext?.write("weights_${sg.displayName}") { sg.getWeightMatrix().clone() }
@@ -377,8 +412,9 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         val computeDeltaContext = probeContext?.createMapProbe("computeDelta")
 
         biasesAccumulator.forEach { (na, delta) ->
-            val delta = config.optimizer.computeDelta(na.biases, delta)
+            val delta = config.optimizer.computeDelta(na.biases, delta.clone().mul(batchScale))
             computeDeltaContext?.write(na.displayName, delta)
+            recordOptimizerUpdate(delta)
             na.biases = na.biases.add(delta)
             na.events.updated.fire()
         }
@@ -386,7 +422,9 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         probeContext?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
 
         rawMatrixAccumulator.forEach { (matrix, delta) ->
-            matrix.add(config.optimizer.computeDelta(matrix, delta))
+            val update = config.optimizer.computeDelta(matrix, delta.clone().mul(batchScale))
+            recordOptimizerUpdate(update)
+            matrix.add(update)
         }
 
         probeContext?.write("rawMatrixAccumulator", rawMatrixAccumulator)

@@ -6,7 +6,10 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.util.*
+import org.simbrain.util.assertMatrixEquals
+import org.simbrain.util.assertMatrixNotEquals
+import org.simbrain.util.frobeniusNorm
+import org.simbrain.util.setValuesInPlace
 import smile.math.matrix.Matrix
 
 class OptimizerTest {
@@ -32,38 +35,51 @@ class OptimizerTest {
         val (net, wm, trainer) = createTestNetwork()
         val optimizer = MomentumOptimizer(momentum = 0.9).apply { learningRate = 0.1 }
         trainer.config.optimizer = optimizer
-        
-        // Set known weights and activations
+
         wm.weights.fill(0.5)
         wm.source.setActivations(doubleArrayOf(1.0, 0.5))
-        
-        // First update - no momentum yet (lastDelta starts as zeros)
+
         val firstDelta = Matrix.of(arrayOf(
             doubleArrayOf(0.2, 0.1),
             doubleArrayOf(0.4, 0.2)
         ))
-        
+
         with(trainer) {
             val result1 = optimizer.computeDelta(wm.weights, firstDelta)
-            // Expected: (zeros * momentum + firstDelta) * learningRate = firstDelta * learningRate
+            // v_1 = 0.9 * 0 + firstDelta; update = lr * v_1
             val expected1 = firstDelta.clone().mul(optimizer.learningRate)
-            
+
             assertMatrixEquals(expected1, result1, "First update should be just learning_rate * delta")
         }
-        
-        // Second update - should include momentum from first delta
+
         val secondDelta = Matrix.of(arrayOf(
             doubleArrayOf(0.1, 0.3),
             doubleArrayOf(0.2, 0.1)
         ))
-        
+
         with(trainer) {
             val result2 = optimizer.computeDelta(wm.weights, secondDelta)
-            // Expected: (firstDelta * momentum + secondDelta) * learningRate
-            val expectedMomentum = firstDelta.clone().mul(0.9)
-            val expected2 = expectedMomentum.add(secondDelta).mul(optimizer.learningRate)
-            
-            assertMatrixEquals(expected2, result2, "Second update should include momentum from first delta")
+            // v_2 = 0.9 * v_1 + secondDelta = 0.9 * firstDelta + secondDelta; update = lr * v_2
+            val expectedVelocity = firstDelta.clone().mul(0.9).add(secondDelta)
+            val expected2 = expectedVelocity.clone().mul(optimizer.learningRate)
+
+            assertMatrixEquals(expected2, result2, "Second update should accumulate velocity")
+        }
+
+        val thirdDelta = Matrix.of(arrayOf(
+            doubleArrayOf(0.05, 0.05),
+            doubleArrayOf(0.05, 0.05)
+        ))
+
+        with(trainer) {
+            val result3 = optimizer.computeDelta(wm.weights, thirdDelta)
+            // v_3 = 0.9 * v_2 + thirdDelta = 0.81 * firstDelta + 0.9 * secondDelta + thirdDelta
+            val expectedVelocity3 = firstDelta.clone().mul(0.9 * 0.9)
+                .add(secondDelta.clone().mul(0.9))
+                .add(thirdDelta)
+            val expected3 = expectedVelocity3.clone().mul(optimizer.learningRate)
+
+            assertMatrixEquals(expected3, result3, "Third update should accumulate full velocity history (Polyak momentum)")
         }
     }
 

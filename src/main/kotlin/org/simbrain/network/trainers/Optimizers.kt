@@ -44,19 +44,18 @@ class MomentumOptimizer(
     )
     var momentum: Double = 0.9
 ) : Optimizer() {
-    private var matrixToLastDeltaMap: HashMap<Matrix, Matrix> = HashMap()
+    private var matrixToVelocityMap: HashMap<Matrix, Matrix> = HashMap()
 
     context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
-        val lastDelta = matrixToLastDeltaMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-        val adjustment = lastDelta.mul(momentum)
-        matrixToLastDeltaMap[matrix] = delta.clone()
-        return adjustment.add(delta).mul(learningRate)
+        val velocity = matrixToVelocityMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
+        velocity.mul(momentum).add(delta)
+        return velocity.clone().mul(learningRate)
     }
 
     context(SupervisedTrainer)
     override fun reset() {
-        matrixToLastDeltaMap.clear()
+        matrixToVelocityMap.clear()
     }
 
     override fun copy() = MomentumOptimizer(momentum).also { it.learningRate = learningRate }

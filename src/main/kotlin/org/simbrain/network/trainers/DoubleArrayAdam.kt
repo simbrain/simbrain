@@ -26,6 +26,15 @@ class DoubleArrayAdam(
      * @param params the parameter array to update in-place
      * @param grad   the gradient array (same length as params)
      */
+    /**
+     * Sum of squared per-parameter updates from the most recent [step] cycle, plus the count
+     * of params updated. Cleared in [step]. Caller can read these to compute an RMS step size.
+     */
+    var lastStepSquaredSum: Double = 0.0
+        private set
+    var lastStepParamCount: Int = 0
+        private set
+
     fun update(key: String, params: DoubleArray, grad: DoubleArray) {
         val size = params.size
         val mArr = m.getOrPut(key) { DoubleArray(size) }
@@ -42,15 +51,22 @@ class DoubleArrayAdam(
             val g = grad[i]
             mArr[i] = beta1 * mArr[i] + (1.0 - beta1) * g
             vArr[i] = beta2 * vArr[i] + (1.0 - beta2) * g * g
-            params[i] -= lr * mArr[i] / (sqrt(vArr[i]) + epsilon)
+            val update = lr * mArr[i] / (sqrt(vArr[i]) + epsilon)
+            lastStepSquaredSum += update * update
+            params[i] -= update
         }
+        lastStepParamCount += size
     }
 
     /**
      * Increment the global timestep. Call once per training iteration (before update calls).
+     * Also resets the per-step update accumulator so [lastStepSquaredSum]/[lastStepParamCount]
+     * track only the upcoming round of [update] calls.
      */
     fun step() {
         timestep++
+        lastStepSquaredSum = 0.0
+        lastStepParamCount = 0
     }
 
     /**

@@ -248,6 +248,14 @@ class CnnTrainerControls(
         val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
+        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
+        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
+            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
+                "For Adam in steady state ≈ learning rate. " +
+                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
+        }
+        labelPanel.addItem("Effective Step Size:", stepSizeValue)
+
         fun updateLabelVisibility() {
             val showTestingLoss = trainer.config.testConfiguration.enabled
             val showTrainingAccuracy = trainer.config.computeAccuracy
@@ -278,6 +286,8 @@ class CnnTrainerControls(
             
             trainingStats.trainingAccuracy?.let { trainingAccuracyValue.text = "${(it * 100).format(1)}%" }
             trainingStats.testingAccuracy?.let { testingAccuracyValue.text = "${(it * 100).format(1)}%" }
+
+            stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
         layout = MigLayout("ins 0, gap 0px 0px")

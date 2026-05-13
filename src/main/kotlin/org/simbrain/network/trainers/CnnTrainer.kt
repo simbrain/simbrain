@@ -11,10 +11,7 @@ import org.simbrain.util.flatten
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import smile.math.matrix.Matrix
-import kotlin.math.abs
-import kotlin.math.exp
-import kotlin.math.ln
-import kotlin.math.max
+import kotlin.math.*
 
 /**
  * Configuration for CNN training.
@@ -250,6 +247,9 @@ class CnnTrainer(
 
     var lastTestingAccuracy: Double? = null
 
+    var lastEffectiveStepSize: Double? = null
+        private set
+
     private var batchAccuracySum = 0.0
     private var batchSampleCount = 0
 
@@ -361,6 +361,11 @@ class CnnTrainer(
         } else {
             null
         }
+        lastEffectiveStepSize = if (adam.lastStepParamCount > 0) {
+            sqrt(adam.lastStepSquaredSum / adam.lastStepParamCount)
+        } else {
+            null
+        }
 
         val shouldComputeTest = config.testConfiguration.enabled &&
             (testingData?.size ?: 0) > 0 &&
@@ -377,7 +382,8 @@ class CnnTrainer(
                 trainingError = loss,
                 testingError = testError,
                 trainingAccuracy = lastTrainingAccuracy,
-                testingAccuracy = testAccuracy
+                testingAccuracy = testAccuracy,
+                effectiveStepSize = lastEffectiveStepSize
             )
         ).await()
 

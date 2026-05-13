@@ -3,6 +3,7 @@ package org.simbrain.custom_sims.simulations.nettalk
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.subnetworks.BackpropNetwork
+import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.nettalk.NettalkEncoder
 import org.simbrain.util.nettalk.NettalkPhonology
@@ -40,6 +41,7 @@ val nettalkComponentSim = newSim("nettalk_component") {
     val encoder = NettalkEncoder(windowSize)
 
     val bp = BackpropNetwork(intArrayOf(encoder.inputSize, hiddenSize, encoder.outputSize)).apply {
+        trainerConfig.optimizer = AdamOptimizer(beta2 = 0.9)
         trainerConfig.learningRate = 0.01
         trainerConfig.testConfiguration.enabled = false
     }

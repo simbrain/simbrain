@@ -1,87 +1,116 @@
 package org.simbrain.custom_sims.simulations.nettalk
 
-import org.simbrain.custom_sims.*
-import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.addSoundWorld
+import org.simbrain.custom_sims.createControlPanel
+import org.simbrain.custom_sims.newSim
 import org.simbrain.util.place
-import org.simbrain.util.point
 import org.simbrain.world.soundworld.PhonemeSynthesizer
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.JTextArea
+import javax.swing.event.DocumentEvent
+import javax.swing.event.DocumentListener
 
 /**
- * Smoke test for the eSpeak-ng phoneme synthesizer.
+ * Demo for the eSpeak-ng phoneme synthesizer.
  *
- * Provides a control panel with buttons that send phoneme strings to a [PhonemeSynthesizer]
- * and update a [NetworkTextObject] showing what was last spoken. Used to verify the
- * eSpeak-ng subprocess pipeline works end-to-end before wiring it into a real NETtalk
- * simulation.
+ * Provides a control panel for sending plain text or phoneme strings to a
+ * [PhonemeSynthesizer]. Used to verify the speech pipeline works end-to-end before
+ * wiring it into a real NETtalk simulation.
  */
-val nettalkSmokeTest = newSim {
+val synthesizerDemo = newSim {
 
     workspace.clearWorkspace()
 
     val synthesizer = PhonemeSynthesizer()
     val soundWorld = addSoundWorld("Phoneme Synthesizer", synthesizer)
 
-    val networkComponent = addNetworkComponent("Status")
-    val net = networkComponent.network
-
-    val currentStatus = NetworkTextObject("Press a button to speak").apply {
-        fontSize = 16
-        location = point(0, 0)
-    }
-    net.addNetworkModel(currentStatus)
-
-    val samples = listOf(
-        "hello" to "h@l'oU",
-        "world" to "w'3rld",
-        "neural" to "n'jU@r@l",
-        "network" to "n'Etw3rk",
-        "Sejnowski" to "sEjn'aUski",
-        "phoneme" to "f'oUnim",
-        "babble" to "b'@b@l",
-        "computer" to "k@mpj'u:t@"
-    )
+    var wordToSpeak = "hello how are you"
+    var phonemesToSpeak = "h@l'oU h'aU A: j'u:"
 
     withGui {
-        place(soundWorld, 0, 0, 400, 300)
-        place(networkComponent, 410, 0, 500, 300)
-
-        createControlPanel("Speak", 920, 0) {
-            samples.forEach { (label, phonemes) ->
-                addButton("$label  [$phonemes]") {
-                    currentStatus.text = "Speaking: $label\n[$phonemes]"
-                    synthesizer.speakPhonemes(phonemes)
-                }
+        val controlPanel = createControlPanel("Speak", 0, 0) {
+            addComponent(textAreaPanel("Text", wordToSpeak) { wordToSpeak = it })
+            addButton("Speak text") {
+                synthesizer.speakWord(wordToSpeak.trim())
             }
-            addButton("Speak word (text mode)") {
-                currentStatus.text = "Speaking word: hello (text mode)"
-                synthesizer.speakWord("hello")
+
+            addSeparator()
+
+            addComponent(textAreaPanel("Phonemes", phonemesToSpeak) { phonemesToSpeak = it })
+            addButton("Speak phonemes") {
+                synthesizer.speakPhonemes(phonemesToSpeak.trim())
             }
         }
+        controlPanel.setBounds(0, 0, 324, 388)
+        place(soundWorld, 330, 3, 520, 300)
     }
 
     addSidebarInfo(
         """
-        # Phoneme Synthesizer Smoke Test
+        # Synthesizer Demo
 
-        This is a development smoke test for the new `PhonemeSynthesizer`. It verifies that
-        Simbrain can drive `espeak-ng` as a subprocess, capture WAV output, and play it through
-        the standard Java audio pipeline.
+        This demo shows the two ways Simbrain can synthesize speech:
+        ordinary text-to-speech in the top panel, and direct phoneme synthesis in the
+        bottom panel. 
+        
+        The synthesizer will probably eventually be turned into a standard component available from the GUI.
 
-        # What to Do
+        # Basic Text-To-Speech
 
-        1. Make sure `espeak-ng` is installed (`brew install espeak-ng` on macOS).
-        2. Click any button in the `Speak` panel to hear the phoneme string.
-        3. The status text in the `Status` network shows what was spoken.
+        Text-to-speech converts written words into audible speech. A synthesizer first
+        decides how the text should be pronounced, then generates the audio waveform for
+        that pronunciation. Simbrain uses [eSpeak NG](https://github.com/espeak-ng/espeak-ng),
+        a compact open-source speech synthesizer, for this basic text-to-speech path.
 
-        Phoneme strings use eSpeak-ng's Kirshenbaum notation, wrapped in `[[...]]` internally.
-        For example, `h@l'oU` is "hello" with primary stress on the second syllable.
+        Enter a word or phrase in `Text` and click `Speak text`.
 
-        If you hear nothing, check the console for an `espeak-ng not found on PATH` warning.
+        # Phoneme Synthesis
 
-        # Next Steps
+        Phoneme synthesis bypasses the ordinary text-to-pronunciation step. Instead of
+        asking the synthesizer to infer how a word should sound, Simbrain sends an explicit
+        sequence of speech sounds. This is useful when you want precise control over the
+        sounds being generated or when another model has already produced a phonetic
+        representation.
 
-        Once this works end-to-end, the same `PhonemeSynthesizer` will be coupled to the output
-        layer of the NETtalk network so the network's predicted phonemes are spoken aloud.
+        The `Phonemes` field uses eSpeak-ng's
+        [Kirshenbaum notation](https://chromium.googlesource.com/chromiumos/third_party/espeak-ng/+/HEAD/docs/phonemes/kirshenbaum.md),
+        an ASCII notation for phonetic sounds. 
+
+        Enter an eSpeak-ng phoneme string in `Phonemes` and click `Speak phonemes`.
+
+        # Examples
+
+        - `h@l'oU` for "hello"
+        - `w'3rld` for "world"
+        - `n'jU@r@l` for "neural"
+        - `n'Etw3rk` for "network"
+        - `sEjn'aUski` for "Sejnowski"
+        - `f'oUnim` for "phoneme"
+        - `b'@b@l` for "babble"
+        - `k@mpj'u:t@` for "computer"
         """.trimIndent()
     )
+}
+
+private fun textAreaPanel(label: String, initialText: String, onChange: (String) -> Unit): JPanel {
+    val textArea = JTextArea(initialText, 4, 28).apply {
+        lineWrap = true
+        wrapStyleWord = true
+        document.addDocumentListener(object : DocumentListener {
+            override fun insertUpdate(e: DocumentEvent) = onChange(text)
+            override fun removeUpdate(e: DocumentEvent) = onChange(text)
+            override fun changedUpdate(e: DocumentEvent) = onChange(text)
+        })
+    }
+    return JPanel(BorderLayout()).apply {
+        add(JLabel(label), BorderLayout.NORTH)
+        add(JScrollPane(textArea).apply {
+            preferredSize = Dimension(280, 90)
+        }, BorderLayout.CENTER)
+    }
 }

@@ -8,10 +8,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
 import org.simbrain.util.SimbrainConstants.NULL_STRING
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.NumericWidget
-import org.simbrain.util.propertyeditor.ObjectWidget
-import org.simbrain.util.propertyeditor.StringWidget
+import org.simbrain.util.propertyeditor.*
 import javax.swing.JComboBox
 import javax.swing.JSpinner
 import kotlin.reflect.full.declaredMemberProperties
@@ -38,6 +35,16 @@ class AnnotatedPropertyEditorTest {
         (ape.propertyNameWidgetMap[prop.name] as NumericWidget).widget.value = .75
         ape.commitChanges()
         assertEquals(.75, n1.activation)
+    }
+
+    @Test
+    fun `test integer spinner increment commits as int`() {
+        val testObject = APETestObjectKotlin()
+        val ape = AnnotatedPropertyEditor(testObject)
+        val widget = ape.getWidgetByLabel("Annotated Int") as NumericWidget
+        widget.widget.value = widget.widget.nextValue
+        ape.commitChanges()
+        assertEquals(2, testObject.annotatedInt)
     }
 
     @Test

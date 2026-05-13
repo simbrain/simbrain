@@ -88,14 +88,13 @@ val nettalkComponentSim = newSim("nettalk_component") {
 }
 
 private val NETTALK_COMPONENT_SIDEBAR: String = """
-    # NETtalk (component edition)
+    # NETtalk
 
-    Same NETtalk demo as the simpler `NETtalk` simulation, but built from a dedicated
-    `NetTalkComponent` wired by couplings to a separate `NetworkComponent`. NetTalk owns
-    its own embedded `PhonemeSynthesizer` — the synth settings (voice, speed, pitch,
-    amplitude) appear at the bottom of the NetTalk panel. The training set is pre-loaded
-    on the network so you can train it via its standard right-click → `Edit/Train
-    Backprop...` dialog.
+    NETtalk demonstrates how a neural network can learn to convert written English into
+    phoneme-like speech output. A `NetTalkComponent` presents the text and audio controls,
+    while a separate `NetworkComponent` learns the mapping from letter windows to phoneme
+    features. The training set is pre-loaded on the network so you can train it via its
+    standard right-click → `Edit/Train Backprop...` dialog.
 
     # Coupling Topology
 
@@ -124,12 +123,10 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     Reopening the file restores both components' state; this simulation's reopen handler
     re-establishes the couplings and re-renders this sidebar info.
 
-    # Audio Pipeline
+    # Links
 
-    `PhonemeSynthesizer` calls into bundled `libespeak-ng` directly via JNA: each utterance
-    flows `text → espeak_Synth → callback(short[]) → SourceDataLine`. Calls to `speakPhonemes`
-    enqueue jobs on a rendezvous channel, so the producer (the workspace updater) blocks
-    when audio is in flight — this naturally paces iteration with audio playback.
+    Simbrain's speech output is based on [eSpeak NG](https://github.com/espeak-ng/espeak-ng),
+    a compact open-source text-to-speech system that supports text and phoneme input.
 
     # Credits
 

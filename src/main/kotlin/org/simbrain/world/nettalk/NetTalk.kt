@@ -18,7 +18,7 @@ import org.simbrain.world.soundworld.PhonemeSynthesizer
  * publishes phoneme strings for an external phoneme synthesizer to speak.
  *
  * Network and synthesizer are wired via couplings — this object owns no network of its
- * own. See `nettalkComponentSim.kt` for typical wiring.
+ * own. See `netTalkSim.kt` for typical wiring.
  */
 class NetTalk : AttributeContainer, EditableObject {
 

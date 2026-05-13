@@ -32,7 +32,10 @@ import kotlin.reflect.jvm.jvmErasure
  * @author Jeff Yoshimi
  * @author Oliver Coleman
  */
-class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) : JPanel() {
+class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
+    val editingObjects: List<O>,
+    private val packWindowOnChange: Boolean = true
+) : JPanel() {
 
     constructor(vararg editingObjects: O) : this(editingObjects.toList())
 
@@ -128,7 +131,9 @@ class AnnotatedPropertyEditor<O : EditableObject>(val editingObjects: List<O>) :
         .mapNotNull { (parameter, widget) ->
             widget.events.valueChanged.on {
                 parameterWidgetMap.forEach { (_, w) -> w.refresh(widget.parameter.property) }
-                swingInvokeLater { SwingUtilities.getWindowAncestor(this)?.pack() }
+                if (packWindowOnChange) {
+                    swingInvokeLater { SwingUtilities.getWindowAncestor(this)?.pack() }
+                }
             }
             // object widgets span the dialog and don’t use labels
             if (widget is ObjectWidget<*, *> && !widget.useEnumStyle) {

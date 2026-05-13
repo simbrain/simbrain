@@ -612,7 +612,14 @@ class NumericWidget<O : EditableObject, T>(
             }
 
             @Suppress("UNCHECKED_CAST")
-            return newValue as T
+            return when (stepSize) {
+                is Int -> newValue.toInt()
+                is Short -> newValue.toInt().toShort()
+                is Long -> newValue.toLong()
+                is Float -> newValue.toFloat()
+                is Double -> newValue
+                else -> newValue
+            } as T
         }
     }
 

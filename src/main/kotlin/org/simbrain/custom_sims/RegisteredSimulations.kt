@@ -17,8 +17,7 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
-import org.simbrain.custom_sims.simulations.nettalk.nettalkSim
-import org.simbrain.custom_sims.simulations.nettalk.nettalkSmokeTest
+import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
@@ -102,17 +101,13 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Three object recurrent") { cogMap3Objects }
     }
 
-    dir("Language models") {
+    dir("Language") {
         item("Basic word embeddings") { nlpSimBasic }
+        item("NETtalk", beta = true) { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
+        item("Synthesizer demo", beta = true) { synthesizerDemo }
         //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny language model (transformer)") { tinyLanguageModel }
-    }
-
-    dir("NETtalk") {
-        item("NETtalk (primitives)", beta = true) { nettalkSim }
-        item("NETtalk (component)", beta = true) { nettalkComponentSim }
-        item("Phoneme synthesizer smoke test", beta = true) { nettalkSmokeTest }
     }
 
     dir("Neuroscience") {

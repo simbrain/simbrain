@@ -42,16 +42,37 @@ fun warnIfEspeakUnavailable() {
  */
 class PhonemeSynthesizer : SoundGenerator() {
 
-    @UserParameter(label = "Voice", description = "Speaking voice / accent")
+    @UserParameter(label = "Voice", description = "Speaking voice / accent", order = 10)
     var voice: Voice = Voice.EN_US
 
-    @UserParameter(label = "Speed (wpm)", minimumValue = 80.0, maximumValue = 450.0)
+    @UserParameter(
+        label = "Speed (80-450 wpm)",
+        description = "Speaking speed in words per minute.",
+        minimumValue = 80.0,
+        maximumValue = 450.0,
+        increment = 10.0,
+        order = 20
+    )
     var speed: Int = 175
 
-    @UserParameter(label = "Pitch", minimumValue = 0.0, maximumValue = 99.0)
+    @UserParameter(
+        label = "Pitch (0-99)",
+        description = "Voice pitch.",
+        minimumValue = 0.0,
+        maximumValue = 99.0,
+        increment = 5.0,
+        order = 30
+    )
     var pitch: Int = 50
 
-    @UserParameter(label = "Amplitude", minimumValue = 0.0, maximumValue = 200.0)
+    @UserParameter(
+        label = "Amplitude (0-200)",
+        description = "Voice volume.",
+        minimumValue = 0.0,
+        maximumValue = 200.0,
+        increment = 10.0,
+        order = 40
+    )
     var amplitude: Int = 100
 
     override val sampleRate: Float
@@ -97,6 +118,13 @@ class PhonemeSynthesizer : SoundGenerator() {
         if (word.isBlank()) return
         if (!EspeakRuntime.ensureInitialized()) return
         runBlocking { phonemeChannel.send(Job(word, asPhonemes = false, label = word)) }
+    }
+
+    fun restoreDefaults() {
+        voice = Voice.EN_US
+        speed = 175
+        pitch = 50
+        amplitude = 100
     }
 
     /** Drop any queued audio and stop playback at the next sample boundary. */
@@ -183,7 +211,6 @@ class PhonemeSynthesizer : SoundGenerator() {
      */
     enum class Voice(val id: String, private val displayName: String) {
         EN_US("en-us", "American (en-us)"),
-        EN_GB("en-gb", "British (en-gb)"),
         EN_GB_RP("en-gb-x-rp", "Received Pronunciation (en-gb-x-rp)"),
         EN_GB_SCOTLAND("en-gb-scotland", "Scottish (en-gb-scotland)"),
         EN_GB_LANCASTER("en-gb-x-gbclan", "Lancastrian (en-gb-x-gbclan)"),

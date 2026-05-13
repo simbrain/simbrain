@@ -14,7 +14,7 @@ class NetTalkSerializationTest {
             text = "hello world"
             position = 4
             audioMode = NetTalk.AudioMode.PER_LETTER
-            synthesizer.voice = PhonemeSynthesizer.Voice.EN_GB
+            synthesizer.voice = PhonemeSynthesizer.Voice.EN_GB_RP
             synthesizer.speed = 200
         }
         val xml = getSimbrainXStream().toXML(original)
@@ -22,7 +22,7 @@ class NetTalkSerializationTest {
         assertEquals("hello world", restored.text)
         assertEquals(4, restored.position)
         assertEquals(NetTalk.AudioMode.PER_LETTER, restored.audioMode)
-        assertEquals(PhonemeSynthesizer.Voice.EN_GB, restored.synthesizer.voice)
+        assertEquals(PhonemeSynthesizer.Voice.EN_GB_RP, restored.synthesizer.voice)
         assertEquals(200, restored.synthesizer.speed)
         assertNotNull(restored.synthesizer)
     }

@@ -1,4 +1,4 @@
-package org.simbrain.world.soundworld
+package org.simbrain.world.speechsynthesizer
 
 import com.sun.jna.Callback
 import com.sun.jna.Library
@@ -7,8 +7,8 @@ import com.sun.jna.Pointer
 import com.sun.jna.ptr.IntByReference
 
 /**
- * Direct JNA binding to the eSpeak-ng C API. Only the surface used by [PhonemeSynthesizer]
- * is mapped — voice/parameter setup, synchronous synthesis with a sample-delivery callback,
+ * Direct JNA binding to the eSpeak-ng C API. Only the surface used by the speech synthesizer
+ * is mapped: voice/parameter setup, synchronous synthesis with a sample-delivery callback,
  * and cancellation. See `speak_lib.h` in the eSpeak-ng source for the canonical reference.
  */
 internal interface EspeakNgLibrary : Library {

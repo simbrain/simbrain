@@ -1,11 +1,11 @@
 package org.simbrain.custom_sims.simulations.nettalk
 
 import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.addSoundWorld
+import org.simbrain.custom_sims.addSpeechSynthesizer
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.util.place
-import org.simbrain.world.soundworld.PhonemeSynthesizer
+import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import java.awt.BorderLayout
 import java.awt.Dimension
 import javax.swing.JLabel
@@ -16,18 +16,18 @@ import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
 /**
- * Demo for the eSpeak-ng phoneme synthesizer.
+ * Demo for the eSpeak-ng speech synthesizer.
  *
  * Provides a control panel for sending plain text or phoneme strings to a
- * [PhonemeSynthesizer]. Used to verify the speech pipeline works end-to-end before
+ * [SpeechSynthesizer]. Used to verify the speech pipeline works end-to-end before
  * wiring it into a real NETtalk simulation.
  */
 val synthesizerDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val synthesizer = PhonemeSynthesizer()
-    val soundWorld = addSoundWorld("Phoneme Synthesizer", synthesizer)
+    val synthesizer = SpeechSynthesizer()
+    val speechWorld = addSpeechSynthesizer("Speech Synthesizer", synthesizer)
 
     var wordToSpeak = "hello how are you"
     var phonemesToSpeak = "h@l'oU h'aU A: j'u:"
@@ -36,7 +36,7 @@ val synthesizerDemo = newSim {
         val controlPanel = createControlPanel("Speak", 0, 0) {
             addComponent(textAreaPanel("Text", wordToSpeak) { wordToSpeak = it })
             addButton("Speak text") {
-                synthesizer.speakWord(wordToSpeak.trim())
+                synthesizer.speakText(wordToSpeak.trim())
             }
 
             addSeparator()
@@ -46,8 +46,8 @@ val synthesizerDemo = newSim {
                 synthesizer.speakPhonemes(phonemesToSpeak.trim())
             }
         }
-        controlPanel.setBounds(0, 0, 324, 388)
-        place(soundWorld, 330, 3, 520, 300)
+        controlPanel.setBounds(0, 3, 324, 388)
+        place(speechWorld, 310, 2, 605, 593)
     }
 
     addSidebarInfo(

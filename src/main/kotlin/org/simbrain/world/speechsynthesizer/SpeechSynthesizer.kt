@@ -1,49 +1,34 @@
-package org.simbrain.world.soundworld
+package org.simbrain.world.speechsynthesizer
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.util.UserParameter
-import org.simbrain.util.showCopyableWarningDialog
 import org.simbrain.workspace.Consumable
-import java.util.concurrent.atomic.AtomicBoolean
+import org.simbrain.workspace.Producible
+import org.simbrain.world.soundworld.SoundGenerator
 import javax.sound.sampled.AudioFormat
-import javax.swing.SwingUtilities
 
-/**
- * Trigger eSpeak initialization and, on failure, surface a one-time warning dialog so the
- * user understands why audio is silent (rather than only seeing a stderr line). Safe to call
- * from any thread; the dialog is dispatched to the EDT. Subsequent calls within the same JVM
- * are no-ops once the dialog has been shown.
- */
-private val espeakWarningShown = AtomicBoolean(false)
-
-fun warnIfEspeakUnavailable() {
-    if (EspeakRuntime.ensureInitialized()) return
-    if (!espeakWarningShown.compareAndSet(false, true)) return
-    val message = EspeakRuntime.errorMessage ?: "Phoneme audio is not available."
-    SwingUtilities.invokeLater { showCopyableWarningDialog(message) }
-}
-
-/**
- * Speaks phonemes or words using the bundled `libespeak-ng` library, called directly via
- * JNA through [EspeakRuntime].
- *
- * Each call to [speakPhonemes] or [speakWord] enqueues a synthesis job on the audio
- * coroutine. Jobs run sequentially: the coroutine pulls a job, hands the text to eSpeak,
- * and writes PCM samples to the underlying [SourceDataLine][javax.sound.sampled.SourceDataLine]
- * as eSpeak produces them via its synth callback. The phoneme channel uses rendezvous
- * capacity so callers (couplings, click handlers) block when audio is in flight.
- *
- * Phoneme strings are passed in eSpeak-ng's Kirshenbaum notation, wrapped in `[[ ]]`
- * automatically (e.g. `h@l'oU` for "hello"). Plain text is also supported via [speakWord].
- *
- * If the bundled library can't be loaded, calls become no-ops and a one-time warning is
- * printed.
- */
-class PhonemeSynthesizer : SoundGenerator() {
+class SpeechSynthesizer : SoundGenerator() {
 
     @UserParameter(label = "Voice", description = "Speaking voice / accent", order = 10)
     var voice: Voice = Voice.EN_US
+
+    @UserParameter(label = "Input mode", description = "Primary input form shown in this synthesizer.", order = 20)
+    var inputMode: InputMode = InputMode.TEXT
+        set(value) {
+            field = value
+            events.inputModeChanged.fire()
+        }
+
+    @UserParameter(label = "Feature decoder", description = "How feature vectors are decoded to phonemes.", order = 30)
+    var codecType: PhonemeCodecType = PhonemeCodecType.NETTALK
+        set(value) {
+            field = value
+            events.codecChanged.fire()
+        }
+
+    val codec: PhonemeCodec
+        get() = codecType.codec
 
     @UserParameter(
         label = "Speed (80-450 wpm)",
@@ -51,7 +36,7 @@ class PhonemeSynthesizer : SoundGenerator() {
         minimumValue = 80.0,
         maximumValue = 450.0,
         increment = 10.0,
-        order = 20
+        order = 40
     )
     var speed: Int = 175
 
@@ -61,7 +46,7 @@ class PhonemeSynthesizer : SoundGenerator() {
         minimumValue = 0.0,
         maximumValue = 99.0,
         increment = 5.0,
-        order = 30
+        order = 50
     )
     var pitch: Int = 50
 
@@ -71,7 +56,7 @@ class PhonemeSynthesizer : SoundGenerator() {
         minimumValue = 0.0,
         maximumValue = 200.0,
         increment = 10.0,
-        order = 40
+        order = 60
     )
     var amplitude: Int = 100
 
@@ -81,7 +66,7 @@ class PhonemeSynthesizer : SoundGenerator() {
     override val format: AudioFormat get() = AudioFormat(sampleRate, 16, 1, true, false)
 
     @Transient
-    var events: PhonemeSynthesizerEvents = PhonemeSynthesizerEvents()
+    var events: SpeechSynthesizerEvents = SpeechSynthesizerEvents()
         private set
 
     @Transient
@@ -90,62 +75,110 @@ class PhonemeSynthesizer : SoundGenerator() {
 
     @Transient
     @Volatile
-    private var phonemeChannel: Channel<Job> = Channel(capacity = Channel.RENDEZVOUS)
+    private var speechChannel: Channel<Job> = Channel(capacity = Channel.RENDEZVOUS)
 
     @Transient
     @Volatile
     private var cancelRequested: Boolean = false
 
-    /** The phoneme string currently being played, or empty when idle. */
     @Transient
-    @Volatile
+    private val transcriptionBuffer = StringBuilder()
+
+    @Transient
+    private var lastFeatureVector: DoubleArray = DoubleArray(codec.inputDimension)
+
+    @Transient
     var currentlySpeaking: String = ""
         private set
+
+    @get:Producible(description = "Current utterance being played, or empty when idle.")
+    val currentUtterance: String
+        get() = currentlySpeaking
+
+    @get:Producible(description = "Accumulated text or phoneme history spoken by this synthesizer.")
+    val transcription: String
+        get() = transcriptionBuffer.toString()
+
+    @get:Producible(description = "Most recent feature vector received by the synthesizer.")
+    val featureVector: DoubleArray
+        get() = lastFeatureVector.copyOf()
 
     init {
         startWorker()
     }
 
-    @Consumable
-    fun speakPhonemes(phonemes: String) {
-        if (phonemes.isBlank()) return
-        if (!EspeakRuntime.ensureInitialized()) return
-        runBlocking { phonemeChannel.send(Job(phonemes, asPhonemes = true, label = phonemes)) }
+    @Consumable(description = "Speak ordinary text.")
+    fun speakText(text: String) {
+        if (text.isBlank()) return
+        appendTranscription(text.trim(), separator = " ")
+        enqueue(Job(text, asPhonemes = false, label = text))
     }
 
-    @Consumable
-    fun speakWord(word: String) {
-        if (word.isBlank()) return
-        if (!EspeakRuntime.ensureInitialized()) return
-        runBlocking { phonemeChannel.send(Job(word, asPhonemes = false, label = word)) }
+    @Consumable(description = "Speak an eSpeak-ng phoneme string.")
+    fun speakPhonemes(phonemes: String) {
+        if (phonemes.isBlank()) return
+        appendTranscription(phonemes.trim(), separator = " ")
+        enqueue(Job(phonemes, asPhonemes = true, label = phonemes))
+    }
+
+    @Consumable(description = "Decode a feature vector to a phoneme with the selected decoder and speak it.")
+    fun speakFeatureVector(vector: DoubleArray) {
+        if (vector.size != codec.inputDimension) return
+        lastFeatureVector = vector.copyOf()
+        val decoded = codec.decodeFeatures(vector)
+        appendTranscription(decoded.symbol.toString(), separator = "")
+        val espeak = codec.symbolsToEspeak(decoded.symbol.toString())
+        if (espeak.isNotBlank()) {
+            enqueue(Job(espeak, asPhonemes = true, label = espeak))
+        }
     }
 
     fun restoreDefaults() {
         voice = Voice.EN_US
+        inputMode = InputMode.TEXT
+        codecType = PhonemeCodecType.NETTALK
         speed = 175
         pitch = 50
         amplitude = 100
     }
 
-    /** Drop any queued audio and stop playback at the next sample boundary. */
+    fun clearTranscription() {
+        transcriptionBuffer.clear()
+        events.transcriptionChanged.fire()
+    }
+
     fun flush() {
         cancelRequested = true
         scope.cancel()
-        phonemeChannel.close()
+        speechChannel.close()
         line.flush()
         scope = newScope()
-        phonemeChannel = Channel(capacity = Channel.RENDEZVOUS)
+        speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
         events.speakingChanged.fire("")
         startWorker()
     }
 
+    private fun enqueue(job: Job) {
+        if (!EspeakRuntime.ensureInitialized()) return
+        runBlocking { speechChannel.send(job) }
+    }
+
+    private fun appendTranscription(value: String, separator: String) {
+        if (value.isBlank()) return
+        if (separator.isNotEmpty() && transcriptionBuffer.isNotEmpty()) {
+            transcriptionBuffer.append(separator)
+        }
+        transcriptionBuffer.append(value)
+        events.transcriptionChanged.fire()
+    }
+
     private fun newScope() = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private fun startWorker() {
         scope.launch {
-            for (job in phonemeChannel) {
+            for (job in speechChannel) {
                 runOne(job)
             }
         }
@@ -175,7 +208,7 @@ class PhonemeSynthesizer : SoundGenerator() {
             }
             line.drain()
         } catch (e: Exception) {
-            System.err.println("PhonemeSynthesizer playback failed: ${e.message}")
+            System.err.println("SpeechSynthesizer playback failed: ${e.message}")
         }
         setSpeaking("")
     }
@@ -187,28 +220,32 @@ class PhonemeSynthesizer : SoundGenerator() {
 
     override fun close() {
         scope.cancel()
-        phonemeChannel.close()
+        speechChannel.close()
         super.close()
     }
 
     fun readResolve(): Any {
-        events = PhonemeSynthesizerEvents()
+        events = SpeechSynthesizerEvents()
         scope = newScope()
-        phonemeChannel = Channel(capacity = Channel.RENDEZVOUS)
+        speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
         startWorker()
         return this
     }
 
-    override val id: String = "Phoneme Synthesizer"
+    override val id: String = "Speech Synthesizer"
 
     private data class Job(val text: String, val asPhonemes: Boolean, val label: String)
 
-    /**
-     * Bundled English voices. The string [id] is what eSpeak's `espeak_SetVoiceByName`
-     * expects; [toString] is the dropdown label shown to the user.
-     */
+    enum class InputMode(private val displayName: String) {
+        TEXT("Text"),
+        PHONEMES("Phonemes"),
+        ARTICULATORY_FEATURES("Articulatory features");
+
+        override fun toString(): String = displayName
+    }
+
     enum class Voice(val id: String, private val displayName: String) {
         EN_US("en-us", "American (en-us)"),
         EN_GB_RP("en-gb-x-rp", "Received Pronunciation (en-gb-x-rp)"),

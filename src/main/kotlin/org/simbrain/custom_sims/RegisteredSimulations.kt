@@ -103,9 +103,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Language") {
         item("Basic word embeddings") { nlpSimBasic }
+        item("Synthesizer demo", beta = true) { synthesizerDemo }
         item("NETtalk", beta = true) { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
-        item("Synthesizer demo", beta = true) { synthesizerDemo }
         //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny language model (transformer)") { tinyLanguageModel }
     }

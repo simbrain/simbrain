@@ -20,13 +20,14 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
 import org.simbrain.world.imageworld.ImageWorldComponent
-import org.simbrain.world.nettalk.NetTalkComponent
 import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.soundworld.SoundGenerator
 import org.simbrain.world.soundworld.SoundWorld
 import org.simbrain.world.soundworld.SoundWorldComponent
+import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
+import org.simbrain.world.speechsynthesizer.SpeechSynthesizerComponent
 import org.simbrain.world.textworld.TextWorldComponent
 import java.io.File
 
@@ -140,12 +141,6 @@ fun SimulationScope.addTextWorld(name: String): TextWorldComponent {
     return textWorldComponent
 }
 
-fun SimulationScope.addNetTalk(name: String = "NETtalk"): NetTalkComponent {
-    val component = NetTalkComponent(name)
-    workspace.addWorkspaceComponent(component)
-    return component
-}
-
 fun SimulationScope.addSoundWorld(name: String, generator: SoundGenerator? = null): SoundWorldComponent {
     val world = SoundWorld().apply {
         if (generator != null) this.generator = generator
@@ -153,6 +148,15 @@ fun SimulationScope.addSoundWorld(name: String, generator: SoundGenerator? = nul
     val soundWorldComponent = SoundWorldComponent(name, world)
     workspace.addWorkspaceComponent(soundWorldComponent)
     return soundWorldComponent
+}
+
+fun SimulationScope.addSpeechSynthesizer(
+    name: String = "Speech Synthesizer",
+    synthesizer: SpeechSynthesizer = SpeechSynthesizer()
+): SpeechSynthesizerComponent {
+    val component = SpeechSynthesizerComponent(name, synthesizer)
+    workspace.addWorkspaceComponent(component)
+    return component
 }
 
 fun SimulationScope.addTimeSeriesComponent(name: String, seriesName: String) = addTimeSeriesComponent(name, listOf(seriesName))
@@ -337,4 +341,3 @@ class WinnerLabeler {
         labelToNodeMap.clear()
     }
 }
-

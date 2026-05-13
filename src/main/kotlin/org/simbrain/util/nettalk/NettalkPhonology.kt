@@ -1,5 +1,8 @@
 package org.simbrain.util.nettalk
 
+import org.simbrain.world.speechsynthesizer.DecodedPhoneme
+import org.simbrain.world.speechsynthesizer.PhonemeCodec
+
 /**
  * Articulatory feature representation for the NETtalk phoneme set, as used in
  * Sejnowski & Rosenberg (1987) "Parallel networks that learn to pronounce English text".
@@ -13,9 +16,11 @@ package org.simbrain.util.nettalk
  * the same linguistic structure (place, manner, voicing, vowel height/backness, tenseness,
  * silence/continuation/punctuation).
  */
-object NettalkPhonology {
+object NettalkPhonology : PhonemeCodec {
 
-    val featureNames = listOf(
+    override val displayName: String = "NETtalk articulatory features"
+
+    override val featureNames = listOf(
         "labial", "dental", "alveolar", "palatal", "velar", "glottal",
         "stop", "nasal", "fricative", "affricate", "glide", "liquid",
         "voiced",
@@ -26,11 +31,13 @@ object NettalkPhonology {
 
     val numArticulatoryFeatures: Int get() = featureNames.size
 
-    val stressNames = listOf(">", "<", "0", "1", "2")
+    override val stressNames = listOf(">", "<", "0", "1", "2")
 
     val numStressFeatures: Int get() = stressNames.size
 
     val outputDimension: Int get() = numArticulatoryFeatures + numStressFeatures
+
+    override val inputDimension: Int get() = outputDimension
 
     private fun feat(vararg fs: String): IntArray {
         val v = IntArray(numArticulatoryFeatures)
@@ -162,6 +169,11 @@ object NettalkPhonology {
         return bestPhon to stressNames[bestStressIdx][0]
     }
 
+    override fun decodeFeatures(vector: DoubleArray): DecodedPhoneme {
+        val (phoneme, stress) = decodeOutput(vector)
+        return DecodedPhoneme(phoneme, stress)
+    }
+
     /**
      * NETtalk phoneme symbols mapped to eSpeak-ng's Kirshenbaum phoneme notation
      * (the form accepted inside `[[ ]]` brackets). `-` (silent) and stress markers
@@ -228,6 +240,8 @@ object NettalkPhonology {
             .mapNotNull { toEspeak[it] }
             .joinToString("")
 
+    override fun symbolsToEspeak(symbols: String): String = nettalkToEspeak(symbols)
+
     /**
      * NETtalk phoneme symbol → IPA transcription. Diphthongs and clusters use the
      * standard multi-character IPA forms (e.g. `eɪ`, `tʃ`, `l̩`). Useful for displaying
@@ -286,4 +300,6 @@ object NettalkPhonology {
             .filter { it != '-' }
             .mapNotNull { toIpa[it] }
             .joinToString("")
+
+    override fun symbolsToIpa(symbols: String): String = nettalkToIpa(symbols)
 }

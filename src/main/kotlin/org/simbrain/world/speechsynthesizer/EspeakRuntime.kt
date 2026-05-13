@@ -1,19 +1,19 @@
-package org.simbrain.world.soundworld
+package org.simbrain.world.speechsynthesizer
 
 import com.sun.jna.Native
 import com.sun.jna.NativeLong
 import com.sun.jna.Pointer
-import org.simbrain.world.soundworld.EspeakRuntime.activeCallback
-import org.simbrain.world.soundworld.EspeakRuntime.ensureInitialized
-import org.simbrain.world.soundworld.EspeakRuntime.isAvailable
-import org.simbrain.world.soundworld.EspeakRuntime.nativeCallback
-import org.simbrain.world.soundworld.EspeakRuntime.synth
+import org.simbrain.world.speechsynthesizer.EspeakRuntime.activeCallback
+import org.simbrain.world.speechsynthesizer.EspeakRuntime.ensureInitialized
+import org.simbrain.world.speechsynthesizer.EspeakRuntime.isAvailable
+import org.simbrain.world.speechsynthesizer.EspeakRuntime.nativeCallback
+import org.simbrain.world.speechsynthesizer.EspeakRuntime.synth
 import java.io.File
 import java.nio.charset.StandardCharsets
 
 /**
  * Process-wide owner of the eSpeak-ng native library. eSpeak holds global state — voice
- * tables, dictionaries, the active synth callback — so initialization happens exactly once
+ * tables, dictionaries, the active synth callback - so initialization happens exactly once
  * per JVM, and synthesis calls serialize through this object's lock.
  *
  * Resolution order for the library (and its `espeak-ng-data` directory):
@@ -105,7 +105,7 @@ internal object EspeakRuntime {
 
     private fun fail(message: String): Boolean {
         errorMessage = message
-        System.err.println("PhonemeSynthesizer: $message")
+        System.err.println("SpeechSynthesizer: $message")
         return false
     }
 
@@ -144,7 +144,7 @@ internal object EspeakRuntime {
     /**
      * Synchronously synthesize [text]. The provided [callback] is invoked with PCM chunks
      * as they're produced. If the callback returns non-zero, eSpeak aborts the remaining
-     * synthesis. Calls are serialized — concurrent callers wait their turn.
+     * synthesis. Calls are serialized; concurrent callers wait their turn.
      */
     fun synth(
         text: String,

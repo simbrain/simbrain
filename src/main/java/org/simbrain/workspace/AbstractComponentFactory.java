@@ -26,13 +26,13 @@ import org.simbrain.world.dataworld.DataWorldComponent;
 import org.simbrain.world.dataworld.gui.DataWorldDesktopComponent;
 import org.simbrain.world.imageworld.ImageWorldComponent;
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent;
-import org.simbrain.world.nettalk.NetTalkComponent;
-import org.simbrain.world.nettalk.gui.NetTalkDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldComponent;
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent;
 import org.simbrain.world.odorworld.OdorWorldUtilsKt;
 import org.simbrain.world.soundworld.SoundWorldComponent;
 import org.simbrain.world.soundworld.gui.SoundWorldDesktopComponent;
+import org.simbrain.world.speechsynthesizer.SpeechSynthesizerComponent;
+import org.simbrain.world.speechsynthesizer.gui.SpeechSynthesizerDesktopComponent;
 import org.simbrain.world.textworld.TextWorldComponent;
 import org.simbrain.world.textworld.gui.TextWorldDesktopComponent;
 
@@ -80,8 +80,9 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Sound world", () -> new SoundWorldComponent(""));
         putGuiComponentFactory(SoundWorldComponent.class, SoundWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("NETtalk", () -> new NetTalkComponent("NETtalk"));
-        putGuiComponentFactory(NetTalkComponent.class, NetTalkDesktopComponent::new);
+        putWorkspaceComponentFactory("Speech synthesizer", () -> new SpeechSynthesizerComponent("Speech Synthesizer"));
+        putGuiComponentFactory(SpeechSynthesizerComponent.class, SpeechSynthesizerDesktopComponent::new);
+
 
         putWorkspaceComponentFactory("Bar chart", () -> new BarChartComponent(""));
         putGuiComponentFactory(BarChartComponent.class, BarChartDesktopComponent::new);

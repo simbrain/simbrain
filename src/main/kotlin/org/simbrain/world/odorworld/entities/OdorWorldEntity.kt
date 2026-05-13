@@ -221,6 +221,8 @@ class OdorWorldEntity @JvmOverloads constructor(
             return
         }
 
+        accumulatedAnimationDistance += kotlin.math.abs(speed)
+
         val (dx, dy) = velocity
 
         val bounds = world.collidableObjects.filter { it !== this }
@@ -452,27 +454,25 @@ class OdorWorldEntity @JvmOverloads constructor(
         private set
 
     /**
-     * Accumulator for fractional frame advancement. Animation advances when this reaches 1.0.
+     * Distance (in pixels) accumulated by [applyMovement] but not yet consumed by frame advancement.
      */
     @Transient
-    private var animationFrameAccumulator: Double = 0.0
+    private var accumulatedAnimationDistance: Double = 0.0
 
     /**
-     * Advance the animation frame based on current speed.
-     * Call this each update tick to sync animation with movement.
+     * Consume accumulated movement distance and advance the animation frame accordingly.
+     * One frame is advanced per [distancePerAnimationFrame] pixels travelled.
      *
-     * @return the number of frames advanced (usually 0 or 1)
+     * @return the number of frames advanced
      */
     fun advanceAnimation(): Int {
         val numFrames = entityType.imageBasePaths.firstOrNull()?.size ?: 1
         if (numFrames <= 1) return 0
 
-        animationFrameAccumulator += speed / distancePerAnimationFrame
         var framesAdvanced = 0
-        while (animationFrameAccumulator >= 1.0) {
-            println(distancePerAnimationFrame)
+        while (accumulatedAnimationDistance >= distancePerAnimationFrame) {
             animationFrame = (animationFrame + 1) % numFrames
-            animationFrameAccumulator -= 1.0
+            accumulatedAnimationDistance -= distancePerAnimationFrame
             framesAdvanced++
         }
         return framesAdvanced
@@ -483,7 +483,7 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     fun resetAnimation() {
         animationFrame = 0
-        animationFrameAccumulator = 0.0
+        accumulatedAnimationDistance = 0.0
     }
 
     /**

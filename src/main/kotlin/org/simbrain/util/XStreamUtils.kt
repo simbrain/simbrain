@@ -14,6 +14,7 @@ import com.thoughtworks.xstream.mapper.Mapper
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.projection.Projector
@@ -61,6 +62,9 @@ fun getSimbrainXStream(): XStream {
                     EditableObject::class.java,
                     NetworkModel::class.java,
                     ImageWorld::class.java,
+                    // Not an EditableObject, but uses the property-converter hook
+                    // (see TrainingDataset companion) to compact-encode `inputs`/`targets`.
+                    TrainingDataset::class.java,
                 ),
                 mapper,
                 reflectionProvider,
@@ -199,7 +203,16 @@ fun createConstructorCallingConverter(
                     propertyNameToDeserializedValueMap[nodeName] = if (reader.getAttribute("class") != null) {
                         context.convertAnother(reader.value, Class.forName(reader.getAttribute("class")))
                     } else {
-                        context.convertAnother(reader.value, it.returnType.javaType as Class<*>)
+                        // For parameterized property types (e.g. `List<String>?`) the javaType is a
+                        // ParameterizedType, not a Class. Unwrap to the raw class — XStream's
+                        // default converters can still deserialize children using that as the hint.
+                        val javaType = it.returnType.javaType
+                        val targetClass: Class<*> = when (javaType) {
+                            is Class<*> -> javaType
+                            is java.lang.reflect.ParameterizedType -> javaType.rawType as Class<*>
+                            else -> throw IllegalStateException("Cannot resolve target class for $nodeName (type $javaType)")
+                        }
+                        context.convertAnother(reader.value, targetClass)
                     }
                 }
             }

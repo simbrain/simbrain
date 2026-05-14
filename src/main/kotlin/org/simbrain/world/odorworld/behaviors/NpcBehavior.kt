@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.behaviors
 
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.propertyeditor.CustomTypeName
 import org.simbrain.util.rayVsAabb
 import org.simbrain.util.shortestAngleDelta
 import org.simbrain.util.toRadian
@@ -32,8 +33,9 @@ val npcBehaviorTypes: List<Class<out CopyableObject>> = listOf(
 )
 
 /**
- * Default placeholder: no AI control. Manual or coupling-driven movement is unaffected.
+ * Default behavior: no AI control. Manual or coupling-driven movement is unaffected.
  */
+@CustomTypeName("None")
 class NoOpBehavior : NpcBehavior() {
     override fun update(entity: OdorWorldEntity) {}
     override fun copy(): NoOpBehavior = NoOpBehavior()
@@ -193,4 +195,3 @@ object Steering {
         }
     }
 }
-

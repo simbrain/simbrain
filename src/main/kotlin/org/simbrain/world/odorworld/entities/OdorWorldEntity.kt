@@ -168,7 +168,7 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     /**
      * NPC behavior. Runs each tick before [applyMovement] and writes to [movement]
-     * (speed and dtheta). Defaults to a no-op so manual or coupling-driven movement is unaffected.
+     * (speed and dtheta). Defaults to None so manual or coupling-driven movement is unaffected.
      */
     @UserParameter(
         label = "Behavior",

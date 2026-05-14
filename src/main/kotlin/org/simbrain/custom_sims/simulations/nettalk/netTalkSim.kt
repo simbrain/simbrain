@@ -19,7 +19,6 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import org.simbrain.workspace.Workspace
-import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizerComponent
 import java.awt.BorderLayout
 import java.awt.Color
@@ -81,9 +80,7 @@ val nettalkComponentSim = newSim("nettalk_component") {
     bp.hiddenLayers().firstOrNull()?.location = point(238, 13)
     bp.outputLayer.location = point(-275, -214)
 
-    val speechComponent = addSpeechSynthesizer("Speech Synthesizer").apply {
-        synthesizer.inputMode = SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
-    }
+    val speechComponent = addSpeechSynthesizer("Speech Synthesizer")
     wireNetTalk(workspace, reader)
 
     withGui {
@@ -123,6 +120,44 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     letter window, while a separate `SpeechSynthesizerComponent` speaks from the network's
     26-dimensional articulatory feature output.
 
+    # Inputs and Outputs
+
+    Each network input is a sliding window over the text. With the default window size of
+    7, the network sees the current character plus three characters of context on each
+    side. Each position in the window is encoded as a 29-unit one-hot vector: 26 units for
+    `a` through `z`, one blank/word-boundary unit, one end-of-sentence punctuation unit,
+    and one general punctuation unit. The default input layer therefore has
+    `7 x 29 = 203` units.
+
+    Each network output is a 26-dimensional NETtalk speech code. The first 21 values are
+    articulatory features such as place, manner, voicing, vowel height/backness, tenseness,
+    and silence. The last 5 values encode stress or syllable markers. The speech
+    synthesizer decodes these outputs by finding the nearest known phoneme feature pattern
+    and then sending the resulting phoneme sequence to the speech synthesizer.
+
+    Training examples are built from a continuous text stream with spaces between words,
+    so the network also learns that word-boundary positions should map to silent output.
+
+    # Relation to the Original NETtalk
+
+    This simulation is faithful to the classic NETtalk setup in its broad architecture:
+    a 7-character input window, 29 one-hot units per character position, 80 hidden units,
+    and 26 speech-code output units. It also uses the UCI NETtalk corpus, an updated and
+    corrected version of the dataset associated with Sejnowski and Rosenberg's work.
+
+    Simbrain does not exactly reproduce the original training protocol. The simulation uses
+    Simbrain's modern backpropagation trainer with Adam, reorders the dictionary by word
+    frequency, filters to regular words, repeats and shuffles the examples, and trains from
+    a continuous stream built from those dictionary entries. This makes the demo easier to
+    train and interact with, but it is not the same as either the paper's continuous informal
+    speech corpus experiment or its exception-heavy dictionary experiment.
+
+    The output representation is also a practical reconstruction. It preserves the 26-unit
+    NETtalk-style target size and maps network outputs to phonemes through articulatory and
+    stress features, but the feature names and decoding are adapted for Simbrain's current
+    speech synthesizer rather than being a byte-for-byte recreation of the original DECtalk
+    pipeline.
+
     # Wiring
 
     - Update action "Set NETtalk inputs" copies `NettalkReader.currentWindow`
@@ -135,7 +170,9 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     # What to Do
 
     1. Train the network: right-click the `Network` component -> `Edit/Train Backprop...`,
-       then play. Mean error should drop steadily.
+       then play. The optimizer settings have been chosen because they work well for this
+       demo. Training still takes some time: on many computers, around 200 iterations is a
+       reasonable target and may take roughly 5-10 minutes. Mean error should drop steadily.
     2. Press the workspace play button. The reader advances through the text and the
        speech synthesizer decodes feature vectors to phonemes.
        Early in training the output often collapses to an "uh"-like vowel sound; this
@@ -144,6 +181,8 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
 
     # Links
 
+    - [NETtalk: A Parallel Network That Learns to Read Aloud](https://papers.cnl.salk.edu/PDFs/NETtalk_%20A%20Parallel%20Network%20That%20Learns%20to%20Read%20Aloud%201988-3562.pdf)
+    - [UCI Connectionist Bench NETtalk Corpus](https://archive.ics.uci.edu/dataset/150/connectionist%2Bbench%2Bnettalk%2Bcorpus)
     Simbrain's speech output is based on [eSpeak NG](https://github.com/espeak-ng/espeak-ng),
     a compact open-source text-to-speech system that supports text and phoneme input.
 
@@ -160,7 +199,6 @@ fun SimulationScope.wireNetTalk(workspace: Workspace, reader: NettalkReader) {
     val bp = networkComp.network.allModelsDeep.filterIsInstance<BackpropNetwork>().firstOrNull()
         ?: error("No BackpropNetwork found in the network component.")
     val synthesizer = speechComp.synthesizer
-    synthesizer.inputMode = SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
     workspace.addUpdateAction("Set NETtalk inputs", position = 0) {
         bp.inputLayer.setActivations(reader.currentWindow)
     }

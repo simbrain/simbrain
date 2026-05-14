@@ -6,5 +6,4 @@ class SpeechSynthesizerEvents : Events() {
     val speakingChanged = OneArgEvent<String>()
     val transcriptionChanged = NoArgEvent()
     val codecChanged = NoArgEvent()
-    val inputModeChanged = NoArgEvent()
 }

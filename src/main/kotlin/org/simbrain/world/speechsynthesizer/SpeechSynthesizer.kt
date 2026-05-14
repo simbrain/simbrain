@@ -13,14 +13,6 @@ class SpeechSynthesizer : SoundGenerator() {
     @UserParameter(label = "Voice", description = "Speaking voice / accent", order = 10)
     var voice: Voice = Voice.EN_US
 
-    @UserParameter(label = "Input mode", description = "Primary input form shown in this synthesizer.", order = 20)
-    var inputMode: InputMode = InputMode.TEXT
-        set(value) {
-            field = value
-            featureBuffer.setLength(0)
-            events.inputModeChanged.fire()
-        }
-
     @UserParameter(label = "Feature decoder", description = "How feature vectors are decoded to phonemes.", order = 30)
     var codecType: PhonemeCodecType = PhonemeCodecType.NETTALK
         set(value) {
@@ -183,7 +175,6 @@ class SpeechSynthesizer : SoundGenerator() {
 
     fun restoreDefaults() {
         voice = Voice.EN_US
-        inputMode = InputMode.TEXT
         codecType = PhonemeCodecType.NETTALK
         bufferingMode = BufferingMode.BUFFERED
         maxBufferSize = 500
@@ -288,14 +279,6 @@ class SpeechSynthesizer : SoundGenerator() {
     override val id: String = "Speech Synthesizer"
 
     private data class Job(val text: String, val asPhonemes: Boolean, val label: String)
-
-    enum class InputMode(private val displayName: String) {
-        TEXT("Text"),
-        PHONEMES("Phonemes"),
-        ARTICULATORY_FEATURES("Articulatory features");
-
-        override fun toString(): String = displayName
-    }
 
     enum class BufferingMode(private val displayName: String) {
         IMMEDIATE("Speak each phoneme"),

@@ -4,14 +4,13 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.addSpeechSynthesizer
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
+import org.simbrain.util.nettalk.NettalkPhonology
 import org.simbrain.util.place
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import java.awt.BorderLayout
 import java.awt.Dimension
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JTextArea
+import java.awt.FlowLayout
+import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 
@@ -45,8 +44,12 @@ val synthesizerDemo = newSim {
             addButton("Speak phonemes") {
                 synthesizer.speakPhonemes(phonemesToSpeak.trim())
             }
+
+            addSeparator()
+
+            addComponent(featureVectorPanel(synthesizer))
         }
-        controlPanel.setBounds(0, 3, 324, 388)
+        controlPanel.setBounds(0, 3, 324, 570)
         place(speechWorld, 310, 2, 605, 593)
     }
 
@@ -54,11 +57,15 @@ val synthesizerDemo = newSim {
         """
         # Synthesizer Demo
 
-        This demo shows the two ways Simbrain can synthesize speech:
-        ordinary text-to-speech in the top panel, and direct phoneme synthesis in the
-        bottom panel. 
-        
-        The synthesizer will probably eventually be turned into a standard component available from the GUI.
+        This demo shows three ways Simbrain can synthesize speech: ordinary text,
+        explicit phoneme strings, and articulatory feature vectors. The `Speak` panel on
+        the left sends examples to the `Speech Synthesizer` component on the right.
+
+        In the synthesizer component, `Currently speaking` shows the utterance being
+        played, `History` shows what has been sent to the synthesizer, and `Most recent
+        feature vector` shows the last articulatory vector received. Open `Settings` to
+        experiment with voices, accents, speed, pitch, amplitude, and feature-vector
+        buffering.
 
         # Basic Text-To-Speech
 
@@ -83,6 +90,26 @@ val synthesizerDemo = newSim {
 
         Enter an eSpeak-ng phoneme string in `Phonemes` and click `Speak phonemes`.
 
+        # Articulatory Feature Synthesis
+
+        Feature-vector synthesis bypasses both ordinary text and phoneme strings. The
+        demo constructs a 26-dimensional feature vector from a selected phoneme and
+        stress marker, then sends it directly to the synthesizer. This representation is
+        inspired by the NETtalk reading-aloud model used in the separate `NETtalk`
+        simulation, but here it is just a compact way to demonstrate feature-vector
+        speech input.
+
+        The feature vector is not a raw acoustic speech signal. It is a symbolic
+        articulatory description: 21 binary features describe properties such as place,
+        manner, voicing, and vowel quality, while 5 stress features encode syllable/stress
+        information.
+
+        When a feature vector is spoken, Simbrain finds the nearest known phoneme pattern
+        and sends that phoneme to [eSpeak NG](https://github.com/espeak-ng/espeak-ng).
+        Random or intermediate network outputs can still be decoded, but they are
+        interpreted by nearest-phoneme match rather than by generating sound directly from
+        the vector.
+
         # Examples
 
         - `h@l'oU` for "hello"
@@ -95,6 +122,62 @@ val synthesizerDemo = newSim {
         - `k@mpj'u:t@` for "computer"
         """.trimIndent()
     )
+}
+
+private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
+    var phoneme = 'a'
+    var stress = '0'
+
+    val phonemeSelector = JComboBox(NettalkPhonology.phonemeFeatures.keys.toTypedArray()).apply {
+        selectedItem = phoneme
+    }
+    val stressSelector = JComboBox(NettalkPhonology.stressNames.map { it[0] }.toTypedArray()).apply {
+        selectedItem = stress
+    }
+    val vectorArea = JTextArea(3, 28).apply {
+        isEditable = false
+        lineWrap = true
+        wrapStyleWord = true
+    }
+
+    fun currentVector() = NettalkPhonology.encodeOutput(phoneme, stress)
+
+    fun updatePreview() {
+        vectorArea.text = currentVector().joinToString(prefix = "[", postfix = "]") { it.toInt().toString() }
+        vectorArea.caretPosition = 0
+    }
+
+    phonemeSelector.addActionListener {
+        phoneme = phonemeSelector.selectedItem as Char
+        updatePreview()
+    }
+    stressSelector.addActionListener {
+        stress = stressSelector.selectedItem as Char
+        updatePreview()
+    }
+
+    updatePreview()
+
+    return JPanel(BorderLayout()).apply {
+        add(JLabel("Articulatory feature vector"), BorderLayout.NORTH)
+        add(JPanel(FlowLayout(FlowLayout.LEFT, 5, 0)).apply {
+            add(JLabel("Phoneme"))
+            add(phonemeSelector)
+            add(JLabel("Stress"))
+            add(stressSelector)
+        }, BorderLayout.CENTER)
+        add(JPanel(BorderLayout()).apply {
+            add(JScrollPane(vectorArea).apply {
+                preferredSize = Dimension(280, 70)
+            }, BorderLayout.CENTER)
+            add(JButton("Speak feature vector").apply {
+                addActionListener {
+                    synthesizer.speakFeatureVector(currentVector())
+                    synthesizer.flushFeatureBuffer()
+                }
+            }, BorderLayout.SOUTH)
+        }, BorderLayout.SOUTH)
+    }
 }
 
 private fun textAreaPanel(label: String, initialText: String, onChange: (String) -> Unit): JPanel {

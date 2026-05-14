@@ -3,6 +3,7 @@ package org.simbrain.world.speechsynthesizer.gui
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.util.DetailTrianglePanel
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import org.simbrain.world.speechsynthesizer.warnIfEspeakUnavailable
@@ -15,13 +16,13 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
         editor.parameterWidgetMap.values.forEach { widget ->
             widget.events.valueChanged.on {
                 editor.commitChanges()
-                updateFeatureVisibility()
+                featureBars.repaint()
             }
         }
     }
 
     private val currentLabel = JLabel(" ").apply {
-        font = Font(Font.SANS_SERIF, Font.BOLD, 15)
+        font = Font(Font.SANS_SERIF, Font.BOLD, 16)
     }
 
     private val transcriptionArea = JTextArea(4, 54).apply {
@@ -39,9 +40,9 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
         layout = MigLayout("fillx, wrap 1, ins 8, gapy 6, hidemode 3")
         warnIfEspeakUnavailable()
 
-        add(editor, "growx")
         add(JLabel("Currently speaking:"))
-        add(currentLabel, "growx")
+        add(currentLabel, "growx, hmin 24")
+        add(DetailTrianglePanel(editor, defaultOpen = false, upLabel = "Settings", downLabel = "Settings"), "growx")
         add(JLabel("History:"))
         add(JScrollPane(transcriptionArea), "growx, h 96!")
         add(JButton("Clear history").apply {
@@ -57,35 +58,10 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
             updateReadout()
         }
         synthesizer.events.codecChanged.on(Dispatchers.Swing) {
-            updateFeatureVisibility()
             featureBars.repaint()
         }
-        synthesizer.events.inputModeChanged.on(Dispatchers.Swing) {
-            updateFeatureVisibility()
-        }
 
-        updateFeatureVisibility()
         updateReadout()
-    }
-
-    private fun updateFeatureVisibility() {
-        val showFeatures = synthesizer.inputMode == SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
-        setEditorParameterVisible("Feature decoder", showFeatures)
-        setEditorParameterVisible("Buffering", showFeatures)
-        setEditorParameterVisible("Max buffer size", showFeatures)
-        featureLabel.isVisible = showFeatures
-        featureBars.isVisible = showFeatures
-        revalidate()
-        repaint()
-    }
-
-    private fun setEditorParameterVisible(label: String, visible: Boolean) {
-        editor.parameterWidgetMap.entries
-            .firstOrNull { (parameter, _) -> parameter.label == label }
-            ?.let { (parameter, widget) ->
-                widget.component.isVisible = visible
-                editor.parameterJLabels[parameter]?.isVisible = visible
-            }
     }
 
     private fun updateReadout() {

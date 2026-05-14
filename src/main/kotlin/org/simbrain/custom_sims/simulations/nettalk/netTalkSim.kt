@@ -84,10 +84,7 @@ val nettalkComponentSim = newSim("nettalk_component") {
     val speechComponent = addSpeechSynthesizer("Speech Synthesizer").apply {
         synthesizer.inputMode = SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
     }
-    wireNetTalkCouplings(workspace, reader)
-    workspace.addUpdateAction("Advance NETtalk reader") {
-        reader.update()
-    }
+    wireNetTalk(workspace, reader)
 
     withGui {
         val readerFrame = createControlPanel("NETtalk Reader", 0, 0) {
@@ -102,10 +99,7 @@ val nettalkComponentSim = newSim("nettalk_component") {
     addSidebarInfo(NETTALK_COMPONENT_SIDEBAR)
 }.registerReopenFunction { workspace ->
     val reader = NettalkReader()
-    wireNetTalkCouplings(workspace, reader)
-    workspace.addUpdateAction("Advance NETtalk reader") {
-        reader.update()
-    }
+    wireNetTalk(workspace, reader)
     withGui {
         createControlPanel("NETtalk Reader", 0, 0) {
             centralPanel.removeAll()
@@ -129,10 +123,14 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     letter window, while a separate `SpeechSynthesizerComponent` speaks from the network's
     26-dimensional articulatory feature output.
 
-    # Coupling Topology
+    # Wiring
 
-    - `NettalkReader.currentWindow` -> `Network.inputLayer.activationArray`
-    - `Network.outputLayer.activationArray` -> `SpeechSynthesizer.speakFeatureVector`
+    - Update action "Set NETtalk inputs" copies `NettalkReader.currentWindow`
+      into `Network.inputLayer` before each step.
+    - Coupling: `Network.outputLayer.activationArray` -> `SpeechSynthesizer.speakFeatureVector`.
+    - Update action "Flush NETtalk word at boundary" calls
+      `SpeechSynthesizer.flushFeatureBuffer()` when the reader passes a non-letter
+      character, so the synthesizer speaks one word at a time (in BUFFERED mode).
 
     # What to Do
 
@@ -154,7 +152,7 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 """.trimIndent()
 
-fun SimulationScope.wireNetTalkCouplings(workspace: Workspace, reader: NettalkReader) {
+fun SimulationScope.wireNetTalk(workspace: Workspace, reader: NettalkReader) {
     val networkComp = workspace.componentList.filterIsInstance<NetworkComponent>().firstOrNull()
         ?: error("No NetworkComponent found in workspace.")
     val speechComp = workspace.componentList.filterIsInstance<SpeechSynthesizerComponent>().firstOrNull()
@@ -163,8 +161,19 @@ fun SimulationScope.wireNetTalkCouplings(workspace: Workspace, reader: NettalkRe
         ?: error("No BackpropNetwork found in the network component.")
     val synthesizer = speechComp.synthesizer
     synthesizer.inputMode = SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
+    workspace.addUpdateAction("Set NETtalk inputs", position = 0) {
+        bp.inputLayer.setActivations(reader.currentWindow)
+    }
+    workspace.addUpdateAction("Flush NETtalk word at boundary") {
+        val ch = reader.currentLetter.firstOrNull()
+        if (ch != null && !ch.isLetter()) {
+            synthesizer.flushFeatureBuffer()
+        }
+    }
+    workspace.addUpdateAction("Advance NETtalk reader") {
+        reader.update()
+    }
     with(workspace.couplingManager) {
-        reader.getProducer(reader::currentWindow) couple bp.inputLayer.getConsumer(bp.inputLayer::setActivations)
         bp.outputLayer.getProducer(bp.outputLayer::activationArray) couple synthesizer.getConsumer(synthesizer::speakFeatureVector)
     }
 }

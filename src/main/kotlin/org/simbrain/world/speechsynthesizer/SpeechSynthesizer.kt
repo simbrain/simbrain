@@ -17,6 +17,7 @@ class SpeechSynthesizer : SoundGenerator() {
     var inputMode: InputMode = InputMode.TEXT
         set(value) {
             field = value
+            featureBuffer.setLength(0)
             events.inputModeChanged.fire()
         }
 
@@ -24,8 +25,28 @@ class SpeechSynthesizer : SoundGenerator() {
     var codecType: PhonemeCodecType = PhonemeCodecType.NETTALK
         set(value) {
             field = value
+            featureBuffer.setLength(0)
             events.codecChanged.fire()
         }
+
+    @UserParameter(
+        label = "Buffering",
+        description = "When receiving a stream of feature vectors, speak each phoneme immediately or buffer them until an external flush signal is received.",
+        order = 35
+    )
+    var bufferingMode: BufferingMode = BufferingMode.BUFFERED
+        set(value) {
+            field = value
+            if (value == BufferingMode.IMMEDIATE) flushFeatureBuffer()
+        }
+
+    @UserParameter(
+        label = "Max buffer size",
+        description = "Safety cap on the feature buffer in BUFFERED mode. When reached, the buffer is auto-flushed so audio keeps playing even if no flush signal arrives. 0 disables the cap.",
+        minimumValue = 0.0,
+        order = 36
+    )
+    var maxBufferSize: Int = 500
 
     val codec: PhonemeCodec
         get() = codecType.codec
@@ -85,6 +106,9 @@ class SpeechSynthesizer : SoundGenerator() {
     private val transcriptionBuffer = StringBuilder()
 
     @Transient
+    private val featureBuffer = StringBuilder()
+
+    @Transient
     private var lastFeatureVector: DoubleArray = DoubleArray(codec.inputDimension)
 
     @Transient
@@ -127,7 +151,31 @@ class SpeechSynthesizer : SoundGenerator() {
         lastFeatureVector = vector.copyOf()
         val decoded = codec.decodeFeatures(vector)
         appendTranscription(decoded.symbol.toString(), separator = "")
-        val espeak = codec.symbolsToEspeak(decoded.symbol.toString())
+        when (bufferingMode) {
+            BufferingMode.IMMEDIATE -> {
+                val espeak = codec.symbolsToEspeak(decoded.symbol.toString())
+                if (espeak.isNotBlank()) {
+                    enqueue(Job(espeak, asPhonemes = true, label = espeak))
+                }
+            }
+            BufferingMode.BUFFERED -> {
+                featureBuffer.append(decoded.symbol)
+                if (maxBufferSize > 0 && featureBuffer.length >= maxBufferSize) {
+                    flushFeatureBuffer()
+                }
+            }
+        }
+    }
+
+    @Consumable(description = "Flush the buffered feature-vector phonemes when signal >= 1.0.")
+    fun flushOnSignal(signal: Double) {
+        if (signal >= 1.0) flushFeatureBuffer()
+    }
+
+    fun flushFeatureBuffer() {
+        if (featureBuffer.isEmpty()) return
+        val espeak = codec.symbolsToEspeak(featureBuffer.toString())
+        featureBuffer.setLength(0)
         if (espeak.isNotBlank()) {
             enqueue(Job(espeak, asPhonemes = true, label = espeak))
         }
@@ -137,6 +185,8 @@ class SpeechSynthesizer : SoundGenerator() {
         voice = Voice.EN_US
         inputMode = InputMode.TEXT
         codecType = PhonemeCodecType.NETTALK
+        bufferingMode = BufferingMode.BUFFERED
+        maxBufferSize = 500
         speed = 175
         pitch = 50
         amplitude = 100
@@ -156,6 +206,7 @@ class SpeechSynthesizer : SoundGenerator() {
         speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
+        featureBuffer.setLength(0)
         events.speakingChanged.fire("")
         startWorker()
     }
@@ -242,6 +293,13 @@ class SpeechSynthesizer : SoundGenerator() {
         TEXT("Text"),
         PHONEMES("Phonemes"),
         ARTICULATORY_FEATURES("Articulatory features");
+
+        override fun toString(): String = displayName
+    }
+
+    enum class BufferingMode(private val displayName: String) {
+        IMMEDIATE("Speak each phoneme"),
+        BUFFERED("Buffer until flush signal");
 
         override fun toString(): String = displayName
     }

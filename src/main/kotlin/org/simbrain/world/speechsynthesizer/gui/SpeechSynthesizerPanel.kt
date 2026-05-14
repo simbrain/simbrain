@@ -71,6 +71,8 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
     private fun updateFeatureVisibility() {
         val showFeatures = synthesizer.inputMode == SpeechSynthesizer.InputMode.ARTICULATORY_FEATURES
         setEditorParameterVisible("Feature decoder", showFeatures)
+        setEditorParameterVisible("Buffering", showFeatures)
+        setEditorParameterVisible("Max buffer size", showFeatures)
         featureLabel.isVisible = showFeatures
         featureBars.isVisible = showFeatures
         revalidate()

@@ -7,7 +7,7 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.addTextWorld
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.subnetworks.SRNNetwork
-import org.simbrain.network.trainers.MomentumOptimizer
+import org.simbrain.network.trainers.BasicOptimizer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
@@ -82,7 +82,7 @@ val srnElmanSentences = newSim {
     )
     srn.trainerConfig.learningRate = learningRate
     srn.trainerConfig.computeAccuracy = true
-    srn.trainerConfig.optimizer = MomentumOptimizer(momentum = 0.0)
+    srn.trainerConfig.optimizer = BasicOptimizer(momentum = 0.0)
 
     // Comment this out to pretrain the network
     // From the original paper: "The training continued in this manner until the network had experienced 6 complete passes
@@ -238,4 +238,3 @@ fun main() {
     // For testing makeElmanVector
     println(makeElmanVector(10))
 }
-

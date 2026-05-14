@@ -56,10 +56,10 @@ class SupervisedModelTest {
         val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModelsAsync(it) }
 
         val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
-            config.optimizer = MomentumOptimizer()
+            config.optimizer = BasicOptimizer()
         }
         val supervisedTrainer = SupervisedTrainer(network2, supervisedModel).apply {
-            config.optimizer = MomentumOptimizer()
+            config.optimizer = BasicOptimizer()
         }
 
         val trainingInputs = mutableListOf(
@@ -172,11 +172,11 @@ class SupervisedModelTest {
         val ngModel = SupervisedModel(ng1, ng3).also { network2.addNetworkModelsAsync(it) }
 
         val naTrainer = SupervisedTrainer(network1, naModel).apply {
-            config.optimizer = MomentumOptimizer(0.0)
+            config.optimizer = BasicOptimizer(0.0)
         }
 
         val ngTrainer = SupervisedTrainer(network2, ngModel).apply {
-            config.optimizer = MomentumOptimizer(0.0)
+            config.optimizer = BasicOptimizer(0.0)
         }
 
         val trainingInputs = mutableListOf(
@@ -286,10 +286,10 @@ class SupervisedModelTest {
         val supervisedModel = SupervisedModel(layer1, layer3).also { network2.addNetworkModelsAsync(it) }
 
         val SupervisedTrainer = SupervisedTrainer(network1, backpropNetwork).apply {
-            config.optimizer = MomentumOptimizer(0.0)
+            config.optimizer = BasicOptimizer(0.0)
         }
         val supervisedTrainer = SupervisedTrainer(network2, supervisedModel).apply {
-            config.optimizer = MomentumOptimizer(0.0)
+            config.optimizer = BasicOptimizer(0.0)
         }
 
         val trainingInputs = mutableListOf(

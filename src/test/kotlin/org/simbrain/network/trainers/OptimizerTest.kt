@@ -31,9 +31,9 @@ class OptimizerTest {
     }
 
     @Test
-    fun `test MomentumOptimizer mathematical correctness`() {
+    fun `test BasicOptimizer mathematical correctness`() {
         val (net, wm, trainer) = createTestNetwork()
-        val optimizer = MomentumOptimizer(momentum = 0.9).apply { learningRate = 0.1 }
+        val optimizer = BasicOptimizer(momentum = 0.9).apply { learningRate = 0.1 }
         trainer.config.optimizer = optimizer
 
         wm.weights.fill(0.5)
@@ -84,9 +84,9 @@ class OptimizerTest {
     }
 
     @Test
-    fun `test MomentumOptimizer reset functionality`() {
+    fun `test BasicOptimizer reset functionality`() {
         val (net, wm, trainer) = createTestNetwork()
-        val optimizer = MomentumOptimizer(momentum = 0.9).apply { learningRate = 0.1 }
+        val optimizer = BasicOptimizer(momentum = 0.9).apply { learningRate = 0.1 }
         trainer.config.optimizer = optimizer
         
         val delta = Matrix.of(arrayOf(
@@ -110,9 +110,9 @@ class OptimizerTest {
     }
 
     @Test
-    fun `test MomentumOptimizer with zero momentum`() {
+    fun `test BasicOptimizer with zero momentum`() {
         val (net, wm, trainer) = createTestNetwork()
-        val optimizer = MomentumOptimizer(momentum = 0.0)
+        val optimizer = BasicOptimizer(momentum = 0.0)
         trainer.config.optimizer = optimizer
         trainer.config.learningRate = 0.1
         
@@ -312,8 +312,8 @@ class OptimizerTest {
 
     @Test
     fun `test optimizer copy functionality`() {
-        // Test MomentumOptimizer copy
-        val momentum = MomentumOptimizer(momentum = 0.8).apply { learningRate = 0.05 }
+        // Test BasicOptimizer copy
+        val momentum = BasicOptimizer(momentum = 0.8).apply { learningRate = 0.05 }
         val momentumCopy = momentum.copy()
         assertEquals(0.8, momentumCopy.momentum)
         assertEquals(0.05, momentumCopy.learningRate)
@@ -351,9 +351,9 @@ class OptimizerTest {
         val adamw = AdamWOptimizer(weightDecay = 1.0, learningRateDecay = 1.0)
         assertNotNull(adamw)
         
-        // Test MomentumOptimizer with extreme momentum
-        val momentum1 = MomentumOptimizer(momentum = 0.0)
-        val momentum2 = MomentumOptimizer(momentum = 1.0)
+        // Test BasicOptimizer with extreme momentum
+        val momentum1 = BasicOptimizer(momentum = 0.0)
+        val momentum2 = BasicOptimizer(momentum = 1.0)
         
         assertNotNull(momentum1)
         assertNotNull(momentum2)
@@ -371,7 +371,7 @@ class OptimizerTest {
             net.addNetworkModelsAsync(input2, output2, wm2)
         }
         
-        val optimizer = MomentumOptimizer(momentum = 0.9)
+        val optimizer = BasicOptimizer(momentum = 0.9)
         trainer.config.optimizer = optimizer
         trainer.config.learningRate = 0.1
         

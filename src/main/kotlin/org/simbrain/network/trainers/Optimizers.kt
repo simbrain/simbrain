@@ -26,7 +26,7 @@ abstract class Optimizer: CopyableObject {
     abstract fun reset()
 
     override fun getTypeList() = listOf(
-        MomentumOptimizer::class.java,
+        BasicOptimizer::class.java,
         AdamOptimizer::class.java,
         AdamWOptimizer::class.java
     )
@@ -34,7 +34,7 @@ abstract class Optimizer: CopyableObject {
     abstract override fun copy(): Optimizer
 }
 
-class MomentumOptimizer(
+class BasicOptimizer(
     @UserParameter(
         label = "Momentum",
         description = "Weight applied to previous gradient update. Higher values (0.8-0.9) accelerate learning in consistent directions. 0 disables momentum",
@@ -58,7 +58,7 @@ class MomentumOptimizer(
         matrixToVelocityMap.clear()
     }
 
-    override fun copy() = MomentumOptimizer(momentum).also { it.learningRate = learningRate }
+    override fun copy() = BasicOptimizer(momentum).also { it.learningRate = learningRate }
 }
 
 class AdamOptimizer(

@@ -24,7 +24,7 @@ fun testBPProbe() {
         )
     )
     val trainer = SupervisedTrainer(network, bp).apply {
-        config.optimizer = MomentumOptimizer()
+        config.optimizer = BasicOptimizer()
     }
 
     // Probe

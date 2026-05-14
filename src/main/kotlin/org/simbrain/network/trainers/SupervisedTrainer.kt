@@ -373,7 +373,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         // accumulateBackprop sums per-row deltas. Average them here so the optimizer sees a
         // per-sample-equivalent gradient, regardless of batch size. Adam-family optimizers are
         // scale-invariant (the constant cancels in m̂/√v̂), but non-normalizing optimizers like
-        // Momentum need this averaging to stay stable as batch size changes. CnnTrainer already
+        // BasicOptimizer need this averaging to stay stable as batch size changes. CnnTrainer already
         // does the same scaling.
         val batchScale = 1.0 / rowRange.count().coerceAtLeast(1)
 

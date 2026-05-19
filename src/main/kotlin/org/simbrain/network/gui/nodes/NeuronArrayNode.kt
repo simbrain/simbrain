@@ -3,6 +3,8 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.NeuronArray
@@ -18,6 +20,8 @@ import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
+import java.awt.BasicStroke
+import java.awt.Graphics2D
 import java.awt.event.ActionEvent
 import javax.swing.AbstractAction
 import javax.swing.Action
@@ -46,9 +50,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     val neuronCircles by lazy {
-        neuronArray.activationArray.map { activation ->
+        neuronArray.activationArray.mapIndexed { i, activation ->
             NeuronCircleNode(networkPanel).also { circle ->
                 circle.drawActivation(activation, neuronArray.updateRule.graphicalBounds)
+                circle.addInputEventListener(object : PBasicInputEventHandler() {
+                    override fun mouseEntered(event: PInputEvent) {
+                        networkPanel.updateNeuronArrayTrace(neuronArray, i)
+                    }
+                    override fun mouseExited(event: PInputEvent) {
+                        networkPanel.clearNeuronArrayTrace()
+                    }
+                })
             }
         }.onEach {
             neuronCircleGroup.addChild(it)
@@ -80,7 +92,36 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
      */
     protected val activationImage = SimbrainImage().apply {
         imageNodeGroup.addChild(this)
+        pickable = true
+        addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseMoved(event: PInputEvent) {
+                val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
+                networkPanel.updateNeuronArrayTrace(neuronArray, idx)
+            }
+            override fun mouseExited(event: PInputEvent) {
+                networkPanel.clearNeuronArrayTrace()
+            }
+        })
     }
+
+    /** Map a pixel within [activationImage] to a neuron index, respecting layout mode. */
+    private fun pixelToNeuronIndex(localPt: java.awt.geom.Point2D): Int? {
+        val size = neuronArray.size
+        if (size <= 0) return null
+        return if (gridMode) {
+            val len = ceil(sqrt(size.toDouble())).toInt()
+            val row = ((localPt.y / imageSize) * len).toInt().coerceIn(0, len - 1)
+            val col = ((localPt.x / imageSize) * len).toInt().coerceIn(0, len - 1)
+            (row * len + col).takeIf { it < size }
+        } else if (neuronArray.verticalLayout) {
+            ((localPt.y / imageSize) * size).toInt().coerceIn(0, size - 1)
+        } else {
+            ((localPt.x / imageSize) * size).toInt().coerceIn(0, size - 1)
+        }
+    }
+
+    /** Trace highlight set by the neuron array tracer. */
+    var traceHighlight: NeuronArrayTraceHighlight? = null
 
     /**
      * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
@@ -271,10 +312,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
+        val g2 = paintContext.graphics
+
+        drawTraceHighlight(g2)
+
         if (neuronArray.circleMode) return
         if (!NetworkPreferences.showNumericOverlays) return
         val activations = neuronArray.activations.toDoubleArray()
-        val g2 = paintContext.graphics
         val decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
 
         if (gridMode) {
@@ -301,6 +345,60 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 offsetX = activationImage.xOffset,
                 offsetY = activationImage.yOffset
             )
+        }
+    }
+
+    private fun drawTraceHighlight(g2: Graphics2D) {
+        val highlight = traceHighlight ?: return
+        val size = neuronArray.size
+        if (size <= 0) return
+        g2.color = highlight.color
+        g2.stroke = BasicStroke(2f)
+
+        if (neuronArray.circleMode) {
+            val pad = 4
+            val d = (NEURON_DIAMETER + 2 * pad).toDouble()
+            for (i in highlight.indices) {
+                val circle = neuronCircles.getOrNull(i) ?: continue
+                val cx = circle.xOffset + neuronCircleGroup.xOffset
+                val cy = circle.yOffset + neuronCircleGroup.yOffset
+                g2.drawRect((cx - d / 2).toInt(), (cy - d / 2).toInt(), d.toInt(), d.toInt())
+            }
+            return
+        }
+
+        val xOff = activationImage.xOffset
+        val yOff = activationImage.yOffset
+        if (gridMode) {
+            val len = ceil(sqrt(size.toDouble())).toInt()
+            val cellW = imageSize / len
+            val cellH = imageSize / len
+            for (i in highlight.indices) {
+                if (i !in 0 until size) continue
+                val row = i / len
+                val col = i % len
+                g2.drawRect(
+                    (xOff + col * cellW).toInt(),
+                    (yOff + row * cellH).toInt(),
+                    cellW.toInt().coerceAtLeast(1),
+                    cellH.toInt().coerceAtLeast(1)
+                )
+            }
+        } else {
+            val vertical = neuronArray.verticalLayout
+            val cellW = if (vertical) flatPixelArrayHeight.toDouble() else imageSize / size
+            val cellH = if (vertical) imageSize / size else flatPixelArrayHeight.toDouble()
+            for (i in highlight.indices) {
+                if (i !in 0 until size) continue
+                val x = if (vertical) 0.0 else i * cellW
+                val y = if (vertical) i * cellH else 0.0
+                g2.drawRect(
+                    (xOff + x).toInt(),
+                    (yOff + y).toInt(),
+                    cellW.toInt().coerceAtLeast(1),
+                    cellH.toInt().coerceAtLeast(1)
+                )
+            }
         }
     }
 

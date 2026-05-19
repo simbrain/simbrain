@@ -3,6 +3,8 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCamera
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.Connector
@@ -20,6 +22,7 @@ import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.util.*
@@ -56,18 +59,33 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
     val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
 
+    /** Trace highlight set by the neuron array tracer. */
+    var traceHighlight: WeightMatrixTraceHighlight? = null
+
     init {
         pickable = true
         val events = weightMatrix.events
         events.updated.on { events.updateGraphics.fire() }
         events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
-        events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> 
+        events.labelChanged.on(Dispatchers.Swing) { _, newLabel ->
             interactionBox.setText(weightMatrix.displayName)
         }
         addChild(interactionBox)
         addChild(arrow)
         addChild(imageBox)
+        imageBox.pickable = true
+        imageBox.addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseMoved(event: PInputEvent) {
+                val wm = weightMatrix as? WeightMatrix ?: return
+                val localPt = event.getPositionRelativeTo(imageBox)
+                val ij = pixelToWeightCell(wm, localPt) ?: return
+                networkPanel.updateWeightMatrixCellTrace(wm, ij.first, ij.second)
+            }
+            override fun mouseExited(event: PInputEvent) {
+                networkPanel.clearNeuronArrayTrace()
+            }
+        })
         
         fun updateLocations() {
             arrow.invalidateFullBounds()
@@ -133,8 +151,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
-        if (!NetworkPreferences.showNumericOverlays) return
         val wm = weightMatrix as? WeightMatrix ?: return
+        val g2 = paintContext.graphics
+
+        drawTraceHighlight(g2, wm)
+
+        if (!NetworkPreferences.showNumericOverlays) return
         val matrix = wm.weights
         val rows: Int
         val cols: Int
@@ -155,7 +177,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 }
             }
         }
-        val g2 = paintContext.graphics
         val boxOffset = imageBox.offset
         g2.drawNumericOverlay(
             data = data,
@@ -166,6 +187,80 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             offsetX = boxOffset.x,
             offsetY = boxOffset.y
         )
+    }
+
+    /**
+     * Map a pixel inside [imageBox] to a `(targetRow, sourceCol)` cell of [wm], respecting the
+     * `weightMatrixTargetSource` display preference (which may transpose the rendered image).
+     */
+    private fun pixelToWeightCell(wm: WeightMatrix, localPt: java.awt.geom.Point2D): Pair<Int, Int>? {
+        val matrix = wm.weights
+        val nTargets = matrix.nrow()
+        val nSources = matrix.ncol()
+        if (nTargets <= 0 || nSources <= 0) return null
+        val displayRows: Int
+        val displayCols: Int
+        if (NetworkPreferences.weightMatrixTargetSource) {
+            displayRows = nTargets
+            displayCols = nSources
+        } else {
+            displayRows = nSources
+            displayCols = nTargets
+        }
+        val displayRow = ((localPt.y / imageHeight) * displayRows).toInt().coerceIn(0, displayRows - 1)
+        val displayCol = ((localPt.x / imageWidth) * displayCols).toInt().coerceIn(0, displayCols - 1)
+        return if (NetworkPreferences.weightMatrixTargetSource) {
+            displayRow to displayCol
+        } else {
+            displayCol to displayRow
+        }
+    }
+
+    private fun drawTraceHighlight(g2: Graphics2D, wm: WeightMatrix) {
+        val h = traceHighlight ?: return
+        val matrix = wm.weights
+        val nTargets = matrix.nrow()
+        val nSources = matrix.ncol()
+        if (nTargets <= 0 || nSources <= 0) return
+        val displayRows: Int
+        val displayCols: Int
+        val displayRow: Int?
+        val displayCol: Int?
+        if (NetworkPreferences.weightMatrixTargetSource) {
+            displayRows = nTargets
+            displayCols = nSources
+            displayRow = h.row
+            displayCol = h.col
+        } else {
+            displayRows = nSources
+            displayCols = nTargets
+            displayRow = h.col
+            displayCol = h.row
+        }
+        val cellW = imageWidth.toDouble() / displayCols
+        val cellH = imageHeight.toDouble() / displayRows
+        val boxOffset = imageBox.offset
+
+        g2.color = h.color
+        g2.stroke = BasicStroke(2f)
+
+        val rect = when {
+            displayRow != null && displayCol != null -> {
+                val r = displayRow.coerceIn(0, displayRows - 1)
+                val c = displayCol.coerceIn(0, displayCols - 1)
+                java.awt.geom.Rectangle2D.Double(boxOffset.x + c * cellW, boxOffset.y + r * cellH, cellW, cellH)
+            }
+            displayRow != null -> {
+                val r = displayRow.coerceIn(0, displayRows - 1)
+                java.awt.geom.Rectangle2D.Double(boxOffset.x, boxOffset.y + r * cellH, imageWidth.toDouble(), cellH)
+            }
+            displayCol != null -> {
+                val c = displayCol.coerceIn(0, displayCols - 1)
+                java.awt.geom.Rectangle2D.Double(boxOffset.x + c * cellW, boxOffset.y, cellW, imageHeight.toDouble())
+            }
+            else -> return
+        }
+        g2.drawRect(rect.x.toInt(), rect.y.toInt(), rect.width.toInt().coerceAtLeast(1), rect.height.toInt().coerceAtLeast(1))
     }
 
     override val isDraggable: Boolean = false

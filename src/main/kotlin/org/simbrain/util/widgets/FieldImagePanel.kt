@@ -1,7 +1,14 @@
 package org.simbrain.util.widgets
 
+import org.simbrain.util.UserParameter
+import org.simbrain.util.createEditorDialog
+import org.simbrain.util.display
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.toHSB
 import java.awt.*
+import javax.swing.JButton
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import kotlin.math.*
 
 /**
@@ -24,15 +31,48 @@ class FieldImagePanel(
 
     var threshold: Double = 0.1
     var maxItems: Int = 8
-    var hue: Float = 0.62f
+    private val settings = FieldImageSettings()
+
+    var textColor: Color
+        get() = settings.textColor
+        set(value) {
+            settings.textColor = value
+            repaint()
+        }
+
+    var scaleSaturationByActivation: Boolean
+        get() = settings.scaleSaturationByActivation
+        set(value) {
+            settings.scaleSaturationByActivation = value
+            repaint()
+        }
 
     private var pushedLabels: List<String>? = null
     private var pushedActivations: DoubleArray? = null
 
+    // TODO: Move these into component-level preferences if Field Image becomes a workspace component.
+    private val preferencesButton = JButton("Preferences...").apply {
+        toolTipText = "Edit field image preferences"
+        isFocusable = false
+        addActionListener {
+            settings.createEditorDialog(
+                titleName = "Field Image Preferences",
+                parent = SwingUtilities.getWindowAncestor(this@FieldImagePanel)
+            ) {
+                repaint()
+            }.display()
+        }
+    }
+
     init {
+        layout = BorderLayout()
         background = Color.WHITE
         preferredSize = Dimension(360, 360)
         minimumSize = Dimension(120, 120)
+        add(JPanel(FlowLayout(FlowLayout.RIGHT, 4, 4)).apply {
+            isOpaque = false
+            add(preferencesButton)
+        }, BorderLayout.NORTH)
     }
 
     fun setData(labels: List<String>, activations: DoubleArray) {
@@ -110,10 +150,34 @@ class FieldImagePanel(
     private fun drawLabel(g2: Graphics2D, text: String, cx: Int, cy: Int, intensity: Float, minFont: Int, maxFont: Int) {
         val size = (minFont + intensity * (maxFont - minFont)).toInt().coerceAtLeast(8)
         g2.font = Font(Font.SANS_SERIF, Font.BOLD, size)
-        val saturation = (0.15f + 0.85f * intensity).coerceIn(0f, 1f)
-        val brightness = (0.85f - 0.15f * (1f - intensity)).coerceIn(0f, 1f)
-        g2.color = Color.getHSBColor(hue, saturation, brightness)
+        g2.color = settings.textColor.withIntensity(intensity)
         val fm = g2.fontMetrics
         g2.drawString(text, cx - fm.stringWidth(text) / 2, cy + (fm.ascent - fm.descent) / 2)
+    }
+
+    private fun Color.withIntensity(intensity: Float): Color {
+        if (!settings.scaleSaturationByActivation) return this
+        val (hue, saturation, brightness) = toHSB()
+        val i = intensity.coerceIn(0f, 1f)
+        val adjustedSaturation = (0.35f + 0.65f * i) * saturation
+        val adjustedBrightness = 0.55f + 0.45f * brightness
+        return Color.getHSBColor(hue, adjustedSaturation.coerceIn(0f, 1f), adjustedBrightness.coerceIn(0f, 1f))
+    }
+
+    companion object {
+        val DEFAULT_TEXT_COLOR: Color = Color(0x118F20)
+    }
+
+    private class FieldImageSettings : EditableObject {
+
+        @UserParameter(label = "Text color", description = "Base color used for field image labels.", order = 10)
+        var textColor: Color = DEFAULT_TEXT_COLOR
+
+        @UserParameter(
+            label = "Scale saturation by activation",
+            description = "If true, less active labels are drawn with lower saturation.",
+            order = 20
+        )
+        var scaleSaturationByActivation: Boolean = true
     }
 }

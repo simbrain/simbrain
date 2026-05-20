@@ -96,15 +96,15 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Cognitive maps") {
         item("Agent trails") { kAgentTrails }
-        item("Field image (sensors)", beta = true) { fieldImageDemo }
-        item("Field image (place cells)", beta = true) { fieldImagePlaceCellsDemo }
+        item("Field image (sensors)") { fieldImageDemo }
+        item("Field image (place cells)") { fieldImagePlaceCellsDemo }
         item("Three object recurrent") { cogMap3Objects }
     }
 
     dir("Language") {
         item("Basic word embeddings") { nlpSimBasic }
-        item("Synthesizer demo", beta = true) { synthesizerDemo }
-        item("NETtalk", beta = true) { nettalkComponentSim }
+        item("Synthesizer demo") { synthesizerDemo }
+        item("NETtalk") { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny language model (transformer)") { tinyLanguageModel }

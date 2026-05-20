@@ -120,7 +120,9 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     letter window, while a separate `SpeechSynthesizerComponent` speaks from the network's
     26-dimensional articulatory feature output.
 
-    # Inputs and Outputs
+    # Simulation Details
+
+    ## Inputs and Outputs
 
     Each network input is a sliding window over the text. With the default window size of
     7, the network sees the current character plus three characters of context on each
@@ -138,7 +140,7 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     Training examples are built from a continuous text stream with spaces between words,
     so the network also learns that word-boundary positions should map to silent output.
 
-    # Relation to the Original NETtalk
+    ## Relation to the Original NETtalk
 
     This simulation is faithful to the classic NETtalk setup in its broad architecture:
     a 7-character input window, 29 one-hot units per character position, 80 hidden units,
@@ -158,12 +160,12 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     speech synthesizer rather than being a byte-for-byte recreation of the original DECtalk
     pipeline.
 
-    # Wiring
+    ## Wiring
 
-    - Update action "Set NETtalk inputs" copies `NettalkReader.currentWindow`
+    - Update action `Set NETtalk inputs` copies `NettalkReader.currentWindow`
       into `Network.inputLayer` before each step.
     - Coupling: `Network.outputLayer.activationArray` -> `SpeechSynthesizer.speakFeatureVector`.
-    - Update action "Flush NETtalk word at boundary" calls
+    - Update action `Flush NETtalk word at boundary` calls
       `SpeechSynthesizer.flushFeatureBuffer()` when the reader passes a non-letter
       character, so the synthesizer speaks one word at a time (in BUFFERED mode).
 
@@ -173,15 +175,18 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
        then play. The optimizer settings have been chosen because they work well for this
        demo. Training still takes some time: on many computers, around 200 iterations is a
        reasonable target and may take roughly 5-10 minutes. Mean error should drop steadily.
-    2. Press the workspace play button. The reader advances through the text and the
+    2. Press `Run`. The reader advances through the text and the
        speech synthesizer decodes feature vectors to phonemes.
        Early in training the output often collapses to an "uh"-like vowel sound; this
        is normal before the network has learned useful letter-to-phoneme mappings.
     3. Edit the reading text directly in the NETtalk Reader panel to test other passages.
 
+    # References
+
+    Sejnowski, T. J., & Rosenberg, C. R. (1987). [_Parallel networks that learn to pronounce English text_](https://papers.cnl.salk.edu/PDFs/NETtalk_%20A%20Parallel%20Network%20That%20Learns%20to%20Read%20Aloud%201988-3562.pdf). _Complex Systems_, _1_, 145-168.
+
     # Links
 
-    - [NETtalk: A Parallel Network That Learns to Read Aloud](https://papers.cnl.salk.edu/PDFs/NETtalk_%20A%20Parallel%20Network%20That%20Learns%20to%20Read%20Aloud%201988-3562.pdf)
     - [UCI Connectionist Bench NETtalk Corpus](https://archive.ics.uci.edu/dataset/150/connectionist%2Bbench%2Bnettalk%2Bcorpus)
     Simbrain's speech output is based on [eSpeak NG](https://github.com/espeak-ng/espeak-ng),
     a compact open-source text-to-speech system that supports text and phoneme input.

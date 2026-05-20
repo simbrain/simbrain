@@ -226,7 +226,7 @@ val lorenzSystem = newSim {
 
         # References
 
-        Lorenz, E. N. (1963). [Deterministic nonperiodic flow](https://doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2). _Journal of the Atmospheric Sciences_, _20_(2), 130-141.
+        Lorenz, E. N. (1963). [_Deterministic nonperiodic flow_](https://doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2). _Journal of the Atmospheric Sciences_, _20_(2), 130-141.
 
         # Credits
 

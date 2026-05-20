@@ -145,25 +145,29 @@ val threeObjectDetector = newSim {
     }
 
     addSidebarInfo(
-        """ 
-            # Three Object Detector 
-            
+        """
+            # Three Object Detector
+
             This simulation uses backprop to train a network to identify smells.
-            
+
             # What to Do
-            
-            1. Double-click on the `Backprop` network in the `Backprop` network window to open the “Train Network” window.
-            
-            2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation. 
+
+            1. Click `Run`, then manually move the mouse around the world. Watch the output neurons as the mouse approaches each object. At first the network should do poorly at classifying the smells.
+
+            2. Double-click on the `Backprop` model in the `Object Detector` network window to open the “Train Network” window.
+
+            3. In the top area of this window, select the `Iterate training until the stop button is pressed` button to train the network.
                 - The “Sum Squared Error” should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
-            
-            3. Click `Apply current row as input and increment selected row` to check the network's performance. As you click the pattern on the bottom should be matched by the 
+
+            4. Click `Apply current row as input and increment selected row` to check the network's performance. As you click the pattern on the bottom should be matched by the
             pattern on the top.
-            
+
+            5. Close the training window, click `Run` again, and move the mouse around the world. The output neurons should now classify the nearby object more accurately.
+
             # Credits
-            
+
             [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-            
+
         """.trimIndent()
     )
 

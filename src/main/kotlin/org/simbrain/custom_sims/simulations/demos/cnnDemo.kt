@@ -144,25 +144,19 @@ val cnnDemo = newSim {
         """
         # CNN Pipeline Demo
 
-        This simulation shows a convolutional neural network (CNN) pipeline
-        connected to a 3D view sensor. The agent sees a pseudo-3D first-person view
-        of the OdorWorld, which feeds into a chain of CNN layers.
+        This simulation shows a convolutional neural network (CNN) connected to a 3D view sensor.
+        The agent sees a pseudo-3D first-person view of the OdorWorld, and the network activity
+        changes as the view changes.
 
-        ## Pipeline
-        - **Input**: 64x64x3 RGB tensor from View3DSensor
-        - **Conv1**: 3x3 kernel, 8 filters, SAME padding, ReLU
-        - **MaxPool1**: 2x2 pool
-        - **Conv2**: 3x3 kernel, 16 filters, SAME padding, ReLU
-        - **MaxPool2**: 2x2 pool
-        - **Flatten**: 16x16x16 = 4096 -> NeuronArray
-        - **Dense**: 4096 -> 3 output neurons (via WeightMatrix)
+        # Simulation Details
 
-        ## How to use
+        The `View3DSensor` sends an RGB representation of the agent's current view to the network.
+
+        # What to Do
         - Use arrow keys in the OdorWorld to move the agent
         - Observe channel activations updating in each tensor layer
         - Right-click on tensors to navigate channels or toggle RGB view
-        - Right-click on conv connectors to browse kernel weights
-        - The output neurons show the full CNN-to-dense pipeline in action
+        - Watch the output neurons change as the agent's view changes
         """.trimIndent()
     )
 }

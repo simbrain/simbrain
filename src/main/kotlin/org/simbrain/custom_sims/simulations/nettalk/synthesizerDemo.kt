@@ -67,7 +67,9 @@ val synthesizerDemo = newSim {
         experiment with voices, accents, speed, pitch, amplitude, and feature-vector
         buffering.
 
-        # Basic Text-To-Speech
+        # Simulation Details
+
+        ## Basic Text-To-Speech
 
         Text-to-speech converts written words into audible speech. A synthesizer first
         decides how the text should be pronounced, then generates the audio waveform for
@@ -76,7 +78,7 @@ val synthesizerDemo = newSim {
 
         Enter a word or phrase in `Text` and click `Speak text`.
 
-        # Phoneme Synthesis
+        ## Phoneme Synthesis
 
         Phoneme synthesis bypasses the ordinary text-to-pronunciation step. Instead of
         asking the synthesizer to infer how a word should sound, Simbrain sends an explicit
@@ -90,7 +92,7 @@ val synthesizerDemo = newSim {
 
         Enter an eSpeak-ng phoneme string in `Phonemes` and click `Speak phonemes`.
 
-        # Articulatory Feature Synthesis
+        ## Articulatory Feature Synthesis
 
         Feature-vector synthesis bypasses both ordinary text and phoneme strings. The
         demo constructs a 26-dimensional feature vector from a selected phoneme and
@@ -110,7 +112,9 @@ val synthesizerDemo = newSim {
         interpreted by nearest-phoneme match rather than by generating sound directly from
         the vector.
 
-        # Examples
+        # What to Do
+
+        ## Examples
 
         - `h@l'oU` for "hello"
         - `w'3rld` for "world"

@@ -144,7 +144,7 @@ val classicalConditioning = newSim("classical conditioning") {
            - The response to the `bell` is now a conditioned response (CR).
         
         5. Extinction
-           - Show the `bell` alone repeatedly, without the cheese.
+           - Show the `bell` alone repeatedly, without the `cheese`.
            - The response gradually disappears—this is `extinction`.
         
         6. Tracking Learning

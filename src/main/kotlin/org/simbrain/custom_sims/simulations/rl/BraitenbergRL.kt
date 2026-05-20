@@ -950,22 +950,22 @@ val braitenbergRL = newSim { optionString ->
 
     You can adjust parameters to see their effects:
 
-    - **Learning Rate**: Controls how quickly weights change (higher = faster but less stable learning)
-    - **Gamma**: Discount factor for future rewards (higher = more farsighted)
-    - **Dispersion**: Sensor range (higher = wider detection)
-    - **Speed Bias**: Base forward speed (higher = faster default movement)
+    - `Learning Rate`: Controls how quickly weights change (higher = faster but less stable learning)
+    - `Gamma`: Discount factor for future rewards (higher = more farsighted)
+    - `Dispersion`: Sensor range (higher = wider detection)
+    - `Speed Bias`: Base forward speed (higher = faster default movement)
 
     ## Reward Configuration
 
     The proximity rewards use configurable decay functions. Each object type (cheese and poison) has independent settings:
 
-    - **Max Reward**: Maximum reward magnitude (default: `15.0`)
-    - **Decay Function**: How reward diminishes with distance
-      - **Gaussian**: Smooth bell-curve decay (recommended for natural behavior)
-      - **Linear**: Linear interpolation to zero at dispersion radius
-      - **Step**: Binary on/off at dispersion radius
-    - **Dispersion**: Distance at which reward approaches zero
-    - **Peak Distance**: Distance where reward is maximum (usually `0`)
+    - `Max Reward`: Maximum reward magnitude (default: `15.0`)
+    - `Decay Function`: How reward diminishes with distance
+      - `Gaussian`: Smooth bell-curve decay (recommended for natural behavior)
+      - `Linear`: Linear interpolation to zero at dispersion radius
+      - `Step`: Binary on/off at dispersion radius
+    - `Dispersion`: Distance at which reward approaches zero
+    - `Peak Distance`: Distance where reward is maximum (usually `0`)
 
     The actual reward is: `maxReward × decayFunction(distance) × taskMultiplier`
 
@@ -977,11 +977,11 @@ val braitenbergRL = newSim { optionString ->
 
     The time series plot shows three key signals that reveal the learning process:
 
-    **Reward**: Shows the immediate reward signal based on proximity to objects. Positive values indicate being near rewarding objects (cheese in most tasks), negative values indicate being near penalizing objects (poison in most tasks). This signal fluctuates continuously as the agent moves around.
+    `Reward`: Shows the immediate reward signal based on proximity to objects. Positive values indicate being near rewarding objects (cheese in most tasks), negative values indicate being near penalizing objects (poison in most tasks). This signal fluctuates continuously as the agent moves around.
 
-    **Value**: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
+    `Value`: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
 
-    **TD Error**: The temporal difference error, which can be understood as: `TD_error = reward + γ×V(current) - V(previous)`. This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
+    `TD Error`: The temporal difference error, which can be understood as: `TD_error = reward + γ×V(current) - V(previous)`. This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
 
     ## Reading the Learning Process
 

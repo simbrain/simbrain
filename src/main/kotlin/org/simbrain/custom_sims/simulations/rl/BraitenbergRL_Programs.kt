@@ -460,6 +460,8 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     A program-based actor-critic experiment using discrete Braitenberg controllers.
 
+    # Simulation Details
+
     ## The Setup
 
     Four programs (discrete actions) control a Braitenberg vehicle:
@@ -516,7 +518,11 @@ val braitenbergRLPrograms = newSim { optionString ->
     - states often contain mixed cheese and poison evidence
     - one TD error must reinforce or punish the entire bundled behavior
 
-    This makes credit assignment much harder than in `BraitenbergRL.kt`, where TD updates direct sensor-to-motor weights.
+    This makes credit assignment much harder than in `Braitenberg RL`, where TD updates direct sensor-to-motor weights.
+
+    # What to Do
+
+    Click `Run` and watch how the program probabilities change as the agent encounters cheese and poison.
 
     ## Reading the Display
 

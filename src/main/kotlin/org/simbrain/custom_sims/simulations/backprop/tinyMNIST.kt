@@ -69,39 +69,43 @@ val tinyMNIST = newSim {
     addSidebarInfo(
         """
         # Tiny MNIST
-        
-        The [MNIST](https://en.wikipedia.org/wiki/MNIST_database) (Modified National Institute of Standards and Technology) database is a dataset of `70,000` `28x28` pixel grayscale images of 
+
+        The [MNIST](https://en.wikipedia.org/wiki/MNIST_database) (Modified National Institute of Standards and Technology) database is a dataset of `70,000` `28x28` pixel grayscale images of
         handwritten digits `0-9`. It consists of `60,000` training images and `10,000` testing images, used in machine learning and image processing. It provides a reliable benchmark for developing
         and testing models, like neural networks, in classification.
-         
+
         This is a subsampling of the dataset down to `10,000` training and `1,000` `20 x 20` images, thanks to Melissa Almeida.
-        
+
         The simulation trains the network to recognize digits. This simulation takes an image of the network as input, and learns to recognize and identify what digit between `0` and `9` it is.
-       
+
+        # Simulation Details
+
+        Training uses the smaller `20 x 20` images in the bundled Tiny MNIST dataset, with separate training and testing examples so you can compare learning and generalization.
+
         # What to Do
-        
+
         1. Enter the `Train Network` dialog by right-clicking the `BackpropNetwork_1` network (under the `Tiny Mnist` window) and selecting `Edit/Train Backprop...`
-        
-        2. Train the simulation by clicking the Play button. This button should display `Iterate training until stop button is pressed` when hovered over
-        
+
+        2. Train the simulation by clicking the `Iterate training until stop button is pressed` button
+
         3. Train this simulation until the `Mean Error` reaches below `0.2` or `0.1`. With the default settings it will hover around there. At that point it achieves decent results. The blue line on the graph shows how well the model is generalizing to test data
-        
+
         Notice that the training error (red line) appears jagged compared to the testing error (blue line). This is because training uses batches of 35 examples when updating, while testing (which happens every 10 iterations, and is thus not visible initially) evaluates the entire test set. See the [docs on supervised learning](https://docs.simbrain.net/docs/network/learning/supervisedLearning.html)
-        
+
         ## Things You Can Do After Training
-        
-        - Manually try specific training or testing images. To do this, under the `Inputs` toolbar, go to the table of interest and click the button with this tooltip: `Apply current row as 
+
+        - Manually try specific training or testing images. To do this, under the `Inputs` toolbar, go to the table of interest and click the button with this tooltip: `Apply current row as
         input to network` when hovered. Then observe how it classifies written digits. The values of the output layer correspond to the probability it assigns the input to a digit `0-9`.
-        
-        - Draw your own image. Right click on the image layer and select `Add coupled image world` then draw your own image and see how the network does. It generally does poorly since it 
+
+        - Draw your own image. Right click on the image layer and select `Add coupled image world` then draw your own image and see how the network does. It generally does poorly since it
         was trained on anti-aliased images.
-        
+
         # Credits
-        
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
+
         Melissa Almeida
-        
+
         """.trimIndent()
     )
 

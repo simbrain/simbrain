@@ -176,22 +176,11 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         """
         # 3D Navigation + Local Inhibition Edge Map
 
-        A retina-like model to illustrate coupling from Odor World with 3d sensor to a local circuit.
-        The circuit is recurrently connected by two [distance-based](https://docs.simbrain.net/docs/network/connections/distanceBased.html) strategies**:
+        A retina-like model to illustrate coupling from `Odor World` with a `3D sensor` to a local circuit.
+        The circuit is recurrently connected by two [distance-based](https://docs.simbrain.net/docs/network/connections/distanceBased.html) strategies:
           one short-range excitatory and one broader inhibitory.
 
-        ## What to Do
-
-        1. Run and move the agent in Odor World.
-        2. Watch `Brightness Array` in the control panel to see the raw data sent to the network
-        3. Watch the network window which shows how a simple retina-like circuit processes this information
-        4. Adjust controls and compare:
-           - More `Inhibitory Lateral`: sharper contrast, stronger surround suppression.
-           - More `Excitatory Lateral`: broader local spread / smoothing.
-           - `Reverse Input (1-x)`: inverts polarity so that darker regions map to less rather than more neural activity
-           - `Raw Input Mode`: disables recurrent effects so you can compare what the network does with direct input.
-
-        ## Scientific Backing
+        # Simulation Details
 
         This captures core neurocomputational ideas from early vision:
         - center-surround style interactions
@@ -200,6 +189,17 @@ val view3dNavigationLateralInhibitionDemo = newSim {
 
         It is a simplified model, not a realistic retinal circuit, and it's also fairly provisional (as of Spring 2026). 
         We have only recently implemented 3d and this is a first example of what's possible. More is coming!
+
+        # What to Do
+
+        1. Click `Run` and move the agent in `Odor World`.
+        2. Watch `Brightness Array` in the control panel to see the raw data sent to the network
+        3. Watch the network window which shows how a simple retina-like circuit processes this information
+        4. Adjust controls and compare:
+           - More `Inhibitory Lateral`: sharper contrast, stronger surround suppression.
+           - More `Excitatory Lateral`: broader local spread / smoothing.
+           - `Reverse Input (1-x)`: inverts polarity so that darker regions map to less rather than more neural activity
+           - `Raw Input Mode`: disables recurrent effects so you can compare what the network does with direct input.
 
         """.trimIndent()
     )

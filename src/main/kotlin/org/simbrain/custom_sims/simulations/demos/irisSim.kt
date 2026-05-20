@@ -98,17 +98,17 @@ val irisClassifier = newSim {
     
     In this simulation, most of the exploration comes from the input layer after you have trained the model, Below are the steps:
     
-    1) Choose which algorithm you want to use.
+    1. Choose which algorithm you want to use.
     
-    2) Double click on the classifier (e.g., `K Nearest Neighbor`) and click the `Train` button.
+    2. Double click on the classifier (e.g., `K Nearest Neighbor`) and click the `Train` button.
     
-    3) Now, click the `play` button to run the simulation.
+    3. Now, click `Run` to run the simulation.
     
-    4) Then, try changing one feature at a time by adjusting the activations of the neurons by clicking on the neurons and pressing the up/down arrow keys. 
+    4. Then, try changing one feature at a time by adjusting the activations of the neurons by clicking on the neurons and pressing the up/down arrow keys.
         
         - Note: You can press `Ctrl+E` after clicking on a neuron to change the neuron's activation more accurately or by double clicking a neuron.
         
-    4) Observe how each feature influences the predicted output.
+    5. Observe how each feature influences the predicted output.
     
     ## Sample Values
     

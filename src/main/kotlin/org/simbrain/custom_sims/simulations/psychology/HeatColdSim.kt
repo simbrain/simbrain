@@ -128,7 +128,7 @@ val heatColdSim = newSim {
 
         A reproduction of McCulloch and Pitts' (1943) account of the heat illusion. This simulation demonstrates a fascinating perceptual phenomenon where the removal of a cold stimulus can create a brief sensation of heat.
 
-        ## Background
+        # Simulation Details
 
         This model comes from Warren McCulloch and Walter Pitts' pioneering 1943 paper "A Logical Calculus of the Ideas Immanent in Nervous Activity," which laid the foundation for both artificial neural networks and computational neuroscience.
 
@@ -150,8 +150,6 @@ val heatColdSim = newSim {
 
         This was likely unintentional in the original model. It shows how even experts fluent in formal logic can miss consequences that become immediately evident in a visualization.
 
-        # Simulation Details
-
         The network consists of:
         - **Heat Receptor**: Input for heat stimuli (clamped)
         - **Cold Receptor**: Input for cold stimuli (clamped)  
@@ -163,23 +161,21 @@ val heatColdSim = newSim {
 
         # What to Do
 
-        1. **Observe normal heat sensation**: Activate the `Heat Receptor` and `run` the simulation
-        2. **Observe normal cold sensation**: Activate the `Cold Receptor` and `run` the simulation  
-        3. **Create the heat illusion**: 
+        1. `Observe normal heat sensation`: Activate the `Heat Receptor` and `Run` the simulation
+        2. `Observe normal cold sensation`: Activate the `Cold Receptor` and `Run` the simulation
+        3. `Create the heat illusion`:
            - Activate the `Cold Receptor` briefly
            - Deactivate it and continue running
                - Watch the `Heat Sensation` activate paradoxically
-        4. **Experiment**: Try different patterns of activation and observe the network dynamics
-
-        # Source and Acknowledgement
-
-        Thanks to Gualtiero Piccinini, whose [paper](https://link.springer.com/article/10.1023/B:SYNT.0000043018.52445.3e) on the topic led to this reproduction of the circuit.
+        4. `Experiment`: Try different patterns of activation and observe the network dynamics
 
         # References
 
-        McCulloch, W. S., & Pitts, W. (1943). A logical calculus of the ideas immanent in nervous activity. *Bulletin of Mathematical Biophysics*, *5*(4), 115-133.
+        McCulloch, W. S., & Pitts, W. (1943). [_A logical calculus of the ideas immanent in nervous activity_](https://doi.org/10.1007/BF02478259). _Bulletin of Mathematical Biophysics_, _5_(4), 115-133.
 
         # Credits
+
+        Thanks to Gualtiero Piccinini, whose [paper](https://link.springer.com/article/10.1023/B:SYNT.0000043018.52445.3e) on the topic led to this reproduction of the circuit.
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 

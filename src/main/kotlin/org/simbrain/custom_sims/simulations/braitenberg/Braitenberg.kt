@@ -155,14 +155,14 @@ val braitenbergSim = newSim {
         
         # What to Do
         
-        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run and observe the behaviors. Below are the steps:
+        In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run and observe the behaviors. Below are the steps:
         
-        1. Press the `play` button on the top menu bar and observe how the vehicles reacts to its environment.        
+        1. Press `Run` on the top menu bar and observe how the vehicles react to the environment.
         1. Edit the `Left weight`, `Right weight`, and the `Velocity` text boxes to adjust the vehicles' parameters.
         1. Press either `Same pair`, `Reversed pair`, and `Opposite pair` to confirm the weight changes and to observe changes in the vehicles' behaviors.
         1. If you press `T` it will toggle trails. This can be useful to show what patterns the vehicles are making. Press it once to turn on trails and again to turn it off (it can slow down a simulation after a while). 
-        1. If the vehicles get too far from one another, press the `play` button again to pause the simulation and manually move the vehicles near each other.
-        1. After doing so, press the `play` button to start the simulation again.
+        1. If the vehicles get too far from one another, press `Run` again to pause the simulation and manually move the vehicles near each other.
+        1. After doing so, press `Run` to start the simulation again.
         
         **Note**: After changing the weight strength values, press one of the three buttons to confirm the change.
         
@@ -186,7 +186,7 @@ val braitenbergSim = newSim {
         
         # References
         
-        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT Press.
         
         Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
         

@@ -419,17 +419,17 @@ val grazingCows = newSim { optionString ->
         
         In this simulation, similar to the other evolutionary simulations, the control panel sets cow-specific options and the trainer controls the evolutionary process. Below are the steps to evolving the simulation:
         
-        1) Specify the parameters of the simulation.
+        1. Specify the parameters of the simulation.
         
-            - Number of agents (e.g., cows)
+            - `Number of agents` (e.g., cows)
             
             - Use of mean group target fitness (`50th` percentile) vs default fitness (`10th` percentile)
 
-            - Evolution parameters in the trainer properties dialog
+            - Evolution parameters in the `Trainer Properties` dialog
         
-        2) After confirming the parameters are what you want, click on the `Open Trainer` button.
+        2. After confirming the parameters are what you want, click on the `Open Trainer` button.
         
-        3) Use the trainer's run controls to start evolution. It can take a while depending on your configuration.
+        3. Use the trainer's run controls to start evolution. It can take a while depending on your configuration.
 
         # Credits
  

@@ -150,9 +150,7 @@ val tinyLanguageModelFF = newSim {
         
         
 
-        """.trimIndent(),
-        initiallyOpened = false
+        """.trimIndent()
     )
 
 }
-

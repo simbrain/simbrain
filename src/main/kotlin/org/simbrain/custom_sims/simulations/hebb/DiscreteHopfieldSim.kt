@@ -42,18 +42,22 @@ val discreteHopfieldSim = newSim {
             
             [Hopfield networks](https://en.wikipedia.org/wiki/Hopfield_network) are recurrent networks often used for pattern recognition and to model memory 
             retrieval. In this simulation, you can test the network's ability to store and retrieve memories in the form of activation patterns.
+
+            # Simulation Details
+
+            The network stores patterns as attractor states. After training, partial or noisy versions of a stored pattern should settle back toward the learned memory.
             
             # What to Do         
             
-            Select one of the input patterns from the button panel (Circle, Square, Diagonal Line, Cross, Vertical Line, or Horizontal Line) and press Train on current pattern to train the network on that pattern. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
+            Select one of the input patterns from the button panel (`Circle`, `Square`, `Diagonal Line`, `Cross`, `Vertical Line`, or `Horizontal Line`) and press `Train on current pattern` to train the network on that pattern. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
             
-            To confirm the pattern is remembered, randomize the network by pressing `N -> R` and then iterate by pressing `Space` to see if the pattern is recreated. You can also manually create part of a pattern using the wand tool (press `D` to activate) and see if the network completes it. The Random Pattern button generates a new random activation pattern, and -1 Canvas sets all neurons to -1.
+            To confirm the pattern is remembered, randomize the network by pressing `N -> R` and then iterate by pressing `Space` to see if the pattern is recreated. You can also manually create part of a pattern using the wand tool (press `D` to activate) and see if the network completes it. The `Random Pattern` button generates a new random activation pattern, and `-1 Canvas` sets all neurons to `-1`.
             
-            The Training iterations field controls how many learning steps occur when you press Train on current pattern. Increasing this value strengthens the memory trace more quickly.
+            The `Training iterations` field controls how many learning steps occur when you press `Train on current pattern`. Increasing this value strengthens the memory trace more quickly.
             
             ## Training on Multiple Patterns
             
-            Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case, about 8 memory states. However, those memories need to be sufficiently distinct. The network should be able to learn all 6 provided patterns, but you must carefully train it on them by selecting each pattern and pressing Train on current pattern multiple times. If patterns are too similar or you store too many, the network may converge to spurious states or fail to recall correctly.
+            Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case, about 8 memory states. However, those memories need to be sufficiently distinct. The network should be able to learn all 6 provided patterns, but you must carefully train it on them by selecting each pattern and pressing `Train on current pattern` multiple times. If patterns are too similar or you store too many, the network may converge to spurious states or fail to recall correctly.
             
             ## Other things to observe
             
@@ -90,11 +94,11 @@ val discreteHopfieldSim = newSim {
             This ensures reproducible results across test runs.
             
             2. **Running the Test**: Click the `Capacity Test` button to open a configuration dialog where you can set:
-               - **Distance threshold**: Maximum allowable distance between recalled and original pattern (as a percentage). For discrete Hopfield, this uses Hamming distance.
-               - **Percent to test**: What percentage of the network size to use as the number of test patterns
-               - **Cue distance**: How much to perturb the pattern when testing retrieval (Hamming distance for discrete Hopfield)
-               - **Test iterations**: How many iterations to run when testing pattern recall
-               - **Forgetting options**: Enable forgetting with decay rates, perturbation, and forgetting iterations
+               - `Distance threshold`: Maximum allowable distance between recalled and original pattern (as a percentage). For discrete Hopfield, this uses Hamming distance.
+               - `Percent to test`: What percentage of the network size to use as the number of test patterns
+               - `Cue distance`: How much to perturb the pattern when testing retrieval (Hamming distance for discrete Hopfield)
+               - `Test iterations`: How many iterations to run when testing pattern recall
+               - `Forgetting options`: Enable forgetting with decay rates, perturbation, and forgetting iterations
             
             3. **Test Process**: For each number of patterns from 1 to the specified maximum:
                - Reset the network and weights
@@ -119,17 +123,17 @@ val discreteHopfieldSim = newSim {
             
             # References
             
-            Amit, D. J., Gutfreund, H., & Sompolinsky, H. (1985). Storing infinite numbers of patterns in a spin-glass model of neural networks. _Physical Review Letters_, _55_(14), 1530–1533.
+            Amit, D. J., Gutfreund, H., & Sompolinsky, H. (1985). [_Storing infinite numbers of patterns in a spin-glass model of neural networks_](https://doi.org/10.1103/PhysRevLett.55.1530). _Physical Review Letters_, _55_(14), 1530–1533.
             
-            Gilbert, M. (2024). [Modeling Forgetting with Attractor Neural Networks](https://escholarship.org/content/qt9fb9d61n/qt9fb9d61n.pdf). Cognitive and Information Sciences, University of California Merced.
+            Gilbert, M. (2024). [_Modeling Forgetting with Attractor Neural Networks_](https://escholarship.org/content/qt9fb9d61n/qt9fb9d61n.pdf). Cognitive and Information Sciences, University of California Merced.
             
-            Hopfield, J. J. (1982). [Neural networks and physical systems with emergent collective computational abilities](https://doi.org/10.1073/pnas.79.8.2554). _Proceedings of the National Academy of Sciences_, _79_(8), 2554–2558.
+            Hopfield, J. J. (1982). [_Neural networks and physical systems with emergent collective computational abilities_](https://doi.org/10.1073/pnas.79.8.2554). _Proceedings of the National Academy of Sciences_, _79_(8), 2554–2558.
             
-            Mongillo, G., Rumpel, S., & Loewenstein, Y. (2017). [Intrinsic volatility of synaptic connections—a challenge to the synaptic trace theory of memory](https://doi.org/10.1016/j.conb.2017.06.006). _Current Opinion in Neurobiology_, _46_, 7–13.
+            Mongillo, G., Rumpel, S., & Loewenstein, Y. (2017). [_Intrinsic volatility of synaptic connections—a challenge to the synaptic trace theory of memory_](https://doi.org/10.1016/j.conb.2017.06.006). _Current Opinion in Neurobiology_, _46_, 7–13.
             
-            Radvansky, G. A., Doolen, A. C., Pettijohn, K. A., & Ritchey, M. (2022). [A new look at memory retention and forgetting](https://doi.org/10.1037/xlm0001110). _Journal of Experimental Psychology: Learning, Memory, and Cognition_, _48_(11), 1698–1723.
+            Radvansky, G. A., Doolen, A. C., Pettijohn, K. A., & Ritchey, M. (2022). [_A new look at memory retention and forgetting_](https://doi.org/10.1037/xlm0001110). _Journal of Experimental Psychology: Learning, Memory, and Cognition_, _48_(11), 1698–1723.
             
-            Susman, L., Brenner, N., & Barak, O. (2019). [Stable memory with unstable synapses](https://doi.org/10.1038/s41467-019-12306-2). _Nature Communications_, _10_, 4441.
+            Susman, L., Brenner, N., & Barak, O. (2019). [_Stable memory with unstable synapses_](https://doi.org/10.1038/s41467-019-12306-2). _Nature Communications_, _10_, 4441.
                 
             # Credits
             

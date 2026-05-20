@@ -401,11 +401,11 @@ val spiveyNet = newSim {
         1. Repeat the steps above (selecting a condition then iterating) to see activation dynamics in the time series.
         1. There will generally be four lines corresponding to the four nodes in each neuron group.
         
-        # Reference
+        # References
         
-        Spivey, M. J. (2025). [A linking hypothesis for eyetracking and mousetracking in the visual world paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325000356). _Brain Research_, 149477.
+        Spivey, M. J. (2025). [_A linking hypothesis for eyetracking and mousetracking in the visual world paradigm_](https://www.sciencedirect.com/science/article/pii/S0006899325000356). _Brain Research_, 149477.
         
-        Spivey, M. J., Grosjean, M., & Knoblich, G. (2005). [Continuous attraction toward phonological competitors](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/). _Proceedings of the National Academy of Sciences_, _102_(29), 10393-10398.
+        Spivey, M. J., Grosjean, M., & Knoblich, G. (2005). [_Continuous attraction toward phonological competitors_](https://pmc.ncbi.nlm.nih.gov/articles/PMC1177386/). _Proceedings of the National Academy of Sciences_, _102_(29), 10393-10398.
 
         # Credits
         

@@ -224,7 +224,7 @@ val binaryReservoir = newSim {
         
         # References
         
-        Comolatti, R., Pigorini, A., Casarotto, S., Fecchio, M., Faria, G., Sarasso, S., Rosanova, M., Gosseries, O., Boly, M., Bodart, O., Ledoux, D., Brichant, J. F., Nobili, L., Laureys, S., Tononi, G., Massimini, M., & Casali, A. G. (2019). [A fast and general method to empirically estimate the complexity of brain responses to transcranial and intracranial stimulations](https://doi.org/10.1016/j.brs.2019.05.013). _Brain stimulation_, _12_(5), 1280–1289. 
+        Comolatti, R., Pigorini, A., Casarotto, S., Fecchio, M., Faria, G., Sarasso, S., Rosanova, M., Gosseries, O., Boly, M., Bodart, O., Ledoux, D., Brichant, J. F., Nobili, L., Laureys, S., Tononi, G., Massimini, M., & Casali, A. G. (2019). [_A fast and general method to empirically estimate the complexity of brain responses to transcranial and intracranial stimulations_](https://doi.org/10.1016/j.brs.2019.05.013). _Brain stimulation_, _12_(5), 1280–1289.
         
         # Credits
         

@@ -162,13 +162,13 @@ val pursuer = newSim {
 
         # What to Do
         
-        In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
+        In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
         
         1. While it runs, observe the behavior of the agent in the odor world
         
         2. Move the cheese around and watch the agent chase it and observe the activity of the neurons in the network window
         
-        3. Press the `stop` button to stop the network from running
+        3. Press `Stop` to stop the network from running
         
         ## Other Observations
         
@@ -186,7 +186,7 @@ val pursuer = newSim {
         
         # References
         
-        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+        Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT Press.
             
         Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 

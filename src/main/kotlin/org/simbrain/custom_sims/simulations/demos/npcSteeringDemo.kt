@@ -98,18 +98,13 @@ val npcSteeringDemo = newSim {
         A Mouse pursues two Swiss cheeses while they evade it. A Fish wanders
         independently. A Pansy and a Tulip sit still as obstacles.
 
-        # What to Do
+        # Simulation Details
 
-        Press the play button. Watch the Mouse track down the cheeses, the cheeses
-        flee in different directions, and the Fish meander around the obstacles
-        without bumping them. To simplify the setup, delete some entities by
-        selecting them and pressing `Delete`.
-
-        Use the control panel to toggle the **steering debug overlay** and see how
+        Use the control panel to toggle the `steering debug overlay` and see how
         each agent is making decisions. You can also toggle tilemap layer visibility
         to simplify the view.
 
-        # Reading the Debug Overlay
+        ## Reading the Debug Overlay
 
         When enabled, each agent draws:
 
@@ -120,21 +115,27 @@ val npcSteeringDemo = newSim {
         - **Magenta dots** mark where the obstacle feeler ray hits a wall or entity.
         - **Status text** under the agent shows the active behavior and speed info.
 
-        # Things to Try
-
-        - Drag a cheese close to the mouse — watch it react.
-        - Drag the Pansy or Tulip into the cheese's escape path.
-        - Open an entity's property dialog (right-click → Properties) and tweak
-          behavior parameters like `Max Speed`, `Vision Range`, or `Num Rays`.
-
-        # How It Works
+        ## How It Works
 
         Each behavior uses **context steering**: every tick it samples N candidate
         headings around the agent, scores each by interest minus danger, and picks
         the best. See `world/odorworld/behaviors/`.
+
+        # What to Do
+
+        Press `Run`. Watch the Mouse track down the cheeses, the cheeses
+        flee in different directions, and the Fish meander around the obstacles
+        without bumping them. To simplify the setup, delete some entities by
+        selecting them and pressing `Delete`.
+
+        ## Things to Try
+
+        - Drag a cheese close to the mouse — watch it react.
+        - Drag the Pansy or Tulip into the cheese's escape path.
+        - Open an entity's property dialog (right-click -> `Properties`) and tweak
+          behavior parameters like `Max Speed`, `Vision Range`, or `Num Rays`.
         """.trimIndent(),
-        width = 350,
-        initiallyOpened = true
+        width = 350
     )
 
     withGui {

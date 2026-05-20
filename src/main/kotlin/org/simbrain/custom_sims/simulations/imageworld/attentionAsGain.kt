@@ -236,32 +236,26 @@ val attentionAsGain = newSim {
         By adjusting the gain (slope) of neurons processing different spatial regions, we can simulate how attention 
         amplifies neural responses to attended stimuli.
         
-        ## Background
+        # Simulation Details
         
         In neuroscience, "gain" refers to the multiplicative factor applied to neural responses. When you attend to a 
         particular location or feature in the visual field, neurons responding to that location show increased gain - 
         they respond more strongly to the same stimulus. This is not an additive effect (adding a constant) but a 
         multiplicative one (scaling the response).
         
-        The equation is simple: **`output = gain × input`**
+        The equation is simple: `output = gain × input`
         
         Higher gain → stronger response to the same input → better signal for attended stimuli.
         
-        ## Network Architecture
-        
-        - **Visual Input Layer**: `450` neurons (`30×15` grid), receiving brightness values from the image world
-        - **Left Region**: `225` neurons (`15×15` grid) processing the left half of the image
-        - **Right Region**: `225` neurons (`15×15` grid) processing the right half of the image
-        - **One-to-one connections**: Each input neuron connects to one region neuron
-        - **Linear neurons with ReLU**: Neurons use linear activation with rectification (negative values → `0`)
+        The image is split into left and right regions whose gains can be controlled independently.
         
         The gain/slope parameter directly controls how strongly each region responds to its input.
         
-        ## What to Do
+        # What to Do
         
         ### Quick Start with Pre-loaded Images
         
-        1. Click `**"`Image 1: Left bars` to load vertical bars on the left side
+        1. Click `Image 1: Left bars` to load vertical bars on the left side
         2. Move the `Left Gain` slider to `4.0` or `5.0`
         3. Iterate the workspace (play button or spacebar) and observe the left region neurons activate strongly
         4. Move the `Left Gain` slider back to `1.0` and see how the response drops
@@ -289,7 +283,7 @@ val attentionAsGain = newSim {
         3. Try drawing on just the left or right side, or create patterns that span both
         4. Experiment with gain settings to see how attention modulates your custom patterns
         
-        ## Key Observations
+        ## Things to Notice
         
         - **Multiplicative effect**: A neuron receiving input of `0.5` produces output of `0.5` with gain=`1`, but `2.0` with gain=`4`
         - **Spatial selectivity**: Attention can be directed to specific spatial locations independently
@@ -304,7 +298,7 @@ val attentionAsGain = newSim {
         - **Image 4**: Horizontal line across both sides (equal input to both regions)
         - **Image 5**: Blank canvas for custom drawings
         
-        ## Extensions and Future Ideas
+        ## Extensions
         
         This simulation provides a foundation for exploring other attention mechanisms:
         
@@ -317,15 +311,15 @@ val attentionAsGain = newSim {
         
         # References
         
-        Reynolds, J. H., & Heeger, D. J. (2009). The normalization model of attention. *Neuron*, 61(2), 168-185.
+        Reynolds, J. H., & Heeger, D. J. (2009). [*The normalization model of attention*](https://doi.org/10.1016/j.neuron.2009.01.002). _Neuron_, _61_(2), 168-185.
         
-        Maunsell, J. H., & Treue, S. (2006). Feature-based attention in visual cortex. *Trends in Neurosciences*, 29(6), 317-322.
+        Maunsell, J. H., & Treue, S. (2006). [*Feature-based attention in visual cortex*](https://doi.org/10.1016/j.tins.2006.04.001). _Trends in Neurosciences_, _29_(6), 317-322.
         
-        Carandini, M., & Heeger, D. J. (2012). Normalization as a canonical neural computation. *Nature Reviews Neuroscience*, 13(1), 51-62.
+        Carandini, M., & Heeger, D. J. (2012). [*Normalization as a canonical neural computation*](https://doi.org/10.1038/nrn3136). _Nature Reviews Neuroscience_, _13_(1), 51-62.
         
-        Martinez-Trujillo, J. C., & Treue, S. (2002). Attentional modulation strength in cortical area MT depends on stimulus contrast. *Neuron*, 35(2), 365-370.
+        Martinez-Trujillo, J. C., & Treue, S. (2002). [*Attentional modulation strength in cortical area MT depends on stimulus contrast*](https://doi.org/10.1016/S0896-6273(02)00778-X). _Neuron_, _35_(2), 365-370.
         
-        ## Credits
+        # Credits
         
         [Jeff Yoshimi](https://jeffyoshimi.net)
         

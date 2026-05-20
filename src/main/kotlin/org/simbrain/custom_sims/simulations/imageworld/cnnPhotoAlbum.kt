@@ -318,30 +318,20 @@ val cnnObjectDetector = newSim {
         The dataset is downloaded on first run (~137 MB) and cached locally.
         Subsequent runs load from cache instantly.
 
-        ## Configuration
+        # Simulation Details
 
         On startup a dialog lets you choose which categories to train on and
         how many images per category (default 50). Select at least 2 categories.
 
-        ## CNN Architecture
+        # What to Do
 
-        - **Input**: 100×100×3 RGB (30,000 values)
-        - **Conv1**: 3×3, 4 filters, SAME, ReLU → 100×100×4
-        - **Pool1**: 5×5 max pooling, stride 5 → 20×20×4
-        - **Conv2**: 3×3, 8 filters, SAME, ReLU → 20×20×8
-        - **Pool2**: 4×4 max pooling, stride 4 → 5×5×8 = 200
-        - **Flatten**: 200
-        - **Dense**: 200 → N classes (softmax + cross-entropy)
-
-        ## How to Use
-
-        1. Right-click the **CNN Photo Album** outline → **Train...**
-        2. Click **Run** to train; watch the loss and accuracy improve
-        3. After training, close the dialog and click **Run** in the main workspace
+        1. Right-click the `CNN Photo Album` outline and select `Train...`
+        2. Click `Run` to train; watch the loss and accuracy improve
+        3. After training, close the dialog and click `Run` in the main workspace
         4. Use the left/right arrow buttons in the Image World to cycle through images
         5. Watch the output neurons update in real-time as different images are shown
 
-        ## Credits
+        # Credits
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
         """.trimIndent()

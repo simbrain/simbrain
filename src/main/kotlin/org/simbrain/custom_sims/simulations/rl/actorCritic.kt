@@ -395,11 +395,11 @@ val actorCritic = newSim {
     
     # References
     
-    Doya, K. (2007). [Reinforcement learning: Computational theory and biological mechanisms.](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.
-    
-    Sutton, R. S. (1995). [Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding.](https://proceedings.neurips.cc/paper_files/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html) _Neural Information Processing Systems_. MIT Press.
-    
-    Tanaka, S. C., Schweighofer, N., Asahi, S., Shishida, K., Okamoto, Y., Yamawaki, S., & Doya, K. (2007). [Serotonin Differentially Regulates Short- and Long-Term Prediction of Rewards in the Ventral and Dorsal Striatum.](https://doi.org/10.1371/journal.pone.0001333) _PLoS ONE_, _2_(12), e1333.
+    Doya, K. (2007). [_Reinforcement learning: Computational theory and biological mechanisms_](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.
+
+    Sutton, R. S. (1995). [_Generalization in Reinforcement Learning: Successful Examples Using Sparse Coarse Coding_](https://proceedings.neurips.cc/paper_files/paper/1995/hash/8f1d43620bc6bb580df6e80b0dc05c48-Abstract.html) _Neural Information Processing Systems_. MIT Press.
+
+    Tanaka, S. C., Schweighofer, N., Asahi, S., Shishida, K., Okamoto, Y., Yamawaki, S., & Doya, K. (2007). [_Serotonin Differentially Regulates Short- and Long-Term Prediction of Rewards in the Ventral and Dorsal Striatum_](https://doi.org/10.1371/journal.pone.0001333) _PLoS ONE_, _2_(12), e1333.
     
     # Credits
     

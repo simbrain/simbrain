@@ -401,7 +401,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         SimbrainDesktop.onboardingManager.showPopup(
             PopupConfig(
                 title = "Language Model Prompt",
-                message = "To enter a prompt, add some text here. To process your prompt through the network, click the play button on the main toolbar.",
+                message = "To enter a prompt, add some text here. To process your prompt through the network, click Run on the main toolbar.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 placement = PopupPlacement.BOTTOM_CENTER,
                 suppressionKey = "tiny_language_model_prompt_help",
@@ -449,7 +449,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         ## Interpreting the Visual Activations
 
-        As you run the simulation, the network displays activation patterns as colors. Understanding these patterns helps you see how the model processes text. Try clicking the play or step button and watching tokens fill in one at a time as tokens are added to observe these patterns emerge. We suggest training first.
+        As you run the simulation, the network displays activation patterns as colors. Understanding these patterns helps you see how the model processes text. Try clicking `Run` or `Step` and watching tokens fill in one at a time as tokens are added to observe these patterns emerge. We suggest training first.
 
         Most patterns are row by row, and are easy to understand when filling in tokens at first, because unused rows are associated with zero vectors. Thus we see "rows" of color filling in at the different component.
 
@@ -487,17 +487,17 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         When you first start this simulation, a dialog appears with these options:
         
-        - **Context Size**: Number of tokens the model can see at once. Larger contexts allow the model to capture longer-range patterns but require more memory and training time.
+        - `Context Size`: Number of tokens the model can see at once. Larger contexts allow the model to capture longer-range patterns but require more memory and training time.
         
-        - **Embedding Dimension**: Size of the internal representation vectors. Higher dimensions allow more expressive representations but require more training data.
+        - `Embedding Dimension`: Size of the internal representation vectors. Higher dimensions allow more expressive representations but require more training data.
         
-        - **Hidden Size**: Number of units in the transformer's feed-forward layer.
+        - `Hidden Size`: Number of units in the transformer's feed-forward layer.
         
-        - **Training Text**: The document used to train the model. The longer the document, the more patterns the model can learn, but training will take longer.
+        - `Training Text`: The document used to train the model. The longer the document, the more patterns the model can learn, but training will take longer.
         
-        - **Test Text**: Optional separate text file for validation. If not provided, the training text is automatically split.
+        - `Test Text`: Optional separate text file for validation. If not provided, the training text is automatically split.
         
-        - **Sampling Strategy**: How the model chooses the next token from the probability distribution (see  below for more details).
+        - `Sampling Strategy`: How the model chooses the next token from the probability distribution (see  below for more details).
         
         # What to Do
         
@@ -538,19 +538,19 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         The Language Model Controls panel provides several tools for interacting with the trained model:
 
-        - **Show Vocabulary**: Display all tokens in the model's vocabulary in a scrollable window. Each token is shown on its own line, with the total count displayed in the window title. This helps you understand exactly what tokens the model can recognize and generate.
+        - `Show Vocabulary`: Display all tokens in the model's vocabulary in a scrollable window. Each token is shown on its own line, with the total count displayed in the window title. This helps you understand exactly what tokens the model can recognize and generate.
 
-        - **Show Training Text**: Display the original training text in a separate scrollable window. This is useful for viewing what the model was trained on, comparing model outputs to the original training data, and understanding the vocabulary and style the model learned.
+        - `Show Training Text`: Display the original training text in a separate scrollable window. This is useful for viewing what the model was trained on, comparing model outputs to the original training data, and understanding the vocabulary and style the model learned.
 
-        - **Temperature slider**: Adjust the randomness of generation. Lower values (`0.1-0.5`) make output more deterministic and focused, higher values (`1.0-2.0`) make output more creative and random.
+        - `Temperature` slider: Adjust the randomness of generation. Lower values (`0.1-0.5`) make output more deterministic and focused, higher values (`1.0-2.0`) make output more creative and random.
 
-        - **Configure Sampling Strategy**: Open a dialog to adjust how the model samples from the probability distribution (Greedy, Top-K, or Top-P sampling).
+        - `Configure Sampling Strategy`: Open a dialog to adjust how the model samples from the probability distribution (Greedy, Top-K, or Top-P sampling).
 
         ## Saving and Reopening
         
         After training, save your workspace to preserve the learned weights. When reopening a saved workspace, use the `Load workspace` button in the control panel below the text world to properly restore the update actions.
         
-        # Experiments
+        ## Experiments
         
         ## Train on Different Text Types
         
@@ -581,11 +581,11 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         The sampling strategy determines how the model selects the next token. In the `Text Inputs` component, try different options:
         
-        - **Greedy**: Always picks the most probable token. Produces deterministic, predictable output that may be repetitive.
+        - `Greedy`: Always picks the most probable token. Produces deterministic, predictable output that may be repetitive.
         
-        - **Top-K**: Randomly samples from the K most probable tokens. Good balance between creativity and coherence. Try K values from `3` to `10`.
+        - `Top-K`: Randomly samples from the K most probable tokens. Good balance between creativity and coherence. Try K values from `3` to `10`.
         
-        - **Top-P (Nucleus)**: Builds a "nucleus" by sorting the tokens by probability, selecting enough to reach `P` (build up cumulative probability to at least `P`), then samples from that nucleus proportionally. More dynamic than Top-K because the number of tokens varies based on the probability distribution. Try `P` values from `0.8` to `0.95`.
+        - `Top-P (Nucleus)`: Builds a "nucleus" by sorting the tokens by probability, selecting enough to reach `P` (build up cumulative probability to at least `P`), then samples from that nucleus proportionally. More dynamic than Top-K because the number of tokens varies based on the probability distribution. Try `P` values from `0.8` to `0.95`.
         
         ## Adjust Temperature
         
@@ -601,20 +601,19 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         
         In the startup dialog's Regularization tab, try different settings:
         
-        - **Weight Decay**: Prevents overfitting by penalizing large weights. Try values from `0.001` to` 0.1`.
-        - **Learning Rate Decay**: Gradually reduces the learning rate during training for more stable convergence.
-        - **AdamW vs Adam**: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
+        - `Weight Decay`: Prevents overfitting by penalizing large weights. Try values from `0.001` to `0.1`.
+        - `Learning Rate Decay`: Gradually reduces the learning rate during training for more stable convergence.
+        - `AdamW vs Adam`: Compare the AdamW optimizer (with decoupled weight decay) to standard Adam.
         
         Regularization is especially important with small training datasets where overfitting is common.
         
-        # Acknowledgements
+        # Credits
         
         This simulation was developed with funding support from [UC Online](https://uconline.edu/).
         
         Designed by Jeff Yoshimi and Yulin Li. Thanks to Sergio Ponce de Leon, Ben Fried, and many students at UC Merced for helping with the design.
 
-        """.trimIndent(),
-        initiallyOpened = false
+        """.trimIndent()
     )
 
     // Run training and workspace iterations if specified (for headless mode)

@@ -34,47 +34,47 @@ val kAgentTrails = newSim {
     addSidebarInfo(
     """
     # Agent Trails
-    
+
     This simulation accompanies the paper _Narrowing the Explanatory Gap with Bridge Metaphors_ by Jeff Yoshimi. This is a simulation that consists of a network that is connected to an agent that exists in a 2D world (an odor world) where, when the action nodes are activated, the agent moves according to the neural activation. The agent's movement is traced as an agent trail in a PCA plot.
-    
+
     # Simulation Details
-    
-    The prediction network predicts the next state of the sensory network based on the current activations of the sensory and motor neurons. Based on what the agent senses and how it moves, it predicts what it will sense next via a linear scaling function of the distance between the sensor and that object. 
-    
+
+    The prediction network predicts the next state of the sensory network based on the current activations of the sensory and motor neurons. Based on what the agent senses and how it moves, it predicts what it will sense next via a linear scaling function of the distance between the sensor and that object.
+
     The points on the plots are colored according to the predictions of the network, with the states that were predicted to occur next colored red with varying degrees of saturation. The red predicted next states move with the current point up to the end. After the agent has passed the 3 objects, its state in the predictor window can be called a bouquet of three arcs, each arc corresponding to one of the objects. After the agent has passed 5 excursions, it creates a spandrelled bouquet, mapping the flower and fish relative to the cheese. Each excursion is a different path that the agent can move on.
-    
+
     After it has done 5 excursions, it correctly predicts the path that it will take. For example, after 5 excursions, it can correctly predict that it will take the mixed cheese/flower state based on what it senses in its sensory nodes and the actions it is taking.
-    
+
     For a more theoretical application of this simulation, we recommend reading the paper that accompanies the simulation.
-    
+
     # What to Do
-    
-    In this simulation, the mouse is the agent with 3 objects: the cheese, fish, and flower. The mouse has 5 excursions it can take: to the cheese, to the fish, to the flower, to the cheese then flower, 
-    and to the cheese then fish. The sensory states and predictions show each excursion. The red corresponds to the path that the mouse is currently traveling, and the gray shows all the possible paths that 
+
+    In this simulation, the mouse is the agent with 3 objects: the cheese, fish, and flower. The mouse has 5 excursions it can take: to the cheese, to the fish, to the flower, to the cheese then flower,
+    and to the cheese then fish. The sensory states and predictions show each excursion. The red corresponds to the path that the mouse is currently traveling, and the gray shows all the possible paths that
     the mouse can take. Below are the step-by-step instructions:
-    
-    1. Select an object from the `Control Panel`, and the mouse will be activated and move towards the object you selected on the `Simple Predictor` window. 
-    
+
+    1. Select an object from the `Control Panel`, and the mouse will be activated and move towards the object you selected on the `Simple Predictor` window.
+
         - For example, if the cheese-sensing neuron is on top of the cheese, then it is maximally activated.
-    
+
         - As the agent moves away from the cheese, the neuron's activation diminishes to `0`.
-    
-    2. In the `Sensory States + Predictions` window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red. 
-    
+
+    2. In the `Sensory States + Predictions` window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red.
+
     3. Repeat this until all 5 paths are taken.
-    
+
     4. After all 5 paths, Select any object again from the `Control Panel`, and the predictor will be able to correctly predicts where the mouse travels.
-    
+
     # References
-    
-    1. Yoshimi, J. (2014). [_Narrowing the Explanatory Gap with Bridge Metaphors_](https://www.cogsci.ucmercedlibrary.info/2014/ucm_cogsci_2014_3143-3148.pdf). 
-    
+
+    Yoshimi, J. (2014). [_Narrowing the Explanatory Gap with Bridge Metaphors_](https://www.cogsci.ucmercedlibrary.info/2014/ucm_cogsci_2014_3143-3148.pdf).
+
     # Credits
-    
+
     Jasmine Lau
-    
+
     [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-    
+
     Kanly Thao
     """.trimIndent()
     )

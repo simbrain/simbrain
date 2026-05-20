@@ -215,7 +215,7 @@ Guidance for section content:
 
 Do **not** add a separate `Architecture`, `Pipeline`, or component-by-component structure section by default. In most simulations the network or processing structure is already visually clear in the workspace, so listing it again is usually redundant.
 
-Only include a structure/architecture explanation if it is genuinely important for understanding the simulation and is not already obvious from the visual layout. If you think such a section would materially help, explain why and check with the user before adding it.
+Only include a structure/architecture explanation if it is genuinely important for operating or interpreting the simulation and is not already obvious from the visual layout. Prefer conceptual descriptions of what to observe over layer-by-layer or component-by-component lists. Implementation details are appropriate when they are the point of the simulation, for example a pure-network implementation of a dynamical system or an analysis that depends on a specific hidden representation. If you think such a section would materially help, explain why and check with the user before adding it.
 
 Style notes:
 - When discussing a specific configuration, button, neuron, number, simulation, or section, use inline code.

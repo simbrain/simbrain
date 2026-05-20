@@ -94,17 +94,17 @@ val braitenbergGame = newSim {
     
     # What to Do
     
-     In this simulation similar to the other Braitenberg simulations, simply press the `play` button on the top toolbar for the simulation to run. Below are the steps:
+     In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
         
-    1) While it runs, tweak the parameters of the agent to avoid the obstacles and get to the cheese.
+    1. While it runs, tweak the parameters of the agent to avoid the obstacles and get to the cheese.
     
-    2) Continue doing so until the agent has approached the cheese.
+    2. Continue doing so until the agent has approached the cheese.
     
-    3) Press the `stop` button to stop the network from running.
+    3. Press `Stop` to stop the network from running.
 
     # References
         
-    Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT press.
+    Braitenberg, V. (1986). [_Vehicles: Experiments in synthetic psychology_](https://mitpress.mit.edu/9780262521123/vehicles/). MIT Press.
         
     Hotton, S., & Yoshimi, J. (2024). [_The Open Dynamics of Braitenberg Vehicles_](https://mitpress.mit.edu/9780262548199/the-open-dynamics-of-braitenberg-vehicles/). MIT Press.
 
@@ -118,8 +118,6 @@ val braitenbergGame = newSim {
     )
 
 }
-
-
 
 
 

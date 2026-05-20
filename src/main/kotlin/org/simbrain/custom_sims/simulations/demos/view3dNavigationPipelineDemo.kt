@@ -110,11 +110,15 @@ val view3dNavigationPipelineDemo = newSim {
         This demo is meant to familiarize you with how [Image World](https://docs.simbrain.net/docs/worlds/imageworld.html) and
         **image processing pipelines** work using a live 3D sensor stream.
 
-        ## What to do
+        # Simulation Details
 
-        Run the simulation, and move the main agent around in the odor world either with keyboard or mouse, and observe the image world edge detection.
+        The `Image World` receives a live stream from the agent's view and applies an edge-detection pipeline to it.
+
+        # What to Do
+
+        Click `Run`, move the main agent around in the `Odor World` with the keyboard or mouse, and observe the `Image World` edge detection.
          
-       In the image world you can edit the current pipeline and see how this changes the presentation. You can
+       In the `Image World` you can edit the current pipeline and see how this changes the presentation. You can:
 
         - Open the `Pipeline View` toolbar and edit the current pipeline.
         - Double click the edge detection operation to adjust its algorithm and parameters.

@@ -151,25 +151,19 @@ val cnnMNIST = newSim {
         A convolutional neural network trained on the same [Tiny MNIST](https://en.wikipedia.org/wiki/MNIST_database)
         dataset as the backprop version, but using convolutional layers to learn spatial features.
 
-        ## Pipeline
-        - **Input**: 20x20x1 grayscale digit images
-        - **Conv1**: 3x3 kernel, 5 filters, SAME padding, ReLU → 20x20x5
-        - **Pool1**: 2x2 max pooling → 10x10x5
-        - **Conv2**: 3x3 kernel, 8 filters, SAME padding, ReLU → 10x10x8
-        - **Pool2**: 2x2 max pooling → 5x5x8
-        - **Flatten**: 5x5x8 = 200
-        - **Dense**: 200 → 10 (cross-entropy + softmax)
+        # Simulation Details
 
-        ## Training Data
+        The dataset contains:
+
         - **Training**: 10,000 images of handwritten digits
         - **Testing**: 1,000 images
 
-        ## How to Use
-        1. Right-click the **CNN MNIST** outline and select **Train...**
-        2. Click **Run** to start training, **Stop** to pause
+        # What to Do
+        1. Right-click the `CNN MNIST` outline and select `Train...`
+        2. Click `Run` to start training, `Stop` to pause
         3. Watch the loss plot decrease
-        4. Use the **Training data** / **Testing data** tabs to browse examples
-        5. Click **Apply inputs** on a row to see the network's prediction
+        4. Use the `Training data` / `Testing data` tabs to browse examples
+        5. Click `Apply inputs` on a row to see the network's prediction
         """.trimIndent()
     )
 }

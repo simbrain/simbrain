@@ -243,54 +243,33 @@ val lorenzSystemSimbrain = newSim {
 
         A pure Simbrain implementation of the Lorenz attractor using only standard network components—no custom update actions. This demonstrates how complex dynamical systems can be built using decay rules (which do Euler integration), product rules (for nonlinear terms), and weighted connections.
 
-        ## Background
-
-        This simulation demonstrates an important principle: complex dynamical systems can be implemented as neural networks. The Lorenz equations, typically solved numerically with integration methods, are instead computed by a recurrent network where:
-
-        - Neurons represent state variables
-        - Synapses represent derivative terms
-        - Product neurons handle nonlinearities
-        - Network updates approximate continuous dynamics
-
-        This connection between dynamical systems and neural networks underlies much of computational neuroscience and reservoir computing.
-
         # Simulation Details
 
-        This simulation implements the Lorenz equations using neural network building blocks:
+        The Lorenz equations are:
 
         - `dx/dt = σ(y - x)`
         - `dy/dt = x(ρ - z) - y`
         - `dz/dt = xy - βz`
 
-        ## Network Architecture
-
-        **State Variables**: Three neurons (`x`, `y`, `z`) with `DecayRule` update rules. The DecayRule performs Euler integration: `activation += input`.
-
-        **Product Neurons**: Two neurons with `ProductRule` compute nonlinear terms:
-        - `xy` neuron: Computes the product `x·y` for the `dz/dt` equation
-        - `xz` neuron: Computes the product `x·z` for the `dy/dt` equation
-
-        **Weighted Connections**: Synaptic weights encode the derivatives. Since DecayRule adds input to activation, the weights directly represent `derivative * timeStep`.
-
         ## How It Works
 
-        The key insight is using `DecayRule` with `decayFraction = 0`, which does:
+        The key implementation idea is using `DecayRule` with `decayFraction = 0`, which does:
         ```
         activation += input
         ```
 
-        This is exactly Euler integration! The weighted inputs provide `dx/dt * timeStep`, and DecayRule adds them to the current activation.
+        This is Euler integration. Weighted inputs provide `dx/dt * timeStep`, `dy/dt * timeStep`, and `dz/dt * timeStep`, and product neurons compute nonlinear terms like `xy` and `xz`.
 
         For example, for `dx/dt = σ(y - x)`:
         - `y→x` connection has weight `σ*dt` (contributes +`σy*dt` to input)
         - `x→x` connection has weight `-σ*dt` (contributes -`σx*dt` to input)
         - DecayRule computes: `x += (σy*dt - σx*dt) = x + σ(y - x)*dt` ✓
 
-        No cheating with time steps in self-connections! The update rule itself handles integration, and synaptic weights encode the actual derivative coefficients.
+        The update rule handles integration, and synaptic weights encode the derivative coefficients.
 
         # What to Do
 
-        Press `Play` to start the simulation. The behavior is identical to the hand-coded version—this validates that both implementations produce the same Lorenz attractor.
+        Press `Play` to start the simulation. The behavior is identical to the hand-coded version; this validates that both implementations produce the same Lorenz attractor.
 
         ## Explore Different Regimes
 
@@ -308,7 +287,7 @@ val lorenzSystemSimbrain = newSim {
 
         Open the standard `Lorenz attractor` simulation alongside this one and run both with identical parameters. The trajectories should match, validating this pure Simbrain approach.
 
-        ## Experiment with Network Structure
+        ## Inspect the Implementation
 
         This implementation exposes the underlying network structure:
 
@@ -329,7 +308,7 @@ val lorenzSystemSimbrain = newSim {
 
         # References
 
-        Lorenz, E. N. (1963). [Deterministic nonperiodic flow](https://doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2). _Journal of the Atmospheric Sciences_, _20_(2), 130-141.
+        Lorenz, E. N. (1963). [_Deterministic nonperiodic flow_](https://doi.org/10.1175/1520-0469(1963)020<0130:DNF>2.0.CO;2). _Journal of the Atmospheric Sciences_, _20_(2), 130-141.
 
         # Credits
 

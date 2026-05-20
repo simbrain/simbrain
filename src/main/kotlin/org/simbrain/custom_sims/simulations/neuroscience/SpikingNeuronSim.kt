@@ -86,15 +86,15 @@ val spikingNeuron = newSim {
         1. Click `Run` to begin the simulation.
         2. Click the `Input` neuron, then press the up/down arrow keys to raise or lower its activation.
         3. Observe:
-            - The spike activity in the Spikes plot
-            - The smooth post-synaptic response in the Spike Responses plot
+            - The spike activity in the `Spikes` plot
+            - The smooth post-synaptic response in the `Spike Responses` plot
 
         ## Exploration of the Izhikevich parameters
 
         You can change the Izhikevich parameters by double-clicking the `Spiking` neuron and then modifying the parameters, A, B, C, and D. 
         
         Use the [Izhikevich documentation](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) to explore different firing behaviors. The bottom of that page has a 
-        list of parameter settings you can try, for example, "Tonic Bursting" or "Phasic Spiking". Observe the different behaviors in the Spikes plot.
+        list of parameter settings you can try, for example, `Tonic Bursting` or `Phasic Spiking`. Observe the different behaviors in the `Spikes` plot.
         
         ## Exploration of other spiking neuron models and spike responders
         
@@ -106,7 +106,7 @@ val spikingNeuron = newSim {
 
         # References
 
-        Izhikevich, E. M. (2003). [Simple model of spiking neurons](https://doi.org/10.1109/TNN.2003.820440). _IEEE Transactions on Neural Networks_, _14_(6), 1569–1572.
+        Izhikevich, E. M. (2003). [_Simple model of spiking neurons_](https://doi.org/10.1109/TNN.2003.820440). _IEEE Transactions on Neural Networks_, _14_(6), 1569–1572.
 
         # Credits
         

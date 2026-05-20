@@ -400,20 +400,9 @@ val categoricalPerception = newSim {
         Cangelosi, Greco & Harnad (1999): within-category compression and
         between-category separation (categorical perception effects).
 
-        ## Architecture
+        # Simulation Details
 
-        ```
-        Input  (50×50×1)
-          ↓  Conv1  3×3, 4 filters, SAME, ReLU  → ${conv1OutShape}
-          ↓  Pool1  2×2 max                      → ${pool1OutShape}
-          ↓  Conv2  3×3, 8 filters, SAME, ReLU  → ${conv2OutShape}
-          ↓  Pool2  2×2 max                      → ${pool2OutShape}
-          ↓  Flatten                             → $flatSize
-          ↓  Repr   $REPR_LAYER_SIZE units, sigmoid          ← analysis target
-          ↓  Output ${TARGET_GRID * TARGET_GRID + NUM_LABEL_UNITS} units (${TARGET_GRID}×${TARGET_GRID} prototype + 7 labels)
-        ```
-
-        The repr layer receives gradients from both prototype reconstruction and label
+        The `Repr` layer is the analysis target. It receives gradients from both prototype reconstruction and label
         prediction, making it the layer most likely to show CP warping effects.
 
         ## Training Data
@@ -433,48 +422,48 @@ val categoricalPerception = newSim {
         ### Prototype sorting (L1 labels)
         One-hot basic-level label appended: `[CIRCLE, ELLIPSE, SQUARE, RECTANGLE, 0, 0, 0]`
 
-        ## How to Run the Experiment
+        # What to Do
 
-        ### Option A — Staged training (recommended)
-        Click **Run Staged Training** in the control panel. This replicates the
+        ## Option A - Staged training
+        Click `Run Staged Training` in the control panel. This replicates the
         paper's sequential procedure:
 
-        1. **Stage 1** ($STAGE1_EPOCHS epochs): prototype sorting only — repr layer
+        1. `Stage 1` ($STAGE1_EPOCHS epochs): prototype sorting only - repr layer
            geometry forms around shape similarity alone
-        2. **Analyze Repr Layer** — record baseline within/between distances
-        3. **Stage 2** ($STAGE2_EPOCHS more epochs): label condition added — repr layer
+        2. Click `Analyze Repr Layer` to record baseline within/between distances
+        3. `Stage 2` ($STAGE2_EPOCHS more epochs): label condition added - repr layer
            is reshaped by the additional categorization pressure
-        4. **Analyze Repr Layer** again — compare to baseline
+        4. Click `Analyze Repr Layer` again and compare to baseline
 
         The CP effect is the *change*: within-class distances should decrease and
         between-class distances should increase after the label stage.
 
-        ### Option B — Manual staged training
-        1. Set condition to **Prototype sorting (no labels)** in the dropdown
-        2. Right-click the CNN outline → **Train...** → run until loss stabilizes
-        3. Click **Analyze Repr Layer** — this is your baseline
-        4. Switch condition to L1 or L2 in the dropdown (weights are preserved)
+        ## Option B - Manual staged training
+        1. Set condition to `Prototype sorting (no labels)` in the dropdown
+        2. Right-click the `CNN` outline and select `Train...`, then run until loss stabilizes
+        3. Click `Analyze Repr Layer`; this is your baseline
+        4. Switch condition to `L1` or `L2` in the dropdown (weights are preserved)
         5. Train again for a smaller number of epochs
-        6. Click **Analyze Repr Layer** — compare to baseline
+        6. Click `Analyze Repr Layer` and compare to baseline
 
         ## Analysis Metrics
 
-        **Analyze Repr Layer** runs all training inputs through the network,
+        `Analyze Repr Layer` runs all training inputs through the network,
         collects the $REPR_LAYER_SIZE-unit repr-layer activations, and computes:
 
         - **Within-class distance**: mean pairwise Euclidean distance within each
-          shape class — lower means more compact clusters
-        - **Between-class distance**: mean pairwise distance across shape classes —
+          shape class - lower means more compact clusters
+        - **Between-class distance**: mean pairwise distance across shape classes -
           higher means better separation
-        - **Categoricity ratio**: within / mean(between) — below 1.0 indicates
+        - **Categoricity ratio**: within / mean(between) - below 1.0 indicates
           good categorical separation
 
         The CP hypothesis predicts that label training will lower within-class
         distances and raise between-class distances relative to the no-label baseline.
 
-        # Reference
+        # References
 
-        Cangelosi, A., Greco, A., & Harnad, S. (1999). [From robotic toil to symbolic theft: Grounding transfer from entry-level to higher-level categories](https://pearl.plymouth.ac.uk/cgi/viewcontent.cgi?article=2719&context=secam-research). _Connection Science_, _12_(2), 143–162.
+        Cangelosi, A., Greco, A., & Harnad, S. (1999). [_From robotic toil to symbolic theft: Grounding transfer from entry-level to higher-level categories_](https://pearl.plymouth.ac.uk/cgi/viewcontent.cgi?article=2719&context=secam-research). _Connection Science_, _12_(2), 143–162.
 
         # Credits
 

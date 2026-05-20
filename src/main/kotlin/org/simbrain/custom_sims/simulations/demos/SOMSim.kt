@@ -129,7 +129,7 @@ val SOMSim = newSim {
 
         # References
         
-        Kohonen, T. (1982). [Self-organized formation of topologically correct feature maps](https://doi.org/10.1007/BF00337288). _Biological Cybernetics_, _43_(1), 59-69.
+        Kohonen, T. (1982). [_Self-organized formation of topologically correct feature maps_](https://doi.org/10.1007/BF00337288). _Biological Cybernetics_, _43_(1), 59-69.
 
         # Credits
         

@@ -133,47 +133,47 @@ val srnElmanSentences = newSim {
     addSidebarInfo(
         """
         # Next Word Prediction (SRN)
-        
-        This simulation implements Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs). 
-        he network learns to predict the next word in grammatically constrained sentences, developing internal representations 
+
+        This simulation implements Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs).
+        The network learns to predict the next word in grammatically constrained sentences, developing internal representations
         that capture syntactic and semantic relationships.
 
         # Simulation Details
-        
+
         The simulation creates sentences using grammatical templates with different word categories:
         - **Noun categories**: Human, animal, inanimate objects, aggressive entities, fragile items, food
         - **Verb categories**: Intransitive, transitive, aggressive-patient, perceptual, destructive, eating
-        
+
         Example sentence templates:
         - `man eat cookie` (human + eat + food)
         - `dragon destroy glass` (aggressive + destroy + fragile)
         - `cat chase mouse` (animal + transitive + animal)
-        
+
         The SRN processes these sentences one word at a time, using its recurrent connections to maintain context and predict the next word based on grammatical constraints.
 
         # What to Do
-        
+
         1. Run the simulation to see the network processing the current sentence.
-        
-        2. Train the network by right-clicking on the SRN network and opening the training dialog.
-        
-        3. Monitor learning progress through the loss function - the network should learn to predict grammatically appropriate next words.
-        
-        4. Observe predictions in the output text world to see what words the network thinks should come next.
-        
+
+        2. Train the network by right-clicking on the `SRN` network and opening the `Train Network` dialog.
+
+        3. Monitor learning progress through the `Loss Function` - the network should learn to predict grammatically appropriate next words.
+
+        4. Observe predictions in the `Output Text World` to see what words the network thinks should come next.
+
         5. Experiment with parameters:
-           - Adjust the number of training sentences
-           - Modify the learning rate
-           - Change the hidden layer size
+           - Adjust the `number of training sentences`
+           - Modify the `learning rate`
+           - Change the `hidden layer size`
 
         # References
-        
-        Elman, J. L. (1990). [Finding structure in time](https://crl.ucsd.edu/~elman/Papers/fsit.pdf). _Cognitive Science_, _14_(2), 179-211.
+
+        Elman, J. L. (1990). [_Finding structure in time_](https://crl.ucsd.edu/~elman/Papers/fsit.pdf). _Cognitive Science_, _14_(2), 179-211.
 
         # Credits
-        
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-        
+
         """.trimIndent()
     )
 

@@ -299,26 +299,28 @@ val objectRecognition3D = newSim {
         # 3D Object Recognition
 
         A CNN learns to classify first-person 3D views of objects in an
-        [OdorWorld]. Use the **Configuration** panel to pick parameters
-        and three object classes, then click **Generate** to build the
+        [OdorWorld](https://docs.simbrain.net/docs/worlds/odorworld.html). Use the `Configuration` panel to pick parameters
+        and three object classes, then click `Generate` to build the
         training / testing datasets and assemble the CNN.
 
-        ## Pose sampling
+        # Simulation Details
+
+        ## Pose Sampling
         - For each class the target entity is teleported to a random
           position (within the world margins) and the mouse is placed in
           an annulus of radius `innerRadius`–`outerRadius` around it with
           a heading pointed toward the target ± the heading jitter.
-        - For the optional **No Object** class the heading is flipped 180°
+        - For the optional `No Object` class the heading is flipped 180°
           so the target falls behind the FOV and the view contains only
           the tilemap and boundary walls.
 
-        ## How to use
-        1. Adjust the parameters and class selections in the **Configuration** panel.
-        2. Click **Generate** to build the datasets and CNN.
-        3. Right-click the **3D Object CNN** subnet and select **Train...**
+        # What to Do
+        1. Adjust the parameters and class selections in the `Configuration` panel.
+        2. Click `Generate` to build the datasets and CNN.
+        3. Right-click the `3D Object CNN` subnet and select `Train...`
         4. Close the dialog and drive the mouse around the world
            (arrow keys) to watch the live predictions.
-        5. Tweak parameters and click **Regenerate** to rerun with fresh data.
+        5. Tweak parameters and click `Regenerate` to rerun with fresh data.
         """.trimIndent()
     )
 }

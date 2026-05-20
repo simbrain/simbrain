@@ -143,25 +143,25 @@ val edgeOfChaos = newSim("edgeOfChaos") {
         to make the states of the reservoir more red if they are closer to the real-time timestep, and they become more transparent as the simulation runs (moving away from the 
         real-time timestep).
          
-        # What To Do
+        # What to Do
                 
         In this simulation, the only configuration for the simulation is the `weight stdev`. To find each state, follow the steps below.
                 
-        1) Change the `weight stdev` value and press the `update` button to change the reservoir's responses to the object, which will be shown in the PCA plot.
+        1. Change the `weight stdev` value and press the `update` button to change the reservoir's responses to the object, which will be shown in the PCA plot.
                         
-        2) Start the simulation by clicking on the `run` button in the top-left corner.
+        2. Start the simulation by clicking on the `Run` button in the top-left corner.
                 
-        3) Click on the `cursor` icon, drag the agent (mouse) to each object until it stabilizes.
+        3. Click on the `cursor` icon, drag the agent (mouse) to each object until it stabilizes.
                 
-        4) Observe changes in the reservoir's representation in the PCA plot.
+        4. Observe changes in the reservoir's representation in the PCA plot.
                 
             - The flowers and cheeses are all represented similarly with their corresponding group type where, their representations branch into two different state spaces in the
             PCA plot (looks like a pair of "wings"). If the weight stdev is very high (i.e., in the chaos state), the state space will become blurred with representations all over the place. If
             the weight stdev is very low (i.e., in the ordered state), the state space collapses to a few points in the state space.
                 
-        5) To `reset` the simulation, stop the simulation by clicking the `run` button again and press `k`. Then clear all points in the PCA plot by clicking on the `clear` button.
+        5. To `reset` the simulation, stop the simulation by clicking the `Run` button again and press `k`. Then clear all points in the PCA plot by clicking on the `Clear` button.
                 
-        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
+        6. Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
          
         ## Observing The Representations Of The Objects
                 
@@ -170,7 +170,7 @@ val edgeOfChaos = newSim("edgeOfChaos") {
                 
         # References
                 
-        Bertschinger, N., & Natschläger, T. (2004). [Real-Time Computation at the Edge of Chaos in Recurrent Neural Networks](https://doi.org/10.1162/089976604323057443). _Neural Computation_, _16_(7), 1413\u20131436.
+        Bertschinger, N., & Natschläger, T. (2004). [_Real-Time Computation at the Edge of Chaos in Recurrent Neural Networks_](https://doi.org/10.1162/089976604323057443). _Neural Computation_, _16_(7), 1413\u20131436.
                 
         # Credits
                 

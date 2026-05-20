@@ -147,7 +147,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             
             The three nodes represent different behaviors (`Wiggle`, `Explore`, `Spin`) that are initially performed with equal probability. Through selective reinforcement and punishment, 
             you can shape the agent's spontaneous behavior to favor desired actions. This differs from more complex operant conditioning scenarios where behaviors come under the control of 
-            discriminative stimuli. For an example of that, see the "Operant with Environment" simulation, which builds on this one by adding controlling stimuli that signal when certain behaviors will be reinforced.
+            discriminative stimuli. For an example of that, see the `Operant with Environment` simulation, which builds on this one by adding controlling stimuli that signal when certain behaviors will be reinforced.
 
             # Simulation Details
             
@@ -164,12 +164,12 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             
             1. Run the simulation to see random behavior selection based on current probabilities
             
-            2. Choose a target behavior you want the agent to learn (e.g., make it always `Sit`)
+            2. Choose a target behavior you want the agent to learn (e.g., make it always `Wiggle`)
             
             3. Apply reinforcement:
                - When your target behavior is active (activation = `1.0`), click `Reward Agent`
                - When other behaviors are active, click `Punish Agent`
-               - You can also click `Do Nothing` to just observe without learning
+               - You can also click `Don't reinforce or punish` to just observe without learning
             
             4. Monitor the probabilities shown in the neuron labels. They should shift toward your target behavior over time.
             
@@ -191,7 +191,6 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
         )
     }
 }
-
 
 
 

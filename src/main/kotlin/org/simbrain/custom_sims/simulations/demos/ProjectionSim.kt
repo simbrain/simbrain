@@ -43,7 +43,9 @@ val recurrentNetArrayBased = newSim {
             
             A neuron array linked to itself by a weight matrix. This simulation is used to study simple recurrent dynamics.   
 
-            The basic thing you do in this simulation is press `run` in the desktop window and watch dynamics unfold.
+            # Simulation Details
+
+            The basic thing you do in this simulation is press `Run` in the desktop window and watch dynamics unfold.
              
             # What to Do
             
@@ -51,7 +53,7 @@ val recurrentNetArrayBased = newSim {
             
             - Randomize the neuron array by clicking on it and pressing `r`. This sets a new initial condition for the dynamics.
             - Randomize the weight matrix by clicking on it and pressing `r` to randomize. This creates a new dynamical system.
-            - At any time you can press the `clear` button (the eraser) in the projection plot to start over with your plot.
+            - At any time you can press the `Clear` button (the eraser) in the projection plot to start over with your plot.
             - You can press the `clamp` button in the plot, assuming PCA, to _freeze_ the current projection pattern.
 
             ## Other Things to Try

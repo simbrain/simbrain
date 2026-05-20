@@ -59,13 +59,13 @@ val hopfieldPatterns = newSim {
         # What to Do        
         
         1. Select one of the patterns on the button panel. 
-        2. Press the train button to train the network on that pattern. Each time you press "train" it will "burn in" the pattern further.
+        2. Press the `Train` button to train the network on that pattern. Each time you press `Train` it will "burn in" the pattern further.
         3. Note that it will learn both the pattern and its anti-pattern.
         4. To confirm the pattern is remembered, try randomizing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
         5. You can also manually create part of the pattern you trained the network and see if it can recreate it.
         6. You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
         
-        # Experiments
+        ## Experiments
         
         - Train the network on the `E`, `F`, and `L` patterns, then randomize and iterate the network (`N -> R`). What do you notice?
         - Click on `Show Correlations`. What do you notice about the above patterns?

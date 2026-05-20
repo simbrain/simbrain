@@ -142,17 +142,10 @@ val cnnSimpleLineDetector = newSim {
         
         You can edit the file corresponding to this to get a sense of performance. For example, with just one CNN layer training performance is perfect but it can't generalize at all.
 
-        ## Pipeline
-        - **Input Layer**: 16x16x1 grayscale patterns
-        - **Convolution Layer 1**: 3x3 kernel, 8 filters, SAME padding, ReLU → 16x16x8
-        - **Pooling Layer 1**: 2x2 max pool → 8x8x8
-        - **Convolution Layer 2**: 3x3 kernel, 16 filters, SAME padding, ReLU → 8x8x16
-        - **Pooling Layer 2**: 2x2 max pool → 4x4x16
-        - **Flatten Layer**: 256 features
-        - **Output Layer**: 3 output neurons (cross-entropy + softmax)
+        # Simulation Details
 
-        ## Training Data
         Three pattern classes are generated from reusable tensor-dataset utilities:
+
         - **Horizontal** line fragments
         - **Vertical** line fragments
         - **Diagonal** line fragments
@@ -160,17 +153,17 @@ val cnnSimpleLineDetector = newSim {
         Each pattern appears at different locations to demonstrate the CNN's ability
         to learn position-invariant features.
 
-        ## How to use
-        1. Right-click the CNN outline → **Train...** to open the training dialog
-        2. Use Step/Run/Stop buttons to train
+        # What to Do
+        1. Right-click the `CNN` outline and select `Train...` to open the training dialog
+        2. Use `Step`, `Run`, and `Stop` buttons to train
         3. Watch both training (red) and testing (blue) error decrease
         4. After training, test the network:
-           - Switch to the **Testing** tab
-           - Browse test samples with the "Inputs" toolbar
-           - Click **apply current row as input to network**
+           - Switch to the `Testing` tab
+           - Browse test samples with the `Inputs` toolbar
+           - Click `apply current row as input to network`
            - Watch the output layer neurons show predictions
         
-        ## Performance Notes
+        ## Things to Try
         Training accuracy typically ranges from 60-80%, varying with random weight 
         initialization. Try randomizing the network a few times and retraining to see 
         how high you can get it!
@@ -181,7 +174,7 @@ val cnnSimpleLineDetector = newSim {
         - **Network capacity**: May need more filters or a different architecture
         - **Training dynamics**: Learning rate, batch size, or optimizer settings
         
-        **Want to improve it?** If interested edit the underlying simulation file. You can try:
+        To improve it, edit the underlying simulation file and try:
         - Increase training samples (e.g., 100+ per class)
         - Add more filters to the convolutional layers
         - Adjust learning rate or batch size in the trainer config

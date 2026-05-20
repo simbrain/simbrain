@@ -206,7 +206,7 @@ val somNetSmells = newSim {
         
         ## Interactive Training
         
-        1. Press the workspace play button to start the simulation
+        1. Press `Run` to start the simulation
         2. Drag the mouse around the environment to move it near different objects
         3. When the mouse is within radius `50` of an object, the most active SOM neuron 
            automatically gets labeled with that object's name
@@ -249,4 +249,3 @@ val somNetSmells = newSim {
         """.trimIndent()
     )
 }
-

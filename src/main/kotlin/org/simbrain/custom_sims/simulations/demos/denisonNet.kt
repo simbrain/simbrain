@@ -379,27 +379,23 @@ addSidebarInfo(
 
         A neural network model of visual attention based on the paper ["A dynamic normalization model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison. The simulation demonstrates how voluntary and involuntary attention interact to detect and classify briefly presented visual patterns.
 
-        ## Background
+        # Simulation Details
 
         In Denison's experiment, participants viewed two tilted grating patterns presented one after the other. Each pattern was rotated either clockwise or counterclockwise. Before the patterns appeared, participants received an auditory cue telling them to pay attention to the first pattern, the second pattern, or both. After viewing the patterns, they reported the rotation direction.
 
         The key finding: When participants were cued to attend to a specific pattern and then asked to report on that same pattern, their response times were faster and more accurate than when cued to one pattern but asked about the other. This demonstrates that voluntary attention (the cue) enhances perceptual processing of attended stimuli.
 
-        # Simulation Details
-
         The model consists of five layers that process visual input and make decisions.
 
-        ## Network Architecture
+        - `Sensory Layer`: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
 
-        - Sensory Layer: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
+        - `Sustained Response Layer`: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decision layer.
 
-        - Sustained Response Layer: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decision layer.
+        - `Decision Layer`: 2 neurons that accumulate evidence for each pattern. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
 
-        - Decision Layer: 2 neurons that accumulate evidence for each pattern. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
+        - `Voluntary Attention`: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which pattern is cued.
 
-        - Voluntary Attention: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which pattern is cued.
-
-        - Involuntary Attention: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
+        - `Involuntary Attention`: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
 
         ## How Attention Works in the Model
 
@@ -415,16 +411,16 @@ addSidebarInfo(
 
         ## What to Observe
 
-        Sensory Responses: Watch the sensory layer activate when patterns appear, and the sustained response layer show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
+        `Sensory Responses`: Watch the sensory layer activate when patterns appear, and the sustained response layer show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
 
-        Attention Dynamics: The `Attention` time series plot shows how voluntary and involuntary attention unfold over time. Notice:
+        `Attention Dynamics`: The `Attention` time series plot shows how voluntary and involuntary attention unfold over time. Notice:
         - When involuntary attention spikes (at pattern onsets)
         - How voluntary attention is allocated to one pattern or the other based on the cue you selected
         - The interaction between the two attention systems
 
-        Decision Formation: The `Decisions` time series plot shows how the two decision neurons accumulate evidence for each pattern over time. Positive activation indicates clockwise rotation, negative indicates counterclockwise. Watch how the decisions evolve as the model processes each stimulus and makes its judgment.
+        `Decision Formation`: The `Decisions` time series plot shows how the two decision neurons accumulate evidence for each pattern over time. Positive activation indicates clockwise rotation, negative indicates counterclockwise. Watch how the decisions evolve as the model processes each stimulus and makes its judgment.
         
-        Behavior: Text at the top of the network shows which stimulus patterns is presented at time 1 and time 2, along with the model's current decision for each pattern. 
+        `Behavior`: Text at the top of the network shows which stimulus patterns is presented at time 1 and time 2, along with the model's current decision for each pattern.
 
         ## Experiment
 
@@ -443,7 +439,7 @@ addSidebarInfo(
 
         # References
 
-        Denison, R. N., Yuval-Greenberg, S., & Carrasco, M. (2021). [A dynamic normalization model of temporal attention](https://www.nature.com/articles/s41562-021-01129-1). _Nature Human Behaviour_, _5_(12), 1674–1685.
+        Denison, R. N., Yuval-Greenberg, S., & Carrasco, M. (2021). [_A dynamic normalization model of temporal attention_](https://www.nature.com/articles/s41562-021-01129-1). _Nature Human Behaviour_, _5_(12), 1674–1685.
 
         # Credits
 

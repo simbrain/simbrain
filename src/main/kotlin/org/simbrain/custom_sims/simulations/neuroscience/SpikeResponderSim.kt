@@ -109,7 +109,7 @@ val spikeResponderSim = newSim {
             2. [Jump and Decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html): Instant rise with exponential decay.
             3. [Rise and Decay](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html): Gradual rise and fall, mimicking slower chemical transmission.
             4. [Short-Term Plasticity](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html): History-dependent responses that adapt over time.
-        - Spike Responders Plot: A time series that visualizes each downstream neuron's post-synaptic response to spikes
+        - `Spike Responders Plot`: A time series that visualizes each downstream neuron's post-synaptic response to spikes
 
         Spike responders convert spikes into post-synaptic signals, modeling how neurons influence one another across synapses. Simbrain includes several types, each representing 
         a different kind of [synaptic dynamic](https://www.sciencedirect.com/topics/computer-science/synaptic-dynamic).

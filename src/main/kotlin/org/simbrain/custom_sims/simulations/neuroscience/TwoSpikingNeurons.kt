@@ -73,7 +73,7 @@ val spikingNeuronTwoInputs = newSim {
 
         - The excitatory neuron sends current with a synaptic strength of `+5.0`.
         - The inhibitory neuron sends current with strength `-5.0`.
-        - These inputs combine in the Izhikevich neuron, which computes its next state using a nonlinear system of equations.
+        - These inputs combine in the AdEx neuron, which computes its next state using adaptive exponential integrate-and-fire dynamics.
         - If the net input drives the membrane potential above the spike threshold, the neuron fires and resets.
 
         This simple network has no recurrent or lateral connections—only forward input into a single neuron—so you can clearly see how input balance shapes output behavior.
@@ -93,8 +93,7 @@ val spikingNeuronTwoInputs = newSim {
         
         ## Exploration of other spiking neuron models
         
-        You can also change the spiking neuron model to a different model (i.e., Izhikevich, [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html),
-        etc) to see other learning model behaviors by double-clicking on `Spiking neuron` to `Update Rule`.
+        You can also change the spiking neuron model by double-clicking `Spiking neuron`, opening `Update Rule`, and selecting another model such as Izhikevich or [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
 
         # Credits
 

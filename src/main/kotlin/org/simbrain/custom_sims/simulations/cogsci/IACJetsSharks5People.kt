@@ -509,17 +509,25 @@ val iacJetsSharks5People = newSim {
                 [IAC](https://en.wikipedia.org/wiki/Interactive_activation_and_competition_networks) model
                 described in the documentation for IAC_Full. Because there are fewer nodes and links, this one runs
                 faster.
-                
+
+                # Simulation Details
+
+                The model uses interactive activation and competition to settle into patterns that complete partial cues.
+
                 # What to Do
-                
+
                 To see the Jets and Shark model in action:
-                
+
                 - Add activation to a person, or to any property, run the network, and see what pattern it settles in to. This models human associative memory. Again, for more info, see the documentation for IAC_Full.
-                
+
+                # References
+
+                McClelland, J. L. (1981). [_Retrieving general and specific information from stored knowledge of specifics_](https://apps.dtic.mil/sti/citations/ADA100702). Proceedings of the Third Annual Conference of the Cognitive Science Society.
+
                 # Credits
-                
+
                 [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
-            
+
             """.trimIndent()
         )
     }

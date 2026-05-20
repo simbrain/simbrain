@@ -81,39 +81,41 @@ val xorSim = newSim { optionString ->
     addSidebarInfo(
         """
         # XOR
-        
+
         A basic demonstration of the backpropagation algorithm using the classic XOR problem. XOR (exclusive or) is linearly inseparable: it cannot be solved by a single layer network, so the network must discover a useful hidden representation.
 
         This simulation intentionally uses only two hidden units. That is enough in principle, but it makes training noticeably sensitive to the initial random weights. This is part of the point of the demo: it gives a taste of old-school neural networks, where small networks could solve surprising problems but often needed repeated randomization to escape plateaus or poor local minima.
-        
-        # What to Do
-        
-        1. Double-click on the "XOR" network in the `XOR` network window to open the `Train Network` window.
-        
-        2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
-        
-        3. Watch the `Sum Squared Error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Randomize` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
-        
-        4. Click `Apply current row as input and increment selected row` to check the network's performance.
-        
-        5. As you click through the training data, the pattern on the bottom should be matched by the pattern on the top.
-        
-        # Training Data
-        
+
+        # Simulation Details
+
+        ## Training Data
+
         The XOR training set consists of:
         - Input `(0,0)` should produce output `0`
-        - Input `(1,0)` should produce output `1`  
+        - Input `(1,0)` should produce output `1`
         - Input `(0,1)` should produce output `1`
         - Input `(1,1)` should produce output `0`
 
-        # Experiments
+        # What to Do
+
+        1. Double-click on the `XOR` network in the `XOR` network window to open the `Train Network` window.
+
+        2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
+
+        3. Watch the `Sum Squared Error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Randomize` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
+
+        4. Click `Apply current row as input and increment selected row` to check the network's performance.
+
+        5. As you click through the training data, the pattern on the bottom should be matched by the pattern on the top.
+
+        ## Experiments
 
         Try switching the optimizer to `Adam`, or build a similar network with three or four hidden units. More hidden units usually make XOR much easier to train, but the two-unit version better illustrates why linearly inseparable tasks were historically interesting and sometimes frustrating.
-        
+
         # Credits
-        
+
         Jasmine Lau
-        
+
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
 
         """.trimIndent()

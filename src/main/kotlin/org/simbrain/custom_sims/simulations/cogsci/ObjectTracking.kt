@@ -293,11 +293,11 @@ val objectTrackingSim = newSim {
         
         # References
         
-        Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023). [A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis in an unsupervised reservoir network](https://doi.org/10.1007/s11571-023-09988-2). ([Preprint](https://doi.org/10.31234/osf.io/pt7bn)). _Cognitive Neurodynamics_, _18_(4), 1811–1834. 
+        Falandays, J. B., Yoshimi, J., Warren, W., & Spivey, M. J. (2023). [_A potential mechanism for Gibsonian resonance: behavioral entrainment emerges from local homeostasis in an unsupervised reservoir network_](https://doi.org/10.1007/s11571-023-09988-2). ([Preprint](https://doi.org/10.31234/osf.io/pt7bn)). _Cognitive Neurodynamics_, _18_(4), 1811–1834.
                 
-        Falandays, J. B., Nguyen, B., & Spivey, M. J. (2021). [Is prediction nothing more than multi-scale pattern completion of the future?](https://doi.org/10.1016/j.brainres.2021.147578) _Brain Research_, _1768_, 147578. 
+        Falandays, J. B., Nguyen, B., & Spivey, M. J. (2021). [_Is prediction nothing more than multi-scale pattern completion of the future?_](https://doi.org/10.1016/j.brainres.2021.147578) _Brain Research_, _1768_, 147578.
          
-        Rule, M. E., O'Leary, T., & Harvey, C. D. (2019). [Causes and consequences of representational drift](https://doi.org/10.1016/j.conb.2019.08.005). _Current opinion in neurobiology_, _58_, 141–147.
+        Rule, M. E., O'Leary, T., & Harvey, C. D. (2019). [_Causes and consequences of representational drift_](https://doi.org/10.1016/j.conb.2019.08.005). _Current opinion in neurobiology_, _58_, 141–147.
         
         # Credits
         

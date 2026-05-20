@@ -152,13 +152,13 @@ val cogMap3Objects = newSim {
     In this simulation, the mouse is the agent with `3` objects, the cheese, fish, and flower. To get a quick feel of the simulation, run the simulation and drag the agent to each of the objects and observe changes
     in the `Cognitive Maps` window. Below are the step-by-step instructions:
     
-    1. Run the simulation with the `Run workspace` button in the toolbar (the play button). 
+    1. Run the simulation with the `Run workspace` button in the toolbar.
     
     2. In the `World` window, drag the agent (the mouse) towards each of the objects (cheese, flower, fish).
     
     3. Observe how the elements in the `Network` and `Cognitive Map` windows change when the agent is moved around.
 
-    4. If the map development slows down, restart the "Cognitive Map" window with the "Eraser" button in the plot toolbar.
+    4. If the map development slows down, restart the `Cognitive Map` window with the `Eraser` button in the plot toolbar.
     
         - Note: You can also run the simulation again to start the mapping again and reset the weights. 
         

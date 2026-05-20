@@ -251,6 +251,8 @@ val corticalLayers = newSim {
         synaptic dynamics. You can observe how activity propagates through these layers via [feedforward](https://docs.simbrain.net/docs/network/subnetworks/feedForward.html), 
         [recurrent](https://docs.simbrain.net/docs/network/subnetworks/simpleRecurrentNetwork.html), and [feedback connections](https://pmc.ncbi.nlm.nih.gov/articles/PMC9990137/) in a [raster plot](https://docs.simbrain.net/docs/plots/rasterPlot.html#raster).
 
+        # Simulation Details
+
         ## Background
 
         ### Cortical Organization
@@ -320,9 +322,9 @@ val corticalLayers = newSim {
 
         # References
 
-        Douglas, R. J., & Martin, K. A. (2004). [Neuronal circuits of the neocortex](https://www.cns.nyu.edu/~tony/vns/readings/douglas-martin-2004.pdf). *Annual Review of Neuroscience*, *27*, 419–451.
+        Douglas, R. J., & Martin, K. A. (2004). [_Neuronal circuits of the neocortex_](https://www.cns.nyu.edu/~tony/vns/readings/douglas-martin-2004.pdf). _Annual Review of Neuroscience_, _27_, 419–451.
 
-        Lefort, S., Tomm, C., Sarria, J. C. F., & Petersen, C. C. H. (2009). [The excitatory neuronal network of the C2 barrel column in mouse primary somatosensory cortex](https://doi.org/10.1016/j.neuron.2008.12.020). *Neuron*, *61*(2), 301–316.
+        Lefort, S., Tomm, C., Sarria, J. C. F., & Petersen, C. C. H. (2009). [_The excitatory neuronal network of the C2 barrel column in mouse primary somatosensory cortex_](https://doi.org/10.1016/j.neuron.2008.12.020). _Neuron_, _61_(2), 301–316.
 
         # Credits
 

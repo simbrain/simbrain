@@ -160,7 +160,7 @@ val roomSchemaSim = newSim {
 
         # References
         
-        Rumelhart, D. E., McClelland, J. L., & the PDP Research Group (1986). Chapter 14: Schemata and Sequential Thought Processes in PDP Models. In _Parallel Distributed Processing: Volume 1_.
+        Rumelhart, D. E., McClelland, J. L., & the PDP Research Group (1986). [_Chapter 14: Schemata and Sequential Thought Processes in PDP Models_](https://web.stanford.edu/group/pdplab/pdphandbook/). In _Parallel Distributed Processing: Volume 1_.
 
         # Credits
         

@@ -5,6 +5,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.setLabels
+import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.*
 import org.simbrain.workspace.updater.UpdateCoupling
 import kotlin.math.*
@@ -68,10 +69,12 @@ val denisonNet = newSim {
     val sensory1 = net.addNeuronCollection(12).apply {
         label = "Sensory"
         setLabels((0..11).map { "${it * 30}°" })
+        layout(GridLayout())
     }
     val sensory2 = net.addNeuronCollection(12).apply {
         label = "Sustained Response"
         setLabels((0..11).map { "${it * 30}°" })
+        layout(GridLayout())
     }
     val decision = net.addNeuronCollection(2).apply { label = "Decision" }.apply {
         setLabels(listOf("Pattern 1", "Pattern 2"))

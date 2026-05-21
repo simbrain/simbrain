@@ -25,6 +25,7 @@ import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
+import java.awt.geom.Ellipse2D
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -59,8 +60,49 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
     val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
 
+    /**
+     * Collect (row, col) cells whose visual area intersects the given global ellipse.
+     * Returned coordinates are in target-row / source-col space regardless of display transpose.
+     */
+    fun collectCellsInGlobalEllipse(ellipse: Ellipse2D): List<Pair<Int, Int>> {
+        val wm = weightMatrix as? WeightMatrix ?: return emptyList()
+        val matrix = wm.weights
+        val nTargets = matrix.nrow()
+        val nSources = matrix.ncol()
+        if (nTargets <= 0 || nSources <= 0) return emptyList()
+        val targetSource = NetworkPreferences.weightMatrixTargetSource
+        val displayRows = if (targetSource) nTargets else nSources
+        val displayCols = if (targetSource) nSources else nTargets
+        val cellW = imageWidth.toDouble() / displayCols
+        val cellH = imageHeight.toDouble() / displayRows
+        return imageBox.cellsIntersectingGlobalEllipse(ellipse, displayRows, displayCols, cellW, cellH) { displayRow, displayCol ->
+            if (targetSource) displayRow to displayCol else displayCol to displayRow
+        }
+    }
+
     /** Trace highlight set by the neuron array tracer. */
     var traceHighlight: WeightMatrixTraceHighlight? = null
+
+    /**
+     * Cells (row=target, col=source) the user has selected for quick-edit. Empty means no pixel selection
+     * is active; in that case increment/decrement/clear/randomize fall through to whole-component behavior.
+     */
+    var pixelSelection: Set<Pair<Int, Int>> = emptySet()
+        set(value) {
+            field = value
+            repaint()
+        }
+
+    private fun selectCell(row: Int, col: Int, addToSelection: Boolean) {
+        val wm = weightMatrix as? WeightMatrix ?: return
+        if (row !in 0 until wm.weights.nrow() || col !in 0 until wm.weights.ncol()) return
+        val cell = row to col
+        pixelSelection = if (addToSelection) {
+            if (cell in pixelSelection) pixelSelection - cell else pixelSelection + cell
+        } else {
+            setOf(cell)
+        }
+    }
 
     init {
         pickable = true
@@ -84,6 +126,16 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             }
             override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearNeuronArrayTrace()
+            }
+            override fun mousePressed(event: PInputEvent) {
+                if (!event.isAltDown) return
+                val wm = weightMatrix as? WeightMatrix ?: return
+                val ij = pixelToWeightCell(wm, event.getPositionRelativeTo(imageBox)) ?: return
+                selectCell(ij.first, ij.second, addToSelection = event.isShiftDown)
+                if (this@WeightMatrixNode !in networkPanel.selectionManager) {
+                    networkPanel.selectionManager.add(this@WeightMatrixNode)
+                }
+                event.isHandled = true
             }
         })
         
@@ -155,6 +207,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         val g2 = paintContext.graphics
 
         drawTraceHighlight(g2, wm)
+        drawPixelSelection(g2, wm)
 
         if (!NetworkPreferences.showNumericOverlays) return
         val matrix = wm.weights
@@ -213,6 +266,35 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             displayRow to displayCol
         } else {
             displayCol to displayRow
+        }
+    }
+
+    private fun drawPixelSelection(g2: Graphics2D, wm: WeightMatrix) {
+        if (pixelSelection.isEmpty()) return
+        val matrix = wm.weights
+        val nTargets = matrix.nrow()
+        val nSources = matrix.ncol()
+        if (nTargets <= 0 || nSources <= 0) return
+        val targetSource = NetworkPreferences.weightMatrixTargetSource
+        val displayRows = if (targetSource) nTargets else nSources
+        val displayCols = if (targetSource) nSources else nTargets
+        val cellW = imageWidth.toDouble() / displayCols
+        val cellH = imageHeight.toDouble() / displayRows
+        val boxOffset = imageBox.offset
+
+        g2.color = NeuronArrayNode.PIXEL_SELECTION_COLOR
+        g2.stroke = BasicStroke(3f)
+
+        for ((row, col) in pixelSelection) {
+            if (row !in 0 until nTargets || col !in 0 until nSources) continue
+            val displayRow = if (targetSource) row else col
+            val displayCol = if (targetSource) col else row
+            g2.drawRect(
+                (boxOffset.x + displayCol * cellW).toInt(),
+                (boxOffset.y + displayRow * cellH).toInt(),
+                cellW.toInt().coerceAtLeast(1),
+                cellH.toInt().coerceAtLeast(1)
+            )
         }
     }
 
@@ -437,7 +519,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override fun createEditDialog(): StandardDialog? = createEditDialog(networkPanel.filterSelectedModelByClass<WeightMatrix>())
 
-    override val propertyDialog: StandardDialog? get() = createEditDialog()
+    override val propertyDialog: StandardDialog?
+        get() = if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else createEditDialog()
 
     override val model: Connector
         get() = weightMatrix
@@ -463,7 +546,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
 
         override val propertyDialog: StandardDialog?
-            get() = this@WeightMatrixNode.createEditDialog()
+            get() = this@WeightMatrixNode.propertyDialog
 
         override val isDraggable: Boolean
             get() = false

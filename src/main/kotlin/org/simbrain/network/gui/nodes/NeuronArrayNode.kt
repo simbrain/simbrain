@@ -21,8 +21,11 @@ import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.event.ActionEvent
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Point2D
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JMenu
@@ -59,6 +62,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                     }
                     override fun mouseExited(event: PInputEvent) {
                         networkPanel.clearNeuronArrayTrace()
+                    }
+                    override fun mousePressed(event: PInputEvent) {
+                        if (!event.isAltDown) return
+                        selectPixel(i, addToSelection = event.isShiftDown)
+                        if (this@NeuronArrayNode !in networkPanel.selectionManager) {
+                            networkPanel.selectionManager.add(this@NeuronArrayNode)
+                        }
+                        event.isHandled = true
                     }
                 })
             }
@@ -101,11 +112,20 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearNeuronArrayTrace()
             }
+            override fun mousePressed(event: PInputEvent) {
+                if (!event.isAltDown) return
+                val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
+                selectPixel(idx, addToSelection = event.isShiftDown)
+                if (this@NeuronArrayNode !in networkPanel.selectionManager) {
+                    networkPanel.selectionManager.add(this@NeuronArrayNode)
+                }
+                event.isHandled = true
+            }
         })
     }
 
     /** Map a pixel within [activationImage] to a neuron index, respecting layout mode. */
-    private fun pixelToNeuronIndex(localPt: java.awt.geom.Point2D): Int? {
+    private fun pixelToNeuronIndex(localPt: Point2D): Int? {
         val size = neuronArray.size
         if (size <= 0) return null
         return if (gridMode) {
@@ -120,8 +140,56 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
+    /**
+     * Collect cell indices whose visual area intersects the given global ellipse.
+     * Used by the wand handler to operate on multiple pixels under the brush.
+     */
+    fun collectCellsInGlobalEllipse(ellipse: Ellipse2D): List<Int> {
+        val size = neuronArray.size
+        if (size <= 0) return emptyList()
+        return when {
+            neuronArray.circleMode ->
+                neuronCircles.indices.filter { i -> ellipse.intersects(neuronCircles[i].globalBounds) }
+            gridMode -> {
+                val len = ceil(sqrt(size.toDouble())).toInt()
+                val cell = imageSize / len
+                activationImage.cellsIntersectingGlobalEllipse(ellipse, len, len, cell, cell) { row, col ->
+                    (row * len + col).takeIf { it < size }
+                }
+            }
+            neuronArray.verticalLayout ->
+                activationImage.cellsIntersectingGlobalEllipse(
+                    ellipse, size, 1, flatPixelArrayHeight.toDouble(), imageSize / size
+                ) { row, _ -> row }
+            else ->
+                activationImage.cellsIntersectingGlobalEllipse(
+                    ellipse, 1, size, imageSize / size, flatPixelArrayHeight.toDouble()
+                ) { _, col -> col }
+        }
+    }
+
     /** Trace highlight set by the neuron array tracer. */
     var traceHighlight: NeuronArrayTraceHighlight? = null
+
+    /**
+     * Indices of pixels (neurons) the user has selected for quick-edit. Empty means no pixel selection
+     * is active; in that case increment/decrement/clear/randomize fall through to whole-component behavior.
+     */
+    var pixelSelection: Set<Int> = emptySet()
+        set(value) {
+            field = value
+            repaint()
+        }
+
+    /** Pick or toggle a pixel as part of the per-pixel selection. */
+    private fun selectPixel(idx: Int, addToSelection: Boolean) {
+        if (idx !in 0 until neuronArray.size) return
+        pixelSelection = if (addToSelection) {
+            if (idx in pixelSelection) pixelSelection - idx else pixelSelection + idx
+        } else {
+            setOf(idx)
+        }
+    }
 
     /**
      * Image with spikes and transparent background overlaid on the activation image for spiking neuron arrays.
@@ -315,6 +383,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val g2 = paintContext.graphics
 
         drawTraceHighlight(g2)
+        drawPixelSelection(g2)
 
         if (neuronArray.circleMode) return
         if (!NetworkPreferences.showNumericOverlays) return
@@ -350,15 +419,25 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun drawTraceHighlight(g2: Graphics2D) {
         val highlight = traceHighlight ?: return
+        drawIndexHighlight(g2, highlight.indices, highlight.color, strokeWidth = 2f)
+    }
+
+    private fun drawPixelSelection(g2: Graphics2D) {
+        if (pixelSelection.isEmpty()) return
+        drawIndexHighlight(g2, pixelSelection, PIXEL_SELECTION_COLOR, strokeWidth = 3f)
+    }
+
+    /** Draw a rectangular outline around each of the given neuron indices. Shared by trace + pixel selection. */
+    private fun drawIndexHighlight(g2: Graphics2D, indices: Set<Int>, color: Color, strokeWidth: kotlin.Float) {
         val size = neuronArray.size
         if (size <= 0) return
-        g2.color = highlight.color
-        g2.stroke = BasicStroke(2f)
+        g2.color = color
+        g2.stroke = BasicStroke(strokeWidth)
 
         if (neuronArray.circleMode) {
             val pad = 4
             val d = (NEURON_DIAMETER + 2 * pad).toDouble()
-            for (i in highlight.indices) {
+            for (i in indices) {
                 val circle = neuronCircles.getOrNull(i) ?: continue
                 val cx = circle.xOffset + neuronCircleGroup.xOffset
                 val cy = circle.yOffset + neuronCircleGroup.yOffset
@@ -373,7 +452,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             val len = ceil(sqrt(size.toDouble())).toInt()
             val cellW = imageSize / len
             val cellH = imageSize / len
-            for (i in highlight.indices) {
+            for (i in indices) {
                 if (i !in 0 until size) continue
                 val row = i / len
                 val col = i % len
@@ -388,7 +467,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             val vertical = neuronArray.verticalLayout
             val cellW = if (vertical) flatPixelArrayHeight.toDouble() else imageSize / size
             val cellH = if (vertical) imageSize / size else flatPixelArrayHeight.toDouble()
-            for (i in highlight.indices) {
+            for (i in indices) {
                 if (i !in 0 until size) continue
                 val x = if (vertical) 0.0 else i * cellW
                 val y = if (vertical) i * cellH else 0.0
@@ -400,6 +479,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 )
             }
         }
+    }
+
+    companion object {
+        /** Outline color used to mark pixels in the per-pixel selection. */
+        val PIXEL_SELECTION_COLOR: Color = Color(255, 200, 0)
     }
 
     override val contextMenu: JPopupMenu
@@ -594,7 +678,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     }
 
     override val propertyDialog: StandardDialog?
-        get() = createEditDialog()
+        get() = if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else createEditDialog()
 
     override val model: NeuronArray
         get() = neuronArray

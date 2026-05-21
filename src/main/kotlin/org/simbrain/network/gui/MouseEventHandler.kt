@@ -65,6 +65,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             override fun acceptsEvent(event: PInputEvent, type: Int): Boolean {
 
                 if (event.isPopupTrigger) return false
+                // Allow lower-level listeners (e.g. per-pixel handlers on neuron-array / weight-matrix images)
+                // to suppress the canvas-level selection by calling event.setHandled(true).
+                if (event.isHandled) return false
 
                 val mouseCursor = networkPanel.mouseCursor
                 return mouseCursor == MouseCursor.Selection || mouseCursor == MouseCursor.Pan && super.acceptsEvent(event, type)

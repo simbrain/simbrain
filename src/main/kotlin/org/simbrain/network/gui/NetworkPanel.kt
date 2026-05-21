@@ -239,6 +239,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
 
         initEventHandlers()
+        bindPixelSelectionToComponentSelection()
     }
 
     /**
@@ -597,10 +598,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun incrementSelectedObjects() {
+        if (hasAnyPixelSelection()) {
+            incrementSelectedPixels()
+            return
+        }
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.increment() }
     }
 
     fun decrementSelectedObjects() {
+        if (hasAnyPixelSelection()) {
+            decrementSelectedPixels()
+            return
+        }
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.decrement() }
     }
 
@@ -609,6 +618,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun hardClearSelectedObjects() {
+        if (hasAnyPixelSelection()) {
+            clearSelectedPixels()
+            return
+        }
         clearSelectedObjects()
         selectionManager.filterSelectedModels<Synapse>().forEach { it.hardClear() }
         selectionManager.filterSelectedModels<NeuronArray>().forEach { it.hardClear() }

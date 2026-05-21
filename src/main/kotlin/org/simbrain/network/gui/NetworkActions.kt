@@ -196,6 +196,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcuts = KeyCombination('R')
     ) {
+        if (networkPanel.hasAnyPixelSelection()) {
+            networkPanel.randomizeSelectedPixels()
+            return@createConditionallyEnabledAction
+        }
         with(network) {
             selectionManager.selectedModels.map { it.randomize() }
         }

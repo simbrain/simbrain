@@ -56,6 +56,13 @@ abstract class WandAction : CopyableObject {
     abstract suspend fun apply(model: NetworkModel, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>)
 
     /**
+     * Apply this action to a single pixel of a neuron array or weight matrix. Default is no-op;
+     * actions whose semantics generalize to per-cell values (e.g. [AdjustValueAction]) should
+     * override. The wand handler dispatches this in addition to [apply] for every drag step.
+     */
+    open suspend fun applyToPixel(pixel: PixelTarget, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {}
+
+    /**
      * Called when wand drag starts. Override to capture initial state for undo.
      */
     open fun beginAction(networkPanel: NetworkPanel) {}
@@ -302,6 +309,22 @@ class AdjustValueAction(
         target.setValue(model, if (clampToBounds) newValue.coerceIn(lower, upper) else newValue)
     }
 
+    override suspend fun applyToPixel(pixel: PixelTarget, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
+        val targetMatches = when (target) {
+            is AdjustValueTarget.NeuronActivation -> pixel is PixelTarget.ArrayPixel
+            is AdjustValueTarget.SynapseStrength -> pixel is PixelTarget.MatrixPixel
+        }
+        if (!targetMatches) return
+        undoState.putIfAbsent(pixel, pixel.read())
+
+        val (lower, upper) = pixel.bounds()
+        val targetValue = amount.computeValue(lower, upper)
+        val currentValue = pixel.read()
+        val newValue = operation.apply(currentValue, targetValue)
+        pixel.write(if (clampToBounds) newValue.coerceIn(lower, upper) else newValue)
+        pixel.fireUpdated()
+    }
+
     override fun endAction(networkPanel: NetworkPanel, undoState: Map<Any, Any?>) {
         if (undoState.isEmpty()) return
 
@@ -309,21 +332,44 @@ class AdjustValueAction(
         val neuronDiffs = undoState.filterKeys { it is Neuron } as Map<Neuron, Double>
         @Suppress("UNCHECKED_CAST")
         val synapseDiffs = undoState.filterKeys { it is Synapse } as Map<Synapse, Double>
+        @Suppress("UNCHECKED_CAST")
+        val pixelDiffs = undoState.filterKeys { it is PixelTarget } as Map<PixelTarget, Double>
 
-        val totalCount = neuronDiffs.size + synapseDiffs.size
+        val totalCount = neuronDiffs.size + synapseDiffs.size + pixelDiffs.size
         if (totalCount > 0) {
             val neuronRedos = neuronDiffs.keys.associateWith { it.activation }
             val synapseRedos = synapseDiffs.keys.associateWith { it.strength }
+            val pixelRedos = pixelDiffs.keys.associateWith { it.read() }
+            val affectedPixelComponents = pixelDiffs.keys.map {
+                when (it) {
+                    is PixelTarget.ArrayPixel -> it.array
+                    is PixelTarget.MatrixPixel -> it.wm
+                }
+            }.distinct()
 
             networkPanel.undoManager.addUndoableAction(
                 description = undoDescription(totalCount),
                 undo = {
                     neuronDiffs.forEach { (neuron, prev) -> neuron.activation = prev }
                     synapseDiffs.forEach { (synapse, prev) -> synapse.strength = prev }
+                    pixelDiffs.forEach { (pixel, prev) -> pixel.write(prev) }
+                    affectedPixelComponents.forEach { c ->
+                        when (c) {
+                            is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
+                            is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
+                        }
+                    }
                 },
                 redo = {
                     neuronRedos.forEach { (neuron, redo) -> neuron.activation = redo }
                     synapseRedos.forEach { (synapse, redo) -> synapse.strength = redo }
+                    pixelRedos.forEach { (pixel, redo) -> pixel.write(redo) }
+                    affectedPixelComponents.forEach { c ->
+                        when (c) {
+                            is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
+                            is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
+                        }
+                    }
                 }
             )
         }

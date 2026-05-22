@@ -426,7 +426,7 @@ jobs:
           if (-not (Get-ChildItem -Recurse build/dist/Simbrain -Filter .jpackage.xml)) { throw ".jpackage.xml missing; jpackage --app-image will reject the app-image." }
           Write-Host "Restored signed app-image OK."
 
-      # Phase 2: wrap the now-signed app-image into the installer .exe.
+      # Phase 2: package the now-signed app-image into the installer .msi.
       - name: Build Windows installer
         run: ./gradlew jpackageWindowsInstaller "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
 
@@ -434,11 +434,11 @@ jobs:
         id: upload-unsigned-artifact
         uses: actions/upload-artifact@v4
         with:
-          name: windows-unsigned-exe
-          path: build/dist/Simbrain*-installer.exe
+          name: windows-unsigned-msi
+          path: build/dist/Simbrain*-installer.msi
           retention-days: 1
 
-      # Round 2 of 2: sign the outer installer .exe.
+      # Round 2 of 2: sign the installer .msi (run directly by msiexec, so this gives the install a verified publisher).
       - name: Sign installer with SignPath
         id: signpath-signing
         uses: signpath/github-action-submit-signing-request@v1
@@ -457,7 +457,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: windows-artifacts
-          path: build/signed/Simbrain*.exe
+          path: build/signed/Simbrain*.msi
           retention-days: 1
 
       - name: Configure AWS CLI
@@ -470,13 +470,13 @@ jobs:
         shell: pwsh
         run: |
           $path = 'build\signed'
-          $files = Get-ChildItem -Path $path -Filter 'Simbrain*.exe'
+          $files = Get-ChildItem -Path $path -Filter 'Simbrain*.msi'
           if ($files.Count -eq 1) {
             & "C:\Program Files\Amazon\AWSCLIV2\aws" s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
           } elseif ($files.Count -eq 0) {
-            Write-Error "No files found matching the pattern 'Simbrain*.exe' in $path"
+            Write-Error "No files found matching the pattern 'Simbrain*.msi' in $path"
           } else {
-            Write-Error "Multiple files found matching the pattern 'Simbrain*.exe' in $path. Only one file is expected."
+            Write-Error "Multiple files found matching the pattern 'Simbrain*.msi' in $path. Only one file is expected."
           }
 
   build-macos-arm64:
@@ -717,7 +717,7 @@ jobs:
           generate_release_notes: true
           files: |
             release-artifacts/**/*.zip
-            release-artifacts/**/*.exe
+            release-artifacts/**/*.msi
             release-artifacts/**/*.dmg
             release-artifacts/**/*.AppImage
         env:

@@ -580,9 +580,11 @@ if (OperatingSystem.current().isWindows) {
         }
     }
 
-    // Phase 2 of 2: wrap the (by now signed) app-image into the installer .exe, then rename it.
-    // Intentionally does NOT depend on jpackageWindowsAppImage so CI can sign the app-image
-    // between the two phases without this task rebuilding and clobbering the signed launcher.
+    // Phase 2 of 2: package the (by now signed) app-image into the installer .msi, then rename it.
+    // An MSI is run directly by msiexec (no self-extracting wrapper), so signing the .msi itself
+    // gives the install a verified publisher. Intentionally does NOT depend on jpackageWindowsAppImage
+    // so CI can sign the app-image between the two phases without this task rebuilding and clobbering
+    // the signed launcher.
     tasks.register<Exec>("jpackageWindowsInstaller") {
         onlyIf { OperatingSystem.current().isWindows }
 
@@ -593,7 +595,7 @@ if (OperatingSystem.current().isWindows) {
             val winVersion = project.version.toString().replace(Regex("-.*"), "")
             executable(jpackagePath)
             args(
-                "--type", "exe",
+                "--type", "msi",
                 "--app-image", winAppImageDir,
                 "--dest", dist,
                 "--name", "Simbrain",
@@ -607,8 +609,8 @@ if (OperatingSystem.current().isWindows) {
         doLast {
             val distDir = file(dist)
             val winVersion = project.version.toString().replace(Regex("-.*"), "")
-            val oldFile = File(distDir, "Simbrain-${winVersion}.exe")
-            val newFile = File(distDir, "Simbrain${versionName}-installer.exe")
+            val oldFile = File(distDir, "Simbrain-${winVersion}.msi")
+            val newFile = File(distDir, "Simbrain${versionName}-installer.msi")
             if (!oldFile.exists()) {
                 throw GradleException("File ${oldFile.name} does not exist.")
             }

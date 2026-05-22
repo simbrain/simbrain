@@ -376,24 +376,77 @@ jobs:
           echo "BUILD_TIMESTAMP=$timestamp" >> $env:GITHUB_ENV
           echo "VERSION=${{ needs.prepare.outputs.version }}" >> $env:GITHUB_ENV
 
-      - name: Build Windows executable
-        run: ./gradlew renameWindowsExecutable "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
+      # Phase 1: build only the app-image so its Simbrain.exe launcher can be signed
+      # before being wrapped into the installer.
+      - name: Build Windows app-image
+        run: ./gradlew jpackageWindowsAppImage "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
 
-      - name: Upload unsigned artifact for signing
+      # Zip the app-image so SignPath can sign the launcher (and any other unsigned PE files) inside it.
+      - name: Zip app-image for signing
+        shell: pwsh
+        run: Compress-Archive -Path build/dist/Simbrain/* -DestinationPath build/dist/Simbrain-app-image.zip -Force
+
+      - name: Upload unsigned app-image for signing
+        id: upload-unsigned-app-image
+        uses: actions/upload-artifact@v4
+        with:
+          name: windows-unsigned-app-image
+          path: build/dist/Simbrain-app-image.zip
+          retention-days: 1
+
+      # Round 1 of 2: sign the launcher inside the app-image zip. Requires a SignPath artifact
+      # configuration (SIGNPATH_APPIMAGE_ARTIFACT_CONFIG_SLUG) that recurses into the zip and
+      # Authenticode-signs the contained PE files, returning the re-zipped container.
+      - name: Sign app-image with SignPath
+        id: signpath-signing-app-image
+        uses: signpath/github-action-submit-signing-request@v1
+        with:
+          api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
+          organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
+          project-slug: '${{ vars.SIGNPATH_PROJECT_SLUG }}'
+          artifact-configuration-slug: '${{ vars.SIGNPATH_APPIMAGE_ARTIFACT_CONFIG_SLUG }}'
+          signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
+          github-artifact-id: '${{ steps.upload-unsigned-app-image.outputs.artifact-id }}'
+          wait-for-completion: true
+          output-artifact-directory: 'build/signed-app-image'
+
+      # Replace the unsigned app-image with the signed one before wrapping it into the installer.
+      - name: Restore signed app-image
+        shell: pwsh
+        run: |
+          Write-Host "SignPath returned:"
+          Get-ChildItem -Recurse build/signed-app-image | Select-Object FullName
+          $zip = Get-ChildItem build/signed-app-image -Filter *.zip | Select-Object -First 1
+          if (-not $zip) { throw "No signed app-image zip found under build/signed-app-image" }
+          Remove-Item -Recurse -Force build/dist/Simbrain
+          Expand-Archive -Path $zip.FullName -DestinationPath build/dist/Simbrain -Force
+          # The installer step needs the full app-image back; verify SignPath passed undeclared files through.
+          if (-not (Test-Path build/dist/Simbrain/Simbrain.exe)) { throw "Simbrain.exe missing from restored app-image." }
+          if (-not (Test-Path build/dist/Simbrain/runtime)) { throw "runtime/ missing from restored app-image; SignPath may have dropped undeclared files." }
+          if (-not (Get-ChildItem -Recurse build/dist/Simbrain -Filter .jpackage.xml)) { throw ".jpackage.xml missing; jpackage --app-image will reject the app-image." }
+          Write-Host "Restored signed app-image OK."
+
+      # Phase 2: wrap the now-signed app-image into the installer .exe.
+      - name: Build Windows installer
+        run: ./gradlew jpackageWindowsInstaller "-PreleaseVersion=${{ env.VERSION }}" "-PbuildNumber=${{ env.BUILD_NUMBER }}" "-PcommitSha=${{ env.COMMIT_SHA }}" "-PbuildTimestamp=${{ env.BUILD_TIMESTAMP }}"
+
+      - name: Upload unsigned installer for signing
         id: upload-unsigned-artifact
         uses: actions/upload-artifact@v4
         with:
           name: windows-unsigned-exe
-          path: build/dist/Simbrain*.exe
+          path: build/dist/Simbrain*-installer.exe
           retention-days: 1
 
-      - name: Sign with SignPath
+      # Round 2 of 2: sign the outer installer .exe.
+      - name: Sign installer with SignPath
         id: signpath-signing
         uses: signpath/github-action-submit-signing-request@v1
         with:
           api-token: '${{ secrets.SIGNPATH_API_TOKEN }}'
           organization-id: '${{ vars.SIGNPATH_ORGANIZATION_ID }}'
           project-slug: '${{ vars.SIGNPATH_PROJECT_SLUG }}'
+          artifact-configuration-slug: '${{ vars.SIGNPATH_INSTALLER_ARTIFACT_CONFIG_SLUG }}'
           signing-policy-slug: '${{ vars.SIGNPATH_SIGNING_POLICY_SLUG }}'
           github-artifact-id: '${{ steps.upload-unsigned-artifact.outputs.artifact-id }}'
           wait-for-completion: true

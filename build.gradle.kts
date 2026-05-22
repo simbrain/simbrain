@@ -537,103 +537,94 @@ if (OperatingSystem.current().isMacOsX) {
 }
 
 if (OperatingSystem.current().isWindows) {
-    tasks.register<Exec>("jpackageWindows") {
+
+    val winJvmArgs = listOf(
+        "-Duser.dir=\$APPDIR",
+        "--add-opens=java.base/java.util=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
+        "--add-opens=java.desktop/java.awt.geom=ALL-UNNAMED",
+        "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
+        "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
+        "--add-opens=java.base/java.lang=ALL-UNNAMED"
+    ).joinToString(" ")
+
+    val jpackagePath = file("${System.getProperty("java.home")}/bin/jpackage.exe")
+
+    // Directory of the jpackage app-image: holds the Simbrain.exe launcher and the bundled runtime.
+    val winAppImageDir = "${dist}/Simbrain"
+
+    // Phase 1 of 2: build only the app-image. Its Simbrain.exe launcher can then be code-signed
+    // before being wrapped into the installer, so the installed program itself is signed and not
+    // just the outer installer.
+    tasks.register<Exec>("jpackageWindowsAppImage") {
         onlyIf { OperatingSystem.current().isWindows }
 
         dependsOn("cleanDistribution")
         dependsOn("shadowJar")
         dependsOn("buildDistribution")
 
-        val iconFile = "etc/simbrain.ico"
-
-        val javaHome = System.getProperty("java.home")
-        val jpackageBinary = if (OperatingSystem.current().isWindows) "jpackage.exe" else "jpackage"
-        val jpackagePath = file("${javaHome}/bin/$jpackageBinary")
-
         doFirst {
-            // Define JVM arguments
-            val jvmArgs = listOf(
-                "-Duser.dir=\$APPDIR",
-                "--add-opens=java.base/java.util=ALL-UNNAMED",
-                "--add-opens=java.desktop/java.awt=ALL-UNNAMED",
-                "--add-opens=java.desktop/java.awt.geom=ALL-UNNAMED",
-                "--add-opens=java.base/java.util.concurrent=ALL-UNNAMED",
-                "--add-opens=java.base/java.util.concurrent.atomic=ALL-UNNAMED",
-                "--add-opens=java.base/java.lang=ALL-UNNAMED"
-            ).joinToString(" ")
-
-            // Windows Installer requires numeric-only version (X.Y.Z), strip any pre-release suffix
+            // Windows Installer requires a numeric-only version (X.Y.Z); strip any pre-release suffix
             val winVersion = project.version.toString().replace(Regex("-.*"), "")
-
-            // Set up the jpackage command and its arguments
             executable(jpackagePath)
             args(
+                "--type", "app-image",
                 "--input", buildMain,
                 "--main-jar", "Simbrain.jar",
                 "--dest", dist,
                 "--name", "Simbrain",
                 "--app-version", winVersion,
-                "--icon", iconFile,
-                "--java-options", jvmArgs,
+                "--icon", "etc/simbrain.ico",
+                "--java-options", winJvmArgs
+            )
+        }
+    }
+
+    // Phase 2 of 2: wrap the (by now signed) app-image into the installer .exe, then rename it.
+    // Intentionally does NOT depend on jpackageWindowsAppImage so CI can sign the app-image
+    // between the two phases without this task rebuilding and clobbering the signed launcher.
+    tasks.register<Exec>("jpackageWindowsInstaller") {
+        onlyIf { OperatingSystem.current().isWindows }
+
+        doFirst {
+            if (!file(winAppImageDir).exists()) {
+                throw GradleException("App-image not found at $winAppImageDir. Run jpackageWindowsAppImage first.")
+            }
+            val winVersion = project.version.toString().replace(Regex("-.*"), "")
+            executable(jpackagePath)
+            args(
+                "--type", "exe",
+                "--app-image", winAppImageDir,
+                "--dest", dist,
+                "--name", "Simbrain",
+                "--app-version", winVersion,
                 "--win-menu",
                 "--win-menu-group", "Simbrain",
                 "--vendor", "Simbrain"
             )
         }
-    }
 
-    tasks.register<Exec>("signWindowsApp") {
-        onlyIf { OperatingSystem.current().isWindows }
-
-        dependsOn("jpackageWindows")
-
-        val appPath = "${dist}/Simbrain-${project.version}.exe"
-
-        val signtool = findWindowsSignTool()
-
-        if (System.getenv("CERTIFICATE_SHA1").isNullOrBlank()) {
-            throw GradleException("Environment variable CERTIFICATE_SHA1 is not set.")
-        }
-
-        doFirst {
-
-            executable(signtool)
-            args(
-                "sign",
-                "/v",
-                "/s",
-                "My",
-                "/sha1",
-                System.getenv("CERTIFICATE_SHA1"),
-                "/fd",
-                "SHA256",
-                appPath
-            )
-        }
-    }
-
-    tasks.register("renameWindowsExecutable") {
-        onlyIf { OperatingSystem.current().isWindows }
-        dependsOn("jpackageWindows")
-        
         doLast {
             val distDir = file(dist)
             val winVersion = project.version.toString().replace(Regex("-.*"), "")
             val oldFile = File(distDir, "Simbrain-${winVersion}.exe")
             val newFile = File(distDir, "Simbrain${versionName}-installer.exe")
-
-            if (oldFile.exists()) {
-                val success = oldFile.renameTo(newFile)
-                if (!success) {
-                    throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
-                } else {
-                    println("Signed executable is available at ${newFile.absolutePath}")
-                }
-            } else {
+            if (!oldFile.exists()) {
                 throw GradleException("File ${oldFile.name} does not exist.")
             }
+            if (!oldFile.renameTo(newFile)) {
+                throw GradleException("Failed to rename file from ${oldFile.name} to ${newFile.name}.")
+            }
+            println("Installer is available at ${newFile.absolutePath}")
         }
     }
+
+    // Convenience aggregator for local, unsigned, end-to-end installer builds.
+    tasks.register("jpackageWindows") {
+        onlyIf { OperatingSystem.current().isWindows }
+        dependsOn("jpackageWindowsAppImage", "jpackageWindowsInstaller")
+    }
+    tasks.named("jpackageWindowsInstaller").configure { mustRunAfter("jpackageWindowsAppImage") }
 }
 
 /**
@@ -1129,44 +1120,5 @@ tasks.register<Exec>("createAppImage") {
     doLast {
         println("AppImage created: ${appImagePath.absolutePath}")
         println("Size: ${appImagePath.length() / 1024 / 1024} MB")
-    }
-}
-
-fun findWindowsSignTool(): String {
-    val windowsKitsFolder = File("C:/Program Files (x86)/Windows Kits/10/bin/")
-    if (!windowsKitsFolder.exists()) {
-        throw GradleException("Windows Kits folder not found")
-    }
-
-    // Find all signtool.exe files specifically in x64 directories under the SDK versions
-    val signToolFiles = findSignToolRecursive(windowsKitsFolder) { it.path.contains("\\x64\\") }
-
-    if (signToolFiles.isEmpty()) {
-        println("Dumping directory structure for debugging:")
-        dumpDirectoryTree(windowsKitsFolder)
-        throw GradleException("SignTool.exe not found in the x64 SDK version folders")
-    }
-
-    return signToolFiles.first().absolutePath
-}
-
-fun findSignToolRecursive(directory: File, filter: (File) -> Boolean = { true }): List<File> {
-    val foundFiles = mutableListOf<File>()
-    directory.walk().forEach {
-        if (it.isFile && it.name.equals("signtool.exe", ignoreCase = true) && filter(it)) {
-            foundFiles.add(it)
-        }
-    }
-    return foundFiles
-}
-
-fun dumpDirectoryTree(directory: File, prefix: String = "") {
-    directory.listFiles()?.forEach {
-        if (it.isDirectory) {
-            println("$prefix${it.name}/")
-            dumpDirectoryTree(it, "$prefix${it.name}/")
-        } else {
-            println("$prefix${it.name}")
-        }
     }
 }

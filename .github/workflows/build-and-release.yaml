@@ -33,9 +33,6 @@ on:
         default: true
         type: boolean
 
-env:
-  AWS_CLI_VERSION: "2.22.35"
-
 jobs:
   # Prepare version, create tag if needed, and determine what to build
   prepare:
@@ -130,15 +127,6 @@ jobs:
       - name: Checkout sources
         uses: actions/checkout@v4
 
-      - name: Setup AWS CLI
-        run: |
-          sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
-          sudo apt-get remove -y awscli
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${{ env.AWS_CLI_VERSION }}.zip" -o "awscliv2.zip"
-          unzip -q awscliv2.zip
-          sudo ./aws/install
-          aws --version
-
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
@@ -172,24 +160,6 @@ jobs:
           path: ${{ github.workspace }}/Simbrain*.zip
           retention-days: 1
 
-      - name: Configure AWS CLI
-        env:
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        run: |
-          aws configure set aws_access_key_id $R2_ACCESS_KEY
-          aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        env:
-          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          for file in $GITHUB_WORKSPACE/Simbrain*.zip; do
-            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
-          done
-
   build-linux-appimage-x64:
     needs: prepare
     if: needs.prepare.outputs.build_linux == 'true'
@@ -198,15 +168,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Setup AWS CLI
-        run: |
-          sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
-          sudo apt-get remove -y awscli || true
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-${{ env.AWS_CLI_VERSION }}.zip" -o "awscliv2.zip"
-          unzip -q awscliv2.zip
-          sudo ./aws/install
-          aws --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -243,24 +204,6 @@ jobs:
           path: ${{ github.workspace }}/Simbrain*.AppImage
           retention-days: 1
 
-      - name: Configure AWS CLI
-        env:
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        run: |
-          aws configure set aws_access_key_id $R2_ACCESS_KEY
-          aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        env:
-          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          for file in $GITHUB_WORKSPACE/Simbrain*.AppImage; do
-            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
-          done
-
   build-linux-appimage-arm64:
     needs: prepare
     if: needs.prepare.outputs.build_linux == 'true'
@@ -269,15 +212,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Setup AWS CLI
-        run: |
-          sudo rm -rf /usr/local/aws-cli /usr/local/bin/aws /usr/local/bin/aws_completer /usr/local/bin/aws-cli /usr/local/bin/aws-cli-plugin
-          sudo apt-get remove -y awscli || true
-          curl "https://awscli.amazonaws.com/awscli-exe-linux-aarch64-${{ env.AWS_CLI_VERSION }}.zip" -o "awscliv2.zip"
-          unzip -q awscliv2.zip
-          sudo ./aws/install
-          aws --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -314,24 +248,6 @@ jobs:
           path: ${{ github.workspace }}/Simbrain*.AppImage
           retention-days: 1
 
-      - name: Configure AWS CLI
-        env:
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        run: |
-          aws configure set aws_access_key_id $R2_ACCESS_KEY
-          aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        env:
-          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          for file in $GITHUB_WORKSPACE/Simbrain*.AppImage; do
-            aws s3 cp "$file" "s3://$CLOUDFLARE_R2_BUCKET/" --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
-          done
-
   build-windows:
     needs: prepare
     if: needs.prepare.outputs.build_windows == 'true'
@@ -345,12 +261,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Setup AWS CLI
-        run: |
-          choco uninstall awscli -y || echo "No existing AWS CLI via Chocolatey"
-          choco install awscli --version=${{ env.AWS_CLI_VERSION }}
-          aws --version
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
@@ -460,25 +370,6 @@ jobs:
           path: build/signed/Simbrain*.msi
           retention-days: 1
 
-      - name: Configure AWS CLI
-        run: |
-          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_access_key_id ${{ secrets.R2_ACCESS_KEY }}
-          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set aws_secret_access_key ${{ secrets.R2_SECRET_KEY }}
-          & "C:\Program Files\Amazon\AWSCLIV2\aws" configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        shell: pwsh
-        run: |
-          $path = 'build\signed'
-          $files = Get-ChildItem -Path $path -Filter 'Simbrain*.msi'
-          if ($files.Count -eq 1) {
-            & "C:\Program Files\Amazon\AWSCLIV2\aws" s3 cp $files[0].FullName s3://${{ secrets.CLOUDFLARE_R2_BUCKET }}/ --endpoint-url=https://${{ secrets.CLOUDFLARE_ACCOUNT_ID }}.r2.cloudflarestorage.com
-          } elseif ($files.Count -eq 0) {
-            Write-Error "No files found matching the pattern 'Simbrain*.msi' in $path"
-          } else {
-            Write-Error "Multiple files found matching the pattern 'Simbrain*.msi' in $path. Only one file is expected."
-          }
-
   build-macos-arm64:
     needs: prepare
     if: needs.prepare.outputs.build_macos_arm64 == 'true'
@@ -488,11 +379,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Setup AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/AWSCLIV2-${{ env.AWS_CLI_VERSION }}.pkg" -o "awscliv2.pkg"
-          sudo installer -pkg awscliv2.pkg -target /
 
       - name: Install Dependencies
         run: |
@@ -563,22 +449,6 @@ jobs:
           path: build/dist/Simbrain*.dmg
           retention-days: 1
 
-      - name: Configure AWS CLI
-        env:
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        run: |
-          aws configure set aws_access_key_id $R2_ACCESS_KEY
-          aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        env:
-          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
-
   build-macos-x64:
     needs: prepare
     if: needs.prepare.outputs.build_macos_x64 == 'true'
@@ -588,11 +458,6 @@ jobs:
     steps:
       - name: Checkout sources
         uses: actions/checkout@v4
-
-      - name: Setup AWS CLI
-        run: |
-          curl "https://awscli.amazonaws.com/AWSCLIV2-${{ env.AWS_CLI_VERSION }}.pkg" -o "awscliv2.pkg"
-          sudo installer -pkg awscliv2.pkg -target /
 
       - name: Install Dependencies
         run: |
@@ -662,22 +527,6 @@ jobs:
           name: macos-x64-artifacts
           path: build/dist/Simbrain*.dmg
           retention-days: 1
-
-      - name: Configure AWS CLI
-        env:
-          R2_ACCESS_KEY: ${{ secrets.R2_ACCESS_KEY }}
-          R2_SECRET_KEY: ${{ secrets.R2_SECRET_KEY }}
-        run: |
-          aws configure set aws_access_key_id $R2_ACCESS_KEY
-          aws configure set aws_secret_access_key $R2_SECRET_KEY
-          aws configure set default.region auto
-
-      - name: Upload to Cloudflare R2
-        env:
-          CLOUDFLARE_R2_BUCKET: ${{ secrets.CLOUDFLARE_R2_BUCKET }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-        run: |
-          aws s3 cp build/dist/Simbrain*.dmg s3://$CLOUDFLARE_R2_BUCKET/ --endpoint-url=https://$CLOUDFLARE_ACCOUNT_ID.r2.cloudflarestorage.com
 
   create-release:
     needs: [prepare, build-linux, build-linux-appimage-x64, build-linux-appimage-arm64, build-windows, build-macos-arm64, build-macos-x64]

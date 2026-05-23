@@ -5,14 +5,11 @@ import java.security.MessageDigest
 import java.time.Duration
 
 /**
- * Main Simbrain build. Many of these functions are called by platform-specific workflow actions in ./github/workflows
+ * Main Simbrain build. Several tasks here are invoked by the platform-specific jobs in
+ * .github/workflows/build-and-release.yaml.
  *
- * To build add relevant bracketed command to commit message (see tops of the .yaml files).  E.g "[push macos]"
- *
- * To build all just use all of them: "[push macos][push windows][push linux]"
- *
- * By default "[push macos]" builds for both silicon and intel. You can also use "[push macos arm64]" and "[push macos x64]"
- *
+ * Releases are produced by running that workflow manually (Actions -> "Build and Release" ->
+ * Run workflow), which takes a version and per-platform build toggles as inputs.
  */
 
 plugins {

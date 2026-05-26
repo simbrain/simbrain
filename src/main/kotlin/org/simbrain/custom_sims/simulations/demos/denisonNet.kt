@@ -16,10 +16,7 @@ import java.awt.BorderLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.JButton
-import javax.swing.JInternalFrame
-import javax.swing.SwingUtilities
-import javax.swing.WindowConstants
+import javax.swing.*
 import kotlin.math.*
 import kotlin.random.Random
 
@@ -553,6 +550,9 @@ val denisonNet = newSim {
             }.also {
                 sweepFrame = it
                 addInternalFrame(it)
+                it.isIcon = false
+                it.toFront()
+                it.isSelected = true
             }
         }
 
@@ -590,13 +590,18 @@ val denisonNet = newSim {
                                 this@progressWindow.text = "Cancelling after current trial..."
                             }
                         }
-                        add(cancelButton, BorderLayout.SOUTH)
+                        val cancelButtonPanel = JPanel(BorderLayout()).apply {
+                            border = BorderFactory.createEmptyBorder(0, 10, 10, 10)
+                            add(cancelButton, BorderLayout.CENTER)
+                        }
+                        add(cancelButtonPanel, BorderLayout.SOUTH)
                         addWindowListener(object : WindowAdapter() {
                             override fun windowClosing(e: WindowEvent) {
                                 cancelRequested.set(true)
                             }
                         })
                         pack()
+                        setLocationRelativeTo(null)
                     }
                 }
                 try {

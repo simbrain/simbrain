@@ -429,6 +429,14 @@ val denisonNet = newSim {
         return stillRunning
     }
 
+    /**
+     * Run one headless trial and return signed correct evidence for the reported target.
+     *
+     * Positive values mean the final decision-node activation points in the target's true direction
+     * (clockwise or counterclockwise), negative values mean it points the wrong way, and larger
+     * positive values indicate stronger correct evidence.
+     *
+     */
     suspend fun runTrialForProxy(cueState: Int, soaValue: Int, targetToReport: Int): Double {
         resetTrial(clearPlots = false, updateDisplay = false, resetWorkspace = false)
         vaState = cueState
@@ -689,7 +697,7 @@ addSidebarInfo(
 
         The paper's main behavioral measure is perceptual sensitivity, or `d'`. A quick way to think about `d'` is "how separable are signal and noise?" If you can reliably tell a real phone buzz from background vibration, spot a faint star against visual noise, or distinguish two similar wines, sensitivity is high. If not, sensitivity is low.
 
-        In this simulation, the analogous question is how strongly the model's final evidence separates clockwise from counterclockwise for the reported target. Strong evidence in the correct direction is like higher sensitivity; weak or ambiguous evidence is like lower sensitivity. This Simbrain model does not compute behavioral `d'` directly, but instead uses a sensitivity proxy based on final correct evidence.
+        In this simulation, the analogous question is how strongly the model's final evidence separates clockwise from counterclockwise for the reported target. Strong evidence in the correct direction is like higher sensitivity; weak or ambiguous evidence is like lower sensitivity. This Simbrain model does not compute behavioral `d'` directly, but instead uses a sensitivity proxy based on signed correct evidence: negative values mean the final evidence points the wrong way, values near zero are ambiguous, and larger positive values mean stronger evidence in the correct direction.
         
         This study allows you to see what the simulations look like and how they unfold moment to moment and how attention and its relation to perception is being modeled. In terms of replicating the main effects from the paper, that is not done in this simulation, though "SOA sweep" does attempt a proxy. Shorter SOAs should make the targets interfere more. Voluntary attention should help the reported target, especially when the cue is valid. The paper emphasizes cueing effects and tradeoffs across time, including larger precueing effects at intermediate SOAs, masking-like improvement for `T1`, and an attentional-blink-like dip for `T2`. As of now we have not investigated which of these if any are evident in the SOA sweep.
 
@@ -711,7 +719,7 @@ addSidebarInfo(
 
         `Reset` cancels any running trial and returns the model to a blank baseline state.
 
-        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition, showing progress in a separate window with a `Cancel` button. When the sweep completes, it opens a `Sensitivity Proxy by SOA` popup. The proxy is the mean correct evidence for the report target: positive values mean the model's final evidence favors the correct clockwise/counterclockwise answer, and larger values mean stronger evidence. This is not `d'`; it is a lightweight way to look for qualitative trends like those shown in Figure 5 in the paper.
+        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition, showing progress in a separate window with a `Cancel` button. When the sweep completes, it opens a `Sensitivity Proxy by SOA` popup. For a clockwise target, positive decision activation counts as correct; for a counterclockwise target, negative decision activation is flipped so it also counts as correct. Larger values in the appropriate direction are stronger correct evidence and thus are a proxy for d'.
 
         Two internal target-specific decisions are made, but only one behavioral report would be requested in the experiment. In this simulation, the two decision nodes are best read as evidence traces for what the model would say if asked about `T1` or `T2`.
 
@@ -765,7 +773,7 @@ addSidebarInfo(
         
         `Behavior`: Compact text at the top of the network shows the current cue, report target, and validity. At the end of a trial, a second line shows the final clockwise/counterclockwise report. The exact randomly selected target orientations are intentionally not shown as text, so the focus stays on the network activity, image display, and evidence traces.
 
-        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open this popup.Compare the valid, neutral, and invalid curves for `T1` and `T2`. The goal is to look for qualitative signatures from the paper, such as voluntary attentional tradeoffs, larger cueing effects at intermediate SOAs, masking-like improvement for `T1`, or an attentional-blink-like dip for `T2`. The current plot is a model evidence proxy, not a direct reproduction of the paper's behavioral `d'` values.
+        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open this popup. Compare the valid, neutral, and invalid curves for `T1` and `T2`. Higher values mean the model's final evidence is farther in the correct direction for the reported target. The goal is to look for qualitative signatures from the paper, such as voluntary attentional tradeoffs, larger cueing effects at intermediate SOAs, masking-like improvement for `T1`, or an attentional-blink-like dip for `T2`. The current plot is a model evidence proxy, not a direct reproduction of the paper's behavioral `d'` values.
 
         ## Experiment
 

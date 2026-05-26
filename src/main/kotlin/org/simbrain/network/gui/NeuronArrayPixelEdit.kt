@@ -1,9 +1,11 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
+import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.nodes.ActivationSequenceNode
 import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.StandardDialog
@@ -64,12 +66,18 @@ fun NetworkPanel.pixelsInGlobalEllipse(ellipse: java.awt.geom.Ellipse2D): Sequen
             yield(PixelTarget.MatrixPixel(wm, r, c))
         }
     }
+    filterScreenElements<ActivationSequenceNode>().forEach { node ->
+        node.collectCellsInGlobalEllipse(ellipse).forEach { (r, c) ->
+            yield(PixelTarget.SequencePixel(node.activationSequence, r, c))
+        }
+    }
 }
 
-/** True if any visible neuron-array or weight-matrix node has a non-empty pixel selection. */
+/** True if any visible neuron-array, weight-matrix, or activation-sequence node has a non-empty pixel selection. */
 fun NetworkPanel.hasAnyPixelSelection(): Boolean =
     filterScreenElements<NeuronArrayNode>().any { it.pixelSelection.isNotEmpty() } ||
-    filterScreenElements<WeightMatrixNode>().any { it.pixelSelection.isNotEmpty() }
+    filterScreenElements<WeightMatrixNode>().any { it.pixelSelection.isNotEmpty() } ||
+    filterScreenElements<ActivationSequenceNode>().any { it.pixelSelection.isNotEmpty() }
 
 /** Drop all pixel selections (e.g. on Escape). */
 fun NetworkPanel.clearAllPixelSelections() {
@@ -77,6 +85,9 @@ fun NetworkPanel.clearAllPixelSelections() {
         if (it.pixelSelection.isNotEmpty()) it.pixelSelection = emptySet()
     }
     filterScreenElements<WeightMatrixNode>().forEach {
+        if (it.pixelSelection.isNotEmpty()) it.pixelSelection = emptySet()
+    }
+    filterScreenElements<ActivationSequenceNode>().forEach {
         if (it.pixelSelection.isNotEmpty()) it.pixelSelection = emptySet()
     }
 }
@@ -93,6 +104,7 @@ fun NetworkPanel.bindPixelSelectionToComponentSelection() {
             when (el) {
                 is NeuronArrayNode -> if (el.pixelSelection.isNotEmpty()) el.pixelSelection = emptySet()
                 is WeightMatrixNode -> if (el.pixelSelection.isNotEmpty()) el.pixelSelection = emptySet()
+                is ActivationSequenceNode -> if (el.pixelSelection.isNotEmpty()) el.pixelSelection = emptySet()
             }
         }
     }
@@ -102,6 +114,7 @@ fun NetworkPanel.bindPixelSelectionToComponentSelection() {
 private fun NetworkPanel.forEachPixel(
     onNeuron: (NeuronArray, Int) -> Unit,
     onWeight: (WeightMatrix, Int, Int) -> Unit,
+    onSequence: (ActivationSequence, Int, Int) -> Unit,
 ) {
     filterScreenElements<NeuronArrayNode>().forEach { node ->
         val sel = node.pixelSelection
@@ -116,26 +129,36 @@ private fun NetworkPanel.forEachPixel(
         sel.forEach { (r, c) -> onWeight(wm, r, c) }
         wm.events.updated.fire()
     }
+    filterScreenElements<ActivationSequenceNode>().forEach { node ->
+        val sel = node.pixelSelection
+        if (sel.isEmpty()) return@forEach
+        sel.forEach { (r, c) -> onSequence(node.activationSequence, r, c) }
+        node.activationSequence.events.updated.fire()
+    }
 }
 
 fun NetworkPanel.incrementSelectedPixels() = forEachPixel(
     onNeuron = { array, idx -> array.activations[idx, 0] = array.activations[idx, 0] + array.increment },
     onWeight = { wm, r, c -> wm.weights[r, c] = wm.weights[r, c] + wm.increment },
+    onSequence = { seq, r, c -> seq.activations[r, c] = seq.activations[r, c] + seq.increment },
 )
 
 fun NetworkPanel.decrementSelectedPixels() = forEachPixel(
     onNeuron = { array, idx -> array.activations[idx, 0] = array.activations[idx, 0] - array.increment },
     onWeight = { wm, r, c -> wm.weights[r, c] = wm.weights[r, c] - wm.increment },
+    onSequence = { seq, r, c -> seq.activations[r, c] = seq.activations[r, c] - seq.increment },
 )
 
 fun NetworkPanel.clearSelectedPixels() = forEachPixel(
     onNeuron = { array, idx -> array.activations[idx, 0] = 0.0 },
     onWeight = { wm, r, c -> wm.weights[r, c] = 0.0 },
+    onSequence = { seq, r, c -> seq.activations[r, c] = 0.0 },
 )
 
 fun NetworkPanel.randomizeSelectedPixels() = forEachPixel(
     onNeuron = { array, idx -> array.activations[idx, 0] = NetworkPreferences.activationRandomizer.sampleDouble() },
     onWeight = { wm, r, c -> wm.weights[r, c] = NetworkPreferences.weightRandomizer.sampleDouble() },
+    onSequence = { seq, r, c -> seq.activations[r, c] = NetworkPreferences.activationRandomizer.sampleDouble() },
 )
 
 /**
@@ -169,6 +192,13 @@ sealed class PixelTarget {
         override fun bounds(): Pair<Double, Double> = -1.0 to 1.0
         override fun fireUpdated() { wm.events.updated.fire() }
     }
+
+    data class SequencePixel(val seq: ActivationSequence, val row: Int, val col: Int) : PixelTarget() {
+        override fun read(): Double = seq.activations[row, col]
+        override fun write(value: Double) { seq.activations[row, col] = value }
+        override fun bounds(): Pair<Double, Double> = seq.updateRule.graphicalBounds.let { it.start to it.endInclusive }
+        override fun fireUpdated() { seq.events.updated.fire() }
+    }
 }
 
 /**
@@ -183,15 +213,17 @@ class PixelValueWrapper(initValue: Double = 0.0) : EditableObject {
 }
 
 /**
- * Build a batch-edit dialog over every pixel currently selected on any visible neuron array or
- * weight matrix. Returns null if nothing is selected.
+ * Build a batch-edit dialog over every pixel currently selected on any visible neuron array,
+ * weight matrix, or activation sequence. Returns null if nothing is selected.
  */
 fun NetworkPanel.createPixelEditDialog(): StandardDialog? {
     data class ArrayEntry(val array: NeuronArray, val idx: Int, val wrapper: PixelValueWrapper)
     data class MatrixEntry(val wm: WeightMatrix, val row: Int, val col: Int, val wrapper: PixelValueWrapper)
+    data class SequenceEntry(val seq: ActivationSequence, val row: Int, val col: Int, val wrapper: PixelValueWrapper)
 
     val arrayEntries = mutableListOf<ArrayEntry>()
     val matrixEntries = mutableListOf<MatrixEntry>()
+    val sequenceEntries = mutableListOf<SequenceEntry>()
 
     filterScreenElements<NeuronArrayNode>().forEach { node ->
         node.pixelSelection.sorted().forEach { idx ->
@@ -204,15 +236,23 @@ fun NetworkPanel.createPixelEditDialog(): StandardDialog? {
             matrixEntries += MatrixEntry(wm, r, c, PixelValueWrapper(wm.weights[r, c]))
         }
     }
+    filterScreenElements<ActivationSequenceNode>().forEach { node ->
+        node.pixelSelection.forEach { (r, c) ->
+            sequenceEntries += SequenceEntry(node.activationSequence, r, c, PixelValueWrapper(node.activationSequence.activations[r, c]))
+        }
+    }
 
-    val wrappers: List<PixelValueWrapper> = arrayEntries.map { it.wrapper } + matrixEntries.map { it.wrapper }
+    val wrappers: List<PixelValueWrapper> =
+        arrayEntries.map { it.wrapper } + matrixEntries.map { it.wrapper } + sequenceEntries.map { it.wrapper }
     if (wrappers.isEmpty()) return null
 
     val title = "Edit ${wrappers.size} pixel${if (wrappers.size != 1) "s" else ""}"
     return wrappers.createEditorDialog(titleName = title) {
         arrayEntries.forEach { it.array.activations[it.idx, 0] = it.wrapper.value }
         matrixEntries.forEach { it.wm.weights[it.row, it.col] = it.wrapper.value }
+        sequenceEntries.forEach { it.seq.activations[it.row, it.col] = it.wrapper.value }
         arrayEntries.map { it.array }.distinct().forEach { it.events.updated.fire() }
         matrixEntries.map { it.wm }.distinct().forEach { it.events.updated.fire() }
+        sequenceEntries.map { it.seq }.distinct().forEach { it.events.updated.fire() }
     }
 }

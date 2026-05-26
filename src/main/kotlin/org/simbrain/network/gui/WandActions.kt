@@ -311,7 +311,7 @@ class AdjustValueAction(
 
     override suspend fun applyToPixel(pixel: PixelTarget, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         val targetMatches = when (target) {
-            is AdjustValueTarget.NeuronActivation -> pixel is PixelTarget.ArrayPixel
+            is AdjustValueTarget.NeuronActivation -> pixel is PixelTarget.ArrayPixel || pixel is PixelTarget.SequencePixel
             is AdjustValueTarget.SynapseStrength -> pixel is PixelTarget.MatrixPixel
         }
         if (!targetMatches) return
@@ -344,6 +344,7 @@ class AdjustValueAction(
                 when (it) {
                     is PixelTarget.ArrayPixel -> it.array
                     is PixelTarget.MatrixPixel -> it.wm
+                    is PixelTarget.SequencePixel -> it.seq
                 }
             }.distinct()
 
@@ -357,6 +358,7 @@ class AdjustValueAction(
                         when (c) {
                             is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
                             is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
+                            is org.simbrain.network.core.ActivationSequence -> c.events.updated.fire()
                         }
                     }
                 },
@@ -368,6 +370,7 @@ class AdjustValueAction(
                         when (c) {
                             is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
                             is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
+                            is org.simbrain.network.core.ActivationSequence -> c.events.updated.fire()
                         }
                     }
                 }

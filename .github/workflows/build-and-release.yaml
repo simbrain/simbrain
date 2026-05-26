@@ -547,10 +547,16 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Download all artifacts
+      # Only pull release-intended artifacts. SignPath input artifacts (windows-unsigned-msi,
+      # windows-unsigned-app-image) are not named with the "-artifacts" suffix, so they are
+      # excluded here -- otherwise the unsigned SignPath-input MSI overwrites the signed one
+      # at release-publish time (alphabetical glob order: windows-artifacts uploads first,
+      # then windows-unsigned-msi overwrites it).
+      - name: Download release artifacts
         uses: actions/download-artifact@v4
         with:
           path: release-artifacts
+          pattern: '*-artifacts'
 
       - name: List artifacts
         run: |

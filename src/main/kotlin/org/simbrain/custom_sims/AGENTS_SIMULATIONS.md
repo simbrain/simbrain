@@ -199,6 +199,8 @@ Standard template and intent:
   Brief explanation of the simulation. Be clear and concise. Length depends on the simulation: paper-based models may need more context; simpler sims may only need a few sentences.
 - `# Simulation Details`
   Technical background and specifics of the simulation. Use `##` subsections when needed.
+- `## Control Panel Settings`
+  Optional subsection for simulations with control panels. Place it near the top of the documentation, usually under `# Simulation Details`, when the controls are important for interpreting or running the simulation. Briefly explain what each setting changes, or point users to tooltips when the UI already explains the controls well.
 - `# What to Do`
   Explain how to run the simulation and what the user should try. Use `##` subsections for demos, experiments, or exploration paths when helpful.
 - `# Links`

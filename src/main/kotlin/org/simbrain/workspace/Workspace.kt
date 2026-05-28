@@ -1,6 +1,8 @@
 package org.simbrain.workspace
 
 import kotlinx.coroutines.*
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import org.pmw.tinylog.Logger
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
@@ -95,6 +97,16 @@ class Workspace: CoroutineScope {
     @Transient
     val updater = WorkspaceUpdater(this)
 
+    /**
+     * Held while a simulation is being constructed (see [org.simbrain.custom_sims.NewSimulation.run]).
+     * Update entry points (run / iterate) wait on this so that iteration cannot begin while the
+     * network and other components are still being assembled, which would otherwise cause
+     * concurrent modification errors (e.g. iterating a neuron's fan-in while synapses are still
+     * being added).
+     */
+    @Transient
+    val simulationBuildLock = Mutex()
+
     @Transient
     val infoDoc = DocViewer()
 
@@ -143,13 +155,22 @@ class Workspace: CoroutineScope {
     }
 
     /**
+     * Suspends until any in-progress simulation build has finished, so that iteration never begins
+     * on a partially constructed workspace.
+     */
+    private suspend fun awaitSimulationBuild() {
+        simulationBuildLock.withLock { }
+    }
+
+    /**
      * Iterates all couplings on all components until halted by user.
      */
     fun run() {
-        for (wc in componentList) {
-            wc.start()
-        }
         launch {
+            awaitSimulationBuild()
+            for (wc in componentList) {
+                wc.start()
+            }
             updater.run()
         }
     }
@@ -172,10 +193,11 @@ class Workspace: CoroutineScope {
      * Note: This method is intended for Java compatibility and does not block the calling thread.
      */
     fun iterateAsync(numIterations: Int) {
-        for (wc in componentList) {
-            wc.start()
-        }
         launch {
+            awaitSimulationBuild()
+            for (wc in componentList) {
+                wc.start()
+            }
             updater.iterate(numIterations)
             stop()
         }
@@ -187,6 +209,7 @@ class Workspace: CoroutineScope {
      * This is the preferred iteration method to use when working in Kotlin coroutine-based environments.
      */
     suspend fun iterateSuspend(numIterations: Int = 1) {
+        awaitSimulationBuild()
         for (wc in componentList) {
             wc.start()
         }
@@ -198,6 +221,7 @@ class Workspace: CoroutineScope {
      * Iterate until the provided predicate is true.
      */
     suspend fun iterateWhile(predicate: () -> Boolean) {
+        awaitSimulationBuild()
         for (wc in componentList) {
             wc.start()
         }

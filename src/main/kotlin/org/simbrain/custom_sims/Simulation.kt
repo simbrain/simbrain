@@ -3,6 +3,7 @@ package org.simbrain.custom_sims
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.sync.withLock
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -65,8 +66,10 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
 
     suspend fun run(desktop: SimbrainDesktop? = null, optionString: String? = null) {
         with(SimulationScope(desktop)) {
-            task(optionString)
-            workspace.simulationId = id
+            workspace.simulationBuildLock.withLock {
+                task(optionString)
+                workspace.simulationId = id
+            }
         }
     }
 
@@ -79,7 +82,9 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
 
     suspend fun reopen(workspace: Workspace, desktop: SimbrainDesktop? = null) {
         with(SimulationScope(desktop)) {
-            reopenFunction(workspace)
+            workspace.simulationBuildLock.withLock {
+                reopenFunction(workspace)
+            }
         }
     }
 }

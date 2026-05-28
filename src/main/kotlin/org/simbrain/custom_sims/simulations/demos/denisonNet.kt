@@ -1,6 +1,5 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.addNeuronCollection
@@ -281,97 +280,102 @@ val denisonNet = newSim {
                 SOA = selectedSOA.state
             }
 
+            suspend fun simulationStep() {
+                if (workspace.time >= (init_t + 1100) / dt) {
+                    workspace.stop()
+                    return
+                }
+
+                s1History.add(sensory1.activations.toDoubleArray())
+                if (s1History.size > maxHist) s1History.removeAt(0)
+
+                if (workspace.time < init_t / dt) {
+                    currentTarget = -1; imageWorld.setFrame(24)
+                } else if (workspace.time < (init_t + 30) / dt) {
+                    currentTarget = T1; imageWorld.setFrame(T1)
+                } else if (workspace.time < (init_t + 30 + SOA) / dt) {
+                    currentTarget = -1; imageWorld.setFrame(24)
+                } else if (workspace.time < (init_t + 60 + SOA) / 2) {
+                    currentTarget = T2; imageWorld.setFrame(T2)
+                } else {
+                    currentTarget = -1; imageWorld.setFrame(24)
+                }
+
+                val T1DecisionText = if (decision.getNeuron(0).activation > 0) "clockwise"
+                                else if (decision.getNeuron(0).activation < 0) "counterclockwise"
+                                else "none"
+                val T2DecisionText = if (decision.getNeuron(1).activation > 0) "clockwise"
+                                else if (decision.getNeuron(1).activation < 0) "counterclockwise"
+                                else "none"
+
+                t1Decision.text = "Current decision: $T1DecisionText"
+                t2Decision.text = "Current decision: $T2DecisionText"
+
+                val newS1 = calculateActivations(Layer.S1)
+                val newS2 = calculateActivations(Layer.S2)
+                val newDecision = calculateActivations(Layer.DECISION)
+                val newVA = calculateActivations(Layer.VA)
+                val newIA = calculateActivations(Layer.IA)
+
+                sensory1.setActivations(newS1)
+                sensory2.setActivations(newS2)
+                decision.setActivations(newDecision)
+                vaLayer.setActivations(newVA)
+                iaLayer.setActivations(newIA)
+            }
+
             workspace.updater.updateManager.clear()
+            workspace.updater.updateManager.addAction(updateAction("Temporal attention step") { simulationStep() })
             workspace.updater.updateManager.addAction(UpdateCoupling(VAPlot))
             workspace.updater.updateManager.addAction(UpdateCoupling(IAPlot))
             workspace.updater.updateManager.addAction(UpdateCoupling(Decision1Plot))
             workspace.updater.updateManager.addAction(UpdateCoupling(Decision2Plot))
 
             addButton("Start") {
-                workspace.launch {
-                    attentionPlot.model.clearData()
-                    decisionPlot.model.clearData()
-                    t1Stimulus.text = ""
-                    t1Decision.text = ""
-                    t2Stimulus.text = ""
-                    t2Decision.text = ""
+                if (workspace.updater.isRunning) return@addButton
 
-                    T1 = Random.nextInt(0, 24)
-                    T2 = Random.nextInt(0, 24)
+                attentionPlot.model.clearData()
+                decisionPlot.model.clearData()
+                t1Stimulus.text = ""
+                t1Decision.text = ""
+                t2Stimulus.text = ""
+                t2Decision.text = ""
 
-                    val T1Direction = if (T1 < 12) "counterclockwise" else "clockwise"
-                    val T2Direction = if (T2 < 12) "counterclockwise" else "clockwise"
-                    val T1Angle = grat_orientations[T1].toDegrees().roundTo(2)
-                    val T2Angle = grat_orientations[T2].toDegrees().roundTo(2)
+                T1 = Random.nextInt(0, 24)
+                T2 = Random.nextInt(0, 24)
 
-                    t1Stimulus.text = "Stimulus (t1): $T1Direction (${T1Angle}°)"
-                    t2Stimulus.text = "Stimulus (t2): $T2Direction (${T2Angle}°)"
+                val T1Direction = if (T1 < 12) "counterclockwise" else "clockwise"
+                val T2Direction = if (T2 < 12) "counterclockwise" else "clockwise"
+                val T1Angle = grat_orientations[T1].toDegrees().roundTo(2)
+                val T2Angle = grat_orientations[T2].toDegrees().roundTo(2)
 
-                    val t_R = 918.0
-                    totalAttention = 1 + min(SOA.toDouble() / t_R, 1.0)
+                t1Stimulus.text = "Stimulus (t1): $T1Direction (${T1Angle}°)"
+                t2Stimulus.text = "Stimulus (t2): $T2Direction (${T2Angle}°)"
 
-                    if (vaState == 0) {
-                        val w_N = 0.28
-                        T1Allocation = w_N * totalAttention
-                        T2Allocation = (1 - w_N) * totalAttention
-                    } else if (vaState == 1) {
-                        T1Allocation = 1.0
-                        T2Allocation = totalAttention - 1.0
-                    } else if (vaState == 2) {
-                        T2Allocation = 1.0
-                        T1Allocation = totalAttention - 1.0
-                    }
+                val t_R = 918.0
+                totalAttention = 1 + min(SOA.toDouble() / t_R, 1.0)
 
-                    decision.setActivations(doubleArrayOf(0.0, 0.0))
-                    sensory1.setActivations(DoubleArray(12) { 0.0 })
-                    sensory2.setActivations(DoubleArray(12) { 0.0 })
-                    vaLayer.setActivations(doubleArrayOf(0.0))
-                    iaLayer.setActivations(doubleArrayOf(0.0))
-                    s1History.clear()
-
-                    workspace.resetTime()
-
-                    while (workspace.time < (init_t + 1100) / dt) {
-                        s1History.add(sensory1.activations.toDoubleArray())
-                        if (s1History.size > maxHist) s1History.removeAt(0)
-
-                        if (workspace.time < init_t / dt) {
-                            currentTarget = -1; imageWorld.setFrame(24)
-                        } else if (workspace.time < (init_t + 30) / dt) {
-                            currentTarget = T1; imageWorld.setFrame(T1)
-                        } else if (workspace.time < (init_t + 30 + SOA) / dt) {
-                            currentTarget = -1; imageWorld.setFrame(24)
-                        } else if (workspace.time < (init_t + 60 + SOA) / 2) {
-                            currentTarget = T2; imageWorld.setFrame(T2)
-                        } else {
-                            currentTarget = -1; imageWorld.setFrame(24)
-                        }
-
-                        val T1DecisionText = if (decision.getNeuron(0).activation > 0) "clockwise" 
-                                        else if (decision.getNeuron(0).activation < 0) "counterclockwise"
-                                        else "none"
-                        val T2DecisionText = if (decision.getNeuron(1).activation > 0) "clockwise"
-                                        else if (decision.getNeuron(1).activation < 0) "counterclockwise"
-                                        else "none"
-
-                        t1Decision.text = "Current decision: $T1DecisionText"
-                        t2Decision.text = "Current decision: $T2DecisionText"
-
-                        val newS1 = calculateActivations(Layer.S1)
-                        val newS2 = calculateActivations(Layer.S2)
-                        val newDecision = calculateActivations(Layer.DECISION)
-                        val newVA = calculateActivations(Layer.VA)
-                        val newIA = calculateActivations(Layer.IA)
-
-                        sensory1.setActivations(newS1)
-                        sensory2.setActivations(newS2)
-                        decision.setActivations(newDecision)
-                        vaLayer.setActivations(newVA)
-                        iaLayer.setActivations(newIA)
-
-                        workspace.iterateSuspend()
-                    }
+                if (vaState == 0) {
+                    val w_N = 0.28
+                    T1Allocation = w_N * totalAttention
+                    T2Allocation = (1 - w_N) * totalAttention
+                } else if (vaState == 1) {
+                    T1Allocation = 1.0
+                    T2Allocation = totalAttention - 1.0
+                } else if (vaState == 2) {
+                    T2Allocation = 1.0
+                    T1Allocation = totalAttention - 1.0
                 }
+
+                decision.setActivations(doubleArrayOf(0.0, 0.0))
+                sensory1.setActivations(DoubleArray(12) { 0.0 })
+                sensory2.setActivations(DoubleArray(12) { 0.0 })
+                vaLayer.setActivations(doubleArrayOf(0.0))
+                iaLayer.setActivations(doubleArrayOf(0.0))
+                s1History.clear()
+
+                workspace.resetTime()
+                workspace.run()
             }
         }
     }

@@ -46,9 +46,15 @@ object Clipboard {
         val supervisedModelNeurons = supervisedModelLayers.filterIsInstance<NeuronCollection>().flatMap { it.neuronList }.toMutableSet()
         val supervisedModelSynapses = supervisedModelSynapseGroups.flatMap { it.synapses }.toMutableSet()
 
+        // a subnetwork copies its own children, so don't copy them again as free models
+        val subnetworkChildren = objects.filterIsInstance<Subnetwork>().flatMap { it.modelList.all }.toMutableSet()
+        val subnetworkNeurons = subnetworkChildren.filterIsInstance<NeuronCollection>().flatMap { it.neuronList }.toMutableSet()
+        val subnetworkSynapses = subnetworkChildren.filterIsInstance<SynapseGroup>().flatMap { it.synapses }.toMutableSet()
+
         val collectionObjects = collectionNeurons + collectionSynapses +
                 supervisedModelWeightMatrices + supervisedModelSynapseGroups +
-                supervisedModelLayers + supervisedModelNeurons + supervisedModelSynapses
+                supervisedModelLayers + supervisedModelNeurons + supervisedModelSynapses +
+                subnetworkChildren + subnetworkNeurons + subnetworkSynapses
 
         copiedObjects = objects
             .filter { it !in collectionObjects }

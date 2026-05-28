@@ -89,6 +89,13 @@ class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, tru
         this@ControlPanelKt.add(BorderLayout.CENTER, this)
     }
 
+    override fun removeNotify() {
+        super.removeNotify()
+        // Cancel pending button actions when the panel is removed (e.g. when the workspace is cleared) so they
+        // do not outlive the simulation and pop up dialogs over a different one.
+        job.cancel()
+    }
+
     val tabbedPane by lazy {
         JTabbedPane()
     }

@@ -1,5 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.FixedDegree
 import org.simbrain.network.core.Network
@@ -97,7 +99,7 @@ val binaryReservoir = newSim {
     }
     setVariance(variance)
 
-    fun perturbAndRunNetwork(network: Network) {
+    suspend fun perturbAndRunNetwork(network: Network) {
 
         println("Variance: ${variance}")
 
@@ -106,13 +108,19 @@ val binaryReservoir = newSim {
         activations.clear()
 
         // Baseline window
-        repeat(baseIterations) { network.update() }
+        repeat(baseIterations) {
+            currentCoroutineContext().ensureActive()
+            network.update()
+        }
 
         // Perturb nodes
         resNeurons.take(numNodesToPerturb).forEach { n -> n.addInputValue(1.0) }
 
         // Response window
-        repeat(responseIterations) { network.update() }
+        repeat(responseIterations) {
+            currentCoroutineContext().ensureActive()
+            network.update()
+        }
     }
 
     network.addUpdateAction(updateAction("Record activations") {
@@ -138,6 +146,7 @@ val binaryReservoir = newSim {
             }
             addButton("Run one trial") {
                 perturbAndRunNetwork(network)
+                currentCoroutineContext().ensureActive()
                 showSaveDialog("", "activations.csv") {
                     writeText(activations.toCsvString())
                 }

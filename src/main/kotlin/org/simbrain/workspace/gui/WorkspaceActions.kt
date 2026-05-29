@@ -155,7 +155,7 @@ class WorkspaceActions {
         description = "Open workspace coupling manager.",
         coroutineScope = workspace
     ) {
-        DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
+        DesktopCouplingManager(SimbrainDesktop).displayInDialog(title = "Couplings") {  }
     }
 
     val openCouplingListAction = desktopPane.createAction(

@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
+import org.simbrain.util.Theme;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 
@@ -51,11 +52,11 @@ public class AttributeTypePanel extends JPanel {
 
     private void addAttributeTypesToModel(WorkspaceComponent component, ProducerOrConsumer poc) {
         if (poc == ProducerOrConsumer.Consuming) {
-            setBorder(BorderFactory.createTitledBorder("Consumers in " + component.getName()));
+            setBorder(Theme.sectionBorder("Consumers in " + component.getName()));
             component.getWorkspace().getCouplingManager().getConsumerMethods(component)
                     .forEach(model::addRow);
         } else {
-            setBorder(BorderFactory.createTitledBorder("Producers in " + component.getName()));
+            setBorder(Theme.sectionBorder("Producers in " + component.getName()));
             component.getWorkspace().getCouplingManager().getProducerMethods(component)
                     .forEach(model::addRow);
         }

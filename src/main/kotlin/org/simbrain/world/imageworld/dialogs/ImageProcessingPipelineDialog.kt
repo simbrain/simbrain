@@ -1,6 +1,7 @@
 package org.simbrain.world.imageworld.dialogs
 
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Theme
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.filters.*
@@ -86,7 +87,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createNamePanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        panel.border = BorderFactory.createTitledBorder("Pipeline Settings")
+        panel.border = Theme.sectionBorder("Pipeline Settings")
 
         panel.add(JLabel("Name:"))
         
@@ -127,7 +128,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createAvailableOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createTitledBorder("Available Operations")
+        panel.border = Theme.sectionBorder("Available Operations")
 
         // Configure available operations list
         availableOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION
@@ -166,7 +167,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createActiveOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createTitledBorder("Pipeline Operations")
+        panel.border = Theme.sectionBorder("Pipeline Operations")
 
         // Configure active operations list
         activeOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION

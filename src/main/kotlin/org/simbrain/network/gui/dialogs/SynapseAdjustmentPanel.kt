@@ -8,6 +8,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.LabelledItemPanel
+import org.simbrain.util.Theme
 import org.simbrain.util.complement
 import org.simbrain.util.createApplyPanel
 import org.simbrain.util.displayInDialog
@@ -115,7 +116,7 @@ class SynapseAdjustmentPanel(
 
         layout = GridBagLayout()
         val synTypePanel = JPanel().apply {
-            border = BorderFactory.createTitledBorder("Synapse" + " Stats")
+            border = Theme.sectionBorder("Synapse Stats")
             layout = GridLayout(3, 2)
             add(numSynsLabel)
             add(meanLabel)

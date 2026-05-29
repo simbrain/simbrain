@@ -5,6 +5,7 @@ import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.Theme
 import org.simbrain.util.format
 import org.simbrain.util.getColorGradient
 import java.awt.BasicStroke
@@ -180,6 +181,6 @@ const val TEXT_VISIBILITY_THRESHOLD = 0.5
 
 const val NEURON_DIAMETER = 24
 
-val NEURON_FONT = Font("Arial", Font.PLAIN, 11)
+val NEURON_FONT: Font get() = Theme.body
 
-val NEURON_FONT_BOLD = Font("Arial", Font.BOLD, 11)
+val NEURON_FONT_BOLD: Font get() = Theme.bodyBold

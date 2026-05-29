@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui
 
 import bsh.Interpreter
 import bsh.util.JConsole
+import com.formdev.flatlaf.FlatLightLaf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -41,6 +42,23 @@ import javax.swing.event.*
  * @author Jeff Yoshimi
  */
 object SimbrainDesktop {
+
+    init {
+        try {
+            if (Utils.isMacOSX()) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true")
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
+                System.setProperty("apple.awt.application.name", "Simbrain")
+            }
+            if (Utils.isLinux()) {
+                UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
+            }
+            FlatLightLaf.setup()
+            UIManager.put("Button.minimumWidth", 80)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+    }
 
     val workspace = Workspace()
 
@@ -591,19 +609,19 @@ object SimbrainDesktop {
         infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
 
         val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
-        titleLabel.font = Font("SansSerif", Font.BOLD, 18)
+        titleLabel.font = Theme.font(18, Font.BOLD)
         titleLabel.alignmentX = Component.CENTER_ALIGNMENT
 
         val versionLabel = JLabel(BuildInfo.fullVersionString)
-        versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
+        versionLabel.font = Theme.font(14)
         versionLabel.alignmentX = Component.CENTER_ALIGNMENT
-        
+
         // Add build info if available
         val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
             JLabel("Commit: ${BuildInfo.commitSha}").apply {
-                font = Font("SansSerif", Font.PLAIN, 12)
+                font = Theme.font(12)
                 alignmentX = Component.CENTER_ALIGNMENT
-                foreground = Color.GRAY
+                foreground = Theme.mutedText
             }
         } else null
 
@@ -1286,24 +1304,6 @@ object SimbrainDesktop {
      */
     @JvmStatic
     fun main(args: Array<String>) {
-        try {
-            // Set macOS-specific properties for menu bar
-            if (Utils.isMacOSX()) {
-                System.setProperty("apple.laf.useScreenMenuBar", "true")
-                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
-                System.setProperty("apple.awt.application.name", "Simbrain")
-            }
-            
-            // Line below for Ubuntu so that icons don't turn on by default
-            // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
-            if (Utils.isLinux()) {
-                UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
-            }
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
         SwingUtilities.invokeLater { createAndShowGUI() }
     }
 }

@@ -4,6 +4,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.WeightInitializationStrategy
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
+import org.simbrain.util.Theme
 import org.simbrain.util.createApplyPanel
 import org.simbrain.util.flatten
 import org.simbrain.util.math.SimbrainMath
@@ -49,7 +50,7 @@ class WeightMatrixAdjustmentPanel(
 
         layout = GridBagLayout()
         val statsInfoPanel = JPanel().apply {
-            border = BorderFactory.createTitledBorder("Weight Matrix Stats")
+            border = Theme.sectionBorder("Weight Matrix Stats")
             layout = GridLayout(3, 2)
             add(shapeLabel)
             add(meanLabel)

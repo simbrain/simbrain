@@ -54,7 +54,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      * @param attributeType
      */
     public AttributePanel(Workspace workspace, ProducerOrConsumer attributeType) {
-        super(new BorderLayout());
+        super(new BorderLayout(0, org.simbrain.util.Theme.componentGap));
         this.producerOrConsumer = attributeType;
 
         // Set up attribute lists

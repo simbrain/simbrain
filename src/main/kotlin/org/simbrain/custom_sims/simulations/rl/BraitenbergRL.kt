@@ -160,11 +160,11 @@ private class BraitenbergWeightSpacePanel(
         g2.stroke = BasicStroke(1.5f)
         g2.drawRect(x, y, size, size)
 
-        g2.font = font.deriveFont(Font.BOLD, 14f)
+        g2.font = Theme.heading
         drawCenteredString(g2, space.label, x + size / 2, y - 12)
 
-        g2.font = font.deriveFont(Font.PLAIN, 11f)
-        g2.color = Color(85, 85, 85)
+        g2.font = Theme.body
+        g2.color = Theme.mutedText
         g2.drawString("left weight", x + size / 2 - 28, y + size + 28)
         g2.rotate(-Math.PI / 2, (x - 26).toDouble(), (y + size / 2).toDouble())
         drawCenteredString(g2, "right weight", x - 26, y + size / 2)

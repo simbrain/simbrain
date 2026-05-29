@@ -2,9 +2,10 @@ package org.simbrain.network.gui.dialogs.text;
 
 import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Theme;
 
 import javax.swing.*;
-import javax.swing.border.TitledBorder;
+import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -166,7 +167,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      */
     public void init() {
         super.setTitle("Font Chooser");
-        TitledBorder panelBorder = new TitledBorder("Sample");
+        Border panelBorder = Theme.sectionBorder("Sample");
         fList.setSelectionMode(0);
         stList.setSelectionMode(0);
         sizeList.setSelectionMode(0);

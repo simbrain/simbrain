@@ -367,7 +367,7 @@ const val NUMERIC_OVERLAY_MIN_CELL_SIZE = 25.0
  * Compute the largest font size whose worst-case [refString] fits within [targetWidth] x [targetHeight].
  */
 fun computeCellFont(targetWidth: Double, targetHeight: Double, refString: String, frc: FontRenderContext): Font {
-    val baseFont = Font("SansSerif", Font.PLAIN, 12)
+    val baseFont = Theme.font(12)
     val refLayout = TextLayout(refString, baseFont, frc)
     val scaleByWidth = if (refLayout.bounds.width > 0) targetWidth / refLayout.bounds.width else 1.0
     val scaleByHeight = if (refLayout.bounds.height > 0) targetHeight / refLayout.bounds.height else 1.0

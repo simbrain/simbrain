@@ -58,7 +58,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         })
     }
     private val channelLabel = PText("").apply {
-        font = Font("Arial", Font.PLAIN, 10)
+        font = Theme.label
         mainNode.addChild(this)
     }
 

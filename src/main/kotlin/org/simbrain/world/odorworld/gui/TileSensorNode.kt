@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.gui
 
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.simbrain.util.Theme
 import org.simbrain.util.Utils
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -39,7 +40,7 @@ class TileSensorNode(override val sensor: TileSensor) : EntityAttributeNode(), N
         addChild(shape)
         labelText = PText()
         labelText.pickable = false
-        labelText.font = labelText.font.deriveFont(9.0f)
+        labelText.font = Theme.small
         updateLabel()
         shape.addChild(labelText)
         drawDispersionCircleAround(shape)

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -146,7 +147,7 @@ class WandPalettePanel(
 
             // Description label with tooltip for long descriptions
             val descLabel = JLabel(action.description).apply {
-                font = font.deriveFont(12f)
+                font = Theme.font(12)
                 toolTipText = action.description
             }
             add(descLabel, BorderLayout.CENTER)
@@ -317,7 +318,7 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         // Draw letter in center
         val displayLetter = letter.firstOrNull()?.toString() ?: ""
         g2.color = Color(0, 0, 0, 200)
-        g2.font = Font(Font.SANS_SERIF, Font.BOLD, (size * 0.5).toInt())
+        g2.font = Theme.font((size * 0.5).toInt(), Font.BOLD)
         val fm = g2.fontMetrics
         val textX = (size - fm.stringWidth(displayLetter)) / 2
         val textY = (size - fm.height) / 2 + fm.ascent
@@ -464,7 +465,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""
 
             g2.color = Color.DARK_GRAY
-            g2.font = Font(Font.SANS_SERIF, Font.BOLD, (size * 0.6).toInt())
+            g2.font = Theme.font((size * 0.6).toInt(), Font.BOLD)
             val fm = g2.fontMetrics
             val textX = x + (size - fm.stringWidth(displayLetter)) / 2
             val textY = y + (size - fm.height) / 2 + fm.ascent

@@ -2,15 +2,13 @@ package org.simbrain.util.geneticalgorithm
 
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
+import org.simbrain.util.Theme
 import org.simbrain.util.format
 import java.awt.*
-import java.awt.geom.RoundRectangle2D
 import javax.swing.BoxLayout
 import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
-import javax.swing.border.AbstractBorder
-import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
 import kotlin.reflect.KProperty1
 
@@ -203,44 +201,6 @@ class GeneDisplayBuilder(
 }
 
 /**
- * Rounded border used for each gene card.
- */
-private class RoundedBorder(
-    private val radius: Int,
-    private val borderColor: Color,
-    private val fillColor: Color?
-) : AbstractBorder() {
-
-    override fun paintBorder(c: Component, g: Graphics, x: Int, y: Int, w: Int, h: Int) {
-        val g2 = g.create() as Graphics2D
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-        val shape = RoundRectangle2D.Float(
-            x + 0.5f, y + 0.5f, w - 1f, h - 1f, radius.toFloat(), radius.toFloat()
-        )
-        if (fillColor != null) {
-            g2.color = fillColor
-            g2.fill(shape)
-        }
-        g2.color = borderColor
-        g2.draw(shape)
-        g2.dispose()
-    }
-
-    override fun getBorderInsets(c: Component) = Insets(radius / 2, radius / 2, radius / 2, radius / 2)
-
-    override fun isBorderOpaque() = false
-}
-
-private val LABEL_COLOR = Color(100, 100, 100)
-private val VALUE_FONT = Font("SansSerif", Font.BOLD, 11)
-private val LABEL_FONT = Font("SansSerif", Font.PLAIN, 10)
-private val TYPE_FONT = Font("SansSerif", Font.ITALIC, 9)
-private val SECTION_FONT = Font("SansSerif", Font.BOLD, 12)
-private val TITLE_FONT = Font("SansSerif", Font.BOLD, 14)
-private val CARD_BORDER_COLOR = Color(180, 180, 180)
-private val CARD_BG = Color(250, 250, 250)
-
-/**
  * Swing panel that renders chromosome sections as labeled rows of gene cards.
  */
 class GeneDisplayPanel(
@@ -322,14 +282,14 @@ class GeneDisplayPanel(
     private fun buildTitlePanel(): JPanel {
         return JPanel(FlowLayout(FlowLayout.LEFT, 8, 0)).apply {
             isOpaque = false
-            add(JLabel("Genome").apply { font = TITLE_FONT })
+            add(JLabel("Genome").apply { font = Theme.heading })
             metadata?.let { meta ->
-                add(JLabel("Genome ${meta.id}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                add(JLabel("Genome ${meta.id}").apply { font = Theme.label; foreground = Theme.mutedText })
                 meta.parentId?.let { pid ->
-                    add(JLabel("Parent $pid").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
+                    add(JLabel("Parent $pid").apply { font = Theme.label; foreground = Theme.mutedText })
                 }
-                add(JLabel("Generation ${meta.generation}").apply { font = LABEL_FONT; foreground = LABEL_COLOR })
-                add(JLabel("$metricLabel ${meta.fitness.format(4)}").apply { font = VALUE_FONT })
+                add(JLabel("Generation ${meta.generation}").apply { font = Theme.label; foreground = Theme.mutedText })
+                add(JLabel("$metricLabel ${meta.fitness.format(4)}").apply { font = Theme.bodyBold })
             }
         }
     }
@@ -339,12 +299,12 @@ class GeneDisplayPanel(
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
             isOpaque = false
             add(JLabel(section.label).apply {
-                font = SECTION_FONT
+                font = Theme.section
                 alignmentX = RIGHT_ALIGNMENT
             })
             add(JLabel(section.typeName).apply {
-                font = TYPE_FONT
-                foreground = LABEL_COLOR
+                font = Theme.type
+                foreground = Theme.mutedText
                 alignmentX = RIGHT_ALIGNMENT
             })
         }
@@ -360,8 +320,8 @@ class GeneDisplayPanel(
 
         if (section.genes.isEmpty() || fields.isEmpty()) {
             panel.add(JLabel("(empty)").apply {
-                font = LABEL_FONT
-                foreground = LABEL_COLOR
+                font = Theme.label
+                foreground = Theme.mutedText
             })
             return panel
         }
@@ -376,10 +336,7 @@ class GeneDisplayPanel(
     private fun <G : Gene<*, *>> buildCard(gene: G, fields: List<GeneField<G>>): JPanel {
         val card = JPanel().apply {
             layout = BoxLayout(this, BoxLayout.Y_AXIS)
-            border = CompoundBorder(
-                RoundedBorder(8, CARD_BORDER_COLOR, CARD_BG),
-                EmptyBorder(4, 8, 4, 8)
-            )
+            border = Theme.roundedCard(radius = 8, padding = 8)
             isOpaque = false
         }
 
@@ -387,11 +344,11 @@ class GeneDisplayPanel(
             val value = field.getValue(gene)
             val line = JPanel(FlowLayout(FlowLayout.LEFT, 3, 0)).apply { isOpaque = false }
             line.add(JLabel(field.label).apply {
-                font = LABEL_FONT
-                foreground = LABEL_COLOR
+                font = Theme.label
+                foreground = Theme.mutedText
             })
             line.add(JLabel(value).apply {
-                font = VALUE_FONT
+                font = Theme.bodyBold
             })
             card.add(line)
         }

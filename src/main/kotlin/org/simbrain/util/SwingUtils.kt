@@ -648,3 +648,40 @@ fun Container.onWindowClose(block: (evt: PropertyChangeEvent) -> Unit) {
 fun Container.onWindowClose(block: Runnable) = onWindowClose {
     block.run()
 }
+
+/**
+ * Apply the standard outer padding ([Theme.dialogBorder]) to a panel.
+ * If the panel already has a border, the dialog padding wraps around it.
+ */
+fun JComponent.applyDialogPadding() {
+    border = border?.let { javax.swing.border.CompoundBorder(Theme.dialogBorder(), it) }
+        ?: Theme.dialogBorder()
+}
+
+/**
+ * Horizontal row of components with [Theme.componentGap] between them.
+ * Defaults to left-aligned; pass `align = FlowLayout.RIGHT` for a trailing row (e.g. OK/Cancel).
+ */
+@JvmOverloads
+fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: Int = Theme.componentGap): JPanel {
+    val panel = JPanel(FlowLayout(align, gap, 0))
+    panel.isOpaque = false
+    for (c in components) panel.add(c)
+    return panel
+}
+
+/**
+ * Vertical stack of components separated by [gap] pixels (default [Theme.sectionGap]).
+ * Each row is centered horizontally; for explicit alignment use a custom layout.
+ */
+@JvmOverloads
+fun verticalStack(vararg components: Component, gap: Int = Theme.sectionGap): JPanel {
+    val panel = JPanel()
+    panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
+    panel.isOpaque = false
+    for ((i, c) in components.withIndex()) {
+        if (i > 0) panel.add(Box.createVerticalStrut(gap))
+        panel.add(c)
+    }
+    return panel
+}

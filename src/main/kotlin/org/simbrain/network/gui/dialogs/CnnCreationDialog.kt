@@ -8,6 +8,7 @@ import org.simbrain.network.gui.PoolLayerTemplate
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Theme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.toDisplayText
@@ -101,7 +102,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Tensor layers section
         val tensorSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
-            border = BorderFactory.createTitledBorder("Tensor Layers (Conv / Pool)")
+            border = Theme.sectionBorder("Tensor Layers (Conv / Pool)")
         }
         val tensorScrollPane = JScrollPane(tensorLayerListPanel).apply {
             border = null
@@ -126,7 +127,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Dense layers section
         val denseSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
-            border = BorderFactory.createTitledBorder("Dense Layers")
+            border = Theme.sectionBorder("Dense Layers")
         }
         val denseScrollPane = JScrollPane(denseLayerListPanel).apply {
             border = null

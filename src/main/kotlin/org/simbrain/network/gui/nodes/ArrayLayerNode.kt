@@ -23,7 +23,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     protected val CLAMPED_STROKE = BasicStroke(2f)
 
-    protected val INFO_FONT = Font("Arial", Font.PLAIN, 8)
+    protected val INFO_FONT: Font get() = Theme.tiny
 
     /**
      * Margin around main box in pixels. Override to specify further.

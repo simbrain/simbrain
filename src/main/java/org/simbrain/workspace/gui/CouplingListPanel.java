@@ -64,7 +64,7 @@ public class CouplingListPanel extends JPanel {
      * @param couplingList list of couplings to be shown in window
      */
     public CouplingListPanel(SimbrainDesktop desktop, Collection<Coupling> couplingList) {
-        super(new BorderLayout());
+        super(new BorderLayout(0, org.simbrain.util.Theme.componentGap));
 
         // Reference to the simbrain desktop
         this.desktop = desktop;

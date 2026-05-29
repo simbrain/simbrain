@@ -6,6 +6,7 @@ import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.util.Theme
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
 import org.simbrain.util.toRadian
@@ -20,7 +21,6 @@ import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.BasicStroke
 import java.awt.Color
-import java.awt.Font
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
@@ -139,7 +139,7 @@ class EntityNode(
             if (info.collided) lines.add("COLLIDED" to Color(255, 120, 120))
             if (entity.wasStuckLastTick) lines.add("STUCK (no progress)" to Color(255, 120, 120))
 
-            g.font = Font("SansSerif", Font.PLAIN, 9)
+            g.font = Theme.small
             val fm = g.fontMetrics
             var ty = entity.height / 2 + fm.ascent + 2
             for ((text, color) in lines) {

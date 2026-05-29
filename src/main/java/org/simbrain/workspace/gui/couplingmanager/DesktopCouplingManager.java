@@ -2,6 +2,8 @@ package org.simbrain.workspace.gui.couplingmanager;
 
 import kotlin.Pair;
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.SwingUtilsKt;
+import org.simbrain.util.Theme;
 import org.simbrain.util.widgets.ShowHelpAction;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
@@ -58,28 +60,25 @@ public class DesktopCouplingManager extends JPanel {
      * @param desktop reference to parent desktop
      */
     public DesktopCouplingManager(final SimbrainDesktop desktop) {
-        super(new BorderLayout());
+        super(new BorderLayout(Theme.componentGap, Theme.sectionGap));
+        SwingUtilsKt.applyDialogPadding(this);
         this.desktop = desktop;
         isVisible = true;
 
         // Left Panel
-        Border leftBorder = BorderFactory.createTitledBorder("Producers");
         producerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Producing);
-        producerPanel.setBorder(leftBorder);
+        producerPanel.setBorder(Theme.sectionBorder("Producers"));
 
         // Right Panel
-        Border rightBorder = BorderFactory.createTitledBorder("Consumers");
         consumerPanel = new AttributePanel(desktop.getWorkspace(), ProducerOrConsumer.Consuming);
-        consumerPanel.setBorder(rightBorder);
+        consumerPanel.setBorder(Theme.sectionBorder("Consumers"));
 
-        // Legend Panel
-        JPanel legend = new JPanel(new FlowLayout(FlowLayout.LEFT));
-
+        // Legend
+        JPanel legend = new JPanel(new FlowLayout(FlowLayout.LEFT, Theme.componentGap, 0));
         var bluePairs = makeLegend("Text", String.class);
         var greenPairs = makeLegend("Array", double[].class);
         var orangePairs = makeLegend("Matrix", Matrix.class);
         var blackPairs = makeLegend("Number", double.class);
-
         legend.add(bluePairs.getFirst());
         legend.add(bluePairs.getSecond());
         legend.add(greenPairs.getFirst());
@@ -89,46 +88,45 @@ public class DesktopCouplingManager extends JPanel {
         legend.add(blackPairs.getFirst());
         legend.add(blackPairs.getSecond());
 
-        // Bottom Panel
-        JPanel bottomPanel = new JPanel();
-        bottomPanel.setLayout(new BoxLayout(bottomPanel, BoxLayout.X_AXIS));
-
-        bottomPanel.add(legend);
-        bottomPanel.add(Box.createHorizontalGlue());
-        bottomPanel.add(new JButton(new ShowHelpAction("https://docs.simbrain.net/docs/workspace/couplings.html")));
-        bottomPanel.add(couplingMethodComboBox);
-
+        // Bottom controls (trailing)
+        JButton helpButton = new JButton(new ShowHelpAction("https://docs.simbrain.net/docs/workspace/couplings.html"));
         JButton addCouplingsButton = new JButton("Add Coupling(s)");
         addCouplingsButton.setToolTipText("Create couplings from currently selected producers and consumers");
         addCouplingsButton.setIcon(ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addCouplingsButton.setActionCommand("addCouplings");
-        addCouplingsButton.addActionListener((e) -> {
-            addCouplings();
-        });
-        bottomPanel.add(addCouplingsButton);
+        addCouplingsButton.addActionListener((e) -> addCouplings());
+
+        JPanel trailingControls = SwingUtilsKt.buttonRow(
+            new Component[]{helpButton, couplingMethodComboBox, addCouplingsButton},
+            FlowLayout.RIGHT,
+            Theme.componentGap
+        );
+
+        JPanel bottomPanel = new JPanel(new BorderLayout(Theme.componentGap, 0));
+        bottomPanel.add(legend, BorderLayout.WEST);
+        bottomPanel.add(trailingControls, BorderLayout.EAST);
 
         // Center panel with couplings
         JComponent couplingList = new CouplingListPanel(desktop, desktop.getWorkspace().getCouplings());
-        couplingList.setBorder(BorderFactory.createTitledBorder("Couplings"));
+        couplingList.setBorder(Theme.sectionBorder("Couplings"));
 
         // Main Panel
-        JPanel centerPanel = new JPanel(new GridLayout(1, 3, 10, 10));
+        JPanel centerPanel = new JPanel(new GridLayout(1, 3, Theme.sectionGap, Theme.sectionGap));
         centerPanel.add(producerPanel);
         centerPanel.add(couplingList);
         centerPanel.add(consumerPanel);
         centerPanel.setPreferredSize(new Dimension(800, 400));
-        this.add("Center", centerPanel);
-        this.add("South", bottomPanel);
+        this.add(centerPanel, BorderLayout.CENTER);
+        this.add(bottomPanel, BorderLayout.SOUTH);
     }
 
     private Pair<JLabel, JPanel> makeLegend(String label, Type dataType) {
-        final int dimensions = 20;
-        JLabel colorLabel = new JLabel();
+        final int dimensions = 10;
+        JLabel colorLabel = new JLabel(label);
+        colorLabel.setForeground(getColor(dataType));
         JPanel colorBox = new JPanel();
         colorBox.setBackground(getColor(dataType));
-        colorBox.setSize(dimensions, dimensions);
-        colorLabel.setText(label);
-        colorLabel.setForeground(getColor(dataType));
+        colorBox.setPreferredSize(new Dimension(dimensions, dimensions));
         return new Pair<>(colorLabel, colorBox);
     }
 

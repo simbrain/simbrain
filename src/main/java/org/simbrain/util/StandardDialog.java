@@ -62,11 +62,6 @@ public class StandardDialog extends GenericJDialog {
     private JButton cancelButton;
 
     /**
-     * The spacing between components in pixels.
-     */
-    private static final int COMPONENT_SPACING = 10;
-
-    /**
      * Flag indicating if the "Cancel" button was pressed to close dialog.
      */
     private boolean myIsDialogCancelled = true;
@@ -143,9 +138,9 @@ public class StandardDialog extends GenericJDialog {
         // and the standard button panel
         JPanel internalContentPane = new JPanel();
 
-        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
+        internalContentPane.setLayout(new BorderLayout(0, Theme.sectionGap));
 
-        internalContentPane.setBorder(BorderFactory.createEmptyBorder(COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING));
+        internalContentPane.setBorder(Theme.dialogBorder());
 
         // Create the standard "Ok" Button
         Action okAction = new AbstractAction("OK") {
@@ -166,15 +161,22 @@ public class StandardDialog extends GenericJDialog {
             }
         };
 
-        JPanel buttonPanel = new JPanel();
-
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
         okButton = new JButton(okAction);
-        buttonPanel.add(customButtonPanel);
-        buttonPanel.add(okButton);
+        okButton.setMnemonic('O');
         cancelButton = new JButton(cancelAction);
-        buttonPanel.add(cancelButton);
+        cancelButton.setMnemonic('C');
+
+        // Subclass-supplied buttons (e.g. Help) sit on the left; OK/Cancel are
+        // right-aligned, the platform-conventional placement.
+        customButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, Theme.componentGap, 0));
+
+        JPanel okCancelPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, Theme.componentGap, 0));
+        okCancelPanel.add(okButton);
+        okCancelPanel.add(cancelButton);
+
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(customButtonPanel, BorderLayout.WEST);
+        buttonPanel.add(okCancelPanel, BorderLayout.EAST);
 
         getRootPane().setDefaultButton(okButton);
 

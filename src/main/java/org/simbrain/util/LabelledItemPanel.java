@@ -1,15 +1,21 @@
 package org.simbrain.util;
 
+import com.formdev.flatlaf.util.UIScale;
+import net.miginfocom.swing.MigLayout;
+
 import javax.swing.*;
-import java.awt.*;
 
 /**
  * <b>LabelledItemPanel</b> provides a panel for laying out labeled elements
  * neatly with all the labels and elements aligned down the screen.
  *
+ * <p>Backed by MigLayout: labels sit in column 0 at their natural width and
+ * fields in column 1, which grows to fill the available horizontal space so
+ * every field shares a common width and their right edges line up (capped at
+ * {@link #FIELD_MAX_WIDTH} so fields don't sprawl on very wide dialogs).
+ *
  * @author David Fraser
  * @author Michael Harris
- * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
 public class LabelledItemPanel extends JPanel {
@@ -20,8 +26,11 @@ public class LabelledItemPanel extends JPanel {
     private int myNextItemRow = 0;
 
     /**
-     * This method is the default constructor.
+     * Maximum field width (unscaled px) before a field stops growing, so fields
+     * grow to fill but never become unwieldy on wide dialogs.
      */
+    private static final int FIELD_MAX_WIDTH = 360;
+
     public LabelledItemPanel() {
         init();
     }
@@ -30,22 +39,23 @@ public class LabelledItemPanel extends JPanel {
      * Initializes the panel and layout manager.
      */
     private void init() {
-        setLayout(new GridBagLayout());
+        // fillx (not fill): the grid fills horizontally so the field column can grow,
+        // but takes only its preferred height and stays top-anchored when the panel is
+        // taller than its content (e.g. inside a tall scroll pane or tab).
+        setLayout(new MigLayout(
+            "fillx, aligny top, insets " + Theme.dialogInsetVertical + " " + Theme.dialogInsetHorizontal
+                + " " + Theme.dialogInsetVertical + " " + Theme.dialogInsetHorizontal,
+            "[]" + Theme.componentGap + "[grow, fill]"
+        ));
+    }
 
-        // Create a blank label to use as a vertical fill so that the
-        // label/item pairs are aligned to the top of the panel and are not
-        // grouped in the centre if the parent component is taller than
-        // the preferred size of the panel.
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 99;
-        constraints.insets = new Insets(10, 0, 0, 0);
-        constraints.weighty = 1.0;
-        constraints.fill = GridBagConstraints.VERTICAL;
+    private String labelCC(int gridx, int row) {
+        return "cell " + gridx + " " + row + ", aligny center, gaptop " + Theme.componentGap;
+    }
 
-        JLabel verticalFillLabel = new JLabel();
-
-        add(verticalFillLabel, constraints);
+    private String itemCC(int gridx, int row) {
+        return "cell " + gridx + " " + row + ", growx, wmax " + UIScale.scale(FIELD_MAX_WIDTH)
+            + ", gaptop " + Theme.componentGap;
     }
 
     /**
@@ -57,33 +67,10 @@ public class LabelledItemPanel extends JPanel {
      * @return The label created for the item.
      */
     public JLabel addItem(final String labelText, final JComponent item) {
-        // Create the label and its constraints
         JLabel label = new JLabel(labelText);
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = myNextItemRow;
-        labelConstraints.insets = new Insets(10, 10, 0, 0);
-        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
-        labelConstraints.fill = GridBagConstraints.NONE;
-
-        add(label, labelConstraints);
-
-        // Add the component with its constraints
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = 1;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.WEST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        add(label, labelCC(0, myNextItemRow));
+        add(item, itemCC(1, myNextItemRow));
         myNextItemRow++;
-
         return label;
     }
 
@@ -93,68 +80,23 @@ public class LabelledItemPanel extends JPanel {
      *
      * @param label The label text for the item.
      * @param item  The item to be added.
-     * @param col   desired grid bag layer column
+     * @param col   desired layout column (1-based)
      */
     public void addItem(final JLabel label, final JComponent item, int col) {
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-
-        labelConstraints.gridx = col;
-        labelConstraints.gridy = myNextItemRow;
-        labelConstraints.insets = new Insets(10, 10, 0, 0);
-        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
-        labelConstraints.fill = GridBagConstraints.NONE;
-
-        add(label, labelConstraints);
-
-        // Add the component with its constraints
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = col + 1;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.WEST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        add(label, labelCC(2 * (col - 1), myNextItemRow));
+        add(item, itemCC(2 * (col - 1) + 1, myNextItemRow));
     }
 
     /**
-     * Adds a labeled item to the panel on the current myNextItemRow, at the
-     * specified column.
+     * Adds a labeled item to the panel on the current row, at the specified
+     * column.
      *
      * @param name The label text for the item.
      * @param item The item to be added.
-     * @param col  desired grid bag layor column
+     * @param col  desired layout column (1-based)
      */
     public void addItem(final String name, final JComponent item, int col) {
-
-        JLabel label = new JLabel(name);
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-
-        labelConstraints.gridx = col;
-        labelConstraints.gridy = myNextItemRow;
-        labelConstraints.insets = new Insets(10, 10, 0, 0);
-        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
-        labelConstraints.fill = GridBagConstraints.NONE;
-
-        add(label, labelConstraints);
-
-        // Add the component with its constraints
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = col + 1;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.WEST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        addItem(new JLabel(name), item, col);
     }
 
     /**
@@ -165,28 +107,8 @@ public class LabelledItemPanel extends JPanel {
      * @param item  SimbrainComponent to be added
      */
     public void addItemLabel(final JLabel label, final JComponent item) {
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = myNextItemRow;
-        labelConstraints.insets = new Insets(10, 10, 0, 0);
-        labelConstraints.anchor = GridBagConstraints.NORTHEAST;
-        labelConstraints.fill = GridBagConstraints.NONE;
-
-        add(label, labelConstraints);
-
-        // Add the component with its constraints
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = 1;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.WEST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        add(label, labelCC(0, myNextItemRow));
+        add(item, itemCC(1, myNextItemRow));
         myNextItemRow++;
     }
 
@@ -196,46 +118,20 @@ public class LabelledItemPanel extends JPanel {
      * @param item the item to add
      */
     public void addItem(final JComponent item) {
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = 0;
-        itemConstraints.gridwidth = 3;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.EAST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        add(item, "cell 0 " + myNextItemRow + ", span, growx, gaptop " + Theme.componentGap);
         revalidate();
-
         myNextItemRow++;
     }
 
-
     /**
-     * A function which adds an item without a label. This function works with
-     * the already established constraints and coordinates of the
-     * LabelledItemPanel class to keep the code clean.
+     * A function which adds an item without a label.
      *
      * @param item the desired item
      * @param col  the column in which it is to be deposited
      */
     public void addItem(final JComponent item, int col) {
-        GridBagConstraints itemConstraints = new GridBagConstraints();
-
-        itemConstraints.gridx = col;
-        itemConstraints.gridy = myNextItemRow;
-        itemConstraints.insets = new Insets(10, 10, 0, 10);
-        itemConstraints.weightx = 1.0;
-        itemConstraints.anchor = GridBagConstraints.EAST;
-        itemConstraints.fill = GridBagConstraints.HORIZONTAL;
-
-        add(item, itemConstraints);
-
+        add(item, itemCC(col, myNextItemRow));
         myNextItemRow++;
-
     }
 
     /**

@@ -45,10 +45,12 @@ object Theme {
     val tiny: Font      get() = font(8)
     val type: Font      get() = font(9, Font.ITALIC)
 
-    val mutedText: Color = Color(100, 100, 100)
-    val divider: Color = Color(200, 200, 200)
-    val cardBg: Color = Color(250, 250, 250)
-    val cardBorder: Color = Color(180, 180, 180)
+    // Colors derive from UIManager via computed getters (not stored vals) so they track the
+    // active LaF and re-resolve on a theme switch; the literal fallbacks preserve the old look.
+    val mutedText: Color get() = UIManager.getColor("Label.disabledForeground") ?: Color(100, 100, 100)
+    val divider: Color get() = UIManager.getColor("Component.borderColor") ?: Color(200, 200, 200)
+    val cardBg: Color get() = UIManager.getColor("List.background") ?: Color(250, 250, 250)
+    val cardBorder: Color get() = UIManager.getColor("Component.borderColor") ?: Color(180, 180, 180)
 
     const val dialogInsetVertical: Int = 8
     const val dialogInsetHorizontal: Int = 12

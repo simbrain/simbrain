@@ -1,7 +1,10 @@
 package org.simbrain.custom_sims.simulations
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.addNeuronCollection
@@ -110,7 +113,10 @@ val denisonNet = newSim {
     val background = DoubleArray(10000) { 0.0 }.toGrayScaleImage(100, 100)
     imageWorld.imageAlbum.addImage(background)
 
-    val (attentionPlot, IASeries, VASeries) = addTimeSeries("Attention", seriesNames = listOf("Involuntary Attention", "Voluntary Attention"))
+    val (attentionPlot, IASeries, VASeries, SensoryMeanSeries, SustainedMeanSeries) = addTimeSeries(
+        "Attention",
+        seriesNames = listOf("Involuntary Attention", "Voluntary Attention", "Sensory Mean", "Sustained Mean")
+    )
     attentionPlot.apply {
         model.isAutoRange = true
         model.fixedWidth = false
@@ -159,9 +165,10 @@ val denisonNet = newSim {
     val s1HistoryLock = Any()
     val wFilter = DoubleArray(15) { i -> exp(-i / 5.0) } // temporal kernel
     var trialPrepared = false
-    var sweepFrame: JInternalFrame? = null
+    val sweepFrames = mutableListOf<JInternalFrame>()
 
     val sweepSeriesNames = listOf("T1 valid", "T1 neutral", "T1 invalid", "T2 valid", "T2 neutral", "T2 invalid")
+    val sweepConditionSeriesNames = listOf("valid", "neutral", "invalid")
     val sweepTrialsPerCondition = 2
 
     data class MenuOption(val name: String, val state: Int) {
@@ -455,13 +462,15 @@ val denisonNet = newSim {
         trialsPerCondition: Int = sweepTrialsPerCondition,
         onProgress: (completed: Int, total: Int, status: String) -> Unit = { _, _, _ -> },
         shouldCancel: () -> Boolean = { false }
-    ): TimeSeriesModel? {
+    ): Pair<TimeSeriesModel, TimeSeriesModel>? {
         workspace.stop()
-        val sweepModel = TimeSeriesModel().apply {
+        fun newSweepModel() = TimeSeriesModel().apply {
             isAutoRange = true
             fixedWidth = false
-            sweepSeriesNames.forEach { addTimeSeries(it) }
+            sweepConditionSeriesNames.forEach { addTimeSeries(it) }
         }
+        val t1Model = newSweepModel()
+        val t2Model = newSweepModel()
         val originalCue = vaState
         val originalSOA = SOA
         val originalReportMode = reportMode
@@ -492,10 +501,15 @@ val denisonNet = newSim {
                             "SOA ${soaOption.state} ms, ${sweepSeriesNames[seriesIndex]}: $completedSteps / $totalSteps"
                         )
                     }
-                    sweepModel.addData(seriesIndex, soaOption.state.toDouble(), proxyValues.average())
+                    val (model, conditionIndex) = if (seriesIndex < 3) {
+                        t1Model to seriesIndex
+                    } else {
+                        t2Model to seriesIndex - 3
+                    }
+                    model.addData(conditionIndex, soaOption.state.toDouble(), proxyValues.average())
                 }
             }
-            return sweepModel
+            return t1Model to t2Model
         } finally {
             vaState = originalCue
             SOA = originalSOA
@@ -545,16 +559,28 @@ val denisonNet = newSim {
         vaLayer.location = point(44.0, -97.0)
         iaLayer.location = point(370.0, -97.0)
 
-        fun showSweepFrame(model: TimeSeriesModel) {
-            sweepFrame?.takeIf { it.isDisplayable }?.dispose()
-            JInternalFrame("Sensitivity Proxy by SOA", true, true, true, true).apply {
+        fun makeSweepFrame(title: String, model: TimeSeriesModel, x: Int, y: Int) =
+            JInternalFrame(title, true, true, true, true).apply {
                 layout = BorderLayout()
-                add(TimeSeriesPlotPanel(model), BorderLayout.CENTER)
-                setBounds(120, 120, 760, 460)
+                val plotPanel = TimeSeriesPlotPanel(model).apply {
+                    chartPanel.chart.xyPlot.domainAxis.label = "SOA"
+                    chartPanel.chart.xyPlot.rangeAxis.label = "Sensitivity"
+                }
+                add(plotPanel, BorderLayout.CENTER)
+                setBounds(x, y, 600, 420)
                 defaultCloseOperation = JInternalFrame.DISPOSE_ON_CLOSE
                 isVisible = true
-            }.also {
-                sweepFrame = it
+            }
+
+        fun showSweepFrames(t1Model: TimeSeriesModel, t2Model: TimeSeriesModel) {
+            sweepFrames.filter { it.isDisplayable }.forEach { it.dispose() }
+            sweepFrames.clear()
+            val frames = listOf(
+                makeSweepFrame("Sensitivity Proxy by SOA — T1", t1Model, 60, 120),
+                makeSweepFrame("Sensitivity Proxy by SOA — T2", t2Model, 670, 120)
+            )
+            frames.forEach {
+                sweepFrames.add(it)
                 addInternalFrame(it)
                 it.isIcon = false
                 it.toFront()
@@ -611,7 +637,7 @@ val denisonNet = newSim {
                     }
                 }
                 try {
-                    val model = runSweep(
+                    val models = runSweep(
                         onProgress = { completed, total, status ->
                             SwingUtilities.invokeLater {
                                 progressWindow.value = completed
@@ -623,8 +649,9 @@ val denisonNet = newSim {
                     )
                     withContext(Dispatchers.Swing) {
                         progressWindow.close()
-                        if (model != null) {
-                            showSweepFrame(model)
+                        if (models != null) {
+                            val (t1Model, t2Model) = models
+                            showSweepFrames(t1Model, t2Model)
                         }
                     }
                 } finally {
@@ -641,6 +668,10 @@ val denisonNet = newSim {
             workspace.updater.updateManager.clear()
             workspace.updater.updateManager.addAction(updateAction("Temporal attention step") {
                 stepTrial(updateDisplay = true, updateWorkspace = false)
+            })
+            workspace.updater.updateManager.addAction(updateAction("Sensory/sustained means") {
+                SensoryMeanSeries.setValue(sensory1.activationArray.average())
+                SustainedMeanSeries.setValue(sensory2.activationArray.average())
             })
             workspace.updater.updateManager.addAction(UpdateCoupling(VAPlot))
             workspace.updater.updateManager.addAction(UpdateCoupling(IAPlot))
@@ -706,7 +737,7 @@ addSidebarInfo(
 
         `Reset` cancels any running trial and returns the model to a blank baseline state.
 
-        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition, showing progress in a separate window with a `Cancel` button. When the sweep completes, it opens a `Sensitivity Proxy by SOA` popup. For a clockwise target, positive decision activation counts as correct; for a counterclockwise target, negative decision activation is flipped so it also counts as correct. Larger values in the appropriate direction are stronger correct evidence and thus are a proxy for d'.
+        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition, showing progress in a separate window with a `Cancel` button. When the sweep completes, it opens two `Sensitivity Proxy by SOA` popups side by side, one for `T1` and one for `T2`. Each plots the `valid`, `neutral`, and `invalid` curves against `SOA` (x-axis) and the sensitivity proxy (y-axis). For a clockwise target, positive decision activation counts as correct; for a counterclockwise target, negative decision activation is flipped so it also counts as correct. Larger values in the appropriate direction are stronger correct evidence and thus are a proxy for d'.
 
         Two internal target-specific decisions are made, but only one behavioral report would be requested in the experiment. In this simulation, the two decision nodes are best read as evidence traces for what the model would say if asked about `T1` or `T2`.
 
@@ -760,7 +791,7 @@ addSidebarInfo(
         
         `Behavior`: Compact text at the top of the network shows the current cue, report target, and validity. At the end of a trial, a second line shows the final clockwise/counterclockwise report. The exact randomly selected target orientations are intentionally not shown as text, so the focus stays on the network activity, image display, and evidence traces.
 
-        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open this popup. Compare the valid, neutral, and invalid curves for `T1` and `T2`. Higher values mean the model's final evidence is farther in the correct direction for the reported target. The goal is to look for qualitative signatures from the paper, such as voluntary attentional tradeoffs, larger cueing effects at intermediate SOAs, masking-like improvement for `T1`, or an attentional-blink-like dip for `T2`. The current plot is a model evidence proxy, not a direct reproduction of the paper's behavioral `d'` values.
+        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open two popups side by side, one for `T1` and one for `T2`. In each, compare the valid, neutral, and invalid curves, with `SOA` on the x-axis and the sensitivity proxy on the y-axis. Higher values mean the model's final evidence is farther in the correct direction for the reported target. The goal is to look for qualitative signatures from the paper, such as voluntary attentional tradeoffs, larger cueing effects at intermediate SOAs, masking-like improvement for `T1`, or an attentional-blink-like dip for `T2`. The current plots are a model evidence proxy, not a direct reproduction of the paper's behavioral `d'` values.
 
         ## Experiment
 
@@ -773,7 +804,7 @@ addSidebarInfo(
 
         3. Try different `SOA` (stimulus onset asynchrony) values to see how the timing between the two targets affects attention allocation and evidence strength.
 
-        4. Click `Run SOA Sweep` and compare the sensitivity proxy curves for valid, neutral, and invalid trials.
+        4. Click `Run SOA Sweep` and compare the sensitivity proxy curves for valid, neutral, and invalid trials in the side-by-side `T1` and `T2` plots.
 
         ## Performance Tip
 

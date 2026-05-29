@@ -22,9 +22,10 @@ import javax.swing.border.EmptyBorder
  * hardcoding "SansSerif" or "Arial" — which on macOS resolves to Helvetica
  * and clashes with FlatLaf chrome.
  *
- * Typography ladder:
- *   title 16B, heading 14B, section 12B, bodyBold 11B, body 11, label 10,
- *   small 9, tiny 8, type 9I
+ * Typography ladder, sized relative to the LaF base font so text tracks the
+ * look-and-feel instead of undershooting it. With a 13px base:
+ *   title 18B, heading 16B, section 14B, bodyBold 13B, body 13, label 12,
+ *   small 11, tiny 10, type 11I
  *
  * Use [font] as an escape hatch for one-off sizes.
  */
@@ -35,15 +36,17 @@ object Theme {
 
     fun font(size: Int, style: Int = Font.PLAIN): Font = baseFont.deriveFont(style, size.toFloat())
 
-    val title: Font     get() = font(16, Font.BOLD)
-    val heading: Font   get() = font(14, Font.BOLD)
-    val section: Font   get() = font(12, Font.BOLD)
-    val bodyBold: Font  get() = font(11, Font.BOLD)
-    val body: Font      get() = font(11)
-    val label: Font     get() = font(10)
-    val small: Font     get() = font(9)
-    val tiny: Font      get() = font(8)
-    val type: Font      get() = font(9, Font.ITALIC)
+    private val baseSize: Int get() = baseFont.size
+
+    val title: Font     get() = font(baseSize + 5, Font.BOLD)
+    val heading: Font   get() = font(baseSize + 3, Font.BOLD)
+    val section: Font   get() = font(baseSize + 1, Font.BOLD)
+    val bodyBold: Font  get() = font(baseSize, Font.BOLD)
+    val body: Font      get() = font(baseSize)
+    val label: Font     get() = font(baseSize - 1)
+    val small: Font     get() = font(baseSize - 2)
+    val tiny: Font      get() = font(baseSize - 3)
+    val type: Font      get() = font(baseSize - 2, Font.ITALIC)
 
     // Colors derive from UIManager via computed getters (not stored vals) so they track the
     // active LaF and re-resolve on a theme switch; the literal fallbacks preserve the old look.

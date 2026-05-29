@@ -115,7 +115,7 @@ val denisonNet = newSim {
 
     val (attentionPlot, IASeries, VASeries, SensoryMeanSeries, SustainedMeanSeries) = addTimeSeries(
         "Attention",
-        seriesNames = listOf("Involuntary Attention", "Voluntary Attention", "Sensory Mean", "Sustained Mean")
+        seriesNames = listOf("Involuntary Attention", "Voluntary Attention", "Sensory", "Sustained")
     )
     attentionPlot.apply {
         model.isAutoRange = true
@@ -703,21 +703,17 @@ addSidebarInfo(
         """
         # Temporal Attention Model
 
-        A neural network model of visual attention based on the paper ["A dynamic normalization model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison, Marisa Carrasco, and David Heeger. The simulation demonstrates how voluntary and involuntary attention interact to detect and classify briefly presented visual patterns.
+        A neural network model of visual attention based on the paper ["A dynamic normalization model of temporal attention"](https://www.nature.com/articles/s41562-021-01129-1) by Rachel Denison, Marisa Carrasco, and David Heeger. The main goal of this simulation is to make the model inspectable: you can run or step through a trial and watch the stimulus, sensory responses, attention traces, sustained activity, and decision evidence unfold over time. The model approximates some qualitative effects from the experiment, via the `SOA Sweep` button, discussed below.
 
         # Simulation Details
 
-        In Denison's experiment, participants viewed two tilted grating targets presented one after the other: Target 1 (`T1`) and Target 2 (`T2`). Each target was rotated either clockwise or counterclockwise. Before the targets appeared, participants received an auditory cue telling them to pay attention to `T1`, `T2`, or both target times. After viewing the targets, they were asked to report the rotation direction for one target or the other, depending on the trial.
+        In the experiment, participants viewed two tilted grating targets presented one after the other: Target 1 (`T1`) and Target 2 (`T2`). Each target was rotated either clockwise or counterclockwise. Before the targets appeared, participants received an auditory cue telling them to pay attention to `T1`, `T2`, or both target times. After viewing the targets, they were asked to report the rotation direction for one target or the other, depending on the trial.
 
-        The key finding: When participants were cued to attend to a specific target and then asked to report on that same target, their response times were faster and more accurate than when cued to one target but asked about the other. This demonstrates that voluntary attention (the cue) enhances perceptual processing of attended stimuli.
-
-        ## Theoretical Background
+        Key finding in the paper: When participants were cued to attend to a specific target and then asked to report on that same target, their response times were faster and more accurate than when cued to one target but asked about the other. This demonstrates that voluntary attention enhances perceptual processing of attended stimuli. The paper also replicates earlier results showing that perceptual sensitivity varies with time between stimuli and is more difficult for earlier stimuli.
 
         The paper's main behavioral measure is perceptual sensitivity, or `d'`. A quick way to think about `d'` is "how separable are signal and noise?" If you can reliably tell a real phone buzz from background vibration, spot a faint star against visual noise, or distinguish two similar wines, sensitivity is high. If not, sensitivity is low.
 
-        In this simulation, the analogous question is how strongly the model's final evidence separates clockwise from counterclockwise for the reported target. Strong evidence in the correct direction is like higher sensitivity; weak or ambiguous evidence is like lower sensitivity. This Simbrain model does not compute behavioral `d'` directly, but instead uses a sensitivity proxy based on signed correct evidence: negative values mean the final evidence points the wrong way, values near zero are ambiguous, and larger positive values mean stronger evidence in the correct direction.
-        
-        This study allows you to see what the simulations look like and how they unfold moment to moment and how attention and its relation to perception is being modeled. In terms of replicating the main effects from the paper, that is not done in this simulation, though "SOA sweep" does attempt a proxy. Shorter SOAs should make the targets interfere more. Voluntary attention should help the reported target, especially when the cue is valid. The paper emphasizes cueing effects and tradeoffs across time, including larger precueing effects at intermediate SOAs, masking-like improvement for `T1`, and an attentional-blink-like dip for `T2`. As of now we have not investigated which of these if any are evident in the SOA sweep.
+        In this simulation, the analogous question is how strongly the model's final evidence separates clockwise from counterclockwise for the reported target. Strong evidence in the correct direction is like higher sensitivity; weak or ambiguous evidence is like lower sensitivity. In Simbrain this corresponds to how strongly the decision nodes are activated. 
 
         ## Control Panel Settings
 
@@ -731,37 +727,66 @@ addSidebarInfo(
 
         `Report Target` sets which target the model is asked to report after the two targets appear. `Random` chooses either `T1` or `T2` for each trial. A trial is `valid` when the attention cue matches the report target, `invalid` when it cues the other target, and `neutral` when the cue is `Both Targets`.
 
+        To set up the main trial conditions:
+
+        - `T1 valid`: set `Attention Cue` to `Target 1` and `Report Target` to `Target 1`.
+        - `T1 invalid`: set `Attention Cue` to `Target 2` and `Report Target` to `Target 1`.
+        - `T2 valid`: set `Attention Cue` to `Target 2` and `Report Target` to `Target 2`.
+        - `T2 invalid`: set `Attention Cue` to `Target 1` and `Report Target` to `Target 2`.
+        - `Neutral`: set `Attention Cue` to `Both Targets` and `Report Target` to `Random`.
+
         `Start` runs one trial with randomly selected orientations for `T1` and `T2`. While a trial is running it has no effect; use the workspace `Stop` control to halt the run, or `Reset` to clear the network state and plots before starting a new trial.
 
         `Step 10` advances the current trial by 10 workspace iterations. If no trial is prepared, it starts a new trial using the current cue and `SOA` settings and then advances 10 iterations.
 
         `Reset` cancels any running trial and returns the model to a blank baseline state.
 
-        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition, showing progress in a separate window with a `Cancel` button. When the sweep completes, it opens two `Sensitivity Proxy by SOA` popups side by side, one for `T1` and one for `T2`. Each plots the `valid`, `neutral`, and `invalid` curves against `SOA` (x-axis) and the sensitivity proxy (y-axis). For a clockwise target, positive decision activation counts as correct; for a counterclockwise target, negative decision activation is flipped so it also counts as correct. Larger values in the appropriate direction are stronger correct evidence and thus are a proxy for d'.
+        `Run SOA Sweep` runs a small batch of trials for every `SOA`, report target, and validity condition. When the sweep completes, it opens two `Sensitivity Proxy by SOA` popups side by side, one for `T1` and one for `T2`. Each plots the `valid`, `neutral`, and `invalid` curves against `SOA` (x-axis) and the sensitivity proxy (y-axis). For a clockwise target, positive decision activation counts as correct; for a counterclockwise target, negative decision activation is flipped so it also counts as correct. Larger values in the appropriate direction are stronger correct evidence and thus are a proxy for d'.
 
-        Two internal target-specific decisions are made, but only one behavioral report would be requested in the experiment. In this simulation, the two decision nodes are best read as evidence traces for what the model would say if asked about `T1` or `T2`.
+        The Simbrain simulations captures some, but not all, of the paper's results. It shows that for the earlier target `T1` sensitivity is dependent on SOA but `T2` us not. Valid trials should often produce stronger evidence than invalid trials, but because this is a small stochastic simulation and not a full fit to behavioral data, that ordering is not guaranteed in every sweep.
+
+       The two decision nodes are best read as evidence traces for what the model would say if asked about `T1` or `T2`.
+       
+       # Model structure and time series plots
+
+        The model starts with a raw stimulus: a tilted grating in the image world. While the grating is on screen, it drives orientation-tuned activity in the sensory layer. That raw sensory response is then transformed into a slower sustained response, which is what the decision layer reads out as evidence for clockwise or counterclockwise tilt.
 
         The model consists of five layers that process visual input and make decisions.
 
-        - `Sensory Layer`: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses.
+        - `Sensory Layer`: 12 neurons, each tuned to a different orientation (0°, 30°, 60°, etc.). When a grating pattern appears, the neuron matching that orientation activates most strongly, with nearby orientations showing weaker responses. This is the model's immediate response to the raw stimulus.
 
-        - `Sustained Response Layer`: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are what get accumulated in the decisions layer.
+        - `Sustained Response Layer`: 12 neurons that maintain prolonged activation after the sensory layer responds. These sustained activations are a slower echo of the raw sensory response, and they are what get accumulated in the decisions layer.
 
         - `Decisions Layer`: 2 neurons that accumulate evidence for each target. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The strength of activation reflects the model's confidence.
 
-        - `Voluntary Attention`: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which target is cued.
+        - `Voluntary Attention`: A single neuron controlled by the attention cue selected in the control panel. It enhances processing in the sensory layer based on which target is cued and when that target is expected.
 
         - `Involuntary Attention`: A single neuron driven by the stimulus itself. It responds automatically to pattern onsets regardless of the cue, and also enhances processing in the sensory layer.
 
         ## How Attention Works in the Model
 
-        Both attention systems modulate the gain of the sensory layer: they multiply the overall activation level. Voluntary attention is determined by your cue selection. Involuntary attention is stimulus-driven and responds to any visual pattern onset.
+        Both attention systems modulate the gain of the sensory layer: they multiply the overall activation level before the sustained response and decision evidence are computed.
+
+        Voluntary attention is determined by the cue and by the known timing of the two targets. A `Target 1` cue makes the voluntary trace larger around the first target, a `Target 2` cue makes it larger around the second target, and a neutral cue divides attention across both target times. The available voluntary attention is limited over short intervals and recovers as SOA increases, so cueing one target can reduce the gain available for the other.
+
+        Involuntary attention is stimulus-driven. It is computed from recent sensory-layer activity, so it rises after a grating appears even when that target was not cued. Because it is driven by S1 activity, it can be larger when the stimulus response has already been boosted by voluntary attention.
+
+        ## Time Series
+
+        The `Attention` plot contains four traces:
+
+        - `Involuntary Attention`: the automatic, stimulus-driven gain signal produced by recent sensory activity.
+        - `Voluntary Attention`: the cue-driven gain signal timed around the expected target onsets.
+        - `Sensory`: the average activity of the raw orientation-tuned sensory layer.
+        - `Sustained`: the average activity of the slower sustained response layer that feeds decision evidence.
+
+        Read these four traces together (we suggest starting by stepping through a trial). A target first produces a sensory response; that response feeds a sustained response; voluntary and involuntary attention change the gain of the sensory response; and the decision units accumulate the sustained activity in separate windows for `T1` and `T2`.
 
         # What to Do
 
         ## Run a Trial
 
-        1. Select an `Attention Cue`, `SOA`, and `Report Target` from the control panel.
+        1. Select an `Attention Cue`, `SOA`, and `Report Target` from the control panel. Generally it's best to use one of the 5 possibilities noted above: valid T1, valid T2, etc.
         2. Click `Start` to run a trial
         3. Use `Step 10` instead of `Start` if you want to advance through the trial manually
         4. Click `Reset` if you want to stop the current trial and clear the display
@@ -782,17 +807,19 @@ addSidebarInfo(
 
         `Sensory Responses`: Watch the sensory layer activate when patterns appear, and the sustained response layer show a fading echo of sensory activations. The neuron corresponding to the pattern's orientation will activate most strongly.
 
-        `Attention Dynamics`: The `Attention` time series plot shows how voluntary and involuntary attention unfold over time. Notice:
+        `Attention Dynamics`: The `Attention` time series plot shows how voluntary attention, involuntary attention, the raw sensory response, and the sustained response unfold over time. Notice:
         - When involuntary attention spikes (at pattern onsets)
         - How voluntary attention is allocated to one target or the other based on the cue you selected
+        - How the sensory mean rises quickly to the current grating
+        - How the sustained mean lingers after the sensory response
         - The interaction between the two attention systems
 
         `Evidence Formation`: The `Evidence (CW + / CCW -)` time series plot shows how the two decision neurons accumulate evidence for each target over time. Positive activation indicates clockwise rotation, negative indicates counterclockwise. The decision node labels also show the current evidence direction directly as `T1: clockwise` or `T2: counterclockwise`.
         
         `Behavior`: Compact text at the top of the network shows the current cue, report target, and validity. At the end of a trial, a second line shows the final clockwise/counterclockwise report. The exact randomly selected target orientations are intentionally not shown as text, so the focus stays on the network activity, image display, and evidence traces.
 
-        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open two popups side by side, one for `T1` and one for `T2`. In each, compare the valid, neutral, and invalid curves, with `SOA` on the x-axis and the sensitivity proxy on the y-axis. Higher values mean the model's final evidence is farther in the correct direction for the reported target. The goal is to look for qualitative signatures from the paper, such as voluntary attentional tradeoffs, larger cueing effects at intermediate SOAs, masking-like improvement for `T1`, or an attentional-blink-like dip for `T2`. The current plots are a model evidence proxy, not a direct reproduction of the paper's behavioral `d'` values.
-
+        `Sensitivity Proxy by SOA`: Click `Run SOA Sweep` to run the sweep and open two popups side by side, one for `T1` and one for `T2`. In each, compare the valid, neutral, and invalid curves, with `SOA` on the x-axis and the sensitivity proxy on the y-axis. Higher values mean the model's final evidence is farther in the correct direction for the reported target.
+        
         ## Experiment
 
         1. Try different attention cues and observe how they affect:
@@ -805,10 +832,6 @@ addSidebarInfo(
         3. Try different `SOA` (stimulus onset asynchrony) values to see how the timing between the two targets affects attention allocation and evidence strength.
 
         4. Click `Run SOA Sweep` and compare the sensitivity proxy curves for valid, neutral, and invalid trials in the side-by-side `T1` and `T2` plots.
-
-        ## Performance Tip
-
-        For better performance during trials or the SOA sweep, minimize the time series windows (`Attention` and `Evidence (CW + / CCW -)`). The simulation will run faster when these plots are not actively rendering.
 
         # References
 

@@ -201,6 +201,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.miglayout/miglayout-swing
     implementation(group = "com.miglayout", name = "miglayout-swing", version = "11.0")
 
+    // https://mvnrepository.com/artifact/com.formdev/flatlaf
+    implementation(group = "com.formdev", name = "flatlaf", version = "3.5.4")
+
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
     implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.4.0")
 
@@ -236,6 +239,25 @@ tasks.register<JavaExec>("runSim") {
         } else {
             args(project.property("simName") as String)
         }
+    }
+}
+
+sourceSets {
+    create("snapshots") {
+        compileClasspath += sourceSets["main"].output + sourceSets["main"].runtimeClasspath
+        runtimeClasspath += output + sourceSets["main"].output + sourceSets["main"].runtimeClasspath
+    }
+}
+
+// Sample invocation:
+// ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ImagePipelineDialogSnapshot [-Ptheme=light|dark]
+tasks.register<JavaExec>("uiSnapshot") {
+    jvmArgs(simbrainJvmArgs)
+    classpath = sourceSets["snapshots"].runtimeClasspath
+    mainClass.set("org.simbrain.util.uisnapshot.UiSnapshotKt")
+    if (project.hasProperty("snapshotDef")) {
+        val theme = project.findProperty("theme") as String? ?: "light"
+        args(project.property("snapshotDef") as String, theme)
     }
 }
 

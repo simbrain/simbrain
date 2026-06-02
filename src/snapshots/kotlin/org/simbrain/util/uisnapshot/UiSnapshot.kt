@@ -3,6 +3,7 @@ package org.simbrain.util.uisnapshot
 import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLightLaf
 import org.simbrain.util.DetailTrianglePanel
+import org.simbrain.util.installSimbrainFlatLafDefaults
 import java.awt.Component
 import java.awt.Container
 import java.awt.Window
@@ -40,6 +41,7 @@ interface UiSnapshotDef {
  * the FlatLaf core artifact, so no extra dependency is required.
  */
 fun setupTheme(name: String) {
+    installSimbrainFlatLafDefaults()
     when (name.lowercase()) {
         "dark" -> FlatDarkLaf.setup()
         else -> FlatLightLaf.setup()

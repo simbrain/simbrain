@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import com.formdev.flatlaf.FlatLaf
 import java.awt.Color
 import java.awt.Component
 import java.awt.Font
@@ -13,6 +14,22 @@ import javax.swing.border.AbstractBorder
 import javax.swing.border.Border
 import javax.swing.border.CompoundBorder
 import javax.swing.border.EmptyBorder
+
+/**
+ * Registers Simbrain's global FlatLaf custom defaults — accent color, rounded
+ * corners, focus ring, chevron arrows — from the classpath package
+ * `org.simbrain.util.theme` (see its `FlatLaf.properties`). These merge over
+ * FlatLaf's bundled defaults for every theme, so the look is consistent across
+ * light and dark.
+ *
+ * MUST be called before `FlatLightLaf.setup()` / `FlatDarkLaf.setup()`: custom
+ * defaults are read only while the look-and-feel builds its UIDefaults during
+ * install. The registry is a static on [FlatLaf], so calling this once per JVM
+ * is enough and re-registering the same package is harmless.
+ */
+fun installSimbrainFlatLafDefaults() {
+    FlatLaf.registerCustomDefaultsSource("org.simbrain.util.theme")
+}
 
 /**
  * Centralized typography, color, and border tokens for Simbrain's Swing UI.

@@ -53,6 +53,7 @@ object SimbrainDesktop {
             if (Utils.isLinux()) {
                 UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
             }
+            installSimbrainFlatLafDefaults()
             FlatLightLaf.setup()
             UIManager.put("Button.minimumWidth", 80)
         } catch (e: Exception) {

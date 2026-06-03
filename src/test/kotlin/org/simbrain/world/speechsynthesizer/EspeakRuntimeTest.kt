@@ -1,4 +1,4 @@
-package org.simbrain.world.soundworld
+package org.simbrain.world.speechsynthesizer
 
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue

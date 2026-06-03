@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -11,15 +12,6 @@ import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.subnetworks.*
 import org.simbrain.workspace.gui.SimbrainDesktop
 
-/**
- * Regression tests for subnetwork copy/paste/undo. Covers two bugs:
- *
- * 1. Undo of a pasted Competitive/SOM network left orphaned neuron nodes on the canvas because
- *    [Subnetwork.copy] registered its [NeuronCollection]s with `addModel` rather than tracking
- *    their member neurons in the model list, so deletion never reached them.
- * 2. Duplicating a Hopfield/RBM/SOM network with its `customInfo` (energy/state [InfoText]) node in
- *    the selection copied that InfoText as a free text object, leaving a stray overlapping readout.
- */
 class SubnetworkClipboardTest {
 
     private val network: Network
@@ -197,5 +189,59 @@ class SubnetworkClipboardTest {
 
         panel.undoManager.undo()
         assertEquals(1, subnetCount())
+    }
+
+    @Test
+    fun `feedforward paste undo redo restores internal arrays and weight matrices`() = runBlocking {
+        val feedForward = FeedForward(intArrayOf(2, 2), null)
+        feedForward.inputLayer.isClamped = true
+        feedForward.wmList.single().setWeights(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
+        network.addNetworkModel(feedForward)
+
+        duplicate(feedForward)
+        panel.undoManager.undo()
+        panel.undoManager.redo()
+
+        assertEquals(2, subnetCount())
+        assertEquals(0, network.getModels<NeuronArray>().size, "Subnetwork layers should not be top-level arrays")
+        assertEquals(0, network.getModels<WeightMatrix>().size, "Subnetwork connectors should not be top-level matrices")
+
+        val restored = network.getModels<Subnetwork>().last() as FeedForward
+        assertEquals(2, restored.layerList.size, "Feedforward layer list was not restored after redo")
+        assertEquals(1, restored.wmList.size, "Feedforward weight matrix list was not restored after redo")
+        assertEquals(restored.inputLayer, restored.wmList.single().source)
+        assertEquals(restored.outputLayer, restored.wmList.single().target)
+
+        restored.inputLayer.setActivations(doubleArrayOf(0.4, 0.7))
+        restored.inputLayer.isClamped = true
+        network.update()
+        assertArrayEquals(doubleArrayOf(0.4, 0.7), restored.outputLayer.activationArray, 0.001)
+    }
+
+    @Test
+    fun `backprop paste undo redo keeps children owned by restored subnetwork`() = runBlocking {
+        val backprop = BackpropNetwork(intArrayOf(2, 3, 1), null)
+        network.addNetworkModel(backprop)
+
+        duplicate(backprop)
+        assertEquals(2, subnetCount())
+        assertEquals(0, network.getModels<NeuronArray>().size)
+        assertEquals(0, network.getModels<WeightMatrix>().size)
+
+        panel.undoManager.undo()
+        assertEquals(1, subnetCount())
+        assertEquals(0, network.getModels<NeuronArray>().size)
+        assertEquals(0, network.getModels<WeightMatrix>().size)
+
+        panel.undoManager.redo()
+        assertEquals(2, subnetCount())
+        assertEquals(0, network.getModels<NeuronArray>().size, "Redo leaked backprop layers as top-level arrays")
+        assertEquals(0, network.getModels<WeightMatrix>().size, "Redo leaked backprop matrices as top-level connectors")
+
+        val restored = network.getModels<Subnetwork>().last() as BackpropNetwork
+        assertEquals(listOf(2, 3, 1), restored.layerList.map { it.size })
+        assertEquals(2, restored.wmList.size)
+        assertEquals(restored.inputLayer, restored.wmList.first().source)
+        assertEquals(restored.outputLayer, restored.wmList.last().target)
     }
 }

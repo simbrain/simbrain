@@ -997,6 +997,113 @@ class ClipboardTest {
     }
 
     @Test
+    fun `duplicate neuron arrays and weight matrix undo redo restores endpoints`() = runBlocking {
+        val sourceArray = NeuronArray(3).apply {
+            label = "Source Array"
+            location = point(100.0, 100.0)
+            isClamped = true
+        }
+        val targetArray = NeuronArray(2).apply {
+            label = "Target Array"
+            location = point(100.0, 300.0)
+        }
+        val weightMatrix = WeightMatrix(sourceArray, targetArray).apply {
+            setWeights(doubleArrayOf(1.0, 0.5, 0.0, 0.0, 0.0, 1.0))
+        }
+
+        network.addNetworkModels(sourceArray, targetArray, weightMatrix, usePlacementManager = false)
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        networkPanel.selectionManager.add(
+            networkPanel.screenElements.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
+        )
+        networkPanel.duplicate()
+
+        val duplicatedArrays = network.getModels<NeuronArray>().filter { it.id !in listOf(sourceArray.id, targetArray.id) }
+        val duplicatedSource = duplicatedArrays.single { it.label == sourceArray.label }
+        val duplicatedTarget = duplicatedArrays.single { it.label == targetArray.label }
+        val duplicatedWeightMatrix = network.getModels<WeightMatrix>().single { it.id != weightMatrix.id }
+        val duplicatedIds = listOf(duplicatedSource.id, duplicatedTarget.id, duplicatedWeightMatrix.id)
+
+        assertEquals(duplicatedSource, duplicatedWeightMatrix.source)
+        assertEquals(duplicatedTarget, duplicatedWeightMatrix.target)
+
+        networkPanel.undoManager.undo()
+        assertEquals(2, network.getModels<NeuronArray>().size)
+        assertEquals(1, network.getModels<WeightMatrix>().size)
+        assertFalse(network.getModels<NeuronArray>().any { it.id in duplicatedIds })
+        assertFalse(network.getModels<WeightMatrix>().any { it.id in duplicatedIds })
+
+        networkPanel.undoManager.redo()
+        val restoredSource = network.getModels<NeuronArray>().single { it.id == duplicatedSource.id }
+        val restoredTarget = network.getModels<NeuronArray>().single { it.id == duplicatedTarget.id }
+        val restoredWeightMatrix = network.getModels<WeightMatrix>().single { it.id == duplicatedWeightMatrix.id }
+
+        assertEquals(restoredSource, restoredWeightMatrix.source)
+        assertEquals(restoredTarget, restoredWeightMatrix.target)
+
+        restoredSource.setActivations(doubleArrayOf(1.0, 0.5, 0.2))
+        restoredSource.isClamped = true
+        network.update()
+        assertArrayEquals(doubleArrayOf(1.25, 0.2), restoredTarget.activationArray, 0.001)
+    }
+
+    @Test
+    fun `pasting neuron array with stranded weight matrix skips the matrix`() = runBlocking {
+        val sourceArray = NeuronArray(3).apply {
+            label = "Source Array"
+            location = point(100.0, 100.0)
+        }
+        val targetArray = NeuronArray(2).apply {
+            label = "Target Array"
+            location = point(100.0, 300.0)
+        }
+        val weightMatrix = WeightMatrix(sourceArray, targetArray)
+
+        network.addNetworkModels(sourceArray, targetArray, weightMatrix, usePlacementManager = false)
+        Clipboard.add(listOf(sourceArray, weightMatrix))
+
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+        Clipboard.paste(networkPanel)
+
+        assertEquals(3, network.getModels<NeuronArray>().size)
+        assertEquals(1, network.getModels<WeightMatrix>().size)
+    }
+
+    @Test
+    fun `repeated neuron array duplicate undo redo leaves no extra copies`() = runBlocking {
+        val sourceArray = NeuronArray(2).apply {
+            label = "Source Array"
+            location = point(100.0, 100.0)
+        }
+        val targetArray = NeuronArray(2).apply {
+            label = "Target Array"
+            location = point(100.0, 300.0)
+        }
+        val weightMatrix = WeightMatrix(sourceArray, targetArray)
+
+        network.addNetworkModels(sourceArray, targetArray, weightMatrix, usePlacementManager = false)
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        networkPanel.selectionManager.add(
+            networkPanel.screenElements.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
+        )
+        networkPanel.duplicate()
+        networkPanel.duplicate()
+
+        assertEquals(6, network.getModels<NeuronArray>().size)
+        assertEquals(3, network.getModels<WeightMatrix>().size)
+
+        networkPanel.undoManager.undo()
+        assertEquals(4, network.getModels<NeuronArray>().size)
+        assertEquals(2, network.getModels<WeightMatrix>().size)
+
+        networkPanel.undoManager.redo()
+        assertEquals(6, network.getModels<NeuronArray>().size)
+        assertEquals(3, network.getModels<WeightMatrix>().size)
+    }
+
+    @Test
     fun `test SupervisedModel copy paste`() = runBlocking {
         // Create two neuron arrays
         val sourceArray = NeuronArray(3).apply {

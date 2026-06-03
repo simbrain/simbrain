@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.util.point
 
 class NetworkDialogsTest {
 
@@ -161,5 +162,83 @@ class NetworkDialogsTest {
         assertEquals(1, network.getModels<PoolingConnector>().size)
         assertEquals(1, network.getModels<FlattenConnector>().size)
         assertEquals(1, network.getModels<NeuronArray>().size)
+    }
+
+    @Test
+    fun `add neuron array action undo redo restores connector endpoints`() = runBlocking {
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        val sourceArray = NeuronArray(3).apply {
+            label = "Source"
+            location = point(100.0, 100.0)
+            isClamped = true
+        }
+        network.addNetworkModel(sourceArray, usePlacementManager = false)
+
+        val (targetArray, connector) = networkPanel.addNeuronArray(
+            sourceArray,
+            NeuronArray.CreationTemplate().apply { numNodes = 2 }
+        )
+        connector.setWeights(doubleArrayOf(1.0, 0.5, 0.0, 0.0, 0.0, 1.0))
+
+        val targetId = targetArray.id
+        val connectorId = connector.id
+        assertEquals(2, network.getModels<NeuronArray>().size)
+        assertEquals(1, network.getModels<WeightMatrix>().size)
+
+        networkPanel.undoManager.undo()
+        assertEquals(1, network.getModels<NeuronArray>().size)
+        assertEquals(0, network.getModels<WeightMatrix>().size)
+
+        networkPanel.undoManager.redo()
+        val restoredTarget = network.getModels<NeuronArray>().first { it.id == targetId }
+        val restoredConnector = network.getModels<WeightMatrix>().first { it.id == connectorId }
+
+        assertEquals(sourceArray, restoredConnector.source)
+        assertEquals(restoredTarget, restoredConnector.target)
+        assertTrue(sourceArray.outgoingConnectors.contains(restoredConnector))
+        assertTrue(restoredTarget.incomingConnectors.contains(restoredConnector))
+
+        sourceArray.setActivations(doubleArrayOf(1.0, 0.5, 0.2))
+        network.update()
+        assertArrayEquals(doubleArrayOf(1.25, 0.2), restoredTarget.activationArray, 0.001)
+    }
+
+    @Test
+    fun `flatten layer undo redo restores incoming connector registration`() = runBlocking {
+        val network = Network()
+        val networkComponent = NetworkComponent("Test", network)
+        val networkPanel = NetworkPanel(networkComponent)
+
+        val sourceTensor = TensorLayer(TensorShape(2, 2, 1)).apply {
+            isClamped = true
+            activations = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
+        }
+        network.addNetworkModel(sourceTensor, usePlacementManager = false)
+
+        networkPanel.addFlattenLayer(sourceTensor)
+        val targetArray = network.getModels<NeuronArray>().single()
+        val connector = network.getModels<FlattenConnector>().single()
+        val targetId = targetArray.id
+        val connectorId = connector.id
+
+        assertTrue(targetArray.incomingFlattenConnectors.contains(connector))
+
+        networkPanel.undoManager.undo()
+        assertEquals(0, network.getModels<NeuronArray>().size)
+        assertEquals(0, network.getModels<FlattenConnector>().size)
+
+        networkPanel.undoManager.redo()
+        val restoredTarget = network.getModels<NeuronArray>().single { it.id == targetId }
+        val restoredConnector = network.getModels<FlattenConnector>().single { it.id == connectorId }
+
+        assertEquals(sourceTensor, restoredConnector.source)
+        assertEquals(restoredTarget, restoredConnector.target)
+        assertTrue(restoredTarget.incomingFlattenConnectors.contains(restoredConnector))
+
+        network.update()
+        assertArrayEquals(sourceTensor.activations, restoredTarget.activationArray, 0.001)
     }
 }

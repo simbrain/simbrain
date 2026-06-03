@@ -60,6 +60,7 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 - Use minimal plain comments only when they add clarity
 - Test initialization in each test (not `@BeforeEach`)
 - Use backtick test names: `` `test that something works`() ``
+- Avoid class-level doc comments that frame ordinary unit tests as regressions or describe specific historical bugs; put scenario intent in the test name and only use local comments when they clarify a non-obvious setup or assertion.
 
 ## Common Tasks
 

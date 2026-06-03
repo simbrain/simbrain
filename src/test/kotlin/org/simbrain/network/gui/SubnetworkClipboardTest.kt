@@ -140,8 +140,8 @@ class SubnetworkClipboardTest {
 
         duplicate(comp)
         panel.undoManager.undo()
-        // Let the async node removal from undo settle before redo (as it would between user clicks).
-        awaitNeuronNodeCount(40)
+        // Back-to-back with no settle: exercises the model->node map race directly (see CollectionUtils
+        // CompletableDeferredHashMap.set / removeIfValue and NetworkPanel.batchNodeRemoval).
         panel.undoManager.redo()
 
         assertEquals(2, subnetCount())
@@ -167,7 +167,6 @@ class SubnetworkClipboardTest {
 
         duplicate(som)
         panel.undoManager.undo()
-        awaitNeuronNodeCount(36)
         panel.undoManager.redo()
 
         assertEquals(2, subnetCount())

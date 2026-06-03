@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeout
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -221,8 +222,14 @@ class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1
 
     operator fun set(key: K, value: V): CompletableDeferred<V> {
         return map.compute(key) { _, existingValue ->
-            (existingValue ?: CompletableDeferred()).apply {
-                complete(value)
+            // A pending deferred has a waiter (a get); complete it so the waiter unblocks. An already
+            // completed deferred is stale (e.g. the model's previous node, whose async removal has not
+            // run yet); replace it so the map points at the new value rather than silently dropping it,
+            // since complete() is a no-op on an already completed deferred.
+            if (existingValue != null && !existingValue.isCompleted) {
+                existingValue.apply { complete(value) }
+            } else {
+                CompletableDeferred(value)
             }
         }!!
     }
@@ -230,6 +237,28 @@ class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1
     fun remove(key: K) {
         map.remove(key)
     }
+
+    /**
+     * Atomically remove [key] only if it currently maps to a completed value satisfying [predicate].
+     *
+     * Used to make asynchronous node removal identity-safe: a delayed removal of an old node must not
+     * clear the mapping if the model has since been re-added with a new node (e.g. undo followed by redo).
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun removeIfValue(key: K, predicate: (V) -> Boolean) {
+        map.computeIfPresent(key) { _, deferred ->
+            if (deferred.isCompleted && predicate(deferred.getCompleted())) null else deferred
+        }
+    }
+
+    /**
+     * Non-blocking lookup: return the value if [key] is present and already resolved, else null.
+     *
+     * Unlike [get]/[getImmediately] this never suspends and never waits on a pending value, so it is safe
+     * for gating logic that must not block (e.g. deciding during a restore whether dependent nodes exist).
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    fun peek(key: K): V? = map[key]?.let { if (it.isCompleted) it.getCompleted() else null }
 
     val keys get() = map.keys
 

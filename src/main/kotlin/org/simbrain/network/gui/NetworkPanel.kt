@@ -303,7 +303,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         }
         node.model.events.deleted.on {
-            network.events.batchNodeRemoval.fire(it)
+            network.events.batchNodeRemoval.fire(node)
         }
         network.events.zoomToFitPage.fire()
     }
@@ -808,17 +808,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             modelRemoved.on {
                 zoomToFitPage.fire()
             }
-            batchNodeRemoval.on { models ->
-                val modelsUniq = models.toSet()
-                val nodes = modelsUniq.map {
-                    modelNodeMap.getImmediately<ScreenElement>(it)
-                }
+            batchNodeRemoval.on { nodes ->
+                val nodesUniq = nodes.toSet()
                 withContext(Swing) {
-                    nodes.forEach {
+                    nodesUniq.forEach {
                         canvas.layer.removeChild(it)
                     }
                 }
-                modelsUniq.forEach { modelNodeMap.remove(it) }
+                // Removal is asynchronous (debounced) and can land after the model was re-added with a
+                // new node (undo then redo). Only clear the mapping if it still points at this node, so
+                // a stale removal never wipes a freshly recreated node.
+                nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
             updated.on(Dispatchers.Swing, wait = true) {

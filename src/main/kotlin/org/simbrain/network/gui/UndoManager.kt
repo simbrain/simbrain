@@ -1,8 +1,12 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
@@ -131,10 +135,19 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
                     parent.synapses.add(synapse)
-                    // If there is a synapsegroupnode already, we are deleting the synapse and must add the node back
-                    // Note that synapsegroupnodes don't actually contain synapsenodes as children, so all we have to
-                    // do is create the node. The check is still required, to synchronize with neuron group recreation.
-                    modelNodeMap.getImmediately<SynapseGroupNode>(parent)?.let { synapseGroupNode ->
+                    // Recreate a free SynapseNode only when the group actually shows individual synapses
+                    // (below the visibility threshold, mirroring createNode(SynapseGroup)) AND its node and
+                    // both endpoint nodes are already live. Gating with non-blocking peeks avoids two
+                    // hazards during a full-subnetwork redo: a stale group node left by an in-flight async
+                    // removal must not spawn synapse nodes (the group rebuilds via createNode(subnetwork)),
+                    // and createNode(synapse) must never block on an endpoint that is only recreated later
+                    // in this same restore.
+                    val belowThreshold = parent.synapses.size < NetworkPreferences.synapseVisibilityThreshold
+                    if (belowThreshold &&
+                        modelNodeMap.peek(parent) != null &&
+                        modelNodeMap.peek(synapse.source) != null &&
+                        modelNodeMap.peek(synapse.target) != null
+                    ) {
                         createNode(synapse)
                     }
                 }
@@ -177,6 +190,17 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     context(NetworkPanel)
     suspend fun restore(deletedModels: List<NetworkModel>) {
         restoreMapSnapshot()
+        // Node removal on delete is asynchronous and debounced, so a redo running back-to-back with undo
+        // can find the deleted models still carrying their old nodes (mapped and on the canvas). Node
+        // recreation below reuses mapped nodes (getImmediately ?: createNode); reusing a node whose
+        // removal is still pending leaves the model with no canvas node once that removal finally lands.
+        // Proactively drop those stale nodes so recreation starts from a clean slate; the pending async
+        // removal then resolves to an identity-safe no-op.
+        val staleNodes = deletedModels.mapNotNull { model -> modelNodeMap.peek(model)?.let { model to it } }
+        if (staleNodes.isNotEmpty()) {
+            withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> canvas.layer.removeChild(node) } }
+            staleNodes.forEach { (model, node) -> modelNodeMap.removeIfValue(model) { it === node } }
+        }
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }

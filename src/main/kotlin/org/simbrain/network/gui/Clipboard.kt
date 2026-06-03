@@ -56,8 +56,11 @@ object Clipboard {
                 supervisedModelLayers + supervisedModelNeurons + supervisedModelSynapses +
                 subnetworkChildren + subnetworkNeurons + subnetworkSynapses
 
+        // InfoText (e.g. a subnetwork's energy readout) is owned by its parent model and is
+        // recreated when that parent is copied. It must never be copied as a standalone free
+        // text object, or duplicating leaves a stray overlapping readout near the original.
         copiedObjects = objects
-            .filter { it !in collectionObjects }
+            .filter { it !in collectionObjects && it !is InfoText }
 
         fireClipboardChanged()
     }
@@ -113,6 +116,9 @@ object Clipboard {
                                 )
                                 add(newSynapse)
                             }
+                        }
+                        is InfoText -> {
+                            // customInfo is recreated by its owning model's copy(); never copy it as free text
                         }
                         is NetworkTextObject -> {
                             val newText = NetworkTextObject(item)

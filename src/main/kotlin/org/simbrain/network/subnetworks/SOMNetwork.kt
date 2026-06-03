@@ -257,12 +257,12 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         // Copy SOM layer
         copy.som = som.copy()
         copy.som.label = som.label
-        copy.addModel(copy.som)
+        copy.addNeuronCollection(copy.som)
 
         // Copy input layer
         copy.inputLayer = inputLayer.copy()
         copy.inputLayer.label = inputLayer.label
-        copy.addModel(copy.inputLayer)
+        copy.addNeuronCollection(copy.inputLayer)
 
         // Copy params
         copy.initialLearningRate = initialLearningRate

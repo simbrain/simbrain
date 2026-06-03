@@ -142,6 +142,16 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
 
             is Subnetwork -> {
                 parent.modelList.add(model)
+                // Deleting a subnetwork deletes its neurons individually, which empties any
+                // NeuronCollection's neuronList. Restore that membership so the subnetwork's
+                // collections (and their update logic and node grouping) work after redo. The
+                // collection's own per-neuron deletion listener persists, so a plain add (rather
+                // than addNeuron) avoids registering a duplicate listener.
+                if (model is Neuron) {
+                    (parent.childToParentMap[model] as? NeuronCollection)?.let { collection ->
+                        if (model !in collection.neuronList) collection.neuronList.add(model)
+                    }
+                }
                 modelNodeMap.getImmediately<SubnetworkNode>(parent)?.let { subnetworkNode ->
                     modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
                         subnetworkNode.addNode(screenElement)

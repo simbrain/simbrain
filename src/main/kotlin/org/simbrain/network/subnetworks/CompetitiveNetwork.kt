@@ -300,13 +300,13 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         // Copy competitive layer
         copy.competitive = competitive.copy()
         copy.competitive.label = competitive.label
-        copy.addModel(copy.competitive)
+        copy.addNeuronCollection(copy.competitive)
 
         // Copy input layer
         copy.inputLayer = inputLayer.copy()
         copy.inputLayer.label = inputLayer.label
         copy.inputLayer.isAllClamped = true
-        copy.addModel(copy.inputLayer)
+        copy.addNeuronCollection(copy.inputLayer)
 
         // Copy weights
         copy.weights = SynapseGroup(copy.inputLayer, copy.competitive)

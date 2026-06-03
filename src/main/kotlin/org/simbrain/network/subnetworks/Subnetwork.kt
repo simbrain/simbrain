@@ -47,6 +47,18 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
         return NeuronCollection(neurons).also { addModel(it) }
     }
 
+    /**
+     * Register an already-created [NeuronCollection] with this subnetwork, adding both its neurons
+     * (as free models) and the collection itself to the model list. Use this instead of [addModel]
+     * when the collection's neurons are not yet tracked, e.g. in [copy]. Without this the neurons
+     * get GUI nodes but are invisible to deletion, leaving leftover nodes on undo.
+     */
+    fun addNeuronCollection(neuronCollection: NeuronCollection): NeuronCollection {
+        neuronCollection.neuronList.forEach { addModel(it) }
+        addModel(neuronCollection)
+        return neuronCollection
+    }
+
     fun addModel(model: NetworkModel) {
         modelList.add(model)
         if (model is LocatableModel) {

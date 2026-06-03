@@ -26,6 +26,19 @@ import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.workspace.updater.WorkspaceUpdater
 import java.io.*
 import java.util.*
+import kotlin.coroutines.CoroutineContext
+
+/**
+ * Coroutine context marker present while a simulation build block (the body of `newSim { }` or a
+ * reopen function) is running. Iteration triggered from within the build carries this marker and is
+ * allowed to proceed without waiting on [Workspace.simulationBuildLock], which makes the lock
+ * reentrant with respect to the building coroutine. Iteration coming from anywhere else (e.g. the
+ * desktop run button or auto-run) does not carry the marker and still waits for the build to finish.
+ */
+internal object SimulationBuildContext : CoroutineContext.Element {
+    override val key get() = Key
+    object Key : CoroutineContext.Key<SimulationBuildContext>
+}
 
 /**
  * A collection of components which interact via couplings. Neural networks,
@@ -159,6 +172,9 @@ class Workspace: CoroutineScope {
      * on a partially constructed workspace.
      */
     private suspend fun awaitSimulationBuild() {
+        // Iteration triggered from within the simulation build is part of the scripted, sequential
+        // setup and is safe to proceed; re-acquiring the lock here would deadlock the build coroutine.
+        if (currentCoroutineContext()[SimulationBuildContext.Key] != null) return
         simulationBuildLock.withLock { }
     }
 

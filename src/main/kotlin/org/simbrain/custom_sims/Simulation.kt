@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.sync.withLock
+import kotlinx.coroutines.withContext
 import org.simbrain.docviewer.DocViewerComponent
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -14,6 +15,7 @@ import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
+import org.simbrain.workspace.SimulationBuildContext
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
@@ -67,8 +69,10 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
     suspend fun run(desktop: SimbrainDesktop? = null, optionString: String? = null) {
         with(SimulationScope(desktop)) {
             workspace.simulationBuildLock.withLock {
-                task(optionString)
-                workspace.simulationId = id
+                withContext(SimulationBuildContext) {
+                    task(optionString)
+                    workspace.simulationId = id
+                }
             }
         }
     }
@@ -83,7 +87,9 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
     suspend fun reopen(workspace: Workspace, desktop: SimbrainDesktop? = null) {
         with(SimulationScope(desktop)) {
             workspace.simulationBuildLock.withLock {
-                reopenFunction(workspace)
+                withContext(SimulationBuildContext) {
+                    reopenFunction(workspace)
+                }
             }
         }
     }

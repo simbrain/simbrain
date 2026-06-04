@@ -85,6 +85,7 @@ internal fun NetworkPanel.addNeuronArray(
             network.addNetworkModel(targetNeuronArray, usePlacementManager = false, useAutoAssignedId = false)
             targetNeuronArray.setLocation(sourceNeuronArray.locationX, sourceNeuronArray.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+            connector.afterRestore()
         }
     )
     return targetNeuronArray to connector
@@ -163,6 +164,7 @@ internal fun NetworkPanel.addConvLayer(sourceTensorLayer: TensorLayer, template:
             network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
             targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+            connector.afterRestore()
         }
     )
     return targetTensorLayer to connector
@@ -183,6 +185,7 @@ internal fun NetworkPanel.addPoolLayer(sourceTensorLayer: TensorLayer, template:
             network.addNetworkModel(targetTensorLayer, usePlacementManager = false, useAutoAssignedId = false)
             targetTensorLayer.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+            connector.afterRestore()
         }
     )
     return targetTensorLayer to connector
@@ -207,6 +210,7 @@ fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
             network.addNetworkModel(targetArray, usePlacementManager = false, useAutoAssignedId = false)
             targetArray.setLocation(sourceTensorLayer.locationX, sourceTensorLayer.locationY - 400)
             network.addNetworkModel(connector, usePlacementManager = false, useAutoAssignedId = false)
+            connector.afterRestore()
         }
     )
 }

@@ -16,7 +16,6 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
-import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import javax.swing.JMenu

@@ -669,19 +669,3 @@ fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: I
     for (c in components) panel.add(c)
     return panel
 }
-
-/**
- * Vertical stack of components separated by [gap] pixels (default [Theme.sectionGap]).
- * Each row is centered horizontally; for explicit alignment use a custom layout.
- */
-@JvmOverloads
-fun verticalStack(vararg components: Component, gap: Int = Theme.sectionGap): JPanel {
-    val panel = JPanel()
-    panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
-    panel.isOpaque = false
-    for ((i, c) in components.withIndex()) {
-        if (i > 0) panel.add(Box.createVerticalStrut(gap))
-        panel.add(c)
-    }
-    return panel
-}

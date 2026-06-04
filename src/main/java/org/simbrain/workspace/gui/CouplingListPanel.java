@@ -1,6 +1,7 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.Theme;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
@@ -64,7 +65,7 @@ public class CouplingListPanel extends JPanel {
      * @param couplingList list of couplings to be shown in window
      */
     public CouplingListPanel(SimbrainDesktop desktop, Collection<Coupling> couplingList) {
-        super(new BorderLayout(0, org.simbrain.util.Theme.componentGap));
+        super(new BorderLayout(0, Theme.componentGap));
 
         // Reference to the simbrain desktop
         this.desktop = desktop;

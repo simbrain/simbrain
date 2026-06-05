@@ -521,6 +521,11 @@ if (OperatingSystem.current().isMacOsX) {
                 }
                 val logOutput = logOutputStream.toString()
                 println("Detailed Notarization Log:\n$logOutput")
+                throw GradleException(
+                    "Notarization failed with status '$status' (submission $uuid). " +
+                        "The .dmg was not stapled; see the detailed log above. Failing the build so an " +
+                        "un-notarized artifact is not released."
+                )
             }
         }
     }

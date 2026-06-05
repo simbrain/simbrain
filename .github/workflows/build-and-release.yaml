@@ -434,10 +434,13 @@ jobs:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
           ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-          ./etc/sign_mac_jar.sh
-          # buildDistribution copies the (now-signed) Simbrain.jar plus simulations,
-          # scripts, LICENSE, and the bundled eSpeak-ng build into build/main/.
+          # buildDistribution copies Simbrain.jar plus simulations, scripts, LICENSE,
+          # and the bundled eSpeak-ng build into build/main/.
           ./gradlew buildDistribution -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          # Sign the native libs inside build/main/Simbrain.jar, i.e. the jar jpackage
+          # packages. Signing must happen after buildDistribution (not before) so the
+          # signatures are not discarded by a shadowJar re-run.
+          ./etc/sign_mac_jar.sh
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 
@@ -513,10 +516,13 @@ jobs:
           DEVELOPER_ID: ${{ secrets.DEVELOPER_ID }}
         run: |
           ./gradlew shadowJar -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
-          ./etc/sign_mac_jar.sh
-          # buildDistribution copies the (now-signed) Simbrain.jar plus simulations,
-          # scripts, LICENSE, and the bundled eSpeak-ng build into build/main/.
+          # buildDistribution copies Simbrain.jar plus simulations, scripts, LICENSE,
+          # and the bundled eSpeak-ng build into build/main/.
           ./gradlew buildDistribution -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
+          # Sign the native libs inside build/main/Simbrain.jar, i.e. the jar jpackage
+          # packages. Signing must happen after buildDistribution (not before) so the
+          # signatures are not discarded by a shadowJar re-run.
+          ./etc/sign_mac_jar.sh
           ./gradlew jpackageMacOS -PreleaseVersion=$VERSION -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
           ./gradlew notarizeMacApp -PreleaseVersion=$VERSION -PversionSuffix="_x64" -PbuildNumber=$BUILD_NUMBER -PcommitSha=$COMMIT_SHA -PbuildTimestamp=$BUILD_TIMESTAMP
 

@@ -5,8 +5,13 @@ set -e
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR" || exit 1
 
-# Variables
-JAR_DIR="${SCRIPT_DIR}/../build/libs"
+# Directory holding the jar(s) whose bundled native libraries should be signed.
+# Defaults to build/main (populated by the buildDistribution task) so the
+# signatures land in the jar that jpackage actually packages. Signing the
+# build/libs copy is unsafe: a later buildDistribution run sees shadowJar's
+# output was mutated, re-runs shadowJar, and regenerates an unsigned jar,
+# silently discarding the signatures (which then fails notarization).
+JAR_DIR="${1:-${SCRIPT_DIR}/../build/main}"
 
 developer_application_id="Developer ID Application: $DEVELOPER_ID"
 
@@ -14,7 +19,7 @@ developer_application_id="Developer ID Application: $DEVELOPER_ID"
 sign_file() {
     local file_path="$1"
     echo "Signing binary: $binary"
-    codesign -f --sign "$developer_application_id" --timestamp "$file_path"
+    codesign -f --sign "$developer_application_id" --timestamp --options runtime "$file_path"
     echo "Verifying binary: $binary"
     codesign -vvv --deep --strict "$file_path"
 }
@@ -22,7 +27,7 @@ sign_file() {
 # Function to sign all binaries within a directory
 sign_binaries_in_dir() {
     local dir_path="$1"
-    find "$dir_path" -type f -name "*.dylib" -or -name "*.jnilib" | while read -r binary; do
+    find "$dir_path" -type f \( -name "*.dylib" -o -name "*.jnilib" \) | while read -r binary; do
         sign_file "$binary"
     done
 }

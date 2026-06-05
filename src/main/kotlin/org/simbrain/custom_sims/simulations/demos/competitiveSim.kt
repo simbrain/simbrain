@@ -21,6 +21,7 @@ val competitiveSim = newSim {
     // Competitive network
     val competitive = CompetitiveNetwork(7, 5)
     network.addNetworkModelAsync(competitive)
+    competitive.applySimulationLayout()
     competitive.inputLayer.setUpperBound(1.0)
     
     competitive.learningRate = 0.05

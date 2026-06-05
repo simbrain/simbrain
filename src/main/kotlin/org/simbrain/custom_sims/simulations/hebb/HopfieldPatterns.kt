@@ -27,6 +27,9 @@ val hopfieldPatterns = newSim {
         updateFunc = HopfieldUpdate.SYNC
         customInfo.fontSize = 24
         customInfo.spacing = 20.0
+        neuronGroup.betweenNeuronInterval = 25
+        neuronGroup.setLayoutBasedOnSize()
+        neuronGroup.applyLayout()
     }
     var patternCnt = 0.0
     network.addNetworkModelAsync(hopfield)

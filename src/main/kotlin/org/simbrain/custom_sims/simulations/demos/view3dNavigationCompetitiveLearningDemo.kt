@@ -14,7 +14,9 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val (odorWorldComponent, view3dSensor) = createView3dNavigationScene(16, 16)
+    val scene = createView3dNavigationScene(16, 16)
+    val odorWorldComponent = scene.odorWorldComponent
+    val view3dSensor = scene.view3dSensor
     val inputSize = view3dSensor.outputWidth * view3dSensor.outputHeight
 
     val prototypeComponent = addImageWorld("Winner Prototype")

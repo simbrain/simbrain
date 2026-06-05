@@ -109,6 +109,27 @@ network.updateManager.addAction(updateAction("Custom Learning") {
 })
 ```
 
+**Neuron collection layout (spacing and multi-layer subnetworks):**
+
+Changing `betweenNeuronInterval` or other layout spacing after a `NeuronCollection` or subnetwork is built requires more than assigning the property. `setLayoutBasedOnSize()` configures the layout object and lays out neurons once; you still need `applyLayout()` so neuron positions update at the collection's current location.
+
+For subnetworks with multiple layers (`CompetitiveNetwork`, `SOMNetwork`, etc.), also re-run alignment and offset after relayouting every layer. Otherwise layers overlap or drift apart.
+
+```kotlin
+collection.betweenNeuronInterval = 30
+collection.setLayoutBasedOnSize()
+collection.applyLayout()
+```
+
+```kotlin
+alignNetworkModels(inputLayer, outputLayer, Alignment.VERTICAL)
+offsetNeuronCollections(inputLayer, outputLayer, Direction.NORTH, gap)
+```
+
+**Kotlin shadowing:** if a local variable has the same name as a subnetwork field (for example `val competitive = CompetitiveNetwork(...)` and the `competitive` neuron group inside it), `competitive.betweenNeuronInterval` inside `apply { }` refers to the network, not the neuron collection. Use `this.competitive`, rename the local variable, or call an extension on the subnetwork type.
+
+Shared helpers and defaults for competitive/SOM menu sims live in `SimulationLayoutUtils.kt` (`applySimulationLayout()`, `SIM_NEURON_INTERVAL`, `COMPETITIVE_LAYER_GAP`). For SOM sims, pass separate `inputNeuronInterval` and `somNeuronInterval` when the map needs more room for labels; layer gap is half the laid-out SOM group height plus `SOM_LAYER_GAP_EXTRA` (100px). Good single-layer examples: `hebb/HopfieldPatterns.kt`, `hebb/DiscreteHopfieldSim.kt`.
+
 **Reopenable (with custom updates/panels):**
 ```kotlin
 val mySim = newSim("unique_id") {

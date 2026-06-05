@@ -1,5 +1,8 @@
 package org.simbrain.custom_sims.simulations.demos
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
@@ -7,12 +10,18 @@ import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
+import org.simbrain.util.showWarningConfirmDialog
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.OdorWorldPreferences
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.View3DSensor
+import java.awt.BorderLayout
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.io.File
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.swing.*
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -39,7 +48,7 @@ val objectRecognition3D = newSim {
         EntityType.Geraniums, EntityType.Tulip, EntityType.Flax, EntityType.Pansy,
     )
 
-    var samplesPerClass = 2048
+    var samplesPerClass = 200
     var innerRadius = 20.0
     var outerRadius = 180.0
     var headingJitterDeg = 30.0
@@ -86,7 +95,23 @@ val objectRecognition3D = newSim {
     val networkComponent = addNetworkComponent("CNN")
     val network = networkComponent.network
 
-    suspend fun generateAndBuild() {
+    suspend fun confirmDatasetSize(): Boolean = withContext(Dispatchers.Swing) {
+        val numClasses = (if (includeNoObject) 4 else 3)
+        val estMb = estimatedDatasetMb(samplesPerClass, numClasses, pixelsPerImage)
+        val maxMb = Runtime.getRuntime().maxMemory() / (1024 * 1024)
+        if (estMb <= maxMb * 0.3) {
+            return@withContext true
+        }
+        showWarningConfirmDialog(
+            """
+            Estimated dataset size is about $estMb MB (max heap: $maxMb MB).
+
+            This may cause an OutOfMemoryError. Continue anyway?
+            """.trimIndent()
+        ) == JOptionPane.YES_OPTION
+    }
+
+    suspend fun generateAndBuild(cancelRequested: AtomicBoolean = AtomicBoolean(false)): Boolean {
         view3dSensor.viewDistance = viewDistance
 
         if (network.allModels.isNotEmpty()) {
@@ -111,39 +136,79 @@ val objectRecognition3D = newSim {
         val targetXRange = odorWorld.width - 2 * targetMargin
         val targetYRange = odorWorld.height - 2 * targetMargin
 
-        val progressWindow = ProgressWindow(totalSamples, "Generating dataset")
+        val progressWindow = withContext(Dispatchers.Swing) {
+            ProgressWindow(totalSamples, "Generating dataset: 0 / $totalSamples").apply progressWindow@{
+                defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+                val cancelButton = JButton("Cancel").apply {
+                    addActionListener {
+                        cancelRequested.set(true)
+                        isEnabled = false
+                        text = "Cancelling..."
+                        this@progressWindow.text = "Cancelling after current sample..."
+                    }
+                }
+                add(
+                    JPanel(BorderLayout()).apply {
+                        border = BorderFactory.createEmptyBorder(0, 10, 10, 10)
+                        add(cancelButton, BorderLayout.CENTER)
+                    },
+                    BorderLayout.SOUTH
+                )
+                addWindowListener(object : WindowAdapter() {
+                    override fun windowClosing(e: WindowEvent) {
+                        cancelRequested.set(true)
+                    }
+                })
+                pack()
+                setLocationRelativeTo(null)
+            }
+        }
+
         var globalIdx = 0
-        for ((classIdx, type) in classes.withIndex()) {
-            if (type != null) target.entityType = type
-            val oneHot = DoubleArray(classes.size) { if (it == classIdx) 1.0 else 0.0 }
-            repeat(samplesPerClass) {
-                val tx = targetMargin + rng.nextDouble() * targetXRange
-                val ty = targetMargin + rng.nextDouble() * targetYRange
-                target.x = tx
-                target.y = ty
-                val r = innerRadius + rng.nextDouble() * (outerRadius - innerRadius)
-                val theta = rng.nextDouble() * 2 * PI
-                mouse.x = tx + r * cos(theta)
-                mouse.y = ty + r * sin(theta)
-                val toTarget = Math.toDegrees(atan2(mouse.y - ty, tx - mouse.x))
-                // For "No Object" samples the mouse faces 180° away so the target falls behind the FOV.
-                val baseHeading = if (type == null) toTarget + 180.0 else toTarget
-                val jitter = (rng.nextDouble() * 2 - 1) * headingJitterDeg
-                mouse.heading = baseHeading + jitter
-                view3dSensor.update(mouse)
-                val pixels = view3dSensor.rgbTensorLayer
-                val row = ArrayList<Double>(pixelsPerImage)
-                for (v in pixels) row.add(v)
-                allInputs.add(row)
-                allTargets.add(oneHot.toMutableList())
-                globalIdx++
-                if (globalIdx % 100 == 0) {
-                    progressWindow.value = globalIdx
-                    progressWindow.text = "Generating dataset: $globalIdx / $totalSamples"
+        try {
+            for ((classIdx, type) in classes.withIndex()) {
+                if (type != null) target.entityType = type
+                val oneHot = DoubleArray(classes.size) { if (it == classIdx) 1.0 else 0.0 }
+                repeat(samplesPerClass) {
+                    if (cancelRequested.get()) {
+                        target.delete()
+                        return false
+                    }
+                    val tx = targetMargin + rng.nextDouble() * targetXRange
+                    val ty = targetMargin + rng.nextDouble() * targetYRange
+                    target.x = tx
+                    target.y = ty
+                    val r = innerRadius + rng.nextDouble() * (outerRadius - innerRadius)
+                    val theta = rng.nextDouble() * 2 * PI
+                    mouse.x = tx + r * cos(theta)
+                    mouse.y = ty + r * sin(theta)
+                    val toTarget = Math.toDegrees(atan2(mouse.y - ty, tx - mouse.x))
+                    // For "No Object" samples the mouse faces 180° away so the target falls behind the FOV.
+                    val baseHeading = if (type == null) toTarget + 180.0 else toTarget
+                    val jitter = (rng.nextDouble() * 2 - 1) * headingJitterDeg
+                    mouse.heading = baseHeading + jitter
+                    view3dSensor.update(mouse)
+                    val pixels = view3dSensor.rgbTensorLayer
+                    val row = ArrayList<Double>(pixelsPerImage)
+                    for (v in pixels) row.add(v)
+                    allInputs.add(row)
+                    allTargets.add(oneHot.toMutableList())
+                    globalIdx++
+                    if (globalIdx % 50 == 0 || globalIdx == totalSamples) {
+                        withContext(Dispatchers.Swing) {
+                            progressWindow.value = globalIdx
+                            progressWindow.text = "Generating dataset: $globalIdx / $totalSamples"
+                        }
+                    }
+                }
+            }
+        } finally {
+            withContext(Dispatchers.Swing) {
+                if (progressWindow.isDisplayable) {
+                    progressWindow.close()
                 }
             }
         }
-        progressWindow.close()
 
         target.delete()
         val uniqueTypes = classEntityTypes.toSet().toList()
@@ -253,6 +318,7 @@ val objectRecognition3D = newSim {
             view3dSensor.getProducer(View3DSensor::rgbTensorLayer) couple
                     inputTensorLayer.getConsumer(inputTensorLayer::activations)
         }
+        return true
     }
 
     val gui = withGui {
@@ -278,9 +344,16 @@ val objectRecognition3D = newSim {
                 text = if (hasGenerated) "Regenerating..." else "Generating..."
                 isEnabled = false
                 try {
-                    generateAndBuild()
-                    hasGenerated = true
-                    text = "Regenerate"
+                    if (!confirmDatasetSize()) {
+                        return@addButton
+                    }
+                    val cancelRequested = AtomicBoolean(false)
+                    if (generateAndBuild(cancelRequested)) {
+                        hasGenerated = true
+                        text = "Regenerate"
+                    } else {
+                        text = prior
+                    }
                 } catch (e: Throwable) {
                     text = prior
                     throw e
@@ -305,6 +378,15 @@ val objectRecognition3D = newSim {
 
         # Simulation Details
 
+        ## Dataset Size and Memory
+        The default is `200` samples per class, which is enough to explore the
+        workflow without using much memory. For better accuracy, increase
+        `Samples per class` in the Configuration panel (e.g. 1000–2000+).
+        Large datasets can require substantial memory; if you see an
+        `OutOfMemoryError`, lower `Samples per class` and try again. Simbrain
+        warns before generating when the estimated dataset may exceed about
+        30% of available memory.
+
         ## Pose Sampling
         - For each class the target entity is teleported to a random
           position (within the world margins) and the mouse is placed in
@@ -323,4 +405,10 @@ val objectRecognition3D = newSim {
         5. Tweak parameters and click `Regenerate` to rerun with fresh data.
         """.trimIndent()
     )
+}
+
+private fun estimatedDatasetMb(samplesPerClass: Int, numClasses: Int, pixelsPerImage: Int): Long {
+    val totalSamples = samplesPerClass.toLong() * numClasses
+    val bytesPerSample = pixelsPerImage.toLong() * 8 * 3 + numClasses * 8 * 3
+    return totalSamples * bytesPerSample / (1024 * 1024)
 }

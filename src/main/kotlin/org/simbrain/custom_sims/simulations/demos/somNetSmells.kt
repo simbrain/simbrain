@@ -29,6 +29,7 @@ val somNetSmells = newSim {
 
     val somNet = SOMNetwork(9, 16)
     network.addNetworkModel(somNet)
+    somNet.applySimulationLayout(somNeuronInterval = SOM_SMELLS_SOM_INTERVAL)
     somNet.inputLayer.apply {
         setUpperBound(1.0)
         isClamped = false

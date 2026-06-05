@@ -8,6 +8,7 @@ import org.simbrain.util.point
 import org.simbrain.world.imageworld.filters.EdgeDetectionFilter
 import org.simbrain.world.imageworld.filters.GrayscaleOperation
 import org.simbrain.world.imageworld.filters.ResizeOperation
+import org.simbrain.world.odorworld.behaviors.Wander
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.sensors.View3DSensor
 
@@ -41,6 +42,9 @@ val view3dNavigationPipelineDemo = newSim {
         heading = 344.0
         location = point(54, 116)
         name = "Agent"
+        behavior = Wander().apply {
+            maxSpeed = 1.5
+        }
     }
 
     val view3dSensor = View3DSensor().apply {
@@ -116,7 +120,7 @@ val view3dNavigationPipelineDemo = newSim {
 
         # What to Do
 
-        Click `Run`, move the main agent around in the `Odor World` with the keyboard or mouse, and observe the `Image World` edge detection.
+        Click `Run` and watch Amy wander through the world. The `Image World` updates live with edge-detected views of the landmarks she passes. You can also move her manually with the keyboard or mouse.
          
        In the `Image World` you can edit the current pipeline and see how this changes the presentation. You can:
 

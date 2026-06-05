@@ -6,7 +6,6 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.layouts.LineLayout
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.SmellSource
 import org.simbrain.util.place
@@ -35,9 +34,10 @@ val cogMap3Objects = newSim {
 
     // Make reservoir
     val recurrent = network.addNeuronCollection(numNeurons).apply {
-        // layout(GridLayout())
         label = "Recurrent"
-        // setNeuronType(LinearRule())
+        betweenNeuronInterval = 30
+        setLayoutBasedOnSize(point(0.0, 0.0))
+        applyLayout()
     }
     val weightMatrix = WeightMatrix(recurrent, recurrent)
     weightMatrix.randomize()
@@ -49,8 +49,9 @@ val cogMap3Objects = newSim {
         setLowerBound(-1.0)
         setUpperBound(1.0)
         label = "Sensory Neurons"
-        layout = LineLayout()
-        setLocation(0.0, 751.0)
+        betweenNeuronInterval = 30
+        setLayoutBasedOnSize(point(0.0, 751.0))
+        applyLayout()
     }
 
     val sparseExcitatory = Sparse(0.7, true, false)

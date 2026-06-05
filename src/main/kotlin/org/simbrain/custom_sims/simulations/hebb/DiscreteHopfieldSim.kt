@@ -28,6 +28,9 @@ val discreteHopfieldSim = newSim {
     val hopfield = Hopfield(numNeurons).apply {
         updateFunc = HopfieldUpdate.SYNC
         customInfo.fontSize = 24
+        neuronGroup.betweenNeuronInterval = 25
+        neuronGroup.setLayoutBasedOnSize()
+        neuronGroup.applyLayout()
     }
     network.addNetworkModelAsync(hopfield)
 

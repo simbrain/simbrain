@@ -17,6 +17,7 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Dimension
 import java.awt.Graphics
+import javax.swing.JPanel
 
 /**
  * A retina-like simulation / first effort to link 3d sensor to free nodes with recurrent connections
@@ -25,7 +26,14 @@ val view3dNavigationLateralInhibitionDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val (odorWorldComponent, view3dSensor) = createView3dNavigationScene(24, 24)
+    val scene = createView3dNavigationScene(24, 24)
+    scene.agent.apply {
+        location = point(54, 116)
+        heading = 344.0
+    }
+    scene.view3dSensor.update(scene.agent)
+    val odorWorldComponent = scene.odorWorldComponent
+    val view3dSensor = scene.view3dSensor
     val imageSize = view3dSensor.outputWidth * view3dSensor.outputHeight
 
     val networkComponent = addNetworkComponent("Lateral Inhibition Network")
@@ -98,16 +106,15 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         place(odorWorldComponent, 345, 0, 400, 620)
         place(networkComponent, 734, 0, 565, 618)
 
-        val brightnessPanel = object : javax.swing.JPanel() {
-            init {
-                preferredSize = Dimension(280, 180)
-            }
+        val brightnessPanel = object : JPanel() {
+            override fun getPreferredSize() = Dimension(280, 180)
+            override fun getMinimumSize() = Dimension(280, 180)
+            override fun getMaximumSize() = Dimension(280, 180)
 
             override fun paintComponent(g: Graphics) {
                 super.paintComponent(g)
                 val brightness = view3dSensor.brightness
-                val expectedSize = view3dSensor.outputWidth * view3dSensor.outputHeight
-                if (brightness.size == expectedSize && expectedSize > 0) {
+                if (brightness.size == imageSize) {
                     val image = brightness.toGrayScaleImage(
                         view3dSensor.outputWidth,
                         view3dSensor.outputHeight
@@ -120,8 +127,8 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         }
 
         val controlPanel = createControlPanel("Lateral Inhibition Controls", 0, 0) {
-            addComponent(brightnessPanel)
             addLabel("Brightness Array")
+            addComponent(brightnessPanel)
             addSeparator()
             addSlider("Input Gain", 0.1, 2.5, inputGain, 0.05) {
                 inputGain = it
@@ -150,14 +157,6 @@ val view3dNavigationLateralInhibitionDemo = newSim {
                 }
                 applyStrengths()
             }
-            //addButton("Clear Retina") {
-            //    retina.activationArray = DoubleArray(imageSize)
-            //}
-            //addButton("Randomize Lateral Weights") {
-            //    excitatoryLateralSynapses.forEach { it.randomize() }
-            //    inhibitoryLateralSynapses.forEach { it.randomize() }
-            //    applyStrengths()
-            //}
         }
         controlPanel.setBounds(0, 0, 353, 597)
 
@@ -169,7 +168,6 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         }
     }
 
-    // Iterate once so that something is showing in control panel
     workspace.updater.iterate(2)
 
     addSidebarInfo(
@@ -192,7 +190,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
 
         # What to Do
 
-        1. Click `Run` and move the agent in `Odor World`.
+        1. Click `Run` and watch Amy wander through `Odor World`, or move her manually.
         2. Watch `Brightness Array` in the control panel to see the raw data sent to the network
         3. Watch the network window which shows how a simple retina-like circuit processes this information
         4. Adjust controls and compare:

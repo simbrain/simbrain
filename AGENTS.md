@@ -64,7 +64,7 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 
 ## Common Tasks
 
-**Adding a simulation:** See `custom_sims/AGENTS_SIMULATIONS.md`
+**Adding a simulation:** See `custom_sims/AGENTS_SIMULATIONS.md` (includes neuron layout spacing pitfalls and `SimulationLayoutUtils.kt` for multi-layer subnetworks)
 
 **Adding a neuron type:**
 1. Create class in `network/updaterules/` extending `NeuronUpdateRule`

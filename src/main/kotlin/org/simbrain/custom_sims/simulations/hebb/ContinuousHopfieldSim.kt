@@ -36,6 +36,7 @@ val hopfieldSimContinuous = newSim {
 
     val hopfield = network.addNeuronCollection(numNeurons) { updateRule = AdditiveRule() }.apply {
         toggleClamping() // Default to clamping for training
+        betweenNeuronInterval = 25
         setLayoutBasedOnSize()
         applyLayout()
     }

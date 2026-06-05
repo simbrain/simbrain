@@ -1,7 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.network.core.activations
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.util.add
 import org.simbrain.util.place
@@ -20,6 +19,7 @@ val competitiveGridSim = newSim {
     // Competitive network
     val competitive = CompetitiveNetwork(100, 5)
     network.addNetworkModelAsync(competitive)
+    competitive.applySimulationLayout()
     competitive.inputLayer.setUpperBound(1.0)
     val inputs = competitive.inputLayer
 
@@ -90,7 +90,7 @@ val competitiveGridSim = newSim {
         createControlPanel("Control Panel", 0, 13) {
 
             addButton("Pattern 1") {
-                competitive.inputLayer.neuronList.activations =
+                competitive.showInputPattern(network,
                     listOf(
                         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
@@ -102,11 +102,11 @@ val competitiveGridSim = newSim {
                         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0
-                    )
+                ))
                 winningLabel = "P1"
             }
             addButton("Pattern 2") {
-                competitive.inputLayer.neuronList.activations =
+                competitive.showInputPattern(network,
                     listOf(
                         0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,
@@ -118,11 +118,11 @@ val competitiveGridSim = newSim {
                         0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0,
                         0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0
-                    )
+                ))
                 winningLabel = "P2"
             }
             addButton("Pattern 3") {
-                competitive.inputLayer.neuronList.activations =
+                competitive.showInputPattern(network,
                     listOf(
                         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0,
                         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
@@ -134,11 +134,11 @@ val competitiveGridSim = newSim {
                         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
                         0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0,
                         1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0
-                    )
+                ))
                 winningLabel = "P3"
             }
             addButton("Pattern 4") {
-                competitive.inputLayer.neuronList.activations =
+                competitive.showInputPattern(network,
                     listOf(
                         1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                         1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -150,11 +150,11 @@ val competitiveGridSim = newSim {
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0,
                         0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0
-                    )
+                ))
                 winningLabel = "P4"
             }
             addButton("Pattern 5") {
-                competitive.inputLayer.neuronList.activations =
+                competitive.showInputPattern(network,
                     listOf(
                         0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0,
                         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
@@ -166,7 +166,7 @@ val competitiveGridSim = newSim {
                         1.0, 1.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 1.0, 1.0,
                         0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0,
                         0.0, 0.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 0.0, 0.0
-                    )
+                ))
                 winningLabel = "P5"
             }
 

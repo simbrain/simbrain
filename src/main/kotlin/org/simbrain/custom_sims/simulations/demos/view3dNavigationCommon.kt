@@ -6,11 +6,15 @@ import org.simbrain.util.SmellSource
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.OdorWorldComponent
+import org.simbrain.world.odorworld.behaviors.Wander
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.View3DSensor
+import kotlin.math.atan2
 
 data class View3dNavigationScene(
     val odorWorldComponent: OdorWorldComponent,
+    val agent: OdorWorldEntity,
     val view3dSensor: View3DSensor
 )
 
@@ -38,9 +42,11 @@ suspend fun SimulationScope.createView3dNavigationScene(
         odorWorld.height / 2,
         EntityType.Amy
     ).apply {
-        heading = 90.0
         location = point(281, 300)
         name = "Agent"
+        behavior = Wander().apply {
+            maxSpeed = 1.5
+        }
     }
 
     val view3dSensor = View3DSensor().apply {
@@ -55,14 +61,16 @@ suspend fun SimulationScope.createView3dNavigationScene(
     }
     agent.addSensor(view3dSensor)
     agent.addDefaultEffectors()
-    agent.select()
+
+    val flowerX = 280.0
+    val flowerY = 190.0
 
     listOf(
         Triple(120, 120, EntityType.Swiss),
         Triple(430, 120, EntityType.Fish),
         Triple(120, 430, EntityType.Candle),
         Triple(430, 430, EntityType.Poison),
-        Triple(280, 190, EntityType.Flower),
+        Triple(flowerX.toInt(), flowerY.toInt(), EntityType.Flower),
         Triple(190, 320, EntityType.Tulip),
         Triple(360, 300, EntityType.Pansy),
         Triple(90, 270, EntityType.Lion),
@@ -74,7 +82,11 @@ suspend fun SimulationScope.createView3dNavigationScene(
         }
     }
 
-    return View3dNavigationScene(odorWorldComponent, view3dSensor)
+    agent.heading = Math.toDegrees(atan2(flowerY - agent.y, flowerX - agent.x))
+    view3dSensor.update(agent)
+    agent.select()
+
+    return View3dNavigationScene(odorWorldComponent, agent, view3dSensor)
 }
 
 fun neighborhoodAverage(

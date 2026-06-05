@@ -20,6 +20,7 @@ val SOMSim = newSim {
     // SOM network
     val SOM = SOMNetwork(7, 16)
     network.addNetworkModelAsync(SOM)
+    SOM.applySimulationLayout(somNeuronInterval = SOM_SIM_SOM_INTERVAL)
     SOM.inputLayer.setUpperBound(1.0)
 
     var winningLabel = ""

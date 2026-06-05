@@ -4,8 +4,9 @@ import org.simbrain.network.gui.nodes.TextNode;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.Theme;
 
+import net.miginfocom.swing.MigLayout;
+
 import javax.swing.*;
-import javax.swing.border.Border;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import java.awt.*;
@@ -24,16 +25,6 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      * Selection list.
      */
     private Collection<TextNode> selectionList;
-
-    /**
-     * Tabbed pane for font and color effects.
-     */
-    private JTabbedPane tabbedPane = new JTabbedPane();
-
-    /**
-     * Color Chooser.
-     */
-    private JColorChooser colorTab = new JColorChooser();
 
     /**
      * Gets available fonts.
@@ -141,12 +132,7 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
     private JTextField jtfTest = new JTextField("AaBbYyZz");
 
     /**
-     * Main container.
-     */
-    Container container = getContentPane();
-
-    /**
-     * Main panel.
+     * Sample preview panel.
      */
     JPanel panel = new JPanel();
 
@@ -167,57 +153,38 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
      */
     public void init() {
         super.setTitle("Font Chooser");
-        Border panelBorder = Theme.sectionBorder("Sample");
         fList.setSelectionMode(0);
         stList.setSelectionMode(0);
         sizeList.setSelectionMode(0);
+        fList.setVisibleRowCount(8);
+        stList.setVisibleRowCount(8);
+        sizeList.setVisibleRowCount(8);
         jtfTest.setHorizontalAlignment(JTextField.CENTER);
         jspFont.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jspStyle.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
         jspSize.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
 
-        panel.setBorder(panelBorder);
+        panel.setLayout(new BorderLayout());
+        panel.setBorder(Theme.sectionBorder("Sample"));
+        panel.add(jtfTest, BorderLayout.CENTER);
 
-        jtfFonts.setBounds(8, 5, 121, 20);
-        jspFont.setBounds(8, 29, 121, 82);
+        JPanel content = new JPanel(new MigLayout(
+                "insets 0, wrap 3, fillx",
+                "[grow 40,fill][grow 40,fill][grow 20,fill]",
+                "[][][grow][]"));
+        content.add(jlbFonts);
+        content.add(jlbStyle);
+        content.add(jlbSize);
+        content.add(jtfFonts);
+        content.add(jtfStyle);
+        content.add(jtfSize);
+        content.add(jspFont, "grow");
+        content.add(jspStyle, "grow");
+        content.add(jspSize, "grow");
+        content.add(panel, "span 3, growx, gaptop " + Theme.componentGap);
 
-        jtfStyle.setBounds(136, 5, 121, 20);
-        jspStyle.setBounds(136, 29, 121, 82);
-
-        jtfSize.setBounds(264, 5, 41, 20);
-        jspSize.setBounds(264, 29, 41, 82);
-
-        panel.setBounds(6, 121, 301, 67);
-
-        container.add(jlbFonts);
-        container.add(jtfFonts);
-        container.add(jspFont);
-
-        container.add(jlbStyle);
-        container.add(jtfStyle);
-        container.add(jspStyle);
-
-        container.add(jlbSize);
-        container.add(jtfSize);
-        container.add(jspSize);
-
-        container.add(panel);
-
-        jtfTest.setBounds(8, 20, 288, 35);
-
-        panel.add(jtfTest);
-
-        container.setLayout(null);
-        panel.setLayout(null);
-
-        setSize(340, 278);
-        setResizable(false);
+        setContentPane(content);
         setModal(true);
-
-        // tabbedPane.addTab("Font", container);
-        // tabbedPane.addTab("Color", colorTab);
-        // setContentPane(tabbedPane);
-        setContentPane(container);
 
         jtfFonts.addActionListener(this);
         jtfSize.addActionListener(this);
@@ -225,6 +192,8 @@ public class TextDialog extends StandardDialog implements ActionListener, ListSe
         fList.addListSelectionListener(this);
         stList.addListSelectionListener(this);
         sizeList.addListSelectionListener(this);
+
+        pack();
     }
 
     /**

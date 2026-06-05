@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
+import net.miginfocom.swing.MigLayout
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
@@ -303,7 +304,7 @@ object SimbrainDesktop {
 
         // Set up Desktop
         if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
-            desktopPane.background = Color.WHITE
+            desktopPane.background = UIManager.getColor("Desktop.background")
             desktopPane.border = BorderFactory.createLoweredBevelBorder()
         }
         desktopPane.addMouseListener(mouseListener)
@@ -587,87 +588,12 @@ object SimbrainDesktop {
      * Show the About dialog with version and build information
      */
     private fun showAboutDialog() {
-        val aboutDialog = JDialog(frame, "About Simbrain", true)
-        aboutDialog.layout = BorderLayout()
-        
-        // Logo at the top
-        val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-        val logoLabel = JLabel()
-        val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
-        logoLabel.icon = ImageIcon(logoImage)
-        logoPanel.add(logoLabel)
-        
-        // Middle section with info
-        val infoPanel = JPanel()
-        infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-        infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
-
-        val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
-        titleLabel.font = Theme.font(18, Font.BOLD)
-        titleLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-        val versionLabel = JLabel(BuildInfo.fullVersionString)
-        versionLabel.font = Theme.font(14)
-        versionLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-        // Add build info if available
-        val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
-            JLabel("Commit: ${BuildInfo.commitSha}").apply {
-                font = Theme.font(12)
-                alignmentX = Component.CENTER_ALIGNMENT
-                foreground = Theme.mutedText
-            }
-        } else null
-
-        val descriptionLabel = JLabel("A framework for neural network simulation")
-        descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
-        
-        infoPanel.add(Box.createVerticalStrut(10))
-        infoPanel.add(titleLabel)
-        infoPanel.add(Box.createVerticalStrut(5))
-        infoPanel.add(versionLabel)
-        buildInfoLabel?.let {
-            infoPanel.add(Box.createVerticalStrut(3))
-            infoPanel.add(it)
+        buildAboutDialog(frame).apply {
+            isModal = true
+            pack()
+            setLocationRelativeTo(frame)
+            isVisible = true
         }
-        infoPanel.add(Box.createVerticalStrut(10))
-        infoPanel.add(descriptionLabel)
-        infoPanel.add(Box.createVerticalStrut(10))
-
-        // Links
-        val linkPanel = JPanel()
-        linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
-        linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
-        
-        val websiteButton = JButton("Visit Simbrain Website")
-        websiteButton.addActionListener { 
-            Utils.displayURLInBrowser("https://simbrain.net")
-        }
-        websiteButton.alignmentX = Component.CENTER_ALIGNMENT
-        
-        val creditsButton = JButton("View Credits")
-        creditsButton.addActionListener { 
-            Utils.displayURLInBrowser("https://simbrain.net/credits/")
-        }
-        creditsButton.alignmentX = Component.CENTER_ALIGNMENT
-        
-        linkPanel.add(websiteButton)
-        linkPanel.add(Box.createVerticalStrut(5))
-        linkPanel.add(creditsButton)
-
-        // Add all components to the dialog
-        val centerPanel = JPanel(BorderLayout())
-        centerPanel.add(logoPanel, BorderLayout.NORTH)
-        centerPanel.add(infoPanel, BorderLayout.CENTER)
-        
-        aboutDialog.add(centerPanel, BorderLayout.CENTER)
-        aboutDialog.add(linkPanel, BorderLayout.SOUTH)
-
-        // Configure dialog
-        aboutDialog.size = Dimension(375, 380)
-        aboutDialog.isResizable = false
-        aboutDialog.setLocationRelativeTo(frame)
-        aboutDialog.isVisible = true
     }
 
     private fun createContextMenu() {
@@ -1049,15 +975,7 @@ object SimbrainDesktop {
             e.printStackTrace(PrintWriter(sw))
             e.printStackTrace()
             val stackTrace = sw.toString()
-            val textArea = JTextArea("An error occurred: ${e.message}\n\n$stackTrace").apply {
-                isEditable = false
-                rows = 10
-                columns = 50
-            }
-            val scrollPane = JScrollPane(textArea)
-            SwingUtilities.invokeLater {
-                JOptionPane.showMessageDialog(null, scrollPane, "Uncaught Exception", JOptionPane.ERROR_MESSAGE)
-            }
+            showMessageDialog("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
         }
 
         /*
@@ -1079,19 +997,15 @@ object SimbrainDesktop {
      * @return the JOptionPane pane result
      */
     private fun showHasChangedDialog(): Int {
-        val options = arrayOf<Any>("Save", "Don't Save", "Cancel")
-        return JOptionPane.showOptionDialog(
-            frame,
+        val options = arrayOf("Save", "Don't Save", "Cancel")
+        return showOptionDialog(
             """
      The workspace has changed since last save,
      Would you like to save these changes?
      """.trimIndent(),
             "Workspace Has Changed",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE,
-            null,
             options,
-            options[0]
+            0
         )
     }
 
@@ -1297,5 +1211,37 @@ object SimbrainDesktop {
     @JvmStatic
     fun main(args: Array<String>) {
         SwingUtilities.invokeLater { createAndShowGUI() }
+    }
+}
+
+/**
+ * Build the About dialog (logo, version/build info, website/credits links) on a [StandardDialog].
+ */
+fun buildAboutDialog(parent: Window?): StandardDialog {
+    val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+
+    val content = JPanel(MigLayout("wrap 1, insets 0", "[grow,center]")).apply {
+        add(JLabel(ImageIcon(logoImage)))
+        add(JLabel("Simbrain ${BuildInfo.versionName}").apply { font = Theme.font(18, Font.BOLD) }, "gaptop ${Theme.sectionGap}")
+        add(JLabel(BuildInfo.fullVersionString).apply { font = Theme.font(14) }, "gaptop ${Theme.tightGap}")
+        if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
+            add(JLabel("Commit: ${BuildInfo.commitSha}").apply {
+                font = Theme.font(12)
+                foreground = Theme.mutedText
+            }, "gaptop ${Theme.tightGap}")
+        }
+        add(JLabel("A framework for neural network simulation"), "gaptop ${Theme.sectionGap}")
+    }
+
+    return StandardDialog(parent, "About Simbrain").apply {
+        contentPane = content
+        addButton(JButton("Visit Simbrain Website").apply {
+            addActionListener { Utils.displayURLInBrowser("https://simbrain.net") }
+        })
+        addButton(JButton("View Credits").apply {
+            addActionListener { Utils.displayURLInBrowser("https://simbrain.net/credits/") }
+        })
+        setAsDoneDialog()
+        isResizable = false
     }
 }

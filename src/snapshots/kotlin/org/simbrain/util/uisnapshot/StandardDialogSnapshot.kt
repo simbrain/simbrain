@@ -8,7 +8,7 @@ import javax.swing.JButton
 
 /**
  * A plain [StandardDialog] with a subclass-supplied "Help" button, to exercise the
- * full button bar: Help on the left, OK/Cancel right-aligned.
+ * full button bar: the FlatLaf round help button on the left, OK/Cancel right-aligned.
  */
 class StandardDialogSnapshot : UiSnapshotDef {
     override val name = "standard_dialog"
@@ -18,7 +18,7 @@ class StandardDialogSnapshot : UiSnapshotDef {
         val dialog = StandardDialog()
         dialog.contentPane = editor
         dialog.title = "Standard Dialog"
-        dialog.addButton(JButton("Help"))
+        dialog.addButton(JButton("Help").apply { putClientProperty("JButton.buttonType", "help") })
         return dialog
     }
 }

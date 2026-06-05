@@ -800,7 +800,6 @@ object SimbrainDesktop {
     fun addDesktopComponent(workspaceComponent: WorkspaceComponent) {
         Logger.trace("Adding workspace component: $workspaceComponent")
         val componentFrame = DesktopInternalFrame(workspaceComponent)
-        // componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("icons/20.png")));
         val desktopComponent = createDesktopComponent(componentFrame, workspaceComponent)
         componentFrame.setGuiComponent(desktopComponent)
 

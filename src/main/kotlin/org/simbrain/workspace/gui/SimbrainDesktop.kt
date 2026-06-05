@@ -199,11 +199,6 @@ object SimbrainDesktop {
     private val timeLabel = JLabel()
 
     /**
-     * "Throbber" to indicate a simulation is running.
-     */
-    private val runningLabel = JLabel()
-
-    /**
      * Update rate for display.
      */
     private var updateRate = 0
@@ -467,11 +462,8 @@ object SimbrainDesktop {
                 }
             }
         })
-        runningLabel.icon = ResourceManager.getSmallIcon("menu_icons/Throbber.gif")
-        runningLabel.isVisible = false
         updateTimeLabel()
         bar.add(timeLabel)
-        bar.add(runningLabel)
         return bar
     }
 
@@ -1138,7 +1130,6 @@ object SimbrainDesktop {
         }
         val text = String.format("Timestep: %s (%sHz)", timestep, updateRate)
         timeLabel.text = text
-        runningLabel.isVisible = workspace.updater.isRunning
     }
 
     /**

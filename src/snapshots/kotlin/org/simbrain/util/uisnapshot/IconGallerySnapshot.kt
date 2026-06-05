@@ -26,9 +26,10 @@ class IconGallerySnapshot : UiSnapshotDef {
         "DeleteTableColumn", "AddTableRow", "DeleteTableRow", "fill", "Fill_0", "Rand", "Rand_C",
         "AlignHorizontal", "AlignVertical", "SpaceHorizontal", "SpaceVertical", "Arrow", "Hand",
         "Sequence", "TestInput", "Text", "Terminal", "speaker", "World", "camera", "photo", "Trophy",
-        // domain / special (still raster until later stages)
+        "lambda", "Gauge",
+        // domain (still raster until later stages)
         "ActivationTool", "Clamp", "CubeShadow", "network_icon_black", "mouse_icon", "swiss_icon",
-        "lambda", "PixelPlot", "RasterPlot", "Gauge", "GreenCheck", "RedX"
+        "PixelPlot", "RasterPlot"
     ).map { "menu_icons/$it.png" }
 
     override fun build(): JPanel {

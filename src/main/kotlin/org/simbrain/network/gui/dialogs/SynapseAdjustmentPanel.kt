@@ -7,22 +7,20 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
+import net.miginfocom.swing.MigLayout
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.Theme
 import org.simbrain.util.complement
 import org.simbrain.util.createApplyPanel
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.math.SimbrainMath
+import org.simbrain.util.showWarningDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
-import java.awt.GridBagConstraints
-import java.awt.GridBagLayout
-import java.awt.GridLayout
-import java.awt.Insets
 import java.util.*
 import javax.swing.*
 
@@ -114,10 +112,15 @@ class SynapseAdjustmentPanel(
         //     inhibitoryPanel.fillFieldValues()
         // }
 
-        layout = GridBagLayout()
-        val synTypePanel = JPanel().apply {
+        layout = MigLayout("fill, insets 0", "[grow]", "[][][grow][]")
+
+        add(JPanel(MigLayout("insets 0")).apply {
+            add(JLabel("Display:"))
+            add(synTypeSelector)
+        }, "align right, wrap")
+
+        val synTypePanel = JPanel(MigLayout("wrap 2, fillx, insets 0", "[grow][grow]")).apply {
             border = Theme.sectionBorder("Synapse Stats")
-            layout = GridLayout(3, 2)
             add(numSynsLabel)
             add(meanLabel)
             add(numExSynsLabel)
@@ -125,79 +128,34 @@ class SynapseAdjustmentPanel(
             add(numInSynsLabel)
             add(sdLabel)
         }
-        val gbc = GridBagConstraints().apply {
-            weightx = 1.0
-            weighty = 0.0
-            fill = GridBagConstraints.HORIZONTAL
-            insets = Insets(5, 5, 5, 5)
-            anchor = GridBagConstraints.NORTHWEST
-            gridx = 0
-            gridy = 0
-            gridwidth = HistogramPanel.GRID_WIDTH - 1
-            gridheight = 1
-        }
-        this.add(synTypePanel, gbc)
-        gbc.apply {
-            gridwidth = 1
-            anchor = GridBagConstraints.CENTER
-            gridx = HistogramPanel.GRID_WIDTH - 1
-        }
-        this.add(synTypeSelector, gbc)
-        gbc.apply {
-            weighty = 1.0
-            fill = GridBagConstraints.BOTH
-            anchor = GridBagConstraints.NORTHWEST
-            gridwidth = HistogramPanel.GRID_WIDTH
-            gridheight = HistogramPanel.GRID_HEIGHT
-            gridy = 1
-            gridx = 0
-        }
-        this.add(histogramPanel, gbc)
-        gbc.gridy += HistogramPanel.GRID_HEIGHT
-        gbc.gridheight = 1
+        add(synTypePanel, "growx, wrap")
+        add(histogramPanel, "grow, wrap")
+
         val bottomPanel = JTabbedPane()
-        val randTab = JPanel()
-        val perturbTab = JPanel()
-        val prunerTab = JPanel()
-        val scalerTab = JPanel()
-        val polarizerTab = JPanel()
-        randTab.layout = GridBagLayout()
-        perturbTab.layout = GridBagLayout()
-        val c = GridBagConstraints().apply {
-            gridwidth = 2
-            gridx = 0
-            gridy = 0
-            weightx = 1.0
-            weighty = 0.0
-            fill = GridBagConstraints.HORIZONTAL
-            anchor = GridBagConstraints.CENTER
+        val randTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+            add(chooseRandomizerPanel, "growx, wrap")
+            add(randomizeButton, "align right, gapright 5")
         }
-        randTab.add(chooseRandomizerPanel, c)
-        // TODO: Use ObjecTypeEditor.createEditor to set label to "perturber"
-        perturbTab.add(perturberPanel, c)
-        scalerTab.add(SynapseScalerPanel(), c)
-        prunerTab.add(PrunerPanel(), c)
-        c.apply {
-            gridwidth = 1
-            gridx = 1
-            gridy = 1
-            weightx = 0.0
-            weighty = 0.0
-            fill = GridBagConstraints.NONE
-            anchor = GridBagConstraints.NORTHEAST
-            insets = Insets(5, 0, 5, 10)
+        val perturbTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+            add(perturberPanel, "growx, wrap")
+            add(perturbButton, "align right, gapright 5")
         }
-        randTab.add(randomizeButton, c)
-        perturbTab.add(perturbButton, c)
-
-        polarizerTab.add(
-            PercentExcitatoryPanel(synapses.count { it.strength > 0 } / synapses.size.toDouble() * 100)
-                .createApplyPanel {
-                    polarizeSynapses(synapses, getPercentAsProbability() * 100)
-                    fullUpdate()
-                }
-        )
-
+        val prunerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+            add(PrunerPanel(), "growx, top")
+        }
+        val scalerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+            add(SynapseScalerPanel(), "growx, top")
+        }
+        val polarizerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+            add(
+                PercentExcitatoryPanel(synapses.count { it.strength > 0 } / synapses.size.toDouble() * 100)
+                    .createApplyPanel {
+                        polarizeSynapses(synapses, getPercentAsProbability() * 100)
+                        fullUpdate()
+                    },
+                "growx, top"
+            )
+        }
         bottomPanel.apply {
             addTab("Randomizer", randTab)
             addTab("Perturber", perturbTab)
@@ -205,7 +163,7 @@ class SynapseAdjustmentPanel(
             addTab("Scaler", scalerTab)
             addTab("Polarizer", polarizerTab)
         }
-        this.add(bottomPanel, gbc)
+        add(bottomPanel, "growx")
 
         addActionListeners()
         initRandomizerPanel()
@@ -610,17 +568,10 @@ fun createSynapseAdjustmentPanel(
 ): SynapseAdjustmentPanel? {
     val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer)
     if (synapses.isEmpty()) {
-        JOptionPane.showMessageDialog(
-            null, "No synapses to display", "Warning",
-            JOptionPane.WARNING_MESSAGE
-        )
+        showWarningDialog("No synapses to display")
         return null
     }
     return sap
-}
-
-fun createSynapseAdjustmentPanel(synapses: List<Synapse>): SynapseAdjustmentPanel? {
-    return createSynapseAdjustmentPanel(synapses)
 }
 
 /**

@@ -17,7 +17,7 @@ import java.util.Scanner;
  */
 public class ResourceManager {
 
-    public static final int smallIconSize = 18;
+    public static final int smallIconSize = Icons.SMALL;
 
     /**
      * Retrieve an ImageIcon based on its file name.
@@ -45,10 +45,12 @@ public class ResourceManager {
     }
 
     /**
-     * Load an ImageIcon from the resources directory and scale it if necessary.
+     * Load an icon at the canonical small size ({@link Icons#SMALL}). Resolves to a crisp,
+     * theme-aware {@link com.formdev.flatlaf.extras.FlatSVGIcon} when a matching SVG exists, else
+     * a HiDPI-correct downscale of the raster. See {@link Icons} for the resolution rules.
      *
      * @param path The path of the icon to load within the resources directory.
-     * @return Returns a scaled ImageIcon.
+     * @return the resolved icon, or null if the path is blank or the resource is missing.
      */
     public static ImageIcon getSmallIcon(String path) {
         if (path == null || path.trim().isEmpty()) {
@@ -57,21 +59,11 @@ public class ResourceManager {
             Thread.dumpStack();
             return null;
         }
-        path = assertForwardSlash(path);
-        try {
-            URL url = ClassLoader.getSystemClassLoader().getResource(path);
-            if (url == null) {
-                System.err.println("Could not load icon: resource not found: " + path);
-                return null;
-            }
-            ImageIcon imageIcon = new ImageIcon(url);
-            Image image = imageIcon.getImage().getScaledInstance(smallIconSize, smallIconSize, Image.SCALE_SMOOTH);
-            imageIcon.setImage(image);
-            return imageIcon;
-        } catch (Exception e) {
-            System.err.println("Could not load icon: " + path + " (" + e.getMessage() + ")");
-            return null;
+        ImageIcon icon = Icons.small(assertForwardSlash(path));
+        if (icon == null) {
+            System.err.println("Could not load icon: resource not found: " + path);
         }
+        return icon;
     }
 
     /**

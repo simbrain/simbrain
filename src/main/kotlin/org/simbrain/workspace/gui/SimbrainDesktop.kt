@@ -55,6 +55,7 @@ object SimbrainDesktop {
             }
             installSimbrainFlatLafDefaults()
             FlatLightLaf.setup()
+            installSimbrainSvgIconColors()
             UIManager.put("Button.minimumWidth", 80)
         } catch (e: Exception) {
             e.printStackTrace()

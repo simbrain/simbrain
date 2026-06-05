@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLightLaf
 import org.simbrain.util.DetailTrianglePanel
 import org.simbrain.util.installSimbrainFlatLafDefaults
+import org.simbrain.util.installSimbrainSvgIconColors
 import java.awt.Component
 import java.awt.Container
 import java.awt.Window
@@ -46,6 +47,7 @@ fun setupTheme(name: String) {
         "dark" -> FlatDarkLaf.setup()
         else -> FlatLightLaf.setup()
     }
+    installSimbrainSvgIconColors()
 }
 
 /**

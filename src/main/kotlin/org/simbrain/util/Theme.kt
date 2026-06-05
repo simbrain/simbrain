@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import com.formdev.flatlaf.FlatLaf
+import com.formdev.flatlaf.extras.FlatSVGIcon
 import java.awt.Color
 import java.awt.Component
 import java.awt.Font
@@ -29,6 +30,23 @@ import javax.swing.border.EmptyBorder
  */
 fun installSimbrainFlatLafDefaults() {
     FlatLaf.registerCustomDefaultsSource("org.simbrain.util.theme")
+}
+
+/**
+ * Installs the global [FlatSVGIcon.ColorFilter] that recolors single-color SVG icons
+ * (see [Icons]) to the Look-and-Feel foreground, so icons track the active theme in both light
+ * and dark. The mapper reads `Label.foreground` live, so a future light/dark switch adapts
+ * automatically (after the FlatSVGIcon cache is flushed). Near-black is the single authored
+ * icon color; deliberately-colored icons (in `icons/multicolor/`) avoid it and pass through.
+ *
+ * MUST be called AFTER `FlatLightLaf.setup()` / `FlatDarkLaf.setup()` so `UIManager` is populated.
+ */
+fun installSimbrainSvgIconColors() {
+    FlatSVGIcon.ColorFilter.getInstance().setMapper { color ->
+        if (color.red < 40 && color.green < 40 && color.blue < 40)
+            UIManager.getColor("Label.foreground") ?: color
+        else color
+    }
 }
 
 /**

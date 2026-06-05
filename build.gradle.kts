@@ -204,6 +204,10 @@ dependencies {
     // https://mvnrepository.com/artifact/com.formdev/flatlaf
     implementation(group = "com.formdev", name = "flatlaf", version = "3.5.4")
 
+    // https://mvnrepository.com/artifact/com.formdev/flatlaf-extras
+    // FlatSVGIcon: scalable, theme-adaptive (ColorFilter) icon rendering.
+    implementation(group = "com.formdev", name = "flatlaf-extras", version = "3.5.4")
+
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
     implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.4.0")
 

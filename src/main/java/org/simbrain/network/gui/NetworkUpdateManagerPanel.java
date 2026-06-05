@@ -144,9 +144,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
         JLabel label = new JLabel((index + 1) + ": " + ((UpdateAction) updateAction).getDescription());
         label.setToolTipText(((UpdateAction) updateAction).getLongDescription());
         if (index == 0) {
-            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
+            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Theme.getDivider()));
         } else {
-            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.getDivider()));
         }
         label.setBackground(null);
         if (isSelected) {

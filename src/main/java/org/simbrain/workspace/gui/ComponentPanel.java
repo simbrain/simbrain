@@ -1,5 +1,6 @@
 package org.simbrain.workspace.gui;
 
+import org.simbrain.util.Theme;
 import org.simbrain.workspace.WorkspaceComponent;
 import org.simbrain.workspace.events.WorkspaceEvents;
 
@@ -56,7 +57,7 @@ public class ComponentPanel extends JPanel {
         componentTable = new JTable(model);
         ((DefaultTableCellRenderer) componentTable.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         componentTable.setRowSelectionAllowed(false);
-        componentTable.setGridColor(Color.LIGHT_GRAY);
+        componentTable.setGridColor(Theme.getDivider());
         componentTable.setFocusable(false);
 
         JScrollPane scrollPane = new JScrollPane(componentTable);

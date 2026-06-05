@@ -4,6 +4,7 @@ import org.simbrain.util.CmdOrCtrl;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingUtilsKt;
+import org.simbrain.util.Theme;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -78,7 +79,7 @@ public class SensorEffectorPanel extends JPanel {
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
-        table.setGridColor(Color.LIGHT_GRAY);
+        table.setGridColor(Theme.getDivider());
         table.setFocusable(false);
 
         // Context menu

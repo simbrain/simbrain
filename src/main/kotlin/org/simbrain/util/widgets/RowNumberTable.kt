@@ -1,5 +1,6 @@
 package org.simbrain.util.widgets
 
+import org.simbrain.util.Theme
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainDataFrame
 import java.awt.Color
@@ -38,7 +39,7 @@ class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, Prope
     init {
         main.addPropertyChangeListener(this)
         main.model.addTableModelListener(this)
-        setGridColor(Color.gray)
+        setGridColor(Theme.divider)
         isFocusable = false
         setAutoCreateColumnsFromModel(false)
         setSelectionModel(main.selectionModel)

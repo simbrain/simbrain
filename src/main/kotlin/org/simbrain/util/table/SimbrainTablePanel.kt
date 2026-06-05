@@ -7,6 +7,7 @@ import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
+import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
 import java.awt.*
@@ -251,7 +252,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
             }
         }
 
-        setGridColor(Color.gray)
+        setGridColor(Theme.divider)
 
         // Manages beginning and endings edits in cells, which is surprisingly hard to get right.
         val unfocusedEvent = AWTEventListener { event ->

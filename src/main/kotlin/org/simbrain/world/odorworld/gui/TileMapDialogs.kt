@@ -175,7 +175,7 @@ fun TileMap.editor(p: Point2D) = StandardDialog().apply {
 
     fun tilePanel(name: String, tile: Tile, change: suspend (Int) -> Unit) = TilePanel().apply titlePanel@{
 
-        border = TitledBorder(MatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY), name)
+        border = TitledBorder(MatteBorder(1, 1, 1, 1, Theme.divider), name)
 
         val image = tileImage(tile.id)
 
@@ -269,7 +269,7 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
 
     val table = JTable(model).apply {
         setRowSelectionAllowed(true)
-        gridColor = Color.LIGHT_GRAY
+        gridColor = Theme.divider
     }
     val panel = JPanel(BorderLayout())
     panel.add(BorderLayout.CENTER,JScrollPane(table))

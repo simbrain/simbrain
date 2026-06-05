@@ -8,6 +8,8 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 
+import org.simbrain.util.SwingUtilsKt;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
@@ -191,7 +193,7 @@ public class HistogramPanel extends JPanel {
                     model.applyCurrentData();
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
-                    JOptionPane.showMessageDialog(getParent(), "Non-Integer number of bins.", "Error", JOptionPane.ERROR);
+                    SwingUtilsKt.showErrorDialog("Non-Integer number of bins.");
                 }
             }
 
@@ -242,10 +244,10 @@ public class HistogramPanel extends JPanel {
 
         } catch (IllegalArgumentException iaEx) {
             iaEx.printStackTrace();
-            JOptionPane.showMessageDialog(null, iaEx.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            SwingUtilsKt.showErrorDialog(iaEx.getMessage());
         } catch (IllegalStateException isEx) {
             isEx.printStackTrace();
-            JOptionPane.showMessageDialog(null, isEx.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            SwingUtilsKt.showErrorDialog(isEx.getMessage());
         }
         mainPanel = new ChartPanel(mainChart);
 

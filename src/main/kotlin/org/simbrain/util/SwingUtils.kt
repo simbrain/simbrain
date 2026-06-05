@@ -337,10 +337,25 @@ suspend fun <T: EditableObject> T.showAPEOptionDialog(title: String) = let {
     deferred
 }.await()
 
-fun showWarningDialog(message: String) {
+@JvmOverloads
+fun showWarningDialog(message: String?, title: String = "Warning!") {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.WARNING_MESSAGE)
+}
+
+@JvmOverloads
+fun showErrorDialog(message: String?, title: String = "Error") {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.ERROR_MESSAGE)
+}
+
+@JvmOverloads
+fun showInfoDialog(message: String?, title: String = "Information") {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.INFORMATION_MESSAGE)
 }
 
 /**
@@ -368,7 +383,7 @@ fun showWarningConfirmDialog(message: String): Int {
 /**
  * Create a dialog that takes an input in a text field and returns it as a string.
  */
-fun showInputDialog(message: String, initValue: String = ""): String {
+fun showInputDialog(message: String, initValue: String? = ""): String? {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
     return JOptionPane.showInputDialog(dialog, message, initValue)

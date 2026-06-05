@@ -129,7 +129,7 @@ public class StandardDialog extends GenericJDialog {
     private void init() {
 
         if (isRunning && USE_RUN_WARNINGS) {
-            JOptionPane.showMessageDialog(null, "WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            SwingUtilsKt.showWarningDialog("WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.");
         }
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);

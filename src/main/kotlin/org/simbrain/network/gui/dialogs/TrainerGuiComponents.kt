@@ -358,15 +358,7 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
             toolTipText = "Set number of rows in input and target tables"
             addActionListener {
                 val currentRows = if (tables.isNotEmpty()) tables[0].model.rowCount else 0
-                val input = javax.swing.JOptionPane.showInputDialog(
-                    this@AddRemoveRows,
-                    "Enter number of rows:",
-                    "Set Number of Rows",
-                    javax.swing.JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    null,
-                    currentRows.toString()
-                ) as String?
+                val input = showInputDialog("Enter number of rows:", currentRows.toString())
                 
                 input?.let { inputStr ->
                     try {
@@ -374,20 +366,10 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
                         if (numRows >= 0) {
                             tables.forEach { it.model.setNumRows(numRows) }
                         } else {
-                            javax.swing.JOptionPane.showMessageDialog(
-                                this@AddRemoveRows,
-                                "Number of rows must be non-negative",
-                                "Invalid Input",
-                                javax.swing.JOptionPane.ERROR_MESSAGE
-                            )
+                            showErrorDialog("Number of rows must be non-negative", "Invalid Input")
                         }
                     } catch (e: NumberFormatException) {
-                        javax.swing.JOptionPane.showMessageDialog(
-                            this@AddRemoveRows,
-                            "Please enter a valid integer",
-                            "Invalid Input",
-                            javax.swing.JOptionPane.ERROR_MESSAGE
-                        )
+                        showErrorDialog("Please enter a valid integer", "Invalid Input")
                     }
                 }
             }

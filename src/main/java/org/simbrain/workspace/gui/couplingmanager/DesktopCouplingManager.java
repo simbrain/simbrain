@@ -138,7 +138,7 @@ public class DesktopCouplingManager extends JPanel {
         List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
 
         if ((producers.size() == 0) || (consumers.size() == 0)) {
-            JOptionPane.showMessageDialog(null, "You must select at least one consuming and producing attribute\nto create couplings.", "No Attributes Selected Warning", JOptionPane.WARNING_MESSAGE);
+            SwingUtilsKt.showWarningDialog("You must select at least one consuming and producing attribute\nto create couplings.", "No Attributes Selected Warning");
             return;
         }
 
@@ -150,7 +150,7 @@ public class DesktopCouplingManager extends JPanel {
                 desktop.getWorkspace().getCouplingManager().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
-            JOptionPane.showMessageDialog(null, e.getMessage(), "Unmatched Attributes", JOptionPane.WARNING_MESSAGE, null);
+            SwingUtilsKt.showWarningDialog(e.getMessage(), "Unmatched Attributes");
         }
     }
 

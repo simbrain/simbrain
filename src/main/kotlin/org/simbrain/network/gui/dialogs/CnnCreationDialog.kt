@@ -11,6 +11,7 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.Theme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
+import org.simbrain.util.showErrorDialog
 import org.simbrain.util.toDisplayText
 import javax.swing.*
 import javax.swing.event.DocumentEvent
@@ -364,26 +365,26 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     override fun closeDialogOk() {
         val inputShape = getInputShape()
         if (inputShape == null) {
-            JOptionPane.showMessageDialog(this, "Invalid input shape.", "Error", JOptionPane.ERROR_MESSAGE)
+            showErrorDialog("Invalid input shape.")
             return
         }
 
         if (tensorLayers.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "Add at least one tensor layer.", "Error", JOptionPane.ERROR_MESSAGE)
+            showErrorDialog("Add at least one tensor layer.")
             return
         }
 
         val outputNeurons = try {
             outputNeuronsField.text.trim().toInt().also { require(it > 0) }
         } catch (e: Exception) {
-            JOptionPane.showMessageDialog(this, "Invalid output neuron count.", "Error", JOptionPane.ERROR_MESSAGE)
+            showErrorDialog("Invalid output neuron count.")
             return
         }
 
         // Validate dense layer neuron counts
         for ((i, spec) in denseLayers.withIndex()) {
             if (spec.neurons <= 0) {
-                JOptionPane.showMessageDialog(this, "Dense layer ${i + 1} must have > 0 neurons.", "Error", JOptionPane.ERROR_MESSAGE)
+                showErrorDialog("Dense layer ${i + 1} must have > 0 neurons.")
                 return
             }
         }
@@ -394,9 +395,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
             try {
                 currentShape = spec.outputShape(currentShape)
             } catch (e: Exception) {
-                JOptionPane.showMessageDialog(
-                    this, "Error in tensor layer ${i + 1}: ${e.message}", "Error", JOptionPane.ERROR_MESSAGE
-                )
+                showErrorDialog("Error in tensor layer ${i + 1}: ${e.message}")
                 return
             }
         }

@@ -355,20 +355,22 @@ class KebabIcon : Icon {
 class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel) : JPanel() {
 
     private var popupMenu: JPopupMenu? = null
-    private val mainButton: JButton
+    private val mainButton: JToggleButton
     private val dropdownButton: JButton
 
     init {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
         isOpaque = false
 
-        // Main button - activates wand mode
-        mainButton = JButton().apply {
+        // Main button - activates wand mode. A toggle so it shows the flat toolbar "active"
+        // highlight while the wand is the current edit mode (driven by editMode below).
+        mainButton = JToggleButton().apply {
             putClientProperty("JButton.buttonType", "toolBarButton")
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 updateWandCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
+                isSelected = true
             }
         }
 
@@ -384,7 +386,13 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         add(mainButton)
         add(dropdownButton)
-        
+
+        // Reflect the active tool: highlight while the wand is the current edit mode.
+        mainButton.isSelected = networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Wand
+        networkPanel.addPropertyChangeListener("editMode") {
+            mainButton.isSelected = networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Wand
+        }
+
         // Set initial tooltip after button is created
         updateTooltip()
 

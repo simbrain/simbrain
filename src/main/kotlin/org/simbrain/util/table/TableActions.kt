@@ -17,8 +17,12 @@ import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
+import net.miginfocom.swing.MigLayout
 import java.awt.Component
+import javax.swing.JLabel
 import javax.swing.JOptionPane
+import javax.swing.JPanel
+import javax.swing.JTextField
 import kotlin.reflect.KClass
 
 fun SimbrainTablePanel.addSimpleDefaults() {
@@ -92,12 +96,9 @@ val SimbrainJTable.fillAction
             columnModel.selectionModel.addListSelectionListener { updateAction() }
         }
     ) {
-        JOptionPane.showInputDialog(this, "Value:", "0")
-            ?.toDouble()
-            ?.let { fillVal ->
-                fillSelectedCells(fillVal)
-            }
-
+        showNumericInputDialog("Value:", 0.0)?.let { fillVal ->
+            fillSelectedCells(fillVal)
+        }
     }
 
 val SimbrainJTable.editRandomizerAction
@@ -161,28 +162,16 @@ val SimbrainJTable.setRowsColumnsAction
         description = "Set number of rows and columns (cells are zeroed out)",
     ) {
         fun createDimensionDialog(): Pair<Int, Int>? {
-            val currentRows = model.rowCount
-            val currentCols = model.columnCount
-            
-            val rowField = javax.swing.JTextField(currentRows.toString(), 10)
-            val colField = javax.swing.JTextField(currentCols.toString(), 10)
-            
-            val panel = javax.swing.JPanel(java.awt.GridBagLayout()).apply {
-                val gbc = java.awt.GridBagConstraints()
-                
-                gbc.gridx = 0; gbc.gridy = 0; gbc.anchor = java.awt.GridBagConstraints.WEST; gbc.insets = java.awt.Insets(5, 5, 5, 5)
-                add(javax.swing.JLabel("Number of rows:"), gbc)
-                
-                gbc.gridx = 1
-                add(rowField, gbc)
-                
-                gbc.gridx = 0; gbc.gridy = 1
-                add(javax.swing.JLabel("Number of columns:"), gbc)
-                
-                gbc.gridx = 1
-                add(colField, gbc)
+            val rowField = JTextField(model.rowCount.toString(), 10)
+            val colField = JTextField(model.columnCount.toString(), 10)
+
+            val panel = JPanel(MigLayout("insets 0", "[][grow]")).apply {
+                add(JLabel("Number of rows:"))
+                add(rowField, "growx, wrap")
+                add(JLabel("Number of columns:"))
+                add(colField, "growx")
             }
-            
+
             val result = JOptionPane.showConfirmDialog(
                 this@createAction,
                 panel,
@@ -190,7 +179,7 @@ val SimbrainJTable.setRowsColumnsAction
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE
             )
-            
+
             return if (result == JOptionPane.OK_OPTION) {
                 try {
                     val newRows = rowField.text.toInt()
@@ -198,21 +187,11 @@ val SimbrainJTable.setRowsColumnsAction
                     if (newRows > 0 && newCols > 0) {
                         Pair(newRows, newCols)
                     } else {
-                        JOptionPane.showMessageDialog(
-                            this@createAction,
-                            "Rows and columns must be positive integers",
-                            "Invalid Input",
-                            JOptionPane.ERROR_MESSAGE
-                        )
+                        showErrorDialog("Rows and columns must be positive integers", "Invalid Input")
                         null
                     }
                 } catch (e: NumberFormatException) {
-                    JOptionPane.showMessageDialog(
-                        this@createAction,
-                        "Please enter valid integer values",
-                        "Invalid Input",
-                        JOptionPane.ERROR_MESSAGE
-                    )
+                    showErrorDialog("Please enter valid integer values", "Invalid Input")
                     null
                 }
             } else null
@@ -223,7 +202,7 @@ val SimbrainJTable.setRowsColumnsAction
                 if (i < existing.size) existing[i] else null
             }.toMutableList()
         }
-        
+
         val dimensions = createDimensionDialog()
         if (dimensions != null) {
             val (newRows, newCols) = dimensions
@@ -246,12 +225,7 @@ val SimbrainJTable.setRowsColumnsAction
                     tableModel.fireTableStructureChanged()
                 }
                 else -> {
-                    JOptionPane.showMessageDialog(
-                        this,
-                        "Reshaping not supported for this table type",
-                        "Warning",
-                        JOptionPane.WARNING_MESSAGE
-                    )
+                    showWarningDialog("Reshaping not supported for this table type", "Warning")
                 }
             }
         }
@@ -330,12 +304,7 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
     },
 ) {
     val eigenValues = model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigenValuesString()
-    JOptionPane.showMessageDialog(
-        this,
-        "[${eigenValues.joinToString(", ")}]",
-        "Eigenvalues",
-        JOptionPane.INFORMATION_MESSAGE
-    )
+    showInfoDialog("[${eigenValues.joinToString(", ")}]", "Eigenvalues")
 }
 
 /**
@@ -411,13 +380,7 @@ fun SimbrainJTable.importCSVAction(
         val csvFile = chooser.showOpenDialog(parentComponent)
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
-                JOptionPane.showOptionDialog(
-                    null,
-                    "Trying to import a table with the wrong number of columns ",
-                    "Warning",
-                    JOptionPane.DEFAULT_OPTION,
-                    JOptionPane.WARNING_MESSAGE, null, null, null
-                )
+                showWarningDialog("Trying to import a table with the wrong number of columns ", "Warning")
                 return false
             }
             return true

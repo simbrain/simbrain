@@ -1,13 +1,18 @@
 package org.simbrain.network.gui
 
+import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.Icons
 import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.showErrorDialog
 import org.simbrain.util.showOpenDialog
 import org.simbrain.util.showSaveDialog
+import org.simbrain.util.showWarningConfirmDialog
+import org.simbrain.util.showWarningDialog
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -32,7 +37,7 @@ class WandPalettePanel(
 
     init {
         layout = BorderLayout()
-        border = EmptyBorder(8, 8, 8, 8)
+        border = EmptyBorder(Theme.componentGap, Theme.componentGap, Theme.componentGap, Theme.componentGap)
 
         // Scrollable list area
         val scrollPane = JScrollPane(listPanel).apply {
@@ -43,37 +48,29 @@ class WandPalettePanel(
         }
         add(scrollPane, BorderLayout.CENTER)
 
-        // Bottom buttons panel
-        val buttonPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 5))
-
-        val addButton = JButton("+").apply {
+        val addButton = JButton(Icons.small("plus.png")).apply {
             toolTipText = "Add new action"
             addActionListener { addNewAction() }
         }
-        buttonPanel.add(addButton)
-
-        buttonPanel.add(Box.createHorizontalStrut(20))
-
         val exportButton = JButton("Export...").apply {
             toolTipText = "Export palette to file"
             addActionListener { exportPalette() }
         }
-        buttonPanel.add(exportButton)
-
         val importButton = JButton("Import...").apply {
             toolTipText = "Import palette from file"
             addActionListener { importPalette() }
         }
-        buttonPanel.add(importButton)
-
-        buttonPanel.add(Box.createHorizontalStrut(20))
-
         val revertButton = JButton("Revert to Default").apply {
             toolTipText = "Reset palette to default actions"
             addActionListener { revertToDefault() }
         }
-        buttonPanel.add(revertButton)
 
+        val buttonPanel = JPanel(MigLayout("insets ${Theme.tightGap} 0 0 0", "[]${Theme.sectionGap}[]${Theme.componentGap}[]push[]")).apply {
+            add(addButton)
+            add(exportButton)
+            add(importButton)
+            add(revertButton)
+        }
         add(buttonPanel, BorderLayout.SOUTH)
 
         // Add Esc key binding to close popup
@@ -129,13 +126,18 @@ class WandPalettePanel(
     private fun createActionRow(index: Int, action: WandAction): JPanel {
         val isSelected = index == palette.selectedIndex
 
-        return JPanel(BorderLayout(5, 0)).apply {
+        val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
+        // Opaque selection wash: blend the accent over the card background so the (opaque) row
+        // paints a solid color, rather than an alpha tint that would smear on scroll.
+        val selectedBg = blend(accent, Theme.cardBg, 0.16)
+
+        return JPanel(BorderLayout(Theme.tightGap, 0)).apply {
             border = BorderFactory.createCompoundBorder(
-                if (isSelected) BorderFactory.createLineBorder(Color(100, 150, 255), 2)
-                else BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+                if (isSelected) BorderFactory.createLineBorder(accent, 2)
+                else BorderFactory.createLineBorder(Theme.divider, 1),
                 EmptyBorder(4, 6, 4, 6)
             )
-            background = if (isSelected) Color(230, 240, 255) else Color.WHITE
+            background = if (isSelected) selectedBg else Theme.cardBg
             maximumSize = Dimension(Int.MAX_VALUE, 36)
             preferredSize = Dimension(280, 36)
 
@@ -231,12 +233,7 @@ class WandPalettePanel(
             palette.removeAction(index)
             savePalette()
         } else {
-            JOptionPane.showMessageDialog(
-                this,
-                "Cannot delete the last action. The palette must have at least one action.",
-                "Cannot Delete",
-                JOptionPane.WARNING_MESSAGE
-            )
+            showWarningDialog("Cannot delete the last action. The palette must have at least one action.", "Cannot Delete")
         }
     }
 
@@ -261,30 +258,27 @@ class WandPalettePanel(
                 palette.setActions(imported.actions)
                 savePalette()
             } catch (e: Exception) {
-                JOptionPane.showMessageDialog(
-                    this@WandPalettePanel,
-                    "Failed to import palette: ${e.message}",
-                    "Import Error",
-                    JOptionPane.ERROR_MESSAGE
-                )
+                showErrorDialog("Failed to import palette: ${e.message}", "Import Error")
             }
         }
     }
 
     private fun revertToDefault() {
-        val result = JOptionPane.showConfirmDialog(
-            this,
-            "Reset palette to default actions? This cannot be undone.",
-            "Revert to Default",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
-        )
-        if (result == JOptionPane.YES_OPTION) {
+        if (showWarningConfirmDialog("Reset palette to default actions? This cannot be undone.") == JOptionPane.YES_OPTION) {
             val defaultPalette = WandPalette.createDefault()
             palette.setActions(defaultPalette.actions)
             savePalette()
         }
     }
+}
+
+/**
+ * Returns an opaque color that is [fraction] of the way from [base] toward [over].
+ */
+private fun blend(over: Color, base: Color, fraction: Double): Color {
+    val f = fraction.coerceIn(0.0, 1.0)
+    fun mix(a: Int, b: Int) = (a * f + b * (1 - f)).toInt().coerceIn(0, 255)
+    return Color(mix(over.red, base.red), mix(over.green, base.green), mix(over.blue, base.blue))
 }
 
 /**
@@ -311,7 +305,7 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         g2.fill(Ellipse2D.Double(padding.toDouble(), padding.toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
         // Draw border
-        g2.color = Color.DARK_GRAY
+        g2.color = Theme.foreground
         g2.stroke = BasicStroke(1.5f)
         g2.draw(Ellipse2D.Double(padding.toDouble(), padding.toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
@@ -342,7 +336,7 @@ class KebabIcon : Icon {
         val g2 = g as Graphics2D
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-        g2.color = Color.DARK_GRAY
+        g2.color = Theme.mutedText
         val startX = x + 2
         val startY = y + 2
 
@@ -370,6 +364,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         // Main button - activates wand mode
         mainButton = JButton().apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 updateWandCursor()
@@ -379,6 +374,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         // Dropdown button - shows palette popup
         dropdownButton = JButton().apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
             toolTipText = "Select wand action"
             icon = DropdownArrowIcon(6, 18)
             addActionListener {
@@ -456,15 +452,15 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             val padding = 1
             val circleSize = size - padding * 2
 
-            // Draw circle outline (black/white style)
-            g2.color = Color.DARK_GRAY
+            // Draw circle outline, tracking the theme foreground like other toolbar icons
+            g2.color = Theme.foreground
             g2.stroke = BasicStroke(1.5f)
             g2.draw(Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
             // Draw the letter in the center
             val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""
 
-            g2.color = Color.DARK_GRAY
+            g2.color = Theme.foreground
             g2.font = Theme.font((size * 0.6).toInt(), Font.BOLD)
             val fm = g2.fontMetrics
             val textX = x + (size - fm.stringWidth(displayLetter)) / 2
@@ -495,7 +491,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             triangle.addPoint(arrowX + arrowWidth, arrowY)
             triangle.addPoint(arrowX + arrowWidth / 2, arrowY + arrowHeight)
 
-            g2.color = Color.DARK_GRAY
+            g2.color = Theme.foreground
             g2.fill(triangle)
         }
     }

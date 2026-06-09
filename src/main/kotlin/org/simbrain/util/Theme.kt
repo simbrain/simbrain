@@ -85,6 +85,7 @@ object Theme {
 
     // Colors derive from UIManager via computed getters (not stored vals) so they track the
     // active LaF and re-resolve on a theme switch; the literal fallbacks preserve the old look.
+    @JvmStatic val foreground: Color get() = UIManager.getColor("Label.foreground") ?: Color.BLACK
     @JvmStatic val mutedText: Color get() = UIManager.getColor("Label.disabledForeground") ?: Color(100, 100, 100)
     @JvmStatic val divider: Color get() = UIManager.getColor("Component.borderColor") ?: Color(200, 200, 200)
     @JvmStatic val cardBg: Color get() = UIManager.getColor("List.background") ?: Color(250, 250, 250)

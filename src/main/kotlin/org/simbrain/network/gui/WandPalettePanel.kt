@@ -4,6 +4,7 @@ import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.Icons
 import org.simbrain.util.Theme
+import org.simbrain.util.blend
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -270,15 +271,6 @@ class WandPalettePanel(
             savePalette()
         }
     }
-}
-
-/**
- * Returns an opaque color that is [fraction] of the way from [base] toward [over].
- */
-private fun blend(over: Color, base: Color, fraction: Double): Color {
-    val f = fraction.coerceIn(0.0, 1.0)
-    fun mix(a: Int, b: Int) = (a * f + b * (1 - f)).toInt().coerceIn(0, 255)
-    return Color(mix(over.red, base.red), mix(over.green, base.green), mix(over.blue, base.blue))
 }
 
 /**

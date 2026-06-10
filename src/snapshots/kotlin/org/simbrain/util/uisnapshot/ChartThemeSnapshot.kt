@@ -7,9 +7,11 @@ import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.category.DefaultCategoryDataset
 import org.jfree.data.general.DefaultPieDataset
 import org.jfree.data.statistics.HistogramDataset
+import org.jfree.chart.renderer.xy.XYBarRenderer
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.chartSeriesColor
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.GridLayout
@@ -53,10 +55,18 @@ class ChartThemeSnapshot : UiSnapshotDef {
     }
 
     private fun histogram(): JFreeChart {
-        val values = DoubleArray(200) { sin(it / 5.0) + sin(it / 13.0) }
-        val data = HistogramDataset().apply { addSeries("h", values, 20) }
+        val a = DoubleArray(200) { sin(it / 5.0) + sin(it / 13.0) }
+        val b = DoubleArray(200) { sin(it / 7.0 + 1.0) * 0.8 + sin(it / 11.0) }
+        val data = HistogramDataset().apply { addSeries("A", a, 20); addSeries("B", b, 20) }
         return ChartFactory.createHistogram("Histogram", "Value", "Count", data, PlotOrientation.VERTICAL, true, true, false)
-            .apply { applySimbrainChartTheme() }
+            .apply {
+                applySimbrainChartTheme()
+                // Mirror HistogramPanel: overlapping series blend via partial alpha from the shared palette.
+                (xyPlot.renderer as XYBarRenderer).apply { setShadowVisible(false); setDrawBarOutline(false) }
+                xyPlot.foregroundAlpha = 0.75f
+                xyPlot.renderer.setSeriesPaint(0, chartSeriesColor(0, 176))
+                xyPlot.renderer.setSeriesPaint(1, chartSeriesColor(1, 176))
+            }
     }
 
     override fun build(): Component {

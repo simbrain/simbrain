@@ -8,6 +8,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 
+import org.simbrain.plot.ChartThemeKt;
 import org.simbrain.util.SwingUtilsKt;
 
 import javax.swing.*;
@@ -211,7 +212,7 @@ public class HistogramPanel extends JPanel {
         try {
             if (this.getModel().getData() != null) {
                 mainChart = ChartFactory.createHistogram(title, xAxisName, yAxisName, model.getDataSet(), PlotOrientation.VERTICAL, true, true, false);
-                mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
+                ChartThemeKt.applySimbrainChartTheme(mainChart);
 
                 XYPlot plot = (XYPlot) mainChart.getPlot();
                 plot.setForegroundAlpha(0.75F);
@@ -238,7 +239,7 @@ public class HistogramPanel extends JPanel {
             } else {
 
                 mainChart = ChartFactory.createHistogram(title, xAxisName, yAxisName, model.getDataSet(), PlotOrientation.VERTICAL, true, true, false);
-                mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
+                ChartThemeKt.applySimbrainChartTheme(mainChart);
 
             }
 

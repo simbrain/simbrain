@@ -86,6 +86,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
         item("Temporal attention network", beta = true) { denisonNet }
+        item("Temporal attention network (paper model)", beta = true) { denisonNetPaper }
     }
 
     dir("Behaviorism") {

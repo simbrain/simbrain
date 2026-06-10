@@ -536,7 +536,7 @@ object SimbrainDesktop {
     private fun createAppearanceMenu(): JMenu {
         val menu = JMenu("Appearance")
         val group = ButtonGroup()
-        for (mode in ThemeMode.values()) {
+        for (mode in ThemeMode.entries) {
             val item = JRadioButtonMenuItem(mode.label).apply {
                 isSelected = WorkspacePreferences.themeMode == mode
                 addActionListener { switchTheme(mode) }
@@ -555,10 +555,10 @@ object SimbrainDesktop {
      */
     fun switchTheme(mode: ThemeMode) {
         if (WorkspacePreferences.themeMode == mode) return
-        WorkspacePreferences.themeMode = mode
         setupLookAndFeel(mode)
         FlatLaf.updateUI()
         refreshThemedChrome()
+        WorkspacePreferences.themeMode = mode
     }
 
     /**

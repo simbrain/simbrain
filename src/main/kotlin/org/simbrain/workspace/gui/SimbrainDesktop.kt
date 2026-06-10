@@ -2,7 +2,9 @@ package org.simbrain.workspace.gui
 
 import bsh.Interpreter
 import bsh.util.JConsole
-import com.formdev.flatlaf.FlatLightLaf
+import com.formdev.flatlaf.FlatLaf
+import org.jfree.chart.ChartPanel
+import org.simbrain.plot.applySimbrainChartTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -54,10 +56,7 @@ object SimbrainDesktop {
             if (Utils.isLinux()) {
                 UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
             }
-            installSimbrainFlatLafDefaults()
-            FlatLightLaf.setup()
-            installSimbrainSvgIconColors()
-            UIManager.put("Button.minimumWidth", 80)
+            setupLookAndFeel(WorkspacePreferences.themeMode)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -522,6 +521,8 @@ object SimbrainDesktop {
 
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
+        viewMenu.add(createAppearanceMenu())
+        viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.toggleBottomDock))
         viewMenu.add(JMenuItem(actionManager.toggleInfoDock))
         viewMenu.addSeparator()
@@ -530,6 +531,53 @@ object SimbrainDesktop {
         viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.showComponentBoundsAction))
         return viewMenu
+    }
+
+    private fun createAppearanceMenu(): JMenu {
+        val menu = JMenu("Appearance")
+        val group = ButtonGroup()
+        for (mode in ThemeMode.values()) {
+            val item = JRadioButtonMenuItem(mode.label).apply {
+                isSelected = WorkspacePreferences.themeMode == mode
+                addActionListener { switchTheme(mode) }
+            }
+            group.add(item)
+            menu.add(item)
+        }
+        return menu
+    }
+
+    /**
+     * Switches the application look-and-feel to [mode] live: re-installs the FlatLaf theme, repaints
+     * every open window (which also recolors SVG icons via the live color filter), and re-themes the
+     * chrome that Swing's own update cannot reach (JFreeChart plots, the desktop background, table
+     * grids). The choice is persisted so it survives a restart.
+     */
+    fun switchTheme(mode: ThemeMode) {
+        if (WorkspacePreferences.themeMode == mode) return
+        WorkspacePreferences.themeMode = mode
+        setupLookAndFeel(mode)
+        FlatLaf.updateUI()
+        refreshThemedChrome()
+    }
+
+    /**
+     * Re-applies theme-derived colors that [FlatLaf.updateUI] leaves stale because they are not
+     * Swing UIResource values: JFreeChart plots bake their chrome at build time, and the desktop
+     * background and table grid colors are set explicitly.
+     */
+    private fun refreshThemedChrome() {
+        desktopPane.background = UIManager.getColor("Desktop.background")
+        fun walk(c: Component) {
+            when (c) {
+                is ChartPanel -> c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
+                is JTable -> c.gridColor = Theme.divider
+            }
+            if (c is Container) c.components.forEach(::walk)
+        }
+        // Every visible chart/table is inside some window — the desktop frame (which holds the
+        // internal frames) plus any dialogs/detached frames — so this reaches them all.
+        Window.getWindows().forEach(::walk)
     }
 
     private fun createInsertMenu(): JMenu {

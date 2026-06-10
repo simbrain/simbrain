@@ -1,6 +1,8 @@
 package org.simbrain.util
 
+import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLaf
+import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.extras.FlatSVGIcon
 import java.awt.Color
 import java.awt.Component
@@ -47,6 +49,36 @@ fun installSimbrainSvgIconColors() {
             UIManager.getColor("Label.foreground") ?: color
         else color
     }
+}
+
+/**
+ * Color themes Simbrain can run under. The active mode is persisted in
+ * [org.simbrain.workspace.WorkspacePreferences] and applied at startup; the View ▸ Appearance
+ * menu switches it live.
+ */
+enum class ThemeMode(val label: String) { LIGHT("Light"), DARK("Dark") }
+
+/**
+ * Installs the FlatLaf look-and-feel for the given [mode] in the required order: register
+ * Simbrain's custom defaults, run the theme's setup, then install the SVG icon color filter (which
+ * needs a populated UIManager) and the shared button sizing. Safe to call repeatedly — a live theme
+ * switch re-runs this and then calls [FlatLaf.updateUI] to repaint and recolor every open window.
+ */
+fun setupLookAndFeel(mode: ThemeMode) {
+    installSimbrainFlatLafDefaults()
+    when (mode) {
+        ThemeMode.LIGHT -> FlatLightLaf.setup()
+        ThemeMode.DARK -> FlatDarkLaf.setup()
+    }
+    installSimbrainSvgIconColors()
+    UIManager.put("Button.minimumWidth", 80)
+}
+
+/** Linearly blend [over] onto [base] by [fraction] (0 = all base, 1 = all over). */
+fun blend(over: Color, base: Color, fraction: Double): Color {
+    val f = fraction.coerceIn(0.0, 1.0)
+    fun mix(a: Int, b: Int) = (a * f + b * (1 - f)).toInt().coerceIn(0, 255)
+    return Color(mix(over.red, base.red), mix(over.green, base.green), mix(over.blue, base.blue))
 }
 
 /**
@@ -106,37 +138,32 @@ object Theme {
      * Drop-in replacement for [javax.swing.BorderFactory.createTitledBorder] with a modernized look.
      */
     @JvmStatic
-    fun sectionBorder(title: String): Border = HeaderStripBorder(
-        title = title,
-        titleFont = section,
-        titleColor = UIManager.getColor("Label.foreground") ?: Color.BLACK,
-        lineColor = divider
-    )
+    fun sectionBorder(title: String): Border = HeaderStripBorder(title)
 
-    private class HeaderStripBorder(
-        private val title: String,
-        private val titleFont: Font,
-        private val titleColor: Color,
-        private val lineColor: Color
-    ) : AbstractBorder() {
+    /**
+     * Reads its font and colors live from [section]/[foreground]/[divider] every paint, so the
+     * ~20 [sectionBorder] sites track a light/dark switch without being rebuilt.
+     */
+    private class HeaderStripBorder(private val title: String) : AbstractBorder() {
         private val gapBelowTitle = 3
         private val gapBelowLine = tightGap
 
         override fun paintBorder(c: Component, g: Graphics, x: Int, y: Int, width: Int, height: Int) {
             val g2 = g.create() as Graphics2D
             g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+            val titleFont = section
             val fm = g2.getFontMetrics(titleFont)
             g2.font = titleFont
-            g2.color = titleColor
+            g2.color = foreground
             g2.drawString(title, x, y + fm.ascent)
             val lineY = y + fm.height + gapBelowTitle
-            g2.color = lineColor
+            g2.color = divider
             g2.drawLine(x, lineY, x + width - 1, lineY)
             g2.dispose()
         }
 
         override fun getBorderInsets(c: Component): Insets {
-            val fm = c.getFontMetrics(titleFont)
+            val fm = c.getFontMetrics(section)
             val topInset = fm.height + gapBelowTitle + 1 + gapBelowLine
             return Insets(topInset, 0, 0, 0)
         }
@@ -146,23 +173,27 @@ object Theme {
 
     fun roundedBorder(
         radius: Int = 8,
-        borderColor: Color = cardBorder,
-        fillColor: Color? = cardBg
+        borderColor: Color? = null,
+        fillColor: Color? = null
     ): Border = RoundedBorder(radius, borderColor, fillColor)
 
     fun roundedCard(
         radius: Int = 8,
         padding: Int = 8,
-        borderColor: Color = cardBorder,
-        fillColor: Color? = cardBg
+        borderColor: Color? = null,
+        fillColor: Color? = null
     ): Border = CompoundBorder(
         roundedBorder(radius, borderColor, fillColor),
         EmptyBorder(padding / 2, padding, padding / 2, padding)
     )
 
+    /**
+     * A null [borderColor]/[fillColor] resolves live from [cardBorder]/[cardBg] each paint, so cards
+     * track a light/dark switch; pass an explicit color to pin it.
+     */
     private class RoundedBorder(
         private val radius: Int,
-        private val borderColor: Color,
+        private val borderColor: Color?,
         private val fillColor: Color?
     ) : AbstractBorder() {
         override fun paintBorder(c: Component, g: Graphics, x: Int, y: Int, w: Int, h: Int) {
@@ -171,11 +202,9 @@ object Theme {
             val shape = RoundRectangle2D.Float(
                 x + 0.5f, y + 0.5f, w - 1f, h - 1f, radius.toFloat(), radius.toFloat()
             )
-            if (fillColor != null) {
-                g2.color = fillColor
-                g2.fill(shape)
-            }
-            g2.color = borderColor
+            g2.color = fillColor ?: cardBg
+            g2.fill(shape)
+            g2.color = borderColor ?: cardBorder
             g2.draw(shape)
             g2.dispose()
         }

@@ -36,7 +36,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
         // Manage stats label
         val trainingStatsLabel = JLabel("---")
         val testingStatsLabel = JLabel("---")
-        layout = MigLayout("fillx")
+        layout = MigLayout("fillx, ins 8")
         fun updateStatsLabel() {
             trainingStatsLabel.text = classifier.trainingStats
             testingStatsLabel.text = classifier.testingStats

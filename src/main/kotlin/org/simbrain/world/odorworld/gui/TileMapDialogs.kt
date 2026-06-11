@@ -269,6 +269,8 @@ fun OdorWorld.layerEditor() = StandardDialog().apply {
 
     val table = JTable(model).apply {
         setRowSelectionAllowed(true)
+        setShowGrid(true)
+        intercellSpacing = Dimension(1, 1)
         gridColor = Theme.divider
     }
     val panel = JPanel(BorderLayout())

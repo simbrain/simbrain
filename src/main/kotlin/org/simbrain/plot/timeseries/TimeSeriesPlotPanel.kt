@@ -38,7 +38,7 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
     init {
         preferredSize = PREFERRED_SIZE
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 8, gap 0px 0px")
 
         addClearGraphDataButton()
         addPreferencesButton()

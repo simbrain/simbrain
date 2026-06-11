@@ -37,9 +37,10 @@ fun installSimbrainFlatLafDefaults() {
 /**
  * Installs the global [FlatSVGIcon.ColorFilter] that recolors single-color SVG icons
  * (see [Icons]) to the Look-and-Feel foreground, so icons track the active theme in both light
- * and dark. The mapper reads `Label.foreground` live, so a future light/dark switch adapts
- * automatically (after the FlatSVGIcon cache is flushed). Near-black is the single authored
- * icon color; deliberately-colored icons (in `icons/multicolor/`) avoid it and pass through.
+ * and dark. The mapper reads `Label.foreground` live and FlatSVGIcon re-applies it on every paint,
+ * so a light/dark switch recolors every icon on the next repaint ([FlatLaf.updateUI]) with no cache
+ * to flush. Near-black is the single authored icon color; deliberately-colored icons (in
+ * `icons/multicolor/`) avoid it and pass through.
  *
  * MUST be called AFTER `FlatLightLaf.setup()` / `FlatDarkLaf.setup()` so `UIManager` is populated.
  */
@@ -52,24 +53,44 @@ fun installSimbrainSvgIconColors() {
 }
 
 /**
- * Color themes Simbrain can run under. The active mode is persisted in
- * [org.simbrain.workspace.WorkspacePreferences] and applied at startup; the View ▸ Appearance
- * menu switches it live.
+ * Color themes Simbrain can run under, persisted in [org.simbrain.workspace.WorkspacePreferences]
+ * and chosen in the Workspace Preferences dialog. [SYSTEM] follows the OS appearance (macOS); the
+ * Swing content switches live, while the native window frame and macOS screen menu bar match the
+ * mode chosen at the previous launch (they can only be set before AWT starts — see Splasher).
  */
-enum class ThemeMode(val label: String) { LIGHT("Light"), DARK("Dark") }
+enum class ThemeMode(val label: String) {
+    SYSTEM("System"), LIGHT("Light"), DARK("Dark");
+    override fun toString() = label
+}
+
+/** Whether macOS is currently in dark mode, via `defaults read -g AppleInterfaceStyle`. */
+fun isMacSystemDark(): Boolean = try {
+    val process = ProcessBuilder("defaults", "read", "-g", "AppleInterfaceStyle")
+        .redirectErrorStream(true).start()
+    val output = process.inputStream.bufferedReader().readText().trim()
+    process.waitFor(2, java.util.concurrent.TimeUnit.SECONDS)
+    output.equals("Dark", ignoreCase = true)
+} catch (e: Exception) {
+    false
+}
+
+/** Resolves [SYSTEM] to a concrete dark/light decision; non-macOS [SYSTEM] falls back to light. */
+fun ThemeMode.resolvedDark(): Boolean = when (this) {
+    ThemeMode.DARK -> true
+    ThemeMode.LIGHT -> false
+    ThemeMode.SYSTEM -> Utils.isMacOSX() && isMacSystemDark()
+}
 
 /**
  * Installs the FlatLaf look-and-feel for the given [mode] in the required order: register
- * Simbrain's custom defaults, run the theme's setup, then install the SVG icon color filter (which
- * needs a populated UIManager) and the shared button sizing. Safe to call repeatedly — a live theme
- * switch re-runs this and then calls [FlatLaf.updateUI] to repaint and recolor every open window.
+ * Simbrain's custom defaults, run the resolved theme's setup, then install the SVG icon color
+ * filter (which needs a populated UIManager) and the shared button sizing. Safe to call repeatedly —
+ * a live theme switch re-runs this and then calls [FlatLaf.updateUI] to repaint and recolor every
+ * open window.
  */
 fun setupLookAndFeel(mode: ThemeMode) {
     installSimbrainFlatLafDefaults()
-    when (mode) {
-        ThemeMode.LIGHT -> FlatLightLaf.setup()
-        ThemeMode.DARK -> FlatDarkLaf.setup()
-    }
+    if (mode.resolvedDark()) FlatDarkLaf.setup() else FlatLightLaf.setup()
     installSimbrainSvgIconColors()
     UIManager.put("Button.minimumWidth", 80)
 }

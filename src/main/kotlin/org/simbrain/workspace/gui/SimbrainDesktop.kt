@@ -60,6 +60,12 @@ object SimbrainDesktop {
         } catch (e: Exception) {
             e.printStackTrace()
         }
+        // Apply theme changes committed in the Workspace Preferences dialog, and follow the OS
+        // appearance live while in System mode (macOS fires this when system dark mode is toggled).
+        WorkspacePreferences.registerChangeListener { applyThemeIfChanged() }
+        Toolkit.getDefaultToolkit().addPropertyChangeListener("apple.awt.application.appearance") {
+            applyThemeIfChanged()
+        }
     }
 
     val workspace = Workspace()
@@ -521,8 +527,6 @@ object SimbrainDesktop {
 
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
-        viewMenu.add(createAppearanceMenu())
-        viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.toggleBottomDock))
         viewMenu.add(JMenuItem(actionManager.toggleInfoDock))
         viewMenu.addSeparator()
@@ -533,32 +537,33 @@ object SimbrainDesktop {
         return viewMenu
     }
 
-    private fun createAppearanceMenu(): JMenu {
-        val menu = JMenu("Appearance")
-        val group = ButtonGroup()
-        for (mode in ThemeMode.entries) {
-            val item = JRadioButtonMenuItem(mode.label).apply {
-                isSelected = WorkspacePreferences.themeMode == mode
-                addActionListener { switchTheme(mode) }
-            }
-            group.add(item)
-            menu.add(item)
-        }
-        return menu
+    /** The dark/light state currently realized in the Swing UI, to skip no-op re-themes. */
+    private var appliedDark = WorkspacePreferences.themeMode.resolvedDark()
+
+    /**
+     * Sets the theme [mode] (persisting it) and applies it live if the resolved dark/light actually
+     * changes. Used for programmatic switches; the Workspace Preferences dialog drives the same live
+     * apply through [applyThemeIfChanged] on commit.
+     */
+    fun switchTheme(mode: ThemeMode) {
+        WorkspacePreferences.themeMode = mode
+        applyThemeIfChanged()
     }
 
     /**
-     * Switches the application look-and-feel to [mode] live: re-installs the FlatLaf theme, repaints
-     * every open window (which also recolors SVG icons via the live color filter), and re-themes the
-     * chrome that Swing's own update cannot reach (JFreeChart plots, the desktop background, table
-     * grids). The choice is persisted so it survives a restart.
+     * Re-themes the live Swing UI when the resolved dark/light differs from what is realized:
+     * re-installs the FlatLaf theme, repaints every open window (which also recolors SVG icons via
+     * the live color filter), and re-themes the chrome Swing's own update cannot reach. Fired on a
+     * Workspace Preferences commit and on a macOS OS-appearance change (for System mode). The native
+     * window frame and macOS menu bar are set at launch (Splasher) and update only on restart.
      */
-    fun switchTheme(mode: ThemeMode) {
-        if (WorkspacePreferences.themeMode == mode) return
-        setupLookAndFeel(mode)
+    private fun applyThemeIfChanged() {
+        val dark = WorkspacePreferences.themeMode.resolvedDark()
+        if (dark == appliedDark) return
+        appliedDark = dark
+        setupLookAndFeel(WorkspacePreferences.themeMode)
         FlatLaf.updateUI()
         refreshThemedChrome()
-        WorkspacePreferences.themeMode = mode
     }
 
     /**

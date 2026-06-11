@@ -55,8 +55,13 @@ object WorkspacePreferences: PreferenceHolder() {
     )
     var importExportDirectory by StringPreference(".")
 
-    // Application color theme; switched live via the View ▸ Appearance menu, applied at startup.
-    var themeMode by EnumPreference(ThemeMode.LIGHT)
+    @UserParameter(
+        label = "Theme",
+        description = "Application color theme. System follows the OS appearance. On macOS the " +
+            "Swing content switches immediately; the window frame and menu bar update on restart.",
+        order = 5
+    )
+    var themeMode by EnumPreference(ThemeMode.SYSTEM)
 
     // Onboarding popup preferences - stored as comma-separated suppressed popup keys
     var suppressedPopups by StringPreference("")

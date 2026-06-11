@@ -36,6 +36,17 @@ public class Splasher {
         System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain");
         System.setProperty("apple.awt.application.name", "Simbrain");
 
+        // Match the native window frame and macOS screen menu bar to the saved app theme. This must
+        // be set before AWT initializes, so read the preference straight from java.util.prefs (the
+        // same node and key SimbrainPreferences uses) without loading any Swing class.
+        String themeMode = java.util.prefs.Preferences.userRoot().node("/org/simbrain").get("themeMode", "SYSTEM");
+        String appearance = switch (themeMode) {
+            case "DARK" -> "NSAppearanceNameDarkAqua";
+            case "LIGHT" -> "NSAppearanceNameAqua";
+            default -> "system";
+        };
+        System.setProperty("apple.awt.application.appearance", appearance);
+
         // Set up loggers (other logging config for tinylog is in build.gradle)
         Logger.getLogger("com.jme").setLevel(Level.OFF);
         Logger.getLogger("com.jmex").setLevel(Level.OFF);

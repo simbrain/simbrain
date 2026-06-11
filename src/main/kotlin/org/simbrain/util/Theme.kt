@@ -151,9 +151,10 @@ object Theme {
     const val componentGap: Int = 8
     const val tightGap: Int = 4
 
+    /** Uniform margin around a dialog's content AND its button bar, so the padding reads symmetric. */
     @JvmStatic
     fun dialogBorder(): Border =
-        EmptyBorder(dialogInsetVertical, dialogInsetHorizontal, dialogInsetVertical, dialogInsetHorizontal)
+        EmptyBorder(dialogInsetHorizontal, dialogInsetHorizontal, dialogInsetHorizontal, dialogInsetHorizontal)
 
     /** A bold [section]-font label for in-panel headers (e.g. column titles above a table). */
     @JvmStatic

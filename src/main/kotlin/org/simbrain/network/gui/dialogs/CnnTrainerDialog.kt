@@ -205,7 +205,7 @@ class CnnTrainerControls(
             trainer.config.createEditorDialog().display()
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 0, gap 8px") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
         runTools.add(JButton(stepAction))
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")

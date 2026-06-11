@@ -1,5 +1,6 @@
 package org.simbrain.util;
 
+import net.miginfocom.swing.MigLayout;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
@@ -166,11 +167,13 @@ public class StandardDialog extends GenericJDialog {
         cancelButton = new JButton(cancelAction);
         cancelButton.setMnemonic('C');
 
-        // Subclass-supplied buttons (e.g. Help) sit on the left; OK/Cancel are
-        // right-aligned, the platform-conventional placement.
-        customButtonPanel.setLayout(new FlowLayout(FlowLayout.LEFT, Theme.componentGap, 0));
+        // Subclass-supplied buttons (e.g. Help) sit on the left; OK/Cancel are right-aligned, the
+        // platform-conventional placement. MigLayout (not FlowLayout, which pads its edges) so the
+        // buttons sit flush against the dialog border and line up with the content margin. hidemode 3
+        // drops a hidden Cancel (e.g. setAsDoneDialog) so it reserves no space or gap.
+        customButtonPanel.setLayout(new MigLayout("insets 0, gap " + Theme.componentGap + ", hidemode 3"));
 
-        JPanel okCancelPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, Theme.componentGap, 0));
+        JPanel okCancelPanel = new JPanel(new MigLayout("insets 0, gap " + Theme.componentGap + ", hidemode 3"));
         okCancelPanel.add(okButton);
         okCancelPanel.add(cancelButton);
 

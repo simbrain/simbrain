@@ -162,7 +162,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             add(buttonPanel, "wrap, align center, gapbottom 20px")
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 0, gap 8px") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
         stepButton = JButton(stepAction)
         runTools.add(stepButton)
         runStopToggleButton = ToggleButton(listOf(runAction, stopAction)).apply {

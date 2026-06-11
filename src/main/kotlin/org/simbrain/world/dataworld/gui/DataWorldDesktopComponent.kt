@@ -12,9 +12,8 @@ import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
+import java.awt.BorderLayout
 import java.awt.Dimension
-import java.awt.event.ComponentAdapter
-import java.awt.event.ComponentEvent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
@@ -64,17 +63,9 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
             addAction(table.insertColumnAction)
             addAction(table.deleteColumnAction)
         }
-        add(tablePanel)
+        layout = BorderLayout()
+        add(tablePanel, BorderLayout.CENTER)
         frame.pack()
-
-        // Force component to fill up parent panel
-        addComponentListener(object : ComponentAdapter() {
-            override fun componentResized(e: ComponentEvent) {
-                val component = e.component
-                tablePanel.preferredSize = Dimension(component.width, component.height)
-                tablePanel.revalidate()
-            }
-        })
 
         parentFrame.pack()
     }

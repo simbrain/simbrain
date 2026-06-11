@@ -5,6 +5,7 @@ import org.simbrain.network.core.getSynapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
+import java.awt.BorderLayout
 import javax.swing.JPanel
 
 class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): JPanel() {
@@ -40,7 +41,8 @@ class WeightMatrixViewer(val sources: List<Neuron>, val targets: List<Neuron>): 
     }
 
     val dataViewer = SimbrainTablePanel(dataModel).also {
-        add(it)
+        layout = BorderLayout()
+        add(it, BorderLayout.CENTER)
     }
 
     fun commitChanges() {

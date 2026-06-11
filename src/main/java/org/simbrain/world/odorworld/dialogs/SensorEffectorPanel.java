@@ -79,6 +79,8 @@ public class SensorEffectorPanel extends JPanel {
         ((DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(true);
         table.setSelectionMode(javax.swing.ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
+        table.setShowGrid(true);
+        table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Theme.getDivider());
         table.setFocusable(false);
 

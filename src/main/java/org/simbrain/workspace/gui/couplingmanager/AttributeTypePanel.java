@@ -41,6 +41,8 @@ public class AttributeTypePanel extends JPanel {
         DefaultTableCellRenderer renderer = (DefaultTableCellRenderer) table.getTableHeader().getDefaultRenderer();
         renderer.setHorizontalAlignment(SwingConstants.CENTER);
         table.setRowSelectionAllowed(false);
+        table.setShowGrid(true);
+        table.setIntercellSpacing(new Dimension(1, 1));
         table.setGridColor(Theme.getDivider());
         table.setFocusable(false);
 

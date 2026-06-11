@@ -57,6 +57,8 @@ public class ComponentPanel extends JPanel {
         componentTable = new JTable(model);
         ((DefaultTableCellRenderer) componentTable.getTableHeader().getDefaultRenderer()).setHorizontalAlignment(SwingConstants.CENTER);
         componentTable.setRowSelectionAllowed(false);
+        componentTable.setShowGrid(true);
+        componentTable.setIntercellSpacing(new Dimension(1, 1));
         componentTable.setGridColor(Theme.getDivider());
         componentTable.setFocusable(false);
 

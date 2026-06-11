@@ -97,7 +97,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         layout = BorderLayout()
 
         val constraints = buildList {
-            add("fillx")
+            add("fill")
             if (!usePadding) add("insets 0")
         }.joinToString(",")
 

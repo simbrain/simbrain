@@ -105,8 +105,8 @@ class DataSetPanel(
         layout = MigLayout("ins 8, gap 12px 6px")
         add(Theme.sectionLabel("Inputs"))
         add(Theme.sectionLabel("Targets"), "wrap")
-        add(inputs)
-        add(targets, "wrap")
+        add(inputs, "grow, push")
+        add(targets, "grow, push, wrap")
         add(JLabel("Edit rows:"), "split 2, gaptop 8")
         add(addRemoveRows)
         
@@ -218,7 +218,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(dataSetTabPane, "wrap")
+        runControls.add(dataSetTabPane, "grow, push, wrap")
 
         addCommitTask { syncDataSet() }
 

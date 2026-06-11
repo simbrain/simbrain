@@ -117,7 +117,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         updateOverallValidation()
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(dataSetTabPane, "wrap")
+        runControls.add(dataSetTabPane, "grow, push, wrap")
 
         addCommitTask { syncDataSet() }
 

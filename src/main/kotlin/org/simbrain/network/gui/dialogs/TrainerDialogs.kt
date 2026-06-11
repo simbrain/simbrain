@@ -145,7 +145,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         // Run training algorithm
         val runControls = JPanel()
-        runControls.layout = MigLayout("ins 8, gap 0px 8px")
+        runControls.layout = MigLayout("ins 0, gap 0px 8px")
         val trainer = SupervisedTrainer(network, supervisedNetwork)
         val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 

@@ -156,13 +156,13 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             val errorPlot = ErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
-            val buttonPanel = JPanel(MigLayout("ins 0, gap 0px 0px"))
+            val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
             add(buttonPanel, "wrap, align center, gapbottom 20px")
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 0, gap 8px") }
         stepButton = JButton(stepAction)
         runTools.add(stepButton)
         runStopToggleButton = ToggleButton(listOf(runAction, stopAction)).apply {
@@ -336,7 +336,7 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
 class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
 
     init {
-        layout = MigLayout("ins 0, gap 2px")
+        layout = MigLayout("ins 0, gap 8px")
         // Add row
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")

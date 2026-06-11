@@ -252,6 +252,10 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
             }
         }
 
+        // FlatLaf turns off table grid lines by default (Table.showHorizontalLines/showVerticalLines
+        // false, intercellSpacing 0,0). Re-enable them so data cells stay visually separated.
+        setShowGrid(true)
+        intercellSpacing = Dimension(1, 1)
         setGridColor(Theme.divider)
 
         // Manages beginning and endings edits in cells, which is surprisingly hard to get right.

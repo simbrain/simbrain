@@ -12,6 +12,7 @@ import java.awt.Graphics2D
 import java.awt.Insets
 import java.awt.RenderingHints
 import java.awt.geom.RoundRectangle2D
+import javax.swing.JLabel
 import javax.swing.UIManager
 import javax.swing.border.AbstractBorder
 import javax.swing.border.Border
@@ -153,6 +154,10 @@ object Theme {
     @JvmStatic
     fun dialogBorder(): Border =
         EmptyBorder(dialogInsetVertical, dialogInsetHorizontal, dialogInsetVertical, dialogInsetHorizontal)
+
+    /** A bold [section]-font label for in-panel headers (e.g. column titles above a table). */
+    @JvmStatic
+    fun sectionLabel(text: String): JLabel = JLabel(text).apply { font = section }
 
     /**
      * "Header strip" section border — bold title + thin separator line at the top, no surrounding box.

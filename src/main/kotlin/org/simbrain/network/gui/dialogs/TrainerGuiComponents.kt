@@ -254,7 +254,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
         add(errorPlotPanel, "grow, gapbottom 0px")
     }

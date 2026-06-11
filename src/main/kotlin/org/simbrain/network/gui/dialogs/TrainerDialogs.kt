@@ -102,12 +102,12 @@ class DataSetPanel(
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
 
     init {
-        layout = MigLayout("gap 0px 0px, ins 0")
-        add(JLabel("Inputs"))
-        add(JLabel("Targets"), "wrap")
+        layout = MigLayout("ins 8, gap 12px 6px")
+        add(Theme.sectionLabel("Inputs"))
+        add(Theme.sectionLabel("Targets"), "wrap")
         add(inputs)
         add(targets, "wrap")
-        add(JLabel("Edit rows:"), "split 2")
+        add(JLabel("Edit rows:"), "split 2, gaptop 8")
         add(addRemoveRows)
         
         // Listen for table model changes to update validation
@@ -145,7 +145,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         // Run training algorithm
         val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        runControls.layout = MigLayout("ins 8, gap 0px 8px")
         val trainer = SupervisedTrainer(network, supervisedNetwork)
         val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 

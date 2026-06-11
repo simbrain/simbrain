@@ -44,7 +44,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         })
 
         val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        runControls.layout = MigLayout("ins 8, gap 0px 8px")
         val trainerControls = CnnTrainerControls(trainer)
 
         fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
@@ -290,7 +290,7 @@ class CnnTrainerControls(
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
         add(errorPlotPanel, "grow, gapbottom 0px")
     }

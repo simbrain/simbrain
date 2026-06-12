@@ -95,6 +95,19 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         /**
          * Timing is applied once and shared by all handlers (matching the old per-event throttle/debounce), so
          * a single shared collector drives the [sample]/[debounce] operator rather than one per subscriber.
+         *
+         * Note the deliberate edge change for [TimingMode.Throttle]: the old [Events] throttle was leading-edge
+         * (deliver the first fire in a window, drop the rest, never deliver a trailing one), whereas [sample] is
+         * trailing-edge (drop intermediate fires, deliver the latest value at the end of each window). For the
+         * real throttled events — repaint/outline coalescing ([NetworkModelEvents.updateGraphics],
+         * [NeuronCollectionEvents.shouldUpdateOutline]) — trailing-edge is what's actually wanted: the last paint
+         * reflects the current model state, where leading-edge could leave the final state unpainted until the
+         * next fire. A single isolated fire is still delivered (at the next sample tick).
+         *
+         * Because the shaped flow is shared via [SharingStarted.WhileSubscribed], the upstream [sample]/[debounce]
+         * collector starts on the first subscriber and stops when the last one cancels, restarting if a new
+         * subscriber arrives. [raw] has no replay, so a fire that lands while there are zero subscribers is
+         * dropped — fine for throttled UI refreshes, but a reason to keep barrier/once-only events off this path.
          */
         private val shaped: Flow<T> by lazy {
             if (interval == 0) raw

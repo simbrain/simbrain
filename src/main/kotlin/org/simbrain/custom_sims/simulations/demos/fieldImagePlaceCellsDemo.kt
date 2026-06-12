@@ -6,6 +6,7 @@ import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.core.connect
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.DecayRule
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
 import org.simbrain.util.widgets.FieldImagePanel
@@ -211,7 +212,7 @@ val fieldImagePlaceCellsDemo = newSim {
             add(JLabel("Threshold"), BorderLayout.WEST)
             add(thresholdSlider, BorderLayout.CENTER)
         }
-        val fieldFrame = JInternalFrame("Field Image", true, true, true, true).apply {
+        val fieldFrame = GenericJInternalFrame("Field Image", true, true, true, true).apply {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)

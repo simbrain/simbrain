@@ -49,6 +49,20 @@ public class GenericJInternalFrame extends JInternalFrame implements GenericFram
     }
 
     /**
+     * Drop-in for {@link JInternalFrame#JInternalFrame(String, boolean, boolean, boolean, boolean)} so call
+     * sites that build a plain internal frame can switch to the rounded one with no other change.
+     */
+    public GenericJInternalFrame(String title, boolean resizable, boolean closable,
+                                 boolean maximizable, boolean iconifiable) {
+        this();
+        setTitle(title);
+        setResizable(resizable);
+        setClosable(closable);
+        setMaximizable(maximizable);
+        setIconifiable(iconifiable);
+    }
+
+    /**
      * Re-root every descendant repaint to this frame so the rounded clip and outline
      * (painted in {@link #paintComponent}/{@link #paintChildren}) are re-applied on top. Without this,
      * an opaque child repainting itself directly (the title pane on selection, the content canvas while

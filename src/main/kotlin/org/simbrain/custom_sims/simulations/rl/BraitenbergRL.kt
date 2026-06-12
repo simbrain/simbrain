@@ -9,6 +9,7 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.decayfunctions.StepDecayFunction
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -805,7 +806,7 @@ val braitenbergRL = newSim { optionString ->
                         )
                     )
                     weightSpacePanel = panel
-                    JInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
+                    GenericJInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
                         layout = BorderLayout()
                         add(panel, BorderLayout.CENTER)
                         setBounds(165, 155, 760, 420)

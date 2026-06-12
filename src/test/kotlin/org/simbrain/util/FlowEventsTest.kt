@@ -317,4 +317,46 @@ class FlowEventsTest {
         assertEquals(1, batches.size)
         events.close()
     }
+
+    @Test
+    fun `noarg awaitable event awaits all handlers before fire returns`() = runBlocking {
+        val events = FlowEvents()
+        val event = events.NoArgAwaitableEvent()
+        val order = Collections.synchronizedList(mutableListOf<String>())
+
+        event.on(Dispatchers.Default) { delay(30); order.add("a") }
+        event.on(Dispatchers.Default) { delay(10); order.add("b") }
+
+        event.fire()
+        order.add("after")
+
+        assertEquals(listOf("a", "b", "after"), order.toList()) // sequential, both done before fire returns
+        events.close()
+    }
+
+    @Test
+    fun `awaitable fireAsync completes only after all handlers finish`() = runBlocking {
+        val events = FlowEvents()
+        val event = events.AwaitableEvent<String>()
+        val received = AtomicReference<String>()
+
+        event.on(Dispatchers.Default) { delay(20); received.set(it) }
+        event.fireAsync("x").await() // non-suspend fire, awaitable barrier
+
+        assertEquals("x", received.get())
+        events.close()
+    }
+
+    @Test
+    fun `noarg awaitable fireAndBlock bridges from a non-suspend caller`() {
+        val events = FlowEvents()
+        val event = events.NoArgAwaitableEvent()
+        val ran = AtomicReference(false)
+
+        event.on(Dispatchers.Default) { ran.set(true) }
+        event.fireAndBlock()
+
+        assertTrue(ran.get())
+        events.close()
+    }
 }

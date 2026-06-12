@@ -3,10 +3,12 @@ package org.simbrain.util
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -229,5 +231,30 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             warnIfFireAndBlockOnEdt()
             fire(value)
         }
+
+        /**
+         * Fires from a non-suspend caller and returns a [Deferred] that completes once every handler has run.
+         * Await it for the barrier (e.g. wait until a model's node has been created); ignore it for
+         * fire-and-forget. Unlike [fireAndBlock] it never blocks the calling thread, so it is safe on the EDT.
+         */
+        fun fireAsync(value: T): Deferred<Unit> = async { fire(value) }
+    }
+
+    /**
+     * No-argument [AwaitableEvent]: same barrier semantics, for events whose firer must wait for all handlers
+     * but which carry no payload (e.g. the network update -> repaint barrier).
+     */
+    inner class NoArgAwaitableEvent {
+
+        private val delegate = AwaitableEvent<Unit>()
+
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Default, handler: suspend () -> Unit): () -> Unit =
+            delegate.on(dispatcher) { handler() }
+
+        suspend fun fire() = delegate.fire(Unit)
+
+        fun fireAndBlock() = delegate.fireAndBlock(Unit)
+
+        fun fireAsync(): Deferred<Unit> = delegate.fireAsync(Unit)
     }
 }

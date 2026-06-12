@@ -10,10 +10,12 @@ import kotlinx.coroutines.sync.withLock
 import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicLong
 import java.util.function.BiConsumer
 import java.util.function.Consumer
+import javax.swing.SwingUtilities
 import kotlin.system.measureNanoTime
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.nanoseconds
@@ -48,16 +50,37 @@ import kotlin.time.Duration.Companion.seconds
  * For a sense of how events work see [EventTesting]
  *
  */
-open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
+open class Events(val timeout: Duration = 5.seconds): CoroutineScope, AutoCloseable {
 
     private val job = SupervisorJob()
 
-    override val coroutineContext = Dispatchers.Default + job
+    /**
+     * Logs uncaught exceptions thrown by fire-and-forget (wait = false) handlers, which would otherwise be
+     * delivered to the JVM default handler with no indication of which event bus they came from. Handlers run
+     * under [job] (a [SupervisorJob]), so a failing handler never cancels the scope or sibling handlers.
+     */
+    private val exceptionHandler = CoroutineExceptionHandler { _, throwable ->
+        System.err.println("Uncaught exception in ${this::class.simpleName} event handler:")
+        throwable.printStackTrace()
+    }
+
+    override val coroutineContext = Dispatchers.Default + job + exceptionHandler
+
+    /**
+     * Cancels this event scope and drops all registered handlers. Call only at the true end of life of the
+     * owning object (for example when a component is permanently closed). Do not call this in response to a
+     * model deletion that can be undone: undo/redo reuses the same instances, and a cancelled scope can never
+     * fire again.
+     */
+    override fun close() {
+        job.cancel()
+        eventMapping.clear()
+    }
 
     /**
      * Associates events to their listeners
      */
-    private val eventMapping = HashMap<EventObject, ConcurrentLinkedQueue<EventObjectHandler>>()
+    private val eventMapping = ConcurrentHashMap<EventObject, ConcurrentLinkedQueue<EventObjectHandler>>()
 
     enum class TimingMode {
         Throttle, Debounce
@@ -86,7 +109,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
          */
         protected fun onSuspendHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: suspend (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
-            eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
+            eventMapping.computeIfAbsent(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
             return {
                 eventMapping[this@EventObject]?.remove(eventObjectHandler)
             }
@@ -99,7 +122,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
          */
         protected fun onHelper(dispatcher: CoroutineDispatcher?, wait: Boolean, run: (new: Any?, old: Any?) -> Unit): () -> Boolean? {
             val eventObjectHandler = EventObjectHandler(dispatcher, wait, run)
-            eventMapping.getOrPut(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
+            eventMapping.computeIfAbsent(this@EventObject) { ConcurrentLinkedQueue() }.add(eventObjectHandler)
             return {
                 eventMapping[this@EventObject]?.remove(eventObjectHandler)
             }
@@ -231,10 +254,27 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
                 val timing = measureNanoTime {
                     result = block()
                 }
-                println("Event ${this@Events::class.simpleName} from ${Thread.getAllStackTraces()[Thread.currentThread()]?.dropWhile { it.className.contains("java.lang.Thread") }?.dropWhile { it.className.contains("util.Event") }?.firstOrNull().toString()} took ${timing.nanoseconds} to complete.")
+                println("Event ${this@Events::class.simpleName} from ${Thread.currentThread().stackTrace?.dropWhile { it.className.contains("java.lang.Thread") }?.dropWhile { it.className.contains("util.Event") }?.firstOrNull().toString()} took ${timing.nanoseconds} to complete.")
                 return result!!
             } else {
                 return block()
+            }
+        }
+
+        /**
+         * Warns (rather than silently freezing the UI) if [fireAndBlock] is called on the Swing event dispatch
+         * thread. Blocking the EDT here can deadlock against handlers registered on [Dispatchers.Swing]. Fire from
+         * a coroutine with `fire().await()` instead. Today all callers reach [fireAndBlock] off the EDT; this makes
+         * that invariant observable rather than load-bearing-by-luck.
+         */
+        protected fun warnIfOnEventDispatchThread() {
+            if (SwingUtilities.isEventDispatchThread()) {
+                System.err.println(
+                    "Warning: fireAndBlock() was called on the Swing event dispatch thread. This blocks the UI " +
+                        "and can deadlock against Dispatchers.Swing handlers. Fire from a coroutine with " +
+                        "fire().await() instead."
+                )
+                Thread.dumpStack()
             }
         }
     }
@@ -268,6 +308,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
          * Java fire and block. Fire event and wait for it to terminate before continuing.
          */
         fun fireAndBlock() = runBlocking {
+            warnIfOnEventDispatchThread()
             printTiming { fire().await() }
         }
 
@@ -292,6 +333,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         fun fire(new: T) = fireAllHelper { handler -> handler(new, null) }
 
         fun fireAndBlock(new: T) = runBlocking {
+            warnIfOnEventDispatchThread()
             printTiming { fire(new).await() }
         }
 
@@ -319,6 +361,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         fun fire(new: T) = batchFireAllHelper(new, null)
 
         fun fireAndBlock(new: T) = runBlocking {
+            warnIfOnEventDispatchThread()
             printTiming { fire(new).await() }
         }
     }
@@ -344,6 +387,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         fun fire(new: T, old: T) = fireAllHelper { handler -> if (new != old) handler(new, old) }
 
         fun fireAndBlock(new: T, old: T) = runBlocking {
+            warnIfOnEventDispatchThread()
             printTiming { fire(new, old).await() }
         }
 
@@ -371,6 +415,7 @@ open class Events(val timeout: Duration = 5.seconds): CoroutineScope {
         fun fire(new: T, old: T) = batchFireAllHelper(new, old)
 
         fun fireAndBlock(new: T, old: T) = runBlocking {
+            warnIfOnEventDispatchThread()
             printTiming { fire(new, old).await() }
         }
     }
@@ -381,7 +426,7 @@ data class EventObjectHandler(
     val dispatcher: CoroutineDispatcher?,
     val wait: Boolean,
     val handler: suspend (new: Any?, old: Any?) -> Unit,
-    val stackTraceElements: Array<StackTraceElement>? = if (useEventDebug) Thread.getAllStackTraces()[Thread.currentThread()] else null
+    val stackTraceElements: Array<StackTraceElement>? = if (useEventDebug) Thread.currentThread().stackTrace else null
 ) {
     override fun equals(other: Any?): Boolean {
         if (this === other) return true

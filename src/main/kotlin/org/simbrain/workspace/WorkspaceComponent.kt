@@ -114,6 +114,7 @@ abstract class WorkspaceComponent(name: String) {
             )
         }
         workspace.removeWorkspaceComponent(this)
+        events.close()
     }
 
     /**

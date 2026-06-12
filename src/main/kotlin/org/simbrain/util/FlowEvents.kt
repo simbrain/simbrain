@@ -12,14 +12,17 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
+import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.function.BiConsumer
 import java.util.function.Consumer
@@ -158,6 +161,49 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         @JvmOverloads
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: BiConsumer<T, T>): Job =
             onFlow(dispatcher) { (new, old) -> handler.accept(new, old) }
+    }
+
+    /**
+     * Accumulates every value fired during a timing window and delivers them to handlers as one batch (a
+     * [List]), once per window — the batch analogue of [OneArgEvent]. Use when every fired value must be handled
+     * (e.g. removing each deleted node) but the handling can be coalesced, unlike the plain throttled/debounced
+     * events which keep only the latest value. Batch order is not significant.
+     */
+    inner class BatchOneArgEvent<T>(interval: Int, timingMode: TimingMode = TimingMode.Debounce) :
+        FlowEvent<T>(interval, timingMode) {
+
+        private val buffer = ConcurrentLinkedQueue<T>()
+
+        private fun drain(): List<T> = buildList {
+            while (true) add(buffer.poll() ?: break)
+        }
+
+        /**
+         * Each timing tick flushes everything accumulated since the previous flush as one batch. Shared eagerly
+         * so the buffer is always drained and can never grow unbounded, even with no subscriber — matching the
+         * old [Events] batch, whose flush logic ran regardless of handlers. A batch is delivered only while
+         * subscribed (no replay); empty drains are dropped.
+         */
+        @OptIn(FlowPreview::class)
+        private val batched: Flow<List<T>> = run {
+            val ticks = if (interval == 0) raw else when (timingMode) {
+                TimingMode.Throttle -> raw.sample(interval.milliseconds)
+                TimingMode.Debounce -> raw.debounce(interval.milliseconds)
+            }
+            ticks.map { drain() }.filter { it.isNotEmpty() }.shareIn(this@FlowEvents, SharingStarted.Eagerly)
+        }
+
+        fun fire(value: T) {
+            buffer.add(value)
+            raw.tryEmit(value)
+        }
+
+        fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (List<T>) -> Unit): Job =
+            batched.onEach(handler).flowOn(dispatcher).launchIn(this@FlowEvents)
+
+        @JvmOverloads
+        fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: Consumer<List<T>>): Job =
+            batched.onEach { handler.accept(it) }.flowOn(dispatcher).launchIn(this@FlowEvents)
     }
 
     inner class AwaitableEvent<T> {

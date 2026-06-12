@@ -372,7 +372,7 @@ class XStreamPropertyConverterUnmarshallingContext<T>(private val objectComplete
     }
 
     fun withConstructedObject(block: T.() -> Unit) {
-        objectCompletedEvent.objectCompleted.on(wait = true) {
+        objectCompletedEvent.objectCompleted.on {
             (it as T).block()
         }
     }
@@ -388,8 +388,8 @@ fun <T> createXStreamPropertyConverter(
     )
 }
 
-class ConvertedObjectEvent: Events() {
-    val objectCompleted = OneArgEvent<Any>()
+class ConvertedObjectEvent: FlowEvents() {
+    val objectCompleted = AwaitableEvent<Any>()
 }
 
 /**

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import javax.swing.SwingUtilities
 
 class FlowEventsTest {
 
@@ -84,19 +85,20 @@ class FlowEventsTest {
     }
 
     @Test
-    fun `awaitable event fire returns only after all handlers finish`() = runBlocking {
+    fun `awaitable event runs handlers sequentially and returns only after all finish`() = runBlocking {
         val events = FlowEvents()
         val event = events.AwaitableEvent<Int>()
         val order = Collections.synchronizedList(mutableListOf<String>())
 
+        // "slow" is registered first; sequential execution means it completes before "fast" starts,
+        // even though it sleeps longer.
         event.on(Dispatchers.Default) { delay(50); order.add("slow") }
         event.on(Dispatchers.Default) { delay(10); order.add("fast") }
 
         event.fire(1)
         order.add("after-fire")
 
-        assertTrue(order.containsAll(listOf("slow", "fast")))
-        assertEquals("after-fire", order.last())
+        assertEquals(listOf("slow", "fast", "after-fire"), order.toList())
         events.close()
     }
 
@@ -110,6 +112,22 @@ class FlowEventsTest {
         event.fireAndBlock("x")
 
         assertEquals("x", received.get())
+        events.close()
+    }
+
+    @Test
+    fun `awaitable fireAndBlock on the EDT completes when handlers run off-EDT`() {
+        val events = FlowEvents()
+        val event = events.AwaitableEvent<String>()
+        val received = AtomicReference<String>()
+        event.on(Dispatchers.Default) { received.set(it) }
+
+        // Blocks the EDT, but the handler runs on Dispatchers.Default, so there is no deadlock.
+        SwingUtilities.invokeAndWait {
+            event.fireAndBlock("edt")
+        }
+
+        assertEquals("edt", received.get())
         events.close()
     }
 }

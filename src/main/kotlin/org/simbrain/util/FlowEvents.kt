@@ -7,10 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -50,6 +47,21 @@ import kotlin.time.Duration.Companion.milliseconds
  * its siblings, and [close] cancels everything at end of life.
  */
 private val edtDispatcher: CoroutineDispatcher get() = Dispatchers.Swing.immediate
+
+/**
+ * Warns (rather than silently freezing the UI) if a blocking fire happens on the Swing EDT. Mirrors the guard
+ * on [Events.fireAndBlock]. For [FlowEvents.AwaitableEvent] this is advisory: barrier handlers default to
+ * [Dispatchers.Default], so an on-EDT fire only deadlocks if a handler also explicitly requires the EDT.
+ */
+internal fun warnIfFireAndBlockOnEdt() {
+    if (SwingUtilities.isEventDispatchThread()) {
+        System.err.println(
+            "Warning: fireAndBlock() was called on the Swing event dispatch thread. This blocks the UI and " +
+                "can deadlock against EDT handlers. Fire from a coroutine instead."
+        )
+        Thread.dumpStack()
+    }
+}
 
 open class FlowEvents : CoroutineScope, AutoCloseable {
 
@@ -145,14 +157,17 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             return { handlers.remove(wrapped) }
         }
 
+        /**
+         * Runs every handler to completion before returning, in registration order. Sequential (not concurrent)
+         * to match the old `on(wait = true)` semantics, where ordering between handlers can matter (e.g. the
+         * XStream post-deserialization wiring in [ConvertedObjectEvent]).
+         */
         suspend fun fire(value: T) {
-            coroutineScope { handlers.map { async { it(value) } }.awaitAll() }
+            for (handler in handlers) handler(value)
         }
 
         fun fireAndBlock(value: T) = runBlocking {
-            check(!SwingUtilities.isEventDispatchThread()) {
-                "AwaitableEvent.fireAndBlock must not run on the Swing event dispatch thread — fire from a coroutine."
-            }
+            warnIfFireAndBlockOnEdt()
             fire(value)
         }
     }

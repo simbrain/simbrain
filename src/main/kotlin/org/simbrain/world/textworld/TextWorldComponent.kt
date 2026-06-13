@@ -1,5 +1,6 @@
 package org.simbrain.world.textworld
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.projection.KDTreeConvertor
 import org.simbrain.workspace.AttributeContainer
@@ -41,7 +42,7 @@ class TextWorldComponent : WorkspaceComponent {
      * Initialize attribute types.
      */
     private fun init() {
-        world.events.atEnd.on {
+        world.events.atEnd.on(Dispatchers.Default) {
             if (world.stopAtEnd) {
                 workspace.stop()
             }

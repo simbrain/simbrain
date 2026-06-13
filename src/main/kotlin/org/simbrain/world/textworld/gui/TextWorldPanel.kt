@@ -127,15 +127,15 @@ class TextWorldPanel(
             }
         }
 
-        world.events.cursorPositionChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.cursorPositionChanged.on(Dispatchers.Swing) {
             textArea.caretPosition = world.position
         }
 
-        world.events.currentTokenChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.currentTokenChanged.on(Dispatchers.Swing) {
             updateHighlights()
         }
 
-        world.events.preferencesChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.preferencesChanged.on(Dispatchers.Swing) {
 
             updateHighlights()
         }

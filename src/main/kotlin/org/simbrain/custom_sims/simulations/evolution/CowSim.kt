@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.newSim
@@ -240,7 +241,7 @@ val evolveCow = newSim {
             eliminationRatio = 0.5,
             stoppingFunction = { nthPercentileFitness(10) > -1000 || generation > maxGenerations },
         )
-        runner.events.generationUpdated.on { state ->
+        runner.events.generationUpdated.on(Dispatchers.Default) { state ->
             listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                 "$it: ${state.nthPercentileFitness(it).format(3)}"
             }.also {
@@ -249,7 +250,7 @@ val evolveCow = newSim {
                 progressWindow.value = state.generation
             }
         }
-        runner.events.endEvolution.on {
+        runner.events.endEvolution.on(Dispatchers.Default) {
             runner.generationState?.let { state ->
                 with(state.best.createDisplayCopy(workspace) as CowSim) {
                     build()

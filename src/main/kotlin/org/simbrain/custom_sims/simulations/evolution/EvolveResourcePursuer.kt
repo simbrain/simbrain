@@ -400,7 +400,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
     suspend fun runHeadless() {
         val runner = EvolutionRunner(evaluatorParams) { seed -> EvolveResourcePursuerSim(seed = seed) }
-        runner.events.endEvolution.on {
+        runner.events.endEvolution.on(Dispatchers.Default) {
             runner.generationState?.let { state ->
                 with(state.best.createDisplayCopy(workspace, state.bestMetadata) as EvolveResourcePursuerSim) {
                     build()

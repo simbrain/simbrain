@@ -59,7 +59,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
         initBlock = {
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 isEnabled = false
             }
             trainer.events.endTraining.on {
@@ -90,7 +90,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                     showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
                 }
             }
-            trainer.events.errorUpdated.fire(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
+            trainer.events.errorUpdated.fireAsync(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
         }.display()
     }
 
@@ -167,7 +167,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         runTools.add(stepButton)
         runStopToggleButton = ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
@@ -301,7 +301,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
             }
         }
 
-        trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
+        trainer.events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
     }

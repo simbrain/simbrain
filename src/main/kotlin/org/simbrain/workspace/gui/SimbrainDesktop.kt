@@ -261,7 +261,7 @@ object SimbrainDesktop {
             lastTimestep = 0
             updateTimeLabel()
         }
-        events.componentAdded.on(Dispatchers.Swing, wait = true) { addDesktopComponent(it) }
+        events.componentAdded.on(Dispatchers.Swing) { addDesktopComponent(it) }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on
             workspaceComponentDesktopComponentMap.remove(wc)

@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.neuroscience
 
+import kotlinx.coroutines.Job
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.RandomWeightInitializer
 import org.simbrain.network.connections.Sparse
@@ -222,13 +223,13 @@ val corticalLayers = newSim {
 
     withGui {
         val previousSelectedWandIndex = NetworkPreferences.wandPalette.selectedIndex
-        var unregisterRestoreWandListener: (() -> Boolean?)? = null
+        var unregisterRestoreWandListener: Job? = null
         unregisterRestoreWandListener = workspace.events.workspaceCleared.on {
             val restorePalette = NetworkPreferences.wandPalette
             val restoredIndex = previousSelectedWandIndex.coerceIn(0, (restorePalette.actions.size - 1).coerceAtLeast(0))
             restorePalette.selectAction(restoredIndex)
             NetworkPreferences.wandPalette = restorePalette
-            unregisterRestoreWandListener?.invoke()
+            unregisterRestoreWandListener?.cancel()
             unregisterRestoreWandListener = null
         }
 

@@ -10,6 +10,7 @@ import org.junit.jupiter.api.Test
 import java.util.Collections
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
+import java.util.function.Consumer
 import javax.swing.SwingUtilities
 
 class FlowEventsTest {
@@ -385,6 +386,32 @@ class FlowEventsTest {
         event.fire()
 
         withTimeout(2000) { fired.await() }
+        events.close()
+    }
+
+    @Test
+    fun `awaitable event Consumer overload is awaited like the suspend form`() {
+        val events = FlowEvents()
+        val event = events.AwaitableEvent<String>()
+        val received = AtomicReference<String>()
+
+        event.on(Dispatchers.Default, Consumer { received.set(it) })
+        event.fireAndBlock("java")
+
+        assertEquals("java", received.get())
+        events.close()
+    }
+
+    @Test
+    fun `noarg awaitable Runnable overload is awaited like the suspend form`() {
+        val events = FlowEvents()
+        val event = events.NoArgAwaitableEvent()
+        val ran = AtomicReference(false)
+
+        event.on(Dispatchers.Default, Runnable { ran.set(true) })
+        event.fireAndBlock()
+
+        assertTrue(ran.get())
         events.close()
     }
 }

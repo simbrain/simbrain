@@ -230,6 +230,10 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             return { handlers.remove(wrapped) }
         }
 
+        @JvmOverloads
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Default, handler: Consumer<T>): () -> Unit =
+            on(dispatcher) { handler.accept(it) }
+
         /**
          * Runs every handler to completion before returning, in registration order. Sequential (not concurrent)
          * to match the old `on(wait = true)` semantics, where ordering between handlers can matter (e.g. the
@@ -262,6 +266,10 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Default, handler: suspend () -> Unit): () -> Unit =
             delegate.on(dispatcher) { handler() }
+
+        @JvmOverloads
+        fun on(dispatcher: CoroutineDispatcher = Dispatchers.Default, handler: Runnable): () -> Unit =
+            delegate.on(dispatcher) { handler.run() }
 
         suspend fun fire() = delegate.fire(Unit)
 

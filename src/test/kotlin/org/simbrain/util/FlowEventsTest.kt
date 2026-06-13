@@ -21,7 +21,7 @@ class FlowEventsTest {
         val received = CompletableDeferred<String>()
 
         event.on(Dispatchers.Default) { received.complete(it) }
-        delay(100) // SharedFlow has no replay; let the collector subscribe before firing
+        delay(100)
 
         event.fire("hello")
 
@@ -178,7 +178,7 @@ class FlowEventsTest {
         delay(150)
         assertEquals(1, count.get())
 
-        job.cancel() // last subscriber gone -> the shared WhileSubscribed collector tears down
+        job.cancel() // removes the handler from the list; the shaping collector keeps running
         delay(100)
         event.fire(2)
         delay(150)
@@ -200,10 +200,10 @@ class FlowEventsTest {
         delay(150)
         assertEquals(listOf(1), first.toList())
 
-        job1.cancel() // shared collector stops
+        job1.cancel() // removes handler1 from the list
         delay(100)
 
-        val job2 = event.on(Dispatchers.Default) { second.add(it) } // restarts the shared collector
+        val job2 = event.on(Dispatchers.Default) { second.add(it) } // registers a fresh handler synchronously
         delay(100)
         event.fire(2)
         delay(150)
@@ -228,13 +228,13 @@ class FlowEventsTest {
         assertEquals(1, a.get())
         assertEquals(1, b.get())
 
-        jobA.cancel() // one of two subscribers leaves; the collector stays up for jobB
+        jobA.cancel() // removes handler A; handler B stays in the list
         delay(100)
         event.fire(2)
         delay(150)
 
         assertEquals(1, a.get()) // cancelled subscriber stopped
-        assertEquals(2, b.get()) // survivor keeps receiving from the still-shared collector
+        assertEquals(2, b.get()) // survivor keeps receiving
         events.close()
     }
 
@@ -357,6 +357,34 @@ class FlowEventsTest {
         event.fireAndBlock()
 
         assertTrue(ran.get())
+        events.close()
+    }
+
+    @Test
+    fun `handler registered with on receives a fire that immediately follows it`() = runBlocking {
+        val events = FlowEvents()
+        val event = events.OneArgEvent<String>()
+        val received = CompletableDeferred<String>()
+
+        // No delay between on() and fire(): registration is synchronous, so the fire cannot race the
+        // subscription. A per-handler async launchIn could drop this; this is the regression guard.
+        event.on(Dispatchers.Default) { received.complete(it) }
+        event.fire("now")
+
+        assertEquals("now", withTimeout(2000) { received.await() })
+        events.close()
+    }
+
+    @Test
+    fun `noarg event delivers a fire that immediately follows on`() = runBlocking {
+        val events = FlowEvents()
+        val event = events.NoArgEvent()
+        val fired = CompletableDeferred<Unit>()
+
+        event.on(Dispatchers.Default) { fired.complete(Unit) }
+        event.fire()
+
+        withTimeout(2000) { fired.await() }
         events.close()
     }
 }

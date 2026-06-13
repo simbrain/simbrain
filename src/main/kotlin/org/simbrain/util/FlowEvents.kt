@@ -10,17 +10,12 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.async
 import kotlinx.coroutines.channels.BufferOverflow
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.debounce
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.sample
-import kotlinx.coroutines.flow.shareIn
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
@@ -32,21 +27,24 @@ import javax.swing.SwingUtilities
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Flow-based event bus (Option B spike). Runs in parallel to [Events] and is not yet a replacement; only
- * [org.simbrain.docviewer.DocViewerEvents] has been migrated so far.
+ * Flow-based event bus (Option B). Runs in parallel to [Events] and is not yet a full replacement.
  *
  * It separates the two patterns the old [Events] bus conflated into one `wait`-flag mechanism:
  *
- * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent]) backed by [MutableSharedFlow].
- *   `fire()` never blocks and is safe from any thread (it `tryEmit`s). Handlers registered with `on()` run on
- *   the Swing EDT by default (so the common "model changed -> repaint" handler is EDT-safe without ceremony);
- *   pass [Dispatchers.Default] to opt out for background work. Throttling/debouncing is delegated to the Flow
- *   [sample]/[debounce] operators. `on()` returns the [Job] of the collector; cancel it to unsubscribe.
+ * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent], [BatchOneArgEvent]). Handlers
+ *   register SYNCHRONOUSLY: `on()` adds the handler to a [CopyOnWriteArrayList] the instant it returns (like the
+ *   old bus), so a `fire()` immediately after `on()` can never miss it. `fire()` never blocks and is safe from
+ *   any thread. Handlers run on the Swing EDT by default (so the common "model changed -> repaint" handler is
+ *   EDT-safe without ceremony); pass [Dispatchers.Default] to opt out for background work. Un-throttled events
+ *   dispatch directly from `fire()`; throttled/debounced events feed a [MutableSharedFlow] driven by a single
+ *   eager collector that applies [sample]/[debounce] once and fans out to the handlers. `on()` returns a [Job];
+ *   cancel it to unsubscribe.
  *
- * - **Await-for-completion barrier** ([AwaitableEvent]) for the rare event whose firer must wait until every
- *   handler has finished (serialization ordering, the update loop). `fire()` is a suspend function that returns
- *   only once all handlers complete; [AwaitableEvent.fireAndBlock] is the Java / non-suspend bridge and must not
- *   be called on the EDT.
+ * - **Await-for-completion barrier** ([AwaitableEvent], [NoArgAwaitableEvent]) for the rare event whose firer
+ *   must wait until every handler has finished (serialization ordering, the update loop). `fire()` is a suspend
+ *   function that returns only once all handlers complete; [AwaitableEvent.fireAndBlock] is the Java / non-suspend
+ *   bridge and must not be called on the EDT, and [AwaitableEvent.fireAsync] returns an awaitable from a
+ *   non-suspend caller.
  *
  * Handler coroutines live on this object's [SupervisorJob], so one failing handler never cancels the scope or
  * its siblings, and [close] cancels everything at end of life.
@@ -89,47 +87,54 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
     enum class TimingMode { Throttle, Debounce }
 
+    /**
+     * Base for the fire-and-forget pub/sub events. Handlers register SYNCHRONOUSLY in [handlers], so a `fire()`
+     * that immediately follows an `on()` can never miss the handler — the gap that a per-handler async
+     * `launchIn` collector left open. Un-throttled events ([interval] == 0) dispatch directly; throttled and
+     * debounced events feed [raw] and a single eager collector applies the timing operator and fans out.
+     */
     @OptIn(FlowPreview::class)
     abstract inner class FlowEvent<T>(val interval: Int, val timingMode: TimingMode) {
 
-        protected val raw = MutableSharedFlow<T>(
-            extraBufferCapacity = 64,
-            onBufferOverflow = BufferOverflow.SUSPEND
-        )
+        private val handlers = CopyOnWriteArrayList<Pair<CoroutineDispatcher, suspend (T) -> Unit>>()
 
-        /**
-         * Timing is applied once and shared by all handlers (matching the old per-event throttle/debounce), so
-         * a single shared collector drives the [sample]/[debounce] operator rather than one per subscriber.
-         *
-         * Note the deliberate edge change for [TimingMode.Throttle]: the old [Events] throttle was leading-edge
-         * (deliver the first fire in a window, drop the rest, never deliver a trailing one), whereas [sample] is
-         * trailing-edge (drop intermediate fires, deliver the latest value at the end of each window). For the
-         * real throttled events — repaint/outline coalescing ([NetworkModelEvents.updateGraphics],
-         * [NeuronCollectionEvents.shouldUpdateOutline]) — trailing-edge is what's actually wanted: the last paint
-         * reflects the current model state, where leading-edge could leave the final state unpainted until the
-         * next fire. A single isolated fire is still delivered (at the next sample tick).
-         *
-         * Because the shaped flow is shared via [SharingStarted.WhileSubscribed], the upstream [sample]/[debounce]
-         * collector starts on the first subscriber and stops when the last one cancels, restarting if a new
-         * subscriber arrives. [raw] has no replay, so a fire that lands while there are zero subscribers is
-         * dropped — fine for throttled UI refreshes, but a reason to keep barrier/once-only events off this path.
-         */
-        private val shaped: Flow<T> by lazy {
-            if (interval == 0) raw
-            else when (timingMode) {
-                TimingMode.Throttle -> raw.sample(interval.milliseconds)
-                TimingMode.Debounce -> raw.debounce(interval.milliseconds)
-            }.shareIn(this@FlowEvents, SharingStarted.WhileSubscribed())
+        private val raw by lazy {
+            MutableSharedFlow<T>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
         }
 
-        protected fun onFlow(dispatcher: CoroutineDispatcher, handler: suspend (T) -> Unit): Job =
-            shaped.onEach(handler).flowOn(dispatcher).launchIn(this@FlowEvents)
+        init {
+            // Throttling/debouncing needs a timer, so it runs through [raw] and one eager collector that shapes
+            // and fans out. [TimingMode.Throttle] uses [sample] (trailing-edge: drop intermediate fires, deliver
+            // the latest at the end of each window) — deliberately unlike the old leading-edge throttle, since the
+            // real throttled events coalesce repaint/outline requests and want the final state painted.
+            if (interval != 0) {
+                when (timingMode) {
+                    TimingMode.Throttle -> raw.sample(interval.milliseconds)
+                    TimingMode.Debounce -> raw.debounce(interval.milliseconds)
+                }.onEach { dispatch(it) }.launchIn(this@FlowEvents)
+            }
+        }
+
+        private fun dispatch(value: T) {
+            handlers.forEach { (dispatcher, handler) -> launch(dispatcher) { handler(value) } }
+        }
+
+        /** Deliver [value] to all current handlers: directly when un-throttled, else through the shaping collector. */
+        protected fun fireShaped(value: T) {
+            if (interval == 0) dispatch(value) else raw.tryEmit(value)
+        }
+
+        protected fun onFlow(dispatcher: CoroutineDispatcher, handler: suspend (T) -> Unit): Job {
+            val entry = dispatcher to handler
+            handlers.add(entry)
+            return Job().apply { invokeOnCompletion { handlers.remove(entry) } }
+        }
     }
 
     inner class NoArgEvent(interval: Int = 0, timingMode: TimingMode = TimingMode.Debounce) :
         FlowEvent<Unit>(interval, timingMode) {
 
-        fun fire() { raw.tryEmit(Unit) }
+        fun fire() = fireShaped(Unit)
 
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend () -> Unit): Job =
             onFlow(dispatcher) { handler() }
@@ -142,7 +147,7 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
     inner class OneArgEvent<T>(interval: Int = 0, timingMode: TimingMode = TimingMode.Debounce) :
         FlowEvent<T>(interval, timingMode) {
 
-        fun fire(value: T) { raw.tryEmit(value) }
+        fun fire(value: T) = fireShaped(value)
 
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (T) -> Unit): Job =
             onFlow(dispatcher, handler)
@@ -155,7 +160,7 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
     inner class ChangedEvent<T>(interval: Int = 0, timingMode: TimingMode = TimingMode.Debounce) :
         FlowEvent<Pair<T, T>>(interval, timingMode) {
 
-        fun fire(new: T, old: T) { if (new != old) raw.tryEmit(new to old) }
+        fun fire(new: T, old: T) { if (new != old) fireShaped(new to old) }
 
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (new: T, old: T) -> Unit): Job =
             onFlow(dispatcher) { (new, old) -> handler(new, old) }
@@ -170,29 +175,33 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
      * [List]), once per window — the batch analogue of [OneArgEvent]. Use when every fired value must be handled
      * (e.g. removing each deleted node) but the handling can be coalesced, unlike the plain throttled/debounced
      * events which keep only the latest value. Batch order is not significant.
+     *
+     * Like the other pub/sub events, handlers register synchronously. The eager collector always drains the
+     * buffer (so it can never grow unbounded, even with no subscriber — matching the old [Events] batch, whose
+     * flush ran regardless of handlers); a batch is delivered only while a handler is registered.
      */
-    inner class BatchOneArgEvent<T>(interval: Int, timingMode: TimingMode = TimingMode.Debounce) :
-        FlowEvent<T>(interval, timingMode) {
+    @OptIn(FlowPreview::class)
+    inner class BatchOneArgEvent<T>(val interval: Int, val timingMode: TimingMode = TimingMode.Debounce) {
 
+        private val raw = MutableSharedFlow<T>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
         private val buffer = ConcurrentLinkedQueue<T>()
+        private val handlers = CopyOnWriteArrayList<Pair<CoroutineDispatcher, suspend (List<T>) -> Unit>>()
 
         private fun drain(): List<T> = buildList {
             while (true) add(buffer.poll() ?: break)
         }
 
-        /**
-         * Each timing tick flushes everything accumulated since the previous flush as one batch. Shared eagerly
-         * so the buffer is always drained and can never grow unbounded, even with no subscriber — matching the
-         * old [Events] batch, whose flush logic ran regardless of handlers. A batch is delivered only while
-         * subscribed (no replay); empty drains are dropped.
-         */
-        @OptIn(FlowPreview::class)
-        private val batched: Flow<List<T>> = run {
+        init {
             val ticks = if (interval == 0) raw else when (timingMode) {
                 TimingMode.Throttle -> raw.sample(interval.milliseconds)
                 TimingMode.Debounce -> raw.debounce(interval.milliseconds)
             }
-            ticks.map { drain() }.filter { it.isNotEmpty() }.shareIn(this@FlowEvents, SharingStarted.Eagerly)
+            ticks.onEach {
+                val batch = drain()
+                if (batch.isNotEmpty()) {
+                    handlers.forEach { (dispatcher, handler) -> launch(dispatcher) { handler(batch) } }
+                }
+            }.launchIn(this@FlowEvents)
         }
 
         fun fire(value: T) {
@@ -200,12 +209,15 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             raw.tryEmit(value)
         }
 
-        fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (List<T>) -> Unit): Job =
-            batched.onEach(handler).flowOn(dispatcher).launchIn(this@FlowEvents)
+        fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (List<T>) -> Unit): Job {
+            val entry = dispatcher to handler
+            handlers.add(entry)
+            return Job().apply { invokeOnCompletion { handlers.remove(entry) } }
+        }
 
         @JvmOverloads
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: Consumer<List<T>>): Job =
-            batched.onEach { handler.accept(it) }.flowOn(dispatcher).launchIn(this@FlowEvents)
+            on(dispatcher) { handler.accept(it) }
     }
 
     inner class AwaitableEvent<T> {

@@ -502,7 +502,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     suspend fun select() {
-        events.selected.fire(this).await()
+        events.selected.fire(this)
     }
 
     override val childrenContainers: List<AttributeContainer>

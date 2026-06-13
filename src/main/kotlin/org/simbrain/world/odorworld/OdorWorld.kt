@@ -157,7 +157,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         entityList.add(entity)
 
         events.entityAdded.fire(entity).await()
-        entity.events.deleted.on { handleEntityDelete(it) }
+        entity.events.deleted.on(Dispatchers.Default) { handleEntityDelete(it) }
 
         // Recompute max stimulus length
         recomputeMaxVectorNorm()
@@ -356,7 +356,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         events = OdorWorldEvents()
 
         entityList.forEach { entity ->
-            entity.events.deleted.on { handleEntityDelete(it) }
+            entity.events.deleted.on(Dispatchers.Default) { handleEntityDelete(it) }
         }
         recomputeMaxVectorNorm()
         return this

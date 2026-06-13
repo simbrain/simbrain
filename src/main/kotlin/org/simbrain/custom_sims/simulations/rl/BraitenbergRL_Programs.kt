@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.rl
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
@@ -325,7 +326,7 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     val minObjectSeparation = 200.0
 
-    agent.events.collided.on { collidedWith ->
+    agent.events.collided.on(Dispatchers.Default) { collidedWith ->
         if (collidedWith === cheese) {
             justHitCheese = true
             respawnObject(world, collidedWith, minObjectSeparation)

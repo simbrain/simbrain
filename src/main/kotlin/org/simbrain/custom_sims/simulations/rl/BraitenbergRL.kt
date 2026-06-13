@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.rl
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
@@ -696,7 +697,7 @@ val braitenbergRL = newSim { optionString ->
         }
     }
 
-    agent.events.collided.on { collidedWith ->
+    agent.events.collided.on(Dispatchers.Default) { collidedWith ->
         if (collidedWith === cheese || collidedWith === poison) {
             respawnCountPerTrial++
             respawnObject(world, collidedWith)

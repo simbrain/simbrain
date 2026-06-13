@@ -15,5 +15,5 @@ class OdorWorldEvents: Events() {
     val entityAdded = OneArgEvent<OdorWorldEntity>()
     val entityRemoved = OneArgEvent<OdorWorldEntity>()
     val tileMapChanged = NoArgEvent()
-    val cleanups = HashMap<OdorWorldEntity, () -> Boolean?>()
+    val cleanups = HashMap<OdorWorldEntity, () -> Unit>()
 }

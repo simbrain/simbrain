@@ -10,13 +10,13 @@ import org.simbrain.world.odorworld.sensors.Sensor
 
 
 interface EntityLocationEvent {
-    val moved: Events.NoArgEvent
+    val moved: FlowEvents.NoArgEvent
 }
 
 /**
  * See [Events].
  */
-class EntityEvents: Events(), EntityLocationEvent {
+class EntityEvents: FlowEvents(), EntityLocationEvent {
     val updated = NoArgEvent()
     val typeChanged = ChangedEvent<EntityType>()
     val deleted = OneArgEvent<OdorWorldEntity>()
@@ -29,7 +29,7 @@ class EntityEvents: Events(), EntityLocationEvent {
     override val moved = NoArgEvent()
     val trailVisibilityChanged = ChangedEvent<Boolean>()
     val trailCleared = NoArgEvent()
-    val selected = OneArgEvent<OdorWorldEntity>()
+    val selected = AwaitableEvent<OdorWorldEntity>()
 
 }
 /**

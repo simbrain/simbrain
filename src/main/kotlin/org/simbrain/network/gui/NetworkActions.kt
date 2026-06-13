@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -277,7 +278,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 isEnabled = networkPanel.selectionManager.selection.isNotEmpty()
             }
             updateAction()
-            networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+            networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
         }
     ) {
         networkPanel.showEditDialogsForSelectedModels()
@@ -659,8 +660,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     val connectWithWeightMatrix = networkPanel.createAction(
@@ -681,8 +682,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     val connectWithSynapseGroup = networkPanel.createAction(
@@ -1144,8 +1145,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         updateAction()
 
         networkPanel.network.events.modelAdded.on { updateAction() }
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
 
     }
 
@@ -1253,8 +1254,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         updateAction()
 
         networkPanel.network.events.modelAdded.on { updateAction() }
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(

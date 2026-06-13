@@ -239,7 +239,7 @@ class ExpressionEntry(
     }
 }
 
-class ExpressionHistoryEvents : Events() {
+class ExpressionHistoryEvents : FlowEvents() {
     val changed = NoArgEvent()
 }
 

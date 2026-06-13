@@ -1,6 +1,6 @@
 package org.simbrain.network.gui
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.Color
 
@@ -142,7 +142,7 @@ class WandPalette : EditableObject {
 /**
  * Events fired by [WandPalette].
  */
-class WandPaletteEvents : Events() {
+class WandPaletteEvents : FlowEvents() {
     val selectionChanged = NoArgEvent()
     val actionAdded = OneArgEvent<WandAction>()
     val actionRemoved = OneArgEvent<WandAction>()

@@ -1,7 +1,7 @@
 package org.simbrain.world.imageworld.filters
 
 import org.simbrain.util.CachedObject
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getBrightnessArray
 import org.simbrain.util.propertyeditor.EditableObject
@@ -43,7 +43,7 @@ class ImageProcessingPipeline(
     @Transient
     val events = PipelineEvents()
 
-    class PipelineEvents : Events() {
+    class PipelineEvents : FlowEvents() {
         val operationAdded = OneArgEvent<ImageOperation>()
         val operationRemoved = OneArgEvent<ImageOperation>()
         val operationOrderChanged = NoArgEvent()

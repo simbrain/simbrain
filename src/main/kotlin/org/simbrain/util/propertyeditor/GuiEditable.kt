@@ -326,7 +326,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
  * Events to fire when the property dialog changes. Changing boolean values, editing text, etc. will fire this event.
  * Allows some dialog entries to respond to others.
  */
-class ParameterEvents<O : EditableObject, T> : Events() {
+class ParameterEvents<O : EditableObject, T> : FlowEvents() {
 
     val valueChanged = OneArgEvent<KProperty1<O, T>>()
 

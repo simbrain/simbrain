@@ -562,7 +562,7 @@ fun SimbrainJTable.createApplyAction(name: String = "Apply", applyInputs: suspen
         iconPath = "menu_icons/Step.png",
     ) {
         initRowSelection()
-        (model as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
+        (model as? SimbrainDataFrame)?.events?.currentRowChanged?.fireAsync()
         applyInputs(selectedRow)
     }
 

@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld.transformations
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.world.imageworld.ImageSource
 import org.simbrain.world.imageworld.events.ImagePipelineCollectionEvents
@@ -38,7 +39,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
 
     init {
         initializeDefaultPipelines()
-        imageSource.events.imageUpdate.on(null, true) {
+        imageSource.events.imageUpdate.on(Dispatchers.Default) {
             pipelinesList.toList().forEach { it.applyPipeline() }
         }
     }
@@ -48,7 +49,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
      */
     fun readResolve(): Any {
         events = ImagePipelineCollectionEvents()
-        imageSource.events.imageUpdate.on {
+        imageSource.events.imageUpdate.on(Dispatchers.Default) {
             pipelinesList.toList().forEach { it.applyPipeline() }
         }
         // Reinitialize the default unfiltered pipeline reference
@@ -67,7 +68,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
         defaultUnfilteredPipeline = unfiltered
         
         // Add resize operation to match original image size
-        imageSource.events.resize.on(null, true) {
+        imageSource.events.resize.on(Dispatchers.Default) {
             // Update any resize operations to match image size if needed
         }
         pipelinesList.add(unfiltered)
@@ -99,13 +100,13 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
      */
     suspend fun addPipeline(pipeline: ImageProcessingPipeline) {
         pipelinesList.add(pipeline)
-        events.pipelineAdded.fire(pipeline).await()
+        events.pipelineAdded.fire(pipeline)
     }
 
     suspend fun addPipeline(name: String, config: ImageProcessingPipeline.() -> Unit = {}) {
         val pipeline = ImageProcessingPipeline(name, imageSource).apply(config)
         pipelinesList.add(pipeline)
-        events.pipelineAdded.fire(pipeline).await()
+        events.pipelineAdded.fire(pipeline)
     }
 
     /**
@@ -117,7 +118,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
             return
         }
         pipelinesList.remove(pipeline)
-        events.pipelineRemoved.fire(pipeline).await()
+        events.pipelineRemoved.fire(pipeline)
     }
 
     /**
@@ -133,8 +134,8 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
     suspend fun setCurrentPipeline(pipeline: ImageProcessingPipeline) {
         val oldPipeline = currentPipeline
         currentPipeline = pipeline
-        events.pipelineChanged.fire(pipeline, oldPipeline).await()
-        events.pipelineSelectionChanged.fire(pipeline).await()
+        if (pipeline != oldPipeline) events.pipelineChanged.fire(pipeline to oldPipeline)
+        events.pipelineSelectionChanged.fire(pipeline)
     }
 
     val pipelines: List<ImageProcessingPipeline> get() = pipelinesList.toList()

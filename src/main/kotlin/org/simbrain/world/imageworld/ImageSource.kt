@@ -42,7 +42,7 @@ abstract class ImageSource {
     constructor(currentImage: BufferedImage = BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB)) {
         events = ImageEvents()
         this.currentImage = currentImage
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     /**
@@ -58,7 +58,7 @@ abstract class ImageSource {
      */
     suspend fun fireImageUpdate() {
         if (this.isEnabled) {
-            events.imageUpdate.fire().await()
+            events.imageUpdate.fire()
         }
     }
 

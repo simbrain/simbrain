@@ -139,7 +139,7 @@ public class PixelPlot implements AttributeContainer, EditableObject {
                 image.setRGB(x, y, color);
             }
         }
-        events.getImageUpdate().fire();
+        events.getImageUpdate().fireAsync();
     }
 
     private int getChannelValue(int channelIndex, int x, int y) {

@@ -386,7 +386,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         }
         
         // Fire the event
-        (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
+        (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fireAsync()
     }
 
     fun incrementSelectedColumn() {

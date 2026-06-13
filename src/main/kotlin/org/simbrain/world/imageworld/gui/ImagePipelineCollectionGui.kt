@@ -124,7 +124,7 @@ class ImagePipelineCollectionGui(
     init {
         imagePipelineCollection.events.pipelineAdded.on(swingDispatcher) { updateComboBox() }
         imagePipelineCollection.events.pipelineRemoved.on(swingDispatcher) { updateComboBox() }
-        imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { newPipeline: ImageProcessingPipeline, _: ImageProcessingPipeline ->
+        imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { (newPipeline, _) ->
             setComboBoxSelection(newPipeline)
             updateButtonStates()
         }

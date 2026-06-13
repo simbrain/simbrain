@@ -176,7 +176,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         lastY = y
 
         g2d.dispose()
-        imageWorld.imageAlbum.events.imageUpdate.fire()
+        imageWorld.imageAlbum.events.imageUpdate.fireAsync()
     }
 
     /**

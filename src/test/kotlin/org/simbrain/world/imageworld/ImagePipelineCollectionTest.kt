@@ -82,7 +82,7 @@ class ImagePipelineCollectionTest {
         
         pipelineCollection.events.pipelineAdded.on { pipelineAddedFired = true }
         pipelineCollection.events.pipelineRemoved.on { pipelineRemovedFired = true }
-        pipelineCollection.events.pipelineChanged.on { _, _ -> pipelineChangedFired = true }
+        pipelineCollection.events.pipelineChanged.on { (_, _) -> pipelineChangedFired = true }
         pipelineCollection.events.pipelineSelectionChanged.on { pipelineSelectionChangedFired = true }
         
         // Test pipeline selection change

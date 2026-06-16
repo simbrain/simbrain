@@ -36,7 +36,7 @@ class OdorWorldComponent : WorkspaceComponent {
     }
 
     private fun init() {
-        world.events.entityAdded.on(wait = true) { entity: OdorWorldEntity ->
+        world.events.entityAdded.on(Dispatchers.Default) { entity: OdorWorldEntity ->
             fireAttributeContainerAdded(entity).await()
             setChangedSinceLastSave(true)
             entity.events.sensorAdded.on(Dispatchers.Default, handler = ::fireAttributeContainerAdded)
@@ -46,7 +46,7 @@ class OdorWorldComponent : WorkspaceComponent {
             setChangedSinceLastSave(true)
         }
 
-        world.events.entityRemoved.on { e: OdorWorldEntity ->
+        world.events.entityRemoved.on(Dispatchers.Default) { e: OdorWorldEntity ->
             fireAttributeContainerRemoved(e)
             e.sensors.forEach(this::fireAttributeContainerRemoved)
             e.effectors.forEach(this::fireAttributeContainerRemoved)

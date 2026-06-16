@@ -128,7 +128,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      */
     suspend fun update() {
         entityList.forEach(Consumer { obj: OdorWorldEntity -> obj.update() })
-        events.updated.fire().await()
+        events.updated.fire()
     }
 
     /**
@@ -156,7 +156,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         // Add entity to the map
         entityList.add(entity)
 
-        events.entityAdded.fire(entity).await()
+        events.entityAdded.fire(entity)
         entity.events.deleted.on(Dispatchers.Default) { handleEntityDelete(it) }
 
         // Recompute max stimulus length

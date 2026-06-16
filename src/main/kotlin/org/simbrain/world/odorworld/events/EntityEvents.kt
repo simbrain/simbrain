@@ -1,6 +1,5 @@
 package org.simbrain.world.odorworld.events
 
-import org.simbrain.util.Events
 import org.simbrain.util.FlowEvents
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.Bounded
@@ -14,7 +13,7 @@ interface EntityLocationEvent {
 }
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
 class EntityEvents: FlowEvents(), EntityLocationEvent {
     val updated = NoArgEvent()
@@ -33,7 +32,7 @@ class EntityEvents: FlowEvents(), EntityLocationEvent {
 
 }
 /**
- * See [Events]
+ * See [FlowEvents]
  */
 class SensorEffectorEvents: FlowEvents() {
     val updated = NoArgEvent()

@@ -147,7 +147,7 @@ class FlowEventsTest {
         delay(200)    // past the sample window
 
         // sample() is trailing-edge: intermediate fires are dropped and only the latest survives.
-        // The old leading-edge Events throttle would have delivered 1 instead.
+        // The old leading-edge throttle would have delivered 1 instead.
         assertEquals(listOf(3), received.toList())
         events.close()
     }

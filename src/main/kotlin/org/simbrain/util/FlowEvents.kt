@@ -27,9 +27,9 @@ import javax.swing.SwingUtilities
 import kotlin.time.Duration.Companion.milliseconds
 
 /**
- * Flow-based event bus (Option B). Runs in parallel to [Events] and is not yet a full replacement.
+ * Flow-based event bus: the single event bus for all model and UI events.
  *
- * It separates the two patterns the old [Events] bus conflated into one `wait`-flag mechanism:
+ * It separates the two patterns the previous coroutine event bus conflated into one `wait`-flag mechanism:
  *
  * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent], [BatchOneArgEvent]). Handlers
  *   register SYNCHRONOUSLY: `on()` adds the handler to a [CopyOnWriteArrayList] the instant it returns (like the
@@ -52,9 +52,9 @@ import kotlin.time.Duration.Companion.milliseconds
 private val edtDispatcher: CoroutineDispatcher get() = Dispatchers.Swing.immediate
 
 /**
- * Warns (rather than silently freezing the UI) if a blocking fire happens on the Swing EDT. Mirrors the guard
- * on [Events.fireAndBlock]. For [FlowEvents.AwaitableEvent] this is advisory: barrier handlers default to
- * [Dispatchers.Default], so an on-EDT fire only deadlocks if a handler also explicitly requires the EDT.
+ * Warns (rather than silently freezing the UI) if a blocking fire happens on the Swing EDT. For
+ * [FlowEvents.AwaitableEvent] this is advisory: barrier handlers default to [Dispatchers.Default], so an on-EDT
+ * fire only deadlocks if a handler also explicitly requires the EDT.
  */
 internal fun warnIfFireAndBlockOnEdt() {
     if (SwingUtilities.isEventDispatchThread()) {
@@ -79,7 +79,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
     /**
      * Cancels this event scope, unsubscribing every handler. Call only at the true end of life of the owning
-     * object. See [Events.close] for the undo/redo caveat.
+     * object (e.g. [org.simbrain.workspace.WorkspaceComponent.close]) — NOT on model delete(): undo/redo reuses
+     * the same model instances, and a cancelled scope can never fire again, so closing on delete would leave
+     * resurrected models permanently inert.
      */
     override fun close() {
         job.cancel()
@@ -177,8 +179,8 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
      * events which keep only the latest value. Batch order is not significant.
      *
      * Like the other pub/sub events, handlers register synchronously. The eager collector always drains the
-     * buffer (so it can never grow unbounded, even with no subscriber — matching the old [Events] batch, whose
-     * flush ran regardless of handlers); a batch is delivered only while a handler is registered.
+     * buffer (so it can never grow unbounded, even with no subscriber — matching the previous event bus's batch,
+     * whose flush ran regardless of handlers); a batch is delivered only while a handler is registered.
      */
     @OptIn(FlowPreview::class)
     inner class BatchOneArgEvent<T>(val interval: Int, val timingMode: TimingMode = TimingMode.Debounce) {

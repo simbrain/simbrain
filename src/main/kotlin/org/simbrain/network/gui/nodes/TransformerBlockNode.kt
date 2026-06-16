@@ -145,7 +145,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
 
 
 
-        events.updated.on {
+        events.updated.on(Dispatchers.Default) {
             events.updateGraphics.fire()
         }
 

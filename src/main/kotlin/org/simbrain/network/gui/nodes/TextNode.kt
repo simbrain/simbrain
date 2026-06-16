@@ -27,7 +27,7 @@ open class TextNode(
         this.addChild(pStyledText)
 
         val events = textObject.events
-        events.locationChanged.on { this.recenterTextObject() }
+        events.locationChanged.on(swingDispatcher) { this.recenterTextObject() }
         events.textUpdated.on(swingDispatcher) { this.update() }
 
         update()

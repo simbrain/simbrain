@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.psychology
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
@@ -222,7 +223,7 @@ val categoricalPerception = newSim {
     }
     network.addNetworkModelAsync(labelView, usePlacementManager = false)
 
-    outputArray.events.updated.on {
+    outputArray.events.updated.on(Dispatchers.Default) {
         val out = outputArray.activationArray
         imageView.activationArray = out.copyOfRange(0, protoSize)
         labelView.activationArray = out.copyOfRange(protoSize, protoSize + NUM_LABEL_UNITS)

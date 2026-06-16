@@ -1144,7 +1144,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.network.events.modelAdded.on { updateAction() }
+        networkPanel.network.events.modelAdded.on(Dispatchers.Default) { updateAction() }
         networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
         networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
 
@@ -1253,7 +1253,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.network.events.modelAdded.on { updateAction() }
+        networkPanel.network.events.modelAdded.on(Dispatchers.Default) { updateAction() }
         networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
         networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }

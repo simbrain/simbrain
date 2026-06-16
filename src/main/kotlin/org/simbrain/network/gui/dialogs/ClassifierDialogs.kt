@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
@@ -42,7 +43,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             testingStatsLabel.text = classifier.testingStats
         }
         updateStatsLabel()
-        events.updated.on {
+        events.updated.on(Dispatchers.Swing) {
             updateStatsLabel()
         }
 

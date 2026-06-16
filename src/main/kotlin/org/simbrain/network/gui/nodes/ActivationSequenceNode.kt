@@ -55,7 +55,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
 
 
-        events.updated.on {
+        events.updated.on(Dispatchers.Default) {
             events.updateGraphics.fire()
         }
 

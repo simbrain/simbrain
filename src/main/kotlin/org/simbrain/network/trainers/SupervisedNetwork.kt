@@ -1,5 +1,6 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -43,7 +44,7 @@ interface SupervisedNetwork {
         updateLossFunctionIfNeeded()
         
         // Listen to output layer update events for future changes
-        outputLayer.events.updated.on {
+        outputLayer.events.updated.on(Dispatchers.Default) {
             updateLossFunctionIfNeeded()
         }
     }

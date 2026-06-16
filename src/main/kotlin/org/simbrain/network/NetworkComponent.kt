@@ -1,5 +1,6 @@
 package org.simbrain.network
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronCollection
@@ -47,7 +48,7 @@ class NetworkComponent : WorkspaceComponent {
     private fun init() {
         val event = network.events
 
-        event.modelAdded.on { m ->
+        event.modelAdded.on(Dispatchers.Default) { m ->
             setChangedSinceLastSave(true)
             if (m is AttributeContainer) {
                 fireAttributeContainerAdded(m)
@@ -61,7 +62,7 @@ class NetworkComponent : WorkspaceComponent {
             }
         }
 
-        event.modelRemoved.on { m ->
+        event.modelRemoved.on(Dispatchers.Default) { m ->
             setChangedSinceLastSave(true)
             if (m is AttributeContainer) {
                 fireAttributeContainerRemoved(m)

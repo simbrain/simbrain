@@ -55,7 +55,7 @@ open class NetworkTextObject : EditableObject, LocatableModel {
     }
 
     override suspend fun delete(): List<NetworkTextObject> {
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this)
     }
 

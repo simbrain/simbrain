@@ -185,7 +185,7 @@ class Network: CoroutineScope, EditableObject {
 
     suspend fun updateSuspend(name: String = "") {
         updateInternal(name)
-        events.updated.fire().await()
+        events.updated.fire()
     }
 
     /**
@@ -295,7 +295,7 @@ class Network: CoroutineScope, EditableObject {
      * For best results call with `?.await()` when possible.
      */
     @JvmOverloads
-    fun addNetworkModelAsync(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true): Deferred<Boolean>? {
+    fun addNetworkModelAsync(model: NetworkModel, usePlacementManager: Boolean = true, useAutoAssignedId: Boolean = true): Deferred<Unit>? {
         if (model.shouldAdd()) {
             if (useAutoAssignedId) {
                 assignId(model)
@@ -305,34 +305,34 @@ class Network: CoroutineScope, EditableObject {
                 placementManager.placeObject(model)
             }
             (model as? LocatableModel)?.let { locatableModel ->
-                locatableModel.events.locationChanged.on {
+                locatableModel.events.locationChanged.on(Dispatchers.Default) {
                     events.boundsChanged.fire()
                 }
             }
-            model.events.deleted.on(wait = true) {
+            model.events.deleted.on(Dispatchers.Default) {
                 networkModels.remove(it)
                 childToParentMap.remove(it)
-                events.modelRemoved.fire(it).join()
+                events.modelRemoved.fire(it)
                 updatePriorityList()
             }
-            val deferred = events.modelAdded.fire(model)
+            val deferred = events.modelAdded.fireAsync(model)
             when(model) {
                 is NeuronCollection -> {
                     model.neuronList.forEach { childToParentMap[it] = model }
                     model.neuronList.forEach { n ->
-                        n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
+                        n.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(n) }
                     }
                 }
                 is SynapseGroup -> {
                     model.synapses.forEach { childToParentMap[it] = model }
                     model.synapses.forEach { s ->
-                        s.events.deleted.on(wait = true) { childToParentMap.remove(s) }
+                        s.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(s) }
                     }
                 }
                 is Subnetwork -> {
                     model.modelList.all.forEach { childToParentMap[it] = model }
                     model.modelList.all.forEach { m ->
-                        m.events.deleted.on(wait = true) { childToParentMap.remove(m) }
+                        m.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(m) }
                     }
                 }
                 is SupervisedModel -> {
@@ -340,13 +340,13 @@ class Network: CoroutineScope, EditableObject {
                     model.weightMatrices.forEach { childToParentMap[it] = model }
                     model.synapseGroups.forEach { childToParentMap[it] = model }
                     model.layers.forEach { l ->
-                        l.events.deleted.on(wait = true) { childToParentMap.remove(l) }
+                        l.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(l) }
                     }
                     model.weightMatrices.forEach { m ->
-                        m.events.deleted.on(wait = true) { childToParentMap.remove(m) }
+                        m.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(m) }
                     }
                     model.synapseGroups.forEach { sg ->
-                        sg.events.deleted.on(wait = true) { childToParentMap.remove(sg) }
+                        sg.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(sg) }
                     }
                 }
             }
@@ -443,7 +443,7 @@ class Network: CoroutineScope, EditableObject {
 
         // Initialize update manager
         networkModels.allInUpdatingOrder.forEach { model ->
-            model.events.deleted.on(wait = true) {
+            model.events.deleted.on(Dispatchers.Default) {
                 networkModels.remove(it)
                 events.modelRemoved.fire(it)
             }

@@ -295,14 +295,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
         modelNodeMap[node.model] = node
         addNodeOrdered(node)
-        node.model.events.selected.on {
+        node.model.events.selected.on(Dispatchers.Default) {
             if (node is NeuronCollectionNode) {
                 selectionManager.add(node.getInteractionBox())
             } else {
                 selectionManager.add(node)
             }
         }
-        node.model.events.deleted.on {
+        node.model.events.deleted.on(Dispatchers.Default) {
             network.events.batchNodeRemoval.fire(node)
         }
         network.events.zoomToFitPage.fire()
@@ -377,7 +377,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         }
         createNodes(synapseGroup.synapses)
-        synapseGroup.events.synapseListChanged.on {
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Default) {
             // Clean up orphaned SynapseNodes that belong to this SynapseGroup but no longer have valid synapses
             val currentSynapses = synapseGroup.synapses.toList() // Snapshot to avoid concurrent modification
             val allSynapseNodes = filterScreenElements<SynapseNode>()
@@ -793,7 +793,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 stateSetter = { autoZoom = it },
                 tooltipGenerator = { isOn -> "Autozoom is ${if (isOn) "on" else "off"}" }
             ).apply {
-                network.events.zoomModeChanged.on {
+                network.events.zoomModeChanged.on(Dispatchers.Swing) {
                     updateFromExternalState()
                 }
             })
@@ -802,13 +802,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     private fun initEventHandlers() {
         network.events.apply {
-            modelAdded.on(Dispatchers.Swing, wait = true) {
+            modelAdded.on(Dispatchers.Swing) {
                 createNode(it)
             }
-            modelRemoved.on {
+            modelRemoved.on(Dispatchers.Default) {
                 zoomToFitPage.fire()
             }
-            batchNodeRemoval.on { nodes ->
+            batchNodeRemoval.on(Dispatchers.Default) { nodes ->
                 val nodesUniq = nodes.toSet()
                 withContext(Swing) {
                     nodesUniq.forEach {
@@ -821,7 +821,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-            updated.on(Dispatchers.Swing, wait = true) {
+            updated.on(Dispatchers.Swing) {
                 repaint()
                 timeLabel.update()
             }
@@ -844,7 +844,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             boundsChanged.on(Dispatchers.Swing) {
                 zoomToFitPage.fire()
             }
-            selected.on { list ->
+            selected.on(Dispatchers.Default) { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
             }
         }

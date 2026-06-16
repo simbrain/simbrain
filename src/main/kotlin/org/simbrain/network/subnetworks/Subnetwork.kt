@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.SubnetworkEvents
 import org.simbrain.util.minus
@@ -62,7 +63,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     fun addModel(model: NetworkModel) {
         modelList.add(model)
         if (model is LocatableModel) {
-            model.events.locationChanged.on {
+            model.events.locationChanged.on(Dispatchers.Default) {
                 events.locationChanged.fire()
             }
         }
@@ -70,18 +71,18 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             is NeuronCollection -> {
                 model.neuronList.forEach { childToParentMap[it] = model }
                 model.neuronList.forEach { n ->
-                    n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
+                    n.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(n) }
                 }
             }
             is SynapseGroup -> {
                 model.synapses.forEach { childToParentMap[it] = model }
                 model.synapses.forEach { s ->
-                    s.events.deleted.on(wait = true) { childToParentMap.remove(s) }
+                    s.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(s) }
                 }
             }
         }
         events.locationChanged.fire()
-        model.events.deleted.on(wait = true) {
+        model.events.deleted.on(Dispatchers.Default) {
             modelList.remove(it)
             childToParentMap.remove(it)
             if (modelList.size == 0) {
@@ -113,7 +114,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             it.delete()
         }
         customInfo?.let { it.events.deleted.fire(it) }
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return toDelete + this
     }
 

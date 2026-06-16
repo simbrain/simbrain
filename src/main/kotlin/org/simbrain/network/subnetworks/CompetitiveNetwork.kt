@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
@@ -117,7 +118,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         weights.synapses.forEach { it.lowerBound = 0.0 }
         randomize()
 
-        competitive.events.fanInUpdated.on {
+        competitive.events.fanInUpdated.on(Dispatchers.Default) {
             weights.events.updated.fire()
         }
 

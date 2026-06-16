@@ -667,7 +667,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     override suspend fun delete(): List<NetworkModel> {
         val synapses = deleteConnectedSynapses()
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return buildList<NetworkModel> {
             add(this@Neuron)
             addAll(synapses)

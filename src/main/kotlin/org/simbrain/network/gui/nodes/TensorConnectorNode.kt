@@ -209,7 +209,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
         // Wire up events
         val connectorEvents = connector.events
-        connectorEvents.updated.on { connectorEvents.updateGraphics.fire() }
+        connectorEvents.updated.on(Dispatchers.Default) { connectorEvents.updateGraphics.fire() }
         connectorEvents.updateGraphics.on(Dispatchers.Swing) {
             if (connector is ConvolutionConnector) {
                 if (connector.kernelGridMode) {

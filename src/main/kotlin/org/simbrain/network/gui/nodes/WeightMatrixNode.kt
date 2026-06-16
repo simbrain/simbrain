@@ -59,8 +59,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     init {
         pickable = true
         val events = weightMatrix.events
-        events.updated.on { events.updateGraphics.fire() }
-        events.clampChanged.on { setClamped((weightMatrix as WeightMatrix).clamped) }
+        events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
+        events.clampChanged.on(Dispatchers.Swing) { setClamped((weightMatrix as WeightMatrix).clamped) }
         events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel -> 
             interactionBox.setText(weightMatrix.displayName)
@@ -312,7 +312,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 wmViewer.addSeparator()
                 wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
                 contentPane.addTab("Weight Matrix", wmViewer)
-                editingObject.events.updated.on { wmViewer.model.fireTableDataChanged() }
+                editingObject.events.updated.on(Dispatchers.Swing) { wmViewer.model.fireTableDataChanged() }
                 dialog.addCommitTask {
                     editingObject.setWeights(wm.get2DDoubleArray())
                     editingObject.events.updated.fire()

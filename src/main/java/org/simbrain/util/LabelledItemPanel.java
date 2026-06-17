@@ -130,7 +130,7 @@ public class LabelledItemPanel extends JPanel {
      * @param col  the column in which it is to be deposited
      */
     public void addItem(final JComponent item, int col) {
-        add(item, itemCC(col, myNextItemRow));
+        add(item, itemCC(2 * (col - 1) + 1, myNextItemRow));
         myNextItemRow++;
     }
 

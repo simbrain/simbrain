@@ -32,6 +32,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
+import kotlin.concurrent.thread
 import javax.swing.*
 import javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY
 import javax.swing.event.*
@@ -558,12 +559,20 @@ object SimbrainDesktop {
      * window frame and macOS menu bar are set at launch (Splasher) and update only on restart.
      */
     private fun applyThemeIfChanged() {
-        val dark = WorkspacePreferences.themeMode.resolvedDark()
-        if (dark == appliedDark) return
-        appliedDark = dark
-        setupLookAndFeel(WorkspacePreferences.themeMode)
-        FlatLaf.updateUI()
-        refreshThemedChrome()
+        // Resolve the target mode off the EDT: System mode shells out to `defaults read`, which can
+        // block for up to two seconds, and the macOS appearance listener may fire off-thread. The
+        // look-and-feel mutation then runs back on the EDT, where all Swing work belongs.
+        thread(isDaemon = true, name = "theme-apply") {
+            val mode = WorkspacePreferences.themeMode
+            val dark = mode.resolvedDark()
+            SwingUtilities.invokeLater {
+                if (dark == appliedDark) return@invokeLater
+                appliedDark = dark
+                setupLookAndFeel(mode)
+                FlatLaf.updateUI()
+                refreshThemedChrome()
+            }
+        }
     }
 
     /**

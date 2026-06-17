@@ -12,6 +12,7 @@ import java.awt.event.*
 import java.beans.PropertyChangeEvent
 import java.io.File
 import javax.swing.*
+import javax.swing.border.CompoundBorder
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.min
@@ -669,7 +670,7 @@ fun Container.onWindowClose(block: Runnable) = onWindowClose {
  * If the panel already has a border, the dialog padding wraps around it.
  */
 fun JComponent.applyDialogPadding() {
-    border = border?.let { javax.swing.border.CompoundBorder(Theme.dialogBorder(), it) }
+    border = border?.let { CompoundBorder(Theme.dialogBorder(), it) }
         ?: Theme.dialogBorder()
 }
 

@@ -26,7 +26,10 @@ import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.*
+import javax.swing.event.TableModelListener
 
 fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
     
@@ -111,7 +114,7 @@ class DataSetPanel(
         add(addRemoveRows)
         
         // Listen for table model changes to update validation
-        val tableModelListener = javax.swing.event.TableModelListener {
+        val tableModelListener = TableModelListener {
             onRowCountChanged?.invoke(inputDataFrame.rowCount, targetDataFrame.rowCount)
         }
         
@@ -136,8 +139,8 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         modalityType = Dialog.ModalityType.APPLICATION_MODAL
         
         // Ensure proper focus management for child dialogs
-        addWindowFocusListener(object : java.awt.event.WindowAdapter() {
-            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {
+        addWindowFocusListener(object : WindowAdapter() {
+            override fun windowGainedFocus(e: WindowEvent?) {
                 // When this dialog gains focus, ensure it stays in front
                 toFront()
             }

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import kotlinx.coroutines.Dispatchers;
 
 /**
  * Represents raster data.
@@ -37,8 +38,8 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     private void initEvents() {
-        model.getEvents().getRasterConsumerAdded().on(this::fireAttributeContainerAdded);
-        model.getEvents().getRasterConsumerRemoved().on(this::fireAttributeContainerRemoved);
+        model.getEvents().getRasterConsumerAdded().on(Dispatchers.getDefault(), this::fireAttributeContainerAdded);
+        model.getEvents().getRasterConsumerRemoved().on(Dispatchers.getDefault(), this::fireAttributeContainerRemoved);
     }
 
     public RasterModel getModel() {

@@ -414,4 +414,47 @@ class FlowEventsTest {
         assertTrue(ran.get())
         events.close()
     }
+
+    @Test
+    fun `awaitable barrier isolates a throwing handler so siblings still run and the firer is not torn down`() {
+        val events = FlowEvents()
+        val event = events.AwaitableEvent<String>()
+        val secondRan = AtomicReference(false)
+
+        event.on(Dispatchers.Default) { throw RuntimeException("boom") }
+        event.on(Dispatchers.Default) { secondRan.set(true) }
+
+        // The handler exception is logged, not propagated: fireAndBlock returns and the later handler still runs.
+        assertDoesNotThrow { event.fireAndBlock("x") }
+        assertTrue(secondRan.get())
+
+        // The event still works after a handler threw (the scope was not torn down).
+        val later = AtomicReference(false)
+        event.on(Dispatchers.Default) { later.set(true) }
+        assertDoesNotThrow { event.fireAndBlock("y") }
+        assertTrue(later.get())
+        events.close()
+    }
+
+    @Test
+    fun `pubsub one failing handler neither cancels the scope nor blocks its siblings`() = runBlocking {
+        val events = FlowEvents()
+        val event = events.OneArgEvent<String>()
+        val siblingRan = CompletableDeferred<Unit>()
+
+        event.on(Dispatchers.Default) { throw RuntimeException("boom") }
+        event.on(Dispatchers.Default) { siblingRan.complete(Unit) }
+        delay(100)
+
+        event.fire("first")
+        withTimeout(2000) { siblingRan.await() } // sibling ran despite the throwing sibling
+
+        // The SupervisorJob scope survived the failure: a later subscriber still receives.
+        val laterRan = CompletableDeferred<Unit>()
+        event.on(Dispatchers.Default) { laterRan.complete(Unit) }
+        delay(50)
+        event.fire("second")
+        withTimeout(2000) { laterRan.await() }
+        events.close()
+    }
 }

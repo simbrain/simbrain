@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -26,29 +27,7 @@ import java.util.function.Consumer
 import javax.swing.SwingUtilities
 import kotlin.time.Duration.Companion.milliseconds
 
-/**
- * Flow-based event bus: the single event bus for all model and UI events.
- *
- * It separates the two patterns the previous coroutine event bus conflated into one `wait`-flag mechanism:
- *
- * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent], [BatchOneArgEvent]). Handlers
- *   register SYNCHRONOUSLY: `on()` adds the handler to a [CopyOnWriteArrayList] the instant it returns (like the
- *   old bus), so a `fire()` immediately after `on()` can never miss it. `fire()` never blocks and is safe from
- *   any thread. Handlers run on the Swing EDT by default (so the common "model changed -> repaint" handler is
- *   EDT-safe without ceremony); pass [Dispatchers.Default] to opt out for background work. Un-throttled events
- *   dispatch directly from `fire()`; throttled/debounced events feed a [MutableSharedFlow] driven by a single
- *   eager collector that applies [sample]/[debounce] once and fans out to the handlers. `on()` returns a [Job];
- *   cancel it to unsubscribe.
- *
- * - **Await-for-completion barrier** ([AwaitableEvent], [NoArgAwaitableEvent]) for the rare event whose firer
- *   must wait until every handler has finished (serialization ordering, the update loop). `fire()` is a suspend
- *   function that returns only once all handlers complete; [AwaitableEvent.fireAndBlock] is the Java / non-suspend
- *   bridge and must not be called on the EDT, and [AwaitableEvent.fireAsync] returns an awaitable from a
- *   non-suspend caller.
- *
- * Handler coroutines live on this object's [SupervisorJob], so one failing handler never cancels the scope or
- * its siblings, and [close] cancels everything at end of life.
- */
+/** Default dispatcher for pub/sub handlers: the Swing EDT (immediate), so "model changed -> repaint" is UI-safe. */
 private val edtDispatcher: CoroutineDispatcher get() = Dispatchers.Swing.immediate
 
 /**
@@ -66,6 +45,32 @@ internal fun warnIfFireAndBlockOnEdt() {
     }
 }
 
+/**
+ * Flow-based event bus: the single event bus for all model and UI events.
+ *
+ * It separates the two patterns the previous coroutine event bus conflated into one `wait`-flag mechanism:
+ *
+ * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent], [BatchOneArgEvent]). Handlers
+ *   register SYNCHRONOUSLY: `on()` adds the handler to a [CopyOnWriteArrayList] the instant it returns (like the
+ *   old bus), so a `fire()` immediately after `on()` can never miss it (for un-throttled events; throttled /
+ *   debounced events may drop a fire issued in the brief window before their shaping collector subscribes).
+ *   `fire()` never blocks and is safe from any thread. Handlers run on the Swing EDT BY DEFAULT (so the common
+ *   "model changed -> repaint" handler is EDT-safe without ceremony); pass [Dispatchers.Default] explicitly for
+ *   background / model / headless handlers. `on()` returns a [Job]; `cancel()` it to unsubscribe (from Java,
+ *   `cancel(null)` — Kotlin's default-arg `cause` means there is no no-arg overload).
+ *
+ * - **Await-for-completion barrier** ([AwaitableEvent], [NoArgAwaitableEvent]) for the rare event whose firer
+ *   must wait until every handler has finished (serialization ordering, the update loop). `fire()` is a suspend
+ *   function that returns only once all handlers complete; [AwaitableEvent.fireAndBlock] is the Java / non-suspend
+ *   bridge (avoid it on the EDT — it warns and blocks the UI, and deadlocks if a handler requires the EDT; prefer
+ *   [AwaitableEvent.fireAsync] from EDT / non-suspend callers). Barrier handlers run on [Dispatchers.Default] BY
+ *   DEFAULT — the OPPOSITE of pub/sub — so pass [Dispatchers.Swing] explicitly for handlers that touch the UI.
+ *   `on()` returns a `() -> Unit` remover; invoke it to unsubscribe.
+ *
+ * One failing handler never cancels the scope or its siblings: pub/sub handlers run as children of this object's
+ * [SupervisorJob], and the barrier path logs and skips a throwing handler (see [AwaitableEvent.fire]). [close]
+ * cancels everything at end of life.
+ */
 open class FlowEvents : CoroutineScope, AutoCloseable {
 
     private val job = SupervisorJob()
@@ -226,6 +231,10 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
         private val handlers = CopyOnWriteArrayList<suspend (T) -> Unit>()
 
+        /**
+         * Subscribe. Default dispatcher is [Dispatchers.Default] (off-EDT) — pass [Dispatchers.Swing] for handlers
+         * that touch the UI. Returns a `() -> Unit` remover; invoke it to unsubscribe.
+         */
         fun on(dispatcher: CoroutineDispatcher = Dispatchers.Default, handler: suspend (T) -> Unit): () -> Unit {
             val wrapped: suspend (T) -> Unit = { withContext(dispatcher) { handler(it) } }
             handlers.add(wrapped)
@@ -239,10 +248,22 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         /**
          * Runs every handler to completion before returning, in registration order. Sequential (not concurrent)
          * to match the old `on(wait = true)` semantics, where ordering between handlers can matter (e.g. the
-         * XStream post-deserialization wiring in [ConvertedObjectEvent]).
+         * network update -> repaint barrier). A handler that throws is logged and the remaining handlers still
+         * run, so one failing handler never aborts its siblings or tears down the firer — matching the
+         * [SupervisorJob] isolation of the pub/sub path (a [CancellationException] still propagates, so scope
+         * cancellation is honored).
          */
         suspend fun fire(value: T) {
-            for (handler in handlers) handler(value)
+            for (handler in handlers) {
+                try {
+                    handler(value)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Throwable) {
+                    System.err.println("Uncaught exception in ${this@FlowEvents::class.simpleName} barrier handler:")
+                    e.printStackTrace()
+                }
+            }
         }
 
         fun fireAndBlock(value: T) = runBlocking {

@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.effectors.Speech;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
@@ -103,8 +104,8 @@ public class SpeechNode extends EntityAttributeNode {
         speechText.setPickable(false);
         shape.setVisible(false);
 
-        effector.getEvents().getUpdated().on(this::updateEffector);
-        effector.getEvents().getPropertyChanged().on(this::updateEffector);
+        effector.getEvents().getUpdated().on(SwingUtilsKt.getSwingDispatcher(), this::updateEffector);
+        effector.getEvents().getPropertyChanged().on(SwingUtilsKt.getSwingDispatcher(), this::updateEffector);
 
     }
 

@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import kotlinx.coroutines.Dispatchers;
 
 /**
  * Data for a JFreeChart bar chart.
@@ -50,7 +51,7 @@ public class BarChartComponent extends WorkspaceComponent {
 
         // When couplings are added, if the consumer is this bar chart, set the bar labels to the label array, if any
         // of the producer
-        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(Dispatchers.getDefault(), c -> {
             if (c.getConsumer().getBaseObject() == model) {
                 model.setBarNames(c.getProducer().getLabelArray());
             }

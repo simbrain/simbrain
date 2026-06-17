@@ -195,7 +195,7 @@ class EvolutionEvents : FlowEvents() {
  * Usage:
  * ```
  * val runner = EvolutionRunner(evaluatorParams) { seed -> MySim(seed = seed) }
- * runner.events.generationUpdated.on { state -> updateDisplay(state) }
+ * runner.events.generationUpdated.on(Dispatchers.Swing) { state -> updateDisplay(state) }
  * runner.startEvolving()   // continuous
  * runner.stopEvolving()    // pause
  * runner.evolveOnce()      // single step

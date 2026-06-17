@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import kotlinx.coroutines.Dispatchers;
 
 /**
  * Pie chart component.
@@ -28,7 +29,7 @@ public class PieChartComponent extends WorkspaceComponent {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
 
-        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(c -> {
+        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(Dispatchers.getDefault(), c -> {
             if (c.getConsumer().getBaseObject() == model) {
                 model.setSliceNames(c.getProducer().getLabelArray());
             }

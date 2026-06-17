@@ -75,7 +75,7 @@ public class RasterPlotPanel extends JPanel {
         );
         renderer = ((XYPlot) chart.getPlot()).getRenderer();
         updateChartSettings();
-        model.getEvents().getPropertyChanged().on(this::updateChartSettings);
+        model.getEvents().getPropertyChanged().on(SwingUtilsKt.getSwingDispatcher(), this::updateChartSettings);
         chartPanel.setChart(chart);
         chart.setBackgroundPaint(null);
 

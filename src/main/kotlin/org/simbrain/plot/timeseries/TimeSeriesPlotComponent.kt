@@ -1,6 +1,7 @@
 package org.simbrain.plot.timeseries
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.plot.XYSeriesConverter
 import org.simbrain.plot.timeseries.TimeSeriesModel.TimeSeries
 import org.simbrain.util.DoubleArrayConverter
@@ -20,7 +21,7 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
             // Workspace object is not available in the constructor.
             super.workspace = workspace
 
-            workspace.couplingManager.events.couplingAdded.on { c: Coupling ->
+            workspace.couplingManager.events.couplingAdded.on(Dispatchers.Default) { c: Coupling ->
                 // A new array coupling is being added to this time series
                 if (c.consumer.baseObject === model) {
                     // Initialize series with provided names, e.g neuron labels
@@ -40,11 +41,11 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
                 }
             }
 
-            model.events.timeSeriesAdded.on { addedContainer: TimeSeries ->
+            model.events.timeSeriesAdded.on(Dispatchers.Default) { addedContainer: TimeSeries ->
                 this.fireAttributeContainerAdded(addedContainer)
             }
 
-            model.events.timeSeriesRemoved.on { removedContainer: TimeSeries ->
+            model.events.timeSeriesRemoved.on(Dispatchers.Default) { removedContainer: TimeSeries ->
                 this.fireAttributeContainerRemoved(removedContainer)
             }
         }

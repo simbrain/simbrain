@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
+import kotlinx.coroutines.Dispatchers;
 
 /**
  * Maintain a list of workspace update actions. When the workspace is iterated
@@ -111,19 +112,19 @@ public class UpdateActionManager {
             componentActionMap.put(wc, componentAction);
         });
 
-        events.getComponentRemoved().on(wc -> removeAction(componentActionMap.remove(wc)));
+        events.getComponentRemoved().on(Dispatchers.getDefault(), wc -> removeAction(componentActionMap.remove(wc)));
 
         // Add / remove coupling actions as needed
         CouplingEvents couplingEvents = workspaceUpdater.getWorkspace().getCouplingManager().getEvents();
 
-        couplingEvents.getCouplingAdded().on(c -> {
+        couplingEvents.getCouplingAdded().on(Dispatchers.getDefault(), c -> {
             UpdateCoupling couplingAction = new UpdateCoupling(c);
             couplingActionMap.put(c, couplingAction);
         });
 
-        couplingEvents.getCouplingRemoved().on(c -> removeAction(couplingActionMap.remove(c)));
+        couplingEvents.getCouplingRemoved().on(Dispatchers.getDefault(), c -> removeAction(couplingActionMap.remove(c)));
 
-        couplingEvents.getCouplingsRemoved().on(cl -> cl.forEach(c -> removeAction(couplingActionMap.remove(c))));
+        couplingEvents.getCouplingsRemoved().on(Dispatchers.getDefault(), cl -> cl.forEach(c -> removeAction(couplingActionMap.remove(c))));
 
     }
 

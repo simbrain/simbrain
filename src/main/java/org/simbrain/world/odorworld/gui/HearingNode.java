@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld.gui;
 import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.nodes.PText;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Utils;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.sensors.Hearing;
@@ -94,8 +95,8 @@ public class HearingNode extends EntityAttributeNode {
         hearingBubbleTrailSmall.setPickable(false);
         hearingText.setPickable(false);
         shape.setVisible(false);
-        sensor.getEvents().getUpdated().on(this::updateSensor);
-        sensor.getEvents().getPropertyChanged().on(this::updateSensor);
+        sensor.getEvents().getUpdated().on(SwingUtilsKt.getSwingDispatcher(), this::updateSensor);
+        sensor.getEvents().getPropertyChanged().on(SwingUtilsKt.getSwingDispatcher(), this::updateSensor);
     }
 
     @Override

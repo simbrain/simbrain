@@ -1,5 +1,6 @@
 package org.simbrain.world.imageworld.gui
 
+import org.simbrain.util.Theme
 import org.simbrain.world.imageworld.ImageWorld
 import java.awt.*
 import javax.swing.*
@@ -82,7 +83,7 @@ class ColorPickerButton(private val imageWorld: ImageWorld) : JButton() {
             background = color
             isOpaque = true
             isBorderPainted = true
-            border = BorderFactory.createLineBorder(Color.GRAY, 1)
+            border = BorderFactory.createLineBorder(Theme.divider, 1)
             toolTipText = getColorName(color)
         }
     }
@@ -121,7 +122,7 @@ class ColorPickerButton(private val imageWorld: ImageWorld) : JButton() {
             g2d.fillRect(x + 1, y + 1, size - 2, size - 2)
 
             // Draw border
-            g2d.color = Color.GRAY
+            g2d.color = Theme.divider
             g2d.drawRect(x + 1, y + 1, size - 3, size - 3)
         }
     }

@@ -1,6 +1,7 @@
 package org.simbrain.world.imageworld
 
 import org.simbrain.util.copy
+import org.simbrain.util.showWarningDialog
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
@@ -10,7 +11,6 @@ import java.io.IOException
 import java.util.*
 import javax.imageio.ImageIO
 import javax.swing.ImageIcon
-import javax.swing.JOptionPane
 import kotlin.math.ceil
 import kotlin.math.sqrt
 
@@ -75,7 +75,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
                 if (read != null) {
                     list.add(read)
                 } else {
-                    JOptionPane.showMessageDialog(null, String.format("Could not parse %s", file.name))
+                    showWarningDialog(String.format("Could not parse %s", file.name))
                     System.err.printf("Could not parse %s", file.name)
                 }
             } catch (e: IOException) {

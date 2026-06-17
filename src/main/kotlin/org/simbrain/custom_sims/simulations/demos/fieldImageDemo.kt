@@ -6,6 +6,7 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
 import org.simbrain.util.updateAction
@@ -232,7 +233,7 @@ val fieldImageDemo = newSim {
                 if (image != null) g.drawImage(image, 0, 0, width, height, null)
             }
         }
-        val viewFrame = JInternalFrame("Mouse 3D View", true, true, true, true).apply {
+        val viewFrame = GenericJInternalFrame("Mouse 3D View", true, true, true, true).apply {
             layout = BorderLayout()
             add(viewPanel, BorderLayout.CENTER)
             setBounds(480, 250, 360, 250)
@@ -261,7 +262,7 @@ val fieldImageDemo = newSim {
             add(JLabel("Threshold"), BorderLayout.WEST)
             add(thresholdSlider, BorderLayout.CENTER)
         }
-        val fieldFrame = JInternalFrame("Field Image", true, true, true, true).apply {
+        val fieldFrame = GenericJInternalFrame("Field Image", true, true, true, true).apply {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)

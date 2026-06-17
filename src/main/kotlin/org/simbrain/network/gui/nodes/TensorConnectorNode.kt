@@ -36,7 +36,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** Detail label for filter/channel info (ConvolutionConnector only). */
     private val detailLabel = PText("").apply {
-        font = Font("Arial", Font.PLAIN, 9)
+        font = Theme.small
     }
 
     /** For ConvolutionConnector: delegates to model state. */
@@ -95,7 +95,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         // Add column labels ("C1", "C2", ...) along top
         for (c in 0 until inputChannels) {
             val label = PText("C${c + 1}").apply {
-                font = Font("Arial", Font.PLAIN, 7)
+                font = Theme.font(7)
             }
             label.setOffset(
                 labelOffset + c * (cellSize + gap) + (cellSize - label.width) / 2,
@@ -107,7 +107,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         // Add row labels ("F1", "F2", ...) along left
         for (f in 0 until numFilters) {
             val label = PText("F${f + 1}").apply {
-                font = Font("Arial", Font.PLAIN, 7)
+                font = Theme.font(7)
             }
             label.setOffset(
                 0.0,

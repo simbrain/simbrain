@@ -44,7 +44,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         })
 
         val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        runControls.layout = MigLayout("ins 0, gap 0px 8px")
         val trainerControls = CnnTrainerControls(trainer)
 
         fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
@@ -117,7 +117,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         updateOverallValidation()
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(dataSetTabPane, "wrap")
+        runControls.add(dataSetTabPane, "grow, push, wrap")
 
         addCommitTask { syncDataSet() }
 
@@ -153,7 +153,7 @@ class CnnTrainerControls(
             val errorPlot = CnnErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
-            val buttonPanel = JPanel(MigLayout("ins 0, gap 0px 0px"))
+            val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
             add(buttonPanel, "wrap, align center, gapbottom 20px")
@@ -205,7 +205,7 @@ class CnnTrainerControls(
             trainer.config.createEditorDialog().display()
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
         runTools.add(JButton(stepAction))
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
@@ -290,7 +290,7 @@ class CnnTrainerControls(
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
         add(errorPlotPanel, "grow, gapbottom 0px")
     }

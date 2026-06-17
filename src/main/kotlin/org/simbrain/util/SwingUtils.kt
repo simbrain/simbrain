@@ -12,6 +12,7 @@ import java.awt.event.*
 import java.beans.PropertyChangeEvent
 import java.io.File
 import javax.swing.*
+import javax.swing.border.CompoundBorder
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.min
@@ -337,10 +338,25 @@ suspend fun <T: EditableObject> T.showAPEOptionDialog(title: String) = let {
     deferred
 }.await()
 
-fun showWarningDialog(message: String) {
+@JvmOverloads
+fun showWarningDialog(message: String?, title: String = "Warning!") {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.WARNING_MESSAGE)
+}
+
+@JvmOverloads
+fun showErrorDialog(message: String?, title: String = "Error") {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.ERROR_MESSAGE)
+}
+
+@JvmOverloads
+fun showInfoDialog(message: String?, title: String = "Information") {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.INFORMATION_MESSAGE)
 }
 
 /**
@@ -368,7 +384,7 @@ fun showWarningConfirmDialog(message: String): Int {
 /**
  * Create a dialog that takes an input in a text field and returns it as a string.
  */
-fun showInputDialog(message: String, initValue: String = ""): String {
+fun showInputDialog(message: String, initValue: String? = ""): String? {
     val dialog = JDialog()
     dialog.isAlwaysOnTop = true
     return JOptionPane.showInputDialog(dialog, message, initValue)
@@ -647,4 +663,25 @@ fun Container.onWindowClose(block: (evt: PropertyChangeEvent) -> Unit) {
 
 fun Container.onWindowClose(block: Runnable) = onWindowClose {
     block.run()
+}
+
+/**
+ * Apply the standard outer padding ([Theme.dialogBorder]) to a panel.
+ * If the panel already has a border, the dialog padding wraps around it.
+ */
+fun JComponent.applyDialogPadding() {
+    border = border?.let { CompoundBorder(Theme.dialogBorder(), it) }
+        ?: Theme.dialogBorder()
+}
+
+/**
+ * Horizontal row of components with [Theme.componentGap] between them.
+ * Defaults to left-aligned; pass `align = FlowLayout.RIGHT` for a trailing row (e.g. OK/Cancel).
+ */
+@JvmOverloads
+fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: Int = Theme.componentGap): JPanel {
+    val panel = JPanel(FlowLayout(align, gap, 0))
+    panel.isOpaque = false
+    for (c in components) panel.add(c)
+    return panel
 }

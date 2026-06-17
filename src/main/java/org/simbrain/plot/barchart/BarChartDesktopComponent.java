@@ -5,6 +5,7 @@ import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.simbrain.plot.ChartThemeKt;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -77,6 +78,8 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
         boolean urls = false;
 
         chart = ChartFactory.createBarChart(title, xLabel, yLabel, this.getWorkspaceComponent().getModel().getDataset(), PlotOrientation.VERTICAL, legend, tooltips, urls);
+        ChartThemeKt.applySimbrainChartTheme(chart);
+        chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
         chartPanel.setChart(chart);
         chart.getCategoryPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
         if (!getWorkspaceComponent().getModel().isAutoRange()) {

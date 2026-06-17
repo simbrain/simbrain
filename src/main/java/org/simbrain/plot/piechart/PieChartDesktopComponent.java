@@ -3,6 +3,7 @@ package org.simbrain.plot.piechart;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.simbrain.plot.ChartThemeKt;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -37,6 +38,7 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         add("Center", chartPanel);
 
         chart = ChartFactory.createPieChart("", getWorkspaceComponent().getModel().getDataset(), true, true, false);
+        ChartThemeKt.applySimbrainChartTheme(chart);
         chartPanel.setChart(chart);
     }
 

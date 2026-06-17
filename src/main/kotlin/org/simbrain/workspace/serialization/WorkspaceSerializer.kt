@@ -2,6 +2,7 @@ package org.simbrain.workspace.serialization
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.showWarningDialog
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.Coupling
@@ -11,7 +12,6 @@ import java.io.*
 import java.util.zip.ZipEntry
 import java.util.zip.ZipInputStream
 import java.util.zip.ZipOutputStream
-import javax.swing.JOptionPane
 
 class WorkspaceSerializer(val workspace: Workspace) {
 
@@ -277,7 +277,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     val message = String.format("Failed to deserialize component %s.", archivedComponent.name)
-                    JOptionPane.showMessageDialog(null, message)
+                    showWarningDialog(message)
                 }
             }
         }

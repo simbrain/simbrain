@@ -10,6 +10,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.*
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.updater.UpdateCoupling
 import java.awt.BorderLayout
@@ -549,7 +550,7 @@ val denisonNet = newSim {
 
         fun showSweepFrame(model: TimeSeriesModel) {
             sweepFrame?.takeIf { it.isDisplayable }?.dispose()
-            JInternalFrame("Sensitivity Proxy by SOA", true, true, true, true).apply {
+            GenericJInternalFrame("Sensitivity Proxy by SOA", true, true, true, true).apply {
                 layout = BorderLayout()
                 add(TimeSeriesPlotPanel(model), BorderLayout.CENTER)
                 setBounds(120, 120, 760, 460)

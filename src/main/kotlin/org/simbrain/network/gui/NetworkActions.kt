@@ -509,12 +509,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             } catch (e: IOException) {
                 println("[DEBUG_LOG] Error saving file: ${e.message}")
                 e.printStackTrace()
-                JOptionPane.showMessageDialog(
-                    networkPanel,
-                    "Error saving file: ${e.message}",
-                    "Save error",
-                    JOptionPane.ERROR_MESSAGE
-                )
+                showErrorDialog("Error saving file: ${e.message}", "Save error")
             }
         } else {
             println("[DEBUG_LOG] No file selected for save")
@@ -883,11 +878,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Prune selected weights",
         enablingCondition = EnablingConditions.SYNAPSES
     ) {
-        val threshold: String = JOptionPane.showInputDialog(
-            null,
-            "Pruning threshold:",
-            ".5"
-        )
+        val threshold = showInputDialog("Pruning threshold:", ".5") ?: return@createConditionallyEnabledAction
         selectionManager.filterSelectedModels<Synapse>()
             .filter { Math.abs(it.strength) < threshold.toDouble() }
             .forEach { it.delete() }
@@ -900,11 +891,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Create sparse connection",
         enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS
     ) {
-        val sparsity: String = JOptionPane.showInputDialog(
-            null,
-            "Sparsity (0 to 1):",
-            ".1"
-        )
+        val sparsity = showInputDialog("Sparsity (0 to 1):", ".1") ?: return@createConditionallyEnabledAction
         val sparse = Sparse().apply {
             connectionDensity = sparsity.toDouble()
         }
@@ -978,7 +965,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         val alignment = Alignment.VERTICAL
 
-        val topologyString = showInputDialog("Enter the number of neurons in each layer separated by commas", "5,3,5")
+        val topologyString = showInputDialog("Enter the number of neurons in each layer separated by commas", "5,3,5") ?: return@createAction
 
         val topology = topologyString.split(",").map { it.toInt() }
 

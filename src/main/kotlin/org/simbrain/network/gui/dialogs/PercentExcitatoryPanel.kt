@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import org.simbrain.util.SwitchableChangeListener
 import org.simbrain.util.SwitchablePropertyChangeListener
+import org.simbrain.util.Theme
 import org.simbrain.util.Utils
 import org.simbrain.util.displayInDialog
 import java.awt.*
@@ -151,7 +152,7 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         //     sliderPanel.add(sliderApply, gbc)
         // }
 
-        val sliderBorder: Border = BorderFactory.createTitledBorder("Inhibitory/Excitatory Ratio")
+        val sliderBorder: Border = Theme.sectionBorder("Inhibitory/Excitatory Ratio")
         sliderPanel.border = sliderBorder
         layout = BorderLayout()
         add(sliderPanel, BorderLayout.NORTH)

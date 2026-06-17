@@ -1,5 +1,6 @@
 package org.simbrain.util.widgets
 
+import org.simbrain.util.Theme
 import org.simbrain.util.UserParameter
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
@@ -118,7 +119,7 @@ class FieldImagePanel(
         if (items.isEmpty()) {
             g2.color = Color(0xAAAAAA)
             val msgFont = (baseDim * 0.05).toInt().coerceAtLeast(10)
-            g2.font = Font(Font.SANS_SERIF, Font.ITALIC, msgFont)
+            g2.font = Theme.font(msgFont, Font.ITALIC)
             val msg = "(quiet)"
             val fm = g2.fontMetrics
             g2.drawString(msg, cx - fm.stringWidth(msg) / 2, cy + (fm.ascent - fm.descent) / 2)
@@ -149,7 +150,7 @@ class FieldImagePanel(
 
     private fun drawLabel(g2: Graphics2D, text: String, cx: Int, cy: Int, intensity: Float, minFont: Int, maxFont: Int) {
         val size = (minFont + intensity * (maxFont - minFont)).toInt().coerceAtLeast(8)
-        g2.font = Font(Font.SANS_SERIF, Font.BOLD, size)
+        g2.font = Theme.font(size, Font.BOLD)
         g2.color = settings.textColor.withIntensity(intensity)
         val fm = g2.fontMetrics
         g2.drawString(text, cx - fm.stringWidth(text) / 2, cy + (fm.ascent - fm.descent) / 2)

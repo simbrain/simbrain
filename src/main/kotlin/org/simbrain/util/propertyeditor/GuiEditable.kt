@@ -1256,9 +1256,8 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
         } else {
             JPanel(BorderLayout()).apply {
                 if (parameter.showLabeledBorder) {
-                    border = BorderFactory.createTitledBorder(parameter.label).apply {
-                        toolTipText = parameter.description
-                    }
+                    border = Theme.sectionBorder(parameter.label)
+                    toolTipText = parameter.description
                 }
                 val detailTrianglePanel = DetailTrianglePanel(
                     editorPanelContainer,

@@ -8,6 +8,7 @@ import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.projection.ProjectionDesktopComponent
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.projection.AuxDataColoringManager
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -75,7 +76,8 @@ suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
-class ControlPanelKt(title: String = "Control Panel"): JInternalFrame(title, true, true), CoroutineScope {
+class ControlPanelKt(title: String = "Control Panel"):
+    GenericJInternalFrame(title, true, true, false, false), CoroutineScope {
 
     @Transient
     private var job = SupervisorJob()

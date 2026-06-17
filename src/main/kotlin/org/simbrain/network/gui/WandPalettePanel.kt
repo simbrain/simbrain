@@ -1,12 +1,19 @@
 package org.simbrain.network.gui
 
+import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.Icons
+import org.simbrain.util.Theme
+import org.simbrain.util.blend
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
+import org.simbrain.util.showErrorDialog
 import org.simbrain.util.showOpenDialog
 import org.simbrain.util.showSaveDialog
+import org.simbrain.util.showWarningConfirmDialog
+import org.simbrain.util.showWarningDialog
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -31,7 +38,7 @@ class WandPalettePanel(
 
     init {
         layout = BorderLayout()
-        border = EmptyBorder(8, 8, 8, 8)
+        border = EmptyBorder(Theme.componentGap, Theme.componentGap, Theme.componentGap, Theme.componentGap)
 
         // Scrollable list area
         val scrollPane = JScrollPane(listPanel).apply {
@@ -42,37 +49,29 @@ class WandPalettePanel(
         }
         add(scrollPane, BorderLayout.CENTER)
 
-        // Bottom buttons panel
-        val buttonPanel = JPanel(FlowLayout(FlowLayout.LEFT, 5, 5))
-
-        val addButton = JButton("+").apply {
+        val addButton = JButton(Icons.small("plus.png")).apply {
             toolTipText = "Add new action"
             addActionListener { addNewAction() }
         }
-        buttonPanel.add(addButton)
-
-        buttonPanel.add(Box.createHorizontalStrut(20))
-
         val exportButton = JButton("Export...").apply {
             toolTipText = "Export palette to file"
             addActionListener { exportPalette() }
         }
-        buttonPanel.add(exportButton)
-
         val importButton = JButton("Import...").apply {
             toolTipText = "Import palette from file"
             addActionListener { importPalette() }
         }
-        buttonPanel.add(importButton)
-
-        buttonPanel.add(Box.createHorizontalStrut(20))
-
         val revertButton = JButton("Revert to Default").apply {
             toolTipText = "Reset palette to default actions"
             addActionListener { revertToDefault() }
         }
-        buttonPanel.add(revertButton)
 
+        val buttonPanel = JPanel(MigLayout("insets ${Theme.tightGap} 0 0 0", "[]${Theme.sectionGap}[]${Theme.componentGap}[]push[]")).apply {
+            add(addButton)
+            add(exportButton)
+            add(importButton)
+            add(revertButton)
+        }
         add(buttonPanel, BorderLayout.SOUTH)
 
         // Add Esc key binding to close popup
@@ -128,13 +127,18 @@ class WandPalettePanel(
     private fun createActionRow(index: Int, action: WandAction): JPanel {
         val isSelected = index == palette.selectedIndex
 
-        return JPanel(BorderLayout(5, 0)).apply {
+        val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
+        // Opaque selection wash: blend the accent over the card background so the (opaque) row
+        // paints a solid color, rather than an alpha tint that would smear on scroll.
+        val selectedBg = blend(accent, Theme.cardBg, 0.16)
+
+        return JPanel(BorderLayout(Theme.tightGap, 0)).apply {
             border = BorderFactory.createCompoundBorder(
-                if (isSelected) BorderFactory.createLineBorder(Color(100, 150, 255), 2)
-                else BorderFactory.createLineBorder(Color.LIGHT_GRAY, 1),
+                if (isSelected) BorderFactory.createLineBorder(accent, 2)
+                else BorderFactory.createLineBorder(Theme.divider, 1),
                 EmptyBorder(4, 6, 4, 6)
             )
-            background = if (isSelected) Color(230, 240, 255) else Color.WHITE
+            background = if (isSelected) selectedBg else Theme.cardBg
             maximumSize = Dimension(Int.MAX_VALUE, 36)
             preferredSize = Dimension(280, 36)
 
@@ -146,7 +150,7 @@ class WandPalettePanel(
 
             // Description label with tooltip for long descriptions
             val descLabel = JLabel(action.description).apply {
-                font = font.deriveFont(12f)
+                font = Theme.font(12)
                 toolTipText = action.description
             }
             add(descLabel, BorderLayout.CENTER)
@@ -230,12 +234,7 @@ class WandPalettePanel(
             palette.removeAction(index)
             savePalette()
         } else {
-            JOptionPane.showMessageDialog(
-                this,
-                "Cannot delete the last action. The palette must have at least one action.",
-                "Cannot Delete",
-                JOptionPane.WARNING_MESSAGE
-            )
+            showWarningDialog("Cannot delete the last action. The palette must have at least one action.", "Cannot Delete")
         }
     }
 
@@ -260,25 +259,13 @@ class WandPalettePanel(
                 palette.setActions(imported.actions)
                 savePalette()
             } catch (e: Exception) {
-                JOptionPane.showMessageDialog(
-                    this@WandPalettePanel,
-                    "Failed to import palette: ${e.message}",
-                    "Import Error",
-                    JOptionPane.ERROR_MESSAGE
-                )
+                showErrorDialog("Failed to import palette: ${e.message}", "Import Error")
             }
         }
     }
 
     private fun revertToDefault() {
-        val result = JOptionPane.showConfirmDialog(
-            this,
-            "Reset palette to default actions? This cannot be undone.",
-            "Revert to Default",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE
-        )
-        if (result == JOptionPane.YES_OPTION) {
+        if (showWarningConfirmDialog("Reset palette to default actions? This cannot be undone.") == JOptionPane.YES_OPTION) {
             val defaultPalette = WandPalette.createDefault()
             palette.setActions(defaultPalette.actions)
             savePalette()
@@ -310,14 +297,14 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         g2.fill(Ellipse2D.Double(padding.toDouble(), padding.toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
         // Draw border
-        g2.color = Color.DARK_GRAY
+        g2.color = Theme.foreground
         g2.stroke = BasicStroke(1.5f)
         g2.draw(Ellipse2D.Double(padding.toDouble(), padding.toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
         // Draw letter in center
         val displayLetter = letter.firstOrNull()?.toString() ?: ""
         g2.color = Color(0, 0, 0, 200)
-        g2.font = Font(Font.SANS_SERIF, Font.BOLD, (size * 0.5).toInt())
+        g2.font = Theme.font((size * 0.5).toInt(), Font.BOLD)
         val fm = g2.fontMetrics
         val textX = (size - fm.stringWidth(displayLetter)) / 2
         val textY = (size - fm.height) / 2 + fm.ascent
@@ -341,7 +328,7 @@ class KebabIcon : Icon {
         val g2 = g as Graphics2D
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
 
-        g2.color = Color.DARK_GRAY
+        g2.color = Theme.mutedText
         val startX = x + 2
         val startY = y + 2
 
@@ -360,24 +347,28 @@ class KebabIcon : Icon {
 class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel) : JPanel() {
 
     private var popupMenu: JPopupMenu? = null
-    private val mainButton: JButton
+    private val mainButton: JToggleButton
     private val dropdownButton: JButton
 
     init {
         layout = BoxLayout(this, BoxLayout.X_AXIS)
         isOpaque = false
 
-        // Main button - activates wand mode
-        mainButton = JButton().apply {
+        // Main button - activates wand mode. A toggle so it shows the flat toolbar "active"
+        // highlight while the wand is the current edit mode (driven by editMode below).
+        mainButton = JToggleButton().apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 updateWandCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
+                isSelected = true
             }
         }
 
         // Dropdown button - shows palette popup
         dropdownButton = JButton().apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
             toolTipText = "Select wand action"
             icon = DropdownArrowIcon(6, 18)
             addActionListener {
@@ -387,7 +378,13 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
         add(mainButton)
         add(dropdownButton)
-        
+
+        // Reflect the active tool: highlight while the wand is the current edit mode.
+        mainButton.isSelected = networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Wand
+        networkPanel.addPropertyChangeListener("editMode") {
+            mainButton.isSelected = networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Wand
+        }
+
         // Set initial tooltip after button is created
         updateTooltip()
 
@@ -455,16 +452,16 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             val padding = 1
             val circleSize = size - padding * 2
 
-            // Draw circle outline (black/white style)
-            g2.color = Color.DARK_GRAY
+            // Draw circle outline, tracking the theme foreground like other toolbar icons
+            g2.color = Theme.foreground
             g2.stroke = BasicStroke(1.5f)
             g2.draw(Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble()))
 
             // Draw the letter in the center
             val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""
 
-            g2.color = Color.DARK_GRAY
-            g2.font = Font(Font.SANS_SERIF, Font.BOLD, (size * 0.6).toInt())
+            g2.color = Theme.foreground
+            g2.font = Theme.font((size * 0.6).toInt(), Font.BOLD)
             val fm = g2.fontMetrics
             val textX = x + (size - fm.stringWidth(displayLetter)) / 2
             val textY = y + (size - fm.height) / 2 + fm.ascent
@@ -494,7 +491,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             triangle.addPoint(arrowX + arrowWidth, arrowY)
             triangle.addPoint(arrowX + arrowWidth / 2, arrowY + arrowHeight)
 
-            g2.color = Color.DARK_GRAY
+            g2.color = Theme.foreground
             g2.fill(triangle)
         }
     }

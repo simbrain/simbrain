@@ -137,7 +137,7 @@ class CouplingMenu(
         if (moreItems > 0) {
             submenu.add(JSeparator())
             submenu.add(createAction("... and $moreItems more ${if (moreItems == 1) "item" else "items"}") {
-                DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
+                DesktopCouplingManager(SimbrainDesktop).displayInDialog(title = "Couplings") {  }
             })
         }
         add(submenu)

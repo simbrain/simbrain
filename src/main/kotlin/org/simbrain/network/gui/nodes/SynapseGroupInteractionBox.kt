@@ -5,9 +5,9 @@ import org.simbrain.network.gui.*
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.displayInDialog
+import org.simbrain.util.showInputDialog
 import javax.swing.JMenu
 import javax.swing.JMenuItem
-import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
 
 
@@ -33,7 +33,7 @@ class SynapseGroupInteractionBox(
             menu.add(networkPanel.createAction(
                 name = "Rename synapse group..."
             ) {
-                val newName = JOptionPane.showInputDialog("Name:", synapseGroup.label)
+                val newName = showInputDialog("Name:", synapseGroup.label)
                 if (newName != null) {
                     synapseGroup.label = newName
                 }

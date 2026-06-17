@@ -184,7 +184,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         projector.projectionMethod.let { projection ->
             if (projection is IterableProjectionMethod) {
                 projection.iterate(projector.dataset)
-                projector.events.iterated.fire(projection.error).await()
+                projector.events.iterated.fire(projection.error)
             }
         }
         projector.events.datasetChanged.fire()
@@ -325,7 +325,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             bottomPanel.repaint()
             launch { redrawAllPoints() }
         }
-        projector.events.iterated.on(dispatcher = Dispatchers.Swing, wait = true) { error ->
+        projector.events.iterated.on(Dispatchers.Swing) { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
         launch {

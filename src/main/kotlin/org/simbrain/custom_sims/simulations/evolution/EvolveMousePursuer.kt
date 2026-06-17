@@ -257,7 +257,7 @@ val evolveMousePursuer = newSim { optionString ->
                 }
             }
 
-            mouse.events.collided.on { collided ->
+            mouse.events.collided.on(Dispatchers.Default) { collided ->
                 if (collided is OdorWorldEntity && collided.entityType == EntityType.Swiss) {
                     simState.cheesesFound += 1
                     simState.fitness += mouseParams.cheeseReward

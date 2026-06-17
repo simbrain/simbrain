@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnTrainerConfig
 import org.simbrain.network.trainers.TrainingDataset
@@ -109,7 +110,7 @@ class ConvolutionalNeuralNetwork(
 
         // If any pipeline component is removed, remove this wrapper as well.
         pipelineComponents.forEach { component ->
-            component.events.deleted.on {
+            component.events.deleted.on(Dispatchers.Default) {
                 delete()
             }
         }

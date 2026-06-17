@@ -1,13 +1,13 @@
 package org.simbrain.workspace.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 
-class WorkspaceUpdaterEvents() : Events() {
+class WorkspaceUpdaterEvents() : FlowEvents() {
 
     val couplingsUpdates = NoArgEvent()
     val workspaceUpdated = NoArgEvent()
-    val runStarted = NoArgEvent()
-    val runFinished = NoArgEvent()
+    val runStarted = NoArgAwaitableEvent()
+    val runFinished = NoArgAwaitableEvent()
 
 }

@@ -301,7 +301,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     override suspend fun delete(): List<NetworkModel> {
         val connectors = LinkedHashSet<NetworkModel>(incomingConnectors + outgoingConnectors + incomingFlattenConnectors)
         connectors.forEach { it.delete() }
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return buildList {
             add(this@NeuronArray)
             addAll(connectors)

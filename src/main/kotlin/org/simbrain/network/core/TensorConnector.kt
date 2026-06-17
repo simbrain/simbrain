@@ -35,7 +35,7 @@ abstract class TensorConnector(val source: TensorLayer, val target: TensorLayer)
     override suspend fun delete(): List<NetworkModel> {
         source.removeOutgoingConnector(this)
         target.removeIncomingConnector(this)
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this)
     }
 

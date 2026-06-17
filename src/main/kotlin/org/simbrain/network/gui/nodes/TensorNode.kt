@@ -133,7 +133,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             interactionBox.setText(tensorDisplayText())
         }
-        tensorEvents.updated.on {
+        tensorEvents.updated.on(Dispatchers.Default) {
             tensorEvents.updateGraphics.fire()
         }
         tensorEvents.updateGraphics.on(Dispatchers.Swing) {

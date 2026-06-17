@@ -2,9 +2,9 @@ package org.simbrain.plot
 
 import org.simbrain.plot.raster.RasterModel
 import org.simbrain.plot.timeseries.TimeSeriesModel
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
-open class PlotEvents: Events() {
+open class PlotEvents: FlowEvents() {
     val propertyChanged = NoArgEvent()
 }
 

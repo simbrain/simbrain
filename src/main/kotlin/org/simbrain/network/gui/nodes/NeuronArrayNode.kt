@@ -152,7 +152,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         addChild(labelBackground)
 
-        events.updated.on {
+        events.updated.on(Dispatchers.Default) {
             events.updateGraphics.fire()
         }
 

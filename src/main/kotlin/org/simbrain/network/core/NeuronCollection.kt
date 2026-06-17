@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.events.NeuronCollectionEvents
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
 import org.simbrain.network.layouts.GridLayout
@@ -218,8 +219,8 @@ class NeuronCollection : Layer, CopyableObject {
     }
 
     internal fun addListener(n: Neuron) {
-        n.events.locationChanged.on { events.locationChanged.fire() }
-        n.events.deleted.on(wait = true) { neuron ->
+        n.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
+        n.events.deleted.on(Dispatchers.Default) { neuron ->
             neuronList.remove(neuron)
             if (isEmpty) {
                 delete()
@@ -302,7 +303,7 @@ class NeuronCollection : Layer, CopyableObject {
             addAll(outgoingSg.flatMap { it.delete() })
             addAll(incomingSgs.flatMap { it.delete() })
             val customInfo = customInfo
-            customInfo?.events?.deleted?.fire(customInfo)?.await()
+            customInfo?.events?.deleted?.fire(customInfo)
         }
     }
 

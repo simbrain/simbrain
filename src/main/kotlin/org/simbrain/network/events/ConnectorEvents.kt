@@ -3,7 +3,7 @@ package org.simbrain.network.events
 import java.awt.geom.Point2D
 
 /**
- * @see Events
+ * @see org.simbrain.util.FlowEvents
  */
 class ConnectorEvents: NetworkModelEvents() {
     val locationChanged = ChangedEvent<Point2D>()

@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
@@ -244,7 +245,7 @@ class OdorWorldPanel(
         canvas.addInputEventListener(WorldMouseHandler(this, world))
         canvas.addInputEventListener(WorldContextMenuEventHandler(this, world))
 
-        world.events.entityAdded.on(swingDispatcher, wait = true) { e ->
+        world.events.entityAdded.on(swingDispatcher) { e ->
             val node = EntityNode(e)
             canvas.layer.addChild(node)
             selectionManager.clear()
@@ -255,10 +256,10 @@ class OdorWorldPanel(
                 selectionManager.add(node)
             }
         }
-        world.events.entityRemoved.on {
+        world.events.entityRemoved.on(Dispatchers.Default) {
             world.events.cleanups[it]?.invoke()
         }
-        world.events.updated.on(swingDispatcher, wait = true) { this.centerCameraToSelectedEntity() }
+        world.events.updated.on(swingDispatcher) { this.centerCameraToSelectedEntity() }
         world.events.frameAdvanced.on(swingDispatcher) {
             canvas.layer.childrenReference
                 .filterIsInstance<EntityNode>()
@@ -284,9 +285,7 @@ class OdorWorldPanel(
             }
 
             // Single layer update
-            world.tileMap.events.layerImageChanged.on(
-                wait = true, dispatcher = swingDispatcher
-            ) { oldImage: PImage?, newImage: PImage? ->
+            world.tileMap.events.layerImageChanged.on(swingDispatcher) { (oldImage: PImage?, newImage: PImage?) ->
                 val index = canvas.layer.indexOfChild(oldImage)
                 canvas.layer.removeChild(oldImage)
                 if (index != -1) {
@@ -298,7 +297,7 @@ class OdorWorldPanel(
             renderAllLayers(world)
         }
 
-        world.events.worldStarted.on(null, true) {
+        world.events.worldStarted.on(Dispatchers.Default) {
             if (movementTimer != null) {
                 movementTimer?.cancel()
                 movementTimer = null
@@ -314,7 +313,7 @@ class OdorWorldPanel(
             }
         }
 
-        world.events.worldStopped.on(null, true, Runnable {
+        world.events.worldStopped.on(Dispatchers.Default) {
             if (movementTimer == null) {
                 movementTimer = Timer().apply {
                     schedule(object : TimerTask() {
@@ -328,7 +327,7 @@ class OdorWorldPanel(
                 animationTimer?.cancel()
                 animationTimer = null
             }
-        })
+        }
 
         canvas.addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseWheelRotated(event: PInputEvent) {

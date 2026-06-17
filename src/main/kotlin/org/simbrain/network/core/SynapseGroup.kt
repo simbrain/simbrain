@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -91,7 +92,7 @@ class SynapseGroup @JvmOverloads constructor(
         val removedSynapses = removeAllSynapses()
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this) + removedSynapses
     }
 
@@ -231,7 +232,7 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun addSynapseListener(synapse: Synapse) {
-        synapse.events.deleted.on(wait = true) {
+        synapse.events.deleted.on(Dispatchers.Default) {
             this.synapses.remove(it)
             if (this.synapses.isEmpty()) {
                 this.delete()

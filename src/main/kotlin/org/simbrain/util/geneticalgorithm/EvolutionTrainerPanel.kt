@@ -61,8 +61,8 @@ class EvolutionTrainerControls(
         description = "Evolve one generation",
         iconPath = "menu_icons/Step.png",
         initBlock = {
-            runner.events.beginEvolution.on { isEnabled = false }
-            runner.events.endEvolution.on { isEnabled = true }
+            runner.events.beginEvolution.on(Dispatchers.Swing) { isEnabled = false }
+            runner.events.endEvolution.on(Dispatchers.Swing) { isEnabled = true }
         }
     ) {
         runner.evolveOnce()
@@ -239,7 +239,7 @@ class ExpressionEntry(
     }
 }
 
-class ExpressionHistoryEvents : Events() {
+class ExpressionHistoryEvents : FlowEvents() {
     val changed = NoArgEvent()
 }
 

@@ -346,7 +346,7 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
     }
 
     dialog.addCloseTask {
-        unregister()
+        unregister.cancel()
     }
 
     val synapsesEditorApplyPanel = synapsesEditor.createApplyPanel {

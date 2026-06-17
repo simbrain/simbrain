@@ -168,7 +168,7 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
     override suspend fun delete(): List<NetworkModel> {
         val connectors = LinkedHashSet(incomingConnectors + outgoingConnectors)
         connectors.forEach { it.delete() }
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return buildList {
             add(this@Layer)
             addAll(connectors)

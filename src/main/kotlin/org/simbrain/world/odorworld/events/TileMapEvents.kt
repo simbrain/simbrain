@@ -1,13 +1,13 @@
 package org.simbrain.world.odorworld.events
 
 import org.piccolo2d.nodes.PImage
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
-class TileMapEvents: Events() {
+class TileMapEvents: FlowEvents() {
     val layersChanged = NoArgEvent()
-    val layerImageChanged = ChangedEvent<PImage?>()
+    val layerImageChanged = AwaitableEvent<Pair<PImage?, PImage?>>()
     val mapSizeChanged = NoArgEvent()
 }

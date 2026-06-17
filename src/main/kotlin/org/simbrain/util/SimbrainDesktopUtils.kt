@@ -457,7 +457,7 @@ suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: Clas
     val deregisterDeleteEvent = smileClassifier.events.deleted.on {
         workspace.removeWorkspaceComponent(projectionComponent)
     }
-    val deregisterUpdateEvent = smileClassifier.events.updated.on {
+    val deregisterUpdateEvent = smileClassifier.events.updated.on(Dispatchers.Default) {
         val datapoint = DataPoint(
             smileClassifier.inputNeuronGroup.activationArray,
             aux = colors.getOrNull(smileClassifier.winner)
@@ -480,7 +480,7 @@ suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: Clas
     workspace.events.componentRemoved.on {
         if (it == projectionComponent) {
             deregisterDeleteEvent()
-            deregisterUpdateEvent()
+            deregisterUpdateEvent.cancel()
         }
     }
     return projectionComponent

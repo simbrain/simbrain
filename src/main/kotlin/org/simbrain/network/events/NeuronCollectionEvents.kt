@@ -1,9 +1,9 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
 class NeuronCollectionEvents: LocationEvents() {
     val customInfoUpdated = NoArgEvent()

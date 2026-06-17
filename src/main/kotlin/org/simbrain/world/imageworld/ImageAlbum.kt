@@ -105,7 +105,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         _frames.add(image)
         frameIndex = _frames.size - 1
         setCurrentImage(image)
-        events.imageUpdate.fire().await()
+        events.imageUpdate.fire()
     }
 
     /**
@@ -119,7 +119,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         graphics.drawImage(imageIcon.image, 0, 0, null)
         graphics.dispose()
         setCurrentImage(image)
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     /**
@@ -217,7 +217,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
             }
             currentImage = newImage
             channels = Array(3) { DoubleArray(length * length) }
-            events.resize.fire()
+            events.resize.fireAsync()
         }
         return true
     }
@@ -247,7 +247,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         System.arraycopy(values, 0, channels[1], 0, values.size)
         System.arraycopy(values, 0, channels[2], 0, values.size)
         updateImageFromChannels()
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     @Consumable
@@ -255,7 +255,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         if (!resizeToFit(values)) return
         System.arraycopy(values, 0, channels[0], 0, values.size)
         updateImageFromChannels()
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     @Consumable
@@ -263,7 +263,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         if (!resizeToFit(values)) return
         System.arraycopy(values, 0, channels[1], 0, values.size)
         updateImageFromChannels()
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     @Consumable
@@ -271,7 +271,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
         if (!resizeToFit(values)) return
         System.arraycopy(values, 0, channels[2], 0, values.size)
         updateImageFromChannels()
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     /**
@@ -289,7 +289,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
             channels[2][i] = values[i * 3 + 2]
         }
         updateImageFromChannels()
-        events.imageUpdate.fire()
+        events.imageUpdate.fireAsync()
     }
 
     override val id: String

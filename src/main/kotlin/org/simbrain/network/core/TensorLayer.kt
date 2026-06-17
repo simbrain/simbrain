@@ -310,7 +310,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
     override suspend fun delete(): List<NetworkModel> {
         val connectors = LinkedHashSet<NetworkModel>(incomingTensorConnectors + outgoingTensorConnectors + outgoingFlattenConnectors)
         connectors.forEach { it.delete() }
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return buildList {
             add(this@TensorLayer)
             addAll(connectors)

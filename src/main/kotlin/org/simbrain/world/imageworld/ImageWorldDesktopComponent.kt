@@ -134,7 +134,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
             updateToolbar()
             repaint()
         }
-        imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { _: ImageProcessingPipeline, _: ImageProcessingPipeline ->
+        imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { (_, _) ->
             updateToolbar()
             repaint()
         }

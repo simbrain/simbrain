@@ -1,5 +1,6 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
@@ -96,7 +97,7 @@ class SupervisedModel(
         }
         
         (layers + weightMatrices).forEach {
-            it.events.deleted.on {
+            it.events.deleted.on(Dispatchers.Default) {
                 delete()
             }
         }
@@ -180,7 +181,7 @@ class SupervisedModel(
     }
 
     override suspend fun delete(): List<NetworkModel> {
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this)
     }
 

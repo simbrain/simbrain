@@ -435,7 +435,7 @@ val actorCritic = newSim {
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
             addCheckBox("Show Values", showValues) {
                 showValues = it
-                odorWorldComponent.world.events.updated.fire()
+                odorWorldComponent.world.events.updated.fireAsync()
             }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")

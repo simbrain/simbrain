@@ -34,7 +34,7 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
     override suspend fun delete(): List<NetworkModel> {
         source.removeOutgoingConnector(this)
         target.removeIncomingConnector(this)
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this)
     }
 

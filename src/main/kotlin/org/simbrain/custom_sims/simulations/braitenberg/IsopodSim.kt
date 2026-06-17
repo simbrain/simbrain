@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
@@ -145,7 +146,7 @@ val isopodSim = newSim { optionString ->
                 theta = -45.0
                 addSensor(this)
             }
-            events.collided.on {
+            events.collided.on(Dispatchers.Default) {
                 if (it is OdorWorld && !collision) {
                     log.append("# Collided with wall\n")
                 }

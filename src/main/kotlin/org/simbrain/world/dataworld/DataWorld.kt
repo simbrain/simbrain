@@ -63,7 +63,7 @@ class DataWorld(val rows: Int = 30, val cols: Int = 5): AttributeContainer, Edit
 
     suspend fun update() {
         handleRowAdvancement()
-        dataModel.events.currentRowChanged.fire().await()
+        dataModel.events.currentRowChanged.fire()
     }
 
     private fun handleRowAdvancement() {

@@ -252,7 +252,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         ) {
             with(network) {
                 launch {
-                    trainer.events.beginTraining.fire().await()
+                    trainer.events.beginTraining.fire()
                     trainer.trainOnce(unsupervisedNetwork)
                     trainer.events.endTraining.fire()
                 }
@@ -288,7 +288,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             }
             runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
                 setAction("Run")
-                trainer.events.beginTraining.on {
+                trainer.events.beginTraining.on(Dispatchers.Swing) {
                     this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                     setAction("Stop")
                 }
@@ -306,7 +306,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         ) {
             unsupervisedNetwork.randomize(null)
             trainer.iteration = 0
-            trainer.events.progressUpdated.fire("Iteration" to trainer.iteration)
+            trainer.events.progressUpdated.fireAsync("Iteration" to trainer.iteration)
         }
         val resetButton = JButton(resetAction)
         resetButton.hideActionText = true
@@ -326,7 +326,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(labelPanel, "wrap")
 
-        trainer.events.progressUpdated.on(Dispatchers.Swing, wait = true) {
+        trainer.events.progressUpdated.on(Dispatchers.Swing) {
             iterationsLabel.text = "" + trainer.iteration
         }
 

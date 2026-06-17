@@ -1,18 +1,18 @@
 package org.simbrain.world.textworld
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.util.TokenizerResult
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
-class TextWorldEvents: Events() {
+class TextWorldEvents: FlowEvents() {
 
-    val textChanged = NoArgEvent()
+    val textChanged = NoArgAwaitableEvent()
     val tokenVectorMapChanged = NoArgEvent()
-    val currentTokenChanged = OneArgEvent<TokenizerResult>()
-    val cursorPositionChanged = NoArgEvent()
-    val atEnd = NoArgEvent()
+    val currentTokenChanged = AwaitableEvent<TokenizerResult>()
+    val cursorPositionChanged = NoArgAwaitableEvent()
+    val atEnd = NoArgAwaitableEvent()
     val preferencesChanged = NoArgEvent()
 
 }

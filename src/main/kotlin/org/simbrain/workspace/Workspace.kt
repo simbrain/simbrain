@@ -139,7 +139,7 @@ class Workspace: CoroutineScope {
             component.name = idManager.getAndIncrementId(component.javaClass)
         }
         events.componentAdded.fireAndBlock(component)
-        component.events.attributeContainerRemoved.on { attributeContainer: AttributeContainer? ->
+        component.events.attributeContainerRemoved.on(Dispatchers.Default) { attributeContainer: AttributeContainer? ->
             couplingManager.removeAttributeContainer(
                 attributeContainer!!
             )

@@ -65,8 +65,8 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
                 val cleanup = neuron.events.locationChanged.on(Dispatchers.Swing) {
                     updateInteractionBoxLocation()
                 }
-                synapseGroup.events.deleted.on {
-                    cleanup()
+                synapseGroup.events.deleted.on(Dispatchers.Default) {
+                    cleanup.cancel()
                 }
             }
         }
@@ -74,7 +74,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
         // Handle events
         val events = synapseGroup.events
-        events.labelChanged.on { _, _ -> updateText() }
+        events.labelChanged.on(Dispatchers.Swing) { _, _ -> updateText() }
         events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
         events.synapseRemoved.on(dispatcher = Dispatchers.Swing) {
             setVisibility()

@@ -114,6 +114,7 @@ abstract class WorkspaceComponent(name: String) {
             )
         }
         workspace.removeWorkspaceComponent(this)
+        events.close()
     }
 
     /**
@@ -141,7 +142,7 @@ abstract class WorkspaceComponent(name: String) {
     /**
      * Notify listeners that an [AttributeContainer] has been added to the component.
      */
-    fun fireAttributeContainerAdded(addedContainer: AttributeContainer) = events.attributeContainerAdded.fire(addedContainer)
+    fun fireAttributeContainerAdded(addedContainer: AttributeContainer) = events.attributeContainerAdded.fireAsync(addedContainer)
 
     /**
      * Notify listeners that an [AttributeContainer]  has been removed from the

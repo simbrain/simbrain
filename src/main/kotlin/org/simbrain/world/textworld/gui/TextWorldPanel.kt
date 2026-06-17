@@ -120,22 +120,22 @@ class TextWorldPanel(
                     )
             }
         })
-        world.events.textChanged.on(Dispatchers.Swing) {
+        world.events.textChanged.on(Dispatchers.Swing.immediate) {
             textArea.text = world.text
             if (world.position <= textArea.document.length) {
                 textArea.caretPosition = world.position
             }
         }
 
-        world.events.cursorPositionChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.cursorPositionChanged.on(Dispatchers.Swing) {
             textArea.caretPosition = world.position
         }
 
-        world.events.currentTokenChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.currentTokenChanged.on(Dispatchers.Swing) {
             updateHighlights()
         }
 
-        world.events.preferencesChanged.on(Dispatchers.Swing, wait = true) {
+        world.events.preferencesChanged.on(Dispatchers.Swing) {
 
             updateHighlights()
         }

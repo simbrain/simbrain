@@ -133,7 +133,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         // Add property change listener to detect when the panel is disposed
         SwingUtilsKt.onWindowClose(this, () -> {
             attributeContainerAddedCleanupHandler.invoke();
-            attributeContainerRemovedCleanupHandler.invoke();
+            attributeContainerRemovedCleanupHandler.cancel(null);
         });
 
     }

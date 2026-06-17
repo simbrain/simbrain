@@ -1,5 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.util.format
@@ -282,7 +284,7 @@ class GeneDisplayPanel(
      */
     fun bind(runner: EvolutionRunner) {
         require(renderer != null) { "No renderer — use the factory function geneDisplayPanel()" }
-        runner.events.generationUpdated.on { state ->
+        runner.events.generationUpdated.on(Dispatchers.Swing) { state ->
             val g = state.best.genotype
             refreshFrom(g, state.bestMetadata)
         }
@@ -450,7 +452,7 @@ fun GeneDisplayPanel.bind(
     precision: Int = 4,
     extract: (GenerationState) -> Pair<Genotype, GeneDisplayBuilder.() -> Unit>
 ) {
-    runner.events.generationUpdated.on { state ->
+    runner.events.generationUpdated.on(Dispatchers.Swing) { state ->
         val (genotype, block) = extract(state)
         val newSections = GeneDisplayBuilder(genotype, precision).apply(block).buildSections()
         refresh(newSections, state.bestMetadata)

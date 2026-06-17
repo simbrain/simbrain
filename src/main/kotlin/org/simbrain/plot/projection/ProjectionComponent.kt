@@ -1,6 +1,7 @@
 package org.simbrain.plot.projection
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.util.createConstructorCallingConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.projection.DataPoint
@@ -42,7 +43,7 @@ class ProjectionComponent @JvmOverloads constructor(name: String, val projector:
         get() = getProjectorXStream().toXML(projector)
 
     init {
-        projector.events.pointUpdated.on(wait = true) {
+        projector.events.pointUpdated.on(Dispatchers.Default) {
             projector.coloringManager.updateAllColors()
             projector.dataset.currentPoint?.let { projector.coloringManager.activate(it) }
         }

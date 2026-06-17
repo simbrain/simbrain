@@ -180,7 +180,7 @@ class CnnTrainerControls(
             description = "Iterate training once",
             iconPath = "menu_icons/Step.png",
             initBlock = {
-                trainer.events.beginTraining.on { isEnabled = false }
+                trainer.events.beginTraining.on(Dispatchers.Swing) { isEnabled = false }
                 trainer.events.endTraining.on { isEnabled = isValidationEnabled }
             }
         ) {
@@ -209,7 +209,7 @@ class CnnTrainerControls(
         runTools.add(JButton(stepAction))
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 this@CnnTrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
@@ -371,7 +371,7 @@ class CnnErrorTimeSeries(trainer: CnnTrainer) : JPanel() {
             }
         }
 
-        trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
+        trainer.events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
     }

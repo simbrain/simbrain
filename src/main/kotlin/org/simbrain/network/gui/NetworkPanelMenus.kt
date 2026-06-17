@@ -1,5 +1,7 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
@@ -184,7 +186,7 @@ val NetworkPanel.viewMenu
                 addSeparator()
                 add(JCheckBoxMenuItem(toggleAutoZoom).apply {
                     this.state = networkPanel.autoZoom
-                    networkPanel.network.events.zoomModeChanged.on {
+                    networkPanel.network.events.zoomModeChanged.on(Dispatchers.Swing) {
                         this.state = it
                     }
                 })
@@ -197,13 +199,13 @@ val NetworkPanel.viewMenu
             addSeparator()
             add(JCheckBoxMenuItem(toggleFreeWeightVisibility).apply {
                 this.state = networkPanel.freeWeightsVisible
-                networkPanel.network.events.freeWeightVisibilityChanged.on {
+                networkPanel.network.events.freeWeightVisibilityChanged.on(Dispatchers.Swing) {
                     this.state = it
                 }
             })
             add(JCheckBoxMenuItem(toggleSynapseSpikingOnlyVisibility).apply {
                 this.state = networkPanel.synapseSpikingOnlyVisible
-                networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on {
+                networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(Dispatchers.Swing) {
                     this.state = it
                 }
             })

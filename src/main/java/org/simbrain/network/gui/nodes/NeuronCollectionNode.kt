@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.Dispatchers
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.*
@@ -55,12 +56,12 @@ class NeuronCollectionNode(
         neuronNodes.addAll(nodes)
         for (node in nodes) {
             val events = node.neuron.events
-            events.deleted.on { _ ->
+            events.deleted.on(swingDispatcher) { _ ->
                 neuronNodes.remove(node)
                 fireUpdateOutline()
             }
-            events.locationChanged.on { fireUpdateOutline() }
-            events.labelChanged.on { _, _ -> fireUpdateOutline() }
+            events.locationChanged.on(Dispatchers.Default) { fireUpdateOutline() }
+            events.labelChanged.on(Dispatchers.Default) { _, _ -> fireUpdateOutline() }
         }
         fireUpdateOutline()
     }

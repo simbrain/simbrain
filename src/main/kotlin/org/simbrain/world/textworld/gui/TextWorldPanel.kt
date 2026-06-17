@@ -120,7 +120,7 @@ class TextWorldPanel(
                     )
             }
         })
-        world.events.textChanged.on(Dispatchers.Swing) {
+        world.events.textChanged.on(Dispatchers.Swing.immediate) {
             textArea.text = world.text
             if (world.position <= textArea.document.length) {
                 textArea.caretPosition = world.position

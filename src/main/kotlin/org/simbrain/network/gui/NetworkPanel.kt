@@ -821,7 +821,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-            updated.on(Dispatchers.Swing) {
+            updated.on(Dispatchers.Swing.immediate) {
                 repaint()
                 timeLabel.update()
             }

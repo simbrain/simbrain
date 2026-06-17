@@ -346,6 +346,9 @@ fun SimbrainJTable.createOpenProjectionAction(useRowLabels: Boolean = false) = c
         description = "PCA plot of token embedding",
         iconPath = "menu_icons/RasterPlot.png",
     ) {
+        // This createAction overload runs its body via runBlocking on the EDT, but addWorkspaceComponent fires
+        // the componentAdded barrier (fireAndBlock) whose desktop handler hops to the EDT — firing it on the EDT
+        // would deadlock. The Dispatchers.Default switch keeps the add (and the barrier fire) off the EDT; keep it.
         withContext(Dispatchers.Default) {
             val projectionComponent = ProjectionComponent("Projection of table data")
             projectionComponent.projector.useHotPoint = false

@@ -278,7 +278,7 @@ fun createConstructorCallingConverter(
                 }
             }
 
-            objectCompletedEvent.objectCompleted.fireAndBlock(convertedObject)
+            objectCompletedEvent.objectCompleted.fire(convertedObject)
 
             // XStream's standard ReflectionConverter invokes readResolve via Java's
             // serialization machinery, but our custom unmarshal bypasses that path.
@@ -388,8 +388,22 @@ fun <T> createXStreamPropertyConverter(
     )
 }
 
-class ConvertedObjectEvent: FlowEvents() {
-    val objectCompleted = AwaitableEvent<Any>()
+/**
+ * Synchronous post-deserialization hook for the XStream converters. A fresh instance is created for every object
+ * being unmarshalled (see [createConstructorCallingConverter]); [XStreamPropertyConverterUnmarshallingContext.withConstructedObject]
+ * registers callbacks on it, and the converter fires them inline on the deserializing thread once the object is
+ * fully constructed, before it is returned to XStream. This is deliberately a plain synchronous callback rather
+ * than a coroutine event: the wiring must finish before the object is handed back, and deserialization often runs
+ * on the Swing EDT (e.g. while building a panel), where a blocking coroutine fire would freeze the UI.
+ */
+class ConvertedObjectEvent {
+    val objectCompleted = ObjectCompletedCallback()
+}
+
+class ObjectCompletedCallback {
+    private val handlers = mutableListOf<(Any) -> Unit>()
+    fun on(handler: (Any) -> Unit) { handlers.add(handler) }
+    fun fire(value: Any) { handlers.forEach { it(value) } }
 }
 
 /**

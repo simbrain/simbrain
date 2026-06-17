@@ -1,5 +1,6 @@
 package org.simbrain.util;
 
+import net.miginfocom.swing.MigLayout;
 import org.simbrain.util.genericframe.GenericJDialog;
 
 import javax.swing.*;
@@ -60,11 +61,6 @@ public class StandardDialog extends GenericJDialog {
      * A global cancel button for accessibility.
      */
     private JButton cancelButton;
-
-    /**
-     * The spacing between components in pixels.
-     */
-    private static final int COMPONENT_SPACING = 10;
 
     /**
      * Flag indicating if the "Cancel" button was pressed to close dialog.
@@ -134,7 +130,7 @@ public class StandardDialog extends GenericJDialog {
     private void init() {
 
         if (isRunning && USE_RUN_WARNINGS) {
-            JOptionPane.showMessageDialog(null, "WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.", "Warning!", JOptionPane.WARNING_MESSAGE);
+            SwingUtilsKt.showWarningDialog("WARNING: You are modifying system parameters while a simulation is running. \n " + "It is reccomended that you first stop the simulation using the stop button.\n" + " Some functions may not behave as they are supposed to.");
         }
 
         setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
@@ -143,9 +139,9 @@ public class StandardDialog extends GenericJDialog {
         // and the standard button panel
         JPanel internalContentPane = new JPanel();
 
-        internalContentPane.setLayout(new BorderLayout(COMPONENT_SPACING, COMPONENT_SPACING));
+        internalContentPane.setLayout(new BorderLayout(0, Theme.sectionGap));
 
-        internalContentPane.setBorder(BorderFactory.createEmptyBorder(COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING, COMPONENT_SPACING));
+        internalContentPane.setBorder(Theme.dialogBorder());
 
         // Create the standard "Ok" Button
         Action okAction = new AbstractAction("OK") {
@@ -166,15 +162,24 @@ public class StandardDialog extends GenericJDialog {
             }
         };
 
-        JPanel buttonPanel = new JPanel();
-
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
         okButton = new JButton(okAction);
-        buttonPanel.add(customButtonPanel);
-        buttonPanel.add(okButton);
+        okButton.setMnemonic('O');
         cancelButton = new JButton(cancelAction);
-        buttonPanel.add(cancelButton);
+        cancelButton.setMnemonic('C');
+
+        // Subclass-supplied buttons (e.g. Help) sit on the left; OK/Cancel are right-aligned, the
+        // platform-conventional placement. MigLayout (not FlowLayout, which pads its edges) so the
+        // buttons sit flush against the dialog border and line up with the content margin. hidemode 3
+        // drops a hidden Cancel (e.g. setAsDoneDialog) so it reserves no space or gap.
+        customButtonPanel.setLayout(new MigLayout("insets 0, gap " + Theme.componentGap + ", hidemode 3"));
+
+        JPanel okCancelPanel = new JPanel(new MigLayout("insets 0, gap " + Theme.componentGap + ", hidemode 3"));
+        okCancelPanel.add(okButton);
+        okCancelPanel.add(cancelButton);
+
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(customButtonPanel, BorderLayout.WEST);
+        buttonPanel.add(okCancelPanel, BorderLayout.EAST);
 
         getRootPane().setDefaultButton(okButton);
 

@@ -161,6 +161,32 @@ object NetworkPreferences: PreferenceHolder() {
     var showNumericOverlays by BooleanPreference(true)
 
     @UserParameter(
+        label = "Show synapse strength labels",
+        description = "Show numeric strength values on individual synapses when zoomed in",
+        tab = "GUI",
+        order = 26
+    )
+    var showSynapseStrengthLabels by BooleanPreference(true)
+
+    @UserParameter(
+        label = "Synapse strength decimal places",
+        description = "Number of decimal places to display in synapse strength labels",
+        minimumValue = 0.0,
+        tab = "GUI",
+        order = 27
+    )
+    var synapseStrengthDecimalPlaces by IntegerPreference(2)
+
+    @UserParameter(
+        label = "Synapse label min screen size",
+        description = "Minimum on-screen synapse circle diameter (in pixels) before a strength label is drawn",
+        minimumValue = 1.0,
+        tab = "GUI",
+        order = 28
+    )
+    var synapseStrengthLabelMinScreenSize by IntegerPreference(28)
+
+    @UserParameter(
         label = "Tooltip decimal places",
         description = "Number of decimal places to display in neuron tooltips",
         minimumValue = 0.0,

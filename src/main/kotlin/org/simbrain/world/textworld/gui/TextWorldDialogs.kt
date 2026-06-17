@@ -13,7 +13,7 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
 
         title = "Compare Word Vectors"
         contentPane = JPanel()
-        layout = MigLayout("ins 0, gap 20px 20px")
+        layout = MigLayout("ins 8, gap 20px 20px")
 
         val filteredTerms = removeStopWords(tokenEmbedding.tokensMap.keys.toList())
 

@@ -1,5 +1,7 @@
 package org.simbrain.util.widgets;
 
+import org.simbrain.util.Theme;
+
 import javax.swing.*;
 import java.awt.*;
 
@@ -27,7 +29,7 @@ public class ColorSelector extends JPanel {
         super();
         add(colorButton);
         colorIndicator.setSize(20, 20);
-        colorIndicator.setBorder(BorderFactory.createLineBorder(Color.BLACK));
+        colorIndicator.setBorder(BorderFactory.createLineBorder(Theme.getDivider()));
         colorIndicator.setBackground(color);
         add(colorIndicator);
         colorButton.addActionListener(arg0 -> {

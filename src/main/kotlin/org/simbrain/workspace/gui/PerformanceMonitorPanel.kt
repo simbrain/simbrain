@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.simbrain.util.Theme
 import org.simbrain.util.format
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.updater.*
@@ -35,18 +36,12 @@ class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderL
         contentPanel.layout = BoxLayout(contentPanel, BoxLayout.X_AXIS)
         val timersList = JList<String>()
         val updateActionPane = JScrollPane(timersList)
-        updateActionPane.border = BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder("Update Actions"),
-            BorderFactory.createEmptyBorder(0, 0, 0, 0)
-        )
+        updateActionPane.border = Theme.sectionBorder("Update Actions")
         timersList.font = Font("Monospaced", Font.PLAIN, 11)
         contentPanel.add(updateActionPane)
         val threadsList = JList<String>()
         val threadPane = JScrollPane(threadsList)
-        threadPane.border = BorderFactory.createCompoundBorder(
-            BorderFactory.createTitledBorder("Threads"),
-            BorderFactory.createEmptyBorder(0, 0, 0, 0)
-        )
+        threadPane.border = Theme.sectionBorder("Threads")
         contentPanel.add(threadPane)
 
         this.add("Center", contentPanel)

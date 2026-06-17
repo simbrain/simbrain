@@ -7,6 +7,7 @@ import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.simbrain.plot.ChartThemeKt;
 import org.simbrain.plot.raster.RasterModel;
 import org.simbrain.util.SwingUtilsKt;
 
@@ -77,7 +78,7 @@ public class RasterPlotPanel extends JPanel {
         updateChartSettings();
         model.getEvents().getPropertyChanged().on(SwingUtilsKt.getSwingDispatcher(), this::updateChartSettings);
         chartPanel.setChart(chart);
-        chart.setBackgroundPaint(null);
+        ChartThemeKt.applySimbrainChartTheme(chart);
 
     }
 

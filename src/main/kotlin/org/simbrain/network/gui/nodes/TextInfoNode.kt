@@ -6,6 +6,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.display
+import org.simbrain.util.showErrorDialog
 import javax.swing.*
 
 class TextInfoNode(netPanel: NetworkPanel, text: InfoText) : TextNode(netPanel, text) {
@@ -75,12 +76,7 @@ private fun createInfoTextEditor(infoText: InfoText): StandardDialog {
             infoText.spacing = spacingField.text.toDouble()
         } catch (e: NumberFormatException) {
             // Show error message if spacing is not a valid number
-            JOptionPane.showMessageDialog(
-                dialog,
-                "Please enter a valid number for spacing.",
-                "Invalid Input",
-                JOptionPane.ERROR_MESSAGE
-            )
+            showErrorDialog("Please enter a valid number for spacing.", "Invalid Input")
         }
     }
     

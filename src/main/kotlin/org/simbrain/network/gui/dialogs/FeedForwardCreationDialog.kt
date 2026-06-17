@@ -2,7 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.StandardDialog
-import javax.swing.JOptionPane
+import org.simbrain.util.showErrorDialog
 
 /**
  * Dialog for creating a generic layered network.
@@ -22,12 +22,7 @@ open class FeedForwardCreationDialog(protected val networkPanel: NetworkPanel) :
             networkCreationPanel.commit(networkPanel, "FeedForward")
             super.closeDialogOk()
         } catch (nfe: NumberFormatException) {
-            JOptionPane.showMessageDialog(
-                null,
-                "Inappropriate Field Values (Numbers only in all fields)",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            )
+            showErrorDialog("Inappropriate Field Values (Numbers only in all fields)")
             nfe.printStackTrace()
         }
     }

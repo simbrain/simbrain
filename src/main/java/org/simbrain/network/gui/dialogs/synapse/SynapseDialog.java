@@ -118,6 +118,7 @@ public final class SynapseDialog extends StandardDialog {
         JScrollPane scroller = new JScrollPane(synapseEditingPanel);
         scroller.setBorder(null);
         setContentPane(scroller);
+        helpButton.putClientProperty("JButton.buttonType", "help");
         this.addButton(helpButton);
     }
 

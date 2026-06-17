@@ -1,6 +1,7 @@
 package org.simbrain.world.imageworld.gui
 
 import org.simbrain.util.ResourceManager
+import org.simbrain.util.Theme
 import org.simbrain.world.imageworld.ImageWorld
 import java.awt.Color
 import java.awt.Dimension
@@ -64,7 +65,7 @@ class BrushSettingsButton(private val imageWorld: ImageWorld) : JButton() {
         val panel = JPanel()
         panel.layout = BoxLayout(panel, BoxLayout.Y_AXIS)
         panel.border = BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(Color.GRAY),
+            BorderFactory.createLineBorder(Theme.divider),
             BorderFactory.createEmptyBorder(8, 8, 8, 8)
         )
         panel.background = UIManager.getColor("Panel.background")

@@ -5,7 +5,7 @@ import java.awt.Toolkit
 import java.awt.datatransfer.*
 import java.awt.image.BufferedImage
 import java.io.IOException
-import javax.swing.JOptionPane
+import org.simbrain.util.showWarningDialog
 
 class ImageClipboard(private val world: ImageWorld) : ClipboardOwner {
     private inner class TransferableImage(private val image: Image) : Transferable {
@@ -48,9 +48,9 @@ class ImageClipboard(private val world: ImageWorld) : ClipboardOwner {
                 graphics.dispose()
                 world.imageAlbum.addImage(bufferedImage)
             } catch (ex: UnsupportedFlavorException) {
-                JOptionPane.showMessageDialog(null, "Unable to read image from clipboard: ${ex.message}")
+                showWarningDialog("Unable to read image from clipboard: ${ex.message}")
             } catch (ex: IOException) {
-                JOptionPane.showMessageDialog(null, "Unable to read image from clipboard: ${ex.message}")
+                showWarningDialog("Unable to read image from clipboard: ${ex.message}")
             }
         }
     }

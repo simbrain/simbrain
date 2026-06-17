@@ -32,7 +32,6 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
-import kotlin.concurrent.thread
 import javax.swing.*
 import javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY
 import javax.swing.event.*
@@ -541,6 +540,9 @@ object SimbrainDesktop {
     /** The dark/light state currently realized in the Swing UI, to skip no-op re-themes. */
     private var appliedDark = WorkspacePreferences.themeMode.resolvedDark()
 
+    /** Suppresses the macOS appearance event that applying a FlatLaf theme fires back at us. */
+    private var applyingTheme = false
+
     /**
      * Sets the theme [mode] (persisting it) and applies it live if the resolved dark/light actually
      * changes. Used for programmatic switches; the Workspace Preferences dialog drives the same live
@@ -559,18 +561,24 @@ object SimbrainDesktop {
      * window frame and macOS menu bar are set at launch (Splasher) and update only on restart.
      */
     private fun applyThemeIfChanged() {
-        // Resolve the target mode off the EDT: System mode shells out to `defaults read`, which can
-        // block for up to two seconds, and the macOS appearance listener may fire off-thread. The
-        // look-and-feel mutation then runs back on the EDT, where all Swing work belongs.
-        thread(isDaemon = true, name = "theme-apply") {
-            val mode = WorkspacePreferences.themeMode
-            val dark = mode.resolvedDark()
-            SwingUtilities.invokeLater {
-                if (dark == appliedDark) return@invokeLater
-                appliedDark = dark
+        if (applyingTheme) return
+        // Resolve synchronously so events that arrive together (a prefs commit and the macOS
+        // appearance change it induces) apply in arrival order. A thread-per-event design let the
+        // System-mode `defaults read` subprocesses finish out of order, so a stale read could revert
+        // the theme. Only the Swing mutation is marshaled onto the EDT, where it belongs.
+        val mode = WorkspacePreferences.themeMode
+        val dark = mode.resolvedDark()
+        if (dark == appliedDark) return
+        SwingUtilities.invokeLater {
+            if (dark == appliedDark) return@invokeLater
+            appliedDark = dark
+            applyingTheme = true
+            try {
                 setupLookAndFeel(mode)
                 FlatLaf.updateUI()
                 refreshThemedChrome()
+            } finally {
+                applyingTheme = false
             }
         }
     }

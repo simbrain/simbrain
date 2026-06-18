@@ -21,13 +21,10 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.propertyeditor.wrapperWidget
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Dimension
-import java.awt.FlowLayout
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import javax.swing.*
-import javax.swing.border.EmptyBorder
 import javax.swing.event.ListSelectionListener
 import javax.swing.table.DefaultTableModel
 
@@ -398,13 +395,12 @@ fun NetworkPanel.showClassifierCreationDialog() {
 }
 
 fun NetworkPanel.showUndoHistoryDialog() {
-    val dialog = JDialog(JFrame.getFrames().firstOrNull(), "Undo / Redo History", true).apply {
-        defaultCloseOperation = JDialog.DISPOSE_ON_CLOSE
-        setSize(600, 400)
-        setLocationRelativeTo(this@showUndoHistoryDialog)
-    }
+    buildUndoHistoryDialog().display()
+}
 
-    // Create list models for undo and redo stacks
+fun NetworkPanel.buildUndoHistoryDialog(): StandardDialog {
+    val dialog = StandardDialog(JFrame.getFrames().firstOrNull(), "Undo / Redo History")
+
     val undoListModel = DefaultListModel<String>().apply {
         addAll(undoManager.undoStack.reversed().mapIndexed { index, action ->
             "${index + 1}. ${action.description}"
@@ -417,109 +413,70 @@ fun NetworkPanel.showUndoHistoryDialog() {
         })
     }
 
-    // Create lists for undo and redo stacks
     val undoJList = JList(undoListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
         if (model.size > 0) {
             selectedIndex = 0
         }
-        border = EmptyBorder(5, 5, 5, 5)
     }
 
     val redoJList = JList(redoListModel).apply {
         selectionMode = ListSelectionModel.SINGLE_SELECTION
-        // If nothing is selected in undo list and there is something in redo list, select first entry
-        if(undoJList.selectedIndex == -1) {
-            if (model.size > 0) {
-                selectedIndex = 0
-            }
-        }
-        border = EmptyBorder(5, 5, 5, 5)
-    }
-
-    // Create buttons
-    val closeButton = JButton("Close").apply {
-        addActionListener {
-            dialog.dispose()
+        if (undoJList.selectedIndex == -1 && model.size > 0) {
+            selectedIndex = 0
         }
     }
 
     val goToButton = JButton("Go To Selected Point").apply {
+        isEnabled = undoJList.selectedIndex != -1 || redoJList.selectedIndex != -1
         addActionListener {
             val undoIndex = undoJList.selectedIndex
             val redoIndex = redoJList.selectedIndex
-
             if (undoIndex != -1) {
-                // Go to a point in the undo stack
-                // We need to undo (undoIndex + 1) operations
-                val operationsToUndo = undoIndex + 1
-                this@showUndoHistoryDialog.launch {
-                    repeat(operationsToUndo) {
-                        undoManager.undo()
-                    }
+                this@buildUndoHistoryDialog.launch {
+                    repeat(undoIndex + 1) { undoManager.undo() }
                     dialog.dispose()
                 }
             } else if (redoIndex != -1) {
-                // Go to a point in the redo stack
-                // We need to redo (redoIndex + 1) operations
-                val operationsToRedo = redoIndex + 1
-                this@showUndoHistoryDialog.launch {
-                    repeat(operationsToRedo) {
-                        undoManager.redo()
-                    }
+                this@buildUndoHistoryDialog.launch {
+                    repeat(redoIndex + 1) { undoManager.redo() }
                     dialog.dispose()
                 }
             }
         }
     }
 
-    // Enable the Go To button when an item is selected in either list
     val listSelectionListener = ListSelectionListener { e ->
-        // If a selection is made in one list, clear the selection in the other list
         if (e.source === undoJList && !e.valueIsAdjusting && undoJList.selectedIndex != -1) {
             redoJList.clearSelection()
         } else if (e.source === redoJList && !e.valueIsAdjusting && redoJList.selectedIndex != -1) {
             undoJList.clearSelection()
         }
-
-        // Enable the Go To button if an item is selected in either list
         goToButton.isEnabled = undoJList.selectedIndex != -1 || redoJList.selectedIndex != -1
     }
 
     undoJList.addListSelectionListener(listSelectionListener)
     redoJList.addListSelectionListener(listSelectionListener)
 
-    // Create panels for undo and redo lists with descriptive headers
-    val undoPanel = JPanel(BorderLayout()).apply {
+    val undoPanel = JPanel(BorderLayout(0, Theme.tightGap)).apply {
         add(JLabel("Undo Stack (${undoListModel.size()} items)"), BorderLayout.NORTH)
         add(JScrollPane(undoJList), BorderLayout.CENTER)
-        border = EmptyBorder(5, 5, 5, 5)
     }
 
-    val redoPanel = JPanel(BorderLayout()).apply {
+    val redoPanel = JPanel(BorderLayout(0, Theme.tightGap)).apply {
         add(JLabel("Redo Stack (${redoListModel.size()} items)"), BorderLayout.NORTH)
         add(JScrollPane(redoJList), BorderLayout.CENTER)
-        border = EmptyBorder(5, 5, 5, 5)
     }
 
-    // Create split pane to hold both panels
     val splitPane = JSplitPane(JSplitPane.HORIZONTAL_SPLIT, undoPanel, redoPanel).apply {
-        dividerLocation = 300
         resizeWeight = 0.5
+        preferredSize = Dimension(600, 400)
     }
 
-    // Create button panel
-    val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT)).apply {
-        add(goToButton)
-        add(closeButton)
-    }
-
-    // Add components to dialog
-    dialog.contentPane.layout = BorderLayout()
-    dialog.contentPane.add(splitPane, BorderLayout.CENTER)
-    dialog.contentPane.add(buttonPanel, BorderLayout.SOUTH)
-
-    dialog.isVisible = true
+    dialog.contentPane = splitPane
+    dialog.addButton(goToButton)
+    dialog.setAsDoneDialog()
+    return dialog
 }
 
 fun NetworkPanel.showPriorityTableDialog() {
@@ -567,7 +524,7 @@ fun NetworkPanel.showPriorityTableDialog() {
         setRowSelectionAllowed(true)
         setColumnSelectionAllowed(false)
         setCellSelectionEnabled(true)
-        gridColor = Color.LIGHT_GRAY
+        gridColor = Theme.divider
         autoCreateRowSorter = true
 
         // Custom cell editor for priority column that selects all text on focus

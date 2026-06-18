@@ -37,12 +37,7 @@ class ImagePipelineCollectionGui(
     private val addPipelineButton = JButton(imageWorldDesktopComponent.createAction(
         iconPath = "menu_icons/plus.png",
     ) {
-        val pipelineName = JOptionPane.showInputDialog(
-            imageWorldDesktopComponent,
-            "Enter name for new pipeline:",
-            "Create Pipeline",
-            JOptionPane.PLAIN_MESSAGE
-        )
+        val pipelineName = showInputDialog("Enter name for new pipeline:")
         if (pipelineName != null && pipelineName.isNotBlank()) {
             val newPipeline = ImageProcessingPipeline(pipelineName, imagePipelineCollection.imageSource)
             imagePipelineCollection.addPipeline(newPipeline)
@@ -62,12 +57,7 @@ class ImagePipelineCollectionGui(
     }
     private val deletePipelineButton = JButton(imageWorldDesktopComponent.createAction(iconPath = "menu_icons/minus.png") {
         val currentPipeline = imagePipelineCollection.currentPipeline
-        val dialogResult = JOptionPane.showConfirmDialog(
-            imageWorldDesktopComponent,
-            "Are you sure you want to delete pipeline \"${currentPipeline.name}\"?",
-            "Warning",
-            JOptionPane.YES_NO_OPTION
-        )
+        val dialogResult = showWarningConfirmDialog("Are you sure you want to delete pipeline \"${currentPipeline.name}\"?")
         if (dialogResult == JOptionPane.YES_OPTION) {
             imagePipelineCollection.removePipeline(currentPipeline)
             updateComboBox()

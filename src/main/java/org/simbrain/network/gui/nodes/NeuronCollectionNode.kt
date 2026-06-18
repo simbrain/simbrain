@@ -276,7 +276,7 @@ class NeuronCollectionNode(
 
     private val renameAction = object : AbstractAction("Rename Neuron Collection...") {
         override fun actionPerformed(e: ActionEvent?) {
-            JOptionPane.showInputDialog("Name:", model.label)?.let { model.label = it }
+            showInputDialog("Name:", model.label)?.let { model.label = it }
         }
     }
 

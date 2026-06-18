@@ -1,9 +1,11 @@
 package org.simbrain.util.widgets
 
+import org.simbrain.util.Theme
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainDataFrame
 import java.awt.Color
 import java.awt.Component
+import java.awt.Dimension
 import java.awt.Font
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
@@ -38,7 +40,9 @@ class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, Prope
     init {
         main.addPropertyChangeListener(this)
         main.model.addTableModelListener(this)
-        setGridColor(Color.gray)
+        setShowGrid(true)
+        intercellSpacing = Dimension(1, 1)
+        setGridColor(Theme.divider)
         isFocusable = false
         setAutoCreateColumnsFromModel(false)
         setSelectionModel(main.selectionModel)

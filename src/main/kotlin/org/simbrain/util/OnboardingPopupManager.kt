@@ -392,12 +392,12 @@ private class OnboardingPopup(
         
         // Draw title
         g2.color = Color.BLACK
-        g2.font = g2.font.deriveFont(Font.BOLD, 14f)
+        g2.font = Theme.heading
         g2.drawString(config.title, bounds.x + padding, y + g2.fontMetrics.ascent)
         y += g2.fontMetrics.height + 4
         
         // Draw message
-        g2.font = g2.font.deriveFont(Font.PLAIN, 12f)
+        g2.font = Theme.font(12)
         val metrics = g2.fontMetrics
         val messageLines = wrapText(config.message, bounds.width - padding * 2, metrics)
         
@@ -437,7 +437,7 @@ private class OnboardingPopup(
         
         // Draw text
         g2.color = Color.BLACK
-        g2.font = g2.font.deriveFont(Font.PLAIN, 11f)
+        g2.font = Theme.body
         g2.drawString("Do not show again", checkboxTextBounds.x, checkboxTextBounds.y + 12)
     }
     

@@ -2,6 +2,9 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.randomizeBiases
@@ -11,7 +14,11 @@ import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
+import java.awt.BasicStroke
+import java.awt.Graphics2D
 import java.awt.event.ActionEvent
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Point2D
 import javax.swing.AbstractAction
 import javax.swing.Action
 import javax.swing.JMenu
@@ -28,6 +35,74 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
      */
     protected val activationImage = SimbrainImage().apply {
         mainNode.addChild(this)
+        pickable = true
+        addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseMoved(event: PInputEvent) {
+                val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
+                networkPanel.updateActivationSequenceTrace(activationSequence, row, col)
+            }
+            override fun mouseExited(event: PInputEvent) {
+                networkPanel.clearNeuronArrayTrace()
+            }
+            override fun mousePressed(event: PInputEvent) {
+                if (!event.isAltDown) return
+                val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
+                selectCell(row, col, addToSelection = event.isShiftDown)
+                if (this@ActivationSequenceNode !in networkPanel.selectionManager) {
+                    networkPanel.selectionManager.add(this@ActivationSequenceNode)
+                }
+                event.isHandled = true
+            }
+        })
+    }
+
+    /** Trace highlight set by the activation sequence tracer. */
+    var traceHighlight: SequenceTraceHighlight? = null
+
+    /**
+     * Cells (row = sequence position, col = feature) the user has selected for quick-edit. Empty means no
+     * pixel selection is active; in that case increment/decrement/clear/randomize fall through to
+     * whole-component behavior.
+     */
+    var pixelSelection: Set<Pair<Int, Int>> = emptySet()
+        set(value) {
+            field = value
+            repaint()
+        }
+
+    /** Map a pixel within [activationImage] to a `(position row, feature col)` cell. */
+    private fun pixelToCell(localPt: Point2D): Pair<Int, Int>? {
+        val rows = activationSequence.sequenceSize
+        val cols = activationSequence.size
+        if (rows <= 0 || cols <= 0) return null
+        val row = ((localPt.y / imageSize) * rows).toInt().coerceIn(0, rows - 1)
+        val col = ((localPt.x / imageSize) * cols).toInt().coerceIn(0, cols - 1)
+        return row to col
+    }
+
+    private fun selectCell(row: Int, col: Int, addToSelection: Boolean) {
+        if (row !in 0 until activationSequence.sequenceSize || col !in 0 until activationSequence.size) return
+        val cell = row to col
+        pixelSelection = if (addToSelection) {
+            if (cell in pixelSelection) pixelSelection - cell else pixelSelection + cell
+        } else {
+            setOf(cell)
+        }
+    }
+
+    /**
+     * Collect (row, col) cells whose visual area intersects the given global ellipse.
+     * Used by the wand handler to operate on multiple pixels under the brush.
+     */
+    fun collectCellsInGlobalEllipse(ellipse: Ellipse2D): List<Pair<Int, Int>> {
+        val rows = activationSequence.sequenceSize
+        val cols = activationSequence.size
+        if (rows <= 0 || cols <= 0) return emptyList()
+        val cellW = imageSize / cols
+        val cellH = imageSize / rows
+        return activationImage.cellsIntersectingGlobalEllipse(ellipse, rows, cols, cellW, cellH) { row, col ->
+            row to col
+        }
     }
 
     /**
@@ -87,6 +162,58 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             imageSize, imageSize
         )
         activationImage.addBorder()
+    }
+
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        val g2 = paintContext.graphics
+        traceHighlight?.let { drawSequenceHighlight(g2, it.rows, it.cols, it.color, strokeWidth = 2f) }
+        if (pixelSelection.isNotEmpty()) {
+            drawCellHighlight(g2, pixelSelection, NeuronArrayNode.PIXEL_SELECTION_COLOR, strokeWidth = 3f)
+        }
+    }
+
+    /** Draw full-width row outlines and full-height column outlines for trace highlighting. */
+    private fun drawSequenceHighlight(g2: Graphics2D, rows: Set<Int>, cols: Set<Int>, color: java.awt.Color, strokeWidth: kotlin.Float) {
+        val nRows = activationSequence.sequenceSize
+        val nCols = activationSequence.size
+        if (nRows <= 0 || nCols <= 0) return
+        val cellW = imageSize / nCols
+        val cellH = imageSize / nRows
+        val xOff = activationImage.xOffset
+        val yOff = activationImage.yOffset
+        g2.color = color
+        g2.stroke = BasicStroke(strokeWidth)
+        for (row in rows) {
+            if (row !in 0 until nRows) continue
+            g2.drawRect(xOff.toInt(), (yOff + row * cellH).toInt(), imageSize.toInt(), cellH.toInt().coerceAtLeast(1))
+        }
+        for (col in cols) {
+            if (col !in 0 until nCols) continue
+            g2.drawRect((xOff + col * cellW).toInt(), yOff.toInt(), cellW.toInt().coerceAtLeast(1), imageSize.toInt())
+        }
+    }
+
+    /** Draw a rectangular outline around each selected `(row, col)` cell. */
+    private fun drawCellHighlight(g2: Graphics2D, cells: Set<Pair<Int, Int>>, color: java.awt.Color, strokeWidth: kotlin.Float) {
+        val nRows = activationSequence.sequenceSize
+        val nCols = activationSequence.size
+        if (nRows <= 0 || nCols <= 0) return
+        val cellW = imageSize / nCols
+        val cellH = imageSize / nRows
+        val xOff = activationImage.xOffset
+        val yOff = activationImage.yOffset
+        g2.color = color
+        g2.stroke = BasicStroke(strokeWidth)
+        for ((row, col) in cells) {
+            if (row !in 0 until nRows || col !in 0 until nCols) continue
+            g2.drawRect(
+                (xOff + col * cellW).toInt(),
+                (yOff + row * cellH).toInt(),
+                cellW.toInt().coerceAtLeast(1),
+                cellH.toInt().coerceAtLeast(1)
+            )
+        }
     }
 
     override val contextMenu: JPopupMenu
@@ -173,7 +300,8 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
     override fun createEditDialog(): StandardDialog? = createEditDialog(networkPanel.filterSelectedNodeByClass<ActivationSequenceNode>())
 
-    override val propertyDialog get() = createEditDialog(listOf(this))
+    override val propertyDialog: StandardDialog?
+        get() = if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else createEditDialog(listOf(this))
 
     override val model: ActivationSequence
         get() = activationSequence

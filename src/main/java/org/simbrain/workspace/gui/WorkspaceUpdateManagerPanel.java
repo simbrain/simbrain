@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Theme;
 import org.simbrain.util.UpdateAction;
 import org.simbrain.workspace.Workspace;
 import org.simbrain.workspace.updater.UpdateActionManager.UpdateManagerListener;
@@ -160,7 +161,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         JScrollPane currentListScroll = new JScrollPane(currentActionJList);
         currentListScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        currentListScroll.setViewportBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY));
+        currentListScroll.setViewportBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Theme.getDivider()));
         updateCurrentActionsList();
         add(currentListScroll, BorderLayout.CENTER);
 
@@ -234,7 +235,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         String text = (index + 1) + ": " + action.getDescription();
         JLabel label = new JLabel(text);
         label.setToolTipText(action.getLongDescription());
-        label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+        label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.getDivider()));
         label.setBackground(null);
         setCellColor(label, list, isSelected);
         label.setEnabled(list.isEnabled());

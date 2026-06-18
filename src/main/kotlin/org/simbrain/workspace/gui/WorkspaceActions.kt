@@ -34,7 +34,6 @@ import java.lang.Math.ceil
 import java.lang.Math.sqrt
 import javax.swing.Action
 import javax.swing.JMenu
-import javax.swing.JOptionPane
 
 /**
  * Workspace action manager contains references to all the actions for a Workspace.
@@ -155,7 +154,7 @@ class WorkspaceActions {
         description = "Open workspace coupling manager.",
         coroutineScope = workspace
     ) {
-        DesktopCouplingManager(SimbrainDesktop).displayInDialog {  }
+        DesktopCouplingManager(SimbrainDesktop).displayInDialog(title = "Couplings") {  }
     }
 
     val openCouplingListAction = desktopPane.createAction(
@@ -301,11 +300,7 @@ class WorkspaceActions {
             description = "Rename this component",
             coroutineScope = workspace
         ) {
-            val newTitle: String? = JOptionPane.showInputDialog(
-                null,
-                "Rename component",
-                desktopComponent.title
-            )
+            val newTitle = showInputDialog("Rename component", desktopComponent.title)
             if (newTitle != null) {
                 desktopComponent.title = newTitle
                 workspaceComponent.name = newTitle

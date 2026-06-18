@@ -50,6 +50,12 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     private val touchedModels = mutableSetOf<NetworkModel>()
 
     /**
+     * Tracks pixels (neuron-array / weight-matrix cells) already operated on this drag session,
+     * so a single drag doesn't randomize / increment the same pixel repeatedly.
+     */
+    private val touchedPixels = mutableSetOf<PixelTarget>()
+
+    /**
      * Tracks pending apply jobs so we can await them before finalizing the action.
      */
     private val pendingJobs = mutableListOf<Job>()
@@ -58,6 +64,7 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         super.mousePressed(event)
         undoState = mutableMapOf()
         touchedModels.clear()
+        touchedPixels.clear()
         pendingJobs.clear()
 
         // Notify action that we're starting
@@ -113,6 +120,9 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
                 is SynapseNode -> modifyModel(node.synapse)
             }
         }
+
+        // Apply action to neuron-array / weight-matrix pixels under the cursor
+        networkPanel.pixelsInGlobalEllipse(ellipse).forEach { pixel -> modifyPixel(pixel) }
     }
 
     override fun endDrag(event: PInputEvent?) {
@@ -128,6 +138,19 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         touchedModels.add(model)
         val job = networkPanel.launch(Dispatchers.Swing) {
             wandPalette.selectedAction?.apply(model, networkPanel, undoState)
+        }
+        pendingJobs.add(job)
+    }
+
+    /**
+     * Apply the selected wand action to a single array / matrix pixel.
+     * Skips pixels already operated on in this drag session.
+     */
+    private fun modifyPixel(pixel: PixelTarget) {
+        if (pixel in touchedPixels) return
+        touchedPixels.add(pixel)
+        val job = networkPanel.launch(Dispatchers.Swing) {
+            wandPalette.selectedAction?.applyToPixel(pixel, networkPanel, undoState)
         }
         pendingJobs.add(job)
     }

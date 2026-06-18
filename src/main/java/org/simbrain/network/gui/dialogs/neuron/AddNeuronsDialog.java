@@ -5,6 +5,7 @@ import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.Layout;
 import org.simbrain.util.DetailTrianglePanel;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Theme;
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
@@ -39,7 +40,7 @@ public class AddNeuronsDialog extends StandardDialog {
 
         // Quantity panel
         JPanel quantityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        quantityPanel.setBorder(BorderFactory.createTitledBorder("Quantity"));
+        quantityPanel.setBorder(Theme.sectionBorder("Quantity"));
         quantityPanel.add(new JLabel("Number of Neurons:"));
         quantityPanel.add(numNeurons);
         mainPanel.add(quantityPanel);
@@ -47,13 +48,13 @@ public class AddNeuronsDialog extends StandardDialog {
         // Neuron type panel
         neuronEditor = new AnnotatedPropertyEditor<>(Collections.singletonList(baseNeuron));
         DetailTrianglePanel neuronPanel = new DetailTrianglePanel(neuronEditor, false);
-        neuronPanel.setBorder(BorderFactory.createTitledBorder("Neuron Type"));
+        neuronPanel.setBorder(Theme.sectionBorder("Neuron Type"));
         mainPanel.add(neuronPanel);
 
         // Layout panel
         layoutPanel = new AnnotatedPropertyEditor<>(layoutEditor);
         DetailTrianglePanel layoutDetailPanel = new DetailTrianglePanel(layoutPanel, false);
-        layoutDetailPanel.setBorder(BorderFactory.createTitledBorder("Neuron Layout"));
+        layoutDetailPanel.setBorder(Theme.sectionBorder("Neuron Layout"));
         mainPanel.add(layoutDetailPanel);
 
         setContentPane(new JScrollPane(mainPanel));

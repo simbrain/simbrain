@@ -10,10 +10,10 @@ import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.showInputDialog
 import org.simbrain.util.swingDispatcher
 import java.awt.Color
 import javax.swing.JComponent
-import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
 
 class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: SupervisedModel) : ScreenElement(networkPanel) {
@@ -111,7 +111,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
     private val <T: JComponent> T.renameAction get() = createAction(
         name = "Rename..."
     ) {
-        val newName = JOptionPane.showInputDialog("Name:", supervisedModel.label)
+        val newName = showInputDialog("Name:", supervisedModel.label)
         if (newName != null) {
             supervisedModel.label = newName
         }

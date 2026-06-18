@@ -1,6 +1,6 @@
 package org.simbrain.util.widgets;
 
-import org.simbrain.util.ResourceManager;
+import org.simbrain.util.Icons;
 
 import javax.swing.*;
 import java.awt.*;
@@ -188,31 +188,21 @@ public class DropDownTriangle extends JPanel implements MouseListener {
      */
     private class ClickableTriangle extends JPanel {
 
-        /**
-         * The image icon for the triangle in it's down pointing state.
-         */
-        private final ImageIcon downTriangle = ResourceManager.getRawImageIcon("menu_icons/DownTriangle.png");
+        private static final int TRIANGLE_SIZE = 12;
+
+        private final Icon downTriangle = Icons.sized("menu_icons/DownTriangle.png", TRIANGLE_SIZE);
+        private final Icon leftTriangle = Icons.sized("menu_icons/LeftTriangle.png", TRIANGLE_SIZE);
+        private final Icon rightTriangle = Icons.sized("menu_icons/RightTriangle.png", TRIANGLE_SIZE);
 
         /**
-         * The image icon for the triangle in it's left pointing state.
+         * The triangle shown in the "up" (collapsed) state: points left or right.
          */
-        private final ImageIcon leftTriangle = ResourceManager.getRawImageIcon("menu_icons/LeftTriangle.png");
+        private final Icon upTriangle;
 
         /**
-         * The image icon for the triangle in it's left pointing state.
+         * The currently displayed triangle.
          */
-        private final ImageIcon rightTriangle = ResourceManager.getRawImageIcon("menu_icons/RightTriangle.png");
-
-        /**
-         * The image icon for the triangle in it's "up" pointing state
-         * (Left/Right).
-         */
-        private final ImageIcon upTriangle;
-
-        /**
-         * The currently displayed triangle image.
-         */
-        private Image triangle;
+        private Icon triangle;
 
         /**
          * Construct the triangle
@@ -224,7 +214,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
             else
                 upTriangle = rightTriangle;
 
-            triangle = down ? downTriangle.getImage() : upTriangle.getImage();
+            triangle = down ? downTriangle : upTriangle;
             setSize();
             setLayout(null);
             repaint();
@@ -235,7 +225,7 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          * Sets the size of the panel to fit the triangle image.
          */
         private void setSize() {
-            Dimension size = new Dimension(triangle.getWidth(null), triangle.getHeight(null));
+            Dimension size = new Dimension(triangle.getIconWidth(), triangle.getIconHeight());
             setPreferredSize(size);
             setMaximumSize(size);
             setMinimumSize(size);
@@ -252,16 +242,15 @@ public class DropDownTriangle extends JPanel implements MouseListener {
          *             triangle down.
          */
         public void setState(boolean down) {
-            triangle = down ? downTriangle.getImage() : upTriangle.getImage();
+            triangle = down ? downTriangle : upTriangle;
             setSize();
         }
 
         @Override
         public void paintComponent(Graphics g) {
-            removeAll();
             super.paintComponent(g);
             setSize();
-            g.drawImage(triangle, 0, 0, null);
+            triangle.paintIcon(this, g, 0, 0);
         }
 
     }

@@ -37,7 +37,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
         // Manage stats label
         val trainingStatsLabel = JLabel("---")
         val testingStatsLabel = JLabel("---")
-        layout = MigLayout("fillx")
+        layout = MigLayout("fill, ins 8")
         fun updateStatsLabel() {
             trainingStatsLabel.text = classifier.trainingStats
             testingStatsLabel.text = classifier.testingStats
@@ -81,14 +81,14 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             classifier.testingData = testingDataSetPanel.exportDataSet()
         }
 
-        val trainingPanel = JPanel(MigLayout()).apply {
+        val trainingPanel = JPanel(MigLayout("fill")).apply {
             add(trainingStatsLabel, "wrap")
-            add(trainingDataSetPanel)
+            add(trainingDataSetPanel, "grow, push")
         }
 
-        val testPanel = JPanel(MigLayout()).apply {
+        val testPanel = JPanel(MigLayout("fill")).apply {
             add(testingStatsLabel, "wrap")
-            add(testingDataSetPanel)
+            add(testingDataSetPanel, "grow, push")
         }
 
         val dataSetTabPane = JTabbedPane().apply {
@@ -115,7 +115,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             add(JSeparator(), "growx, span, wrap")
         }
         contentPane.add(trainButton,  "wrap")
-        contentPane.add(dataSetTabPane, "wrap")
+        contentPane.add(dataSetTabPane, "grow, push, wrap")
     }
 }
 

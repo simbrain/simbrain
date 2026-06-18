@@ -22,13 +22,21 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + VK_DOWN) { nudge(0, 1) }
     bind(Shift + VK_LEFT) { nudge(-1, 0) }
     bind(Shift + VK_RIGHT) { nudge(1, 0) }
-    bind(VK_ESCAPE) { selectionManager.clear(); selectionManager.clearAllSource() }
+    bind(VK_ESCAPE) {
+        clearAllPixelSelections()
+        selectionManager.clear()
+        selectionManager.clearAllSource()
+    }
 
     bind(Shift + 'C') { hardClearSelectedObjects() }
     bind(Alt + 'D') { println(network) } // Print debug information
     bind(Shift + 'F') { toggleClamping() }
     bind(CmdOrCtrl + 'E') {
-        selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
+        if (hasAnyPixelSelection()) {
+            createPixelEditDialog()?.display()
+        } else {
+            selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
+        }
     }
     bindTo("G", networkActions.addGroupAction)
     bindTo("S", networkActions.selectionEditModeAction)

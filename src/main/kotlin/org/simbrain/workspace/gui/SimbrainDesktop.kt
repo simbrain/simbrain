@@ -2,10 +2,14 @@ package org.simbrain.workspace.gui
 
 import bsh.Interpreter
 import bsh.util.JConsole
+import com.formdev.flatlaf.FlatLaf
+import org.jfree.chart.ChartPanel
+import org.simbrain.plot.applySimbrainChartTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
+import net.miginfocom.swing.MigLayout
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
@@ -41,6 +45,28 @@ import javax.swing.event.*
  * @author Jeff Yoshimi
  */
 object SimbrainDesktop {
+
+    init {
+        try {
+            if (Utils.isMacOSX()) {
+                System.setProperty("apple.laf.useScreenMenuBar", "true")
+                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
+                System.setProperty("apple.awt.application.name", "Simbrain")
+            }
+            if (Utils.isLinux()) {
+                UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
+            }
+            setupLookAndFeel(WorkspacePreferences.themeMode)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+        // Apply theme changes committed in the Workspace Preferences dialog, and follow the OS
+        // appearance live while in System mode (macOS fires this when system dark mode is toggled).
+        WorkspacePreferences.registerChangeListener { applyThemeIfChanged() }
+        Toolkit.getDefaultToolkit().addPropertyChangeListener("apple.awt.application.appearance") {
+            applyThemeIfChanged()
+        }
+    }
 
     val workspace = Workspace()
 
@@ -179,11 +205,6 @@ object SimbrainDesktop {
     private val timeLabel = JLabel()
 
     /**
-     * "Throbber" to indicate a simulation is running.
-     */
-    private val runningLabel = JLabel()
-
-    /**
      * Update rate for display.
      */
     private var updateRate = 0
@@ -288,7 +309,7 @@ object SimbrainDesktop {
 
         // Set up Desktop
         if (System.getProperty("os.name").lowercase(Locale.getDefault()).contains("windows")) {
-            desktopPane.background = Color.WHITE
+            desktopPane.background = UIManager.getColor("Desktop.background")
             desktopPane.border = BorderFactory.createLoweredBevelBorder()
         }
         desktopPane.addMouseListener(mouseListener)
@@ -447,11 +468,8 @@ object SimbrainDesktop {
                 }
             }
         })
-        runningLabel.icon = ResourceManager.getSmallIcon("menu_icons/Throbber.gif")
-        runningLabel.isVisible = false
         updateTimeLabel()
         bar.add(timeLabel)
-        bar.add(runningLabel)
         return bar
     }
 
@@ -519,6 +537,71 @@ object SimbrainDesktop {
         return viewMenu
     }
 
+    /** The dark/light state currently realized in the Swing UI, to skip no-op re-themes. */
+    private var appliedDark = WorkspacePreferences.themeMode.resolvedDark()
+
+    /** Suppresses the macOS appearance event that applying a FlatLaf theme fires back at us. */
+    private var applyingTheme = false
+
+    /**
+     * Sets the theme [mode] (persisting it) and applies it live if the resolved dark/light actually
+     * changes. Used for programmatic switches; the Workspace Preferences dialog drives the same live
+     * apply through [applyThemeIfChanged] on commit.
+     */
+    fun switchTheme(mode: ThemeMode) {
+        WorkspacePreferences.themeMode = mode
+        applyThemeIfChanged()
+    }
+
+    /**
+     * Re-themes the live Swing UI when the resolved dark/light differs from what is realized:
+     * re-installs the FlatLaf theme, repaints every open window (which also recolors SVG icons via
+     * the live color filter), and re-themes the chrome Swing's own update cannot reach. Fired on a
+     * Workspace Preferences commit and on a macOS OS-appearance change (for System mode). The native
+     * window frame and macOS menu bar are set at launch (Splasher) and update only on restart.
+     */
+    private fun applyThemeIfChanged() {
+        if (applyingTheme) return
+        // Resolve synchronously so events that arrive together (a prefs commit and the macOS
+        // appearance change it induces) apply in arrival order. A thread-per-event design let the
+        // System-mode `defaults read` subprocesses finish out of order, so a stale read could revert
+        // the theme. Only the Swing mutation is marshaled onto the EDT, where it belongs.
+        val mode = WorkspacePreferences.themeMode
+        val dark = mode.resolvedDark()
+        if (dark == appliedDark) return
+        SwingUtilities.invokeLater {
+            if (dark == appliedDark) return@invokeLater
+            appliedDark = dark
+            applyingTheme = true
+            try {
+                setupLookAndFeel(mode)
+                FlatLaf.updateUI()
+                refreshThemedChrome()
+            } finally {
+                applyingTheme = false
+            }
+        }
+    }
+
+    /**
+     * Re-applies theme-derived colors that [FlatLaf.updateUI] leaves stale because they are not
+     * Swing UIResource values: JFreeChart plots bake their chrome at build time, and the desktop
+     * background and table grid colors are set explicitly.
+     */
+    private fun refreshThemedChrome() {
+        desktopPane.background = UIManager.getColor("Desktop.background")
+        fun walk(c: Component) {
+            when (c) {
+                is ChartPanel -> c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
+                is JTable -> c.gridColor = Theme.divider
+            }
+            if (c is Container) c.components.forEach(::walk)
+        }
+        // Every visible chart/table is inside some window — the desktop frame (which holds the
+        // internal frames) plus any dialogs/detached frames — so this reaches them all.
+        Window.getWindows().forEach(::walk)
+    }
+
     private fun createInsertMenu(): JMenu {
         val insertMenu = JMenu("Insert")
         insertMenu.add(actionManager.newNetworkAction)
@@ -575,87 +658,12 @@ object SimbrainDesktop {
      * Show the About dialog with version and build information
      */
     private fun showAboutDialog() {
-        val aboutDialog = JDialog(frame, "About Simbrain", true)
-        aboutDialog.layout = BorderLayout()
-        
-        // Logo at the top
-        val logoPanel = JPanel(FlowLayout(FlowLayout.CENTER))
-        val logoLabel = JLabel()
-        val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
-        logoLabel.icon = ImageIcon(logoImage)
-        logoPanel.add(logoLabel)
-        
-        // Middle section with info
-        val infoPanel = JPanel()
-        infoPanel.layout = BoxLayout(infoPanel, BoxLayout.Y_AXIS)
-        infoPanel.border = BorderFactory.createEmptyBorder(5, 15, 5, 15)
-
-        val titleLabel = JLabel("Simbrain ${BuildInfo.versionName}")
-        titleLabel.font = Font("SansSerif", Font.BOLD, 18)
-        titleLabel.alignmentX = Component.CENTER_ALIGNMENT
-
-        val versionLabel = JLabel(BuildInfo.fullVersionString)
-        versionLabel.font = Font("SansSerif", Font.PLAIN, 14)
-        versionLabel.alignmentX = Component.CENTER_ALIGNMENT
-        
-        // Add build info if available
-        val buildInfoLabel = if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
-            JLabel("Commit: ${BuildInfo.commitSha}").apply {
-                font = Font("SansSerif", Font.PLAIN, 12)
-                alignmentX = Component.CENTER_ALIGNMENT
-                foreground = Color.GRAY
-            }
-        } else null
-
-        val descriptionLabel = JLabel("A framework for neural network simulation")
-        descriptionLabel.alignmentX = Component.CENTER_ALIGNMENT
-        
-        infoPanel.add(Box.createVerticalStrut(10))
-        infoPanel.add(titleLabel)
-        infoPanel.add(Box.createVerticalStrut(5))
-        infoPanel.add(versionLabel)
-        buildInfoLabel?.let {
-            infoPanel.add(Box.createVerticalStrut(3))
-            infoPanel.add(it)
+        buildAboutDialog(frame).apply {
+            isModal = true
+            pack()
+            setLocationRelativeTo(frame)
+            isVisible = true
         }
-        infoPanel.add(Box.createVerticalStrut(10))
-        infoPanel.add(descriptionLabel)
-        infoPanel.add(Box.createVerticalStrut(10))
-
-        // Links
-        val linkPanel = JPanel()
-        linkPanel.layout = BoxLayout(linkPanel, BoxLayout.Y_AXIS)
-        linkPanel.border = BorderFactory.createEmptyBorder(0, 0, 10, 0)
-        
-        val websiteButton = JButton("Visit Simbrain Website")
-        websiteButton.addActionListener { 
-            Utils.displayURLInBrowser("https://simbrain.net")
-        }
-        websiteButton.alignmentX = Component.CENTER_ALIGNMENT
-        
-        val creditsButton = JButton("View Credits")
-        creditsButton.addActionListener { 
-            Utils.displayURLInBrowser("https://simbrain.net/credits/")
-        }
-        creditsButton.alignmentX = Component.CENTER_ALIGNMENT
-        
-        linkPanel.add(websiteButton)
-        linkPanel.add(Box.createVerticalStrut(5))
-        linkPanel.add(creditsButton)
-
-        // Add all components to the dialog
-        val centerPanel = JPanel(BorderLayout())
-        centerPanel.add(logoPanel, BorderLayout.NORTH)
-        centerPanel.add(infoPanel, BorderLayout.CENTER)
-        
-        aboutDialog.add(centerPanel, BorderLayout.CENTER)
-        aboutDialog.add(linkPanel, BorderLayout.SOUTH)
-
-        // Configure dialog
-        aboutDialog.size = Dimension(375, 380)
-        aboutDialog.isResizable = false
-        aboutDialog.setLocationRelativeTo(frame)
-        aboutDialog.isVisible = true
     }
 
     private fun createContextMenu() {
@@ -780,7 +788,6 @@ object SimbrainDesktop {
     fun addDesktopComponent(workspaceComponent: WorkspaceComponent) {
         Logger.trace("Adding workspace component: $workspaceComponent")
         val componentFrame = DesktopInternalFrame(workspaceComponent)
-        // componentFrame.setFrameIcon(new ImageIcon(ResourceManager.getImage("icons/20.png")));
         val desktopComponent = createDesktopComponent(componentFrame, workspaceComponent)
         componentFrame.setGuiComponent(desktopComponent)
 
@@ -1038,15 +1045,7 @@ object SimbrainDesktop {
             e.printStackTrace(PrintWriter(sw))
             e.printStackTrace()
             val stackTrace = sw.toString()
-            val textArea = JTextArea("An error occurred: ${e.message}\n\n$stackTrace").apply {
-                isEditable = false
-                rows = 10
-                columns = 50
-            }
-            val scrollPane = JScrollPane(textArea)
-            SwingUtilities.invokeLater {
-                JOptionPane.showMessageDialog(null, scrollPane, "Uncaught Exception", JOptionPane.ERROR_MESSAGE)
-            }
+            showMessageDialog("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
         }
 
         /*
@@ -1068,19 +1067,15 @@ object SimbrainDesktop {
      * @return the JOptionPane pane result
      */
     private fun showHasChangedDialog(): Int {
-        val options = arrayOf<Any>("Save", "Don't Save", "Cancel")
-        return JOptionPane.showOptionDialog(
-            frame,
+        val options = arrayOf("Save", "Don't Save", "Cancel")
+        return showOptionDialog(
             """
      The workspace has changed since last save,
      Would you like to save these changes?
      """.trimIndent(),
             "Workspace Has Changed",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE,
-            null,
             options,
-            options[0]
+            0
         )
     }
 
@@ -1119,7 +1114,6 @@ object SimbrainDesktop {
         }
         val text = String.format("Timestep: %s (%sHz)", timestep, updateRate)
         timeLabel.text = text
-        runningLabel.isVisible = workspace.updater.isRunning
     }
 
     /**
@@ -1286,24 +1280,38 @@ object SimbrainDesktop {
      */
     @JvmStatic
     fun main(args: Array<String>) {
-        try {
-            // Set macOS-specific properties for menu bar
-            if (Utils.isMacOSX()) {
-                System.setProperty("apple.laf.useScreenMenuBar", "true")
-                System.setProperty("com.apple.mrj.application.apple.menu.about.name", "Simbrain")
-                System.setProperty("apple.awt.application.name", "Simbrain")
-            }
-            
-            // Line below for Ubuntu so that icons don't turn on by default
-            // See https://stackoverflow.com/questions/10356725/jdesktoppane-has-a-toolbar-at-bottom-of-window-on-linux
-            if (Utils.isLinux()) {
-                UIManager.put("DesktopPaneUI", "javax.swing.plaf.basic.BasicDesktopPaneUI")
-            }
-            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName())
-        } catch (e: Exception) {
-            e.printStackTrace()
-        }
-
         SwingUtilities.invokeLater { createAndShowGUI() }
+    }
+}
+
+/**
+ * Build the About dialog (logo, version/build info, website/credits links) on a [StandardDialog].
+ */
+fun buildAboutDialog(parent: Window?): StandardDialog {
+    val logoImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
+
+    val content = JPanel(MigLayout("wrap 1, insets 0", "[grow,center]")).apply {
+        add(JLabel(ImageIcon(logoImage)))
+        add(JLabel("Simbrain ${BuildInfo.versionName}").apply { font = Theme.font(18, Font.BOLD) }, "gaptop ${Theme.sectionGap}")
+        add(JLabel(BuildInfo.fullVersionString).apply { font = Theme.font(14) }, "gaptop ${Theme.tightGap}")
+        if (BuildInfo.buildNumber != "dev" && BuildInfo.commitSha != "unknown") {
+            add(JLabel("Commit: ${BuildInfo.commitSha}").apply {
+                font = Theme.font(12)
+                foreground = Theme.mutedText
+            }, "gaptop ${Theme.tightGap}")
+        }
+        add(JLabel("A framework for neural network simulation"), "gaptop ${Theme.sectionGap}")
+    }
+
+    return StandardDialog(parent, "About Simbrain").apply {
+        contentPane = content
+        addButton(JButton("Visit Simbrain Website").apply {
+            addActionListener { Utils.displayURLInBrowser("https://simbrain.net") }
+        })
+        addButton(JButton("View Credits").apply {
+            addActionListener { Utils.displayURLInBrowser("https://simbrain.net/credits/") }
+        })
+        setAsDoneDialog()
+        isResizable = false
     }
 }

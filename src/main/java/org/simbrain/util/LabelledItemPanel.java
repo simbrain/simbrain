@@ -42,8 +42,11 @@ public class LabelledItemPanel extends JPanel {
         // fillx (not fill): the grid fills horizontally so the field column can grow,
         // but takes only its preferred height and stays top-anchored when the panel is
         // taller than its content (e.g. inside a tall scroll pane or tab).
+        // hidemode 3: a conditionally hidden widget (APE visibility rules) is disregarded
+        // entirely so its row collapses, instead of reserving empty space for the union of
+        // every possible field (which made conditional dialogs grow far too tall).
         setLayout(new MigLayout(
-            "fillx, aligny top, insets " + Theme.dialogInsetVertical + " " + Theme.dialogInsetHorizontal
+            "hidemode 3, fillx, aligny top, insets " + Theme.dialogInsetVertical + " " + Theme.dialogInsetHorizontal
                 + " " + Theme.dialogInsetVertical + " " + Theme.dialogInsetHorizontal,
             "[]" + Theme.componentGap + "[grow, fill]"
         ));

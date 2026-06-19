@@ -195,16 +195,10 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         val trainingErrorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
         val trainingErrorLabel = labelPanel.addItem("Training ${errorDescriptionString()}", trainingErrorValue)
-        
-        val testingErrorValue = JLabel("N/A")
-        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
-        
-        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
-        
-        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
+        // Effective Step Size is always shown, so keep it grouped with the other always-visible
+        // rows (Iterations, Training Error) instead of after the conditional testing/accuracy rows,
+        // which would leave it detached from the text above when those are hidden.
         fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
         val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
             toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
@@ -212,6 +206,15 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                 "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
         }
         labelPanel.addItem("Effective Step Size:", stepSizeValue)
+
+        val testingErrorValue = JLabel("N/A")
+        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
+
+        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
+
+        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
         fun updateLabelVisibility() {
             val showTestingLoss = supervisedNetwork.trainerConfig.testConfiguration.enabled

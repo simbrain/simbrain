@@ -45,11 +45,15 @@ public class AddNeuronsDialog extends StandardDialog {
         quantityPanel.add(numNeurons);
         mainPanel.add(quantityPanel);
 
+        mainPanel.add(Box.createVerticalStrut(Theme.sectionGap));
+
         // Neuron type panel
         neuronEditor = new AnnotatedPropertyEditor<>(Collections.singletonList(baseNeuron));
         DetailTrianglePanel neuronPanel = new DetailTrianglePanel(neuronEditor, false);
         neuronPanel.setBorder(Theme.sectionBorder("Neuron Type"));
         mainPanel.add(neuronPanel);
+
+        mainPanel.add(Box.createVerticalStrut(Theme.sectionGap));
 
         // Layout panel
         layoutPanel = new AnnotatedPropertyEditor<>(layoutEditor);
@@ -57,7 +61,11 @@ public class AddNeuronsDialog extends StandardDialog {
         layoutDetailPanel.setBorder(Theme.sectionBorder("Neuron Layout"));
         mainPanel.add(layoutDetailPanel);
 
-        setContentPane(new JScrollPane(mainPanel));
+        // The dialog already supplies its own margin (Theme.dialogBorder), so let the scroll
+        // pane be borderless rather than drawing a redundant box around the sections.
+        JScrollPane scrollPane = new JScrollPane(mainPanel);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder());
+        setContentPane(scrollPane);
     }
 
     @Override

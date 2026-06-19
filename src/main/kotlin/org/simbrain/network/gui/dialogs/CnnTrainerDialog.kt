@@ -239,6 +239,17 @@ class CnnTrainerControls(
         fun lossDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
         val trainingLossLabel = labelPanel.addItem("Training ${lossDescriptionString()}", trainingLossValue)
 
+        // Effective Step Size is always shown, so keep it grouped with the other always-visible
+        // rows (Iterations, Training Loss) instead of after the conditional testing/accuracy rows,
+        // which would leave it detached from the text above when those are hidden.
+        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
+        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
+            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
+                "For Adam in steady state ≈ learning rate. " +
+                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
+        }
+        labelPanel.addItem("Effective Step Size:", stepSizeValue)
+
         val testingLossValue = JLabel("N/A")
         val testingLossLabel = labelPanel.addItem("Testing ${lossDescriptionString()}", testingLossValue)
 
@@ -247,14 +258,6 @@ class CnnTrainerControls(
 
         val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
-
-        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
-        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
-            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
-                "For Adam in steady state ≈ learning rate. " +
-                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
-        }
-        labelPanel.addItem("Effective Step Size:", stepSizeValue)
 
         fun updateLabelVisibility() {
             val showTestingLoss = trainer.config.testConfiguration.enabled

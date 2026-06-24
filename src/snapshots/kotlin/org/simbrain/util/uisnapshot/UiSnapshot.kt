@@ -7,15 +7,12 @@ import org.simbrain.util.installSimbrainFlatLafDefaults
 import org.simbrain.util.installSimbrainSvgIconColors
 import java.awt.Component
 import java.awt.Container
+import java.awt.Desktop
 import java.awt.Window
 import java.awt.image.BufferedImage
 import java.io.File
 import javax.imageio.ImageIO
-import javax.swing.JComponent
-import javax.swing.JDialog
-import javax.swing.JTabbedPane
-import javax.swing.RootPaneContainer
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 /**
  * A single screenshot target. Implement this with a no-arg constructor and pass the FQCN
@@ -82,6 +79,8 @@ fun main(args: Array<String>) {
     val fqcn = args.firstOrNull()
         ?: error("Pass FQCN of a UiSnapshotDef class as the first argument")
     val themeName = args.getOrNull(1) ?: "light"
+    val scale = args.getOrNull(2)?.toDoubleOrNull()?.coerceIn(1.0, 4.0) ?: 1.0
+    val openAfterRun = args.getOrNull(3)?.toBooleanStrictOrNull() ?: false
 
     setupTheme(themeName)
 
@@ -126,18 +125,33 @@ fun main(args: Array<String>) {
     // Drain pending EDT tasks (component listeners may have queued layout/zoom work).
     SwingUtilities.invokeAndWait { }
 
+    lateinit var outFile: File
     SwingUtilities.invokeAndWait {
         val w = target.width.coerceAtLeast(1)
         val h = target.height.coerceAtLeast(1)
-        val img = BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB)
+        val outW = (w * scale).toInt().coerceAtLeast(1)
+        val outH = (h * scale).toInt().coerceAtLeast(1)
+        val img = BufferedImage(outW, outH, BufferedImage.TYPE_INT_ARGB)
         val g = img.createGraphics()
+        if (scale != 1.0) {
+            g.scale(scale, scale)
+        }
         target.paint(g)
         g.dispose()
 
         val outDir = File("build/ui-snapshots").apply { mkdirs() }
-        val outFile = File(outDir, "${def.name}.png")
+        val suffix = if (scale == 1.0) "" else "@${scale.toInt()}x"
+        outFile = File(outDir, "${def.name}${suffix}.png")
         ImageIO.write(img, "PNG", outFile)
-        println("Wrote ${outFile.absolutePath} (${w}x${h})")
+        println("Wrote ${outFile.absolutePath} (${outW}x${outH}, scale=$scale)")
+    }
+
+    if (openAfterRun) {
+        if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
+            Desktop.getDesktop().open(outFile)
+        } else {
+            System.err.println("Could not open ${outFile.absolutePath}: desktop integration is unavailable")
+        }
     }
 
     System.exit(0)

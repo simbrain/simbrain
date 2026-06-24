@@ -251,14 +251,16 @@ sourceSets {
 }
 
 // Sample invocation:
-// ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ImagePipelineDialogSnapshot [-Ptheme=light|dark]
+// ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ImagePipelineDialogSnapshot [-Ptheme=light|dark] [-Pscale=2] [-Popen=true]
 tasks.register<JavaExec>("uiSnapshot") {
     jvmArgs(simbrainJvmArgs)
     classpath = sourceSets["snapshots"].runtimeClasspath
     mainClass.set("org.simbrain.util.uisnapshot.UiSnapshotKt")
     if (project.hasProperty("snapshotDef")) {
         val theme = project.findProperty("theme") as String? ?: "light"
-        args(project.property("snapshotDef") as String, theme)
+        val scale = project.findProperty("scale") as String? ?: "1"
+        val open = project.findProperty("open") as String? ?: "false"
+        args(project.property("snapshotDef") as String, theme, scale, open)
     }
 }
 

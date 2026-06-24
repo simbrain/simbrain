@@ -116,6 +116,11 @@ class ConvolutionalNeuralNetwork(
         }
     }
 
+    // Deleting any pipeline component asynchronously self-deletes the whole CNN (see the deleted-listener
+    // in init), a cascade undo cannot reconstruct. So the entire pipeline is protected: it can only be
+    // removed by deleting the whole subnetwork.
+    override val protectedChildModels: List<NetworkModel> get() = modelList.all
+
     context(Network)
     override fun update() {
         // Forward through CNN tensor stages (TensorConnector.propagate + Tensor.update)

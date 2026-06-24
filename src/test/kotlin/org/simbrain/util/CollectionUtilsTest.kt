@@ -5,7 +5,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.util.geneticalgorithm.toProbabilityWeight
 
 class CollectionUtilsTest {
 
@@ -119,6 +118,17 @@ class CollectionUtilsTest {
         assertNull(map.getImmediately("a"))
         // This one waits
         assertEquals(42, map.get("a"))
+    }
+
+    @Test
+    fun `getImmediately returns null on a pending value instead of throwing`() = runBlocking {
+        val map = CompletableDeferredHashMap<String, Int>(immediateTimeoutMillis = 50)
+        // A pending get() leaves a not-yet-completed deferred under the key.
+        val getter = launch { runCatching { map.get<Int>("a") } }
+        delay(20)
+        // getImmediately must report absence (null), not throw a TimeoutCancellationException.
+        assertNull(map.getImmediately<Int>("a"))
+        getter.cancel()
     }
 
 

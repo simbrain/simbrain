@@ -32,8 +32,11 @@ import java.awt.event.KeyEvent
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import javax.swing.*
+import javax.swing.AbstractAction
 import javax.swing.Action.SHORT_DESCRIPTION
+import javax.swing.JCheckBoxMenuItem
+import javax.swing.JLabel
+import javax.swing.JPanel
 
 class NetworkActions(val networkPanel: NetworkPanel) {
     // For testing purposes only
@@ -856,7 +859,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (groupsAboveThreshold.isNotEmpty()) {
             showWarningDialog("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}")
         }
-        groupsBelowThreshold.forEach { it.displaySynapses = !it.displaySynapses }
+        // A manual toggle pins visibility: stop auto-tracking the threshold so the user's choice sticks.
+        groupsBelowThreshold.forEach {
+            it.autoVisibility = false
+            it.displaySynapses = !it.displaySynapses
+        }
     }
 
     /**

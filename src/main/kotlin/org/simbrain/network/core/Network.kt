@@ -397,13 +397,17 @@ class Network: CoroutineScope, EditableObject {
                         if (parent is NeuronCollection || parent is SupervisedModel) {
                             addAll(model.delete())
                         }
+                        // The parent itself was deleted; drop all of its now-orphaned children from the map.
+                        childToParentMap.entries.filter { it.value == parent }.map { it.key }.forEach {
+                            childToParentMap.remove(it)
+                        }
                     }
                 } else {
                     addAll(model.delete())
-                }
-                // Remove all children of deleted parents from the map
-                childToParentMap.entries.filter { it.value == parent }.map { it.key }.forEach {
-                    childToParentMap.remove(it)
+                    // Only this child was deleted and its parent survives. Drop just this child; surviving
+                    // siblings must stay mapped, or a later operation's undo snapshot (which reads this map)
+                    // would treat them as parentless and restore them ungrouped.
+                    childToParentMap.remove(model)
                 }
             }
 

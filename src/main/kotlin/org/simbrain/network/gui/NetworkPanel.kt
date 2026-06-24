@@ -370,39 +370,31 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
-        suspend fun createNodes(synapseList: List<Synapse>) {
-            if (synapseList.size < NetworkPreferences.synapseVisibilityThreshold) {
-                synapseList.forEach {
-                    createNode(it)
+        // Loose individual synapse nodes and the collapsed arrow are mutually exclusive, both driven by
+        // synapseGroup.displaySynapses (the single source of truth, kept in sync with the visibility
+        // threshold by SynapseGroup.refreshVisibility). Expanded -> every group synapse has a node;
+        // collapsed -> the arrow stands in, so its loose nodes are removed.
+        suspend fun reconcileLooseSynapseNodes() {
+            val groupSynapses = synapseGroup.synapses.toSet()
+            val groupSynapseNodes = filterScreenElements<SynapseNode>().filter { it.synapse in groupSynapses }
+            if (synapseGroup.displaySynapses) {
+                val withNodes = groupSynapseNodes.map { it.synapse }.toSet()
+                groupSynapses.filter { it !in withNodes }.forEach { synapse ->
+                    createNode(synapse)
+                    // Group synapses follow displaySynapses, not the free-weight visibility that
+                    // createNode(synapse) applies.
+                    synapse.isVisible = synapseGroup.displaySynapses
+                }
+            } else {
+                groupSynapseNodes.forEach {
+                    canvas.layer.removeChild(it)
+                    modelNodeMap.remove(it.model)
                 }
             }
         }
-        createNodes(synapseGroup.synapses)
-        synapseGroup.events.synapseListChanged.on(Dispatchers.Default) {
-            // Clean up orphaned SynapseNodes that belong to this SynapseGroup but no longer have valid synapses
-            val currentSynapses = synapseGroup.synapses.toList() // Snapshot to avoid concurrent modification
-            val allSynapseNodes = filterScreenElements<SynapseNode>()
-            val orphanedNodes = allSynapseNodes.filter { synapseNode ->
-                // Only consider SynapseNodes whose synapses were originally from this SynapseGroup
-                // and check if the synapse is still valid in the network
-                val synapse = synapseNode.synapse
-                val sourceNeuron = synapse.source
-                val targetNeuron = synapse.target
-                
-                // Check if this synapse belongs to this SynapseGroup's neurons
-                val belongsToThisGroup = (sourceNeuron in synapseGroup.source.neuronList && 
-                                         targetNeuron in synapseGroup.target.neuronList)
-                
-                // If it belongs to this group, check if it's still a valid connection
-                belongsToThisGroup && !currentSynapses.contains(synapse)
-            }
-            orphanedNodes.forEach { orphanedNode ->
-                canvas.layer.removeChild(orphanedNode)
-                modelNodeMap.remove(orphanedNode.model)
-            }
-            // Create nodes for current synapses 
-            createNodes(currentSynapses)
-        }
+        reconcileLooseSynapseNodes()
+        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
         SynapseGroupNode(this, synapseGroup)
     }
 
@@ -457,8 +449,33 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun deleteSelectedObjects() {
 
-        val selectedModels = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
+        // A subnetwork's neuron collection is structural and cannot be dismantled piecemeal: ungrouping
+        // it (deleting the collection) or emptying it (deleting all of its neurons) would leave a
+        // degenerate subnetwork that the undo machinery cannot reconstruct. Such models are protected;
+        // the whole subnetwork can still be deleted via its interaction box, and a collection can still
+        // be resized by deleting some (not all) of its neurons. See [subnetworkProtectedModels].
+        val allSelected = selectionManager.selection.map { it.model }.sortedBy { updatingOrder(it) }
+        val protected = network.subnetworkProtectedModels(allSelected)
+        val selectedModels = allSelected.filter { it !in protected }
 
+        if (selectedModels.isEmpty()) {
+            if (protected.isNotEmpty()) {
+                withContext(Dispatchers.Swing) {
+                    showWarningDialog(
+                        "These are structural parts of a subnetwork and cannot be deleted individually, " +
+                            "as that would leave the subnetwork in a state the undo system cannot " +
+                            "reconstruct. Delete the whole subnetwork instead (via its interaction box).",
+                        "Cannot delete subnetwork components"
+                    )
+                }
+            }
+            return
+        }
+
+        // Emptying a free container that self-deletes (a NeuronCollection when its last neuron goes, a
+        // SynapseGroup when its last synapse goes) needs no special handling here: Network.deleteModels
+        // captures it — the last member hits the isLastChildOfParent branch, which deletes and returns the
+        // container — so undo restores the container and its grouping.
         val undeleteContext = UndeleteContext(this, selectedModels)
 
         val deletedModels = network.deleteModels(selectedModels.reversed())
@@ -990,4 +1007,51 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
+}
+
+/**
+ * The subset of [selection] that may not be deleted because doing so would dismantle a composite model
+ * (a [Subnetwork] or a [SupervisedModel] overlay) in a way the undo machinery cannot reconstruct.
+ *
+ * Three things are protected:
+ *  - A structural [NeuronCollection] (owned by a subnetwork's [Subnetwork.modelList], or used as a layer
+ *    of a supervised overlay). Deleting it would ungroup it (leaving loose neurons); emptying it (deleting
+ *    all of its neurons) destroys the collection and cascades, via asynchronous listeners, to the whole
+ *    composite — a cascade deleteModels does not capture. Both the collection and (when its full neuron
+ *    set is selected) all of its neurons are protected.
+ *  - Any model a subnetwork declares essential via [Subnetwork.protectedChildModels] (e.g. a CNN's whole
+ *    pipeline, where deleting any one component asynchronously self-deletes the network).
+ *
+ * Ownership is read from live container membership ([Subnetwork.modelList] / [SupervisedModel.layers])
+ * rather than [Network.childToParentMap], because deleting any child wipes that subnetwork's entries from
+ * the map (see [Network.deleteModels]) — so a map-based check would stop protecting after a single prior
+ * deletion. A free (top-level) collection that is not a composite's layer is never protected and stays
+ * freely ungroupable; deleting only some of a collection's neurons (a resize) is likewise allowed.
+ */
+fun Network.subnetworkProtectedModels(selection: Collection<NetworkModel>): Set<NetworkModel> {
+    val selectionSet = selection.toSet()
+    val structuralCollections = buildList {
+        fun collect(subnet: Subnetwork) {
+            addAll(subnet.modelList.all.filterIsInstance<NeuronCollection>())
+            subnet.modelList.all.filterIsInstance<Subnetwork>().forEach { collect(it) }
+        }
+        getModels<Subnetwork>().forEach { collect(it) }
+        getModels<SupervisedModel>().forEach { addAll(it.layers.filterIsInstance<NeuronCollection>()) }
+    }
+    val protectedChildren = buildList {
+        fun collect(subnet: Subnetwork) {
+            addAll(subnet.protectedChildModels)
+            subnet.modelList.all.filterIsInstance<Subnetwork>().forEach { collect(it) }
+        }
+        getModels<Subnetwork>().forEach { collect(it) }
+    }
+    return buildSet {
+        for (collection in structuralCollections) {
+            if (collection in selectionSet) add(collection)
+            if (collection.neuronList.isNotEmpty() && selectionSet.containsAll(collection.neuronList)) {
+                addAll(collection.neuronList)
+            }
+        }
+        addAll(protectedChildren.filter { it in selectionSet })
+    }
 }

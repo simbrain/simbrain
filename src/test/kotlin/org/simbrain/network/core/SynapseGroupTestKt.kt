@@ -478,4 +478,20 @@ class SynapseGroupTestKt {
         assertEquals(1.0, groupSynapse.strength, 0.001)
     }
 
+    @Test
+    fun `refreshVisibility honors a manual override but otherwise tracks the threshold`() {
+        val sg = SynapseGroup(sourceGroup, targetGroup) // 1x2 = 2 synapses, below the visibility threshold
+
+        // Manually pin it collapsed; auto-recompute must not override that.
+        sg.autoVisibility = false
+        sg.displaySynapses = false
+        sg.refreshVisibility()
+        assertFalse(sg.displaySynapses, "a manually pinned visibility must not be overwritten by refreshVisibility")
+
+        // With auto-tracking on, a below-threshold group expands.
+        sg.autoVisibility = true
+        sg.refreshVisibility()
+        assertTrue(sg.displaySynapses, "with autoVisibility, a below-threshold group auto-expands")
+    }
+
 }

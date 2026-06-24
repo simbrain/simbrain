@@ -6,7 +6,6 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.UndoManager.UndoableAction
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
@@ -103,7 +102,18 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
 
     private val modelsToDelete = modelsToDelete.sortedBy { updatingOrder(it) }
 
-    private val subnetworks = this.modelsToDelete.filterIsInstance<Subnetwork>()
+    // Snapshot the parent maps of every subnetwork in the network, not just the ones being deleted.
+    // Deleting a single internal child (e.g. one neuron in a subnetwork's NeuronCollection, or one
+    // synapse in its SynapseGroup) records the child->container link only in that subnetwork's own
+    // childToParentMap. If that map is not snapshotted, restore cannot find the child's parent, treats
+    // it as a free top-level model, and re-adds it incorrectly (which also deadlocks node creation).
+    private val subnetworks: List<Subnetwork> = buildList {
+        fun collect(subnet: Subnetwork) {
+            add(subnet)
+            subnet.modelList.all.filterIsInstance<Subnetwork>().forEach { collect(it) }
+        }
+        network.getModels<Subnetwork>().forEach { collect(it) }
+    }
 
     // Snapshot of deleted objects and their relationships, which can be used to reconstruct a
     // prior state of the network
@@ -124,9 +134,10 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 (model as? Neuron)?.let { neuron ->
                     network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
                     parent.neuronList.add(neuron)
-                    // If the node exists, create neuron nodes for the children and re-add them
-                    modelNodeMap.getImmediately<NeuronCollectionNode>(parent)?.let { collectionNode ->
-                        val neuronNode = modelNodeMap.getImmediately<NeuronNode>(neuron) ?: createNode(neuron)
+                    // The awaited addNetworkModel above already created the neuron's node, so a non-blocking
+                    // peek finds it; recreate only if it is somehow absent. Attach to the collection node.
+                    (modelNodeMap.peek(parent) as? NeuronCollectionNode)?.let { collectionNode ->
+                        val neuronNode = (modelNodeMap.peek(neuron) as? NeuronNode) ?: createNode(neuron)
                         collectionNode.addNeuronNodes(listOf(neuronNode))
                     }
                 }
@@ -135,20 +146,21 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
                     parent.synapses.add(synapse)
-                    // Recreate a free SynapseNode only when the group actually shows individual synapses
-                    // (below the visibility threshold, mirroring createNode(SynapseGroup)) AND its node and
-                    // both endpoint nodes are already live. Gating with non-blocking peeks avoids two
-                    // hazards during a full-subnetwork redo: a stale group node left by an in-flight async
-                    // removal must not spawn synapse nodes (the group rebuilds via createNode(subnetwork)),
-                    // and createNode(synapse) must never block on an endpoint that is only recreated later
-                    // in this same restore.
-                    val belowThreshold = parent.synapses.size < NetworkPreferences.synapseVisibilityThreshold
-                    if (belowThreshold &&
+                    // Restoring synapses changes the group's size; recompute its expanded/collapsed state.
+                    // A flip to collapsed fires visibilityChanged, whose reconcile removes any loose nodes.
+                    parent.refreshVisibility()
+                    // Recreate a loose SynapseNode only when the group is expanded AND its node and both
+                    // endpoint nodes are already live. Gating with non-blocking peeks avoids two hazards
+                    // during a full-subnetwork redo: a stale group node left by an in-flight async removal
+                    // must not spawn synapse nodes (the group rebuilds via createNode(subnetwork)), and
+                    // createNode(synapse) must never block on an endpoint recreated later in this restore.
+                    if (parent.displaySynapses &&
                         modelNodeMap.peek(parent) != null &&
                         modelNodeMap.peek(synapse.source) != null &&
                         modelNodeMap.peek(synapse.target) != null
                     ) {
                         createNode(synapse)
+                        synapse.isVisible = parent.displaySynapses
                     }
                 }
             }
@@ -160,22 +172,53 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 // collections (and their update logic and node grouping) work after redo. The
                 // collection's own per-neuron deletion listener persists, so a plain add (rather
                 // than addNeuron) avoids registering a duplicate listener.
-                if (model is Neuron) {
-                    (parent.childToParentMap[model] as? NeuronCollection)?.let { collection ->
-                        if (model !in collection.neuronList) collection.neuronList.add(model)
-                    }
+                val collection = (model as? Neuron)?.let { parent.childToParentMap[it] as? NeuronCollection }
+                if (collection != null && model !in collection.neuronList) {
+                    collection.neuronList.add(model)
                 }
-                modelNodeMap.getImmediately<SubnetworkNode>(parent)?.let { subnetworkNode ->
-                    modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
-                        subnetworkNode.addNode(screenElement)
+                // Re-create the node if its asynchronous, debounced removal already landed (getImmediately
+                // returns null once it has), then attach it to the right container node. Without this a
+                // restored internal model (e.g. a neuron array in a feedforward) comes back as a model but
+                // stays invisible on the canvas. createNode for these layer/connector/neuron types does not
+                // await any other node, so re-creating them here cannot deadlock; for any other type fall
+                // back to re-attaching an already-live node, never blocking on an endpoint that is only
+                // re-created later in this same restore.
+                if (collection != null) {
+                    modelNodeMap.getImmediately<NeuronCollectionNode>(collection)?.let { collectionNode ->
+                        val neuronNode = modelNodeMap.getImmediately<NeuronNode>(model) ?: createNode(model as Neuron)
+                        collectionNode.addNeuronNodes(listOf(neuronNode))
+                    }
+                } else {
+                    // Non-blocking peeks: restore must not stall up to 1s awaiting a pending node. The
+                    // subnetwork node is already live for a surviving subnetwork (skip the attach if not),
+                    // and the model's own node was removed on delete, so peek returns null and we recreate
+                    // it below (createNode also completes any pending waiter on that model's node).
+                    (modelNodeMap.peek(parent) as? SubnetworkNode)?.let { subnetworkNode ->
+                        val screenElement = modelNodeMap.peek(model) ?: when (model) {
+                            is NeuronArray -> createNode(model)
+                            is NeuronCollection -> createNode(model)
+                            is TensorLayer -> createNode(model)
+                            is TensorConnector -> createNode(model)
+                            is FlattenConnector -> createNode(model)
+                            is Connector -> createNode(model)
+                            // A SynapseGroup restored into a surviving subnetwork has live endpoint
+                            // collections, so createNode(SynapseGroup) (which below the visibility
+                            // threshold builds its synapse nodes) does not block on a recreated endpoint.
+                            is SynapseGroup -> createNode(model)
+                            else -> null
+                        }
+                        screenElement?.let { subnetworkNode.addNode(it) }
                     }
                 }
             }
 
             is SupervisedModel -> {
                 network.addNetworkModel(model, usePlacementManager = false, useAutoAssignedId = false)
-                modelNodeMap.getImmediately<SupervisedModelNode>(parent)?.let { supervisedModelNode ->
-                    modelNodeMap.getImmediately<ScreenElement>(model)?.let { screenElement ->
+                // Non-blocking: the overlay's own node is (re)built later in this restore via
+                // createNode(SupervisedModel), which re-attaches its layer/matrix nodes; this best-effort
+                // attach only matters when that node already exists, so peek-and-skip is correct.
+                (modelNodeMap.peek(parent) as? SupervisedModelNode)?.let { supervisedModelNode ->
+                    modelNodeMap.peek(model)?.let { screenElement ->
                         supervisedModelNode.addNode(screenElement)
                     }
                 }
@@ -186,6 +229,9 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     private fun hasNoParent(model: NetworkModel): Boolean {
         return childToParentMaps.none { it.containsKey(model) }
     }
+
+    private fun immediateParent(model: NetworkModel): NetworkModel? =
+        childToParentMaps.firstNotNullOfOrNull { it[model] }
 
     context(NetworkPanel)
     suspend fun restore(deletedModels: List<NetworkModel>) {
@@ -210,8 +256,16 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             usePlacementManager = false,
             useAutoAssignedId = false
         ).awaitAll()
-        // Call afterRestore on all models to finalize recreation as needed
-        modelsToReAdd.filter { hasNoParent(it) }.forEach { it.afterRestore() }
+        // Finalize recreation. afterRestore re-establishes a model's external links (a Connector
+        // re-registers with its endpoint layers, a Synapse with its neurons' fan-in/out, a SynapseGroup
+        // with its layers, etc.). Call it on every restored model whose parent is NOT itself being
+        // restored: parentless models, and models re-added into a container that survived the deletion
+        // (e.g. one weight matrix put back into an existing subnetwork). Children whose parent is also
+        // restored are finalized by that parent's afterRestore (Subnetwork/SupervisedModel recurse), so
+        // they are skipped here to avoid double-registration (afterRestore is not idempotent).
+        modelsToReAdd
+            .filter { val parent = immediateParent(it); parent == null || parent !in modelsToReAdd }
+            .forEach { it.afterRestore() }
     }
 
 }

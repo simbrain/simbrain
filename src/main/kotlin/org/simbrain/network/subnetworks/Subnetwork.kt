@@ -33,6 +33,16 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
 
     /**
+     * Child models that may not be deleted individually because doing so would dismantle this subnetwork.
+     * The GUI delete path ([org.simbrain.network.gui.subnetworkProtectedModels]) refuses to delete any of
+     * these; the whole subnetwork must be deleted instead. Default is empty (children are freely
+     * deletable). Override for subnetworks whose internal components cannot be removed piecemeal — e.g. a
+     * monolithic pipeline whose any-child deletion asynchronously cascades to destroy the whole network,
+     * a cascade undo cannot reconstruct.
+     */
+    open val protectedChildModels: List<NetworkModel> get() = emptyList()
+
+    /**
      * Whether the GUI should display neuron collections contained in this subnetwork. This will usually be true, but in
      * cases where a subnetwork has just one neuron collection it is redundant to display both. So this flag indicates to the
      * GUI that neuron collections in this subnetwork need not be displayed.

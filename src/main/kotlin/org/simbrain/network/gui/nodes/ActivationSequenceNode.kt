@@ -15,6 +15,7 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import java.awt.BasicStroke
+import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.event.ActionEvent
 import java.awt.geom.Ellipse2D
@@ -171,10 +172,19 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
         if (pixelSelection.isNotEmpty()) {
             drawCellHighlight(g2, pixelSelection, NeuronArrayNode.PIXEL_SELECTION_COLOR, strokeWidth = 3f)
         }
+        val highlightedRows = activationSequence.highlightedRows
+        if (highlightedRows.isNotEmpty()) {
+            drawSequenceHighlight(g2, highlightedRows, emptySet(), ROW_HIGHLIGHT_COLOR, strokeWidth = 1.5f)
+        }
+    }
+
+    companion object {
+        /** Outline color for programmatic row highlights (e.g. the current-token row in a language model). */
+        val ROW_HIGHLIGHT_COLOR: Color = Color(0, 200, 255, 160)
     }
 
     /** Draw full-width row outlines and full-height column outlines for trace highlighting. */
-    private fun drawSequenceHighlight(g2: Graphics2D, rows: Set<Int>, cols: Set<Int>, color: java.awt.Color, strokeWidth: kotlin.Float) {
+    private fun drawSequenceHighlight(g2: Graphics2D, rows: Set<Int>, cols: Set<Int>, color: Color, strokeWidth: kotlin.Float) {
         val nRows = activationSequence.sequenceSize
         val nCols = activationSequence.size
         if (nRows <= 0 || nCols <= 0) return
@@ -195,7 +205,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     }
 
     /** Draw a rectangular outline around each selected `(row, col)` cell. */
-    private fun drawCellHighlight(g2: Graphics2D, cells: Set<Pair<Int, Int>>, color: java.awt.Color, strokeWidth: kotlin.Float) {
+    private fun drawCellHighlight(g2: Graphics2D, cells: Set<Pair<Int, Int>>, color: Color, strokeWidth: kotlin.Float) {
         val nRows = activationSequence.sequenceSize
         val nCols = activationSequence.size
         if (nRows <= 0 || nCols <= 0) return

@@ -92,6 +92,9 @@ sealed class Preference<T>(val default: T) {
         }
     }
 
+    /** True if the user has explicitly stored a value (rather than falling back to the default). */
+    fun isExplicitlySet(): Boolean = this::name.isInitialized && systemPreferences.get(name, null) != null
+
     open operator fun <H: PreferenceHolder> getValue(thisRef: H, property: KProperty<*>): T {
         name = property.name
         if (cachedValue == null) {
@@ -101,8 +104,16 @@ sealed class Preference<T>(val default: T) {
     }
 
     open operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: T) {
+        name = property.name
         systemPreferences.put(property.name, serialize(value))
         cachedValue = value
+    }
+
+    /** Remove any stored value for [propertyName] and drop the cache, so the next read re-resolves the default. */
+    protected fun clearStoredValue(propertyName: String) {
+        name = propertyName
+        systemPreferences.remove(propertyName)
+        cachedValue = null
     }
 
     /**
@@ -152,6 +163,31 @@ class StringPreference(defaultPath: String): Preference<String>(defaultPath) {
 class ColorPreference(defaultColor: Color): Preference<Color>(defaultColor) {
     override fun deserialize(value: String) = Color(value.toInt())
     override fun serialize(value: Color) = value.rgb.toString()
+}
+
+/**
+ * Stores a [ThemeColor] (a light + dark color pair) as a single preference, so the network canvas
+ * colors carry both modes. Serialized as `light|dark|useManualDark`.
+ *
+ * Because the property editor commits every field on OK (even unchanged ones), storing a value equal
+ * to the [default] would needlessly pin it; so only an actual deviation is stored, and returning a
+ * value to the default clears any prior customization.
+ */
+class ThemeColorPreference(default: ThemeColor): Preference<ThemeColor>(default) {
+    override fun deserialize(value: String): ThemeColor {
+        val (light, dark, manual) = value.split("|")
+        return ThemeColor(Color(light.toInt()), Color(dark.toInt()), manual.toBoolean())
+    }
+
+    override fun serialize(value: ThemeColor) = "${value.light.rgb}|${value.dark.rgb}|${value.useManualDark}"
+
+    override operator fun <H: PreferenceHolder> setValue(thisRef: H, property: KProperty<*>, value: ThemeColor) {
+        if (value == default) {
+            clearStoredValue(property.name)
+        } else {
+            super.setValue(thisRef, property, value)
+        }
+    }
 }
 
 class EnumPreference<E : Enum<E>>(defaultVal: E, private val enumClass: Class<E>): Preference<E>(defaultVal) {

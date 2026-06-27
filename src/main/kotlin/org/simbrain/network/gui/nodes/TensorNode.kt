@@ -58,6 +58,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     }
     private val channelLabel = PText("").apply {
         font = Theme.label
+        textPaint = NetworkTheme.current.valueText
         mainNode.addChild(this)
     }
 
@@ -101,7 +102,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val x = thumbStartX + c * (thumbSize + thumbGap)
         PPath.createRectangle(x, thumbStripY, thumbSize, thumbSize).apply {
             paint = null
-            strokePaint = Color.GRAY
+            strokePaint = NetworkTheme.current.imageBorder
             stroke = BasicStroke(1f)
             thumbnailStripNode.addChild(this)
         }
@@ -162,6 +163,12 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
                 channelBuffer[h * tensorLayer.shape.width + w] = tensorLayer.activations[tensorLayer.shape.index(h, w, c)]
             }
         }
+    }
+
+    override fun refreshTheme() {
+        borderBox.paint = NetworkPreferences.backgroundColor
+        borderBox.strokePaint = NetworkTheme.current.nodeOutline
+        updateActivationImage()
     }
 
     private fun updateActivationImage() {
@@ -235,12 +242,12 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             channelBuffer.writeSimbrainColorImage(thumbImages[c])
             thumbPImages[c].invalidatePaint()
 
-            // Update border: orange for selected, gray for others
+            // Update border: highlight for selected, default for others
             if (c == selectedCh) {
-                thumbBorders[c].strokePaint = Color.ORANGE
+                thumbBorders[c].strokePaint = NetworkTheme.current.weightMatrixBoundary
                 thumbBorders[c].stroke = BasicStroke(2f)
             } else {
-                thumbBorders[c].strokePaint = Color.GRAY
+                thumbBorders[c].strokePaint = NetworkTheme.current.imageBorder
                 thumbBorders[c].stroke = BasicStroke(1f)
             }
         }
@@ -309,6 +316,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = createRectangle(x, y, w, h)
+        newBorder.paint = NetworkPreferences.backgroundColor
+        newBorder.strokePaint = NetworkTheme.current.nodeOutline
         newBorder.stroke = if (tensorLayer.isClamped) BasicStroke(2f) else DEFAULT_STROKE
         return newBorder
     }

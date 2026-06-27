@@ -9,6 +9,7 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font
@@ -101,6 +102,8 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = PPath.createRectangle(x, y, w, h)
+        newBorder.paint = NetworkPreferences.backgroundColor
+        newBorder.strokePaint = NetworkTheme.current.nodeOutline
         newBorder.stroke = if (layer.isClamped) {
             CLAMPED_STROKE
         } else {
@@ -140,6 +143,11 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
             RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
         )
         super.paint(paintContext)
+    }
+
+    override fun refreshTheme() {
+        borderBox.paint = NetworkPreferences.backgroundColor
+        borderBox.strokePaint = NetworkTheme.current.nodeOutline
     }
 
     /**

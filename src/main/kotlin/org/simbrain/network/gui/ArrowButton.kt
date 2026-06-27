@@ -4,13 +4,12 @@ import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
-import java.awt.Color
+import org.piccolo2d.util.PPaintContext
+import org.simbrain.util.NetworkTheme
+import org.simbrain.util.blend
 import java.awt.geom.GeneralPath
 
 enum class ArrowDirection { LEFT, RIGHT, UP, DOWN }
-
-private val NORMAL_COLOR = Color(130, 130, 130)
-private val HOVER_COLOR = Color(50, 50, 50)
 
 /**
  * Create a clickable triangular arrow button.
@@ -55,8 +54,19 @@ fun createArrowButton(direction: ArrowDirection, size: Double = 8.0, onClick: ()
         closePath()
     }
 
-    val arrowPath = PPath.Float(shape)
-    arrowPath.paint = NORMAL_COLOR
+    // Fill the triangle with theme colors read fresh on every paint, so it tracks light/dark — both
+    // its resting and hover state — and recolors on a live theme switch instead of caching colors.
+    val arrowPath = object : PPath.Float(shape) {
+        var hovered = false
+        override fun paint(paintContext: PPaintContext) {
+            paintContext.graphics.paint = if (hovered) {
+                NetworkTheme.current.valueText
+            } else {
+                blend(NetworkTheme.current.valueText, NetworkTheme.current.canvasBackground, 0.5)
+            }
+            paintContext.graphics.fill(pathReference)
+        }
+    }
     arrowPath.stroke = null
 
     val container = PNode()
@@ -69,10 +79,12 @@ fun createArrowButton(direction: ArrowDirection, size: Double = 8.0, onClick: ()
             onClick()
         }
         override fun mouseEntered(event: PInputEvent) {
-            arrowPath.paint = HOVER_COLOR
+            arrowPath.hovered = true
+            arrowPath.invalidatePaint()
         }
         override fun mouseExited(event: PInputEvent) {
-            arrowPath.paint = NORMAL_COLOR
+            arrowPath.hovered = false
+            arrowPath.invalidatePaint()
         }
     })
 

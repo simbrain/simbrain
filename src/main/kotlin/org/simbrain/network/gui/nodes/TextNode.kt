@@ -83,6 +83,7 @@ open class TextNode(
     fun update() {
         try {
             val simpleAttributeSet = createAttributeSet(textObject.fontName, textObject.fontSize, textObject.isItalic, textObject.isBold)
+            StyleConstants.setForeground(simpleAttributeSet, NetworkTheme.current.valueText)
             pStyledText.document.remove(0, pStyledText.document.length)
             pStyledText.document.insertString(0, textObject.text, simpleAttributeSet)
             pStyledText.syncWithDocument()
@@ -90,6 +91,10 @@ open class TextNode(
         } catch (e: BadLocationException) {
             e.printStackTrace()
         }
+    }
+
+    override fun refreshTheme() {
+        update()
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {

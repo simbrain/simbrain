@@ -1,6 +1,7 @@
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
+import org.simbrain.util.ThemeColor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.invokeLegacySetter
 import org.simbrain.util.swingInvokeLater
@@ -237,6 +238,12 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
             is Color -> ColorWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, Color>,
+                isConsistent
+            ) as ParameterWidget<O, T>
+
+            is ThemeColor -> ThemeColorWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, ThemeColor>,
                 isConsistent
             ) as ParameterWidget<O, T>
 

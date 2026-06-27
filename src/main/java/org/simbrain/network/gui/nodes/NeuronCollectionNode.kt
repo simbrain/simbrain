@@ -261,7 +261,7 @@ class NeuronCollectionNode(
     // Interaction box
 
     private inner class NeuronCollectionInteractionBox(net: NetworkPanel) : InteractionBox(net) {
-        init { setPaint(Color(209, 255, 204)) }
+        override val tabFillColor: Color get() = NetworkTheme.current.tabFillSupervised
 
         override val propertyDialog get() = this@NeuronCollectionNode.propertyDialog
         override val model get() = this@NeuronCollectionNode.model

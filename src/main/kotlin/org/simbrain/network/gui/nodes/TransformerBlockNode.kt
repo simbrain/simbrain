@@ -183,6 +183,11 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         updateTextLabels()
     }
 
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateImages()
+    }
+
     private fun updateImages() {
 
 
@@ -488,6 +493,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         val label = PText().apply {
             this.text = text
             font = INFO_FONT
+            textPaint = NetworkTheme.current.valueText
         }
         addChild(label)
         return label
@@ -680,7 +686,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                     
                     // Draw filled white circle
                     val originalFillColor = g2.color
-                    g2.color = Color.WHITE
+                    g2.color = NetworkTheme.current.canvasBackground
                     g2.fillOval(
                         (lastPoint.x - junctionRadius).toInt(),
                         (lastPoint.y - junctionRadius).toInt(),
@@ -719,7 +725,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                     
                     // Draw filled white circle
                     val originalFillColor = g2.color
-                    g2.color = Color.WHITE
+                    g2.color = NetworkTheme.current.canvasBackground
                     g2.fillOval(
                         (lastPoint.x - junctionRadius).toInt(),
                         (lastPoint.y - junctionRadius).toInt(),

@@ -150,6 +150,11 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
     }
 
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateActivationImage()
+    }
+
     private fun updateActivationImage() {
         activationImage.removeAllChildren()
         spikeImage.removeAllChildren()

@@ -14,6 +14,7 @@ import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
@@ -594,6 +595,7 @@ object SimbrainDesktop {
             when (c) {
                 is ChartPanel -> c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
                 is JTable -> c.gridColor = Theme.divider
+                is NetworkPanel -> c.preferenceLoader()
             }
             if (c is Container) c.components.forEach(::walk)
         }

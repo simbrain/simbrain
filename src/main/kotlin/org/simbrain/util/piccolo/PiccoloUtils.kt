@@ -10,6 +10,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PAffineTransform
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.nodes.ScreenElement
+import org.simbrain.util.NetworkTheme
 import org.simbrain.util.component1
 import org.simbrain.util.component2
 import org.simbrain.util.minus
@@ -43,12 +44,12 @@ val PInputEvent.isDoubleClick
 fun Collection<PNode>.unionOfGlobalFullBounds() = map { it.globalFullBounds }.fold(PBounds()) { acc, b -> acc.add(b); acc }
 
 /**
- * Add a black border around a PImage. Must be called after the image's bounds have been set.
+ * Add a themed border around a PImage. Must be called after the image's bounds have been set.
  */
 fun PImage.addBorder(strokeWidth: Float = 1f): PNode {
     val (x, y, w, h) = bounds
     val box = PPath.createRectangle(x, y, w, h)
-    box.strokePaint = Color.BLACK
+    box.strokePaint = NetworkTheme.current.imageBorder
     box.stroke = BasicStroke(strokeWidth)
     box.paint = null
     addChild(box)

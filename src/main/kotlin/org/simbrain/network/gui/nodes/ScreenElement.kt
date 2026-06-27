@@ -142,4 +142,11 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     fun select() {
         networkPanel.selectionManager.add(this)
     }
+
+    /**
+     * Re-apply theme-derived colors after a light/dark switch. Default does nothing; nodes that cache
+     * themed paints (rather than re-reading them on a model event) override this to re-set them. Invoked
+     * by [NetworkPanel] when the canvas is recolored.
+     */
+    open fun refreshTheme() {}
 }

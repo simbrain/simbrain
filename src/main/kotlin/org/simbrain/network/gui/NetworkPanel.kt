@@ -19,6 +19,7 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.Outline
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -169,13 +170,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
         SynapseNode.minDiameter = NetworkPreferences.minWeightSize
         SynapseNode.maxDiameter = NetworkPreferences.maxWeightSize
-        SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
 
-        network.flatNeuronList.map {
-            it.events.colorChanged.fire()
-        }
-        // Force update activation text for decimal places preference changes
-        filterScreenElements<NeuronNode>().forEach { it.forceUpdateActivationText() }
         network.flatSynapseList.forEach {
             it.events.colorPreferencesChanged.fire()
         }
@@ -186,19 +181,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
-        filterScreenElements<WeightMatrixNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-        filterScreenElements<TensorConnectorNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-        filterScreenElements<FlattenConnectorNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-        filterScreenElements<SmileClassifierNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
+        filterScreenElements<WeightMatrixNode>().forEach { it.updateArrowColorFromPreferences() }
+        filterScreenElements<TensorConnectorNode>().forEach { it.updateArrowColorFromPreferences() }
+        filterScreenElements<FlattenConnectorNode>().forEach { it.updateArrowColorFromPreferences() }
+        filterScreenElements<SmileClassifierNode>().forEach { it.updateArrowColorFromPreferences() }
 
+        // Re-apply theme-derived colors that nodes cache at construction (not driven by a model event):
+        // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, and image borders.
+        canvas.layer.allNodes.filterIsInstance<Outline>().forEach { it.refreshThemeColor() }
+        canvas.layer.allNodes.filterIsInstance<ImageBox>().forEach { it.updateBorderColorFromPreferences() }
+        screenElements.forEach { it.refreshTheme() }
+        canvas.repaint()
     }
 
 

@@ -236,7 +236,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 customOffsetAnchor.location.y
             ).apply {
                 this.stroke = PPath.DEFAULT_STROKE
-                this.strokePaint = Color.red
+                this.strokePaint = NetworkTheme.current.sourceHandle
             }
             networkPanel.canvas.layer.addChild(placementManagerDelta)
         }

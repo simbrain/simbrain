@@ -17,13 +17,32 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-fun Double.getColorGradient(range: ClosedFloatingPointRange<Double>, lowColor: Color, highColor: Color) = clip(range).let {
-    if (it < 0) {
-        val (h, s, v) = lowColor.toHSB()
-        Color.getHSBColor(h, SimbrainMath.rescale(-it, 0.0, -range.start, 0.0, s.toDouble()).toFloat(), v)
-    } else {
-        val (h, s, v) = highColor.toHSB()
-        Color.getHSBColor(h, SimbrainMath.rescale(it, 0.0, range.endInclusive, 0.0, s.toDouble()).toFloat(), v)
+/** Linear RGB interpolation from [from] to [to] by [t] (0..1), packed as an opaque ARGB int. */
+private fun lerpRgb(from: Color, to: Color, t: Float): Int {
+    val tc = if (t < 0f) 0f else if (t > 1f) 1f else t
+    val r = (from.red + (to.red - from.red) * tc).toInt()
+    val g = (from.green + (to.green - from.green) * tc).toInt()
+    val b = (from.blue + (to.blue - from.blue) * tc).toInt()
+    return -0x1000000 or (r shl 16) or (g shl 8) or b
+}
+
+/**
+ * Maps a signed value to a diverging color: [lowColor] at the low end of [range], [midColor] (the
+ * theme's neutral midpoint, matched to the canvas background) at zero, [highColor] at the high end.
+ * Because zero maps to a background-matched neutral, resting/zero values recede instead of glowing on
+ * either a light or dark canvas (the old mapping desaturated toward white at zero).
+ */
+fun Double.getColorGradient(
+    range: ClosedFloatingPointRange<Double>,
+    lowColor: Color,
+    highColor: Color,
+    midColor: Color = NetworkTheme.current.neutralMidpoint,
+): Color {
+    val v = coerceIn(range)
+    return when {
+        v < 0 && range.start < 0 -> Color(lerpRgb(midColor, lowColor, (v / range.start).toFloat()))
+        v > 0 && range.endInclusive > 0 -> Color(lerpRgb(midColor, highColor, (v / range.endInclusive).toFloat()))
+        else -> midColor
     }
 }
 
@@ -35,32 +54,54 @@ fun Double.toSimbrainColor(range: ClosedFloatingPointRange<Double>, coolHue: Flo
     }
 }
 
-fun Float.toSimbrainColor() = clip(-1.0f..1.0f).let {
-    if (it < 0) Color.HSBtoRGB(2/3f, -it, 1.0f) else Color.HSBtoRGB(0.0f, it, 1.0f)
+/**
+ * Diverging color for a value in -1..1 packed as an opaque ARGB int: [neg] at -1, [mid] at 0, [pos] at
+ * +1 (see [getColorGradient]). The defaults track the active theme so bitmaps recede at zero on either
+ * background instead of glowing white.
+ */
+fun Float.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+): Int {
+    val v = if (this < -1f) -1f else if (this > 1f) 1f else this
+    return if (v < 0) lerpRgb(mid, neg, -v) else lerpRgb(mid, pos, v)
 }
 
-fun Double.toSimbrainColor() = toFloat().toSimbrainColor()
+fun Double.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = toFloat().toSimbrainColor(neg, mid, pos)
 
-/**
- * Convert array of float values to array of RGB color values.
- */
-fun FloatArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
+/** Convert an array of values in -1..1 to packed ARGB ints (theme colors resolved once for the array). */
+fun FloatArray.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(size) { this[it].toSimbrainColor(neg, mid, pos) }
 
-/**
- * Convert array of double values to array of RGB color values.
- */
-fun DoubleArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
+fun DoubleArray.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(size) { this[it].toSimbrainColor(neg, mid, pos) }
 
 /**
  * Converts a double array to matrix representation (as a Buffered Image) with a specified width and height, in pixels.
  *
  * Width * height must be less than the array size.
  */
-fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
+fun DoubleArray.toSimbrainColorImage(
+    width: Int, height: Int,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(width * height).let {
     if (this.size < it.size) {
-        it.fill(Color.lightGray.rgb, this.size, it.size)
+        it.fill(mid.rgb, this.size, it.size)
     }
-    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
+    System.arraycopy(toSimbrainColor(neg, mid, pos), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
     val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
@@ -71,22 +112,32 @@ fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width *
  * Write Simbrain color values directly into the backing array of [dest], avoiding all intermediate allocations.
  * [dest] should be a [BufferedImage.TYPE_INT_RGB] image whose dimensions match the data.
  */
-fun DoubleArray.writeSimbrainColorImage(dest: BufferedImage) {
+fun DoubleArray.writeSimbrainColorImage(
+    dest: BufferedImage,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) {
     val pixels = (dest.raster.dataBuffer as DataBufferInt).data
     val len = min(size, pixels.size)
     for (i in 0 until len) {
-        pixels[i] = this[i].toSimbrainColor()
+        pixels[i] = this[i].toSimbrainColor(neg, mid, pos)
     }
     if (size < pixels.size) {
-        pixels.fill(Color.lightGray.rgb, size, pixels.size)
+        pixels.fill(mid.rgb, size, pixels.size)
     }
 }
 
 /**
  * Converts a float array to a matrix image as in [DoubleArray.toSimbrainColorImage]
  */
-fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
-    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
+fun FloatArray.toSimbrainColorImage(
+    width: Int, height: Int,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(width * height).let {
+    System.arraycopy(toSimbrainColor(neg, mid, pos), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
     val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
@@ -376,8 +427,9 @@ fun computeCellFont(targetWidth: Double, targetHeight: Double, refString: String
 }
 
 /**
- * Draw [text] centered at ([centerX], [centerY]) as black with a white outline for readability on any background.
- * Sets antialiasing hints and modifies stroke/color on the receiver.
+ * Draw [text] centered at ([centerX], [centerY]) in the themed value color with a halo in the themed
+ * canvas color for readability on any background. Sets antialiasing hints and modifies stroke/color on
+ * the receiver.
  */
 fun Graphics2D.drawCenteredOutlinedLabel(text: String, font: Font, centerX: Double, centerY: Double) {
     if (text.isEmpty()) return
@@ -391,15 +443,16 @@ fun Graphics2D.drawCenteredOutlinedLabel(text: String, font: Font, centerX: Doub
     setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
     stroke = BasicStroke(font.size2D * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-    color = Color.WHITE
+    color = NetworkTheme.current.canvasBackground
     draw(outline)
-    color = Color.BLACK
+    color = NetworkTheme.current.valueText
     fill(outline)
 }
 
 /**
  * Draw numeric value labels over a grid of cells. Only cells visible in the current clip are drawn.
- * Text is rendered as black with a white outline for readability over any background color.
+ * Text is rendered in the themed value color with a halo in the themed canvas color for readability
+ * over any background color.
  * Font size is computed once from a worst-case reference string so that all cells use the same size.
  */
 fun Graphics2D.drawNumericOverlay(

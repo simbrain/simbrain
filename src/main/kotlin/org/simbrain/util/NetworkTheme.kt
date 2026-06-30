@@ -1,5 +1,8 @@
 package org.simbrain.util
 
+import org.simbrain.util.NetworkTheme.current
+import org.simbrain.util.NetworkTheme.darkPalette
+import org.simbrain.util.NetworkTheme.lightPalette
 import java.awt.Color
 import javax.swing.UIManager
 
@@ -61,18 +64,18 @@ object NetworkTheme {
         subnetOutline = Color(0x8C8C8C),
         selectionHandle = Color(0x0A84FF),
         sourceHandle = Color(0xD32F2F),
-        hotNode = Color(0xB2182B),
-        coolNode = Color(0x2166AC),
+        hotNode = Color(0xD5584F),
+        coolNode = Color(0x5082C4),
         neutralMidpoint = Color(0xF2F2F2),
         connectionLine = Color(0x444444),
         excitatorySynapse = Color(0xC0392B),
         inhibitorySynapse = Color(0x2C6FB5),
         zeroWeight = Color(0xBFBFBF),
-        spiking = Color(0xF5A623),
+        spiking = Color(0xDB5A00),
         groupArrow = Color(0x2E9B3D),
-        connectorArrow = Color(0xE08600),
-        weightMatrixBoundary = Color(0xE08600),
-        receptiveFieldTrace = Color(0xE08600),
+        connectorArrow = Color(0xB86E00),
+        weightMatrixBoundary = Color(0xB86E00),
+        receptiveFieldTrace = Color(0xB86E00),
         backwardTrace = Color(0x2C6FB5),
     )
 
@@ -87,8 +90,8 @@ object NetworkTheme {
         subnetOutline = Color(0x6E7177),
         selectionHandle = Color(0x3D9BFF),
         sourceHandle = Color(0xFF5A52),
-        hotNode = Color(0xF4715E),
-        coolNode = Color(0x6FB1E6),
+        hotNode = Color(0xC74B43),
+        coolNode = Color(0x3F70B0),
         neutralMidpoint = Color(0x242629),
         connectionLine = Color(0x9A9DA3),
         excitatorySynapse = Color(0xFF6B57),

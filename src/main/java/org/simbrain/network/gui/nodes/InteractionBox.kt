@@ -8,6 +8,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.NetworkTheme
+import org.simbrain.util.Theme
 import org.simbrain.util.blend
 import java.awt.Color
 import java.awt.geom.Rectangle2D
@@ -65,7 +66,7 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
      */
     init {
         this.append(rect, false)
-        textLabel = PText()
+        textLabel = PText().apply { font = Theme.body }
         addChild(textLabel)
 
         // Create kebab menu button

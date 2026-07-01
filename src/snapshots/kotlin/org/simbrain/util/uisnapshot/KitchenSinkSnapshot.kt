@@ -13,6 +13,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Padding
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.TensorActivation
 import org.simbrain.network.core.TensorLayer
@@ -169,6 +170,24 @@ class KitchenSinkSnapshot : UiSnapshotDef {
                 displaySynapses = false  // -> directed green arrow
             }
             network.addNetworkModel(sg, usePlacementManager = false)
+
+            // Row 3 right: free neurons with synapses (weight ball + line + strength coloring),
+            // including a self-connection so the self-loop arc renders.
+            val fnA = Neuron().apply {
+                location = point(350.0, 60.0)
+                activation = 1.0
+            }
+            val fnB = Neuron().apply { location = point(500.0, 140.0) }
+            val fnC = Neuron().apply {
+                location = point(650.0, 60.0)
+                activation = -1.0
+            }
+            network.addNetworkModel(fnA, usePlacementManager = false)
+            network.addNetworkModel(fnB, usePlacementManager = false)
+            network.addNetworkModel(fnC, usePlacementManager = false)
+            network.addNetworkModel(Synapse(fnA, fnB, 1.0), usePlacementManager = false)
+            network.addNetworkModel(Synapse(fnB, fnC, -1.0), usePlacementManager = false)
+            network.addNetworkModel(Synapse(fnC, fnC, 0.5), usePlacementManager = false)
 
             // Row 4: SRN subnetwork (Outline + tab + 4 internal NeuronArray layers + weight matrices).
             val srn = SRNNetwork(

@@ -1,13 +1,14 @@
 package org.simbrain.util.widgets
 
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PArea
 import org.piccolo2d.nodes.PPath
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.geom.AffineTransform
 import java.awt.geom.Arc2D
+import java.awt.geom.Area
 import java.awt.geom.Point2D
 import kotlin.math.cos
 import kotlin.math.sin
@@ -24,35 +25,32 @@ class RecurrentArrow(color: Color) : PNode() {
     private val endDeg = 320.0
 
     /**
-     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [layout] this
-     * triangle will be placed onto the correct location
+     * The stroked arc and the tip triangle unioned into a single translucent shape, so their
+     * overlap does not double-blend into seams.
      */
-    private val arrowTip = listOf(point(-1, 0), point(1, 0), point(0, -1))
-            .map { it * 30.0 }
-            .toPolygon()
-            .let { polygon -> PArea(polygon, null) }
-            .apply {
-                paint = color
-                val arrowTipRadian = endDeg.toRadian()
-                rotate(-arrowTipRadian)
-                offset(cos(arrowTipRadian) * radius, -sin(arrowTipRadian) * radius)
-                transparency = 0.5f
-                this@RecurrentArrow.addChild(this)
-            }
-
-    private val arc = PPath.createArc(-radius, -radius, 2 * radius, 2 * radius, startDeg,
-        endDeg - startDeg, Arc2D.OPEN)
-        .apply {
-            paint = null
-            stroke = BasicStroke(20.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
-            strokePaint = color
+    private val arrowView = run {
+        val arc = Arc2D.Double(-radius, -radius, 2 * radius, 2 * radius, startDeg, endDeg - startDeg, Arc2D.OPEN)
+        val arrowTipRadian = endDeg.toRadian()
+        val tipTransform = AffineTransform().apply {
+            translate(cos(arrowTipRadian) * radius, -sin(arrowTipRadian) * radius)
+            rotate(-arrowTipRadian)
+        }
+        val arrowTipShape = listOf(point(-1, 0), point(1, 0), point(0, -1))
+                .map { it * 30.0 }
+                .toPolygon()
+        val arrowShape = Area(BasicStroke(20.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER).createStrokedShape(arc)).apply {
+            add(Area(tipTransform.createTransformedShape(arrowTipShape)))
+        }
+        PPath.Double(arrowShape, null).apply {
+            paint = color
             transparency = 0.5f
-        }.also { addChild(it) }
+            this@RecurrentArrow.addChild(this)
+        }
+    }
 
-    /** Recolor the arc and tip to the given color. */
+    /** Recolor the arrow to the given color. */
     fun updateColor(color: Color) {
-        arrowTip.paint = color
-        arc.strokePaint = color
+        arrowView.paint = color
     }
 
     /**

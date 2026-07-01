@@ -186,6 +186,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
     override fun refreshTheme() {
         super.refreshTheme()
         updateImages()
+        mainNode.allNodes.filterIsInstance<PText>().forEach { it.textPaint = NetworkTheme.current.valueText }
     }
 
     private fun updateImages() {

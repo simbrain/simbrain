@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -276,6 +277,12 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         renderKernelGrid()
         updateArrowColorFromPreferences()
         updateDetailLabel()
+        kernelGridGroup.allNodes.forEach { node ->
+            when (node) {
+                is PText -> node.textPaint = NetworkTheme.current.valueText
+                is PPath -> node.strokePaint = NetworkTheme.current.imageBorder
+            }
+        }
     }
 
     fun renderKernelImage() {

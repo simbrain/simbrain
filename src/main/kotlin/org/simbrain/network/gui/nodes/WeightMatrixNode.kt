@@ -170,6 +170,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         arrow.updateColorFromPreferences()
     }
 
+    override fun refreshTheme() {
+        renderMatrixToImage()
+        updateArrowColorFromPreferences()
+        setClamped((weightMatrix as WeightMatrix).clamped)
+    }
+
     /**
      * Render the weight matrix to the [.imageBox].
      *

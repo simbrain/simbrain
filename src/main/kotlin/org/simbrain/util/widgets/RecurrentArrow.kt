@@ -49,13 +49,17 @@ class RecurrentArrow(color: Color) : PNode() {
             transparency = 0.5f
         }.also { addChild(it) }
 
+    /** Recolor the arc and tip to the given color. */
+    fun updateColor(color: Color) {
+        arrowTip.paint = color
+        arc.strokePaint = color
+    }
+
     /**
      * Update the arrow color from the current [NetworkPreferences.connectorArrowColor][org.simbrain.network.gui.dialogs.NetworkPreferences.connectorArrowColor].
      */
     fun updateColorFromPreferences() {
-        val c = NetworkPreferences.connectorArrowColor
-        arrowTip.paint = c
-        arc.strokePaint = c
+        updateColor(NetworkPreferences.connectorArrowColor)
     }
 
     /**

@@ -265,6 +265,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
 
         channelLabel.visible = true
+        channelLabel.textPaint = NetworkTheme.current.valueText
         channelLabel.text = if (tensorLayer.rgbComposite && tensorLayer.shape.channels == 3) {
             "RGB Composite"
         } else {

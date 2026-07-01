@@ -104,12 +104,20 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     }
 
     /**
+     * Recolor the arrow to the given color. The arrowTip paint is updated immediately; the curve
+     * strokePaint updates on the next [layout] call.
+     */
+    fun updateColor(color: Color) {
+        this.color = color
+        arrowTip.paint = color
+    }
+
+    /**
      * Update the arrow color from the current [NetworkPreferences.connectorArrowColor].
      * The arrowTip paint is updated immediately; the curve strokePaint updates on the next [layout] call.
      */
     fun updateColorFromPreferences() {
-        color = NetworkPreferences.connectorArrowColor
-        arrowTip.paint = color
+        updateColor(NetworkPreferences.connectorArrowColor)
     }
 
     /**

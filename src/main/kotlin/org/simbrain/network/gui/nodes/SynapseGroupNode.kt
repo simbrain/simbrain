@@ -142,6 +142,10 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox.setText(synapseGroup.displayName)
     }
 
+    override fun refreshTheme() {
+        directedNode?.updateColorFromPreferences()
+    }
+
     override val isDraggable: Boolean = false
 
     override val model: SynapseGroup

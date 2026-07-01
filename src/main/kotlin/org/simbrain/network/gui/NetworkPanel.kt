@@ -190,6 +190,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, and image borders.
         canvas.layer.allNodes.filterIsInstance<Outline>().forEach { it.refreshThemeColor() }
         canvas.layer.allNodes.filterIsInstance<ImageBox>().forEach { it.updateBorderColorFromPreferences() }
+        canvas.layer.allNodes.filterIsInstance<NodeHandle>().forEach { it.refreshThemeColor() }
         screenElements.forEach { it.refreshTheme() }
         canvas.repaint()
     }

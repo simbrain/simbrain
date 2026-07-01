@@ -16,10 +16,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.computeCellFont
-import org.simbrain.util.drawCenteredOutlinedLabel
-import org.simbrain.util.format
+import org.simbrain.util.*
 import java.awt.Color
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
@@ -161,10 +158,15 @@ class SynapseNode(
 
     fun updateClampStatus() {
         if (synapse.clamped) {
-            circle!!.strokePaint = Color.black
+            circle!!.strokePaint = NetworkTheme.current.nodeOutline
         } else {
             circle!!.strokePaint = null
         }
+    }
+
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateClampStatus()
     }
 
     val isSelfConnection: Boolean

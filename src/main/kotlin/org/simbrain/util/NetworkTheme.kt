@@ -38,6 +38,7 @@ object NetworkTheme {
         val subnetOutline: Color,
         val selectionHandle: Color,
         val sourceHandle: Color,
+        val marquee: Color,
         val hotNode: Color,
         val coolNode: Color,
         val neutralMidpoint: Color,
@@ -51,6 +52,7 @@ object NetworkTheme {
         val weightMatrixBoundary: Color,
         val receptiveFieldTrace: Color,
         val backwardTrace: Color,
+        val rowHighlight: Color,
     )
 
     val lightPalette = Palette(
@@ -62,8 +64,9 @@ object NetworkTheme {
         tabFillSupervised = Color(0xE2F4D8),
         tabText = Color(0x1A1A1A),
         subnetOutline = Color(0x8C8C8C),
-        selectionHandle = Color(0x0A84FF),
+        selectionHandle = Color(0x22A745),
         sourceHandle = Color(0xD32F2F),
+        marquee = Color(0xEAB308),
         hotNode = Color(0xD5584F),
         coolNode = Color(0x5082C4),
         neutralMidpoint = Color(0xF2F2F2),
@@ -77,6 +80,7 @@ object NetworkTheme {
         weightMatrixBoundary = Color(0xB86E00),
         receptiveFieldTrace = Color(0xB86E00),
         backwardTrace = Color(0x2C6FB5),
+        rowHighlight = Color(0, 200, 255, 160),
     )
 
     val darkPalette = Palette(
@@ -88,8 +92,9 @@ object NetworkTheme {
         tabFillSupervised = Color(0x2F3A2C),
         tabText = Color(0xE6E6E6),
         subnetOutline = Color(0x6E7177),
-        selectionHandle = Color(0x3D9BFF),
+        selectionHandle = Color(0x5BD96A),
         sourceHandle = Color(0xFF5A52),
+        marquee = Color(0xFFDA4D),
         hotNode = Color(0xC74B43),
         coolNode = Color(0x3F70B0),
         neutralMidpoint = Color(0x242629),
@@ -103,6 +108,7 @@ object NetworkTheme {
         weightMatrixBoundary = Color(0xF2A33C),
         receptiveFieldTrace = Color(0xF2A33C),
         backwardTrace = Color(0x6FB1E6),
+        rowHighlight = Color(90, 210, 255, 160),
     )
 
     /**

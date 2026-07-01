@@ -179,13 +179,8 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
         }
         val highlightedRows = activationSequence.highlightedRows
         if (highlightedRows.isNotEmpty()) {
-            drawSequenceHighlight(g2, highlightedRows, emptySet(), ROW_HIGHLIGHT_COLOR, strokeWidth = 1.5f)
+            drawSequenceHighlight(g2, highlightedRows, emptySet(), NetworkTheme.current.rowHighlight, strokeWidth = 1.5f)
         }
-    }
-
-    companion object {
-        /** Outline color for programmatic row highlights (e.g. the current-token row in a language model). */
-        val ROW_HIGHLIGHT_COLOR: Color = Color(0, 200, 255, 160)
     }
 
     /** Draw full-width row outlines and full-height column outlines for trace highlighting. */

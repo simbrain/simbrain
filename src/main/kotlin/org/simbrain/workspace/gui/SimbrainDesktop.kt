@@ -3,8 +3,10 @@ package org.simbrain.workspace.gui
 import bsh.Interpreter
 import bsh.util.JConsole
 import com.formdev.flatlaf.FlatLaf
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.jfree.chart.ChartPanel
 import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.util.widgets.applyLafSyntaxTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -596,6 +598,7 @@ object SimbrainDesktop {
                 is ChartPanel -> c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
                 is JTable -> c.gridColor = Theme.divider
                 is NetworkPanel -> c.preferenceLoader()
+                is RSyntaxTextArea -> c.applyLafSyntaxTheme()
             }
             if (c is Container) c.components.forEach(::walk)
         }

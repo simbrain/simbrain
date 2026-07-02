@@ -339,6 +339,9 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
  * Parameters are not updated directly. Parameter deltas are accumulated in data structures provided to this function.
  * [SupervisedTrainer.trainBatch] sums these deltas and uses them to update weights, synapses, and biases.
  *
+ * Layers in [inputLayers] are gradient boundaries: no bias deltas are accumulated for them and their incoming
+ * connectors are left untouched, so training never modifies anything upstream of the designated inputs.
+ *
  * Returns a scalar error used in the GUI when training.
  */
 context(Network)
@@ -382,6 +385,11 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
+
+        // Input layers are gradient boundaries. Without this, layers feeding into an input layer
+        // (e.g. when the input layer is an interior layer of another network, as with probes)
+        // would have their weights and biases modified.
+        if (layer in inputLayers) return@forEach
 
         val layerContext = backpropLayersContext?.createMapProbe(layer.displayName)
 

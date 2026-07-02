@@ -77,7 +77,7 @@ class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
     }
 
     var value: ThemeColor
-        get() = ThemeColor(lightColor, effectiveDark(), useManualDark)
+        get() = ThemeColor(lightColor, manualDarkColor, useManualDark)
         set(themeColor) {
             lightColor = themeColor.light
             manualDarkColor = themeColor.dark

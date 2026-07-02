@@ -19,7 +19,7 @@ import kotlin.random.Random
 
 /** Linear RGB interpolation from [from] to [to] by [t] (0..1), packed as an opaque ARGB int. */
 private fun lerpRgb(from: Color, to: Color, t: Float): Int {
-    val tc = if (t < 0f) 0f else if (t > 1f) 1f else t
+    val tc = t.coerceIn(0f, 1f)
     val r = (from.red + (to.red - from.red) * tc).toInt()
     val g = (from.green + (to.green - from.green) * tc).toInt()
     val b = (from.blue + (to.blue - from.blue) * tc).toInt()
@@ -38,7 +38,7 @@ fun Double.getColorGradient(
     highColor: Color,
     midColor: Color = NetworkTheme.current.neutralMidpoint,
 ): Color {
-    val v = coerceIn(range)
+    val v = clip(range)
     return when {
         v < 0 && range.start < 0 -> Color(lerpRgb(midColor, lowColor, (v / range.start).toFloat()))
         v > 0 && range.endInclusive > 0 -> Color(lerpRgb(midColor, highColor, (v / range.endInclusive).toFloat()))
@@ -64,7 +64,7 @@ fun Float.toSimbrainColor(
     mid: Color = NetworkTheme.current.neutralMidpoint,
     pos: Color = NetworkTheme.current.hotNode,
 ): Int {
-    val v = if (this < -1f) -1f else if (this > 1f) 1f else this
+    val v = coerceIn(-1f, 1f)
     return if (v < 0) lerpRgb(mid, neg, -v) else lerpRgb(mid, pos, v)
 }
 

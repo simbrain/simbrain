@@ -45,7 +45,9 @@ public final class SelectionMarquee extends PPath.Float {
     protected void paint(final PPaintContext paintContext) {
         NetworkTheme.Palette palette = NetworkTheme.INSTANCE.getCurrent();
         Color stroke = palette.getMarquee();
-        Color fill = blend(stroke, palette.getCanvasBackground(), 0.8f);
+        // 20% alpha so the fill composites against whatever is actually beneath the marquee
+        // (network canvas, odor world tiles, customized backgrounds).
+        Color fill = new Color(stroke.getRed(), stroke.getGreen(), stroke.getBlue(), 51);
         Path2D path = getPathReference();
         Graphics2D g2 = paintContext.getGraphics();
 
@@ -55,13 +57,5 @@ public final class SelectionMarquee extends PPath.Float {
         g2.setPaint(stroke);
         g2.setStroke(new PFixedWidthStroke(1.5f));
         g2.draw(path);
-    }
-
-    private static Color blend(final Color a, final Color b, final float bWeight) {
-        float aWeight = 1f - bWeight;
-        return new Color(
-            Math.round(a.getRed() * aWeight + b.getRed() * bWeight),
-            Math.round(a.getGreen() * aWeight + b.getGreen() * bWeight),
-            Math.round(a.getBlue() * aWeight + b.getBlue() * bWeight));
     }
 }

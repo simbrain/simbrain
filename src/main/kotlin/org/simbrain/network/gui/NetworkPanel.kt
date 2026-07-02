@@ -181,17 +181,21 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
-        filterScreenElements<WeightMatrixNode>().forEach { it.updateArrowColorFromPreferences() }
-        filterScreenElements<TensorConnectorNode>().forEach { it.updateArrowColorFromPreferences() }
-        filterScreenElements<FlattenConnectorNode>().forEach { it.updateArrowColorFromPreferences() }
-        filterScreenElements<SmileClassifierNode>().forEach { it.updateArrowColorFromPreferences() }
-
         // Re-apply theme-derived colors that nodes cache at construction (not driven by a model event):
-        // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, and image borders.
-        canvas.layer.allNodes.filterIsInstance<Outline>().forEach { it.refreshThemeColor() }
-        canvas.layer.allNodes.filterIsInstance<ImageBox>().forEach { it.updateBorderColorFromPreferences() }
-        canvas.layer.allNodes.filterIsInstance<NodeHandle>().forEach { it.refreshThemeColor() }
-        screenElements.forEach { it.refreshTheme() }
+        // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, arrows, and image
+        // borders. A single traversal, since this runs on every preference commit and theme switch.
+        canvas.layer.allNodes.forEach { node ->
+            when (node) {
+                is Outline -> node.refreshThemeColor()
+                is ImageBox -> node.updateBorderColorFromPreferences()
+                is NodeHandle -> node.refreshThemeColor()
+                is WeightMatrixNode -> node.updateArrowColorFromPreferences()
+                is TensorConnectorNode -> node.updateArrowColorFromPreferences()
+                is FlattenConnectorNode -> node.updateArrowColorFromPreferences()
+                is SmileClassifierNode -> node.updateArrowColorFromPreferences()
+            }
+            if (node is ScreenElement) node.refreshTheme()
+        }
         canvas.repaint()
     }
 

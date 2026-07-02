@@ -102,8 +102,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = PPath.createRectangle(x, y, w, h)
-        newBorder.paint = NetworkPreferences.backgroundColor
-        newBorder.strokePaint = NetworkTheme.current.nodeOutline
+        newBorder.applyLayerBorderTheme()
         newBorder.stroke = if (layer.isClamped) {
             CLAMPED_STROKE
         } else {
@@ -146,8 +145,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     }
 
     override fun refreshTheme() {
-        borderBox.paint = NetworkPreferences.backgroundColor
-        borderBox.strokePaint = NetworkTheme.current.nodeOutline
+        borderBox.applyLayerBorderTheme()
     }
 
     /**
@@ -167,4 +165,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     }
 
+}
+/** Themed fill and outline for the border box around an array layer node. */
+fun PPath.applyLayerBorderTheme() {
+    paint = NetworkPreferences.backgroundColor
+    strokePaint = NetworkTheme.current.nodeOutline
 }

@@ -174,10 +174,10 @@ class ColorPreference(defaultColor: Color): Preference<Color>(defaultColor) {
  * value to the default clears any prior customization.
  */
 class ThemeColorPreference(default: ThemeColor): Preference<ThemeColor>(default) {
-    override fun deserialize(value: String): ThemeColor {
+    override fun deserialize(value: String): ThemeColor = runCatching {
         val (light, dark, manual) = value.split("|")
-        return ThemeColor(Color(light.toInt()), Color(dark.toInt()), manual.toBoolean())
-    }
+        ThemeColor(Color(light.toInt(), true), Color(dark.toInt(), true), manual.toBoolean())
+    }.getOrDefault(default)
 
     override fun serialize(value: ThemeColor) = "${value.light.rgb}|${value.dark.rgb}|${value.useManualDark}"
 

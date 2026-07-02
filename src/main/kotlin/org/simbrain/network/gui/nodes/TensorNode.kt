@@ -166,8 +166,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     }
 
     override fun refreshTheme() {
-        borderBox.paint = NetworkPreferences.backgroundColor
-        borderBox.strokePaint = NetworkTheme.current.nodeOutline
+        borderBox.applyLayerBorderTheme()
         updateActivationImage()
     }
 
@@ -317,8 +316,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = createRectangle(x, y, w, h)
-        newBorder.paint = NetworkPreferences.backgroundColor
-        newBorder.strokePaint = NetworkTheme.current.nodeOutline
+        newBorder.applyLayerBorderTheme()
         newBorder.stroke = if (tensorLayer.isClamped) BasicStroke(2f) else DEFAULT_STROKE
         return newBorder
     }

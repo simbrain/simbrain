@@ -2,9 +2,13 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
+import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.LinearRule
@@ -66,6 +70,58 @@ val tinyMNIST = newSim {
 
     net.addNetworkModels(bp)
 
+    // Linear probe on the first hidden layer: does the current digit contain a loop (0, 6, 8, 9)?
+    val loopDigits = setOf(0, 6, 8, 9)
+    val probedLayer = bp.hiddenLayers().first()
+
+    val probeReadout = NeuronArray(2).apply {
+        label = "Probe readout"
+        updateRule = SoftmaxRule()
+        gridMode = true
+        labelArray = arrayOf("No loop", "Loop")
+    }
+    probeReadout.setLocation(probedLayer.locationX + 550, probedLayer.locationY)
+    val probeWeights = WeightMatrix(probedLayer, probeReadout)
+    val probe = SupervisedModel(probedLayer, probeReadout).apply {
+        label = "Loop probe"
+        trainerConfig.learningRate = .001
+        trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
+        trainerConfig.computeAccuracy = true
+        trainerConfig.testConfiguration.enabled = true
+        trainerConfig.testConfiguration.testFrequency = 10
+    }
+    net.addNetworkModels(probeReadout, probeWeights, probe)
+
+    fun loopTargets(labelRows: List<List<Double>>) = labelRows.map { row ->
+        val digit = row.withIndex().maxBy { it.value }.index
+        if (digit in loopDigits) mutableListOf(0.0, 1.0) else mutableListOf(1.0, 0.0)
+    }.toMutableList()
+
+    // The probe is trained on the host's hidden layer activations, harvested by running the host
+    // over its dataset. Must be re-run after the host is (re)trained or the harvest is stale.
+    fun harvestProbeDataset(hostData: TrainingDataset) = with(net) {
+        val hiddenActivations = hostData.inputs.map { row ->
+            bp.inputLayer.setActivations(row.toDoubleArray())
+            bp.forwardPass()
+            probedLayer.activationArray.toMutableList()
+        }.toMutableList()
+        TrainingDataset(
+            inputs = hiddenActivations,
+            targets = loopTargets(hostData.targets),
+            inputSize = probedLayer.size,
+            targetSize = 2
+        )
+    }
+
+    fun rebuildProbeDatasets() {
+        probe.trainingSet = harvestProbeDataset(bp.trainingSet)
+        probe.testingSet = harvestProbeDataset(bp.testingSet)
+    }
+    rebuildProbeDatasets()
+
+    val loopFraction = loopTargets(bp.trainingSet.targets).count { it[1] == 1.0 }.toDouble() / bp.trainingSet.size
+    val majorityBaseline = maxOf(loopFraction, 1 - loopFraction)
+
     addSidebarInfo(
         """
         # Tiny MNIST
@@ -100,6 +156,21 @@ val tinyMNIST = newSim {
         - Draw your own image. Right click on the image layer and select `Add coupled image world` then draw your own image and see how the network does. It generally does poorly since it
         was trained on anti-aliased images.
 
+        # Linear Probe
+
+        A [linear probe](https://en.wikipedia.org/wiki/Probing_(machine_learning)) is a simple classifier trained on a hidden layer's activations to test what information that layer
+        represents. Here the probe (`Loop probe` on the right) reads the first hidden layer and predicts whether the current digit contains a loop (`0`, `6`, `8`, `9`).
+
+        The probe is trained on *harvested* activations: the digit network is run over its dataset and the hidden layer's activations are recorded as the probe's inputs. Training the
+        probe never changes the digit network's weights.
+
+        1. Train the digit network first (see above)
+        2. Click `Rebuild probe dataset` in the `Loop Probe` panel — the harvested activations are stale whenever the digit network is retrained
+        3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
+
+        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel (always guessing "no loop"). Accuracy well above baseline means loop information is
+        linearly decodable from the hidden layer. Try training the probe *before* training the digit network to see how decodable the information is from a random projection.
+
         # Credits
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)
@@ -112,6 +183,12 @@ val tinyMNIST = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent, 0, 0, 700, 700)
+        createControlPanel("Loop Probe", 710, 0) {
+            addLabelledText("Majority baseline", "${(majorityBaseline * 100).let { "%.1f".format(it) }}%")
+            addButton("Rebuild probe dataset") {
+                rebuildProbeDatasets()
+            }
+        }
     }
 
     val trainer = SupervisedTrainer(net, bp)

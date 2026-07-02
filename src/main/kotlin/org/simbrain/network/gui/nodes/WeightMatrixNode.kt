@@ -170,6 +170,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         arrow.updateColorFromPreferences()
     }
 
+    override fun refreshTheme() {
+        renderMatrixToImage()
+        updateArrowColorFromPreferences()
+        setClamped((weightMatrix as WeightMatrix).clamped)
+    }
+
     /**
      * Render the weight matrix to the [.imageBox].
      *
@@ -510,7 +516,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     fun setClamped(clamped: Boolean) {
         if (clamped) {
             imageBox.box.stroke = BasicStroke(4.0f)
-            imageBox.box.strokePaint = Color.BLACK
+            imageBox.box.strokePaint = NetworkTheme.current.nodeOutline
         } else {
             imageBox.box.stroke = BasicStroke(1.0f)
             imageBox.box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor

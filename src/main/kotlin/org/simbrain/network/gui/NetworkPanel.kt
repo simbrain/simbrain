@@ -19,6 +19,7 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.Outline
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -169,13 +170,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
         SynapseNode.minDiameter = NetworkPreferences.minWeightSize
         SynapseNode.maxDiameter = NetworkPreferences.maxWeightSize
-        SynapseNode.zeroWeightColor = NetworkPreferences.zeroWeightColor
 
-        network.flatNeuronList.map {
-            it.events.colorChanged.fire()
-        }
-        // Force update activation text for decimal places preference changes
-        filterScreenElements<NeuronNode>().forEach { it.forceUpdateActivationText() }
         network.flatSynapseList.forEach {
             it.events.colorPreferencesChanged.fire()
         }
@@ -186,19 +181,22 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         network.getModels<TransformerBlock>().forEach {
             it.events.updateGraphics.fire()
         }
-        filterScreenElements<WeightMatrixNode>().forEach {
-            it.updateArrowColorFromPreferences()
+        // Re-apply theme-derived colors that nodes cache at construction (not driven by a model event):
+        // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, arrows, and image
+        // borders. A single traversal, since this runs on every preference commit and theme switch.
+        canvas.layer.allNodes.forEach { node ->
+            when (node) {
+                is Outline -> node.refreshThemeColor()
+                is ImageBox -> node.updateBorderColorFromPreferences()
+                is NodeHandle -> node.refreshThemeColor()
+                is WeightMatrixNode -> node.updateArrowColorFromPreferences()
+                is TensorConnectorNode -> node.updateArrowColorFromPreferences()
+                is FlattenConnectorNode -> node.updateArrowColorFromPreferences()
+                is SmileClassifierNode -> node.updateArrowColorFromPreferences()
+            }
+            if (node is ScreenElement) node.refreshTheme()
         }
-        filterScreenElements<TensorConnectorNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-        filterScreenElements<FlattenConnectorNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-        filterScreenElements<SmileClassifierNode>().forEach {
-            it.updateArrowColorFromPreferences()
-        }
-
+        canvas.repaint()
     }
 
 

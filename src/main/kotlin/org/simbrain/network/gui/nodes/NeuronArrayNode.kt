@@ -289,6 +289,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     }
 
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateActivationImage()
+        if (neuronArray.circleMode) {
+            val acts = neuronArray.activations.toDoubleArray()
+            neuronCircles.forEachIndexed { i, circle ->
+                circle.drawActivation(acts.getOrElse(i) { 0.0 }, neuronArray.updateRule.graphicalBounds)
+            }
+        }
+    }
+
     private fun updateActivationImage() {
         activationImage.removeAllChildren()
         spikeImage.removeAllChildren()

@@ -160,4 +160,10 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         return true
     }
 
+    override fun refreshTheme() {
+        updatePolarity()
+        updateActivation()
+        updateTextLabel()
+    }
+
 }

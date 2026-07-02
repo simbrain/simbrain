@@ -7,12 +7,13 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.util.NetworkTheme
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.createAction
+import java.awt.Color
 import org.simbrain.util.piccolo.Outline
 import org.simbrain.util.showInputDialog
 import org.simbrain.util.swingDispatcher
-import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.JPopupMenu
 
@@ -138,7 +139,6 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
 
     init {
         interactionBox.setText(supervisedModel.displayName)
-        interactionBox.paint = Color(209, 255, 204)
         addChild(outline)
         addChild(interactionBox)
 
@@ -168,6 +168,8 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
      * appears when the box is double-clicked.
      */
     inner class SupervisedModelNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
+
+        override val tabFillColor: Color get() = NetworkTheme.current.tabFillSupervised
 
         override val contextMenu: JPopupMenu
             get() = this@SupervisedModelNode.contextMenu

@@ -183,6 +183,12 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         updateTextLabels()
     }
 
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateImages()
+        mainNode.allNodes.filterIsInstance<PText>().forEach { it.textPaint = NetworkTheme.current.valueText }
+    }
+
     private fun updateImages() {
 
 
@@ -488,6 +494,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         val label = PText().apply {
             this.text = text
             font = INFO_FONT
+            textPaint = NetworkTheme.current.valueText
         }
         addChild(label)
         return label
@@ -562,19 +569,19 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
             return this
         }
         
-        fun build(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+        fun build(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = NetworkTheme.current.connectionLine): Arrow {
             return Arrow(points.toList(), ArrowType.ARROWHEAD, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
         
-        fun buildWithoutArrowhead(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+        fun buildWithoutArrowhead(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = NetworkTheme.current.connectionLine): Arrow {
             return Arrow(points.toList(), ArrowType.NONE, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
         
-        fun buildWithJunction(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+        fun buildWithJunction(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = NetworkTheme.current.connectionLine): Arrow {
             return Arrow(points.toList(), ArrowType.JUNCTION, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
         
-        fun buildWithMultiply(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = Color.GRAY): Arrow {
+        fun buildWithMultiply(strokeWidth: kotlin.Float = 1.0f, strokeColor: Color = NetworkTheme.current.connectionLine): Arrow {
             return Arrow(points.toList(), ArrowType.MULTIPLY, strokeWidth = strokeWidth, strokeColor = strokeColor)
         }
     }
@@ -604,7 +611,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
         private val path: List<Point2D>, 
         private val arrowType: ArrowType = ArrowType.ARROWHEAD,
         private val strokeWidth: kotlin.Float = 1.0f,
-        private val strokeColor: Color = Color.GRAY
+        private val strokeColor: Color = NetworkTheme.current.connectionLine
     ): PNode() {
         
         private val arrowHeadSize = 5.0
@@ -680,7 +687,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                     
                     // Draw filled white circle
                     val originalFillColor = g2.color
-                    g2.color = Color.WHITE
+                    g2.color = NetworkTheme.current.canvasBackground
                     g2.fillOval(
                         (lastPoint.x - junctionRadius).toInt(),
                         (lastPoint.y - junctionRadius).toInt(),
@@ -719,7 +726,7 @@ class TransformerBlockNode(networkPanel: NetworkPanel, val transformerBlock: Tra
                     
                     // Draw filled white circle
                     val originalFillColor = g2.color
-                    g2.color = Color.WHITE
+                    g2.color = NetworkTheme.current.canvasBackground
                     g2.fillOval(
                         (lastPoint.x - junctionRadius).toInt(),
                         (lastPoint.y - junctionRadius).toInt(),

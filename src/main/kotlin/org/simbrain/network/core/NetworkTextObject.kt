@@ -2,6 +2,7 @@ package org.simbrain.network.core
 
 import org.simbrain.network.events.TextObjectEvents
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.Font
 import java.awt.geom.Point2D
 
 /**
@@ -22,7 +23,7 @@ open class NetworkTextObject : EditableObject, LocatableModel {
         }
 
 
-    var fontName: String = "Helvetica"
+    var fontName: String = Font.SANS_SERIF
 
     var fontSize: Int = 12
 

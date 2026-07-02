@@ -5,6 +5,7 @@ import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
+import org.simbrain.util.widgets.ThemeColorSelector
 import org.simbrain.util.widgets.YesNoNull
 import org.simbrain.workspace.WorkspacePreferences
 import smile.math.matrix.Matrix
@@ -756,6 +757,38 @@ class ColorWidget<O : EditableObject>(
     }
 
     override val value: Color
+        get() = widget.value
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.update(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+class ThemeColorWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, ThemeColor>,
+    isConsistent: Boolean
+) : ParameterWidget<O, ThemeColor>(parameter, isConsistent) {
+
+    override val widget by lazy {
+        ThemeColorSelector().also {
+            if (isConsistent) {
+                it.value = parameter.value
+            }
+        }
+    }
+
+    override val value: ThemeColor
         get() = widget.value
 
     override fun refresh(property: KProperty<*>) {

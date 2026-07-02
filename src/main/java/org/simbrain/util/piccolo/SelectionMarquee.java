@@ -3,6 +3,7 @@ package org.simbrain.util.piccolo;
 import org.piccolo2d.extras.util.PFixedWidthStroke;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PPaintContext;
+import org.simbrain.util.NetworkTheme;
 import org.simbrain.util.Utils;
 
 import java.awt.*;
@@ -15,19 +16,9 @@ import java.awt.geom.Rectangle2D;
 public final class SelectionMarquee extends PPath.Float {
 
     /**
-     * Default paint.
-     */
-    private static final Paint DEFAULT_PAINT = Color.WHITE;
-
-    /**
      * Default stroke.
      */
     private static final Stroke DEFAULT_STROKE = Utils.isMacOSX() ? new BasicStroke(1.0f) : new PFixedWidthStroke(1.0f);
-
-    /**
-     * Color of selection marquee.
-     */
-    private static Color marqueeColor = Color.yellow;
 
     /**
      * Default interior transparency.
@@ -46,37 +37,25 @@ public final class SelectionMarquee extends PPath.Float {
 
         append(new Rectangle2D.Float(x, y, 0.0f, 0.0f), false);
 
-        setPaint(DEFAULT_PAINT);
         setStroke(DEFAULT_STROKE);
-        setStrokePaint(marqueeColor);
         setTransparency(DEFAULT_TRANSPARENCY);
     }
 
     @Override
     protected void paint(final PPaintContext paintContext) {
-        Paint p = getPaint();
-        Stroke stroke = getStroke();
-        Paint strokePaint = getStrokePaint();
+        NetworkTheme.Palette palette = NetworkTheme.INSTANCE.getCurrent();
+        Color stroke = palette.getMarquee();
+        // 20% alpha so the fill composites against whatever is actually beneath the marquee
+        // (network canvas, odor world tiles, customized backgrounds).
+        Color fill = new Color(stroke.getRed(), stroke.getGreen(), stroke.getBlue(), 51);
         Path2D path = getPathReference();
         Graphics2D g2 = paintContext.getGraphics();
 
-        if (p != null) {
-            g2.setPaint(p);
-            g2.fill(path);
-        }
+        g2.setPaint(fill);
+        g2.fill(path);
 
-        if (stroke != null && strokePaint != null) {
-            g2.setPaint(strokePaint);
-            g2.setStroke(new PFixedWidthStroke(1.5f));
-            g2.draw(path);
-        }
-    }
-
-    public static Color getMarqueeColor() {
-        return marqueeColor;
-    }
-
-    public static void setMarqueeColor(final Color marqueeColor) {
-        SelectionMarquee.marqueeColor = marqueeColor;
+        g2.setPaint(stroke);
+        g2.setStroke(new PFixedWidthStroke(1.5f));
+        g2.draw(path);
     }
 }

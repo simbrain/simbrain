@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.flatten
 
@@ -69,6 +70,97 @@ class ProbeTrainingTest {
         }
         assertArrayEquals(hostOutputBiasesBefore, hostOutput.biases.flatten(), 0.0)
 
+        assertFalse(probeWmBefore.contentEquals(probeWm.weights.flatten())) {
+            "Probe weights should change during probe training"
+        }
+    }
+
+    @Test
+    fun `forward pass does not overwrite an unclamped interior input layer's activations`() = runBlocking {
+        val network = Network()
+
+        val hostInput = NeuronArray(2).apply { isClamped = true; label = "Host input" }
+        val hostHidden = NeuronArray(2).apply { updateRule = SigmoidalRule(); label = "Host hidden" }
+        val hostWm = WeightMatrix(hostInput, hostHidden)
+
+        val readout = NeuronArray(2).apply { updateRule = SigmoidalRule(); label = "Probe readout" }
+        val probeWm = WeightMatrix(hostHidden, readout)
+        val probe = SupervisedModel(hostHidden, readout)
+
+        network.addNetworkModelsAsync(hostInput, hostHidden, hostWm, readout, probeWm, probe)
+
+        // Host input chosen so that recomputing the hidden layer from it would produce
+        // something other than the harvested values set below
+        hostInput.setActivations(doubleArrayOf(5.0, -5.0))
+
+        val harvestedRow = doubleArrayOf(0.25, 0.75)
+        with(network) {
+            hostHidden.setActivations(harvestedRow)
+            probe.forwardPass()
+        }
+
+        assertArrayEquals(harvestedRow, hostHidden.activationArray, 0.0) {
+            "Forward pass should preserve the activations set on the probe's input layer"
+        }
+    }
+
+    @Test
+    fun `probe on a backprop subnetwork hidden layer trains on harvested activations without touching the host`() = runBlocking {
+        val network = Network()
+
+        val bp = BackpropNetwork(intArrayOf(4, 3, 2), null)
+        network.addNetworkModelsAsync(bp)
+        val hidden = bp.hiddenLayers().first()
+
+        val readout = NeuronArray(2).apply { updateRule = SigmoidalRule(); label = "Probe readout" }
+        val probeWm = WeightMatrix(hidden, readout)
+        val probe = SupervisedModel(hidden, readout)
+        network.addNetworkModelsAsync(readout, probeWm, probe)
+
+        val hostInputs = listOf(
+            doubleArrayOf(0.0, 0.0, 1.0, 1.0),
+            doubleArrayOf(1.0, 1.0, 0.0, 0.0),
+            doubleArrayOf(1.0, 0.0, 1.0, 0.0),
+            doubleArrayOf(0.0, 1.0, 0.0, 1.0),
+        )
+        val harvested = hostInputs.map { row ->
+            with(network) {
+                bp.inputLayer.setActivations(row)
+                bp.forwardPass()
+            }
+            hidden.activationArray.toMutableList()
+        }.toMutableList()
+
+        probe.trainingSet = TrainingDataset(
+            inputs = harvested,
+            targets = hostInputs.map { row ->
+                if (row[0] > 0.5) mutableListOf(1.0, 0.0) else mutableListOf(0.0, 1.0)
+            }.toMutableList(),
+            inputSize = hidden.size,
+            targetSize = 2,
+        )
+
+        val hostWeightsBefore = bp.wmList.map { it.weights.flatten() }
+        val hostBiasesBefore = bp.layerList.map { it.biases.flatten() }
+        val probeWmBefore = probeWm.weights.flatten()
+
+        val trainer = SupervisedTrainer(network, probe)
+        with(network) {
+            repeat(10) {
+                trainer.trainBatch(0 until probe.trainingSet.size)
+            }
+        }
+
+        bp.wmList.zip(hostWeightsBefore).forEach { (wm, before) ->
+            assertArrayEquals(before, wm.weights.flatten(), 0.0) {
+                "Host subnetwork weights should be untouched by probe training"
+            }
+        }
+        bp.layerList.zip(hostBiasesBefore).forEach { (layer, before) ->
+            assertArrayEquals(before, layer.biases.flatten(), 0.0) {
+                "Host subnetwork biases should be untouched by probe training"
+            }
+        }
         assertFalse(probeWmBefore.contentEquals(probeWm.weights.flatten())) {
             "Probe weights should change during probe training"
         }

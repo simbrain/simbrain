@@ -227,6 +227,9 @@ fun LinkedHashSet<Layer>.getAllOutgoingSynapseGroups() = filterIsInstance<Neuron
  *
  * Multiple inputs can be specified (this is not yet supported in the GUI however)
  *
+ * Layers in [inputLayers] have their activations set from [inputValues] and are otherwise left alone: they are not
+ * re-updated from their own incoming connectors, so an interior layer of another network can serve as an input layer.
+ *
  * (Optionally) records probes of weights, biases, inputs, and activations at key stages of processing.
  *
  */
@@ -290,6 +293,10 @@ fun LinkedHashSet<Layer>.forwardPass(inputValues: List<Matrix>, inputLayers: Lis
     val layersContext = probeContext?.createMapProbe("layersInForwardPass")
 
     allLayers.forEach {
+        // Input layer activations were set above and must not be overwritten by re-updating
+        // from their own incoming connectors (see kdoc)
+        if (it in inputLayers) return@forEach
+
         val layerContext = layersContext?.createMapProbe(it.displayName)
         val inputsBeforeAccumulation = layerContext?.createMapProbe("inputsBeforeAccumulation")
         layerContext?.createMapProbe("inputs")

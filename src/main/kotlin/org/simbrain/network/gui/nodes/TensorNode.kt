@@ -16,7 +16,6 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
-import java.awt.Font
 import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import javax.swing.JMenu
@@ -58,7 +57,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         })
     }
     private val channelLabel = PText("").apply {
-        font = Font("Arial", Font.PLAIN, 10)
+        font = Theme.label
+        textPaint = NetworkTheme.current.valueText
         mainNode.addChild(this)
     }
 
@@ -102,7 +102,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val x = thumbStartX + c * (thumbSize + thumbGap)
         PPath.createRectangle(x, thumbStripY, thumbSize, thumbSize).apply {
             paint = null
-            strokePaint = Color.GRAY
+            strokePaint = NetworkTheme.current.imageBorder
             stroke = BasicStroke(1f)
             thumbnailStripNode.addChild(this)
         }
@@ -133,7 +133,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             interactionBox.setText(tensorDisplayText())
         }
-        tensorEvents.updated.on {
+        tensorEvents.updated.on(Dispatchers.Default) {
             tensorEvents.updateGraphics.fire()
         }
         tensorEvents.updateGraphics.on(Dispatchers.Swing) {
@@ -163,6 +163,11 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
                 channelBuffer[h * tensorLayer.shape.width + w] = tensorLayer.activations[tensorLayer.shape.index(h, w, c)]
             }
         }
+    }
+
+    override fun refreshTheme() {
+        borderBox.applyLayerBorderTheme()
+        updateActivationImage()
     }
 
     private fun updateActivationImage() {
@@ -236,12 +241,12 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             channelBuffer.writeSimbrainColorImage(thumbImages[c])
             thumbPImages[c].invalidatePaint()
 
-            // Update border: orange for selected, gray for others
+            // Update border: highlight for selected, default for others
             if (c == selectedCh) {
-                thumbBorders[c].strokePaint = Color.ORANGE
+                thumbBorders[c].strokePaint = NetworkTheme.current.weightMatrixBoundary
                 thumbBorders[c].stroke = BasicStroke(2f)
             } else {
-                thumbBorders[c].strokePaint = Color.GRAY
+                thumbBorders[c].strokePaint = NetworkTheme.current.imageBorder
                 thumbBorders[c].stroke = BasicStroke(1f)
             }
         }
@@ -259,6 +264,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
 
         channelLabel.visible = true
+        channelLabel.textPaint = NetworkTheme.current.valueText
         channelLabel.text = if (tensorLayer.rgbComposite && tensorLayer.shape.channels == 3) {
             "RGB Composite"
         } else {
@@ -310,6 +316,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = createRectangle(x, y, w, h)
+        newBorder.applyLayerBorderTheme()
         newBorder.stroke = if (tensorLayer.isClamped) BasicStroke(2f) else DEFAULT_STROKE
         return newBorder
     }

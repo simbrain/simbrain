@@ -1,7 +1,11 @@
 package org.simbrain.world.imageworld.dialogs
 
+import org.simbrain.util.ResourceManager
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.Theme
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
+import org.simbrain.util.showWarningConfirmDialog
+import org.simbrain.util.showWarningDialog
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.filters.*
 import java.awt.*
@@ -26,6 +30,15 @@ class ImageProcessingPipelineDialog(
     init {
         title = "Image Processing Pipeline - ${pipeline.name}"
         setContentPane(createPipelinePanel())
+        addButton(JButton("Clear All").apply {
+            toolTipText = "Remove all operations from the pipeline"
+            addActionListener {
+                if (showWarningConfirmDialog("Remove all operations from the pipeline?") == JOptionPane.YES_OPTION) {
+                    pipeline.clearOperations()
+                }
+            }
+        })
+        setAsDoneDialog()
         isModal = false
         pack()
 
@@ -77,16 +90,12 @@ class ImageProcessingPipelineDialog(
         splitPane.resizeWeight = 0.4
         mainPanel.add(splitPane, BorderLayout.CENTER)
 
-        // Button panel
-        val buttonPanel = createButtonPanel()
-        mainPanel.add(buttonPanel, BorderLayout.SOUTH)
-
         return mainPanel
     }
 
     private fun createNamePanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        panel.border = BorderFactory.createTitledBorder("Pipeline Settings")
+        panel.border = Theme.sectionBorder("Pipeline Settings")
 
         panel.add(JLabel("Name:"))
         
@@ -127,7 +136,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createAvailableOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createTitledBorder("Available Operations")
+        panel.border = Theme.sectionBorder("Available Operations")
 
         // Configure available operations list
         availableOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION
@@ -157,7 +166,7 @@ class ImageProcessingPipelineDialog(
         panel.add(scrollPane, BorderLayout.CENTER)
 
         // Add button
-        val addButton = JButton("Add >>")
+        val addButton = JButton("Add")
         addButton.addActionListener { addSelectedAvailableOperation() }
         panel.add(addButton, BorderLayout.SOUTH)
 
@@ -166,7 +175,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createActiveOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = BorderFactory.createTitledBorder("Pipeline Operations")
+        panel.border = Theme.sectionBorder("Pipeline Operations")
 
         // Configure active operations list
         activeOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION
@@ -178,7 +187,9 @@ class ImageProcessingPipelineDialog(
                 if (value is ImageOperation) {
                     val prefix = "${activeOperationsListModel.indexOf(value) + 1}. "
                     text = "$prefix${value.name} ${if (value.enabled) "(Enabled)" else "(Disabled)"}"
-                    foreground = if (value.enabled) Color.BLACK else Color.GRAY
+                    if (!value.enabled && !isSelected) {
+                        foreground = Theme.mutedText
+                    }
                 }
                 return this
             }
@@ -215,12 +226,12 @@ class ImageProcessingPipelineDialog(
         toggleButton.addActionListener { toggleSelectedOperation() }
         panel.add(toggleButton)
 
-        val upButton = JButton("▲")
+        val upButton = JButton(ResourceManager.getSmallIcon("menu_icons/Up.png"))
         upButton.toolTipText = "Move up"
         upButton.addActionListener { moveSelectedOperationUp() }
         panel.add(upButton)
 
-        val downButton = JButton("▼")
+        val downButton = JButton(ResourceManager.getSmallIcon("menu_icons/Down.png"))
         downButton.toolTipText = "Move down"
         downButton.addActionListener { moveSelectedOperationDown() }
         panel.add(downButton)
@@ -228,30 +239,6 @@ class ImageProcessingPipelineDialog(
         val removeButton = JButton("Remove")
         removeButton.addActionListener { removeSelectedActiveOperation() }
         panel.add(removeButton)
-
-        return panel
-    }
-
-    private fun createButtonPanel(): JPanel {
-        val panel = JPanel(FlowLayout())
-
-        val clearAllButton = JButton("Clear All")
-        clearAllButton.addActionListener {
-            val result = JOptionPane.showConfirmDialog(
-                this,
-                "Remove all operations from the pipeline?",
-                "Clear all operations",
-                JOptionPane.YES_NO_OPTION
-            )
-            if (result == JOptionPane.YES_OPTION) {
-                pipeline.clearOperations()
-            }
-        }
-        panel.add(clearAllButton)
-
-        val closeButton = JButton("Close")
-        closeButton.addActionListener { isVisible = false }
-        panel.add(closeButton)
 
         return panel
     }
@@ -286,12 +273,7 @@ class ImageProcessingPipelineDialog(
                 pipeline.addOperation(operation)
             }
         } catch (e: Exception) {
-            JOptionPane.showMessageDialog(
-                this,
-                "Failed to create operation: ${e.message}",
-                "Error",
-                JOptionPane.ERROR_MESSAGE
-            )
+            showWarningDialog("Failed to create operation: ${e.message}")
         }
     }
 

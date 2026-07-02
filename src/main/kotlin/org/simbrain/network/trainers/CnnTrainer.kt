@@ -319,7 +319,7 @@ class CnnTrainer(
         stoppingConditionReached = false
         config.stoppingCondition.resetEarlyStopping()
         isRunning = true
-        events.beginTraining.fire().await()
+        events.beginTraining.fire()
         submitTask(TrainerTask.Train)
     }
 
@@ -346,7 +346,7 @@ class CnnTrainer(
                     trainingAccuracy = null,
                     testingAccuracy = null
                 )
-            ).await()
+            )
             if (isRunning) submitTask(TrainerTask.Stop)
             return
         }
@@ -385,7 +385,7 @@ class CnnTrainer(
                 testingAccuracy = testAccuracy,
                 effectiveStepSize = lastEffectiveStepSize
             )
-        ).await()
+        )
 
         if (isRunning) {
             if (config.stoppingCondition.validate(iteration, lastTrainingError, testError)) {

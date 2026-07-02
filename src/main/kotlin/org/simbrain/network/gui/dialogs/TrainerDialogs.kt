@@ -26,7 +26,10 @@ import java.awt.Dialog
 import java.awt.Dimension
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import javax.swing.*
+import javax.swing.event.TableModelListener
 
 fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
     
@@ -102,16 +105,16 @@ class DataSetPanel(
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
 
     init {
-        layout = MigLayout("gap 0px 0px, ins 0")
-        add(JLabel("Inputs"))
-        add(JLabel("Targets"), "wrap")
-        add(inputs)
-        add(targets, "wrap")
-        add(JLabel("Edit rows:"), "split 2")
+        layout = MigLayout("ins 8, gap 12px 6px")
+        add(Theme.sectionLabel("Inputs"))
+        add(Theme.sectionLabel("Targets"), "wrap")
+        add(inputs, "grow, push")
+        add(targets, "grow, push, wrap")
+        add(JLabel("Edit rows:"), "split 2, gaptop 8")
         add(addRemoveRows)
         
         // Listen for table model changes to update validation
-        val tableModelListener = javax.swing.event.TableModelListener {
+        val tableModelListener = TableModelListener {
             onRowCountChanged?.invoke(inputDataFrame.rowCount, targetDataFrame.rowCount)
         }
         
@@ -136,8 +139,8 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         modalityType = Dialog.ModalityType.APPLICATION_MODAL
         
         // Ensure proper focus management for child dialogs
-        addWindowFocusListener(object : java.awt.event.WindowAdapter() {
-            override fun windowGainedFocus(e: java.awt.event.WindowEvent?) {
+        addWindowFocusListener(object : WindowAdapter() {
+            override fun windowGainedFocus(e: WindowEvent?) {
                 // When this dialog gains focus, ensure it stays in front
                 toFront()
             }
@@ -145,7 +148,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         // Run training algorithm
         val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        runControls.layout = MigLayout("ins 0, gap 0px 8px")
         val trainer = SupervisedTrainer(network, supervisedNetwork)
         val trainerControls = TrainerControls(trainer, supervisedNetwork, this@NetworkPanel)
 
@@ -218,7 +221,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(dataSetTabPane, "wrap")
+        runControls.add(dataSetTabPane, "grow, push, wrap")
 
         addCommitTask { syncDataSet() }
 
@@ -252,7 +255,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         ) {
             with(network) {
                 launch {
-                    trainer.events.beginTraining.fire().await()
+                    trainer.events.beginTraining.fire()
                     trainer.trainOnce(unsupervisedNetwork)
                     trainer.events.endTraining.fire()
                 }
@@ -288,7 +291,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             }
             runControls.add(ToggleButton(listOf(runAction, stopAction)).apply {
                 setAction("Run")
-                trainer.events.beginTraining.on {
+                trainer.events.beginTraining.on(Dispatchers.Swing) {
                     this@dialog.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                     setAction("Stop")
                 }
@@ -306,7 +309,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         ) {
             unsupervisedNetwork.randomize(null)
             trainer.iteration = 0
-            trainer.events.progressUpdated.fire("Iteration" to trainer.iteration)
+            trainer.events.progressUpdated.fireAsync("Iteration" to trainer.iteration)
         }
         val resetButton = JButton(resetAction)
         resetButton.hideActionText = true
@@ -326,7 +329,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(labelPanel, "wrap")
 
-        trainer.events.progressUpdated.on(Dispatchers.Swing, wait = true) {
+        trainer.events.progressUpdated.on(Dispatchers.Swing) {
             iterationsLabel.text = "" + trainer.iteration
         }
 

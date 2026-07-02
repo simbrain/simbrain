@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
@@ -36,7 +37,8 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** Detail label for filter/channel info (ConvolutionConnector only). */
     private val detailLabel = PText("").apply {
-        font = Font("Arial", Font.PLAIN, 9)
+        font = Theme.small
+        textPaint = NetworkTheme.current.valueText
     }
 
     /** For ConvolutionConnector: delegates to model state. */
@@ -95,7 +97,8 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         // Add column labels ("C1", "C2", ...) along top
         for (c in 0 until inputChannels) {
             val label = PText("C${c + 1}").apply {
-                font = Font("Arial", Font.PLAIN, 7)
+                font = Theme.font(7)
+                textPaint = NetworkTheme.current.valueText
             }
             label.setOffset(
                 labelOffset + c * (cellSize + gap) + (cellSize - label.width) / 2,
@@ -107,7 +110,8 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         // Add row labels ("F1", "F2", ...) along left
         for (f in 0 until numFilters) {
             val label = PText("F${f + 1}").apply {
-                font = Font("Arial", Font.PLAIN, 7)
+                font = Theme.font(7)
+                textPaint = NetworkTheme.current.valueText
             }
             label.setOffset(
                 0.0,
@@ -128,7 +132,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 // Thin border
                 val border = createRectangle(x, y, cellSize, cellSize)
                 border.paint = null
-                border.strokePaint = Color.GRAY
+                border.strokePaint = NetworkTheme.current.imageBorder
                 border.stroke = BasicStroke(0.5f)
                 kernelGridGroup.addChild(border)
 
@@ -209,7 +213,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
         // Wire up events
         val connectorEvents = connector.events
-        connectorEvents.updated.on { connectorEvents.updateGraphics.fire() }
+        connectorEvents.updated.on(Dispatchers.Default) { connectorEvents.updateGraphics.fire() }
         connectorEvents.updateGraphics.on(Dispatchers.Swing) {
             if (connector is ConvolutionConnector) {
                 if (connector.kernelGridMode) {
@@ -267,6 +271,19 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** Trace highlight set by the receptive field tracer. */
     var traceHighlight: ConnectorTraceHighlight? = null
+
+    override fun refreshTheme() {
+        renderKernelImage()
+        renderKernelGrid()
+        updateArrowColorFromPreferences()
+        updateDetailLabel()
+        kernelGridGroup.allNodes.forEach { node ->
+            when (node) {
+                is PText -> node.textPaint = NetworkTheme.current.valueText
+                is PPath -> node.strokePaint = NetworkTheme.current.imageBorder
+            }
+        }
+    }
 
     fun renderKernelImage() {
         val conv = connector as? ConvolutionConnector ?: return
@@ -351,6 +368,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     }
 
     fun updateDetailLabel() {
+        detailLabel.textPaint = NetworkTheme.current.valueText
         if (connector is ConvolutionConnector) {
             val c = connector
             detailLabel.text = "F${currentFilter + 1}/${c.numFilters} Ch${currentInputChannel + 1}/${c.source.shape.channels}"

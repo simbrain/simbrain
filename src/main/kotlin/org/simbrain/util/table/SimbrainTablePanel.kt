@@ -7,6 +7,7 @@ import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.cartesianProduct
+import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.widgets.RowNumberTable
 import java.awt.*
@@ -96,7 +97,7 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         layout = BorderLayout()
 
         val constraints = buildList {
-            add("fillx")
+            add("fill")
             if (!usePadding) add("insets 0")
         }.joinToString(",")
 
@@ -251,7 +252,11 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
             }
         }
 
-        setGridColor(Color.gray)
+        // FlatLaf turns off table grid lines by default (Table.showHorizontalLines/showVerticalLines
+        // false, intercellSpacing 0,0). Re-enable them so data cells stay visually separated.
+        setShowGrid(true)
+        intercellSpacing = Dimension(1, 1)
+        setGridColor(Theme.divider)
 
         // Manages beginning and endings edits in cells, which is surprisingly hard to get right.
         val unfocusedEvent = AWTEventListener { event ->
@@ -386,7 +391,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         }
         
         // Fire the event
-        (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fire()
+        (dataModel as? SimbrainDataFrame)?.events?.currentRowChanged?.fireAsync()
     }
 
     fun incrementSelectedColumn() {

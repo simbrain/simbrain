@@ -237,4 +237,26 @@ class NetworkTest {
         
         // Weight matrices don't contain individual synapse objects, so no verification needed
     }
+
+    @Test
+    fun `deleting a subset of a collection's neurons keeps surviving siblings mapped`() = runBlocking {
+        val testNet = Network()
+        val neurons = (0 until 4).map { Neuron() }
+        neurons.forEach { testNet.addNetworkModel(it) }
+        val collection = NeuronCollection(neurons)
+        testNet.addNetworkModel(collection)
+
+        testNet.deleteModels(neurons.take(2))
+
+        // The map-clearing in deleteModels only fires when the parent is deleted; a partial delete must
+        // leave surviving siblings mapped (an undo snapshot taken later reads this map).
+        Assertions.assertEquals(collection, testNet.childToParentMap[neurons[2]],
+            "a surviving sibling must stay mapped to its collection")
+        Assertions.assertEquals(collection, testNet.childToParentMap[neurons[3]],
+            "a surviving sibling must stay mapped to its collection")
+        Assertions.assertFalse(testNet.childToParentMap.containsKey(neurons[0]),
+            "the deleted neuron must be removed from the map")
+        Assertions.assertFalse(testNet.childToParentMap.containsKey(neurons[1]),
+            "the deleted neuron must be removed from the map")
+    }
 }

@@ -1,5 +1,7 @@
 package org.simbrain.util.geneticalgorithm
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.util.ControlPanelKt
 import org.simbrain.util.format
@@ -79,13 +81,13 @@ class EvolutionControlPanel(val evaluatorParams: EvaluatorParams) {
             minimumSize = Dimension(300, 100)
             setLocationRelativeTo(null)
         }
-        runner.events.generationUpdated.on { state ->
+        runner.events.generationUpdated.on(Dispatchers.Swing) { state ->
             val metricName = evaluatorParams.stoppingCondition.name
             val value = state.nthPercentileFitness(evaluatorParams.evaluationPercentile)
             pw.text = "$metricName: ${value.format(4)}"
             pw.value = state.generation
         }
-        runner.events.endEvolution.on {
+        runner.events.endEvolution.on(Dispatchers.Swing) {
             pw.close()
         }
     }

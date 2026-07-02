@@ -44,7 +44,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         })
 
         val runControls = JPanel()
-        runControls.layout = MigLayout("gap 0px 0px, ins 0")
+        runControls.layout = MigLayout("ins 0, gap 0px 8px")
         val trainerControls = CnnTrainerControls(trainer)
 
         fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
@@ -117,7 +117,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
         updateOverallValidation()
         runControls.add(trainerControls, "span, growx, wrap")
-        runControls.add(dataSetTabPane, "wrap")
+        runControls.add(dataSetTabPane, "grow, push, wrap")
 
         addCommitTask { syncDataSet() }
 
@@ -153,7 +153,7 @@ class CnnTrainerControls(
             val errorPlot = CnnErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
-            val buttonPanel = JPanel(MigLayout("ins 0, gap 0px 0px"))
+            val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
             add(buttonPanel, "wrap, align center, gapbottom 20px")
@@ -180,7 +180,7 @@ class CnnTrainerControls(
             description = "Iterate training once",
             iconPath = "menu_icons/Step.png",
             initBlock = {
-                trainer.events.beginTraining.on { isEnabled = false }
+                trainer.events.beginTraining.on(Dispatchers.Swing) { isEnabled = false }
                 trainer.events.endTraining.on { isEnabled = isValidationEnabled }
             }
         ) {
@@ -205,11 +205,11 @@ class CnnTrainerControls(
             trainer.config.createEditorDialog().display()
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
         runTools.add(JButton(stepAction))
         runTools.add(ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 this@CnnTrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
@@ -239,6 +239,17 @@ class CnnTrainerControls(
         fun lossDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
         val trainingLossLabel = labelPanel.addItem("Training ${lossDescriptionString()}", trainingLossValue)
 
+        // Effective Step Size is always shown, so keep it grouped with the other always-visible
+        // rows (Iterations, Training Loss) instead of after the conditional testing/accuracy rows,
+        // which would leave it detached from the text above when those are hidden.
+        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
+        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
+            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
+                "For Adam in steady state ≈ learning rate. " +
+                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
+        }
+        labelPanel.addItem("Effective Step Size:", stepSizeValue)
+
         val testingLossValue = JLabel("N/A")
         val testingLossLabel = labelPanel.addItem("Testing ${lossDescriptionString()}", testingLossValue)
 
@@ -247,14 +258,6 @@ class CnnTrainerControls(
 
         val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
         val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
-
-        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
-        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
-            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
-                "For Adam in steady state ≈ learning rate. " +
-                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
-        }
-        labelPanel.addItem("Effective Step Size:", stepSizeValue)
 
         fun updateLabelVisibility() {
             val showTestingLoss = trainer.config.testConfiguration.enabled
@@ -290,7 +293,7 @@ class CnnTrainerControls(
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
         add(errorPlotPanel, "grow, gapbottom 0px")
     }
@@ -371,7 +374,7 @@ class CnnErrorTimeSeries(trainer: CnnTrainer) : JPanel() {
             }
         }
 
-        trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
+        trainer.events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
     }

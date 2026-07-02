@@ -5,6 +5,8 @@ import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.NetworkTheme
+import org.simbrain.util.Theme
 import org.simbrain.util.format
 import org.simbrain.util.getColorGradient
 import java.awt.BasicStroke
@@ -51,11 +53,13 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
 
     private val activationText = PText().also {
         it.font = NEURON_FONT_BOLD
+        it.textPaint = NetworkTheme.current.valueText
         addChild(it)
     }
 
     private val labelText = PText().also {
         it.font = NEURON_FONT
+        it.textPaint = NetworkTheme.current.valueText
         addChild(it)
     }
 
@@ -96,7 +100,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
                 return
             }
             if (value == null) {
-                mainNode.strokePaint = Color.BLACK
+                mainNode.strokePaint = NetworkTheme.current.nodeOutline
             } else {
                 mainNode.strokePaint = value
             }
@@ -110,6 +114,8 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     fun drawActivation(activation: kotlin.Double, graphicalBounds: ClosedFloatingPointRange<kotlin.Double>) {
         this.activation = activation
         this.graphicalBounds = graphicalBounds
+        activationText.textPaint = NetworkTheme.current.valueText
+        labelText.textPaint = NetworkTheme.current.valueText
         updatePaint(activation.getColorGradient(graphicalBounds, NetworkPreferences.coolNodeColor, NetworkPreferences.hotNodeColor))
         updateStroke()
 
@@ -180,6 +186,6 @@ const val TEXT_VISIBILITY_THRESHOLD = 0.5
 
 const val NEURON_DIAMETER = 24
 
-val NEURON_FONT = Font("Arial", Font.PLAIN, 11)
+val NEURON_FONT: Font get() = Theme.body
 
-val NEURON_FONT_BOLD = Font("Arial", Font.BOLD, 11)
+val NEURON_FONT_BOLD: Font get() = Theme.bodyBold

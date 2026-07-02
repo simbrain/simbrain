@@ -1,14 +1,14 @@
 package org.simbrain.workspace.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.workspace.WorkspaceComponent
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
-class WorkspaceEvents: Events() {
+class WorkspaceEvents: FlowEvents() {
     val workspaceCleared = NoArgEvent()
     val workspaceOpened = NoArgEvent()
-    val componentAdded = OneArgEvent<WorkspaceComponent>()
+    val componentAdded = AwaitableEvent<WorkspaceComponent>()
     val componentRemoved = OneArgEvent<WorkspaceComponent>()
 }

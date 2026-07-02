@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnTrainerConfig
 import org.simbrain.network.trainers.TrainingDataset
@@ -109,11 +110,16 @@ class ConvolutionalNeuralNetwork(
 
         // If any pipeline component is removed, remove this wrapper as well.
         pipelineComponents.forEach { component ->
-            component.events.deleted.on {
+            component.events.deleted.on(Dispatchers.Default) {
                 delete()
             }
         }
     }
+
+    // Deleting any pipeline component asynchronously self-deletes the whole CNN (see the deleted-listener
+    // in init), a cascade undo cannot reconstruct. So the entire pipeline is protected: it can only be
+    // removed by deleting the whole subnetwork.
+    override val protectedChildModels: List<NetworkModel> get() = modelList.all
 
     context(Network)
     override fun update() {

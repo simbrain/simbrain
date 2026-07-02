@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -31,8 +32,11 @@ import java.awt.event.KeyEvent
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import javax.swing.*
+import javax.swing.AbstractAction
 import javax.swing.Action.SHORT_DESCRIPTION
+import javax.swing.JCheckBoxMenuItem
+import javax.swing.JLabel
+import javax.swing.JPanel
 
 class NetworkActions(val networkPanel: NetworkPanel) {
     // For testing purposes only
@@ -196,6 +200,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcuts = KeyCombination('R')
     ) {
+        if (networkPanel.hasAnyPixelSelection()) {
+            networkPanel.randomizeSelectedPixels()
+            return@createConditionallyEnabledAction
+        }
         with(network) {
             selectionManager.selectedModels.map { it.randomize() }
         }
@@ -277,7 +285,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 isEnabled = networkPanel.selectionManager.selection.isNotEmpty()
             }
             updateAction()
-            networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
+            networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
         }
     ) {
         networkPanel.showEditDialogsForSelectedModels()
@@ -505,12 +513,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             } catch (e: IOException) {
                 println("[DEBUG_LOG] Error saving file: ${e.message}")
                 e.printStackTrace()
-                JOptionPane.showMessageDialog(
-                    networkPanel,
-                    "Error saving file: ${e.message}",
-                    "Save error",
-                    JOptionPane.ERROR_MESSAGE
-                )
+                showErrorDialog("Error saving file: ${e.message}", "Save error")
             }
         } else {
             println("[DEBUG_LOG] No file selected for save")
@@ -659,8 +662,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     val connectWithWeightMatrix = networkPanel.createAction(
@@ -681,8 +684,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     val connectWithSynapseGroup = networkPanel.createAction(
@@ -856,7 +859,11 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (groupsAboveThreshold.isNotEmpty()) {
             showWarningDialog("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}")
         }
-        groupsBelowThreshold.forEach { it.displaySynapses = !it.displaySynapses }
+        // A manual toggle pins visibility: stop auto-tracking the threshold so the user's choice sticks.
+        groupsBelowThreshold.forEach {
+            it.autoVisibility = false
+            it.displaySynapses = !it.displaySynapses
+        }
     }
 
     /**
@@ -879,11 +886,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Prune selected weights",
         enablingCondition = EnablingConditions.SYNAPSES
     ) {
-        val threshold: String = JOptionPane.showInputDialog(
-            null,
-            "Pruning threshold:",
-            ".5"
-        )
+        val threshold = showInputDialog("Pruning threshold:", ".5") ?: return@createConditionallyEnabledAction
         selectionManager.filterSelectedModels<Synapse>()
             .filter { Math.abs(it.strength) < threshold.toDouble() }
             .forEach { it.delete() }
@@ -896,11 +899,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Create sparse connection",
         enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS
     ) {
-        val sparsity: String = JOptionPane.showInputDialog(
-            null,
-            "Sparsity (0 to 1):",
-            ".1"
-        )
+        val sparsity = showInputDialog("Sparsity (0 to 1):", ".1") ?: return@createConditionallyEnabledAction
         val sparse = Sparse().apply {
             connectionDensity = sparsity.toDouble()
         }
@@ -974,7 +973,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         val alignment = Alignment.VERTICAL
 
-        val topologyString = showInputDialog("Enter the number of neurons in each layer separated by commas", "5,3,5")
+        val topologyString = showInputDialog("Enter the number of neurons in each layer separated by commas", "5,3,5") ?: return@createAction
 
         val topology = topologyString.split(",").map { it.toInt() }
 
@@ -1143,9 +1142,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.network.events.modelAdded.on { updateAction() }
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.network.events.modelAdded.on(Dispatchers.Default) { updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
 
     }
 
@@ -1252,9 +1251,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.network.events.modelAdded.on { updateAction() }
-        networkPanel.selectionManager.events.selection.on { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on { _, _ -> updateAction() }
+        networkPanel.network.events.modelAdded.on(Dispatchers.Default) { updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
     }
 
     fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(

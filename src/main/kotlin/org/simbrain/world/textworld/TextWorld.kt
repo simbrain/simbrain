@@ -60,7 +60,7 @@ class TextWorld : AttributeContainer, EditableObject {
         get() = _text
         set(value) {
             _text = value
-            events.textChanged.fire()
+            events.textChanged.fireAsync()
         }
 
     @UserParameter(
@@ -98,7 +98,7 @@ class TextWorld : AttributeContainer, EditableObject {
             val tokenList = tokens
             if (tokenList.isEmpty()) return
             _currentTokenIndex = value.coerceIn(0, tokenList.lastIndex)
-            events.currentTokenChanged.fire(tokenList[_currentTokenIndex])
+            events.currentTokenChanged.fireAsync(tokenList[_currentTokenIndex])
         }
 
     /**
@@ -110,7 +110,7 @@ class TextWorld : AttributeContainer, EditableObject {
         val tokenList = tokens
         if (tokenList.isEmpty()) return
         _currentTokenIndex = value.coerceIn(0, tokenList.lastIndex)
-        events.currentTokenChanged.fire(tokenList[_currentTokenIndex]).await()
+        events.currentTokenChanged.fire(tokenList[_currentTokenIndex])
     }
 
     @UserParameter(
@@ -154,7 +154,7 @@ class TextWorld : AttributeContainer, EditableObject {
      */
     suspend fun setTextSuspend(newText: String) {
         _text = newText
-        events.textChanged.fire().await()
+        events.textChanged.fire()
     }
 
     /**
@@ -240,7 +240,7 @@ class TextWorld : AttributeContainer, EditableObject {
         if (currentTokenIndex < tokens.size - 1) {
             setCurrentTokenIndexSuspend(currentTokenIndex + 1)
         } else {
-            events.atEnd.fire().await()
+            events.atEnd.fire()
             setCurrentTokenIndexSuspend(0)
         }
         position = tokens[currentTokenIndex].end
@@ -263,9 +263,9 @@ class TextWorld : AttributeContainer, EditableObject {
     fun addTextAtEnd(newText: String, spacing: String = " ") {
         runBlocking {
             _text += "$spacing$newText"
-            events.textChanged.fire().await()
+            events.textChanged.fire()
             position = _text.length
-            events.cursorPositionChanged.fire().await()
+            events.cursorPositionChanged.fire()
             currentTokenIndex = tokens.lastIndex
         }
     }
@@ -287,7 +287,7 @@ class TextWorld : AttributeContainer, EditableObject {
                 currentTokenIndex = findTokenIndexAtPosition(newPosition)
             }
             if (fireEvent) {
-                events.cursorPositionChanged.fire()
+                events.cursorPositionChanged.fireAsync()
             }
         } else {
             System.err.println("Invalid position:$newPosition")

@@ -1,11 +1,11 @@
 package org.simbrain.world.imageworld.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 /**
- * See [Events]
+ * See [FlowEvents]
  */
-class ImageEvents: Events() {
-    val imageUpdate = NoArgEvent()
-    val resize = NoArgEvent()
+class ImageEvents: FlowEvents() {
+    val imageUpdate = NoArgAwaitableEvent()
+    val resize = NoArgAwaitableEvent()
 }

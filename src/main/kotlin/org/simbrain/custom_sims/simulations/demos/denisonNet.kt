@@ -13,6 +13,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.*
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.updater.UpdateCoupling
 import java.awt.BorderLayout
@@ -560,7 +561,7 @@ val denisonNet = newSim {
         iaLayer.location = point(370.0, -97.0)
 
         fun makeSweepFrame(title: String, model: TimeSeriesModel, x: Int, y: Int) =
-            JInternalFrame(title, true, true, true, true).apply {
+            GenericJInternalFrame(title, true, true, true, true).apply {
                 layout = BorderLayout()
                 val plotPanel = TimeSeriesPlotPanel(model).apply {
                     chartPanel.chart.xyPlot.domainAxis.label = "SOA"

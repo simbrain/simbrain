@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.util.createConstructorCallingConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.piccolo.TileMap
@@ -35,17 +36,17 @@ class OdorWorldComponent : WorkspaceComponent {
     }
 
     private fun init() {
-        world.events.entityAdded.on(wait = true) { entity: OdorWorldEntity ->
+        world.events.entityAdded.on(Dispatchers.Default) { entity: OdorWorldEntity ->
             fireAttributeContainerAdded(entity).await()
             setChangedSinceLastSave(true)
-            entity.events.sensorAdded.on(handler = ::fireAttributeContainerAdded)
-            entity.events.effectorAdded.on(handler = ::fireAttributeContainerAdded)
-            entity.events.sensorRemoved.on(handler = ::fireAttributeContainerRemoved)
-            entity.events.effectorRemoved.on(handler = ::fireAttributeContainerRemoved)
+            entity.events.sensorAdded.on(Dispatchers.Default, handler = ::fireAttributeContainerAdded)
+            entity.events.effectorAdded.on(Dispatchers.Default, handler = ::fireAttributeContainerAdded)
+            entity.events.sensorRemoved.on(Dispatchers.Default, handler = ::fireAttributeContainerRemoved)
+            entity.events.effectorRemoved.on(Dispatchers.Default, handler = ::fireAttributeContainerRemoved)
             setChangedSinceLastSave(true)
         }
 
-        world.events.entityRemoved.on { e: OdorWorldEntity ->
+        world.events.entityRemoved.on(Dispatchers.Default) { e: OdorWorldEntity ->
             fireAttributeContainerRemoved(e)
             e.sensors.forEach(this::fireAttributeContainerRemoved)
             e.effectors.forEach(this::fireAttributeContainerRemoved)

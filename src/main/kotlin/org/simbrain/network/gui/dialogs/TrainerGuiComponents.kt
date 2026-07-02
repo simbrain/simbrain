@@ -59,7 +59,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         description = "Iterate training once",
         iconPath =  "menu_icons/Step.png",
         initBlock = {
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 isEnabled = false
             }
             trainer.events.endTraining.on {
@@ -90,7 +90,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                     showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
                 }
             }
-            trainer.events.errorUpdated.fire(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
+            trainer.events.errorUpdated.fireAsync(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
         }.display()
     }
 
@@ -156,18 +156,18 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             val errorPlot = ErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
-            val buttonPanel = JPanel(MigLayout("ins 0, gap 0px 0px"))
+            val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getClearGraphAction(errorPlot.graphPanel)))
             buttonPanel.add(JButton(TimeSeriesPlotActions.getPropertiesDialogAction(errorPlot.graphPanel)))
             add(buttonPanel, "wrap, align center, gapbottom 20px")
         }
 
-        val runTools = JPanel().apply { layout = MigLayout("nogrid ") }
+        val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
         stepButton = JButton(stepAction)
         runTools.add(stepButton)
         runStopToggleButton = ToggleButton(listOf(runAction, stopAction)).apply {
             setAction("Run")
-            trainer.events.beginTraining.on {
+            trainer.events.beginTraining.on(Dispatchers.Swing) {
                 this@TrainerControls.cursor = Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR)
                 setAction("Stop")
             }
@@ -195,16 +195,10 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         val trainingErrorValue = JLabel(trainer.lastTrainingError.roundToString(4))
         fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
         val trainingErrorLabel = labelPanel.addItem("Training ${errorDescriptionString()}", trainingErrorValue)
-        
-        val testingErrorValue = JLabel("N/A")
-        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
-        
-        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
-        
-        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
+        // Effective Step Size is always shown, so keep it grouped with the other always-visible
+        // rows (Iterations, Training Error) instead of after the conditional testing/accuracy rows,
+        // which would leave it detached from the text above when those are hidden.
         fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
         val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
             toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
@@ -212,6 +206,15 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                 "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
         }
         labelPanel.addItem("Effective Step Size:", stepSizeValue)
+
+        val testingErrorValue = JLabel("N/A")
+        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
+
+        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
+
+        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
+        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
 
         fun updateLabelVisibility() {
             val showTestingLoss = supervisedNetwork.trainerConfig.testConfiguration.enabled
@@ -254,7 +257,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
 
-        layout = MigLayout("ins 0, gap 0px 0px")
+        layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
         add(errorPlotPanel, "grow, gapbottom 0px")
     }
@@ -301,7 +304,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
             }
         }
 
-        trainer.events.iterationReset.on(Dispatchers.Swing, wait = true) {
+        trainer.events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
     }
@@ -336,7 +339,7 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
 class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
 
     init {
-        layout = MigLayout("ins 0, gap 2px")
+        layout = MigLayout("ins 0, gap 8px")
         // Add row
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
@@ -358,15 +361,7 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
             toolTipText = "Set number of rows in input and target tables"
             addActionListener {
                 val currentRows = if (tables.isNotEmpty()) tables[0].model.rowCount else 0
-                val input = javax.swing.JOptionPane.showInputDialog(
-                    this@AddRemoveRows,
-                    "Enter number of rows:",
-                    "Set Number of Rows",
-                    javax.swing.JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    null,
-                    currentRows.toString()
-                ) as String?
+                val input = showInputDialog("Enter number of rows:", currentRows.toString())
                 
                 input?.let { inputStr ->
                     try {
@@ -374,20 +369,10 @@ class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
                         if (numRows >= 0) {
                             tables.forEach { it.model.setNumRows(numRows) }
                         } else {
-                            javax.swing.JOptionPane.showMessageDialog(
-                                this@AddRemoveRows,
-                                "Number of rows must be non-negative",
-                                "Invalid Input",
-                                javax.swing.JOptionPane.ERROR_MESSAGE
-                            )
+                            showErrorDialog("Number of rows must be non-negative", "Invalid Input")
                         }
                     } catch (e: NumberFormatException) {
-                        javax.swing.JOptionPane.showMessageDialog(
-                            this@AddRemoveRows,
-                            "Please enter a valid integer",
-                            "Invalid Input",
-                            javax.swing.JOptionPane.ERROR_MESSAGE
-                        )
+                        showErrorDialog("Please enter a valid integer", "Invalid Input")
                     }
                 }
             }

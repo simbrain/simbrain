@@ -8,7 +8,8 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
+import org.simbrain.util.Theme
 import org.simbrain.util.UserParameter
 import org.simbrain.util.nettalk.NettalkEncoder
 import org.simbrain.util.nettalk.NettalkPhonology
@@ -286,7 +287,7 @@ class NettalkReader(windowSize: Int = 7) : AttributeContainer {
     }
 }
 
-class NettalkReaderEvents : Events() {
+class NettalkReaderEvents : FlowEvents() {
     val textChanged = NoArgEvent()
     val positionChanged = NoArgEvent()
 }
@@ -308,13 +309,13 @@ private class NettalkReaderPanel(private val reader: NettalkReader) : JPanel() {
     }
 
     private val textLabel = JLabel("Text to read").apply {
-        font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-        foreground = Color(80, 80, 80)
+        font = Theme.section
+        foreground = Theme.mutedText
     }
 
     private val windowSectionLabel = JLabel("Centered letter window").apply {
-        font = Font(Font.SANS_SERIF, Font.BOLD, 12)
-        foreground = Color(80, 80, 80)
+        font = Theme.section
+        foreground = Theme.mutedText
     }
 
     init {

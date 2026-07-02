@@ -33,7 +33,7 @@ package org.simbrain.util.geneticalgorithm
  */
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.sampleWithReplacement
@@ -177,12 +177,12 @@ class Chromosome<P, G : Gene<*, P>>(genes: List<G>) : MutableList<G> by ArrayLis
     operator fun plus(other: Chromosome<P, G>) = Chromosome(buildList { addAll(this@Chromosome); addAll(other); })
 }
 
-class EvolutionEvents : Events() {
-    val beginEvolution = NoArgEvent()
-    val endEvolution = NoArgEvent()
+class EvolutionEvents : FlowEvents() {
+    val beginEvolution = NoArgAwaitableEvent()
+    val endEvolution = NoArgAwaitableEvent()
     /** Fires after [endEvolution] when the stopping condition was met (not when the user paused). */
     val targetReached = NoArgEvent()
-    val generationUpdated = OneArgEvent<GenerationState>()
+    val generationUpdated = AwaitableEvent<GenerationState>()
 }
 
 /**
@@ -195,7 +195,7 @@ class EvolutionEvents : Events() {
  * Usage:
  * ```
  * val runner = EvolutionRunner(evaluatorParams) { seed -> MySim(seed = seed) }
- * runner.events.generationUpdated.on { state -> updateDisplay(state) }
+ * runner.events.generationUpdated.on(Dispatchers.Swing) { state -> updateDisplay(state) }
  * runner.startEvolving()   // continuous
  * runner.stopEvolving()    // pause
  * runner.evolveOnce()      // single step
@@ -301,7 +301,7 @@ class EvolutionRunner(
 
     private suspend fun startHandler() {
         isRunning = true
-        events.beginEvolution.fire().await()
+        events.beginEvolution.fire()
         submitTask(EvolutionTask.Evolve)
     }
 
@@ -321,7 +321,7 @@ class EvolutionRunner(
         }
         val state = GenerationState(generation, sorted)
         generationState = state
-        events.generationUpdated.fire(state).await()
+        events.generationUpdated.fire(state)
 
         val eliminationCount = (sorted.size * eliminationRatio).roundToInt()
         val survivors = sorted.take(populationSize - eliminationCount)
@@ -349,7 +349,7 @@ class EvolutionRunner(
 
     private suspend fun stopHandler() {
         isRunning = false
-        events.endEvolution.fire().await()
+        events.endEvolution.fire()
         if (stoppedByTarget) {
             stoppedByTarget = false
             events.targetReached.fire()

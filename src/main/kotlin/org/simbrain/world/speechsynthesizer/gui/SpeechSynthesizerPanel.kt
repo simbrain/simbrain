@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.util.DetailTrianglePanel
+import org.simbrain.util.Theme
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import org.simbrain.world.speechsynthesizer.warnIfEspeakUnavailable
@@ -22,7 +23,7 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
     }
 
     private val currentLabel = JLabel(" ").apply {
-        font = Font(Font.SANS_SERIF, Font.BOLD, 16)
+        font = Theme.title
     }
 
     private val transcriptionArea = JTextArea(4, 54).apply {
@@ -92,7 +93,7 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
             val barHeight = (height - labelArea).coerceAtLeast(1)
             val w = width.toDouble() / n
             val barGap = (w * 0.30).toInt().coerceIn(2, 10)
-            g2.font = Font(Font.SANS_SERIF, Font.PLAIN, 11)
+            g2.font = Theme.body
             for (i in 0 until n) {
                 val value = values[i].coerceIn(0.0, 1.0)
                 val h = (value * barHeight).toInt()

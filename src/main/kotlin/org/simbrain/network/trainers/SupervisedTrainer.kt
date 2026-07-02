@@ -199,7 +199,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         // Reset early stopping state when training starts
         config.stoppingCondition.resetEarlyStopping()
         isRunning = true
-        events.beginTraining.fire().await()
+        events.beginTraining.fire()
         submitTask(TrainerTask.Train)
     }
 
@@ -278,7 +278,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             testingAccuracy = testAccuracy,
             effectiveStepSize = lastEffectiveStepSize
         )
-        events.errorUpdated.fire(trainingStats).await()
+        events.errorUpdated.fire(trainingStats)
         if (isRunning) {
             if (config.stoppingCondition.validate(iteration, lastTrainingError, testError)) {
                 stoppingConditionReached = true

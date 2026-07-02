@@ -167,6 +167,7 @@ val actorCritic = newSim {
     val errorPlot = couplingManager.createCoupling(tdError, tdErrorSeries)
 
     var showValues = false
+    var showGrid = true
 
     /**
      * Draws a color overlay on tiles based on learned value weights. Green indicates positive value, red indicates negative, with alpha proportional to magnitude.
@@ -187,13 +188,15 @@ val actorCritic = newSim {
                     val tileIndex = col + row * numTilesInADimension
                     val tileValue = values.getOrElse(tileIndex) { 0.0 }
                     val normalizedValue = (tileValue / maxMagnitude).coerceIn(-1.0, 1.0)
-                    val alpha = (140 * kotlin.math.abs(normalizedValue)).toInt().coerceIn(0, 255)
-                    graphics.color = if (normalizedValue >= 0) {
-                        Color(70, 185, 120, alpha)
-                    } else {
-                        Color(225, 110, 110, alpha)
+                    if (showGrid) {
+                        val alpha = (140 * kotlin.math.abs(normalizedValue)).toInt().coerceIn(0, 255)
+                        graphics.color = if (normalizedValue >= 0) {
+                            Color(70, 185, 120, alpha)
+                        } else {
+                            Color(225, 110, 110, alpha)
+                        }
+                        graphics.fillRect(col * gridSize, row * gridSize, gridSize, gridSize)
                     }
-                    graphics.fillRect(col * gridSize, row * gridSize, gridSize, gridSize)
 
                     graphics.color = borderColor
                     graphics.stroke = tileStroke
@@ -364,6 +367,10 @@ val actorCritic = newSim {
     5) `Cheese Reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior.
     
     6) `Poison Reward`: The value received when the agent reaches the poison. Negative values create aversive learning and produce red tiles in the value overlay.
+
+    7) `Show Grid`: Toggles the colored value overlay on the world tiles. When checked, green tiles indicate locations with positive learned value and red tiles indicate locations with negative learned value.
+
+    8) `Show Values`: Toggles numeric value labels on the world tiles so you can inspect the learned value estimate for each location directly.
     
     ## Time Series
     
@@ -419,9 +426,14 @@ val actorCritic = newSim {
         place(networkComponent,240, 10, 520, 600)
         place(odorWorldComponent, 760, 10, 500, 500)
         place(plot, 760, 590, 520, 300)
-        (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).apply {
+        val odorWorldDesktopComponent = (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).apply {
             worldPanel.canvas.layer.addChild(world.tileMap.layers.size, valueOverlay)
             zoomToFitSize(500, 500)
+        }
+
+        fun refreshValueOverlay() {
+            valueOverlay.invalidatePaint()
+            odorWorldDesktopComponent.worldPanel.canvas.repaint()
         }
 
         // Control panel
@@ -433,9 +445,13 @@ val actorCritic = newSim {
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
             val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
+            addCheckBox("Show Grid", showGrid) {
+                showGrid = it
+                refreshValueOverlay()
+            }
             addCheckBox("Show Values", showValues) {
                 showValues = it
-                odorWorldComponent.world.events.updated.fire()
+                refreshValueOverlay()
             }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")

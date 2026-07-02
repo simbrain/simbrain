@@ -7,6 +7,7 @@ import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.ValueMarker
+import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import java.awt.Dimension
@@ -65,7 +66,7 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
             false
         )
         chartPanel.chart = chart
-        chart.backgroundPaint = null
+        chart.applySimbrainChartTheme()
 
         updateChartSettings()
 

@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
 import org.simbrain.network.events.SubnetworkEvents
 import org.simbrain.util.minus
@@ -32,6 +33,16 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     val childToParentMap = mutableMapOf<NetworkModel, NetworkModel>()
 
     /**
+     * Child models that may not be deleted individually because doing so would dismantle this subnetwork.
+     * The GUI delete path ([org.simbrain.network.gui.subnetworkProtectedModels]) refuses to delete any of
+     * these; the whole subnetwork must be deleted instead. Default is empty (children are freely
+     * deletable). Override for subnetworks whose internal components cannot be removed piecemeal — e.g. a
+     * monolithic pipeline whose any-child deletion asynchronously cascades to destroy the whole network,
+     * a cascade undo cannot reconstruct.
+     */
+    open val protectedChildModels: List<NetworkModel> get() = emptyList()
+
+    /**
      * Whether the GUI should display neuron collections contained in this subnetwork. This will usually be true, but in
      * cases where a subnetwork has just one neuron collection it is redundant to display both. So this flag indicates to the
      * GUI that neuron collections in this subnetwork need not be displayed.
@@ -62,7 +73,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
     fun addModel(model: NetworkModel) {
         modelList.add(model)
         if (model is LocatableModel) {
-            model.events.locationChanged.on {
+            model.events.locationChanged.on(Dispatchers.Default) {
                 events.locationChanged.fire()
             }
         }
@@ -70,18 +81,18 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             is NeuronCollection -> {
                 model.neuronList.forEach { childToParentMap[it] = model }
                 model.neuronList.forEach { n ->
-                    n.events.deleted.on(wait = true) { childToParentMap.remove(n) }
+                    n.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(n) }
                 }
             }
             is SynapseGroup -> {
                 model.synapses.forEach { childToParentMap[it] = model }
                 model.synapses.forEach { s ->
-                    s.events.deleted.on(wait = true) { childToParentMap.remove(s) }
+                    s.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(s) }
                 }
             }
         }
         events.locationChanged.fire()
-        model.events.deleted.on(wait = true) {
+        model.events.deleted.on(Dispatchers.Default) {
             modelList.remove(it)
             childToParentMap.remove(it)
             if (modelList.size == 0) {
@@ -113,7 +124,7 @@ abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer
             it.delete()
         }
         customInfo?.let { it.events.deleted.fire(it) }
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return toDelete + this
     }
 

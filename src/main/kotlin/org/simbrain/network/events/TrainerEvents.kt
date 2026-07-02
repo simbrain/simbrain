@@ -1,6 +1,6 @@
 package org.simbrain.network.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 /**
  * Training statistics for a single training iteration.
@@ -19,12 +19,12 @@ data class TrainingStats(
 )
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
-class TrainerEvents: Events() {
-    val beginTraining = NoArgEvent()
+class TrainerEvents: FlowEvents() {
+    val beginTraining = NoArgAwaitableEvent()
     val endTraining = NoArgEvent()
-    val errorUpdated = OneArgEvent<TrainingStats>()
-    val progressUpdated = OneArgEvent<Pair<String, Int>>()
+    val errorUpdated = AwaitableEvent<TrainingStats>()
+    val progressUpdated = AwaitableEvent<Pair<String, Int>>()
     val iterationReset = NoArgEvent()
 }

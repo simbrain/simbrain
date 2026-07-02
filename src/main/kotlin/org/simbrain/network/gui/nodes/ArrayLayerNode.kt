@@ -9,6 +9,7 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Font
@@ -23,7 +24,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     protected val CLAMPED_STROKE = BasicStroke(2f)
 
-    protected val INFO_FONT = Font("Arial", Font.PLAIN, 8)
+    protected val INFO_FONT: Font get() = Theme.tiny
 
     /**
      * Margin around main box in pixels. Override to specify further.
@@ -101,6 +102,7 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         val newBound = mainNode.fullBounds.addPadding(margin)
         val (x, y, w, h) = newBound
         val newBorder = PPath.createRectangle(x, y, w, h)
+        newBorder.applyLayerBorderTheme()
         newBorder.stroke = if (layer.isClamped) {
             CLAMPED_STROKE
         } else {
@@ -142,6 +144,10 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         super.paint(paintContext)
     }
 
+    override fun refreshTheme() {
+        borderBox.applyLayerBorderTheme()
+    }
+
     /**
      * Basic interaction box for array layer nodes. Ensures a property dialog
      * appears when the box is double-clicked.
@@ -159,4 +165,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     }
 
+}
+/** Themed fill and outline for the border box around an array layer node. */
+fun PPath.applyLayerBorderTheme() {
+    paint = NetworkPreferences.backgroundColor
+    strokePaint = NetworkTheme.current.nodeOutline
 }

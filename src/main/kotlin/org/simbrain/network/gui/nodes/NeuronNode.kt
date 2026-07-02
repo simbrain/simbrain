@@ -44,7 +44,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
             networkPanel.network.events.zoomToFitPage.fire()
         }
         events.clampChanged.on(Dispatchers.Swing)  { updateClampStatus() }
-        events.locationChanged.on(wait = true) { pullViewPositionFromModel() }
+        events.locationChanged.on(Dispatchers.Swing) { pullViewPositionFromModel() }
         events.updateRuleChanged.on(Dispatchers.Swing) { _, _ -> updateShape() }
     }
 
@@ -158,6 +158,12 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     override fun acceptsSourceHandle(): Boolean {
         return true
+    }
+
+    override fun refreshTheme() {
+        updatePolarity()
+        updateActivation()
+        updateTextLabel()
     }
 
 }

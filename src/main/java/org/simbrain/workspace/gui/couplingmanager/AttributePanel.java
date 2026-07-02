@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui.couplingmanager;
 
 import org.simbrain.util.StandardDialog;
 import org.simbrain.util.SwingUtilsKt;
+import org.simbrain.util.Theme;
 import org.simbrain.workspace.*;
 import org.simbrain.workspace.events.WorkspaceComponentEvents;
 import org.simbrain.workspace.events.WorkspaceEvents;
@@ -54,7 +55,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      * @param attributeType
      */
     public AttributePanel(Workspace workspace, ProducerOrConsumer attributeType) {
-        super(new BorderLayout());
+        super(new BorderLayout(0, Theme.componentGap));
         this.producerOrConsumer = attributeType;
 
         // Set up attribute lists
@@ -133,7 +134,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
         // Add property change listener to detect when the panel is disposed
         SwingUtilsKt.onWindowClose(this, () -> {
             attributeContainerAddedCleanupHandler.invoke();
-            attributeContainerRemovedCleanupHandler.invoke();
+            attributeContainerRemovedCleanupHandler.cancel(null);
         });
 
     }

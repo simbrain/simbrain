@@ -781,6 +781,7 @@ fun SimulationScope.setupUpdateActions(workspace: Workspace, options: TinyLangua
         val tokenPosition = (actualLength - 1).coerceAtLeast(0)
         val sequenceOutput = softmaxSequence.activations.row(tokenPosition)
         inferenceOutput.activations = sequenceOutput.toColumnVector()
+        softmaxSequence.highlightedRows = setOf(tokenPosition)
     }
 
     workspace.addUpdateAction("Predict Next Word") {

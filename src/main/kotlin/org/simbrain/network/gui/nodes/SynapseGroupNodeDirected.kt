@@ -56,4 +56,13 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
         }
     }
 
+    /** Re-read the themed [NetworkPreferences.synapseGroupArrowColor] (e.g. after a light/dark switch). */
+    fun updateColorFromPreferences() {
+        val color = NetworkPreferences.synapseGroupArrowColor
+        when (arrow) {
+            is RecurrentArrow -> arrow.updateColor(color)
+            is BezierArrow -> arrow.updateColor(color)
+        }
+    }
+
 }

@@ -27,7 +27,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 10
     )
-    var backgroundColor by ColorPreference(Color.WHITE)
+    var backgroundColorTheme by ThemeColorPreference(NetworkTheme.pair { it.canvasBackground })
+    val backgroundColor: Color get() = backgroundColorTheme.resolved
 
     @UserParameter(
         label = "Node hot color",
@@ -35,7 +36,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 20
     )
-    var hotNodeColor by ColorPreference(Color.RED)
+    var hotNodeColorTheme by ThemeColorPreference(NetworkTheme.pair { it.hotNode })
+    val hotNodeColor: Color get() = hotNodeColorTheme.resolved
 
     @UserParameter(
         label = "Node cool color",
@@ -43,7 +45,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 30
     )
-    var coolNodeColor by ColorPreference(Color.BLUE)
+    var coolNodeColorTheme by ThemeColorPreference(NetworkTheme.pair { it.coolNode })
+    val coolNodeColor: Color get() = coolNodeColorTheme.resolved
 
     @UserParameter(
         label = "Connection line color",
@@ -51,7 +54,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 40
     )
-    var connectionLineColor by ColorPreference(Color.BLACK)
+    var connectionLineColorTheme by ThemeColorPreference(NetworkTheme.pair { it.connectionLine })
+    val connectionLineColor: Color get() = connectionLineColorTheme.resolved
 
     @UserParameter(
         label = "Spiking color",
@@ -59,7 +63,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 50
     )
-    var spikingColor by ColorPreference(Color.YELLOW)
+    var spikingColorTheme by ThemeColorPreference(NetworkTheme.pair { it.spiking })
+    val spikingColor: Color get() = spikingColorTheme.resolved
 
     @UserParameter(
         label = "Excitatory color",
@@ -67,7 +72,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 60
     )
-    var excitatorySynapseColor by ColorPreference(Color.RED)
+    var excitatorySynapseColorTheme by ThemeColorPreference(NetworkTheme.pair { it.excitatorySynapse })
+    val excitatorySynapseColor: Color get() = excitatorySynapseColorTheme.resolved
 
     @UserParameter(
         label = "Inhibitory color",
@@ -75,7 +81,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 70
     )
-    var inhibitorySynapseColor by ColorPreference(Color.BLUE)
+    var inhibitorySynapseColorTheme by ThemeColorPreference(NetworkTheme.pair { it.inhibitorySynapse })
+    val inhibitorySynapseColor: Color get() = inhibitorySynapseColorTheme.resolved
 
     @UserParameter(
         label = "Zero color",
@@ -83,7 +90,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 80
     )
-    var zeroWeightColor by ColorPreference(Color.LIGHT_GRAY)
+    var zeroWeightColorTheme by ThemeColorPreference(NetworkTheme.pair { it.zeroWeight })
+    val zeroWeightColor: Color get() = zeroWeightColorTheme.resolved
 
     @UserParameter(
         label = "Weight matrix boundary color",
@@ -91,7 +99,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 90
     )
-    var weightMatrixBoundaryColor by ColorPreference(Color.ORANGE)
+    var weightMatrixBoundaryColorTheme by ThemeColorPreference(NetworkTheme.pair { it.weightMatrixBoundary })
+    val weightMatrixBoundaryColor: Color get() = weightMatrixBoundaryColorTheme.resolved
 
     @UserParameter(
         label = "Synapse group arrow color",
@@ -99,7 +108,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 100
     )
-    var synapseGroupArrowColor by ColorPreference(Color.GREEN)
+    var synapseGroupArrowColorTheme by ThemeColorPreference(NetworkTheme.pair { it.groupArrow })
+    val synapseGroupArrowColor: Color get() = synapseGroupArrowColorTheme.resolved
 
     @UserParameter(
         label = "Connector arrow color",
@@ -107,7 +117,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 110
     )
-    var connectorArrowColor by ColorPreference(Color.ORANGE)
+    var connectorArrowColorTheme by ThemeColorPreference(NetworkTheme.pair { it.connectorArrow })
+    val connectorArrowColor: Color get() = connectorArrowColorTheme.resolved
 
     @UserParameter(
         label = "Receptive field trace color",
@@ -115,7 +126,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 120
     )
-    var receptiveFieldTraceColor by ColorPreference(Color.ORANGE)
+    var receptiveFieldTraceColorTheme by ThemeColorPreference(NetworkTheme.pair { it.receptiveFieldTrace })
+    val receptiveFieldTraceColor: Color get() = receptiveFieldTraceColorTheme.resolved
 
     @UserParameter(
         label = "Backward trace color",
@@ -123,7 +135,8 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "Colors",
         order = 121
     )
-    var backwardTraceColor by ColorPreference(Color(100, 180, 255))
+    var backwardTraceColorTheme by ThemeColorPreference(NetworkTheme.pair { it.backwardTrace })
+    val backwardTraceColor: Color get() = backwardTraceColorTheme.resolved
 
     @UserParameter(
         label = "Receptive field trace mode",
@@ -159,6 +172,32 @@ object NetworkPreferences: PreferenceHolder() {
         order = 25
     )
     var showNumericOverlays by BooleanPreference(true)
+
+    @UserParameter(
+        label = "Show synapse strength labels",
+        description = "Show numeric strength values on individual synapses when zoomed in",
+        tab = "GUI",
+        order = 26
+    )
+    var showSynapseStrengthLabels by BooleanPreference(true)
+
+    @UserParameter(
+        label = "Synapse strength decimal places",
+        description = "Number of decimal places to display in synapse strength labels",
+        minimumValue = 0.0,
+        tab = "GUI",
+        order = 27
+    )
+    var synapseStrengthDecimalPlaces by IntegerPreference(2)
+
+    @UserParameter(
+        label = "Synapse label min screen size",
+        description = "Minimum on-screen synapse circle diameter (in pixels) before a strength label is drawn",
+        minimumValue = 1.0,
+        tab = "GUI",
+        order = 28
+    )
+    var synapseStrengthLabelMinScreenSize by IntegerPreference(28)
 
     @UserParameter(
         label = "Tooltip decimal places",

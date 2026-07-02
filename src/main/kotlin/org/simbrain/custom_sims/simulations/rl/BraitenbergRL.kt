@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.rl
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
@@ -9,6 +10,7 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.decayfunctions.LinearDecayFunction
 import org.simbrain.util.decayfunctions.StepDecayFunction
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -160,11 +162,11 @@ private class BraitenbergWeightSpacePanel(
         g2.stroke = BasicStroke(1.5f)
         g2.drawRect(x, y, size, size)
 
-        g2.font = font.deriveFont(Font.BOLD, 14f)
+        g2.font = Theme.heading
         drawCenteredString(g2, space.label, x + size / 2, y - 12)
 
-        g2.font = font.deriveFont(Font.PLAIN, 11f)
-        g2.color = Color(85, 85, 85)
+        g2.font = Theme.body
+        g2.color = Theme.mutedText
         g2.drawString("left weight", x + size / 2 - 28, y + size + 28)
         g2.rotate(-Math.PI / 2, (x - 26).toDouble(), (y + size / 2).toDouble())
         drawCenteredString(g2, "right weight", x - 26, y + size / 2)
@@ -696,7 +698,7 @@ val braitenbergRL = newSim { optionString ->
         }
     }
 
-    agent.events.collided.on { collidedWith ->
+    agent.events.collided.on(Dispatchers.Default) { collidedWith ->
         if (collidedWith === cheese || collidedWith === poison) {
             respawnCountPerTrial++
             respawnObject(world, collidedWith)
@@ -805,7 +807,7 @@ val braitenbergRL = newSim { optionString ->
                         )
                     )
                     weightSpacePanel = panel
-                    JInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
+                    GenericJInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
                         layout = BorderLayout()
                         add(panel, BorderLayout.CENTER)
                         setBounds(165, 155, 760, 420)

@@ -4,6 +4,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.weightMatrixImageMaxS
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
 import java.awt.*
+import java.awt.font.FontRenderContext
 import java.awt.font.TextLayout
 import java.awt.geom.AffineTransform
 import java.awt.geom.Rectangle2D
@@ -16,13 +17,32 @@ import kotlin.math.max
 import kotlin.math.min
 import kotlin.random.Random
 
-fun Double.getColorGradient(range: ClosedFloatingPointRange<Double>, lowColor: Color, highColor: Color) = clip(range).let {
-    if (it < 0) {
-        val (h, s, v) = lowColor.toHSB()
-        Color.getHSBColor(h, SimbrainMath.rescale(-it, 0.0, -range.start, 0.0, s.toDouble()).toFloat(), v)
-    } else {
-        val (h, s, v) = highColor.toHSB()
-        Color.getHSBColor(h, SimbrainMath.rescale(it, 0.0, range.endInclusive, 0.0, s.toDouble()).toFloat(), v)
+/** Linear RGB interpolation from [from] to [to] by [t] (0..1), packed as an opaque ARGB int. */
+private fun lerpRgb(from: Color, to: Color, t: Float): Int {
+    val tc = t.coerceIn(0f, 1f)
+    val r = (from.red + (to.red - from.red) * tc).toInt()
+    val g = (from.green + (to.green - from.green) * tc).toInt()
+    val b = (from.blue + (to.blue - from.blue) * tc).toInt()
+    return -0x1000000 or (r shl 16) or (g shl 8) or b
+}
+
+/**
+ * Maps a signed value to a diverging color: [lowColor] at the low end of [range], [midColor] (the
+ * theme's neutral midpoint, matched to the canvas background) at zero, [highColor] at the high end.
+ * Because zero maps to a background-matched neutral, resting/zero values recede instead of glowing on
+ * either a light or dark canvas (the old mapping desaturated toward white at zero).
+ */
+fun Double.getColorGradient(
+    range: ClosedFloatingPointRange<Double>,
+    lowColor: Color,
+    highColor: Color,
+    midColor: Color = NetworkTheme.current.neutralMidpoint,
+): Color {
+    val v = clip(range)
+    return when {
+        v < 0 && range.start < 0 -> Color(lerpRgb(midColor, lowColor, (v / range.start).toFloat()))
+        v > 0 && range.endInclusive > 0 -> Color(lerpRgb(midColor, highColor, (v / range.endInclusive).toFloat()))
+        else -> midColor
     }
 }
 
@@ -34,32 +54,54 @@ fun Double.toSimbrainColor(range: ClosedFloatingPointRange<Double>, coolHue: Flo
     }
 }
 
-fun Float.toSimbrainColor() = clip(-1.0f..1.0f).let {
-    if (it < 0) Color.HSBtoRGB(2/3f, -it, 1.0f) else Color.HSBtoRGB(0.0f, it, 1.0f)
+/**
+ * Diverging color for a value in -1..1 packed as an opaque ARGB int: [neg] at -1, [mid] at 0, [pos] at
+ * +1 (see [getColorGradient]). The defaults track the active theme so bitmaps recede at zero on either
+ * background instead of glowing white.
+ */
+fun Float.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+): Int {
+    val v = coerceIn(-1f, 1f)
+    return if (v < 0) lerpRgb(mid, neg, -v) else lerpRgb(mid, pos, v)
 }
 
-fun Double.toSimbrainColor() = toFloat().toSimbrainColor()
+fun Double.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = toFloat().toSimbrainColor(neg, mid, pos)
 
-/**
- * Convert array of float values to array of RGB color values.
- */
-fun FloatArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
+/** Convert an array of values in -1..1 to packed ARGB ints (theme colors resolved once for the array). */
+fun FloatArray.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(size) { this[it].toSimbrainColor(neg, mid, pos) }
 
-/**
- * Convert array of double values to array of RGB color values.
- */
-fun DoubleArray.toSimbrainColor() = map { it.toSimbrainColor() }.toIntArray()
+fun DoubleArray.toSimbrainColor(
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(size) { this[it].toSimbrainColor(neg, mid, pos) }
 
 /**
  * Converts a double array to matrix representation (as a Buffered Image) with a specified width and height, in pixels.
  *
  * Width * height must be less than the array size.
  */
-fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
+fun DoubleArray.toSimbrainColorImage(
+    width: Int, height: Int,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(width * height).let {
     if (this.size < it.size) {
-        it.fill(Color.lightGray.rgb, this.size, it.size)
+        it.fill(mid.rgb, this.size, it.size)
     }
-    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
+    System.arraycopy(toSimbrainColor(neg, mid, pos), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
     val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
@@ -70,22 +112,32 @@ fun DoubleArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width *
  * Write Simbrain color values directly into the backing array of [dest], avoiding all intermediate allocations.
  * [dest] should be a [BufferedImage.TYPE_INT_RGB] image whose dimensions match the data.
  */
-fun DoubleArray.writeSimbrainColorImage(dest: BufferedImage) {
+fun DoubleArray.writeSimbrainColorImage(
+    dest: BufferedImage,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) {
     val pixels = (dest.raster.dataBuffer as DataBufferInt).data
     val len = min(size, pixels.size)
     for (i in 0 until len) {
-        pixels[i] = this[i].toSimbrainColor()
+        pixels[i] = this[i].toSimbrainColor(neg, mid, pos)
     }
     if (size < pixels.size) {
-        pixels.fill(Color.lightGray.rgb, size, pixels.size)
+        pixels.fill(mid.rgb, size, pixels.size)
     }
 }
 
 /**
  * Converts a float array to a matrix image as in [DoubleArray.toSimbrainColorImage]
  */
-fun FloatArray.toSimbrainColorImage(width: Int, height: Int) = IntArray(width * height).let {
-    System.arraycopy(toSimbrainColor(), 0, it, 0, min(size, width * height))
+fun FloatArray.toSimbrainColorImage(
+    width: Int, height: Int,
+    neg: Color = NetworkTheme.current.coolNode,
+    mid: Color = NetworkTheme.current.neutralMidpoint,
+    pos: Color = NetworkTheme.current.hotNode,
+) = IntArray(width * height).let {
+    System.arraycopy(toSimbrainColor(neg, mid, pos), 0, it, 0, min(size, width * height))
     val colorModel: ColorModel = DirectColorModel(24, 0xff0000, 0x00ff00, 0x0000ff)
     val sampleModel = colorModel.createCompatibleSampleModel(width, height)
     val raster = Raster.createWritableRaster(sampleModel, DataBufferInt(it, width * height), null)
@@ -363,8 +415,44 @@ fun BufferedImage.getBrightnessArray() = getRGB(0, 0, width, height, null, 0, wi
 const val NUMERIC_OVERLAY_MIN_CELL_SIZE = 25.0
 
 /**
+ * Compute the largest font size whose worst-case [refString] fits within [targetWidth] x [targetHeight].
+ */
+fun computeCellFont(targetWidth: Double, targetHeight: Double, refString: String, frc: FontRenderContext): Font {
+    val baseFont = Theme.font(12)
+    val refLayout = TextLayout(refString, baseFont, frc)
+    val scaleByWidth = if (refLayout.bounds.width > 0) targetWidth / refLayout.bounds.width else 1.0
+    val scaleByHeight = if (refLayout.bounds.height > 0) targetHeight / refLayout.bounds.height else 1.0
+    val scaleFactor = min(scaleByWidth, scaleByHeight)
+    return baseFont.deriveFont((12.0 * scaleFactor).toFloat())
+}
+
+/**
+ * Draw [text] centered at ([centerX], [centerY]) in the themed value color with a halo in the themed
+ * canvas color for readability on any background. Sets antialiasing hints and modifies stroke/color on
+ * the receiver.
+ */
+fun Graphics2D.drawCenteredOutlinedLabel(text: String, font: Font, centerX: Double, centerY: Double) {
+    if (text.isEmpty()) return
+    val layout = TextLayout(text, font, fontRenderContext)
+    val textBounds = layout.bounds
+    val x = centerX - textBounds.width / 2 - textBounds.x
+    val y = centerY + textBounds.height / 2
+    val outline = layout.getOutline(AffineTransform.getTranslateInstance(x, y))
+
+    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+    setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+
+    stroke = BasicStroke(font.size2D * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+    color = NetworkTheme.current.canvasBackground
+    draw(outline)
+    color = NetworkTheme.current.valueText
+    fill(outline)
+}
+
+/**
  * Draw numeric value labels over a grid of cells. Only cells visible in the current clip are drawn.
- * Text is rendered as black with a white outline for readability over any background color.
+ * Text is rendered in the themed value color with a halo in the themed canvas color for readability
+ * over any background color.
  * Font size is computed once from a worst-case reference string so that all cells use the same size.
  */
 fun Graphics2D.drawNumericOverlay(
@@ -383,7 +471,6 @@ fun Graphics2D.drawNumericOverlay(
     val cellScreenSize = min(cellWidth, cellHeight) * scalingFactor
     if (cellScreenSize < NUMERIC_OVERLAY_MIN_CELL_SIZE) return
 
-    // Determine visible cell range from clip bounds
     val clip = clipBounds
     val startCol: Int
     val endCol: Int
@@ -401,52 +488,17 @@ fun Graphics2D.drawNumericOverlay(
         endRow = rows - 1
     }
 
-    val frc = fontRenderContext
-
-    // Compute a single font size for the entire grid using a worst-case reference string
     val refString = "-" + "8".repeat(decimalPlaces + 1) + "." + "8".repeat(decimalPlaces)
-    val targetTextWidth = cellWidth * 0.6
-    val targetTextHeight = cellHeight * 0.6
-    val baseFont = Font("SansSerif", Font.PLAIN, 12)
-    val refLayout = TextLayout(refString, baseFont, frc)
-    val scaleByWidth = if (refLayout.bounds.width > 0) targetTextWidth / refLayout.bounds.width else 1.0
-    val scaleByHeight = if (refLayout.bounds.height > 0) targetTextHeight / refLayout.bounds.height else 1.0
-    val scaleFactor = min(scaleByWidth, scaleByHeight)
-    val fontSize = (12.0 * scaleFactor).toFloat()
-    val scaledFont = baseFont.deriveFont(fontSize)
-
-    // Outline stroke proportional to font size (~15% of font size)
-    val outlineStroke = BasicStroke(fontSize * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-
-    // Use antialiasing for text
-    setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
-    setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+    val scaledFont = computeCellFont(cellWidth * 0.6, cellHeight * 0.6, refString, fontRenderContext)
 
     for (row in startRow..endRow) {
         for (col in startCol..endCol) {
             val idx = row * cols + col
             if (idx >= data.size) continue
-
             val text = data[idx].format(decimalPlaces)
-            if (text.isEmpty()) continue
-
-            val layout = TextLayout(text, scaledFont, frc)
-            val textBounds = layout.bounds
-
-            // Center in cell
-            val cx = offsetX + col * cellWidth + (cellWidth - textBounds.width) / 2 - textBounds.x
-            val cy = offsetY + row * cellHeight + (cellHeight + textBounds.height) / 2
-
-            val outline = layout.getOutline(AffineTransform.getTranslateInstance(cx, cy))
-
-            // White outline
-            stroke = outlineStroke
-            color = Color.WHITE
-            draw(outline)
-
-            // Black fill
-            color = Color.BLACK
-            fill(outline)
+            val cx = offsetX + col * cellWidth + cellWidth / 2
+            val cy = offsetY + row * cellHeight + cellHeight / 2
+            drawCenteredOutlinedLabel(text, scaledFont, cx, cy)
         }
     }
 }

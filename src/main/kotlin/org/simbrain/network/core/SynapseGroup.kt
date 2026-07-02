@@ -1,5 +1,6 @@
 package org.simbrain.network.core
 
+import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -48,9 +49,18 @@ class SynapseGroup @JvmOverloads constructor(
     var displaySynapses = false
         set(value) {
             field = value
-            this.synapses.forEach { it.isVisible = value }
+            // Snapshot: refreshVisibility may flip this from a Dispatchers.Default synapse listener while
+            // the GUI reconcile iterates `synapses` on the EDT, so don't iterate the live list here.
+            this.synapses.toList().forEach { it.isVisible = value }
             events.visibilityChanged.fire()
         }
+
+    /**
+     * When true, [displaySynapses] is kept in sync with the visibility threshold automatically as the
+     * group's size changes (see [refreshVisibility]). A manual visibility toggle clears this so the
+     * user's explicit choice is preserved.
+     */
+    var autoVisibility = true
 
     init {
         // Validate that all synapses have sources in source collection and targets in target collection
@@ -78,6 +88,20 @@ class SynapseGroup @JvmOverloads constructor(
         displaySynapses = source.size * target.size <= threshold
     }
 
+    /**
+     * Recompute [displaySynapses] from the current synapse count against the visibility threshold, so the
+     * group shows individual synapses when few and collapses to an arrow when many. Uses the actual
+     * synapse count (matching the manual-toggle gate and the rendering reconcile), which is exactly what
+     * the add/remove triggers change. No-op once the user has manually overridden visibility
+     * ([autoVisibility] is false). Only assigns on an actual change, so the visibilityChanged event (and
+     * the GUI rebuild it drives) fires only when the representation actually flips.
+     */
+    fun refreshVisibility() {
+        if (!autoVisibility) return
+        val show = synapses.size <= NetworkPreferences.synapseVisibilityThreshold
+        if (show != displaySynapses) displaySynapses = show
+    }
+
     private suspend fun removeAllSynapses(): List<NetworkModel> {
         return buildList {
             synapses.toList().forEach {  synapse ->
@@ -91,7 +115,7 @@ class SynapseGroup @JvmOverloads constructor(
         val removedSynapses = removeAllSynapses()
         target.removeIncomingSg(this)
         source.removeOutgoingSg(this)
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this) + removedSynapses
     }
 
@@ -113,6 +137,7 @@ class SynapseGroup @JvmOverloads constructor(
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
         this.synapses.add(syn)
+        refreshVisibility()
     }
 
     fun isRecurrent(): Boolean {
@@ -231,10 +256,12 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun addSynapseListener(synapse: Synapse) {
-        synapse.events.deleted.on(wait = true) {
+        synapse.events.deleted.on(Dispatchers.Default) {
             this.synapses.remove(it)
             if (this.synapses.isEmpty()) {
                 this.delete()
+            } else {
+                refreshVisibility()
             }
         }
     }

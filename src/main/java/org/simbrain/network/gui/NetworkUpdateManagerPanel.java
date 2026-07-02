@@ -3,6 +3,7 @@ package org.simbrain.network.gui;
 import org.simbrain.network.core.Network;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.StandardDialog;
+import org.simbrain.util.Theme;
 import org.simbrain.util.UpdateAction;
 
 import javax.swing.*;
@@ -48,7 +49,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         JScrollPane currentListScroll = new JScrollPane(currentActionJList);
         currentListScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        currentListScroll.setBorder(BorderFactory.createTitledBorder("Current Update Sequence"));
+        currentListScroll.setBorder(Theme.sectionBorder("Current Update Sequence"));
         updateCurrentActionsList();
         add(currentListScroll, BorderLayout.CENTER);
 
@@ -143,9 +144,9 @@ public class NetworkUpdateManagerPanel extends JPanel {
         JLabel label = new JLabel((index + 1) + ": " + ((UpdateAction) updateAction).getDescription());
         label.setToolTipText(((UpdateAction) updateAction).getLongDescription());
         if (index == 0) {
-            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Color.LIGHT_GRAY));
+            label.setBorder(BorderFactory.createMatteBorder(1, 0, 1, 0, Theme.getDivider()));
         } else {
-            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY));
+            label.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Theme.getDivider()));
         }
         label.setBackground(null);
         if (isSelected) {

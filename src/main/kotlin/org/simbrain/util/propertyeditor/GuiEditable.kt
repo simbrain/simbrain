@@ -5,6 +5,7 @@ import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ChoicesWithNull
 import org.simbrain.util.widgets.ColorSelector
+import org.simbrain.util.widgets.ThemeColorSelector
 import org.simbrain.util.widgets.YesNoNull
 import org.simbrain.workspace.WorkspacePreferences
 import smile.math.matrix.Matrix
@@ -326,7 +327,7 @@ class UpdateFunctionContext<O : EditableObject, T>(
  * Events to fire when the property dialog changes. Changing boolean values, editing text, etc. will fire this event.
  * Allows some dialog entries to respond to others.
  */
-class ParameterEvents<O : EditableObject, T> : Events() {
+class ParameterEvents<O : EditableObject, T> : FlowEvents() {
 
     val valueChanged = OneArgEvent<KProperty1<O, T>>()
 
@@ -756,6 +757,38 @@ class ColorWidget<O : EditableObject>(
     }
 
     override val value: Color
+        get() = widget.value
+
+    override fun refresh(property: KProperty<*>) {
+        parameter.update(UpdateFunctionContext(
+            editor,
+            parameter,
+            property,
+            enableWidgetProvider = { enabled ->
+                widget.isEnabled = enabled
+            },
+            widgetVisibilityProvider = { visible ->
+                widget.isVisible = visible
+            }
+        ))
+    }
+}
+
+class ThemeColorWidget<O : EditableObject>(
+    val editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, ThemeColor>,
+    isConsistent: Boolean
+) : ParameterWidget<O, ThemeColor>(parameter, isConsistent) {
+
+    override val widget by lazy {
+        ThemeColorSelector().also {
+            if (isConsistent) {
+                it.value = parameter.value
+            }
+        }
+    }
+
+    override val value: ThemeColor
         get() = widget.value
 
     override fun refresh(property: KProperty<*>) {
@@ -1256,9 +1289,8 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
         } else {
             JPanel(BorderLayout()).apply {
                 if (parameter.showLabeledBorder) {
-                    border = BorderFactory.createTitledBorder(parameter.label).apply {
-                        toolTipText = parameter.description
-                    }
+                    border = Theme.sectionBorder(parameter.label)
+                    toolTipText = parameter.description
                 }
                 val detailTrianglePanel = DetailTrianglePanel(
                     editorPanelContainer,

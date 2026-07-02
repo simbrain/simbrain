@@ -13,8 +13,8 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.showInputDialog
 import javax.swing.JComponent
-import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
 
 /**
@@ -174,7 +174,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val <T: JComponent> T.renameAction get() = createAction(
         name = "Rename..."
     ) {
-        val newName = JOptionPane.showInputDialog("Name:", subnetwork.label)
+        val newName = showInputDialog("Name:", subnetwork.label)
         if (newName != null) {
             subnetwork.label = newName
         }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSynapseContextMenu
@@ -15,17 +16,14 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
-import org.simbrain.util.StandardDialog
+import org.simbrain.util.*
 import java.awt.Color
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 import javax.swing.JPopupMenu
-import kotlin.math.abs
-import kotlin.math.atan
-import kotlin.math.cos
-import kotlin.math.sin
+import kotlin.math.*
 
 /**
  *  Piccolo representation of [Synapse]
@@ -160,10 +158,15 @@ class SynapseNode(
 
     fun updateClampStatus() {
         if (synapse.clamped) {
-            circle!!.strokePaint = Color.black
+            circle!!.strokePaint = NetworkTheme.current.nodeOutline
         } else {
             circle!!.strokePaint = null
         }
+    }
+
+    override fun refreshTheme() {
+        super.refreshTheme()
+        updateClampStatus()
     }
 
     val isSelfConnection: Boolean
@@ -361,6 +364,37 @@ class SynapseNode(
     override val model: Synapse
         get() = synapse
 
+
+    override fun paintAfterChildren(paintContext: PPaintContext) {
+        super.paintAfterChildren(paintContext)
+        if (!NetworkPreferences.showSynapseStrengthLabels) return
+        if (isSelfConnection) return
+
+        val diameter = circle?.width ?: return
+        if (diameter * networkPanel.scalingFactor < NetworkPreferences.synapseStrengthLabelMinScreenSize) return
+
+        // Visible center of the circle in this node's local coords (fullBounds includes circle.offset).
+        val centerRef = circle!!.fullBoundsReference
+        val circleCx = centerRef.centerX
+        val circleCy = centerRef.centerY
+
+        // The synapse circle sits on the target neuron's perimeter, so the half toward the target is
+        // covered. Offset the label toward the source (visible half). Direction is preserved under
+        // translation, so we can compute it directly from the global neuron locations.
+        val dx = source.neuron.x - target.neuron.x
+        val dy = source.neuron.y - target.neuron.y
+        val mag = sqrt(dx * dx + dy * dy)
+        if (mag < 1e-6) return
+        val labelX = circleCx + (dx / mag) * (diameter / 4)
+        val labelY = circleCy + (dy / mag) * (diameter / 4)
+
+        val decimals = NetworkPreferences.synapseStrengthDecimalPlaces
+        val text = synapse.strength.format(decimals)
+        val refString = "-9." + "9".repeat(decimals)
+        val g2 = paintContext.graphics
+        val font = computeCellFont(diameter * 0.6, diameter * 0.3, refString, g2.fontRenderContext)
+        g2.drawCenteredOutlinedLabel(text, font, labelX, labelY)
+    }
 
     override fun isIntersecting(bound: PBounds?): Boolean {
         if (isSelfConnection) {

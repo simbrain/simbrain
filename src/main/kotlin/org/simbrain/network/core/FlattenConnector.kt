@@ -51,7 +51,7 @@ class FlattenConnector(val source: TensorLayer, val target: NeuronArray) :
     override suspend fun delete(): List<NetworkModel> {
         source.removeOutgoingFlattenConnector(this)
         target.removeIncomingFlattenConnector(this)
-        events.deleted.fire(this).await()
+        events.deleted.fire(this)
         return listOf(this)
     }
 

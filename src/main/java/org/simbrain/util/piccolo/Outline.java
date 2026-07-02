@@ -4,6 +4,7 @@ import org.piccolo2d.PNode;
 import org.piccolo2d.nodes.PPath;
 import org.piccolo2d.util.PBounds;
 import org.simbrain.network.gui.nodes.ScreenElement;
+import org.simbrain.util.NetworkTheme;
 
 import java.awt.*;
 import java.beans.PropertyChangeListener;
@@ -94,9 +95,14 @@ public class Outline extends PNode {
                 ARC_SIZE,
                 ARC_SIZE
         );
-        outline.setStrokePaint(Color.gray);
+        outline.setStrokePaint(NetworkTheme.INSTANCE.getCurrent().getSubnetOutline());
         outline.setPaint(null);
         addChild(outline);
+    }
+
+    /** Re-apply the themed outline color after a light/dark switch (bounds are unchanged). */
+    public void refreshThemeColor() {
+        outline.setStrokePaint(NetworkTheme.INSTANCE.getCurrent().getSubnetOutline());
     }
 
     public int getOutlinePadding() {

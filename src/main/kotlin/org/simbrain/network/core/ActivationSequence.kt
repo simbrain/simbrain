@@ -59,6 +59,19 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
             events.updated.fire()
         }
 
+    /**
+     * Rows (sequence positions) to draw a persistent highlight box around in the GUI. Unlike the hover
+     * trace, this is programmatic and survives mouse movement, so simulations can call out a position of
+     * interest (e.g. the row a next token is sampled from). Empty means no highlight.
+     */
+    @Transient
+    var highlightedRows: Set<Int> = emptySet()
+        set(value) {
+            if (field == value) return
+            field = value
+            events.updateGraphics.fire()
+        }
+
     override fun processError(
         error: Matrix,
         signalSource: Layer,

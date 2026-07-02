@@ -9,7 +9,6 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.io.File
 import javax.swing.Action
-import javax.swing.JOptionPane
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
 import kotlin.math.abs
@@ -176,7 +175,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         lastY = y
 
         g2d.dispose()
-        imageWorld.imageAlbum.events.imageUpdate.fire()
+        imageWorld.imageAlbum.events.imageUpdate.fireAsync()
     }
 
     /**
@@ -344,7 +343,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
 
     private fun saveAllImages() {
         val fileChooser = SFileChooser(imageDirectory, "")
-        JOptionPane.showInputDialog("Enter a prefix for the image files")?.let { fileNamePrefix ->
+        showInputDialog("Enter a prefix for the image files")?.let { fileNamePrefix ->
             fileChooser.setDescription("Save images")
             showDirectorySelectionDialog()?.let { File(it) }?.let { dir ->
                 imageWorld.imageAlbum.writeAllImagesToFile(dir, fileNamePrefix)

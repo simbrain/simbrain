@@ -261,14 +261,14 @@ val grazingCows = newSim { optionString ->
 
     suspend fun runHeadless() {
         val runner = buildRunner()
-        runner.events.generationUpdated.on { state ->
+        runner.events.generationUpdated.on(Dispatchers.Default) { state ->
             listOf(0, 10, 25, 50, 75, 90, 100).joinToString(" ") {
                 "$it: ${state.nthPercentileFitness(it).format(3)}"
             }.also {
                 println("[${state.generation}] $it")
             }
         }
-        runner.events.endEvolution.on {
+        runner.events.endEvolution.on(Dispatchers.Default) {
             runner.generationState?.let { state ->
                 with(state.best.createDisplayCopy(workspace) as CowSim) {
                     build()

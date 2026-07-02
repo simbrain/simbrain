@@ -7,6 +7,9 @@ import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.util.NetworkTheme
+import org.simbrain.util.Theme
+import org.simbrain.util.blend
 import java.awt.Color
 import java.awt.geom.Rectangle2D
 import java.beans.PropertyChangeEvent
@@ -19,6 +22,10 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
 
     private val textLabel: PText
     private val kebabMenu: PNode
+    private val dots = mutableListOf<PPath>()
+
+    /** Tab fill color; subclasses override to tint the tab (e.g. supervised models). */
+    protected open val tabFillColor: Color get() = NetworkTheme.current.tabFill
 
     /**
      * Padding values for layout
@@ -59,19 +66,28 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
      */
     init {
         this.append(rect, false)
-        val color = Color(248, 252, 184)
-        setPaint(color)
-        // setTransparency(.2f);
-        setStrokePaint(Color.GRAY)
-        
-        textLabel = PText()
+        textLabel = PText().apply { font = Theme.body }
         addChild(textLabel)
-        
+
         // Create kebab menu button
         kebabMenu = createKebabMenu()
         addChild(kebabMenu)
-        
+
+        applyThemeColors()
+
         networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener)
+    }
+
+    /** Re-apply the themed tab colors (fill, border, label, kebab dots). */
+    protected fun applyThemeColors() {
+        setPaint(tabFillColor)
+        setStrokePaint(NetworkTheme.current.subnetOutline)
+        textLabel.textPaint = NetworkTheme.current.tabText
+        dots.forEach { it.setPaint(blend(NetworkTheme.current.tabText, tabFillColor, 0.55)) }
+    }
+
+    override fun refreshTheme() {
+        applyThemeColors()
     }
 
     /**
@@ -86,15 +102,11 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         // Set explicit bounds for the menu container with padding for hover area
         menuNode.setBounds(0.0, 0.0, dotSize + (kebabPaddingX * 2), dotsHeight + (kebabPaddingY * 2))
         
-        val dots = mutableListOf<PPath>()
-        val normalDotColor = Color.DARK_GRAY
-        val hoverDotColor = Color.GRAY
-        
         // Calculate starting position for dots
         val dotsStartX = kebabPaddingX
         val dotsStartY = kebabPaddingY
-        
-        // Create three circular dots, arranged vertically
+
+        // Create three circular dots, arranged vertically (colors applied by applyThemeColors)
         for (i in 0..2) {
             val dot = PPath.createEllipse(
                 dotsStartX,
@@ -102,24 +114,23 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
                 dotSize,
                 dotSize
             )
-            dot.setPaint(normalDotColor)
             dot.setStroke(null) // No border, just filled circles
             dots.add(dot)
             menuNode.addChild(dot)
         }
-        
-        // Add input event handlers for click and hover
+
+        // Add input event handlers for click and hover (hover colors read fresh from the theme)
         menuNode.addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseClicked(event: PInputEvent) {
                 onKebabMenuClicked(event)
             }
-            
+
             override fun mouseEntered(event: PInputEvent) {
-                dots.forEach { it.setPaint(hoverDotColor) }
+                dots.forEach { it.setPaint(NetworkTheme.current.tabText) }
             }
-            
+
             override fun mouseExited(event: PInputEvent) {
-                dots.forEach { it.setPaint(normalDotColor) }
+                dots.forEach { it.setPaint(blend(NetworkTheme.current.tabText, tabFillColor, 0.55)) }
             }
         })
         

@@ -8,6 +8,7 @@ import org.pmw.tinylog.Logger
 import org.simbrain.util.SFileChooser
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.showWarningDialog
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -115,7 +116,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
                 FileInputStream(file)
             }
         } catch (ex: FileNotFoundException) {
-            JOptionPane.showMessageDialog(null, String.format("File %s was not found.", file))
+            showWarningDialog(String.format("File %s was not found.", file))
             return
         }
         val newComponent: E = try {
@@ -131,7 +132,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
                 name,
                 workspaceComponent.javaClass.simpleName
             )
-            JOptionPane.showMessageDialog(null, message)
+            showWarningDialog(message)
             ex.printStackTrace()
             return
         }

@@ -5,12 +5,12 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.simbrain.network.gui.nodes.InteractionBox
 import org.simbrain.network.gui.nodes.NodeHandle
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.util.complement
 import java.util.*
 import java.util.concurrent.CopyOnWriteArraySet
 
-class OdorWorldSelectionEvent: Events() {
+class OdorWorldSelectionEvent: FlowEvents() {
     val selection = ChangedEvent<Set<PNode>>()
 }
 

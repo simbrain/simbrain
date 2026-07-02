@@ -8,13 +8,15 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 
+import org.simbrain.plot.ChartThemeKt;
+import org.simbrain.util.SwingUtilsKt;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Arrays;
 import java.util.Iterator;
-import java.util.Random;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a
@@ -63,6 +65,12 @@ public class HistogramPanel extends JPanel {
     public static final byte DEFAULT_ALPHA = -0x50;
 
     /**
+     * Alpha (0–255) applied to series colors so overlapping histogram bars blend; the unsigned value
+     * of the legacy {@link #DEFAULT_ALPHA} byte.
+     */
+    private static final int SERIES_ALPHA = DEFAULT_ALPHA & 0xFF;
+
+    /**
      * The default (and maximum, unless otherwise changed) number of colors
      * available to different data sets. Implicitly this is the default maximum
      * number of supported data sets.
@@ -89,25 +97,15 @@ public class HistogramPanel extends JPanel {
      * replaced with ALPHA.
      */
     static {
-        DEFAULT_PALLET[0] = new Color((Color.RED.getRGB() << 8) >>> 8 | DEFAULT_ALPHA << 24, true);
-        DEFAULT_PALLET[1] = new Color((Color.BLUE.getRGB() << 8) >>> 8 | DEFAULT_ALPHA << 24, true);
-        DEFAULT_PALLET[2] = new Color((Color.GREEN.getRGB() << 8) >>> 8 | DEFAULT_ALPHA << 24, true);
-        DEFAULT_PALLET[3] = new Color((Color.YELLOW.getRGB() << 8) >>> 8 | DEFAULT_ALPHA << 24, true);
-
+        for (int i = 0; i < DEFAULT_NUM_DATASETS; i++) {
+            DEFAULT_PALLET[i] = ChartThemeKt.chartSeriesColor(i, SERIES_ALPHA);
+        }
     }
 
     private int index = 0;
 
     private Color assignColor() {
-        if (index < DEFAULT_PALLET.length) {
-            return DEFAULT_PALLET[index++];
-        } else {
-            int randomColor = 0;
-            Random rand = new Random();
-            randomColor = rand.nextInt() << 8 >>> 8;
-            randomColor = randomColor | DEFAULT_ALPHA << 24;
-            return new Color(randomColor);
-        }
+        return ChartThemeKt.chartSeriesColor(index++, SERIES_ALPHA);
     }
 
     /**
@@ -191,7 +189,7 @@ public class HistogramPanel extends JPanel {
                     model.applyCurrentData();
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
-                    JOptionPane.showMessageDialog(getParent(), "Non-Integer number of bins.", "Error", JOptionPane.ERROR);
+                    SwingUtilsKt.showErrorDialog("Non-Integer number of bins.");
                 }
             }
 
@@ -209,7 +207,7 @@ public class HistogramPanel extends JPanel {
         try {
             if (this.getModel().getData() != null) {
                 mainChart = ChartFactory.createHistogram(title, xAxisName, yAxisName, model.getDataSet(), PlotOrientation.VERTICAL, true, true, false);
-                mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
+                ChartThemeKt.applySimbrainChartTheme(mainChart);
 
                 XYPlot plot = (XYPlot) mainChart.getPlot();
                 plot.setForegroundAlpha(0.75F);
@@ -236,16 +234,16 @@ public class HistogramPanel extends JPanel {
             } else {
 
                 mainChart = ChartFactory.createHistogram(title, xAxisName, yAxisName, model.getDataSet(), PlotOrientation.VERTICAL, true, true, false);
-                mainChart.setBackgroundPaint(UIManager.getColor("this.Background"));
+                ChartThemeKt.applySimbrainChartTheme(mainChart);
 
             }
 
         } catch (IllegalArgumentException iaEx) {
             iaEx.printStackTrace();
-            JOptionPane.showMessageDialog(null, iaEx.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            SwingUtilsKt.showErrorDialog(iaEx.getMessage());
         } catch (IllegalStateException isEx) {
             isEx.printStackTrace();
-            JOptionPane.showMessageDialog(null, isEx.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+            SwingUtilsKt.showErrorDialog(isEx.getMessage());
         }
         mainPanel = new ChartPanel(mainChart);
 

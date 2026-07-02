@@ -3,6 +3,7 @@ package org.simbrain.util
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 
@@ -206,7 +207,13 @@ fun <T> Collection<T>.sizeIncluding(item: T?): Int {
  *
  * @param timeoutMillis Maximum time in milliseconds to wait for a value before timing out.
  */
-class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1000) {
+class CompletableDeferredHashMap<K, V : Any>(
+    // Generous: only a backstop against a value that truly never arrives (a bug), not a load-sensitivity
+    // knob. The previous 1s value caused spurious timeouts whenever node creation lagged under EDT load.
+    private val timeoutMillis: Long = 10_000,
+    // Short: getImmediately only briefly waits on an in-flight value before reporting absence.
+    private val immediateTimeoutMillis: Long = 1_000,
+) {
     private val map = ConcurrentHashMap<K, CompletableDeferred<V>>()
 
     suspend fun <T : V> get(key: K): T {
@@ -216,8 +223,15 @@ class CompletableDeferredHashMap<K, V : Any>(private val timeoutMillis: Long = 1
         }
     }
 
+    /**
+     * The value if it is (or quickly becomes) available, else null. Unlike [get], a slow or
+     * never-arriving value is reported as null after [immediateTimeoutMillis] rather than thrown, so a
+     * caller can recreate or skip instead of crashing the whole operation. This is what its name implies
+     * — "give it to me if it's readily there" — and matches its `?: createNode(...)` / `?.let { }` uses.
+     */
+    @Suppress("UNCHECKED_CAST")
     suspend fun <T : V> getImmediately(key: K): T? {
-        return withTimeout(timeoutMillis) { map[key]?.await() as T? }
+        return withTimeoutOrNull(immediateTimeoutMillis) { map[key]?.await() as T? }
     }
 
     operator fun set(key: K, value: V): CompletableDeferred<V> {

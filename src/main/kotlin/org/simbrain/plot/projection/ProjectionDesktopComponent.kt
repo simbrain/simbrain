@@ -17,6 +17,7 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.xy.XYDataset
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.projection.*
@@ -184,7 +185,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         projector.projectionMethod.let { projection ->
             if (projection is IterableProjectionMethod) {
                 projection.iterate(projector.dataset)
-                projector.events.iterated.fire(projection.error).await()
+                projector.events.iterated.fire(projection.error)
             }
         }
         projector.events.datasetChanged.fire()
@@ -215,9 +216,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         "", "Projection X", "Projection Y",
         xyCollection, PlotOrientation.VERTICAL, true, true, false
     ).apply {
-        xyPlot.backgroundPaint = Color.white
-        xyPlot.domainGridlinePaint = Color.gray
-        xyPlot.rangeGridlinePaint = Color.gray
+        applySimbrainChartTheme()
         val rangeAxis = xyPlot.rangeAxis as NumberAxis
         val domainAxis = xyPlot.domainAxis as NumberAxis
         rangeAxis.upperMargin = 0.1
@@ -325,7 +324,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             bottomPanel.repaint()
             launch { redrawAllPoints() }
         }
-        projector.events.iterated.on(dispatcher = Dispatchers.Swing, wait = true) { error ->
+        projector.events.iterated.on(Dispatchers.Swing) { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
         launch {

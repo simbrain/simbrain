@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes;
 import org.piccolo2d.PNode;
 import org.piccolo2d.extras.handles.PHandle;
 import org.piccolo2d.extras.util.PNodeLocator;
+import org.simbrain.util.NetworkTheme;
 
 import java.awt.*;
 import java.awt.geom.Rectangle2D;
@@ -17,24 +18,24 @@ public class NodeHandle extends PHandle {
 
 
     /**
-     * Green selection handle.
+     * Ordinary selection handle (themed selection color).
      */
     public static final Config SELECTION_STYLE = new Config();
 
     /**
-     * Red "source style" selection handle.
+     * Source-selection handle (themed source color).
      */
-    public static final Config SOURCE_STYLE = new Config(0.2f, Color.RED);
+    public static final Config SOURCE_STYLE = new Config(0.2f, Config.Role.SOURCE);
 
     /**
      * Style used with interaction box selection.
      */
-    public static final Config INTERACTION_BOX_SELECTION_STYLE = new Config(0.01f, 2, Color.green);
+    public static final Config INTERACTION_BOX_SELECTION_STYLE = new Config(0.01f, 2, Config.Role.SELECTION);
 
     /**
      * Style used with interaction box source selection.
      */
-    public static final Config INTERACTION_BOX_SOURCE_STYLE = new Config(0.09f, Color.RED);
+    public static final Config INTERACTION_BOX_SOURCE_STYLE = new Config(0.09f, Config.Role.SOURCE);
 
     /**
      * Regular selections associated with a node.
@@ -69,11 +70,19 @@ public class NodeHandle extends PHandle {
         if (style.thickness > 1) {
             setStroke(new BasicStroke(style.thickness, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         }
-        setStrokePaint(style.selectionColor);
+        setStrokePaint(style.resolveColor());
 
         // Force handle to check its location and size
         updateBounds();
         relocateHandle();
+    }
+
+    /**
+     * Re-resolve this handle's stroke color from the active canvas theme. Called on a live light/dark switch
+     * since handles are plain {@link PHandle} children and are not in the network panel's screen-element sweep.
+     */
+    public void refreshThemeColor() {
+        setStrokePaint(style.resolveColor());
     }
 
     @Override
@@ -191,27 +200,33 @@ public class NodeHandle extends PHandle {
     public static class Config {
 
         /**
+         * Whether a handle marks an ordinary selection or a connection source, determining which themed
+         * canvas color it resolves against.
+         */
+        public enum Role {SELECTION, SOURCE}
+
+        /**
          * Amount of space to add between the selected object and the selection
          * handle.
          */
         private float extensionFactor = 0.075f;
 
         /**
-         * Color of selection boxes.
+         * Role of this handle, mapped to a themed color at paint/refresh time.
          */
-        private Color selectionColor = Color.green;
+        private Role role = Role.SELECTION;
 
         private int thickness = 1;
 
-        public Config(float extensionFactor, int thickness, Color selectionColor) {
+        public Config(float extensionFactor, int thickness, Role role) {
             this.extensionFactor = extensionFactor;
-            this.selectionColor = selectionColor;
+            this.role = role;
             this.thickness = thickness;
         }
 
-        public Config(float extensionFactor, Color selectionColor) {
+        public Config(float extensionFactor, Role role) {
             this.extensionFactor = extensionFactor;
-            this.selectionColor = selectionColor;
+            this.role = role;
         }
 
         public Config() {
@@ -221,8 +236,18 @@ public class NodeHandle extends PHandle {
             return extensionFactor;
         }
 
-        public Color getSelectionColor() {
-            return selectionColor;
+        public Role getRole() {
+            return role;
+        }
+
+        /**
+         * The current themed stroke color for this handle's role, read live from {@link NetworkTheme} so it
+         * always reflects the active light/dark mode.
+         */
+        public Color resolveColor() {
+            return role == Role.SOURCE
+                    ? NetworkTheme.INSTANCE.getCurrent().getSourceHandle()
+                    : NetworkTheme.INSTANCE.getCurrent().getSelectionHandle();
         }
     }
 }

@@ -1,11 +1,11 @@
 package org.simbrain.workspace.couplings
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 
 /**
- * See [Events]
+ * See [FlowEvents]
  */
-class CouplingEvents: Events() {
+class CouplingEvents: FlowEvents() {
 
     val couplingAdded = OneArgEvent<Coupling>()
     val couplingRemoved = OneArgEvent<Coupling>()

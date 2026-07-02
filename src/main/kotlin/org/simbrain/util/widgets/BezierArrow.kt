@@ -1,12 +1,13 @@
 package org.simbrain.util.widgets
 
 import org.piccolo2d.PNode
-import org.piccolo2d.nodes.PArea
 import org.piccolo2d.nodes.PPath
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.geom.AffineTransform
+import java.awt.geom.Area
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Line2D
 
@@ -35,16 +36,17 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     private val updateEvent = template.updateEvent
 
     /**
-     * The triangle at the tip of the arrow. This triangle is constructed only once, and during [layout] the this
-     * triangle will be placed onto the correct location
+     * The triangle at the tip of the arrow. This shape is constructed only once, and during [layout] it is
+     * transformed onto the correct location and unioned with the stroked curve.
      */
-    private val arrowTip = listOf(point(0.0, -sin60deg), point(0.5, 0.0), point(-0.5, 0.0))
+    private val arrowTipShape = listOf(point(0.0, -sin60deg), point(0.5, 0.0), point(-0.5, 0.0))
             .map { it * (thickness * 2.0) }.toPolygon()
-            .let { polygon -> PArea(polygon, null) }
-            .apply {
-                paint = color
-                transparency = 0.5f
-            }
+
+    /**
+     * The arrow as currently rendered: the stroked curve and the tip triangle unioned into a single
+     * translucent shape, so their overlap does not double-blend into seams.
+     */
+    private var arrowView: PPath? = null
 
     /**
      * Update the shape of the arrow base on the outlines of source and target.
@@ -71,15 +73,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                     }
                 }.also { if (it == null) updateEvent(null) } ?: return
 
-        // 2. put the arrow tip at the right location and orient it at the right angle
-        arrowTip.getTransformReference(true).apply {
-            setToTranslation(targetSide.headOffset.x, targetSide.headOffset.y)
-            val theta = targetSide.normalTheta
-            rotate(theta)
-        }
-        arrowTip.invalidateFullBounds();
-
-        // 3. compute the curve
+        // 2. compute the curve
         val curveModel = cubicBezier(
                 sourceSide.tailOffset,
                 sourceSide.tailOffset + deltaVector.abs * sourceSide.unitNormal * 0.5,
@@ -87,29 +81,39 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                 targetSide.headOffset
         )
 
-        // 4. create the curve PNode
-        val curveView = PPath.Double(curveModel, BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)).apply {
-            paint = null
-            strokePaint = color
-            transparency = 0.5f
+        // 3. transform the tip onto the head location and union it with the stroked curve
+        val tipTransform = AffineTransform().apply {
+            translate(targetSide.headOffset.x, targetSide.headOffset.y)
+            rotate(targetSide.normalTheta)
+        }
+        val arrowShape = Area(BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER).createStrokedShape(curveModel)).apply {
+            add(Area(tipTransform.createTransformedShape(arrowTipShape)))
         }
 
-        // 5. add shape to node
-        addChild(curveView)
-        addChild(arrowTip)
+        // 4. create the arrow PNode
+        arrowView = PPath.Double(arrowShape, null).apply {
+            paint = color
+            transparency = 0.5f
+        }.also { addChild(it) }
 
-        // 6. call back
+        // 5. call back
         updateEvent(curveModel)
 
     }
 
     /**
+     * Recolor the arrow to the given color.
+     */
+    fun updateColor(color: Color) {
+        this.color = color
+        arrowView?.paint = color
+    }
+
+    /**
      * Update the arrow color from the current [NetworkPreferences.connectorArrowColor].
-     * The arrowTip paint is updated immediately; the curve strokePaint updates on the next [layout] call.
      */
     fun updateColorFromPreferences() {
-        color = NetworkPreferences.connectorArrowColor
-        arrowTip.paint = color
+        updateColor(NetworkPreferences.connectorArrowColor)
     }
 
     /**

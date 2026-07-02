@@ -33,5 +33,9 @@ class ImageBox(val width: Int, val height: Int, thickness: Float) : PNode() {
         addChild(it)
     }
 
+    /** Re-read the boundary color from preferences (e.g. after a light/dark theme switch). */
+    fun updateBorderColorFromPreferences() {
+        box.strokePaint = NetworkPreferences.weightMatrixBoundaryColor
+    }
 
 }

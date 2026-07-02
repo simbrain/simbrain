@@ -1,17 +1,17 @@
 package org.simbrain.workspace.events
 
-import org.simbrain.util.Events
+import org.simbrain.util.FlowEvents
 import org.simbrain.workspace.AttributeContainer
 
 /**
- * See [Events].
+ * See [FlowEvents].
  */
-class WorkspaceComponentEvents: Events() {
+class WorkspaceComponentEvents: FlowEvents() {
     val componentUpdated = NoArgEvent()
     val componentMinimized = OneArgEvent<Boolean>()
     val guiToggled = NoArgEvent()
     val componentOnOffToggled = NoArgEvent()
     val componentClosing = NoArgEvent()
-    val attributeContainerAdded = OneArgEvent<AttributeContainer>()
+    val attributeContainerAdded = AwaitableEvent<AttributeContainer>()
     val attributeContainerRemoved = OneArgEvent<AttributeContainer>()
 }

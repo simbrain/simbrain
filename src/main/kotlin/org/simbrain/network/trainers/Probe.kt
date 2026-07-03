@@ -55,6 +55,12 @@ class Probe(
         upstreamWeightModels().forEach { model ->
             model.events.updated.on(Dispatchers.Default) { stale = true }
         }
+        // A probed tensor stage is outside this model's layer chain, so the SupervisedModel
+        // deleted-listeners don't cover it. Safety net for deletions that bypass
+        // Network.deleteModels (which captures this cascade for undo itself).
+        if (probedModel !== inputLayer) {
+            probedModel.events.deleted.on(Dispatchers.Default) { delete() }
+        }
     }
 
     suspend fun rebuildDataset() {

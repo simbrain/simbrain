@@ -250,9 +250,19 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
-        // Add all models without parents back
+        // Add all models without parents back. Supervised overlays go in a second, awaited batch:
+        // their node creation awaits their layer and matrix nodes (see NetworkPanel.createNode), and
+        // those can live inside another restored container (a probe on a host subnetwork's internal
+        // layer), whose node tree must therefore exist first. fireAsync gives no ordering guarantee
+        // within one batch, so a barrier between the batches is required.
+        val (overlays, others) = modelsToReAdd.filter { hasNoParent(it) }.partition { it is SupervisedModel }
         network.addNetworkModelsAsync(
-            modelsToReAdd.filter { hasNoParent(it) },
+            others,
+            usePlacementManager = false,
+            useAutoAssignedId = false
+        ).awaitAll()
+        network.addNetworkModelsAsync(
+            overlays,
             usePlacementManager = false,
             useAutoAssignedId = false
         ).awaitAll()

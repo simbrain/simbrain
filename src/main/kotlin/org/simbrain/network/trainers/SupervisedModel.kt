@@ -112,15 +112,15 @@ open class SupervisedModel(
      */
     context(Network)
     override fun shouldAdd(): Boolean {
-        // Register layers as children of this model
-        childToParentMap[inputLayer] = this@SupervisedModel
-        childToParentMap[outputLayer] = this@SupervisedModel
-        
-        // Register all weight matrices as children of this model
+        // Register layers and weight matrices as children of this model. A model may already belong
+        // to another container (e.g. a probed layer inside a host subnetwork); the first registered
+        // parent keeps ownership, or undo would restore that model outside its real container.
+        childToParentMap.putIfAbsent(inputLayer, this@SupervisedModel)
+        childToParentMap.putIfAbsent(outputLayer, this@SupervisedModel)
         weightMatrices.forEach { matrix ->
-            childToParentMap[matrix] = this@SupervisedModel
+            childToParentMap.putIfAbsent(matrix, this@SupervisedModel)
         }
-        
+
         return true
     }
 

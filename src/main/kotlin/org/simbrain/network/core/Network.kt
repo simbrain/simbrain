@@ -5,6 +5,7 @@ import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -336,9 +337,12 @@ class Network: CoroutineScope, EditableObject {
                     }
                 }
                 is SupervisedModel -> {
-                    model.layers.forEach { childToParentMap[it] = model }
-                    model.weightMatrices.forEach { childToParentMap[it] = model }
-                    model.synapseGroups.forEach { childToParentMap[it] = model }
+                    // putIfAbsent: a supervised model's path can run through models owned by another
+                    // container (e.g. a probe on a layer inside a host subnetwork), which must keep
+                    // its original parent for undo to restore it into the right container.
+                    model.layers.forEach { childToParentMap.putIfAbsent(it, model) }
+                    model.weightMatrices.forEach { childToParentMap.putIfAbsent(it, model) }
+                    model.synapseGroups.forEach { childToParentMap.putIfAbsent(it, model) }
                     model.layers.forEach { l ->
                         l.events.deleted.on(Dispatchers.Default) { childToParentMap.remove(l) }
                     }
@@ -376,6 +380,10 @@ class Network: CoroutineScope, EditableObject {
      * @return list of deleted models (needed for undo /redo)
      */
     suspend fun deleteModels(networkModels: List<NetworkModel>): List<NetworkModel> {
+
+        // Snapshot before deleting: a probe whose host is deleted below removes itself from the
+        // model list through an asynchronous listener, racing the sweep at the end of this method.
+        val probes = getModels(Probe::class.java).toList()
 
         fun isLastChildOfParent(childToParentMap: Map<NetworkModel, NetworkModel>, model: NetworkModel): Boolean {
             return childToParentMap[model]?.let { parent ->
@@ -417,6 +425,19 @@ class Network: CoroutineScope, EditableObject {
                 }
                 deleteModel(childToParentMap, it)
             }
+
+            // A probe references its probed host model outside its own layer chain (e.g. a CNN
+            // tensor stage feeding the probe through a flatten connector), so deleting the host does
+            // not cascade to the probe through the maps above. Delete such probes here so the
+            // cascade is captured for undo.
+            probes
+                .filter { probe -> probe.probedModel in this && probe !in this }
+                .forEach { probe ->
+                    addAll(probe.delete())
+                    childToParentMap.entries.filter { entry -> entry.value == probe }.map { entry -> entry.key }.forEach {
+                        childToParentMap.remove(it)
+                    }
+                }
         }
     }
 

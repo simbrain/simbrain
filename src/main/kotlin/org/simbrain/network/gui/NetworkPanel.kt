@@ -404,6 +404,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {
         val arrayNodes = supervisedModel.layers.map { modelNodeMap.get<ScreenElement>(it) }
         val weightMatrixNodes = supervisedModel.weightMatrices.map { modelNodeMap.get<ScreenElement>(it) }
+        val customInfoNode = supervisedModel.customInfo?.let { model ->
+            modelNodeMap.getImmediately<ScreenElement>(model) ?: createNode(model)
+        }
         val node = when (supervisedModel) {
             is Probe -> ProbeNode(this, supervisedModel)
             else -> SupervisedModelNode(this, supervisedModel)
@@ -411,6 +414,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         node.apply {
             arrayNodes.forEach { addNode(it) }
             weightMatrixNodes.forEach { addNode(it) }
+            customInfoNode?.let { setInfoTextNode(it) }
         }
     }
 

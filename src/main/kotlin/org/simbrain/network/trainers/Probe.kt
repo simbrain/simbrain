@@ -27,6 +27,13 @@ class Probe(
     override val events: ProbeEvents = ProbeEvents()
 
     /**
+     * Canvas text displaying the probed layer, the current prediction, and staleness; kept in sync
+     * by [updateCustomInfo]. Position and spacing are user-editable via its settings dialog and
+     * serialized with the probe.
+     */
+    override val customInfo = InfoText("").apply { position = InfoText.Position.ABOVE_INTERACTION_BOX }
+
+    /**
      * Human-readable provenance of the targets, e.g. "Has loop: digit in {0, 6, 8, 9}, derived from
      * MNIST labels".
      */
@@ -40,7 +47,10 @@ class Probe(
         set(value) {
             val changed = field != value
             field = value
-            if (changed) events.stalenessChanged.fire()
+            if (changed) {
+                events.stalenessChanged.fire()
+                updateCustomInfo()
+            }
         }
 
     /**
@@ -67,6 +77,31 @@ class Probe(
         if (probedModel !== inputLayer) {
             probedModel.events.deleted.on(Dispatchers.Default) { delete() }
         }
+        outputLayer.events.updated.on(Dispatchers.Default) { updateCustomInfo() }
+        updateCustomInfo()
+    }
+
+    /**
+     * The readout's winning label with its activation, or null if the readout has no labels.
+     */
+    fun predictedLabel(): Pair<String, Double>? {
+        val readout = outputLayer as? NeuronArray ?: return null
+        val labels = readout.labelArray ?: return null
+        val activations = readout.activationArray
+        if (activations.isEmpty()) return null
+        val winner = activations.indices.maxBy { activations[it] }
+        return labels.getOrNull(winner)?.let { it to activations[winner] }
+    }
+
+    fun updateCustomInfo() {
+        customInfo.text = buildString {
+            append("Probing ${probedModel.displayName}")
+            predictedLabel()?.let { (label, confidence) ->
+                append("\nPredicted: $label (${"%.2f".format(confidence)})")
+            }
+            if (stale) append("\nStale: dataset needs rebuild")
+        }
+        events.customInfoUpdated.fire()
     }
 
     suspend fun rebuildDataset() {
@@ -146,5 +181,12 @@ class Probe(
         }
         visit(inputLayer)
         return result
+    }
+
+    override fun toString(): String = buildString {
+        append(super.toString())
+        append("\nProbing: ${probedModel.displayName}")
+        if (targetDescription.isNotBlank()) append("\nTargets: $targetDescription")
+        if (stale) append("\nDataset is stale")
     }
 }

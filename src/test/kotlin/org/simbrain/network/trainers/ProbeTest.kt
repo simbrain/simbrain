@@ -126,6 +126,7 @@ class ProbeTest {
         }
         probe.targetDescription = "Test targets"
         probe.stale = true
+        probe.customInfo.position = InfoText.Position.ABOVE_INTERACTION_BOX
 
         val xml = getNetworkXStream().toXML(network)
         val fromXml = getNetworkXStream().fromXML(xml) as Network
@@ -137,6 +138,7 @@ class ProbeTest {
         assertSame(restoredHidden, restoredProbe.inputLayer)
         assertEquals("Test targets", restoredProbe.targetDescription)
         assertTrue(restoredProbe.stale)
+        assertEquals(InfoText.Position.ABOVE_INTERACTION_BOX, restoredProbe.customInfo.position)
 
         restoredProbe.stale = false
         restoredBp.wmList.first().randomize()
@@ -262,6 +264,34 @@ class ProbeTest {
             assertEquals(1.0, probe.outputLayer.activationArray.sum(), 1e-10,
                 "the softmax readout must have been recomputed")
         }
+    }
+
+    @Test
+    fun `custom info text shows the probed layer, prediction, and staleness`() = runBlocking {
+        val network = Network()
+        val hostInput = NeuronArray(2).apply { isClamped = true }
+        val hostHidden = NeuronArray(2)
+        network.addNetworkModelsAsync(hostInput, hostHidden, WeightMatrix(hostInput, hostHidden))
+        val probe = with(network) {
+            createProbe(hostHidden, readoutSize = 2, readoutLabels = arrayOf("No", "Yes"))
+        }
+
+        assertTrue(probe.customInfo.text.contains("Probing ${hostHidden.displayName}"))
+
+        with(network) {
+            hostInput.setActivations(doubleArrayOf(5.0, 0.0))
+            hostHidden.accumulateInputs()
+            hostHidden.update()
+            probe.refreshOutput()
+        }
+        withTimeout(2000) {
+            while (!probe.customInfo.text.contains("Predicted: ")) delay(20)
+        }
+
+        probe.stale = true
+        assertTrue(probe.customInfo.text.contains("Stale"))
+        probe.stale = false
+        assertFalse(probe.customInfo.text.contains("Stale"))
     }
 
     @Test

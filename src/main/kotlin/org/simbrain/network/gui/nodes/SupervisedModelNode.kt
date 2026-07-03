@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.util.PBounds
+import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.LocationEvents
@@ -33,12 +34,39 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
      */
     private val outlinedObjects: MutableSet<ScreenElement> = LinkedHashSet()
 
+    private var infoTextNode: ScreenElement? = null
+
     public override fun layoutChildren() {
         updateOutline()
         interactionBox.centerFullBoundsOnPoint(
             outline.fullBounds.centerX,
             outline.fullBounds.getY() - interactionBox.fullBounds.getHeight() / 2 + 0.5
         )
+        infoTextNode?.let { positionInfoTextNode(it) }
+    }
+
+    fun setInfoTextNode(infoTextNode: ScreenElement) {
+        this.infoTextNode = infoTextNode
+        supervisedModel.events.customInfoUpdated.on(swingDispatcher) { this.layoutChildren() }
+        layoutChildren()
+    }
+
+    private fun positionInfoTextNode(infoNode: ScreenElement) {
+        val infoText = supervisedModel.customInfo as? InfoText ?: return
+        when (infoText.position) {
+            InfoText.Position.BELOW_INTERACTION_BOX -> infoNode.centerFullBoundsOnPoint(
+                interactionBox.fullBounds.centerX,
+                interactionBox.fullBounds.maxY + infoText.spacing + infoNode.fullBounds.height / 2
+            )
+            InfoText.Position.ABOVE_INTERACTION_BOX -> infoNode.centerFullBoundsOnPoint(
+                interactionBox.fullBounds.centerX,
+                interactionBox.fullBounds.minY - infoText.spacing - infoNode.fullBounds.height / 2
+            )
+            InfoText.Position.BELOW_OUTLINE -> infoNode.centerFullBoundsOnPoint(
+                outline.fullBounds.centerX,
+                outline.fullBounds.maxY + infoText.spacing + infoNode.fullBounds.height / 2
+            )
+        }
     }
 
     /**
@@ -120,10 +148,12 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
         }
     }
 
+    protected open val removeActionName: String get() = "Remove Supervised Model..."
+
     private val <T: JComponent> T.removeAction get() = createAction(
-        name = "Remove Supervised Model...",
+        name = removeActionName,
         iconPath = "menu_icons/minus.png",
-        description = "Remove this supervised model...",
+        description = removeActionName,
         coroutineScope = networkPanel.network
     ) {
         supervisedModel.deleteBlocking()
@@ -153,6 +183,7 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
         outlinedObjects.filter { it.model is LocatableModel }.forEach { it.offset(dx, dy) }
+        infoTextNode?.offset(dx, dy)
         outline.resetOutlinedNodes(outlinedObjects)
     }
 

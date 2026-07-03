@@ -2,7 +2,7 @@ package org.simbrain.network.trainers
 
 import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.*
-import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.events.SupervisedModelEvents
 import org.simbrain.network.trainers.SupervisedTrainer.TestConfiguration
 import org.simbrain.util.*
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -29,7 +29,13 @@ open class SupervisedModel(
     val synapseGroups = layers.getAllOutgoingSynapseGroups()
 
     @Transient
-    override val events = LocationEvents()
+    override val events: SupervisedModelEvents = SupervisedModelEvents()
+
+    /**
+     * Optional model displaying status info about this model on the canvas, positioned by the
+     * corresponding node. Compare [org.simbrain.network.subnetworks.Subnetwork.customInfo].
+     */
+    open val customInfo: LocatableModel? get() = null
 
     override val trainerConfig: SupervisedTrainerConfig = SupervisedTrainerConfig(
         lossFunctionProvider = ::possibleLossFunctions
@@ -182,6 +188,8 @@ open class SupervisedModel(
 
     override suspend fun delete(): List<NetworkModel> {
         events.deleted.fire(this)
+        // InfoText.delete is a no-op, so remove its node by firing the event directly
+        customInfo?.let { it.events.deleted.fire(it) }
         return listOf(this)
     }
 

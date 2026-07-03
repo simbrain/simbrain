@@ -1,6 +1,5 @@
 package org.simbrain.network.gui.nodes
 
-import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.createShuffledControl
@@ -8,7 +7,6 @@ import org.simbrain.network.trainers.majorityClassProportion
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.createAction
 import org.simbrain.util.showInfoDialog
-import org.simbrain.util.swingDispatcher
 import java.awt.Color
 import javax.swing.JPopupMenu
 
@@ -16,25 +14,18 @@ class ProbeNode(networkPanel: NetworkPanel, val probe: Probe) : SupervisedModelN
 
     override val tabFill: Color get() = NetworkTheme.current.tabFillProbe
 
-    override fun updateText() {
-        interactionBox.setText(buildString {
-            append(probe.displayName)
-            predictedLabel()?.let { append(": ").append(it) }
-            if (probe.stale) append(" (stale)")
-        })
-    }
-
-    private fun predictedLabel(): String? {
-        val readout = probe.outputLayer as? NeuronArray ?: return null
-        val labels = readout.labelArray ?: return null
-        val activations = readout.activationArray
-        if (activations.isEmpty()) return null
-        return labels.getOrNull(activations.indices.maxBy { activations[it] })
-    }
+    override val removeActionName: String get() = "Remove Probe..."
 
     override val contextMenu: JPopupMenu
         get() = super.contextMenu.apply {
             addSeparator()
+            add(createAction(
+                name = "Select Probed Layer",
+                description = "Select the host layer this probe reads from"
+            ) {
+                networkPanel.selectionManager.clear()
+                probe.probedModel.select()
+            })
             add(createAction(
                 name = "Rebuild Probe Dataset",
                 description = "Re-harvest host activations into this probe's datasets",
@@ -65,11 +56,5 @@ class ProbeNode(networkPanel: NetworkPanel, val probe: Probe) : SupervisedModelN
             appendLine("Majority baseline (test): ${"%.1f".format(majorityClassProportion(probe.testingSet.targets) * 100)}%")
         }
         append(if (probe.stale) "Dataset is STALE: host weights changed since the last harvest." else "Dataset is up to date.")
-    }
-
-    init {
-        probe.events.stalenessChanged.on(swingDispatcher) { updateText() }
-        (probe.outputLayer as? NeuronArray)?.events?.updated?.on(swingDispatcher) { updateText() }
-        updateText()
     }
 }

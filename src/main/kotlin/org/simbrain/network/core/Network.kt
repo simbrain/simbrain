@@ -411,8 +411,9 @@ class Network: CoroutineScope, EditableObject {
                         addAll(parent.delete())
                         // If (1) deleting a supervised/cnn model because one of its children models has been deleted or
                         //    (2) deleting a neuron collection because its last node was deleted
-                        //  then the child model must be manually deleted
-                        if (parent is NeuronCollection || parent is SupervisedModel) {
+                        //  then the child model must be manually deleted. A probe's delete cascades to
+                        //  its owned readout path, so skip a child its parent's delete already covered.
+                        if ((parent is NeuronCollection || parent is SupervisedModel) && model !in this@buildList) {
                             addAll(model.delete())
                         }
                         // The parent itself was deleted; drop all of its now-orphaned children from the map.
@@ -426,6 +427,14 @@ class Network: CoroutineScope, EditableObject {
                     // siblings must stay mapped, or a later operation's undo snapshot (which reads this map)
                     // would treat them as parentless and restore them ungrouped.
                     childToParentMap.remove(model)
+                    // A directly deleted supervised model takes its map entries with it (for a probe the
+                    // keys themselves were just deleted by its cascade), or the map would keep pointing
+                    // surviving or deleted children at a deleted parent.
+                    if (model is SupervisedModel) {
+                        childToParentMap.entries.filter { it.value == model }.map { it.key }.forEach {
+                            childToParentMap.remove(it)
+                        }
+                    }
                 }
             }
 

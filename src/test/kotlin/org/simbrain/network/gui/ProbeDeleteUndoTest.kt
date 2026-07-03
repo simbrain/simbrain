@@ -29,6 +29,9 @@ class ProbeDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         awaitUntil { network.getModels<Probe>().isEmpty() }
         assertEquals(0, network.getModels<Probe>().size, "deleting the host must delete the probe overlay")
         assertEquals(0, network.getModels<Subnetwork>().size)
+        awaitUntil { network.getModels<NeuronArray>().none { it === probe.outputLayer } }
+        assertTrue(network.getModels<NeuronArray>().none { it === probe.outputLayer },
+            "deleting the host must also delete the probe's readout array")
 
         panel.undoManager.undo()
         assertEquals(1, network.getModels<Subnetwork>().size, "undo must restore the host")
@@ -63,16 +66,66 @@ class ProbeDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         panel.deleteSelectedObjects()
         awaitUntil { network.getModels<Probe>().isEmpty() }
         assertEquals(0, network.getModels<Probe>().size, "deleting the probed layer must delete the probe")
+        awaitUntil { network.getModels<NeuronArray>().none { it === probe.outputLayer } }
+        assertTrue(network.getModels<NeuronArray>().none { it === probe.outputLayer },
+            "deleting the probed layer must also delete the probe's readout array")
 
         panel.undoManager.undo()
         val restored = network.getModels<Probe>().firstOrNull()
         assertNotNull(restored, "undo must restore the probe")
         assertSame(probe, restored)
         assertSame(hostHidden, restored!!.probedModel)
+        assertTrue(network.getModels<NeuronArray>().any { it === probe.outputLayer },
+            "undo must restore the probe's readout array")
 
         panel.undoManager.redo()
         awaitUntil { network.getModels<Probe>().isEmpty() }
         assertEquals(0, network.getModels<Probe>().size, "redo must delete the probe again")
+    }
+
+    @Test
+    fun `deleting a probe deletes its readout path and undo restores it`() = runBlocking {
+        val hostInput = NeuronArray(4).apply { isClamped = true }
+        val hostHidden = NeuronArray(3)
+        val hostWm = WeightMatrix(hostInput, hostHidden)
+        network.addNetworkModel(hostInput)
+        network.addNetworkModel(hostHidden)
+        network.addNetworkModel(hostWm)
+        val probe = with(network) { createProbe(hostHidden, readoutSize = 2) }
+        val readout = probe.outputLayer
+        val probeWm = probe.weightMatrices.first()
+
+        selectOnly(probe)
+        panel.deleteSelectedObjects()
+        awaitUntil { network.getModels<Probe>().isEmpty() }
+        assertEquals(0, network.getModels<Probe>().size)
+        awaitUntil { network.getModels<NeuronArray>().none { it === readout } }
+        assertTrue(network.getModels<NeuronArray>().none { it === readout },
+            "deleting the probe must delete its readout array")
+        assertTrue(network.getModels<WeightMatrix>().none { it === probeWm },
+            "deleting the probe must delete its weight matrix")
+        assertTrue(probeWm !in hostHidden.outgoingConnectors,
+            "the deleted weight matrix must be detached from the probed layer")
+        assertTrue(network.getModels<NeuronArray>().any { it === hostHidden },
+            "the probed host layer must survive probe deletion")
+
+        panel.undoManager.undo()
+        val restored = network.getModels<Probe>().firstOrNull()
+        assertNotNull(restored, "undo must restore the probe")
+        assertSame(probe, restored)
+        assertTrue(network.getModels<NeuronArray>().any { it === readout },
+            "undo must restore the readout array")
+        assertTrue(probeWm in hostHidden.outgoingConnectors,
+            "undo must re-register the probe's weight matrix with the probed layer")
+
+        panel.undoManager.redo()
+        awaitUntil { network.getModels<Probe>().isEmpty() }
+        assertEquals(0, network.getModels<Probe>().size, "redo must delete the probe again")
+        awaitUntil { network.getModels<NeuronArray>().none { it === readout } }
+        assertTrue(network.getModels<NeuronArray>().none { it === readout },
+            "redo must delete the readout array again")
+        assertTrue(network.getModels<NeuronArray>().any { it === hostHidden },
+            "the probed host layer must survive redo")
     }
 
     @Test
@@ -93,6 +146,9 @@ class ProbeDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         awaitUntil { network.getModels<Probe>().isEmpty() }
         assertEquals(0, network.getModels<Probe>().size,
             "deleting the CNN host must delete the probe on its tensor stage")
+        awaitUntil { network.getModels<NeuronArray>().none { it === probe.inputLayer || it === probe.outputLayer } }
+        assertTrue(network.getModels<NeuronArray>().none { it === probe.inputLayer || it === probe.outputLayer },
+            "deleting the CNN host must also delete the probe's flatten and readout arrays")
 
         panel.undoManager.undo()
         assertEquals(1, network.getModels<Subnetwork>().size, "undo must restore the CNN")

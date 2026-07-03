@@ -51,6 +51,12 @@ class Probe(
     @Transient
     var datasetRebuilder: (suspend () -> Unit)? = null
 
+    @Transient
+    private var deleting = false
+
+    @Transient
+    private var deletionCascade: List<NetworkModel>? = null
+
     init {
         upstreamWeightModels().forEach { model ->
             model.events.updated.on(Dispatchers.Default) { stale = true }
@@ -68,6 +74,39 @@ class Probe(
             it()
             stale = false
         }
+    }
+
+    /**
+     * A probe owns its readout path: every model in its chain except the probed host layer was
+     * created for the probe (see [createProbe]) and has no meaning without it, so deleting the
+     * probe deletes them too. For tensor probes that includes the flatten input array, whose
+     * deletion cascades to its [FlattenConnector].
+     *
+     * Deleted events are barriers ([org.simbrain.util.FlowEvents.AwaitableEvent]): handlers run
+     * inline within each fire, so the [SupervisedModel] listeners on owned models re-enter this
+     * method in the middle of its own cascade. The [deleting] flag turns those re-entries into
+     * no-ops (a handler discards the return value anyway); the memoized cascade is for callers
+     * arriving after completion — in particular the [Network.deleteModels] sweep, which records
+     * the full list for undo when an inline handler, whose result is discarded, ran the cascade.
+     */
+    override suspend fun delete(): List<NetworkModel> {
+        deletionCascade?.let { return it }
+        if (deleting) return emptyList()
+        deleting = true
+        try {
+            return buildList {
+                addAll(super.delete())
+                val ownsInputLayer = probedModel !== inputLayer
+                layers.filter { ownsInputLayer || it !== inputLayer }.forEach { addAll(it.delete()) }
+            }.also { deletionCascade = it }
+        } finally {
+            deleting = false
+        }
+    }
+
+    override suspend fun afterRestore(context: Any?) {
+        super.afterRestore(context)
+        deletionCascade = null
     }
 
     /**

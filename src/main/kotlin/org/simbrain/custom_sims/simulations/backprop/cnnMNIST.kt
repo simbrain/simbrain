@@ -6,13 +6,14 @@ import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.ProbeCreator
-import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.createProbe
 import org.simbrain.network.trainers.harvestActivations
 import org.simbrain.network.trainers.harvestedDataset
+import org.simbrain.network.trainers.majorityClassProportion
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.createAction
 import org.simbrain.util.createEditorDialog
@@ -154,11 +155,11 @@ val cnnMNIST = newSim {
         if (digit in loopDigits) mutableListOf(0.0, 1.0) else mutableListOf(1.0, 0.0)
     }.toMutableList()
 
-    val probes = mutableListOf<Pair<SupervisedModel, LocatableModel>>()
+    val probes = mutableListOf<Probe>()
 
     // Probes train on activations harvested by running the CNN over its dataset. Harvests go stale
     // whenever the CNN is (re)trained.
-    fun harvestFor(probe: SupervisedModel) = with(network) {
+    fun harvestFor(probe: Probe) = with(network) {
         probe.trainingSet = harvestedDataset(
             cnnModel.harvestActivations(probe.inputLayer, trainingSet.inputs),
             loopTargets(trainingSet.targets)
@@ -167,12 +168,13 @@ val cnnMNIST = newSim {
             cnnModel.harvestActivations(probe.inputLayer, testingSet.inputs),
             loopTargets(testingSet.targets)
         )
+        probe.stale = false
     }
 
-    fun rebuildProbeDatasets() = probes.forEach { (probe, _) -> harvestFor(probe) }
+    suspend fun rebuildProbeDatasets() = probes.forEach { it.rebuildDataset() }
 
     fun addLoopProbe(probedModel: LocatableModel, label: String, hiddenSizes: List<Int> = emptyList()) = with(network) {
-        val offset = point(550.0, probes.count { it.second === probedModel } * 300.0)
+        val offset = point(550.0, probes.count { it.probedModel === probedModel } * 300.0)
         val probe = when (probedModel) {
             is TensorLayer -> createProbe(probedModel, 2, arrayOf("No loop", "Loop"), hiddenSizes, label, offset)
             is Layer -> createProbe(probedModel, 2, arrayOf("No loop", "Loop"), hiddenSizes, label, offset)
@@ -183,8 +185,10 @@ val cnnMNIST = newSim {
             trainerConfig.computeAccuracy = true
             trainerConfig.testConfiguration.enabled = true
             trainerConfig.testConfiguration.testFrequency = 10
+            targetDescription = "Has loop: digit in {0, 6, 8, 9}, derived from MNIST labels"
+            datasetRebuilder = { harvestFor(this) }
         }
-        probes += probe to probedModel
+        probes += probe
         harvestFor(probe)
         probe
     }
@@ -200,8 +204,7 @@ val cnnMNIST = newSim {
         }
     }
 
-    val loopFraction = loopTargets(trainingSet.targets).count { it[1] == 1.0 }.toDouble() / trainingSet.size
-    val majorityBaseline = maxOf(loopFraction, 1 - loopFraction)
+    val majorityBaseline = majorityClassProportion(loopTargets(trainingSet.targets))
 
     // Pre-load input with a random training image
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
@@ -251,12 +254,14 @@ val cnnMNIST = newSim {
         The probe is trained on *harvested* activations: the CNN is run over its dataset and the probed stage's activations are recorded as the probe's inputs. Training the probe
         never changes the CNN's weights.
 
-        1. Train the CNN first (see above)
-        2. Click `Rebuild probe datasets` in the `Loop Probe` panel — the harvested activations are stale whenever the CNN is retrained
+        1. Train the CNN first (see above). The probe's tab shows `(stale)` once the CNN's weights change, since the harvested activations no longer match
+        2. Right-click the `Loop probe` outline and select `Rebuild Probe Dataset` (or click `Rebuild probe datasets` in the `Loop Probe` panel) to re-harvest
         3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
 
-        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel. You can add probes to other stages: right-click a conv, pool, or flatten layer and
-        select `Add loop probe...`. Comparing accuracy across stages shows where loop information becomes linearly decodable.
+        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel; `Probe Info...` in the probe's right-click menu shows the same baselines. You can add
+        probes to other stages: right-click a conv, pool, or flatten layer and select `Add loop probe...`. Comparing accuracy across stages shows where loop information becomes
+        linearly decodable. `Add Shuffled-Label Control` in the probe's right-click menu creates a memorization check: a matching probe trained on shuffled targets, which should
+        stay near baseline for a linear probe.
         """.trimIndent()
     )
 }

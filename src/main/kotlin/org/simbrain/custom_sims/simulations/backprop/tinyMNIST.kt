@@ -7,13 +7,14 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.Layer
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.ProbeCreator
-import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.createProbe
 import org.simbrain.network.trainers.harvestActivations
 import org.simbrain.network.trainers.harvestedDataset
+import org.simbrain.network.trainers.majorityClassProportion
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.createAction
@@ -85,11 +86,11 @@ val tinyMNIST = newSim {
         if (digit in loopDigits) mutableListOf(0.0, 1.0) else mutableListOf(1.0, 0.0)
     }.toMutableList()
 
-    val probes = mutableListOf<Pair<SupervisedModel, Layer>>()
+    val probes = mutableListOf<Probe>()
 
     // Probes train on activations harvested by running the host over its dataset. Harvests go stale
     // whenever the host is (re)trained.
-    fun harvestFor(probe: SupervisedModel, probedLayer: Layer) = with(net) {
+    fun harvestFor(probe: Probe, probedLayer: Layer) = with(net) {
         probe.trainingSet = harvestedDataset(
             bp.harvestActivations(probedLayer, bp.trainingSet.inputs),
             loopTargets(bp.trainingSet.targets)
@@ -98,9 +99,10 @@ val tinyMNIST = newSim {
             bp.harvestActivations(probedLayer, bp.testingSet.inputs),
             loopTargets(bp.testingSet.targets)
         )
+        probe.stale = false
     }
 
-    fun rebuildProbeDatasets() = probes.forEach { (probe, probedLayer) -> harvestFor(probe, probedLayer) }
+    suspend fun rebuildProbeDatasets() = probes.forEach { it.rebuildDataset() }
 
     fun addLoopProbe(probedLayer: Layer, label: String, hiddenSizes: List<Int> = emptyList()) = with(net) {
         val probe = createProbe(
@@ -109,15 +111,17 @@ val tinyMNIST = newSim {
             readoutLabels = arrayOf("No loop", "Loop"),
             hiddenSizes = hiddenSizes,
             label = label,
-            offset = point(550.0, probes.count { it.second === probedLayer } * 300.0),
+            offset = point(550.0, probes.count { it.probedModel === probedLayer } * 300.0),
         ).apply {
             trainerConfig.learningRate = .001
             trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
             trainerConfig.computeAccuracy = true
             trainerConfig.testConfiguration.enabled = true
             trainerConfig.testConfiguration.testFrequency = 10
+            targetDescription = "Has loop: digit in {0, 6, 8, 9}, derived from MNIST labels"
+            datasetRebuilder = { harvestFor(this, probedLayer) }
         }
-        probes += probe to probedLayer
+        probes += probe
         harvestFor(probe, probedLayer)
         probe
     }
@@ -133,8 +137,7 @@ val tinyMNIST = newSim {
         }
     }
 
-    val loopFraction = loopTargets(bp.trainingSet.targets).count { it[1] == 1.0 }.toDouble() / bp.trainingSet.size
-    val majorityBaseline = maxOf(loopFraction, 1 - loopFraction)
+    val majorityBaseline = majorityClassProportion(loopTargets(bp.trainingSet.targets))
 
     addSidebarInfo(
         """
@@ -178,16 +181,20 @@ val tinyMNIST = newSim {
         The probe is trained on *harvested* activations: the digit network is run over its dataset and the hidden layer's activations are recorded as the probe's inputs. Training the
         probe never changes the digit network's weights.
 
-        1. Train the digit network first (see above)
-        2. Click `Rebuild probe datasets` in the `Loop Probe` panel — the harvested activations are stale whenever the digit network is retrained
+        1. Train the digit network first (see above). The probe's tab shows `(stale)` once the digit network's weights change, since the harvested activations no longer match
+        2. Right-click the `Loop probe` outline and select `Rebuild Probe Dataset` (or click `Rebuild probe datasets` in the `Loop Probe` panel) to re-harvest
         3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
 
-        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel (always guessing "no loop"). Accuracy well above baseline means loop information is
-        linearly decodable from the hidden layer. Try training the probe *before* training the digit network to see how decodable the information is from a random projection.
+        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel (always guessing "no loop"); `Probe Info...` in the probe's right-click menu shows the
+        same baselines. Accuracy well above baseline means loop information is linearly decodable from the hidden layer. Try training the probe *before* training the digit network to
+        see how decodable the information is from a random projection.
 
         You can add more probes: right-click either hidden layer and select `Add loop probe...`. Comparing probe accuracy on the first vs. second hidden layer shows how loop
         information changes across depth. Leaving `Hidden layer sizes` empty keeps the probe linear; adding hidden layers gives the probe more capacity, but then success may
         reflect the probe's own computation rather than what the layer encodes.
+
+        To check for probe memorization, right-click the probe and select `Add Shuffled-Label Control`: a second probe with the same architecture and shuffled targets. If the control
+        also beats baseline, the original probe's accuracy reflects its own capacity, not information in the layer. A linear probe's control should stay near baseline.
 
         # Credits
 

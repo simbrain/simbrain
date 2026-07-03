@@ -39,6 +39,7 @@ class ProbeNodeSnapshot : UiSnapshotDef {
                 hostHidden.update()
                 probe.refreshOutput()
             }
+            probe.datasetRebuilder = { }
             probe.stale = true
         }
         SwingUtilities.invokeAndWait {

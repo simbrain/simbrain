@@ -289,9 +289,35 @@ class ProbeTest {
         }
 
         probe.stale = true
-        assertTrue(probe.customInfo.text.contains("Stale"))
+        assertTrue(probe.customInfo.text.contains("Stale: dataset needs rebuild"))
+        probe.datasetRebuilder = { }
+        assertTrue(probe.customInfo.text.contains("Stale: click to rebuild"))
         probe.stale = false
         assertFalse(probe.customInfo.text.contains("Stale"))
+    }
+
+    @Test
+    fun `rebuildStaleProbeDatasets rebuilds every stale probe with a rebuilder and skips the rest`() = runBlocking {
+        val network = Network()
+        val hostInput = NeuronArray(4).apply { isClamped = true }
+        val hostHidden = NeuronArray(3)
+        network.addNetworkModelsAsync(hostInput, hostHidden, WeightMatrix(hostInput, hostHidden))
+        val staleWithRebuilder = with(network) { createProbe(hostHidden, readoutSize = 2) }
+        val staleWithoutRebuilder = with(network) { createProbe(hostHidden, readoutSize = 2) }
+        val freshWithRebuilder = with(network) { createProbe(hostHidden, readoutSize = 2) }
+        var rebuilds = 0
+        staleWithRebuilder.datasetRebuilder = { rebuilds++ }
+        freshWithRebuilder.datasetRebuilder = { rebuilds++ }
+        staleWithRebuilder.stale = true
+        staleWithoutRebuilder.stale = true
+
+        val count = network.rebuildStaleProbeDatasets()
+
+        assertEquals(1, count)
+        assertEquals(1, rebuilds)
+        assertFalse(staleWithRebuilder.stale)
+        assertTrue(staleWithoutRebuilder.stale) { "a probe without a rebuilder must stay stale" }
+        assertFalse(freshWithRebuilder.stale)
     }
 
     @Test

@@ -165,6 +165,18 @@ fun Network.probesReading(hostModels: Collection<NetworkModel>): List<Probe> =
     getModels(Probe::class.java).filter { probe -> hostModels.any { it === probe.probedModel } }
 
 /**
+ * Re-harvests every stale probe that has a registered [Probe.datasetRebuilder]; probes without one
+ * (e.g. after loading a workspace without re-running the creating simulation) are left stale.
+ * Rebuilds run sequentially: each harvest takes the network training lock and clamps/restores host
+ * input state, so interleaving them buys nothing. Returns the number of probes rebuilt.
+ */
+suspend fun Network.rebuildStaleProbeDatasets(): Int {
+    val staleProbes = getModels(Probe::class.java).filter { it.stale && it.datasetRebuilder != null }
+    staleProbes.forEach { it.rebuildDataset() }
+    return staleProbes.size
+}
+
+/**
  * The accuracy of always guessing the most common class in [targets]: the baseline a probe must beat
  * before it demonstrates anything about the probed layer. Rows are read as one-hot / softmax targets
  * (class = argmax); single-column rows are read as binary targets thresholded at 0.5.

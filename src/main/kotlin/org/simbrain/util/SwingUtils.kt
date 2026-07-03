@@ -382,6 +382,15 @@ fun showWarningConfirmDialog(message: String): Int {
 }
 
 /**
+ * Yes/no question dialog; returns true only when the user chooses yes (closing the dialog counts as no).
+ */
+fun showYesNoDialog(message: String, title: String = "Confirm"): Boolean {
+    val dialog = JDialog()
+    dialog.isAlwaysOnTop = true
+    return JOptionPane.showConfirmDialog(dialog, message, title, JOptionPane.YES_NO_OPTION) == JOptionPane.YES_OPTION
+}
+
+/**
  * Create a dialog that takes an input in a text field and returns it as a string.
  */
 fun showInputDialog(message: String, initValue: String? = ""): String? {

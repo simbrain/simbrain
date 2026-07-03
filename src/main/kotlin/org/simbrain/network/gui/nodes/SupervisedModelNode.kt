@@ -45,7 +45,7 @@ open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: 
         infoTextNode?.let { positionInfoTextNode(it) }
     }
 
-    fun setInfoTextNode(infoTextNode: ScreenElement) {
+    open fun setInfoTextNode(infoTextNode: ScreenElement) {
         this.infoTextNode = infoTextNode
         supervisedModel.events.customInfoUpdated.on(swingDispatcher) { this.layoutChildren() }
         layoutChildren()

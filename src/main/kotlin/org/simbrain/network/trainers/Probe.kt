@@ -60,6 +60,17 @@ class Probe(
      */
     @Transient
     var datasetRebuilder: (suspend () -> Unit)? = null
+        set(value) {
+            field = value
+            updateCustomInfo()
+        }
+
+    /**
+     * True while [rebuildDataset] is running, so the canvas info text can show progress.
+     */
+    @Transient
+    var rebuilding: Boolean = false
+        private set
 
     @Transient
     private var deleting = false
@@ -99,15 +110,25 @@ class Probe(
             predictedLabel()?.let { (label, confidence) ->
                 append("\nPredicted: $label (${"%.2f".format(confidence)})")
             }
-            if (stale) append("\nStale: dataset needs rebuild")
+            when {
+                rebuilding -> append("\nRebuilding dataset...")
+                stale -> append(if (datasetRebuilder != null) "\nStale: click to rebuild" else "\nStale: dataset needs rebuild")
+            }
         }
         events.customInfoUpdated.fire()
     }
 
     suspend fun rebuildDataset() {
         datasetRebuilder?.let {
-            it()
-            stale = false
+            rebuilding = true
+            updateCustomInfo()
+            try {
+                it()
+                stale = false
+            } finally {
+                rebuilding = false
+                updateCustomInfo()
+            }
         }
     }
 

@@ -278,7 +278,7 @@ class ConvolutionalNeuralNetworkTest {
         val outputArray = NeuronArray(1)
 
         // CNN constructor should throw because it can't walk from flatten target to outputArray
-        assertThrows(NoSuchElementException::class.java) {
+        assertThrows(IllegalStateException::class.java) {
             ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
         }
     }

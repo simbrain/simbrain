@@ -274,6 +274,19 @@ fun Network.addConvolutionalNeuralNetwork(
 }
 
 /**
+ * Return true if [target] can be reached from this layer by following outgoing [WeightMatrix]
+ * connectors. Used to keep CNN pipeline discovery on the pipeline when side branches (e.g. probe
+ * readouts) are attached to pipeline layers.
+ */
+fun Layer.reachesThroughWeightMatrices(target: Layer, visited: MutableSet<Layer> = mutableSetOf()): Boolean {
+    if (this === target) return true
+    if (!visited.add(this)) return false
+    return outgoingConnectors
+        .filterIsInstance<WeightMatrix>()
+        .any { it.target.reachesThroughWeightMatrices(target, visited) }
+}
+
+/**
  * Return true if the synapse "overlaps" an existing synapse
  */
 fun Synapse.overlapsExistingSynapse(): Boolean {

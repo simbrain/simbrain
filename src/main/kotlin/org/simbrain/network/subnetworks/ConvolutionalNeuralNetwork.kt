@@ -55,20 +55,23 @@ class ConvolutionalNeuralNetwork(
         trainingSet = defaultTrainingSet
         testingSet = defaultTestingSet
 
-        // Discover pipeline by walking the graph from inputTensor
+        // Discover pipeline by walking the graph from inputTensor. Only follow branches that lead to
+        // the output array, since side branches (e.g. probe flatten connectors) can be attached to
+        // pipeline stages.
         val connectors = mutableListOf<TensorConnector>()
         val stages = mutableListOf<TensorLayer>()
         var currentTensor = inputTensorLayer
 
         while (true) {
-            val flattenOut = currentTensor.outgoingFlattenConnectors
-            if (flattenOut.isNotEmpty()) {
-                flattenConnector = flattenOut.first()
+            val flattenToOutput = currentTensor.outgoingFlattenConnectors
+                .firstOrNull { it.target.reachesThroughWeightMatrices(outputArray) }
+            if (flattenToOutput != null) {
+                flattenConnector = flattenToOutput
                 break
             }
             val outgoing = currentTensor.outgoingTensorConnectors
             check(outgoing.isNotEmpty()) {
-                "Pipeline broken: Tensor '${currentTensor.displayName}' has no outgoing connectors"
+                "Pipeline broken: Tensor '${currentTensor.displayName}' has no outgoing connectors leading to the output"
             }
             val connector = outgoing.first()
             connectors.add(connector)
@@ -83,7 +86,9 @@ class ConvolutionalNeuralNetwork(
         val nas = mutableListOf<NeuronArray>()
         var currentLayer: Layer = flattenConnector.target
         while (currentLayer != outputArray) {
-            val wm = currentLayer.outgoingConnectors.filterIsInstance<WeightMatrix>().first()
+            val wm = currentLayer.outgoingConnectors
+                .filterIsInstance<WeightMatrix>()
+                .first { it.target.reachesThroughWeightMatrices(outputArray) }
             wms.add(wm)
             nas.add(wm.target as NeuronArray)
             currentLayer = wm.target as Layer

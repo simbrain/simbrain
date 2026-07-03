@@ -423,19 +423,20 @@ class CnnTrainer(
     private fun discoverPipeline() {
         var currentTensor = inputTensorLayer
 
-        // Walk through TensorConnectors (Conv/Pool)
+        // Walk through TensorConnectors (Conv/Pool). Only follow branches that lead to the output
+        // array, since side branches (e.g. probe flatten connectors) can be attached to pipeline stages.
         while (true) {
             val outgoing = currentTensor.outgoingTensorConnectors
-            val flattenOut = currentTensor.outgoingFlattenConnectors
+            val flattenToOutput = currentTensor.outgoingFlattenConnectors
+                .firstOrNull { it.target.reachesThroughWeightMatrices(outputArray) }
 
-            if (flattenOut.isNotEmpty()) {
-                // Found the flatten connector
-                flattenConnector = flattenOut.first()
+            if (flattenToOutput != null) {
+                flattenConnector = flattenToOutput
                 break
             }
 
             check(outgoing.isNotEmpty()) {
-                "Pipeline broken: Tensor '${currentTensor.displayName}' has no outgoing connectors"
+                "Pipeline broken: Tensor '${currentTensor.displayName}' has no outgoing connectors leading to the output"
             }
 
             val connector = outgoing.first()
@@ -447,12 +448,12 @@ class CnnTrainer(
         // Walk through WeightMatrix chain from flattenConnector.target to outputArray
         var currentLayer: Layer = flattenConnector.target
         while (currentLayer != outputArray) {
-            val outgoing = currentLayer.outgoingConnectors
+            val wm = currentLayer.outgoingConnectors
                 .filterIsInstance<WeightMatrix>()
-            check(outgoing.isNotEmpty()) {
-                "Pipeline broken: Layer '${currentLayer.displayName}' has no outgoing WeightMatrix"
+                .firstOrNull { it.target.reachesThroughWeightMatrices(outputArray) }
+            checkNotNull(wm) {
+                "Pipeline broken: Layer '${currentLayer.displayName}' has no outgoing WeightMatrix leading to the output"
             }
-            val wm = outgoing.first()
             denseLayers.add(DenseLayerSnapshot(
                 inputSize = wm.source.size,
                 outputSize = wm.target.size,

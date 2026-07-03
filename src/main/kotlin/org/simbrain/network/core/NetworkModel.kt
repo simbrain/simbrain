@@ -6,6 +6,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
+import javax.swing.Action
 
 /**
  * "Model" objects placed in a [org.simbrain.network.core.Network] should implement this interface.  E.g. neurons, synapses, neuron groups, etc.
@@ -32,6 +33,16 @@ abstract class NetworkModel {
 
     @UserParameter(label = "Update Priority", order = 20)
     var priority: Int = 0
+
+    @Transient
+    private var _customContextMenuActions: MutableList<Action>? = null
+
+    /**
+     * GUI actions appended to the end of this model's context menu, typically registered by
+     * simulations. Not serialized; a simulation must re-register them each time it is run.
+     */
+    val customContextMenuActions: MutableList<Action>
+        get() = _customContextMenuActions ?: mutableListOf<Action>().also { _customContextMenuActions = it }
 
     /**
      * First pass of updating. Generally a "weighted input".

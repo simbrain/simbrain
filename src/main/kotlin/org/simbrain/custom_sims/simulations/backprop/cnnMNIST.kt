@@ -2,14 +2,25 @@ package org.simbrain.custom_sims.simulations.backprop
 
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
+import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
+import org.simbrain.network.trainers.ProbeCreator
+import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.trainers.createProbe
+import org.simbrain.network.trainers.harvestActivations
+import org.simbrain.network.trainers.harvestedDataset
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.createAction
+import org.simbrain.util.createEditorDialog
 import org.simbrain.util.csvToDouble2DArray
+import org.simbrain.util.display
 import org.simbrain.util.fetchDataWithCache
 import org.simbrain.util.place
+import org.simbrain.util.point
 
 /**
  * CNN version of the Tiny MNIST simulation.
@@ -135,14 +146,80 @@ val cnnMNIST = newSim {
         testConfiguration.testFrequency = 10
     }
 
+    // Linear probes: does the current digit contain a loop (0, 6, 8, 9)?
+    val loopDigits = setOf(0, 6, 8, 9)
+
+    fun loopTargets(labelRows: List<List<Double>>) = labelRows.map { row ->
+        val digit = row.withIndex().maxBy { it.value }.index
+        if (digit in loopDigits) mutableListOf(0.0, 1.0) else mutableListOf(1.0, 0.0)
+    }.toMutableList()
+
+    val probes = mutableListOf<Pair<SupervisedModel, LocatableModel>>()
+
+    // Probes train on activations harvested by running the CNN over its dataset. Harvests go stale
+    // whenever the CNN is (re)trained.
+    fun harvestFor(probe: SupervisedModel) = with(network) {
+        probe.trainingSet = harvestedDataset(
+            cnnModel.harvestActivations(probe.inputLayer, trainingSet.inputs),
+            loopTargets(trainingSet.targets)
+        )
+        probe.testingSet = harvestedDataset(
+            cnnModel.harvestActivations(probe.inputLayer, testingSet.inputs),
+            loopTargets(testingSet.targets)
+        )
+    }
+
+    fun rebuildProbeDatasets() = probes.forEach { (probe, _) -> harvestFor(probe) }
+
+    fun addLoopProbe(probedModel: LocatableModel, label: String, hiddenSizes: List<Int> = emptyList()) = with(network) {
+        val offset = point(550.0, probes.count { it.second === probedModel } * 300.0)
+        val probe = when (probedModel) {
+            is TensorLayer -> createProbe(probedModel, 2, arrayOf("No loop", "Loop"), hiddenSizes, label, offset)
+            is Layer -> createProbe(probedModel, 2, arrayOf("No loop", "Loop"), hiddenSizes, label, offset)
+            else -> error("Cannot probe ${probedModel.displayName}")
+        }.apply {
+            trainerConfig.learningRate = .001
+            trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
+            trainerConfig.computeAccuracy = true
+            trainerConfig.testConfiguration.enabled = true
+            trainerConfig.testConfiguration.testFrequency = 10
+        }
+        probes += probe to probedModel
+        harvestFor(probe)
+        probe
+    }
+
+    addLoopProbe(poolLayer1, "Loop probe")
+
+    listOf(conv1Out, poolLayer1, conv2Out, poolLayer2, flatArray).forEach { stage ->
+        stage.customContextMenuActions += createAction(name = "Add loop probe...") {
+            val creator = ProbeCreator("Loop probe (${stage.displayName})")
+            creator.createEditorDialog("Add Probe") {
+                addLoopProbe(stage, creator.label, creator.parseHiddenSizes())
+            }.display()
+        }
+    }
+
+    val loopFraction = loopTargets(trainingSet.targets).count { it[1] == 1.0 }.toDouble() / trainingSet.size
+    val majorityBaseline = maxOf(loopFraction, 1 - loopFraction)
+
     // Pre-load input with a random training image
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
     inputTensorLayer.activations = trainingSet.inputs[randomSampleIndex].toDoubleArray()
-    
+
     // GUI
 
     place(networkComponent, 0, 0, 600, 800)
     workspace.simpleIterate()
+
+    withGui {
+        createControlPanel("Loop Probe", 610, 0) {
+            addLabelledText("Majority baseline", "${(majorityBaseline * 100).let { "%.1f".format(it) }}%")
+            addButton("Rebuild probe datasets") {
+                rebuildProbeDatasets()
+            }
+        }
+    }
 
     addSidebarInfo(
         """
@@ -164,6 +241,22 @@ val cnnMNIST = newSim {
         3. Watch the loss plot decrease
         4. Use the `Training data` / `Testing data` tabs to browse examples
         5. Click `Apply inputs` on a row to see the network's prediction
+
+        # Linear Probe
+
+        A [linear probe](https://en.wikipedia.org/wiki/Probing_(machine_learning)) is a simple classifier trained on an internal layer's activations to test what information that
+        layer represents. Here the probe (`Loop probe` on the right) reads the first pooling stage and predicts whether the current digit contains a loop (`0`, `6`, `8`, `9`).
+        Since convolutional stages are tensors, the probe reads them through a flatten layer, added automatically.
+
+        The probe is trained on *harvested* activations: the CNN is run over its dataset and the probed stage's activations are recorded as the probe's inputs. Training the probe
+        never changes the CNN's weights.
+
+        1. Train the CNN first (see above)
+        2. Click `Rebuild probe datasets` in the `Loop Probe` panel — the harvested activations are stale whenever the CNN is retrained
+        3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
+
+        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel. You can add probes to other stages: right-click a conv, pool, or flatten layer and
+        select `Add loop probe...`. Comparing accuracy across stages shows where loop information becomes linearly decodable.
         """.trimIndent()
     )
 }

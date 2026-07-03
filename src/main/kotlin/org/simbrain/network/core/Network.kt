@@ -17,6 +17,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.updater.PerformanceMonitor
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.locks.ReentrantLock
 import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.ln
@@ -107,6 +108,15 @@ class Network: CoroutineScope, EditableObject {
      */
     @Transient
     private var updateCompleted = AtomicBoolean(false)
+
+    /**
+     * Serializes training iterations and activation harvesting across trainers that share this
+     * network's layers, e.g. a host trainer and a [org.simbrain.network.trainers.Probe] trainer.
+     * Forward passes write shared layer activations, so concurrent training corrupts both gradients.
+     */
+    @Transient
+    var trainingLock = ReentrantLock()
+        private set
 
     /**
      * Manage ids for all network elements.
@@ -465,6 +475,8 @@ class Network: CoroutineScope, EditableObject {
         placementManager = PlacementManager()
 
         updateCompleted = AtomicBoolean(false)
+
+        trainingLock = ReentrantLock()
 
         // Initialize update manager
         networkModels.allInUpdatingOrder.forEach { model ->

@@ -8,6 +8,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.geom.Point2D
+import kotlin.concurrent.withLock
 
 /**
  * Utilities for linear probes: supervised readouts trained on activations harvested from a layer of a
@@ -22,11 +23,13 @@ import java.awt.geom.Point2D
  */
 context(Network)
 fun SupervisedNetwork.harvestActivations(probedLayer: Layer, inputs: List<List<Double>>): MutableList<MutableList<Double>> =
-    inputs.map { row ->
-        inputLayer.setActivations(row.toDoubleArray())
-        forwardPass()
-        probedLayer.activationArray.toMutableList()
-    }.toMutableList()
+    trainingLock.withLock {
+        inputs.map { row ->
+            inputLayer.setActivations(row.toDoubleArray())
+            forwardPass()
+            probedLayer.activationArray.toMutableList()
+        }.toMutableList()
+    }
 
 /**
  * [harvestActivations] for a [ConvolutionalNeuralNetwork] host, whose forward sweep happens in
@@ -38,15 +41,17 @@ fun SupervisedNetwork.harvestActivations(probedLayer: Layer, inputs: List<List<D
 context(Network)
 fun ConvolutionalNeuralNetwork.harvestActivations(probedLayer: Layer, inputs: List<List<Double>>): MutableList<MutableList<Double>> {
     val insideCnn = probedLayer in modelList.all
-    return inputs.map { row ->
-        inputTensorLayer.activations = row.toDoubleArray()
-        update()
-        if (!insideCnn) {
-            probedLayer.accumulateInputs()
-            probedLayer.update()
-        }
-        probedLayer.activationArray.toMutableList()
-    }.toMutableList()
+    return trainingLock.withLock {
+        inputs.map { row ->
+            inputTensorLayer.activations = row.toDoubleArray()
+            update()
+            if (!insideCnn) {
+                probedLayer.accumulateInputs()
+                probedLayer.update()
+            }
+            probedLayer.activationArray.toMutableList()
+        }.toMutableList()
+    }
 }
 
 /**

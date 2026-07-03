@@ -12,6 +12,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
+import kotlin.concurrent.withLock
 import kotlin.math.sqrt
 import kotlin.random.Random
 import kotlin.reflect.KFunction
@@ -302,7 +303,7 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     /**
      * @return the mean error for the batch
      */
-    open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
+    open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double = network.trainingLock.withLock {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
@@ -429,14 +430,14 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 
         probeContext?.write("rawMatrixAccumulator", rawMatrixAccumulator)
 
-        return error / rowRange.count()
+        error / rowRange.count()
     }
 
     /**
      * Compute the error on the testing set
      */
-    open suspend fun computeTestError(): Double {
-        return supervisedNetwork.testingSet.sumOf { (input, target) ->
+    open suspend fun computeTestError(): Double = network.trainingLock.withLock {
+        supervisedNetwork.testingSet.sumOf { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
                 supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
@@ -473,8 +474,8 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
     /**
      * Compute the accuracy on the testing set
      */
-    open suspend fun computeTestAccuracy(): Double {
-        return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
+    open suspend fun computeTestAccuracy(): Double = network.trainingLock.withLock {
+        supervisedNetwork.testingSet.mapNotNull { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
                 supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())

@@ -1,6 +1,9 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.*
@@ -167,6 +170,48 @@ class ProbeTest {
         )
         assertArrayEquals(arrayOf("No", "Yes"), (control.outputLayer as NeuronArray).labelArray)
         assertTrue(control.targetDescription.contains("control"))
+    }
+
+    @Test
+    fun `training iterations block while another trainer holds the network training lock`() = runBlocking {
+        val network = Network()
+        val hostInput = NeuronArray(4).apply { isClamped = true }
+        val hostHidden = NeuronArray(3)
+        network.addNetworkModelsAsync(hostInput, hostHidden, WeightMatrix(hostInput, hostHidden))
+        val probe = with(network) { createProbe(hostHidden, readoutSize = 2) }
+        val trainer = SupervisedTrainer(network, probe)
+
+        network.trainingLock.lock()
+        val trained = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            trainer.trainBatch(0 until probe.trainingSet.size)
+            trained.complete(Unit)
+        }
+        delay(200)
+        assertFalse(trained.isCompleted) { "trainBatch should wait for the training lock" }
+        network.trainingLock.unlock()
+        withTimeout(2000) { trained.await() }
+        job.join()
+    }
+
+    @Test
+    fun `harvesting blocks while another trainer holds the network training lock`() = runBlocking {
+        val network = Network()
+        val bp = BackpropNetwork(intArrayOf(2, 3, 2), null)
+        network.addNetworkModelsAsync(bp)
+        val hidden = bp.hiddenLayers().first()
+
+        network.trainingLock.lock()
+        val harvested = CompletableDeferred<Unit>()
+        val job = launch(Dispatchers.Default) {
+            with(network) { bp.harvestActivations(hidden, listOf(listOf(0.0, 1.0), listOf(1.0, 0.0))) }
+            harvested.complete(Unit)
+        }
+        delay(200)
+        assertFalse(harvested.isCompleted) { "harvestActivations should wait for the training lock" }
+        network.trainingLock.unlock()
+        withTimeout(2000) { harvested.await() }
+        job.join()
     }
 
     @Test

@@ -11,6 +11,7 @@ import org.simbrain.util.flatten
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import smile.math.matrix.Matrix
+import kotlin.concurrent.withLock
 import kotlin.math.*
 
 /**
@@ -614,7 +615,7 @@ class CnnTrainer(
      * @param rowRange the range of row indices in the training data to use
      * @return average loss over the batch
      */
-    fun trainBatch(rowRange: IntRange): Double {
+    fun trainBatch(rowRange: IntRange): Double = network.trainingLock.withLock {
         val data = trainingData ?: error("Training data not set")
 
         // Clear all gradients
@@ -646,7 +647,7 @@ class CnnTrainer(
             count++
         }
 
-        if (count == 0) return 0.0
+        if (count == 0) return@withLock 0.0
 
         val scale = 1.0 / count
 
@@ -682,7 +683,7 @@ class CnnTrainer(
         // Sync updated weights back to network objects
         denseLayers.forEach { it.syncToNetwork() }
 
-        return totalLoss / count
+        totalLoss / count
     }
 
     /**
@@ -722,20 +723,20 @@ class CnnTrainer(
         inputTensorLayer.clearGradients()
     }
 
-    private fun computeTestError(): Double {
-        val data = testingData ?: return 0.0
-        if (data.size == 0) return 0.0
+    private fun computeTestError(): Double = network.trainingLock.withLock {
+        val data = testingData ?: return@withLock 0.0
+        if (data.size == 0) return@withLock 0.0
         var sum = 0.0
         for (i in 0 until data.size) {
             val output = forwardPass(data.inputs[i].toDoubleArray())
             sum += config.lossFunction.loss(output, data.targets[i].toDoubleArray())
         }
-        return sum / data.size
+        sum / data.size
     }
 
-    private fun computeTestAccuracy(): Double {
-        val data = testingData ?: return 0.0
-        if (data.size == 0) return 0.0
+    private fun computeTestAccuracy(): Double = network.trainingLock.withLock {
+        val data = testingData ?: return@withLock 0.0
+        if (data.size == 0) return@withLock 0.0
         var sum = 0.0
         var count = 0
         for (i in 0 until data.size) {
@@ -745,7 +746,7 @@ class CnnTrainer(
                 count++
             }
         }
-        return if (count == 0) 0.0 else sum / count
+        if (count == 0) 0.0 else sum / count
     }
 
     private fun computeClassificationAccuracy(output: DoubleArray, target: DoubleArray): Double? {

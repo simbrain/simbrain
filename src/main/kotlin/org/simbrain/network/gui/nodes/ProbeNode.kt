@@ -13,6 +13,7 @@ import org.simbrain.util.createAction
 import org.simbrain.util.showInfoDialog
 import org.simbrain.util.showYesNoDialog
 import java.awt.Color
+import java.awt.Cursor
 import javax.swing.JPopupMenu
 
 class ProbeNode(networkPanel: NetworkPanel, val probe: Probe) : SupervisedModelNode(networkPanel, probe) {
@@ -24,10 +25,29 @@ class ProbeNode(networkPanel: NetworkPanel, val probe: Probe) : SupervisedModelN
     override fun setInfoTextNode(infoTextNode: ScreenElement) {
         super.setInfoTextNode(infoTextNode)
         infoTextNode.addInputEventListener(object : PBasicInputEventHandler() {
+
+            private var handCursorPushed = false
+
+            private fun staleWarningActionable() = probe.stale && !probe.rebuilding && probe.datasetRebuilder != null
+
             override fun mouseClicked(event: PInputEvent) {
-                if (!probe.stale || probe.rebuilding || probe.datasetRebuilder == null) return
+                if (!staleWarningActionable()) return
                 event.isHandled = true
                 rebuildFromStaleWarning()
+            }
+
+            override fun mouseEntered(event: PInputEvent) {
+                if (!handCursorPushed && staleWarningActionable()) {
+                    event.pushCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR))
+                    handCursorPushed = true
+                }
+            }
+
+            override fun mouseExited(event: PInputEvent) {
+                if (handCursorPushed) {
+                    event.popCursor()
+                    handCursorPushed = false
+                }
             }
         })
     }

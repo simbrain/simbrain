@@ -290,10 +290,25 @@ class ProbeTest {
 
         probe.stale = true
         assertTrue(probe.customInfo.text.contains("Stale: dataset needs rebuild"))
+        with(probe.customInfo) {
+            assertEquals(
+                "Stale: dataset needs rebuild",
+                spans.single { it.role == TextStyleRole.WARNING }.let { text.substring(it.start, it.end) }
+            )
+        }
+
         probe.datasetRebuilder = { }
         assertTrue(probe.customInfo.text.contains("Stale: click to rebuild"))
+        with(probe.customInfo) {
+            assertEquals(
+                "click to rebuild",
+                spans.single { it.role == TextStyleRole.ACTION }.let { text.substring(it.start, it.end) }
+            )
+        }
+
         probe.stale = false
         assertFalse(probe.customInfo.text.contains("Stale"))
+        assertTrue(probe.customInfo.spans.isEmpty())
     }
 
     @Test

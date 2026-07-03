@@ -3,6 +3,8 @@ package org.simbrain.network.gui.nodes
 import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.NetworkTextObject
+import org.simbrain.network.core.TextSpan
+import org.simbrain.network.core.TextStyleRole
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
 import java.util.stream.Collectors
@@ -11,6 +13,7 @@ import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultStyledDocument
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
+import javax.swing.text.StyledDocument
 
 /**
  * An editable text element, which wraps a PStyledText object.
@@ -86,10 +89,34 @@ open class TextNode(
             StyleConstants.setForeground(simpleAttributeSet, NetworkTheme.current.valueText)
             pStyledText.document.remove(0, pStyledText.document.length)
             pStyledText.document.insertString(0, textObject.text, simpleAttributeSet)
+            applySpanStyles()
             pStyledText.syncWithDocument()
             recenterTextObject()
         } catch (e: BadLocationException) {
             e.printStackTrace()
+        }
+    }
+
+    /**
+     * Overlays the model's [TextSpan]s on the base attributes, mapping each semantic role to
+     * theme colors and decorations at render time so spans track light/dark mode.
+     */
+    private fun applySpanStyles() {
+        val document = pStyledText.document as? StyledDocument ?: return
+        textObject.spans.forEach { span ->
+            val start = span.start.coerceIn(0, document.length)
+            val end = span.end.coerceIn(start, document.length)
+            if (end == start) return@forEach
+            val attrs = SimpleAttributeSet()
+            when (span.role) {
+                TextStyleRole.WARNING -> StyleConstants.setForeground(attrs, NetworkTheme.current.warningText)
+                TextStyleRole.ACTION -> {
+                    StyleConstants.setForeground(attrs, NetworkTheme.current.actionText)
+                    StyleConstants.setUnderline(attrs, true)
+                }
+                TextStyleRole.EMPHASIS -> StyleConstants.setItalic(attrs, true)
+            }
+            document.setCharacterAttributes(start, end - start, attrs, false)
         }
     }
 

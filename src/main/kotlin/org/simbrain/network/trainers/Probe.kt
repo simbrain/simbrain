@@ -105,16 +105,33 @@ class Probe(
     }
 
     fun updateCustomInfo() {
-        customInfo.text = buildString {
+        val spans = mutableListOf<TextSpan>()
+        val text = buildString {
+            fun appendSpan(part: String, role: TextStyleRole) {
+                spans.add(TextSpan(length, length + part.length, role))
+                append(part)
+            }
             append("Probing ${probedModel.displayName}")
             predictedLabel()?.let { (label, confidence) ->
                 append("\nPredicted: $label (${"%.2f".format(confidence)})")
             }
             when {
-                rebuilding -> append("\nRebuilding dataset...")
-                stale -> append(if (datasetRebuilder != null) "\nStale: click to rebuild" else "\nStale: dataset needs rebuild")
+                rebuilding -> {
+                    append("\n")
+                    appendSpan("Rebuilding dataset...", TextStyleRole.EMPHASIS)
+                }
+                stale -> {
+                    append("\n")
+                    if (datasetRebuilder != null) {
+                        appendSpan("Stale: ", TextStyleRole.WARNING)
+                        appendSpan("click to rebuild", TextStyleRole.ACTION)
+                    } else {
+                        appendSpan("Stale: dataset needs rebuild", TextStyleRole.WARNING)
+                    }
+                }
             }
         }
+        customInfo.setStyledText(text, spans)
         events.customInfoUpdated.fire()
     }
 

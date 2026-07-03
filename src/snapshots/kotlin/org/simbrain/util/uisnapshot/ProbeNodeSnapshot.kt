@@ -7,6 +7,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.trainers.createProbe
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.util.NetworkTheme
 import org.simbrain.util.point
 import java.awt.Component
 import java.awt.Dimension
@@ -21,6 +22,9 @@ class ProbeNodeSnapshot : UiSnapshotDef {
     override val name = "probe_node"
 
     override fun build(): Component {
+        // Building the panel runs app code that can reinstall its own LookAndFeel; remember the
+        // harness-requested mode so the canvas can be recolored under it before the snapshot.
+        val requestedDark = NetworkTheme.isDark
         val network = Network()
         val component = NetworkComponent("snapshot", network)
         val panel = NetworkPanel(component).apply { preferredSize = Dimension(900, 500) }
@@ -44,6 +48,8 @@ class ProbeNodeSnapshot : UiSnapshotDef {
         }
         SwingUtilities.invokeAndWait {
             JDialog().apply { contentPane = panel; pack() }
+            setupTheme(if (requestedDark) "dark" else "light")
+            panel.preferenceLoader()
             network.events.zoomToFitPage.fire()
         }
         return panel

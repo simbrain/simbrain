@@ -22,6 +22,19 @@ open class NetworkTextObject : EditableObject, LocatableModel {
             events.textUpdated.fire()
         }
 
+    /**
+     * Styled ranges overlaid on [text], resolved to theme colors by the view so they track
+     * light/dark mode. Kept consistent with the text by [setStyledText]; callers assigning [text]
+     * directly leave old spans in place (the view clamps them to the text bounds), so styled text
+     * should always be set through [setStyledText].
+     */
+    var spans: List<TextSpan> = listOf()
+        private set
+
+    fun setStyledText(newText: String, newSpans: List<TextSpan>) {
+        spans = newSpans
+        text = newText
+    }
 
     var fontName: String = Font.SANS_SERIF
 
@@ -71,3 +84,14 @@ open class NetworkTextObject : EditableObject, LocatableModel {
     override val name: String
         get() = "Text Object"
 }
+
+/**
+ * Semantic style for a [TextSpan]; the view maps roles to theme colors and decorations
+ * (see [org.simbrain.network.gui.nodes.TextNode]).
+ */
+enum class TextStyleRole { WARNING, ACTION, EMPHASIS }
+
+/**
+ * A styled range of a [NetworkTextObject]'s text, from [start] (inclusive) to [end] (exclusive).
+ */
+data class TextSpan(val start: Int, val end: Int, val role: TextStyleRole)

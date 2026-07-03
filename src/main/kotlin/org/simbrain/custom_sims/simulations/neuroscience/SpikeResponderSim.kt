@@ -70,7 +70,7 @@ val spikeResponderSim = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 400
             height = 400
         }
@@ -80,8 +80,8 @@ val spikeResponderSim = newSim {
     val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries, stpSeries) = addTimeSeries("Spike Responders", seriesNames = listOf("Step", "Jump and Decay", "Rise and Decay", "Short Term Plasticity"))
 
     withGui {
-        placeComponent(spikePlot, 410, 0, 400, 400)
-        placeComponent(spikeResponderPlot, 410, 410, 400, 400)
+        placeComponent(spikePlot, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
+        placeComponent(spikeResponderPlot, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, 400, 400)
     }
 
     with(couplingManager) {

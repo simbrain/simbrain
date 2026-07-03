@@ -1,16 +1,11 @@
 package org.simbrain.custom_sims.simulations.hebb
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.SimulationScope
-import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.network.core.Layer
-import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.ControlPanelKt
-import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.distributions.TwoValued
-import kotlin.math.abs
 import kotlin.math.ceil
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -90,7 +85,7 @@ suspend fun SimulationScope.createPatternControlPanel(
     randomizeWeights: () -> Unit = {},
 ): ControlPanelKt? {
     return withGui {
-        createControlPanel("Control Panel", 0, 0) {
+        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Random pattern") {
                 if (isContinuous) {
                     layer.randomize(TwoValued(-1.0, 1.0))
@@ -123,4 +118,3 @@ suspend fun SimulationScope.createPatternControlPanel(
         }
     }
 }
-

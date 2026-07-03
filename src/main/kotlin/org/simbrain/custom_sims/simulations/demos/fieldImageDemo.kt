@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations.demos
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addOdorWorldComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.genericframe.GenericJInternalFrame
@@ -218,8 +215,8 @@ val fieldImageDemo = newSim {
     )
 
     withGui {
-        place(odorWorldComponent, 0, 0, 480, 500)
-        place(networkComponent, 480, 0, 360, 250)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 480, 500)
+        place(networkComponent, SIM_WINDOW_GAP + 480 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 360, 250)
 
         val viewPanel = object : JPanel() {
             init {
@@ -236,7 +233,7 @@ val fieldImageDemo = newSim {
         val viewFrame = GenericJInternalFrame("Mouse 3D View", true, true, true, true).apply {
             layout = BorderLayout()
             add(viewPanel, BorderLayout.CENTER)
-            setBounds(480, 250, 360, 250)
+            setBounds(SIM_WINDOW_GAP + 480 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 250 + SIM_WINDOW_GAP, 360, 250)
             isVisible = true
         }
         addInternalFrame(viewFrame)
@@ -266,7 +263,7 @@ val fieldImageDemo = newSim {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)
-            setBounds(840, 0, 480, 500)
+            setBounds(SIM_WINDOW_GAP + 480 + SIM_WINDOW_GAP + 360 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 480, 500)
             isVisible = true
         }
         addInternalFrame(fieldFrame)

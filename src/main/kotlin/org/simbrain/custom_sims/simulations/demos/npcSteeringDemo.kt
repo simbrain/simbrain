@@ -4,10 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
-import org.simbrain.custom_sims.addOdorWorldComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
 import org.simbrain.world.odorworld.OdorWorldPreferences
@@ -139,7 +136,7 @@ val npcSteeringDemo = newSim {
     )
 
     withGui {
-        place(odorWorldComponent, 0, 0, 550, 550)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 550, 550)
 
         val viewPanel = object : JPanel() {
             init {
@@ -157,7 +154,7 @@ val npcSteeringDemo = newSim {
             }
         }
 
-        createControlPanel("Control Panel", 11, 537) {
+        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP) {
             addCheckBox("Show steering debug", false) { enabled ->
                 movingEntities.forEach {
                     it.showSteeringDebug = enabled
@@ -170,9 +167,9 @@ val npcSteeringDemo = newSim {
             }
         }
 
-        val view3dPanel = createControlPanel("Mouse 3D View", 546, 5) {
+        val view3dPanel = createControlPanel("Mouse 3D View", SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComponent(viewPanel)
-        }
+        }.awaitLayout()
 
         view3dSensor.update(mouse)
 

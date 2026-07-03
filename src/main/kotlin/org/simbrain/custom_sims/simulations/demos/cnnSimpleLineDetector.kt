@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.demos
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -126,7 +127,7 @@ val cnnSimpleLineDetector = newSim {
     val thirdClassSample = dataset.inputs[thirdClassIndex]
     inputLayer.activations = thirdClassSample.toDoubleArray()
 
-    place(networkComponent, 0, 0, 850, 730)
+    place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 850, 730)
     workspace.simpleIterate() // So some activations are shown
 
     addSidebarInfo(

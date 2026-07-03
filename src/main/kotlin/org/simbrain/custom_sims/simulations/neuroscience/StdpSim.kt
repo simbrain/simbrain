@@ -79,9 +79,9 @@ val stdpSim = newSim {
     val (plot, series) = addTimeSeries("STDP Plot", seriesNames = listOf("Synapse"))
 
     withGui {
-        place(networkComponent, 10, 10, 400, 300)
-        placeComponent(plot, 420, 10, 400, 300)
-        placeComponent(dataWorldComponent, 10, 320, 400, 300)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 300)
+        placeComponent(plot, 400 + 2 * SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 300)
+        placeComponent(dataWorldComponent, SIM_WINDOW_GAP, 300 + 2 * SIM_WINDOW_GAP, 400, 300)
     }
 
     // Coupling

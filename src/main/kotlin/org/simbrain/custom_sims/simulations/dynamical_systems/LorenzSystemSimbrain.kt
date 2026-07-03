@@ -172,11 +172,8 @@ val lorenzSystemSimbrain = newSim {
     }
 
     withGui {
-        place(projectionPlot, 638, 7, 519, 485)
-        place(networkComponent, 259, 6, 386, 493)
-
         // Control panel for changing parameters
-        createControlPanel("Lorenz Parameters", 4, 6) {
+        val controlPanel = createControlPanel("Lorenz Parameters", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addButton("Reset to Initial Conditions") {
                 xNeuron.activation = 1.0
@@ -233,7 +230,9 @@ val lorenzSystemSimbrain = newSim {
 
                 updateWeights()
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 386, 493)
+        place(projectionPlot, controlPanel.rightEdgeWithGap() + 386 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 519, 485)
     }
 
 

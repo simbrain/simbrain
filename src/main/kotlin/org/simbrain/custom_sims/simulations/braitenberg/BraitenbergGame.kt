@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations.braitenberg
 
-import org.simbrain.custom_sims.addOdorWorldComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.graphicalUpperBound
 import org.simbrain.util.place
@@ -35,13 +32,7 @@ val braitenbergGame = newSim {
     val vehicle1 = oc.world.createVehicle("Vehicle 1", EntityType.Circle, EntityType.Swiss, Point2D.Double(194.0, 407.0))
 
     withGui {
-        place(vehicle1.networkComponent, 53, 282, 359, 327)
-        place(oc, 462, 19, 600, 600)
-        oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
-    }
-
-    withGui {
-        createControlPanel("Control Panel", 64, 38) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             // Update neuron and weight bounds to reasonable values given weight values
             fun updateBounds(w1: Double, w2: Double) {
                 val bound = graphicalUpperBound(max(w1, w2))
@@ -74,7 +65,13 @@ val braitenbergGame = newSim {
             }
             updateVehicle()
 
-        }
+        }.awaitLayout()
+        val networkWidth = 359
+        controlPanel.setLocation(controlPanel.centeredXInColumn(SIM_WINDOW_GAP, networkWidth), SIM_WINDOW_GAP)
+        val leftColumnRight = max(controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP + networkWidth + SIM_WINDOW_GAP)
+        place(vehicle1.networkComponent, SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap(), networkWidth, 327)
+        place(oc, leftColumnRight, SIM_WINDOW_GAP, 600, 600)
+        oc.getDesktopComponentAs<OdorWorldDesktopComponent>().fitWorldToFrameSize()
     }
 
     addSidebarInfo(
@@ -118,6 +115,3 @@ val braitenbergGame = newSim {
     )
 
 }
-
-
-

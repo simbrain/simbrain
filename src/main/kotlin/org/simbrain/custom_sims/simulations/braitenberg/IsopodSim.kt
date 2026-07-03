@@ -18,6 +18,7 @@ import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import org.simbrain.world.odorworld.sensors.SmellSensor
+import kotlin.math.max
 
 /**
  * A simulation of Isopod navigation. With Peter Hinow and Kaiden Schmidt.
@@ -90,15 +91,6 @@ val isopodSim = newSim { optionString ->
     }
     var leftSpeedWeight: Synapse? = null
     var rightSpeedWeight: Synapse? = null
-
-    // Location of the network in the desktop
-    withGui {
-        place(networkComponent) {
-            location = point(0, 210)
-            width = 400
-            height = 400
-        }
-    }
 
     // Build 2d World
 
@@ -189,11 +181,6 @@ val isopodSim = newSim { optionString ->
     }
 
     withGui {
-        place(odorWorldComponent) {
-            location = point(410, 10)
-            width = 600
-            height = 600
-        }
         isopod.select()
     }
 
@@ -237,7 +224,7 @@ val isopodSim = newSim { optionString ->
 
     withGui {
         isopod.select()
-        createControlPanel("Control Panel", 130, 15) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             suspend fun runTrials() {
                 log.clear()
@@ -331,8 +318,20 @@ val isopodSim = newSim { optionString ->
                     useSpeedInhibition()
                 }
             }
+        }.awaitLayout()
+        val networkWidth = 400
+        controlPanel.setLocation(controlPanel.centeredXInColumn(SIM_WINDOW_GAP, networkWidth), SIM_WINDOW_GAP)
+        val leftColumnRight = max(controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP + networkWidth + SIM_WINDOW_GAP)
+        place(networkComponent) {
+            location = point(SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap())
+            width = networkWidth
+            height = 400
         }
-
+        place(odorWorldComponent) {
+            location = point(leftColumnRight, SIM_WINDOW_GAP)
+            width = 600
+            height = 600
+        }
     }
 
     addSidebarInfo(
@@ -506,4 +505,3 @@ val isopodSim = newSim { optionString ->
     }
 
 }
-

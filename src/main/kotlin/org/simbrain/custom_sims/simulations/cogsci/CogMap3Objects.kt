@@ -174,9 +174,9 @@ val cogMap3Objects = newSim {
     )
 
     withGui{
-        place(networkComponent,470, 450, 470, 427)
-        place(odorWorldComponent,0, 0, 470, 593)
-        place(projectionPlot,470, 0, 470, 450)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 470, 593)
+        place(projectionPlot, SIM_WINDOW_GAP + 470 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 470, 450)
+        place(networkComponent, SIM_WINDOW_GAP + 470 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 450 + SIM_WINDOW_GAP, 470, 427)
     }
 
 }

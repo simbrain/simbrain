@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.backprop
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -141,7 +142,7 @@ val cnnMNIST = newSim {
     
     // GUI
 
-    place(networkComponent, 0, 0, 600, 800)
+    place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 800)
     workspace.simpleIterate()
 
     addSidebarInfo(

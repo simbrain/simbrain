@@ -60,7 +60,6 @@ val classicalConditioning = newSim("classical conditioning") {
     withGui {
         (getDesktopComponent(nc) as NetworkDesktopComponent)
             .networkPanel.selectionManager.clear()
-        place(nc, 0, 14, 350, 443)
     }
 
     // Create the odor world
@@ -97,9 +96,9 @@ val classicalConditioning = newSim("classical conditioning") {
     }
 
     withGui {
-        place(nc, 0, 14, 350, 443)
-        place(oc, 351, 13, 377, 444)
-        place(plot, 728, 13, 406, 444)
+        place(nc, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 350, 443)
+        place(oc, SIM_WINDOW_GAP + 350 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 377, 444)
+        place(plot, SIM_WINDOW_GAP + 350 + SIM_WINDOW_GAP + 377 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 406, 444)
     }
 
     addSidebarInfo(

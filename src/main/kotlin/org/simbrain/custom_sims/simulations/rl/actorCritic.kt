@@ -423,9 +423,6 @@ val actorCritic = newSim {
     // Lay everything out
     withGui {
 
-        place(networkComponent,240, 10, 520, 600)
-        place(odorWorldComponent, 760, 10, 500, 500)
-        place(plot, 760, 590, 520, 300)
         val odorWorldDesktopComponent = (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).apply {
             worldPanel.canvas.layer.addChild(world.tileMap.layers.size, valueOverlay)
             zoomToFitSize(500, 500)
@@ -437,7 +434,7 @@ val actorCritic = newSim {
         }
 
         // Control panel
-        createControlPanel("RL Controls", 10, 10) {
+        val controlPanel = createControlPanel("RL Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val tfTrials = addTextField("Trials", "" + numTrials)
             val tfGamma = addTextField("Discount (gamma)", "" + gamma)
@@ -513,7 +510,12 @@ val actorCritic = newSim {
                 resetMouse()
                 progressLabel.text = "Status: Reset"
             }
-        }
+        }.awaitLayout()
+
+        val mainX = controlPanel.rightEdgeWithGap()
+        place(networkComponent, mainX, SIM_WINDOW_GAP, 520, 600)
+        place(odorWorldComponent, mainX + 520 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 500)
+        place(plot, mainX + 520 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 500 + SIM_WINDOW_GAP, 520, 300)
     }
 
 }

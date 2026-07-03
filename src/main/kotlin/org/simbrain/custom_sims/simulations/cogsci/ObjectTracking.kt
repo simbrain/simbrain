@@ -220,11 +220,6 @@ val objectTrackingSim = newSim {
     })
 
     workspace.addWorkspaceComponent(odorWorldComponent)
-    withGui {
-        place(networkComponent, 258, 0, 600, 600)
-        place(odorWorldComponent, 867, 0, 600, 600)
-
-    }
 
     // Couple output neurons to effectors
     with(couplingManager) {
@@ -233,7 +228,7 @@ val objectTrackingSim = newSim {
     }
 
     withGui {
-        createControlPanel("Control Panel", 0, 0) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tfNumIterations: JTextField = addTextField("Number of iterations", "1000")
             val cbRecordSpikes = addCheckBox("Record spikes", recordSpikes)
             addButton("Run trial") {
@@ -245,7 +240,9 @@ val objectTrackingSim = newSim {
                     writeText(data.toCsvString())
                 }
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)
+        place(odorWorldComponent, controlPanel.rightEdgeWithGap() + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
     }
 
     addSidebarInfo(

@@ -713,9 +713,6 @@ val braitenbergRL = newSim { optionString ->
     }
 
     withGui {
-        place(networkComponent, 320, 10, 360, 400)
-        place(oc, 670, 10, 415, 415)
-        place(plot, 320, 410, 500, 300)
         val plotFrame = getDesktopComponent(plot).parentFrame
         if (plotFrame is JInternalFrame) {
             plotFrame.isClosable = false
@@ -726,7 +723,7 @@ val braitenbergRL = newSim { optionString ->
         }
 
         // Combined control panel
-        createControlPanel("Control Panel", 0, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addLabel("Task:")
 
@@ -877,8 +874,12 @@ val braitenbergRL = newSim { optionString ->
             }
             zeroResetButton.toolTipText = "Set all weights to zero"
 
-            swingInvokeLater { pack() }
-        }
+        }.awaitLayout()
+
+        val mainX = controlPanel.rightEdgeWithGap()
+        place(networkComponent, mainX, SIM_WINDOW_GAP, 360, 400)
+        place(oc, mainX + 360 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 415, 415)
+        place(plot, mainX, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, 500, 300)
     }
 
 

@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations.nettalk
 
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.addSpeechSynthesizer
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.util.nettalk.NettalkPhonology
 import org.simbrain.util.place
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
@@ -32,7 +29,7 @@ val synthesizerDemo = newSim {
     var phonemesToSpeak = "h@l'oU h'aU A: j'u:"
 
     withGui {
-        val controlPanel = createControlPanel("Speak", 0, 0) {
+        val controlPanel = createControlPanel("Speak", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComponent(textAreaPanel("Text", wordToSpeak) { wordToSpeak = it })
             addButton("Speak text") {
                 synthesizer.speakText(wordToSpeak.trim())
@@ -48,9 +45,9 @@ val synthesizerDemo = newSim {
             addSeparator()
 
             addComponent(featureVectorPanel(synthesizer))
-        }
-        controlPanel.setBounds(0, 3, 324, 570)
-        place(speechWorld, 310, 2, 605, 593)
+        }.awaitLayout()
+        controlPanel.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 324, 570)
+        place(speechWorld, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 605, 593)
     }
 
     addSidebarInfo(

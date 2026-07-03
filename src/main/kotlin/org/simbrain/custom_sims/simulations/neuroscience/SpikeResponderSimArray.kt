@@ -85,8 +85,8 @@ val spikeResponderSimArray = newSim {
 
     val spikePlot = addTimeSeriesComponent("Izhikevich", "Membrane Potentials")
     withGui {
-        placeComponent(networkComponent, 0, 0, 715, 733)
-        placeComponent(spikePlot, 715, 0, 400, 400)
+        placeComponent(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 715, 733)
+        placeComponent(spikePlot, SIM_WINDOW_GAP + 715 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
     }
 
     with(couplingManager) {

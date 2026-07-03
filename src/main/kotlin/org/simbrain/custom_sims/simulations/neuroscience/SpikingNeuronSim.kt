@@ -41,7 +41,7 @@ val spikingNeuron = newSim {
     }
 
     withGui {
-        place(networkComponent, 0, 0, 400,400)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400,400)
     }
 
     val spikes = addTimeSeriesComponent("Voltage trace of spiking neuron", seriesNames = listOf("Spiking"))
@@ -120,9 +120,9 @@ val spikingNeuron = newSim {
     )
 
     withGui {
-        place(networkComponent, 0, 0, 400,400)
-        place(spikes, 410, 0, 400,400)
-        place(spikeResponses, 824, 2, 400, 400)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400,400)
+        place(spikes, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400,400)
+        place(spikeResponses, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
     }
 
     network.events.zoomToFitPage.fire()

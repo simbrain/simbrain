@@ -231,13 +231,13 @@ val avoider = newSim {
     // GUI layout
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 400
             height = 400
         }
 
         place(odorWorldComponent) {
-            location = point(400, 0)
+            location = point(SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 400
             height = 435
         }

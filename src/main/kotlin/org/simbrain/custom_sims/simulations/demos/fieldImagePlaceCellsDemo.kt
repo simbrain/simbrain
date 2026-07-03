@@ -183,8 +183,8 @@ val fieldImagePlaceCellsDemo = newSim {
     )
 
     withGui {
-        place(odorWorldComponent, 0, 0, 520, 589)
-        place(networkComponent, 512, 1, 476, 582)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 520, 589)
+        place(networkComponent, SIM_WINDOW_GAP + 520 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 476, 582)
 
         val fieldPanel = FieldImagePanel(
             source = {
@@ -216,7 +216,7 @@ val fieldImagePlaceCellsDemo = newSim {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)
-            setBounds(989, 5, 517, 574)
+            setBounds(SIM_WINDOW_GAP + 520 + SIM_WINDOW_GAP + 476 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 517, 574)
             isVisible = true
         }
         addInternalFrame(fieldFrame)

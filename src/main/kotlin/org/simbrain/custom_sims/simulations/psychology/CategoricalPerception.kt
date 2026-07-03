@@ -1,10 +1,7 @@
 package org.simbrain.custom_sims.simulations.psychology
 
 import kotlinx.coroutines.Dispatchers
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SigmoidalRule
@@ -363,9 +360,7 @@ val categoricalPerception = newSim {
     // Control panel
 
     withGui {
-        place(networkComponent, 300, 0, 940, 677)
-
-        createControlPanel("Analysis", 0, 0) {
+        val controlPanel = createControlPanel("Analysis", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addLabel("Training Condition:")
             addComboBox("", TrainingCondition.entries, currentCondition) { selectedCondition ->
                 currentCondition = selectedCondition
@@ -389,7 +384,8 @@ val categoricalPerception = newSim {
                 val result = runAnalysis()
                 showMessageDialog(result, "Repr Layer Analysis")
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 940, 677)
     }
 
     addSidebarInfo("""

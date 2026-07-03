@@ -88,11 +88,8 @@ val operantWithEnvironment = newSim("operant_with_environment") {
     updateBehaviorNetNeuronLabels(behaviorNet)
 
     withGui {
-        place(networkComponent, 239, 10, 575, 500)
         (getDesktopComponent(networkComponent) as NetworkDesktopComponent)
             .networkPanel.selectionManager.clear()
-
-        place(odorWorldComponent, 804, 10, 315, 383)
         (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = .5
     }
 
@@ -196,7 +193,8 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
 
     val random = Random(Random.nextLong())
 
-    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
+    val network = networkComponent.network
     val behaviorNet = network.getModelByLabel<NeuronCollection>("Behaviors")
     val stimulusNet = network.getModelByLabel<NeuronCollection>("Stimuli")
     val rewardNeuron = network.getModelByLabel<Neuron>("Food Pellet")
@@ -264,7 +262,7 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
     })
 
     withGui {
-        createControlPanel("Control Panel", 5, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             fun normIntrinsicProbabilities() {
                 val totalMass = behaviorNet.neuronList.sumOf { it.auxValue }
@@ -319,7 +317,9 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
                 SimbrainDesktop.workspace.iterateSuspend()
             }
 
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 575, 500)
+        place(odorWorldComponent, controlPanel.rightEdgeWithGap() + 575 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 315, 383)
     }
 
 }

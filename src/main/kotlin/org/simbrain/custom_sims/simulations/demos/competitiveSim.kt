@@ -140,8 +140,7 @@ val competitiveSim = newSim {
     )
 
     withGui {
-        place(networkComponent, 149, 4, 674, 615)
-        createControlPanel("Control Panel",1, 4) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addButton("Pattern 1") {
                 competitive.inputLayer.neuronList.activations =
@@ -191,6 +190,7 @@ val competitiveSim = newSim {
                 competitive.randomize()
                 labelTracker.clear(competitive.competitive.neuronList)
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 674, 615)
     }
 }

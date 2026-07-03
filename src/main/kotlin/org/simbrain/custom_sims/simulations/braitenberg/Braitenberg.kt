@@ -32,18 +32,12 @@ val braitenbergSim = newSim {
     val vehicle1 = oc.world.createVehicle("Vehicle 1", EntityType.Circle, EntityType.Circle, Point2D.Double(120.0, 245.0))
     val vehicle2 = oc.world.createVehicle("Vehicle 2", EntityType.Circle, EntityType.Circle, Point2D.Double(320.0, 245.0))
 
-    withGui {
-        place(vehicle1.networkComponent, 230, 0, 360, 323)
-        place(vehicle2.networkComponent, 230, 323, 360, 323)
-        place(oc, 590, 0, 496, 646)
-    }
-
     var leftWeight = 30.0
     var rightWeight = 50.0
     var velocity = 1.0
 
     withGui {
-        createControlPanel("Control Panel", 5, 5) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addFormattedNumericTextField("Left weight", initValue = leftWeight) {
                 leftWeight = it
             }
@@ -108,7 +102,10 @@ val braitenbergSim = newSim {
                 updateBounds(leftWeight, rightWeight)
             }
             initSamePair() // Default to same pair / revolving config
-        }
+        }.awaitLayout()
+        place(vehicle1.networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 360, 323)
+        place(vehicle2.networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP + 323 + SIM_WINDOW_GAP, 360, 323)
+        place(oc, controlPanel.rightEdgeWithGap() + 360 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 496, 646)
     }
 
     addSidebarInfo(

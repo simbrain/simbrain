@@ -91,11 +91,10 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     })
 
     withGui {
-        place(networkComponent, 0, 0, 588, 617)
-        place(tsPlot, 588, 183, 460, 434)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 588, 617)
 
         // Set up control panel
-        createControlPanel("Controller", 588, 1) {
+        val controlPanel = createControlPanel("Controller", SIM_WINDOW_GAP + 588 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tf_stdev = addTextField("Weight stdev", variance.toString())
             addButton("Update") {
                 variance = tf_stdev.text.toDouble()
@@ -104,7 +103,8 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
                 val normalDist2 = NormalDistribution(0.0, variance).apply { randomSeed = 42L }
                 sgRes2.randomize(normalDist2)
             }
-        }
+        }.awaitLayout()
+        place(tsPlot, SIM_WINDOW_GAP + 588 + SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap(), 460, 434)
     }
 
     addSidebarInfo(

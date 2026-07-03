@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import org.json.JSONObject
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -468,8 +469,8 @@ val evolveResourcePursuer = newSim { optionString ->
                         }
                         energyTextObject.location = point(-160, -20)
                         withGui {
-                            place(networkComponent, 390, 10, 380, 600)
-                            place(odorWorldComponent, 770, 10, 620, 600)
+                            place(networkComponent, 390, SIM_WINDOW_GAP, 380, 600)
+                            place(odorWorldComponent, 390 + 380 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 620, 600)
                             (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
                         }
                     }
@@ -573,8 +574,8 @@ val evolveResourcePursuer = newSim { optionString ->
                 }
 
                 withGui {
-                    place(networkComponent, 390, 10, 380, 600)
-                    place(odorWorldComponent, 770, 10, 620, 600)
+                    place(networkComponent, 390, SIM_WINDOW_GAP, 380, 600)
+                    place(odorWorldComponent, 390 + 380 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 620, 600)
                     (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
                 }
             }

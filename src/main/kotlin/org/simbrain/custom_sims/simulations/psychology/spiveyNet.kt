@@ -240,8 +240,6 @@ val spiveyNet = newSim {
 
     withGui {
         //place(docViewer, 0, 0, 464, 619)
-        place(networkComponent, 222, 15, 672, 716)
-        place(oc, 890, 17, 434, 548)
         (getDesktopComponent(oc) as? OdorWorldDesktopComponent)?.worldPanel?.let {
             it.scalingFactor = 0.1
             delay(100L)
@@ -252,7 +250,7 @@ val spiveyNet = newSim {
 
         applyControlCondition()
 
-        createControlPanel("Control Panel", 15, 15) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Control Condition") {
                 applyControlCondition()
             }
@@ -307,7 +305,9 @@ val spiveyNet = newSim {
                 mouse.clearTrail()
                 eye.clearTrail()
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 672, 716)
+        place(oc, controlPanel.rightEdgeWithGap() + 672 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 434, 548)
     }
 
     addSidebarInfo(

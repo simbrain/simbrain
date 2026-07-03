@@ -1,5 +1,8 @@
 package org.simbrain.custom_sims
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Network
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.subnetworks.CompetitiveNetwork
@@ -8,9 +11,13 @@ import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.network.util.offsetNeuronCollections
+import org.simbrain.util.ControlPanelKt
+import java.awt.Component
 import kotlin.math.sqrt
 
 const val SIM_NEURON_INTERVAL = 30
+
+const val SIM_WINDOW_GAP = 10
 
 const val COMPETITIVE_LAYER_GAP = 140.0
 
@@ -19,6 +26,18 @@ const val SOM_SIM_SOM_INTERVAL = 34
 const val SOM_SMELLS_SOM_INTERVAL = 38
 
 const val SOM_LAYER_GAP_EXTRA = 100.0
+
+fun Component.rightEdgeWithGap(gap: Int = SIM_WINDOW_GAP) = x + width + gap
+
+fun Component.bottomEdgeWithGap(gap: Int = SIM_WINDOW_GAP) = y + height + gap
+
+fun Component.centeredXInColumn(columnX: Int, columnWidth: Int) = columnX + ((columnWidth - width) / 2).coerceAtLeast(0)
+
+suspend fun ControlPanelKt.awaitLayout() = apply {
+    withContext(Dispatchers.Swing) {
+        pack()
+    }
+}
 
 fun CompetitiveNetwork.showInputPattern(network: Network, pattern: List<Double>) {
     inputLayer.setActivations(pattern.toDoubleArray())

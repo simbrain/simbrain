@@ -107,12 +107,12 @@ val edgeOfChaos = newSim("edgeOfChaos") {
     couplingManager.createCoupling(smellSensor, sensorNodes)
 
     withGui {
-        place(networkComponent, 0, 0, 590, 675)
-        place(oc, 590, 0, 420, 312)
-        place(pc, 590, 312, 422, 363)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 590, 675)
+        place(oc, SIM_WINDOW_GAP + 590 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 420, 312)
+        place(pc, SIM_WINDOW_GAP + 590 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 312 + SIM_WINDOW_GAP, 422, 363)
 
         // Set up control panel
-        createControlPanel("Controller", 1010, 0) {
+        createControlPanel("Controller", SIM_WINDOW_GAP + 590 + SIM_WINDOW_GAP + 422 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tf_stdev = addTextField("Weight stdev", variance.toString())
             addButton("Update") {
                 // Update variance of weight strengths

@@ -10,7 +10,6 @@ import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.swingInvokeLater
 import org.simbrain.util.toDoubleArray
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -354,12 +353,9 @@ val braitenbergRLPrograms = newSim { optionString ->
     }
 
     withGui {
-        place(networkComponent, 342, 14, 523, 493)
-        place(oc, 865, 14, 504, 497)
-
         activeTextLabel.location = point(50.0, -70.0)
 
-        val controlPanel = createControlPanel("Control Panel", 0, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addLabel("Task:")
             addComboBox("", tasks, tasks[0]) { selectedTask ->
@@ -403,9 +399,11 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             addButton("Reset Learning") { resetLearning() }
 
-            swingInvokeLater { pack() }
-        }
-        controlPanel.setBounds(0, 10, 347, 506)
+        }.awaitLayout()
+
+        val mainX = controlPanel.rightEdgeWithGap()
+        place(networkComponent, mainX, SIM_WINDOW_GAP, 523, 493)
+        place(oc, mainX + 523 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 504, 497)
     }
 
     // Headless mode

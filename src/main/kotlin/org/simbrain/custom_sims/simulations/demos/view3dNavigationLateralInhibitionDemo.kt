@@ -103,9 +103,6 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     }
 
     withGui {
-        place(odorWorldComponent, 345, 0, 400, 620)
-        place(networkComponent, 734, 0, 565, 618)
-
         val brightnessPanel = object : JPanel() {
             override fun getPreferredSize() = Dimension(280, 180)
             override fun getMinimumSize() = Dimension(280, 180)
@@ -126,7 +123,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             }
         }
 
-        val controlPanel = createControlPanel("Lateral Inhibition Controls", 0, 0) {
+        val controlPanel = createControlPanel("Lateral Inhibition Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addLabel("Brightness Array")
             addComponent(brightnessPanel)
             addSeparator()
@@ -157,8 +154,10 @@ val view3dNavigationLateralInhibitionDemo = newSim {
                 }
                 applyStrengths()
             }
-        }
-        controlPanel.setBounds(0, 0, 353, 597)
+        }.awaitLayout()
+        controlPanel.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 353, 597)
+        place(odorWorldComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 400, 620)
+        place(networkComponent, controlPanel.rightEdgeWithGap() + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 565, 618)
 
         controlPanel.launch(Dispatchers.Swing) {
             while (true) {

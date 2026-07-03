@@ -135,16 +135,13 @@ val somNetSmells = newSim {
     }
 
     withGui {
-        place(networkComponent, 182, 10, 450, 720)
-        place(oc, 640, 10, 450, 520)
-
         val originalLearningRate = somNet.initialLearningRate
         val originalNeighborhoodSize = somNet.initNeighborhoodSize
         
         var savedLearningRate = originalLearningRate
         var savedNeighborhoodSize = originalNeighborhoodSize
         
-        createControlPanel("Control Panel", 10, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
 
             val freezeLearning = addCheckBox("Freeze Learning", false)
@@ -174,7 +171,9 @@ val somNetSmells = newSim {
                 network.events.updated.fire()
             }
 
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 450, 720)
+        place(oc, controlPanel.rightEdgeWithGap() + 450 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 450, 520)
     }
 
     addSidebarInfo(

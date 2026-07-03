@@ -140,8 +140,14 @@ val threeObjectDetector = newSim {
     }
 
     withGui {
-        place(odorWorldComponent,435, 0, 380, 508)
-        place(networkComponent, 0, 0, 447, 595)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 447, 595)
+        place(
+            odorWorldComponent,
+            SIM_WINDOW_GAP + 447 + SIM_WINDOW_GAP,
+            SIM_WINDOW_GAP,
+            380,
+            508
+        )
     }
 
     addSidebarInfo(

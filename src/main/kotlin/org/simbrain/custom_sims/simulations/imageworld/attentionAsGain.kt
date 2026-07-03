@@ -181,7 +181,7 @@ val attentionAsGain = newSim {
 
     withGui {
         // Control panel on the left
-        createControlPanel("Attention Control", 10, 10) {
+        val controlPanel = createControlPanel("Attention Control", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addSlider("Left Gain", 0.1, 5.0, leftGain, 0.1) { value ->
                 leftGain = value
                 updateGains()
@@ -219,11 +219,11 @@ val attentionAsGain = newSim {
             addButton("Reset Network") {
                 network.clearActivations()
             }
-        }
+        }.awaitLayout()
         
         // Place components after control panel is created
-        place(networkComponent, 220, 10, 650, 600)
-        place(imageWorldComponent, 880, 10, 500, 600)
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 650, 600)
+        place(imageWorldComponent, controlPanel.rightEdgeWithGap() + 650 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 600)
         // place(leftPlotComponent, 10, 620, 550, 250)
         // place(rightPlotComponent, 570, 620, 550, 250)
     }

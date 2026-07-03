@@ -8,14 +8,10 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.util.FlowEvents
-import org.simbrain.util.Theme
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.nettalk.NettalkEncoder
 import org.simbrain.util.nettalk.NettalkPhonology
 import org.simbrain.util.nettalk.loadNettalkCorpus
-import org.simbrain.util.place
-import org.simbrain.util.point
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -85,13 +81,13 @@ val nettalkComponentSim = newSim("nettalk_component") {
     wireNetTalk(workspace, reader)
 
     withGui {
-        val readerFrame = createControlPanel("NETtalk Reader", 0, 0) {
+        val readerFrame = createControlPanel("NETtalk Reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
         }
-        readerFrame.setBounds(0, 0, 636, 256)
-        place(networkComponent, 625, 0, 851, 835)
-        place(speechComponent, 0, 241, 637, 593)
+        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 636, 256)
+        place(networkComponent, readerFrame.rightEdgeWithGap(), SIM_WINDOW_GAP, 851, 835)
+        place(speechComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP + 256 + SIM_WINDOW_GAP, 637, 593)
     }
 
     addSidebarInfo(NETTALK_COMPONENT_SIDEBAR)
@@ -99,15 +95,16 @@ val nettalkComponentSim = newSim("nettalk_component") {
     val reader = NettalkReader()
     wireNetTalk(workspace, reader)
     withGui {
-        createControlPanel("NETtalk Reader", 0, 0) {
+        val readerFrame = createControlPanel("NETtalk Reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
-        }.setBounds(0, 0, 636, 256)
+        }
+        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 636, 256)
         workspace.componentList.filterIsInstance<NetworkComponent>().firstOrNull()?.let {
-            place(it, 625, 0, 851, 835)
+            place(it, readerFrame.rightEdgeWithGap(), SIM_WINDOW_GAP, 851, 835)
         }
         workspace.componentList.filterIsInstance<SpeechSynthesizerComponent>().firstOrNull()?.let {
-            place(it, 0, 241, 637, 593)
+            place(it, SIM_WINDOW_GAP, SIM_WINDOW_GAP + 256 + SIM_WINDOW_GAP, 637, 593)
         }
     }
     addSidebarInfo(NETTALK_COMPONENT_SIDEBAR)

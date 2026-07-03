@@ -2,6 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -173,7 +174,7 @@ val evolveXor = newSim {
                         genotype.output.neurons.location = point(0, -25)
                         genomeDisplay.refreshFrom(genotype)
                         withGui {
-                            place(networkComponent, 340, 10, 384, 480)
+                            place(networkComponent, 340, SIM_WINDOW_GAP, 384, 480)
                         }
                         history.add(ExpressionEntry.forComponents(
                             workspace, listOf(networkComponent), state.historyLabel(evaluatorParams)

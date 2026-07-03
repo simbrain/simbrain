@@ -82,7 +82,7 @@ val kAgentTrails = newSim {
 
     withGui {
         place(networkComponent) {
-            location = point(322, 13)
+            location = point(SIM_WINDOW_GAP + 315 + SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 544
             height = 336
         }
@@ -141,7 +141,7 @@ val kAgentTrails = newSim {
     val odorWorldComponent = addOdorWorldComponent("World")
 
     withGui {
-        place(odorWorldComponent,9, 348, 315, 388)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP + 336 + SIM_WINDOW_GAP, 315, 388)
     }
 
     val odorWorld = odorWorldComponent.world.apply {
@@ -195,14 +195,14 @@ val kAgentTrails = newSim {
             projector.tolerance = .001
         }
         place(plot) {
-            location = point(322, 348)
+            location = point(SIM_WINDOW_GAP + 315 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 336 + SIM_WINDOW_GAP)
             width = 546
             height = 390
         }
 
         couplingManager.createCoupling(sensoryNet, plot)
 
-        createControlPanel("Control Panel", 11, 16) {
+        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
 
             fun resetObjects() {

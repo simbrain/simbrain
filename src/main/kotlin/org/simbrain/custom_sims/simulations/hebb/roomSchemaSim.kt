@@ -1,8 +1,5 @@
 package org.simbrain.custom_sims.simulations
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
@@ -56,8 +53,7 @@ val roomSchemaSim = newSim {
     }
 
     withGui {
-        place(networkComponent, 236, 10, 800, 600)
-        createControlPanel("Control Panel", 5, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Kitchen") {
                 activateNodes(listOf(
                     "oven", "coffee-pot", "cupboard", "toaster", "refrigerator", "sink", "stove", "drapes",
@@ -102,7 +98,8 @@ val roomSchemaSim = newSim {
                     .map { flipBitWithChance(it.toInt(), 0.1).toDouble() }
                     .toDoubleArray()
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 800, 600)
     }
 
     addSidebarInfo(

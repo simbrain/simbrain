@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -134,7 +135,7 @@ val irisClassifier = newSim {
     // Location of the network in the desktop
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 800
             height = 500
         }

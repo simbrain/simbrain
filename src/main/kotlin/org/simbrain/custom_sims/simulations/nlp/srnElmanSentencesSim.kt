@@ -2,10 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.addTextWorld
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.BasicOptimizer
 import org.simbrain.network.trainers.TrainingDataset
@@ -93,9 +90,9 @@ val srnElmanSentences = newSim {
     // }
 
     withGui {
-        place(textWorldInputs, 0, 7, 531, 929)
-        place(textWorldOut, 523, 7, 500, 204)
-        place(networkComponent, 523, 208, 500, 550)
+        place(textWorldInputs, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 531, 929)
+        place(textWorldOut, SIM_WINDOW_GAP + 531 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 204)
+        place(networkComponent, SIM_WINDOW_GAP + 531 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 204 + SIM_WINDOW_GAP, 500, 550)
     }
 
     workspace.addUpdateAction("Update Inputs") {

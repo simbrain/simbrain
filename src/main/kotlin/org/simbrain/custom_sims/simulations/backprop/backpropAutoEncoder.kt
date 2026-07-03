@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -77,7 +78,7 @@ val backpropAutoEncoder = newSim {
 
     // Location of the network in the desktop
     withGui {
-        place(networkComponent,0, 0, 700, 700)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 700)
     }
 
 //    // Adding a docviewer

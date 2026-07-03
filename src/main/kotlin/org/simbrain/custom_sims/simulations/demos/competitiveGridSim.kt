@@ -86,8 +86,7 @@ val competitiveGridSim = newSim {
     )
 
     withGui {
-        place(networkComponent, 153, 10, 528, 728)
-        createControlPanel("Control Panel", 0, 13) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addButton("Pattern 1") {
                 competitive.showInputPattern(network,
@@ -193,6 +192,7 @@ val competitiveGridSim = newSim {
                 competitive.randomize()
                 labelTracker.clear(competitive.competitive.neuronList)
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 528, 728)
     }
 }

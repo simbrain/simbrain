@@ -322,9 +322,9 @@ val objectRecognition3D = newSim {
     }
 
     val gui = withGui {
-        place(odorWorldComponent, 0, 0, 400, 400)
-        place(networkComponent, 410, 0, 600, 800)
-        createControlPanel("Configuration", 1020, 0) {
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
+        place(networkComponent, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 800)
+        createControlPanel("Configuration", SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addFormattedNumericTextField("Samples per class", samplesPerClass) { samplesPerClass = it }
             addFormattedNumericTextField("Inner radius", innerRadius) { innerRadius = it }
             addFormattedNumericTextField("Outer radius", outerRadius) { outerRadius = it }

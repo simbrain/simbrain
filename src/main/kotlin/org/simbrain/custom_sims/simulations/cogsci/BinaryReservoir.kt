@@ -130,14 +130,15 @@ val binaryReservoir = newSim {
         // println("" + activations.last() + ",")
     })
 
+    val projectionPlot = addProjectionPlot("Activations")
     withGui {
         place(networkComponent) {
-            location = point(0, 0)
+            location = point(SIM_WINDOW_GAP, SIM_WINDOW_GAP)
             width = 567
             height = 617
         }
 
-        createControlPanel("Control Panel", 567, 0) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP + 567 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tf_stdev: JTextField = addTextField("Weight stdev", "" + variance)
             addComponent(tf_stdev)
             addButton("Apply Variance") {
@@ -168,15 +169,10 @@ val binaryReservoir = newSim {
 
             }
 
-        }
+        }.awaitLayout()
 
-    }
-
-    // Location of the projection in the desktop
-    val projectionPlot = addProjectionPlot("Activations")
-    withGui {
         place(projectionPlot) {
-            location = point(567, 197)
+            location = point(SIM_WINDOW_GAP + 567 + SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap())
             width = 452
             height = 420
         }

@@ -58,8 +58,8 @@ val corticalLayers = newSim {
     rasterPlot.model.addDataSources(3, listOf("L2/3", "L4", "L5/6"))
 
     withGui {
-        place(nc, 10, 10, 550, 800)
-        place(rasterPlot, 560, 12, 524, 568)
+        place(nc, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 550, 800)
+        place(rasterPlot, SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 524, 568)
         rasterPlot.model.windowSize = 1000
         (getDesktopComponent(rasterPlot) as RasterPlotDesktopComponent).rasterPanel.updateChartSettings()
     }

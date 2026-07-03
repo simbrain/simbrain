@@ -306,7 +306,7 @@ val cnnObjectDetector = newSim {
 
     workspace.iterateSuspend(1)
 
-    place(networkComponent, 0, 0, 600, 800)
+    place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 800)
 
     addSidebarInfo(
         """

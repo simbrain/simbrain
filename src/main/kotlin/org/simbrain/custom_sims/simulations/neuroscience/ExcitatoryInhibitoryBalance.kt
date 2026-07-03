@@ -92,9 +92,7 @@ val excitatoryInhibitoryBalance = newSim {
 
     withGui {
         getNetworkPanel(networkComponent).freeWeightsVisible = false
-        place(networkComponent, 334, 0, 600, 600)
-        place(rasterPlot, 921, 0, 600, 600)
-        createControlPanel("E/I Balance Controls", 0, 0) {
+        val controlPanel = createControlPanel("E/I Balance Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addSlider("Excitatory Drive", 0.0, 30.0, excDrive, 0.5) { value ->
                 excDrive = value
                 updateDrives()
@@ -109,7 +107,9 @@ val excitatoryInhibitoryBalance = newSim {
             addButton("Clear Activation") {
                 neurons.forEach { it.activation = 0.0 }
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)
+        place(rasterPlot, controlPanel.rightEdgeWithGap() + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
     }
 
     with(couplingManager) {

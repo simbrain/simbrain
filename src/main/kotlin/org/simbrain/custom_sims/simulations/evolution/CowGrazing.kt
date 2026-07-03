@@ -5,6 +5,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.custom_sims.newSim
@@ -294,7 +295,7 @@ val grazingCows = newSim { optionString ->
             trainerDialog = null
             session = null
         }
-        createControlPanel("Control Panel", 5, 10) {
+        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val numCowsTf = addTextField("Number of cows", "" + numCows)
             val useAverageCB = addCheckBox("Use mean group fitness (else min)", useAverage)
@@ -337,10 +338,10 @@ val grazingCows = newSim { optionString ->
 
                         withGui {
                             newComponents.filterIsInstance<OdorWorldComponent>().firstOrNull()?.let {
-                                place(it, 280, 10, 476, 432)
+                                place(it, 280, SIM_WINDOW_GAP, 476, 432)
                             }
                             newComponents.filterIsInstance<NetworkComponent>().forEachIndexed { i, net ->
-                                place(net, 768, 10 + i * 282, 326, 282)
+                                place(net, 280 + 476 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + i * (282 + SIM_WINDOW_GAP), 326, 282)
                             }
                         }
 

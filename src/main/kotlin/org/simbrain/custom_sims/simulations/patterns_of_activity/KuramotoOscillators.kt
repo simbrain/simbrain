@@ -126,9 +126,9 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }
 
     withGui {
-        place(networkComponent, 10, 10, 443, 450)
-        place(oc, 445, 14, 426, 437)
-        place(plot, 858, 12, 460, 437)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 443, 450)
+        place(oc, 443 + 2 * SIM_WINDOW_GAP, SIM_WINDOW_GAP, 426, 437)
+        place(plot, 443 + 426 + 3 * SIM_WINDOW_GAP, SIM_WINDOW_GAP, 460, 437)
     }
 
     // // "Halo" based on prediction error

@@ -26,9 +26,6 @@ val simpleOperant = newSim("simple operant conditioning") {
     workspace.clearWorkspace()
 
     val nc = addNetworkComponent("Behaviors")
-    withGui {
-        place(nc, 239, 10, 575, 500)
-    }
     val behaviorNet = nc.network.addNeuronCollection(numNeurons).apply {
         label = "Behaviors"
         layout = LineLayout(100.0, LineLayout.LineOrientation.HORIZONTAL)
@@ -49,7 +46,8 @@ val simpleOperant = newSim("simple operant conditioning") {
 
 suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
 
-    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
+    val network = networkComponent.network
     val behaviorNet = network.getModelByLabel<NeuronCollection>("Behaviors")
     val nodeToLabel = HashMap<Neuron, String>()
     nodeToLabel[behaviorNet.getNeuron(0)] = "Wiggle"
@@ -102,7 +100,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             }
         }
 
-        createControlPanel("Control Panel", 5, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addButton("Reward Agent") {
                 for (n in behaviorNet.neuronList) {
@@ -131,7 +129,14 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             addButton("Don't reinforce or punish") {
                 SimbrainDesktop.workspace.simpleIterate()
             }
-        }
+        }.awaitLayout()
+        place(
+            networkComponent,
+            controlPanel.rightEdgeWithGap(),
+            SIM_WINDOW_GAP,
+            575,
+            500
+        )
 
         addSidebarInfo(
             """
@@ -191,7 +196,3 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
         )
     }
 }
-
-
-
-

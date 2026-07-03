@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.patterns_of_activity
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -501,7 +502,7 @@ val iacJetsSharks5People = newSim {
 
 
     withGui{
-        place(networkComponent, 0, 0, 600, 600)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
         addSidebarInfo(
             """
                 # Jets and Sharks

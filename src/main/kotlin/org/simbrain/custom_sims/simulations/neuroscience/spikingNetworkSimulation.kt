@@ -111,9 +111,7 @@ val spikingNetworkSimulation = newSim {
 
     withGui {
         getNetworkPanel(networkComponent).synapseSpikingOnlyVisible = true
-        place(networkComponent, 210, 0, 600, 600)
-        place(rasterPlot, 810, 0, 600, 600)
-        createControlPanel("Controls", 0, 0) {
+        val controlPanel = createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Randomize Activations") {
                 neuronCollection.randomize()
             }
@@ -269,7 +267,9 @@ val spikingNetworkSimulation = newSim {
                     (pacemakerNeuron!!.updateRule as SinusoidalRule).frequency = newFreq
                 }
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)
+        place(rasterPlot, controlPanel.rightEdgeWithGap() + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
     }
 
     // Set up the coupling between the neuron collection and the raster plot

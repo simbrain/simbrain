@@ -326,11 +326,10 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     setupUpdateActions(workspace, options)
 
     withGui {
-        place(textWorldComponent, 10, 10, 401, 372)
-        place(networkComponent, 401, 10, 791, 622)
-
+        val textWorldWidth = 401
+        val textWorldHeight = 372
         // Create control panel for language model controls
-        createControlPanel("Language Model Controls", 10, 370) {
+        val controlPanel = createControlPanel("Language Model Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
 
             addButton("Show Vocabulary") {
                 val tokensText = tokenEmbedding.tokens.joinToString("\n")
@@ -395,7 +394,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 }
                 dialog.display()
             }
-        }
+        }.awaitLayout()
+        controlPanel.setLocation(
+            controlPanel.centeredXInColumn(SIM_WINDOW_GAP, textWorldWidth),
+            SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP
+        )
+        place(textWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, textWorldWidth, textWorldHeight)
+        place(networkComponent, SIM_WINDOW_GAP + textWorldWidth + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 791, 622)
 
         val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
         SimbrainDesktop.onboardingManager.showPopup(

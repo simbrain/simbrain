@@ -81,7 +81,7 @@ val simpleImageWorld = newSim {
     // Place network in the desktop
     withGui {
         val networkPanel = getNetworkPanel(networkComponent)
-        val controlPanel = createControlPanel("Control Panel", 5, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             repeat(outputs.size) { index ->
                 addTextField("Category ${index + 1}", "") { category ->
                     outputs.neuronList[index].label = category
@@ -103,18 +103,18 @@ val simpleImageWorld = newSim {
             addButton("Train...") {
                 with(networkPanel) { supervisedModel.getSupervisedTrainingDialog().display() }
             }
-        }
+        }.awaitLayout()
         var controlPanelHeight = controlPanel.size.height
         waitFor {
             val condition = controlPanel.size.height > 100 && controlPanelHeight == controlPanel.size.height
             controlPanelHeight = controlPanel.size.height
             condition
         }
-        place(networkComponent, controlPanel.size.width + 10, 10, 350, controlPanel.size.height)
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 350, controlPanel.size.height)
         place(
             imageWorldComponent,
-            controlPanel.size.width + 10 + 350 + 10,
-            10,
+            controlPanel.rightEdgeWithGap() + 350 + SIM_WINDOW_GAP,
+            SIM_WINDOW_GAP,
             600,
             600
         )

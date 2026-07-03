@@ -52,8 +52,8 @@ val spikingNeuronTwoInputs = newSim {
 
     // GUI layout
     withGui {
-        place(netComponent, 0, 0, 400, 400)
-        place(timeSeriesPlot, 420, 0, 400, 400)
+        place(netComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
+        place(timeSeriesPlot, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
     }
 
     addSidebarInfo(

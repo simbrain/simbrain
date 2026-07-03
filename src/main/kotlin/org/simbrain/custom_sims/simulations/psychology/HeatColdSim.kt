@@ -1,5 +1,6 @@
 package org.simbrain.custom_sims.simulations.psychology
 
+import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
@@ -119,7 +120,7 @@ val heatColdSim = newSim {
     }
 
     withGui {
-        place(networkComponent, 0, 0, 500, 400)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 400)
     }
 
     addSidebarInfo(

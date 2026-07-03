@@ -54,8 +54,8 @@ val recurrentProjection = newSim("recurrent_projection") {
     }
 
     withGui {
-        place(networkComponent, 210, 0, 600, 600)
-        place(projectionPlot, 810, 0, 600, 600)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
+        place(projectionPlot, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
     }
 
     setUpRecurrentSim(workspace)
@@ -136,7 +136,7 @@ suspend fun SimulationScope.setUpRecurrentSim(workspace: Workspace) {
     val wts = network.flatSynapseList
 
     withGui {
-        createControlPanel("Controls", 0, 0) {
+        createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP) {
             addButton("Randomize activations") {
                 randomizeActivations(recurrentNet)
             }

@@ -1,8 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.custom_sims.simulations.hebb.*
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
@@ -78,9 +76,8 @@ val rbmSim = newSim {
     )
 
     withGui {
-        place(networkComponent, 230, 0, 815, 619)
         var numTrainIterations = 100
-        createPatternControlPanel(
+        val controlPanel = createPatternControlPanel(
             rbm.visibleLayer,
             false
         ) { rbm.randomizeWeights() }?.apply {
@@ -117,6 +114,7 @@ val rbmSim = newSim {
                     .sampleDouble(rbm.visibleLayer.size)
                     .toColumnVector()
             }
-        }
+        }?.awaitLayout()
+        place(networkComponent, controlPanel?.rightEdgeWithGap() ?: SIM_WINDOW_GAP, SIM_WINDOW_GAP, 815, 619)
     }
 }

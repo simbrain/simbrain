@@ -28,8 +28,8 @@ val recurrentNetArrayBased = newSim {
         projector.tolerance = .01
     }
     withGui {
-        place(networkComponent, 0, 0, 500, 500)
-        place(projectionPlot, 505, 5, 500, 500)
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 500)
+        place(projectionPlot, SIM_WINDOW_GAP + 500 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 500)
     }
 
     // Couple the neuron array to the projection plot

@@ -10,7 +10,6 @@ import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.swingInvokeLater
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.sensors.ObjectSensor
@@ -438,12 +437,9 @@ val braitenbergProgramLearning = newSim { optionString ->
     }
 
     withGui {
-        place(networkComponent, 320, 10, 550, 350)
-        place(oc, 870, 10, 500, 500)
-
         activeTextLabel.location = point(50.0, -50.0)
 
-        createControlPanel("Control Panel", 0, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addLabel("Task:")
 
@@ -485,8 +481,11 @@ val braitenbergProgramLearning = newSim { optionString ->
             }
             resetButton.toolTipText = "Reset all program biases to 0"
 
-            swingInvokeLater { pack() }
-        }
+        }.awaitLayout()
+
+        val mainX = controlPanel.rightEdgeWithGap()
+        place(networkComponent, mainX, SIM_WINDOW_GAP, 550, 350)
+        place(oc, mainX + 550 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 500)
     }
 
     addSidebarInfo(

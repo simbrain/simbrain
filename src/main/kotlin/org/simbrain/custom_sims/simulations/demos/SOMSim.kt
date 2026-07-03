@@ -27,8 +27,7 @@ val SOMSim = newSim {
     val labelTracker = WinnerLabeler()
 
     withGui {
-        place(networkComponent, 157, 10, 548, 750)
-        createControlPanel("Control Panel", 5, 10) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addButton("Pattern 1") {
                 SOM.inputLayer.neuronList.activations =
@@ -86,7 +85,8 @@ val SOMSim = newSim {
                 SOM.reset()
                 labelTracker.clear(SOM.som.neuronList)
             }
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 548, 750)
     }
 
     addSidebarInfo(

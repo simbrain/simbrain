@@ -1,9 +1,6 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.computeCorrelationMatrix
@@ -309,9 +306,7 @@ val hopfieldPatterns = newSim {
         "Checker Pattern" to CheckerShape,
     )
     withGui {
-        place(networkComponent, 249, 0, 509, 619)
-
-        createControlPanel("Control Panel", 0, 0) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             for ((label, pattern) in patternMap) {
                 addButton(label) {
                     hopfield.neuronGroup.setActivations(pattern)
@@ -375,6 +370,7 @@ val hopfieldPatterns = newSim {
                 }
             }
 
-        }
+        }.awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 509, 619)
     }
 }

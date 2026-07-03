@@ -543,11 +543,6 @@ val denisonNet = newSim {
     sensory2.setActivations(DoubleArray(12) { 0.0 })
 
     withGui {
-        place(netComponent, 200, 15, 492, 447)
-        place(imageWorldComponent, 690, 15, 503, 447)
-        place(attentionPlot, 195, 450, 500, 300)
-        place(decisionPlot, 693, 448, 500, 300)
-
         trialStatusText.location = point(185.0, -200.0)
         finalReportStatusText.location = point(185.0, -250.0)
         updateTrialStatusText()
@@ -589,7 +584,7 @@ val denisonNet = newSim {
             }
         }
 
-        createControlPanel("Control Panel", 15, 15) {
+        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addLabel("Attention Cue:")
             addComboBox("", cueTypes, cueTypes[0]) { selectedCue ->
                 vaState = selectedCue.state
@@ -697,7 +692,12 @@ val denisonNet = newSim {
                 workspace.stop()
                 resetTrial()
             }
-        }
+        }.awaitLayout()
+        val gridX = controlPanel.rightEdgeWithGap()
+        place(netComponent, gridX, SIM_WINDOW_GAP, 492, 447)
+        place(imageWorldComponent, gridX + 492 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 503, 447)
+        place(attentionPlot, gridX, SIM_WINDOW_GAP + 447 + SIM_WINDOW_GAP, 500, 300)
+        place(decisionPlot, gridX + 500 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 447 + SIM_WINDOW_GAP, 500, 300)
     }
 
 addSidebarInfo(

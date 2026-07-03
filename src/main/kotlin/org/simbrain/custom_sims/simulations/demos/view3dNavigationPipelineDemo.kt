@@ -101,8 +101,8 @@ val view3dNavigationPipelineDemo = newSim {
     }
 
     withGui {
-        place(odorWorldComponent, 0, 0, 600, 600)
-        place(imageWorldComponent, 605, 0, 600, 600)
+        place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
+        place(imageWorldComponent, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
     }
 
     workspace.updater.iterate(2)

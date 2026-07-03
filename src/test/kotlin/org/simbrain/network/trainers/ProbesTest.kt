@@ -55,7 +55,8 @@ class ProbesTest {
         assertEquals(setOf(hostHidden, probe.outputLayer), probe.layers)
         assertEquals(1, probe.weightMatrices.size)
         assertArrayEquals(arrayOf("No", "Yes"), (probe.outputLayer as NeuronArray).labelArray)
-        assertTrue(probe in network.getModels<SupervisedModel>())
+        assertTrue(probe in network.getModels<Probe>())
+        assertTrue(probe in network.supervisedModels)
         assertTrue(probe.outputLayer in network.getModels<NeuronArray>())
     }
 

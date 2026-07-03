@@ -66,7 +66,7 @@ fun harvestedDataset(inputs: MutableList<MutableList<Double>>, targets: MutableL
 /**
  * Creates a probe reading from [probedLayer]: a chain of optional hidden [NeuronArray]s (empty by
  * default, which keeps the probe linear — added capacity confounds what is being measured), a Softmax
- * readout, connecting [WeightMatrix] models, and a [SupervisedModel] wrapping the whole path. All new
+ * readout, connecting [WeightMatrix] models, and a [Probe] wrapping the whole path. All new
  * models are added to the network and placed to the right of [probedLayer] starting at [offset].
  *
  * The returned probe has a placeholder dataset; populate it with [harvestActivations].
@@ -79,19 +79,53 @@ fun createProbe(
     hiddenSizes: List<Int> = emptyList(),
     label: String = "Probe",
     offset: Point2D = point(550.0, 0.0),
-): SupervisedModel {
+): Probe = buildProbe(probedLayer, probedLayer, readoutSize, readoutLabels, hiddenSizes, label, offset)
+
+/**
+ * [createProbe] for a [TensorLayer] (e.g. a CNN conv or pool stage). Since tensor layers are outside
+ * the [Layer] hierarchy the trainer operates on, a [FlattenConnector] and flatten [NeuronArray] are
+ * inserted first and the probe reads from the flatten array.
+ */
+context(Network)
+fun createProbe(
+    probedTensor: TensorLayer,
+    readoutSize: Int,
+    readoutLabels: Array<String>? = null,
+    hiddenSizes: List<Int> = emptyList(),
+    label: String = "Probe",
+    offset: Point2D = point(550.0, 0.0),
+): Probe {
+    val flat = NeuronArray(probedTensor.shape.size).apply {
+        this.label = "$label flatten"
+        location = point(probedTensor.locationX + offset.x, probedTensor.locationY + offset.y)
+    }
+    val flatten = FlattenConnector(probedTensor, flat)
+    addNetworkModelsAsync(flat, flatten)
+    return buildProbe(probedTensor, flat, readoutSize, readoutLabels, hiddenSizes, label, offset)
+}
+
+context(Network)
+private fun buildProbe(
+    probedModel: LocatableModel,
+    inputLayer: Layer,
+    readoutSize: Int,
+    readoutLabels: Array<String>?,
+    hiddenSizes: List<Int>,
+    label: String,
+    offset: Point2D,
+): Probe {
     require(readoutSize > 0) { "Probe readout size must be positive" }
     require(hiddenSizes.all { it > 0 }) { "Probe hidden layer sizes must be positive" }
 
     fun place(index: Int, layer: Layer) {
         layer.location = point(
-            probedLayer.locationX + offset.x + index * 350.0,
-            probedLayer.locationY + offset.y
+            inputLayer.locationX + offset.x + index * 350.0,
+            inputLayer.locationY + offset.y
         )
     }
 
     val newModels = mutableListOf<NetworkModel>()
-    var current: Layer = probedLayer
+    var current: Layer = inputLayer
     hiddenSizes.forEachIndexed { i, size ->
         val hidden = NeuronArray(size).apply {
             this.label = "$label hidden ${i + 1}"
@@ -111,34 +145,62 @@ fun createProbe(
     place(hiddenSizes.size, readout)
     newModels += WeightMatrix(current, readout)
     newModels += readout
-    val probe = SupervisedModel(probedLayer, readout).apply { this.label = label }
+    val probe = Probe(probedModel, inputLayer, readout).apply { this.label = label }
     newModels += probe
     addNetworkModelsAsync(newModels)
     return probe
 }
 
 /**
- * [createProbe] for a [TensorLayer] (e.g. a CNN conv or pool stage). Since tensor layers are outside
- * the [Layer] hierarchy the trainer operates on, a [FlattenConnector] and flatten [NeuronArray] are
- * inserted first and the probe reads from the flatten array.
+ * The accuracy of always guessing the most common class in [targets]: the baseline a probe must beat
+ * before it demonstrates anything about the probed layer. Rows are read as one-hot / softmax targets
+ * (class = argmax); single-column rows are read as binary targets thresholded at 0.5.
+ */
+fun majorityClassProportion(targets: List<List<Double>>): Double {
+    require(targets.isNotEmpty()) { "Cannot compute a majority baseline from empty targets" }
+    val classCounts = targets.groupingBy { row ->
+        if (row.size == 1) if (row[0] > 0.5) 1 else 0 else row.indices.maxBy { row[it] }
+    }.eachCount()
+    return classCounts.values.max().toDouble() / targets.size
+}
+
+/**
+ * Creates a random-label control for this probe: a second [Probe] with the same architecture, reading
+ * the same layer, whose targets are shuffled copies of this probe's targets. If the control performs
+ * well the original probe's accuracy reflects memorization capacity, not information in the probed
+ * layer. Placed below this probe's readout path.
  */
 context(Network)
-fun createProbe(
-    probedTensor: TensorLayer,
-    readoutSize: Int,
-    readoutLabels: Array<String>? = null,
-    hiddenSizes: List<Int> = emptyList(),
-    label: String = "Probe",
-    offset: Point2D = point(550.0, 0.0),
-): SupervisedModel {
-    val flat = NeuronArray(probedTensor.shape.size).apply {
-        this.label = "$label flatten"
-        location = point(probedTensor.locationX + offset.x, probedTensor.locationY + offset.y)
-    }
-    val flatten = FlattenConnector(probedTensor, flat)
-    addNetworkModelsAsync(flat, flatten)
-    return createProbe(flat, readoutSize, readoutLabels, hiddenSizes, label, offset)
+fun Probe.createShuffledControl(): Probe {
+    val hiddenSizes = layers.filter { it !== inputLayer && it !== outputLayer }.map { it.size }
+    val control = buildProbe(
+        probedModel = probedModel,
+        inputLayer = inputLayer,
+        readoutSize = outputLayer.size,
+        readoutLabels = (outputLayer as? NeuronArray)?.labelArray,
+        hiddenSizes = hiddenSizes,
+        label = "$displayName shuffled control",
+        offset = point(
+            outputLayer.locationX - inputLayer.locationX - hiddenSizes.size * 350.0,
+            outputLayer.locationY - inputLayer.locationY + 300.0
+        )
+    )
+    control.trainingSet = shuffledTargetsCopy(trainingSet)
+    control.testingSet = shuffledTargetsCopy(testingSet)
+    control.targetDescription = "Shuffled-label control for $displayName"
+    control.stale = stale
+    control.trainerConfig.learningRate = trainerConfig.learningRate
+    control.trainerConfig.computeAccuracy = trainerConfig.computeAccuracy
+    control.trainerConfig.testConfiguration.enabled = trainerConfig.testConfiguration.enabled
+    return control
 }
+
+private fun shuffledTargetsCopy(dataset: TrainingDataset) = TrainingDataset(
+    inputs = dataset.inputs.map { it.toMutableList() }.toMutableList(),
+    targets = dataset.targets.shuffled().map { it.toMutableList() }.toMutableList(),
+    inputSize = dataset.inputSize,
+    targetSize = dataset.targetSize
+)
 
 /**
  * Editable options for probe creation, for use with a creation dialog (see `createEditorDialog`).

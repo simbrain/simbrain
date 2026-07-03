@@ -16,9 +16,9 @@ import java.awt.geom.Point2D
  * @param trainTestSplit A value between 0 and 1 used to specify how much of the data will be used for training vs testing.
  *                            Default to 1, which means no testing set.
  */
-class SupervisedModel(
-    override val inputLayer: Layer,
-    override val outputLayer: Layer,
+open class SupervisedModel(
+    final override val inputLayer: Layer,
+    final override val outputLayer: Layer,
     trainTestSplit: Double = 1.0,
 ): LocatableModel(), SupervisedNetwork {
 
@@ -37,9 +37,9 @@ class SupervisedModel(
         testConfiguration = TestConfiguration().apply { enabled = trainTestSplit < 1.0 }
     }
 
-    override var trainingSet: TrainingDataset
+    final override var trainingSet: TrainingDataset
 
-    override var testingSet: TrainingDataset
+    final override var testingSet: TrainingDataset
 
     init {
 

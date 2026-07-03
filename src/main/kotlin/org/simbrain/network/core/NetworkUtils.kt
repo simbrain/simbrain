@@ -7,6 +7,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.biasesRandomizer
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -153,6 +154,13 @@ fun Neuron.totalFanInStrength(): Double {
 fun List<Neuron>.totalFanInStrength(): Double {
     return this.sumOf{n -> n.totalFanInStrength()}
 }
+
+/**
+ * All [SupervisedModel]s in the network, including subclasses like [Probe], which
+ * [NetworkModelList] keys under their own concrete class.
+ */
+val Network.supervisedModels: List<SupervisedModel>
+    get() = (getModels<SupervisedModel>() + getModels<Probe>()).toList()
 
 fun getNetworkXStream(): XStream {
     val xstream = getSimbrainXStream()

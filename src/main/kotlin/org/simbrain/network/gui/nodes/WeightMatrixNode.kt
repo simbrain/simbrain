@@ -1,7 +1,9 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.piccolo2d.PCamera
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
@@ -57,8 +59,21 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     val interactionBox: WeightMatrixInteractionBox = WeightMatrixInteractionBox(networkPanel)
 
-    val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
-    val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
+    private var sourceNodeCache: ScreenElement? = null
+    private var targetNodeCache: ScreenElement? = null
+
+    /**
+     * Endpoint nodes, resolved without blocking. Arrow layout runs on the EDT during Piccolo
+     * validation, and node creation itself needs the EDT, so a blocking await for a pending
+     * endpoint node can never succeed there — it freezes the EDT for the full await timeout
+     * (e.g. during undo, when this node is recreated before its endpoint's). A pending endpoint
+     * reads as null instead; resolution is retried on access, and init schedules a re-layout for
+     * when both nodes exist.
+     */
+    val sourceNode: ScreenElement?
+        get() = sourceNodeCache ?: networkPanel.modelNodeMap.peek(weightMatrix.source)?.also { sourceNodeCache = it }
+    val targetNode: ScreenElement?
+        get() = targetNodeCache ?: networkPanel.modelNodeMap.peek(weightMatrix.target)?.also { targetNodeCache = it }
 
     /**
      * Collect (row, col) cells whose visual area intersects the given global ellipse.
@@ -141,6 +156,15 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         
         fun updateLocations() {
             arrow.invalidateFullBounds()
+        }
+        // If an endpoint node does not exist yet (this node can be recreated first during undo),
+        // layoutChildren skips the arrow; re-layout once both endpoint nodes are live.
+        if (sourceNode == null || targetNode == null) {
+            networkPanel.launch {
+                networkPanel.modelNodeMap.get<ScreenElement>(weightMatrix.source)
+                networkPanel.modelNodeMap.get<ScreenElement>(weightMatrix.target)
+                withContext(Dispatchers.Swing) { updateLocations() }
+            }
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()

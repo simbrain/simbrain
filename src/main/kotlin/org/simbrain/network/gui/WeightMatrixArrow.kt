@@ -13,29 +13,23 @@ import org.simbrain.util.widgets.bezierArrow
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
     private val source get() = weightMatrixNode.model.source
-    private val sourceNodeBounds get() = with(weightMatrixNode.sourceNode) {
-        when (this) {
-            is NeuronCollectionNode -> outlinedObjects.globalFullBounds
-            else -> this.globalBounds
+    private val sourceNodeBounds get() = weightMatrixNode.sourceNode?.let {
+        when (it) {
+            is NeuronCollectionNode -> it.outlinedObjects.globalFullBounds
+            else -> it.globalBounds
         }
     }
-    private val sourceNodeOutlines get() = with(weightMatrixNode.sourceNode) {
-        when (this) {
-            is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
-            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
+    private val sourceNodeOutlines get() = weightMatrixNode.sourceNode?.let {
+        when (it) {
+            is NeuronCollectionNode -> it.outlinedObjects.globalFullBounds.outlines
+            else -> directionalOutlines(it.globalFullBounds, it.globalBounds)
         }
     }
     private val target get() = weightMatrixNode.model.target
-    private val targetNodeBounds get() = with(weightMatrixNode.targetNode) {
-        when (this) {
-            is NeuronCollectionNode -> outlinedObjects.globalFullBounds
-            else -> this.globalBounds
-        }
-    }
-    private val targetNodeOutlines get() = with(weightMatrixNode.targetNode) {
-        when (this) {
-            is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
-            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
+    private val targetNodeOutlines get() = weightMatrixNode.targetNode?.let {
+        when (it) {
+            is NeuronCollectionNode -> it.outlinedObjects.globalFullBounds.outlines
+            else -> directionalOutlines(it.globalFullBounds, it.globalBounds)
         }
     }
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }
@@ -80,12 +74,21 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     }
 
     override fun layoutChildren() {
+        // Endpoint nodes may not exist yet (see WeightMatrixNode.sourceNode); skip this pass and
+        // rely on the re-layout the weight matrix node schedules for when they do.
         when (arrow) {
-            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) ->
-                weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
-                weightMatrixNode.interactionBox.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - weightMatrixNode.interactionBox.fullBounds.height / 2.0)
+            is RecurrentArrow -> {
+                val bounds = sourceNodeBounds ?: return
+                arrow.layout(bounds.centerLeft + point(15, 0)) { (x, y) ->
+                    weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
+                    weightMatrixNode.interactionBox.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - weightMatrixNode.interactionBox.fullBounds.height / 2.0)
+                }
             }
-            is BezierArrow -> arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
+            is BezierArrow -> {
+                val sourceOutlines = sourceNodeOutlines ?: return
+                val targetOutlines = targetNodeOutlines ?: return
+                arrow.layout(sourceOutlines, targetOutlines, isBidirectional())
+            }
         }
     }
 }

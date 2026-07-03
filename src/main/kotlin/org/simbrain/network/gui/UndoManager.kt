@@ -247,7 +247,11 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> canvas.layer.removeChild(node) } }
             staleNodes.forEach { (model, node) -> modelNodeMap.removeIfValue(model) { it === node } }
         }
-        val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
+        // Reverse deletion order alone is not a valid reconstruction order: a deleted layer returns
+        // itself before its cascaded connectors, so plain reversal re-adds each connector before its
+        // endpoint layer. Order by [updatingOrder] (models before the models that refer to them);
+        // the stable sort keeps reverse-deletion order within a kind.
+        val modelsToReAdd = LinkedHashSet(deletedModels.reversed().sortedBy { updatingOrder(it) })
         // Adds models back to parent groups.
         modelsToReAdd.forEach { reAddToGroup(it) }
         // Add all models without parents back. Supervised overlays go in a second, awaited batch:

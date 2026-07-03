@@ -18,6 +18,7 @@ import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.UnsupervisedNetwork
+import org.simbrain.network.trainers.probesReading
 import org.simbrain.util.*
 import org.simbrain.util.table.*
 import org.simbrain.util.widgets.ToggleButton
@@ -156,6 +157,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             with(network) {
                 inputLayer.setActivations(inputDataFrame.getRow<Double>(selectedRow).toDoubleArray())
                 this@SupervisedNetwork.forwardPass()
+                probesReading(this@SupervisedNetwork.layers).forEach { it.refreshOutput() }
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
                     targetDataFrame.getRow<Double>(selectedRow).toDoubleArray().toColumnVector()

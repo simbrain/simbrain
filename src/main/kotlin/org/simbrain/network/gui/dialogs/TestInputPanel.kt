@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.trainers.probesReading
 import org.simbrain.util.createAction
 import org.simbrain.util.table.createApplyAction
 import org.simbrain.util.table.deleteRowAction
@@ -25,7 +26,10 @@ fun NetworkPanel.createTestInputPanel(layer: Layer)= createTestInputPanel(layer.
     } else {
         layer.addInputs(this.table.model.getCurrentDoubleRow().toDoubleArray().toColumnVector())
     }
-    with(network) { layer.update() }
+    with(network) {
+        layer.update()
+        probesReading(listOf(layer)).forEach { it.refreshOutput() }
+    }
 }
 
 /**

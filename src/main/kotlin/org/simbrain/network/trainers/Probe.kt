@@ -110,6 +110,22 @@ class Probe(
     }
 
     /**
+     * Recomputes this probe's prediction from the probed layer's current activations. Interactive
+     * host forward passes (e.g. stepping rows in the host's trainer dialog) update only the host's
+     * own layers, so callers use this to keep the readout in sync; see [probesReading]. For tensor
+     * probes the flatten input array is pulled from the probed stage first. If the host has been
+     * retrained since harvest the prediction uses stale probe weights, which [stale] already flags.
+     */
+    context(Network)
+    fun refreshOutput() {
+        if (probedModel !== inputLayer) {
+            inputLayer.accumulateInputs()
+            inputLayer.update()
+        }
+        forwardPass()
+    }
+
+    /**
      * All weight-bearing models (weight matrices, synapse groups, tensor connectors, flatten
      * connectors) upstream of the probe's input layer in the host network. Changes to any of these
      * invalidate harvested activations. The probe's own weight matrices are downstream and excluded.

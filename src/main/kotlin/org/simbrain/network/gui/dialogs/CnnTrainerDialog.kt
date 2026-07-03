@@ -9,6 +9,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.trainers.CnnTrainer
 import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.trainers.probesReading
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
@@ -65,6 +66,10 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
             trainer.tensorLayerStages.forEach { it.events.updated.fire() }
             flattenTarget.events.updated.fire()
             cnnNetwork.outputArray.events.updated.fire()
+
+            with(this@NetworkPanel.network) {
+                probesReading(cnnNetwork.modelList.all).forEach { it.refreshOutput() }
+            }
 
             // Compute and display per-row loss
             val target = targetDataFrame.getRow<Double>(selectedRow).toDoubleArray()

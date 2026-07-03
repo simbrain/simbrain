@@ -215,6 +215,56 @@ class ProbeTest {
     }
 
     @Test
+    fun `refreshOutput recomputes the readout from the probed layer's current activations`() = runBlocking {
+        val network = Network()
+        val hostInput = NeuronArray(2).apply { isClamped = true }
+        val hostHidden = NeuronArray(2)
+        network.addNetworkModelsAsync(hostInput, hostHidden, WeightMatrix(hostInput, hostHidden))
+        val probe = with(network) { createProbe(hostHidden, readoutSize = 2) }
+
+        with(network) {
+            hostInput.setActivations(doubleArrayOf(5.0, 0.0))
+            hostHidden.accumulateInputs()
+            hostHidden.update()
+            probe.refreshOutput()
+            val first = probe.outputLayer.activationArray.copyOf()
+            assertTrue(first[0] > first[1]) { "softmax readout should favor the active unit" }
+
+            hostInput.setActivations(doubleArrayOf(0.0, 5.0))
+            hostHidden.accumulateInputs()
+            hostHidden.update()
+            probe.refreshOutput()
+            val second = probe.outputLayer.activationArray.copyOf()
+            assertTrue(second[1] > second[0]) { "readout should follow the probed layer's new activations" }
+        }
+    }
+
+    @Test
+    fun `refreshOutput on a tensor probe pulls the flatten array from the probed stage first`() = runBlocking {
+        val network = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(3, 3, 1)).apply { isClamped = true }
+        val convOutShape = TensorShape(3, 3, 1).convOutputShape(3, 1, Padding.SAME, 2)
+        val convOut = TensorLayer(convOutShape)
+        ConvolutionConnector(inputTensorLayer, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val flatArray = NeuronArray(convOutShape.size)
+        FlattenConnector(convOut, flatArray)
+        val outputArray = NeuronArray(2)
+        WeightMatrix(flatArray, outputArray)
+        val cnn = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+        val probe = with(network) { createProbe(convOut, readoutSize = 2) }
+
+        with(network) {
+            inputTensorLayer.activations = DoubleArray(9) { 1.0 }
+            cnn.update()
+            probe.refreshOutput()
+            assertArrayEquals(convOut.activations, probe.inputLayer.activationArray, 1e-10,
+                "the probe's flatten array must mirror the probed tensor stage after refresh")
+            assertEquals(1.0, probe.outputLayer.activationArray.sum(), 1e-10,
+                "the softmax readout must have been recomputed")
+        }
+    }
+
+    @Test
     fun `majorityClassProportion computes the majority baseline`() {
         val oneHot = listOf(
             listOf(1.0, 0.0), listOf(1.0, 0.0), listOf(1.0, 0.0), listOf(0.0, 1.0)

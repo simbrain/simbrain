@@ -157,6 +157,14 @@ private fun buildProbe(
 }
 
 /**
+ * Probes whose probed model is one of [hostModels]. Interactive apply/advance-row controls pass the
+ * host's layers (or a subnetwork's internal models) after a host forward pass, which never walks
+ * probe connectors, then call [Probe.refreshOutput] on each so probe readouts follow along.
+ */
+fun Network.probesReading(hostModels: Collection<NetworkModel>): List<Probe> =
+    getModels(Probe::class.java).filter { probe -> hostModels.any { it === probe.probedModel } }
+
+/**
  * The accuracy of always guessing the most common class in [targets]: the baseline a probe must beat
  * before it demonstrates anything about the probed layer. Rows are read as one-hot / softmax targets
  * (class = argmax); single-column rows are read as binary targets thresholded at 0.5.

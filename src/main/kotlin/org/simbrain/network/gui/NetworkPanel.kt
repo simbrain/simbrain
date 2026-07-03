@@ -17,6 +17,7 @@ import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
@@ -403,7 +404,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {
         val arrayNodes = supervisedModel.layers.map { modelNodeMap.get<ScreenElement>(it) }
         val weightMatrixNodes = supervisedModel.weightMatrices.map { modelNodeMap.get<ScreenElement>(it) }
-        SupervisedModelNode(this, supervisedModel).apply {
+        val node = when (supervisedModel) {
+            is Probe -> ProbeNode(this, supervisedModel)
+            else -> SupervisedModelNode(this, supervisedModel)
+        }
+        node.apply {
             arrayNodes.forEach { addNode(it) }
             weightMatrixNodes.forEach { addNode(it) }
         }
@@ -1034,7 +1039,7 @@ fun Network.subnetworkProtectedModels(selection: Collection<NetworkModel>): Set<
             subnet.modelList.all.filterIsInstance<Subnetwork>().forEach { collect(it) }
         }
         getModels<Subnetwork>().forEach { collect(it) }
-        getModels<SupervisedModel>().forEach { addAll(it.layers.filterIsInstance<NeuronCollection>()) }
+        supervisedModels.forEach { addAll(it.layers.filterIsInstance<NeuronCollection>()) }
     }
     val protectedChildren = buildList {
         fun collect(subnet: Subnetwork) {

@@ -2,6 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.core.*
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.trainers.Probe
 import org.simbrain.network.trainers.SupervisedModel
 
 /**
@@ -142,7 +143,17 @@ object Clipboard {
                                     }
                                 )
                             )
-                            add(SupervisedModel(layerMappings[item.inputLayer]!!, layerMappings[item.outputLayer]!!))
+                            if (item is Probe) {
+                                // The pasted probe is detached from the original host, so it probes
+                                // its own copied input layer and starts stale.
+                                val newInputLayer = layerMappings[item.inputLayer]!!
+                                add(Probe(newInputLayer, newInputLayer, layerMappings[item.outputLayer]!!).apply {
+                                    targetDescription = item.targetDescription
+                                    stale = true
+                                })
+                            } else {
+                                add(SupervisedModel(layerMappings[item.inputLayer]!!, layerMappings[item.outputLayer]!!))
+                            }
                         }
                         is NeuronArray -> {
                             val copy = item.copy()

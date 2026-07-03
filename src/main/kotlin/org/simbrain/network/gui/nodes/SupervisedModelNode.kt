@@ -17,9 +17,11 @@ import org.simbrain.util.swingDispatcher
 import javax.swing.JComponent
 import javax.swing.JPopupMenu
 
-class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: SupervisedModel) : ScreenElement(networkPanel) {
+open class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: SupervisedModel) : ScreenElement(networkPanel) {
 
-    private var interactionBox: SupervisedModelNodeInteractionBox = SupervisedModelNodeInteractionBox(networkPanel)
+    protected val interactionBox: SupervisedModelNodeInteractionBox = SupervisedModelNodeInteractionBox(networkPanel)
+
+    protected open val tabFill: Color get() = NetworkTheme.current.tabFillSupervised
 
     /**
      * The outlined objects (neuron and synapse groups) for this node.
@@ -62,7 +64,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
     /**
      * Update the text in the interaction box.
      */
-    fun updateText() {
+    open fun updateText() {
         interactionBox.setText(supervisedModel.displayName)
     }
 
@@ -169,7 +171,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
      */
     inner class SupervisedModelNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
-        override val tabFillColor: Color get() = NetworkTheme.current.tabFillSupervised
+        override val tabFillColor: Color get() = this@SupervisedModelNode.tabFill
 
         override val contextMenu: JPopupMenu
             get() = this@SupervisedModelNode.contextMenu

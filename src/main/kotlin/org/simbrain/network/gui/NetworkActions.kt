@@ -1087,7 +1087,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 reasons.add("No connection between source and target")
             }
         }
-        if (networkPanel.network.getModels<SupervisedModel>().any {
+        if (networkPanel.network.supervisedModels.any {
             it.layers.first() == source && it.layers.last() == target
         }) {
             reasons.add("A supervised model already exists for this connection")

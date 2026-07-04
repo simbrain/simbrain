@@ -17,6 +17,12 @@ import kotlin.concurrent.withLock
  */
 
 /**
+ * Largest readout for which probe readouts display as labeled neuron circles; bigger readouts fall
+ * back to the grid image, since circles at 50px spacing get unwieldy.
+ */
+private const val READOUT_CIRCLE_MODE_MAX = 20
+
+/**
  * Runs the host network's forward pass over [inputs] and records [probedLayer]'s activations after
  * each pass. The result can be used as the input rows of a probe's [TrainingDataset]. Must be re-run
  * whenever the host network is retrained, since harvested activations go stale.
@@ -145,6 +151,7 @@ private fun buildProbe(
         this.label = "$label readout"
         updateRule = SoftmaxRule()
         gridMode = true
+        circleMode = readoutSize <= READOUT_CIRCLE_MODE_MAX
         readoutLabels?.let { labelArray = it }
     }
     place(hiddenSizes.size, readout)

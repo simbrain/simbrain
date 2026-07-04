@@ -193,8 +193,6 @@ val cnnMNIST = newSim {
         probe
     }
 
-    addLoopProbe(poolLayer1, "Loop probe")
-
     listOf(conv1Out, poolLayer1, conv2Out, poolLayer2, flatArray).forEach { stage ->
         stage.customContextMenuActions += createAction(name = "Add loop probe...") {
             val creator = ProbeCreator("Loop probe (${stage.displayName})")
@@ -248,20 +246,22 @@ val cnnMNIST = newSim {
         # Linear Probe
 
         A [linear probe](https://en.wikipedia.org/wiki/Probing_(machine_learning)) is a simple classifier trained on an internal layer's activations to test what information that
-        layer represents. Here the probe (`Loop probe` on the right) reads the first pooling stage and predicts whether the current digit contains a loop (`0`, `6`, `8`, `9`).
-        Since convolutional stages are tensors, the probe reads them through a flatten layer, added automatically.
+        layer represents. Here a probe can be added to any conv, pool, or flatten stage to predict whether the current digit contains a loop (`0`, `6`, `8`, `9`). Since
+        convolutional stages are tensors, the probe reads them through a flatten layer, added automatically.
 
         The probe is trained on *harvested* activations: the CNN is run over its dataset and the probed stage's activations are recorded as the probe's inputs. Training the probe
         never changes the CNN's weights.
 
-        1. Train the CNN first (see above). The probe's tab shows `(stale)` once the CNN's weights change, since the harvested activations no longer match
-        2. Right-click the `Loop probe` outline and select `Rebuild Probe Dataset` (or click `Rebuild probe datasets` in the `Loop Probe` panel) to re-harvest
-        3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
+        1. Train the CNN first (see above)
+        2. Right-click a conv, pool, or flatten layer and select `Add loop probe...`; the probe harvests its dataset from the stage's current activations when created
+        3. Right-click the probe's outline and select `Train...`, then iterate training
 
-        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel; `Probe Info...` in the probe's right-click menu shows the same baselines. You can add
-        probes to other stages: right-click a conv, pool, or flatten layer and select `Add loop probe...`. Comparing accuracy across stages shows where loop information becomes
-        linearly decodable. `Add Shuffled-Label Control` in the probe's right-click menu creates a memorization check: a matching probe trained on shuffled targets, which should
-        stay near baseline for a linear probe.
+        If the CNN is retrained later, the probe's status text shows `Stale: click to rebuild`, since the harvested activations no longer match; click it (or use `Rebuild probe
+        datasets` in the `Loop Probe` panel) to re-harvest.
+
+        Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel; `Probe Info...` in the probe's right-click menu shows the same baselines. Adding
+        probes to several stages and comparing accuracy shows where loop information becomes linearly decodable. `Add Shuffled-Label Control` in the probe's right-click menu creates
+        a memorization check: a matching probe trained on shuffled targets, which should stay near baseline for a linear probe.
         """.trimIndent()
     )
 }

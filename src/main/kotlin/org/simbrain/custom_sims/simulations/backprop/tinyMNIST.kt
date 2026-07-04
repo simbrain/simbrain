@@ -126,8 +126,6 @@ val tinyMNIST = newSim {
         probe
     }
 
-    addLoopProbe(bp.hiddenLayers().first(), "Loop probe")
-
     bp.hiddenLayers().forEachIndexed { i, layer ->
         layer.customContextMenuActions += createAction(name = "Add loop probe...") {
             val creator = ProbeCreator("Loop probe (hidden ${i + 1})")
@@ -176,22 +174,24 @@ val tinyMNIST = newSim {
         # Linear Probe
 
         A [linear probe](https://en.wikipedia.org/wiki/Probing_(machine_learning)) is a simple classifier trained on a hidden layer's activations to test what information that layer
-        represents. Here the probe (`Loop probe` on the right) reads the first hidden layer and predicts whether the current digit contains a loop (`0`, `6`, `8`, `9`).
+        represents. Here a probe can be added to either hidden layer to predict whether the current digit contains a loop (`0`, `6`, `8`, `9`).
 
         The probe is trained on *harvested* activations: the digit network is run over its dataset and the hidden layer's activations are recorded as the probe's inputs. Training the
         probe never changes the digit network's weights.
 
-        1. Train the digit network first (see above). The probe's tab shows `(stale)` once the digit network's weights change, since the harvested activations no longer match
-        2. Right-click the `Loop probe` outline and select `Rebuild Probe Dataset` (or click `Rebuild probe datasets` in the `Loop Probe` panel) to re-harvest
-        3. Right-click the `Loop probe` outline and select `Train...`, then iterate training
+        1. Train the digit network first (see above)
+        2. Right-click a hidden layer and select `Add loop probe...`; the probe harvests its dataset from the layer's current activations when created
+        3. Right-click the probe's outline and select `Train...`, then iterate training
+
+        If the digit network is retrained later, the probe's status text shows `Stale: click to rebuild`, since the harvested activations no longer match; click it (or use
+        `Rebuild probe datasets` in the `Loop Probe` panel) to re-harvest.
 
         Compare the probe's accuracy to the majority baseline shown in the `Loop Probe` panel (always guessing "no loop"); `Probe Info...` in the probe's right-click menu shows the
-        same baselines. Accuracy well above baseline means loop information is linearly decodable from the hidden layer. Try training the probe *before* training the digit network to
-        see how decodable the information is from a random projection.
+        same baselines. Accuracy well above baseline means loop information is linearly decodable from the hidden layer. Try adding and training a probe *before* training the digit
+        network to see how decodable the information is from a random projection.
 
-        You can add more probes: right-click either hidden layer and select `Add loop probe...`. Comparing probe accuracy on the first vs. second hidden layer shows how loop
-        information changes across depth. Leaving `Hidden layer sizes` empty keeps the probe linear; adding hidden layers gives the probe more capacity, but then success may
-        reflect the probe's own computation rather than what the layer encodes.
+        You can add multiple probes; comparing probe accuracy on the first vs. second hidden layer shows how loop information changes across depth. Leaving `Hidden layer sizes`
+        empty keeps the probe linear; adding hidden layers gives the probe more capacity, but then success may reflect the probe's own computation rather than what the layer encodes.
 
         To check for probe memorization, right-click the probe and select `Add Shuffled-Label Control`: a second probe with the same architecture and shuffled targets. If the control
         also beats baseline, the original probe's accuracy reflects its own capacity, not information in the layer. A linear probe's control should stay near baseline.

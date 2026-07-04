@@ -87,7 +87,74 @@ class PlanGraph(val plan: OpPlan) {
 
     /** The ops that read [name] directly. */
     fun readers(name: String): List<TensorOp> = readersOf[name] ?: emptyList()
+
+    /** Position of [op] in the plan's schedule. */
+    fun scheduleIndex(op: TensorOp): Int? = opIndex[op]
+
+    /**
+     * The ops on paths between [anchors] that join two or more displayed data streams — inputs
+     * that are anchors themselves or are computed by other ops (pure parameters don't count).
+     * These are the diagram's junction points: the residual rejoins, q x k, attention x values,
+     * embedding + positions.
+     */
+    fun junctionOps(anchors: Collection<String>): Set<TensorOp> {
+        val anchorSet = anchors.toSet()
+        val onPaths = anchorEdges(anchors).flatMapTo(HashSet()) { it.ops }
+        return onPaths.filterTo(LinkedHashSet()) { op ->
+            op.inputs.count { it.name in anchorSet || it.name in writerOf } >= 2
+        }
+    }
+
+    /**
+     * Like [anchorEdges], but walks also stop at [junctions]: the result connects anchors AND
+     * junction ops, so a multi-input op renders as a vertex its input streams' arrows converge
+     * into, instead of a glyph strung on one arbitrary edge.
+     */
+    fun displayEdges(anchors: Collection<String>, junctions: Set<TensorOp>): List<DisplaySegment> {
+        val anchorSet = anchors.toSet()
+        val edges = LinkedHashMap<Pair<Any, Any>, LinkedHashSet<TensorOp>>()
+
+        fun walk(sourceKey: Any, startPorts: List<String>) {
+            val visited = HashSet<String>()
+            val stack = ArrayDeque<Pair<String, List<TensorOp>>>()
+
+            fun expand(port: String, opsSoFar: List<TensorOp>) {
+                for (op in readersOf[port].orEmpty()) {
+                    if (op in junctions) {
+                        edges.getOrPut(sourceKey to op) { LinkedHashSet() }.addAll(opsSoFar)
+                        continue
+                    }
+                    for (out in op.outputs) {
+                        if (out.name in anchorSet) {
+                            edges.getOrPut(sourceKey to out.name) { LinkedHashSet() }.addAll(opsSoFar + op)
+                        } else {
+                            stack.add(out.name to (opsSoFar + op))
+                        }
+                    }
+                }
+            }
+
+            for (port in startPorts) expand(port, emptyList())
+            while (stack.isNotEmpty()) {
+                val (port, opsSoFar) = stack.removeLast()
+                if (!visited.add(port)) continue
+                expand(port, opsSoFar)
+            }
+        }
+
+        for (anchor in anchors) walk(anchor, listOf(anchor))
+        for (junction in junctions) {
+            val (anchorOuts, innerOuts) = junction.outputs.partition { it.name in anchorSet }
+            // A junction writing an anchor port directly is an edge on its own.
+            for (out in anchorOuts) edges.getOrPut(junction as Any to out.name) { LinkedHashSet() }
+            walk(junction, innerOuts.map { it.name })
+        }
+        return edges.map { (endpoints, ops) -> DisplaySegment(endpoints.first, endpoints.second, ops.toList()) }
+    }
 }
 
 /** One derived diagram edge: anchor [from] to anchor [to], with the [ops] crossed between them. */
 class EdgePath(val from: String, val to: String, val ops: List<TensorOp>)
+
+/** A display-graph edge; each end is a port name (an anchor tile) or a junction [TensorOp]. */
+class DisplaySegment(val from: Any, val to: Any, val ops: List<TensorOp>)

@@ -16,25 +16,54 @@ class TeachingCompositorTest {
         contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = 1
     ))
 
-    @Test
-    fun `spine checkpoints chain and the skip edge rejoins through the residual add`() {
-        val scene = TeachingCompositor.buildScene(model())
-        val edges = scene.edges.associateBy { it.from.id to it.to.id }
+    private fun FlowEndpoint.key() = when (this) {
+        is TensorTile -> id
+        is OpVertex -> op.name
+    }
 
-        val skip = edges.getValue("resid0" to "layers.0.attn_resid")
-        assertTrue(skip.ops.any { it is AddOp }, "the trunk skip edge carries the residual add glyph")
-        val limbReturn = edges.getValue("layers.0.attn.out" to "layers.0.attn_resid")
-        assertTrue(limbReturn.ops.any { it is AddOp })
+    @Test
+    fun `spine checkpoints chain through junction adds and limb streams converge on their ops`() {
+        val scene = TeachingCompositor.buildScene(model())
+        val edges = scene.edges.associateBy { it.from.key() to it.to.key() }
+        val junctions = scene.opVertices.associateBy { it.op.name }
+
+        assertTrue(junctions.getValue("layers.0.attn_residual").op is AddOp,
+            "the residual rejoin is a junction vertex")
+        assertTrue(("resid0" to "layers.0.attn_residual") in edges, "the skip arm arrows into the ⊕")
+        assertTrue(("layers.0.attn.out" to "layers.0.attn_residual") in edges, "the limb return arrows into the ⊕")
+        assertTrue(("layers.0.attn_residual" to "layers.0.attn_resid") in edges, "the ⊕ writes the checkpoint")
+
+        assertTrue("add_pos" in junctions, "embedding + positions join at the + itself")
+        assertTrue(("embed.table" to "add_pos") in edges)
+        assertTrue(("embed.pos" to "add_pos") in edges)
+        assertTrue(("add_pos" to "resid0") in edges)
 
         val intoQ = edges.getValue("resid0" to "layers.0.attn.q")
         assertTrue(intoQ.ops.any { it is LayerNormOp }, "limb entry crosses the pre-norm")
         assertTrue(intoQ.ops.any { it is MatMulLinearOp })
 
-        assertTrue(("layers.0.attn.q" to "layers.0.attn.weights") in edges)
-        assertTrue(("layers.0.attn.weights" to "layers.0.attn.out") in edges)
-        assertTrue(("layers.0.attn_resid" to "layers.0.resid") in edges, "second skip edge")
+        assertTrue(("layers.0.attn.q" to "layers.0.attn.score") in edges, "q arrows into the scores ×")
+        assertTrue(("layers.0.attn.k" to "layers.0.attn.score") in edges, "k arrows into the scores ×")
+        assertTrue(("layers.0.attn.score" to "layers.0.attn.weights") in edges)
+        assertTrue(("layers.0.attn.weights" to "layers.0.attn.mix") in edges)
+        assertTrue(("layers.0.attn.v" to "layers.0.attn.mix") in edges)
+        assertTrue(("layers.0.attn.mix" to "layers.0.attn.out") in edges)
         assertTrue(("layers.0.resid" to "logits") in edges)
         assertTrue(("logits" to "probs") in edges)
+    }
+
+    @Test
+    fun `head-stacked segments are stranded and merge collapses the fan`() {
+        val scene = TeachingCompositor.buildScene(model())
+        val edges = scene.edges.associateBy { it.from.key() to it.to.key() }
+        assertTrue(edges.getValue("layers.0.attn.q" to "layers.0.attn.score").stranded,
+            "after the split the flow is per-head")
+        assertTrue(edges.getValue("layers.0.attn.score" to "layers.0.attn.weights").stranded)
+        assertTrue(edges.getValue("layers.0.attn.weights" to "layers.0.attn.mix").stranded)
+        assertTrue(edges.getValue("layers.0.attn.v" to "layers.0.attn.mix").stranded)
+        assertTrue(!edges.getValue("layers.0.attn.mix" to "layers.0.attn.out").stranded,
+            "the merge bead collapses the strands")
+        assertTrue(!edges.getValue("resid0" to "layers.0.attn.q").stranded)
     }
 
     @Test
@@ -43,18 +72,18 @@ class TeachingCompositorTest {
         val satellites = scene.satellites.associateBy { it.tile.id }
 
         val wq = satellites.getValue("layers.0.attn.wq")
-        assertEquals("resid0" to "layers.0.attn.q", wq.edge.from.id to wq.edge.to.id,
+        assertEquals("resid0" to "layers.0.attn.q", wq.edge.from.key() to wq.edge.to.key(),
             "Wq rides the limb-entry edge with its projection op")
         assertTrue(wq.op is MatMulLinearOp)
 
         val b1 = satellites.getValue("layers.0.mlp.b1")
-        assertEquals("layers.0.mlp.act", b1.edge.to.id, "the bias strip rides the edge into the hidden tile")
+        assertEquals("layers.0.mlp.act", b1.edge.to.key(), "the bias strip rides the edge into the hidden tile")
 
         assertTrue("unembed.weight" in satellites)
         assertTrue("embed.table" !in satellites, "the embedding consumes above the first anchor")
-        val edgeEndpoints = scene.edges.map { it.from.id to it.to.id }
-        assertTrue(("embed.table" to "resid0") in edgeEndpoints, "standalone parameters keep their own edges")
-        assertTrue(scene.edges.none { it.from.id == "layers.0.attn.wq" || it.to.id == "layers.0.attn.wq" },
+        val edgeEndpoints = scene.edges.map { it.from.key() to it.to.key() }
+        assertTrue(("embed.table" to "add_pos") in edgeEndpoints, "standalone parameters arrow into their junction")
+        assertTrue(scene.edges.none { it.from.key() == "layers.0.attn.wq" || it.to.key() == "layers.0.attn.wq" },
             "satellite parameters are not edge anchors")
     }
 

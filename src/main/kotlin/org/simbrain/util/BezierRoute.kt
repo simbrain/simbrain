@@ -26,6 +26,9 @@ class BezierRoute(val segments: List<CubicCurve2D>) {
     private val weights = segments.map { (it.p1 distanceTo it.p2).coerceAtLeast(1e-9) }
     private val totalWeight = weights.sum()
 
+    /** Approximate curve length (sum of segment chords). */
+    val length: Double get() = totalWeight
+
     private fun locate(t: Double): Pair<CubicCurve2D, Double> {
         val target = t.coerceIn(0.0, 1.0) * totalWeight
         var acc = 0.0

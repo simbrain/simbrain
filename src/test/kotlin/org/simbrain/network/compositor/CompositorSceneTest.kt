@@ -198,12 +198,23 @@ class CompositorSceneTest {
         val tileB = VectorHistoryTile(b, rows = 1).also { scene.addTile(it) }
         val tileD = VectorHistoryTile(d, rows = 1).also { scene.addTile(it) }
         scene.connectFromGraph()
-        assertEquals(3, scene.edges.size, "a->b, b->d, and the bypass a->d")
+        fun FlowEndpoint.key() = when (this) {
+            is TensorTile -> id
+            is OpVertex -> op.name
+        }
+        val endpoints = scene.edges.map { it.from.key() to it.to.key() }.toSet()
+        assertEquals(
+            setOf("a" to "b", "a" to "add", "b" to "add", "add" to "d"), endpoints,
+            "the two-input add becomes a junction vertex both streams arrow into"
+        )
 
         scene.setTrace(tileB)
         assertEquals(setOf(tileA, tileB, tileD), scene.tracedTiles)
-        val traced = scene.tracedEdges.map { it.from.id to it.to.id }.toSet()
-        assertEquals(setOf("a" to "b", "b" to "d"), traced, "the a->d bypass edge is not on a path through b")
+        val traced = scene.tracedEdges.map { it.from.key() to it.to.key() }.toSet()
+        assertEquals(
+            setOf("a" to "b", "b" to "add", "add" to "d"), traced,
+            "the a->add bypass arm is not on a path through b"
+        )
 
         scene.setTrace(null)
         assertTrue(scene.tracedTiles.isEmpty())

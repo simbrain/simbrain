@@ -1,10 +1,35 @@
 package org.simbrain.network.compositor
 
+import org.simbrain.network.tensor.op.HeadMixOp
+import org.simbrain.network.tensor.op.HeadScoresOp
+import org.simbrain.network.tensor.op.MergeHeadsOp
+import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.NetworkTheme
 import java.awt.geom.Point2D
 
-class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp> = emptyList()) {
+/** Something an edge can start or end at: a tensor tile, or a junction op vertex. */
+sealed interface FlowEndpoint
+
+/**
+ * A multi-input op promoted to a diagram vertex: its input streams' arrows converge into the
+ * glyph and one arrow leaves it — the residual ⊕, q x k, attention x values, embedding +
+ * positions. [x]/[y] are the glyph center, assigned by layout ([placed]) or derived from
+ * neighbors at render time.
+ */
+class OpVertex(val op: TensorOp) : FlowEndpoint {
+    var x = 0.0
+    var y = 0.0
+    var placed = false
+}
+
+class FlowEdge(
+    val from: FlowEndpoint,
+    val to: FlowEndpoint,
+    val ops: List<TensorOp> = emptyList(),
+    /** True when the value crossing this edge is head-stacked — rendered as a strand fan. */
+    val stranded: Boolean = false,
+) {
     /** Interior route knots in scene coordinates; set by layout to steer the curve around tiles. */
     var waypoints: List<Point2D> = emptyList()
 }
@@ -14,7 +39,7 @@ class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp>
  * matrix sitting on the line with its multiply, a bias strip on the line with its add. Its
  * layout rect is derived from the edge's curve at render time, never placed independently.
  */
-class TileSatellite(val tile: TensorTile, val edge: TileEdge, val op: TensorOp)
+class TileSatellite(val tile: TensorTile, val edge: FlowEdge, val op: TensorOp)
 
 /**
  * Self-contained selection over compositor tiles, shaped like the network canvas selection model
@@ -72,7 +97,10 @@ class CompositorScene(val graph: PlanGraph? = null) {
     private val _tiles = mutableListOf<TensorTile>()
     val tiles: List<TensorTile> get() = _tiles
 
-    var edges: List<TileEdge> = emptyList()
+    var edges: List<FlowEdge> = emptyList()
+        private set
+
+    var opVertices: List<OpVertex> = emptyList()
         private set
 
     var lens: LogitLens? = null
@@ -90,34 +118,80 @@ class CompositorScene(val graph: PlanGraph? = null) {
         private set
 
     /**
-     * Derives tile-to-tile edges (and their op decorations) from op-graph reachability.
+     * Derives the display graph from op-graph reachability: edges between anchor tiles and
+     * [OpVertex] junctions (multi-input ops rendered as convergence points), with single-input
+     * ops riding the edges as glyph beads.
      *
      * Parameter tiles ([TileKind.WEIGHT]) are not edge anchors: each one attaches as a
      * [TileSatellite] to the edge carrying the op that reads it. A parameter whose consuming op
      * lies on no edge (e.g. the embedding table, consumed above the first anchor) falls back to
      * being a standalone anchor with its own edges.
+     *
+     * Pass [junctionVertices] = false for scenes that deliberately abstract the op flow (coarse
+     * residual-history views): every op stays a bead and no vertices are created.
      */
-    fun connectFromGraph() {
+    fun connectFromGraph(junctionVertices: Boolean = true) {
         val g = requireNotNull(graph) { "Scene has no plan graph to derive edges from" }
         val byId = _tiles.associateBy { it.id }
         val params = _tiles.filter { it.kind == TileKind.WEIGHT }
         val coreIds = _tiles.filter { it.kind != TileKind.WEIGHT }.map { it.id }
         val coreEdges = g.anchorEdges(coreIds)
-        val attachable = params.filter { p ->
+        val attachable = params.filterTo(mutableListOf()) { p ->
             val readers = g.readers(p.id)
             coreEdges.any { edge -> edge.ops.any { it in readers } }
         }
-        val standaloneIds = (params - attachable.toSet()).map { it.id }
-        edges = g.anchorEdges(coreIds + standaloneIds).map {
-            TileEdge(byId.getValue(it.from), byId.getValue(it.to), it.ops)
+
+        while (true) {
+            val anchorIds = coreIds + (params - attachable.toSet()).map { it.id }
+            val junctions = if (junctionVertices) g.junctionOps(anchorIds) else emptySet()
+            val verticesByOp = junctions.associateWith { OpVertex(it) }
+            fun endpoint(key: Any): FlowEndpoint = when (key) {
+                is String -> byId.getValue(key)
+                is TensorOp -> verticesByOp.getValue(key)
+                else -> error("Unexpected endpoint $key")
+            }
+            val derived = g.displayEdges(anchorIds, junctions).map {
+                val from = endpoint(it.from)
+                FlowEdge(from, endpoint(it.to), it.ops, stranded = strandedState(from, it.ops))
+            }
+            // A satellite needs its consuming op riding some edge as a bead; if the op was
+            // promoted to a junction (or fell off the paths), the parameter goes standalone.
+            val unhosted = attachable.filter { p ->
+                val readers = g.readers(p.id).toSet()
+                derived.none { edge -> edge.ops.any { it in readers } }
+            }
+            if (unhosted.isNotEmpty()) {
+                attachable.removeAll(unhosted)
+                continue
+            }
+            edges = derived
+            opVertices = verticesByOp.values.toList()
+            satellites = attachable.map { p ->
+                val readers = g.readers(p.id).toSet()
+                // Prefer the most direct hop carrying the consuming op — e.g. Wo rides the
+                // attention-pattern edge into the output, not the longer value bypass.
+                val host = edges.filter { edge -> edge.ops.any { it in readers } }.minBy { it.ops.size }
+                TileSatellite(p, host, host.ops.first { it in readers })
+            }
+            return
         }
-        satellites = attachable.map { p ->
-            val readers = g.readers(p.id).toSet()
-            // Prefer the most direct hop carrying the consuming op — e.g. Wo rides the
-            // attention-pattern edge into the output, not the longer value bypass.
-            val host = edges.filter { edge -> edge.ops.any { it in readers } }.minBy { it.ops.size }
-            TileSatellite(p, host, host.ops.first { it in readers })
+    }
+
+    /** Whether the value arriving at the end of an edge with these beads is head-stacked. */
+    private fun strandedState(from: FlowEndpoint, beads: List<TensorOp>): Boolean {
+        var stacked = when (from) {
+            is DeckTile -> true
+            is OpVertex -> from.op is SplitHeadsOp || from.op is HeadScoresOp || from.op is HeadMixOp
+            else -> false
         }
+        for (op in beads) {
+            when (op) {
+                is SplitHeadsOp -> stacked = true
+                is MergeHeadsOp -> stacked = false
+                else -> {}
+            }
+        }
+        return stacked
     }
 
     /** Copies this token's values into every tile and refreshes the lens. Compute-thread side. */
@@ -189,13 +263,15 @@ class CompositorScene(val graph: PlanGraph? = null) {
     var tracedTiles: Set<TensorTile> = emptySet()
         private set
 
-    var tracedEdges: Set<TileEdge> = emptySet()
+    var tracedEdges: Set<FlowEdge> = emptySet()
         private set
 
     /**
      * Sets (or clears, with null) the trace focus: highlights every tile on a data-flow path
      * into or out of [focus], and the edges along those paths — but not edges that bypass the
-     * focus, like a residual edge skipping around a traced attention tile.
+     * focus, like a residual edge skipping around a traced attention tile. Junction vertices
+     * qualify through their output ports: an arm into a junction traces only when the junction's
+     * result actually flows through (or is) the focus.
      */
     fun setTrace(focus: TensorTile?) {
         traceFocus = focus
@@ -206,12 +282,19 @@ class CompositorScene(val graph: PlanGraph? = null) {
         }
         val upstream = graph.upstreamPorts(focus.id)
         val downstream = graph.downstreamPorts(focus.id)
-        val upTiles = _tiles.filter { it.id in upstream }.toSet()
-        val downTiles = _tiles.filter { it.id in downstream }.toSet()
-        tracedTiles = upTiles + downTiles + focus
+        tracedTiles = _tiles.filter { it.id in upstream || it.id in downstream }.toSet() + focus
+
+        fun up(e: FlowEndpoint) = when (e) {
+            is TensorTile -> e.id in upstream
+            is OpVertex -> e.op.outputs.any { it.name in upstream || it.name == focus.id }
+        }
+        fun down(e: FlowEndpoint) = when (e) {
+            is TensorTile -> e.id in downstream
+            is OpVertex -> e.op.outputs.any { it.name in downstream }
+        }
         tracedEdges = edges.filter { edge ->
-            (edge.from in upTiles && (edge.to in upTiles || edge.to == focus)) ||
-                (edge.to in downTiles && (edge.from in downTiles || edge.from == focus))
+            (up(edge.from) && (up(edge.to) || edge.to == focus)) ||
+                (down(edge.to) && (down(edge.from) || edge.from == focus))
         }.toSet()
     }
 }

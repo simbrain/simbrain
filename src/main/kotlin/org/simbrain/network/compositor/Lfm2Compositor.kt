@@ -48,7 +48,8 @@ object Lfm2Compositor {
             }
         )
 
-        scene.connectFromGraph()
+        // This is a coarse residual-history view: keep every op a bead, no junction vertices.
+        scene.connectFromGraph(junctionVertices = false)
         scene.lens = LogitLens(
             embedWeight = model.plan.port("model.embed_tokens.weight").tensor,
             normWeight = model.plan.port("model.embedding_norm.weight").tensor,

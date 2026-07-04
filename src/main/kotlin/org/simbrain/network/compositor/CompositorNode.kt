@@ -66,7 +66,7 @@ class CompositorNode(
     private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()
 
     /** The curve each edge currently renders along, rebuilt with the edges. */
-    private val routesByEdge = HashMap<TileEdge, BezierRoute>()
+    private val routesByEdge = HashMap<FlowEdge, BezierRoute>()
 
     private val arrowTip = Path2D.Double().apply {
         moveTo(0.0, -TIP_LENGTH)
@@ -306,18 +306,49 @@ class CompositorNode(
         }
     }
 
+    /** The rectangle an edge attaches to: a tile's rect, or a small box around a junction glyph. */
+    private val FlowEndpoint.endpointBounds: Rectangle2D
+        get() = when (this) {
+            is TensorTile -> bounds
+            is OpVertex -> Rectangle2D.Double(
+                x - GLYPH_RADIUS, y - GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS
+            )
+        }
+
     /**
-     * Attach fractions along each tile side, spread so several curves sharing a side fan out
+     * Junction vertices the layout didn't position (scenes without a layout pass) settle at the
+     * centroid of their neighbors, so they always render somewhere sensible.
+     */
+    private fun placeLooseVertices() {
+        repeat(2) {
+            for (vertex in scene.opVertices) {
+                if (vertex.placed) continue
+                val neighbors = scene.edges.mapNotNull { edge ->
+                    when {
+                        edge.from === vertex -> edge.to
+                        edge.to === vertex -> edge.from
+                        else -> null
+                    }
+                }.filter { it is TensorTile || (it is OpVertex && it.placed) }
+                if (neighbors.isEmpty()) continue
+                vertex.x = neighbors.map { it.endpointBounds.centerX }.average()
+                vertex.y = neighbors.map { it.endpointBounds.centerY }.average()
+            }
+        }
+    }
+
+    /**
+     * Attach fractions along each endpoint side, spread so several curves sharing a side fan out
      * instead of stacking on the midpoint. Curves are ordered along the side by where their far
      * endpoint projects onto it, so the fan never crosses itself.
      */
     private fun attachFractions(
-        sideOf: (TileEdge) -> Line2D,
-        tileOf: (TileEdge) -> TensorTile,
-        guideOf: (TileEdge) -> Point2D,
-    ): Map<TileEdge, Double> {
-        val fractions = HashMap<TileEdge, Double>()
-        val bySide = scene.edges.groupBy { tileOf(it) to sideOf(it).midPoint.let { m -> m.x to m.y } }
+        sideOf: (FlowEdge) -> Line2D,
+        endpointOf: (FlowEdge) -> FlowEndpoint,
+        guideOf: (FlowEdge) -> Point2D,
+    ): Map<FlowEdge, Double> {
+        val fractions = HashMap<FlowEdge, Double>()
+        val bySide = scene.edges.groupBy { endpointOf(it) to sideOf(it).midPoint.let { m -> m.x to m.y } }
         for ((_, group) in bySide) {
             val ordered = group.sortedBy { sideOf(it).projectionFraction(guideOf(it)) }
             ordered.forEachIndexed { j, edge -> fractions[edge] = (j + 1.0) / (ordered.size + 1.0) }
@@ -327,22 +358,32 @@ class CompositorNode(
 
     /**
      * Slides a satellite along its curve away from the op's nominal slot until it stops
-     * overlapping already-placed tiles.
+     * overlapping already-placed tiles; when every pocket is blocked, settles for the candidate
+     * with the least overlap.
      */
     private fun satelliteT(route: BezierRoute, tile: TensorTile, slotT: Double, obstacles: List<TensorTile>): Double {
+        var bestT = slotT
+        var bestOverlap = Double.MAX_VALUE
         for (offset in SATELLITE_NUDGES) {
             val t = slotT + offset
             if (t < 0.1 || t > 0.9) continue
             val at = route.pointAt(t)
-            val clear = obstacles.none {
-                it.intersects(
-                    at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
-                    tile.width + 24, tile.height + 24
-                )
+            val box = Rectangle2D.Double(
+                at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
+                tile.width + 24, tile.height + 24
+            )
+            val overlap = obstacles.sumOf { o ->
+                val w = minOf(box.maxX, o.x + o.width) - maxOf(box.x, o.x)
+                val h = minOf(box.maxY, o.y + o.height) - maxOf(box.y, o.y)
+                if (w > 0 && h > 0) w * h else 0.0
             }
-            if (clear) return t
+            if (overlap == 0.0) return t
+            if (overlap < bestOverlap) {
+                bestOverlap = overlap
+                bestT = t
+            }
         }
-        return slotT
+        return bestT
     }
 
     private fun rebuildEdges() {
@@ -350,22 +391,30 @@ class CompositorNode(
         edgeLayer.removeAllChildren()
         glyphsByOp.clear()
         routesByEdge.clear()
+        placeLooseVertices()
         val satellitesByEdge = scene.satellites.groupBy { it.edge }
         val satelliteTiles = scene.satellites.map { it.tile }.toSet()
         val placedObstacles = scene.tiles.filter { it !in satelliteTiles }.toMutableList()
         val badgedOps = tileNodes.mapNotNull { it.activationOp }.toSet()
+        for (vertex in scene.opVertices) {
+            OpGlyphNode(vertex.op).apply {
+                setOffset(vertex.x, vertex.y)
+                glyphsByOp[vertex.op] = this
+                edgeLayer.addChild(this)
+            }
+        }
         val tailSides = scene.edges.associateWith {
-            it.from.bounds.facingSide(it.waypoints.firstOrNull() ?: it.to.bounds.center)
+            it.from.endpointBounds.facingSide(it.waypoints.firstOrNull() ?: it.to.endpointBounds.center)
         }
         val headSides = scene.edges.associateWith {
-            it.to.bounds.facingSide(it.waypoints.lastOrNull() ?: it.from.bounds.center)
+            it.to.endpointBounds.facingSide(it.waypoints.lastOrNull() ?: it.from.endpointBounds.center)
         }
         val tailFractions = attachFractions(
             { tailSides.getValue(it) }, { it.from },
-            { it.waypoints.firstOrNull() ?: it.to.bounds.center })
+            { it.waypoints.firstOrNull() ?: it.to.endpointBounds.center })
         val headFractions = attachFractions(
             { headSides.getValue(it) }, { it.to },
-            { it.waypoints.lastOrNull() ?: it.from.bounds.center })
+            { it.waypoints.lastOrNull() ?: it.from.endpointBounds.center })
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
             val tailSide = tailSides.getValue(edge)
@@ -378,9 +427,20 @@ class CompositorNode(
             )
             routesByEdge[edge] = route
             val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
-            val ribbon = Area(
-                BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER).createStrokedShape(route.path)
-            )
+            val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+            if (edge.stranded) {
+                // Head-stacked flow renders as a strand fan echoing the deck's back cards.
+                for (i in 2 downTo 1) {
+                    val strandOffset = AffineTransform.getTranslateInstance(-DECK_STEP * i, -DECK_STEP * i)
+                    PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
+                        paint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
+                        transparency = 0.2f
+                        pickable = false
+                        edgeLayer.addChild(this)
+                    }
+                }
+            }
+            val ribbon = Area(stroke.createStrokedShape(route.path))
             val tangent = route.endTangent
             val tipTransform = AffineTransform().apply {
                 translate(route.end.x, route.end.y)
@@ -395,6 +455,12 @@ class CompositorNode(
             }
             val satellitesByOp = satellitesByEdge[edge]?.associateBy { it.op } ?: emptyMap()
             val visibleOps = edge.ops.filter { it !in badgedOps }
+            // Short curves can't fit every bead without overlap: sample evenly, keep the rest
+            // reachable through the shown ones' tooltips. Satellite ops always render.
+            val fit = (route.length / (GLYPH_RADIUS * 3.0)).toInt().coerceAtLeast(1)
+            val shownIndices = if (visibleOps.size <= fit) visibleOps.indices.toSet() else {
+                (0 until fit).map { it * (visibleOps.size - 1) / (fit - 1).coerceAtLeast(1) }.toSet()
+            }
             for ((i, op) in visibleOps.withIndex()) {
                 val slotT = (i + 1).toDouble() / (visibleOps.size + 1)
                 val satellite = satellitesByOp[op]
@@ -409,7 +475,7 @@ class CompositorNode(
                     placedObstacles.add(satellite.tile)
                     tileNodesById.getValue(satellite.tile.id).syncLayout()
                 }
-                if (op !in glyphsByOp) {
+                if (op !in glyphsByOp && (satellite != null || i in shownIndices)) {
                     OpGlyphNode(op).apply {
                         if (satellite != null) {
                             setOffset(satellite.tile.x + satellite.tile.width, satellite.tile.y + satellite.tile.height)
@@ -576,7 +642,8 @@ class CompositorNode(
         private const val STALE_TRANSPARENCY = 0.35f
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
-        private val SATELLITE_NUDGES = doubleArrayOf(0.0, -0.08, 0.08, -0.16, 0.16, -0.24, 0.24, -0.32, 0.32)
+        private val SATELLITE_NUDGES = doubleArrayOf(0.0) +
+            (1..7).flatMap { listOf(-it * 0.06, it * 0.06) }.toDoubleArray()
     }
 }
 

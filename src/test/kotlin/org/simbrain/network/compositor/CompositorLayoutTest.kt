@@ -70,14 +70,29 @@ class CompositorLayoutTest {
     }
 
     @Test
-    fun `standalone parameters sit above the anchor they feed`() {
+    fun `standalone parameters sit side by side above the junction that joins them`() {
         val scene = scene()
-        val resid0 = scene.tile("resid0")
-        for (id in listOf("embed.table", "embed.pos")) {
-            val param = scene.tile(id)
-            assertTrue(param.y + param.height <= resid0.y, "$id sits above the first checkpoint")
-            assertTrue(param.x + param.width <= resid0.x, "$id sits left of the first checkpoint")
-        }
+        val junction = scene.opVertices.first { it.op.name == "add_pos" }
+        val table = scene.tile("embed.table")
+        val pos = scene.tile("embed.pos")
+        assertTrue(table.y + table.height < junction.y, "embedding sits above the +")
+        assertTrue(pos.y + pos.height < junction.y, "positions sit above the +")
+        assertTrue(table.x + table.width <= pos.x, "the group lays out left to right")
+        val groupCenter = (table.x + (pos.x + pos.width)) / 2
+        assertEquals(junction.x, groupCenter, 1e-9, "the parameter row centers on the junction")
+    }
+
+    @Test
+    fun `junction adds pin to the spine axis between their checkpoints`() {
+        val scene = scene()
+        val axis = scene.centerX("resid0")
+        val rejoin = scene.opVertices.first { it.op.name == "layers.0.attn_residual" }
+        assertTrue(rejoin.placed)
+        assertEquals(axis, rejoin.x, 1e-9, "the residual ⊕ sits on the trunk")
+        assertTrue(rejoin.y > scene.tile("layers.0.attn.out").y, "the ⊕ ranks after the limb output")
+        assertTrue(rejoin.y < scene.tile("layers.0.attn_resid").y, "the ⊕ ranks before the checkpoint it writes")
+        val scores = scene.opVertices.first { it.op.name == "layers.0.attn.score" }
+        assertTrue(scores.x > scene.tile("resid0").x + scene.tile("resid0").width, "limb junctions stay in the limb")
     }
 
     @Test

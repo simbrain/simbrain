@@ -30,7 +30,7 @@ abstract class TensorTile(
     val cols: Int,
     private val signedNorm: Boolean,
     val kind: TileKind = TileKind.ACTIVATION,
-) {
+) : FlowEndpoint {
 
     var x = 0.0
     var y = 0.0

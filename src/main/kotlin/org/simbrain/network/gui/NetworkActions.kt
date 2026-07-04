@@ -135,12 +135,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showActivationSequenceCreationDialog()
     }
-    val addTransformerBlockAction = networkPanel.createAction(
-        name = "Add transformer block...",
-        description = "Add a transformer block to the network",
-    ) {
-        showTransformerBlockCreationDialog()
-    }
     val addLanguageModelAction = networkPanel.createAction(
         name = "Add language model...",
         description = "Add a language model (LFM2.5-230M) to the network",
@@ -1085,9 +1079,6 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
         if (source == target) {
             reasons.add("Source and target cannot be the same")
-        }
-        if (source is TransformerBlock || target is TransformerBlock) {
-            reasons.add("Transformer blocks cannot be used as source or target layers")
         }
         if (source is ActivationSequence || target is ActivationSequence) {
             reasons.add("Activation sequences are not currently supported")

@@ -18,8 +18,9 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.TensorActivation
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.core.TensorShape
-import org.simbrain.network.core.TransformerBlock
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TeachingTransformerConfig
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
@@ -272,12 +273,16 @@ class KitchenSinkSnapshot : UiSnapshotDef {
             val flatten = FlattenConnector(poolOut, flat).apply { label = "Flatten" }
             network.addNetworkModel(flatten, usePlacementManager = false)
 
-            // Row 6: TransformerBlock (matrices/sequences/attention/FF + white junction & multiply glyphs).
-            val tb = TransformerBlock(sequenceSize = 7, inputSize = 4, hiddenSize = 16).apply {
-                label = "Transformer"
+            // Row 6: TeachingTransformer (residual spine, weight tiles, attention deck, op glyphs).
+            val teaching = TeachingTransformer(TeachingTransformerConfig(
+                contextSize = 7, embedDim = 8, numHeads = 2, hiddenDim = 12, vocabSize = 6, numLayers = 1
+            )).apply {
+                label = "Teaching transformer"
             }
-            network.addNetworkModel(tb, usePlacementManager = false)
-            tb.location = point(-600.0, 950.0)
+            network.addNetworkModel(teaching, usePlacementManager = false)
+            teaching.location = point(-600.0, 950.0)
+            teaching.setContext(intArrayOf(0, 1, 2, 3, 4))
+            teaching.forwardContext()
 
             // Row 6 right: ActivationSequence (sequence image + programmatic row highlight).
             val seq = ActivationSequence(sequenceSize = 7, inputSize = 4).apply {

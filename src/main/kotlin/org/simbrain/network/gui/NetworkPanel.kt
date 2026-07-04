@@ -180,9 +180,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             it.events.colorPreferencesChanged.fire()
             it.events.updateGraphics.fire()
         }
-        network.getModels<TransformerBlock>().forEach {
-            it.events.updateGraphics.fire()
-        }
         // Re-apply theme-derived colors that nodes cache at construction (not driven by a model event):
         // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, arrows, and image
         // borders. A single traversal, since this runs on every preference commit and theme switch.
@@ -315,7 +312,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is Synapse -> createNode(model)
             is NeuronArray -> createNode(model)
             is ActivationSequence -> createNode(model)
-            is TransformerBlock -> createNode(model)
             is LanguageModel -> createNode(model)
             is TeachingTransformer -> createNode(model)
             is NeuronCollection -> createNode(model)
@@ -353,8 +349,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     suspend fun createNode(flattenConnector: FlattenConnector) = addScreenElement { FlattenConnectorNode(this, flattenConnector) }
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
-
-    suspend fun createNode(transformerBlock: TransformerBlock) = addScreenElement { TransformerBlockNode(this, transformerBlock) }
 
     suspend fun createNode(languageModel: LanguageModel) = addScreenElement { LanguageModelNode(this, languageModel) }
 

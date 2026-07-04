@@ -258,20 +258,6 @@ class PoolLayerTemplate : EditableObject {
     override val name = "Pooling Layer"
 }
 
-fun NetworkPanel.showTransformerBlockCreationDialog() {
-    TransformerBlock.CreationTemplate().createEditorDialog {
-        val transformerBlock = it.create()
-        network.addNetworkModelAsync(transformerBlock)
-        undoManager.addUndoableAction(
-            description = "Add transformer block ${transformerBlock.id}",
-            undo = { transformerBlock.delete() },
-            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false) }
-        )
-    }.also {
-        it.title = "Create Transformer Block"
-    }.display()
-}
-
 fun NetworkPanel.showLanguageModelCreationDialog() {
     LanguageModel.CreationTemplate().createEditorDialog { template ->
         val existing = Lfm2Weights.findWeightsDirectory()

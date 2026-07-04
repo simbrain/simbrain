@@ -336,6 +336,16 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         order = 1,
     )
 
+    var samplingTemperature by GuiEditable(
+        initValue = 1.0,
+        label = "Sampling temperature",
+        description = "Sharpens (below 1) or flattens (above 1) the next-token distribution before sampling",
+        min = 0.01,
+        max = 4.0,
+        increment = 0.05,
+        order = 2,
+    )
+
     var lensEnabled: Boolean = true
         set(value) {
             field = value
@@ -452,10 +462,19 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         events.updated.fire()
     }
 
-    /** The model's distribution for the next token after the current context. */
+    /**
+     * The model's distribution for the next token after the current context, with
+     * [samplingTemperature] applied (probabilities raised to 1/T and renormalized).
+     */
     fun nextTokenDistribution(): DoubleArray {
         val distribution = model.distributionAt((contextTokens.size - 1).coerceAtLeast(0))
-        return DoubleArray(distribution.size) { distribution[it].toDouble() }
+        val temperature = samplingTemperature
+        val powered = DoubleArray(distribution.size) {
+            Math.pow(distribution[it].toDouble(), 1.0 / temperature)
+        }
+        val sum = powered.sum()
+        if (sum > 0.0) for (i in powered.indices) powered[i] /= sum
+        return powered
     }
 
     /**

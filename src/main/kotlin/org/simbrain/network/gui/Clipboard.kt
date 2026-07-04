@@ -154,11 +154,6 @@ object Clipboard {
                             layerMappings[item] = copy
                             add(copy)
                         }
-                        is TransformerBlock -> {
-                            val copy = item.copy()
-                            layerMappings[item] = copy
-                            add(copy)
-                        }
                         is WeightMatrix -> {
                             if (!item.isStranded()) {
                                 val weightMatrix = WeightMatrix(

@@ -46,17 +46,59 @@ class Tape {
      * recorded op in reverse order, accumulating into [grads].
      */
     fun backward(loss: TensorPort, grads: Gradients) {
-        require(loss.tensor.size == 1) { "Loss port ${loss.name} is not scalar" }
-        grads.of(loss.tensor).fill(1f)
-        for (entry in entries.asReversed()) {
-            for (i in entry.saved.indices) {
-                check(entry.saved[i].version == entry.versions[i]) {
-                    "Tensor saved by ${entry.op.name} was mutated between record and backward"
-                }
-            }
-            entry.op.backward(grads)
-        }
+        beginBackward(loss, grads)
+        while (isBackwardInProgress) stepBackward(grads)
     }
 
-    fun clear() = entries.clear()
+    /** Index into the recorded entries of the next VJP to run; -1 when no backward pass is armed. */
+    private var backCursor = -1
+
+    val isBackwardInProgress get() = backCursor >= 0
+
+    private val backwardHooks = mutableListOf<(TensorOp) -> Unit>()
+
+    /**
+     * Registers [hook] to run right after each op's VJP completes during backward stepping, with
+     * the op whose gradients were just produced (read them via [Gradients.of] on its ports'
+     * tensors). The channel backward visualization hangs off, mirroring the plan's port hooks.
+     */
+    fun onBackwardStep(hook: (TensorOp) -> Unit): HookHandle {
+        backwardHooks.add(hook)
+        return HookHandle { backwardHooks.remove(hook) }
+    }
+
+    /**
+     * Arms a micro-stepped backward pass: seeds the loss gradient and points the reverse cursor
+     * at the last recorded op. The caller must ensure the forward pass that recorded this tape is
+     * complete (a partial forward leaves the loss port unwritten).
+     */
+    fun beginBackward(loss: TensorPort, grads: Gradients) {
+        check(!isBackwardInProgress) { "Backward pass already in progress" }
+        require(loss.tensor.size == 1) { "Loss port ${loss.name} is not scalar" }
+        grads.of(loss.tensor).fill(1f)
+        backCursor = entries.size - 1
+    }
+
+    /**
+     * Runs the single next recorded op's VJP (micro-stepping in reverse), fires backward hooks,
+     * and returns the op. Check [isBackwardInProgress] to see whether entries remain.
+     */
+    fun stepBackward(grads: Gradients): TensorOp {
+        check(isBackwardInProgress) { "No backward pass in progress; call beginBackward first" }
+        val entry = entries[backCursor]
+        for (i in entry.saved.indices) {
+            check(entry.saved[i].version == entry.versions[i]) {
+                "Tensor saved by ${entry.op.name} was mutated between record and backward"
+            }
+        }
+        entry.op.backward(grads)
+        backCursor--
+        backwardHooks.forEach { it(entry.op) }
+        return entry.op
+    }
+
+    fun clear() {
+        entries.clear()
+        backCursor = -1
+    }
 }

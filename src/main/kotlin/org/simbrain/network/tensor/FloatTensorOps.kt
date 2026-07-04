@@ -17,17 +17,29 @@ import org.bytedeco.openblas.global.openblas_nolapack.cblas_sscal
  * casual use; decode loops run on preallocated workspaces.
  */
 
-/** out = alpha * (a x b) + beta * out. With [transposeB], b is used as its transpose. */
-fun matmul(a: FloatTensor, b: FloatTensor, out: FloatTensor, alpha: Float = 1f, beta: Float = 0f, transposeB: Boolean = false) {
+/** out = alpha * (a x b) + beta * out. With [transposeA]/[transposeB], that side is used as its transpose. */
+fun matmul(
+    a: FloatTensor,
+    b: FloatTensor,
+    out: FloatTensor,
+    alpha: Float = 1f,
+    beta: Float = 0f,
+    transposeB: Boolean = false,
+    transposeA: Boolean = false
+) {
+    val aRows = if (transposeA) a.cols else a.rows
+    val aCols = if (transposeA) a.rows else a.cols
     val bRows = if (transposeB) b.cols else b.rows
     val bCols = if (transposeB) b.rows else b.cols
-    require(a.cols == bRows) { "matmul inner dims: ${a.rows}x${a.cols} x ${bRows}x$bCols" }
-    require(out.rows == a.rows && out.cols == bCols) {
-        "matmul out ${out.rows}x${out.cols} != ${a.rows}x$bCols"
+    require(aCols == bRows) { "matmul inner dims: ${aRows}x$aCols x ${bRows}x$bCols" }
+    require(out.rows == aRows && out.cols == bCols) {
+        "matmul out ${out.rows}x${out.cols} != ${aRows}x$bCols"
     }
     cblas_sgemm(
-        CblasRowMajor, CblasNoTrans, if (transposeB) CblasTrans else CblasNoTrans,
-        a.rows, bCols, a.cols,
+        CblasRowMajor,
+        if (transposeA) CblasTrans else CblasNoTrans,
+        if (transposeB) CblasTrans else CblasNoTrans,
+        aRows, bCols, aCols,
         alpha, a.pointer, a.cols, b.pointer, b.cols,
         beta, out.pointer, out.cols
     )

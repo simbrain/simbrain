@@ -60,6 +60,32 @@ class FloatTensorTest {
     }
 
     @Test
+    fun `matmul with transposed a matches naive on transposed data`() {
+        val rng = Random(51)
+        val a = randomTensor(8, 5, rng)
+        val aT = FloatTensor(5, 8)
+        for (r in 0 until a.rows) for (c in 0 until a.cols) aT[c, r] = a[r, c]
+        val b = randomTensor(8, 3, rng)
+        val out = FloatTensor(5, 3)
+        matmul(a, b, out, transposeA = true)
+        assertArrayEquals(naiveMatmul(aT, b), out.toFloatArray(), 1e-5f)
+    }
+
+    @Test
+    fun `matmul with both sides transposed matches naive on transposed data`() {
+        val rng = Random(52)
+        val a = randomTensor(6, 4, rng)
+        val aT = FloatTensor(4, 6)
+        for (r in 0 until a.rows) for (c in 0 until a.cols) aT[c, r] = a[r, c]
+        val b = randomTensor(3, 6, rng)
+        val bT = FloatTensor(6, 3)
+        for (r in 0 until b.rows) for (c in 0 until b.cols) bT[c, r] = b[r, c]
+        val out = FloatTensor(4, 3)
+        matmul(a, b, out, transposeA = true, transposeB = true)
+        assertArrayEquals(naiveMatmul(aT, bT), out.toFloatArray(), 1e-5f)
+    }
+
+    @Test
     fun `matvec matches matmul with single column`() {
         val rng = Random(44)
         val a = randomTensor(9, 11, rng)

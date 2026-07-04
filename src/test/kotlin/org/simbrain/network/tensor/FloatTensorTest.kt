@@ -23,7 +23,7 @@ class FloatTensorTest {
     }
 
     private fun randomTensor(rows: Int, cols: Int, rng: Random) =
-        FloatTensor(rows, cols, FloatArray(rows * cols) { rng.nextFloat() - 0.5f })
+        FloatTensor.of(rows, cols, FloatArray(rows * cols) { rng.nextFloat() - 0.5f })
 
     @Test
     fun `matmul matches naive reference`() {
@@ -32,7 +32,7 @@ class FloatTensorTest {
         val b = randomTensor(13, 5, rng)
         val out = FloatTensor(7, 5)
         matmul(a, b, out)
-        assertArrayEquals(naiveMatmul(a, b), out.data, 1e-5f)
+        assertArrayEquals(naiveMatmul(a, b), out.toFloatArray(), 1e-5f)
     }
 
     @Test
@@ -44,7 +44,19 @@ class FloatTensorTest {
         out.fill(2f)
         matmul(a, b, out, alpha = 1f, beta = 1f)
         val expected = naiveMatmul(a, b).map { it + 2f }.toFloatArray()
-        assertArrayEquals(expected, out.data, 1e-5f)
+        assertArrayEquals(expected, out.toFloatArray(), 1e-5f)
+    }
+
+    @Test
+    fun `matmul with transposed b matches naive on transposed data`() {
+        val rng = Random(47)
+        val a = randomTensor(5, 8, rng)
+        val b = randomTensor(3, 8, rng)
+        val bT = FloatTensor(8, 3)
+        for (r in 0 until b.rows) for (c in 0 until b.cols) bT[c, r] = b[r, c]
+        val out = FloatTensor(5, 3)
+        matmul(a, b, out, transposeB = true)
+        assertArrayEquals(naiveMatmul(a, bT), out.toFloatArray(), 1e-5f)
     }
 
     @Test
@@ -54,31 +66,59 @@ class FloatTensorTest {
         val x = randomTensor(11, 1, rng)
         val viaGemv = FloatTensor.vector(9)
         matvec(a, x, viaGemv)
-        assertArrayEquals(naiveMatmul(a, x), viaGemv.data, 1e-5f)
+        assertArrayEquals(naiveMatmul(a, x), viaGemv.toFloatArray(), 1e-5f)
+    }
+
+    @Test
+    fun `matvec over leading rows writes only that prefix`() {
+        val rng = Random(48)
+        val a = randomTensor(6, 4, rng)
+        val x = randomTensor(4, 1, rng)
+        val out = FloatTensor.vector(6)
+        out.fill(-1f)
+        matvec(a, x, out, rowCount = 3)
+        val full = naiveMatmul(a, x)
+        val result = out.toFloatArray()
+        for (i in 0 until 3) assertEquals(full[i], result[i], 1e-5f)
+        for (i in 3 until 6) assertEquals(-1f, result[i])
+    }
+
+    @Test
+    fun `transposed matvec over leading rows matches manual sum`() {
+        val rng = Random(49)
+        val a = randomTensor(5, 3, rng)
+        val w = randomTensor(5, 1, rng)
+        val out = FloatTensor.vector(3)
+        matvec(a, w, out, rowCount = 4, transposeA = true)
+        for (c in 0 until 3) {
+            var expected = 0f
+            for (r in 0 until 4) expected += a[r, c] * w[r, 0]
+            assertEquals(expected, out[c, 0], 1e-5f)
+        }
     }
 
     @Test
     fun `axpy and scal compose to a fused update`() {
-        val x = FloatTensor(1, 4, floatArrayOf(1f, 2f, 3f, 4f))
-        val y = FloatTensor(1, 4, floatArrayOf(10f, 20f, 30f, 40f))
+        val x = FloatTensor.of(1, 4, floatArrayOf(1f, 2f, 3f, 4f))
+        val y = FloatTensor.of(1, 4, floatArrayOf(10f, 20f, 30f, 40f))
         scal(0.5f, y)
         axpy(2f, x, y)
-        assertArrayEquals(floatArrayOf(7f, 14f, 21f, 28f), y.data, 1e-6f)
+        assertArrayEquals(floatArrayOf(7f, 14f, 21f, 28f), y.toFloatArray(), 1e-6f)
     }
 
     @Test
     fun `hadamard multiplies elementwise`() {
-        val a = FloatTensor(2, 2, floatArrayOf(1f, 2f, 3f, 4f))
-        val b = FloatTensor(2, 2, floatArrayOf(5f, 6f, 7f, 8f))
+        val a = FloatTensor.of(2, 2, floatArrayOf(1f, 2f, 3f, 4f))
+        val b = FloatTensor.of(2, 2, floatArrayOf(5f, 6f, 7f, 8f))
         val out = FloatTensor(2, 2)
         hadamard(a, b, out)
-        assertArrayEquals(floatArrayOf(5f, 12f, 21f, 32f), out.data, 0f)
+        assertArrayEquals(floatArrayOf(5f, 12f, 21f, 32f), out.toFloatArray(), 0f)
     }
 
     @Test
     fun `dot matches manual sum`() {
-        val x = FloatTensor(1, 3, floatArrayOf(1f, 2f, 3f))
-        val y = FloatTensor(1, 3, floatArrayOf(4f, 5f, 6f))
+        val x = FloatTensor.of(1, 3, floatArrayOf(1f, 2f, 3f))
+        val y = FloatTensor.of(1, 3, floatArrayOf(4f, 5f, 6f))
         assertEquals(32f, dot(x, y), 1e-6f)
     }
 
@@ -99,7 +139,7 @@ class FloatTensorTest {
 
     @Test
     fun `snapshots are immutable`() {
-        val t = FloatTensor(2, 2, floatArrayOf(1f, 2f, 3f, 4f))
+        val t = FloatTensor.of(2, 2, floatArrayOf(1f, 2f, 3f, 4f))
         val snap = t.snapshot()
         t[0, 0] = 99f
         assertEquals(1f, snap[0, 0])
@@ -109,10 +149,21 @@ class FloatTensorTest {
     @Test
     fun `reshape aliases the same buffer`() {
         val t = FloatTensor(2, 6)
+        t.fill(0f)
         val r = t.reshaped(3, 4)
         r[0, 0] = 7f
         assertEquals(7f, t[0, 0])
         assertThrows(IllegalArgumentException::class.java) { t.reshaped(5, 2) }
+    }
+
+    @Test
+    fun `heap round trip preserves values`() {
+        val values = floatArrayOf(1.5f, -2.5f, 3.5f, -4.5f, 5.5f, -6.5f)
+        val t = FloatTensor.of(2, 3, values)
+        assertArrayEquals(values, t.toFloatArray(), 0f)
+        val u = FloatTensor(2, 3)
+        u.copyFrom(t)
+        assertArrayEquals(values, u.toFloatArray(), 0f)
     }
 
     @Test
@@ -134,7 +185,7 @@ class FloatTensorTest {
             val b = randomTensor(8, 8, rng)
             val out = FloatTensor(8, 8)
             matmul(a, b, out)
-            assertArrayEquals(naiveMatmul(a, b), out.data, 1e-5f)
+            assertArrayEquals(naiveMatmul(a, b), out.toFloatArray(), 1e-5f)
         }
         assertEquals(before, Blas.numThreads)
     }

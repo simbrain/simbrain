@@ -2,6 +2,7 @@ package org.simbrain.network.tensor
 
 import org.bytedeco.openblas.global.openblas_nolapack.CblasNoTrans
 import org.bytedeco.openblas.global.openblas_nolapack.CblasRowMajor
+import org.bytedeco.openblas.global.openblas_nolapack.CblasTrans
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_saxpy
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sdot
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sgemm
@@ -15,32 +16,52 @@ import org.bytedeco.openblas.global.openblas_nolapack.cblas_sscal
  * casual use; decode loops run on preallocated workspaces.
  */
 
-/** out = alpha * (a x b) + beta * out */
-fun matmul(a: FloatTensor, b: FloatTensor, out: FloatTensor, alpha: Float = 1f, beta: Float = 0f) {
-    require(a.cols == b.rows) { "matmul inner dims: ${a.rows}x${a.cols} x ${b.rows}x${b.cols}" }
-    require(out.rows == a.rows && out.cols == b.cols) {
-        "matmul out ${out.rows}x${out.cols} != ${a.rows}x${b.cols}"
+/** out = alpha * (a x b) + beta * out. With [transposeB], b is used as its transpose. */
+fun matmul(a: FloatTensor, b: FloatTensor, out: FloatTensor, alpha: Float = 1f, beta: Float = 0f, transposeB: Boolean = false) {
+    val bRows = if (transposeB) b.cols else b.rows
+    val bCols = if (transposeB) b.rows else b.cols
+    require(a.cols == bRows) { "matmul inner dims: ${a.rows}x${a.cols} x ${bRows}x$bCols" }
+    require(out.rows == a.rows && out.cols == bCols) {
+        "matmul out ${out.rows}x${out.cols} != ${a.rows}x$bCols"
     }
     cblas_sgemm(
-        CblasRowMajor, CblasNoTrans, CblasNoTrans,
-        a.rows, b.cols, a.cols,
-        alpha, a.data, a.cols, b.data, b.cols,
-        beta, out.data, out.cols
+        CblasRowMajor, CblasNoTrans, if (transposeB) CblasTrans else CblasNoTrans,
+        a.rows, bCols, a.cols,
+        alpha, a.pointer, a.cols, b.pointer, b.cols,
+        beta, out.pointer, out.cols
     )
     out.markMutated()
 }
 
 infix fun FloatTensor.matmul(b: FloatTensor) = FloatTensor(rows, b.cols).also { matmul(this, b, it) }
 
-/** out = alpha * (a . x) + beta * out, where x and out are vectors. */
-fun matvec(a: FloatTensor, x: FloatTensor, out: FloatTensor, alpha: Float = 1f, beta: Float = 0f) {
-    require(x.size == a.cols) { "matvec x size ${x.size} != ${a.cols}" }
-    require(out.size == a.rows) { "matvec out size ${out.size} != ${a.rows}" }
+/**
+ * out = alpha * (a . x) + beta * out, where x and out are vectors. [rowCount] restricts to the
+ * first rows of a (used for growing KV-cache slices); with [transposeA] computes a^T . x, so
+ * x spans [rowCount] and out spans a.cols. Oversized x/out buffers are allowed for cache reuse.
+ */
+fun matvec(
+    a: FloatTensor,
+    x: FloatTensor,
+    out: FloatTensor,
+    alpha: Float = 1f,
+    beta: Float = 0f,
+    rowCount: Int = a.rows,
+    transposeA: Boolean = false
+) {
+    require(rowCount in 1..a.rows) { "matvec rowCount $rowCount out of 1..${a.rows}" }
+    if (transposeA) {
+        require(x.size >= rowCount) { "matvec x size ${x.size} < rowCount $rowCount" }
+        require(out.size >= a.cols) { "matvec out size ${out.size} < ${a.cols}" }
+    } else {
+        require(x.size >= a.cols) { "matvec x size ${x.size} < ${a.cols}" }
+        require(out.size >= rowCount) { "matvec out size ${out.size} < rowCount $rowCount" }
+    }
     cblas_sgemv(
-        CblasRowMajor, CblasNoTrans,
-        a.rows, a.cols,
-        alpha, a.data, a.cols, x.data, 1,
-        beta, out.data, 1
+        CblasRowMajor, if (transposeA) CblasTrans else CblasNoTrans,
+        rowCount, a.cols,
+        alpha, a.pointer, a.cols, x.pointer, 1,
+        beta, out.pointer, 1
     )
     out.markMutated()
 }
@@ -50,40 +71,41 @@ infix fun FloatTensor.matvec(x: FloatTensor) = FloatTensor.vector(rows).also { m
 /** y += alpha * x */
 fun axpy(alpha: Float, x: FloatTensor, y: FloatTensor) {
     require(x.size == y.size) { "axpy size ${x.size} != ${y.size}" }
-    cblas_saxpy(x.size, alpha, x.data, 1, y.data, 1)
+    cblas_saxpy(x.size, alpha, x.pointer, 1, y.pointer, 1)
     y.markMutated()
 }
 
 /** x *= alpha */
 fun scal(alpha: Float, x: FloatTensor) {
-    cblas_sscal(x.size, alpha, x.data, 1)
+    cblas_sscal(x.size, alpha, x.pointer, 1)
     x.markMutated()
 }
 
 fun dot(x: FloatTensor, y: FloatTensor): Float {
     require(x.size == y.size) { "dot size ${x.size} != ${y.size}" }
-    return cblas_sdot(x.size, x.data, 1, y.data, 1)
+    return cblas_sdot(x.size, x.pointer, 1, y.pointer, 1)
 }
 
-/** out = a * b elementwise (gate ops). Plain loop; JIT-vectorized, no BLAS call overhead. */
+/** out = a * b elementwise (gate ops). Plain loop over the direct-buffer views. */
 fun hadamard(a: FloatTensor, b: FloatTensor, out: FloatTensor) {
     require(a.size == b.size && a.size == out.size) { "hadamard sizes ${a.size}, ${b.size}, ${out.size}" }
     val ad = a.data
     val bd = b.data
     val od = out.data
-    for (i in od.indices) {
-        od[i] = ad[i] * bd[i]
+    for (i in 0 until out.size) {
+        od.put(i, ad.get(i) * bd.get(i))
     }
     out.markMutated()
 }
 
 /**
- * Elementwise kernels as inline transforms: the lambda inlines into a plain loop, so this JITs
- * to vectorized code (unlike Smile's applyFunction, which megamorphizes).
+ * Elementwise kernels as inline transforms: the lambda inlines into a plain loop over the
+ * direct-buffer view, so this JITs to straight loads/stores (unlike Smile's applyFunction,
+ * which megamorphizes).
  */
 inline fun FloatTensor.transformInPlace(f: (Float) -> Float) {
-    for (i in data.indices) {
-        data[i] = f(data[i])
+    for (i in 0 until size) {
+        data.put(i, f(data.get(i)))
     }
     markMutated()
 }
@@ -92,8 +114,8 @@ inline fun FloatTensor.transformInto(out: FloatTensor, f: (Float) -> Float) {
     require(size == out.size) { "transformInto size $size != ${out.size}" }
     val src = data
     val dst = out.data
-    for (i in dst.indices) {
-        dst[i] = f(src[i])
+    for (i in 0 until size) {
+        dst.put(i, f(src.get(i)))
     }
     out.markMutated()
 }

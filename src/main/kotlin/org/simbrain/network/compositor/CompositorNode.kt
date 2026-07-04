@@ -102,6 +102,9 @@ class CompositorNode(
 
     private var marquee: PPath? = null
 
+    /** Invoked after every tier-1 relayout, e.g. so a host can persist tile positions. */
+    var onLayoutChanged: (() -> Unit)? = null
+
     init {
         rebuildEdges()
         relayout()
@@ -137,6 +140,7 @@ class CompositorNode(
                 bounds.width + 2 * MARGIN + LENS_SPACE, bounds.height + 2 * MARGIN
             ), false
         )
+        onLayoutChanged?.invoke()
     }
 
     /** Tier 3: re-run the palette over every value buffer — data untouched, geometry untouched. */

@@ -141,6 +141,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showTransformerBlockCreationDialog()
     }
+    val addLanguageModelAction = networkPanel.createAction(
+        name = "Add language model...",
+        description = "Add a language model (LFM2.5-230M) to the network",
+    ) {
+        showLanguageModelCreationDialog()
+    }
     val addClassifierAction = createAction("Add classifier") {
         networkPanel.showClassifierCreationDialog()
     }

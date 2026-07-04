@@ -28,6 +28,7 @@ data class Lfm2Config(
     val normEps: Float = 1e-5f,
     val convKernel: Int = 3,
     val maxSeqLen: Int = 2048,
+    val eosTokenId: Int = 7,
 ) {
     val kvDim get() = numKvHeads * headDim
 }

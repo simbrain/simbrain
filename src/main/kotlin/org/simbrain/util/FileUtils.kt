@@ -203,43 +203,23 @@ fun fetchDataWithCache(urlString: String): String? {
 }
 
 /**
- * Downloads a zip archive from [url], extracts it (preserving directory structure) into the
- * system cache directory, and returns the root extraction directory.
+ * Downloads [url] into [target], showing a progress window. When [expectedChecksum] is provided
+ * it is verified inline; the algorithm is inferred from the digest length: 32 hex chars → MD5,
+ * 40 → SHA-1, 64 → SHA-256. Partial or corrupt downloads are deleted.
  *
- * On subsequent calls the zip is not re-downloaded: if the extraction directory already exists
- * and is non-empty it is returned immediately.
- *
- * The zip file itself is deleted after successful extraction to save disk space.
- *
- * @param url              URL of the zip archive. Query parameters (e.g. `?download=1`) are
- *                         stripped when deriving the local directory name.
- * @param expectedChecksum Optional hex checksum to verify the download. The algorithm is inferred
- *                         from the digest length: 32 hex chars → MD5, 40 → SHA-1, 64 → SHA-256.
- *                         If verification fails the partial download is deleted and null is returned.
- * @return The root extraction directory, or `null` on failure.
+ * @return true when [target] was written and verified.
  */
-fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
-    val cacheDir = getSystemCacheDirectory()
-    // Strip query string to get a clean filename for the cache dir name
-    val zipName = URI(url).path.substringAfterLast('/')
-    val extractDir = File(cacheDir, zipName.removeSuffix(".zip"))
-
-    if (extractDir.exists() && extractDir.listFiles()?.isNotEmpty() == true) {
-        return extractDir
-    }
-
-    // Resolve digest algorithm before downloading so we can compute it inline
+fun downloadFile(url: String, target: File, expectedChecksum: String? = null): Boolean {
     val digest: MessageDigest? = if (expectedChecksum != null) {
         val algorithm = when (expectedChecksum.length) {
             32   -> "MD5"
             40   -> "SHA-1"
             64   -> "SHA-256"
-            else -> { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return null }
+            else -> { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return false }
         }
         MessageDigest.getInstance(algorithm)
     } else null
 
-    val zipFile = File(cacheDir, zipName)
     var progressWindow: ProgressWindow? = null
     try {
         val client = HttpClient.newBuilder()
@@ -249,17 +229,17 @@ fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
         val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
 
         if (response.statusCode() != 200) {
-            showWarningDialog("Failed to download $zipName (HTTP ${response.statusCode()})")
-            return null
+            showWarningDialog("Failed to download ${target.name} (HTTP ${response.statusCode()})")
+            return false
         }
 
         val contentLength = response.headers().firstValueAsLong("Content-Length").orElse(-1L)
-        progressWindow = ProgressWindow(contentLength.toInt(), "Downloading $zipName…")
+        progressWindow = ProgressWindow(contentLength.toInt(), "Downloading ${target.name}…")
 
         response.body().use { input ->
             // Wrap output in DigestOutputStream when checksum verification is requested,
             // computing the hash inline during download without a second file read.
-            val fileOut = FileOutputStream(zipFile)
+            val fileOut = FileOutputStream(target)
             val output = if (digest != null) DigestOutputStream(fileOut, digest) else fileOut
             output.use { out ->
                 val buffer = ByteArray(8192)
@@ -275,18 +255,66 @@ fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
         progressWindow.close()
     } catch (e: Exception) {
         progressWindow?.close()
-        showWarningDialog("Error downloading $zipName: ${e.message}")
-        zipFile.delete()
-        return null
+        showWarningDialog("Error downloading ${target.name}: ${e.message}")
+        target.delete()
+        return false
     }
 
     if (digest != null && expectedChecksum != null) {
         val actual = digest.digest().joinToString("") { "%02x".format(it) }
         if (!actual.equals(expectedChecksum, ignoreCase = true)) {
-            showWarningDialog("Checksum mismatch for $zipName.\nExpected: $expectedChecksum\nActual:   $actual")
-            zipFile.delete()
-            return null
+            showWarningDialog("Checksum mismatch for ${target.name}.\nExpected: $expectedChecksum\nActual:   $actual")
+            target.delete()
+            return false
         }
+    }
+    return true
+}
+
+/**
+ * Downloads [url] into the system cache under [subDirectory], skipping the download when the file
+ * is already cached. Checksum handling as in [downloadFile].
+ *
+ * @return the cached file, or null on failure.
+ */
+fun fetchFileWithCache(url: String, subDirectory: String, expectedChecksum: String? = null): File? {
+    val fileName = URI(url).path.substringAfterLast('/')
+    val dir = File(getSystemCacheDirectory(), subDirectory)
+    dir.mkdirs()
+    val target = File(dir, fileName)
+    if (target.exists() && target.length() > 0) {
+        return target
+    }
+    return if (downloadFile(url, target, expectedChecksum)) target else null
+}
+
+/**
+ * Downloads a zip archive from [url], extracts it (preserving directory structure) into the
+ * system cache directory, and returns the root extraction directory.
+ *
+ * On subsequent calls the zip is not re-downloaded: if the extraction directory already exists
+ * and is non-empty it is returned immediately.
+ *
+ * The zip file itself is deleted after successful extraction to save disk space.
+ *
+ * @param url              URL of the zip archive. Query parameters (e.g. `?download=1`) are
+ *                         stripped when deriving the local directory name.
+ * @param expectedChecksum Optional hex checksum to verify the download, as in [downloadFile].
+ * @return The root extraction directory, or `null` on failure.
+ */
+fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
+    val cacheDir = getSystemCacheDirectory()
+    // Strip query string to get a clean filename for the cache dir name
+    val zipName = URI(url).path.substringAfterLast('/')
+    val extractDir = File(cacheDir, zipName.removeSuffix(".zip"))
+
+    if (extractDir.exists() && extractDir.listFiles()?.isNotEmpty() == true) {
+        return extractDir
+    }
+
+    val zipFile = File(cacheDir, zipName)
+    if (!downloadFile(url, zipFile, expectedChecksum)) {
+        return null
     }
 
     try {

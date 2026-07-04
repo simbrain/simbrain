@@ -7,6 +7,7 @@ import org.bytedeco.openblas.global.openblas_nolapack.cblas_saxpy
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sdot
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sgemm
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sgemv
+import org.bytedeco.openblas.global.openblas_nolapack.cblas_sger
 import org.bytedeco.openblas.global.openblas_nolapack.cblas_sscal
 
 /**
@@ -79,6 +80,15 @@ fun axpy(alpha: Float, x: FloatTensor, y: FloatTensor) {
 fun scal(alpha: Float, x: FloatTensor) {
     cblas_sscal(x.size, alpha, x.pointer, 1)
     x.markMutated()
+}
+
+/** a += alpha * (x outer y), the rank-1 update backing linear-layer weight gradients. */
+fun ger(x: FloatTensor, y: FloatTensor, a: FloatTensor, alpha: Float = 1f) {
+    require(a.rows == x.size && a.cols == y.size) {
+        "ger ${a.rows}x${a.cols} != ${x.size} outer ${y.size}"
+    }
+    cblas_sger(CblasRowMajor, a.rows, a.cols, alpha, x.pointer, 1, y.pointer, 1, a.pointer, a.cols)
+    a.markMutated()
 }
 
 fun dot(x: FloatTensor, y: FloatTensor): Float {

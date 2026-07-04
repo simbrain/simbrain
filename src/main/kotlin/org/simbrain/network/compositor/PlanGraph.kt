@@ -84,6 +84,9 @@ class PlanGraph(val plan: OpPlan) {
 
     /** The op that writes [name], or null for pure inputs (parameters, clamped ports). */
     fun writer(name: String): TensorOp? = writerOf[name]
+
+    /** The ops that read [name] directly. */
+    fun readers(name: String): List<TensorOp> = readersOf[name] ?: emptyList()
 }
 
 /** One derived diagram edge: anchor [from] to anchor [to], with the [ops] crossed between them. */

@@ -22,11 +22,21 @@ object TeachingCompositor {
             scene.addTile(MatrixTile(
                 model.params.getValue(name),
                 kind = TileKind.WEIGHT,
-                title = title,
+                title = if (weightsTransposed) "${title}ᵀ" else title,
                 displayTransposed = weightsTransposed,
             ).apply {
                 this.x = x; this.y = y
                 width = size; height = size
+            })
+        }
+
+        fun biasTile(name: String, title: String) {
+            scene.addTile(MatrixTile(
+                model.params.getValue(name),
+                kind = TileKind.WEIGHT,
+                title = title,
+            ).apply {
+                width = BIAS_WIDTH; height = BIAS_HEIGHT
             })
         }
 
@@ -77,8 +87,10 @@ object TeachingCompositor {
 
             val mlpTop = top + 420.0
             weightTile("$prefix.mlp.w1", "W1", WEIGHT_X, mlpTop)
+            biasTile("$prefix.mlp.b1", "b1")
             activationTile("$prefix.mlp.act", "hidden (ReLU)", QKV_X, mlpTop, QKV_WIDTH, QKV_HEIGHT)
             weightTile("$prefix.mlp.w2", "W2", DECK_X, mlpTop)
+            biasTile("$prefix.mlp.b2", "b2")
             activationTile("$prefix.mlp.out", "mlp out", ATTN_OUT_X, mlpTop, QKV_WIDTH, QKV_HEIGHT)
             spineTile("$prefix.resid", "residual + mlp", mlpTop + 130.0)
         }
@@ -127,4 +139,6 @@ object TeachingCompositor {
     private const val DECK_X = 540.0
     private const val DECK_SIZE = 130.0
     private const val ATTN_OUT_X = 730.0
+    private const val BIAS_WIDTH = 95.0
+    private const val BIAS_HEIGHT = 8.0
 }

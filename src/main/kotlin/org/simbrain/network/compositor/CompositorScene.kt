@@ -10,6 +10,13 @@ class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp>
 }
 
 /**
+ * A parameter tile that rides the data-flow edge carrying the op that consumes it — a weight
+ * matrix sitting on the line with its multiply, a bias strip on the line with its add. Its
+ * layout rect is derived from the edge's curve at render time, never placed independently.
+ */
+class TileSatellite(val tile: TensorTile, val edge: TileEdge, val op: TensorOp)
+
+/**
  * Self-contained selection over compositor tiles, shaped like the network canvas selection model
  * (add/remove/toggle/set/clear plus change notification) but deliberately separate from it —
  * interior objects aren't network models, so global selection actions don't apply to them.
@@ -79,12 +86,36 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     fun tile(id: String) = _tiles.firstOrNull { it.id == id } ?: error("No tile with id $id")
 
-    /** Derives tile-to-tile edges (and their op decorations) from op-graph reachability. */
+    var satellites: List<TileSatellite> = emptyList()
+        private set
+
+    /**
+     * Derives tile-to-tile edges (and their op decorations) from op-graph reachability.
+     *
+     * Parameter tiles ([TileKind.WEIGHT]) are not edge anchors: each one attaches as a
+     * [TileSatellite] to the edge carrying the op that reads it. A parameter whose consuming op
+     * lies on no edge (e.g. the embedding table, consumed above the first anchor) falls back to
+     * being a standalone anchor with its own edges.
+     */
     fun connectFromGraph() {
         val g = requireNotNull(graph) { "Scene has no plan graph to derive edges from" }
         val byId = _tiles.associateBy { it.id }
-        edges = g.anchorEdges(byId.keys).map {
+        val params = _tiles.filter { it.kind == TileKind.WEIGHT }
+        val coreIds = _tiles.filter { it.kind != TileKind.WEIGHT }.map { it.id }
+        val coreEdges = g.anchorEdges(coreIds)
+        val attachable = params.filter { p ->
+            val readers = g.readers(p.id)
+            coreEdges.any { edge -> edge.ops.any { it in readers } }
+        }
+        val standaloneIds = (params - attachable.toSet()).map { it.id }
+        edges = g.anchorEdges(coreIds + standaloneIds).map {
             TileEdge(byId.getValue(it.from), byId.getValue(it.to), it.ops)
+        }
+        satellites = attachable.map { p ->
+            val readers = g.readers(p.id).toSet()
+            edges.firstNotNullOf { edge ->
+                edge.ops.firstOrNull { it in readers }?.let { TileSatellite(p, edge, it) }
+            }
         }
     }
 

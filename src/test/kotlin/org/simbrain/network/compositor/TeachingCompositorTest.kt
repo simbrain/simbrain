@@ -30,12 +30,32 @@ class TeachingCompositorTest {
         assertTrue(intoQ.ops.any { it is LayerNormOp }, "limb entry crosses the pre-norm")
         assertTrue(intoQ.ops.any { it is MatMulLinearOp })
 
-        assertTrue(("layers.0.attn.wq" to "layers.0.attn.q") in edges, "weight tiles feed their projections")
         assertTrue(("layers.0.attn.q" to "layers.0.attn.weights") in edges)
         assertTrue(("layers.0.attn.weights" to "layers.0.attn.out") in edges)
         assertTrue(("layers.0.attn_resid" to "layers.0.resid") in edges, "second skip edge")
         assertTrue(("layers.0.resid" to "logits") in edges)
         assertTrue(("logits" to "probs") in edges)
+    }
+
+    @Test
+    fun `weight and bias tiles ride the edges carrying their consuming ops`() {
+        val scene = TeachingCompositor.buildScene(model())
+        val satellites = scene.satellites.associateBy { it.tile.id }
+
+        val wq = satellites.getValue("layers.0.attn.wq")
+        assertEquals("resid0" to "layers.0.attn.q", wq.edge.from.id to wq.edge.to.id,
+            "Wq rides the limb-entry edge with its projection op")
+        assertTrue(wq.op is MatMulLinearOp)
+
+        val b1 = satellites.getValue("layers.0.mlp.b1")
+        assertEquals("layers.0.mlp.act", b1.edge.to.id, "the bias strip rides the edge into the hidden tile")
+
+        assertTrue("unembed.weight" in satellites)
+        assertTrue("embed.table" !in satellites, "the embedding consumes above the first anchor")
+        val edgeEndpoints = scene.edges.map { it.from.id to it.to.id }
+        assertTrue(("embed.table" to "resid0") in edgeEndpoints, "standalone parameters keep their own edges")
+        assertTrue(scene.edges.none { it.from.id == "layers.0.attn.wq" || it.to.id == "layers.0.attn.wq" },
+            "satellite parameters are not edge anchors")
     }
 
     @Test

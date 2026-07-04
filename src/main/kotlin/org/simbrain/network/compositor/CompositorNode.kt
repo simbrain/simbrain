@@ -272,7 +272,7 @@ class CompositorNode(
 
     private fun opSymbol(op: TensorOp): String = when (op) {
         is AddOp -> "+"
-        is BiasOp -> "+b"
+        is BiasOp -> "+"
         is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp -> "×"
         is LayerNormOp, is RmsNormOp -> "LN"
         is CausalMaskedRowSoftmaxOp -> "σ"
@@ -290,6 +290,7 @@ class CompositorNode(
         edgeLayer.removeAllChildren()
         glyphsByOp.clear()
         routesByEdge.clear()
+        val satellitesByEdge = scene.satellites.groupBy { it.edge }
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
             val route = bezierRoute(edge.from.bounds, edge.to.bounds, edge.waypoints, headPadding = TIP_LENGTH)
@@ -310,14 +311,25 @@ class CompositorNode(
                 pickable = false
                 edgeLayer.addChild(this)
             }
-            val newOps = edge.ops.filter { it !in glyphsByOp }
-            for ((i, op) in newOps.withIndex()) {
-                val t = (i + 1).toDouble() / (newOps.size + 1)
-                val at = route.pointAt(t)
-                OpGlyphNode(op).apply {
-                    setOffset(at.x, at.y)
-                    glyphsByOp[op] = this
-                    edgeLayer.addChild(this)
+            val satellitesByOp = satellitesByEdge[edge]?.associateBy { it.op } ?: emptyMap()
+            for ((i, op) in edge.ops.withIndex()) {
+                val at = route.pointAt((i + 1).toDouble() / (edge.ops.size + 1))
+                val satellite = satellitesByOp[op]
+                if (satellite != null) {
+                    satellite.tile.x = at.x - satellite.tile.width / 2
+                    satellite.tile.y = at.y - satellite.tile.height / 2
+                    tileNodesById.getValue(satellite.tile.id).syncLayout()
+                }
+                if (op !in glyphsByOp) {
+                    OpGlyphNode(op).apply {
+                        if (satellite != null) {
+                            setOffset(satellite.tile.x + satellite.tile.width, satellite.tile.y + satellite.tile.height)
+                        } else {
+                            setOffset(at.x, at.y)
+                        }
+                        glyphsByOp[op] = this
+                        edgeLayer.addChild(this)
+                    }
                 }
             }
         }

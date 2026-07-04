@@ -1,8 +1,9 @@
 package org.simbrain.network.compositor
 
+import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.NetworkTheme
 
-class TileEdge(val from: TensorTile, val to: TensorTile)
+class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp> = emptyList())
 
 /**
  * Self-contained selection over compositor tiles, shaped like the network canvas selection model
@@ -74,11 +75,13 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     fun tile(id: String) = _tiles.firstOrNull { it.id == id } ?: error("No tile with id $id")
 
-    /** Derives tile-to-tile edges from op-graph reachability between the tiles' ports. */
+    /** Derives tile-to-tile edges (and their op decorations) from op-graph reachability. */
     fun connectFromGraph() {
         val g = requireNotNull(graph) { "Scene has no plan graph to derive edges from" }
         val byId = _tiles.associateBy { it.id }
-        edges = g.anchorEdges(byId.keys).map { (from, to) -> TileEdge(byId.getValue(from), byId.getValue(to)) }
+        edges = g.anchorEdges(byId.keys).map {
+            TileEdge(byId.getValue(it.from), byId.getValue(it.to), it.ops)
+        }
     }
 
     /** Copies this token's values into every tile and refreshes the lens. Compute-thread side. */

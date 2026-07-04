@@ -53,13 +53,26 @@ class PlanGraphTest {
     @Test
     fun `anchor edges stop at intermediate anchors but keep bypass paths`() {
         val (_, graph) = diamond()
-        val edges = graph.anchorEdges(listOf("a", "b", "d")).toSet()
+        val edges = graph.anchorEdges(listOf("a", "b", "d")).map { it.from to it.to }.toSet()
         assertEquals(setOf("a" to "b", "b" to "d", "a" to "d"), edges)
     }
 
     @Test
     fun `anchor edges through unanchored ports collapse to one hop`() {
         val (_, graph) = diamond()
-        assertEquals(listOf("x" to "d"), graph.anchorEdges(listOf("x", "d")))
+        assertEquals(listOf("x" to "d"), graph.anchorEdges(listOf("x", "d")).map { it.from to it.to })
+    }
+
+    @Test
+    fun `anchor edges carry the ops crossed between the anchors`() {
+        val (_, graph) = diamond()
+        val edges = graph.anchorEdges(listOf("a", "b", "d")).associateBy { it.from to it.to }
+        assertEquals(listOf("l2"), edges.getValue("a" to "b").ops.map { it.name })
+        assertEquals(listOf("add", "l3"), edges.getValue("b" to "d").ops.map { it.name })
+        assertEquals(setOf("add", "l3"), edges.getValue("a" to "d").ops.map { it.name }.toSet())
+
+        val collapsed = graph.anchorEdges(listOf("x", "d")).single()
+        assertTrue(collapsed.ops.any { it.name == "l1" }, "first op on the path must be carried")
+        assertTrue(collapsed.ops.any { it.name == "l3" }, "last op on the path must be carried")
     }
 }

@@ -225,6 +225,71 @@ class MatrixTile(
 }
 
 /**
+ * A stacked rank-3 tile: the source tensor holds [slices] stacked row blocks (slice s occupying
+ * rows [s*rows, (s+1)*rows)) — per-head attention maps, per-head projections — and the tile
+ * renders one slice at a time. Every slice is retained in a cube on publish, so [selectedSlice]
+ * flips instantly by reshading from memory with zero recompute. Full-pass semantics like
+ * [MatrixTile]: publish is version-gated and ignores the token index.
+ */
+class DeckTile(
+    id: String,
+    title: String,
+    val tensor: FloatTensor,
+    val slices: Int,
+    kind: TileKind = TileKind.ATTENTION,
+    signedNorm: Boolean = false,
+) : TensorTile(id, title, tensor.rows / slices, tensor.cols, signedNorm, kind) {
+
+    constructor(
+        port: TensorPort,
+        slices: Int,
+        kind: TileKind = TileKind.ATTENTION,
+        title: String = port.name,
+        signedNorm: Boolean = false,
+    ) : this(port.name, title, port.tensor, slices, kind, signedNorm)
+
+    init {
+        require(tensor.rows % slices == 0) { "${tensor.rows} rows not divisible into $slices slices" }
+    }
+
+    private val cube = FloatArray(tensor.rows * tensor.cols)
+    private var lastVersion = -1L
+
+    var selectedSlice = 0
+        set(value) {
+            require(value in 0 until slices) { "Slice $value out of range 0..${slices - 1}" }
+            if (field != value) {
+                field = value
+                rebuildFromCube()
+            }
+        }
+
+    override fun reset() {
+        super.reset()
+        cube.fill(0f)
+        lastVersion = -1L
+    }
+
+    @Synchronized
+    override fun publish(tokenIndex: Int) {
+        if (tensor.version == lastVersion) return
+        lastVersion = tensor.version
+        for (i in cube.indices) cube[i] = tensor.data.get(i)
+        var max = 0f
+        for (v in cube) max = maxOf(max, abs(v))
+        growAbsMax(max)
+        System.arraycopy(cube, selectedSlice * rows * cols, values, 0, rows * cols)
+        markAllDirty()
+    }
+
+    @Synchronized
+    private fun rebuildFromCube() {
+        System.arraycopy(cube, selectedSlice * rows * cols, values, 0, rows * cols)
+        markAllDirty()
+    }
+}
+
+/**
  * The causal attention-map tile: row t holds the selected head's softmaxed attention over
  * positions 0..t at token t, building the familiar lower triangle as generation runs. History
  * for every head is retained, so [selectedHead] switches instantly by reshading from stored

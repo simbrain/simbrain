@@ -8,9 +8,13 @@ import kotlin.math.sqrt
 
 /**
  * The logit lens: projects each source port (typically the residual stream after every layer)
- * through the model's final norm and tied unembedding, reading off the top predicted token per
- * layer — the prediction sharpening layer by layer as generation runs. With tied embeddings this
- * is one norm + one vocab-sized matvec per layer, computed on the compute thread at publish time.
+ * through the model's final norm and unembedding, reading off the top predicted token per
+ * layer — the prediction sharpening layer by layer as generation runs. One norm + one
+ * vocab-sized matvec per layer, computed on the compute thread at publish time.
+ *
+ * Decode-shaped sources are 1 x dim vectors; full-sequence sources are seq x dim matrices with
+ * [sourceRow] selecting the position the lens reads (the position about to predict). RMSNorm by
+ * default; [meanCenter] plus [normBias] make it the LayerNorm a GPT-style teaching model uses.
  *
  * For the last layer's residual the lens is exactly the model's own output distribution, since it
  * applies the same norm and unembedding the model does.
@@ -20,6 +24,8 @@ class LogitLens(
     private val normWeight: FloatTensor,
     private val eps: Float,
     val sources: List<TensorPort>,
+    private val normBias: FloatTensor? = null,
+    private val meanCenter: Boolean = false,
 ) {
 
     class Reading {
@@ -34,6 +40,15 @@ class LogitLens(
     /** Lens GEMVs cost ~3.5 ms per layer; turn off to decode at full speed. */
     var enabled = true
 
+    /** Which row of each source matrix the lens projects. Changing it re-reads every source. */
+    var sourceRow = 0
+        set(value) {
+            if (field != value) {
+                field = value
+                reset()
+            }
+        }
+
     private val normed = FloatTensor(1, embedWeight.cols)
     private val logits = FloatTensor(1, embedWeight.rows)
     private val lastVersions = LongArray(sources.size) { -1L }
@@ -46,22 +61,29 @@ class LogitLens(
             val tensor = source.tensor
             if (tensor.version == lastVersions[i]) continue
             lastVersions[i] = tensor.version
-            rmsNorm(tensor)
+            norm(tensor)
             matvec(embedWeight, normed, logits)
             readOff(readings[i])
         }
     }
 
-    private fun rmsNorm(x: FloatTensor) {
-        val n = x.size
+    private fun norm(x: FloatTensor) {
+        val n = x.cols
+        val base = sourceRow.coerceIn(0, x.rows - 1) * n
+        var mean = 0f
+        if (meanCenter) {
+            for (j in 0 until n) mean += x.data.get(base + j)
+            mean /= n
+        }
         var sumSquares = 0f
         for (j in 0 until n) {
-            val v = x.data.get(j)
+            val v = x.data.get(base + j) - mean
             sumSquares += v * v
         }
         val inv = 1f / sqrt(sumSquares / n + eps)
         for (j in 0 until n) {
-            normed.data.put(j, x.data.get(j) * inv * normWeight.data.get(j))
+            val bias = normBias?.data?.get(j) ?: 0f
+            normed.data.put(j, (x.data.get(base + j) - mean) * inv * normWeight.data.get(j) + bias)
         }
         normed.markMutated()
     }

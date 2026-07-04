@@ -1,0 +1,105 @@
+package org.simbrain.network.compositor
+
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.simbrain.network.llm.TeachingTransformerConfig
+import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.tensor.op.AddOp
+import org.simbrain.network.tensor.op.LayerNormOp
+import org.simbrain.network.tensor.op.MatMulLinearOp
+import kotlin.math.abs
+
+class TeachingCompositorTest {
+
+    private fun model() = TeachingTransformerModel(TeachingTransformerConfig(
+        contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = 1
+    ))
+
+    @Test
+    fun `spine checkpoints chain and the skip edge rejoins through the residual add`() {
+        val scene = TeachingCompositor.buildScene(model())
+        val edges = scene.edges.associateBy { it.from.id to it.to.id }
+
+        val skip = edges.getValue("resid0" to "layers.0.attn_resid")
+        assertTrue(skip.ops.any { it is AddOp }, "the trunk skip edge carries the residual add glyph")
+        val limbReturn = edges.getValue("layers.0.attn.out" to "layers.0.attn_resid")
+        assertTrue(limbReturn.ops.any { it is AddOp })
+
+        val intoQ = edges.getValue("resid0" to "layers.0.attn.q")
+        assertTrue(intoQ.ops.any { it is LayerNormOp }, "limb entry crosses the pre-norm")
+        assertTrue(intoQ.ops.any { it is MatMulLinearOp })
+
+        assertTrue(("layers.0.attn.wq" to "layers.0.attn.q") in edges, "weight tiles feed their projections")
+        assertTrue(("layers.0.attn.q" to "layers.0.attn.weights") in edges)
+        assertTrue(("layers.0.attn.weights" to "layers.0.attn.out") in edges)
+        assertTrue(("layers.0.attn_resid" to "layers.0.resid") in edges, "second skip edge")
+        assertTrue(("layers.0.resid" to "logits") in edges)
+        assertTrue(("logits" to "probs") in edges)
+    }
+
+    @Test
+    fun `forward pass fills spine deck and probability tiles through full-pass publish`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        model.setSample(intArrayOf(1, 2, 3, 4, 0))
+        model.forward()
+        scene.publish()
+
+        val spine = scene.tile("resid0")
+        assertTrue((0 until spine.cols).any { spine.valueAt(0, it) != 0f }, "spine received the residual")
+
+        val deck = scene.tile("layers.0.attn.weights") as DeckTile
+        for (row in 0 until deck.rows) {
+            var sum = 0f
+            for (col in 0..row) sum += deck.valueAt(row, col)
+            assertTrue(abs(sum - 1f) < 1e-5f, "head 0 row $row attention sums to $sum")
+            for (col in row + 1 until deck.cols) {
+                assertEquals(0f, deck.valueAt(row, col), 0f, "masked cell ($row,$col)")
+            }
+        }
+        val head0 = deck.valueAt(1, 0)
+        deck.selectedSlice = 1
+        assertTrue(abs(deck.valueAt(1, 0) + deck.valueAt(1, 1) - 1f) < 1e-5f, "head 1 rows normalized too")
+        deck.selectedSlice = 0
+        assertEquals(head0, deck.valueAt(1, 0), 0f, "flipping back restores head 0 from the cube")
+
+        val probsTile = scene.tile("probs")
+        var probSum = 0f
+        for (col in 0 until probsTile.cols) probSum += probsTile.valueAt(0, col)
+        assertTrue(abs(probSum - 1f) < 1e-5f, "probability rows sum to 1")
+    }
+
+    @Test
+    fun `lens reads the selected position through the model's own head`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        model.setSample(intArrayOf(1, 2, 3))
+        model.forward()
+        val lens = scene.lens!!
+        lens.sourceRow = 2
+        scene.publish()
+
+        val lastReading = lens.readings.last()
+        val distribution = model.distributionAt(2)
+        val expectedToken = distribution.indices.maxBy { distribution[it] }
+        assertEquals(expectedToken, lastReading.tokenId,
+            "the last checkpoint's lens is the model's own prediction")
+        assertEquals(distribution[expectedToken], lastReading.prob, 1e-4f)
+    }
+
+    @Test
+    fun `weight tiles refresh when a training step bumps parameter versions`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        model.setSample(intArrayOf(1, 2, 3, 4, 0))
+        model.forward()
+        scene.publish()
+        val wq = scene.tile("layers.0.attn.wq")
+        val before = wq.values.copyOf()
+
+        model.trainStep(intArrayOf(1, 2, 3, 4, 0), intArrayOf(2, 3, 4, 0, 1))
+        scene.publish()
+        assertTrue(!before.contentEquals(wq.values), "Adam's version bump must republish the weight tile")
+    }
+}

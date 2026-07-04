@@ -6,6 +6,23 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.tensor.op.AddOp
+import org.simbrain.network.tensor.op.BiasOp
+import org.simbrain.network.tensor.op.CausalMaskedRowSoftmaxOp
+import org.simbrain.network.tensor.op.HeadMixOp
+import org.simbrain.network.tensor.op.HeadScoresOp
+import org.simbrain.network.tensor.op.LayerNormOp
+import org.simbrain.network.tensor.op.LinearOp
+import org.simbrain.network.tensor.op.MatMulLinearOp
+import org.simbrain.network.tensor.op.MergeHeadsOp
+import org.simbrain.network.tensor.op.ReLUOp
+import org.simbrain.network.tensor.op.RmsNormOp
+import org.simbrain.network.tensor.op.SeqEmbedOp
+import org.simbrain.network.tensor.op.SeqSoftmaxCrossEntropyOp
+import org.simbrain.network.tensor.op.SiluGateOp
+import org.simbrain.network.tensor.op.SoftmaxCrossEntropyOp
+import org.simbrain.network.tensor.op.SplitHeadsOp
+import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
 import org.simbrain.util.piccolo.SimbrainImage
@@ -14,6 +31,7 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import kotlin.math.abs
 
 /**
  * Renders a [CompositorScene] as one Piccolo node: tile rasters ([SimbrainImage] children, whose
@@ -41,6 +59,15 @@ class CompositorNode(
     private val edgeLayer = PNode().also { addChild(it) }
 
     private inner class TileNode(val tile: TensorTile) : PNode() {
+        /** Dimmed offset cards behind a deck's live front slice — the 2.5D stack. */
+        val backCards: List<PPath> = if (tile is DeckTile && tile.slices > 1) {
+            (minOf(tile.slices - 1, MAX_BACK_CARDS) downTo 1).map { i ->
+                PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
+                    pickable = false
+                    setOffset(-DECK_STEP * i, -DECK_STEP * i)
+                }.also { addChild(it) }
+            }
+        } else emptyList()
         val raster = SimbrainImage(tile.image).apply {
             setBounds(0.0, 0.0, tile.width, tile.height)
         }.also { addChild(it) }
@@ -59,6 +86,11 @@ class CompositorNode(
         fun syncLayout() {
             setOffset(tile.x, tile.y)
             label.setOffset(0.0, tile.height + 3.0)
+            syncLabel()
+        }
+
+        fun syncLabel() {
+            label.text = if (tile is DeckTile) "${tile.title} · head ${tile.selectedSlice}" else tile.title
         }
 
         fun syncHighlight() {
@@ -72,6 +104,11 @@ class CompositorNode(
                 tile in scene.tracedTiles -> palette.receptiveFieldTrace
                 tile.kind == TileKind.WEIGHT -> palette.weightMatrixBoundary
                 else -> palette.imageBorder
+            }
+            backCards.forEach {
+                it.paint = palette.canvasBackground
+                it.strokePaint = palette.imageBorder
+                it.stroke = BasicStroke(1f)
             }
         }
     }
@@ -163,22 +200,100 @@ class CompositorNode(
         rebuildEdges()
     }
 
+    /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
+    private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()
+
+    /**
+     * A small operation glyph strung on a data-flow edge: circled symbols for the arithmetic ops
+     * (the old transformer node's junction/multiply decorations, now derived from the plan) and
+     * abbreviations for the rest.
+     */
+    inner class OpGlyphNode(val op: TensorOp) : PNode() {
+        private val symbol = opSymbol(op)
+        private val circular = symbol.length == 1
+        val shape: PPath = if (circular) {
+            PPath.createEllipse(-GLYPH_RADIUS, -GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS)
+        } else {
+            PPath.createRoundRectangle(
+                -GLYPH_RADIUS * 1.6, -GLYPH_RADIUS * 0.8,
+                GLYPH_RADIUS * 3.2, GLYPH_RADIUS * 1.6, 4.0, 4.0
+            )
+        }.also { addChild(it) }
+        private val text = PText(symbol).apply {
+            font = Theme.tiny
+        }.also { addChild(it) }
+
+        var glowing = false
+            set(value) {
+                field = value
+                syncTheme()
+            }
+
+        init {
+            pickable = false
+            syncTheme()
+        }
+
+        fun syncTheme() {
+            val palette = NetworkTheme.current
+            shape.paint = palette.canvasBackground
+            shape.strokePaint = if (glowing) palette.sourceHandle else palette.connectionLine
+            shape.stroke = BasicStroke(if (glowing) 2.5f else 1f)
+            text.textPaint = palette.valueText
+            text.setOffset(-text.width / 2, -text.height / 2)
+        }
+
+        fun containsScenePoint(sceneX: Double, sceneY: Double): Boolean {
+            val reach = GLYPH_RADIUS * if (circular) 1.0 else 1.8
+            return abs(sceneX - xOffset) <= reach && abs(sceneY - yOffset) <= reach
+        }
+    }
+
+    private fun opSymbol(op: TensorOp): String = when (op) {
+        is AddOp -> "+"
+        is BiasOp -> "+b"
+        is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp -> "×"
+        is LayerNormOp, is RmsNormOp -> "LN"
+        is CausalMaskedRowSoftmaxOp -> "σ"
+        is SoftmaxCrossEntropyOp, is SeqSoftmaxCrossEntropyOp -> "CE"
+        is ReLUOp -> "ReLU"
+        is SiluGateOp -> "SiLU"
+        is SplitHeadsOp -> "split"
+        is MergeHeadsOp -> "merge"
+        is SeqEmbedOp -> "emb"
+        else -> op.name.substringAfterLast('.')
+    }
+
     private fun rebuildEdges() {
         val palette = NetworkTheme.current
         edgeLayer.removeAllChildren()
+        glyphsByOp.clear()
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
-            PPath.createLine(
-                edge.from.x + edge.from.width / 2, edge.from.y + edge.from.height / 2,
-                edge.to.x + edge.to.width / 2, edge.to.y + edge.to.height / 2
-            ).apply {
+            val fromX = edge.from.x + edge.from.width / 2
+            val fromY = edge.from.y + edge.from.height / 2
+            val toX = edge.to.x + edge.to.width / 2
+            val toY = edge.to.y + edge.to.height / 2
+            PPath.createLine(fromX, fromY, toX, toY).apply {
                 stroke = BasicStroke(if (traced) 3f else 1.5f)
                 strokePaint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
                 pickable = false
                 edgeLayer.addChild(this)
             }
+            val newOps = edge.ops.filter { it !in glyphsByOp }
+            for ((i, op) in newOps.withIndex()) {
+                val t = (i + 1).toDouble() / (newOps.size + 1)
+                OpGlyphNode(op).apply {
+                    setOffset(fromX + (toX - fromX) * t, fromY + (toY - fromY) * t)
+                    glyphsByOp[op] = this
+                    edgeLayer.addChild(this)
+                }
+            }
         }
     }
+
+    /** The glyph rendered for [op], if any edge carries it. */
+    fun glyphFor(op: TensorOp): OpGlyphNode? = glyphsByOp[op]
 
     private inner class InteriorInputHandler : PBasicInputEventHandler() {
 
@@ -261,9 +376,24 @@ class CompositorNode(
             pressPoint = null
         }
 
+        override fun mouseWheelRotated(event: PInputEvent) {
+            val point = event.getPositionRelativeTo(this@CompositorNode)
+            val tile = scene.tileAt(point.x, point.y) as? DeckTile ?: return
+            val next = (tile.selectedSlice + event.wheelRotation).mod(tile.slices)
+            tile.selectedSlice = next
+            tileNodesById.getValue(tile.id).syncLabel()
+            refreshDirtyTiles()
+            event.isHandled = true
+        }
+
         override fun mouseMoved(event: PInputEvent) {
             val target = canvas ?: return
             val point = event.getPositionRelativeTo(this@CompositorNode)
+            val glyph = glyphsByOp.values.firstOrNull { it.containsScenePoint(point.x, point.y) }
+            if (glyph != null) {
+                target.toolTipText = glyph.op.toString()
+                return
+            }
             val tile = scene.tileAt(point.x, point.y)
             val cell = tile?.cellAt(point.x, point.y)
             target.toolTipText = if (tile != null && cell != null) cellReadout(tile, cell.first, cell.second) else null
@@ -284,5 +414,8 @@ class CompositorNode(
     companion object {
         private const val MARGIN = 40.0
         private const val LENS_SPACE = 220.0
+        private const val DECK_STEP = 4.0
+        private const val MAX_BACK_CARDS = 5
+        private const val GLYPH_RADIUS = 7.0
     }
 }

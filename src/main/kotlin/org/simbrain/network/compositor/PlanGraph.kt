@@ -54,25 +54,32 @@ class PlanGraph(val plan: OpPlan) {
      * tiles): an edge a -> b exists when some op path leads from a to b without passing through
      * any other anchor. This yields exactly the arrows a block diagram wants — e.g. residual
      * stream tiles chain layer to layer, with an extra hop through an attention-weights tile
-     * where data really flows through it.
+     * where data really flows through it. Each edge carries the ops crossed on the way (from at
+     * least one such path), so renderers can decorate edges with operation glyphs.
      */
-    fun anchorEdges(anchors: Collection<String>): List<Pair<String, String>> {
+    fun anchorEdges(anchors: Collection<String>): List<EdgePath> {
         val anchorSet = anchors.toSet()
-        val edges = LinkedHashSet<Pair<String, String>>()
+        val edges = LinkedHashMap<Pair<String, String>, LinkedHashSet<TensorOp>>()
         for (anchor in anchors) {
             val visited = HashSet<String>()
-            val stack = ArrayDeque<String>()
-            readersOf[anchor]?.forEach { op -> op.outputs.forEach { stack.add(it.name) } }
+            val stack = ArrayDeque<Pair<String, List<TensorOp>>>()
+            readersOf[anchor]?.forEach { op -> op.outputs.forEach { stack.add(it.name to listOf(op)) } }
             while (stack.isNotEmpty()) {
-                val port = stack.removeLast()
-                if (!visited.add(port)) continue
+                val (port, opsSoFar) = stack.removeLast()
                 if (port in anchorSet) {
-                    if (port != anchor) edges.add(anchor to port)
+                    if (port != anchor) edges.getOrPut(anchor to port) { LinkedHashSet() }.addAll(opsSoFar)
                     continue
                 }
-                readersOf[port]?.forEach { op -> op.outputs.forEach { stack.add(it.name) } }
+                if (!visited.add(port)) continue
+                readersOf[port]?.forEach { op -> op.outputs.forEach { stack.add(it.name to (opsSoFar + op)) } }
             }
         }
-        return edges.toList()
+        return edges.map { (endpoints, ops) -> EdgePath(endpoints.first, endpoints.second, ops.toList()) }
     }
+
+    /** The op that writes [name], or null for pure inputs (parameters, clamped ports). */
+    fun writer(name: String): TensorOp? = writerOf[name]
 }
+
+/** One derived diagram edge: anchor [from] to anchor [to], with the [ops] crossed between them. */
+class EdgePath(val from: String, val to: String, val ops: List<TensorOp>)

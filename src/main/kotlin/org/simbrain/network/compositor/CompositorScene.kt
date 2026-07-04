@@ -123,6 +123,30 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     fun tilesIn(x: Double, y: Double, w: Double, h: Double) = _tiles.filter { it.intersects(x, y, w, h) }
 
+    /**
+     * The tiles a mid-pass forward step has NOT yet reached: their writer op's schedule index is
+     * at or past [cursor]. At a step boundary (cursor 0) nothing is stale. Tiles with no writer
+     * op (parameters) are never stale.
+     */
+    fun staleTiles(cursor: Int): Set<TensorTile> {
+        val g = graph ?: return emptySet()
+        if (cursor == 0) return emptySet()
+        return _tiles.filter { tile ->
+            val writer = g.writerIndex(tile.id)
+            writer != null && writer >= cursor
+        }.toSet()
+    }
+
+    /**
+     * Swaps every tile that has a gradient buffer between its forward values and its gradients
+     * (the training-mode backward view); tiles without one keep showing forward values.
+     */
+    fun setGradientView(enabled: Boolean) {
+        for (tile in _tiles) {
+            (tile as? MatrixTile)?.let { if (it.gradientSource != null) it.showingGradient = enabled }
+        }
+    }
+
     var traceFocus: TensorTile? = null
         private set
 

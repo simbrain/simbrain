@@ -89,6 +89,52 @@ class TeachingCompositorTest {
     }
 
     @Test
+    fun `stale tiles shrink as a stepped pass advances and clear at the boundary`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        assertTrue(scene.staleTiles(0).isEmpty(), "nothing is stale at a step boundary")
+
+        model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4, 0), intArrayOf(2, 3, 4, 0, 1))
+        model.stepOp()
+        val afterEmbed = scene.staleTiles(model.plan.cursor)
+        assertTrue(scene.tile("resid0") in afterEmbed, "resid0 is written by the second op")
+        assertTrue(scene.tile("probs") in afterEmbed)
+        assertTrue(scene.tile("embed.table") !in afterEmbed, "parameter tiles are never stale")
+
+        var lastSize = afterEmbed.size
+        while (model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) {
+            model.stepOp()
+            val stale = scene.staleTiles(model.plan.cursor)
+            assertTrue(stale.size <= lastSize, "stale set only shrinks during the pass")
+            lastSize = stale.size
+        }
+        assertTrue(scene.staleTiles(model.plan.cursor).isEmpty())
+        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) model.stepOp()
+    }
+
+    @Test
+    fun `gradient view swaps tiles to gradient buffers and back`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4, 0), intArrayOf(2, 3, 4, 0, 1))
+        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) model.stepOp()
+
+        scene.publish()
+        val wq = scene.tile("layers.0.attn.wq") as MatrixTile
+        val forwardValues = wq.values.copyOf()
+
+        scene.setGradientView(true)
+        scene.publish()
+        val gradients = model.grads.of(model.params.getValue("layers.0.attn.wq").tensor)
+        assertEquals(gradients.data.get(0), wq.valueAt(0, 0), 0f, "gradient view reads the gradient buffer")
+        assertTrue((0 until wq.values.size).any { wq.values[it] != forwardValues[it] })
+
+        scene.setGradientView(false)
+        scene.publish()
+        assertTrue(forwardValues.contentEquals(wq.values), "leaving gradient view restores forward values")
+    }
+
+    @Test
     fun `weight tiles refresh when a training step bumps parameter versions`() {
         val model = model()
         val scene = TeachingCompositor.buildScene(model)

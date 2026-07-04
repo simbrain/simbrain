@@ -195,9 +195,71 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
         plan.forward(tape)
         val lossValue = loss.tensor.data.get(0)
         tape.backward(loss, grads)
+        applyOptimizer()
+        return lossValue
+    }
+
+    private fun applyOptimizer() {
         adam.step()
         params.forEach { (name, port) -> adam.update(name, port.tensor, grads.of(port.tensor)) }
-        return lossValue
+    }
+
+    enum class StepPhase { IDLE, FORWARD, BACKWARD }
+
+    /** Where a micro-stepped training step currently is; [stepOp] advances through the phases. */
+    var stepPhase = StepPhase.IDLE
+        private set
+
+    /**
+     * Arms a micro-stepped training step on [tokens]/[targets]: subsequent [stepOp] calls run one
+     * op at a time — the whole forward pass, then every VJP in reverse, then the Adam update —
+     * with [stepPhase] tracking where the walk is.
+     */
+    fun beginSteppedTrainStep(tokens: IntArray, targets: IntArray) {
+        check(stepPhase == StepPhase.IDLE) { "A stepped train step is already in progress" }
+        check(plan.cursor == 0) { "Plan is mid-pass at op ${plan.cursor}" }
+        setSample(tokens, targets)
+        tape.clear()
+        grads.zeroAll()
+        stepPhase = StepPhase.FORWARD
+    }
+
+    /** The op the next [stepOp] will run, or null when idle. */
+    fun nextOp(): TensorOp? = when (stepPhase) {
+        StepPhase.IDLE -> null
+        StepPhase.FORWARD -> plan.ops[plan.cursor]
+        StepPhase.BACKWARD -> tape.peekBackward()
+    }
+
+    /**
+     * Advances a stepped training step by one op. Forward completion arms the backward pass;
+     * backward completion applies the optimizer and returns to idle.
+     */
+    fun stepOp(): TensorOp {
+        return when (stepPhase) {
+            StepPhase.IDLE -> error("No stepped train step in progress; call beginSteppedTrainStep")
+            StepPhase.FORWARD -> plan.stepOp(tape).also {
+                if (plan.cursor == 0) {
+                    tape.beginBackward(loss, grads)
+                    stepPhase = StepPhase.BACKWARD
+                }
+            }
+            StepPhase.BACKWARD -> tape.stepBackward(grads).also {
+                if (!tape.isBackwardInProgress) {
+                    applyOptimizer()
+                    stepPhase = StepPhase.IDLE
+                }
+            }
+        }
+    }
+
+    /**
+     * Advances a plain inference pass by one op (no tape, no gradients) — token/layer/op-level
+     * stepping outside training. Only valid when no stepped training step is active.
+     */
+    fun stepForwardOnly(): TensorOp {
+        check(stepPhase == StepPhase.IDLE) { "A stepped train step is in progress" }
+        return plan.stepOp()
     }
 
     /** Next-token distribution at [position] (the row of [probs] the next token is sampled from). */

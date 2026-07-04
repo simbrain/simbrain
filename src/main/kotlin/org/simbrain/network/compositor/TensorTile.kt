@@ -71,6 +71,12 @@ abstract class TensorTile(
         fullReshade = true
     }
 
+    /** Forgets the signed-normalization scale — for view switches to differently-scaled data. */
+    protected fun resetScale() {
+        absMax = 0f
+        markAllDirty()
+    }
+
     /**
      * Grows the signed-normalization scale. Growth invalidates every already-shaded pixel, so the
      * whole tile reshades; the scale never shrinks mid-run, keeping steady-state cost at one row.
@@ -189,6 +195,21 @@ class MatrixTile(
 
     private var lastVersion = -1L
 
+    /**
+     * The tile's gradient buffer, when a scene supports the training-mode gradient view. Not
+     * version-gated: VJPs accumulate into gradient buffers through hot loops that don't bump
+     * versions, so gradient publishes always re-copy.
+     */
+    var gradientSource: FloatTensor? = null
+
+    var showingGradient = false
+        set(value) {
+            if (field == value) return
+            field = value
+            lastVersion = -1L
+            resetScale()
+        }
+
     override fun reset() {
         super.reset()
         lastVersion = -1L
@@ -196,16 +217,18 @@ class MatrixTile(
 
     @Synchronized
     override fun publish(tokenIndex: Int) {
-        if (versionGated && tensor.version == lastVersion) return
-        lastVersion = tensor.version
+        val source = if (showingGradient) gradientSource ?: return else tensor
+        val gate = versionGated && !showingGradient
+        if (gate && source.version == lastVersion) return
+        lastVersion = source.version
         if (displayTransposed) {
             for (r in 0 until rows) {
                 for (c in 0 until cols) {
-                    values[r * cols + c] = tensor.data.get(c * tensor.cols + r)
+                    values[r * cols + c] = source.data.get(c * source.cols + r)
                 }
             }
         } else {
-            for (i in values.indices) values[i] = tensor.data.get(i)
+            for (i in values.indices) values[i] = source.data.get(i)
         }
         growAbsMax(normalizationScale())
         markAllDirty()

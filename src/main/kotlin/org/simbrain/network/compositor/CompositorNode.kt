@@ -290,10 +290,28 @@ class CompositorNode(
                 }
             }
         }
+        currentStepOp?.let { glyphsByOp[it]?.glowing = true }
     }
 
     /** The glyph rendered for [op], if any edge carries it. */
     fun glyphFor(op: TensorOp): OpGlyphNode? = glyphsByOp[op]
+
+    private var currentStepOp: TensorOp? = null
+    private var staleTiles: Set<TensorTile> = emptySet()
+
+    /**
+     * Micro-stepping render state: glows [currentOp]'s glyph and dims every tile in [stale]
+     * (the not-yet-recomputed half of the pass). Dimming is pure transparency over the cached
+     * rasters — no reshading. Pass (null, empty) at a step boundary to clear.
+     */
+    fun syncStepState(currentOp: TensorOp?, stale: Set<TensorTile>) {
+        currentStepOp = currentOp
+        staleTiles = stale
+        glyphsByOp.values.forEach { it.glowing = it.op == currentOp }
+        tileNodes.forEach {
+            it.raster.transparency = if (it.tile in stale) STALE_TRANSPARENCY else 1f
+        }
+    }
 
     private inner class InteriorInputHandler : PBasicInputEventHandler() {
 
@@ -417,5 +435,6 @@ class CompositorNode(
         private const val DECK_STEP = 4.0
         private const val MAX_BACK_CARDS = 5
         private const val GLYPH_RADIUS = 7.0
+        private const val STALE_TRANSPARENCY = 0.35f
     }
 }

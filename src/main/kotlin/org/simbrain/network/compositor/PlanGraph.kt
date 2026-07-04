@@ -13,13 +13,18 @@ class PlanGraph(val plan: OpPlan) {
 
     private val writerOf = HashMap<String, TensorOp>()
     private val readersOf = HashMap<String, MutableList<TensorOp>>()
+    private val opIndex = HashMap<TensorOp, Int>()
 
     init {
-        for (op in plan.ops) {
+        for ((i, op) in plan.ops.withIndex()) {
+            opIndex[op] = i
             for (port in op.outputs) writerOf[port.name] = op
             for (port in op.inputs) readersOf.getOrPut(port.name) { mutableListOf() }.add(op)
         }
     }
+
+    /** Position of the op that writes [name] in the plan's schedule, or null for pure inputs. */
+    fun writerIndex(name: String): Int? = writerOf[name]?.let { opIndex.getValue(it) }
 
     /** All ports whose values (transitively) feed [name], not including [name] itself. */
     fun upstreamPorts(name: String): Set<String> {

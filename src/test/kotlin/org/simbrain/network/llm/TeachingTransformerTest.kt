@@ -73,6 +73,56 @@ class TeachingTransformerTest {
     }
 
     @Test
+    fun `stepped train step walks forward then backward then applies the optimizer`() {
+        val model = TeachingTransformerModel(TeachingTransformerConfig(
+            contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1
+        ))
+        val opCount = model.plan.ops.size
+        val weightBefore = model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()
+
+        model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4), intArrayOf(2, 3, 4, 5))
+        assertEquals(TeachingTransformerModel.StepPhase.FORWARD, model.stepPhase)
+
+        val forwardOps = mutableListOf<String>()
+        while (model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) {
+            assertEquals(model.nextOp()!!.name, model.plan.ops[model.plan.cursor].name)
+            forwardOps.add(model.stepOp().name)
+        }
+        assertEquals(opCount, forwardOps.size)
+        assertEquals("cross_entropy", forwardOps.last())
+        assertTrue(model.loss.tensor.data.get(0) > 0f, "forward completion produced a loss")
+
+        val backwardOps = mutableListOf<String>()
+        while (model.stepPhase == TeachingTransformerModel.StepPhase.BACKWARD) {
+            backwardOps.add(model.stepOp().name)
+        }
+        assertEquals(forwardOps.reversed(), backwardOps, "backward visits the same ops in reverse")
+        assertEquals(TeachingTransformerModel.StepPhase.IDLE, model.stepPhase)
+        assertTrue(!weightBefore.contentEquals(model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()),
+            "completing the walk applied the Adam update")
+    }
+
+    @Test
+    fun `stepped and atomic train steps produce the same loss trajectory`() {
+        val config = TeachingTransformerConfig(
+            contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1
+        )
+        val tokens = intArrayOf(1, 2, 3, 4)
+        val targets = intArrayOf(2, 3, 4, 5)
+
+        val atomic = TeachingTransformerModel(config, seed = 11L)
+        val atomicLosses = (0 until 3).map { atomic.trainStep(tokens, targets) }
+
+        val stepped = TeachingTransformerModel(config, seed = 11L)
+        val steppedLosses = (0 until 3).map {
+            stepped.beginSteppedTrainStep(tokens, targets)
+            while (stepped.stepPhase != TeachingTransformerModel.StepPhase.IDLE) stepped.stepOp()
+            stepped.loss.tensor.data.get(0)
+        }
+        assertEquals(atomicLosses, steppedLosses)
+    }
+
+    @Test
     fun `short contexts pad with unsupervised positions and still produce a finite loss`() {
         val model = TeachingTransformerModel(TeachingTransformerConfig(
             contextSize = 8, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1

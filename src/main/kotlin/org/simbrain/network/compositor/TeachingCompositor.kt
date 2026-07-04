@@ -97,6 +97,10 @@ object TeachingCompositor {
 
         scene.connectFromGraph()
 
+        for (tile in scene.tiles) {
+            (tile as? MatrixTile)?.gradientSource = model.grads.of(tile.tensor)
+        }
+
         val checkpoints = listOf(model.plan.port("resid0")) + (0 until config.numLayers).flatMap { l ->
             listOf(model.plan.port("layers.$l.attn_resid"), model.plan.port("layers.$l.resid"))
         }

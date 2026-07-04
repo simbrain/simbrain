@@ -1,11 +1,15 @@
 package org.simbrain.network.compositor
 
+import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.op.TensorPort
 import org.simbrain.util.toSimbrainColor
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferInt
 import kotlin.math.abs
+
+/** What a tile shows, driving its colormap and border styling. */
+enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
 
 /**
  * One heatmap in the compositor's retained scene: a layout rect in scene coordinates, a value
@@ -24,6 +28,7 @@ abstract class TensorTile(
     val rows: Int,
     val cols: Int,
     private val signedNorm: Boolean,
+    val kind: TileKind = TileKind.ACTIVATION,
 ) {
 
     var x = 0.0
@@ -120,7 +125,7 @@ class VectorHistoryTile(
     val port: TensorPort,
     rows: Int,
     title: String = port.name,
-) : TensorTile(port.name, title, rows, port.tensor.size, signedNorm = true) {
+) : TensorTile(port.name, title, rows, port.tensor.size, signedNorm = true, kind = TileKind.RESIDUAL) {
 
     private var lastVersion = -1L
     private val magnitudes = FloatArray(cols)
@@ -150,6 +155,76 @@ class VectorHistoryTile(
 }
 
 /**
+ * A tile mirroring a whole 2-D tensor that changes in bulk — the full-sequence teaching pass,
+ * where every forward (or training step, for weights) rewrites the entire matrix. [publish]
+ * ignores the token index: it is version-gated on the source tensor and copies everything.
+ * [displayTransposed] renders the transpose (weight tiles honoring Simbrain's source-target
+ * display convention); [quantileNorm] normalizes by a high magnitude quantile instead of the
+ * max (residual checkpoints, whose outlier channels would wash everything else out).
+ */
+class MatrixTile(
+    id: String,
+    title: String,
+    val tensor: FloatTensor,
+    kind: TileKind = TileKind.ACTIVATION,
+    signedNorm: Boolean = true,
+    private val quantileNorm: Boolean = false,
+    private val versionGated: Boolean = true,
+    private val displayTransposed: Boolean = false,
+) : TensorTile(
+    id, title,
+    if (displayTransposed) tensor.cols else tensor.rows,
+    if (displayTransposed) tensor.rows else tensor.cols,
+    signedNorm, kind,
+) {
+
+    constructor(
+        port: TensorPort,
+        kind: TileKind = TileKind.ACTIVATION,
+        title: String = port.name,
+        signedNorm: Boolean = true,
+        quantileNorm: Boolean = false,
+        displayTransposed: Boolean = false,
+    ) : this(port.name, title, port.tensor, kind, signedNorm, quantileNorm, true, displayTransposed)
+
+    private var lastVersion = -1L
+
+    override fun reset() {
+        super.reset()
+        lastVersion = -1L
+    }
+
+    @Synchronized
+    override fun publish(tokenIndex: Int) {
+        if (versionGated && tensor.version == lastVersion) return
+        lastVersion = tensor.version
+        if (displayTransposed) {
+            for (r in 0 until rows) {
+                for (c in 0 until cols) {
+                    values[r * cols + c] = tensor.data.get(c * tensor.cols + r)
+                }
+            }
+        } else {
+            for (i in values.indices) values[i] = tensor.data.get(i)
+        }
+        growAbsMax(normalizationScale())
+        markAllDirty()
+    }
+
+    private fun normalizationScale(): Float {
+        if (!quantileNorm) {
+            var max = 0f
+            for (v in values) max = maxOf(max, abs(v))
+            return max
+        }
+        val magnitudes = FloatArray(values.size) { abs(values[it]) }
+        magnitudes.sort()
+        val quantile = magnitudes[(magnitudes.size * 995 / 1000).coerceAtMost(magnitudes.size - 1)]
+        return if (quantile > 0f) quantile else magnitudes[magnitudes.size - 1]
+    }
+}
+
+/**
  * The causal attention-map tile: row t holds the selected head's softmaxed attention over
  * positions 0..t at token t, building the familiar lower triangle as generation runs. History
  * for every head is retained, so [selectedHead] switches instantly by reshading from stored
@@ -161,7 +236,7 @@ class AttentionTile(
     val numHeads: Int,
     seqLen: Int,
     title: String = port.name,
-) : TensorTile(port.name, title, seqLen, seqLen, signedNorm = false) {
+) : TensorTile(port.name, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION) {
 
     private val history = FloatArray(numHeads * rows * cols)
     private var lastVersion = -1L

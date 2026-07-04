@@ -87,16 +87,27 @@ class CompositorScene(val graph: PlanGraph? = null) {
         lens?.refresh()
     }
 
+    /**
+     * Full-pass publish for scenes without a token cursor (the teaching model recomputes every
+     * tile's tensor each forward): version-gated tiles refresh, token-indexed tiles no-op.
+     */
+    fun publish() = publish(-1)
+
     /** Clears every tile's published history for a fresh generation run. */
     fun reset() {
         for (tile in _tiles) tile.reset()
         lens?.reset()
     }
 
-    /** Tier-2/3 pixel writes: shades whatever is dirty using the active theme palette. */
+    /** Tier-2/3 pixel writes: shades whatever is dirty, choosing the palette by tile kind. */
     fun shadeDirty() {
         val palette = NetworkTheme.current
-        for (tile in _tiles) tile.shadeDirty(palette.coolNode, palette.neutralMidpoint, palette.hotNode)
+        for (tile in _tiles) {
+            when (tile.kind) {
+                TileKind.WEIGHT -> tile.shadeDirty(palette.inhibitorySynapse, palette.zeroWeight, palette.excitatorySynapse)
+                else -> tile.shadeDirty(palette.coolNode, palette.neutralMidpoint, palette.hotNode)
+            }
+        }
     }
 
     /** Tier 3: re-runs the color mapping over every tile's value buffer (palette/theme change). */

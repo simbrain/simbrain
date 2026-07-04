@@ -65,11 +65,12 @@ class CompositorNode(
             val palette = NetworkTheme.current
             label.textPaint = palette.valueText
             val highlighted = tile == scene.traceFocus || tile in scene.tracedTiles || tile in scene.selection
-            border.stroke = BasicStroke(if (highlighted) 2f else 1f)
+            border.stroke = BasicStroke(if (highlighted || tile.kind == TileKind.WEIGHT) 2f else 1f)
             border.strokePaint = when {
                 tile == scene.traceFocus -> palette.sourceHandle
                 tile in scene.selection -> palette.selectionHandle
                 tile in scene.tracedTiles -> palette.receptiveFieldTrace
+                tile.kind == TileKind.WEIGHT -> palette.weightMatrixBoundary
                 else -> palette.imageBorder
             }
         }

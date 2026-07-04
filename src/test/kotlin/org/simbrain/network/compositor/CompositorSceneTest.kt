@@ -101,6 +101,50 @@ class CompositorSceneTest {
     }
 
     @Test
+    fun `matrix tile bulk-publishes the whole tensor gated on its version`() {
+        val tensor = FloatTensor.of(2, 3, floatArrayOf(1f, -2f, 3f, -4f, 5f, -6f))
+        val tile = MatrixTile("weights", "weights", tensor, kind = TileKind.WEIGHT)
+        tile.publish(-1)
+        tile.shadeDirty(neg, mid, pos)
+
+        assertEquals(-2f, tile.valueAt(0, 1))
+        assertEquals(5f, tile.valueAt(1, 1))
+        assertEquals((-1f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(2, 1), "-6 is the abs max")
+
+        tensor.data.put(0, 99f)
+        tile.publish(-1)
+        assertEquals(1f, tile.valueAt(0, 0), "unbumped version must not republish")
+        tensor.markMutated()
+        tile.publish(-1)
+        assertEquals(99f, tile.valueAt(0, 0), "version bump republishes the whole matrix")
+    }
+
+    @Test
+    fun `transposed matrix tile renders the transpose for display`() {
+        val tensor = FloatTensor.of(2, 3, floatArrayOf(1f, 2f, 3f, 4f, 5f, 6f))
+        val tile = MatrixTile("w", "w", tensor, displayTransposed = true)
+        assertEquals(3, tile.rows)
+        assertEquals(2, tile.cols)
+        tile.publish(-1)
+        assertEquals(4f, tile.valueAt(0, 1))
+        assertEquals(3f, tile.valueAt(2, 0))
+    }
+
+    @Test
+    fun `full-pass scene publish refreshes matrix tiles and leaves token-indexed tiles alone`() {
+        val matrixTensor = FloatTensor.of(2, 2, floatArrayOf(1f, 2f, 3f, 4f))
+        val historyPort = TensorPort("resid", FloatTensor.of(1, 2, floatArrayOf(7f, 8f)))
+        val scene = CompositorScene().apply {
+            addTile(MatrixTile("m", "m", matrixTensor))
+            addTile(VectorHistoryTile(historyPort, rows = 3))
+        }
+        scene.publish()
+        assertEquals(1f, scene.tile("m").valueAt(0, 0))
+        assertEquals(0f, scene.tile("resid").valueAt(0, 0),
+            "a token-history tile must ignore a full-pass publish")
+    }
+
+    @Test
     fun `hit testing maps scene points to tiles and cells`() {
         val port = TensorPort("resid", FloatTensor(1, 4))
         val tile = VectorHistoryTile(port, rows = 2).apply {

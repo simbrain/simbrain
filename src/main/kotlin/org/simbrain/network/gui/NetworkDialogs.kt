@@ -16,6 +16,7 @@ import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
+import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -319,6 +320,20 @@ private fun NetworkPanel.addLanguageModel(languageModel: LanguageModel) {
         undo = { languageModel.delete() },
         redo = { network.addNetworkModel(languageModel, usePlacementManager = false, useAutoAssignedId = false) }
     )
+}
+
+fun NetworkPanel.showTeachingTransformerCreationDialog() {
+    TeachingTransformer.CreationTemplate().createEditorDialog { template ->
+        val teachingTransformer = template.create()
+        network.addNetworkModelAsync(teachingTransformer)
+        undoManager.addUndoableAction(
+            description = "Add teaching transformer ${teachingTransformer.id}",
+            undo = { teachingTransformer.delete() },
+            redo = { network.addNetworkModel(teachingTransformer, usePlacementManager = false, useAutoAssignedId = false) }
+        )
+    }.also {
+        it.title = "Create Teaching Transformer"
+    }.display()
 }
 
 fun NetworkPanel.createNeuronCollectionDialog(neuronGroup: NeuronCollection) = neuronGroup.createEditorDialog()

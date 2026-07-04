@@ -147,6 +147,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showLanguageModelCreationDialog()
     }
+    val addTeachingTransformerAction = networkPanel.createAction(
+        name = "Add teaching transformer...",
+        description = "Add a small trainable transformer with an op-level teaching interior",
+    ) {
+        showTeachingTransformerCreationDialog()
+    }
     val addClassifierAction = createAction("Add classifier") {
         networkPanel.showClassifierCreationDialog()
     }

@@ -83,7 +83,7 @@ object TeachingCompositor {
             spineTile("$prefix.resid", "residual + mlp", mlpTop + 130.0)
         }
 
-        val finalY = LAYER_TOP + config.numLayers * LAYER_PITCH
+        val finalY = LAYER_TOP + config.numLayers * LAYER_PITCH + 90.0
         weightTile("unembed.weight", "unembedding", WEIGHT_X, finalY)
         activationTile("logits", "logits", 0.0, finalY, SPINE_WIDTH, 80.0)
         scene.addTile(MatrixTile(

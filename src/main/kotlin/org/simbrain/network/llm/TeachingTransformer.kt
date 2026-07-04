@@ -1,7 +1,24 @@
 package org.simbrain.network.llm
 
+import org.simbrain.network.compositor.CompositorScene
+import org.simbrain.network.compositor.DeckTile
+import org.simbrain.network.compositor.TeachingCompositor
+import org.simbrain.network.core.LocatableModel
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.core.XStreamConstructor
+import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.TensorRole
+import org.simbrain.network.trainers.TapeTrainer
+import org.simbrain.util.UserParameter
+import org.simbrain.util.WithXStreamPropertyConverter
+import org.simbrain.util.createXStreamPropertyConverter
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import java.awt.geom.Point2D
+import java.nio.ByteBuffer
+import java.util.Base64
 import org.simbrain.network.tensor.op.AddOp
 import org.simbrain.network.tensor.op.BiasOp
 import org.simbrain.network.tensor.op.CausalMaskedRowSoftmaxOp
@@ -271,5 +288,319 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
     fun distributionAt(position: Int): FloatArray {
         val p = probs.tensor
         return FloatArray(p.cols) { p[position, it] }
+    }
+}
+
+class TeachingTransformerEvents : LocationEvents() {
+    val modelRebuilt = NoArgEvent()
+}
+
+/**
+ * The teaching transformer on the network canvas: wraps the headless [TeachingTransformerModel],
+ * its [TapeTrainer], and the compositor spine scene. Each network update runs a full forward pass
+ * on the current context, so the workspace drives generation while the interior shows the whole
+ * computation.
+ *
+ * Serialization: the config, corpus, view state, AND the trained weights go into the workspace
+ * file — this is a trained-in-place teaching artifact, unlike [LanguageModel], which reloads its
+ * weights from disk. Weight capture happens at marshal time through the companion's property
+ * converter, so whatever training did up to the save is what comes back.
+ */
+class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), EditableObject {
+
+    var config: TeachingTransformerConfig = TeachingTransformerConfig()
+        private set
+
+    var model: TeachingTransformerModel = TeachingTransformerModel(config)
+        private set
+
+    /** Vocabulary index to token string, for lens readouts and status text. */
+    var tokenLabels: ArrayList<String>? = null
+
+    var corpusTokenIds: IntArray? = null
+        private set
+
+    var testCorpusTokenIds: IntArray? = null
+        private set
+
+    /** The context window the next forward pass reads, most recent tokens last. */
+    var contextTokens: IntArray = IntArray(0)
+        private set
+
+    var learningRate by GuiEditable(
+        initValue = 0.001,
+        label = "Learning rate",
+        description = "Adam learning rate for the tape trainer",
+        min = 0.0,
+        increment = 0.0005,
+        order = 1,
+    )
+
+    var lensEnabled: Boolean = true
+        set(value) {
+            field = value
+            scene.lens?.enabled = value
+        }
+
+    var selectedHead: Int = 0
+        set(value) {
+            field = value
+            decks().forEach { it.selectedSlice = value.coerceIn(0, it.slices - 1) }
+        }
+
+    /** Saved tile positions by tile id, applied to the scene on load. */
+    var tileLayout: HashMap<String, DoubleArray>? = null
+
+    override var location: Point2D = Point2D.Double()
+        set(value) {
+            field = value
+            events.locationChanged.fire()
+        }
+
+    @Transient
+    override var events: TeachingTransformerEvents = TeachingTransformerEvents()
+        private set
+
+    @Transient
+    var scene: CompositorScene = TeachingCompositor.buildScene(model)
+        private set
+
+    @Transient
+    var trainer: TapeTrainer = TapeTrainer(model)
+        private set
+
+    @Transient
+    private var windowCursor = 0
+
+    constructor(config: TeachingTransformerConfig) : this() {
+        this.config = config
+        rebuildRuntime(null)
+    }
+
+    private fun decks() = scene.tiles.filterIsInstance<DeckTile>()
+
+    /** Rebuilds the headless model, trainer, and scene — after deserialization or a config change. */
+    private fun rebuildRuntime(weights: Map<String, FloatArray>?) {
+        model = TeachingTransformerModel(config)
+        weights?.forEach { (name, values) ->
+            model.params[name]?.tensor?.takeIf { it.size == values.size }?.copyFrom(values)
+        }
+        trainer = TapeTrainer(model)
+        trainer.learningRate = learningRate.toFloat()
+        applyCorpusToTrainer()
+        rebuildScene()
+        events.modelRebuilt.fire()
+    }
+
+    private fun rebuildScene() {
+        scene = TeachingCompositor.buildScene(model)
+        tileLayout?.forEach { (id, xy) ->
+            scene.tiles.firstOrNull { it.id == id }?.let {
+                it.x = xy[0]
+                it.y = xy[1]
+            }
+        }
+        decks().forEach { it.selectedSlice = selectedHead.coerceIn(0, it.slices - 1) }
+        scene.lens?.enabled = lensEnabled
+    }
+
+    /** Copies the scene's current tile positions and deck slice into the serialized view state. */
+    fun captureViewState() {
+        tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
+        decks().firstOrNull()?.let { selectedHead = it.selectedSlice }
+    }
+
+    /** Sets the training (and optional testing) corpus as vocabulary token ids. */
+    fun setCorpus(tokenIds: IntArray, testTokenIds: IntArray? = null) {
+        corpusTokenIds = tokenIds
+        testCorpusTokenIds = testTokenIds
+        applyCorpusToTrainer()
+    }
+
+    private fun applyCorpusToTrainer() {
+        trainer.trainingWindows = corpusTokenIds?.let(::windowsOf) ?: emptyList()
+        trainer.testingWindows = testCorpusTokenIds?.let(::windowsOf) ?: emptyList()
+    }
+
+    private fun windowsOf(corpus: IntArray): List<Pair<IntArray, IntArray>> {
+        val seq = config.contextSize
+        if (corpus.size <= seq) return emptyList()
+        return (0 until corpus.size - seq).map { start ->
+            corpus.copyOfRange(start, start + seq) to corpus.copyOfRange(start + 1, start + seq + 1)
+        }
+    }
+
+    /** Replaces the context window (keeping the most recent [config.contextSize] tokens). */
+    fun setContext(tokens: IntArray) {
+        contextTokens = if (tokens.size <= config.contextSize) tokens.copyOf()
+        else tokens.copyOfRange(tokens.size - config.contextSize, tokens.size)
+    }
+
+    context(Network)
+    override fun update() {
+        forwardContext()
+    }
+
+    /** Runs a full forward pass on the current context and publishes it to the scene. */
+    fun forwardContext() {
+        if (contextTokens.isEmpty()) return
+        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
+        model.setSample(contextTokens)
+        model.forward()
+        scene.lens?.sourceRow = contextTokens.size - 1
+        scene.publish()
+        events.updated.fire()
+    }
+
+    /** The model's distribution for the next token after the current context. */
+    fun nextTokenDistribution(): DoubleArray {
+        val distribution = model.distributionAt((contextTokens.size - 1).coerceAtLeast(0))
+        return DoubleArray(distribution.size) { distribution[it].toDouble() }
+    }
+
+    /**
+     * Advances a micro-stepped training walk by one op, arming a fresh walk on the next training
+     * window when idle. Returns the op that ran, or null with no training windows.
+     */
+    fun stepTrainingOp(): TensorOp? {
+        if (model.stepPhase == TeachingTransformerModel.StepPhase.IDLE) {
+            val windows = trainer.trainingWindows
+            if (windows.isEmpty()) return null
+            val (tokens, targets) = windows[windowCursor % windows.size]
+            windowCursor++
+            trainer.learningRate = learningRate.toFloat()
+            model.beginSteppedTrainStep(tokens, targets)
+        }
+        val op = model.stepOp()
+        scene.publish()
+        events.updated.fire()
+        return op
+    }
+
+    /** Advances a plain forward pass on the current context by one op. */
+    fun stepInferenceOp(): TensorOp? {
+        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) return null
+        if (model.plan.cursor == 0) {
+            if (contextTokens.isEmpty()) return null
+            model.setSample(contextTokens)
+            scene.lens?.sourceRow = contextTokens.size - 1
+        }
+        val op = model.stepForwardOnly()
+        scene.publish()
+        events.updated.fire()
+        return op
+    }
+
+    /** The op the next micro-step will run: mid-walk, mid-forward, or null at a clean boundary. */
+    fun pendingOp(): TensorOp? = model.nextOp()
+        ?: if (model.plan.cursor != 0) model.plan.ops[model.plan.cursor] else null
+
+    override suspend fun delete(): List<NetworkModel> {
+        trainer.stopTraining()
+        events.deleted.fire(this)
+        return listOf(this)
+    }
+
+    fun readResolve(): Any {
+        events = TeachingTransformerEvents()
+        return this
+    }
+
+    override fun toString(): String = buildString {
+        appendLine("Name: $displayName (teaching transformer)")
+        appendLine("Config: context ${config.contextSize}, embed ${config.embedDim}, " +
+                "${config.numHeads} heads, ${config.numLayers} layer(s), vocab ${config.vocabSize}")
+        append("Trained iterations: ${trainer.iteration}")
+    }
+
+    class CreationTemplate : EditableObject {
+
+        @UserParameter(label = "Context size", description = "Tokens in the context window", order = 1)
+        var contextSize = 24
+
+        @UserParameter(label = "Embedding dimension", description = "Width of the residual stream", order = 2)
+        var embedDim = 20
+
+        @UserParameter(label = "Attention heads", description = "Must divide the embedding dimension", order = 3)
+        var numHeads = 4
+
+        @UserParameter(label = "Hidden size", description = "MLP hidden units", order = 4)
+        var hiddenDim = 30
+
+        @UserParameter(label = "Vocabulary size", description = "Number of distinct tokens", order = 5)
+        var vocabSize = 100
+
+        @UserParameter(label = "Layers", description = "Transformer layers", order = 6)
+        var numLayers = 1
+
+        fun create(): TeachingTransformer = TeachingTransformer(TeachingTransformerConfig(
+            contextSize = contextSize,
+            embedDim = embedDim,
+            numHeads = numHeads,
+            hiddenDim = hiddenDim,
+            vocabSize = vocabSize,
+            numLayers = numLayers,
+        ))
+
+        override val name = "Teaching Transformer"
+    }
+
+    companion object : WithXStreamPropertyConverter {
+
+        /**
+         * Serializes the [model] property as its parameter tensors (name to base64 floats),
+         * captured live at marshal time; on unmarshal the runtime is rebuilt from the restored
+         * config and the saved weights are copied back in.
+         */
+        override val xStreamPropertyConverter = createXStreamPropertyConverter<TeachingTransformer>(
+            marshal = {
+                on(TeachingTransformer::model) { writer, _ ->
+                    writer.startNode("model")
+                    params.forEach { (name, port) ->
+                        writer.startNode("param")
+                        writer.startNode("name"); writer.setValue(name); writer.endNode()
+                        writer.startNode("values")
+                        writer.setValue(floatsToBase64(port.tensor.toFloatArray()))
+                        writer.endNode()
+                        writer.endNode()
+                    }
+                    writer.endNode()
+                }
+            },
+            unmarshal = {
+                on("model") { reader, _ ->
+                    val weights = HashMap<String, FloatArray>()
+                    while (reader.hasMoreChildren()) {
+                        reader.moveDown()
+                        var name: String? = null
+                        var values: FloatArray? = null
+                        while (reader.hasMoreChildren()) {
+                            reader.moveDown()
+                            when (reader.nodeName) {
+                                "name" -> name = reader.value
+                                "values" -> values = base64ToFloats(reader.value)
+                            }
+                            reader.moveUp()
+                        }
+                        if (name != null && values != null) weights[name] = values
+                        reader.moveUp()
+                    }
+                    withConstructedObject { rebuildRuntime(weights) }
+                }
+            }
+        )
+
+        private fun floatsToBase64(values: FloatArray): String {
+            val buffer = ByteBuffer.allocate(values.size * Float.SIZE_BYTES)
+            buffer.asFloatBuffer().put(values)
+            return Base64.getEncoder().encodeToString(buffer.array())
+        }
+
+        private fun base64ToFloats(encoded: String): FloatArray {
+            val bytes = Base64.getDecoder().decode(encoded)
+            val floats = FloatArray(bytes.size / Float.SIZE_BYTES)
+            ByteBuffer.wrap(bytes).asFloatBuffer().get(floats)
+            return floats
+        }
     }
 }

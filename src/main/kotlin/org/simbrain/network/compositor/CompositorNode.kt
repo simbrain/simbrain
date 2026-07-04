@@ -58,6 +58,13 @@ class CompositorNode(
 
     private val edgeLayer = PNode().also { addChild(it) }
 
+    /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
+    private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()
+
+    private var currentStepOp: TensorOp? = null
+
+    private var staleTiles: Set<TensorTile> = emptySet()
+
     private inner class TileNode(val tile: TensorTile) : PNode() {
         /** Dimmed offset cards behind a deck's live front slice — the 2.5D stack. */
         val backCards: List<PPath> = if (tile is DeckTile && tile.slices > 1) {
@@ -200,9 +207,6 @@ class CompositorNode(
         rebuildEdges()
     }
 
-    /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
-    private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()
-
     /**
      * A small operation glyph strung on a data-flow edge: circled symbols for the arithmetic ops
      * (the old transformer node's junction/multiply decorations, now derived from the plan) and
@@ -295,9 +299,6 @@ class CompositorNode(
 
     /** The glyph rendered for [op], if any edge carries it. */
     fun glyphFor(op: TensorOp): OpGlyphNode? = glyphsByOp[op]
-
-    private var currentStepOp: TensorOp? = null
-    private var staleTiles: Set<TensorTile> = emptySet()
 
     /**
      * Micro-stepping render state: glows [currentOp]'s glyph and dims every tile in [stale]

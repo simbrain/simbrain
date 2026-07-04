@@ -2,8 +2,12 @@ package org.simbrain.network.compositor
 
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.NetworkTheme
+import java.awt.geom.Point2D
 
-class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp> = emptyList())
+class TileEdge(val from: TensorTile, val to: TensorTile, val ops: List<TensorOp> = emptyList()) {
+    /** Interior route knots in scene coordinates; set by layout to steer the curve around tiles. */
+    var waypoints: List<Point2D> = emptyList()
+}
 
 /**
  * Self-contained selection over compositor tiles, shaped like the network canvas selection model

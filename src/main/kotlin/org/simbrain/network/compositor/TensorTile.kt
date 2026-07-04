@@ -4,6 +4,7 @@ import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.op.TensorPort
 import org.simbrain.util.toSimbrainColor
 import java.awt.Color
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferInt
 import kotlin.math.abs
@@ -105,6 +106,8 @@ abstract class TensorTile(
 
     fun contains(sceneX: Double, sceneY: Double) =
         sceneX >= x && sceneX < x + width && sceneY >= y && sceneY < y + height
+
+    val bounds: Rectangle2D get() = Rectangle2D.Double(x, y, width, height)
 
     fun intersects(rx: Double, ry: Double, rw: Double, rh: Double) =
         rx < x + width && rx + rw > x && ry < y + height && ry + rh > y

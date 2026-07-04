@@ -23,15 +23,22 @@ import org.simbrain.network.tensor.op.SiluGateOp
 import org.simbrain.network.tensor.op.SoftmaxCrossEntropyOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
+import org.simbrain.util.BezierRoute
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
+import org.simbrain.util.bezierRoute
 import org.simbrain.util.piccolo.SimbrainImage
+import org.simbrain.util.sin60deg
 import org.simbrain.util.toSimbrainColor
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.geom.AffineTransform
+import java.awt.geom.Area
+import java.awt.geom.Path2D
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import kotlin.math.abs
+import kotlin.math.atan2
 
 /**
  * Renders a [CompositorScene] as one Piccolo node: tile rasters ([SimbrainImage] children, whose
@@ -60,6 +67,16 @@ class CompositorNode(
 
     /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
     private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()
+
+    /** The curve each edge currently renders along, rebuilt with the edges. */
+    private val routesByEdge = HashMap<TileEdge, BezierRoute>()
+
+    private val arrowTip = Path2D.Double().apply {
+        moveTo(0.0, -TIP_LENGTH)
+        lineTo(RIBBON_THICKNESS.toDouble(), 0.0)
+        lineTo(-RIBBON_THICKNESS.toDouble(), 0.0)
+        closePath()
+    }
 
     private var currentStepOp: TensorOp? = null
 
@@ -272,23 +289,33 @@ class CompositorNode(
         val palette = NetworkTheme.current
         edgeLayer.removeAllChildren()
         glyphsByOp.clear()
+        routesByEdge.clear()
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
-            val fromX = edge.from.x + edge.from.width / 2
-            val fromY = edge.from.y + edge.from.height / 2
-            val toX = edge.to.x + edge.to.width / 2
-            val toY = edge.to.y + edge.to.height / 2
-            PPath.createLine(fromX, fromY, toX, toY).apply {
-                stroke = BasicStroke(if (traced) 3f else 1.5f)
-                strokePaint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
+            val route = bezierRoute(edge.from.bounds, edge.to.bounds, edge.waypoints, headPadding = TIP_LENGTH)
+            routesByEdge[edge] = route
+            val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
+            val ribbon = Area(
+                BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER).createStrokedShape(route.path)
+            )
+            val tangent = route.endTangent
+            val tipTransform = AffineTransform().apply {
+                translate(route.end.x, route.end.y)
+                rotate(atan2(tangent.x, -tangent.y))
+            }
+            ribbon.add(Area(tipTransform.createTransformedShape(arrowTip)))
+            PPath.Double(ribbon, null).apply {
+                paint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
+                transparency = if (traced) 0.8f else 0.5f
                 pickable = false
                 edgeLayer.addChild(this)
             }
             val newOps = edge.ops.filter { it !in glyphsByOp }
             for ((i, op) in newOps.withIndex()) {
                 val t = (i + 1).toDouble() / (newOps.size + 1)
+                val at = route.pointAt(t)
                 OpGlyphNode(op).apply {
-                    setOffset(fromX + (toX - fromX) * t, fromY + (toY - fromY) * t)
+                    setOffset(at.x, at.y)
                     glyphsByOp[op] = this
                     edgeLayer.addChild(this)
                 }
@@ -437,5 +464,7 @@ class CompositorNode(
         private const val MAX_BACK_CARDS = 5
         private const val GLYPH_RADIUS = 7.0
         private const val STALE_TRANSPARENCY = 0.35f
+        private const val RIBBON_THICKNESS = 5f
+        private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
     }
 }

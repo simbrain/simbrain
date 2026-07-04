@@ -134,7 +134,8 @@ class VectorHistoryTile(
     val port: TensorPort,
     rows: Int,
     title: String = port.name,
-) : TensorTile(port.name, title, rows, port.tensor.size, signedNorm = true, kind = TileKind.RESIDUAL) {
+    kind: TileKind = TileKind.RESIDUAL,
+) : TensorTile(port.name, title, rows, port.tensor.size, signedNorm = true, kind = kind) {
 
     private var lastVersion = -1L
     private val magnitudes = FloatArray(cols)
@@ -157,7 +158,7 @@ class VectorHistoryTile(
             magnitudes[i] = abs(v)
         }
         magnitudes.sort()
-        val quantile = magnitudes[(cols * 995 / 1000).coerceAtMost(cols - 1)]
+        val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
         growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
         markRowsDirty(tokenIndex)
     }
@@ -245,17 +246,19 @@ class MatrixTile(
         }
         val magnitudes = FloatArray(values.size) { abs(values[it]) }
         magnitudes.sort()
-        val quantile = magnitudes[(magnitudes.size * 995 / 1000).coerceAtMost(magnitudes.size - 1)]
+        val quantile = magnitudes[(magnitudes.size.toLong() * 995 / 1000).toInt().coerceAtMost(magnitudes.size - 1)]
         return if (quantile > 0f) quantile else magnitudes[magnitudes.size - 1]
     }
 }
 
 /**
- * A stacked rank-3 tile: the source tensor holds [slices] stacked row blocks (slice s occupying
- * rows [s*rows, (s+1)*rows)) — per-head attention maps, per-head projections — and the tile
- * renders one slice at a time. Every slice is retained in a cube on publish, so [selectedSlice]
- * flips instantly by reshading from memory with zero recompute. Full-pass semantics like
- * [MatrixTile]: publish is version-gated and ignores the token index.
+ * A stacked rank-3 tile: the source tensor holds [slices] stacked blocks — row blocks by default
+ * (slice s occupying rows [s*rows, (s+1)*rows)): per-head attention maps, per-head projections —
+ * or column blocks with [columnSlices] (slice s occupying columns [s*cols, (s+1)*cols)): KV
+ * caches laid out positions x (heads · headDim). The tile renders one slice at a time; every
+ * slice is retained in a cube on publish, so [selectedSlice] flips instantly by reshading from
+ * memory with zero recompute. Full-pass semantics like [MatrixTile]: publish is version-gated
+ * and ignores the token index.
  */
 class DeckTile(
     id: String,
@@ -264,7 +267,13 @@ class DeckTile(
     val slices: Int,
     kind: TileKind = TileKind.ATTENTION,
     signedNorm: Boolean = false,
-) : TensorTile(id, title, tensor.rows / slices, tensor.cols, signedNorm, kind) {
+    private val columnSlices: Boolean = false,
+) : TensorTile(
+    id, title,
+    if (columnSlices) tensor.rows else tensor.rows / slices,
+    if (columnSlices) tensor.cols / slices else tensor.cols,
+    signedNorm, kind,
+) {
 
     constructor(
         port: TensorPort,
@@ -272,10 +281,15 @@ class DeckTile(
         kind: TileKind = TileKind.ATTENTION,
         title: String = port.name,
         signedNorm: Boolean = false,
-    ) : this(port.name, title, port.tensor, slices, kind, signedNorm)
+        columnSlices: Boolean = false,
+    ) : this(port.name, title, port.tensor, slices, kind, signedNorm, columnSlices)
 
     init {
-        require(tensor.rows % slices == 0) { "${tensor.rows} rows not divisible into $slices slices" }
+        if (columnSlices) {
+            require(tensor.cols % slices == 0) { "${tensor.cols} cols not divisible into $slices slices" }
+        } else {
+            require(tensor.rows % slices == 0) { "${tensor.rows} rows not divisible into $slices slices" }
+        }
     }
 
     private val cube = FloatArray(tensor.rows * tensor.cols)
@@ -304,14 +318,24 @@ class DeckTile(
         var max = 0f
         for (v in cube) max = maxOf(max, abs(v))
         growAbsMax(max)
-        System.arraycopy(cube, selectedSlice * rows * cols, values, 0, rows * cols)
+        copySlice()
         markAllDirty()
     }
 
     @Synchronized
     private fun rebuildFromCube() {
-        System.arraycopy(cube, selectedSlice * rows * cols, values, 0, rows * cols)
+        copySlice()
         markAllDirty()
+    }
+
+    private fun copySlice() {
+        if (columnSlices) {
+            for (r in 0 until rows) {
+                System.arraycopy(cube, r * tensor.cols + selectedSlice * cols, values, r * cols, cols)
+            }
+        } else {
+            System.arraycopy(cube, selectedSlice * rows * cols, values, 0, rows * cols)
+        }
     }
 }
 

@@ -6,6 +6,13 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.llm.AttendMixOp
+import org.simbrain.network.llm.AttendScoresOp
+import org.simbrain.network.llm.CacheWriteOp
+import org.simbrain.network.llm.CausalConvOp
+import org.simbrain.network.llm.EmbedLookupOp
+import org.simbrain.network.llm.HeadwiseNormRopeOp
+import org.simbrain.network.llm.OffsetGateOp
 import org.simbrain.network.tensor.op.AddOp
 import org.simbrain.network.tensor.op.BiasOp
 import org.simbrain.network.tensor.op.CausalMaskedRowSoftmaxOp
@@ -670,14 +677,17 @@ class CompositorNode(
 /** The op's glyph icon in the app icon style, or null for the text-pill fallback. */
 private fun opIcon(op: TensorOp): String? = when (op) {
     is AddOp, is BiasOp -> "icons/op-add.svg"
-    is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp -> "icons/op-multiply.svg"
-    is LayerNormOp, is RmsNormOp -> "icons/op-layer-norm.svg"
+    is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp,
+    is OffsetGateOp, is AttendScoresOp, is AttendMixOp -> "icons/op-multiply.svg"
+    is LayerNormOp, is RmsNormOp, is HeadwiseNormRopeOp -> "icons/op-layer-norm.svg"
     is CausalMaskedRowSoftmaxOp -> "icons/op-softmax.svg"
     is SoftmaxCrossEntropyOp, is SeqSoftmaxCrossEntropyOp -> "icons/op-cross-entropy.svg"
     is ReLUOp -> "icons/op-relu.svg"
     is SiluGateOp -> "icons/op-silu.svg"
     is SplitHeadsOp -> "icons/op-split.svg"
     is MergeHeadsOp -> "icons/op-merge.svg"
-    is SeqEmbedOp -> "icons/op-embed.svg"
+    is SeqEmbedOp, is EmbedLookupOp -> "icons/op-embed.svg"
+    is CausalConvOp -> "icons/op-conv.svg"
+    is CacheWriteOp -> "icons/op-cache-write.svg"
     else -> null
 }

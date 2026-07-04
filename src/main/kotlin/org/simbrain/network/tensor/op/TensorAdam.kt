@@ -22,8 +22,20 @@ class TensorAdam(
     var timestep = 0
         private set
 
+    private var stepSquaredSum = 0.0
+    private var stepParamCount = 0
+
+    /**
+     * RMS of the per-parameter update applied since the last [step] — the same effective-step
+     * readout [org.simbrain.network.events.TrainingStats] carries for the classic trainer.
+     */
+    val effectiveStepSize: Double?
+        get() = if (stepParamCount > 0) sqrt(stepSquaredSum / stepParamCount) else null
+
     fun step() {
         timestep++
+        stepSquaredSum = 0.0
+        stepParamCount = 0
     }
 
     fun update(key: String, params: FloatTensor, grad: FloatTensor) {
@@ -41,8 +53,11 @@ class TensorAdam(
             val gi = g.get(i)
             mArr[i] = beta1 * mArr[i] + (1f - beta1) * gi
             vArr[i] = beta2 * vArr[i] + (1f - beta2) * gi * gi
-            p.put(i, p.get(i) - lr * mArr[i] / (sqrt(vArr[i]) + epsilon))
+            val delta = lr * mArr[i] / (sqrt(vArr[i]) + epsilon)
+            stepSquaredSum += delta.toDouble() * delta
+            p.put(i, p.get(i) - delta)
         }
+        stepParamCount += size
         params.markMutated()
     }
 
@@ -50,5 +65,7 @@ class TensorAdam(
         m.clear()
         v.clear()
         timestep = 0
+        stepSquaredSum = 0.0
+        stepParamCount = 0
     }
 }

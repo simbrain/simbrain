@@ -182,12 +182,14 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
     }
 
     /** Full forward pass on the bound sample; returns the loss (0 when nothing is supervised). */
+    @Synchronized
     fun forward(): Float {
         plan.forward()
         return loss.tensor.data.get(0)
     }
 
     /** One tape-recorded forward + backward + Adam update on [tokens]/[targets]; returns the loss. */
+    @Synchronized
     fun trainStep(tokens: IntArray, targets: IntArray): Float {
         setSample(tokens, targets)
         tape.clear()
@@ -215,6 +217,7 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
      * op at a time — the whole forward pass, then every VJP in reverse, then the Adam update —
      * with [stepPhase] tracking where the walk is.
      */
+    @Synchronized
     fun beginSteppedTrainStep(tokens: IntArray, targets: IntArray) {
         check(stepPhase == StepPhase.IDLE) { "A stepped train step is already in progress" }
         check(plan.cursor == 0) { "Plan is mid-pass at op ${plan.cursor}" }
@@ -235,6 +238,7 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
      * Advances a stepped training step by one op. Forward completion arms the backward pass;
      * backward completion applies the optimizer and returns to idle.
      */
+    @Synchronized
     fun stepOp(): TensorOp {
         return when (stepPhase) {
             StepPhase.IDLE -> error("No stepped train step in progress; call beginSteppedTrainStep")
@@ -257,6 +261,7 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
      * Advances a plain inference pass by one op (no tape, no gradients) — token/layer/op-level
      * stepping outside training. Only valid when no stepped training step is active.
      */
+    @Synchronized
     fun stepForwardOnly(): TensorOp {
         check(stepPhase == StepPhase.IDLE) { "A stepped train step is in progress" }
         return plan.stepOp()

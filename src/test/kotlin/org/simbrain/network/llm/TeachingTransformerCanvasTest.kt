@@ -40,6 +40,7 @@ class TeachingTransformerCanvasTest {
         teaching.tokenLabels = arrayListOf("a", "b", "c", "d", "e")
         teaching.setCorpus(IntArray(30) { it % 5 }, IntArray(12) { it % 5 })
         teaching.tileLayout = hashMapOf("resid0" to doubleArrayOf(12.0, 34.0))
+        teaching.junctionLayout = hashMapOf("layers.0.attn_residual" to doubleArrayOf(56.0, 78.0))
         teaching.selectedHead = 2
         teaching.lensEnabled = false
         teaching.learningRate = 0.005
@@ -67,6 +68,9 @@ class TeachingTransformerCanvasTest {
         assertArrayEquals(trainedEmbed, restored.model.params.getValue("embed.table").tensor.toFloatArray(), 0f)
 
         assertEquals(12.0, restored.scene.tile("resid0").x, 0.0, "saved tile layout applied to the rebuilt scene")
+        val rejoin = restored.scene.opVertices.first { it.op.name == "layers.0.attn_residual" }
+        assertEquals(56.0, rejoin.x, 0.0, "saved junction layout applied to the rebuilt scene")
+        assertEquals(78.0, rejoin.y, 0.0)
         assertEquals(24, restored.trainer.trainingWindows.size, "corpus windows rebuilt from the restored corpus")
         assertEquals(6, restored.trainer.testingWindows.size)
         assertEquals(0.005f, restored.trainer.learningRate)

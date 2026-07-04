@@ -364,6 +364,7 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         trainer.learningRate = learningRate.toFloat()
         if (diagramScale != appliedDiagramScale) {
             tileLayout = null
+            junctionLayout = null
             rebuildScene()
             events.modelRebuilt.fire()
         }
@@ -383,6 +384,9 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
 
     /** Saved tile positions by tile id, applied to the scene on load. */
     var tileLayout: HashMap<String, DoubleArray>? = null
+
+    /** Saved junction glyph centers by op name, applied to the scene on load. */
+    var junctionLayout: HashMap<String, DoubleArray>? = null
 
     override var location: Point2D = Point2D.Double()
         set(value) {
@@ -434,6 +438,13 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
                 it.y = xy[1]
             }
         }
+        junctionLayout?.forEach { (opName, xy) ->
+            scene.opVertices.firstOrNull { it.op.name == opName }?.let {
+                it.x = xy[0]
+                it.y = xy[1]
+                it.placed = true
+            }
+        }
         decks().forEach { it.selectedSlice = selectedHead.coerceIn(0, it.slices - 1) }
         scene.lens?.enabled = lensEnabled
     }
@@ -441,6 +452,7 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
     /** Copies the scene's current tile positions and deck slice into the serialized view state. */
     fun captureViewState() {
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
+        junctionLayout = scene.opVertices.associateTo(HashMap()) { it.op.name to doubleArrayOf(it.x, it.y) }
         decks().firstOrNull()?.let { selectedHead = it.selectedSlice }
     }
 

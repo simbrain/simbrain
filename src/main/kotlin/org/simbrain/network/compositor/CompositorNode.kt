@@ -514,6 +514,7 @@ class CompositorNode(
         private var mode = Mode.NONE
         private var pressPoint: Point2D? = null
         private var marqueeAdditive = false
+        private var draggedVertex: OpVertex? = null
 
         override fun mousePressed(event: PInputEvent) {
             if (!event.isLeftMouseButton) return
@@ -522,6 +523,16 @@ class CompositorNode(
             if (event.clickCount == 2) {
                 scene.setTrace(if (tile == null || scene.traceFocus == tile) null else tile)
                 syncHighlights()
+                event.isHandled = true
+                return
+            }
+            val vertex = scene.opVertices.firstOrNull {
+                glyphsByOp[it.op]?.containsScenePoint(point.x, point.y) == true
+            }
+            if (vertex != null) {
+                draggedVertex = vertex
+                mode = Mode.MOVE_VERTEX
+                pressPoint = point
                 event.isHandled = true
                 return
             }
@@ -551,6 +562,14 @@ class CompositorNode(
                         tile.x += delta.width
                         tile.y += delta.height
                     }
+                    relayout()
+                }
+                Mode.MOVE_VERTEX -> {
+                    val vertex = draggedVertex ?: return
+                    val delta = event.getDeltaRelativeTo(this@CompositorNode)
+                    vertex.x += delta.width
+                    vertex.y += delta.height
+                    vertex.placed = true
                     relayout()
                 }
                 Mode.MARQUEE -> {
@@ -588,6 +607,7 @@ class CompositorNode(
             }
             mode = Mode.NONE
             pressPoint = null
+            draggedVertex = null
         }
 
         override fun mouseWheelRotated(event: PInputEvent) {
@@ -628,7 +648,7 @@ class CompositorNode(
         )
     }
 
-    private enum class Mode { NONE, MOVE, MARQUEE }
+    private enum class Mode { NONE, MOVE, MOVE_VERTEX, MARQUEE }
 
     companion object {
         private const val MARGIN = 40.0

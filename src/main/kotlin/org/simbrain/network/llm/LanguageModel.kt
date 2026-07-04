@@ -3,6 +3,7 @@ package org.simbrain.network.llm
 import org.simbrain.network.compositor.AttentionTile
 import org.simbrain.network.compositor.CompositorScene
 import org.simbrain.network.compositor.Lfm2Compositor
+import org.simbrain.network.compositor.Lfm2LayerCompositor
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
@@ -125,6 +126,31 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     var loaded: LoadedState? = null
         private set
 
+    /** Live per-layer anatomy scenes, keyed by layer, in LRU order. */
+    @Transient
+    private val layerScenes = LinkedHashMap<Int, CompositorScene>()
+
+    /**
+     * The live anatomy scene for [layer] — built on first request and publishing from then on,
+     * so its history tiles accumulate token rows from that moment. LRU-capped: the weight
+     * rasters of many live scenes would otherwise pile up.
+     */
+    @Synchronized
+    fun layerScene(layer: Int): CompositorScene? {
+        val state = loaded ?: return null
+        layerScenes.remove(layer)?.let {
+            layerScenes[layer] = it
+            return it
+        }
+        val scene = Lfm2LayerCompositor.buildScene(state.model, layer, displaySeq)
+        scene.publish(state.model.position - 1)
+        layerScenes[layer] = scene
+        while (layerScenes.size > MAX_LAYER_SCENES) {
+            layerScenes.remove(layerScenes.keys.first())
+        }
+        return scene
+    }
+
     val isLoaded get() = loaded != null
 
     @Transient
@@ -157,6 +183,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
      * Loads weights and tokenizer from [weightsDirectory] and builds the compositor scene. Heavy
      * (~1 GB of tensors, a few seconds) — call off the EDT. Throws if the directory is invalid.
      */
+    @Synchronized
     fun loadWeights() {
         val dir = Path.of(weightsDirectory)
         check(Lfm2Weights.isValidWeightsDirectory(dir)) {
@@ -165,6 +192,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         Blas.numThreads = 4
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
+        layerScenes.clear()
         loaded = LoadedState(model, tokenizer, buildScene(model))
         events.weightsLoaded.fire()
     }
@@ -201,6 +229,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
+        layerScenes.values.forEach { it.reset() }
         promptIds = state.tokenizer.encode(prompt)
         cursor = 0
         generatedCount = 0
@@ -237,6 +266,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val position = state.model.position
         val logits = state.model.forwardToken(id)
         state.scene.publish(position)
+        for (scene in layerScenes.values) scene.publish(position)
         sampledToken = sampleToken(logits)
         if (cursor >= promptIds.size - 1) {
             if (stopAtEndOfText && sampledToken == state.model.config.eosTokenId) {
@@ -293,6 +323,10 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         appendLine("Name: $displayName (LFM2.5-230M)")
         appendLine("Weights: ${weightsDirectory.ifEmpty { "not set" }}${if (isLoaded) "" else " (not loaded)"}")
         append("Text: ${text.take(120)}")
+    }
+
+    companion object {
+        private const val MAX_LAYER_SCENES = 3
     }
 
     class CreationTemplate : EditableObject {

@@ -139,7 +139,12 @@ class CompositorNode(
         }
 
         fun syncLabel() {
-            label.text = if (tile is DeckTile) "${tile.title} · head ${tile.selectedSlice}" else tile.title
+            label.text = when (tile) {
+                is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
+                    ?: "${tile.title} · head ${tile.selectedSlice}"
+                is AttentionTile -> "${tile.title} · head ${tile.selectedHead}"
+                else -> tile.title
+            }
         }
 
         fun syncHighlight() {
@@ -199,6 +204,9 @@ class CompositorNode(
 
     /** Invoked after every tier-1 relayout, e.g. so a host can persist tile positions. */
     var onLayoutChanged: (() -> Unit)? = null
+
+    /** Invoked as the pointer moves across tiles (null between tiles); hosts hang previews on it. */
+    var onTileHover: ((TensorTile?) -> Unit)? = null
 
     init {
         rebuildEdges()
@@ -424,6 +432,7 @@ class CompositorNode(
             { it.waypoints.lastOrNull() ?: it.from.endpointBounds.center })
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
+            val emphasized = edge in scene.emphasizedEdges
             val tailSide = tailSides.getValue(edge)
             val headSide = headSides.getValue(edge)
             val tail = tailSide.p(tailFractions.getValue(edge))
@@ -433,14 +442,19 @@ class CompositorNode(
                 tailSide.unitNormal, headSide.unitNormal
             )
             routesByEdge[edge] = route
-            val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
+            val ribbonColor = when {
+                traced -> palette.receptiveFieldTrace
+                emphasized -> palette.sourceHandle
+                else -> palette.connectionLine
+            }
+            val thickness = if (traced || emphasized) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
             if (edge.stranded) {
                 // Head-stacked flow renders as a strand fan echoing the deck's back cards.
                 for (i in 2 downTo 1) {
                     val strandOffset = AffineTransform.getTranslateInstance(-DECK_STEP * i, -DECK_STEP * i)
                     PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
-                        paint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
+                        paint = ribbonColor
                         transparency = 0.2f
                         pickable = false
                         edgeLayer.addChild(this)
@@ -455,8 +469,8 @@ class CompositorNode(
             }
             ribbon.add(Area(tipTransform.createTransformedShape(arrowTip)))
             PPath.Double(ribbon, null).apply {
-                paint = if (traced) palette.receptiveFieldTrace else palette.connectionLine
-                transparency = if (traced) 0.8f else 0.5f
+                paint = ribbonColor
+                transparency = if (traced) 0.8f else if (emphasized) 0.65f else 0.5f
                 pickable = false
                 edgeLayer.addChild(this)
             }
@@ -619,17 +633,27 @@ class CompositorNode(
 
         override fun mouseWheelRotated(event: PInputEvent) {
             val point = event.getPositionRelativeTo(this@CompositorNode)
-            val tile = scene.tileAt(point.x, point.y) as? DeckTile ?: return
-            val next = (tile.selectedSlice + event.wheelRotation).mod(tile.slices)
-            tile.selectedSlice = next
-            tileNodesById.getValue(tile.id).syncLabel()
+            when (val tile = scene.tileAt(point.x, point.y)) {
+                is DeckTile -> {
+                    tile.selectedSlice = (tile.selectedSlice + event.wheelRotation).mod(tile.slices)
+                    scene.onHeadSelected?.invoke(tile, tile.selectedSlice)
+                }
+                is AttentionTile -> {
+                    tile.selectedHead = (tile.selectedHead + event.wheelRotation).mod(tile.numHeads)
+                    scene.onHeadSelected?.invoke(tile, tile.selectedHead)
+                }
+                else -> return
+            }
+            tileNodes.forEach { it.syncLabel() }
             refreshDirtyTiles()
             event.isHandled = true
         }
 
         override fun mouseMoved(event: PInputEvent) {
-            val target = canvas ?: return
             val point = event.getPositionRelativeTo(this@CompositorNode)
+            val tile = scene.tileAt(point.x, point.y)
+            onTileHover?.invoke(tile)
+            val target = canvas ?: return
             val glyph = glyphsByOp.values.firstOrNull { it.containsScenePoint(point.x, point.y) }
             if (glyph != null) {
                 target.toolTipText = glyph.op.toString()
@@ -640,12 +664,12 @@ class CompositorNode(
                 target.toolTipText = badged.activationOp.toString()
                 return
             }
-            val tile = scene.tileAt(point.x, point.y)
             val cell = tile?.cellAt(point.x, point.y)
             target.toolTipText = if (tile != null && cell != null) cellReadout(tile, cell.first, cell.second) else null
         }
 
         override fun mouseExited(event: PInputEvent) {
+            onTileHover?.invoke(null)
             canvas?.toolTipText = null
         }
 

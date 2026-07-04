@@ -92,4 +92,29 @@ class Lfm2LayerCompositorTest {
         assertTrue("model.layers.$layer.self_attn.q_proj.weight" in satellites)
         assertTrue("model.layers.$layer.self_attn.out_proj.weight" in satellites)
     }
+
+    @Test
+    fun `flipping the attention deck flips the kv cache decks to the serving group`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        val m = model(dir!!)
+        val layer = m.config.attentionLayers.first()
+        val scene = Lfm2LayerCompositor.buildScene(m, layer, displaySeq = 8)
+
+        val attention = scene.tile("layers.$layer.attn.weights") as AttentionTile
+        val kCache = scene.tile("layers.$layer.attn.k_cache") as DeckTile
+        val vCache = scene.tile("layers.$layer.attn.v_cache") as DeckTile
+        val qPerKv = m.config.numHeads / m.config.numKvHeads
+
+        attention.selectedHead = 5
+        scene.onHeadSelected?.invoke(attention, 5)
+        assertEquals(5 / qPerKv, kCache.selectedSlice, "the k deck flips to the serving kv group")
+        assertEquals(5 / qPerKv, vCache.selectedSlice)
+        assertTrue(kCache.sliceLabel!!.invoke(kCache.selectedSlice).contains("serves q"))
+
+        assertTrue(scene.emphasizedEdges.isNotEmpty(), "the cache arrows carry standing emphasis")
+        assertTrue(scene.emphasizedEdges.all { edge ->
+            (edge.from as TensorTile).id.endsWith("_cache")
+        })
+    }
 }

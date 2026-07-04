@@ -105,6 +105,12 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     var lens: LogitLens? = null
 
+    /** Edges rendered with standing emphasis — e.g. the KV-cache arrows telling the GQA story. */
+    var emphasizedEdges: Set<FlowEdge> = emptySet()
+
+    /** Invoked when the user wheel-flips a deck or attention tile, e.g. to couple GQA decks. */
+    var onHeadSelected: ((TensorTile, Int) -> Unit)? = null
+
     val selection = TileSelectionModel()
 
     fun addTile(tile: TensorTile) {

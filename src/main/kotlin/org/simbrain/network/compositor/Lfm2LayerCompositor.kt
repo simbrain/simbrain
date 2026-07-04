@@ -96,6 +96,32 @@ object Lfm2LayerCompositor {
 
         scene.connectFromGraph()
         CompositorLayout().apply(scene)
+
+        if (attention) {
+            // The GQA story: 16 query heads share 8 KV heads. Wheel-flipping the attention deck
+            // flips the cache decks to the serving group, and the cache arrows carry standing
+            // emphasis so the sharing path reads at a glance.
+            val kCacheTile = scene.tile("$prefix.attn.k_cache") as DeckTile
+            val vCacheTile = scene.tile("$prefix.attn.v_cache") as DeckTile
+            val qPerKv = config.numHeads / config.numKvHeads
+            fun servingLabel(name: String): (Int) -> String = { group ->
+                "$name · kv head $group (serves q ${group * qPerKv}–${(group + 1) * qPerKv - 1})"
+            }
+            kCacheTile.sliceLabel = servingLabel("k cache")
+            vCacheTile.sliceLabel = servingLabel("v cache")
+            scene.onHeadSelected = { tile, head ->
+                if (tile is AttentionTile) {
+                    val group = head / qPerKv
+                    kCacheTile.selectedSlice = group
+                    vCacheTile.selectedSlice = group
+                }
+            }
+            scene.emphasizedEdges = scene.edges.filter { edge ->
+                (edge.from as? TensorTile)?.id?.let {
+                    it.endsWith(".attn.k_cache") || it.endsWith(".attn.v_cache")
+                } == true
+            }.toSet()
+        }
         return scene
     }
 

@@ -295,6 +295,9 @@ class DeckTile(
     private val cube = FloatArray(tensor.rows * tensor.cols)
     private var lastVersion = -1L
 
+    /** Custom label per selected slice; null falls back to "title · head N". */
+    var sliceLabel: ((Int) -> String)? = null
+
     var selectedSlice = 0
         set(value) {
             require(value in 0 until slices) { "Slice $value out of range 0..${slices - 1}" }

@@ -1,20 +1,26 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "transformers==5.13.0",
+#     "torch==2.12.1",
+#     "numpy",
+#     "huggingface-hub",
+# ]
+# ///
 """Exports LFM2.5-230M reference activations for the Kotlin parity test (Lfm2ParityTest).
 
 Loads the model in float32 (same bf16 widening the Kotlin loader does), runs fixed prompts,
 and writes per-layer hidden states plus logits as raw little-endian f32 binaries with a JSON
 manifest, to ~/.cache/simbrain/lfm2-parity/.
 
-Usage: python3 src/test/python/lfm2_export_reference.py
+Usage: uv run src/test/python/lfm2_export_reference.py
 """
 
 import json
 from pathlib import Path
 
-import numpy as np
 import torch
-from huggingface_hub import hf_hub_download
-from tokenizers import Tokenizer
-from transformers import AutoModelForCausalLM
+from transformers import AutoModelForCausalLM, AutoTokenizer
 
 MODEL_ID = "LiquidAI/LFM2.5-230M"
 OUT_DIR = Path.home() / ".cache" / "simbrain" / "lfm2-parity"
@@ -30,8 +36,8 @@ def main():
     torch.set_num_threads(1)
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
-    tokenizer = Tokenizer.from_file(hf_hub_download(MODEL_ID, "tokenizer.json"))
-    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, torch_dtype=torch.float32)
+    tokenizer = AutoTokenizer.from_pretrained(MODEL_ID)
+    model = AutoModelForCausalLM.from_pretrained(MODEL_ID, dtype=torch.float32)
     model.eval()
 
     theta = getattr(model.config, "rope_theta", None)
@@ -42,7 +48,7 @@ def main():
 
     manifest = {"model": MODEL_ID, "rope_theta": theta, "prompts": []}
     for pi, prompt in enumerate(PROMPTS):
-        ids = torch.tensor([tokenizer.encode(prompt).ids])
+        ids = tokenizer(prompt, return_tensors="pt")["input_ids"]
         with torch.no_grad():
             out = model(ids, output_hidden_states=True, use_cache=False)
         seq = ids.shape[1]

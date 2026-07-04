@@ -371,9 +371,9 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         ## Weights, operations, and the lens
 
-        Tiles with heavy orange borders are **weight matrices** — the model's learned parameters (Wq/Wk/Wv/Wo for attention, W1/W2 for the MLP, plus the embedding, position, and unembedding tables). They only change during training.
+        Tiles with heavy orange borders are **weight matrices** — the model's learned parameters. They ride directly on the line that uses them: Wq/Wk/Wv sit on the curves into q/k/v, W1 and W2 on the MLP path (each followed by its thin **bias strip**, showing the actual bias vector), Wo on the attention output, and the unembedding on the way into the logits. They only change during training.
 
-        The small glyphs on the connecting lines are the **operations**: ⊕ addition, × matrix multiply, LN layer norm, σ masked softmax, ReLU, and CE the cross-entropy loss. Hover over any glyph to see the operation's input and output tensors.
+        The small circled icons on the connecting lines are the **operations**: ⊕ addition, × matrix multiply, a bell curve for layer norm, σ for the masked softmax, and a target for the cross-entropy loss. The activation function appears as a corner badge on the tile it produces (the hockey-stick icon on `hidden` is the ReLU). Hover over any icon to see the operation's input and output tensors.
 
         The small readouts beside each spine tile are the **logit lens**: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read down the spine — the bottom reading is the model's actual prediction.
 
@@ -406,6 +406,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         - **Double-click a tile** to trace its data-flow paths through the diagram; double-click again to clear.
         - **Hover over any cell** to read its exact value; drag tiles to rearrange the diagram.
         - Adjust `Temperature` and the sampling strategy in the control panel and compare generated text.
+        - If the diagram is too large next to other components, lower **Diagram scale** in the transformer's Settings — tiles and spacing shrink while labels stay readable.
         - Try more heads or layers in the startup dialog. With two layers you can watch the logit lens improve across both.
 
         ## Saving

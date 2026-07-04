@@ -95,23 +95,30 @@ fun routeThrough(knots: List<Point2D>, startNormal: Point2D, endNormal: Point2D)
 }
 
 /**
+ * The side of this rectangle whose outward normal best faces [guide].
+ */
+fun Rectangle2D.facingSide(guide: Point2D): java.awt.geom.Line2D =
+    outlines.toList().maxBy { it.unitNormal dot (guide - it.midPoint).norm }
+
+/**
  * Route a curve from the boundary of [sourceBounds] to the boundary of [targetBounds] through the
  * given [waypoints]. Attach sides are chosen to face the nearest guide point (the first/last
  * waypoint, or the other rectangle's center when there are none), so the curve exits and enters
- * perpendicular to the tile borders.
+ * perpendicular to the tile borders. [tailFraction]/[headFraction] slide the attach points along
+ * their sides, letting callers spread several curves sharing one side.
  */
 fun bezierRoute(
     sourceBounds: Rectangle2D,
     targetBounds: Rectangle2D,
     waypoints: List<Point2D> = emptyList(),
     tailPadding: Double = 0.0,
-    headPadding: Double = 0.0
+    headPadding: Double = 0.0,
+    tailFraction: Double = 0.5,
+    headFraction: Double = 0.5,
 ): BezierRoute {
-    val sourceGuide = waypoints.firstOrNull() ?: targetBounds.center
-    val targetGuide = waypoints.lastOrNull() ?: sourceBounds.center
-    val sourceSide = sourceBounds.outlines.toList().maxBy { it.unitNormal dot (sourceGuide - it.midPoint).norm }
-    val targetSide = targetBounds.outlines.toList().maxBy { it.unitNormal dot (targetGuide - it.midPoint).norm }
-    val tail = sourceSide.midPoint + sourceSide.unitNormal * tailPadding
-    val head = targetSide.midPoint + targetSide.unitNormal * headPadding
+    val sourceSide = sourceBounds.facingSide(waypoints.firstOrNull() ?: targetBounds.center)
+    val targetSide = targetBounds.facingSide(waypoints.lastOrNull() ?: sourceBounds.center)
+    val tail = sourceSide.p(tailFraction) + sourceSide.unitNormal * tailPadding
+    val head = targetSide.p(headFraction) + targetSide.unitNormal * headPadding
     return routeThrough(listOf(tail) + waypoints + listOf(head), sourceSide.unitNormal, targetSide.unitNormal)
 }

@@ -181,6 +181,14 @@ val Line2D.midPoint
  */
 fun Line2D.p(t: Double) = point(p1.x + (p2.x - p1.x) * t, p1.y + (p2.y - p1.y) * t)
 
+/**
+ * Fraction along this line (unclamped) of [point]'s perpendicular projection onto it.
+ */
+fun Line2D.projectionFraction(point: Point2D): Double {
+    val v = vector
+    return ((point - p1) dot v) / v.magnitudeSq
+}
+
 fun Line2D.scale(t: Double) = p(t)
 
 // Rectangles

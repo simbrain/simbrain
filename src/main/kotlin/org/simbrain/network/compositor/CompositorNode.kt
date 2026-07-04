@@ -23,17 +23,13 @@ import org.simbrain.network.tensor.op.SiluGateOp
 import org.simbrain.network.tensor.op.SoftmaxCrossEntropyOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.util.BezierRoute
-import org.simbrain.util.NetworkTheme
-import org.simbrain.util.Theme
-import org.simbrain.util.bezierRoute
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
-import org.simbrain.util.sin60deg
-import org.simbrain.util.toSimbrainColor
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.geom.Area
+import java.awt.geom.Line2D
 import java.awt.geom.Path2D
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
@@ -189,7 +185,7 @@ class CompositorNode(
         for (row in lensRows) {
             val sourceId = scene.lens?.sources?.get(row.index)?.name ?: continue
             val tile = tileNodesById[sourceId]?.tile ?: continue
-            row.setOffset(tile.x + tile.width + 14.0, tile.y + tile.height / 2 - 8.0)
+            row.setOffset(tile.x - LENS_SPACE, tile.y + tile.height / 2 - 8.0)
         }
         val bounds = scene.tiles.fold(null as Rectangle2D?) { acc, tile ->
             val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 20)
@@ -198,7 +194,7 @@ class CompositorNode(
         background.reset()
         background.append(
             Rectangle2D.Double(
-                bounds.x - MARGIN, bounds.y - MARGIN,
+                bounds.x - MARGIN - LENS_SPACE, bounds.y - MARGIN,
                 bounds.width + 2 * MARGIN + LENS_SPACE, bounds.height + 2 * MARGIN
             ), false
         )
@@ -285,15 +281,75 @@ class CompositorNode(
         else -> op.name.substringAfterLast('.')
     }
 
+    /**
+     * Attach fractions along each tile side, spread so several curves sharing a side fan out
+     * instead of stacking on the midpoint. Curves are ordered along the side by where their far
+     * endpoint projects onto it, so the fan never crosses itself.
+     */
+    private fun attachFractions(
+        sideOf: (TileEdge) -> Line2D,
+        tileOf: (TileEdge) -> TensorTile,
+        guideOf: (TileEdge) -> Point2D,
+    ): Map<TileEdge, Double> {
+        val fractions = HashMap<TileEdge, Double>()
+        val bySide = scene.edges.groupBy { tileOf(it) to sideOf(it).midPoint.let { m -> m.x to m.y } }
+        for ((_, group) in bySide) {
+            val ordered = group.sortedBy { sideOf(it).projectionFraction(guideOf(it)) }
+            ordered.forEachIndexed { j, edge -> fractions[edge] = (j + 1.0) / (ordered.size + 1.0) }
+        }
+        return fractions
+    }
+
+    /**
+     * Slides a satellite along its curve away from the op's nominal slot until it stops
+     * overlapping already-placed tiles.
+     */
+    private fun satelliteT(route: BezierRoute, tile: TensorTile, slotT: Double, obstacles: List<TensorTile>): Double {
+        for (offset in SATELLITE_NUDGES) {
+            val t = slotT + offset
+            if (t < 0.1 || t > 0.9) continue
+            val at = route.pointAt(t)
+            val clear = obstacles.none {
+                it.intersects(
+                    at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
+                    tile.width + 24, tile.height + 24
+                )
+            }
+            if (clear) return t
+        }
+        return slotT
+    }
+
     private fun rebuildEdges() {
         val palette = NetworkTheme.current
         edgeLayer.removeAllChildren()
         glyphsByOp.clear()
         routesByEdge.clear()
         val satellitesByEdge = scene.satellites.groupBy { it.edge }
+        val satelliteTiles = scene.satellites.map { it.tile }.toSet()
+        val placedObstacles = scene.tiles.filter { it !in satelliteTiles }.toMutableList()
+        val tailSides = scene.edges.associateWith {
+            it.from.bounds.facingSide(it.waypoints.firstOrNull() ?: it.to.bounds.center)
+        }
+        val headSides = scene.edges.associateWith {
+            it.to.bounds.facingSide(it.waypoints.lastOrNull() ?: it.from.bounds.center)
+        }
+        val tailFractions = attachFractions(
+            { tailSides.getValue(it) }, { it.from },
+            { it.waypoints.firstOrNull() ?: it.to.bounds.center })
+        val headFractions = attachFractions(
+            { headSides.getValue(it) }, { it.to },
+            { it.waypoints.lastOrNull() ?: it.from.bounds.center })
         for (edge in scene.edges) {
             val traced = edge in scene.tracedEdges
-            val route = bezierRoute(edge.from.bounds, edge.to.bounds, edge.waypoints, headPadding = TIP_LENGTH)
+            val tailSide = tailSides.getValue(edge)
+            val headSide = headSides.getValue(edge)
+            val tail = tailSide.p(tailFractions.getValue(edge))
+            val head = headSide.p(headFractions.getValue(edge)) + headSide.unitNormal * TIP_LENGTH
+            val route = routeThrough(
+                listOf(tail) + edge.waypoints + listOf(head),
+                tailSide.unitNormal, headSide.unitNormal
+            )
             routesByEdge[edge] = route
             val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val ribbon = Area(
@@ -313,11 +369,17 @@ class CompositorNode(
             }
             val satellitesByOp = satellitesByEdge[edge]?.associateBy { it.op } ?: emptyMap()
             for ((i, op) in edge.ops.withIndex()) {
-                val at = route.pointAt((i + 1).toDouble() / (edge.ops.size + 1))
+                val slotT = (i + 1).toDouble() / (edge.ops.size + 1)
                 val satellite = satellitesByOp[op]
+                val at = if (satellite != null) {
+                    route.pointAt(satelliteT(route, satellite.tile, slotT, placedObstacles))
+                } else {
+                    route.pointAt(slotT)
+                }
                 if (satellite != null) {
                     satellite.tile.x = at.x - satellite.tile.width / 2
                     satellite.tile.y = at.y - satellite.tile.height / 2
+                    placedObstacles.add(satellite.tile)
                     tileNodesById.getValue(satellite.tile.id).syncLayout()
                 }
                 if (op !in glyphsByOp) {
@@ -478,5 +540,6 @@ class CompositorNode(
         private const val STALE_TRANSPARENCY = 0.35f
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
+        private val SATELLITE_NUDGES = doubleArrayOf(0.0, -0.08, 0.08, -0.16, 0.16, -0.24, 0.24, -0.32, 0.32)
     }
 }

@@ -113,9 +113,10 @@ class CompositorScene(val graph: PlanGraph? = null) {
         }
         satellites = attachable.map { p ->
             val readers = g.readers(p.id).toSet()
-            edges.firstNotNullOf { edge ->
-                edge.ops.firstOrNull { it in readers }?.let { TileSatellite(p, edge, it) }
-            }
+            // Prefer the most direct hop carrying the consuming op — e.g. Wo rides the
+            // attention-pattern edge into the output, not the longer value bypass.
+            val host = edges.filter { edge -> edge.ops.any { it in readers } }.minBy { it.ops.size }
+            TileSatellite(p, host, host.ops.first { it in readers })
         }
     }
 

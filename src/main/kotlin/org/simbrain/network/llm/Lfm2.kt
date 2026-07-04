@@ -1,18 +1,15 @@
 package org.simbrain.network.llm
 
-import org.bytedeco.javacpp.FloatPointer
-import org.bytedeco.openblas.global.openblas_nolapack.CblasNoTrans
-import org.bytedeco.openblas.global.openblas_nolapack.CblasRowMajor
-import org.bytedeco.openblas.global.openblas_nolapack.CblasTrans
-import org.bytedeco.openblas.global.openblas_nolapack.cblas_sgemv
 import org.simbrain.network.tensor.FloatTensor
-import org.simbrain.network.tensor.matvec
-import java.nio.FloatBuffer
-import kotlin.math.cos
-import kotlin.math.exp
+import org.simbrain.network.tensor.op.HookHandle
+import org.simbrain.network.tensor.op.LinearOp
+import org.simbrain.network.tensor.op.AddOp
+import org.simbrain.network.tensor.op.OpPlan
+import org.simbrain.network.tensor.op.RmsNormOp
+import org.simbrain.network.tensor.op.SiluGateOp
+import org.simbrain.network.tensor.op.TensorOp
+import org.simbrain.network.tensor.op.TensorPort
 import kotlin.math.pow
-import kotlin.math.sin
-import kotlin.math.sqrt
 
 /**
  * LFM2 model family hyperparameters. Defaults are LFM2.5-230M. [maxSeqLen] sizes the KV caches
@@ -36,238 +33,182 @@ data class Lfm2Config(
 }
 
 /**
- * Headless LFM2 forward pass on the FloatTensor substrate: token-by-token decode through the
- * 14-layer stack (gated short-conv and GQA attention mixers, SwiGLU MLPs, pre-norm residuals),
- * with rolling conv caches and KV caches. Mirrors the reference `modeling_lfm2.py` math in f32.
+ * Headless LFM2 forward pass, expressed as an explicit [OpPlan]: token-by-token decode through
+ * the 14-layer stack (gated short-conv and GQA attention mixers, SwiGLU MLPs, pre-norm
+ * residuals) with rolling conv caches and KV caches. Mirrors the reference `modeling_lfm2.py`
+ * math in f32.
  *
- * Weights come from [Safetensors.load] keyed by the file's names; the unembedding is tied to
- * `model.embed_tokens.weight`. All workspaces are preallocated — steady-state decode allocates
- * nothing per token.
+ * Every intermediate is a named [TensorPort] with per-layer workspaces (`layers.3.attn.weights`,
+ * `layers.5.conv.gated`, ...), so probes hook values via [onPort], the renderer sees per-tensor
+ * dirty versions, and [plan] can be micro-stepped op by op. Weights come from [Safetensors.load]
+ * keyed by the file's names; the unembedding is tied to `model.embed_tokens.weight`. All
+ * workspaces are preallocated — steady-state decode allocates nothing per token.
  */
 class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTensor>) {
 
-    private fun param(name: String) = params[name] ?: error("Missing parameter $name")
+    private fun paramPort(name: String) =
+        TensorPort(name, params[name] ?: error("Missing parameter $name"))
 
-    private val embedTokens = param("model.embed_tokens.weight")
-    private val embeddingNorm = param("model.embedding_norm.weight")
+    private fun workspace(name: String, cols: Int, rows: Int = 1) =
+        TensorPort(name, FloatTensor(rows, cols).apply { fill(0f) })
 
-    private inner class Layer(idx: Int) {
-        val isAttention = idx in config.attentionLayers
-        val operatorNorm = param("model.layers.$idx.operator_norm.weight")
-        val ffnNorm = param("model.layers.$idx.ffn_norm.weight")
-        val w1 = param("model.layers.$idx.feed_forward.w1.weight")
-        val w2 = param("model.layers.$idx.feed_forward.w2.weight")
-        val w3 = param("model.layers.$idx.feed_forward.w3.weight")
-        val qProj = if (isAttention) param("model.layers.$idx.self_attn.q_proj.weight") else null
-        val kProj = if (isAttention) param("model.layers.$idx.self_attn.k_proj.weight") else null
-        val vProj = if (isAttention) param("model.layers.$idx.self_attn.v_proj.weight") else null
-        val outProj = if (isAttention) param("model.layers.$idx.self_attn.out_proj.weight") else null
-        val qNorm = if (isAttention) param("model.layers.$idx.self_attn.q_layernorm.weight") else null
-        val kNorm = if (isAttention) param("model.layers.$idx.self_attn.k_layernorm.weight") else null
-        val convWeight = if (!isAttention) param("model.layers.$idx.conv.conv.weight") else null
-        val convInProj = if (!isAttention) param("model.layers.$idx.conv.in_proj.weight") else null
-        val convOutProj = if (!isAttention) param("model.layers.$idx.conv.out_proj.weight") else null
+    private val state = Lfm2DecodeState()
 
-        val kCache = if (isAttention) FloatTensor(config.maxSeqLen, config.kvDim) else null
-        val vCache = if (isAttention) FloatTensor(config.maxSeqLen, config.kvDim) else null
-        val convCache = if (!isAttention) FloatTensor(config.hiddenSize, config.convKernel).apply { fill(0f) } else null
+    private val embedPort = paramPort("model.embed_tokens.weight")
+    private val convCaches = ArrayList<FloatTensor>()
+
+    val plan: OpPlan = buildPlan()
+
+    val logits: TensorPort get() = plan.port("logits")
+
+    val position get() = state.position
+
+    private fun buildPlan(): OpPlan {
+        val c = config
+        val ops = ArrayList<TensorOp>()
+        val invFreq = DoubleArray(c.headDim / 2) { i -> 1.0 / c.ropeTheta.pow(2.0 * i / c.headDim) }
+
+        var resid = workspace("embed", c.hiddenSize)
+        ops += EmbedLookupOp("embed_lookup", embedPort, resid, state)
+
+        val ropeCos = workspace("rope.cos", c.headDim / 2)
+        val ropeSin = workspace("rope.sin", c.headDim / 2)
+        ops += RopeAnglesOp("rope_angles", ropeCos, ropeSin, invFreq, state)
+
+        for (i in 0 until c.numLayers) {
+            val prefix = "layers.$i"
+            val weightPrefix = "model.layers.$i"
+
+            val normed = workspace("$prefix.operator_normed", c.hiddenSize)
+            ops += RmsNormOp("$prefix.operator_norm", resid,
+                paramPort("$weightPrefix.operator_norm.weight"), normed, c.normEps)
+
+            val mixerOut = if (i in c.attentionLayers) {
+                attentionOps(ops, prefix, weightPrefix, normed, ropeCos, ropeSin)
+            } else {
+                convOps(ops, prefix, weightPrefix, normed)
+            }
+
+            val mixerResid = workspace("$prefix.mixer_resid", c.hiddenSize)
+            ops += AddOp("$prefix.mixer_residual", resid, mixerOut, mixerResid)
+
+            val ffnNormed = workspace("$prefix.ffn_normed", c.hiddenSize)
+            ops += RmsNormOp("$prefix.ffn_norm", mixerResid,
+                paramPort("$weightPrefix.ffn_norm.weight"), ffnNormed, c.normEps)
+            val mlpGate = workspace("$prefix.mlp.gate", c.intermediateSize)
+            val mlpUp = workspace("$prefix.mlp.up", c.intermediateSize)
+            val mlpAct = workspace("$prefix.mlp.act", c.intermediateSize)
+            val mlpOut = workspace("$prefix.mlp.out", c.hiddenSize)
+            ops += LinearOp("$prefix.mlp.w1", paramPort("$weightPrefix.feed_forward.w1.weight"), ffnNormed, mlpGate)
+            ops += LinearOp("$prefix.mlp.w3", paramPort("$weightPrefix.feed_forward.w3.weight"), ffnNormed, mlpUp)
+            ops += SiluGateOp("$prefix.mlp.silu_gate", mlpGate, mlpUp, mlpAct)
+            ops += LinearOp("$prefix.mlp.w2", paramPort("$weightPrefix.feed_forward.w2.weight"), mlpAct, mlpOut)
+
+            val layerResid = workspace("$prefix.resid", c.hiddenSize)
+            ops += AddOp("$prefix.residual", mixerResid, mlpOut, layerResid)
+            resid = layerResid
+        }
+
+        val finalNormed = workspace("final_norm", c.hiddenSize)
+        ops += RmsNormOp("embedding_norm", resid,
+            paramPort("model.embedding_norm.weight"), finalNormed, c.normEps)
+        ops += LinearOp("unembed", embedPort, finalNormed, workspace("logits", c.vocabSize))
+
+        return OpPlan(ops)
     }
 
-    private val layers = List(config.numLayers) { Layer(it) }
+    private fun attentionOps(
+        ops: MutableList<TensorOp>,
+        prefix: String,
+        weightPrefix: String,
+        normed: TensorPort,
+        ropeCos: TensorPort,
+        ropeSin: TensorPort,
+    ): TensorPort {
+        val c = config
+        val qRaw = workspace("$prefix.attn.q_raw", c.numHeads * c.headDim)
+        val kRaw = workspace("$prefix.attn.k_raw", c.kvDim)
+        val v = workspace("$prefix.attn.v", c.kvDim)
+        ops += LinearOp("$prefix.attn.q_proj", paramPort("$weightPrefix.self_attn.q_proj.weight"), normed, qRaw)
+        ops += LinearOp("$prefix.attn.k_proj", paramPort("$weightPrefix.self_attn.k_proj.weight"), normed, kRaw)
+        ops += LinearOp("$prefix.attn.v_proj", paramPort("$weightPrefix.self_attn.v_proj.weight"), normed, v)
 
-    private val x = FloatTensor(1, config.hiddenSize)
-    private val normed = FloatTensor(1, config.hiddenSize)
-    private val bcx = FloatTensor(1, 3 * config.hiddenSize)
-    private val gated = FloatTensor(1, config.hiddenSize)
-    private val q = FloatTensor(1, config.numHeads * config.headDim)
-    private val k = FloatTensor(1, config.kvDim)
-    private val v = FloatTensor(1, config.kvDim)
-    private val scores = FloatTensor(1, config.maxSeqLen)
-    private val attnOut = FloatTensor(1, config.numHeads * config.headDim)
-    private val mlpGate = FloatTensor(1, config.intermediateSize)
-    private val mlpUp = FloatTensor(1, config.intermediateSize)
-    private val logits = FloatTensor(1, config.vocabSize)
+        val q = workspace("$prefix.attn.q", c.numHeads * c.headDim)
+        val k = workspace("$prefix.attn.k", c.kvDim)
+        ops += HeadwiseNormRopeOp("$prefix.attn.q_norm_rope", qRaw,
+            paramPort("$weightPrefix.self_attn.q_layernorm.weight"), ropeCos, ropeSin, q,
+            c.numHeads, c.headDim, c.normEps)
+        ops += HeadwiseNormRopeOp("$prefix.attn.k_norm_rope", kRaw,
+            paramPort("$weightPrefix.self_attn.k_layernorm.weight"), ropeCos, ropeSin, k,
+            c.numKvHeads, c.headDim, c.normEps)
 
-    private val invFreq = DoubleArray(config.headDim / 2) { i ->
-        1.0 / config.ropeTheta.pow(2.0 * i / config.headDim)
+        val kCache = workspace("$prefix.attn.k_cache", c.kvDim, rows = c.maxSeqLen)
+        val vCache = workspace("$prefix.attn.v_cache", c.kvDim, rows = c.maxSeqLen)
+        ops += CacheWriteOp("$prefix.attn.k_cache_write", k, kCache, state)
+        ops += CacheWriteOp("$prefix.attn.v_cache_write", v, vCache, state)
+
+        val weights = workspace("$prefix.attn.weights", c.maxSeqLen, rows = c.numHeads)
+        ops += AttendScoresOp("$prefix.attn.scores", q, kCache, weights, state,
+            c.numHeads, c.numKvHeads, c.headDim)
+        val context = workspace("$prefix.attn.context", c.numHeads * c.headDim)
+        ops += AttendMixOp("$prefix.attn.mix", weights, vCache, context, state,
+            c.numHeads, c.numKvHeads, c.headDim)
+
+        val attnOut = workspace("$prefix.attn.out", c.hiddenSize)
+        ops += LinearOp("$prefix.attn.out_proj", paramPort("$weightPrefix.self_attn.out_proj.weight"), context, attnOut)
+        return attnOut
     }
-    private val ropeCos = FloatArray(config.headDim / 2)
-    private val ropeSin = FloatArray(config.headDim / 2)
 
-    var position = 0
-        private set
+    private fun convOps(
+        ops: MutableList<TensorOp>,
+        prefix: String,
+        weightPrefix: String,
+        normed: TensorPort,
+    ): TensorPort {
+        val c = config
+        val bcx = workspace("$prefix.conv.bcx", 3 * c.hiddenSize)
+        ops += LinearOp("$prefix.conv.in_proj", paramPort("$weightPrefix.conv.in_proj.weight"), normed, bcx)
 
-    fun reset() {
-        position = 0
-        layers.forEach { it.convCache?.fill(0f) }
+        val bx = workspace("$prefix.conv.bx", c.hiddenSize)
+        ops += OffsetGateOp("$prefix.conv.b_gate", bcx, 0, bcx, 2 * c.hiddenSize, bx)
+
+        val cache = workspace("$prefix.conv.cache", c.convKernel, rows = c.hiddenSize)
+        convCaches.add(cache.tensor)
+        val convRaw = workspace("$prefix.conv.raw", c.hiddenSize)
+        ops += CausalConvOp("$prefix.conv.causal_conv", bx, cache,
+            paramPort("$weightPrefix.conv.conv.weight"), convRaw)
+
+        val gated = workspace("$prefix.conv.gated", c.hiddenSize)
+        ops += OffsetGateOp("$prefix.conv.c_gate", convRaw, 0, bcx, c.hiddenSize, gated)
+
+        val convOut = workspace("$prefix.conv.out", c.hiddenSize)
+        ops += LinearOp("$prefix.conv.out_proj", paramPort("$weightPrefix.conv.out_proj.weight"), gated, convOut)
+        return convOut
     }
 
     /**
-     * Runs one token through the stack at the current position and returns the logits workspace
-     * (valid until the next call). [captureHidden] receives the residual stream as heap copies:
-     * index 0 = embedding, index i = raw output of layer i, index numLayers + 1 = the final
-     * embedding_norm output. (Transformers' `output_hidden_states` list differs in one spot:
-     * its last entry is the post-norm state, not the raw final-layer residual.)
+     * Runs one token through the plan at the current position and returns the logits workspace
+     * (valid until the next call). Intermediate values are exposed on named ports — see [onPort].
      */
-    fun forwardToken(tokenId: Int, captureHidden: ((Int, FloatArray) -> Unit)? = null): FloatTensor {
+    fun forwardToken(tokenId: Int): FloatTensor {
         require(tokenId in 0 until config.vocabSize) { "Token id $tokenId out of vocab" }
-        check(position < config.maxSeqLen) { "KV cache full at $position (maxSeqLen ${config.maxSeqLen})" }
-
-        x.data.duplicate().put(embedTokens.data.slice(tokenId * config.hiddenSize, config.hiddenSize))
-        x.markMutated()
-        captureHidden?.invoke(0, x.toFloatArray())
-
-        val half = config.headDim / 2
-        for (i in 0 until half) {
-            val angle = position * invFreq[i]
-            ropeCos[i] = cos(angle).toFloat()
-            ropeSin[i] = sin(angle).toFloat()
+        check(state.position < config.maxSeqLen) {
+            "KV cache full at ${state.position} (maxSeqLen ${config.maxSeqLen})"
         }
-
-        layers.forEachIndexed { layerIdx, layer ->
-            rmsNormInto(x.data, 0, config.hiddenSize, layer.operatorNorm.data, normed.data, 0)
-            normed.markMutated()
-            if (layer.isAttention) attentionMixer(layer) else convMixer(layer)
-
-            rmsNormInto(x.data, 0, config.hiddenSize, layer.ffnNorm.data, normed.data, 0)
-            normed.markMutated()
-            matvec(layer.w1, normed, mlpGate)
-            matvec(layer.w3, normed, mlpUp)
-            val g = mlpGate.data
-            for (i in 0 until config.intermediateSize) {
-                val a = g.get(i)
-                g.put(i, a / (1f + exp(-a)) * mlpUp.data.get(i))
-            }
-            mlpGate.markMutated()
-            matvec(layer.w2, mlpGate, x, beta = 1f)
-
-            captureHidden?.invoke(layerIdx + 1, x.toFloatArray())
-        }
-
-        rmsNormInto(x.data, 0, config.hiddenSize, embeddingNorm.data, normed.data, 0)
-        normed.markMutated()
-        captureHidden?.invoke(config.numLayers + 1, normed.toFloatArray())
-        matvec(embedTokens, normed, logits)
-
-        position++
-        return logits
+        state.tokenId = tokenId
+        plan.forward()
+        state.position++
+        return logits.tensor
     }
 
-    /** x += out_proj(attention(operator_norm(x))) for one decode step. */
-    private fun attentionMixer(layer: Layer) {
-        matvec(layer.qProj!!, normed, q)
-        matvec(layer.kProj!!, normed, k)
-        matvec(layer.vProj!!, normed, v)
+    /**
+     * Registers a probe-style hook that fires with the port's fresh value each time its op runs.
+     * Residual-stream ports: `embed`, `layers.<i>.resid`, `final_norm`; see the plan for all.
+     */
+    fun onPort(name: String, hook: (TensorPort) -> Unit): HookHandle = plan.onPort(name, hook)
 
-        for (h in 0 until config.numHeads) {
-            rmsNormInto(q.data, h * config.headDim, config.headDim, layer.qNorm!!.data, q.data, h * config.headDim)
-        }
-        for (h in 0 until config.numKvHeads) {
-            rmsNormInto(k.data, h * config.headDim, config.headDim, layer.kNorm!!.data, k.data, h * config.headDim)
-        }
-        for (h in 0 until config.numHeads) applyRope(q.data, h * config.headDim)
-        for (h in 0 until config.numKvHeads) applyRope(k.data, h * config.headDim)
-        q.markMutated()
-        k.markMutated()
-
-        val kCache = layer.kCache!!
-        val vCache = layer.vCache!!
-        kCache.data.duplicate().also { it.position(position * config.kvDim) }.put(k.data.duplicate())
-        vCache.data.duplicate().also { it.position(position * config.kvDim) }.put(v.data.duplicate())
-        kCache.markMutated()
-        vCache.markMutated()
-
-        val seen = position + 1
-        val scale = 1f / sqrt(config.headDim.toFloat())
-        val groupSize = config.numHeads / config.numKvHeads
-        for (h in 0 until config.numHeads) {
-            val kvHead = h / groupSize
-            val headOffset = (kvHead * config.headDim).toLong()
-            cblas_sgemv(
-                CblasRowMajor, CblasNoTrans, seen, config.headDim, scale,
-                FloatPointer(kCache.pointer).position(headOffset), config.kvDim,
-                FloatPointer(q.pointer).position((h * config.headDim).toLong()), 1,
-                0f, scores.pointer, 1
-            )
-            softmaxInPlace(scores.data, seen)
-            cblas_sgemv(
-                CblasRowMajor, CblasTrans, seen, config.headDim, 1f,
-                FloatPointer(vCache.pointer).position(headOffset), config.kvDim,
-                scores.pointer, 1,
-                0f, FloatPointer(attnOut.pointer).position((h * config.headDim).toLong()), 1
-            )
-        }
-        scores.markMutated()
-        attnOut.markMutated()
-
-        matvec(layer.outProj!!, attnOut, x, beta = 1f)
-    }
-
-    /** x += out_proj(C * conv(B * xProj)) for one decode step, rolling the k-wide conv cache. */
-    private fun convMixer(layer: Layer) {
-        matvec(layer.convInProj!!, normed, bcx)
-        val h = config.hiddenSize
-        val b = bcx.data
-        for (i in 0 until h) {
-            gated.data.put(i, b.get(i) * b.get(2 * h + i))
-        }
-        gated.markMutated()
-
-        val cache = layer.convCache!!.data
-        val w = layer.convWeight!!.data
-        val kk = config.convKernel
-        for (c in 0 until h) {
-            val base = c * kk
-            var acc = 0f
-            for (j in 0 until kk - 1) {
-                val shifted = cache.get(base + j + 1)
-                cache.put(base + j, shifted)
-                acc += shifted * w.get(base + j)
-            }
-            val newest = gated.data.get(c)
-            cache.put(base + kk - 1, newest)
-            acc += newest * w.get(base + kk - 1)
-            gated.data.put(c, acc * b.get(h + c))
-        }
-        layer.convCache!!.markMutated()
-        gated.markMutated()
-
-        matvec(layer.convOutProj!!, gated, x, beta = 1f)
-    }
-
-    private fun rmsNormInto(src: FloatBuffer, srcOffset: Int, n: Int, weight: FloatBuffer, dst: FloatBuffer, dstOffset: Int) {
-        var sumSq = 0f
-        for (i in 0 until n) {
-            val a = src.get(srcOffset + i)
-            sumSq += a * a
-        }
-        val inv = 1f / sqrt(sumSq / n + config.normEps)
-        for (i in 0 until n) {
-            dst.put(dstOffset + i, src.get(srcOffset + i) * inv * weight.get(i))
-        }
-    }
-
-    /** Rotate-half RoPE over one head at the precomputed position angles. */
-    private fun applyRope(buf: FloatBuffer, offset: Int) {
-        val half = config.headDim / 2
-        for (i in 0 until half) {
-            val a = buf.get(offset + i)
-            val bVal = buf.get(offset + half + i)
-            buf.put(offset + i, a * ropeCos[i] - bVal * ropeSin[i])
-            buf.put(offset + half + i, bVal * ropeCos[i] + a * ropeSin[i])
-        }
-    }
-
-    private fun softmaxInPlace(buf: FloatBuffer, n: Int) {
-        var max = Float.NEGATIVE_INFINITY
-        for (i in 0 until n) max = maxOf(max, buf.get(i))
-        var sum = 0f
-        for (i in 0 until n) {
-            val e = exp(buf.get(i) - max)
-            buf.put(i, e)
-            sum += e
-        }
-        val inv = 1f / sum
-        for (i in 0 until n) buf.put(i, buf.get(i) * inv)
+    fun reset() {
+        state.position = 0
+        convCaches.forEach { it.fill(0f) }
     }
 }

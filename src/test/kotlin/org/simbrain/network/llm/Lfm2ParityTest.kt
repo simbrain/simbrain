@@ -62,11 +62,18 @@ class Lfm2ParityTest {
 
             model.reset()
             val captured = Array(numHidden + 1) { ArrayList<FloatArray>(ids.size) }
+            val hooks = buildList {
+                add(model.onPort("embed") { captured[0].add(it.tensor.toFloatArray()) })
+                for (layer in 0 until model.config.numLayers) {
+                    add(model.onPort("layers.$layer.resid") { captured[layer + 1].add(it.tensor.toFloatArray()) })
+                }
+                add(model.onPort("final_norm") { captured[numHidden].add(it.tensor.toFloatArray()) })
+            }
             val capturedLogits = ArrayList<FloatArray>(ids.size)
             for (id in ids) {
-                val logits = model.forwardToken(id) { layer, hidden -> captured[layer].add(hidden) }
-                capturedLogits.add(logits.toFloatArray())
+                capturedLogits.add(model.forwardToken(id).toFloatArray())
             }
+            hooks.forEach { it.remove() }
             // Transformers' last hidden_states entry is the post-embedding_norm state, which the
             // model reports at capture index numHidden (= numLayers + 1); raw layer outputs are 0..numHidden-1.
             captured[numHidden - 1] = captured[numHidden]

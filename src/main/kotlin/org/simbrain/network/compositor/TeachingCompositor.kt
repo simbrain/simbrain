@@ -81,7 +81,7 @@ object TeachingCompositor {
 
             weightTile("$prefix.mlp.w1", "W1")
             biasTile("$prefix.mlp.b1", "b1")
-            activationTile("$prefix.mlp.act", "hidden (ReLU)")
+            activationTile("$prefix.mlp.act", "hidden")
             weightTile("$prefix.mlp.w2", "W2")
             biasTile("$prefix.mlp.b2", "b2")
             activationTile("$prefix.mlp.out", "mlp out")

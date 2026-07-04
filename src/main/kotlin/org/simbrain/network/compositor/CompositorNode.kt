@@ -25,6 +25,7 @@ import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
+import org.simbrain.util.piccolo.SvgIconNode
 import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.geom.AffineTransform
@@ -98,6 +99,27 @@ class CompositorNode(
             font = Theme.tiny
         }.also { addChild(it) }
 
+        /** The activation op producing this tile, shown as a corner badge instead of an edge glyph. */
+        val activationOp: TensorOp? = scene.graph?.writer(tile.id)
+            ?.takeIf { it is ReLUOp || it is SiluGateOp }
+
+        val badge: PPath? = activationOp?.let { op ->
+            PPath.createEllipse(-BADGE_RADIUS, -BADGE_RADIUS, 2 * BADGE_RADIUS, 2 * BADGE_RADIUS).apply {
+                pickable = false
+                setOffset(tile.width, 0.0)
+                addChild(SvgIconNode(opIcon(op)!!, BADGE_ICON).apply {
+                    setOffset(-BADGE_ICON / 2, -BADGE_ICON / 2)
+                })
+            }.also { addChild(it) }
+        }
+
+        var badgeGlowing = false
+            set(value) {
+                if (field == value) return
+                field = value
+                syncHighlight()
+            }
+
         init {
             syncLayout()
             syncHighlight()
@@ -130,7 +152,15 @@ class CompositorNode(
                 it.strokePaint = palette.imageBorder
                 it.stroke = BasicStroke(1f)
             }
+            badge?.let {
+                it.paint = palette.canvasBackground
+                it.strokePaint = if (badgeGlowing) palette.sourceHandle else palette.connectionLine
+                it.stroke = BasicStroke(if (badgeGlowing) 2.5f else 1f)
+            }
         }
+
+        fun badgeContains(sceneX: Double, sceneY: Double) = activationOp != null &&
+            abs(sceneX - (tile.x + tile.width)) <= BADGE_RADIUS && abs(sceneY - tile.y) <= BADGE_RADIUS
     }
 
     private val tileNodes = scene.tiles.map { TileNode(it).also { node -> addChild(node) } }
@@ -221,13 +251,13 @@ class CompositorNode(
     }
 
     /**
-     * A small operation glyph strung on a data-flow edge: circled symbols for the arithmetic ops
-     * (the old transformer node's junction/multiply decorations, now derived from the plan) and
-     * abbreviations for the rest.
+     * A small operation glyph strung on a data-flow edge: a circled SVG symbol in the app icon
+     * style for the known ops (derived from the plan, never hand-wired), a text pill for
+     * anything without an icon yet.
      */
     inner class OpGlyphNode(val op: TensorOp) : PNode() {
-        private val symbol = opSymbol(op)
-        private val circular = symbol.length == 1
+        private val icon = opIcon(op)
+        private val circular = icon != null
         val shape: PPath = if (circular) {
             PPath.createEllipse(-GLYPH_RADIUS, -GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS)
         } else {
@@ -236,9 +266,17 @@ class CompositorNode(
                 GLYPH_RADIUS * 3.2, GLYPH_RADIUS * 1.6, 4.0, 4.0
             )
         }.also { addChild(it) }
-        private val text = PText(symbol).apply {
+        private val text = if (icon == null) PText(op.name.substringAfterLast('.')).apply {
             font = Theme.tiny
-        }.also { addChild(it) }
+        }.also { addChild(it) } else null
+
+        init {
+            icon?.let {
+                addChild(SvgIconNode(it, GLYPH_ICON).apply {
+                    setOffset(-GLYPH_ICON / 2, -GLYPH_ICON / 2)
+                })
+            }
+        }
 
         var glowing = false
             set(value) {
@@ -256,29 +294,16 @@ class CompositorNode(
             shape.paint = palette.canvasBackground
             shape.strokePaint = if (glowing) palette.sourceHandle else palette.connectionLine
             shape.stroke = BasicStroke(if (glowing) 2.5f else 1f)
-            text.textPaint = palette.valueText
-            text.setOffset(-text.width / 2, -text.height / 2)
+            text?.let {
+                it.textPaint = palette.valueText
+                it.setOffset(-it.width / 2, -it.height / 2)
+            }
         }
 
         fun containsScenePoint(sceneX: Double, sceneY: Double): Boolean {
             val reach = GLYPH_RADIUS * if (circular) 1.0 else 1.8
             return abs(sceneX - xOffset) <= reach && abs(sceneY - yOffset) <= reach
         }
-    }
-
-    private fun opSymbol(op: TensorOp): String = when (op) {
-        is AddOp -> "+"
-        is BiasOp -> "+"
-        is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp -> "×"
-        is LayerNormOp, is RmsNormOp -> "LN"
-        is CausalMaskedRowSoftmaxOp -> "σ"
-        is SoftmaxCrossEntropyOp, is SeqSoftmaxCrossEntropyOp -> "CE"
-        is ReLUOp -> "ReLU"
-        is SiluGateOp -> "SiLU"
-        is SplitHeadsOp -> "split"
-        is MergeHeadsOp -> "merge"
-        is SeqEmbedOp -> "emb"
-        else -> op.name.substringAfterLast('.')
     }
 
     /**
@@ -328,6 +353,7 @@ class CompositorNode(
         val satellitesByEdge = scene.satellites.groupBy { it.edge }
         val satelliteTiles = scene.satellites.map { it.tile }.toSet()
         val placedObstacles = scene.tiles.filter { it !in satelliteTiles }.toMutableList()
+        val badgedOps = tileNodes.mapNotNull { it.activationOp }.toSet()
         val tailSides = scene.edges.associateWith {
             it.from.bounds.facingSide(it.waypoints.firstOrNull() ?: it.to.bounds.center)
         }
@@ -368,8 +394,9 @@ class CompositorNode(
                 edgeLayer.addChild(this)
             }
             val satellitesByOp = satellitesByEdge[edge]?.associateBy { it.op } ?: emptyMap()
-            for ((i, op) in edge.ops.withIndex()) {
-                val slotT = (i + 1).toDouble() / (edge.ops.size + 1)
+            val visibleOps = edge.ops.filter { it !in badgedOps }
+            for ((i, op) in visibleOps.withIndex()) {
+                val slotT = (i + 1).toDouble() / (visibleOps.size + 1)
                 val satellite = satellitesByOp[op]
                 val at = if (satellite != null) {
                     route.pointAt(satelliteT(route, satellite.tile, slotT, placedObstacles))
@@ -412,6 +439,7 @@ class CompositorNode(
         glyphsByOp.values.forEach { it.glowing = it.op == currentOp }
         tileNodes.forEach {
             it.raster.transparency = if (it.tile in stale) STALE_TRANSPARENCY else 1f
+            it.badgeGlowing = currentOp != null && it.activationOp == currentOp
         }
     }
 
@@ -514,6 +542,11 @@ class CompositorNode(
                 target.toolTipText = glyph.op.toString()
                 return
             }
+            val badged = tileNodes.firstOrNull { it.badgeContains(point.x, point.y) }
+            if (badged != null) {
+                target.toolTipText = badged.activationOp.toString()
+                return
+            }
             val tile = scene.tileAt(point.x, point.y)
             val cell = tile?.cellAt(point.x, point.y)
             target.toolTipText = if (tile != null && cell != null) cellReadout(tile, cell.first, cell.second) else null
@@ -536,10 +569,28 @@ class CompositorNode(
         private const val LENS_SPACE = 220.0
         private const val DECK_STEP = 4.0
         private const val MAX_BACK_CARDS = 5
-        private const val GLYPH_RADIUS = 7.0
+        private const val GLYPH_RADIUS = 9.0
+        private const val GLYPH_ICON = 12.0
+        private const val BADGE_RADIUS = 10.0
+        private const val BADGE_ICON = 13.0
         private const val STALE_TRANSPARENCY = 0.35f
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
         private val SATELLITE_NUDGES = doubleArrayOf(0.0, -0.08, 0.08, -0.16, 0.16, -0.24, 0.24, -0.32, 0.32)
     }
+}
+
+/** The op's glyph icon in the app icon style, or null for the text-pill fallback. */
+private fun opIcon(op: TensorOp): String? = when (op) {
+    is AddOp, is BiasOp -> "icons/op-add.svg"
+    is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp -> "icons/op-multiply.svg"
+    is LayerNormOp, is RmsNormOp -> "icons/op-layer-norm.svg"
+    is CausalMaskedRowSoftmaxOp -> "icons/op-softmax.svg"
+    is SoftmaxCrossEntropyOp, is SeqSoftmaxCrossEntropyOp -> "icons/op-cross-entropy.svg"
+    is ReLUOp -> "icons/op-relu.svg"
+    is SiluGateOp -> "icons/op-silu.svg"
+    is SplitHeadsOp -> "icons/op-split.svg"
+    is MergeHeadsOp -> "icons/op-merge.svg"
+    is SeqEmbedOp -> "icons/op-embed.svg"
+    else -> null
 }

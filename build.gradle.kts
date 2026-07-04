@@ -219,10 +219,17 @@ dependencies {
     // JNA — calls into bundled libespeak-ng from PhonemeSynthesizer.
     implementation("net.java.dev.jna:jna:5.14.0")
 
+    // HuggingFace tokenizer.json loading (standalone JNI binding to the Rust tokenizers lib)
+    implementation("ai.djl.huggingface:tokenizers:0.33.0")
+
 }
 
 tasks.test {
     jvmArgs(simbrainJvmArgs)
+    maxHeapSize = "2g"
+    // JavaCPP caps off-heap allocation at the heap max by default; the LFM2 parity test loads ~1 GB of weights.
+    systemProperty("org.bytedeco.javacpp.maxbytes", "0")
+    systemProperty("org.bytedeco.javacpp.maxphysicalbytes", "0")
     useJUnitPlatform()
 }
 

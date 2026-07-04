@@ -1,0 +1,62 @@
+package org.simbrain.network.llm
+
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assumptions.assumeTrue
+import org.junit.jupiter.api.Test
+import org.simbrain.network.tensor.Blas
+import java.nio.file.Path
+import kotlin.io.path.exists
+import kotlin.io.path.listDirectoryEntries
+
+class Lfm2GenerationTest {
+
+    private fun snapshotDir(): Path? {
+        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
+            "models--LiquidAI--LFM2.5-230M", "snapshots")
+        if (!hub.exists()) return null
+        return hub.listDirectoryEntries().firstOrNull { it.resolve("model.safetensors").exists() }
+    }
+
+    @Test
+    fun `greedy decoding produces text end to end`() {
+        val snapshot = snapshotDir()
+        assumeTrue(snapshot != null, "LFM2 weights not present in HF cache")
+
+        Blas.numThreads = 4
+        val params = Safetensors.load(snapshot!!.resolve("model.safetensors"))
+        val model = Lfm2Model(Lfm2Config(), params)
+        LlmTokenizer(snapshot.resolve("tokenizer.json")).use { tokenizer ->
+            val promptIds = tokenizer.encode("The capital of France is")
+            var last = 0
+            for (id in promptIds) {
+                last = argmax(model.forwardToken(id))
+            }
+            val generated = ArrayList<Int>()
+            val t0 = System.nanoTime()
+            repeat(30) {
+                generated.add(last)
+                last = argmax(model.forwardToken(last))
+            }
+            val tokensPerSec = 30 / ((System.nanoTime() - t0) / 1e9)
+            val text = tokenizer.decode(generated.toIntArray())
+            println("generated: $text")
+            println("decode speed: ${"%.1f".format(tokensPerSec)} tokens/sec")
+            assertTrue(text.isNotBlank(), "Generated no text")
+            assertTrue(text.contains("Paris"), "Expected greedy completion to mention Paris, got: $text")
+        }
+    }
+
+    private fun argmax(logits: org.simbrain.network.tensor.FloatTensor): Int {
+        val buf = logits.data
+        var best = 0
+        var bestVal = Float.NEGATIVE_INFINITY
+        for (i in 0 until logits.size) {
+            val v = buf.get(i)
+            if (v > bestVal) {
+                bestVal = v
+                best = i
+            }
+        }
+        return best
+    }
+}

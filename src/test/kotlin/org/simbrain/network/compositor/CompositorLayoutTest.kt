@@ -81,6 +81,20 @@ class CompositorLayoutTest {
     }
 
     @Test
+    fun `diagram scale shrinks tiles but keeps the fixed-size lens and label room`() {
+        val model = TeachingTransformerModel(TeachingTransformerConfig(
+            contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = 1
+        ))
+        val scene = TeachingCompositor.buildScene(model, scale = 0.5)
+        val resid0 = scene.tile("resid0")
+        assertEquals(85.0, resid0.width, 1e-9, "tile geometry scales")
+        assertEquals(60.0, resid0.height, 1e-9)
+        val q = scene.tile("layers.0.attn.q")
+        assertTrue(q.y >= resid0.y + resid0.height + 70.0, "row gap keeps its label-room floor")
+        assertTrue(q.x >= resid0.x + resid0.width + 220.0, "the fixed-size lens strip keeps its clearance")
+    }
+
+    @Test
     fun `layout is deterministic across repeated application`() {
         val scene = scene(layers = 2)
         val before = scene.tiles.associate { it.id to (it.x to it.y) }

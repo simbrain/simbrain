@@ -346,6 +346,29 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         order = 2,
     )
 
+    var diagramScale by GuiEditable(
+        initValue = 1.0,
+        label = "Diagram scale",
+        description = "Multiplies interior tile sizes and spacing; labels and glyphs keep their point size, " +
+            "so shrinking the diagram makes it denser without making text smaller",
+        min = 0.25,
+        max = 2.0,
+        increment = 0.25,
+        order = 3,
+    )
+
+    @Transient
+    private var appliedDiagramScale = 1.0
+
+    override fun onCommit() {
+        trainer.learningRate = learningRate.toFloat()
+        if (diagramScale != appliedDiagramScale) {
+            tileLayout = null
+            rebuildScene()
+            events.modelRebuilt.fire()
+        }
+    }
+
     var lensEnabled: Boolean = true
         set(value) {
             field = value
@@ -403,7 +426,8 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
     }
 
     private fun rebuildScene() {
-        scene = TeachingCompositor.buildScene(model)
+        scene = TeachingCompositor.buildScene(model, scale = diagramScale)
+        appliedDiagramScale = diagramScale
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
                 it.x = xy[0]

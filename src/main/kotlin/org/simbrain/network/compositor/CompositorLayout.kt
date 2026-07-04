@@ -10,13 +10,17 @@ package org.simbrain.network.compositor
  * render time.
  */
 class CompositorLayout(
+    scale: Double = 1.0,
     private val spineAxisX: Double = 0.0,
-    private val rowGap: Double = 110.0,
-    private val stackStepX: Double = 30.0,
-    private val stackGap: Double = 50.0,
-    private val limbClearance: Double = 240.0,
-    private val paramGap: Double = 30.0,
 ) {
+
+    // Gaps scale with the diagram but keep floors: labels, glyphs, and the lens strip stay at
+    // fixed point sizes, so a shrunken diagram still needs room for them.
+    private val rowGap = (110.0 * scale).coerceAtLeast(70.0)
+    private val stackStepX = 30.0 * scale
+    private val stackGap = (50.0 * scale).coerceAtLeast(35.0)
+    private val limbClearance = 220.0 + 20.0 * scale
+    private val paramGap = (30.0 * scale).coerceAtLeast(20.0)
 
     fun apply(scene: CompositorScene) {
         val graph = scene.graph ?: return

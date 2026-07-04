@@ -14,9 +14,15 @@ import org.simbrain.network.llm.TeachingTransformerModel
  */
 object TeachingCompositor {
 
-    fun buildScene(model: TeachingTransformerModel, weightsTransposed: Boolean = false): CompositorScene {
+    fun buildScene(
+        model: TeachingTransformerModel,
+        weightsTransposed: Boolean = false,
+        scale: Double = 1.0,
+    ): CompositorScene {
         val config = model.config
         val scene = CompositorScene(PlanGraph(model.plan))
+
+        fun s(value: Double) = value * scale
 
         fun weightTile(name: String, title: String, size: Double = WEIGHT_SIZE) {
             scene.addTile(MatrixTile(
@@ -25,7 +31,7 @@ object TeachingCompositor {
                 title = if (weightsTransposed) "${title}ᵀ" else title,
                 displayTransposed = weightsTransposed,
             ).apply {
-                width = size; height = size
+                width = s(size); height = s(size)
             })
         }
 
@@ -35,13 +41,13 @@ object TeachingCompositor {
                 kind = TileKind.WEIGHT,
                 title = title,
             ).apply {
-                width = BIAS_WIDTH; height = BIAS_HEIGHT
+                width = s(BIAS_WIDTH); height = s(BIAS_HEIGHT).coerceAtLeast(6.0)
             })
         }
 
         fun activationTile(portName: String, title: String, w: Double = ACTIVATION_WIDTH, h: Double = ACTIVATION_HEIGHT) {
             scene.addTile(MatrixTile(model.plan.port(portName), title = title).apply {
-                width = w; height = h
+                width = s(w); height = s(h)
             })
         }
 
@@ -52,7 +58,7 @@ object TeachingCompositor {
                 title = title,
                 quantileNorm = true,
             ).apply {
-                width = SPINE_WIDTH; height = SPINE_HEIGHT
+                width = s(SPINE_WIDTH); height = s(SPINE_HEIGHT)
             })
         }
 
@@ -73,7 +79,7 @@ object TeachingCompositor {
                 slices = config.numHeads,
                 title = "attention",
             ).apply {
-                width = DECK_SIZE; height = DECK_SIZE
+                width = s(DECK_SIZE); height = s(DECK_SIZE)
             })
             weightTile("$prefix.attn.wo", "Wo", 60.0)
             activationTile("$prefix.attn.out", "attn out")
@@ -95,11 +101,11 @@ object TeachingCompositor {
             title = "next-token probabilities",
             signedNorm = false,
         ).apply {
-            width = SPINE_WIDTH; height = HEAD_HEIGHT
+            width = s(SPINE_WIDTH); height = s(HEAD_HEIGHT)
         })
 
         scene.connectFromGraph()
-        CompositorLayout().apply(scene)
+        CompositorLayout(scale).apply(scene)
 
         for (tile in scene.tiles) {
             (tile as? MatrixTile)?.gradientSource = model.grads.of(tile.tensor)

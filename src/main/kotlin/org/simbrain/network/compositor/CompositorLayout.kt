@@ -79,7 +79,7 @@ class CompositorLayout(
 
         fun onSpine(e: FlowEndpoint) = when (e) {
             is TensorTile -> e.id in spineTileIds
-            is OpVertex -> e.op.outputs.any { it.name in spineTileIds }
+            is OpVertex -> e.op.outputs.any { graph.alias(it.name) in spineTileIds }
         }
 
         val spineHalfWidth = flowTiles.filter(::onSpine).maxOfOrNull { it.width / 2 } ?: 0.0

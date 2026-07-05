@@ -25,8 +25,9 @@ import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
 /**
- * Standalone M3 compositor demo: greedy LFM2 decode streaming into residual-stream heatmaps,
- * one attention map with a head selector, and the logit-lens strip. Interactions: click/marquee
+ * Standalone LFM2 structure-view demo: greedy decode streaming into one stacked layer-block
+ * anatomy with the depth strip and logit lens. Interactions: click or wheel a strip row to flip
+ * the whole block to that layer, wheel the attention/cache decks to flip heads, click/marquee
  * select, drag to move tiles, double-click a tile to trace its data-flow paths, hover for cell
  * values, mouse wheel to zoom, drag empty canvas to pan.
  *
@@ -47,9 +48,8 @@ fun main() {
     val tokenizer = LlmTokenizer(snapshot.resolve("tokenizer.json"))
 
     val displaySeq = 128
-    val attentionLayer = 8
-    val scene = Lfm2Compositor.buildScene(model, displaySeq, attentionLayer)
-    val attentionTile = scene.tile("layers.$attentionLayer.attn.weights") as AttentionTile
+    val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
+    val attentionTile = scene.tile("block.attn.weights") as AttentionTile
 
     SwingUtilities.invokeLater {
         val canvas = PCanvas()
@@ -63,14 +63,22 @@ fun main() {
 
         val promptField = JTextField("The capital of France is", 24)
         val stepsSpinner = JSpinner(SpinnerNumberModel(30, 1, displaySeq, 1))
+        val layerCombo = JComboBox((0 until config.numLayers).map {
+            "layer $it (${if (it in config.attentionLayers) "attn" else "conv"})"
+        }.toTypedArray())
         val headCombo = JComboBox((0 until config.numHeads).map { "head $it" }.toTypedArray())
         val lensCheck = JCheckBox("Logit lens", true)
         val generateButton = JButton("Generate")
         val status = JLabel("Ready — weights loaded from ${snapshot.fileName}")
 
+        layerCombo.addActionListener {
+            scene.layerSelector?.invoke(layerCombo.selectedIndex)
+            node.refreshStackState()
+        }
         headCombo.addActionListener {
             attentionTile.selectedHead = headCombo.selectedIndex
-            node.refreshDirtyTiles()
+            scene.onHeadSelected?.invoke(attentionTile, headCombo.selectedIndex)
+            node.refreshStackState()
         }
         lensCheck.addActionListener { scene.lens?.enabled = lensCheck.isSelected }
 
@@ -132,12 +140,14 @@ fun main() {
             add(stepsSpinner)
             add(generateButton)
             addSeparator()
-            add(JLabel(" Attention L$attentionLayer: "))
+            add(JLabel(" Block: "))
+            add(layerCombo)
+            add(JLabel(" Attention: "))
             add(headCombo)
             add(lensCheck)
         }
 
-        JFrame("LFM2.5 Compositor — M3 prototype").apply {
+        JFrame("LFM2.5 Compositor — structure view").apply {
             defaultCloseOperation = JFrame.EXIT_ON_CLOSE
             layout = BorderLayout()
             add(toolbar, BorderLayout.NORTH)

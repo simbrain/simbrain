@@ -2,8 +2,7 @@ package org.simbrain.network.llm
 
 import org.simbrain.network.compositor.AttentionTile
 import org.simbrain.network.compositor.CompositorScene
-import org.simbrain.network.compositor.Lfm2Compositor
-import org.simbrain.network.compositor.Lfm2LayerCompositor
+import org.simbrain.network.compositor.Lfm2StackCompositor
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
@@ -83,13 +82,8 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         order = 5,
     )
 
-    /** Which attention layer's map the compositor shows. Changing it rebuilds the scene. */
-    var attentionLayer: Int = 8
-        set(value) {
-            if (field == value) return
-            field = value
-            rebuildScene()
-        }
+    /** The model layer the structure view shows; the depth strip is the live selector. */
+    var selectedLayer: Int = 0
 
     var selectedHead: Int = 0
         set(value) {
@@ -126,31 +120,6 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     var loaded: LoadedState? = null
         private set
 
-    /** Live per-layer anatomy scenes, keyed by layer, in LRU order. */
-    @Transient
-    private val layerScenes = LinkedHashMap<Int, CompositorScene>()
-
-    /**
-     * The live anatomy scene for [layer] — built on first request and publishing from then on,
-     * so its history tiles accumulate token rows from that moment. LRU-capped: the weight
-     * rasters of many live scenes would otherwise pile up.
-     */
-    @Synchronized
-    fun layerScene(layer: Int): CompositorScene? {
-        val state = loaded ?: return null
-        layerScenes.remove(layer)?.let {
-            layerScenes[layer] = it
-            return it
-        }
-        val scene = Lfm2LayerCompositor.buildScene(state.model, layer, displaySeq)
-        scene.publish(state.model.position - 1)
-        layerScenes[layer] = scene
-        while (layerScenes.size > MAX_LAYER_SCENES) {
-            layerScenes.remove(layerScenes.keys.first())
-        }
-        return scene
-    }
-
     val isLoaded get() = loaded != null
 
     @Transient
@@ -170,13 +139,12 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         private set
 
     private val attentionTile
-        get() = loaded?.scene?.tiles?.firstOrNull { it.id == "layers.$attentionLayer.attn.weights" } as? AttentionTile
+        get() = loaded?.scene?.tiles?.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile
 
-    constructor(weightsDirectory: String, maxSeqLen: Int = 512, displaySeq: Int = 128, attentionLayer: Int = 8) : this() {
+    constructor(weightsDirectory: String, maxSeqLen: Int = 512, displaySeq: Int = 128) : this() {
         this.weightsDirectory = weightsDirectory
         this.maxSeqLen = maxSeqLen
         this.displaySeq = displaySeq
-        this.attentionLayer = attentionLayer
     }
 
     /**
@@ -192,29 +160,28 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         Blas.numThreads = 4
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
-        layerScenes.clear()
         loaded = LoadedState(model, tokenizer, buildScene(model))
         events.weightsLoaded.fire()
     }
 
     private fun buildScene(model: Lfm2Model): CompositorScene {
-        val scene = Lfm2Compositor.buildScene(model, displaySeq, attentionLayer)
+        val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
                 it.x = xy[0]
                 it.y = xy[1]
             }
         }
-        (scene.tiles.firstOrNull { it.id == "layers.$attentionLayer.attn.weights" } as? AttentionTile)
+        (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
             ?.selectedHead = selectedHead
         scene.lens?.enabled = lensEnabled
+        val select = scene.layerSelector
+        scene.layerSelector = { layer ->
+            select?.invoke(layer)
+            selectedLayer = scene.selectedLayer
+        }
+        scene.layerSelector?.invoke(selectedLayer)
         return scene
-    }
-
-    private fun rebuildScene() {
-        val state = loaded ?: return
-        state.scene = buildScene(state.model)
-        events.weightsLoaded.fire()
     }
 
     /** Copies the scene's current tile positions into [tileLayout] so they serialize. */
@@ -229,7 +196,6 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        layerScenes.values.forEach { it.reset() }
         promptIds = state.tokenizer.encode(prompt)
         cursor = 0
         generatedCount = 0
@@ -266,7 +232,6 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val position = state.model.position
         val logits = state.model.forwardToken(id)
         state.scene.publish(position)
-        for (scene in layerScenes.values) scene.publish(position)
         sampledToken = sampleToken(logits)
         if (cursor >= promptIds.size - 1) {
             if (stopAtEndOfText && sampledToken == state.model.config.eosTokenId) {
@@ -323,10 +288,6 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         appendLine("Name: $displayName (LFM2.5-230M)")
         appendLine("Weights: ${weightsDirectory.ifEmpty { "not set" }}${if (isLoaded) "" else " (not loaded)"}")
         append("Text: ${text.take(120)}")
-    }
-
-    companion object {
-        private const val MAX_LAYER_SCENES = 3
     }
 
     class CreationTemplate : EditableObject {

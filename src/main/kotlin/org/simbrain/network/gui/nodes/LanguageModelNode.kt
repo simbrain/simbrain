@@ -2,12 +2,9 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.piccolo2d.PCanvas
-import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
-import org.simbrain.network.compositor.TensorTile
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.llm.LanguageModel
@@ -24,10 +21,6 @@ import org.simbrain.util.showInputDialog
 import org.simbrain.util.showWarningConfirmDialog
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.swingDispatcher
-import java.awt.Dimension
-import java.awt.Image
-import java.awt.event.WindowAdapter
-import java.awt.event.WindowEvent
 import java.awt.geom.Point2D
 import java.nio.file.Path
 import javax.swing.JCheckBoxMenuItem
@@ -55,11 +48,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     private var compositorNode: CompositorNode? = null
 
     private var loadError: String? = null
-
-    private var previewImage: PImage? = null
-    private var previewLayer = -1
-    private var previewPosition = -1
-    private val previewCache = HashMap<Int, Pair<Int, Image>>()
 
     init {
         addChild(interactionBox)
@@ -98,10 +86,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     private fun rebuildInterior() {
         compositorNode?.removeFromParent()
         compositorNode = null
-        previewImage?.removeFromParent()
-        previewImage = null
-        previewLayer = -1
-        previewCache.clear()
         languageModel.loaded?.let { state ->
             compositorNode = CompositorNode(
                 state.scene,
@@ -109,78 +93,11 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 tokenLabel = { id -> "“${state.tokenizer.decode(intArrayOf(id))}”" },
             ).also {
                 it.onLayoutChanged = { languageModel.captureViewState() }
-                it.onTileHover = { tile -> updateLayerPreview(tile) }
                 addChild(it)
             }
         }
         placeChildren()
         refreshView()
-    }
-
-    private fun layerOf(tileId: String): Int? =
-        Regex("""layers\.(\d+)\.resid""").matchEntire(tileId)?.groupValues?.get(1)?.toIntOrNull()
-
-    /**
-     * Hovering a layer's residual tile pops a cached offscreen render of that layer's full
-     * anatomy beside the spine; the raster refreshes when generation has advanced since it was
-     * taken. The anatomy dialog in the context menu is the live, explorable version.
-     */
-    private fun updateLayerPreview(tile: TensorTile?) {
-        val layer = tile?.id?.let(::layerOf)
-        val position = languageModel.loaded?.model?.position ?: -1
-        if (layer == previewLayer && position == previewPosition) return
-        previewImage?.removeFromParent()
-        previewImage = null
-        previewLayer = layer ?: -1
-        previewPosition = position
-        if (layer == null || tile == null) return
-        val interior = compositorNode ?: return
-        val image = previewCache[layer]?.takeIf { it.first == position }?.second ?: run {
-            val scene = languageModel.layerScene(layer) ?: return
-            val anatomy = CompositorNode(scene)
-            val bounds = anatomy.fullBoundsReference
-            val scale = minOf(PREVIEW_MAX / bounds.width, PREVIEW_MAX / bounds.height, 1.0)
-            anatomy.toImage(
-                (bounds.width * scale).toInt().coerceAtLeast(1),
-                (bounds.height * scale).toInt().coerceAtLeast(1),
-                null
-            ).also { previewCache[layer] = position to it }
-        }
-        val interiorBounds = interior.fullBoundsReference
-        previewImage = PImage(image).apply {
-            pickable = false
-            val y = (tile.y + interior.yOffset)
-                .coerceAtMost(interiorBounds.maxY - image.getHeight(null))
-                .coerceAtLeast(interiorBounds.y)
-            setOffset(interiorBounds.maxX + 24.0, y)
-        }.also { addChild(it) }
-    }
-
-    private fun showLayerAnatomyDialog(layer: Int) {
-        val scene = languageModel.layerScene(layer) ?: return
-        val state = languageModel.loaded ?: return
-        val kind = if (layer in state.model.config.attentionLayers) "attention" else "conv"
-        val canvas = PCanvas()
-        val node = CompositorNode(scene, canvas)
-        val bounds = node.fullBoundsReference
-        node.setOffset(-bounds.x, -bounds.y)
-        canvas.layer.addChild(node)
-        canvas.preferredSize = Dimension(760, 860)
-        val job = languageModel.events.updateGraphics.on(swingDispatcher) { node.refreshDirtyTiles() }
-        StandardDialog().apply {
-            title = "${languageModel.displayName} — layer $layer ($kind) anatomy"
-            isModal = false
-            contentPane = canvas
-            addWindowListener(object : WindowAdapter() {
-                override fun windowClosed(e: WindowEvent?) {
-                    job.cancel()
-                }
-            })
-            pack()
-            SwingUtilities.invokeLater {
-                canvas.camera.animateViewToCenterBounds(node.fullBoundsReference, true, 0)
-            }
-        }.display()
     }
 
     private fun placeChildren() {
@@ -243,19 +160,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     add(createAction("Start generation") { languageModel.startGeneration() })
                 }
                 addSeparator()
-                add(JMenu("Layer anatomy").apply {
-                    (0 until state.model.config.numLayers).forEach { layer ->
-                        val kind = if (layer in state.model.config.attentionLayers) "attention" else "conv"
-                        add(createAction("Layer $layer ($kind)...") { showLayerAnatomyDialog(layer) })
-                    }
-                })
-                add(JMenu("Attention layer").apply {
-                    state.model.config.attentionLayers.sorted().forEach { layer ->
-                        add(JRadioButtonMenuItem("Layer $layer", layer == languageModel.attentionLayer).apply {
-                            addActionListener { languageModel.attentionLayer = layer }
-                        })
-                    }
-                })
                 add(JMenu("Attention head").apply {
                     (0 until state.model.config.numHeads).forEach { head ->
                         add(JRadioButtonMenuItem("Head $head", head == languageModel.selectedHead).apply {
@@ -311,10 +215,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         interactionBox.refreshTheme()
         statusText.textPaint = NetworkTheme.current.valueText
         compositorNode?.refreshTheme()
-    }
-
-    companion object {
-        private const val PREVIEW_MAX = 700.0
     }
 
     private inner class LanguageModelInteractionBox(net: NetworkPanel) : InteractionBox(net) {

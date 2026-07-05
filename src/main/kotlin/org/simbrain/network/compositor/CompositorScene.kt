@@ -21,6 +21,9 @@ class OpVertex(val op: TensorOp) : FlowEndpoint {
     var x = 0.0
     var y = 0.0
     var placed = false
+
+    /** True when this junction belongs to a limb the selected layer doesn't use. */
+    var dimmed = false
 }
 
 class FlowEdge(
@@ -32,6 +35,9 @@ class FlowEdge(
 ) {
     /** Interior route knots in scene coordinates; set by layout to steer the curve around tiles. */
     var waypoints: List<Point2D> = emptyList()
+
+    /** True when this edge belongs to a limb the selected layer doesn't use. */
+    var dimmed = false
 }
 
 /**
@@ -110,6 +116,22 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     /** Invoked when the user wheel-flips a deck or attention tile, e.g. to couple GQA decks. */
     var onHeadSelected: ((TensorTile, Int) -> Unit)? = null
+
+    /**
+     * Present on stacked-layer scenes: flips every [LayerStacked] tile (plus limb dimming and
+     * the strip highlight) to one model layer, wrapping out-of-range values. Installed by the
+     * scene's compositor; renderers and hosts invoke it and then refresh.
+     */
+    var layerSelector: ((Int) -> Unit)? = null
+
+    /** The model layer a stacked scene currently shows; -1 for scenes without layer stacks. */
+    var selectedLayer = -1
+
+    /** Maps a tile to the model layer it selects when clicked or wheeled — the depth strip rows. */
+    var layerOfTile: ((TensorTile) -> Int?)? = null
+
+    /** Tiles rendered with a standing accent border — the depth strip rows the block spans. */
+    var highlightedTiles: Set<TensorTile> = emptySet()
 
     val selection = TileSelectionModel()
 
@@ -292,11 +314,11 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
         fun up(e: FlowEndpoint) = when (e) {
             is TensorTile -> e.id in upstream
-            is OpVertex -> e.op.outputs.any { it.name in upstream || it.name == focus.id }
+            is OpVertex -> e.op.outputs.any { graph.alias(it.name).let { n -> n in upstream || n == focus.id } }
         }
         fun down(e: FlowEndpoint) = when (e) {
             is TensorTile -> e.id in downstream
-            is OpVertex -> e.op.outputs.any { it.name in downstream }
+            is OpVertex -> e.op.outputs.any { graph.alias(it.name) in downstream }
         }
         tracedEdges = edges.filter { edge ->
             (up(edge.from) && (up(edge.to) || edge.to == focus)) ||

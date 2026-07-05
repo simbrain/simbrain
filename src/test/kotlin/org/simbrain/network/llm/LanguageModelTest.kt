@@ -121,7 +121,7 @@ class LanguageModelTest {
         languageModel.prompt = "Hello"
         languageModel.tokensToGenerate = 7
         languageModel.temperature = 0.7
-        languageModel.attentionLayer = 4
+        languageModel.selectedLayer = 4
         languageModel.selectedHead = 3
         languageModel.lensEnabled = false
         languageModel.tileLayout = hashMapOf("embed" to doubleArrayOf(11.0, 22.0))
@@ -137,7 +137,7 @@ class LanguageModelTest {
         assertEquals("Hello", restored.prompt)
         assertEquals(7, restored.tokensToGenerate)
         assertEquals(0.7, restored.temperature)
-        assertEquals(4, restored.attentionLayer)
+        assertEquals(4, restored.selectedLayer)
         assertEquals(3, restored.selectedHead)
         assertFalse(restored.lensEnabled)
         assertEquals(11.0, restored.tileLayout?.get("embed")?.get(0))

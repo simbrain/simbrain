@@ -4,7 +4,7 @@ import org.piccolo2d.PCanvas
 import org.simbrain.network.compositor.AttentionTile
 import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.CompositorScene
-import org.simbrain.network.compositor.Lfm2Compositor
+import org.simbrain.network.compositor.Lfm2StackCompositor
 import org.simbrain.network.llm.Lfm2Config
 import org.simbrain.network.llm.Lfm2Model
 import org.simbrain.network.llm.LlmTokenizer
@@ -16,28 +16,30 @@ import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
 /**
- * Renders the LFM2 compositor after a real 48-token greedy decode ("The capital of France is"):
- * residual-stream heatmaps per layer, the layer-8 attention map, and the logit-lens strip.
- * Needs the LFM2.5-230M weights in the HF cache (run `uv run src/test/python/lfm2_export_reference.py`
- * once to fetch them).
+ * Renders the LFM2 structure view after a real 48-token greedy decode ("The capital of France
+ * is"): one stacked layer-block anatomy flipped to a conv layer — conv limb live, attention limb
+ * dimmed — beside the depth strip with the logit lens. Needs the LFM2.5-230M weights in the HF
+ * cache (run `uv run src/test/python/lfm2_export_reference.py` once to fetch them).
  */
-class Lfm2CompositorSnapshot : UiSnapshotDef {
-    override val name = "lfm2-compositor"
-    override fun build() = buildLfm2CompositorCanvas { }
-}
-
-/** The compositor with interior state active: trace on the attention tile, a selected residual tile, head 5. */
-class Lfm2CompositorTraceSnapshot : UiSnapshotDef {
-    override val name = "lfm2-compositor-trace"
-    override fun build() = buildLfm2CompositorCanvas { scene ->
-        val attention = scene.tile("layers.8.attn.weights") as AttentionTile
-        attention.selectedHead = 5
-        scene.setTrace(attention)
-        scene.selection.set(listOf(scene.tile("layers.3.resid")))
+class Lfm2StackConvSnapshot : UiSnapshotDef {
+    override val name = "lfm2-stack-conv"
+    override fun build() = buildLfm2StackCanvas { scene ->
+        scene.layerSelector?.invoke(3)
     }
 }
 
-private fun buildLfm2CompositorCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
+/** The block flipped to an attention layer, attention deck on head 5 with the KV decks coupled. */
+class Lfm2StackAttnSnapshot : UiSnapshotDef {
+    override val name = "lfm2-stack-attn"
+    override fun build() = buildLfm2StackCanvas { scene ->
+        scene.layerSelector?.invoke(8)
+        val attention = scene.tile("block.attn.weights") as AttentionTile
+        attention.selectedHead = 5
+        scene.onHeadSelected?.invoke(attention, 5)
+    }
+}
+
+private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
     val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
         "models--LiquidAI--LFM2.5-230M", "snapshots")
     val weightsDir = (if (hub.exists()) hub.listDirectoryEntries() else emptyList())
@@ -50,7 +52,7 @@ private fun buildLfm2CompositorCanvas(decorate: (CompositorScene) -> Unit): PCan
     val tokenizer = LlmTokenizer(weightsDir.resolve("tokenizer.json"))
 
     val displaySeq = 48
-    val scene = Lfm2Compositor.buildScene(model, displaySeq, attentionLayer = 8)
+    val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
 
     val promptIds = tokenizer.encode("The capital of France is")
     var next = -1

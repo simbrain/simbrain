@@ -87,15 +87,20 @@ class CompositorNode(
     private var staleTiles: Set<TensorTile> = emptySet()
 
     private inner class TileNode(val tile: TensorTile) : PNode() {
-        /** Dimmed offset cards behind a deck's live front slice — the 2.5D stack. */
-        val backCards: List<PPath> = if (tile is DeckTile && tile.slices > 1) {
-            (minOf(tile.slices - 1, MAX_BACK_CARDS) downTo 1).map { i ->
+        /** Dimmed offset cards behind the live front card — a head deck's slices or a layer stack. */
+        val backCards: List<PPath> = run {
+            val depth = when {
+                tile is DeckTile && tile.slices > 1 -> tile.slices - 1
+                tile is LayerStacked && tile.stackLayers.size > 1 -> tile.stackLayers.size - 1
+                else -> 0
+            }
+            (minOf(depth, MAX_BACK_CARDS) downTo 1).map { i ->
                 PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
                     setOffset(-DECK_STEP * i, -DECK_STEP * i)
                 }.also { addChild(it) }
             }
-        } else emptyList()
+        }
         val raster = SimbrainImage(tile.image).apply {
             setBounds(0.0, 0.0, tile.width, tile.height)
         }.also { addChild(it) }
@@ -130,6 +135,7 @@ class CompositorNode(
         init {
             syncLayout()
             syncHighlight()
+            syncDim()
         }
 
         fun syncLayout() {
@@ -139,21 +145,29 @@ class CompositorNode(
         }
 
         fun syncLabel() {
-            label.text = when (tile) {
+            val base = when (tile) {
                 is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
                     ?: "${tile.title} · head ${tile.selectedSlice}"
                 is AttentionTile -> "${tile.title} · head ${tile.selectedHead}"
                 else -> tile.title
             }
+            val layer = (tile as? LayerStacked)?.takeIf { it.stackLayers.size > 1 }?.shownLayer
+            label.text = if (layer != null && layer >= 0) "$base · layer $layer" else base
+        }
+
+        fun syncDim() {
+            transparency = if (tile.dimmed) DIM_TRANSPARENCY else 1f
         }
 
         fun syncHighlight() {
             val palette = NetworkTheme.current
             label.textPaint = palette.valueText
-            val highlighted = tile == scene.traceFocus || tile in scene.tracedTiles || tile in scene.selection
+            val highlighted = tile == scene.traceFocus || tile in scene.tracedTiles ||
+                tile in scene.selection || tile in scene.highlightedTiles
             border.stroke = BasicStroke(if (highlighted || tile.kind == TileKind.WEIGHT) 2f else 1f)
             border.strokePaint = when {
                 tile == scene.traceFocus -> palette.sourceHandle
+                tile in scene.highlightedTiles -> palette.sourceHandle
                 tile in scene.selection -> palette.selectionHandle
                 tile in scene.tracedTiles -> palette.receptiveFieldTrace
                 tile.kind == TileKind.WEIGHT -> palette.weightMatrixBoundary
@@ -414,6 +428,7 @@ class CompositorNode(
         for (vertex in scene.opVertices) {
             OpGlyphNode(vertex.op).apply {
                 setOffset(vertex.x, vertex.y)
+                if (vertex.dimmed) transparency = DIM_TRANSPARENCY
                 glyphsByOp[vertex.op] = this
                 edgeLayer.addChild(this)
             }
@@ -430,7 +445,9 @@ class CompositorNode(
         val headFractions = attachFractions(
             { headSides.getValue(it) }, { it.to },
             { it.waypoints.lastOrNull() ?: it.from.endpointBounds.center })
-        for (edge in scene.edges) {
+        // Undimmed edges render (and claim shared bead glyphs) first, so an op both limbs share
+        // shows at full strength on the active limb's edge.
+        for (edge in scene.edges.sortedBy { it.dimmed }) {
             val traced = edge in scene.tracedEdges
             val emphasized = edge in scene.emphasizedEdges
             val tailSide = tailSides.getValue(edge)
@@ -443,6 +460,7 @@ class CompositorNode(
             )
             routesByEdge[edge] = route
             val ribbonColor = when {
+                edge.dimmed -> palette.connectionLine
                 traced -> palette.receptiveFieldTrace
                 emphasized -> palette.sourceHandle
                 else -> palette.connectionLine
@@ -455,7 +473,7 @@ class CompositorNode(
                     val strandOffset = AffineTransform.getTranslateInstance(-DECK_STEP * i, -DECK_STEP * i)
                     PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
                         paint = ribbonColor
-                        transparency = 0.2f
+                        transparency = if (edge.dimmed) 0.06f else 0.2f
                         pickable = false
                         edgeLayer.addChild(this)
                     }
@@ -470,7 +488,12 @@ class CompositorNode(
             ribbon.add(Area(tipTransform.createTransformedShape(arrowTip)))
             PPath.Double(ribbon, null).apply {
                 paint = ribbonColor
-                transparency = if (traced) 0.8f else if (emphasized) 0.65f else 0.5f
+                transparency = when {
+                    edge.dimmed -> 0.15f
+                    traced -> 0.8f
+                    emphasized -> 0.65f
+                    else -> 0.5f
+                }
                 pickable = false
                 edgeLayer.addChild(this)
             }
@@ -503,6 +526,7 @@ class CompositorNode(
                         } else {
                             setOffset(at.x, at.y)
                         }
+                        if (edge.dimmed) transparency = DIM_TRANSPARENCY
                         glyphsByOp[op] = this
                         edgeLayer.addChild(this)
                     }
@@ -514,6 +538,26 @@ class CompositorNode(
 
     /** The glyph rendered for [op], if any edge carries it. */
     fun glyphFor(op: TensorOp): OpGlyphNode? = glyphsByOp[op]
+
+    /**
+     * Re-renders layer-stack state after the scene's layer selector ran: limb dimming, per-layer
+     * labels, the depth strip's highlighted rows, and freshly flipped tile data.
+     */
+    fun refreshStackState() {
+        tileNodes.forEach {
+            it.syncDim()
+            it.syncLabel()
+            it.syncHighlight()
+        }
+        rebuildEdges()
+        refreshDirtyTiles()
+    }
+
+    private fun selectLayer(layer: Int) {
+        val selector = scene.layerSelector ?: return
+        selector(layer)
+        refreshStackState()
+    }
 
     /**
      * Micro-stepping render state: glows [currentOp]'s glyph and dims every tile in [stale]
@@ -563,6 +607,7 @@ class CompositorNode(
                 } else if (tile !in scene.selection) {
                     scene.selection.set(listOf(tile))
                 }
+                scene.layerOfTile?.invoke(tile)?.let { selectLayer(it) }
                 mode = Mode.MOVE
             } else {
                 marqueeAdditive = event.isShiftDown
@@ -633,7 +678,14 @@ class CompositorNode(
 
         override fun mouseWheelRotated(event: PInputEvent) {
             val point = event.getPositionRelativeTo(this@CompositorNode)
-            when (val tile = scene.tileAt(point.x, point.y)) {
+            val tile = scene.tileAt(point.x, point.y) ?: return
+            if (scene.layerOfTile?.invoke(tile) != null) {
+                // Wheeling over the depth strip walks the selected layer.
+                selectLayer(scene.selectedLayer + event.wheelRotation)
+                event.isHandled = true
+                return
+            }
+            when (tile) {
                 is DeckTile -> {
                     tile.selectedSlice = (tile.selectedSlice + event.wheelRotation).mod(tile.slices)
                     scene.onHeadSelected?.invoke(tile, tile.selectedSlice)
@@ -691,6 +743,7 @@ class CompositorNode(
         private const val BADGE_RADIUS = 10.0
         private const val BADGE_ICON = 13.0
         private const val STALE_TRANSPARENCY = 0.35f
+        private const val DIM_TRANSPARENCY = 0.3f
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
         private val SATELLITE_NUDGES = doubleArrayOf(0.0) +

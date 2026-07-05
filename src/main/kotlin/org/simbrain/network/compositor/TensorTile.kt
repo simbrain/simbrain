@@ -13,6 +13,19 @@ import kotlin.math.abs
 enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
 
 /**
+ * A tile whose data source flips across model layers — the card stack behind a structure-first
+ * view where one block anatomy is shown once and the layer dimension collapses into decks.
+ * [stackLayers] holds the model layer index behind each stack entry (empty for unstacked tiles);
+ * [showLayer] flips to a layer's entry instantly, returning false when the stack has no entry
+ * for it (e.g. a conv-limb tile while an attention layer is selected).
+ */
+interface LayerStacked {
+    val stackLayers: List<Int>
+    val shownLayer: Int
+    fun showLayer(layer: Int): Boolean
+}
+
+/**
  * One heatmap in the compositor's retained scene: a layout rect in scene coordinates, a value
  * buffer holding published data, and a raster the values are shaded into. The tiers of
  * invalidation map onto its methods: moving the rect is tier 1 (geometry only), [publish] is
@@ -36,6 +49,9 @@ abstract class TensorTile(
     var y = 0.0
     var width = cols.toDouble()
     var height = rows.toDouble()
+
+    /** True when this tile belongs to a limb the selected layer doesn't use; rendered faded. */
+    var dimmed = false
 
     /** Published data, row-major [rows] x [cols]. Read for tooltips and probes; written by [publish]. */
     val values = FloatArray(rows * cols)
@@ -129,38 +145,82 @@ abstract class TensorTile(
  * so history lives here in the scene. Signed data, normalized by a running high quantile of the
  * magnitudes rather than the max: transformer residual streams grow a few huge outlier channels,
  * and max scaling would wash every other channel out. Outliers saturate instead.
+ *
+ * With several [ports] the tile is a layer stack: every port's history is retained in a cube on
+ * publish (the ports hold only the current token, so history can't be rebuilt later), one layer
+ * is displayed, and [showLayer] flips by reshading from memory. The normalization scale is
+ * shared across the stack, so flipping through layers compares them on one color scale.
  */
 class VectorHistoryTile(
-    val port: TensorPort,
+    val ports: List<TensorPort>,
     rows: Int,
-    title: String = port.name,
+    title: String = ports.first().name,
     kind: TileKind = TileKind.RESIDUAL,
-) : TensorTile(port.name, title, rows, port.tensor.size, signedNorm = true, kind = kind) {
+    id: String = ports.first().name,
+    override val stackLayers: List<Int> = emptyList(),
+) : TensorTile(id, title, rows, ports.first().tensor.size, signedNorm = true, kind = kind), LayerStacked {
 
-    private var lastVersion = -1L
+    constructor(port: TensorPort, rows: Int, title: String = port.name, kind: TileKind = TileKind.RESIDUAL) :
+        this(listOf(port), rows, title, kind)
+
+    init {
+        require(stackLayers.isEmpty() || stackLayers.size == ports.size) {
+            "Stack layers (${stackLayers.size}) must match ports (${ports.size})"
+        }
+        require(ports.all { it.tensor.size == cols }) { "All stacked ports must share one width" }
+    }
+
+    private val cube = FloatArray(ports.size * rows * cols)
+    private val lastVersions = LongArray(ports.size) { -1L }
     private val magnitudes = FloatArray(cols)
+    private var selected = 0
+
+    override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
+
+    @Synchronized
+    override fun showLayer(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        if (index < 0) return false
+        if (index != selected) {
+            selected = index
+            rebuildFromCube()
+        }
+        return true
+    }
 
     override fun reset() {
         super.reset()
-        lastVersion = -1L
+        cube.fill(0f)
+        lastVersions.fill(-1L)
     }
 
     @Synchronized
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
-        val tensor = port.tensor
-        if (tensor.version == lastVersion) return
-        lastVersion = tensor.version
-        val base = tokenIndex * cols
-        for (i in 0 until cols) {
-            val v = tensor.data.get(i)
-            values[base + i] = v
-            magnitudes[i] = abs(v)
+        for ((s, port) in ports.withIndex()) {
+            val tensor = port.tensor
+            if (tensor.version == lastVersions[s]) continue
+            lastVersions[s] = tensor.version
+            val base = (s * rows + tokenIndex) * cols
+            for (i in 0 until cols) {
+                val v = tensor.data.get(i)
+                cube[base + i] = v
+                magnitudes[i] = abs(v)
+            }
+            magnitudes.sort()
+            val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
+            growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
+            if (s == selected) {
+                System.arraycopy(cube, base, values, tokenIndex * cols, cols)
+                markRowsDirty(tokenIndex)
+            }
         }
-        magnitudes.sort()
-        val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
-        growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
-        markRowsDirty(tokenIndex)
+    }
+
+    @Synchronized
+    private fun rebuildFromCube() {
+        System.arraycopy(cube, selected * rows * cols, values, 0, rows * cols)
+        markAllDirty()
     }
 }
 
@@ -175,18 +235,30 @@ class VectorHistoryTile(
 class MatrixTile(
     id: String,
     title: String,
-    val tensor: FloatTensor,
+    val tensors: List<FloatTensor>,
     kind: TileKind = TileKind.ACTIVATION,
     signedNorm: Boolean = true,
     private val quantileNorm: Boolean = false,
     private val versionGated: Boolean = true,
     private val displayTransposed: Boolean = false,
+    override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(
     id, title,
-    if (displayTransposed) tensor.cols else tensor.rows,
-    if (displayTransposed) tensor.rows else tensor.cols,
+    if (displayTransposed) tensors.first().cols else tensors.first().rows,
+    if (displayTransposed) tensors.first().rows else tensors.first().cols,
     signedNorm, kind,
-) {
+), LayerStacked {
+
+    constructor(
+        id: String,
+        title: String,
+        tensor: FloatTensor,
+        kind: TileKind = TileKind.ACTIVATION,
+        signedNorm: Boolean = true,
+        quantileNorm: Boolean = false,
+        versionGated: Boolean = true,
+        displayTransposed: Boolean = false,
+    ) : this(id, title, listOf(tensor), kind, signedNorm, quantileNorm, versionGated, displayTransposed)
 
     constructor(
         port: TensorPort,
@@ -195,7 +267,36 @@ class MatrixTile(
         signedNorm: Boolean = true,
         quantileNorm: Boolean = false,
         displayTransposed: Boolean = false,
-    ) : this(port.name, title, port.tensor, kind, signedNorm, quantileNorm, true, displayTransposed)
+    ) : this(port.name, title, listOf(port.tensor), kind, signedNorm, quantileNorm, true, displayTransposed)
+
+    init {
+        require(stackLayers.isEmpty() || stackLayers.size == tensors.size) {
+            "Stack layers (${stackLayers.size}) must match tensors (${tensors.size})"
+        }
+        require(tensors.all { it.rows == tensors.first().rows && it.cols == tensors.first().cols }) {
+            "All stacked tensors must share one shape"
+        }
+    }
+
+    private var selected = 0
+
+    /** The currently displayed source. Unstacked tiles have exactly one. */
+    val tensor: FloatTensor get() = tensors[selected]
+
+    override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
+
+    /** Sources persist (weights, rolling caches), so flipping just re-copies the new one. */
+    @Synchronized
+    override fun showLayer(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        if (index < 0) return false
+        if (index != selected) {
+            selected = index
+            lastVersion = -1L
+            publish(-1)
+        }
+        return true
+    }
 
     private var lastVersion = -1L
 
@@ -263,17 +364,28 @@ class MatrixTile(
 class DeckTile(
     id: String,
     title: String,
-    val tensor: FloatTensor,
+    val tensors: List<FloatTensor>,
     val slices: Int,
     kind: TileKind = TileKind.ATTENTION,
     signedNorm: Boolean = false,
     private val columnSlices: Boolean = false,
+    override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(
     id, title,
-    if (columnSlices) tensor.rows else tensor.rows / slices,
-    if (columnSlices) tensor.cols / slices else tensor.cols,
+    if (columnSlices) tensors.first().rows else tensors.first().rows / slices,
+    if (columnSlices) tensors.first().cols / slices else tensors.first().cols,
     signedNorm, kind,
-) {
+), LayerStacked {
+
+    constructor(
+        id: String,
+        title: String,
+        tensor: FloatTensor,
+        slices: Int,
+        kind: TileKind = TileKind.ATTENTION,
+        signedNorm: Boolean = false,
+        columnSlices: Boolean = false,
+    ) : this(id, title, listOf(tensor), slices, kind, signedNorm, columnSlices)
 
     constructor(
         port: TensorPort,
@@ -282,17 +394,43 @@ class DeckTile(
         title: String = port.name,
         signedNorm: Boolean = false,
         columnSlices: Boolean = false,
-    ) : this(port.name, title, port.tensor, slices, kind, signedNorm, columnSlices)
+    ) : this(port.name, title, listOf(port.tensor), slices, kind, signedNorm, columnSlices)
 
     init {
+        require(stackLayers.isEmpty() || stackLayers.size == tensors.size) {
+            "Stack layers (${stackLayers.size}) must match tensors (${tensors.size})"
+        }
+        require(tensors.all { it.rows == tensors.first().rows && it.cols == tensors.first().cols }) {
+            "All stacked tensors must share one shape"
+        }
         if (columnSlices) {
-            require(tensor.cols % slices == 0) { "${tensor.cols} cols not divisible into $slices slices" }
+            require(tensors.first().cols % slices == 0) { "${tensors.first().cols} cols not divisible into $slices slices" }
         } else {
-            require(tensor.rows % slices == 0) { "${tensor.rows} rows not divisible into $slices slices" }
+            require(tensors.first().rows % slices == 0) { "${tensors.first().rows} rows not divisible into $slices slices" }
         }
     }
 
-    private val cube = FloatArray(tensor.rows * tensor.cols)
+    private var selected = 0
+
+    /** The currently displayed source. Unstacked tiles have exactly one. */
+    val tensor: FloatTensor get() = tensors[selected]
+
+    override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
+
+    /** Cache tensors persist in the model, so flipping re-copies the new layer's live state. */
+    @Synchronized
+    override fun showLayer(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        if (index < 0) return false
+        if (index != selected) {
+            selected = index
+            lastVersion = -1L
+            publish(-1)
+        }
+        return true
+    }
+
+    private val cube = FloatArray(tensors.first().rows * tensors.first().cols)
     private var lastVersion = -1L
 
     /** Custom label per selected slice; null falls back to "title · head N". */
@@ -350,19 +488,44 @@ class DeckTile(
  * fixed 0..1 scale.
  */
 class AttentionTile(
-    val port: TensorPort,
+    val ports: List<TensorPort>,
     val numHeads: Int,
     seqLen: Int,
-    title: String = port.name,
-) : TensorTile(port.name, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION) {
+    title: String = ports.first().name,
+    id: String = ports.first().name,
+    override val stackLayers: List<Int> = emptyList(),
+) : TensorTile(id, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION), LayerStacked {
 
-    private val history = FloatArray(numHeads * rows * cols)
-    private var lastVersion = -1L
+    constructor(port: TensorPort, numHeads: Int, seqLen: Int, title: String = port.name) :
+        this(listOf(port), numHeads, seqLen, title)
+
+    init {
+        require(stackLayers.isEmpty() || stackLayers.size == ports.size) {
+            "Stack layers (${stackLayers.size}) must match ports (${ports.size})"
+        }
+    }
+
+    private val history = FloatArray(ports.size * numHeads * rows * cols)
+    private val lastVersions = LongArray(ports.size) { -1L }
+    private var selected = 0
+
+    override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
+
+    @Synchronized
+    override fun showLayer(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        if (index < 0) return false
+        if (index != selected) {
+            selected = index
+            rebuildFromHistory()
+        }
+        return true
+    }
 
     override fun reset() {
         super.reset()
         history.fill(0f)
-        lastVersion = -1L
+        lastVersions.fill(-1L)
     }
 
     var selectedHead = 0
@@ -377,24 +540,29 @@ class AttentionTile(
     @Synchronized
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
-        val tensor = port.tensor
-        if (tensor.version == lastVersion) return
-        lastVersion = tensor.version
         val seen = minOf(tokenIndex + 1, cols)
-        for (head in 0 until numHeads) {
-            val src = head * tensor.cols
-            val dst = (head * rows + tokenIndex) * cols
-            for (j in 0 until seen) {
-                history[dst + j] = tensor.data.get(src + j)
+        for ((s, port) in ports.withIndex()) {
+            val tensor = port.tensor
+            if (tensor.version == lastVersions[s]) continue
+            lastVersions[s] = tensor.version
+            for (head in 0 until numHeads) {
+                val src = head * tensor.cols
+                val dst = ((s * numHeads + head) * rows + tokenIndex) * cols
+                for (j in 0 until seen) {
+                    history[dst + j] = tensor.data.get(src + j)
+                }
             }
         }
-        System.arraycopy(history, (selectedHead * rows + tokenIndex) * cols, values, tokenIndex * cols, cols)
+        System.arraycopy(
+            history, ((selected * numHeads + selectedHead) * rows + tokenIndex) * cols,
+            values, tokenIndex * cols, cols
+        )
         markRowsDirty(tokenIndex)
     }
 
     @Synchronized
     private fun rebuildFromHistory() {
-        System.arraycopy(history, selectedHead * rows * cols, values, 0, rows * cols)
+        System.arraycopy(history, (selected * numHeads + selectedHead) * rows * cols, values, 0, rows * cols)
         markAllDirty()
     }
 }

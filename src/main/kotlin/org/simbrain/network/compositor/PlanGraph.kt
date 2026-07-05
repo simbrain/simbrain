@@ -8,20 +8,53 @@ import org.simbrain.network.tensor.op.TensorOp
  * This is what makes compositor layout and trace derivable from the plan instead of
  * hand-coded — upstream/downstream reachability and tile-to-tile edges all fall out of
  * the op list.
+ *
+ * An optional [aliasFn] projects port and op names into a display namespace before adjacency is
+ * built. Ops whose names alias to the same string merge into one graph node, represented by the
+ * first such op (its class identity drives icons and strand detection); the node's inputs and
+ * outputs are the union over the merged ops. This is how a stacked structure view projects two
+ * representative layers onto one canonical block — e.g. both layers' `mixer_residual` adds
+ * become a single junction whose input streams are the residual bypass and both mixer limbs.
+ * Every name-typed argument and result of this class lives in the aliased namespace.
  */
-class PlanGraph(val plan: OpPlan) {
+class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it }) {
 
     private val writerOf = HashMap<String, TensorOp>()
     private val readersOf = HashMap<String, MutableList<TensorOp>>()
     private val opIndex = HashMap<TensorOp, Int>()
 
+    // Inputs are keyed by (name, occurrence within the op): an op reading the same stream twice
+    // (a gate joining two slices of one projection) keeps both entries and counts as a junction,
+    // while merged ops that each read the shared stream once collapse to a single entry.
+    private val nodeInputs = HashMap<TensorOp, LinkedHashSet<Pair<String, Int>>>()
+    private val nodeOutputs = HashMap<TensorOp, LinkedHashSet<String>>()
+
     init {
+        val representatives = HashMap<String, TensorOp>()
         for ((i, op) in plan.ops.withIndex()) {
-            opIndex[op] = i
-            for (port in op.outputs) writerOf[port.name] = op
-            for (port in op.inputs) readersOf.getOrPut(port.name) { mutableListOf() }.add(op)
+            val node = representatives.getOrPut(aliasFn(op.name)) { op }
+            opIndex.putIfAbsent(node, i)
+            val outputs = nodeOutputs.getOrPut(node) { LinkedHashSet() }
+            for (port in op.outputs) {
+                val name = aliasFn(port.name)
+                outputs.add(name)
+                writerOf[name] = node
+            }
+            val inputs = nodeInputs.getOrPut(node) { LinkedHashSet() }
+            val occurrences = HashMap<String, Int>()
+            for (port in op.inputs) {
+                val name = aliasFn(port.name)
+                inputs.add(name to occurrences.merge(name, 1, Int::plus)!!)
+                val readers = readersOf.getOrPut(name) { mutableListOf() }
+                if (node !in readers) readers.add(node)
+            }
         }
     }
+
+    /** Projects a raw plan name into this graph's display namespace. */
+    fun alias(name: String) = aliasFn(name)
+
+    private fun outputsOf(op: TensorOp): Set<String> = nodeOutputs[op] ?: emptySet()
 
     /** Position of the op that writes [name] in the plan's schedule, or null for pure inputs. */
     fun writerIndex(name: String): Int? = writerOf[name]?.let { opIndex.getValue(it) }
@@ -30,11 +63,11 @@ class PlanGraph(val plan: OpPlan) {
     fun upstreamPorts(name: String): Set<String> {
         val visited = HashSet<String>()
         val stack = ArrayDeque<String>()
-        writerOf[name]?.inputs?.forEach { stack.add(it.name) }
+        writerOf[name]?.let { nodeInputs[it] }?.forEach { stack.add(it.first) }
         while (stack.isNotEmpty()) {
             val port = stack.removeLast()
             if (!visited.add(port)) continue
-            writerOf[port]?.inputs?.forEach { stack.add(it.name) }
+            writerOf[port]?.let { nodeInputs[it] }?.forEach { stack.add(it.first) }
         }
         visited.remove(name)
         return visited
@@ -44,11 +77,11 @@ class PlanGraph(val plan: OpPlan) {
     fun downstreamPorts(name: String): Set<String> {
         val visited = HashSet<String>()
         val stack = ArrayDeque<String>()
-        readersOf[name]?.forEach { op -> op.outputs.forEach { stack.add(it.name) } }
+        readersOf[name]?.forEach { op -> outputsOf(op).forEach { stack.add(it) } }
         while (stack.isNotEmpty()) {
             val port = stack.removeLast()
             if (!visited.add(port)) continue
-            readersOf[port]?.forEach { op -> op.outputs.forEach { stack.add(it.name) } }
+            readersOf[port]?.forEach { op -> outputsOf(op).forEach { stack.add(it) } }
         }
         visited.remove(name)
         return visited
@@ -68,7 +101,7 @@ class PlanGraph(val plan: OpPlan) {
         for (anchor in anchors) {
             val visited = HashSet<String>()
             val stack = ArrayDeque<Pair<String, List<TensorOp>>>()
-            readersOf[anchor]?.forEach { op -> op.outputs.forEach { stack.add(it.name to listOf(op)) } }
+            readersOf[anchor]?.forEach { op -> outputsOf(op).forEach { stack.add(it to listOf(op)) } }
             while (stack.isNotEmpty()) {
                 val (port, opsSoFar) = stack.removeLast()
                 if (port in anchorSet) {
@@ -76,7 +109,7 @@ class PlanGraph(val plan: OpPlan) {
                     continue
                 }
                 if (!visited.add(port)) continue
-                readersOf[port]?.forEach { op -> op.outputs.forEach { stack.add(it.name to (opsSoFar + op)) } }
+                readersOf[port]?.forEach { op -> outputsOf(op).forEach { stack.add(it to (opsSoFar + op)) } }
             }
         }
         return edges.map { (endpoints, ops) -> EdgePath(endpoints.first, endpoints.second, ops.toList()) }
@@ -101,7 +134,7 @@ class PlanGraph(val plan: OpPlan) {
         val anchorSet = anchors.toSet()
         val onPaths = anchorEdges(anchors).flatMapTo(HashSet()) { it.ops }
         return onPaths.filterTo(LinkedHashSet()) { op ->
-            op.inputs.count { it.name in anchorSet || it.name in writerOf } >= 2
+            nodeInputs.getValue(op).count { (name, _) -> name in anchorSet || name in writerOf } >= 2
         }
     }
 
@@ -124,11 +157,11 @@ class PlanGraph(val plan: OpPlan) {
                         edges.getOrPut(sourceKey to op) { LinkedHashSet() }.addAll(opsSoFar)
                         continue
                     }
-                    for (out in op.outputs) {
-                        if (out.name in anchorSet) {
-                            edges.getOrPut(sourceKey to out.name) { LinkedHashSet() }.addAll(opsSoFar + op)
+                    for (out in outputsOf(op)) {
+                        if (out in anchorSet) {
+                            edges.getOrPut(sourceKey to out) { LinkedHashSet() }.addAll(opsSoFar + op)
                         } else {
-                            stack.add(out.name to (opsSoFar + op))
+                            stack.add(out to (opsSoFar + op))
                         }
                     }
                 }
@@ -144,10 +177,10 @@ class PlanGraph(val plan: OpPlan) {
 
         for (anchor in anchors) walk(anchor, listOf(anchor))
         for (junction in junctions) {
-            val (anchorOuts, innerOuts) = junction.outputs.partition { it.name in anchorSet }
+            val (anchorOuts, innerOuts) = outputsOf(junction).partition { it in anchorSet }
             // A junction writing an anchor port directly is an edge on its own.
-            for (out in anchorOuts) edges.getOrPut(junction as Any to out.name) { LinkedHashSet() }
-            walk(junction, innerOuts.map { it.name })
+            for (out in anchorOuts) edges.getOrPut(junction as Any to out) { LinkedHashSet() }
+            walk(junction, innerOuts)
         }
         return edges.map { (endpoints, ops) -> DisplaySegment(endpoints.first, endpoints.second, ops.toList()) }
     }

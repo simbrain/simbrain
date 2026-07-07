@@ -88,6 +88,7 @@ fun main(args: Array<String>) {
     val built = def.build()
 
     lateinit var target: Component
+    var resizeToPreferred = false
     SwingUtilities.invokeAndWait {
         target = when (built) {
             is Window -> {
@@ -103,6 +104,7 @@ fun main(args: Array<String>) {
                         contentPane = built
                         pack()
                     }
+                    resizeToPreferred = true
                 }
                 built
             }
@@ -127,6 +129,12 @@ fun main(args: Array<String>) {
 
     lateinit var outFile: File
     SwingUtilities.invokeAndWait {
+        if (resizeToPreferred) {
+            // The realizing dialog's pack() capped the component at screen size, silently
+            // truncating oversized canvases; snapshots want the full preferred extent.
+            target.size = target.preferredSize
+            target.validate()
+        }
         val w = target.width.coerceAtLeast(1)
         val h = target.height.coerceAtLeast(1)
         val outW = (w * scale).toInt().coerceAtLeast(1)

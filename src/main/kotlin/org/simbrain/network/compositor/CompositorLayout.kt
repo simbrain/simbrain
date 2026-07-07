@@ -1,21 +1,23 @@
 package org.simbrain.network.compositor
 
+import java.awt.geom.Point2D
+
 /**
- * Constrained layered layout for compositor scenes, replacing hand-placed coordinates: anchor
- * tiles AND junction op vertices are ranked by longest path over the derived edges (the plan's
- * schedule order makes this a single relaxation sweep — the graph is already topologically
- * sorted), and the residual checkpoint spine — junction ⊕s included — plus everything downstream
- * of the last checkpoint is pinned to a vertical axis.
+ * Constrained layout for compositor scenes, replacing hand-placed coordinates. The residual
+ * checkpoint spine — junction ⊕s included — plus everything downstream of the last checkpoint
+ * runs top-down on a vertical axis. Off-spine structure is grouped by limb: the connected
+ * components of the flow graph once the spine is removed, each one processing arm (attention,
+ * gated conv, the MLP).
  *
- * Off-spine structure is grouped by limb: the connected components of the flow graph once the
- * spine is removed, each one processing arm (attention, gated conv, the MLP). Limbs whose rank
- * spans overlap get separate column bands so their arrows don't weave through each other; limbs
- * with disjoint spans pack into the band nearest the spine, and limbs with more spine-facing
- * edges take nearer bands so fewer arrows arc across a band. Within a rank, siblings order by
- * the barycenter of their already-placed inputs — the crossing-minimization pass — and cascade
- * down inside their band so fan-in curves clear earlier siblings. Standalone parameter tiles sit
- * above the endpoint they feed. Satellite tiles are untouched — their rects derive from edge
- * curves at render time.
+ * Limbs flow HORIZONTALLY: each lays out as left-to-right columns of its local ranks, hanging
+ * off the spine gap between the checkpoints it connects — the classic block-diagram shape where
+ * arms loop out sideways and rejoin at the ⊕. A long arm costs width instead of height, so the
+ * diagram stays near screen aspect. Limbs sharing a gap stack as strips (more spine-facing
+ * edges on top), and their return arrows route through reserved lanes at the bottom of the gap
+ * via [FlowEdge.waypoints]. Within a column, siblings order by the barycenter of their placed
+ * inputs — the crossing-minimization pass — with schedule order breaking ties. Standalone
+ * parameter tiles sit above the endpoint they feed. Satellite tiles are untouched — their rects
+ * derive from edge curves at render time, with column gaps and spine gaps opened to fit them.
  */
 class CompositorLayout(
     scale: Double = 1.0,
@@ -26,11 +28,12 @@ class CompositorLayout(
     // fixed point sizes, so a shrunken diagram still needs room for them.
     private val rowGap = (90.0 * scale).coerceAtLeast(70.0)
     private val junctionGap = (64.0 * scale).coerceAtLeast(48.0)
-    private val stackStepX = 60.0 * scale
+    private val columnGap = (110.0 * scale).coerceAtLeast(90.0)
     private val stackGap = (70.0 * scale).coerceAtLeast(45.0)
     private val limbClearance = 220.0 + 20.0 * scale
     private val paramGap = (30.0 * scale).coerceAtLeast(20.0)
-    private val bandGap = (100.0 * scale).coerceAtLeast(80.0)
+    private val interLimbGap = (60.0 * scale).coerceAtLeast(50.0)
+    private val laneGap = 26.0
 
     private fun width(e: FlowEndpoint) = when (e) {
         is TensorTile -> e.width
@@ -91,6 +94,17 @@ class CompositorLayout(
             is OpVertex -> e.op.outputs.any { graph.alias(it.name) in spineTileIds }
         }
 
+        val spine = flow.filter(::onSpine)
+        val spineIndex = spine.withIndex().associate { (i, item) -> item to i }
+        val spineHalfWidth = spine.maxOfOrNull { width(it) / 2 } ?: 0.0
+
+        // Satellites riding spine-to-limb entry edges perch in the clearance channel; widen it
+        // so several of them (Wq/Wk/Wv fanning into one limb) have room to spread out.
+        val entrySatelliteNeed = scene.satellites
+            .filter { onSpine(it.edge.from) && it.edge.to in rank && !onSpine(it.edge.to) }
+            .maxOfOrNull { it.tile.width + 100.0 } ?: 0.0
+        val limbLeft = spineAxisX + spineHalfWidth + limbClearance + entrySatelliteNeed
+
         // Limbs: connected components of the flow graph once the spine is removed.
         val neighbors = HashMap<FlowEndpoint, MutableList<FlowEndpoint>>()
         for (edge in scene.edges) {
@@ -114,108 +128,147 @@ class CompositorLayout(
             }
         }
 
-        fun limbExtent(members: List<FlowEndpoint>): Double =
-            members.groupBy { rank.getValue(it) }.values.maxOf { row ->
-                (row.size - 1) * stackStepX + row.maxOf { width(it) }
-            }
+        // Local ranks within each limb become its columns; flow order makes one sweep enough.
+        val localRank = HashMap<FlowEndpoint, Int>()
+        for (item in flow) {
+            val limb = limbOf[item] ?: continue
+            localRank[item] = edgesByTarget[item].orEmpty()
+                .filter { limbOf[it.from] == limb }
+                .mapNotNull { localRank[it.from]?.plus(1) }
+                .maxOrNull() ?: 0
+        }
 
-        // Band assignment: greedy interval coloring over rank spans, nearest band first.
-        val spineEdgeCount = IntArray(limbs.size)
+        class LimbPlan(val id: Int) {
+            val columns: List<List<FlowEndpoint>> = limbs[id]
+                .groupBy { localRank.getValue(it) }
+                .toSortedMap().values
+                .map { column -> column.sortedWith(compareBy({ rank.getValue(it) }, { scheduleIndex(it) })) }
+            val columnHeights = columns.map { column ->
+                column.sumOf { height(it) } + stackGap * (column.size - 1)
+            }
+            val stripHeight = columnHeights.max()
+            // Column boundaries crossed by a satellite-carrying edge open to fit the riding tile.
+            val columnGaps = DoubleArray((columns.size - 1).coerceAtLeast(0)) { columnGap }.also { gaps ->
+                for (satellite in scene.satellites) {
+                    if (limbOf[satellite.edge.from] != id || limbOf[satellite.edge.to] != id) continue
+                    val from = localRank.getValue(satellite.edge.from)
+                    val to = localRank.getValue(satellite.edge.to)
+                    for (boundary in from until to) {
+                        gaps[boundary] = maxOf(gaps[boundary], satellite.tile.width + 100.0)
+                    }
+                }
+            }
+            var spineEdges = 0
+            val returnEdges = scene.edges.filter { limbOf[it.from] == id && onSpine(it.to) }
+            var top = 0.0
+        }
+
+        val plans = limbs.indices.map { LimbPlan(it) }
         for (edge in scene.edges) {
             if (edge.from !in rank || edge.to !in rank) continue
-            if (onSpine(edge.from) && !onSpine(edge.to)) limbOf[edge.to]?.let { spineEdgeCount[it]++ }
-            if (!onSpine(edge.from) && onSpine(edge.to)) limbOf[edge.from]?.let { spineEdgeCount[it]++ }
-        }
-        val bandOfLimb = IntArray(limbs.size)
-        val bandSpans = ArrayList<MutableList<IntRange>>()
-        val bandWidths = ArrayList<Double>()
-        for (id in limbs.indices.sortedWith(compareByDescending<Int> { spineEdgeCount[it] }.thenBy { it })) {
-            val span = limbs[id].minOf { rank.getValue(it) }..limbs[id].maxOf { rank.getValue(it) }
-            var band = bandSpans.indexOfFirst { spans ->
-                spans.none { it.first <= span.last && span.first <= it.last }
-            }
-            if (band < 0) {
-                band = bandSpans.size
-                bandSpans.add(mutableListOf())
-                bandWidths.add(0.0)
-            }
-            bandSpans[band].add(span)
-            bandWidths[band] = maxOf(bandWidths[band], limbExtent(limbs[id]))
-            bandOfLimb[id] = band
-        }
-        val spineHalfWidth = flowTiles.filter(::onSpine).maxOfOrNull { it.width / 2 } ?: 0.0
-        val bandLefts = DoubleArray(bandWidths.size)
-        var bandX = spineAxisX + spineHalfWidth + limbClearance
-        for (band in bandLefts.indices) {
-            bandLefts[band] = bandX
-            bandX += bandWidths[band] + bandGap
+            if (onSpine(edge.from) && !onSpine(edge.to)) limbOf[edge.to]?.let { plans[it].spineEdges++ }
+            if (!onSpine(edge.from) && onSpine(edge.to)) limbOf[edge.from]?.let { plans[it].spineEdges++ }
         }
 
-        // Rank boundaries crossed by a satellite-carrying edge open to fit the riding tile —
-        // its height plus label and curve clearance — replacing the normal gap, not adding to it.
-        val satelliteNeed = HashMap<Int, Double>()
+        // Each limb hangs in the spine gap right below the last spine item feeding it.
+        fun entryGap(plan: LimbPlan): Int {
+            val fromSpine = limbs[plan.id].flatMap { item ->
+                edgesByTarget[item].orEmpty().mapNotNull { spineIndex[it.from] }
+            }
+            val exit = plan.returnEdges.mapNotNull { spineIndex[it.to] }.minOrNull()
+            return (fromSpine.maxOrNull() ?: exit?.minus(1) ?: 0).coerceIn(0, (spine.size - 2).coerceAtLeast(0))
+        }
+
+        val limbsAtGap = plans.groupBy(::entryGap).mapValues { (_, group) ->
+            group.sortedWith(compareByDescending<LimbPlan> { it.spineEdges }.thenBy { it.id })
+        }
+
+        // Spine gaps: the base row gap (tight around junction-only neighbors), opened for
+        // spine-riding satellites, and sized to stack every limb strip hanging in them plus
+        // the return lanes along the bottom.
+        val spineSatelliteNeed = HashMap<Int, Double>()
         for (satellite in scene.satellites) {
-            val from = rank[satellite.edge.from] ?: continue
-            val to = rank[satellite.edge.to] ?: continue
+            val from = spineIndex[satellite.edge.from] ?: continue
+            val to = spineIndex[satellite.edge.to] ?: continue
             for (boundary in from until to) {
-                satelliteNeed[boundary] = maxOf(satelliteNeed[boundary] ?: 0.0, satellite.tile.height + 100.0)
+                spineSatelliteNeed[boundary] =
+                    maxOf(spineSatelliteNeed[boundary] ?: 0.0, satellite.tile.height + 100.0)
             }
         }
-
-        fun centerX(e: FlowEndpoint) = when (e) {
-            is TensorTile -> e.x + e.width / 2
-            is OpVertex -> e.x
+        val gapNeed = DoubleArray((spine.size - 1).coerceAtLeast(0)) { i ->
+            val base = if (spine[i] is OpVertex || spine[i + 1] is OpVertex) junctionGap else rowGap
+            var need = maxOf(base, spineSatelliteNeed[i] ?: 0.0)
+            limbsAtGap[i]?.let { group ->
+                val strips = group.sumOf { it.stripHeight } + interLimbGap * (group.size - 1)
+                val lanes = laneGap * (group.count { it.returnEdges.isNotEmpty() } + 1)
+                need = maxOf(need, rowGap + strips + maxOf(rowGap, lanes))
+            }
+            need
         }
-
-        fun placedInputCenters(item: FlowEndpoint, r: Int) = edgesByTarget[item].orEmpty()
-            .filter { (rank[it.from] ?: r) < r }
-            .map { centerX(it.from) }
-
-        val rowsByRank = flow.groupBy { rank.getValue(it) }
-        fun junctionsOnly(r: Int) = rowsByRank[r]?.all { it is OpVertex } == true
 
         var y = 0.0
-        for (r in 0..rank.values.max()) {
-            val row = rowsByRank[r] ?: continue
-            var rowHeight = 0.0
-            for (item in row.filter(::onSpine)) {
-                place(item, spineAxisX - width(item) / 2, y)
-                rowHeight = maxOf(rowHeight, height(item))
+        for ((i, item) in spine.withIndex()) {
+            place(item, spineAxisX - width(item) / 2, y)
+            if (i < gapNeed.size) {
+                var stripTop = y + height(item) + rowGap
+                for (plan in limbsAtGap[i].orEmpty()) {
+                    plan.top = stripTop
+                    stripTop += plan.stripHeight + interLimbGap
+                }
+                y += height(item) + gapNeed[i]
             }
-            for ((limbId, members) in row.filterNot(::onSpine).groupBy { limbOf.getValue(it) }) {
-                // Barycenter order over placed inputs is the crossing-minimization pass; schedule
-                // order breaks ties so equal-input siblings keep declaration order.
-                val ordered = members.sortedWith(compareBy(
-                    { item -> placedInputCenters(item, r).ifEmpty { null }?.average() ?: Double.MAX_VALUE },
+        }
+
+        for (plan in plans) {
+            var x = limbLeft
+            for ((c, column) in plan.columns.withIndex()) {
+                // Columns center vertically in the strip; within one, siblings order by the
+                // barycenter of their placed inputs — the crossing-minimization pass — with
+                // schedule order breaking ties, and stack so fan-in curves arrive at distinct
+                // heights.
+                val ordered = column.sortedWith(compareBy(
+                    { item ->
+                        val centers = edgesByTarget[item].orEmpty()
+                            .filter { it.from in rank && (limbOf[it.from] != plan.id || localRank.getValue(it.from) < c) }
+                            .map { (it.from as? TensorTile)?.let { t -> t.y + t.height / 2 } ?: (it.from as OpVertex).y }
+                        if (centers.isEmpty()) Double.MAX_VALUE else centers.average()
+                    },
                     { scheduleIndex(it) },
                 ))
-                val bandLeft = bandLefts[bandOfLimb[limbId]]
-                val bandRight = bandLeft + bandWidths[bandOfLimb[limbId]]
-                val extent = ordered.mapIndexed { i, item -> i * stackStepX + width(item) }.max()
-                // The row starts under the barycenter of its placed inputs, clamped to its band,
-                // so the limb snakes with its data flow without invading a neighboring band.
-                val inputCenters = ordered.flatMap { placedInputCenters(it, r) }
-                var x = if (inputCenters.isEmpty()) bandLeft else {
-                    (inputCenters.average() - width(ordered.first()) / 2)
-                        .coerceAtMost(bandRight - extent)
-                        .coerceAtLeast(bandLeft)
-                }
-                var stagger = 0.0
+                var itemY = plan.top + (plan.stripHeight - plan.columnHeights[c]) / 2
                 for (item in ordered) {
-                    // Siblings cascade steeply down with a small x-step: their fan-in curves
-                    // arrive at distinct heights, so neither the curves nor the weights riding
-                    // them cross an earlier sibling.
-                    place(item, x, y + stagger)
-                    rowHeight = maxOf(rowHeight, stagger + height(item))
-                    x += stackStepX
-                    stagger += height(item) + stackGap
+                    place(item, x, itemY)
+                    itemY += height(item) + stackGap
+                }
+                x += (column.maxOf { width(it) }) + (plan.columnGaps.getOrNull(c) ?: 0.0)
+            }
+        }
+
+        // Return arrows travel back to the spine through lanes below the gap's limb strips, so
+        // they never cut through a neighboring strip's columns.
+        for ((_, group) in limbsAtGap) {
+            val stripsBottom = group.last().top + group.last().stripHeight
+            val clearX = group.maxOf { plan ->
+                limbLeft + plan.columns.indices.sumOf { c ->
+                    (plan.columns[c].maxOf { width(it) }) + (plan.columnGaps.getOrNull(c) ?: 0.0)
                 }
             }
-            // Boundaries touching a junction-only row tighten on both sides: the glyphs are
-            // small, so the full row gap around them reads as dead space.
-            val next = (r + 1..rank.values.max()).firstOrNull { rowsByRank.containsKey(it) }
-            val gap = if (junctionsOnly(r) || (next != null && junctionsOnly(next))) junctionGap else rowGap
-            y += rowHeight + maxOf(gap, satelliteNeed[r] ?: 0.0)
+            var laneY = stripsBottom + laneGap
+            for (plan in group.asReversed()) {
+                for (edge in plan.returnEdges) {
+                    val source = edge.from
+                    val sourceRight = when (source) {
+                        is TensorTile -> source.x + source.width
+                        is OpVertex -> source.x + JUNCTION_SIZE / 2
+                    }
+                    val dropX = maxOf(sourceRight + 40.0, if (plan !== group.last()) clearX + 40.0 else sourceRight + 40.0)
+                    edge.waypoints = listOf(
+                        Point2D.Double(dropX, laneY),
+                        Point2D.Double(spineAxisX + spineHalfWidth + 60.0, laneY),
+                    )
+                }
+                laneY += laneGap
+            }
         }
 
         for ((target, group) in params.groupBy { p -> scene.edges.firstOrNull { it.from == p }?.to }) {

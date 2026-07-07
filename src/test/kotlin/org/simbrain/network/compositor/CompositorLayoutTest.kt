@@ -35,7 +35,7 @@ class CompositorLayoutTest {
     }
 
     @Test
-    fun `limb rows sit clear of the lens strip and rank between their checkpoints`() {
+    fun `limbs flow horizontally clear of the lens strip and hang between their checkpoints`() {
         val scene = scene()
         val spineRight = scene.tile("resid0").let { it.x + it.width }
         for (id in listOf("layers.0.attn.q", "layers.0.attn.weights", "layers.0.attn.out", "layers.0.mlp.act")) {
@@ -44,15 +44,18 @@ class CompositorLayoutTest {
         val q = scene.tile("layers.0.attn.q")
         val k = scene.tile("layers.0.attn.k")
         val v = scene.tile("layers.0.attn.v")
-        assertTrue(q.x < k.x && k.x < v.x, "rank row keeps declaration order left to right")
+        assertEquals(q.x, k.x, 1e-9, "q, k, and v share the limb's first column")
+        assertEquals(k.x, v.x, 1e-9)
         assertTrue(q.y + q.height <= k.y && k.y + k.height <= v.y,
-            "same-rank siblings cascade down so fan-in curves clear earlier siblings")
+            "column siblings stack down in declaration order so fan-in curves clear each other")
 
         val branch = scene.tile("resid0")
         val rejoin = scene.tile("layers.0.attn_resid")
         val deck = scene.tile("layers.0.attn.weights")
-        assertTrue(q.y > branch.y && deck.y > q.y && rejoin.y > scene.tile("layers.0.attn.out").y,
-            "the attention limb ranks strictly between its checkpoints")
+        val out = scene.tile("layers.0.attn.out")
+        assertTrue(deck.x > q.x && out.x > deck.x, "the limb flows left to right through its columns")
+        assertTrue(q.y > branch.y + branch.height, "the limb hangs below the checkpoint that feeds it")
+        assertTrue(rejoin.y > branch.y, "the rejoin checkpoint sits below the branch")
     }
 
     @Test

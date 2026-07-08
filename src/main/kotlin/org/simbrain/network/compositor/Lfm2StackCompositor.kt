@@ -112,8 +112,17 @@ object Lfm2StackCompositor {
             width = ROPE_WIDTH; height = ROPE_HEIGHT
         })
         stackedHistory("block.attn.q", attnLayers, "q (${config.numHeads} heads)", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.attn.q" }
-        stackedHistory("block.attn.k", attnLayers, "k (${config.numKvHeads} kv heads)", ACTIVATION_WIDTH * 0.6, ACTIVATION_HEIGHT) { "layers.$it.attn.k" }
-        stackedHistory("block.attn.v", attnLayers, "v (${config.numKvHeads} kv heads)", ACTIVATION_WIDTH * 0.6, ACTIVATION_HEIGHT) { "layers.$it.attn.v" }
+        // k and v are one row in flight: their history IS the cache, so drawing it here too
+        // would duplicate the cache tiles. q keeps its history — it has no cache anywhere.
+        fun tokenVector(id: String, title: String) {
+            scene.addTile(MatrixTile(
+                id = id, title = title,
+                tensors = attnLayers.map { plan.port("layers.$it.${id.removePrefix("block.")}").tensor },
+                stackLayers = attnLayers,
+            ).apply { width = ACTIVATION_WIDTH * 0.6; height = TOKEN_VECTOR_HEIGHT })
+        }
+        tokenVector("block.attn.k", "k (new cache row)")
+        tokenVector("block.attn.v", "v (new cache row)")
         scene.addTile(DeckTile(
             id = "block.attn.k_cache", title = "k cache",
             tensors = attnLayers.map { plan.port("layers.$it.attn.k_cache").tensor },
@@ -226,6 +235,7 @@ object Lfm2StackCompositor {
     private const val ROPE_WIDTH = 60.0
     private const val ROPE_HEIGHT = 50.0
     private const val CONV_WINDOW_HEIGHT = 26.0
+    private const val TOKEN_VECTOR_HEIGHT = 24.0
     private const val STRIP_WIDTH = 170.0
     private const val STRIP_ROW_HEIGHT = 26.0
     private const val STRIP_ROW_GAP = 20.0

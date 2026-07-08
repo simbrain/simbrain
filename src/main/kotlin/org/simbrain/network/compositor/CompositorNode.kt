@@ -250,6 +250,11 @@ class CompositorNode(
             val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 20)
             acc?.also { it.add(r) } ?: r
         } ?: Rectangle2D.Double()
+        // Edge geometry can reach past the tiles (waypoint lanes, arrowheads); keep it inside.
+        val edgeBounds = edgeLayer.fullBoundsReference
+        if (edgeBounds.width > 0 && edgeBounds.height > 0) {
+            bounds.add(Rectangle2D.Double(edgeBounds.x, edgeBounds.y, edgeBounds.width, edgeBounds.height))
+        }
         background.reset()
         background.append(
             Rectangle2D.Double(

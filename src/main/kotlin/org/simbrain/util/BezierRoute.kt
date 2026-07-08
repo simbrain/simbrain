@@ -87,10 +87,19 @@ fun routeThrough(knots: List<Point2D>, startNormal: Point2D, endNormal: Point2D)
         }
     }
     val segments = (0 until knots.lastIndex).map { i ->
+        // Uniform Catmull-Rom tangents blow up when neighboring spans dwarf a segment (a long
+        // waypoint lane feeding a short final hop loops around its target); cap each control
+        // offset by the segment's own chord so short segments stay short.
+        val limit = (knots[i + 1] distanceTo knots[i]).coerceAtLeast(1e-9) / 2.0
+        fun offset(tangent: Point2D): Point2D {
+            val third = tangent / 3.0
+            val magnitude = kotlin.math.sqrt(third.magnitudeSq)
+            return if (magnitude > limit) third * (limit / magnitude) else third
+        }
         cubicBezier(
             knots[i],
-            knots[i] + tangents[i] / 3.0,
-            knots[i + 1] - tangents[i + 1] / 3.0,
+            knots[i] + offset(tangents[i]),
+            knots[i + 1] - offset(tangents[i + 1]),
             knots[i + 1]
         )
     }

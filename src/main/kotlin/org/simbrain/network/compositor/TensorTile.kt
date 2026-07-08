@@ -53,6 +53,15 @@ abstract class TensorTile(
     /** True when this tile belongs to a limb the selected layer doesn't use; rendered faded. */
     var dimmed = false
 
+    /**
+     * The row holding the current token's just-published value, or -1 when rows aren't a token
+     * axis (full-pass publishes). Rendered as a cursor: on history tiles it marks the one row
+     * actually flowing through the graph this step; on the KV caches it marks the write frontier
+     * (rows past it are stale).
+     */
+    var liveRow = -1
+        protected set
+
     /** Published data, row-major [rows] x [cols]. Read for tooltips and probes; written by [publish]. */
     val values = FloatArray(rows * cols)
 
@@ -76,6 +85,7 @@ abstract class TensorTile(
     open fun reset() {
         values.fill(0f)
         absMax = 0f
+        liveRow = -1
         markAllDirty()
     }
 
@@ -197,6 +207,7 @@ class VectorHistoryTile(
     @Synchronized
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
+        liveRow = tokenIndex
         for ((s, port) in ports.withIndex()) {
             val tensor = port.tensor
             if (tensor.version == lastVersions[s]) continue
@@ -455,6 +466,7 @@ class DeckTile(
     override fun publish(tokenIndex: Int) {
         if (tensor.version == lastVersion) return
         lastVersion = tensor.version
+        if (tokenIndex in 0 until rows) liveRow = tokenIndex
         for (i in cube.indices) cube[i] = tensor.data.get(i)
         var max = 0f
         for (v in cube) max = maxOf(max, abs(v))
@@ -540,6 +552,7 @@ class AttentionTile(
     @Synchronized
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
+        liveRow = tokenIndex
         val seen = minOf(tokenIndex + 1, cols)
         for ((s, port) in ports.withIndex()) {
             val tensor = port.tensor

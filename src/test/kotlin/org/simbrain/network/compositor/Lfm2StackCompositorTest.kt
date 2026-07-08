@@ -161,6 +161,28 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `the live row cursor tracks the current token and the cache write frontier`() {
+        val model = syntheticModel()
+        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+
+        val q = scene.tile("block.attn.q")
+        val kCache = scene.tile("block.attn.k_cache")
+        val attention = scene.tile("block.attn.weights")
+        val kernel = scene.tile("block.w.conv.conv.weight")
+        assertEquals(-1, q.liveRow, "no cursor before any token runs")
+
+        repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
+        assertEquals(2, q.liveRow, "history tiles mark the current token's row")
+        assertEquals(2, attention.liveRow)
+        assertEquals(2, kCache.liveRow, "the cache cursor sits at the write frontier")
+        assertEquals(-1, kernel.liveRow, "weights have no token axis")
+
+        scene.reset()
+        assertEquals(-1, q.liveRow)
+        assertEquals(-1, kCache.liveRow)
+    }
+
+    @Test
     fun `flipping the attention deck flips the kv cache decks to the serving group`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)

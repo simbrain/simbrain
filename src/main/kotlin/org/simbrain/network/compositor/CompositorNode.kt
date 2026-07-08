@@ -111,6 +111,17 @@ class CompositorNode(
             font = Theme.tiny
         }.also { addChild(it) }
 
+        /** Cursor at the tile's live row: the current token's row, or a cache's write frontier. */
+        val liveMarker = PPath.Double(Path2D.Double().apply {
+            moveTo(-LIVE_MARKER_SIZE, -LIVE_MARKER_SIZE * 0.7)
+            lineTo(0.0, 0.0)
+            lineTo(-LIVE_MARKER_SIZE, LIVE_MARKER_SIZE * 0.7)
+            closePath()
+        }, null).apply {
+            pickable = false
+            visible = false
+        }.also { addChild(it) }
+
         /** The activation op producing this tile, shown as a corner badge instead of an edge glyph. */
         val activationOp: TensorOp? = scene.graph?.writer(tile.id)
             ?.takeIf { it is ReLUOp || it is SiluGateOp }
@@ -142,6 +153,15 @@ class CompositorNode(
             setOffset(tile.x, tile.y)
             label.setOffset(0.0, tile.height + 3.0)
             syncLabel()
+            syncLiveRow()
+        }
+
+        fun syncLiveRow() {
+            val row = tile.liveRow
+            liveMarker.visible = row in 0 until tile.rows
+            if (liveMarker.visible) {
+                liveMarker.setOffset(0.0, (row + 0.5) / tile.rows * tile.height)
+            }
         }
 
         fun syncLabel() {
@@ -183,6 +203,8 @@ class CompositorNode(
                 it.strokePaint = if (badgeGlowing) palette.sourceHandle else palette.connectionLine
                 it.stroke = BasicStroke(if (badgeGlowing) 2.5f else 1f)
             }
+            liveMarker.paint = palette.sourceHandle
+            liveMarker.strokePaint = null
         }
 
         fun badgeContains(sceneX: Double, sceneY: Double) = activationOp != null &&
@@ -234,6 +256,7 @@ class CompositorNode(
         val dirty = scene.tiles.filter { it.isDirty }
         scene.shadeDirty()
         for (tile in dirty) tileNodesById.getValue(tile.id).raster.invalidatePaint()
+        tileNodes.forEach { it.syncLiveRow() }
         lensRows.forEach { it.refresh() }
     }
 
@@ -749,6 +772,7 @@ class CompositorNode(
         private const val BADGE_ICON = 13.0
         private const val STALE_TRANSPARENCY = 0.35f
         private const val DIM_TRANSPARENCY = 0.3f
+        private const val LIVE_MARKER_SIZE = 6.0
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
         private val SATELLITE_NUDGES = doubleArrayOf(0.0) +

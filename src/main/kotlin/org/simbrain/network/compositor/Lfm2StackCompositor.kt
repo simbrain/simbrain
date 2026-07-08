@@ -93,7 +93,7 @@ object Lfm2StackCompositor {
         stackedHistory("block.conv.bcx", convLayers, "B·C·x (in_proj)", ACTIVATION_WIDTH * 1.4, ACTIVATION_HEIGHT) { "layers.$it.conv.bcx" }
         stackedHistory("block.conv.bx", convLayers, "B ⊙ x", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.conv.bx" }
         scene.addTile(MatrixTile(
-            id = "block.conv.cache", title = "conv window (k=${config.convKernel})",
+            id = "block.conv.cache", title = "conv window (last ${config.convKernel} tokens)",
             tensors = convLayers.map { plan.port("layers.$it.conv.cache").tensor },
             displayTransposed = true, stackLayers = convLayers,
         ).apply { width = ACTIVATION_WIDTH; height = CONV_WINDOW_HEIGHT })

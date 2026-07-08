@@ -193,41 +193,45 @@ val cnnObjectDetector = newSim {
     val networkComponent = addNetworkComponent("CNN Object Detector")
     val network = networkComponent.network
 
-    val leftX = 0.0; val rightX = 400.0; val topY = 0.0; val stepY = 350.0
+    // U-shaped layout coordinates use layer centers. Keep the second convolution on the right leg
+    // so the convolution connector previews do not crowd the left stack.
+    val leftX = -275.0; val rightX = 275.0
+    val inputY = -446.0; val conv1Y = 24.0; val pool1Y = 449.0
+    val conv2Y = 446.0; val pool2Y = 144.0; val flatY = -125.0; val outputY = -442.0
 
     val inputShape = TensorShape(100, 100, 3)
     val inputTensorLayer = TensorLayer(inputShape).apply {
         label = "Input"; isClamped = true
     }
-    inputTensorLayer.setLocation(leftX, topY)
+    inputTensorLayer.setLocation(leftX, inputY)
 
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
     val conv1Out = TensorLayer(conv1OutShape).apply {
         label = "Conv1 ($conv1OutShape)"; activationFunction = TensorActivation.RELU
     }
-    conv1Out.setLocation(leftX, topY + stepY)
+    conv1Out.setLocation(leftX, conv1Y)
     val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
     val pool1OutShape = conv1OutShape.poolOutputShape(5, 5)
     val poolLayer1 = TensorLayer(pool1OutShape).apply { label = "Pool1 ($pool1OutShape)" }
-    poolLayer1.setLocation(leftX, topY + stepY * 2)
+    poolLayer1.setLocation(leftX, pool1Y)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 5, stride = 5, poolingType = PoolingType.MAX)
 
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
         label = "Conv2 ($conv2OutShape)"; activationFunction = TensorActivation.RELU
     }
-    conv2Out.setLocation(leftX, topY + stepY * 3)
+    conv2Out.setLocation(rightX, conv2Y)
     val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     val pool2OutShape = conv2OutShape.poolOutputShape(4, 4)
     val poolLayer2 = TensorLayer(pool2OutShape).apply { label = "Pool2 ($pool2OutShape)" }
-    poolLayer2.setLocation(rightX, topY + stepY * 3)
+    poolLayer2.setLocation(rightX, pool2Y)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 4, stride = 4, poolingType = PoolingType.MAX)
 
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply { label = "Flatten ($flatSize)" }
-    flatArray.setLocation(rightX, topY + stepY * 2)
+    flatArray.setLocation(rightX, flatY)
     val flatten = FlattenConnector(poolLayer2, flatArray)
 
     val outputArray = NeuronArray(numClasses).apply {
@@ -236,11 +240,11 @@ val cnnObjectDetector = newSim {
         circleMode = true
         labelArray = categoryNames.toTypedArray()
     }
-    outputArray.setLocation(rightX, topY)
+    outputArray.setLocation(rightX, outputY)
     WeightMatrix(flatArray, outputArray)
 
     val component = addImageWorld("Image World")
-    placeComponent(component, 591, 0, 360, 300)
+    placeComponent(component, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 360, 300)
     val imageWorld = component.world
     imageWorld.imagePipelineCollection.addPipeline("RGB 100×100") {
         addOperation(ResizeOperation(100, 100))

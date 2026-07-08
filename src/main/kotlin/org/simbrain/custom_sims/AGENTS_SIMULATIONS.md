@@ -161,6 +161,63 @@ withGui {
 }
 ```
 
+Use the shared simulation layout helpers in `SimulationLayoutUtils.kt` for desktop component spacing. The standard gap between internal frames is `SIM_WINDOW_GAP` (10px). Prefer formulas using that constant over literal `0`, `5`, or `10` coordinates so future spacing changes are centralized.
+
+```kotlin
+withGui {
+    place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
+    place(plotComponent, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
+}
+```
+
+When a control panel determines the location of another window, pack it before reading its dimensions. `createControlPanel` contents are added on the Swing dispatcher, so use `awaitLayout()` before `rightEdgeWithGap()` or `bottomEdgeWithGap()`.
+
+```kotlin
+withGui {
+    val controlPanel = createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        addButton("Run") { /* ... */ }
+    }.awaitLayout()
+    place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)
+}
+```
+
+If the left column contains a control panel above a wider network or plot, anchor the right column to the wider of the two. This prevents overlap when the control panel is wider on one platform and prevents oversized gaps when the visual panel is wider.
+
+```kotlin
+withGui {
+    val controlPanel = createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        addButton("Run") { /* ... */ }
+    }.awaitLayout()
+    val networkWidth = 400
+    controlPanel.setLocation(controlPanel.centeredXInColumn(SIM_WINDOW_GAP, networkWidth), SIM_WINDOW_GAP)
+    val rightColumnX = max(controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP + networkWidth + SIM_WINDOW_GAP)
+    place(networkComponent, SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap(), networkWidth, 400)
+    place(worldComponent, rightColumnX, SIM_WINDOW_GAP, 600, 600)
+}
+```
+
+For custom internal frames created directly with `GenericJInternalFrame.setBounds(...)`, apply the same `SIM_WINDOW_GAP` formulas as with `place(...)`; those frames are easy to miss in broad layout passes.
+
+For network-internal layouts, remember that `setLocation(x, y)` uses model coordinates and screen elements are centered on those coordinates. If labels or connector widgets overlap, use debug output from the network panel or a UI snapshot to tune model coordinates, then commit the resulting explicit positions. CNN examples often need more clearance than raw layer centers suggest because convolution connectors draw kernel previews and labels at the midpoint of the connector.
+
+### UI Snapshots
+
+The UI snapshot harness can render Swing/Piccolo layouts without manually opening the full application. Snapshot definitions live in `src/snapshots/kotlin/org/simbrain/util/uisnapshot/` and implement `UiSnapshotDef`.
+
+Run a snapshot with:
+
+```bash
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot
+```
+
+Useful options:
+
+```bash
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.SomeSnapshot -Pscale=2 -Popen=true
+```
+
+For simulation layout work, add a small targeted snapshot definition that builds just the relevant `NetworkPanel`, dialog, or component. Use it to check clearance, label overlap, and frame spacing before asking for manual screenshots. Generated images are written to `build/ui-snapshots/`.
+
 **Couplings:**
 ```kotlin
 with(couplingManager) {

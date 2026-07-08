@@ -53,11 +53,17 @@ val cnnMNIST = newSim {
 
     // Build CNN Pipeline
 
-    // Compact U-shaped layout coordinates
-    val leftX = 0.0
-    val rightX = 400.0
-    val topY = 0.0
-    val stepY = 350.0
+    // U-shaped layout coordinates use layer centers. Keep the second convolution on the right leg
+    // so the convolution connector previews do not crowd the left stack.
+    val leftX = -275.0
+    val rightX = 275.0
+    val inputY = -446.0
+    val conv1Y = 24.0
+    val pool1Y = 449.0
+    val conv2Y = 446.0
+    val pool2Y = 144.0
+    val flatY = -125.0
+    val outputY = -442.0
 
     // Input: 20x20x1
     val inputShape = TensorShape(20, 20, 1)
@@ -65,7 +71,7 @@ val cnnMNIST = newSim {
         label = "Input (20x20x1)"
         isClamped = true
     }
-    inputTensorLayer.setLocation(leftX, topY)
+    inputTensorLayer.setLocation(leftX, inputY)
 
     // Conv1: 3x3, 5 filters, SAME → 20x20x5
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 5)
@@ -73,7 +79,7 @@ val cnnMNIST = newSim {
         label = "Conv1 (${conv1OutShape})"
         activationFunction = TensorActivation.RELU
     }
-    conv1Out.setLocation(leftX, topY + stepY)
+    conv1Out.setLocation(leftX, conv1Y)
     val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 5, stride = 1, padding = Padding.SAME)
 
     // Pool1: 2x2 → 10x10x5
@@ -81,7 +87,7 @@ val cnnMNIST = newSim {
     val poolLayer1 = TensorLayer(pool1OutShape).apply {
         label = "Pool1 (${pool1OutShape})"
     }
-    poolLayer1.setLocation(leftX, topY + stepY * 2)
+    poolLayer1.setLocation(leftX, pool1Y)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     // Conv2: 3x3, 8 filters, SAME → 10x10x8
@@ -90,7 +96,7 @@ val cnnMNIST = newSim {
         label = "Conv2 (${conv2OutShape})"
         activationFunction = TensorActivation.RELU
     }
-    conv2Out.setLocation(leftX, topY + stepY * 3)
+    conv2Out.setLocation(rightX, conv2Y)
     val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     // Pool2: 2x2 → 5x5x8
@@ -98,7 +104,7 @@ val cnnMNIST = newSim {
     val poolLayer2 = TensorLayer(pool2OutShape).apply {
         label = "Pool2 (${pool2OutShape})"
     }
-    poolLayer2.setLocation(rightX, topY + stepY * 3)
+    poolLayer2.setLocation(rightX, pool2Y)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     // Flatten: 5x5x8 = 200
@@ -106,7 +112,7 @@ val cnnMNIST = newSim {
     val flatArray = NeuronArray(flatSize).apply {
         label = "Flatten ($flatSize)"
     }
-    flatArray.setLocation(rightX, topY + stepY * 2)
+    flatArray.setLocation(rightX, flatY)
     val flatten = FlattenConnector(poolLayer2, flatArray)
 
     // Dense output: 10 classes
@@ -117,7 +123,7 @@ val cnnMNIST = newSim {
         gridMode = true
         labelArray = Array(10) { "$it" }
     }
-    outputArray.setLocation(rightX, topY)
+    outputArray.setLocation(rightX, outputY)
     val dense = WeightMatrix(flatArray, outputArray)
 
     // Create ConvolutionalNeuralNetwork

@@ -108,7 +108,10 @@ var function by GuiEditable(initValue = ActivationFunction.SIGMOID)
 ./gradlew run                                # Run Simbrain
 ./gradlew runSim -PsimName="Simulation Name" # Run simulation
 ./gradlew test                               # Run tests
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot # Render a UI snapshot
 ```
+
+UI snapshot definitions live in `src/snapshots/kotlin/org/simbrain/util/uisnapshot/`. Use them to verify Swing/Piccolo layout, dialog sizing, and visual overlap without manually running the full app. Add a targeted `UiSnapshotDef` when a UI change needs screenshot-level validation; generated images are written to `build/ui-snapshots/`.
 
 ## Verification Checklist
 

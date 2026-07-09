@@ -6,29 +6,7 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
-import org.simbrain.network.llm.AttendMixOp
-import org.simbrain.network.llm.AttendScoresOp
-import org.simbrain.network.llm.CacheWriteOp
-import org.simbrain.network.llm.CausalConvOp
-import org.simbrain.network.llm.EmbedLookupOp
-import org.simbrain.network.llm.HeadwiseNormRopeOp
-import org.simbrain.network.llm.OffsetGateOp
-import org.simbrain.network.tensor.op.AddOp
-import org.simbrain.network.tensor.op.BiasOp
-import org.simbrain.network.tensor.op.CausalMaskedRowSoftmaxOp
-import org.simbrain.network.tensor.op.HeadMixOp
-import org.simbrain.network.tensor.op.HeadScoresOp
-import org.simbrain.network.tensor.op.LayerNormOp
-import org.simbrain.network.tensor.op.LinearOp
-import org.simbrain.network.tensor.op.MatMulLinearOp
-import org.simbrain.network.tensor.op.MergeHeadsOp
 import org.simbrain.network.tensor.op.ReLUOp
-import org.simbrain.network.tensor.op.RmsNormOp
-import org.simbrain.network.tensor.op.SeqEmbedOp
-import org.simbrain.network.tensor.op.SeqSoftmaxCrossEntropyOp
-import org.simbrain.network.tensor.op.SiluGateOp
-import org.simbrain.network.tensor.op.SoftmaxCrossEntropyOp
-import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SvgIconNode
@@ -123,7 +101,7 @@ class CompositorNode(
 
         /** The activation op producing this tile, shown as a corner badge instead of an edge glyph. */
         val activationOp: TensorOp? = scene.graph?.writer(tile.id)
-            ?.takeIf { it is ReLUOp || it is SiluGateOp }
+            ?.takeIf { it is ReLUOp }
 
         val badge: PPath? = activationOp?.let { op ->
             PPath.createEllipse(-BADGE_RADIUS, -BADGE_RADIUS, 2 * BADGE_RADIUS, 2 * BADGE_RADIUS).apply {
@@ -313,30 +291,43 @@ class CompositorNode(
     /**
      * A small operation glyph strung on a data-flow edge: a circled SVG symbol in the app icon
      * style for the known ops (derived from the plan, never hand-wired), a text pill for
-     * anything without an icon yet.
+     * anything without an icon yet. Fused ops render as a stage strip — one icon per applied
+     * transform, in order, separated by dividers ([glyphStages]) — and each incoming edge
+     * attaches at the stage whose pin consumes it.
      */
     inner class OpGlyphNode(val op: TensorOp) : PNode() {
-        private val icon = opIcon(op)
-        private val circular = icon != null
-        val shape: PPath = if (circular) {
-            PPath.createEllipse(-GLYPH_RADIUS, -GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS)
-        } else {
-            PPath.createRoundRectangle(
+        private val stages = glyphStages(op)
+        val stageCount = stages?.size ?: 1
+        val shape: PPath = when {
+            stages == null -> PPath.createRoundRectangle(
                 -GLYPH_RADIUS * 1.6, -GLYPH_RADIUS * 0.8,
                 GLYPH_RADIUS * 3.2, GLYPH_RADIUS * 1.6, 4.0, 4.0
             )
+            stageCount == 1 -> PPath.createEllipse(-GLYPH_RADIUS, -GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS)
+            else -> PPath.createRoundRectangle(
+                -GLYPH_RADIUS * stageCount, -GLYPH_RADIUS,
+                2 * GLYPH_RADIUS * stageCount, 2 * GLYPH_RADIUS,
+                2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS
+            )
         }.also { addChild(it) }
-        private val text = if (icon == null) PText(op.name.substringAfterLast('.')).apply {
+        private val dividers: List<PPath> = (1 until stageCount).map { i ->
+            val x = (2 * i - stageCount) * GLYPH_RADIUS
+            PPath.createLine(x, -GLYPH_RADIUS, x, GLYPH_RADIUS).also { addChild(it) }
+        }
+        private val text = if (stages == null) PText(op.name.substringAfterLast('.')).apply {
             font = Theme.tiny
         }.also { addChild(it) } else null
 
         init {
-            icon?.let {
-                addChild(SvgIconNode(it, GLYPH_ICON).apply {
-                    setOffset(-GLYPH_ICON / 2, -GLYPH_ICON / 2)
+            stages?.forEachIndexed { i, stage ->
+                addChild(SvgIconNode(stage.icon, GLYPH_ICON).apply {
+                    setOffset(stageCenterX(i) - GLYPH_ICON / 2, -GLYPH_ICON / 2)
                 })
             }
         }
+
+        /** Center of stage [i] relative to the glyph's own center. */
+        fun stageCenterX(i: Int) = (2 * i + 1 - stageCount) * GLYPH_RADIUS
 
         var glowing = false
             set(value) {
@@ -354,6 +345,10 @@ class CompositorNode(
             shape.paint = palette.canvasBackground
             shape.strokePaint = if (glowing) palette.sourceHandle else palette.connectionLine
             shape.stroke = BasicStroke(if (glowing) 2.5f else 1f)
+            dividers.forEach {
+                it.strokePaint = palette.connectionLine
+                it.stroke = BasicStroke(1f)
+            }
             text?.let {
                 it.textPaint = palette.valueText
                 it.setOffset(-it.width / 2, -it.height / 2)
@@ -361,19 +356,63 @@ class CompositorNode(
         }
 
         fun containsScenePoint(sceneX: Double, sceneY: Double): Boolean {
-            val reach = GLYPH_RADIUS * if (circular) 1.0 else 1.8
-            return abs(sceneX - xOffset) <= reach && abs(sceneY - yOffset) <= reach
+            val reachX = GLYPH_RADIUS * if (stages != null) stageCount.toDouble() else 1.8
+            val reachY = GLYPH_RADIUS * if (stages != null) 1.0 else 1.8
+            return abs(sceneX - xOffset) <= reachX && abs(sceneY - yOffset) <= reachY
         }
     }
 
-    /** The rectangle an edge attaches to: a tile's rect, or a small box around a junction glyph. */
+    /** The rectangle an edge attaches to: a tile's rect, or a box around a junction's glyph strip. */
     private val FlowEndpoint.endpointBounds: Rectangle2D
         get() = when (this) {
             is TensorTile -> bounds
-            is OpVertex -> Rectangle2D.Double(
-                x - GLYPH_RADIUS, y - GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS
-            )
+            is OpVertex -> {
+                val n = glyphStages(op)?.size ?: 1
+                Rectangle2D.Double(x - GLYPH_RADIUS * n, y - GLYPH_RADIUS, 2 * GLYPH_RADIUS * n, 2 * GLYPH_RADIUS)
+            }
         }
+
+    /**
+     * Where an edge meets an endpoint: the attach rectangle, and — for a pin on one stage of a
+     * glyph strip — which of its vertical sides are interior (shared with a neighboring stage)
+     * and so closed to arrows; an arrow through a divider would read as piercing the other stage.
+     */
+    private class AttachRect(val rect: Rectangle2D, val interiorLeft: Boolean = false, val interiorRight: Boolean = false) {
+        fun facingSide(guide: Point2D): Line2D = rect.outlines.toList().filter { side ->
+            val n = side.unitNormal
+            !(n.x < -0.5 && interiorLeft) && !(n.x > 0.5 && interiorRight)
+        }.maxBy { it.unitNormal dot (guide - it.midPoint).norm }
+    }
+
+    /** The pin of stage [stage] on a junction's glyph strip. */
+    private fun stagePin(vertex: OpVertex, stage: Int): AttachRect {
+        val n = glyphStages(vertex.op)?.size ?: 1
+        val cx = vertex.x + (2 * stage + 1 - n) * GLYPH_RADIUS
+        return AttachRect(
+            Rectangle2D.Double(cx - GLYPH_RADIUS, vertex.y - GLYPH_RADIUS, 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS),
+            interiorLeft = stage > 0, interiorRight = stage < n - 1,
+        )
+    }
+
+    /**
+     * Where [edge] enters its target: the pin of the glyph stage consuming the arrival port for
+     * junction targets — q and k land on the multiply, cos/sin on the rotation — falling back to
+     * the whole endpoint when the pin is unknown or ambiguous.
+     */
+    private fun headAttach(edge: FlowEdge): AttachRect {
+        val vertex = edge.to as? OpVertex ?: return AttachRect(edge.to.endpointBounds)
+        val port = edge.toPort ?: return AttachRect(vertex.endpointBounds)
+        val graph = scene.graph ?: return AttachRect(vertex.endpointBounds)
+        val stage = stageForInput(vertex.op, port) { graph.alias(it) } ?: return AttachRect(vertex.endpointBounds)
+        return stagePin(vertex, stage)
+    }
+
+    /** Where [edge] leaves its source: a fused op's result exits from its last stage. */
+    private fun tailAttach(edge: FlowEdge): AttachRect {
+        val vertex = edge.from as? OpVertex ?: return AttachRect(edge.from.endpointBounds)
+        val n = glyphStages(vertex.op)?.size ?: 1
+        return if (n > 1) stagePin(vertex, n - 1) else AttachRect(vertex.endpointBounds)
+    }
 
     /**
      * Junction vertices the layout didn't position (scenes without a layout pass) settle at the
@@ -464,18 +503,20 @@ class CompositorNode(
                 edgeLayer.addChild(this)
             }
         }
+        val tailRects = scene.edges.associateWith { tailAttach(it) }
+        val headRects = scene.edges.associateWith { headAttach(it) }
         val tailSides = scene.edges.associateWith {
-            it.from.endpointBounds.facingSide(it.waypoints.firstOrNull() ?: it.to.endpointBounds.center)
+            tailRects.getValue(it).facingSide(it.waypoints.firstOrNull() ?: headRects.getValue(it).rect.center)
         }
         val headSides = scene.edges.associateWith {
-            it.to.endpointBounds.facingSide(it.waypoints.lastOrNull() ?: it.from.endpointBounds.center)
+            headRects.getValue(it).facingSide(it.waypoints.lastOrNull() ?: tailRects.getValue(it).rect.center)
         }
         val tailFractions = attachFractions(
             { tailSides.getValue(it) }, { it.from },
-            { it.waypoints.firstOrNull() ?: it.to.endpointBounds.center })
+            { it.waypoints.firstOrNull() ?: headRects.getValue(it).rect.center })
         val headFractions = attachFractions(
             { headSides.getValue(it) }, { it.to },
-            { it.waypoints.lastOrNull() ?: it.from.endpointBounds.center })
+            { it.waypoints.lastOrNull() ?: tailRects.getValue(it).rect.center })
         // Undimmed edges render (and claim shared bead glyphs) first, so an op both limbs share
         // shows at full strength on the active limb's edge.
         for (edge in scene.edges.sortedBy { it.dimmed }) {
@@ -783,20 +824,3 @@ class CompositorNode(
     }
 }
 
-/** The op's glyph icon in the app icon style, or null for the text-pill fallback. */
-private fun opIcon(op: TensorOp): String? = when (op) {
-    is AddOp, is BiasOp -> "icons/op-add.svg"
-    is LinearOp, is MatMulLinearOp, is HeadScoresOp, is HeadMixOp,
-    is OffsetGateOp, is AttendScoresOp, is AttendMixOp -> "icons/op-multiply.svg"
-    is LayerNormOp, is RmsNormOp, is HeadwiseNormRopeOp -> "icons/op-layer-norm.svg"
-    is CausalMaskedRowSoftmaxOp -> "icons/op-softmax.svg"
-    is SoftmaxCrossEntropyOp, is SeqSoftmaxCrossEntropyOp -> "icons/op-cross-entropy.svg"
-    is ReLUOp -> "icons/op-relu.svg"
-    is SiluGateOp -> "icons/op-silu.svg"
-    is SplitHeadsOp -> "icons/op-split.svg"
-    is MergeHeadsOp -> "icons/op-merge.svg"
-    is SeqEmbedOp, is EmbedLookupOp -> "icons/op-embed.svg"
-    is CausalConvOp -> "icons/op-conv.svg"
-    is CacheWriteOp -> "icons/op-cache-write.svg"
-    else -> null
-}

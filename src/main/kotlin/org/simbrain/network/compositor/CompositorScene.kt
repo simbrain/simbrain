@@ -31,6 +31,8 @@ class FlowEdge(
     val ops: List<TensorOp> = emptyList(),
     /** True when the value crossing this edge is head-stacked — rendered as a strand fan. */
     val stranded: Boolean = false,
+    /** The junction input port this edge arrives at, keying the target glyph's pin; see [DisplaySegment.toPort]. */
+    val toPort: String? = null,
 ) {
     /** Interior route knots in scene coordinates; set by layout to steer the curve around tiles. */
     var waypoints: List<Point2D> = emptyList()
@@ -180,7 +182,7 @@ class CompositorScene(val graph: PlanGraph? = null) {
             }
             val derived = g.displayEdges(anchorIds, junctions).map {
                 val from = endpoint(it.from)
-                FlowEdge(from, endpoint(it.to), it.ops, stranded = strandedState(from, it.ops))
+                FlowEdge(from, endpoint(it.to), it.ops, stranded = strandedState(from, it.ops), toPort = it.toPort)
             }
             // A satellite needs its consuming op riding some edge as a bead; if the op was
             // promoted to a junction (or fell off the paths), the parameter goes standalone.

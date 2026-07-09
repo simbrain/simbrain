@@ -145,7 +145,9 @@ class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it
      */
     fun displayEdges(anchors: Collection<String>, junctions: Set<TensorOp>): List<DisplaySegment> {
         val anchorSet = anchors.toSet()
-        val edges = LinkedHashMap<Pair<Any, Any>, LinkedHashSet<TensorOp>>()
+        // Edges into a junction are keyed also by the input port they arrive at, so streams
+        // entering a fused op at different pins stay distinct arrows.
+        val edges = LinkedHashMap<Triple<Any, Any, String?>, LinkedHashSet<TensorOp>>()
 
         fun walk(sourceKey: Any, startPorts: List<String>) {
             val visited = HashSet<String>()
@@ -154,12 +156,12 @@ class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it
             fun expand(port: String, opsSoFar: List<TensorOp>) {
                 for (op in readersOf[port].orEmpty()) {
                     if (op in junctions) {
-                        edges.getOrPut(sourceKey to op) { LinkedHashSet() }.addAll(opsSoFar)
+                        edges.getOrPut(Triple(sourceKey, op, port)) { LinkedHashSet() }.addAll(opsSoFar)
                         continue
                     }
                     for (out in outputsOf(op)) {
                         if (out in anchorSet) {
-                            edges.getOrPut(sourceKey to out) { LinkedHashSet() }.addAll(opsSoFar + op)
+                            edges.getOrPut(Triple(sourceKey, out, null)) { LinkedHashSet() }.addAll(opsSoFar + op)
                         } else {
                             stack.add(out to (opsSoFar + op))
                         }
@@ -179,15 +181,19 @@ class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it
         for (junction in junctions) {
             val (anchorOuts, innerOuts) = outputsOf(junction).partition { it in anchorSet }
             // A junction writing an anchor port directly is an edge on its own.
-            for (out in anchorOuts) edges.getOrPut(junction as Any to out) { LinkedHashSet() }
+            for (out in anchorOuts) edges.getOrPut(Triple(junction as Any, out, null)) { LinkedHashSet() }
             walk(junction, innerOuts)
         }
-        return edges.map { (endpoints, ops) -> DisplaySegment(endpoints.first, endpoints.second, ops.toList()) }
+        return edges.map { (key, ops) -> DisplaySegment(key.first, key.second, ops.toList(), key.third) }
     }
 }
 
 /** One derived diagram edge: anchor [from] to anchor [to], with the [ops] crossed between them. */
 class EdgePath(val from: String, val to: String, val ops: List<TensorOp>)
 
-/** A display-graph edge; each end is a port name (an anchor tile) or a junction [TensorOp]. */
-class DisplaySegment(val from: Any, val to: Any, val ops: List<TensorOp>)
+/**
+ * A display-graph edge; each end is a port name (an anchor tile) or a junction [TensorOp].
+ * [toPort] names the junction input port the edge arrives at (null for anchor targets), so the
+ * renderer can attach the arrow to the pin of the glyph stage that consumes it.
+ */
+class DisplaySegment(val from: Any, val to: Any, val ops: List<TensorOp>, val toPort: String? = null)

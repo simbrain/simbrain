@@ -79,6 +79,37 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `edges arrive at the pin of the glyph stage that consumes them`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(), displaySeq = 8)
+        val alias = { name: String -> scene.graph!!.alias(name) }
+
+        // q and k enter the scores glyph at the multiply stage; the softmax stage takes no pins.
+        val scores = scene.opVertices.first { alias(it.op.name) == "block.attn.scores" }
+        val intoScores = scene.edges.filter { it.to === scores }
+        assertEquals(setOf("block.attn.q", "block.attn.k_cache"), intoScores.map { it.toPort }.toSet())
+        intoScores.forEach { assertEquals(0, stageForInput(scores.op, it.toPort!!, alias)) }
+
+        // The projected q enters norm+rope at the norm stage, the rope angles at the rotation.
+        val qRope = scene.opVertices.first { alias(it.op.name) == "block.attn.q_norm_rope" }
+        val portsIn = scene.edges.filter { it.to === qRope }.map { it.toPort!! }.toSet()
+        assertEquals(setOf("block.attn.q_raw", "rope.cos", "rope.sin"), portsIn)
+        assertEquals(0, stageForInput(qRope.op, "block.attn.q_raw", alias))
+        assertEquals(1, stageForInput(qRope.op, "rope.cos", alias))
+        assertEquals(1, stageForInput(qRope.op, "rope.sin", alias))
+
+        // The gate passes through silu before the product; up enters at the product stage.
+        val silu = scene.opVertices.first { alias(it.op.name) == "block.mlp.silu_gate" }
+        assertEquals(0, stageForInput(silu.op, "block.mlp.gate", alias))
+        assertEquals(1, stageForInput(silu.op, "block.mlp.up", alias))
+
+        // The B gate reads bcx twice at one pin-ambiguous port: still a single arrow, no pin.
+        val bGate = scene.opVertices.first { alias(it.op.name) == "block.conv.b_gate" }
+        val intoBGate = scene.edges.filter { it.to === bGate }
+        assertEquals(1, intoBGate.size)
+        assertEquals("block.conv.bcx", intoBGate.single().toPort)
+    }
+
+    @Test
     fun `every anatomy tile stacks its layer subset`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)

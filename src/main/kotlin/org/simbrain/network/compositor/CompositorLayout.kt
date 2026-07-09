@@ -37,7 +37,7 @@ class CompositorLayout(
 
     private fun width(e: FlowEndpoint) = when (e) {
         is TensorTile -> e.width
-        is OpVertex -> JUNCTION_SIZE
+        is OpVertex -> JUNCTION_SIZE * (glyphStages(e.op)?.size ?: 1)
     }
 
     private fun height(e: FlowEndpoint) = when (e) {
@@ -52,7 +52,7 @@ class CompositorLayout(
                 e.y = y
             }
             is OpVertex -> {
-                e.x = x + JUNCTION_SIZE / 2
+                e.x = x + width(e) / 2
                 e.y = y + JUNCTION_SIZE / 2
                 e.placed = true
             }
@@ -259,7 +259,7 @@ class CompositorLayout(
                     val source = edge.from
                     val sourceRight = when (source) {
                         is TensorTile -> source.x + source.width
-                        is OpVertex -> source.x + JUNCTION_SIZE / 2
+                        is OpVertex -> source.x + width(source) / 2
                     }
                     val dropX = maxOf(sourceRight + 40.0, if (plan !== group.last()) clearX + 40.0 else sourceRight + 40.0)
                     edge.waypoints = listOf(

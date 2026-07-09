@@ -5,9 +5,8 @@ import org.simbrain.network.tensor.op.TensorPort
 import org.simbrain.util.toSimbrainColor
 import java.awt.Color
 import java.awt.geom.Rectangle2D
-import java.awt.image.BufferedImage
-import java.awt.image.DataBufferInt
 import kotlin.math.abs
+import kotlin.math.ceil
 
 /** What a tile shows, driving its colormap and border styling. */
 enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
@@ -26,15 +25,15 @@ interface LayerStacked {
 }
 
 /**
- * One heatmap in the compositor's retained scene: a layout rect in scene coordinates, a value
- * buffer holding published data, and a raster the values are shaded into. The tiers of
- * invalidation map onto its methods: moving the rect is tier 1 (geometry only), [publish] is
- * tier 2 (copy fresh values, shade only the dirty rows), [markAllDirty] + [shadeDirty] with new
- * colors is tier 3 (reshade from the value buffer without touching data), and zoom never calls
- * back in at all (the node's image cache rescales).
+ * One heatmap in the compositor's retained scene: a layout rect in scene coordinates and a value
+ * buffer holding published data. No full-resolution image exists — pixels are produced on demand
+ * by [shadePatch], which shades just the visible cell window at screen resolution, so shading
+ * cost tracks viewport pixels, never tensor size. [publish] copies fresh values and bumps
+ * [contentVersion]; the renderer's patch rebuilds when the version moves, the visible region
+ * changes, or the palette switches.
  *
- * [publish] is called from the compute thread and shading from the EDT; both synchronize on the
- * tile, which is cheap at row granularity.
+ * [publish] is called from the compute thread and [shadePatch] from the EDT; both synchronize
+ * on the tile.
  */
 abstract class TensorTile(
     val id: String,
@@ -65,19 +64,19 @@ abstract class TensorTile(
     /** Published data, row-major [rows] x [cols]. Read for tooltips and probes; written by [publish]. */
     val values = FloatArray(rows * cols)
 
-    val image: BufferedImage = BufferedImage(cols, rows, BufferedImage.TYPE_INT_RGB)
-    private val pixels = (image.raster.dataBuffer as DataBufferInt).data
+    /** Bumped on any change to [values] or the color scale; the renderer repaints when it moves. */
+    @Volatile
+    var contentVersion = 0L
+        private set
+
+    protected fun touch() {
+        contentVersion++
+    }
 
     protected var absMax = 0f
         private set
 
-    private var dirtyFrom = -1
-    private var dirtyTo = -1
-    private var fullReshade = true
-
-    val isDirty get() = fullReshade || dirtyFrom >= 0
-
-    /** Copies this token's fresh values out of the source tensor and marks the touched rows dirty. */
+    /** Copies this token's fresh values out of the source tensor and bumps [contentVersion]. */
     abstract fun publish(tokenIndex: Int)
 
     /** Clears published history for a fresh generation run. */
@@ -86,48 +85,61 @@ abstract class TensorTile(
         values.fill(0f)
         absMax = 0f
         liveRow = -1
-        markAllDirty()
-    }
-
-    protected fun markRowsDirty(from: Int, to: Int = from) {
-        dirtyFrom = if (dirtyFrom < 0) from else minOf(dirtyFrom, from)
-        dirtyTo = maxOf(dirtyTo, to)
-    }
-
-    fun markAllDirty() {
-        fullReshade = true
+        touch()
     }
 
     /** Forgets the signed-normalization scale — for view switches to differently-scaled data. */
     protected fun resetScale() {
         absMax = 0f
-        markAllDirty()
+        touch()
     }
 
-    /**
-     * Grows the signed-normalization scale. Growth invalidates every already-shaded pixel, so the
-     * whole tile reshades; the scale never shrinks mid-run, keeping steady-state cost at one row.
-     */
+    /** Grows the signed-normalization scale; it never shrinks mid-run, so shading stays monotone. */
     protected fun growAbsMax(candidate: Float) {
         if (candidate > absMax) {
             absMax = candidate
-            fullReshade = true
+            touch()
         }
     }
 
-    /** Shades dirty rows from [values] into [image] and clears the dirty state. */
+    /**
+     * Shades the patch pixels covering the fractional cell window rows [rowFrom, rowTo) x
+     * cols [colFrom, colTo) into [dest] — [destW] x [destH] pixels, row-major with [stride].
+     * When several cells collapse into one pixel, the cell with the largest magnitude wins
+     * (keeping its sign), so downsampling never hides a spike or an outlier channel.
+     */
     @Synchronized
-    fun shadeDirty(neg: Color, mid: Color, pos: Color) {
-        if (!isDirty) return
-        val from = if (fullReshade) 0 else dirtyFrom
-        val to = if (fullReshade) rows - 1 else dirtyTo
+    fun shadePatch(
+        dest: IntArray, stride: Int, destW: Int, destH: Int,
+        rowFrom: Double, rowTo: Double, colFrom: Double, colTo: Double,
+        neg: Color, mid: Color, pos: Color,
+    ) {
         val scale = if (signedNorm) (if (absMax > 0f) 1f / absMax else 0f) else 1f
-        for (i in from * cols..(to * cols + cols - 1)) {
-            pixels[i] = (values[i] * scale).toSimbrainColor(neg, mid, pos)
+        val rowSpan = rowTo - rowFrom
+        val colSpan = colTo - colFrom
+        for (y in 0 until destH) {
+            val r0 = (rowFrom + rowSpan * y / destH).toInt().coerceIn(0, rows - 1)
+            val r1 = ceil(rowFrom + rowSpan * (y + 1) / destH).toInt().coerceIn(r0 + 1, rows)
+            val destRow = y * stride
+            for (x in 0 until destW) {
+                val c0 = (colFrom + colSpan * x / destW).toInt().coerceIn(0, cols - 1)
+                val c1 = ceil(colFrom + colSpan * (x + 1) / destW).toInt().coerceIn(c0 + 1, cols)
+                var best = 0f
+                var bestAbs = -1f
+                for (r in r0 until r1) {
+                    val base = r * cols
+                    for (c in c0 until c1) {
+                        val v = values[base + c]
+                        val a = abs(v)
+                        if (a > bestAbs) {
+                            bestAbs = a
+                            best = v
+                        }
+                    }
+                }
+                dest[destRow + x] = (best * scale).toSimbrainColor(neg, mid, pos)
+            }
         }
-        fullReshade = false
-        dirtyFrom = -1
-        dirtyTo = -1
     }
 
     fun contains(sceneX: Double, sceneY: Double) =
@@ -223,7 +235,7 @@ class VectorHistoryTile(
             growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
             if (s == selected) {
                 System.arraycopy(cube, base, values, tokenIndex * cols, cols)
-                markRowsDirty(tokenIndex)
+                touch()
             }
         }
     }
@@ -231,7 +243,7 @@ class VectorHistoryTile(
     @Synchronized
     private fun rebuildFromCube() {
         System.arraycopy(cube, selected * rows * cols, values, 0, rows * cols)
-        markAllDirty()
+        touch()
     }
 }
 
@@ -347,7 +359,7 @@ class MatrixTile(
             for (i in values.indices) values[i] = source.data.get(i)
         }
         growAbsMax(normalizationScale())
-        markAllDirty()
+        touch()
     }
 
     private fun normalizationScale(): Float {
@@ -472,13 +484,13 @@ class DeckTile(
         for (v in cube) max = maxOf(max, abs(v))
         growAbsMax(max)
         copySlice()
-        markAllDirty()
+        touch()
     }
 
     @Synchronized
     private fun rebuildFromCube() {
         copySlice()
-        markAllDirty()
+        touch()
     }
 
     private fun copySlice() {
@@ -570,12 +582,12 @@ class AttentionTile(
             history, ((selected * numHeads + selectedHead) * rows + tokenIndex) * cols,
             values, tokenIndex * cols, cols
         )
-        markRowsDirty(tokenIndex)
+        touch()
     }
 
     @Synchronized
     private fun rebuildFromHistory() {
         System.arraycopy(history, (selected * numHeads + selectedHead) * rows * cols, values, 0, rows * cols)
-        markAllDirty()
+        touch()
     }
 }

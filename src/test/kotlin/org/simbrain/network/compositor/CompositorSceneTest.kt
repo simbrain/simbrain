@@ -20,18 +20,26 @@ class CompositorSceneTest {
     private val mid = Color.WHITE
     private val pos = Color.RED
 
+    /** Shades the whole tile into a patch, defaulting to one pixel per cell. */
+    private fun TensorTile.shaded(
+        destW: Int = cols, destH: Int = rows,
+        negColor: Color = neg, midColor: Color = mid, posColor: Color = pos,
+    ) = IntArray(destW * destH).also {
+        shadePatch(it, destW, destW, destH, 0.0, rows.toDouble(), 0.0, cols.toDouble(), negColor, midColor, posColor)
+    }
+
     @Test
-    fun `vector history tile appends the published row and shades only touched rows`() {
+    fun `vector history tile appends the published row and shades it`() {
         val port = TensorPort("resid", FloatTensor.of(1, 3, floatArrayOf(0.5f, -1f, 0.25f)))
         val tile = VectorHistoryTile(port, rows = 4)
         tile.publish(0)
-        tile.shadeDirty(neg, mid, pos)
+        val shaded = tile.shaded()
 
         assertEquals(0.5f, tile.valueAt(0, 0))
         assertEquals(-1f, tile.valueAt(0, 1))
-        assertEquals((0.5f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(0, 0))
-        assertEquals((-1f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(1, 0))
-        assertEquals(0f.toSimbrainColor(neg, mid, pos), tile.image.getRGB(0, 2), "untouched rows stay neutral")
+        assertEquals((0.5f).toSimbrainColor(neg, mid, pos), shaded[0])
+        assertEquals((-1f).toSimbrainColor(neg, mid, pos), shaded[1])
+        assertEquals(0f.toSimbrainColor(neg, mid, pos), shaded[2 * tile.cols], "untouched rows stay neutral")
     }
 
     @Test
@@ -51,33 +59,48 @@ class CompositorSceneTest {
         val port = TensorPort("resid", FloatTensor.of(1, 2, floatArrayOf(0.5f, 0.5f)))
         val tile = VectorHistoryTile(port, rows = 3)
         tile.publish(0)
-        tile.shadeDirty(neg, mid, pos)
-        val fullyHot = tile.image.getRGB(0, 0)
-        assertEquals(1f.toSimbrainColor(neg, mid, pos), fullyHot, "0.5 is the max so far, so it shades saturated")
+        assertEquals(1f.toSimbrainColor(neg, mid, pos), tile.shaded()[0],
+            "0.5 is the max so far, so it shades saturated")
 
+        val version = tile.contentVersion
         port.tensor.copyFrom(floatArrayOf(2f, 2f))
         tile.publish(1)
-        assertTrue(tile.isDirty)
-        tile.shadeDirty(neg, mid, pos)
-        assertEquals((0.25f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(0, 0),
-            "row 0 must reshade against the grown scale")
-        assertEquals(1f.toSimbrainColor(neg, mid, pos), tile.image.getRGB(0, 1))
+        assertTrue(tile.contentVersion > version, "a publish must move the content version")
+        assertEquals((0.25f).toSimbrainColor(neg, mid, pos), tile.shaded()[0],
+            "row 0 must shade against the grown scale")
+        assertEquals(1f.toSimbrainColor(neg, mid, pos), tile.shaded()[1 * tile.cols])
     }
 
     @Test
-    fun `palette reshade rewrites pixels without touching values`() {
+    fun `palette switch rewrites pixels without touching values`() {
         val port = TensorPort("resid", FloatTensor.of(1, 2, floatArrayOf(1f, -1f)))
         val tile = VectorHistoryTile(port, rows = 2)
         tile.publish(0)
-        tile.shadeDirty(neg, mid, pos)
-        val before = tile.image.getRGB(0, 0)
+        val before = tile.shaded()[0]
         val valuesBefore = tile.values.copyOf()
 
-        tile.markAllDirty()
-        tile.shadeDirty(Color.GREEN, Color.BLACK, Color.YELLOW)
-        assertNotEquals(before, tile.image.getRGB(0, 0))
-        assertEquals(1f.toSimbrainColor(Color.GREEN, Color.BLACK, Color.YELLOW), tile.image.getRGB(0, 0))
-        assertTrue(valuesBefore.contentEquals(tile.values), "tier 3 must not touch the value buffer")
+        val reshaded = tile.shaded(negColor = Color.GREEN, midColor = Color.BLACK, posColor = Color.YELLOW)
+        assertNotEquals(before, reshaded[0])
+        assertEquals(1f.toSimbrainColor(Color.GREEN, Color.BLACK, Color.YELLOW), reshaded[0])
+        assertTrue(valuesBefore.contentEquals(tile.values), "a reshade must not touch the value buffer")
+    }
+
+    @Test
+    fun `patch downsampling pools by magnitude so spikes survive`() {
+        val port = TensorPort("resid", FloatTensor.of(1, 2, floatArrayOf(0.1f, 0.1f)))
+        val tile = VectorHistoryTile(port, rows = 4)
+        tile.publish(0)
+        port.tensor.copyFrom(floatArrayOf(0.1f, 0.1f))
+        tile.publish(1)
+        port.tensor.copyFrom(floatArrayOf(-1f, 0.1f))
+        tile.publish(2)
+        port.tensor.copyFrom(floatArrayOf(0.1f, 0.1f))
+        tile.publish(3)
+
+        val pooled = tile.shaded(destW = 1, destH = 2)
+        assertEquals((-1f).toSimbrainColor(neg, mid, pos), pooled[1],
+            "the spike must survive four cells collapsing into one pixel, sign intact")
+        assertEquals((0.1f).toSimbrainColor(neg, mid, pos), pooled[0])
     }
 
     @Test
@@ -92,12 +115,12 @@ class CompositorSceneTest {
         tile.publish(1)
 
         assertEquals(0.7f, tile.valueAt(1, 1), "head 0 shown by default")
+        val version = tile.contentVersion
         tile.selectedHead = 1
         assertEquals(0.4f, tile.valueAt(1, 1), "head switch rebuilds values from retained history")
         assertEquals(0.9f, tile.valueAt(0, 0))
-        assertTrue(tile.isDirty, "head switch must trigger a full reshade")
-        tile.shadeDirty(neg, mid, pos)
-        assertEquals((0.4f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(1, 1))
+        assertTrue(tile.contentVersion > version, "head switch must move the content version")
+        assertEquals((0.4f).toSimbrainColor(neg, mid, pos), tile.shaded()[1 * tile.cols + 1])
     }
 
     @Test
@@ -105,11 +128,10 @@ class CompositorSceneTest {
         val tensor = FloatTensor.of(2, 3, floatArrayOf(1f, -2f, 3f, -4f, 5f, -6f))
         val tile = MatrixTile("weights", "weights", tensor, kind = TileKind.WEIGHT)
         tile.publish(-1)
-        tile.shadeDirty(neg, mid, pos)
 
         assertEquals(-2f, tile.valueAt(0, 1))
         assertEquals(5f, tile.valueAt(1, 1))
-        assertEquals((-1f).toSimbrainColor(neg, mid, pos), tile.image.getRGB(2, 1), "-6 is the abs max")
+        assertEquals((-1f).toSimbrainColor(neg, mid, pos), tile.shaded()[1 * tile.cols + 2], "-6 is the abs max")
 
         tensor.data.put(0, 99f)
         tile.publish(-1)

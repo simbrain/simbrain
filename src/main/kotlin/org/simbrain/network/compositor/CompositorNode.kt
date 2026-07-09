@@ -31,7 +31,6 @@ import org.simbrain.network.tensor.op.SoftmaxCrossEntropyOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
-import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.SvgIconNode
 import java.awt.BasicStroke
 import java.awt.Color
@@ -45,13 +44,13 @@ import kotlin.math.abs
 import kotlin.math.atan2
 
 /**
- * Renders a [CompositorScene] as one Piccolo node: tile rasters ([SimbrainImage] children, whose
- * clip-region caches make zoom/pan a pure rescale of already-shaded pixels — invalidation tier 4),
- * data-flow edges, the logit-lens strip, and the interior interactions — click and marquee
- * selection, drag-move (tier 1), double-click trace, and hover value tooltips.
+ * Renders a [CompositorScene] as one Piccolo node: tile rasters ([TilePatchNode] children that
+ * shade values straight to screen resolution at paint time), data-flow edges, the logit-lens
+ * strip, and the interior interactions — click and marquee selection, drag-move, double-click
+ * trace, and hover value tooltips.
  *
  * Call [refreshDirtyTiles] on the EDT after the compute thread publishes a token; [relayout]
- * after geometry changes; [refreshTheme] on palette/theme switches (tier 3).
+ * after geometry changes; [refreshTheme] on palette/theme switches.
  */
 class CompositorNode(
     val scene: CompositorScene,
@@ -101,7 +100,7 @@ class CompositorNode(
                 }.also { addChild(it) }
             }
         }
-        val raster = SimbrainImage(tile.image).apply {
+        val raster = TilePatchNode(tile).apply {
             setBounds(0.0, 0.0, tile.width, tile.height)
         }.also { addChild(it) }
         val border = PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
@@ -251,16 +250,16 @@ class CompositorNode(
         addInputEventListener(InteriorInputHandler())
     }
 
-    /** Tier 2 (and 3, after a reshade request): shade dirty rows and repaint only touched tiles. */
+    /** Repaints tiles whose content moved since their last shade; actual shading happens at paint. */
     fun refreshDirtyTiles() {
-        val dirty = scene.tiles.filter { it.isDirty }
-        scene.shadeDirty()
-        for (tile in dirty) tileNodesById.getValue(tile.id).raster.invalidatePaint()
-        tileNodes.forEach { it.syncLiveRow() }
+        tileNodes.forEach {
+            it.raster.syncContent()
+            it.syncLiveRow()
+        }
         lensRows.forEach { it.refresh() }
     }
 
-    /** Tier 1: re-derives node offsets, edges, lens placement, and bounds from tile rects. */
+    /** Re-derives node offsets, edges, lens placement, and bounds from tile rects. */
     fun relayout() {
         tileNodes.forEach { it.syncLayout() }
         rebuildEdges()
@@ -288,14 +287,13 @@ class CompositorNode(
         onLayoutChanged?.invoke()
     }
 
-    /** Tier 3: re-run the palette over every value buffer — data untouched, geometry untouched. */
+    /** Re-runs the palette over every tile — data untouched, geometry untouched. */
     fun refreshTheme() {
         val palette = NetworkTheme.current
         background.paint = palette.canvasBackground
         background.strokePaint = palette.subnetOutline
-        scene.reshadeAll()
         tileNodes.forEach {
-            it.raster.invalidatePaint()
+            it.raster.markStale()
             it.syncHighlight()
         }
         rebuildEdges()

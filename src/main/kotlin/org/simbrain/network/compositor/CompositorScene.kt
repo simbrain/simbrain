@@ -5,7 +5,6 @@ import org.simbrain.network.tensor.op.HeadScoresOp
 import org.simbrain.network.tensor.op.MergeHeadsOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.util.NetworkTheme
 import java.awt.geom.Point2D
 
 /** Something an edge can start or end at: a tensor tile, or a junction op vertex. */
@@ -96,7 +95,8 @@ class TileSelectionModel {
  * headless; [CompositorNode] renders it.
  *
  * [publish] runs on the compute thread at each token boundary (the copy into tile value buffers
- * is the compute/EDT synchronization point); [shadeDirty] runs on the EDT before painting.
+ * is the compute/EDT synchronization point); shading happens at paint time on the EDT, straight
+ * from the value buffers ([TilePatchNode]).
  */
 class CompositorScene(val graph: PlanGraph? = null) {
 
@@ -238,23 +238,6 @@ class CompositorScene(val graph: PlanGraph? = null) {
     fun reset() {
         for (tile in _tiles) tile.reset()
         lens?.reset()
-    }
-
-    /** Tier-2/3 pixel writes: shades whatever is dirty, choosing the palette by tile kind. */
-    fun shadeDirty() {
-        val palette = NetworkTheme.current
-        for (tile in _tiles) {
-            when (tile.kind) {
-                TileKind.WEIGHT -> tile.shadeDirty(palette.inhibitorySynapse, palette.zeroWeight, palette.excitatorySynapse)
-                else -> tile.shadeDirty(palette.coolNode, palette.neutralMidpoint, palette.hotNode)
-            }
-        }
-    }
-
-    /** Tier 3: re-runs the color mapping over every tile's value buffer (palette/theme change). */
-    fun reshadeAll() {
-        for (tile in _tiles) tile.markAllDirty()
-        shadeDirty()
     }
 
     fun tileAt(sceneX: Double, sceneY: Double) = _tiles.lastOrNull { it.contains(sceneX, sceneY) }

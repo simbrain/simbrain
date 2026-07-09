@@ -26,6 +26,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.custom_sims.simulations.psychology.categoricalPerception
 import org.simbrain.custom_sims.simulations.psychology.heatColdSim
+import org.simbrain.custom_sims.simulations.psychology.serialOrderMemory
 import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
@@ -85,6 +86,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Heat-cold illusion") { heatColdSim }
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
+        item("Serial order memory (toy)", beta = true) { serialOrderMemory }
         item("Temporal attention network", beta = true) { denisonNet }
     }
 

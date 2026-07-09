@@ -54,6 +54,10 @@ private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
     val displaySeq = 48
     val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
 
+    // Decorate (layer/head flips) BEFORE the run: history is recorded for the watched layer,
+    // so the showcased layer should be watched while the tokens stream through.
+    decorate(scene)
+
     val promptIds = tokenizer.encode("The capital of France is")
     var next = -1
     for (i in 0 until displaySeq) {
@@ -66,7 +70,6 @@ private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
         next = best
     }
 
-    decorate(scene)
     val node = CompositorNode(scene, tokenLabel = { id -> "\"${tokenizer.decode(intArrayOf(id))}\"" })
     val bounds = node.fullBoundsReference
     node.setOffset(-bounds.x, -bounds.y)

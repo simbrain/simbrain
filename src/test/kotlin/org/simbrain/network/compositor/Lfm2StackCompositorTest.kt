@@ -204,6 +204,35 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `tile geometry follows the shared feature, token, and weight scales`() {
+        val config = tinyConfig()
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+
+        val q = scene.tile("block.attn.q")
+        val k = scene.tile("block.attn.k")
+        val gate = scene.tile("block.mlp.gate")
+        val bcx = scene.tile("block.conv.bcx")
+        assertEquals(q.width / 2, k.width, 1e-6, "k is half of q — the GQA ratio is geometric")
+        assertEquals(q.width * config.intermediateSize / config.hiddenSize, gate.width, 1e-6)
+        assertEquals(q.width * 3, bcx.width, 1e-6, "bcx is the three-chunk in_proj output")
+        assertEquals(q.height, gate.height, 1e-6, "one token axis everywhere")
+        assertEquals(q.height, scene.tile("block.attn.weights").width, 1e-6,
+            "the attention triangle's columns are the same token axis as its rows")
+
+        val wq = scene.tile("block.w.self_attn.q_proj.weight")
+        val wk = scene.tile("block.w.self_attn.k_proj.weight")
+        assertEquals(wq.width, wk.width, 1e-6)
+        assertEquals(wq.height / 2, wk.height, 1e-6, "Wk emits half of Wq's output dims")
+
+        val window = scene.tile("block.conv.cache")
+        val kernel = scene.tile("block.w.conv.conv.weight")
+        assertEquals(window.width, kernel.width, 1e-6, "kernel and window share the channel axis")
+        assertEquals(window.rows, kernel.rows, "both render taps as rows")
+        assertTrue(kernel.magnified && window.magnified, "tap strips are floored, marked as insets")
+        assertFalse(scene.tile("block.attn.weights").magnified, "the triangle is at true scale")
+    }
+
+    @Test
     fun `the live row cursor tracks the current token and the cache write frontier`() {
         val model = syntheticModel()
         val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)

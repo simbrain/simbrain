@@ -183,7 +183,12 @@ class CompositorNode(
             label.textPaint = palette.valueText
             val highlighted = tile == scene.traceFocus || tile in scene.tracedTiles ||
                 tile in scene.selection || tile in scene.highlightedTiles
-            border.stroke = BasicStroke(if (highlighted || tile.kind == TileKind.WEIGHT) 2f else 1f)
+            val thickness = if (highlighted || tile.kind == TileKind.WEIGHT) 2f else 1f
+            border.stroke = if (tile.magnified && !highlighted) {
+                BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10f, floatArrayOf(3f, 3f), 0f)
+            } else {
+                BasicStroke(thickness)
+            }
             border.strokePaint = when {
                 tile == scene.traceFocus -> palette.sourceHandle
                 tile in scene.highlightedTiles -> palette.sourceHandle

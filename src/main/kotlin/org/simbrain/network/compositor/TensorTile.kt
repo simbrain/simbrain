@@ -56,6 +56,13 @@ abstract class TensorTile(
     var dimmed = false
 
     /**
+     * True when the tile is drawn larger than the scene's shared axis scales would allow — a
+     * magnified inset (rope angles, single-token rows, conv taps). Rendered with a dashed border
+     * so the scale break is explicit instead of silent.
+     */
+    var magnified = false
+
+    /**
      * The row holding the current token's just-published value, or -1 when rows aren't a token
      * axis (full-pass publishes). Rendered as a cursor: on history tiles it marks the one row
      * actually flowing through the graph this step; on the KV caches it marks the write frontier

@@ -70,60 +70,79 @@ object Lfm2StackCompositor {
         })
         val scene = CompositorScene(PlanGraph(displayPlan, alias))
 
+        // One shared scale per axis, so relative tile sizes are facts about the model: the
+        // feature axis is anchored at hidden size (k/v strips come out exactly half of q, the
+        // MLP inner tiles 2.5x wide, bcx 3x); the token axis is shared by every history row and
+        // both sides of the attention triangle. Weights use their own quarter scale — true
+        // within the weight class, small enough to ride edges as satellites — and tiles too
+        // small to draw at scale are floored and marked [TensorTile.magnified] (dashed border)
+        // so the break is explicit.
+        val pxPerDim = ACTIVATION_WIDTH / config.hiddenSize
+        val weightPxPerDim = pxPerDim / 4
+        fun featureWidth(dims: Int) = dims * pxPerDim
+
         fun stackedHistory(
-            id: String, layers: List<Int>, title: String, w: Double, h: Double,
+            id: String, layers: List<Int>, title: String, w: Double,
             kind: TileKind = TileKind.ACTIVATION, portOf: (Int) -> String,
         ) {
             scene.addTile(VectorHistoryTile(
                 ports = layers.map { plan.port(portOf(it)) },
                 rows = displaySeq, title = title, kind = kind, id = id, stackLayers = layers,
-            ).apply { width = w; height = h })
+            ).apply { width = w; height = TOKEN_AXIS_HEIGHT })
         }
 
-        fun stackedWeight(id: String, layers: List<Int>, title: String, size: Double = WEIGHT_SIZE) {
+        fun stackedWeight(id: String, layers: List<Int>, title: String) {
             // Real-scale weight matrices have heavy outliers; quantile-normalize or they wash gray.
+            val shape = plan.port("model.layers.${layers.first()}." + id.removePrefix("block.w.")).tensor
             scene.addTile(MatrixTile(
                 id = id, title = title,
                 tensors = layers.map { plan.port("model.layers.$it." + id.removePrefix("block.w.")).tensor },
                 kind = TileKind.WEIGHT, quantileNorm = true, stackLayers = layers,
-            ).apply { width = size; height = size })
+            ).apply { width = shape.cols * weightPxPerDim; height = shape.rows * weightPxPerDim })
         }
 
-        stackedHistory("block.in", allLayers, "block in", SPINE_WIDTH, SPINE_HEIGHT, TileKind.RESIDUAL) { inputName(it) }
-        stackedHistory("block.mixer_resid", allLayers, "+ mixer", SPINE_WIDTH, SPINE_HEIGHT, TileKind.RESIDUAL) { "layers.$it.mixer_resid" }
-        stackedHistory("block.resid", allLayers, "+ mlp (block out)", SPINE_WIDTH, SPINE_HEIGHT, TileKind.RESIDUAL) { "layers.$it.resid" }
+        stackedHistory("block.in", allLayers, "block in", featureWidth(config.hiddenSize), TileKind.RESIDUAL) { inputName(it) }
+        stackedHistory("block.mixer_resid", allLayers, "+ mixer", featureWidth(config.hiddenSize), TileKind.RESIDUAL) { "layers.$it.mixer_resid" }
+        stackedHistory("block.resid", allLayers, "+ mlp (block out)", featureWidth(config.hiddenSize), TileKind.RESIDUAL) { "layers.$it.resid" }
 
         stackedWeight("block.w.conv.in_proj.weight", convLayers, "in_proj")
-        stackedWeight("block.w.conv.conv.weight", convLayers, "kernel", 60.0)
-        stackedWeight("block.w.conv.out_proj.weight", convLayers, "out_proj", 60.0)
-        stackedHistory("block.conv.bcx", convLayers, "B·C·x (in_proj)", ACTIVATION_WIDTH * 1.4, ACTIVATION_HEIGHT) { "layers.$it.conv.bcx" }
-        stackedHistory("block.conv.bx", convLayers, "B ⊙ x", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.conv.bx" }
+        stackedWeight("block.w.conv.out_proj.weight", convLayers, "out_proj")
+        stackedHistory("block.conv.bcx", convLayers, "B·C·x (in_proj)", featureWidth(3 * config.hiddenSize)) { "layers.$it.conv.bcx" }
+        stackedHistory("block.conv.bx", convLayers, "B ⊙ x", featureWidth(config.hiddenSize)) { "layers.$it.conv.bx" }
+        // The window and the kernel are dotted per channel, so they render in the same
+        // orientation and width: taps as rows (time downward, newest last), channels across.
         scene.addTile(MatrixTile(
             id = "block.conv.cache", title = "conv window (last ${config.convKernel} tokens)",
             tensors = convLayers.map { plan.port("layers.$it.conv.cache").tensor },
             displayTransposed = true, stackLayers = convLayers,
-        ).apply { width = ACTIVATION_WIDTH; height = CONV_WINDOW_HEIGHT })
-        stackedHistory("block.conv.raw", convLayers, "conv", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.conv.raw" }
-        stackedHistory("block.conv.gated", convLayers, "C ⊙ conv", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.conv.gated" }
-        stackedHistory("block.conv.out", convLayers, "conv out", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.conv.out" }
+        ).apply { width = featureWidth(config.hiddenSize); height = TAP_STRIP_HEIGHT; magnified = true })
+        scene.addTile(MatrixTile(
+            id = "block.w.conv.conv.weight", title = "kernel (${config.convKernel} taps)",
+            tensors = convLayers.map { plan.port("model.layers.$it.conv.conv.weight").tensor },
+            kind = TileKind.WEIGHT, quantileNorm = true, displayTransposed = true, stackLayers = convLayers,
+        ).apply { width = featureWidth(config.hiddenSize); height = TAP_STRIP_HEIGHT; magnified = true })
+        stackedHistory("block.conv.raw", convLayers, "conv", featureWidth(config.hiddenSize)) { "layers.$it.conv.raw" }
+        stackedHistory("block.conv.gated", convLayers, "C ⊙ conv", featureWidth(config.hiddenSize)) { "layers.$it.conv.gated" }
+        stackedHistory("block.conv.out", convLayers, "conv out", featureWidth(config.hiddenSize)) { "layers.$it.conv.out" }
 
         stackedWeight("block.w.self_attn.q_proj.weight", attnLayers, "Wq")
         stackedWeight("block.w.self_attn.k_proj.weight", attnLayers, "Wk")
         stackedWeight("block.w.self_attn.v_proj.weight", attnLayers, "Wv")
-        stackedWeight("block.w.self_attn.out_proj.weight", attnLayers, "Wo", 60.0)
-        scene.addTile(VectorHistoryTile(plan.port("rope.cos"), displaySeq, "rope cos", TileKind.ACTIVATION).apply {
-            width = ROPE_WIDTH; height = ROPE_HEIGHT
-        })
-        scene.addTile(VectorHistoryTile(plan.port("rope.sin"), displaySeq, "rope sin", TileKind.ACTIVATION).apply {
-            width = ROPE_WIDTH; height = ROPE_HEIGHT
-        })
+        stackedWeight("block.w.self_attn.out_proj.weight", attnLayers, "Wo")
+        for (angle in listOf("cos", "sin")) {
+            scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), displaySeq, "rope $angle", TileKind.ACTIVATION).apply {
+                width = maxOf(featureWidth(config.headDim / 2), ROPE_MIN_WIDTH)
+                height = TOKEN_AXIS_HEIGHT
+                magnified = featureWidth(config.headDim / 2) < ROPE_MIN_WIDTH
+            })
+        }
         // q is the one trajectory no cache holds, so it is retained for EVERY attention layer:
         // it is the sufficient statistic from which a flip re-derives the whole attention limb.
         scene.addTile(VectorHistoryTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.q") },
             rows = displaySeq, title = "q (${config.numHeads} heads)", kind = TileKind.ACTIVATION,
             id = "block.attn.q", stackLayers = attnLayers, retainAllLayers = true,
-        ).apply { width = ACTIVATION_WIDTH; height = ACTIVATION_HEIGHT })
+        ).apply { width = featureWidth(config.numHeads * config.headDim); height = TOKEN_AXIS_HEIGHT })
         // k and v are one row in flight: their history IS the cache, so drawing it here too
         // would duplicate the cache tiles. q keeps its history — it has no cache anywhere.
         fun tokenVector(id: String, title: String) {
@@ -131,7 +150,7 @@ object Lfm2StackCompositor {
                 id = id, title = title,
                 tensors = attnLayers.map { plan.port("layers.$it.${id.removePrefix("block.")}").tensor },
                 stackLayers = attnLayers,
-            ).apply { width = ACTIVATION_WIDTH * 0.6; height = TOKEN_VECTOR_HEIGHT })
+            ).apply { width = featureWidth(config.kvDim); height = TOKEN_ROW_HEIGHT; magnified = true })
         }
         tokenVector("block.attn.k", "k (new cache row)")
         tokenVector("block.attn.v", "v (new cache row)")
@@ -139,27 +158,27 @@ object Lfm2StackCompositor {
             id = "block.attn.k_cache", title = "k cache",
             tensors = attnLayers.map { plan.port("layers.$it.attn.k_cache").tensor },
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
-        ).apply { width = DECK_SIZE; height = DECK_SIZE })
+        ).apply { width = DECK_SIZE; height = DECK_SIZE; magnified = true })
         scene.addTile(DeckTile(
             id = "block.attn.v_cache", title = "v cache",
             tensors = attnLayers.map { plan.port("layers.$it.attn.v_cache").tensor },
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
-        ).apply { width = DECK_SIZE; height = DECK_SIZE })
+        ).apply { width = DECK_SIZE; height = DECK_SIZE; magnified = true })
         scene.addTile(AttentionTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.weights") },
             numHeads = config.numHeads, seqLen = displaySeq,
             title = "attention", id = "block.attn.weights", stackLayers = attnLayers,
-        ).apply { width = DECK_SIZE; height = DECK_SIZE })
-        stackedHistory("block.attn.context", attnLayers, "context", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.attn.context" }
-        stackedHistory("block.attn.out", attnLayers, "attn out", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.attn.out" }
+        ).apply { width = TOKEN_AXIS_HEIGHT; height = TOKEN_AXIS_HEIGHT })
+        stackedHistory("block.attn.context", attnLayers, "context", featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.context" }
+        stackedHistory("block.attn.out", attnLayers, "attn out", featureWidth(config.hiddenSize)) { "layers.$it.attn.out" }
 
         stackedWeight("block.w.feed_forward.w1.weight", allLayers, "W1 (gate)")
         stackedWeight("block.w.feed_forward.w3.weight", allLayers, "W3 (up)")
         stackedWeight("block.w.feed_forward.w2.weight", allLayers, "W2 (down)")
-        stackedHistory("block.mlp.gate", allLayers, "gate", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.mlp.gate" }
-        stackedHistory("block.mlp.up", allLayers, "up", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.mlp.up" }
-        stackedHistory("block.mlp.act", allLayers, "silu(gate) ⊙ up", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.mlp.act" }
-        stackedHistory("block.mlp.out", allLayers, "mlp out", ACTIVATION_WIDTH, ACTIVATION_HEIGHT) { "layers.$it.mlp.out" }
+        stackedHistory("block.mlp.gate", allLayers, "gate", featureWidth(config.intermediateSize)) { "layers.$it.mlp.gate" }
+        stackedHistory("block.mlp.up", allLayers, "up", featureWidth(config.intermediateSize)) { "layers.$it.mlp.up" }
+        stackedHistory("block.mlp.act", allLayers, "silu(gate) ⊙ up", featureWidth(config.intermediateSize)) { "layers.$it.mlp.act" }
+        stackedHistory("block.mlp.out", allLayers, "mlp out", featureWidth(config.hiddenSize)) { "layers.$it.mlp.out" }
 
         scene.connectFromGraph()
         CompositorLayout().apply(scene)
@@ -294,16 +313,24 @@ object Lfm2StackCompositor {
         return scene
     }
 
-    private const val SPINE_WIDTH = 190.0
-    private const val SPINE_HEIGHT = 90.0
-    private const val WEIGHT_SIZE = 70.0
+    /** The feature-axis anchor: hidden-size vectors render this wide; everything else scales. */
     private const val ACTIVATION_WIDTH = 110.0
-    private const val ACTIVATION_HEIGHT = 70.0
+
+    /** The token-axis span: the display window renders this tall everywhere it appears. */
+    private const val TOKEN_AXIS_HEIGHT = 120.0
+
+    /** Floor for a single-token row strip (true height would be one token — a few px). */
+    private const val TOKEN_ROW_HEIGHT = 12.0
+
+    /** Floor for the conv window / kernel tap strips (true height would be k tokens). */
+    private const val TAP_STRIP_HEIGHT = 20.0
+
+    /** Floor for the rope angle tiles (headDim/2 dims — a sliver at feature scale). */
+    private const val ROPE_MIN_WIDTH = 24.0
+
+    /** The KV cache decks keep a fixed inset size until the one-axis pass lands. */
     private const val DECK_SIZE = 120.0
-    private const val ROPE_WIDTH = 60.0
-    private const val ROPE_HEIGHT = 50.0
-    private const val CONV_WINDOW_HEIGHT = 26.0
-    private const val TOKEN_VECTOR_HEIGHT = 24.0
+
     private const val STRIP_WIDTH = 170.0
     private const val STRIP_ROW_HEIGHT = 26.0
     private const val STRIP_ROW_GAP = 20.0

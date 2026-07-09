@@ -23,10 +23,8 @@ val serialOrderMemory = newSim {
     val endLabel = "End"
     val random = Random(42)
 
-    var condition = SerialOrderCondition.Arbitrary
     var listLength = 5
     var noiseLevel = 0.18
-    var transitionBias = 0.35
     var phase = SerialOrderPhase.Ready
     var encodeIndex = 0
     var recallIndex = 0
@@ -142,19 +140,7 @@ val serialOrderMemory = newSim {
     fun sequenceText(sequence: List<Int>) = if (sequence.isEmpty()) "(none)" else sequence.joinToString(" ") { itemName(it) }
 
     fun newTargetList(): List<Int> {
-        return when (condition) {
-            SerialOrderCondition.Arbitrary, SerialOrderCondition.Confusable -> itemLabels.indices.shuffled(random).take(listLength)
-            SerialOrderCondition.Structured -> {
-                val aGroup = listOf(0, 2, 4).shuffled(random)
-                val bGroup = listOf(1, 3, 5).shuffled(random)
-                buildList {
-                    for (i in 0 until listLength) {
-                        val group = if (i % 2 == 0) aGroup else bGroup
-                        add(group[i / 2])
-                    }
-                }
-            }
-        }
+        return itemLabels.indices.shuffled(random).take(listLength)
     }
 
     fun resetTrial(nextTargetList: List<Int> = newTargetList()) {
@@ -189,6 +175,10 @@ val serialOrderMemory = newSim {
         return hiddenNeurons[position * itemLabels.size + item].activation
     }
 
+    fun setHiddenActivation(position: Int, item: Int, value: Double) {
+        hiddenNeurons[position * itemLabels.size + item].activation = value
+    }
+
     fun gaussianNoise(scale: Double): Double {
         if (scale <= 0.0) return 0.0
         val u1 = random.nextDouble().coerceAtLeast(1.0e-12)
@@ -196,32 +186,37 @@ val serialOrderMemory = newSim {
         return sqrt(-2.0 * ln(u1)) * cos(2.0 * PI * u2) * scale
     }
 
-    fun similarItem(candidate: Int, encoded: Int): Double {
-        if (candidate == encoded) return 1.0
-        return if (condition == SerialOrderCondition.Confusable && candidate / 2 == encoded / 2) 0.58 else 0.0
+    fun applyVisibleNoiseToHiddenTrace() {
+        for (position in 0 until maxListLength) {
+            for (item in itemLabels.indices) {
+                val baseActivation = if (position < targetList.size) memory[position][item] else 0.0
+                setHiddenActivation(position, item, (baseActivation + gaussianNoise(noiseLevel)).coerceIn(0.0, 1.0))
+            }
+        }
     }
 
-    fun transitionScore(candidate: Int): Double {
-        if (condition != SerialOrderCondition.Structured || recalledList.isEmpty()) return 0.0
-        val previous = recalledList.last()
-        val alternatesGroup = previous % 2 != candidate % 2
-        return if (alternatesGroup) transitionBias else -transitionBias * 0.35
+    fun showRecallConfusion(recalledItem: Int) {
+        val targetItem = targetList.getOrNull(recallIndex) ?: return
+        if (recalledItem == targetItem) return
+        for (item in itemLabels.indices) {
+            setHiddenActivation(recallIndex, item, hiddenActivation(recallIndex, item) * 0.25)
+        }
+        setHiddenActivation(recallIndex, targetItem, max(hiddenActivation(recallIndex, targetItem), 0.25))
+        setHiddenActivation(recallIndex, recalledItem, 1.0)
     }
 
     fun recallCandidate(): Int {
         val scores = itemLabels.indices.map { candidate ->
-            var score = transitionScore(candidate)
+            var score = 0.0
             for (position in 0 until targetList.size) {
                 val distance = kotlin.math.abs(position - recallIndex)
                 val positionWeight = exp(-distance.toDouble() * 1.55)
-                for (encoded in itemLabels.indices) {
-                    score += positionWeight * hiddenActivation(position, encoded) * similarItem(candidate, encoded)
-                }
+                score += positionWeight * hiddenActivation(position, candidate)
             }
             if (candidate in recalledList) {
                 score -= 0.75
             }
-            candidate to score + gaussianNoise(noiseLevel + (targetList.size - 1) * 0.025)
+            candidate to score
         }
         return scores.maxBy { it.second }.first
     }
@@ -229,7 +224,9 @@ val serialOrderMemory = newSim {
     fun recallStep(): Int? {
         if (phase != SerialOrderPhase.Recall) return null
         updateInputDisplay(null, recallCue = true)
+        applyVisibleNoiseToHiddenTrace()
         val item = recallCandidate()
+        showRecallConfusion(item)
         recalledList.add(item)
         recallIndex += 1
         updateOutputDisplay(item)
@@ -278,56 +275,28 @@ val serialOrderMemory = newSim {
         return "$label: ${(100.0 * total / trials).format(1)}%"
     }
 
-    fun benchmarkLine(label: String, trials: Int, setup: () -> Unit, targetFactory: () -> List<Int>): String {
-        setup()
-        var total = 0.0
-        repeat(trials) {
-            runTrial(targetFactory())
-            total += trialAccuracy(targetList, recalledList)
-        }
-        return "$label: ${(100.0 * total / trials).format(1)}%"
-    }
-
     fun runBenchmark(): String {
-        val savedCondition = condition
         val savedLength = listLength
         val savedNoise = noiseLevel
-        val savedBias = transitionBias
         val trials = 120
         val result = buildString {
             appendLine("Mean item-in-position accuracy over $trials trials")
             appendLine()
-            appendLine(benchmarkLine("Length 3", trials) {
-                condition = SerialOrderCondition.Arbitrary
+            appendLine(benchmarkLine("Length 3, low noise", trials) {
                 listLength = 3
-                noiseLevel = savedNoise
-                transitionBias = savedBias
+                noiseLevel = 0.05
             })
-            appendLine(benchmarkLine("Length 6", trials) {
-                condition = SerialOrderCondition.Arbitrary
+            appendLine(benchmarkLine("Length 6, low noise", trials) {
                 listLength = 6
+                noiseLevel = 0.05
             })
-            appendLine(benchmarkLine("Confusable length 6", trials) {
-                condition = SerialOrderCondition.Confusable
+            appendLine(benchmarkLine("Length 6, high noise", trials) {
                 listLength = 6
+                noiseLevel = 0.45
             })
-            appendLine(benchmarkLine("Structured high-probability", trials) {
-                condition = SerialOrderCondition.Structured
-                listLength = 6
-                transitionBias = savedBias.coerceAtLeast(0.25)
-            })
-            appendLine(benchmarkLine("Structured low-probability", trials, setup = {
-                condition = SerialOrderCondition.Structured
-                listLength = 6
-                transitionBias = savedBias.coerceAtLeast(0.25)
-            }, targetFactory = {
-                listOf(0, 2, 4, 1, 3, 5)
-            }))
         }
-        condition = savedCondition
         listLength = savedLength
         noiseLevel = savedNoise
-        transitionBias = savedBias
         resetTrial()
         return result
     }
@@ -349,11 +318,6 @@ val serialOrderMemory = newSim {
             resetTrial()
             refreshLabels()
 
-            addComboBox("Condition", SerialOrderCondition.entries.toList(), condition) {
-                condition = it
-                resetTrial()
-                refreshLabels()
-            }
             addComboBox("List length", (3..maxListLength).toList(), listLength) {
                 listLength = it
                 resetTrial()
@@ -361,9 +325,6 @@ val serialOrderMemory = newSim {
             }
             addSlider("Noise", 0.0, 0.6, noiseLevel, 0.05) {
                 noiseLevel = it
-            }
-            addSlider("Transition bias", 0.0, 0.8, transitionBias, 0.05) {
-                transitionBias = it
             }
             addButton("Reset") {
                 resetTrial()
@@ -393,32 +354,52 @@ val serialOrderMemory = newSim {
 
         This toy simulation illustrates the main idea in Botvinick and Plaut's recurrent neural network account of short-term memory for serial order. A list is encoded as a sustained pattern of activation in a recurrent memory layer, and recall reads out that activation after a `Recall Cue`.
 
+        # Background
+
+        Botvinick and Plaut's model is close to a simple recurrent network in spirit: a recurrent hidden state carries information from one time step to the next, and the network is trained over sequences. The key theoretical point is that the remembered list is stored in sustained activation during a trial, not in new temporary weights.
+
+        This contrasts with many context-based serial-recall models. In those models, item representations are temporarily bound to an independent position or temporal-context representation. In connectionist versions, those item-context bindings are often implemented as short-term weight changes. This is different from Elman-style `context units`, which are just previous hidden activations and are therefore activation-based.
+
+        This toy model is not a full reproduction of the paper's trained recurrent network. There is no BPTT, learned recurrent dynamics, or weight-training phase. It is a compact visual demonstration of the activation-based idea: `Step` first loads temporary activation traces into the recurrent memory layer and then reads those traces using fixed readout weights.
+
+        The toy focuses on one qualitative effect discussed in the paper: recall becomes worse when more items must be maintained, especially when the activation trace is noisy. It is meant to make that activation-based memory idea visible, not to reproduce the paper's quantitative simulations.
+
         # Simulation Details
 
-        The simulation is a compact teaching model, not a reproduction of the paper's full trained network. There is no BPTT, learned recurrent dynamics, or weight-training phase in this version. During a trial, `Step` first loads temporary activation traces into the recurrent memory layer and then reads those traces using fixed readout weights. The point is to illustrate activation-based memory for order, not learning by changing weights during a trial.
+        ## Control Panel
 
-        ## Control Panel Settings
+        `List length` changes how many item-position traces must be maintained. Longer lists are harder because recall has to read from a larger activation pattern.
 
-        `Condition` changes the source of recall errors. `Arbitrary` uses distinct items, `Confusable` makes item pairs overlap, and `Structured` biases recall toward alternating item groups to illustrate how background sequence knowledge can regularize recall. `Noise` controls degradation of the hidden trace. `Transition bias` controls how strongly the structured condition favors familiar transitions.
-
-        ## Control Panel Buttons
+        `Noise` controls random variability in the recurrent memory grid during recall. Higher noise visibly jitters the stored item-position traces and makes the readout more likely to choose a nearby or competing item instead of the correct one.
 
         `Reset` clears visible activations, clears the recurrent memory trace, and draws a new target list.
 
-        `Step` advances the current trial by one state-appropriate step. During `Encoding`, it presents one target item and writes its item-position trace into the recurrent memory layer. After the last item is encoded, the phase label switches to `Recall` and the `Recall Cue` activates. During `Recall`, `Step` reads the visible recurrent memory activations, applies noise, confusability, response suppression, and any structured transition bias, then activates one recall-output neuron. When the phase is `Done`, `Step` has no effect; use `Reset` for a new list.
+        `Step` advances the current trial by one state-appropriate step. During `Encoding`, it presents one target item and writes its item-position trace into the recurrent memory layer. After the last item is encoded, the phase label switches to `Recall` and the `Recall Cue` activates. During `Recall`, `Step` visibly jitters the recurrent memory trace, reads the visible recurrent memory activations, applies response suppression, then activates one recall-output neuron. When the phase is `Done`, `Step` has no effect; use `Reset` for a new list.
 
         This is not weight training. The demo has fixed readout weights; encoding loads a temporary activation trace, and recall reads that trace. If you randomize or edit the recurrent memory neurons before recall, the recall response changes because the readout uses those visible activations.
 
         `Run Trial` performs a full fresh trial: reset, encode the full list, and recall the full list.
 
-        `Run Benchmark` runs repeated trials and reports qualitative accuracy patterns for shorter versus longer lists, confusable lists, and structured high- versus low-probability lists.
+        `Run Benchmark` runs repeated trials and reports qualitative accuracy patterns for shorter versus longer lists and low versus high noise.
+
+        ## Under the Hood
+
+        This toy uses a small rule system. The visible network is a diagram and state display; ordinary Simbrain network stepping is not doing the computation.
+
+        During encoding, `Step` writes a one-hot trace into the recurrent memory grid. For example, if the first item is `C`, the neuron `1:C` is activated. If the second item is `A`, `2:A` is activated. This is intentionally localist: there is one visible memory neuron for each possible item-position pair.
+
+        The full Botvinick and Plaut model is different. Its hidden layer is distributed, so item and position information are encoded as patterns across many hidden units, not as one explicit neuron for each item-position combination. The toy uses the localist grid because it makes the activation trace easy to see.
+
+        During recall, the code first renders a noisy version of the stored trace into the recurrent memory grid. Then it scores each possible output item. The score is based mostly on the activation in the current memory row, with weaker contributions from nearby rows and a penalty for already recalled items. The highest-scoring item is selected. If the selected item is wrong, the current memory row is briefly shifted toward that recalled item so the visible trace reflects the confusion.
+
+        The visible synapses are schematic. They show the intended flow from input to recurrent memory to recall output, but the toy model's recall behavior is controlled by this rule-based scorer rather than by learned recurrent weights.
 
         # What to Do
 
         1. Click `Reset`, then use `Step` to watch items enter the recurrent memory layer.
         2. Continue pressing `Step` after the phase label switches to `Recall` to recall the list from the sustained hidden activation.
-        3. Increase `Noise` or `List length` and observe more transposition and item errors.
-        4. Compare `Arbitrary`, `Confusable`, and `Structured` with `Run Benchmark`.
+        3. Increase `Noise` or `List length` and observe more recall errors.
+        4. Use `Run Benchmark` to compare short, long, and noisy-list recall.
 
         Use the buttons in `Serial Recall Toy` to run the simulation. The main Simbrain `Run` button is not needed for this demo.
 
@@ -428,12 +409,6 @@ val serialOrderMemory = newSim {
         """.trimIndent(),
         width = 360
     )
-}
-
-private enum class SerialOrderCondition {
-    Arbitrary,
-    Confusable,
-    Structured
 }
 
 private enum class SerialOrderPhase(val displayName: String) {

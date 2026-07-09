@@ -104,6 +104,19 @@ class CompositorSceneTest {
     }
 
     @Test
+    fun `weight tiles pool by mean magnitude instead of the outlier`() {
+        val tensor = FloatTensor.of(4, 1, floatArrayOf(0.5f, 0.5f, -1f, 0f))
+        val tile = MatrixTile("w", "w", tensor, kind = TileKind.WEIGHT)
+        tile.publish(-1)
+
+        val pooled = tile.shaded(destW = 1, destH = 1)
+        assertEquals((0.5f).toSimbrainColor(neg, mid, pos), pooled[0],
+            "a dense block shades by its average magnitude, not its -1 outlier")
+        assertEquals((-1f).toSimbrainColor(neg, mid, pos), tile.shaded()[2],
+            "at one cell per pixel the true signed value shows")
+    }
+
+    @Test
     fun `attention tile retains every head and switches heads from history`() {
         val weights = FloatTensor(2, 4)
         val port = TensorPort("attn", weights)

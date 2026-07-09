@@ -108,8 +108,11 @@ abstract class TensorTile(
     /**
      * Shades the patch pixels covering the fractional cell window rows [rowFrom, rowTo) x
      * cols [colFrom, colTo) into [dest] — [destW] x [destH] pixels, row-major with [stride].
-     * When several cells collapse into one pixel, the cell with the largest magnitude wins
-     * (keeping its sign), so downsampling never hides a spike or an outlier channel.
+     * When several cells collapse into one pixel, the pool depends on what the tile shows:
+     * activations and attention keep the largest-magnitude cell (sign intact), so sparse spikes
+     * survive downsampling; weights average the magnitudes (signed by the block average), so a
+     * dense matrix reads by its norm structure instead of clipping every pixel to an outlier.
+     * Both rules converge to the true signed cell value at one-cell-per-pixel zoom.
      */
     @Synchronized
     fun shadePatch(
@@ -118,6 +121,7 @@ abstract class TensorTile(
         neg: Color, mid: Color, pos: Color,
     ) {
         val scale = if (signedNorm) (if (absMax > 0f) 1f / absMax else 0f) else 1f
+        val meanPool = kind == TileKind.WEIGHT
         val rowSpan = rowTo - rowFrom
         val colSpan = colTo - colFrom
         for (y in 0 until destH) {
@@ -127,20 +131,35 @@ abstract class TensorTile(
             for (x in 0 until destW) {
                 val c0 = (colFrom + colSpan * x / destW).toInt().coerceIn(0, cols - 1)
                 val c1 = ceil(colFrom + colSpan * (x + 1) / destW).toInt().coerceIn(c0 + 1, cols)
-                var best = 0f
-                var bestAbs = -1f
-                for (r in r0 until r1) {
-                    val base = r * cols
-                    for (c in c0 until c1) {
-                        val v = values[base + c]
-                        val a = abs(v)
-                        if (a > bestAbs) {
-                            bestAbs = a
-                            best = v
+                var pooled = 0f
+                if (meanPool) {
+                    var sum = 0f
+                    var sumAbs = 0f
+                    for (r in r0 until r1) {
+                        val base = r * cols
+                        for (c in c0 until c1) {
+                            val v = values[base + c]
+                            sum += v
+                            sumAbs += abs(v)
+                        }
+                    }
+                    val mag = sumAbs / ((r1 - r0) * (c1 - c0))
+                    pooled = if (sum < 0) -mag else mag
+                } else {
+                    var bestAbs = -1f
+                    for (r in r0 until r1) {
+                        val base = r * cols
+                        for (c in c0 until c1) {
+                            val v = values[base + c]
+                            val a = abs(v)
+                            if (a > bestAbs) {
+                                bestAbs = a
+                                pooled = v
+                            }
                         }
                     }
                 }
-                dest[destRow + x] = (best * scale).toSimbrainColor(neg, mid, pos)
+                dest[destRow + x] = (pooled * scale).toSimbrainColor(neg, mid, pos)
             }
         }
     }

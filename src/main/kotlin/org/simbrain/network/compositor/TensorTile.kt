@@ -11,6 +11,9 @@ import kotlin.math.ceil
 /** What a tile shows, driving its colormap and border styling. */
 enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
 
+/** How many recently watched layers a history tile stashes, so flip-back is instant and lossless. */
+const val HISTORY_STASH = 3
+
 /**
  * A tile whose data source flips across model layers — the card stack behind a structure-first
  * view where one block anatomy is shown once and the layer dimension collapses into decks.
@@ -168,10 +171,13 @@ abstract class TensorTile(
  * magnitudes rather than the max: transformer residual streams grow a few huge outlier channels,
  * and max scaling would wash every other channel out. Outliers saturate instead.
  *
- * With several [ports] the tile is a layer stack: every port's history is retained in a cube on
- * publish (the ports hold only the current token, so history can't be rebuilt later), one layer
- * is displayed, and [showLayer] flips by reshading from memory. The normalization scale is
- * shared across the stack, so flipping through layers compares them on one color scale.
+ * With several [ports] the tile is a layer stack, and history is recorded for the watched layer
+ * only: [showLayer] stashes the outgoing layer's rows (an LRU of [HISTORY_STASH] recently watched
+ * layers, so flip-back is instant and lossless) and either restores the incoming layer's or
+ * starts blank — a scene-level backfill can then re-derive rows ([backfillRow]) where the
+ * model's real state allows it. [retainAllLayers] keeps the full per-layer cube instead — for q,
+ * the one trajectory no cache holds, which the attention-limb backfill reads via
+ * [copyHistoryRow]. The normalization scale is shared across everything the tile has shown.
  */
 class VectorHistoryTile(
     val ports: List<TensorPort>,
@@ -180,6 +186,7 @@ class VectorHistoryTile(
     kind: TileKind = TileKind.RESIDUAL,
     id: String = ports.first().name,
     override val stackLayers: List<Int> = emptyList(),
+    private val retainAllLayers: Boolean = false,
 ) : TensorTile(id, title, rows, ports.first().tensor.size, signedNorm = true, kind = kind), LayerStacked {
 
     constructor(port: TensorPort, rows: Int, title: String = port.name, kind: TileKind = TileKind.RESIDUAL) :
@@ -192,7 +199,8 @@ class VectorHistoryTile(
         require(ports.all { it.tensor.size == cols }) { "All stacked ports must share one width" }
     }
 
-    private val cube = FloatArray(ports.size * rows * cols)
+    private val cube = if (retainAllLayers) FloatArray(ports.size * rows * cols) else FloatArray(0)
+    private val stash = LinkedHashMap<Int, FloatArray>()
     private val lastVersions = LongArray(ports.size) { -1L }
     private val magnitudes = FloatArray(cols)
     private var selected = 0
@@ -204,15 +212,40 @@ class VectorHistoryTile(
         val index = stackLayers.indexOf(layer)
         if (index < 0) return false
         if (index != selected) {
-            selected = index
-            rebuildFromCube()
+            if (retainAllLayers) {
+                selected = index
+                System.arraycopy(cube, selected * rows * cols, values, 0, rows * cols)
+            } else {
+                if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
+                stash[selected] = values.copyOf()
+                selected = index
+                val restored = stash.remove(index)
+                if (restored != null) System.arraycopy(restored, 0, values, 0, values.size)
+                else values.fill(0f)
+            }
+            touch()
         }
         return true
+    }
+
+    /** True when [layer]'s history is already in memory — shown, stashed, or fully retained. */
+    @Synchronized
+    fun hasHistoryFor(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        return index >= 0 && (retainAllLayers || index == selected || index in stash)
+    }
+
+    /** Copies the retained row for stack entry [stackIndex] at [tokenIndex] into [dest]. */
+    @Synchronized
+    fun copyHistoryRow(stackIndex: Int, tokenIndex: Int, dest: FloatArray) {
+        require(retainAllLayers) { "$id does not retain unwatched layers" }
+        System.arraycopy(cube, (stackIndex * rows + tokenIndex) * cols, dest, 0, cols)
     }
 
     override fun reset() {
         super.reset()
         cube.fill(0f)
+        stash.clear()
         lastVersions.fill(-1L)
     }
 
@@ -220,30 +253,56 @@ class VectorHistoryTile(
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
         liveRow = tokenIndex
-        for ((s, port) in ports.withIndex()) {
-            val tensor = port.tensor
-            if (tensor.version == lastVersions[s]) continue
-            lastVersions[s] = tensor.version
-            val base = (s * rows + tokenIndex) * cols
+        if (retainAllLayers) {
+            for ((s, port) in ports.withIndex()) {
+                val tensor = port.tensor
+                if (tensor.version == lastVersions[s]) continue
+                lastVersions[s] = tensor.version
+                val base = (s * rows + tokenIndex) * cols
+                for (i in 0 until cols) {
+                    val v = tensor.data.get(i)
+                    cube[base + i] = v
+                    magnitudes[i] = abs(v)
+                }
+                growScaleFromMagnitudes()
+                if (s == selected) {
+                    System.arraycopy(cube, base, values, tokenIndex * cols, cols)
+                    touch()
+                }
+            }
+        } else {
+            val tensor = ports[selected].tensor
+            if (tensor.version == lastVersions[selected]) return
+            lastVersions[selected] = tensor.version
+            val base = tokenIndex * cols
             for (i in 0 until cols) {
                 val v = tensor.data.get(i)
-                cube[base + i] = v
+                values[base + i] = v
                 magnitudes[i] = abs(v)
             }
-            magnitudes.sort()
-            val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
-            growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
-            if (s == selected) {
-                System.arraycopy(cube, base, values, tokenIndex * cols, cols)
-                touch()
-            }
+            growScaleFromMagnitudes()
+            touch()
         }
     }
 
+    /** Writes a re-derived or copied history row for the shown layer — the flip-backfill path. */
     @Synchronized
-    private fun rebuildFromCube() {
-        System.arraycopy(cube, selected * rows * cols, values, 0, rows * cols)
+    fun backfillRow(tokenIndex: Int, src: FloatArray, srcOffset: Int = 0) {
+        if (tokenIndex !in 0 until rows) return
+        val base = tokenIndex * cols
+        for (i in 0 until cols) {
+            val v = src[srcOffset + i]
+            values[base + i] = v
+            magnitudes[i] = abs(v)
+        }
+        growScaleFromMagnitudes()
         touch()
+    }
+
+    private fun growScaleFromMagnitudes() {
+        magnitudes.sort()
+        val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
+        growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
     }
 }
 
@@ -506,10 +565,12 @@ class DeckTile(
 
 /**
  * The causal attention-map tile: row t holds the selected head's softmaxed attention over
- * positions 0..t at token t, building the familiar lower triangle as generation runs. History
- * for every head is retained, so [selectedHead] switches instantly by reshading from stored
- * values (a tier-2 full-tile rewrite, no recompute). Weights are probabilities, shaded on a
- * fixed 0..1 scale.
+ * positions 0..t at token t, building the familiar lower triangle as generation runs. All heads
+ * of the watched layer are retained, so [selectedHead] switches instantly with no recompute.
+ * Across layers it records the watched layer only: [showLayer] stashes the outgoing layer's
+ * heads (LRU of [HISTORY_STASH]) and restores or blanks the incoming one, after which the scene
+ * re-derives missing rows from q and the KV caches through [backfillRow]. Weights are
+ * probabilities, shaded on a fixed 0..1 scale.
  */
 class AttentionTile(
     val ports: List<TensorPort>,
@@ -529,8 +590,9 @@ class AttentionTile(
         }
     }
 
-    private val history = FloatArray(ports.size * numHeads * rows * cols)
-    private val lastVersions = LongArray(ports.size) { -1L }
+    private val history = FloatArray(numHeads * rows * cols)
+    private val stash = LinkedHashMap<Int, FloatArray>()
+    private var lastVersion = -1L
     private var selected = 0
 
     override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
@@ -540,16 +602,30 @@ class AttentionTile(
         val index = stackLayers.indexOf(layer)
         if (index < 0) return false
         if (index != selected) {
+            if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
+            stash[selected] = history.copyOf()
             selected = index
+            val restored = stash.remove(index)
+            if (restored != null) System.arraycopy(restored, 0, history, 0, history.size)
+            else history.fill(0f)
+            lastVersion = -1L
             rebuildFromHistory()
         }
         return true
     }
 
+    /** True when [layer]'s head histories are already in memory — shown or stashed. */
+    @Synchronized
+    fun hasHistoryFor(layer: Int): Boolean {
+        val index = stackLayers.indexOf(layer)
+        return index >= 0 && (index == selected || index in stash)
+    }
+
     override fun reset() {
         super.reset()
         history.fill(0f)
-        lastVersions.fill(-1L)
+        stash.clear()
+        lastVersion = -1L
     }
 
     var selectedHead = 0
@@ -565,21 +641,30 @@ class AttentionTile(
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
         liveRow = tokenIndex
+        val tensor = ports[selected].tensor
+        if (tensor.version == lastVersion) return
+        lastVersion = tensor.version
+        record(tokenIndex, tensor)
+    }
+
+    /** Writes a re-derived history row for the shown layer, laid out like the live weights port. */
+    @Synchronized
+    fun backfillRow(tokenIndex: Int, source: FloatTensor) {
+        if (tokenIndex !in 0 until rows) return
+        record(tokenIndex, source)
+    }
+
+    private fun record(tokenIndex: Int, tensor: FloatTensor) {
         val seen = minOf(tokenIndex + 1, cols)
-        for ((s, port) in ports.withIndex()) {
-            val tensor = port.tensor
-            if (tensor.version == lastVersions[s]) continue
-            lastVersions[s] = tensor.version
-            for (head in 0 until numHeads) {
-                val src = head * tensor.cols
-                val dst = ((s * numHeads + head) * rows + tokenIndex) * cols
-                for (j in 0 until seen) {
-                    history[dst + j] = tensor.data.get(src + j)
-                }
+        for (head in 0 until numHeads) {
+            val src = head * tensor.cols
+            val dst = (head * rows + tokenIndex) * cols
+            for (j in 0 until seen) {
+                history[dst + j] = tensor.data.get(src + j)
             }
         }
         System.arraycopy(
-            history, ((selected * numHeads + selectedHead) * rows + tokenIndex) * cols,
+            history, (selectedHead * rows + tokenIndex) * cols,
             values, tokenIndex * cols, cols
         )
         touch()
@@ -587,7 +672,7 @@ class AttentionTile(
 
     @Synchronized
     private fun rebuildFromHistory() {
-        System.arraycopy(history, (selected * numHeads + selectedHead) * rows * cols, values, 0, rows * cols)
+        System.arraycopy(history, selectedHead * rows * cols, values, 0, rows * cols)
         touch()
     }
 }

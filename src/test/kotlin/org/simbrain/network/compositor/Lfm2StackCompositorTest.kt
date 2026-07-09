@@ -123,19 +123,62 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
-    fun `stacked history tiles retain every layer's rows through a flip`() {
+    fun `the spine backfills an unwatched layer's history from the depth strip on a flip`() {
         val model = syntheticModel()
         val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
         repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
 
-        val resid = scene.tile("block.resid") as VectorHistoryTile
-        scene.layerSelector!!.invoke(1)
-        val layer1Row = (0 until resid.cols).map { resid.valueAt(2, it) }
+        val blockOut = scene.tile("block.resid") as VectorHistoryTile
         scene.layerSelector!!.invoke(3)
-        val layer3Row = (0 until resid.cols).map { resid.valueAt(2, it) }
-        assertTrue(layer1Row.any { it != 0f }, "history was retained for layer 1")
-        assertTrue(layer3Row.any { it != 0f }, "history was retained for layer 3")
-        assertFalse(layer1Row == layer3Row, "the flip really changed the displayed layer")
+        val strip = scene.tile("layers.3.resid")
+        val row = (0 until blockOut.cols).map { blockOut.valueAt(2, it) }
+        assertTrue(row.any { it != 0f }, "the flipped-to layer's checkpoint history was backfilled")
+        assertEquals((0 until strip.cols).map { strip.valueAt(2, it) }, row,
+            "the backfill copies the strip checkpoint exactly")
+    }
+
+    @Test
+    fun `a flip to an unwatched attention layer re-derives exactly what live recording stored`() {
+        val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
+        val model = syntheticModel(config)
+        val recorded = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val derived = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        recorded.layerSelector!!.invoke(4)
+        repeat(5) {
+            model.forwardToken(it + 1)
+            recorded.publish(it)
+            derived.publish(it)
+        }
+
+        derived.layerSelector!!.invoke(4)
+        for (id in listOf("block.attn.weights", "block.attn.context", "block.attn.out")) {
+            assertTrue(recorded.tile(id).values.any { it != 0f }, "$id recorded something to compare")
+            assertTrue(recorded.tile(id).values.contentEquals(derived.tile(id).values),
+                "$id must re-derive bit-exactly from q and the caches")
+        }
+    }
+
+    @Test
+    fun `recently watched layers restore from the stash and older ones are evicted`() {
+        val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
+        val model = syntheticModel(config)
+        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
+
+        val bx = scene.tile("block.conv.bx") as VectorHistoryTile
+        val watched = bx.values.copyOf()
+        assertTrue(watched.any { it != 0f })
+
+        scene.layerSelector!!.invoke(1)
+        assertTrue(bx.values.all { it == 0f }, "a never-watched conv layer starts blank")
+        scene.layerSelector!!.invoke(0)
+        assertTrue(bx.values.contentEquals(watched), "flip-back restores the stashed history")
+
+        scene.layerSelector!!.invoke(1)
+        scene.layerSelector!!.invoke(3)
+        scene.layerSelector!!.invoke(5)
+        scene.layerSelector!!.invoke(0)
+        assertTrue(bx.values.all { it == 0f }, "history beyond the stash is gone")
     }
 
     @Test

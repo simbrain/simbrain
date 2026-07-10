@@ -9,7 +9,11 @@ import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
 import org.simbrain.network.llm.HeadwiseNormRopeOp
+import org.simbrain.network.tensor.op.LinearOp
+import org.simbrain.network.tensor.op.MatMulLinearOp
+import org.simbrain.network.tensor.op.MergeHeadsOp
 import org.simbrain.network.tensor.op.ReLUOp
+import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SvgIconNode
@@ -170,6 +174,13 @@ class CompositorNode(
             }.also { addChild(it) }
         }
 
+        /** Identity bars over the ticked segments — the chunk colors the slice edges wear. */
+        val blockBars: List<PPath> = tile.blockLabels.indices.map {
+            PPath.Double(Path2D.Double(), null).apply {
+                pickable = false
+            }.also { addChild(it) }
+        }
+
         /** Caption line one: what the tile is, centered under it. */
         val label = PText(tile.title).apply {
             font = Theme.small
@@ -294,7 +305,13 @@ class CompositorNode(
                 val blockEdges = listOf(0) + tile.columnTicks + listOf(tile.cols)
                 blockTexts.forEachIndexed { i, text ->
                     val cx = (blockEdges[i] + blockEdges[i + 1]) / 2.0 / tile.cols * tile.width
-                    text.setOffset(cx - text.width / 2, -text.height - 2.0)
+                    text.setOffset(cx - text.width / 2, -text.height - 5.0)
+                }
+                blockBars.forEachIndexed { i, bar ->
+                    val x0 = blockEdges[i].toDouble() / tile.cols * tile.width
+                    val x1 = blockEdges[i + 1].toDouble() / tile.cols * tile.width
+                    bar.reset()
+                    bar.append(Rectangle2D.Double(x0 + 1.0, -3.5, x1 - x0 - 2.0, 2.0), false)
                 }
             }
             syncLabel()
@@ -401,7 +418,13 @@ class CompositorNode(
             }
             ticks.strokePaint = palette.imageBorder
             ticks.stroke = BasicStroke(1f)
-            blockTexts.forEach { it.textPaint = palette.valueText }
+            blockTexts.forEachIndexed { i, text ->
+                text.textPaint = palette.chunkColors[i % palette.chunkColors.size]
+            }
+            blockBars.forEachIndexed { i, bar ->
+                bar.paint = palette.chunkColors[i % palette.chunkColors.size]
+                bar.strokePaint = null
+            }
             badge?.let {
                 it.paint = palette.canvasBackground
                 it.strokePaint = if (badgeGlowing) palette.sourceHandle else palette.connectionLine
@@ -792,26 +815,42 @@ class CompositorNode(
             }
             val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+            val tailDir = (tailSide.p2 - tailSide.p1).norm
+            val headDir = (headSide.p2 - headSide.p1).norm
+            val visibleOps = edge.ops.filter { it !in badgedOps }
+            fun nominalT(op: TensorOp) = (visibleOps.indexOf(op) + 1).toDouble() / (visibleOps.size + 1)
             if (edge.strands > 1) {
                 // One ghost strand per real stream, each interpolating between what its two
                 // endpoints offer: a head deck's card ladder (strand i registers on card i) or
                 // a flat tensor's attach side (strands converge onto the ribbon) — a pipe reads
                 // as one vector fanning out into per-head cards, never as a band floating over
-                // a flat tile.
-                val tailFans = fansIntoCards(edge.from)
-                val headFans = fansIntoCards(edge.to)
-                val tailDir = (tailSide.p2 - tailSide.p1).norm
-                val headDir = (headSide.p2 - headSide.p1).norm
+                // a flat tile. Strands span only where the parallelism exists: born at a split
+                // bead, dying at the first bead that mixes the heads back (the output
+                // projection), converging into the responsible glyph.
+                val splitAt = visibleOps.firstOrNull { it is SplitHeadsOp }
+                val mergeAt = visibleOps.firstOrNull { it is MergeHeadsOp || it is LinearOp || it is MatMulLinearOp }
+                val tStart = splitAt?.let(::nominalT) ?: 0.0
+                val tEnd = mergeAt?.let(::nominalT) ?: 1.0
+                val tailFans = splitAt == null && fansIntoCards(edge.from)
+                val headFans = mergeAt == null && fansIntoCards(edge.to)
                 for (i in (edge.strands - 1) downTo 1) {
                     val spread = (i - (edge.strands - 1) / 2.0) * FLAT_STRAND_SPREAD
-                    val tailOff = if (tailFans) Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i) else tailDir * spread
-                    val headOff = if (headFans) Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i) else headDir * spread
+                    val tailOff = when {
+                        splitAt != null -> Point2D.Double(0.0, 0.0)
+                        tailFans -> Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i)
+                        else -> tailDir * spread
+                    }
+                    val headOff = when {
+                        mergeAt != null -> Point2D.Double(0.0, 0.0)
+                        headFans -> Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i)
+                        else -> headDir * spread
+                    }
                     val strandPath = Path2D.Double()
                     for (sample in 0..STRAND_SAMPLES) {
-                        val t = sample.toDouble() / STRAND_SAMPLES
-                        val at = route.pointAt(t)
-                        val x = at.x + tailOff.x * (1 - t) + headOff.x * t
-                        val y = at.y + tailOff.y * (1 - t) + headOff.y * t
+                        val u = sample.toDouble() / STRAND_SAMPLES
+                        val at = route.pointAt(tStart + (tEnd - tStart) * u)
+                        val x = at.x + tailOff.x * (1 - u) + headOff.x * u
+                        val y = at.y + tailOff.y * (1 - u) + headOff.y * u
                         if (sample == 0) strandPath.moveTo(x, y) else strandPath.lineTo(x, y)
                     }
                     PPath.Double(stroke.createStrokedShape(strandPath), null).apply {
@@ -840,8 +879,29 @@ class CompositorNode(
                 pickable = false
                 edgeLayer.addChild(this)
             }
+            if (edge.sliceBlocks.isNotEmpty()) {
+                // A slice-read wears the identity colors of the chunks it carries — one thin
+                // strand per chunk, matching the segment bars on the ticked source tile.
+                val chunkStroke = BasicStroke(2.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
+                for ((j, block) in edge.sliceBlocks.withIndex()) {
+                    val spread = (j - (edge.sliceBlocks.size - 1) / 2.0) * 4.0
+                    val strandPath = Path2D.Double()
+                    for (sample in 0..STRAND_SAMPLES) {
+                        val u = sample.toDouble() / STRAND_SAMPLES
+                        val at = route.pointAt(u)
+                        val off = tailDir * (spread * (1 - u)) + headDir * (spread * u)
+                        if (sample == 0) strandPath.moveTo(at.x + off.x, at.y + off.y)
+                        else strandPath.lineTo(at.x + off.x, at.y + off.y)
+                    }
+                    PPath.Double(chunkStroke.createStrokedShape(strandPath), null).apply {
+                        paint = palette.chunkColors[block % palette.chunkColors.size]
+                        transparency = if (edge.dimmed) 0.12f else 0.7f
+                        pickable = false
+                        edgeLayer.addChild(this)
+                    }
+                }
+            }
             val satellitesByOp = satellitesByEdge[edge]?.associateBy { it.op } ?: emptyMap()
-            val visibleOps = edge.ops.filter { it !in badgedOps }
             // Short curves can't fit every bead without overlap: sample evenly, keep the rest
             // reachable through the shown ones' tooltips. Satellite ops always render.
             val fit = (route.length / (GLYPH_RADIUS * 3.0)).toInt().coerceAtLeast(1)

@@ -172,6 +172,23 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `slice-read edges carry the chunk identities they read`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
+        val alias = { name: String -> scene.graph!!.alias(name) }
+        fun gateEdge(gate: String) = scene.edges.first {
+            (it.from as? TensorTile)?.id == "block.conv.bcx" &&
+                (it.to as? OpVertex)?.let { v -> alias(v.op.name) } == gate
+        }
+
+        assertEquals(listOf(0, 2), gateEdge("block.conv.b_gate").sliceBlocks,
+            "the B gate reads the B and x chunks")
+        assertEquals(listOf(1), gateEdge("block.conv.c_gate").sliceBlocks,
+            "the C gate reads the C chunk")
+        assertTrue(scene.edges.filter { (it.from as? TensorTile)?.id == "block.in" }
+            .all { it.sliceBlocks.isEmpty() }, "whole-value copies stay unmarked")
+    }
+
+    @Test
     fun `every anatomy tile stacks its layer subset`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))

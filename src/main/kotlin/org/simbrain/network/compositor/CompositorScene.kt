@@ -35,6 +35,12 @@ class FlowEdge(
     /** The junction input port this edge arrives at, keying the target glyph's pin; see [DisplaySegment.toPort]. */
     val toPort: String? = null,
 ) {
+    /**
+     * Block indices of the source tile's ticked segments this edge reads, for slice-read edges
+     * (a gate taking one chunk of a fused projection). Rendered as identity-colored strands
+     * matching the segment bars; empty for whole-value edges.
+     */
+    var sliceBlocks: List<Int> = emptyList()
     /** Interior route knots in scene coordinates; set by layout to steer the curve around tiles. */
     var waypoints: List<Point2D> = emptyList()
 

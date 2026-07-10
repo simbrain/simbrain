@@ -4,6 +4,7 @@ import org.simbrain.network.llm.AttendMixOp
 import org.simbrain.network.llm.AttendScoresOp
 import org.simbrain.network.llm.Lfm2DecodeState
 import org.simbrain.network.llm.Lfm2Model
+import org.simbrain.network.llm.OffsetGateOp
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.op.LinearOp
 import org.simbrain.network.tensor.op.OpPlan
@@ -242,6 +243,20 @@ object Lfm2StackCompositor {
         scene.memoryEdges = scene.edges.filter { edge ->
             (edge.from as? TensorTile)?.id?.let { it.endsWith("_cache") || it == "block.conv.cache" } == true
         }.toSet()
+
+        // Slice identity: the conv gates read chunks of the ticked bcx projection. Each edge
+        // carries the chunk indices it reads — the gate's offsets located against the tile's
+        // tick boundaries — rendered as identity-colored strands matching the segment bars.
+        val bcxTile = scene.tile("block.conv.bcx")
+        val chunkStarts = listOf(0) + bcxTile.columnTicks
+        for (edge in scene.edges) {
+            if ((edge.from as? TensorTile)?.id != bcxTile.id) continue
+            val gate = (edge.to as? OpVertex)?.op as? OffsetGateOp ?: continue
+            edge.sliceBlocks = buildList {
+                if (alias(gate.a.name) == bcxTile.id) add(chunkStarts.indexOfLast { it <= gate.aOffset })
+                if (alias(gate.b.name) == bcxTile.id) add(chunkStarts.indexOfLast { it <= gate.bOffset })
+            }.sorted()
+        }
 
         // The depth strip: every residual checkpoint at mini scale with the logit lens, placed
         // left of the block after layout (it takes no part in edge derivation or ranking). Its

@@ -213,9 +213,9 @@ class AttendMixOp(
 class OffsetGateOp(
     name: String,
     val a: TensorPort,
-    private val aOffset: Int,
+    val aOffset: Int,
     val b: TensorPort,
-    private val bOffset: Int,
+    val bOffset: Int,
     val out: TensorPort,
 ) : TensorOp(name) {
 

@@ -47,6 +47,13 @@ class CompositorNode(
         strokePaint = NetworkTheme.current.subnetOutline
     }.also { addChild(it) }
 
+    /**
+     * Tile card fans paint UNDER the edges, front tiles above them: a pipe runs over the card
+     * ladder (strand i visibly on card i) and terminates at the open card's border, instead of
+     * vanishing behind an opaque fan.
+     */
+    private val fanLayer = PNode().also { addChild(it) }
+
     private val edgeLayer = PNode().also { addChild(it) }
 
     /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
@@ -105,6 +112,9 @@ class CompositorNode(
     }
 
     private inner class TileNode(val tile: TensorTile) : PNode() {
+        /** This tile's card fan, a sibling in [fanLayer] so edges route over the cards. */
+        val fan = PNode().also { fanLayer.addChild(it) }
+
         /**
          * Anonymous cards behind a head deck's front card, one per hidden sibling — the pages
          * of the open layer card: 15 behind the attention tile, 7 behind each KV cache, so the
@@ -120,7 +130,7 @@ class CompositorNode(
                 PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
                     setOffset(-HEAD_STEP * i, -HEAD_STEP * i)
-                }.also { addChild(it) }
+                }.also { fan.addChild(it) }
             }
         }
 
@@ -138,7 +148,7 @@ class CompositorNode(
                 layer to PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
                     setOffset(-DECK_STEP * (span - layer), -DECK_STEP * (span - layer))
-                }.also { addChild(it) }
+                }.also { fan.addChild(it) }
             }
         }
         val raster = TilePatchNode(tile).apply {
@@ -249,6 +259,7 @@ class CompositorNode(
 
         fun syncLayout() {
             setOffset(tile.x, tile.y)
+            fan.setOffset(tile.x, tile.y)
             headPagers?.let { (up, down) ->
                 val h = up.fullBoundsReference.height
                 up.setOffset(tile.width + 2.0, tile.height / 2 - h)
@@ -354,6 +365,7 @@ class CompositorNode(
 
         fun syncDim() {
             transparency = if (tile.dimmed) DIM_TRANSPARENCY else 1f
+            fan.transparency = if (tile.dimmed) DIM_TRANSPARENCY else 1f
         }
 
         fun syncHighlight() {

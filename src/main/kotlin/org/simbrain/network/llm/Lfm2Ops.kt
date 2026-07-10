@@ -71,7 +71,7 @@ class HeadwiseNormRopeOp(
     val cosIn: TensorPort,
     val sinIn: TensorPort,
     val out: TensorPort,
-    private val numHeads: Int,
+    val numHeads: Int,
     private val headDim: Int,
     private val eps: Float,
 ) : TensorOp(name) {
@@ -137,7 +137,7 @@ class AttendScoresOp(
     val kCache: TensorPort,
     val weights: TensorPort,
     private val state: Lfm2DecodeState,
-    private val numHeads: Int,
+    val numHeads: Int,
     private val numKvHeads: Int,
     private val headDim: Int,
 ) : TensorOp(name) {
@@ -184,7 +184,7 @@ class AttendMixOp(
     val vCache: TensorPort,
     val out: TensorPort,
     private val state: Lfm2DecodeState,
-    private val numHeads: Int,
+    val numHeads: Int,
     private val numKvHeads: Int,
     private val headDim: Int,
 ) : TensorOp(name) {

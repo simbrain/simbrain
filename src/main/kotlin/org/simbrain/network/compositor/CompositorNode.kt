@@ -6,6 +6,8 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.gui.ArrowDirection
+import org.simbrain.network.gui.createArrowButton
 import org.simbrain.network.tensor.op.ReLUOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
@@ -63,23 +65,78 @@ class CompositorNode(
 
     private var staleTiles: Set<TensorTile> = emptySet()
 
+    /** Pager containers, so the interior handler leaves their clicks to the arrow buttons. */
+    private val pagerNodes = mutableListOf<PNode>()
+
+    /**
+     * A destination-labeled flip arrow: the triangle plus the layer number it pages to, so the
+     * skip-rhythm is readable at the interaction point — an attention tile offers 8 -> 10, a
+     * spine tile 8 -> 9.
+     */
+    private inner class PagerNode(direction: ArrowDirection, private val labelFirst: Boolean, onClick: () -> Unit) : PNode() {
+        private val arrow = createArrowButton(direction, PAGER_ARROW) { onClick() }.also { addChild(it) }
+        private val text = PText().apply {
+            font = Theme.tiny
+            pickable = false
+        }.also { addChild(it) }
+
+        init {
+            pagerNodes.add(this)
+        }
+
+        fun setLabel(value: String?) {
+            visible = value != null
+            pickable = visible
+            childrenPickable = visible
+            text.text = value ?: ""
+            text.textPaint = NetworkTheme.current.valueText
+            val textY = (arrow.fullBoundsReference.height - text.height) / 2
+            if (labelFirst) {
+                text.setOffset(0.0, textY)
+                arrow.setOffset(text.width, 0.0)
+            } else {
+                arrow.setOffset(0.0, 0.0)
+                text.setOffset(arrow.fullBoundsReference.width, textY)
+            }
+        }
+
+        val rowWidth: Double get() = if (visible) fullBoundsReference.width else 0.0
+    }
+
     private inner class TileNode(val tile: TensorTile) : PNode() {
         /**
-         * Dimmed offset cards behind the live front card, one per real stack entry — a deck's
-         * slices, an attention tile's heads, or a layer stack — so stack depth is a fact about
-         * the model: the 16-head attention deck stands twice as deep as the 8-head KV caches.
+         * Anonymous cards behind a head deck's front card, one per hidden sibling — the pages
+         * of the open layer card: 15 behind the attention tile, 7 behind each KV cache, so the
+         * GQA 2:1 stands in the depths.
          */
-        val backCards: List<PPath> = run {
+        val headCards: List<PPath> = run {
             val depth = when {
                 tile is DeckTile && tile.slices > 1 -> tile.slices - 1
                 tile is AttentionTile && tile.numHeads > 1 -> tile.numHeads - 1
-                tile is LayerStacked && tile.stackLayers.size > 1 -> tile.stackLayers.size - 1
                 else -> 0
             }
             (depth downTo 1).map { i ->
                 PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
                     setOffset(-DECK_STEP * i, -DECK_STEP * i)
+                }.also { addChild(it) }
+            }
+        }
+
+        /**
+         * Layer cards on the shared slot axis: every layer deck spans [CompositorScene.layerCount]
+         * slots, with a card only at the layers this tile's stack owns — the skip-rhythm shows
+         * WHICH layers have the piece, not just how many. The selected layer's card is accented,
+         * the rest ghosted; head decks page their layer dimension through the pager instead.
+         */
+        val slotCards: List<Pair<Int, PPath>> = run {
+            if (headCards.isNotEmpty()) return@run emptyList()
+            val stack = (tile as? LayerStacked)?.stackLayers?.takeIf { it.size > 1 } ?: return@run emptyList()
+            val span = maxOf(scene.layerCount, stack.max() + 1)
+            stack.sorted().map { layer ->
+                layer to PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
+                    pickable = false
+                    setOffset(-DECK_STEP * (span - layer), -DECK_STEP * (span - layer))
                 }.also { addChild(it) }
             }
         }
@@ -105,6 +162,30 @@ class CompositorNode(
         val label = PText(tile.title).apply {
             font = Theme.tiny
         }.also { addChild(it) }
+
+        /** Layer pagers flanking the caption, labeled with the layer each flips to. */
+        val layerPagers: Pair<PagerNode, PagerNode>? = (tile as? LayerStacked)
+            ?.takeIf { it.stackLayers.size > 1 }?.let { stacked ->
+                val left = PagerNode(ArrowDirection.LEFT, labelFirst = false) {
+                    stacked.layerBefore(scene.selectedLayer)?.let { selectLayer(it) }
+                }.also { addChild(it) }
+                val right = PagerNode(ArrowDirection.RIGHT, labelFirst = true) {
+                    stacked.layerAfter(scene.selectedLayer)?.let { selectLayer(it) }
+                }.also { addChild(it) }
+                left to right
+            }
+
+        /** Head pagers on a deck tile's right edge — the clickable form of the wheel flip. */
+        val headPagers: Pair<PNode, PNode>? =
+            if (tile is DeckTile && tile.slices > 1 || tile is AttentionTile && tile.numHeads > 1) {
+                val up = createArrowButton(ArrowDirection.UP, PAGER_ARROW) { stepHead(tile, -1) }
+                val down = createArrowButton(ArrowDirection.DOWN, PAGER_ARROW) { stepHead(tile, 1) }
+                listOf(up, down).forEach {
+                    pagerNodes.add(it)
+                    addChild(it)
+                }
+                up to down
+            } else null
 
         /** Cursor at the tile's live row: the current token's row, or a cache's write frontier. */
         val liveMarker = PPath.Double(Path2D.Double().apply {
@@ -146,7 +227,11 @@ class CompositorNode(
 
         fun syncLayout() {
             setOffset(tile.x, tile.y)
-            label.setOffset(0.0, tile.height + 3.0)
+            headPagers?.let { (up, down) ->
+                val h = up.fullBoundsReference.height
+                up.setOffset(tile.width + 2.0, tile.height / 2 - h)
+                down.setOffset(tile.width + 2.0, tile.height / 2)
+            }
             // Notches mark boundaries on both edges, dropping to one edge on tiles too thin for
             // opposing marks to stay visually separate.
             val marks = Path2D.Double()
@@ -194,12 +279,22 @@ class CompositorNode(
         fun syncLabel() {
             val base = when (tile) {
                 is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
-                    ?: "${tile.title} · head ${tile.selectedSlice}"
-                is AttentionTile -> "${tile.title} · head ${tile.selectedHead}"
+                    ?: "${tile.title} · head ${tile.selectedSlice + 1}/${tile.slices}"
+                is AttentionTile -> "${tile.title} · head ${tile.selectedHead}/${tile.numHeads}"
                 else -> tile.title
             }
             val layer = (tile as? LayerStacked)?.takeIf { it.stackLayers.size > 1 }?.shownLayer
             label.text = if (layer != null && layer >= 0) "$base · layer $layer" else base
+            var labelX = 0.0
+            layerPagers?.let { (left, right) ->
+                val stacked = tile as LayerStacked
+                left.setLabel(stacked.layerBefore(scene.selectedLayer)?.toString())
+                left.setOffset(0.0, tile.height + 1.0)
+                labelX = left.rowWidth + 3.0
+                right.setLabel(stacked.layerAfter(scene.selectedLayer)?.toString())
+                right.setOffset(labelX + label.width + 3.0, tile.height + 1.0)
+            }
+            label.setOffset(labelX, tile.height + 3.0)
         }
 
         fun syncDim() {
@@ -225,10 +320,17 @@ class CompositorNode(
                 tile.kind == TileKind.WEIGHT -> palette.weightMatrixBoundary
                 else -> palette.imageBorder
             }
-            backCards.forEach {
+            headCards.forEach {
                 it.paint = palette.canvasBackground
                 it.strokePaint = palette.imageBorder
                 it.stroke = BasicStroke(1f)
+            }
+            for ((layer, card) in slotCards) {
+                val selected = layer == scene.selectedLayer
+                card.paint = palette.canvasBackground
+                card.strokePaint = if (selected) palette.sourceHandle else palette.imageBorder
+                card.stroke = BasicStroke(if (selected) 1.5f else 1f)
+                card.transparency = if (selected) 1f else GHOST_CARD_TRANSPARENCY
             }
             ticks.strokePaint = palette.imageBorder
             ticks.stroke = BasicStroke(1f)
@@ -351,7 +453,8 @@ class CompositorNode(
     inner class OpGlyphNode(val op: TensorOp) : PNode() {
         private val stages = glyphStages(op)
         val stageCount = stages?.size ?: 1
-        val shape: PPath = when {
+
+        private fun stripShape(): PPath = when {
             stages == null -> PPath.createRoundRectangle(
                 -GLYPH_RADIUS * 1.6, -GLYPH_RADIUS * 0.8,
                 GLYPH_RADIUS * 3.2, GLYPH_RADIUS * 1.6, 4.0, 4.0
@@ -362,7 +465,21 @@ class CompositorNode(
                 2 * GLYPH_RADIUS * stageCount, 2 * GLYPH_RADIUS,
                 2 * GLYPH_RADIUS, 2 * GLYPH_RADIUS
             )
-        }.also { addChild(it) }
+        }
+
+        /**
+         * One card per parallel per-head pass behind the glyph — the scores deck runs 16 deep,
+         * the key-side norm+rope 8. Flat ops (projections, cache writes, gates) wear none, so
+         * the fan's absence marks exactly which ops never see heads.
+         */
+        private val parallelCards: List<PPath> = (opParallelism(op) - 1 downTo 1).map { i ->
+            stripShape().apply {
+                pickable = false
+                setOffset(-OP_DECK_STEP * i, -OP_DECK_STEP * i)
+            }.also { addChild(it) }
+        }
+
+        val shape: PPath = stripShape().also { addChild(it) }
         private val dividers: List<PPath> = (1 until stageCount).map { i ->
             val x = (2 * i - stageCount) * GLYPH_RADIUS
             PPath.createLine(x, -GLYPH_RADIUS, x, GLYPH_RADIUS).also { addChild(it) }
@@ -398,6 +515,11 @@ class CompositorNode(
             shape.paint = palette.canvasBackground
             shape.strokePaint = if (glowing) palette.sourceHandle else palette.connectionLine
             shape.stroke = BasicStroke(if (glowing) 2.5f else 1f)
+            parallelCards.forEach {
+                it.paint = palette.canvasBackground
+                it.strokePaint = palette.connectionLine
+                it.stroke = BasicStroke(1f)
+            }
             dividers.forEach {
                 it.strokePaint = palette.connectionLine
                 it.stroke = BasicStroke(1f)
@@ -592,13 +714,14 @@ class CompositorNode(
             }
             val thickness = if (traced || emphasized) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
-            if (edge.stranded) {
-                // Head-stacked flow renders as a strand fan echoing the deck's back cards.
-                for (i in 2 downTo 1) {
-                    val strandOffset = AffineTransform.getTranslateInstance(-DECK_STEP * i, -DECK_STEP * i)
+            if (edge.strands > 1) {
+                // Head-parallel flow renders one ghost strand per real stream, so pipe width is
+                // multiplicity: the 16-strand q pipe runs visibly twice the 8-strand cache pipe.
+                for (i in (edge.strands - 1) downTo 1) {
+                    val strandOffset = AffineTransform.getTranslateInstance(-STRAND_STEP * i, -STRAND_STEP * i)
                     PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
                         paint = ribbonColor
-                        transparency = if (edge.dimmed) 0.06f else 0.2f
+                        transparency = if (edge.dimmed) 0.03f else 0.1f
                         pickable = false
                         edgeLayer.addChild(this)
                     }
@@ -684,6 +807,23 @@ class CompositorNode(
         refreshStackState()
     }
 
+    /** Flips a deck tile's head, coupling GQA partners and refreshing labels — wheel and pager. */
+    private fun stepHead(tile: TensorTile, delta: Int) {
+        when (tile) {
+            is DeckTile -> {
+                tile.selectedSlice = (tile.selectedSlice + delta).mod(tile.slices)
+                scene.onHeadSelected?.invoke(tile, tile.selectedSlice)
+            }
+            is AttentionTile -> {
+                tile.selectedHead = (tile.selectedHead + delta).mod(tile.numHeads)
+                scene.onHeadSelected?.invoke(tile, tile.selectedHead)
+            }
+            else -> return
+        }
+        tileNodes.forEach { it.syncLabel() }
+        refreshDirtyTiles()
+    }
+
     /**
      * Micro-stepping render state: glows [currentOp]'s glyph and dims every tile in [stale]
      * (the not-yet-recomputed half of the pass). Dimming is pure transparency over the cached
@@ -708,6 +848,12 @@ class CompositorNode(
 
         override fun mousePressed(event: PInputEvent) {
             if (!event.isLeftMouseButton) return
+            // Pager clicks belong to their arrow buttons; don't start a marquee under them.
+            var picked: PNode? = event.pickedNode
+            while (picked != null) {
+                if (picked in pagerNodes) return
+                picked = picked.parent
+            }
             val point = event.getPositionRelativeTo(this@CompositorNode)
             val tile = scene.tileAt(point.x, point.y)
             if (event.clickCount == 2) {
@@ -810,19 +956,8 @@ class CompositorNode(
                 event.isHandled = true
                 return
             }
-            when (tile) {
-                is DeckTile -> {
-                    tile.selectedSlice = (tile.selectedSlice + event.wheelRotation).mod(tile.slices)
-                    scene.onHeadSelected?.invoke(tile, tile.selectedSlice)
-                }
-                is AttentionTile -> {
-                    tile.selectedHead = (tile.selectedHead + event.wheelRotation).mod(tile.numHeads)
-                    scene.onHeadSelected?.invoke(tile, tile.selectedHead)
-                }
-                else -> return
-            }
-            tileNodes.forEach { it.syncLabel() }
-            refreshDirtyTiles()
+            if (tile !is DeckTile && tile !is AttentionTile) return
+            stepHead(tile, event.wheelRotation)
             event.isHandled = true
         }
 
@@ -862,6 +997,10 @@ class CompositorNode(
         private const val MARGIN = 40.0
         private const val LENS_SPACE = 220.0
         private const val DECK_STEP = 2.0
+        private const val STRAND_STEP = 1.5
+        private const val OP_DECK_STEP = 1.2
+        private const val GHOST_CARD_TRANSPARENCY = 0.35f
+        private const val PAGER_ARROW = 7.0
         private const val TICK_LENGTH = 4.0
         private const val GLYPH_RADIUS = 9.0
         private const val GLYPH_ICON = 12.0

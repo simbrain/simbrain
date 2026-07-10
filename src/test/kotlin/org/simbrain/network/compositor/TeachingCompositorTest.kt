@@ -53,17 +53,17 @@ class TeachingCompositorTest {
     }
 
     @Test
-    fun `head-stacked segments are stranded and merge collapses the fan`() {
+    fun `head-stacked segments carry per-head strands and merge collapses the fan`() {
         val scene = TeachingCompositor.buildScene(model())
         val edges = scene.edges.associateBy { it.from.key() to it.to.key() }
-        assertTrue(edges.getValue("layers.0.attn.q" to "layers.0.attn.score").stranded,
-            "after the split the flow is per-head")
-        assertTrue(edges.getValue("layers.0.attn.score" to "layers.0.attn.weights").stranded)
-        assertTrue(edges.getValue("layers.0.attn.weights" to "layers.0.attn.mix").stranded)
-        assertTrue(edges.getValue("layers.0.attn.v" to "layers.0.attn.mix").stranded)
-        assertTrue(!edges.getValue("layers.0.attn.mix" to "layers.0.attn.out").stranded,
+        assertEquals(2, edges.getValue("layers.0.attn.q" to "layers.0.attn.score").strands,
+            "after the split the flow is one strand per head")
+        assertEquals(2, edges.getValue("layers.0.attn.score" to "layers.0.attn.weights").strands)
+        assertEquals(2, edges.getValue("layers.0.attn.weights" to "layers.0.attn.mix").strands)
+        assertEquals(2, edges.getValue("layers.0.attn.v" to "layers.0.attn.mix").strands)
+        assertEquals(1, edges.getValue("layers.0.attn.mix" to "layers.0.attn.out").strands,
             "the merge bead collapses the strands")
-        assertTrue(!edges.getValue("resid0" to "layers.0.attn.q").stranded)
+        assertEquals(1, edges.getValue("resid0" to "layers.0.attn.q").strands)
     }
 
     @Test

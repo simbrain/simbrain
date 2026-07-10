@@ -1,7 +1,5 @@
 package org.simbrain.network.compositor
 
-import org.simbrain.network.tensor.op.HeadMixOp
-import org.simbrain.network.tensor.op.HeadScoresOp
 import org.simbrain.network.tensor.op.MergeHeadsOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
@@ -29,8 +27,11 @@ class FlowEdge(
     val from: FlowEndpoint,
     val to: FlowEndpoint,
     val ops: List<TensorOp> = emptyList(),
-    /** True when the value crossing this edge is head-stacked — rendered as a strand fan. */
-    val stranded: Boolean = false,
+    /**
+     * How many independent parallel streams cross this edge — rendered as a strand fan of that
+     * true width, so the 16-strand q pipe meets the 8-strand cache pipe at the scores deck.
+     */
+    val strands: Int = 1,
     /** The junction input port this edge arrives at, keying the target glyph's pin; see [DisplaySegment.toPort]. */
     val toPort: String? = null,
 ) {
@@ -129,6 +130,13 @@ class CompositorScene(val graph: PlanGraph? = null) {
     /** The model layer a stacked scene currently shows; -1 for scenes without layer stacks. */
     var selectedLayer = -1
 
+    /**
+     * Total model layers behind a stacked scene, or 0 when the scene has no layer dimension.
+     * Renderers use it to draw every layer deck on the same slot axis: one slot per model
+     * layer, with gaps where a tile's stack skips layers.
+     */
+    var layerCount = 0
+
     /** Maps a tile to the model layer it selects when clicked or wheeled — the depth strip rows. */
     var layerOfTile: ((TensorTile) -> Int?)? = null
 
@@ -182,7 +190,7 @@ class CompositorScene(val graph: PlanGraph? = null) {
             }
             val derived = g.displayEdges(anchorIds, junctions).map {
                 val from = endpoint(it.from)
-                FlowEdge(from, endpoint(it.to), it.ops, stranded = strandedState(from, it.ops), toPort = it.toPort)
+                FlowEdge(from, endpoint(it.to), it.ops, strands = strandCount(from, it.ops), toPort = it.toPort)
             }
             // A satellite needs its consuming op riding some edge as a bead; if the op was
             // promoted to a junction (or fell off the paths), the parameter goes standalone.
@@ -207,21 +215,27 @@ class CompositorScene(val graph: PlanGraph? = null) {
         }
     }
 
-    /** Whether the value arriving at the end of an edge with these beads is head-stacked. */
-    private fun strandedState(from: FlowEndpoint, beads: List<TensorOp>): Boolean {
-        var stacked = when (from) {
-            is DeckTile -> true
-            is OpVertex -> from.op is SplitHeadsOp || from.op is HeadScoresOp || from.op is HeadMixOp
-            else -> false
-        }
-        for (op in beads) {
-            when (op) {
-                is SplitHeadsOp -> stacked = true
-                is MergeHeadsOp -> stacked = false
-                else -> {}
+    /**
+     * The number of parallel streams arriving at the end of an edge: the source value's strand
+     * count, split up by a head-split bead and collapsed back to one by a merge bead. Strands
+     * are born where head-aware processing begins and die where the heads mix.
+     */
+    private fun strandCount(from: FlowEndpoint, beads: List<TensorOp>): Int {
+        var count = when (from) {
+            is TensorTile -> from.strands
+            is OpVertex -> when (val op = from.op) {
+                is SplitHeadsOp -> op.numHeads
+                else -> opParallelism(op)
             }
         }
-        return stacked
+        for (op in beads) {
+            count = when (op) {
+                is SplitHeadsOp -> op.numHeads
+                is MergeHeadsOp -> 1
+                else -> count
+            }
+        }
+        return count
     }
 
     /** Copies this token's values into every tile and refreshes the lens. Compute-thread side. */

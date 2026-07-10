@@ -67,6 +67,21 @@ fun stageForInput(op: TensorOp, portName: String, alias: (String) -> String): In
     return stages.indices.filter { s -> indices.any { it in stages[s].inputIndices } }.singleOrNull()
 }
 
+/**
+ * How many independent per-head passes [op] runs in one forward — 16 for the query-side
+ * attention ops, 8 for the key-side norm+rope under GQA, 1 for flat ops (projections, cache
+ * writes, elementwise gates). Glyphs with parallelism > 1 wear a card fan; the fan's absence
+ * marks the ops that never see heads.
+ */
+fun opParallelism(op: TensorOp): Int = when (op) {
+    is AttendScoresOp -> op.numHeads
+    is AttendMixOp -> op.numHeads
+    is HeadwiseNormRopeOp -> op.numHeads
+    is HeadScoresOp -> op.numHeads
+    is HeadMixOp -> op.numHeads
+    else -> 1
+}
+
 /** The op's glyph icon in the app icon style, or null for the text-pill fallback. */
 fun opIcon(op: TensorOp): String? = when (op) {
     is AddOp, is BiasOp -> "icons/op-add.svg"

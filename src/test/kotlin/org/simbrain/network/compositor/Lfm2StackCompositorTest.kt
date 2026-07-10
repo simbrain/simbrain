@@ -124,6 +124,54 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `strands trace head parallelism from norm-rope to the output projection`() {
+        val config = tinyConfig()
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val edges = scene.edges.associateBy { it.from.key(scene) to it.to.key(scene) }
+
+        assertEquals(1, edges.getValue("block.in" to "block.attn.q_norm_rope").strands,
+            "flat until the first head-aware op")
+        assertEquals(4, edges.getValue("block.attn.q_norm_rope" to "block.attn.q").strands)
+        assertEquals(4, edges.getValue("block.attn.q" to "block.attn.scores").strands)
+        assertEquals(2, edges.getValue("block.attn.k_norm_rope" to "block.attn.k").strands,
+            "the key side runs at the GQA head count")
+        assertEquals(2, edges.getValue("block.attn.k" to "block.attn.k_cache").strands,
+            "the cache write preserves head structure")
+        assertEquals(2, edges.getValue("block.attn.k_cache" to "block.attn.scores").strands)
+        assertEquals(4, edges.getValue("block.attn.scores" to "block.attn.weights").strands)
+        assertEquals(4, edges.getValue("block.attn.context" to "block.attn.out").strands,
+            "strands run under the output projection satellite")
+        assertEquals(1, edges.getValue("block.attn.out" to "block.mixer_residual").strands,
+            "heads exist nowhere past the output projection")
+        assertEquals(1, edges.getValue("block.conv.bcx" to "block.conv.b_gate").strands)
+
+        val scores = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.scores" }
+        val kRope = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.k_norm_rope" }
+        assertEquals(4, opParallelism(scores.op))
+        assertEquals(2, opParallelism(kRope.op))
+    }
+
+    @Test
+    fun `layer paging steps within a tile's own stack`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(tinyConfig().copy(
+            numLayers = 6, attentionLayers = setOf(2, 4),
+        )), displaySeq = 8)
+
+        val attnTile = scene.tile("block.attn.q") as LayerStacked
+        assertEquals(4, attnTile.layerAfter(2))
+        assertEquals(2, attnTile.layerAfter(4), "wraps past the last attention layer")
+        assertEquals(2, attnTile.layerBefore(4))
+        assertEquals(4, attnTile.layerBefore(2), "wraps back to the last attention layer")
+        assertEquals(4, attnTile.layerAfter(3), "steps from a layer outside the stack")
+
+        val convTile = scene.tile("block.conv.bx") as LayerStacked
+        assertEquals(3, convTile.layerAfter(2))
+        assertEquals(1, convTile.layerBefore(2))
+
+        assertEquals(6, scene.layerCount)
+    }
+
+    @Test
     fun `every anatomy tile stacks its layer subset`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)

@@ -69,6 +69,7 @@ object Lfm2StackCompositor {
             it.name.startsWith("layers.$convRep.") || it in attnArm || it.name == "layers.$attnRep.mixer_residual"
         })
         val scene = CompositorScene(PlanGraph(displayPlan, alias))
+        scene.layerCount = config.numLayers
 
         // One shared scale per axis, so relative tile sizes are facts about the model: the
         // feature axis is anchored at hidden size (k/v strips come out exactly half of q, the
@@ -182,12 +183,14 @@ object Lfm2StackCompositor {
 
         // Substructure marks: head boundaries on the head-packed vectors, and the B|C|x chunk
         // boundaries on the fused conv projection (labels) with matching row blocks on in_proj.
+        // Strand counts trace head parallelism through the limb: born at norm+rope, 16 on the
+        // query side against 8 on the key/value side, dying at the output projection.
         val headTicks = (1 until config.numHeads).map { it * config.headDim }
         val kvHeadTicks = (1 until config.numKvHeads).map { it * config.headDim }
-        scene.tile("block.attn.q").columnTicks = headTicks
-        scene.tile("block.attn.context").columnTicks = headTicks
-        scene.tile("block.attn.k").columnTicks = kvHeadTicks
-        scene.tile("block.attn.v").columnTicks = kvHeadTicks
+        scene.tile("block.attn.q").apply { columnTicks = headTicks; strands = config.numHeads }
+        scene.tile("block.attn.context").apply { columnTicks = headTicks; strands = config.numHeads }
+        scene.tile("block.attn.k").apply { columnTicks = kvHeadTicks; strands = config.numKvHeads }
+        scene.tile("block.attn.v").apply { columnTicks = kvHeadTicks; strands = config.numKvHeads }
         scene.tile("block.conv.bcx").apply {
             columnTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
             blockLabels = listOf("B", "C", "x")
@@ -203,7 +206,7 @@ object Lfm2StackCompositor {
         val vCacheTile = scene.tile("block.attn.v_cache") as DeckTile
         val qPerKv = config.numHeads / config.numKvHeads
         fun servingLabel(name: String): (Int) -> String = { group ->
-            "$name · kv head $group (serves q ${group * qPerKv}–${(group + 1) * qPerKv - 1})"
+            "$name · kv head $group/${config.numKvHeads} (serves q ${group * qPerKv}–${(group + 1) * qPerKv - 1})"
         }
         kCacheTile.sliceLabel = servingLabel("k cache")
         vCacheTile.sliceLabel = servingLabel("v cache")

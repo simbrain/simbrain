@@ -28,6 +28,18 @@ interface LayerStacked {
 }
 
 /**
+ * The next model layer this stack has an entry for, strictly after [layer], wrapping to the
+ * first — a conv tile pages 3 -> 5 past an attention layer instead of landing on a layer it
+ * doesn't exist on.
+ */
+fun LayerStacked.layerAfter(layer: Int): Int? =
+    stackLayers.firstOrNull { it > layer } ?: stackLayers.firstOrNull()
+
+/** The previous stack layer strictly before [layer], wrapping to the last. */
+fun LayerStacked.layerBefore(layer: Int): Int? =
+    stackLayers.lastOrNull { it < layer } ?: stackLayers.lastOrNull()
+
+/**
  * One heatmap in the compositor's retained scene: a layout rect in scene coordinates and a value
  * buffer holding published data. No full-resolution image exists — pixels are produced on demand
  * by [shadePatch], which shades just the visible cell window at screen resolution, so shading
@@ -74,6 +86,13 @@ abstract class TensorTile(
 
     /** Labels for the column blocks the [columnTicks] delimit (size = ticks + 1), or empty. */
     var blockLabels: List<String> = emptyList()
+
+    /**
+     * How many independent parallel streams the tile's value is split into — the strand count
+     * edges leaving this tile render with. 1 for a flat vector; the per-head count from the
+     * first head-aware op (norm+rope) until the heads merge back at the output projection.
+     */
+    var strands = 1
 
     /**
      * The row holding the current token's just-published value, or -1 when rows aren't a token
@@ -498,6 +517,10 @@ class DeckTile(
     signedNorm, kind,
 ), LayerStacked {
 
+    init {
+        strands = slices
+    }
+
     constructor(
         id: String,
         title: String,
@@ -619,6 +642,10 @@ class AttentionTile(
     id: String = ports.first().name,
     override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(id, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION), LayerStacked {
+
+    init {
+        strands = numHeads
+    }
 
     constructor(port: TensorPort, numHeads: Int, seqLen: Int, title: String = port.name) :
         this(listOf(port), numHeads, seqLen, title)

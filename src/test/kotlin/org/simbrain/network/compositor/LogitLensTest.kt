@@ -39,6 +39,33 @@ class LogitLensTest {
     }
 
     @Test
+    fun `async lens computes the same readings off the calling thread`() {
+        val embed = FloatTensor.of(4, 3, floatArrayOf(
+            1f, 0f, 0f,
+            0f, 1f, 0f,
+            0f, 0f, 1f,
+            0.5f, 0.5f, 0.5f,
+        ))
+        val normWeight = FloatTensor.of(1, 3, floatArrayOf(1f, 2f, 1f))
+        val resid = TensorPort("resid", FloatTensor.of(1, 3, floatArrayOf(0.2f, 0.8f, -0.4f)))
+
+        val sync = LogitLens(embed, normWeight, 1e-5f, listOf(resid))
+        sync.refresh()
+
+        val lens = LogitLens(embed, normWeight, 1e-5f, listOf(resid))
+        lens.async = true
+        val landed = java.util.concurrent.CountDownLatch(1)
+        lens.onReadingsUpdated = { landed.countDown() }
+        lens.refresh()
+        // The source may be overwritten right after refresh returns; the snapshot must protect the pass.
+        resid.tensor.copyFrom(floatArrayOf(9f, 9f, 9f))
+        assertEquals(true, landed.await(5, java.util.concurrent.TimeUnit.SECONDS), "worker never landed")
+
+        assertEquals(sync.readings[0].tokenId, lens.readings[0].tokenId)
+        assertEquals(sync.readings[0].prob, lens.readings[0].prob, 1e-6f)
+    }
+
+    @Test
     fun `lens skips sources whose tensor has not changed`() {
         val embed = FloatTensor.of(2, 2, floatArrayOf(1f, 0f, 0f, 1f))
         val normWeight = FloatTensor.of(1, 2, floatArrayOf(1f, 1f))

@@ -170,7 +170,11 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         }
         (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
             ?.selectedHead = selectedHead
-        scene.lens?.enabled = lensEnabled
+        scene.lens?.apply {
+            enabled = lensEnabled
+            async = true
+            onReadingsUpdated = { events.updateGraphics.fire() }
+        }
         val select = scene.layerSelector
         scene.layerSelector = { layer ->
             select?.invoke(layer)

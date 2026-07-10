@@ -17,7 +17,11 @@ import org.bytedeco.openblas.global.openblas_nolapack.cblas_sscal
  * casual use; decode loops run on preallocated workspaces.
  */
 
-/** out = alpha * (a x b) + beta * out. With [transposeA]/[transposeB], that side is used as its transpose. */
+/**
+ * out = alpha * (a x b) + beta * out. With [transposeA]/[transposeB], that side is used as its
+ * transpose. [rowCount] restricts to the first rows of a (batch buffers filled partially); an
+ * oversized out is allowed then, with results landing in its first [rowCount] rows.
+ */
 fun matmul(
     a: FloatTensor,
     b: FloatTensor,
@@ -25,14 +29,17 @@ fun matmul(
     alpha: Float = 1f,
     beta: Float = 0f,
     transposeB: Boolean = false,
-    transposeA: Boolean = false
+    transposeA: Boolean = false,
+    rowCount: Int = a.rows
 ) {
-    val aRows = if (transposeA) a.cols else a.rows
+    require(!transposeA || rowCount == a.rows) { "matmul rowCount requires untransposed a" }
+    require(rowCount in 1..a.rows) { "matmul rowCount $rowCount out of 1..${a.rows}" }
+    val aRows = if (transposeA) a.cols else rowCount
     val aCols = if (transposeA) a.rows else a.cols
     val bRows = if (transposeB) b.cols else b.rows
     val bCols = if (transposeB) b.rows else b.cols
     require(aCols == bRows) { "matmul inner dims: ${aRows}x$aCols x ${bRows}x$bCols" }
-    require(out.rows == aRows && out.cols == bCols) {
+    require(out.rows >= aRows && out.cols == bCols) {
         "matmul out ${out.rows}x${out.cols} != ${aRows}x$bCols"
     }
     cblas_sgemm(

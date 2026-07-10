@@ -261,12 +261,14 @@ class ControlPanelKt(title: String = "Control Panel"):
         initValue: Double,
         increment: Double = 0.1,
         tab: String? = null,
+        toolTip: String? = null,
         onChange: suspend (Double) -> Unit = {}
     ) = JSlider(
         (minValue / increment).toInt(),
         (maxValue / increment).toInt(),
         (initValue / increment).toInt()
     ).also { slider ->
+        slider.toolTipText = toolTip
         slider.paintTicks = true
         slider.paintLabels = true
 
@@ -290,7 +292,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
 
         launch(Dispatchers.Swing) {
-            getTab(tab).addItem(label, slider)
+            getTab(tab).addItem(label, slider).toolTipText = toolTip
             pack()
         }
     }

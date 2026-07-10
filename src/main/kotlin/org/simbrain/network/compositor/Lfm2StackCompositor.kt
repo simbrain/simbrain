@@ -84,6 +84,11 @@ object Lfm2StackCompositor {
         val pxPerDim = ACTIVATION_WIDTH / config.hiddenSize
         val weightPxPerDim = pxPerDim / 4
         fun featureWidth(dims: Int) = dims * pxPerDim
+        // The token axis uses the SAME px-per-cell scale as the feature axis, so cells are
+        // square and every tile's aspect ratio is literal (q at window 512 really is twice as
+        // wide as tall). Tiny windows floor the axis and wear the magnified marker.
+        val tokenExtent = maxOf(window * pxPerDim, TOKEN_AXIS_MIN)
+        val tokenAxisFloored = window * pxPerDim < TOKEN_AXIS_MIN
 
         fun stackedHistory(
             id: String, layers: List<Int>, title: String, w: Double,
@@ -92,7 +97,7 @@ object Lfm2StackCompositor {
             scene.addTile(VectorHistoryTile(
                 ports = layers.map { plan.port(portOf(it)) },
                 rows = window, title = title, kind = kind, id = id, stackLayers = layers,
-            ).apply { width = w; height = TOKEN_AXIS_HEIGHT })
+            ).apply { width = w; height = tokenExtent; magnified = tokenAxisFloored })
         }
 
         fun stackedWeight(id: String, layers: List<Int>, title: String) {
@@ -136,8 +141,8 @@ object Lfm2StackCompositor {
         for (angle in listOf("cos", "sin")) {
             scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), window, "rope $angle", TileKind.ACTIVATION).apply {
                 width = maxOf(featureWidth(config.headDim / 2), SLIVER_MIN_WIDTH)
-                height = TOKEN_AXIS_HEIGHT
-                magnified = featureWidth(config.headDim / 2) < SLIVER_MIN_WIDTH
+                height = tokenExtent
+                magnified = tokenAxisFloored || featureWidth(config.headDim / 2) < SLIVER_MIN_WIDTH
             })
         }
         // q is the one trajectory no cache holds, so it is retained for EVERY attention layer:
@@ -146,7 +151,11 @@ object Lfm2StackCompositor {
             ports = attnLayers.map { plan.port("layers.$it.attn.q") },
             rows = window, title = "q (${config.numHeads} heads)", kind = TileKind.ACTIVATION,
             id = "block.attn.q", stackLayers = attnLayers, retainAllLayers = true,
-        ).apply { width = featureWidth(config.numHeads * config.headDim); height = TOKEN_AXIS_HEIGHT })
+        ).apply {
+            width = featureWidth(config.numHeads * config.headDim)
+            height = tokenExtent
+            magnified = tokenAxisFloored
+        })
         // k and v are one row in flight: their history IS the cache, so drawing it here too
         // would duplicate the cache tiles. q keeps its history — it has no cache anywhere.
         fun tokenVector(id: String, title: String) {
@@ -164,8 +173,8 @@ object Lfm2StackCompositor {
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
         ).apply {
             width = maxOf(featureWidth(config.headDim), SLIVER_MIN_WIDTH)
-            height = TOKEN_AXIS_HEIGHT
-            magnified = featureWidth(config.headDim) < SLIVER_MIN_WIDTH
+            height = tokenExtent
+            magnified = tokenAxisFloored || featureWidth(config.headDim) < SLIVER_MIN_WIDTH
         })
         scene.addTile(DeckTile(
             id = "block.attn.v_cache", title = "v cache",
@@ -173,14 +182,14 @@ object Lfm2StackCompositor {
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
         ).apply {
             width = maxOf(featureWidth(config.headDim), SLIVER_MIN_WIDTH)
-            height = TOKEN_AXIS_HEIGHT
-            magnified = featureWidth(config.headDim) < SLIVER_MIN_WIDTH
+            height = tokenExtent
+            magnified = tokenAxisFloored || featureWidth(config.headDim) < SLIVER_MIN_WIDTH
         })
         scene.addTile(AttentionTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.weights") },
             numHeads = config.numHeads, seqLen = window,
             title = "attention", id = "block.attn.weights", stackLayers = attnLayers,
-        ).apply { width = TOKEN_AXIS_HEIGHT; height = TOKEN_AXIS_HEIGHT })
+        ).apply { width = tokenExtent; height = tokenExtent; magnified = tokenAxisFloored })
         stackedHistory("block.attn.context", attnLayers, "context", featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.context" }
         stackedHistory("block.attn.out", attnLayers, "attn out", featureWidth(config.hiddenSize)) { "layers.$it.attn.out" }
 
@@ -346,8 +355,8 @@ object Lfm2StackCompositor {
     /** The feature-axis anchor: hidden-size vectors render this wide; everything else scales. */
     private const val ACTIVATION_WIDTH = 110.0
 
-    /** The token-axis span: the display window renders this tall everywhere it appears. */
-    private const val TOKEN_AXIS_HEIGHT = 120.0
+    /** Legibility floor for the token axis on tiny context windows; floored tiles are marked. */
+    private const val TOKEN_AXIS_MIN = 24.0
 
     /** Floor for a single-token row strip (true height would be one token — a few px). */
     private const val TOKEN_ROW_HEIGHT = 12.0

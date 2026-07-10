@@ -638,6 +638,14 @@ class CompositorNode(
         return stagePin(vertex, stage)
     }
 
+    /** True when strands at this endpoint should register on its head-card ladder. */
+    private fun fansIntoCards(e: FlowEndpoint): Boolean = when (e) {
+        is DeckTile -> e.slices > 1
+        is AttentionTile -> e.numHeads > 1
+        is TensorTile -> false
+        is OpVertex -> opParallelism(e.op) > 1
+    }
+
     /** Where [edge] leaves its source: a fused op's result exits from its last stage. */
     private fun tailAttach(edge: FlowEdge): AttachRect {
         val vertex = edge.from as? OpVertex ?: return AttachRect(edge.from.endpointBounds)
@@ -773,11 +781,28 @@ class CompositorNode(
             val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
             if (edge.strands > 1) {
-                // Head-parallel flow renders one ghost strand per real stream, so pipe width is
-                // multiplicity: the 16-strand q pipe runs visibly twice the 8-strand cache pipe.
+                // One ghost strand per real stream, each interpolating between what its two
+                // endpoints offer: a head deck's card ladder (strand i registers on card i) or
+                // a flat tensor's attach side (strands converge onto the ribbon) — a pipe reads
+                // as one vector fanning out into per-head cards, never as a band floating over
+                // a flat tile.
+                val tailFans = fansIntoCards(edge.from)
+                val headFans = fansIntoCards(edge.to)
+                val tailDir = (tailSide.p2 - tailSide.p1).norm
+                val headDir = (headSide.p2 - headSide.p1).norm
                 for (i in (edge.strands - 1) downTo 1) {
-                    val strandOffset = AffineTransform.getTranslateInstance(-HEAD_STEP * i, -HEAD_STEP * i)
-                    PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
+                    val spread = (i - (edge.strands - 1) / 2.0) * FLAT_STRAND_SPREAD
+                    val tailOff = if (tailFans) Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i) else tailDir * spread
+                    val headOff = if (headFans) Point2D.Double(-HEAD_STEP * i, -HEAD_STEP * i) else headDir * spread
+                    val strandPath = Path2D.Double()
+                    for (sample in 0..STRAND_SAMPLES) {
+                        val t = sample.toDouble() / STRAND_SAMPLES
+                        val at = route.pointAt(t)
+                        val x = at.x + tailOff.x * (1 - t) + headOff.x * t
+                        val y = at.y + tailOff.y * (1 - t) + headOff.y * t
+                        if (sample == 0) strandPath.moveTo(x, y) else strandPath.lineTo(x, y)
+                    }
+                    PPath.Double(stroke.createStrokedShape(strandPath), null).apply {
                         paint = ribbonColor
                         transparency = if (edge.dimmed) 0.03f else 0.1f
                         pickable = false
@@ -1065,6 +1090,10 @@ class CompositorNode(
         /** One diagonal step for everything head-indexed — deck cards, op-deck cards, edge
          *  strands — so strand i lines up with card i at both ends of a head-parallel pipe. */
         private const val HEAD_STEP = 1.5
+
+        /** Per-strand spacing across the attach side where a pipe meets a flat tensor. */
+        private const val FLAT_STRAND_SPREAD = 1.2
+        private const val STRAND_SAMPLES = 24
         private const val STATE_ICON = 10.0
         private const val PAGER_ROW_HEIGHT = 13.0
         private const val GHOST_CARD_TRANSPARENCY = 0.35f

@@ -311,6 +311,8 @@ class Lfm2StackCompositorTest {
         assertEquals(q.height, gate.height, 1e-6, "one token axis everywhere")
         assertEquals(q.height, scene.tile("block.attn.weights").width, 1e-6,
             "the attention triangle's columns are the same token axis as its rows")
+        assertEquals(q.width / q.cols, q.height / q.rows, 1e-6,
+            "token and feature axes share one px-per-cell scale — tile aspect is literal")
 
         val wq = scene.tile("block.w.self_attn.q_proj.weight")
         val wk = scene.tile("block.w.self_attn.k_proj.weight")

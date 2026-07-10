@@ -47,7 +47,7 @@ private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
         ?: error("LFM2.5-230M weights not found in the HF cache")
 
     Blas.numThreads = 4
-    val config = Lfm2Config(maxSeqLen = 256)
+    val config = Lfm2Config(maxSeqLen = 512)
     val model = Lfm2Model(config, Safetensors.load(weightsDir.resolve("model.safetensors")))
     val tokenizer = LlmTokenizer(weightsDir.resolve("tokenizer.json"))
 

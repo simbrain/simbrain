@@ -61,7 +61,7 @@ class Lfm2StackCompositorTest {
 
     @Test
     fun `both mixer limbs converge on one merged residual junction`() {
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
 
         val junctions = scene.opVertices.map { scene.graph!!.alias(it.op.name) }
         assertEquals(junctions.toSet().size, junctions.size, "no duplicate canonical junctions")
@@ -80,7 +80,7 @@ class Lfm2StackCompositorTest {
 
     @Test
     fun `edges arrive at the pin of the glyph stage that consumes them`() {
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
         val alias = { name: String -> scene.graph!!.alias(name) }
 
         // q and k enter the scores glyph at the multiply stage; the softmax stage takes no pins.
@@ -112,7 +112,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `packed axes carry their substructure boundaries`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
 
         assertEquals(listOf(4, 8, 12), scene.tile("block.attn.q").columnTicks)
         assertEquals(listOf(4, 8, 12), scene.tile("block.attn.context").columnTicks)
@@ -126,7 +126,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `strands trace head parallelism from norm-rope to the output projection`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
         val edges = scene.edges.associateBy { it.from.key(scene) to it.to.key(scene) }
 
         assertEquals(1, edges.getValue("block.in" to "block.attn.q_norm_rope").strands,
@@ -155,7 +155,7 @@ class Lfm2StackCompositorTest {
     fun `layer paging steps within a tile's own stack`() {
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(tinyConfig().copy(
             numLayers = 6, attentionLayers = setOf(2, 4),
-        )), displaySeq = 8)
+        )))
 
         val attnTile = scene.tile("block.attn.q") as LayerStacked
         assertEquals(4, attnTile.layerAfter(2))
@@ -174,7 +174,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `every anatomy tile stacks its layer subset`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
 
         assertEquals((0 until config.numLayers).toList(), (scene.tile("block.resid") as LayerStacked).stackLayers)
         assertEquals(listOf(0, 1, 3), (scene.tile("block.conv.bx") as LayerStacked).stackLayers)
@@ -186,7 +186,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `flipping the layer flips stacked tiles together and dims the unused limb`() {
         val model = syntheticModel()
-        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(model)
         repeat(4) { model.forwardToken(it + 1); scene.publish(it) }
 
         scene.layerSelector!!.invoke(2)
@@ -218,7 +218,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `the spine backfills an unwatched layer's history from the depth strip on a flip`() {
         val model = syntheticModel()
-        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(model)
         repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
 
         val blockOut = scene.tile("block.resid") as VectorHistoryTile
@@ -234,8 +234,8 @@ class Lfm2StackCompositorTest {
     fun `a flip to an unwatched attention layer re-derives exactly what live recording stored`() {
         val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
         val model = syntheticModel(config)
-        val recorded = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
-        val derived = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val recorded = Lfm2StackCompositor.buildScene(model)
+        val derived = Lfm2StackCompositor.buildScene(model)
         recorded.layerSelector!!.invoke(4)
         repeat(5) {
             model.forwardToken(it + 1)
@@ -255,7 +255,7 @@ class Lfm2StackCompositorTest {
     fun `recently watched layers restore from the stash and older ones are evicted`() {
         val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
         val model = syntheticModel(config)
-        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(model)
         repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
 
         val bx = scene.tile("block.conv.bx") as VectorHistoryTile
@@ -277,7 +277,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `the depth strip selects layers and highlights the block's span`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
 
         val strip = scene.tiles.filter { scene.layerOfTile!!.invoke(it) != null }
         assertEquals(config.numLayers + 1, strip.size, "embed plus one row per layer")
@@ -299,7 +299,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `tile geometry follows the shared feature, token, and weight scales`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
 
         val q = scene.tile("block.attn.q")
         val k = scene.tile("block.attn.k")
@@ -328,7 +328,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `the live row cursor tracks the current token and the cache write frontier`() {
         val model = syntheticModel()
-        val scene = Lfm2StackCompositor.buildScene(model, displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(model)
 
         val q = scene.tile("block.attn.q")
         val kCache = scene.tile("block.attn.k_cache")
@@ -350,7 +350,7 @@ class Lfm2StackCompositorTest {
     @Test
     fun `flipping the attention deck flips the kv cache decks to the serving group`() {
         val config = tinyConfig()
-        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))
 
         val attention = scene.tile("block.attn.weights") as AttentionTile
         val kCache = scene.tile("block.attn.k_cache") as DeckTile

@@ -29,7 +29,7 @@ class LanguageModelNodeSnapshot : UiSnapshotDef {
             preferredSize = Dimension(1300, 1500)
         }
 
-        val languageModel = LanguageModel(weightsDir.toString(), maxSeqLen = 256, displaySeq = 48)
+        val languageModel = LanguageModel(weightsDir.toString(), maxSeqLen = 256)
         languageModel.prompt = "The capital of France is"
         languageModel.tokensToGenerate = 24
         languageModel.loadWeights()

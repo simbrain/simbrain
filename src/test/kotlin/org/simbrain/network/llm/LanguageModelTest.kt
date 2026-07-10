@@ -29,7 +29,7 @@ class LanguageModelTest {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64, displaySeq = 32)
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.prompt = "The capital of France is"
         languageModel.tokensToGenerate = 3
         languageModel.stopAtEndOfText = false
@@ -60,7 +60,7 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val net = Network()
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64, displaySeq = 8)
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.loadWeights()
         runBlocking { net.addNetworkModel(languageModel) }
 
@@ -78,7 +78,7 @@ class LanguageModelTest {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64, displaySeq = 32)
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.prompt = "The capital of France is"
         languageModel.tokensToGenerate = 40
         languageModel.loadWeights()
@@ -98,7 +98,7 @@ class LanguageModelTest {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64, displaySeq = 8)
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.loadWeights()
 
         languageModel.step()
@@ -116,7 +116,7 @@ class LanguageModelTest {
     @Test
     fun `network round trip preserves configuration and view state without weights`() {
         val net = Network()
-        val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128, displaySeq = 24)
+        val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)
         languageModel.label = "LM"
         languageModel.prompt = "Hello"
         languageModel.tokensToGenerate = 7
@@ -133,7 +133,6 @@ class LanguageModelTest {
 
         assertEquals("/no/such/dir", restored.weightsDirectory)
         assertEquals(128, restored.maxSeqLen)
-        assertEquals(24, restored.displaySeq)
         assertEquals("Hello", restored.prompt)
         assertEquals(7, restored.tokensToGenerate)
         assertEquals(0.7, restored.temperature)
@@ -152,7 +151,7 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val net = Network()
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64, displaySeq = 8)
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         runBlocking { net.addNetworkModel(languageModel) }
         languageModel.selectedHead = 5
         languageModel.tileLayout = hashMapOf("embed" to doubleArrayOf(123.0, 456.0))

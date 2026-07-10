@@ -47,8 +47,7 @@ fun main() {
     val model = Lfm2Model(config, Safetensors.load(snapshot.resolve("model.safetensors")))
     val tokenizer = LlmTokenizer(snapshot.resolve("tokenizer.json"))
 
-    val displaySeq = 128
-    val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
+    val scene = Lfm2StackCompositor.buildScene(model)
     val attentionTile = scene.tile("block.attn.weights") as AttentionTile
 
     SwingUtilities.invokeLater {
@@ -62,7 +61,7 @@ fun main() {
         }
 
         val promptField = JTextField("The capital of France is", 24)
-        val stepsSpinner = JSpinner(SpinnerNumberModel(30, 1, displaySeq, 1))
+        val stepsSpinner = JSpinner(SpinnerNumberModel(30, 1, config.maxSeqLen, 1))
         val layerCombo = JComboBox((0 until config.numLayers).map {
             "layer $it (${if (it in config.attentionLayers) "attn" else "conv"})"
         }.toTypedArray())
@@ -108,7 +107,7 @@ fun main() {
                 SwingUtilities.invokeAndWait { node.refreshDirtyTiles() }
                 val promptIds = tokenizer.encode(prompt)
                 val generated = StringBuilder()
-                val total = minOf(promptIds.size + steps, displaySeq, config.maxSeqLen)
+                val total = minOf(promptIds.size + steps, config.maxSeqLen)
                 var nextToken = -1
                 val start = System.nanoTime()
                 for (i in 0 until total) {

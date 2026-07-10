@@ -39,9 +39,6 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     var maxSeqLen: Int = 512
         private set
 
-    var displaySeq: Int = 128
-        private set
-
     var prompt by GuiEditable(
         initValue = "The capital of France is",
         label = "Prompt",
@@ -141,10 +138,9 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     private val attentionTile
         get() = loaded?.scene?.tiles?.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile
 
-    constructor(weightsDirectory: String, maxSeqLen: Int = 512, displaySeq: Int = 128) : this() {
+    constructor(weightsDirectory: String, maxSeqLen: Int = 512) : this() {
         this.weightsDirectory = weightsDirectory
         this.maxSeqLen = maxSeqLen
-        this.displaySeq = displaySeq
     }
 
     /**
@@ -165,7 +161,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     }
 
     private fun buildScene(model: Lfm2Model): CompositorScene {
-        val scene = Lfm2StackCompositor.buildScene(model, displaySeq)
+        val scene = Lfm2StackCompositor.buildScene(model)
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
                 it.x = xy[0]
@@ -294,20 +290,13 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
 
         @UserParameter(
             label = "Max sequence length",
-            description = "KV cache capacity; generation stops when it fills",
+            description = "KV cache capacity and the display window; generation stops when it fills",
             order = 1,
         )
         var maxSeqLen = 512
 
-        @UserParameter(
-            label = "Displayed tokens",
-            description = "Token rows retained in the heatmaps; generation beyond this still runs",
-            order = 2,
-        )
-        var displaySeq = 128
-
         fun create(weightsDirectory: String): LanguageModel =
-            LanguageModel(weightsDirectory, maxSeqLen, displaySeq)
+            LanguageModel(weightsDirectory, maxSeqLen)
 
         override val name = "Language Model"
     }

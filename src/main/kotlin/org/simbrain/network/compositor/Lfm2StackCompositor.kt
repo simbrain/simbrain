@@ -28,9 +28,12 @@ import org.simbrain.network.tensor.op.TensorPort
  */
 object Lfm2StackCompositor {
 
-    fun buildScene(model: Lfm2Model, displaySeq: Int): CompositorScene {
+    fun buildScene(model: Lfm2Model): CompositorScene {
         val config = model.config
         val plan = model.plan
+        // One sequence axis: every token-axis tile spans the model's full context window, so
+        // nothing silently freezes past a display cutoff and the caches share the scale.
+        val window = config.maxSeqLen
         val allLayers = (0 until config.numLayers).toList()
         val convLayers = allLayers.filter { it !in config.attentionLayers }
         val attnLayers = config.attentionLayers.sorted()
@@ -88,7 +91,7 @@ object Lfm2StackCompositor {
         ) {
             scene.addTile(VectorHistoryTile(
                 ports = layers.map { plan.port(portOf(it)) },
-                rows = displaySeq, title = title, kind = kind, id = id, stackLayers = layers,
+                rows = window, title = title, kind = kind, id = id, stackLayers = layers,
             ).apply { width = w; height = TOKEN_AXIS_HEIGHT })
         }
 
@@ -131,17 +134,17 @@ object Lfm2StackCompositor {
         stackedWeight("block.w.self_attn.v_proj.weight", attnLayers, "Wv")
         stackedWeight("block.w.self_attn.out_proj.weight", attnLayers, "Wo")
         for (angle in listOf("cos", "sin")) {
-            scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), displaySeq, "rope $angle", TileKind.ACTIVATION).apply {
-                width = maxOf(featureWidth(config.headDim / 2), ROPE_MIN_WIDTH)
+            scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), window, "rope $angle", TileKind.ACTIVATION).apply {
+                width = maxOf(featureWidth(config.headDim / 2), SLIVER_MIN_WIDTH)
                 height = TOKEN_AXIS_HEIGHT
-                magnified = featureWidth(config.headDim / 2) < ROPE_MIN_WIDTH
+                magnified = featureWidth(config.headDim / 2) < SLIVER_MIN_WIDTH
             })
         }
         // q is the one trajectory no cache holds, so it is retained for EVERY attention layer:
         // it is the sufficient statistic from which a flip re-derives the whole attention limb.
         scene.addTile(VectorHistoryTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.q") },
-            rows = displaySeq, title = "q (${config.numHeads} heads)", kind = TileKind.ACTIVATION,
+            rows = window, title = "q (${config.numHeads} heads)", kind = TileKind.ACTIVATION,
             id = "block.attn.q", stackLayers = attnLayers, retainAllLayers = true,
         ).apply { width = featureWidth(config.numHeads * config.headDim); height = TOKEN_AXIS_HEIGHT })
         // k and v are one row in flight: their history IS the cache, so drawing it here too
@@ -159,15 +162,23 @@ object Lfm2StackCompositor {
             id = "block.attn.k_cache", title = "k cache",
             tensors = attnLayers.map { plan.port("layers.$it.attn.k_cache").tensor },
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
-        ).apply { width = DECK_SIZE; height = DECK_SIZE; magnified = true })
+        ).apply {
+            width = maxOf(featureWidth(config.headDim), SLIVER_MIN_WIDTH)
+            height = TOKEN_AXIS_HEIGHT
+            magnified = featureWidth(config.headDim) < SLIVER_MIN_WIDTH
+        })
         scene.addTile(DeckTile(
             id = "block.attn.v_cache", title = "v cache",
             tensors = attnLayers.map { plan.port("layers.$it.attn.v_cache").tensor },
             slices = config.numKvHeads, signedNorm = true, columnSlices = true, stackLayers = attnLayers,
-        ).apply { width = DECK_SIZE; height = DECK_SIZE; magnified = true })
+        ).apply {
+            width = maxOf(featureWidth(config.headDim), SLIVER_MIN_WIDTH)
+            height = TOKEN_AXIS_HEIGHT
+            magnified = featureWidth(config.headDim) < SLIVER_MIN_WIDTH
+        })
         scene.addTile(AttentionTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.weights") },
-            numHeads = config.numHeads, seqLen = displaySeq,
+            numHeads = config.numHeads, seqLen = window,
             title = "attention", id = "block.attn.weights", stackLayers = attnLayers,
         ).apply { width = TOKEN_AXIS_HEIGHT; height = TOKEN_AXIS_HEIGHT })
         stackedHistory("block.attn.context", attnLayers, "context", featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.context" }
@@ -230,7 +241,7 @@ object Lfm2StackCompositor {
         val stripTiles = residPorts.mapIndexed { i, port ->
             val label = if (i == 0) "embed" else
                 "layer ${i - 1} (${if (i - 1 in config.attentionLayers) "attn" else "conv"})"
-            VectorHistoryTile(port, displaySeq, label).apply {
+            VectorHistoryTile(port, window, label).apply {
                 x = blockLeft - STRIP_CLEARANCE - STRIP_WIDTH
                 y = blockTop + i * (STRIP_ROW_HEIGHT + STRIP_ROW_GAP)
                 width = STRIP_WIDTH
@@ -283,7 +294,7 @@ object Lfm2StackCompositor {
                 contextScratch, backfillState, config.numHeads, config.numKvHeads, config.headDim)
             val outProj = LinearOp("backfill.out_proj",
                 plan.port("model.layers.$layer.self_attn.out_proj.weight"), contextScratch, attnOutScratch)
-            for (t in 0 until minOf(model.position, displaySeq)) {
+            for (t in 0 until minOf(model.position, window)) {
                 qTile.copyHistoryRow(stackIndex, t, qRow)
                 qScratch.tensor.copyFrom(qRow)
                 backfillState.position = t
@@ -299,7 +310,7 @@ object Lfm2StackCompositor {
         }
 
         fun backfillFromStrip(target: VectorHistoryTile, source: VectorHistoryTile) {
-            for (t in 0 until minOf(model.position, displaySeq)) {
+            for (t in 0 until minOf(model.position, window)) {
                 target.backfillRow(t, source.values, t * source.cols)
             }
         }
@@ -342,11 +353,8 @@ object Lfm2StackCompositor {
     /** Floor for the conv window / kernel tap strips (true height would be k tokens). */
     private const val TAP_STRIP_HEIGHT = 20.0
 
-    /** Floor for the rope angle tiles (headDim/2 dims — a sliver at feature scale). */
-    private const val ROPE_MIN_WIDTH = 24.0
-
-    /** The KV cache decks keep a fixed inset size until the one-axis pass lands. */
-    private const val DECK_SIZE = 120.0
+    /** Floor for sliver tiles a few dims wide at feature scale (rope angles, cache head slices). */
+    private const val SLIVER_MIN_WIDTH = 24.0
 
     private const val STRIP_WIDTH = 170.0
     private const val STRIP_ROW_HEIGHT = 26.0

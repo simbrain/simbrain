@@ -111,8 +111,35 @@ abstract class TensorTile(
     var contentVersion = 0L
         private set
 
+    private var dirtyAll = true
+    private var dirtyFrom = Int.MAX_VALUE
+    private var dirtyTo = -1
+
     protected fun touch() {
+        dirtyAll = true
         contentVersion++
+    }
+
+    /** Marks a single-row change (a token's publish), letting the renderer reshade just its band. */
+    protected fun touchRow(row: Int) {
+        if (!dirtyAll) {
+            dirtyFrom = minOf(dirtyFrom, row)
+            dirtyTo = maxOf(dirtyTo, row)
+        }
+        contentVersion++
+    }
+
+    /**
+     * The cell rows dirtied since the last consume, cleared on return — null means everything
+     * (bulk writes, scale growth, flips). Single consumer: the tile's patch renderer.
+     */
+    @Synchronized
+    fun consumeDirtyRows(): IntRange? {
+        val result = if (dirtyAll || dirtyTo < dirtyFrom) null else dirtyFrom..dirtyTo
+        dirtyAll = false
+        dirtyFrom = Int.MAX_VALUE
+        dirtyTo = -1
+        return result
     }
 
     protected var absMax = 0f
@@ -158,6 +185,7 @@ abstract class TensorTile(
         dest: IntArray, stride: Int, destW: Int, destH: Int,
         rowFrom: Double, rowTo: Double, colFrom: Double, colTo: Double,
         neg: Color, mid: Color, pos: Color,
+        destOffset: Int = 0,
     ) {
         val scale = if (signedNorm) (if (absMax > 0f) 1f / absMax else 0f) else 1f
         val meanPool = kind == TileKind.WEIGHT
@@ -166,7 +194,7 @@ abstract class TensorTile(
         for (y in 0 until destH) {
             val r0 = (rowFrom + rowSpan * y / destH).toInt().coerceIn(0, rows - 1)
             val r1 = ceil(rowFrom + rowSpan * (y + 1) / destH).toInt().coerceIn(r0 + 1, rows)
-            val destRow = y * stride
+            val destRow = destOffset + y * stride
             for (x in 0 until destW) {
                 val c0 = (colFrom + colSpan * x / destW).toInt().coerceIn(0, cols - 1)
                 val c1 = ceil(colFrom + colSpan * (x + 1) / destW).toInt().coerceIn(c0 + 1, cols)
@@ -325,7 +353,7 @@ class VectorHistoryTile(
                 growScaleFromMagnitudes()
                 if (s == selected) {
                     System.arraycopy(cube, base, values, tokenIndex * cols, cols)
-                    touch()
+                    touchRow(tokenIndex)
                 }
             }
         } else {
@@ -339,7 +367,7 @@ class VectorHistoryTile(
                 magnitudes[i] = abs(v)
             }
             growScaleFromMagnitudes()
-            touch()
+            touchRow(tokenIndex)
         }
     }
 
@@ -354,7 +382,7 @@ class VectorHistoryTile(
             magnitudes[i] = abs(v)
         }
         growScaleFromMagnitudes()
-        touch()
+        touchRow(tokenIndex)
     }
 
     private fun growScaleFromMagnitudes() {
@@ -598,6 +626,9 @@ class DeckTile(
     @Synchronized
     override fun publish(tokenIndex: Int) {
         if (tensor.version == lastVersion) return
+        // A cache deck's steady-state delta is one written row per token; a stale tile
+        // (first publish, layer flip) re-copies with no such guarantee.
+        val incremental = columnSlices && lastVersion != -1L && tokenIndex in 0 until rows
         lastVersion = tensor.version
         if (tokenIndex in 0 until rows) liveRow = tokenIndex
         for (i in cube.indices) cube[i] = tensor.data.get(i)
@@ -605,7 +636,7 @@ class DeckTile(
         for (v in cube) max = maxOf(max, abs(v))
         growAbsMax(max)
         copySlice()
-        touch()
+        if (incremental) touchRow(tokenIndex) else touch()
     }
 
     @Synchronized
@@ -733,7 +764,7 @@ class AttentionTile(
             history, (selectedHead * rows + tokenIndex) * cols,
             values, tokenIndex * cols, cols
         )
-        touch()
+        touchRow(tokenIndex)
     }
 
     @Synchronized

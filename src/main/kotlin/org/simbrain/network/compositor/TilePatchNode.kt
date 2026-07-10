@@ -8,6 +8,7 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.Point2D
 import java.awt.image.BufferedImage
 import java.awt.image.DataBufferInt
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
 
@@ -88,18 +89,37 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
             screenX != prevScreenX || screenY != prevScreenY || screenW != prevScreenW || screenH != prevScreenH
         if (tile.contentVersion != shadedVersion || regionChanged || patch == null) {
             var cache = patch
-            if (cache == null || cache.width < patchW || cache.height < patchH) {
+            val cacheReusable = cache != null && cache.width >= patchW && cache.height >= patchH
+            if (!cacheReusable) {
                 cache = BufferedImage(patchW, patchH, BufferedImage.TYPE_INT_RGB)
                 patch = cache
             }
             val version = tile.contentVersion
+            val dirtyRows = tile.consumeDirtyRows()
             val (neg, mid, pos) = palette()
-            tile.shadePatch(
-                (cache.raster.dataBuffer as DataBufferInt).data, cache.width, patchW, patchH,
-                (visY0 - screenY) / screenH * tile.rows, (visY1 - screenY) / screenH * tile.rows,
-                (visX0 - screenX) / screenW * tile.cols, (visX1 - screenX) / screenW * tile.cols,
-                neg, mid, pos,
-            )
+            val dest = (cache!!.raster.dataBuffer as DataBufferInt).data
+            val rowFrom = (visY0 - screenY) / screenH * tile.rows
+            val rowTo = (visY1 - screenY) / screenH * tile.rows
+            val colFrom = (visX0 - screenX) / screenW * tile.cols
+            val colTo = (visX1 - screenX) / screenW * tile.cols
+            val banded = dirtyRows != null && cacheReusable && !regionChanged && shadedVersion != Long.MIN_VALUE
+            if (banded) {
+                // Reshade only the pixel band covering the dirtied cell rows, padded a pixel so
+                // boundary pixels pool the same cell window a full shade would give them.
+                val rowSpan = rowTo - rowFrom
+                val y0 = (((dirtyRows!!.first - rowFrom) / rowSpan * patchH).toInt() - 1).coerceIn(0, patchH)
+                val y1 = (ceil((dirtyRows.last + 1 - rowFrom) / rowSpan * patchH).toInt() + 1).coerceIn(y0, patchH)
+                if (y1 > y0) {
+                    tile.shadePatch(
+                        dest, cache.width, patchW, y1 - y0,
+                        rowFrom + rowSpan * y0 / patchH, rowFrom + rowSpan * y1 / patchH,
+                        colFrom, colTo, neg, mid, pos,
+                        destOffset = y0 * cache.width,
+                    )
+                }
+            } else {
+                tile.shadePatch(dest, cache.width, patchW, patchH, rowFrom, rowTo, colFrom, colTo, neg, mid, pos)
+            }
             shadedVersion = version
             prevVisX0 = visX0
             prevVisY0 = visY0

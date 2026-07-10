@@ -245,7 +245,9 @@ class CausalConvOp(
     val out: TensorPort,
 ) : TensorOp(name) {
 
-    override val inputs = listOf(src, weight)
+    // The rolling window is genuinely read every step (and rewritten): declaring the read keeps
+    // graph-derived displays honest about past tokens feeding the conv.
+    override val inputs = listOf(src, cache, weight)
     override val outputs = listOf(cache, out)
 
     override fun forward() {

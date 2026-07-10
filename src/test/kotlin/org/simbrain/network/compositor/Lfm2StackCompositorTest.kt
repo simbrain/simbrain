@@ -361,7 +361,9 @@ class Lfm2StackCompositorTest {
         scene.onHeadSelected?.invoke(attention, 3)
         assertEquals(3 / qPerKv, kCache.selectedSlice)
         assertEquals(3 / qPerKv, vCache.selectedSlice)
-        assertTrue(kCache.sliceLabel!!.invoke(kCache.selectedSlice).contains("serves q"))
-        assertTrue(scene.emphasizedEdges.isNotEmpty())
+        assertEquals("1/2 \u2192 q 2\u20133", kCache.sliceLabel!!.invoke(kCache.selectedSlice))
+        assertTrue(scene.memoryEdges.any { (it.from as? TensorTile)?.id == "block.attn.k_cache" })
+        assertTrue(scene.memoryEdges.any { (it.from as? TensorTile)?.id == "block.conv.cache" },
+            "the conv window read is cross-time flow too")
     }
 }

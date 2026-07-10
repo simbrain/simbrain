@@ -134,7 +134,11 @@ class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it
         val anchorSet = anchors.toSet()
         val onPaths = anchorEdges(anchors).flatMapTo(HashSet()) { it.ops }
         return onPaths.filterTo(LinkedHashSet()) { op ->
-            nodeInputs.getValue(op).count { (name, _) -> name in anchorSet || name in writerOf } >= 2
+            // A rolling-state self-loop (an op re-reading a buffer it writes itself) is not a
+            // joining stream — the causal conv stays a bead on its edge.
+            nodeInputs.getValue(op).count { (name, _) ->
+                (name in anchorSet || name in writerOf) && writerOf[name] != op
+            } >= 2
         }
     }
 
@@ -161,7 +165,11 @@ class PlanGraph(val plan: OpPlan, private val aliasFn: (String) -> String = { it
                     }
                     for (out in outputsOf(op)) {
                         if (out in anchorSet) {
-                            edges.getOrPut(Triple(sourceKey, out, null)) { LinkedHashSet() }.addAll(opsSoFar + op)
+                            // A self-loop back to the walk's own anchor (the conv window read)
+                            // is not an edge; the outgoing read edges carry the story.
+                            if (out != sourceKey) {
+                                edges.getOrPut(Triple(sourceKey, out, null)) { LinkedHashSet() }.addAll(opsSoFar + op)
+                            }
                         } else {
                             stack.add(out to (opsSoFar + op))
                         }

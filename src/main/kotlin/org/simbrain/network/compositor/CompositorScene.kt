@@ -114,8 +114,12 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     var lens: LogitLens? = null
 
-    /** Edges rendered with standing emphasis — e.g. the KV-cache arrows telling the GQA story. */
-    var emphasizedEdges: Set<FlowEdge> = emptySet()
+    /**
+     * Edges carrying prior tokens' state into the current step — the KV-cache and conv-window
+     * reads. Everything else in the diagram is this-token dataflow, so these render in their
+     * own cross-time color.
+     */
+    var memoryEdges: Set<FlowEdge> = emptySet()
 
     /** Invoked when the user wheel-flips a deck or attention tile, e.g. to couple GQA decks. */
     var onHeadSelected: ((TensorTile, Int) -> Unit)? = null

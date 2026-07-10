@@ -8,6 +8,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
+import org.simbrain.network.llm.HeadwiseNormRopeOp
 import org.simbrain.network.tensor.op.ReLUOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
@@ -89,7 +90,7 @@ class CompositorNode(
             pickable = visible
             childrenPickable = visible
             text.text = value ?: ""
-            text.textPaint = NetworkTheme.current.valueText
+            text.textPaint = blend(NetworkTheme.current.valueText, NetworkTheme.current.canvasBackground, 0.65)
             val textY = (arrow.fullBoundsReference.height - text.height) / 2
             if (labelFirst) {
                 text.setOffset(0.0, textY)
@@ -118,7 +119,7 @@ class CompositorNode(
             (depth downTo 1).map { i ->
                 PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
-                    setOffset(-DECK_STEP * i, -DECK_STEP * i)
+                    setOffset(-HEAD_STEP * i, -HEAD_STEP * i)
                 }.also { addChild(it) }
             }
         }
@@ -159,8 +160,9 @@ class CompositorNode(
             }.also { addChild(it) }
         }
 
+        /** Caption line one: what the tile is, centered under it. */
         val label = PText(tile.title).apply {
-            font = Theme.tiny
+            font = Theme.small
         }.also { addChild(it) }
 
         /** Layer pagers flanking the caption, labeled with the layer each flips to. */
@@ -186,6 +188,26 @@ class CompositorNode(
                 }
                 up to down
             } else null
+
+        /** Caption line two: where the tile is in its stacks, in a muted icon+number grammar. */
+        val layerIcon: SvgIconNode? = layerPagers?.let {
+            SvgIconNode("icons/stat-layers.svg", STATE_ICON).also { addChild(it) }
+        }
+        val layerText: PText? = layerPagers?.let {
+            PText().apply {
+                font = Theme.tiny
+                pickable = false
+            }.also { addChild(it) }
+        }
+        val headIcon: SvgIconNode? = headPagers?.let {
+            SvgIconNode("icons/stat-heads.svg", STATE_ICON).also { addChild(it) }
+        }
+        val headText: PText? = headPagers?.let {
+            PText().apply {
+                font = Theme.tiny
+                pickable = false
+            }.also { addChild(it) }
+        }
 
         /** Cursor at the tile's live row: the current token's row, or a cache's write frontier. */
         val liveMarker = PPath.Double(Path2D.Double().apply {
@@ -277,24 +299,57 @@ class CompositorNode(
         }
 
         fun syncLabel() {
-            val base = when (tile) {
-                is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
-                    ?: "${tile.title} · head ${tile.selectedSlice + 1}/${tile.slices}"
-                is AttentionTile -> "${tile.title} · head ${tile.selectedHead}/${tile.numHeads}"
-                else -> tile.title
+            label.text = tile.title
+            label.setOffset((tile.width - label.width) / 2, tile.height + 3.0)
+            val muted = blend(NetworkTheme.current.valueText, NetworkTheme.current.canvasBackground, 0.65)
+            layerText?.let {
+                it.text = (tile as LayerStacked).shownLayer.takeIf { l -> l >= 0 }?.toString()
+                    ?: scene.selectedLayer.toString()
+                it.textPaint = muted
             }
-            val layer = (tile as? LayerStacked)?.takeIf { it.stackLayers.size > 1 }?.shownLayer
-            label.text = if (layer != null && layer >= 0) "$base · layer $layer" else base
-            var labelX = 0.0
+            headText?.let {
+                it.text = when (tile) {
+                    is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
+                        ?: "${tile.selectedSlice}/${tile.slices}"
+                    is AttentionTile -> "${tile.selectedHead}/${tile.numHeads}"
+                    else -> ""
+                }
+                it.textPaint = muted
+            }
             layerPagers?.let { (left, right) ->
                 val stacked = tile as LayerStacked
                 left.setLabel(stacked.layerBefore(scene.selectedLayer)?.toString())
-                left.setOffset(0.0, tile.height + 1.0)
-                labelX = left.rowWidth + 3.0
                 right.setLabel(stacked.layerAfter(scene.selectedLayer)?.toString())
-                right.setOffset(labelX + label.width + 3.0, tile.height + 1.0)
             }
-            label.setOffset(labelX, tile.height + 3.0)
+
+            // Assemble the state row centered under the name: ‹6 [stack]8 10›  [heads]5/16
+            val rowTop = tile.height + 4.0 + label.height
+            val gap = 3.0
+            val groupGap = 8.0
+            var rowWidth = 0.0
+            layerPagers?.let { (left, right) ->
+                rowWidth += left.rowWidth + gap + STATE_ICON + 1.0 + layerText!!.width + gap + right.rowWidth
+            }
+            headIcon?.let {
+                if (rowWidth > 0) rowWidth += groupGap
+                rowWidth += STATE_ICON + 1.0 + headText!!.width
+            }
+            var x = (tile.width - rowWidth) / 2
+            fun place(node: PNode, width: Double, height: Double) {
+                node.setOffset(x, rowTop + (PAGER_ROW_HEIGHT - height) / 2)
+                x += width
+            }
+            layerPagers?.let { (left, right) ->
+                place(left, left.rowWidth + gap, left.fullBoundsReference.height)
+                place(layerIcon!!, STATE_ICON + 1.0, STATE_ICON)
+                place(layerText!!, layerText.width + gap, layerText.height)
+                place(right, right.rowWidth, right.fullBoundsReference.height)
+            }
+            headIcon?.let {
+                if (layerPagers != null) x += groupGap
+                place(it, STATE_ICON + 1.0, STATE_ICON)
+                place(headText!!, headText.width, headText.height)
+            }
         }
 
         fun syncDim() {
@@ -407,7 +462,7 @@ class CompositorNode(
             row.setOffset(tile.x - LENS_SPACE, tile.y + tile.height / 2 - 8.0)
         }
         val bounds = scene.tiles.fold(null as Rectangle2D?) { acc, tile ->
-            val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 20)
+            val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 34)
             acc?.also { it.add(r) } ?: r
         } ?: Rectangle2D.Double()
         // Edge geometry can reach past the tiles (waypoint lanes, arrowheads); keep it inside.
@@ -433,6 +488,7 @@ class CompositorNode(
         tileNodes.forEach {
             it.raster.markStale()
             it.syncHighlight()
+            it.syncLabel()
         }
         rebuildEdges()
         lensRows.forEach { it.refresh() }
@@ -475,7 +531,7 @@ class CompositorNode(
         private val parallelCards: List<PPath> = (opParallelism(op) - 1 downTo 1).map { i ->
             stripShape().apply {
                 pickable = false
-                setOffset(-OP_DECK_STEP * i, -OP_DECK_STEP * i)
+                setOffset(-HEAD_STEP * i, -HEAD_STEP * i)
             }.also { addChild(it) }
         }
 
@@ -696,7 +752,7 @@ class CompositorNode(
         // shows at full strength on the active limb's edge.
         for (edge in scene.edges.sortedBy { it.dimmed }) {
             val traced = edge in scene.tracedEdges
-            val emphasized = edge in scene.emphasizedEdges
+            val memory = edge in scene.memoryEdges
             val tailSide = tailSides.getValue(edge)
             val headSide = headSides.getValue(edge)
             val tail = tailSide.p(tailFractions.getValue(edge))
@@ -709,16 +765,18 @@ class CompositorNode(
             val ribbonColor = when {
                 edge.dimmed -> palette.connectionLine
                 traced -> palette.receptiveFieldTrace
-                emphasized -> palette.sourceHandle
+                // Cache reads carry PAST tokens' state into this step; a muted cool tint keeps
+                // that cross-time flow distinct without spending the selection accent on it.
+                memory -> blend(palette.coolNode, palette.connectionLine, 0.5)
                 else -> palette.connectionLine
             }
-            val thickness = if (traced || emphasized) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
+            val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
             val stroke = BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER)
             if (edge.strands > 1) {
                 // Head-parallel flow renders one ghost strand per real stream, so pipe width is
                 // multiplicity: the 16-strand q pipe runs visibly twice the 8-strand cache pipe.
                 for (i in (edge.strands - 1) downTo 1) {
-                    val strandOffset = AffineTransform.getTranslateInstance(-STRAND_STEP * i, -STRAND_STEP * i)
+                    val strandOffset = AffineTransform.getTranslateInstance(-HEAD_STEP * i, -HEAD_STEP * i)
                     PPath.Double(strandOffset.createTransformedShape(stroke.createStrokedShape(route.path)), null).apply {
                         paint = ribbonColor
                         transparency = if (edge.dimmed) 0.03f else 0.1f
@@ -739,7 +797,7 @@ class CompositorNode(
                 transparency = when {
                     edge.dimmed -> 0.15f
                     traced -> 0.8f
-                    emphasized -> 0.65f
+                    memory -> 0.6f
                     else -> 0.5f
                 }
                 pickable = false
@@ -968,7 +1026,13 @@ class CompositorNode(
             val target = canvas ?: return
             val glyph = glyphsByOp.values.firstOrNull { it.containsScenePoint(point.x, point.y) }
             if (glyph != null) {
-                target.toolTipText = glyph.op.toString()
+                val parallel = opParallelism(glyph.op)
+                target.toolTipText = glyph.op.toString() + when {
+                    glyph.op is HeadwiseNormRopeOp ->
+                        " — $parallel per-head passes sharing one norm weight and the rope angles"
+                    parallel > 1 -> " — $parallel independent per-head passes"
+                    else -> ""
+                }
                 return
             }
             val badged = tileNodes.firstOrNull { it.badgeContains(point.x, point.y) }
@@ -997,8 +1061,12 @@ class CompositorNode(
         private const val MARGIN = 40.0
         private const val LENS_SPACE = 220.0
         private const val DECK_STEP = 2.0
-        private const val STRAND_STEP = 1.5
-        private const val OP_DECK_STEP = 1.2
+
+        /** One diagonal step for everything head-indexed — deck cards, op-deck cards, edge
+         *  strands — so strand i lines up with card i at both ends of a head-parallel pipe. */
+        private const val HEAD_STEP = 1.5
+        private const val STATE_ICON = 10.0
+        private const val PAGER_ROW_HEIGHT = 13.0
         private const val GHOST_CARD_TRANSPARENCY = 0.35f
         private const val PAGER_ARROW = 7.0
         private const val TICK_LENGTH = 4.0

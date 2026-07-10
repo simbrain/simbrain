@@ -216,11 +216,11 @@ object Lfm2StackCompositor {
         val kCacheTile = scene.tile("block.attn.k_cache") as DeckTile
         val vCacheTile = scene.tile("block.attn.v_cache") as DeckTile
         val qPerKv = config.numHeads / config.numKvHeads
-        fun servingLabel(name: String): (Int) -> String = { group ->
-            "$name · kv head $group/${config.numKvHeads} (serves q ${group * qPerKv}–${(group + 1) * qPerKv - 1})"
+        val servingLabel: (Int) -> String = { group ->
+            "$group/${config.numKvHeads} → q ${group * qPerKv}–${(group + 1) * qPerKv - 1}"
         }
-        kCacheTile.sliceLabel = servingLabel("k cache")
-        vCacheTile.sliceLabel = servingLabel("v cache")
+        kCacheTile.sliceLabel = servingLabel
+        vCacheTile.sliceLabel = servingLabel
         scene.onHeadSelected = { tile, head ->
             if (tile is AttentionTile) {
                 val group = head / qPerKv
@@ -228,8 +228,10 @@ object Lfm2StackCompositor {
                 vCacheTile.selectedSlice = group
             }
         }
-        scene.emphasizedEdges = scene.edges.filter { edge ->
-            (edge.from as? TensorTile)?.id?.endsWith("_cache") == true
+        // Cross-time reads: the KV caches and the conv window both feed PAST tokens' state into
+        // the current step — the only edges in the diagram that aren't this-token dataflow.
+        scene.memoryEdges = scene.edges.filter { edge ->
+            (edge.from as? TensorTile)?.id?.let { it.endsWith("_cache") || it == "block.conv.cache" } == true
         }.toSet()
 
         // The depth strip: every residual checkpoint at mini scale with the logit lens, placed

@@ -64,14 +64,19 @@ class CompositorNode(
     private var staleTiles: Set<TensorTile> = emptySet()
 
     private inner class TileNode(val tile: TensorTile) : PNode() {
-        /** Dimmed offset cards behind the live front card — a head deck's slices or a layer stack. */
+        /**
+         * Dimmed offset cards behind the live front card, one per real stack entry — a deck's
+         * slices, an attention tile's heads, or a layer stack — so stack depth is a fact about
+         * the model: the 16-head attention deck stands twice as deep as the 8-head KV caches.
+         */
         val backCards: List<PPath> = run {
             val depth = when {
                 tile is DeckTile && tile.slices > 1 -> tile.slices - 1
+                tile is AttentionTile && tile.numHeads > 1 -> tile.numHeads - 1
                 tile is LayerStacked && tile.stackLayers.size > 1 -> tile.stackLayers.size - 1
                 else -> 0
             }
-            (minOf(depth, MAX_BACK_CARDS) downTo 1).map { i ->
+            (depth downTo 1).map { i ->
                 PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
                     pickable = false
                     setOffset(-DECK_STEP * i, -DECK_STEP * i)
@@ -84,6 +89,19 @@ class CompositorNode(
         val border = PPath.createRectangle(0.0, 0.0, tile.width, tile.height).apply {
             paint = null
         }.also { addChild(it) }
+
+        /** Boundary notches marking the substructure packed along the tile's axes (heads, chunks). */
+        val ticks = PPath.Double(Path2D.Double(), null).apply {
+            pickable = false
+        }.also { addChild(it) }
+
+        val blockTexts: List<PText> = tile.blockLabels.map { text ->
+            PText(text).apply {
+                font = Theme.tiny
+                pickable = false
+            }.also { addChild(it) }
+        }
+
         val label = PText(tile.title).apply {
             font = Theme.tiny
         }.also { addChild(it) }
@@ -129,6 +147,38 @@ class CompositorNode(
         fun syncLayout() {
             setOffset(tile.x, tile.y)
             label.setOffset(0.0, tile.height + 3.0)
+            // Notches mark boundaries on both edges, dropping to one edge on tiles too thin for
+            // opposing marks to stay visually separate.
+            val marks = Path2D.Double()
+            val columnTick = minOf(TICK_LENGTH, tile.height / 4)
+            for (c in tile.columnTicks) {
+                val tx = c.toDouble() / tile.cols * tile.width
+                marks.moveTo(tx, 0.0)
+                marks.lineTo(tx, columnTick)
+                if (tile.height >= TICK_LENGTH * 4) {
+                    marks.moveTo(tx, tile.height - columnTick)
+                    marks.lineTo(tx, tile.height)
+                }
+            }
+            val rowTick = minOf(TICK_LENGTH, tile.width / 4)
+            for (r in tile.rowTicks) {
+                val ty = r.toDouble() / tile.rows * tile.height
+                marks.moveTo(0.0, ty)
+                marks.lineTo(rowTick, ty)
+                if (tile.width >= TICK_LENGTH * 4) {
+                    marks.moveTo(tile.width - rowTick, ty)
+                    marks.lineTo(tile.width, ty)
+                }
+            }
+            ticks.reset()
+            ticks.append(marks, false)
+            if (blockTexts.isNotEmpty()) {
+                val blockEdges = listOf(0) + tile.columnTicks + listOf(tile.cols)
+                blockTexts.forEachIndexed { i, text ->
+                    val cx = (blockEdges[i] + blockEdges[i + 1]) / 2.0 / tile.cols * tile.width
+                    text.setOffset(cx - text.width / 2, -text.height - 2.0)
+                }
+            }
             syncLabel()
             syncLiveRow()
         }
@@ -180,6 +230,9 @@ class CompositorNode(
                 it.strokePaint = palette.imageBorder
                 it.stroke = BasicStroke(1f)
             }
+            ticks.strokePaint = palette.imageBorder
+            ticks.stroke = BasicStroke(1f)
+            blockTexts.forEach { it.textPaint = palette.valueText }
             badge?.let {
                 it.paint = palette.canvasBackground
                 it.strokePaint = if (badgeGlowing) palette.sourceHandle else palette.connectionLine
@@ -808,8 +861,8 @@ class CompositorNode(
     companion object {
         private const val MARGIN = 40.0
         private const val LENS_SPACE = 220.0
-        private const val DECK_STEP = 4.0
-        private const val MAX_BACK_CARDS = 5
+        private const val DECK_STEP = 2.0
+        private const val TICK_LENGTH = 4.0
         private const val GLYPH_RADIUS = 9.0
         private const val GLYPH_ICON = 12.0
         private const val BADGE_RADIUS = 10.0

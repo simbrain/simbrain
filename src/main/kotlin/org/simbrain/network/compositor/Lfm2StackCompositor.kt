@@ -180,6 +180,20 @@ object Lfm2StackCompositor {
         stackedHistory("block.mlp.act", allLayers, "silu(gate) ⊙ up", featureWidth(config.intermediateSize)) { "layers.$it.mlp.act" }
         stackedHistory("block.mlp.out", allLayers, "mlp out", featureWidth(config.hiddenSize)) { "layers.$it.mlp.out" }
 
+        // Substructure marks: head boundaries on the head-packed vectors, and the B|C|x chunk
+        // boundaries on the fused conv projection (labels) with matching row blocks on in_proj.
+        val headTicks = (1 until config.numHeads).map { it * config.headDim }
+        val kvHeadTicks = (1 until config.numKvHeads).map { it * config.headDim }
+        scene.tile("block.attn.q").columnTicks = headTicks
+        scene.tile("block.attn.context").columnTicks = headTicks
+        scene.tile("block.attn.k").columnTicks = kvHeadTicks
+        scene.tile("block.attn.v").columnTicks = kvHeadTicks
+        scene.tile("block.conv.bcx").apply {
+            columnTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
+            blockLabels = listOf("B", "C", "x")
+        }
+        scene.tile("block.w.conv.in_proj.weight").rowTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
+
         scene.connectFromGraph()
         CompositorLayout().apply(scene)
 

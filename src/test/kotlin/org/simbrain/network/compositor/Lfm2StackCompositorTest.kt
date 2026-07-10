@@ -110,6 +110,20 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `packed axes carry their substructure boundaries`() {
+        val config = tinyConfig()
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)
+
+        assertEquals(listOf(4, 8, 12), scene.tile("block.attn.q").columnTicks)
+        assertEquals(listOf(4, 8, 12), scene.tile("block.attn.context").columnTicks)
+        assertEquals(listOf(4), scene.tile("block.attn.k").columnTicks)
+        assertEquals(listOf(4), scene.tile("block.attn.v").columnTicks)
+        assertEquals(listOf(16, 32), scene.tile("block.conv.bcx").columnTicks)
+        assertEquals(listOf("B", "C", "x"), scene.tile("block.conv.bcx").blockLabels)
+        assertEquals(listOf(16, 32), scene.tile("block.w.conv.in_proj.weight").rowTicks)
+    }
+
+    @Test
     fun `every anatomy tile stacks its layer subset`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config), displaySeq = 8)

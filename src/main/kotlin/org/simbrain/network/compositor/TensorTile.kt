@@ -63,6 +63,19 @@ abstract class TensorTile(
     var magnified = false
 
     /**
+     * Interior column boundaries (in display cell coordinates) of the substructure packed along
+     * the feature axis — head boundaries on q/k/v/context, chunk boundaries on a fused
+     * projection. Rendered as boundary marks so the packing is countable.
+     */
+    var columnTicks: List<Int> = emptyList()
+
+    /** Interior row boundaries, e.g. the output blocks of a fused projection's weight matrix. */
+    var rowTicks: List<Int> = emptyList()
+
+    /** Labels for the column blocks the [columnTicks] delimit (size = ticks + 1), or empty. */
+    var blockLabels: List<String> = emptyList()
+
+    /**
      * The row holding the current token's just-published value, or -1 when rows aren't a token
      * axis (full-pass publishes). Rendered as a cursor: on history tiles it marks the one row
      * actually flowing through the graph this step; on the KV caches it marks the write frontier

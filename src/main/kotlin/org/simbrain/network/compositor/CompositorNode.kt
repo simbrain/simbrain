@@ -16,6 +16,7 @@ import org.simbrain.network.tensor.op.ReLUOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.RasterCachedNode
 import org.simbrain.util.piccolo.SvgIconNode
 import java.awt.BasicStroke
 import java.awt.Color
@@ -52,13 +53,20 @@ class CompositorNode(
     }.also { addChild(it) }
 
     /**
+     * Fans and edges live in one raster-cached chrome layer: this vector work only changes on
+     * relayout, flips, selection, and theme switches, so between changes each frame blits one
+     * image instead of re-rasterizing every antialiased ribbon, strand, and card.
+     */
+    private val chromeLayer = RasterCachedNode().also { addChild(it) }
+
+    /**
      * Tile card fans paint UNDER the edges, front tiles above them: a pipe runs over the card
      * ladder (strand i visibly on card i) and terminates at the open card's border, instead of
      * vanishing behind an opaque fan.
      */
-    private val fanLayer = PNode().also { addChild(it) }
+    private val fanLayer = PNode().also { chromeLayer.addChild(it) }
 
-    private val edgeLayer = PNode().also { addChild(it) }
+    private val edgeLayer = PNode().also { chromeLayer.addChild(it) }
 
     /** Live op glyphs by op, rebuilt with the edges; micro-stepping highlights through this. */
     private val glyphsByOp = HashMap<TensorOp, OpGlyphNode>()

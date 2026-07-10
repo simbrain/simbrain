@@ -273,6 +273,7 @@ class CompositorNode(
         init {
             syncLayout()
             syncHighlight()
+            syncFanStyle()
             syncDim()
         }
 
@@ -412,18 +413,6 @@ class CompositorNode(
                 tile.kind == TileKind.WEIGHT -> palette.weightMatrixBoundary
                 else -> palette.imageBorder
             }
-            headCards.forEach {
-                it.paint = palette.canvasBackground
-                it.strokePaint = palette.imageBorder
-                it.stroke = BasicStroke(1f)
-            }
-            for ((layer, card) in slotCards) {
-                val selected = layer == scene.selectedLayer
-                card.paint = palette.canvasBackground
-                card.strokePaint = if (selected) palette.sourceHandle else palette.imageBorder
-                card.stroke = BasicStroke(if (selected) 1.5f else 1f)
-                card.transparency = if (selected) 1f else GHOST_CARD_TRANSPARENCY
-            }
             ticks.strokePaint = palette.imageBorder
             ticks.stroke = BasicStroke(1f)
             blockTexts.forEachIndexed { i, text ->
@@ -440,6 +429,27 @@ class CompositorNode(
             }
             liveMarker.paint = palette.sourceHandle
             liveMarker.strokePaint = null
+        }
+
+        /**
+         * Card-fan styling reads only the theme and the selected layer, never tile selection.
+         * The cards live in the chrome raster, so this stays out of [syncHighlight] — selection
+         * clicks must not invalidate that cache.
+         */
+        fun syncFanStyle() {
+            val palette = NetworkTheme.current
+            headCards.forEach {
+                it.paint = palette.canvasBackground
+                it.strokePaint = palette.imageBorder
+                it.stroke = BasicStroke(1f)
+            }
+            for ((layer, card) in slotCards) {
+                val selected = layer == scene.selectedLayer
+                card.paint = palette.canvasBackground
+                card.strokePaint = if (selected) palette.sourceHandle else palette.imageBorder
+                card.stroke = BasicStroke(if (selected) 1.5f else 1f)
+                card.transparency = if (selected) 1f else GHOST_CARD_TRANSPARENCY
+            }
         }
 
         fun badgeContains(sceneX: Double, sceneY: Double) = activationOp != null &&
@@ -531,6 +541,7 @@ class CompositorNode(
         tileNodes.forEach {
             it.raster.markStale()
             it.syncHighlight()
+            it.syncFanStyle()
             it.syncLabel()
         }
         rebuildEdges()
@@ -540,6 +551,14 @@ class CompositorNode(
     private fun syncHighlights() {
         tileNodes.forEach { it.syncHighlight() }
         rebuildEdges()
+    }
+
+    /**
+     * Selection only styles tile borders — edge ribbons don't read it — so click and marquee
+     * skip the edge rebuild and leave the chrome raster untouched.
+     */
+    private fun syncSelection() {
+        tileNodes.forEach { it.syncHighlight() }
     }
 
     /**
@@ -959,6 +978,7 @@ class CompositorNode(
             it.syncDim()
             it.syncLabel()
             it.syncHighlight()
+            it.syncFanStyle()
         }
         rebuildEdges()
         refreshDirtyTiles()
@@ -1049,8 +1069,23 @@ class CompositorNode(
                 mode = Mode.MARQUEE
             }
             pressPoint = point
-            syncHighlights()
+            syncSelection()
             event.isHandled = true
+        }
+
+        /**
+         * Dragged tiles track the pointer every event, but the full edge relayout (routing,
+         * satellites, glyphs) is throttled: edges trail the tile by at most one throttle window,
+         * and release runs an exact relayout.
+         */
+        private var lastDragRelayout = 0L
+
+        private fun relayoutThrottled() {
+            val now = System.currentTimeMillis()
+            if (now - lastDragRelayout >= DRAG_RELAYOUT_MS) {
+                lastDragRelayout = now
+                relayout()
+            }
         }
 
         override fun mouseDragged(event: PInputEvent) {
@@ -1061,8 +1096,9 @@ class CompositorNode(
                     for (tile in scene.selection.selected) {
                         tile.x += delta.width
                         tile.y += delta.height
+                        tileNodesById[tile.id]?.syncLayout()
                     }
-                    relayout()
+                    relayoutThrottled()
                 }
                 Mode.MOVE_VERTEX -> {
                     val vertex = draggedVertex ?: return
@@ -1070,7 +1106,7 @@ class CompositorNode(
                     vertex.x += delta.width
                     vertex.y += delta.height
                     vertex.placed = true
-                    relayout()
+                    relayoutThrottled()
                 }
                 Mode.MARQUEE -> {
                     val point = event.getPositionRelativeTo(this@CompositorNode)
@@ -1101,9 +1137,12 @@ class CompositorNode(
                     val rect = rectBetween(start, point)
                     val hit = scene.tilesIn(rect.x, rect.y, rect.width, rect.height)
                     if (marqueeAdditive) scene.selection.add(hit) else scene.selection.set(hit)
-                    syncHighlights()
+                    syncSelection()
                 }
                 event.isHandled = true
+            }
+            if (mode == Mode.MOVE || mode == Mode.MOVE_VERTEX) {
+                relayout()
             }
             mode = Mode.NONE
             pressPoint = null
@@ -1164,6 +1203,7 @@ class CompositorNode(
 
     companion object {
         private const val MARGIN = 40.0
+        private const val DRAG_RELAYOUT_MS = 33L
         private const val LENS_SPACE = 220.0
         private const val DECK_STEP = 2.0
 

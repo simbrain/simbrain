@@ -115,7 +115,8 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private fun refreshView() {
         compositorNode?.refreshDirtyTiles()
-        statusText.text = statusLine()
+        val line = statusLine()
+        if (statusText.text != line) statusText.text = line
     }
 
     private fun statusLine(): String {

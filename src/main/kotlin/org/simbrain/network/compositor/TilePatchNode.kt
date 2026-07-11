@@ -7,7 +7,6 @@ import java.awt.Color
 import java.awt.geom.AffineTransform
 import java.awt.geom.Point2D
 import java.awt.image.BufferedImage
-import java.awt.image.DataBufferInt
 import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.min
@@ -26,6 +25,7 @@ import kotlin.math.min
 class TilePatchNode(val tile: TensorTile) : PNode() {
 
     private var patch: BufferedImage? = null
+    private var scratch = IntArray(0)
     private var shadedVersion = Long.MIN_VALUE
 
     private var prevFullMode = false
@@ -118,28 +118,37 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
             val version = tile.contentVersion
             val dirtyRows = tile.consumeDirtyRows()
             val (neg, mid, pos) = palette()
-            val dest = (cache!!.raster.dataBuffer as DataBufferInt).data
             val rowFrom = (visY0 - screenY) / screenH * tile.rows
             val rowTo = (visY1 - screenY) / screenH * tile.rows
             val colFrom = (visX0 - screenX) / screenW * tile.cols
             val colTo = (visX1 - screenX) / screenW * tile.cols
+            val rowSpan = rowTo - rowFrom
             val banded = dirtyRows != null && cacheReusable && !regionChanged && shadedVersion != Long.MIN_VALUE
+            val bandY0: Int
+            val bandY1: Int
             if (banded) {
                 // Reshade only the pixel band covering the dirtied cell rows, padded a pixel so
                 // boundary pixels pool the same cell window a full shade would give them.
-                val rowSpan = rowTo - rowFrom
-                val y0 = (((dirtyRows!!.first - rowFrom) / rowSpan * patchH).toInt() - 1).coerceIn(0, patchH)
-                val y1 = (ceil((dirtyRows.last + 1 - rowFrom) / rowSpan * patchH).toInt() + 1).coerceIn(y0, patchH)
-                if (y1 > y0) {
-                    tile.shadePatch(
-                        dest, cache.width, patchW, y1 - y0,
-                        rowFrom + rowSpan * y0 / patchH, rowFrom + rowSpan * y1 / patchH,
-                        colFrom, colTo, neg, mid, pos,
-                        destOffset = y0 * cache.width,
-                    )
-                }
+                bandY0 = (((dirtyRows!!.first - rowFrom) / rowSpan * patchH).toInt() - 1).coerceIn(0, patchH)
+                bandY1 = (ceil((dirtyRows.last + 1 - rowFrom) / rowSpan * patchH).toInt() + 1).coerceIn(bandY0, patchH)
             } else {
-                tile.shadePatch(dest, cache.width, patchW, patchH, rowFrom, rowTo, colFrom, colTo, neg, mid, pos)
+                bandY0 = 0
+                bandY1 = patchH
+            }
+            // Shade into a scratch array and write through setDataElements: grabbing the image's
+            // DataBuffer would permanently un-manage it, forcing a GPU texture re-upload of every
+            // patch on every frame; this way unchanged patches stay cached on the GPU.
+            var y = bandY0
+            while (y < bandY1) {
+                val chunk = min(SCRATCH_ROWS, bandY1 - y)
+                if (scratch.size < patchW * chunk) scratch = IntArray(patchW * chunk)
+                tile.shadePatch(
+                    scratch, patchW, patchW, chunk,
+                    rowFrom + rowSpan * y / patchH, rowFrom + rowSpan * (y + chunk) / patchH,
+                    colFrom, colTo, neg, mid, pos,
+                )
+                cache!!.raster.setDataElements(0, y, patchW, chunk, scratch)
+                y += chunk
             }
             shadedVersion = version
             prevFullMode = fullMode
@@ -158,10 +167,18 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
         val cache = patch ?: return
         val savedTransform = g2.transform
         g2.transform = AffineTransform()
-        g2.drawImage(
-            cache, visX0.toInt(), visY0.toInt(), visX1.toInt(), visY1.toInt(),
-            0, 0, patchW, patchH, null
-        )
+        if (cap >= 1.0) {
+            // Uncapped patches blit 1:1 — an off-by-a-pixel destination rect would demote every
+            // draw to the general scaling loop. The tile border strokes over the ≤1px slack.
+            val dx = Math.round(visX0).toInt()
+            val dy = Math.round(visY0).toInt()
+            g2.drawImage(cache, dx, dy, dx + patchW, dy + patchH, 0, 0, patchW, patchH, null)
+        } else {
+            g2.drawImage(
+                cache, visX0.toInt(), visY0.toInt(), visX1.toInt(), visY1.toInt(),
+                0, 0, patchW, patchH, null
+            )
+        }
         g2.transform = savedTransform
     }
 
@@ -173,5 +190,8 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
     companion object {
         /** Maximum patch dimension per axis, bounding work and allocation at extreme zoom. */
         private const val MAX_PATCH_DIM = 4096.0
+
+        /** Shading scratch is chunked to this many pixel rows, bounding it at deep zoom. */
+        private const val SCRATCH_ROWS = 256
     }
 }

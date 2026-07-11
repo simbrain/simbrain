@@ -16,16 +16,21 @@ import kotlin.math.min
  * Paints a [TensorTile] by shading its value buffer straight into a screen-resolution patch via
  * [TensorTile.shadePatch] — no full-resolution intermediate image exists, so shading cost is
  * bounded by on-screen pixels (capped at [MAX_PATCH_DIM] per axis), never by tensor size. The
- * patch rebuilds when the tile's content version moves or the visible region changes (pan/zoom);
- * [markStale] forces one after palette switches, which don't move content versions. Drawing the
- * patch at 1:1 in device space also sidesteps Java2D's grid-shift scaling artifact (the same
- * scheme as SimbrainImage, without its pre-shaded source).
+ * patch covers the tile's whole screen projection when that fits the cap (so pans and Swing's
+ * shifting damage clips re-blit, and version bumps reshade only the dirty row band), falling
+ * back to the clipped window at deep zoom; [markStale] forces a reshade after palette switches,
+ * which don't move content versions. Drawing the patch at 1:1 in device space also sidesteps
+ * Java2D's grid-shift scaling artifact (the same scheme as SimbrainImage, without its
+ * pre-shaded source).
  */
 class TilePatchNode(val tile: TensorTile) : PNode() {
 
     private var patch: BufferedImage? = null
     private var shadedVersion = Long.MIN_VALUE
 
+    private var prevFullMode = false
+    private var prevPatchW = -1
+    private var prevPatchH = -1
     private var prevVisX0 = Double.NaN
     private var prevVisY0 = Double.NaN
     private var prevVisX1 = Double.NaN
@@ -61,10 +66,10 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
         val screenH = kotlin.math.abs(bottomRight.y - topLeft.y)
         if (screenW < 1 || screenH < 1) return
 
-        var visX0 = screenX
-        var visY0 = screenY
-        var visX1 = screenX + screenW
-        var visY1 = screenY + screenH
+        var clipX0 = screenX
+        var clipY0 = screenY
+        var clipX1 = screenX + screenW
+        var clipY1 = screenY + screenH
         g2.clipBounds?.let { clip ->
             val clipTL = Point2D.Double()
             val clipBR = Point2D.Double()
@@ -72,21 +77,37 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
             transform.transform(
                 Point2D.Double((clip.x + clip.width).toDouble(), (clip.y + clip.height).toDouble()), clipBR
             )
-            visX0 = max(visX0, min(clipTL.x, clipBR.x))
-            visY0 = max(visY0, min(clipTL.y, clipBR.y))
-            visX1 = min(visX1, max(clipTL.x, clipBR.x))
-            visY1 = min(visY1, max(clipTL.y, clipBR.y))
+            clipX0 = max(clipX0, min(clipTL.x, clipBR.x))
+            clipY0 = max(clipY0, min(clipTL.y, clipBR.y))
+            clipX1 = min(clipX1, max(clipTL.x, clipBR.x))
+            clipY1 = min(clipY1, max(clipTL.y, clipBR.y))
         }
+        if (clipX1 - clipX0 < 1 || clipY1 - clipY0 < 1) return
+
+        // When the whole projection fits under the patch cap (any tile at overview zooms), shade
+        // it all and let the clip gate only the blit: Swing repaints clip to the damage rect,
+        // which shifts every token, and a clip-keyed region would demote every paint to a full
+        // reshade. The full patch is also translation-independent, so pans just re-blit. Only a
+        // deep-zoomed tile (projection past the cap) falls back to shading the clipped window.
+        val fullMode = screenW <= MAX_PATCH_DIM && screenH <= MAX_PATCH_DIM
+        val visX0 = if (fullMode) screenX else clipX0
+        val visY0 = if (fullMode) screenY else clipY0
+        val visX1 = if (fullMode) screenX + screenW else clipX1
+        val visY1 = if (fullMode) screenY + screenH else clipY1
         val visW = visX1 - visX0
         val visH = visY1 - visY0
-        if (visW < 1 || visH < 1) return
 
         val cap = min(1.0, min(MAX_PATCH_DIM / visW, MAX_PATCH_DIM / visH))
         val patchW = max(1, (visW * cap).toInt())
         val patchH = max(1, (visH * cap).toInt())
 
-        val regionChanged = visX0 != prevVisX0 || visY0 != prevVisY0 || visX1 != prevVisX1 || visY1 != prevVisY1 ||
-            screenX != prevScreenX || screenY != prevScreenY || screenW != prevScreenW || screenH != prevScreenH
+        val regionChanged = if (fullMode) {
+            !prevFullMode || patchW != prevPatchW || patchH != prevPatchH
+        } else {
+            prevFullMode ||
+                visX0 != prevVisX0 || visY0 != prevVisY0 || visX1 != prevVisX1 || visY1 != prevVisY1 ||
+                screenX != prevScreenX || screenY != prevScreenY || screenW != prevScreenW || screenH != prevScreenH
+        }
         if (tile.contentVersion != shadedVersion || regionChanged || patch == null) {
             var cache = patch
             val cacheReusable = cache != null && cache.width >= patchW && cache.height >= patchH
@@ -121,6 +142,9 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
                 tile.shadePatch(dest, cache.width, patchW, patchH, rowFrom, rowTo, colFrom, colTo, neg, mid, pos)
             }
             shadedVersion = version
+            prevFullMode = fullMode
+            prevPatchW = patchW
+            prevPatchH = patchH
             prevVisX0 = visX0
             prevVisY0 = visY0
             prevVisX1 = visX1

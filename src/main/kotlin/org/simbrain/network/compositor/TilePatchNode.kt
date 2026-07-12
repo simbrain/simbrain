@@ -97,7 +97,16 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
         val visW = visX1 - visX0
         val visH = visY1 - visY0
 
-        val cap = min(1.0, min(MAX_PATCH_DIM / visW, MAX_PATCH_DIM / visH))
+        // In the pooled regime (cells at or below a pixel even at logical resolution), shading
+        // at HiDPI device resolution buys nothing visible but multiplies texture-upload volume
+        // by the pixel ratio squared — and changed patches re-upload wholly every token. Shade
+        // at logical resolution there and let the GPU scale the cached texture; tiles zoomed
+        // past it keep device resolution so cell boundaries stay crisp.
+        val deviceScale = g2.deviceConfiguration?.defaultTransform?.scaleX ?: 1.0
+        val pooled = deviceScale > 1.0 &&
+            tile.cols >= screenW / deviceScale && tile.rows >= screenH / deviceScale
+        val resCap = if (pooled) 1.0 / deviceScale else 1.0
+        val cap = min(resCap, min(MAX_PATCH_DIM / visW, MAX_PATCH_DIM / visH))
         val patchW = max(1, (visW * cap).toInt())
         val patchH = max(1, (visH * cap).toInt())
 

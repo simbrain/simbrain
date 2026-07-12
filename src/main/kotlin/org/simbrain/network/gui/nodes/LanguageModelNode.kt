@@ -11,6 +11,7 @@ import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
 import org.simbrain.util.NetworkTheme
+import org.simbrain.util.RateLimitedEdtAction
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Theme
 import org.simbrain.util.createAction
@@ -59,7 +60,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         events.locationChanged.on(swingDispatcher) { pullLocationFromModel() }
         events.weightsLoaded.on(swingDispatcher) { rebuildInterior() }
         events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
-        events.updateGraphics.on(swingDispatcher) { refreshView() }
+        events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() }
 
         rebuildInterior()
         pullLocationFromModel()
@@ -112,6 +113,13 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             statusText.setOffset(0.0, top)
         }
     }
+
+    /**
+     * Generation-driven refreshes coalesce to ~30fps: syncing dirty tiles invalidates most of
+     * the interior, so at full decode speed a refresh per token would queue a full repaint per
+     * token. User-initiated paths (flips, menu actions) call [refreshView] directly.
+     */
+    private val refreshViewThrottled = RateLimitedEdtAction(33) { refreshView() }
 
     private fun refreshView() {
         compositorNode?.refreshDirtyTiles()

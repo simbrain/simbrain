@@ -685,3 +685,31 @@ fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: I
     for (c in components) panel.add(c)
     return panel
 }
+
+/**
+ * Runs [action] on the EDT at most once per [intervalMs]: immediately when the interval has
+ * elapsed (manual stepping stays responsive), otherwise as one trailing run when the window
+ * closes, so the final state always lands. Coalesces per-iteration GUI work under fast update
+ * loops instead of queueing a frame per iteration.
+ */
+class RateLimitedEdtAction(private val intervalMs: Long, private val action: () -> Unit) {
+
+    private var last = 0L
+
+    private val trailing = javax.swing.Timer(0) {
+        last = System.currentTimeMillis()
+        action()
+    }.apply { isRepeats = false }
+
+    operator fun invoke() {
+        val now = System.currentTimeMillis()
+        val elapsed = now - last
+        if (elapsed >= intervalMs) {
+            last = now
+            action()
+        } else if (!trailing.isRunning) {
+            trailing.initialDelay = (intervalMs - elapsed).toInt().coerceAtLeast(1)
+            trailing.restart()
+        }
+    }
+}

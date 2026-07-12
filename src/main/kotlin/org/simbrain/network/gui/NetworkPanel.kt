@@ -42,6 +42,8 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
+private const val UPDATE_REPAINT_MS = 33L
+
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -831,6 +833,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
+    /**
+     * Full-canvas repaint after a network update, rate-limited to ~30fps: a fast update loop
+     * would otherwise queue a full frame per iteration, and the post-update barrier then waits
+     * behind those paints — display cadence ends up pacing the model. Slow and stepped updates
+     * still repaint immediately, and a trailing repaint always renders the final state.
+     */
+    private val repaintOnUpdate = RateLimitedEdtAction(UPDATE_REPAINT_MS) { repaint() }
+
     private fun initEventHandlers() {
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
@@ -853,7 +863,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
             updated.on(Dispatchers.Swing.immediate) {
-                repaint()
+                repaintOnUpdate()
                 timeLabel.update()
             }
             zoomToFitPage.on(Dispatchers.Swing) {

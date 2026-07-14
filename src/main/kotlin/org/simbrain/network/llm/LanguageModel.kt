@@ -25,7 +25,9 @@ class LanguageModelEvents : LocationEvents() {
 /**
  * A language model on the network canvas: wraps the headless [Lfm2Model] and exposes its interior
  * through a [CompositorScene]. One network update generates one token, so the workspace play
- * button steps generation token by token.
+ * button steps generation token by token. Loading weights arms generation automatically; a run
+ * continues until the context window fills, the model emits end-of-text, or an optional token
+ * budget is reached, and [startGeneration] resets the context window for a fresh run.
  *
  * Only the weights directory, config, prompt, sampling parameters, and view state are serialized —
  * never the weights. On deserialization the model reloads from [weightsDirectory]; if the files
@@ -47,10 +49,11 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     )
 
     var tokensToGenerate by GuiEditable(
-        initValue = 30,
+        initValue = 0,
         label = "Tokens to generate",
-        description = "Generation stops after this many tokens beyond the prompt",
-        min = 1,
+        description = "Generation stops after this many tokens beyond the prompt; " +
+            "0 generates until the context window fills",
+        min = 0,
         order = 2,
     )
 
@@ -157,6 +160,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))
+        startGeneration()
         events.weightsLoaded.fire()
     }
 
@@ -190,7 +194,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
     }
 
-    /** Resets the model and starts a fresh generation run from [prompt]. */
+    /** Resets the model's context window and starts a fresh generation run from [prompt]. */
     @Synchronized
     fun startGeneration() {
         val state = loaded ?: return
@@ -208,6 +212,19 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     @Synchronized
     fun stopGeneration() {
         isGenerating = false
+    }
+
+    /** Continues a stopped run where it left off; no-op when the context window is full. */
+    @Synchronized
+    fun resumeGeneration() {
+        val state = loaded ?: return
+        if (promptIds.isEmpty()) {
+            startGeneration()
+            return
+        }
+        if (state.model.position >= state.model.config.maxSeqLen) return
+        isGenerating = true
+        events.updated.fire()
     }
 
     context(Network)
@@ -239,7 +256,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
             } else {
                 text += state.tokenizer.decode(intArrayOf(sampledToken))
                 generatedCount++
-                if (generatedCount >= tokensToGenerate) {
+                if (tokensToGenerate > 0 && generatedCount >= tokensToGenerate) {
                     isGenerating = false
                 }
             }

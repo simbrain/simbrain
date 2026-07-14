@@ -35,8 +35,9 @@ import javax.swing.SwingUtilities
 /**
  * Canvas node for a [LanguageModel]: an interaction box for whole-node selection and dragging,
  * the compositor interior (which owns its own tile selection, moves, trace, and tooltips), and a
- * status line with the generated text. Generation is paced by the workspace: arm it from the
- * context menu, then play or step the network — one iteration is one token.
+ * status line with the generated text. Generation is paced by the workspace: a loaded model is
+ * armed automatically, so playing or stepping the network generates one token per iteration;
+ * the context menu resets the context window for a fresh run.
  */
 class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageModel) : ScreenElement(networkPanel) {
 
@@ -98,6 +99,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 addChild(it)
             }
         }
+        // The interior's background can grow over the header as tiles move; keep the
+        // interaction box and status line painting (and picking) above it.
+        statusText.raiseToTop()
+        interactionBox.raiseToTop()
         placeChildren()
         refreshView()
     }
@@ -142,8 +147,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             languageModel.isGenerating ->
                 "Generating, token ${state.model.position}/${state.model.config.maxSeqLen} " +
                         "(play or step the network) — …$tail"
-            languageModel.text.isEmpty() -> "Ready — right-click to start generation"
-            else -> "Done — …$tail"
+            state.model.position >= state.model.config.maxSeqLen ->
+                "Context window full — right-click to reset it — …$tail"
+            languageModel.text.isEmpty() -> "Ready — play or step the network"
+            else -> "Stopped — …$tail"
         }
     }
 
@@ -167,9 +174,16 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         languageModel.stopGeneration()
                         refreshView()
                     })
-                } else {
-                    add(createAction("Start generation") { languageModel.startGeneration() })
+                } else if (state.model.position < state.model.config.maxSeqLen) {
+                    add(createAction("Resume generation") {
+                        languageModel.resumeGeneration()
+                        refreshView()
+                    })
                 }
+                add(createAction("Reset context window") {
+                    languageModel.startGeneration()
+                    refreshView()
+                })
                 addSeparator()
                 add(JMenu("Attention head").apply {
                     (0 until state.model.config.numHeads).forEach { head ->

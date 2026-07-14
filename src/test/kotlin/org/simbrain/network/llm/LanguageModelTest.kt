@@ -55,7 +55,7 @@ class LanguageModelTest {
     }
 
     @Test
-    fun `network iterations drive generation one token per update`() {
+    fun `loading arms generation and network iterations drive it one token per update`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
@@ -64,13 +64,16 @@ class LanguageModelTest {
         languageModel.loadWeights()
         runBlocking { net.addNetworkModel(languageModel) }
 
-        net.update()
-        assertEquals(0, languageModel.loaded!!.model.position, "an unarmed model ignores network updates")
+        assertTrue(languageModel.isGenerating, "a loaded model is armed without an explicit start")
+        assertEquals(0, languageModel.tokensToGenerate, "no token cap by default")
 
-        languageModel.startGeneration()
         net.update()
         net.update()
         assertEquals(2, languageModel.loaded!!.model.position)
+
+        languageModel.stopGeneration()
+        net.update()
+        assertEquals(2, languageModel.loaded!!.model.position, "a stopped model ignores network updates")
     }
 
     @Test
@@ -94,7 +97,7 @@ class LanguageModelTest {
     }
 
     @Test
-    fun `steps are no-ops before arming and after stopping`() {
+    fun `steps are no-ops while stopped and resume continues the run`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
@@ -102,15 +105,17 @@ class LanguageModelTest {
         languageModel.loadWeights()
 
         languageModel.step()
-        assertEquals(0, languageModel.loaded!!.model.position)
-
-        languageModel.startGeneration()
-        languageModel.step()
         languageModel.stopGeneration()
         val positionAtStop = languageModel.loaded!!.model.position
+        assertEquals(1, positionAtStop)
         languageModel.step()
         assertEquals(positionAtStop, languageModel.loaded!!.model.position)
         assertFalse(languageModel.isGenerating)
+
+        languageModel.resumeGeneration()
+        assertTrue(languageModel.isGenerating)
+        languageModel.step()
+        assertEquals(positionAtStop + 1, languageModel.loaded!!.model.position)
     }
 
     @Test

@@ -22,6 +22,7 @@ import org.simbrain.util.showInputDialog
 import org.simbrain.util.showWarningConfirmDialog
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.swingDispatcher
+import org.simbrain.workspace.WorkspacePreferences
 import java.awt.geom.Point2D
 import java.nio.file.Path
 import javax.swing.JCheckBoxMenuItem
@@ -115,11 +116,12 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     }
 
     /**
-     * Generation-driven refreshes coalesce to ~30fps: syncing dirty tiles invalidates most of
-     * the interior, so at full decode speed a refresh per token would queue a full repaint per
-     * token. User-initiated paths (flips, menu actions) call [refreshView] directly.
+     * Generation-driven refreshes coalesce to the workspace repaint rate limit: syncing dirty
+     * tiles invalidates most of the interior, so at full decode speed a refresh per token would
+     * queue a full repaint per token. User-initiated paths (flips, menu actions) call
+     * [refreshView] directly.
      */
-    private val refreshViewThrottled = RateLimitedEdtAction(33) { refreshView() }
+    private val refreshViewThrottled = RateLimitedEdtAction({ WorkspacePreferences.repaintIntervalMs }) { refreshView() }
 
     private fun refreshView() {
         compositorNode?.refreshDirtyTiles()

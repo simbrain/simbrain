@@ -22,6 +22,7 @@ import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -42,8 +43,6 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
-private const val UPDATE_REPAINT_MS = 33L
-
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -834,12 +833,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     /**
-     * Full-canvas repaint after a network update, rate-limited to ~30fps: a fast update loop
-     * would otherwise queue a full frame per iteration, and the post-update barrier then waits
-     * behind those paints — display cadence ends up pacing the model. Slow and stepped updates
-     * still repaint immediately, and a trailing repaint always renders the final state.
+     * Full-canvas repaint after a network update, rate-limited to the workspace repaint
+     * preference: a fast update loop would otherwise queue a full frame per iteration, and the
+     * post-update barrier then waits behind those paints — display cadence ends up pacing the
+     * model. Slow and stepped updates still repaint immediately, and a trailing repaint always
+     * renders the final state.
      */
-    private val repaintOnUpdate = RateLimitedEdtAction(UPDATE_REPAINT_MS) { repaint() }
+    private val repaintOnUpdate = RateLimitedEdtAction({ WorkspacePreferences.repaintIntervalMs }) { repaint() }
 
     private fun initEventHandlers() {
         network.events.apply {

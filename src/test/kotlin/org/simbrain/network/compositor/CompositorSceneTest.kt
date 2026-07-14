@@ -198,7 +198,7 @@ class CompositorSceneTest {
     @Test
     fun `selection model notifies on change and supports toggle and marquee set`() {
         val tiles = (0..2).map { VectorHistoryTile(TensorPort("t$it", FloatTensor(1, 2)), rows = 1) }
-        val selection = TileSelectionModel()
+        val selection = InteriorSelectionModel()
         var changes = 0
         selection.onChange = { changes++ }
 

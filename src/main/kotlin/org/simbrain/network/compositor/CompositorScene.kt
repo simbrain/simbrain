@@ -56,31 +56,32 @@ class FlowEdge(
 class TileSatellite(val tile: TensorTile, val edge: FlowEdge, val op: TensorOp)
 
 /**
- * Self-contained selection over compositor tiles, shaped like the network canvas selection model
- * (add/remove/toggle/set/clear plus change notification) but deliberately separate from it —
- * interior objects aren't network models, so global selection actions don't apply to them.
+ * Self-contained selection over interior endpoints — tiles and op vertices — shaped like the
+ * network canvas selection model (add/remove/toggle/set/clear plus change notification) but
+ * deliberately separate from it — interior objects aren't network models, so global selection
+ * actions don't apply to them.
  */
-class TileSelectionModel {
+class InteriorSelectionModel {
 
-    private val _selected = LinkedHashSet<TensorTile>()
-    val selected: Set<TensorTile> get() = _selected
+    private val _selected = LinkedHashSet<FlowEndpoint>()
+    val selected: Set<FlowEndpoint> get() = _selected
 
     var onChange: (() -> Unit)? = null
 
-    operator fun contains(tile: TensorTile) = tile in _selected
+    operator fun contains(item: FlowEndpoint) = item in _selected
 
-    fun add(tiles: Collection<TensorTile>) = change { _selected.addAll(tiles) }
+    fun add(items: Collection<FlowEndpoint>) = change { _selected.addAll(items) }
 
-    fun remove(tile: TensorTile) = change { _selected.remove(tile) }
+    fun remove(item: FlowEndpoint) = change { _selected.remove(item) }
 
-    fun toggle(tile: TensorTile) = change {
-        if (!_selected.remove(tile)) _selected.add(tile) else true
+    fun toggle(item: FlowEndpoint) = change {
+        if (!_selected.remove(item)) _selected.add(item) else true
     }
 
-    fun set(tiles: Collection<TensorTile>) = change {
-        if (_selected == tiles.toSet()) false else {
+    fun set(items: Collection<FlowEndpoint>) = change {
+        if (_selected == items.toSet()) false else {
             _selected.clear()
-            _selected.addAll(tiles)
+            _selected.addAll(items)
             true
         }
     }
@@ -153,7 +154,7 @@ class CompositorScene(val graph: PlanGraph? = null) {
     /** Tiles rendered with a standing accent border — the depth strip rows the block spans. */
     var highlightedTiles: Set<TensorTile> = emptySet()
 
-    val selection = TileSelectionModel()
+    val selection = InteriorSelectionModel()
 
     fun addTile(tile: TensorTile) {
         require(_tiles.none { it.id == tile.id }) { "Duplicate tile id ${tile.id}" }

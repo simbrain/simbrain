@@ -8,6 +8,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
+import org.simbrain.network.gui.isPanKeyDown
 import org.simbrain.network.llm.HeadwiseNormRopeOp
 import org.simbrain.network.tensor.op.LinearOp
 import org.simbrain.network.tensor.op.MatMulLinearOp
@@ -481,6 +482,13 @@ class CompositorNode(
     private val lensRows = scene.lens?.sources?.indices?.map { LensRowNode(it).also { node -> addChild(node) } }
         ?: emptyList()
 
+    /**
+     * Selection rings around selected op glyphs. The glyphs themselves live in the chrome
+     * raster, so restyling them per click would invalidate that cache; the rings are separate
+     * nodes above it instead, like the tile borders.
+     */
+    private val opSelectionOverlay = PNode().apply { pickable = false }.also { addChild(it) }
+
     private var marquee: PPath? = null
 
     /** Invoked after every tier-1 relayout, e.g. so a host can persist tile positions. */
@@ -530,6 +538,7 @@ class CompositorNode(
                 bounds.width + 2 * MARGIN + LENS_SPACE, bounds.height + 2 * MARGIN
             ), false
         )
+        syncOpSelectionOverlay()
         onLayoutChanged?.invoke()
     }
 
@@ -546,19 +555,43 @@ class CompositorNode(
         }
         rebuildEdges()
         lensRows.forEach { it.refresh() }
+        syncOpSelectionOverlay()
     }
 
     private fun syncHighlights() {
         tileNodes.forEach { it.syncHighlight() }
         rebuildEdges()
+        syncOpSelectionOverlay()
     }
 
     /**
-     * Selection only styles tile borders — edge ribbons don't read it — so click and marquee
-     * skip the edge rebuild and leave the chrome raster untouched.
+     * Selection only styles tile borders and the op rings — edge ribbons don't read it — so
+     * click and marquee skip the edge rebuild and leave the chrome raster untouched.
      */
     private fun syncSelection() {
         tileNodes.forEach { it.syncHighlight() }
+        syncOpSelectionOverlay()
+    }
+
+    private fun syncOpSelectionOverlay() {
+        opSelectionOverlay.removeAllChildren()
+        val palette = NetworkTheme.current
+        for (item in scene.selection.selected) {
+            val vertex = item as? OpVertex ?: continue
+            val b = vertex.endpointBounds
+            opSelectionOverlay.addChild(
+                PPath.createRoundRectangle(
+                    b.x - OP_RING_PAD, b.y - OP_RING_PAD,
+                    b.width + 2 * OP_RING_PAD, b.height + 2 * OP_RING_PAD,
+                    2 * (GLYPH_RADIUS + OP_RING_PAD), 2 * (GLYPH_RADIUS + OP_RING_PAD)
+                ).apply {
+                    paint = null
+                    strokePaint = palette.selectionHandle
+                    stroke = BasicStroke(2f)
+                    pickable = false
+                }
+            )
+        }
     }
 
     /**
@@ -1027,10 +1060,11 @@ class CompositorNode(
         private var mode = Mode.NONE
         private var pressPoint: Point2D? = null
         private var marqueeAdditive = false
-        private var draggedVertex: OpVertex? = null
 
         override fun mousePressed(event: PInputEvent) {
             if (!event.isLeftMouseButton) return
+            // With the pan key held the canvas handler owns the gesture; leave it unhandled.
+            if (event.isPanKeyDown) return
             // Pager clicks belong to their arrow buttons; don't start a marquee under them.
             var picked: PNode? = event.pickedNode
             while (picked != null) {
@@ -1048,20 +1082,14 @@ class CompositorNode(
             val vertex = scene.opVertices.firstOrNull {
                 glyphsByOp[it.op]?.containsScenePoint(point.x, point.y) == true
             }
-            if (vertex != null) {
-                draggedVertex = vertex
-                mode = Mode.MOVE_VERTEX
-                pressPoint = point
-                event.isHandled = true
-                return
-            }
-            if (tile != null) {
+            val hit: FlowEndpoint? = vertex ?: tile
+            if (hit != null) {
                 if (event.isShiftDown) {
-                    scene.selection.toggle(tile)
-                } else if (tile !in scene.selection) {
-                    scene.selection.set(listOf(tile))
+                    scene.selection.toggle(hit)
+                } else if (hit !in scene.selection) {
+                    scene.selection.set(listOf(hit))
                 }
-                scene.layerOfTile?.invoke(tile)?.let { selectLayer(it) }
+                (hit as? TensorTile)?.let { t -> scene.layerOfTile?.invoke(t)?.let { selectLayer(it) } }
                 mode = Mode.MOVE
             } else {
                 marqueeAdditive = event.isShiftDown
@@ -1093,19 +1121,20 @@ class CompositorNode(
             when (mode) {
                 Mode.MOVE -> {
                     val delta = event.getDeltaRelativeTo(this@CompositorNode)
-                    for (tile in scene.selection.selected) {
-                        tile.x += delta.width
-                        tile.y += delta.height
-                        tileNodesById[tile.id]?.syncLayout()
+                    for (item in scene.selection.selected) {
+                        when (item) {
+                            is TensorTile -> {
+                                item.x += delta.width
+                                item.y += delta.height
+                                tileNodesById[item.id]?.syncLayout()
+                            }
+                            is OpVertex -> {
+                                item.x += delta.width
+                                item.y += delta.height
+                                item.placed = true
+                            }
+                        }
                     }
-                    relayoutThrottled()
-                }
-                Mode.MOVE_VERTEX -> {
-                    val vertex = draggedVertex ?: return
-                    val delta = event.getDeltaRelativeTo(this@CompositorNode)
-                    vertex.x += delta.width
-                    vertex.y += delta.height
-                    vertex.placed = true
                     relayoutThrottled()
                 }
                 Mode.MARQUEE -> {
@@ -1135,18 +1164,18 @@ class CompositorNode(
                 if (start != null) {
                     val point = event.getPositionRelativeTo(this@CompositorNode)
                     val rect = rectBetween(start, point)
-                    val hit = scene.tilesIn(rect.x, rect.y, rect.width, rect.height)
+                    val hit = scene.tilesIn(rect.x, rect.y, rect.width, rect.height) +
+                        scene.opVertices.filter { it.endpointBounds.intersects(rect) }
                     if (marqueeAdditive) scene.selection.add(hit) else scene.selection.set(hit)
                     syncSelection()
                 }
                 event.isHandled = true
             }
-            if (mode == Mode.MOVE || mode == Mode.MOVE_VERTEX) {
+            if (mode == Mode.MOVE) {
                 relayout()
             }
             mode = Mode.NONE
             pressPoint = null
-            draggedVertex = null
         }
 
         override fun mouseWheelRotated(event: PInputEvent) {
@@ -1199,7 +1228,7 @@ class CompositorNode(
         )
     }
 
-    private enum class Mode { NONE, MOVE, MOVE_VERTEX, MARQUEE }
+    private enum class Mode { NONE, MOVE, MARQUEE }
 
     companion object {
         private const val MARGIN = 40.0
@@ -1220,6 +1249,7 @@ class CompositorNode(
         private const val PAGER_ARROW = 7.0
         private const val TICK_LENGTH = 4.0
         private const val GLYPH_RADIUS = 9.0
+        private const val OP_RING_PAD = 3.0
         private const val GLYPH_ICON = 12.0
         private const val BADGE_RADIUS = 10.0
         private const val BADGE_ICON = 13.0

@@ -1,7 +1,5 @@
 package org.simbrain.network.compositor
 
-import java.awt.geom.Point2D
-
 /**
  * Constrained layout for compositor scenes, replacing hand-placed coordinates. The residual
  * checkpoint spine — junction ⊕s included — plus everything downstream of the last checkpoint
@@ -14,7 +12,8 @@ import java.awt.geom.Point2D
  * sideways and rejoin at the ⊕ below. A long arm costs width instead of height, so the diagram
  * stays near screen aspect. Limbs sharing a checkpoint stack as strips (more spine-facing
  * edges on top) centered as a group, and their return arrows route through reserved lanes at
- * the bottom of the gap via [FlowEdge.waypoints]. Within a column, siblings order by the barycenter of their placed
+ * the bottom of the gap — recorded as [ReturnLaneRoute] intents whose waypoint geometry
+ * re-derives from the current rects on every relayout. Within a column, siblings order by the barycenter of their placed
  * inputs — the crossing-minimization pass — with schedule order breaking ties. Standalone
  * parameter tiles sit above the endpoint they feed. Satellite tiles are untouched — their rects
  * derive from edge curves at render time, with column gaps and spine gaps opened to fit them.
@@ -33,7 +32,7 @@ class CompositorLayout(
     private val limbClearance = 220.0 + 20.0 * scale
     private val paramGap = (30.0 * scale).coerceAtLeast(20.0)
     private val interLimbGap = (60.0 * scale).coerceAtLeast(50.0)
-    private val laneGap = 26.0
+    private val laneGap = LANE_GAP
 
     private fun width(e: FlowEndpoint) = when (e) {
         is TensorTile -> e.width
@@ -259,31 +258,20 @@ class CompositorLayout(
         }
 
         // Return arrows travel back to the spine through lanes below the gap's limb strips, so
-        // they never cut through a neighboring strip's columns.
+        // they never cut through a neighboring strip's columns. Only the routing intent is
+        // recorded here; the waypoint geometry derives from current rects so lanes follow
+        // their tiles when dragged.
+        val lanes = HashMap<FlowEdge, ReturnLaneRoute>()
         for ((_, group) in limbsAtGap) {
-            val stripsBottom = group.last().top + group.last().stripHeight
-            val clearX = group.maxOf { plan ->
-                limbLeft + plan.columns.indices.sumOf { c ->
-                    (plan.columns[c].maxOf { width(it) }) + (plan.columnGaps.getOrNull(c) ?: 0.0)
-                }
-            }
-            var laneY = stripsBottom + laneGap
-            for (plan in group.asReversed()) {
+            val clearItems = group.flatMap { limbs[it.id] }
+            for ((lane, plan) in group.asReversed().withIndex()) {
                 for (edge in plan.returnEdges) {
-                    val source = edge.from
-                    val sourceRight = when (source) {
-                        is TensorTile -> source.x + source.width
-                        is OpVertex -> source.x + width(source) / 2
-                    }
-                    val dropX = maxOf(sourceRight + 40.0, if (plan !== group.last()) clearX + 40.0 else sourceRight + 40.0)
-                    edge.waypoints = listOf(
-                        Point2D.Double(dropX, laneY),
-                        Point2D.Double(spineAxisX + spineHalfWidth + 60.0, laneY),
-                    )
+                    lanes[edge] = ReturnLaneRoute(clearItems, lane, clearsGroupRight = plan !== group.last())
                 }
-                laneY += laneGap
             }
         }
+        scene.returnLanes = lanes
+        scene.deriveReturnWaypoints()
 
         for ((target, group) in params.groupBy { p -> scene.edges.firstOrNull { it.from == p }?.to }) {
             when (target) {
@@ -311,7 +299,4 @@ class CompositorLayout(
         }
     }
 
-    companion object {
-        private const val JUNCTION_SIZE = 24.0
-    }
 }

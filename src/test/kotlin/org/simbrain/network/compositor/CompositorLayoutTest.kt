@@ -118,6 +118,26 @@ class CompositorLayoutTest {
     }
 
     @Test
+    fun `return lanes re-derive from current rects so they follow dragged limbs`() {
+        val scene = scene()
+        val edge = scene.edges.first {
+            (it.from as? TensorTile)?.id == "layers.0.attn.out" && it.to is OpVertex
+        }
+        assertTrue(edge in scene.returnLanes, "the limb-to-spine edge routes through a lane")
+        assertEquals(2, edge.waypoints.size)
+        val route = scene.returnLanes.getValue(edge)
+        val laneBefore = edge.waypoints.first().y
+        assertTrue(laneBefore > route.clearItems.maxOf { it.routeRect.maxY },
+            "the lane runs below everything hanging in the gap")
+
+        val lowest = route.clearItems.filterIsInstance<TensorTile>().maxBy { it.y + it.height }
+        lowest.y += 300.0
+        scene.deriveReturnWaypoints()
+        assertEquals(laneBefore + 300.0, edge.waypoints.first().y, 1e-9,
+            "the lane follows the dragged strip down")
+    }
+
+    @Test
     fun `layout is deterministic across repeated application`() {
         val scene = scene(layers = 2)
         val before = scene.tiles.associate { it.id to (it.x to it.y) }

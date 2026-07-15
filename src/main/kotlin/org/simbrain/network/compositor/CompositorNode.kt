@@ -513,9 +513,10 @@ class CompositorNode(
         lensRows.forEach { it.refresh() }
     }
 
-    /** Re-derives node offsets, edges, lens placement, and bounds from tile rects. */
+    /** Re-derives node offsets, edges, return lanes, lens placement, and bounds from tile rects. */
     fun relayout() {
         tileNodes.forEach { it.syncLayout() }
+        scene.deriveReturnWaypoints()
         rebuildEdges()
         for (row in lensRows) {
             val sourceId = scene.lens?.sources?.get(row.index)?.name ?: continue

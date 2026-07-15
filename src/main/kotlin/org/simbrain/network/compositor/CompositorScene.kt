@@ -4,9 +4,44 @@ import org.simbrain.network.tensor.op.MergeHeadsOp
 import org.simbrain.network.tensor.op.SplitHeadsOp
 import org.simbrain.network.tensor.op.TensorOp
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 
 /** Something an edge can start or end at: a tensor tile, or a junction op vertex. */
 sealed interface FlowEndpoint
+
+/** Box size of a junction glyph on the diagram, per stage of its strip. */
+const val JUNCTION_SIZE = 24.0
+
+/** Vertical spacing between stacked return lanes. */
+const val LANE_GAP = 26.0
+
+/** The rect routing clears for an endpoint: a tile's rect, or the junction glyph's box. */
+val FlowEndpoint.routeRect: Rectangle2D
+    get() = when (this) {
+        is TensorTile -> bounds
+        is OpVertex -> {
+            val stages = glyphStages(op)?.size ?: 1
+            Rectangle2D.Double(
+                x - JUNCTION_SIZE * stages / 2, y - JUNCTION_SIZE / 2,
+                JUNCTION_SIZE * stages, JUNCTION_SIZE
+            )
+        }
+    }
+
+/**
+ * Routing intent for a limb's return edge, recorded by the layout pass. Only the intent is
+ * stored; the waypoint geometry derives from the CURRENT rects each time
+ * [CompositorScene.deriveReturnWaypoints] runs, so lanes follow their tiles when dragged
+ * instead of bending through where the layout once put them.
+ */
+class ReturnLaneRoute(
+    /** Everything hanging in the edge's spine gap — the lane runs below all of it. */
+    val clearItems: List<FlowEndpoint>,
+    /** Lane ordinal below the group, 0 nearest the strips. */
+    val lane: Int,
+    /** True when the drop must also swing right of the whole group, not just its source. */
+    val clearsGroupRight: Boolean,
+)
 
 /**
  * A multi-input op promoted to a diagram vertex: its input streams' arrows converge into the
@@ -153,6 +188,29 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     /** Tiles rendered with a standing accent border — the depth strip rows the block spans. */
     var highlightedTiles: Set<TensorTile> = emptySet()
+
+    /** Lane-routing intents for limb return edges, recorded by the layout pass. */
+    var returnLanes: Map<FlowEdge, ReturnLaneRoute> = emptyMap()
+
+    /**
+     * Re-derives return-edge waypoints from the current rects: each lane runs below everything
+     * hanging in its gap, drops right of its source (or the whole group, for upper strips), and
+     * re-enters toward its spine target. Runs on every relayout, so dragging a tile — or
+     * applying a saved layout — pulls the lanes along with it.
+     */
+    fun deriveReturnWaypoints() {
+        for ((edge, route) in returnLanes) {
+            val laneY = route.clearItems.maxOf { it.routeRect.maxY } + LANE_GAP * (route.lane + 1)
+            var dropX = edge.from.routeRect.maxX + 40.0
+            if (route.clearsGroupRight) {
+                dropX = maxOf(dropX, route.clearItems.maxOf { it.routeRect.maxX } + 40.0)
+            }
+            edge.waypoints = listOf(
+                Point2D.Double(dropX, laneY),
+                Point2D.Double(edge.to.routeRect.maxX + 60.0, laneY),
+            )
+        }
+    }
 
     val selection = InteriorSelectionModel()
 

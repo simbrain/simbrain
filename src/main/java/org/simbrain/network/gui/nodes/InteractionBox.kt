@@ -36,24 +36,10 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
     private val kebabPaddingY = 2.0
 
     /**
-     * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
-     * understand by changing the value and "zooming  out" of a network containing a neuron group.
-     */
-    private val largestZoomRescaleFactor = 4.0
-
-    /**
      * Reference to property change listener so it can be cleaned up later.
      */
     val zoomListener: PropertyChangeListener = PropertyChangeListener { evt: PropertyChangeEvent? ->
-        val viewScale = networkPanel.canvas.camera.viewScale
-        if (viewScale < 1) {
-            // Rescale based on linear equation so that as view scale
-            // goes from 1 to 0 rescaleAmount goes from 1 to "largestZoomRescaleFactor"
-            val rescaleAmount = (1 - largestZoomRescaleFactor) * viewScale + largestZoomRescaleFactor
-            setScale(rescaleAmount)
-        } else {
-            setScale(1.0)
-        }
+        setScale(zoomRescale(networkPanel.canvas.camera.viewScale))
     }
 
     /**
@@ -213,5 +199,19 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
          * Height of interaction box.
          */
         private const val DEFAULT_HEIGHT = 10f
+
+        /**
+         * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
+         * understand by changing the value and "zooming out" of a network containing a neuron group.
+         */
+        private const val LARGEST_ZOOM_RESCALE_FACTOR = 4.0
+
+        /**
+         * The counter-scale keeping an interaction box readable at [viewScale]: as the view scale goes
+         * from 1 to 0 the rescale goes from 1 to [LARGEST_ZOOM_RESCALE_FACTOR]. Nodes that anchor other
+         * chrome to an interaction box use the same curve so their placement tracks the box's footprint.
+         */
+        fun zoomRescale(viewScale: kotlin.Double): kotlin.Double =
+            if (viewScale < 1) (1 - LARGEST_ZOOM_RESCALE_FACTOR) * viewScale + LARGEST_ZOOM_RESCALE_FACTOR else 1.0
     }
 }

@@ -2,6 +2,7 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.piccolo2d.PCamera
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
@@ -24,6 +25,7 @@ import org.simbrain.util.showWarningDialog
 import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.WorkspacePreferences
 import java.awt.geom.Point2D
+import java.beans.PropertyChangeListener
 import java.nio.file.Path
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JMenu
@@ -52,10 +54,17 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private var loadError: String? = null
 
+    /**
+     * The status line rides the interaction box's zoom counter-scale: both stay readable at
+     * overview zoom, and the status keeps clear of the box's enlarged footprint.
+     */
+    private val statusZoomListener = PropertyChangeListener { placeStatusText() }
+
     init {
         addChild(interactionBox)
         addChild(statusText)
         interactionBox.setText(languageModel.displayName)
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, statusZoomListener)
 
         val events = languageModel.events
         events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) }
@@ -107,17 +116,28 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         refreshView()
     }
 
+    /**
+     * The header anchors at the node origin, not under the interior: the interior's bounds
+     * change as tiles move, and a bottom anchor would drift away from the box. The interior
+     * starts below the header line at its largest zoom counter-scale, so it never slides
+     * under the box or status as the camera zooms out.
+     */
     private fun placeChildren() {
         interactionBox.setOffset(0.0, 0.0)
-        val top = interactionBox.fullBoundsReference.height + 6.0
-        val interior = compositorNode
-        if (interior != null) {
+        placeStatusText()
+        val reserve = interactionBox.height * InteractionBox.zoomRescale(0.0) + 12.0
+        compositorNode?.let { interior ->
             val bounds = interior.fullBoundsReference
-            interior.offset(-bounds.x, top - bounds.y)
-            statusText.setOffset(0.0, top + interior.fullBoundsReference.height + 8.0)
-        } else {
-            statusText.setOffset(0.0, top)
+            interior.offset(-bounds.x, reserve - bounds.y)
         }
+    }
+
+    /** One header line: the status rides beside the box at the box's zoom counter-scale. */
+    private fun placeStatusText() {
+        val rescale = InteractionBox.zoomRescale(networkPanel.canvas.camera.viewScale)
+        statusText.scale = rescale
+        val box = interactionBox.fullBoundsReference
+        statusText.setOffset(box.width + 8.0 * rescale, (box.height - statusText.height * rescale) / 2)
     }
 
     /**

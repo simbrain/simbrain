@@ -35,7 +35,7 @@ class CompositorLayoutTest {
     }
 
     @Test
-    fun `limbs flow horizontally clear of the lens strip and hang between their checkpoints`() {
+    fun `limbs flow horizontally clear of the lens strip centered on the checkpoint feeding them`() {
         val scene = scene()
         val spineRight = scene.tile("resid0").let { it.x + it.width }
         for (id in listOf("layers.0.attn.q", "layers.0.attn.weights", "layers.0.attn.out", "layers.0.mlp.act")) {
@@ -54,8 +54,11 @@ class CompositorLayoutTest {
         val deck = scene.tile("layers.0.attn.weights")
         val out = scene.tile("layers.0.attn.out")
         assertTrue(deck.x > q.x && out.x > deck.x, "the limb flows left to right through its columns")
-        assertTrue(q.y > branch.y + branch.height, "the limb hangs below the checkpoint that feeds it")
-        assertTrue(rejoin.y > branch.y, "the rejoin checkpoint sits below the branch")
+        // q/k/v is the limb's tallest column, so its extent is the strip's extent.
+        val stripCenter = (q.y + v.y + v.height) / 2
+        assertEquals(branch.y + branch.height / 2, stripCenter, 1e-6,
+            "the limb strip centers on the checkpoint that feeds it")
+        assertTrue(rejoin.y > v.y + v.height, "the rejoin checkpoint sits below the strip")
     }
 
     @Test
@@ -108,7 +111,9 @@ class CompositorLayoutTest {
         assertEquals(85.0, resid0.width, 1e-9, "tile geometry scales")
         assertEquals(60.0, resid0.height, 1e-9)
         val q = scene.tile("layers.0.attn.q")
-        assertTrue(q.y >= resid0.y + resid0.height + 70.0, "row gap keeps its label-room floor")
+        val logits = scene.tile("logits")
+        val probs = scene.tile("probs")
+        assertTrue(probs.y >= logits.y + logits.height + 70.0, "row gap keeps its label-room floor")
         assertTrue(q.x >= resid0.x + resid0.width + 220.0, "the fixed-size lens strip keeps its clearance")
     }
 

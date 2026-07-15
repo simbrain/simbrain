@@ -9,12 +9,12 @@ import java.awt.geom.Point2D
  * components of the flow graph once the spine is removed, each one processing arm (attention,
  * gated conv, the MLP).
  *
- * Limbs flow HORIZONTALLY: each lays out as left-to-right columns of its local ranks, hanging
- * off the spine gap between the checkpoints it connects — the classic block-diagram shape where
- * arms loop out sideways and rejoin at the ⊕. A long arm costs width instead of height, so the
- * diagram stays near screen aspect. Limbs sharing a gap stack as strips (more spine-facing
- * edges on top), and their return arrows route through reserved lanes at the bottom of the gap
- * via [FlowEdge.waypoints]. Within a column, siblings order by the barycenter of their placed
+ * Limbs flow HORIZONTALLY: each lays out as left-to-right columns of its local ranks, centered
+ * on the checkpoint that feeds it — the classic block-diagram shape where arms run straight out
+ * sideways and rejoin at the ⊕ below. A long arm costs width instead of height, so the diagram
+ * stays near screen aspect. Limbs sharing a checkpoint stack as strips (more spine-facing
+ * edges on top) centered as a group, and their return arrows route through reserved lanes at
+ * the bottom of the gap via [FlowEdge.waypoints]. Within a column, siblings order by the barycenter of their placed
  * inputs — the crossing-minimization pass — with schedule order breaking ties. Standalone
  * parameter tiles sit above the endpoint they feed. Satellite tiles are untouched — their rects
  * derive from edge curves at render time, with column gaps and spine gaps opened to fit them.
@@ -183,9 +183,19 @@ class CompositorLayout(
             group.sortedWith(compareByDescending<LimbPlan> { it.spineEdges }.thenBy { it.id })
         }
 
+        // Limb strips center as a group on the checkpoint feeding them, so the arm runs
+        // straight out sideways instead of stepping down first. A gap then only pays for the
+        // part of the strip stack extending below its checkpoint plus the return lanes; the
+        // part reaching above is charged to the gap before it.
+        fun stackHeight(group: List<LimbPlan>) =
+            group.sumOf { it.stripHeight } + interLimbGap * (group.size - 1)
+
+        fun overhang(i: Int) = limbsAtGap[i]
+            ?.let { ((stackHeight(it) - height(spine[i])) / 2).coerceAtLeast(0.0) } ?: 0.0
+
         // Spine gaps: the base row gap (tight around junction-only neighbors), opened for
-        // spine-riding satellites, and sized to stack every limb strip hanging in them plus
-        // the return lanes along the bottom.
+        // spine-riding satellites, the strip overhangs on either side, and the return lanes
+        // along the bottom.
         val spineSatelliteNeed = HashMap<Int, Double>()
         for (satellite in scene.satellites) {
             val from = spineIndex[satellite.edge.from] ?: continue
@@ -199,21 +209,25 @@ class CompositorLayout(
             val base = if (spine[i] is OpVertex || spine[i + 1] is OpVertex) junctionGap else rowGap
             var need = maxOf(base, spineSatelliteNeed[i] ?: 0.0)
             limbsAtGap[i]?.let { group ->
-                val strips = group.sumOf { it.stripHeight } + interLimbGap * (group.size - 1)
                 val lanes = laneGap * (group.count { it.returnEdges.isNotEmpty() } + 1)
-                need = maxOf(need, rowGap + strips + maxOf(rowGap, lanes))
+                need = maxOf(need, overhang(i) + maxOf(rowGap, lanes))
             }
             need
+        }
+        for (i in 1 until gapNeed.size) {
+            gapNeed[i - 1] += overhang(i)
         }
 
         var y = 0.0
         for ((i, item) in spine.withIndex()) {
             place(item, spineAxisX - width(item) / 2, y)
             if (i < gapNeed.size) {
-                var stripTop = y + height(item) + rowGap
-                for (plan in limbsAtGap[i].orEmpty()) {
-                    plan.top = stripTop
-                    stripTop += plan.stripHeight + interLimbGap
+                limbsAtGap[i]?.let { group ->
+                    var stripTop = y + height(item) / 2 - stackHeight(group) / 2
+                    for (plan in group) {
+                        plan.top = stripTop
+                        stripTop += plan.stripHeight + interLimbGap
+                    }
                 }
                 y += height(item) + gapNeed[i]
             }

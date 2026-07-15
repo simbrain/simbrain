@@ -140,7 +140,7 @@ object Lfm2StackCompositor {
         stackedWeight("block.w.self_attn.v_proj.weight", attnLayers, "Wv")
         stackedWeight("block.w.self_attn.out_proj.weight", attnLayers, "Wo")
         for (angle in listOf("cos", "sin")) {
-            scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), window, "rope $angle", TileKind.ACTIVATION).apply {
+            scene.addTile(VectorHistoryTile(plan.port("rope.$angle"), window, angle, TileKind.ACTIVATION).apply {
                 width = maxOf(featureWidth(config.headDim / 2), SLIVER_MIN_WIDTH)
                 height = tokenExtent
                 magnified = tokenAxisFloored || featureWidth(config.headDim / 2) < SLIVER_MIN_WIDTH
@@ -219,6 +219,17 @@ object Lfm2StackCompositor {
         scene.tile("block.w.conv.in_proj.weight").rowTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
 
         scene.connectFromGraph()
+        // The attention limb reads as three lanes — q, k, v — on shared columns: vectors
+        // aligned, caches aligned, with the rope tables nested between the junctions they feed.
+        scene.limbTemplates = listOf(LimbTemplate.parse(
+            """
+            block.attn.q_norm_rope  block.attn.q  .                   block.attn.scores  block.attn.weights  block.attn.mix  block.attn.context  block.attn.out
+            rope.cos+rope.sin       .             .                   .                  .                   .               .                   .
+            block.attn.k_norm_rope  block.attn.k  block.attn.k_cache  .                  .                   .               .                   .
+            .                       block.attn.v  block.attn.v_cache  .                  .                   .               .                   .
+            """,
+            rowGaps = listOf(12.0, 12.0, null),
+        ))
         CompositorLayout().apply(scene)
 
         // The GQA story: wheel-flipping the attention deck flips the cache decks to the serving

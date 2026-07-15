@@ -193,6 +193,13 @@ class CompositorScene(val graph: PlanGraph? = null) {
     var returnLanes: Map<FlowEdge, ReturnLaneRoute> = emptyMap()
 
     /**
+     * Declarative grid templates for limb interiors, set by the scene's compositor. The layout
+     * pass lays a limb out from the first template whose keys exactly cover its endpoints;
+     * unmatched limbs keep the automatic rank-column layout.
+     */
+    var limbTemplates: List<LimbTemplate> = emptyList()
+
+    /**
      * Re-derives return-edge waypoints from the current rects: each lane runs below everything
      * hanging in its gap, drops right of its source (or the whole group, for upper strips), and
      * re-enters toward its spine target. Runs on every relayout, so dragging a tile — or

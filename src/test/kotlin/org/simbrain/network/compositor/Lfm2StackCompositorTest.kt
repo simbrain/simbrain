@@ -385,4 +385,53 @@ class Lfm2StackCompositorTest {
         assertTrue(scene.memoryEdges.any { (it.from as? TensorTile)?.id == "block.conv.cache" },
             "the conv window read is cross-time flow too")
     }
+
+    @Test
+    fun `the attention limb template lays q, k, and v out as aligned lanes`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
+        val q = scene.tile("block.attn.q")
+        val k = scene.tile("block.attn.k")
+        val v = scene.tile("block.attn.v")
+        assertEquals(q.x, k.x, 1e-9, "q, k, and v share the vector column's left edge")
+        assertEquals(k.x, v.x, 1e-9)
+        assertTrue(q.y + q.height < k.y && k.y + k.height < v.y, "lanes stack q, k, v top down")
+
+        val kCache = scene.tile("block.attn.k_cache")
+        val vCache = scene.tile("block.attn.v_cache")
+        assertEquals(kCache.x, vCache.x, 1e-9, "the caches share the next column")
+        assertEquals(k.y + k.height / 2, kCache.y + kCache.height / 2, 1e-9,
+            "each cache centers on its lane")
+        assertEquals(v.y + v.height / 2, vCache.y + vCache.height / 2, 1e-9)
+
+        // The q lane runs straight: every downstream stop centers on the q row.
+        val qCenter = q.y + q.height / 2
+        for (id in listOf("block.attn.weights", "block.attn.context", "block.attn.out")) {
+            val tile = scene.tile(id)
+            assertEquals(qCenter, tile.y + tile.height / 2, 1e-9, "$id rides the q lane")
+        }
+        val scores = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.scores" }
+        assertEquals(qCenter, scores.y, 1e-9)
+
+        // The rope tables nest between the two rope junctions that consume them.
+        val qRope = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.q_norm_rope" }
+        val kRope = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.k_norm_rope" }
+        val cos = scene.tile("rope.cos")
+        val sin = scene.tile("rope.sin")
+        assertTrue(qRope.y < cos.y && cos.y + cos.height / 2 < kRope.y)
+        assertTrue(cos.x + cos.width < sin.x, "cos and sin sit side by side in one cell")
+        assertEquals(cos.y, sin.y, 1e-9)
+    }
+
+    @Test
+    fun `a template that no longer covers the limb steps aside for the rank layout`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
+        val templated = scene.tiles.associate { it.id to (it.x to it.y) }
+        scene.limbTemplates = listOf(LimbTemplate.parse("block.attn.q  block.attn.k"))
+        CompositorLayout().apply(scene)
+        val q = scene.tile("block.attn.q")
+        val v = scene.tile("block.attn.v")
+        assertTrue(q.x != templated.getValue("block.attn.q").first || q.y != templated.getValue("block.attn.q").second,
+            "an unmatched template falls back to rank columns instead of erroring")
+        assertTrue(v.x != q.x, "rank columns separate v (rank 0) from q (behind its junction)")
+    }
 }

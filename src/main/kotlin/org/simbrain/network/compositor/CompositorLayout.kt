@@ -9,7 +9,9 @@ package org.simbrain.network.compositor
  *
  * Limbs flow HORIZONTALLY: each lays out as left-to-right columns of its local ranks, centered
  * on the checkpoint that feeds it — the classic block-diagram shape where arms run straight out
- * sideways and rejoin at the ⊕ below. A long arm costs width instead of height, so the diagram
+ * sideways and rejoin at the ⊕ below. A limb whose endpoints exactly match a scene
+ * [LimbTemplate] is laid out from that declarative grid instead — aligned rows and columns as
+ * authored — while keeping the same strip stacking, gap sizing, and lane routing. A long arm costs width instead of height, so the diagram
  * stays near screen aspect. Limbs sharing a checkpoint stack as strips (more spine-facing
  * edges on top) centered as a group, and their return arrows route through reserved lanes at
  * the bottom of the gap — recorded as [ReturnLaneRoute] intents whose waypoint geometry
@@ -33,6 +35,7 @@ class CompositorLayout(
     private val paramGap = (30.0 * scale).coerceAtLeast(20.0)
     private val interLimbGap = (60.0 * scale).coerceAtLeast(50.0)
     private val laneGap = LANE_GAP
+    private val cellItemGap = (24.0 * scale).coerceAtLeast(18.0)
 
     private fun width(e: FlowEndpoint) = when (e) {
         is TensorTile -> e.width
@@ -137,21 +140,53 @@ class CompositorLayout(
                 .maxOrNull() ?: 0
         }
 
+        fun key(e: FlowEndpoint) = when (e) {
+            is TensorTile -> e.id
+            is OpVertex -> graph.alias(e.op.name)
+        }
+
         class LimbPlan(val id: Int) {
-            val columns: List<List<FlowEndpoint>> = limbs[id]
+            val template: LimbTemplate? = limbs[id].associateBy(::key).let { byKey ->
+                scene.limbTemplates.firstOrNull { it.keys == byKey.keys }
+            }
+            val grid: List<List<List<FlowEndpoint>>> = template?.cells?.map { row ->
+                row.map { cell -> cell.map { k -> limbs[id].first { key(it) == k } } }
+            } ?: emptyList()
+            val gridRowHeights = grid.map { row ->
+                row.maxOf { cell -> cell.maxOfOrNull { height(it) } ?: 0.0 }
+            }
+            fun gridRowGap(boundary: Int) = template?.rowGaps?.get(boundary) ?: stackGap
+            val gridColWidths = (grid.firstOrNull()?.indices ?: IntRange.EMPTY).map { c ->
+                grid.maxOf { row ->
+                    val cell = row[c]
+                    if (cell.isEmpty()) 0.0 else cell.sumOf { width(it) } + cellItemGap * (cell.size - 1)
+                }
+            }
+            private val gridColOf: Map<FlowEndpoint, Int> = buildMap {
+                for (row in grid) row.forEachIndexed { c, cell -> cell.forEach { put(it, c) } }
+            }
+
+            val columns: List<List<FlowEndpoint>> = if (template != null) emptyList() else limbs[id]
                 .groupBy { localRank.getValue(it) }
                 .toSortedMap().values
                 .map { column -> column.sortedWith(compareBy({ rank.getValue(it) }, { scheduleIndex(it) })) }
             val columnHeights = columns.map { column ->
                 column.sumOf { height(it) } + stackGap * (column.size - 1)
             }
-            val stripHeight = columnHeights.max()
+            val stripHeight = if (template != null) {
+                gridRowHeights.sum() + (0 until grid.size - 1).sumOf { gridRowGap(it) }
+            } else columnHeights.max()
+
+            private fun columnOf(e: FlowEndpoint) = gridColOf[e] ?: localRank.getValue(e)
+
             // Column boundaries crossed by a satellite-carrying edge open to fit the riding tile.
-            val columnGaps = DoubleArray((columns.size - 1).coerceAtLeast(0)) { columnGap }.also { gaps ->
+            val columnGaps = DoubleArray(
+                ((if (template != null) gridColWidths.size else columns.size) - 1).coerceAtLeast(0)
+            ) { columnGap }.also { gaps ->
                 for (satellite in scene.satellites) {
                     if (limbOf[satellite.edge.from] != id || limbOf[satellite.edge.to] != id) continue
-                    val from = localRank.getValue(satellite.edge.from)
-                    val to = localRank.getValue(satellite.edge.to)
+                    val from = columnOf(satellite.edge.from)
+                    val to = columnOf(satellite.edge.to)
                     for (boundary in from until to) {
                         gaps[boundary] = maxOf(gaps[boundary], satellite.tile.width + 100.0)
                     }
@@ -233,6 +268,24 @@ class CompositorLayout(
         }
 
         for (plan in plans) {
+            if (plan.template != null) {
+                // Template limbs place straight from the authored grid: cells left-align in
+                // their column, items center vertically in their row.
+                var rowY = plan.top
+                for ((r, row) in plan.grid.withIndex()) {
+                    var x = limbLeft
+                    for ((c, cell) in row.withIndex()) {
+                        var itemX = x
+                        for (item in cell) {
+                            place(item, itemX, rowY + (plan.gridRowHeights[r] - height(item)) / 2)
+                            itemX += width(item) + cellItemGap
+                        }
+                        x += plan.gridColWidths[c] + (plan.columnGaps.getOrNull(c) ?: 0.0)
+                    }
+                    rowY += plan.gridRowHeights[r] + if (r < plan.grid.size - 1) plan.gridRowGap(r) else 0.0
+                }
+                continue
+            }
             var x = limbLeft
             for ((c, column) in plan.columns.withIndex()) {
                 // Columns center vertically in the strip; within one, siblings order by the

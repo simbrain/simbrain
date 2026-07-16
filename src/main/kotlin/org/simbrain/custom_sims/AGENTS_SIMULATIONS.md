@@ -8,6 +8,10 @@ This guide helps AI coding assistants create and modify custom simulations in Si
 2. Register in `RegisteredSimulations.kt`
 3. Test: `./gradlew runSim -PsimName="Your Sim Name"`
 
+## File Organization
+
+After the package declaration and imports, start a simulation file with its `val mySimulation = newSim { ... }` declaration. Put simulation-scoped helper types and functions below that declaration so readers encounter the simulation setup first. Kotlin permits top-level declarations to reference helpers defined later in the file; move a helper into a separate file instead when it is independently reusable.
+
 ## Basic Structure
 
 ```kotlin

@@ -385,7 +385,8 @@ private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndSh
 
 private class CustomToolTipGenerator(val proj: ProjectionDesktopComponent) : CustomXYToolTipGenerator() {
     override fun generateToolTip(data: XYDataset, series: Int, index: Int): String {
-        return proj.pointList[index].upstairsPoint.format(2)
+        val point = proj.pointList[index]
+        return point.label?.let { "$it: ${point.upstairsPoint.format(2)}" } ?: point.upstairsPoint.format(2)
     }
 }
 
@@ -394,4 +395,3 @@ class LegendXYItemLabelGenerator(val proj: ProjectionDesktopComponent) : Standar
         return if (proj.projector.showLabels) proj.pointList[index].label else null
     }
 }
-

@@ -9,6 +9,7 @@ import org.simbrain.custom_sims.simulations.braitenberg.avoider
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergGame
 import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
+import org.simbrain.custom_sims.simulations.cogsci.landmarkCognitiveMap
 import org.simbrain.custom_sims.simulations.demos.*
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
@@ -36,7 +37,7 @@ import org.simbrain.util.dir
  * `dir` is a JMenu
  * `item` is a JMenuItem.
  *
- * Note that items in a dir appear in the order given unless `alphabetize` is set to true. See [StructureDir].
+ * Note that items in a dir appear in the order given unless `alphabetical` is set to true. See [StructureDir].
  *
  * The label given is used both as the Menu Item name, and in the command line as the name to
  * use to call them using "run sim" (see build.gradle#runSim). If duplicate labels are used the first one encountered
@@ -94,7 +95,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Operant with environment") { operantWithEnvironment }
     }
 
-    dir("Cognitive maps") {
+    dir("Cognitive maps", alphabetical = true) {
+        item("Landmark cognitive map", beta = true) { landmarkCognitiveMap }
         item("Agent trails") { kAgentTrails }
         item("Field image (sensors)") { fieldImageDemo }
         item("Field image (place cells)") { fieldImagePlaceCellsDemo }

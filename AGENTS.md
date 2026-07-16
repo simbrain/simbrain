@@ -53,7 +53,11 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 
 - Prefer Kotlin to Java
 - No author comments
-- Avoid redundant documentation
+- Use a brief file-level KDoc for new Kotlin files and Kotlin files receiving substantive edits; do not do retrofit-only documentation passes
+- Put file-level KDoc at the very top of the `.kt` file, before `package`, and use it to explain the file's role and important collaboration or ownership boundaries
+- Do not add class-level documentation just to repeat a file header; retain declaration documentation only when it independently clarifies a public API or non-obvious behavior
+- Skip a file header when it would be purely redundant, such as for a trivial file whose purpose is fully clear from its name and sole declaration
+- Apply this convention only to Kotlin source and test files, not Java files
 - Prefer dialog helpers in `org.simbrain.util.SwingUtils.kt` (e.g. `showWarningDialog`, `showWarningConfirmDialog`, `showInputDialog`) instead of creating new raw `JOptionPane` dialogs
 - If a needed dialog helper does not exist, add a reusable utility in `SwingUtils.kt` rather than duplicating dialog setup in feature code
 - Do not use code comment separators of any kind (for example `// ----- Section -----`, `// --- Section ---`, `// ========`, or `// ── Section ─────────────────`)

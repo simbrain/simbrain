@@ -168,6 +168,13 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 while (model.plan.cursor != 0) teachingTransformer.stepInferenceOp()
             })
             addSeparator()
+            if (teachingTransformer.isGenerating) {
+                add(createAction("Stop generation") { teachingTransformer.stopGeneration() })
+            } else {
+                add(createAction("Resume generation") { teachingTransformer.resumeGeneration() })
+                add(createAction("Restart generation from prompt") { teachingTransformer.startGeneration() })
+            }
+            addSeparator()
             add(JCheckBoxMenuItem("Gradient view", gradientView).apply {
                 addActionListener {
                     gradientView = isSelected

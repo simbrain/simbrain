@@ -174,13 +174,8 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     @Transient
     private var windowIds = ArrayList<Int>()
 
-    /** The last two published windows; incoming values found here are echoes, not edits. */
     @Transient
-    private var publishedRing = ArrayDeque<String>()
-
-    /** True once a stopped run's final window has been echoed back by a consumer. */
-    @Transient
-    private var tailSynced = true
+    private var syncGate = DocumentSyncGate()
 
     @Transient
     var isGenerating = false
@@ -251,8 +246,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val ids = encodePrompt(state.tokenizer)
         pending = ArrayDeque(ids.toList())
         windowIds = ArrayList(ids.toList())
-        publishedRing.clear()
-        tailSynced = false
+        syncGate.reset()
         generatedCount = 0
         sampledToken = -1
         lastGenerated = ""
@@ -309,7 +303,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         sampledToken = sampleToken(logits)
         if (pending.isEmpty()) {
             windowIds.add(sampledToken)
-            tailSynced = false
+            syncGate.invalidate()
             val stopAtEos = stopAtEndOfText || promptMode == PromptMode.CHAT
             if (stopAtEos && sampledToken == state.model.config.eosTokenId) {
                 isGenerating = false
@@ -362,7 +356,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
             pending.addLast(it)
             windowIds.add(it)
         }
-        tailSynced = false
+        syncGate.invalidate()
         text += newText
     }
 
@@ -381,28 +375,19 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         @Synchronized
         get() {
             val state = loaded ?: return ""
-            if (!isGenerating && tailSynced) return ""
-            val window = state.tokenizer.decode(windowIds.toIntArray())
-            publishedRing.addLast(window)
-            while (publishedRing.size > 2) publishedRing.removeFirst()
-            return window
+            return syncGate.publish(state.tokenizer.decode(windowIds.toIntArray()), isGenerating)
         }
         @Synchronized
         set(value) {
             val state = loaded ?: return
-            if (value.isEmpty()) return
-            if (publishedRing.contains(value)) {
-                if (!isGenerating && value == state.tokenizer.decode(windowIds.toIntArray())) {
-                    tailSynced = true
-                }
-                return
-            }
+            val current = state.tokenizer.decode(windowIds.toIntArray())
+            if (!syncGate.isEdit(value, current, isGenerating)) return
             state.model.reset()
             state.scene.reset()
             val ids = state.tokenizer.encode(value, addSpecials = false)
             pending = ArrayDeque(ids.toList())
             windowIds = ArrayList(ids.toList())
-            tailSynced = false
+            syncGate.invalidate()
             generatedCount = 0
             sampledToken = -1
             lastGenerated = ""

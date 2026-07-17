@@ -15,7 +15,6 @@ import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.workspace.updater.UpdateAllCouplings
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.TokenEmbedding
@@ -242,18 +241,20 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         }
     }
 
+    transformer.tokenizer = tokenizer
+    transformer.samplingStrategy = options.samplingStrategy
+
     with(network) {
         addNetworkModels(transformer)
     }
 
-    // Text World for Inputs
+    // Text World showing the transformer's sliding context window, editable while stopped
     val textWorldComponent = addTextWorld("Text Inputs")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
-    textWorldComponent.world.samplingStrategy = options.samplingStrategy
 
-    setupUpdateActions(workspace)
+    setupGenerationCouplings(workspace)
 
     withGui {
         val textWorldWidth = 401
@@ -312,17 +313,27 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             }
 
             addButton("Configure Sampling Strategy...") {
-                val wrapper = objectWrapper("Sampling Strategy", textWorldComponent.world.samplingStrategy.copy() as SamplingStrategy)
+                val wrapper = objectWrapper("Sampling Strategy", transformer.samplingStrategy.copy() as SamplingStrategy)
                 val editor = AnnotatedPropertyEditor(wrapper)
                 val dialog = StandardDialog(editor).apply {
                     title = "Configure Sampling Strategy"
                     addCommitTask {
                         editor.commitChanges()
-                        // Sync the edited value back to the TextWorld
-                        textWorldComponent.world.samplingStrategy = wrapper.editingObject as SamplingStrategy
+                        transformer.samplingStrategy = wrapper.editingObject as SamplingStrategy
                     }
                 }
                 dialog.display()
+            }
+
+            addSeparator()
+
+            addButton("Start generation") {
+                // Continues from whatever context the text world holds; falls back to the prompt
+                transformer.resumeGeneration()
+            }
+
+            addButton("Stop generation") {
+                transformer.stopGeneration()
             }
         }.awaitLayout()
         controlPanel.setLocation(
@@ -478,53 +489,31 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     }
 
 }.registerReopenFunction { workspace ->
-    setupUpdateActions(workspace)
+    setupGenerationCouplings(workspace)
 }
 
-fun SimulationScope.setupUpdateActions(workspace: Workspace) {
+/**
+ * Wires the transformer's context window to the text world as a two-way document sync: the
+ * sliding window streams into the text world while generating, and text typed there while the
+ * run is stopped replaces the transformer's context. The transformer samples and feeds back
+ * its own tokens, so the old hand-ordered update actions are gone — the default workspace
+ * update (couplings, then components) drives everything. Recreating existing couplings on
+ * reopen is safe: the coupling manager stores them in a set.
+ */
+fun SimulationScope.setupGenerationCouplings(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
     val transformer = network.getModels<TeachingTransformer>().first()
+    val textWorld = workspace.componentList.filterIsInstance<TextWorldComponent>().first().world
 
-    val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
-    val textWorld = textWorldComponent.world
-
-    val contextSize = transformer.config.contextSize
-
-    fun tokenId(token: String): Int = textWorld.tokenEmbedding.get(token).indexOfFirst { it != 0.0 }
-
-    workspace.updater.updateManager.clear()
-
-    workspace.addUpdateAction("Encode Context Window") {
-        val ids = textWorld.text
-            .tokenize(textWorld.tokenizer)
-            .map { tokenId(it.token) }
-        transformer.setContext(ids.takeLast(contextSize).toIntArray())
-    }
-
-    workspace.addUpdateAction(UpdateAllCouplings(workspace.updater))
-
-    workspace.addUpdateAction("Update Text World") {
-        textWorldComponent.update()
-    }
-
-    workspace.addUpdateAction("Update Network") {
-        with(network) {
-            transformer.update()
-        }
-    }
-
-    workspace.addUpdateAction("Predict Next Word") {
-        if (transformer.contextTokens.isEmpty()) return@addUpdateAction
-        val nextWord = textWorld.sampleToken(transformer.nextTokenDistribution())
-        // update text with predicted word and remove first word so that the context window maintains its size
-        val newText = textWorldComponent.world.text.tokenize(textWorld.tokenizer)
-            .map { it.token }
-            .plus(nextWord)
-            .takeLast(contextSize)
-            .tokensToString(textWorld.tokenizer)
-        // Use suspend versions to await UI updates and prevent backpressure
-        textWorldComponent.world.setTextSuspend(newText)
-        textWorldComponent.world.setCurrentTokenIndexSuspend(textWorldComponent.world.tokens.lastIndex)
+    with(workspace.couplingManager) {
+        createCoupling(
+            textWorld.getProducer("getText"),
+            transformer.getConsumer("setContextWindow"),
+        )
+        createCoupling(
+            transformer.getProducer("getContextWindow"),
+            textWorld.getConsumer("setTextIfChanged"),
+        )
     }
 }

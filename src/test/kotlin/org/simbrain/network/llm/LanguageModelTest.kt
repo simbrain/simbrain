@@ -122,6 +122,26 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `chat mode answers the prompt and stops at the end of the assistant turn`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
+        languageModel.prompt = "What is the capital of France?"
+        languageModel.promptMode = PromptMode.CHAT
+        languageModel.loadWeights()
+
+        while (languageModel.isGenerating) {
+            languageModel.step()
+        }
+
+        assertTrue(languageModel.text.contains("Paris"), "got: ${languageModel.text}")
+        assertFalse(languageModel.text.contains("<|"), "chat scaffolding must not leak into text")
+        assertTrue(languageModel.loaded!!.model.position < 128,
+            "the run stops at im_end before the window fills")
+    }
+
+    @Test
     fun `coupling attributes are safe while weights are not loaded`() {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 64)
         assertEquals("", languageModel.generatedToken)
@@ -222,6 +242,8 @@ class LanguageModelTest {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)
         languageModel.label = "LM"
         languageModel.prompt = "Hello"
+        languageModel.promptMode = PromptMode.CHAT
+        languageModel.systemPrompt = "Be brief."
         languageModel.tokensToGenerate = 7
         languageModel.temperature = 0.7
         languageModel.selectedLayer = 4
@@ -237,6 +259,8 @@ class LanguageModelTest {
         assertEquals("/no/such/dir", restored.weightsDirectory)
         assertEquals(128, restored.maxSeqLen)
         assertEquals("Hello", restored.prompt)
+        assertEquals(PromptMode.CHAT, restored.promptMode)
+        assertEquals("Be brief.", restored.systemPrompt)
         assertEquals(7, restored.tokensToGenerate)
         assertEquals(0.7, restored.temperature)
         assertEquals(4, restored.selectedLayer)

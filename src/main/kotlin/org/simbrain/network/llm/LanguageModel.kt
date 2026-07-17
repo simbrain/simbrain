@@ -25,6 +25,13 @@ class LanguageModelEvents : LocationEvents() {
     val weightsLoaded = NoArgEvent()
 }
 
+enum class PromptMode(private val label: String) {
+    COMPLETION("Completion"),
+    CHAT("Chat");
+
+    override fun toString() = label
+}
+
 /**
  * A language model on the network canvas: wraps the headless [Lfm2Model] and exposes its interior
  * through a [CompositorScene]. One network update generates one token, so the workspace play
@@ -56,13 +63,28 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         order = 1,
     )
 
+    var promptMode: PromptMode by GuiEditable(
+        initValue = PromptMode.COMPLETION,
+        label = "Prompt mode",
+        description = "Completion continues the prompt verbatim; " +
+            "chat wraps it as a user message the model answers",
+        order = 2,
+    )
+
+    var systemPrompt by GuiEditable(
+        initValue = "",
+        label = "System prompt",
+        description = "Optional system message ahead of the user message; chat mode only",
+        order = 3,
+    )
+
     var tokensToGenerate by GuiEditable(
         initValue = 0,
         label = "Tokens to generate",
         description = "Generation stops after this many tokens beyond the prompt; " +
             "0 generates until the context window fills",
         min = 0,
-        order = 2,
+        order = 4,
     )
 
     var temperature by GuiEditable(
@@ -72,7 +94,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         min = 0.01,
         max = 4.0,
         increment = 0.05,
-        order = 3,
+        order = 5,
     )
 
     var samplingStrategy: SamplingStrategy by GuiEditable(
@@ -80,14 +102,15 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         label = "Sampling strategy",
         description = "How the next token is chosen from the distribution",
         showDetails = false,
-        order = 4,
+        order = 6,
     )
 
     var stopAtEndOfText by GuiEditable(
         initValue = true,
         label = "Stop at end of text",
-        description = "End the run when the model emits its end-of-text token",
-        order = 5,
+        description = "End the run when the model emits its end-of-text token; " +
+            "chat mode always stops there",
+        order = 7,
     )
 
     /** The model layer the structure view shows; the depth strip is the live selector. */
@@ -213,7 +236,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        pending = ArrayDeque(state.tokenizer.encode(prompt).toList())
+        pending = ArrayDeque(encodePrompt(state.tokenizer).toList())
         generatedCount = 0
         sampledToken = -1
         lastGenerated = ""
@@ -269,10 +292,14 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         state.scene.publish(position)
         sampledToken = sampleToken(logits)
         if (pending.isEmpty()) {
-            if (stopAtEndOfText && sampledToken == state.model.config.eosTokenId) {
+            val stopAtEos = stopAtEndOfText || promptMode == PromptMode.CHAT
+            if (stopAtEos && sampledToken == state.model.config.eosTokenId) {
                 isGenerating = false
             } else {
-                lastGenerated = state.tokenizer.decode(intArrayOf(sampledToken))
+                lastGenerated = state.tokenizer.decode(
+                    intArrayOf(sampledToken),
+                    skipSpecials = promptMode == PromptMode.CHAT,
+                )
                 text += lastGenerated
                 generatedCount++
                 if (tokensToGenerate > 0 && generatedCount >= tokensToGenerate) {
@@ -315,6 +342,18 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
         state.tokenizer.encode(newText, addSpecials = false).forEach { pending.addLast(it) }
         text += newText
+    }
+
+    /**
+     * Encodes [prompt] for a fresh run. Chat mode builds the full templated string — BOS text
+     * included — and encodes with specials off, so the post-processor cannot add a second BOS.
+     */
+    private fun encodePrompt(tokenizer: LlmTokenizer): IntArray = when (promptMode) {
+        PromptMode.COMPLETION -> tokenizer.encode(prompt)
+        PromptMode.CHAT -> tokenizer.encode(
+            Lfm2ChatFormat.chatPrompt(prompt, systemPrompt),
+            addSpecials = false,
+        )
     }
 
     private fun sampleToken(logits: FloatTensor): Int {

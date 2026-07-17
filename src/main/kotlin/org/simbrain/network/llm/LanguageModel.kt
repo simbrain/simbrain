@@ -14,6 +14,9 @@ import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Consumable
+import org.simbrain.workspace.Producible
 import java.awt.geom.Point2D
 import java.nio.file.Path
 import kotlin.math.exp
@@ -32,8 +35,13 @@ class LanguageModelEvents : LocationEvents() {
  * Only the weights directory, config, prompt, sampling parameters, and view state are serialized —
  * never the weights. On deserialization the model reloads from [weightsDirectory]; if the files
  * are missing the model stays unloaded and the GUI offers to relocate or download them.
+ *
+ * As an [AttributeContainer] the model couples to other components through plain strings and
+ * arrays: [generatedToken] and [hiddenState] out, [injectText] in. Everything needing the
+ * tokenizer or unembedding stays on this side of the coupling. All attributes are safe to call
+ * while weights are unloaded (empty results, no-op consumption).
  */
-class LanguageModel @XStreamConstructor constructor() : LocatableModel(), EditableObject {
+class LanguageModel @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer {
 
     /** Directory containing `model.safetensors` and `tokenizer.json`. */
     var weightsDirectory: String = ""
@@ -122,17 +130,22 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
 
     val isLoaded get() = loaded != null
 
+    /**
+     * Tokens waiting to be fed, one per iteration: the encoded prompt after [startGeneration],
+     * plus anything [injectText] appends. While non-empty the model is prefilling; once drained
+     * it feeds back its own [sampledToken].
+     */
     @Transient
-    private var promptIds = IntArray(0)
-
-    @Transient
-    private var cursor = 0
+    private var pending = ArrayDeque<Int>()
 
     @Transient
     private var generatedCount = 0
 
     @Transient
     private var sampledToken = -1
+
+    @Transient
+    private var lastGenerated = ""
 
     @Transient
     var isGenerating = false
@@ -200,10 +213,10 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        promptIds = state.tokenizer.encode(prompt)
-        cursor = 0
+        pending = ArrayDeque(state.tokenizer.encode(prompt).toList())
         generatedCount = 0
         sampledToken = -1
+        lastGenerated = ""
         text = prompt
         isGenerating = true
         events.updated.fire()
@@ -218,7 +231,7 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     @Synchronized
     fun resumeGeneration() {
         val state = loaded ?: return
-        if (promptIds.isEmpty()) {
+        if (pending.isEmpty() && sampledToken < 0) {
             startGeneration()
             return
         }
@@ -233,36 +246,75 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     }
 
     /**
-     * Advances generation by one token: feeds the next prompt token (or the last sampled token
-     * once the prompt is consumed), publishes activations to the scene, and samples the next
+     * Advances generation by one token: feeds the next pending token (or the last sampled token
+     * once the queue is drained), publishes activations to the scene, and samples the next
      * token. No-op unless a run is active.
      */
     @Synchronized
     fun step() {
         val state = loaded ?: return
+        lastGenerated = ""
         if (!isGenerating) return
         if (state.model.position >= state.model.config.maxSeqLen) {
             isGenerating = false
             return
         }
-        val id = if (cursor < promptIds.size) promptIds[cursor] else sampledToken
+        val id = if (pending.isNotEmpty()) pending.removeFirst() else sampledToken
+        if (id < 0) {
+            isGenerating = false
+            return
+        }
         val position = state.model.position
         val logits = state.model.forwardToken(id)
         state.scene.publish(position)
         sampledToken = sampleToken(logits)
-        if (cursor >= promptIds.size - 1) {
+        if (pending.isEmpty()) {
             if (stopAtEndOfText && sampledToken == state.model.config.eosTokenId) {
                 isGenerating = false
             } else {
-                text += state.tokenizer.decode(intArrayOf(sampledToken))
+                lastGenerated = state.tokenizer.decode(intArrayOf(sampledToken))
+                text += lastGenerated
                 generatedCount++
                 if (tokensToGenerate > 0 && generatedCount >= tokensToGenerate) {
                     isGenerating = false
                 }
             }
         }
-        cursor++
         events.updated.fire()
+    }
+
+    /** Text of the token generated this iteration; empty while prefilling or stopped. */
+    @get:Producible
+    val generatedToken: String
+        get() = lastGenerated
+
+    /** The residual stream at [selectedLayer] for the last processed token. */
+    @get:Producible(customDescriptionMethod = "hiddenStateDescription")
+    val hiddenState: DoubleArray
+        get() {
+            val state = loaded ?: return DoubleArray(0)
+            val layer = selectedLayer.coerceIn(0, state.model.config.numLayers - 1)
+            val tensor = state.model.plan.port("layers.$layer.resid").tensor
+            return DoubleArray(tensor.size) { tensor.data.get(it).toDouble() }
+        }
+
+    fun hiddenStateDescription() = "$id:hiddenState (layer $selectedLayer residual)"
+
+    /**
+     * Encodes [newText] without adding specials and appends it to the feed queue, extending
+     * prefill: the model walks the injected tokens one per iteration before resuming its own
+     * continuation. A freshly sampled token that has not been fed yet is queued first, so the
+     * context stays in [text]'s order. Does not start or resume a stopped run. Meant for
+     * advancing sources — a static string producer re-injects its value every coupling update.
+     */
+    @Synchronized
+    @Consumable
+    fun injectText(newText: String) {
+        val state = loaded ?: return
+        if (newText.isEmpty()) return
+        if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
+        state.tokenizer.encode(newText, addSpecials = false).forEach { pending.addLast(it) }
+        text += newText
     }
 
     private fun sampleToken(logits: FloatTensor): Int {

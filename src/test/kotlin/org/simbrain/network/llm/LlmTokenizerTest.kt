@@ -2,6 +2,9 @@ package org.simbrain.network.llm
 
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertArrayEquals
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
@@ -37,6 +40,34 @@ class LlmTokenizerTest {
                 assertArrayEquals(expected, tokenizer.encode(prompt), "ids differ for \"$prompt\"")
                 assertTrue(tokenizer.decode(expected).contains(prompt), "decode lost \"$prompt\"")
             }
+        }
+    }
+
+    @Test
+    fun `specials-off encoding maps marker text to single ids and adds no bos`() {
+        val path = tokenizerPath()
+        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+
+        LlmTokenizer(path!!).use { tokenizer ->
+            assertArrayEquals(intArrayOf(6), tokenizer.encode("<|im_start|>", addSpecials = false),
+                "literal marker text must encode to its single added-token id")
+            assertEquals(1, tokenizer.encode("Hello").first(), "the post-processor prepends BOS by default")
+            assertNotEquals(1, tokenizer.encode("Hello", addSpecials = false).first())
+        }
+    }
+
+    @Test
+    fun `skip-specials decode drops scaffolding but keeps tool call markers`() {
+        val path = tokenizerPath()
+        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+
+        LlmTokenizer(path!!).use { tokenizer ->
+            val ids = tokenizer.encode("Hello")
+            assertTrue(tokenizer.decode(ids).contains("<|startoftext|>"))
+            assertFalse(tokenizer.decode(ids, skipSpecials = true).contains("<|"))
+            val toolIds = tokenizer.encode("<|tool_call_start|>[now()]<|tool_call_end|>", addSpecials = false)
+            assertTrue(tokenizer.decode(toolIds, skipSpecials = true).contains("<|tool_call_start|>"),
+                "tool-call markers are deliberately non-special and must survive a skip-specials decode")
         }
     }
 }

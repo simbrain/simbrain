@@ -7,8 +7,11 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.workspace.Workspace
+import org.simbrain.world.textworld.TextWorldComponent
 import java.nio.file.Path
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
@@ -116,6 +119,101 @@ class LanguageModelTest {
         assertTrue(languageModel.isGenerating)
         languageModel.step()
         assertEquals(positionAtStop + 1, languageModel.loaded!!.model.position)
+    }
+
+    @Test
+    fun `coupling attributes are safe while weights are not loaded`() {
+        val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 64)
+        assertEquals("", languageModel.generatedToken)
+        assertEquals(0, languageModel.hiddenState.size)
+        languageModel.injectText("hello")
+        assertEquals("", languageModel.text)
+    }
+
+    @Test
+    fun `generated tokens flow through a workspace coupling and prefill produces none`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val workspace = Workspace()
+        val network = Network()
+        workspace.addWorkspaceComponent(NetworkComponent("net", network))
+        val textWorldComponent = TextWorldComponent("text")
+        workspace.addWorkspaceComponent(textWorldComponent)
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.prompt = "The capital of France is"
+        languageModel.stopAtEndOfText = false
+        runBlocking { network.addNetworkModel(languageModel) }
+        languageModel.loadWeights()
+
+        with(workspace.couplingManager) {
+            createCoupling(
+                languageModel.getProducer("getGeneratedToken"),
+                textWorldComponent.world.getConsumer("addTextAtEnd"),
+            )
+        }
+
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
+        repeat(promptTokens - 1) { workspace.simpleIterate() }
+        assertEquals("", languageModel.generatedToken, "prefill produces no token")
+        assertTrue(textWorldComponent.world.text.isEmpty(), "empty productions must not accumulate")
+
+        repeat(3) { workspace.simpleIterate() }
+        assertTrue(languageModel.generatedToken.isNotEmpty())
+        assertTrue(languageModel.text.endsWith(languageModel.generatedToken))
+        assertTrue(textWorldComponent.world.text.isNotBlank(),
+            "generated tokens arrive in the text world (couplings run before components, so it lags one token)")
+    }
+
+    @Test
+    fun `hidden state produces the selected layer's residual once tokens flow`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.selectedLayer = 4
+        languageModel.loadWeights()
+
+        languageModel.step()
+        val state = languageModel.hiddenState
+        assertEquals(1024, state.size)
+        assertTrue(state.any { it != 0.0 })
+        assertTrue(languageModel.hiddenStateDescription().contains("layer 4"))
+    }
+
+    @Test
+    fun `injected text extends prefill before the model resumes its own continuation`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.prompt = "The capital of France is"
+        languageModel.stopAtEndOfText = false
+        languageModel.loadWeights()
+
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
+        repeat(promptTokens + 2) { languageModel.step() }
+        languageModel.stopGeneration()
+
+        val injected = " The capital of Germany is"
+        val injectedIds = languageModel.loaded!!.tokenizer.encode(injected, addSpecials = false).size
+        languageModel.injectText(injected)
+        assertFalse(languageModel.isGenerating, "injection does not arm a run")
+        assertTrue(languageModel.text.endsWith(injected))
+
+        languageModel.resumeGeneration()
+        val positionBefore = languageModel.loaded!!.model.position
+        repeat(injectedIds) {
+            languageModel.step()
+            assertEquals("", languageModel.generatedToken,
+                "walking the unfed sample and injected tokens is prefill")
+        }
+        languageModel.step()
+        assertTrue(languageModel.generatedToken.isNotEmpty(),
+            "the last injected token's prediction resumes generation")
+        assertEquals(positionBefore + injectedIds + 1, languageModel.loaded!!.model.position,
+            "the pre-injection sample is fed first, then the injected tokens")
     }
 
     @Test

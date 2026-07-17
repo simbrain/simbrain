@@ -257,10 +257,16 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Add a text to the end of the world text.
+     * Add a text to the end of the world text. Empty strings are ignored so per-iteration
+     * couplings from sources that only sometimes produce a token add no stray spacing.
      */
     @Consumable
-    fun addTextAtEnd(newText: String, spacing: String = " ") {
+    fun addTextAtEnd(newText: String) {
+        if (newText.isEmpty()) return
+        addTextAtEnd(newText, " ")
+    }
+
+    fun addTextAtEnd(newText: String, spacing: String) {
         runBlocking {
             _text += "$spacing$newText"
             events.textChanged.fire()

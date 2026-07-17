@@ -66,12 +66,17 @@ class TextWorld : AttributeContainer, EditableObject {
 
     /**
      * Replaces the whole document, but only when [newText] actually differs — a per-iteration
-     * coupling from a document producer syncs through this without endless change events.
+     * coupling from a document producer syncs through this without endless change events. The
+     * cursor follows [addTextAtEnd]'s convention: pinned to the end with the newest token
+     * current, so the view tracks a growing document.
      */
     @Consumable
     fun setTextIfChanged(newText: String) {
         if (newText.isEmpty() || newText == _text) return
         text = newText
+        position = _text.length
+        events.cursorPositionChanged.fireAsync()
+        currentTokenIndex = tokens.lastIndex
     }
 
     @UserParameter(

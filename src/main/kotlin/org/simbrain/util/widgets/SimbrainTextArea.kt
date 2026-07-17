@@ -25,6 +25,8 @@ fun RSyntaxTextArea.applyLafSyntaxTheme() {
         // Keep RSyntaxTextArea defaults if the bundled theme cannot be loaded.
     }
     currentLineHighlightColor = background
+    // The bundled light theme ships a pure-red caret; follow the LaF caret color instead
+    caretColor = UIManager.getColor("TextArea.caretForeground") ?: caretColor
 }
 
 class SimbrainTextArea : RSyntaxTextArea() {

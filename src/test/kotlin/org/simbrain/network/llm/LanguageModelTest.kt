@@ -146,7 +146,9 @@ class LanguageModelTest {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 64)
         assertEquals("", languageModel.generatedToken)
         assertEquals(0, languageModel.hiddenState.size)
+        assertEquals("", languageModel.contextWindow)
         languageModel.injectText("hello")
+        languageModel.contextWindow = "hello"
         assertEquals("", languageModel.text)
     }
 

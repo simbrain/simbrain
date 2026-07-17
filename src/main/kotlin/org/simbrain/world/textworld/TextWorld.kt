@@ -56,12 +56,23 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * The main "world text" associated with this world (which displays in the main window).
      */
+    @get:Producible
     var text: String
         get() = _text
         set(value) {
             _text = value
             events.textChanged.fireAsync()
         }
+
+    /**
+     * Replaces the whole document, but only when [newText] actually differs — a per-iteration
+     * coupling from a document producer syncs through this without endless change events.
+     */
+    @Consumable
+    fun setTextIfChanged(newText: String) {
+        if (newText.isEmpty() || newText == _text) return
+        text = newText
+    }
 
     @UserParameter(
         label = "Tokenizer",

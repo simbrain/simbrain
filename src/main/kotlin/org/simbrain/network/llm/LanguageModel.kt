@@ -170,6 +170,18 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
     @Transient
     private var lastGenerated = ""
 
+    /** The committed token stream in [text] order: prompt, injections, accepted samples. */
+    @Transient
+    private var windowIds = ArrayList<Int>()
+
+    /** The last two published windows; incoming values found here are echoes, not edits. */
+    @Transient
+    private var publishedRing = ArrayDeque<String>()
+
+    /** True once a stopped run's final window has been echoed back by a consumer. */
+    @Transient
+    private var tailSynced = true
+
     @Transient
     var isGenerating = false
         private set
@@ -236,7 +248,11 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        pending = ArrayDeque(encodePrompt(state.tokenizer).toList())
+        val ids = encodePrompt(state.tokenizer)
+        pending = ArrayDeque(ids.toList())
+        windowIds = ArrayList(ids.toList())
+        publishedRing.clear()
+        tailSynced = false
         generatedCount = 0
         sampledToken = -1
         lastGenerated = ""
@@ -292,6 +308,8 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         state.scene.publish(position)
         sampledToken = sampleToken(logits)
         if (pending.isEmpty()) {
+            windowIds.add(sampledToken)
+            tailSynced = false
             val stopAtEos = stopAtEndOfText || promptMode == PromptMode.CHAT
             if (stopAtEos && sampledToken == state.model.config.eosTokenId) {
                 isGenerating = false
@@ -340,9 +358,57 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         val state = loaded ?: return
         if (newText.isEmpty()) return
         if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
-        state.tokenizer.encode(newText, addSpecials = false).forEach { pending.addLast(it) }
+        state.tokenizer.encode(newText, addSpecials = false).forEach {
+            pending.addLast(it)
+            windowIds.add(it)
+        }
+        tailSynced = false
         text += newText
     }
+
+    /**
+     * The full context window as text, scaffolding included: everything committed to the token
+     * stream, decoded with specials kept. Producing follows an ownership rule — the window is
+     * published while a run is generating (plus until a stopped run's final window has echoed
+     * back), and is empty otherwise, so a paired document consumer is never clobbered while the
+     * user may be editing it. Consuming an unrecognized value is an edit: the model resets and
+     * requeues the whole edited window for a watchable re-prefill, preserving the run state
+     * (a stopped model stays stopped until resumed).
+     */
+    @get:Producible
+    @set:Consumable
+    var contextWindow: String
+        @Synchronized
+        get() {
+            val state = loaded ?: return ""
+            if (!isGenerating && tailSynced) return ""
+            val window = state.tokenizer.decode(windowIds.toIntArray())
+            publishedRing.addLast(window)
+            while (publishedRing.size > 2) publishedRing.removeFirst()
+            return window
+        }
+        @Synchronized
+        set(value) {
+            val state = loaded ?: return
+            if (value.isEmpty()) return
+            if (publishedRing.contains(value)) {
+                if (!isGenerating && value == state.tokenizer.decode(windowIds.toIntArray())) {
+                    tailSynced = true
+                }
+                return
+            }
+            state.model.reset()
+            state.scene.reset()
+            val ids = state.tokenizer.encode(value, addSpecials = false)
+            pending = ArrayDeque(ids.toList())
+            windowIds = ArrayList(ids.toList())
+            tailSynced = false
+            generatedCount = 0
+            sampledToken = -1
+            lastGenerated = ""
+            text = state.tokenizer.decode(ids, skipSpecials = true)
+            events.updated.fire()
+        }
 
     /**
      * Encodes [prompt] for a fresh run. Chat mode builds the full templated string — BOS text

@@ -11,6 +11,9 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.Blas
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.trainers.SamplingStrategy
+import org.simbrain.util.HuggingFaceFileTokenizer
+import org.simbrain.util.ProvidesDisplayTokenizer
+import org.simbrain.util.Tokenizer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -48,7 +51,14 @@ enum class PromptMode(private val label: String) {
  * tokenizer or unembedding stays on this side of the coupling. All attributes are safe to call
  * while weights are unloaded (empty results, no-op consumption).
  */
-class LanguageModel @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer {
+class LanguageModel @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer,
+    ProvidesDisplayTokenizer {
+
+    /** The model's real tokenization, for consumers drawing token boundaries; path-derived. */
+    override val displayTokenizer: Tokenizer<*>
+        get() = HuggingFaceFileTokenizer(
+            Path.of(weightsDirectory).resolve("tokenizer.json").toString()
+        )
 
     /** Directory containing `model.safetensors` and `tokenizer.json`. */
     var weightsDirectory: String = ""

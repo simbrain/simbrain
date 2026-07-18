@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.DependenciesInvalidatingCachedObject
 import org.simbrain.util.SimpleTokenizer
+import org.simbrain.util.Tokenizer
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
@@ -95,9 +96,21 @@ class TextWorld : AttributeContainer, EditableObject {
             } ?: throw UnsupportedOperationException("Cannot change tokenizer when training document is not set.")
         }
 
+    /**
+     * When set, token boxes, highlighting, and [currentToken] follow this tokenizer instead of
+     * the embedding's — so a document synced from a language model shows the model's true token
+     * boundaries. Adopted automatically when a document coupling from a
+     * [org.simbrain.util.ProvidesDisplayTokenizer] is created; embedding lookups are unaffected.
+     */
+    var displayTokenizer: Tokenizer<*>? = null
+        set(value) {
+            field = value
+            events.textChanged.fireAsync()
+        }
+
     @delegate:Transient
-    var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer) {
-        tokenizer.tokenize(text)
+    var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer, ::displayTokenizer) {
+        (displayTokenizer ?: tokenizer).tokenize(text)
     }
 
     @Transient

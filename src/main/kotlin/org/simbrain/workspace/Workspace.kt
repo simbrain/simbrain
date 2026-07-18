@@ -131,6 +131,7 @@ class Workspace: CoroutineScope {
         Logger.debug("adding component: $component")
         _componentList.add(component)
         component.workspace = this
+        component.onWorkspaceAttached()
         component.setChangedSinceLastSave(false)
         setWorkspaceChanged(true)
 

@@ -9,6 +9,7 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
+import org.simbrain.util.HuggingFaceFileTokenizer
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.TextWorldComponent
@@ -124,6 +125,25 @@ class ContextWindowSyncTest {
         repeat(6) { rig.workspace.simpleIterate() }
         assertTrue(rig.languageModel.text.contains("Berlin"),
             "the model continues from the edited context, got: ${rig.languageModel.text}")
+    }
+
+    @Test
+    fun `the synced document adopts the model's tokenizer and boxes its real tokens`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val rig = Rig(dir!!)
+        var waited = 0
+        while (rig.world.displayTokenizer == null && waited++ < 100) {
+            Thread.sleep(10)
+        }
+        assertTrue(rig.world.displayTokenizer != null,
+            "creating the document coupling hands the model's tokenizer over")
+        assertTrue(rig.world.displayTokenizer is HuggingFaceFileTokenizer)
+
+        repeat(3) { rig.workspace.simpleIterate() }
+        assertEquals("<|startoftext|>", rig.world.tokens.first().token,
+            "token boxes follow the model's real BPE boundaries, scaffolding included")
     }
 
     @Test

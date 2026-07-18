@@ -18,6 +18,9 @@ abstract class WorkspaceComponent(name: String) {
 
     open lateinit var workspace: Workspace
 
+    /** Called once [workspace] is set, when this component is added to it. */
+    open fun onWorkspaceAttached() {}
+
 
     var isRunning: Boolean = false
 

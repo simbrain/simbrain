@@ -58,7 +58,7 @@ abstract class Tokenizer<T: CopyableObject>: CopyableObject {
     abstract fun tokenize(text: String): List<TokenizerResult>
     abstract fun joinTokens(tokens: List<String>): String
 
-    override fun getTypeList() = listOf(SimpleTokenizer::class.java, CharacterTokenizer::class.java, BytePairTokenizer::class.java)
+    override fun getTypeList() = listOf(SimpleTokenizer::class.java, CharacterTokenizer::class.java, BytePairTokenizer::class.java, HuggingFaceFileTokenizer::class.java)
 }
 
 /**

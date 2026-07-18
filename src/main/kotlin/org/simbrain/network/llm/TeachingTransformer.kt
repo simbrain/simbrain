@@ -12,6 +12,7 @@ import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.TensorRole
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.network.trainers.TapeTrainer
+import org.simbrain.util.ProvidesDisplayTokenizer
 import org.simbrain.util.SimpleTokenizer
 import org.simbrain.util.Tokenizer
 import org.simbrain.util.UserParameter
@@ -318,7 +319,11 @@ class TeachingTransformerEvents : LocationEvents() {
  * in — over a word-level vocabulary: text maps through [tokenizer] and [tokenLabels], and
  * words outside the vocabulary are dropped.
  */
-class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer {
+class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer,
+    ProvidesDisplayTokenizer {
+
+    override val displayTokenizer: Tokenizer<*>
+        get() = tokenizer
 
     var config: TeachingTransformerConfig = TeachingTransformerConfig()
         private set

@@ -113,6 +113,21 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         order = 7,
     )
 
+    var enableDemoTools by GuiEditable(
+        initValue = false,
+        label = "Enable demo tools",
+        description = "Advertise the built-in offline demo tools (current time, canned weather) " +
+            "in chat mode and answer the model's calls to them",
+        order = 8,
+    )
+
+    /** Tools registered by simulations, advertised alongside the demo tools in chat mode. */
+    @Transient
+    var tools: List<LlmTool> = emptyList()
+
+    private fun activeTools(): List<LlmTool> =
+        if (enableDemoTools) tools + demoTools else tools
+
     /** The model layer the structure view shows; the depth strip is the live selector. */
     var selectedLayer: Int = 0
 
@@ -176,6 +191,14 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
 
     @Transient
     private var syncGate = DocumentSyncGate()
+
+    /** Sampled ids between the tool-call markers; null while not capturing a call. */
+    @Transient
+    private var toolCallBuffer: MutableList<Int>? = null
+
+    /** Calls parsed from a completed capture, executed when the assistant turn closes. */
+    @Transient
+    private var pendingToolCalls: List<Lfm2ChatFormat.ToolCall>? = null
 
     @Transient
     var isGenerating = false
@@ -250,6 +273,8 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         generatedCount = 0
         sampledToken = -1
         lastGenerated = ""
+        toolCallBuffer = null
+        pendingToolCalls = null
         text = prompt
         isGenerating = true
         events.updated.fire()
@@ -304,9 +329,16 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         if (pending.isEmpty()) {
             windowIds.add(sampledToken)
             syncGate.invalidate()
+            trackToolCall(state, sampledToken)
             val stopAtEos = stopAtEndOfText || promptMode == PromptMode.CHAT
             if (stopAtEos && sampledToken == state.model.config.eosTokenId) {
-                isGenerating = false
+                val calls = pendingToolCalls
+                if (calls != null) {
+                    pendingToolCalls = null
+                    answerToolCalls(state, calls)
+                } else {
+                    isGenerating = false
+                }
             } else {
                 lastGenerated = state.tokenizer.decode(
                     intArrayOf(sampledToken),
@@ -391,23 +423,72 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
             generatedCount = 0
             sampledToken = -1
             lastGenerated = ""
+            toolCallBuffer = null
+            pendingToolCalls = null
             text = state.tokenizer.decode(ids, skipSpecials = true)
             events.updated.fire()
         }
 
+    private fun trackToolCall(state: LoadedState, id: Int) {
+        val buffer = toolCallBuffer
+        when {
+            id == Lfm2ChatFormat.TOOL_CALL_START_ID -> toolCallBuffer = ArrayList()
+            buffer == null -> {}
+            id == Lfm2ChatFormat.TOOL_CALL_END_ID -> {
+                toolCallBuffer = null
+                pendingToolCalls = Lfm2ChatFormat
+                    .parseToolCalls(state.tokenizer.decode(buffer.toIntArray()))
+                    .takeIf { it.isNotEmpty() }
+            }
+            else -> buffer.add(id)
+        }
+    }
+
+    /**
+     * Executes [calls] and injects the tool-result turn into the feed queue — the closing
+     * `im_end` is fed first, then the tool turn and a reopened assistant turn — so decoding
+     * continues through the answer instead of stopping.
+     */
+    private fun answerToolCalls(state: LoadedState, calls: List<Lfm2ChatFormat.ToolCall>) {
+        val results = calls.map { call ->
+            val tool = activeTools().firstOrNull { it.name == call.name }
+            if (tool == null) "error: unknown tool ${call.name}"
+            else runCatching { tool.execute(call.arguments) }.getOrElse { "error: ${it.message}" }
+        }
+        val ids = state.tokenizer.encode(
+            Lfm2ChatFormat.toolResultTurn(results.joinToString("\n")),
+            addSpecials = false,
+        )
+        if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
+        ids.forEach {
+            pending.addLast(it)
+            windowIds.add(it)
+        }
+        syncGate.invalidate()
+        text += state.tokenizer.decode(ids, skipSpecials = true)
+    }
+
     /**
      * Encodes [prompt] for a fresh run. Chat mode builds the full templated string — BOS text
-     * included — and encodes with specials off, so the post-processor cannot add a second BOS.
+     * included — and encodes with specials off, so the post-processor cannot add a second BOS;
+     * available tools are advertised as plain text in the system turn, per the template.
      */
     private fun encodePrompt(tokenizer: LlmTokenizer): IntArray = when (promptMode) {
         PromptMode.COMPLETION -> tokenizer.encode(prompt)
-        PromptMode.CHAT -> tokenizer.encode(
-            Lfm2ChatFormat.chatPrompt(prompt, systemPrompt),
-            addSpecials = false,
-        )
+        PromptMode.CHAT -> {
+            val toolLine = activeTools().takeIf { it.isNotEmpty() }?.let(Lfm2ChatFormat::toolListLine)
+            val system = listOfNotNull(systemPrompt.takeIf { it.isNotEmpty() }, toolLine)
+                .joinToString("\n")
+            tokenizer.encode(Lfm2ChatFormat.chatPrompt(prompt, system), addSpecials = false)
+        }
     }
 
+    /** Test seam: scripts the sampled token stream when set, bypassing [samplingStrategy]. */
+    @Transient
+    internal var sampleOverride: (() -> Int)? = null
+
     private fun sampleToken(logits: FloatTensor): Int {
+        sampleOverride?.let { return it() }
         val strategy = samplingStrategy
         if (strategy === SamplingStrategy.Greedy) {
             var best = 0
@@ -447,6 +528,29 @@ class LanguageModel @XStreamConstructor constructor() : LocatableModel(), Editab
         appendLine("Name: $displayName (LFM2.5-230M)")
         appendLine("Weights: ${weightsDirectory.ifEmpty { "not set" }}${if (isLoaded) "" else " (not loaded)"}")
         append("Text: ${text.take(120)}")
+    }
+
+    companion object {
+
+        /** Offline built-in tools for the tool-calling demo; [enableDemoTools] advertises them. */
+        val demoTools: List<LlmTool> = listOf(
+            LlmTool(
+                name = "current_time",
+                description = "Get the current date and time",
+                parameters = """{"type": "object", "properties": {}, "required": []}""",
+            ) {
+                java.time.LocalDateTime.now()
+                    .format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy, h:mm a"))
+            },
+            LlmTool(
+                name = "get_weather",
+                description = "Get the current weather at a location",
+                parameters = """{"type": "object", "properties": {"location": """ +
+                    """{"type": "string", "description": "City name"}}, "required": ["location"]}""",
+            ) { arguments ->
+                "Sunny, 22 degrees C in ${arguments["location"] ?: "your location"} (demo data)"
+            },
+        )
     }
 
     class CreationTemplate : EditableObject {

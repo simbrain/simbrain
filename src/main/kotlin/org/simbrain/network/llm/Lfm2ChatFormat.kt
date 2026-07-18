@@ -45,4 +45,72 @@ object Lfm2ChatFormat {
     /** A tool-result turn ready to inject mid-run, reopening the assistant turn after it. */
     fun toolResultTurn(result: String) =
         turn("tool", "$TOOL_RESPONSE_START$result$TOOL_RESPONSE_END") + GENERATION_PROMPT
+
+    /** The plain-text tool advertisement the template puts in the system turn. */
+    fun toolListLine(tools: List<LlmTool>) =
+        tools.joinToString(", ", prefix = "List of tools: [", postfix = "]") { it.schemaJson() }
+
+    data class ToolCall(val name: String, val arguments: Map<String, String>)
+
+    private val callPattern = Regex("""([A-Za-z_][A-Za-z0-9_]*)\s*\(([^)]*)\)""")
+
+    /**
+     * Parses the model's Python-style call list, e.g. `[get_weather(location='Boston, MA')]` —
+     * the text between the tool-call markers. The template renders string arguments
+     * single-quoted but the model also emits double quotes in practice; both are stripped and
+     * commas inside them survive. Other values are kept verbatim. A tiny parser, not a
+     * grammar: nested parentheses inside argument values are out of scope.
+     */
+    fun parseToolCalls(raw: String): List<ToolCall> = callPattern.findAll(raw).map { match ->
+        val arguments = splitArgs(match.groupValues[2])
+            .mapNotNull { pair ->
+                val parts = pair.split("=", limit = 2).map { it.trim() }
+                if (parts.size == 2) {
+                    parts[0] to parts[1].removeSurrounding("'").removeSurrounding("\"")
+                } else null
+            }
+            .toMap()
+        ToolCall(match.groupValues[1], arguments)
+    }.toList()
+
+    private fun splitArgs(raw: String): List<String> {
+        val parts = ArrayList<String>()
+        val current = StringBuilder()
+        var quote: Char? = null
+        for (c in raw) {
+            when {
+                quote != null -> {
+                    current.append(c)
+                    if (c == quote) quote = null
+                }
+                c == '\'' || c == '"' -> {
+                    current.append(c)
+                    quote = c
+                }
+                c == ',' -> {
+                    parts.add(current.toString())
+                    current.clear()
+                }
+                else -> current.append(c)
+            }
+        }
+        if (current.isNotBlank()) parts.add(current.toString())
+        return parts
+    }
+}
+
+/**
+ * A tool the model can call in chat mode: advertised in the system turn as a JSON schema,
+ * invoked with the parsed argument map, returning plain text for the tool-result turn.
+ * [parameters] is the JSON-schema `parameters` object as a raw string.
+ */
+class LlmTool(
+    val name: String,
+    val description: String,
+    val parameters: String,
+    val execute: (Map<String, String>) -> String,
+) {
+    fun schemaJson(): String =
+        """{"type": "function", "function": {"name": "$name", "description": "$description", """ +
+            """"parameters": $parameters}}"""
 }

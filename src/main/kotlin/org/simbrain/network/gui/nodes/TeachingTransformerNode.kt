@@ -120,6 +120,12 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
     private fun statusLine(): String {
         val trainer = teachingTransformer.trainer
         val model = teachingTransformer.model
+        val generation = when {
+            teachingTransformer.waitingForInput -> "generating — waiting for input"
+            teachingTransformer.isGenerating -> "generating (play or step the network)"
+            teachingTransformer.text.isNotEmpty() -> "stopped — right-click to resume"
+            else -> null
+        }
         val phase = when (model.stepPhase) {
             TeachingTransformerModel.StepPhase.IDLE ->
                 if (model.plan.cursor != 0) "stepping forward: ${teachingTransformer.pendingOp()?.name}" else null
@@ -135,6 +141,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             .takeLast(8)
             .joinToString(" ") { teachingTransformer.tokenLabels?.getOrNull(it) ?: "#$it" }
         return listOfNotNull(
+            generation,
             training,
             phase,
             if (context.isNotEmpty()) "context: …$context" else null,
@@ -172,8 +179,8 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 add(createAction("Stop generation") { teachingTransformer.stopGeneration() })
             } else {
                 add(createAction("Resume generation") { teachingTransformer.resumeGeneration() })
-                add(createAction("Restart generation from prompt") { teachingTransformer.startGeneration() })
             }
+            add(createAction("Restart generation from prompt") { teachingTransformer.startGeneration() })
             addSeparator()
             add(JCheckBoxMenuItem("Gradient view", gradientView).apply {
                 addActionListener {

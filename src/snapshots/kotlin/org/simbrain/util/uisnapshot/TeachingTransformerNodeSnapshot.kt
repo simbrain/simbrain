@@ -39,7 +39,8 @@ class TeachingTransformerNodeSnapshot : UiSnapshotDef {
         runBlocking { network.addNetworkModel(teaching, usePlacementManager = false) }
         teaching.location = point(0.0, 0.0)
         teaching.setContext(intArrayOf(0, 1, 2, 3, 4, 5, 6, 7, 0, 1))
-        teaching.forwardContext()
+        teaching.resumeGeneration()
+        repeat(2) { teaching.step() }
 
         Thread.sleep(300)
         SwingUtilities.invokeAndWait {

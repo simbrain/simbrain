@@ -532,10 +532,15 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
 
     override fun hasRunToContinue(): Boolean = pending.isNotEmpty() || contextTokens.isNotEmpty()
 
+    /** An armed run with nothing to walk; it idles until context arrives (typed or coupled). */
+    val waitingForInput: Boolean
+        get() = isGenerating && pending.isEmpty() && contextTokens.isEmpty()
+
     /**
      * Advances generation by one token: slides the next pending word (or the last sample) into
      * the context, runs a full forward pass, and samples the next word. Skips the iteration
-     * while an op micro-step walk is mid-flight.
+     * while an op micro-step walk is mid-flight; an empty context idles armed, waiting for
+     * input, so arming before the document sync delivers text is not a dead end.
      */
     @Synchronized
     fun step() {
@@ -550,10 +555,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
             return
         }
         if (sampledToken >= 0) setContext(contextTokens + sampledToken)
-        if (contextTokens.isEmpty()) {
-            isGenerating = false
-            return
-        }
+        if (contextTokens.isEmpty()) return
         forwardContext()
         sampledToken = sampleNext()
         acceptSample()

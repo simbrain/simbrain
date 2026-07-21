@@ -84,16 +84,32 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
-    fun `generation stops itself when there is no vocabulary to walk`() {
+    fun `an armed run with nothing to walk idles waiting for input`() {
         val transformer = TeachingTransformer(TeachingTransformerConfig(
             contextSize = 6, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1,
         ))
         transformer.prompt = "anything"
         transformer.startGeneration()
-        transformer.step()
-        assertFalse(transformer.isGenerating)
+        repeat(3) { transformer.step() }
+        assertTrue(transformer.isGenerating, "an empty context waits for input instead of disarming")
+        assertTrue(transformer.waitingForInput)
         assertEquals("", transformer.generatedToken)
         assertEquals(0, transformer.hiddenState.size)
+    }
+
+    @Test
+    fun `context arriving while idle-armed starts generation without rearming`() {
+        val transformer = model()
+        transformer.startGeneration()
+        transformer.step()
+        assertTrue(transformer.waitingForInput)
+
+        transformer.contextWindow = "the cat"
+        assertFalse(transformer.waitingForInput)
+        transformer.step()
+        assertTrue(transformer.generatedToken.isNotEmpty(),
+            "the delivered context generates on the next step")
+        assertTrue(transformer.text.startsWith("the cat"))
     }
 
     @Test

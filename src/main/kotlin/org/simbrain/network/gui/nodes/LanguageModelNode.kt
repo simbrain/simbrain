@@ -168,9 +168,9 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 "Generating, token ${state.model.position}/${state.model.config.maxSeqLen} " +
                         "(play or step the network) — …$tail"
             state.model.position >= state.model.config.maxSeqLen ->
-                "Context window full — right-click to reset it — …$tail"
+                "Context window full — right-click to restart from the prompt — …$tail"
             languageModel.text.isEmpty() -> "Ready — play or step the network"
-            else -> "Stopped — …$tail"
+            else -> "Stopped — right-click to resume — …$tail"
         }
     }
 
@@ -200,7 +200,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         refreshView()
                     })
                 }
-                add(createAction("Reset context window") {
+                add(createAction("Restart generation from prompt") {
                     languageModel.startGeneration()
                     refreshView()
                 })

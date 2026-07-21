@@ -14,9 +14,11 @@ import java.awt.event.ComponentEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
+import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JToolBar
+import javax.swing.UIManager
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.BadLocationException
@@ -44,6 +46,18 @@ class TextWorldPanel(
      * The main scroll panel.
      */
     val inputScrollPane: JScrollPane
+
+    private val runLockLabel = JLabel("Read-only while running — pause to edit").apply {
+        foreground = UIManager.getColor("Label.disabledForeground")
+        font = font.deriveFont(font.size2D - 1f)
+        isVisible = false
+    }
+
+    /** Locks the text while the workspace runs; the label says why the caret is dead. */
+    fun setRunLock(locked: Boolean) {
+        textArea.isEditable = !locked
+        runLockLabel.isVisible = locked
+    }
 
     /**
      * Initialize the panel with an open / close toolbar.
@@ -73,6 +87,7 @@ class TextWorldPanel(
         bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
         val toolbarModeSelect = JToolBar()
         bottomToolbarPanel.add(toolbarModeSelect)
+        bottomToolbarPanel.add(runLockLabel)
         add(bottomToolbarPanel, BorderLayout.SOUTH)
 
         // Reset text position when user clicks in text area

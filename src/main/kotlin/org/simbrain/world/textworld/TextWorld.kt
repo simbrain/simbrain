@@ -108,6 +108,19 @@ class TextWorld : AttributeContainer, EditableObject {
             events.textChanged.fireAsync()
         }
 
+    /**
+     * When true, the text is read-only while the workspace is running, so a model streaming
+     * into this document is never edited mid-iteration — pause the workspace to edit, and the
+     * settled edit is consumed on the next Play or Step. Adopted automatically alongside
+     * [displayTokenizer] when a document coupling from a generative model is created.
+     */
+    @UserParameter(
+        label = "Read-only while running",
+        description = "Lock the text while the workspace is running; pause to edit.",
+        order = 6
+    )
+    var lockWhileRunning = false
+
     @delegate:Transient
     var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer, ::displayTokenizer) {
         (displayTokenizer ?: tokenizer).tokenize(text)

@@ -1,5 +1,7 @@
 package org.simbrain.world.textworld.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.couplings.getProducer
@@ -72,6 +74,11 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         addMenuBar()
         add(panel)
         frame.pack()
+
+        val updater = component.workspace.updater
+        updater.events.runStarted.on(Dispatchers.Swing) { panel.setRunLock(world.lockWhileRunning) }
+        updater.events.runFinished.on(Dispatchers.Swing) { panel.setRunLock(false) }
+        panel.setRunLock(world.lockWhileRunning && updater.isRunning)
 
         // Force component to fill up parent panel
         addComponentListener(object : ComponentAdapter() {

@@ -53,7 +53,9 @@ class TextWorldComponent : WorkspaceComponent {
 
     /**
      * When a document coupling into this world is created from a producer that knows its own
-     * tokenization, adopt that tokenizer for display, so token boxes match the source's truth.
+     * tokenization, adopt that tokenizer for display, so token boxes match the source's truth,
+     * and lock the document while the workspace runs, so the stream is never edited
+     * mid-iteration.
      */
     override fun onWorkspaceAttached() {
         workspace.couplingManager.events.couplingAdded.on(Dispatchers.Default) { coupling ->
@@ -63,6 +65,7 @@ class TextWorldComponent : WorkspaceComponent {
                 provider is ProvidesDisplayTokenizer
             ) {
                 world.displayTokenizer = provider.displayTokenizer.copy() as Tokenizer<*>
+                world.lockWhileRunning = true
             }
         }
     }

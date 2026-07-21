@@ -57,6 +57,8 @@ class DisplayTokenizerAdoptionTest {
         assertTrue(rig.world.displayTokenizer is CharacterTokenizer)
         assertFalse(rig.world.displayTokenizer === rig.transformer.tokenizer,
             "the world owns an independent copy")
+        assertTrue(rig.world.lockWhileRunning,
+            "a document coupling locks the world while the workspace runs")
 
         rig.world.text = "ab cd"
         assertEquals(5, rig.world.tokens.size,
@@ -76,5 +78,7 @@ class DisplayTokenizerAdoptionTest {
         Thread.sleep(300)
         assertNull(rig.world.displayTokenizer,
             "only text-document consumers adopt a display tokenizer")
+        assertFalse(rig.world.lockWhileRunning,
+            "a non-document coupling does not lock the world")
     }
 }

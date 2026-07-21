@@ -113,6 +113,39 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
+    fun `armed at setup, a typed prompt and play generate through the couplings`() {
+        val workspace = Workspace()
+        val network = Network()
+        workspace.addWorkspaceComponent(NetworkComponent("net", network))
+        val textWorldComponent = TextWorldComponent("text")
+        workspace.addWorkspaceComponent(textWorldComponent)
+        val world = textWorldComponent.world
+
+        val transformer = model()
+        runBlocking { network.addNetworkModel(transformer) }
+        with(workspace.couplingManager) {
+            createCoupling(
+                world.getProducer("getText"),
+                transformer.getConsumer("setContextWindow"),
+            )
+            createCoupling(
+                transformer.getProducer("getContextWindow"),
+                world.getConsumer("setTextIfChanged"),
+            )
+        }
+        transformer.resumeGeneration()
+
+        repeat(2) { workspace.simpleIterate() }
+        assertTrue(transformer.waitingForInput, "an empty document leaves the armed run idling")
+
+        world.text = "the cat sat"
+        repeat(4) { workspace.simpleIterate() }
+        assertTrue(transformer.text.split(" ").size > 3,
+            "the typed prompt generates without re-arming, got: ${transformer.text}")
+        assertTrue(world.text.startsWith("the cat sat"))
+    }
+
+    @Test
     fun `the sliding window syncs with a text world and edits replace the context`() {
         val workspace = Workspace()
         val network = Network()

@@ -3,16 +3,13 @@ package org.simbrain.network.llm
 import org.simbrain.network.compositor.CompositorScene
 import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.compositor.TeachingCompositor
-import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.TensorRole
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.network.trainers.TapeTrainer
-import org.simbrain.util.ProvidesDisplayTokenizer
 import org.simbrain.util.SimpleTokenizer
 import org.simbrain.util.Tokenizer
 import org.simbrain.util.UserParameter
@@ -21,10 +18,6 @@ import org.simbrain.util.createXStreamPropertyConverter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.tokenize
-import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.Consumable
-import org.simbrain.workspace.Producible
-import java.awt.geom.Point2D
 import java.nio.ByteBuffer
 import java.util.Base64
 import org.simbrain.network.tensor.op.AddOp
@@ -314,13 +307,11 @@ class TeachingTransformerEvents : LocationEvents() {
  * weights from disk. Weight capture happens at marshal time through the companion's property
  * converter, so whatever training did up to the save is what comes back.
  *
- * As an [AttributeContainer] it exposes the same coupling vocabulary as [LanguageModel] —
- * [generatedToken] and [hiddenState] out, [injectText] and the [contextWindow] document sync
- * in — over a word-level vocabulary: text maps through [tokenizer] and [tokenLabels], and
- * words outside the vocabulary are dropped.
+ * The coupling vocabulary and document-sync protocol live on [GenerativeModel], here over a
+ * word-level vocabulary: text maps through [tokenizer] and [tokenLabels], and words outside
+ * the vocabulary are dropped.
  */
-class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), EditableObject, AttributeContainer,
-    ProvidesDisplayTokenizer {
+class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() {
 
     override val displayTokenizer: Tokenizer<*>
         get() = tokenizer
@@ -374,14 +365,14 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         order = 3,
     )
 
-    var prompt by GuiEditable(
+    override var prompt by GuiEditable(
         initValue = "",
         label = "Prompt",
         description = "Text generation restarts from; words outside the vocabulary are dropped",
         order = 4,
     )
 
-    var samplingStrategy: SamplingStrategy by GuiEditable(
+    override var samplingStrategy: SamplingStrategy by GuiEditable(
         initValue = SamplingStrategy.Greedy,
         label = "Sampling strategy",
         description = "How the next token is chosen from the distribution",
@@ -391,27 +382,6 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
 
     /** Splits prompt and injected text into vocabulary words; share the corpus tokenizer. */
     var tokenizer: Tokenizer<*> = SimpleTokenizer()
-
-    /** Prompt plus generated continuation from the current run; keeps the full history. */
-    var text: String = ""
-        private set
-
-    @Transient
-    var isGenerating = false
-        private set
-
-    /** Vocabulary ids waiting to enter the context, one per iteration: prompt, then injections. */
-    @Transient
-    private var pending = ArrayDeque<Int>()
-
-    @Transient
-    private var sampledToken = -1
-
-    @Transient
-    private var lastGenerated = ""
-
-    @Transient
-    private var syncGate = DocumentSyncGate()
 
     @Transient
     private var appliedDiagramScale = 1.0
@@ -443,12 +413,6 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
 
     /** Saved junction glyph centers by op name, applied to the scene on load. */
     var junctionLayout: HashMap<String, DoubleArray>? = null
-
-    override var location: Point2D = Point2D.Double()
-        set(value) {
-            field = value
-            events.locationChanged.fire()
-        }
 
     @Transient
     override var events: TeachingTransformerEvents = TeachingTransformerEvents()
@@ -558,35 +522,15 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         return tokenizer.joinTokens(ids.map { labels.getOrNull(it) }.filterNotNull())
     }
 
-    /** Clears the context and starts a fresh generation run from [prompt]. */
-    @Synchronized
-    fun startGeneration() {
+    /** Clears the context for a fresh run from [prompt]. */
+    override fun onRestart(): IntArray {
         val ids = encode(prompt)
-        pending = ArrayDeque(ids.toList())
         contextTokens = IntArray(0)
-        sampledToken = -1
-        lastGenerated = ""
         text = decode(ids)
-        syncGate.reset()
-        isGenerating = true
-        events.updated.fire()
+        return ids
     }
 
-    @Synchronized
-    fun stopGeneration() {
-        isGenerating = false
-    }
-
-    /** Continues a stopped run from the current context, or starts fresh if there is none. */
-    @Synchronized
-    fun resumeGeneration() {
-        if (pending.isEmpty() && contextTokens.isEmpty()) {
-            startGeneration()
-            return
-        }
-        isGenerating = true
-        events.updated.fire()
-    }
+    override fun hasRunToContinue(): Boolean = pending.isNotEmpty() || contextTokens.isNotEmpty()
 
     /**
      * Advances generation by one token: slides the next pending word (or the last sample) into
@@ -601,7 +545,7 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         if (pending.isNotEmpty()) {
             setContext(contextTokens + pending.removeFirst())
             forwardContext()
-            sampledToken = samplingStrategy.sample(nextTokenDistribution())
+            sampledToken = sampleNext()
             if (pending.isEmpty()) acceptSample()
             return
         }
@@ -611,9 +555,12 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
             return
         }
         forwardContext()
-        sampledToken = samplingStrategy.sample(nextTokenDistribution())
+        sampledToken = sampleNext()
         acceptSample()
     }
+
+    private fun sampleNext(): Int =
+        sampleOverride?.invoke() ?: samplingStrategy.sample(nextTokenDistribution())
 
     private fun acceptSample() {
         val label = tokenLabels?.getOrNull(sampledToken) ?: return
@@ -622,47 +569,23 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         syncGate.invalidate()
     }
 
-    /** Text of the word generated this iteration; empty while walking queued text or stopped. */
-    @get:Producible
-    val generatedToken: String
-        get() = lastGenerated
-
     /** The final residual stream row for the current context position. */
-    @get:Producible(customDescriptionMethod = "hiddenStateDescription")
-    val hiddenState: DoubleArray
-        get() {
-            if (contextTokens.isEmpty()) return DoubleArray(0)
-            val resid = model.plan.port("layers.${config.numLayers - 1}.resid").tensor
-            val row = contextTokens.size - 1
-            return DoubleArray(resid.cols) { resid[row, it].toDouble() }
-        }
+    override fun computeHiddenState(): DoubleArray {
+        if (contextTokens.isEmpty()) return DoubleArray(0)
+        val resid = model.plan.port("layers.${config.numLayers - 1}.resid").tensor
+        val row = contextTokens.size - 1
+        return DoubleArray(resid.cols) { resid[row, it].toDouble() }
+    }
 
-    fun hiddenStateDescription() = "$id:hiddenState (final residual)"
+    override fun hiddenStateLabel() = "final residual"
 
-    /**
-     * Queues [newText]'s vocabulary words to enter the context ahead of the model's own
-     * continuation; a freshly sampled word that has not entered the context yet goes first,
-     * keeping [text]'s order. Does not start or resume a stopped run.
-     */
-    @Synchronized
-    @Consumable
-    fun injectText(newText: String) {
-        if (newText.isEmpty()) return
-        val ids = encode(newText)
-        if (ids.isEmpty()) return
-        if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
-        ids.forEach { pending.addLast(it) }
-        syncGate.invalidate()
+    override fun encodeText(textIn: String): IntArray = encode(textIn)
+
+    override fun onInjected(newText: String, ids: IntArray) {
         val injected = decode(ids)
         text = if (text.isEmpty()) injected else tokenizer.joinTokens(listOf(text, injected))
     }
 
-    /**
-     * The sliding context window as text — exactly what the next forward pass reads, so the
-     * document visibly slides once the window fills. Follows the same sync protocol as
-     * [LanguageModel.contextWindow]; consumed edits replace the context outright, which is
-     * free here — the forward pass is stateless, so there is nothing to replay.
-     */
     /** What the next forward pass will read: the context plus a sampled word not yet slid in. */
     private fun windowTokens(): IntArray {
         val withSample = if (pending.isEmpty() && sampledToken >= 0) {
@@ -672,24 +595,18 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
         else withSample.copyOfRange(withSample.size - config.contextSize, withSample.size)
     }
 
-    @get:Producible
-    @set:Consumable
-    var contextWindow: String
-        @Synchronized
-        get() = syncGate.publish(decode(windowTokens()), isGenerating)
-        @Synchronized
-        set(value) {
-            if (!syncGate.isEdit(value, decode(windowTokens()), isGenerating)) return
-            val ids = encode(value)
-            if (ids.isEmpty()) return
-            setContext(ids)
-            pending = ArrayDeque()
-            sampledToken = -1
-            lastGenerated = ""
-            syncGate.invalidate()
-            text = decode(contextTokens)
-            events.updated.fire()
-        }
+    /**
+     * The sliding window as text, so the coupled document visibly slides once the window
+     * fills.
+     */
+    override fun windowText(): String = decode(windowTokens())
+
+    /** Edits replace the context outright — the forward pass is stateless, nothing to replay. */
+    override fun applyWindowEdit(ids: IntArray) {
+        setContext(ids)
+        pending = ArrayDeque()
+        text = decode(contextTokens)
+    }
 
     /** Runs a full forward pass on the current context and publishes it to the scene. */
     fun forwardContext() {
@@ -754,11 +671,8 @@ class TeachingTransformer @XStreamConstructor constructor() : LocatableModel(), 
     fun pendingOp(): TensorOp? = model.nextOp()
         ?: if (model.plan.cursor != 0) model.plan.ops[model.plan.cursor] else null
 
-    override suspend fun delete(): List<NetworkModel> {
-        stopGeneration()
+    override suspend fun onDelete() {
         trainer.stopTraining()
-        events.deleted.fire(this)
-        return listOf(this)
     }
 
     fun readResolve(): Any {

@@ -2,6 +2,7 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.world.textworld.TextWorld
@@ -18,7 +19,6 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JToolBar
-import javax.swing.UIManager
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.BadLocationException
@@ -47,16 +47,25 @@ class TextWorldPanel(
      */
     val inputScrollPane: JScrollPane
 
-    private val runLockLabel = JLabel("Read-only while running — pause to edit").apply {
-        foreground = UIManager.getColor("Label.disabledForeground")
-        font = font.deriveFont(font.size2D - 1f)
-        isVisible = false
+    private val statusLabel = JLabel().apply {
+        font = Theme.label
+        foreground = Theme.mutedText
     }
 
-    /** Locks the text while the workspace runs; the label says why the caret is dead. */
+    private val tokenCountLabel = JLabel().apply {
+        font = Theme.label
+        foreground = Theme.mutedText
+    }
+
+    /** Locks the text while the workspace runs; the status bar says why the caret is dead. */
     fun setRunLock(locked: Boolean) {
         textArea.isEditable = !locked
-        runLockLabel.isVisible = locked
+        statusLabel.text = if (locked) "Read-only while running — pause to edit" else ""
+    }
+
+    private fun updateTokenCount() {
+        val count = world.tokens.size
+        tokenCountLabel.text = if (count == 1) "1 token" else "$count tokens"
     }
 
     /**
@@ -67,12 +76,15 @@ class TextWorldPanel(
     init {
 
         this.layout = BorderLayout()
-        border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
         textArea.lineWrap = true
         textArea.text = world.text
+        textArea.margin = Insets(4, 6, 4, 6)
         inputScrollPane =
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
-        add(inputScrollPane)
+        add(JPanel(BorderLayout()).apply {
+            border = BorderFactory.createEmptyBorder(6, 10, 8, 10)
+            add(inputScrollPane)
+        })
 
         // Top toolbar
         val topToolBar = JToolBar()
@@ -82,13 +94,17 @@ class TextWorldPanel(
         topToolBar.add(world.textWorldPrefs)
         add(topToolBar,  BorderLayout.NORTH)
 
-        // Bottom toolbar
-        val bottomToolbarPanel = JPanel()
-        bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
-        val toolbarModeSelect = JToolBar()
-        bottomToolbarPanel.add(toolbarModeSelect)
-        bottomToolbarPanel.add(runLockLabel)
-        add(bottomToolbarPanel, BorderLayout.SOUTH)
+        // Status bar
+        val statusBar = JPanel(BorderLayout()).apply {
+            border = BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.divider),
+                BorderFactory.createEmptyBorder(4, 10, 4, 10)
+            )
+            add(statusLabel, BorderLayout.WEST)
+            add(tokenCountLabel, BorderLayout.EAST)
+        }
+        add(statusBar, BorderLayout.SOUTH)
+        updateTokenCount()
 
         // Reset text position when user clicks in text area
         textArea.addMouseListener(object : MouseAdapter() {
@@ -114,6 +130,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateTokenCount()
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
@@ -122,6 +139,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateTokenCount()
             }
         })
 
@@ -140,6 +158,7 @@ class TextWorldPanel(
             if (world.position <= textArea.document.length) {
                 textArea.caretPosition = world.position
             }
+            updateTokenCount()
         }
 
         world.events.cursorPositionChanged.on(Dispatchers.Swing) {

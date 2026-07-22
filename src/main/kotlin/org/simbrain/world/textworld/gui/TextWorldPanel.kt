@@ -60,12 +60,22 @@ class TextWorldPanel(
     /** Locks the text while the workspace runs; the status bar says why the caret is dead. */
     fun setRunLock(locked: Boolean) {
         textArea.isEditable = !locked
-        statusLabel.text = if (locked) "Read-only while running — pause to edit" else ""
+        statusLabel.text = if (locked) "Read-only while running" else ""
+        val explanation = if (locked) RUN_LOCK_EXPLANATION else null
+        statusLabel.toolTipText = explanation
+        textArea.toolTipText = explanation
     }
 
+    /** Token counts only mean something for a document tokenized by a model's own tokenizer. */
     private fun updateTokenCount() {
+        if (world.displayTokenizer == null) {
+            tokenCountLabel.text = ""
+            tokenCountLabel.toolTipText = null
+            return
+        }
         val count = world.tokens.size
         tokenCountLabel.text = if (count == 1) "1 token" else "$count tokens"
+        tokenCountLabel.toolTipText = "Tokens in this document, counted by the model's tokenizer"
     }
 
     /**
@@ -78,7 +88,7 @@ class TextWorldPanel(
         this.layout = BorderLayout()
         textArea.lineWrap = true
         textArea.text = world.text
-        textArea.margin = Insets(4, 6, 4, 6)
+        textArea.margin = Insets(6, 8, 8, 8)
         inputScrollPane =
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
         add(JPanel(BorderLayout()).apply {
@@ -226,6 +236,12 @@ class TextWorldPanel(
     }
 
     internal inner class MyHighlightPainter(color: Color?) : DefaultHighlightPainter(color)
+
+    companion object {
+        private const val RUN_LOCK_EXPLANATION =
+            "The workspace is running, so this document is read-only. " +
+                "Pause the workspace to edit — the edit is applied on the next Play or Step."
+    }
 
     fun highlight(begin: Int, end: Int) {
         if (!world.highlightCurrentToken) return

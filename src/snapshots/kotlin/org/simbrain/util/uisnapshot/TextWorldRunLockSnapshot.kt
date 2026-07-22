@@ -1,5 +1,6 @@
 package org.simbrain.util.uisnapshot
 
+import org.simbrain.util.SimpleTokenizer
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.gui.TextWorldPanel
 import java.awt.Component
@@ -15,6 +16,7 @@ class TextWorldRunLockSnapshot : UiSnapshotDef {
     override fun build(): Component {
         val world = TextWorld()
         world.lockWhileRunning = true
+        world.displayTokenizer = SimpleTokenizer()
         world.setTextNoEvent("The capital of France is Paris. The capital of Germany is")
         val panel = TextWorldPanel(world).apply {
             preferredSize = Dimension(420, 300)

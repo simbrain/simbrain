@@ -14,9 +14,8 @@ import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.llm.LanguageModel
-import org.simbrain.network.llm.Lfm2Weights
-import org.simbrain.network.llm.LlmPreferences
 import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -260,39 +259,9 @@ class PoolLayerTemplate : EditableObject {
 
 fun NetworkPanel.showLanguageModelCreationDialog() {
     LanguageModel.CreationTemplate().createEditorDialog { template ->
-        val existing = Lfm2Weights.findWeightsDirectory()
-        if (existing != null) {
-            addLanguageModel(template.create(existing.toString()))
-            return@createEditorDialog
-        }
-        when (showOptionDialog(
-            "No ${Lfm2Weights.MODEL_NAME} weights were found on this machine.",
-            "Language Model Weights",
-            arrayOf("Download…", "Locate folder…", "Cancel"),
-            defaultOption = 0,
-        )) {
-            0 -> {
-                if (showWarningConfirmDialog(Lfm2Weights.downloadNotice) != JOptionPane.OK_OPTION) {
-                    return@createEditorDialog
-                }
-                val languageModel = template.create("")
-                addLanguageModel(languageModel)
-                network.launch(Dispatchers.Default) {
-                    val dir = Lfm2Weights.download() ?: return@launch
-                    LlmPreferences.weightsDirectory = dir.toString()
-                    languageModel.weightsDirectory = dir.toString()
-                    runCatching { languageModel.loadWeights() }
-                }
-            }
-            1 -> {
-                val dir = showDirectorySelectionDialog() ?: return@createEditorDialog
-                if (!Lfm2Weights.isValidWeightsDirectory(java.nio.file.Path.of(dir))) {
-                    showWarningDialog("No model.safetensors and tokenizer.json in $dir")
-                    return@createEditorDialog
-                }
-                LlmPreferences.weightsDirectory = dir
-                addLanguageModel(template.create(dir))
-            }
+        val languageModel = template.create("")
+        if (languageModel.obtainWeightsInteractive(network)) {
+            addLanguageModel(languageModel)
         }
     }.also {
         it.title = "Create Language Model"

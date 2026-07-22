@@ -240,6 +240,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         if (showWarningConfirmDialog(Lfm2Weights.downloadNotice) != JOptionPane.OK_OPTION) return
         networkPanel.network.launch(Dispatchers.Default) {
             val dir = Lfm2Weights.download() ?: return@launch
+            LlmPreferences.weightsDirectory = dir.toString()
             languageModel.weightsDirectory = dir.toString()
             loadInBackground()
         }

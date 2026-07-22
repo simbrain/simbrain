@@ -47,7 +47,7 @@ class TextWorldPanel(
      */
     val inputScrollPane: JScrollPane
 
-    private val statusLabel = JLabel().apply {
+    private val statusLabel = JLabel(" ").apply {
         font = Theme.label
         foreground = Theme.mutedText
     }
@@ -60,22 +60,23 @@ class TextWorldPanel(
     /** Locks the text while the workspace runs; the status bar says why the caret is dead. */
     fun setRunLock(locked: Boolean) {
         textArea.isEditable = !locked
-        statusLabel.text = if (locked) "Read-only while running" else ""
+        // The single space keeps the bar's height when there is nothing to say
+        statusLabel.text = if (locked) "Read-only while running" else " "
         val explanation = if (locked) RUN_LOCK_EXPLANATION else null
         statusLabel.toolTipText = explanation
         textArea.toolTipText = explanation
     }
 
-    /** Token counts only mean something for a document tokenized by a model's own tokenizer. */
+    /** The count follows the token boxes: shown for token-focused worlds, quiet otherwise. */
     private fun updateTokenCount() {
-        if (world.displayTokenizer == null) {
+        if (!world.showTokenBoundaries) {
             tokenCountLabel.text = ""
             tokenCountLabel.toolTipText = null
             return
         }
         val count = world.tokens.size
         tokenCountLabel.text = if (count == 1) "1 token" else "$count tokens"
-        tokenCountLabel.toolTipText = "Tokens in this document, counted by the model's tokenizer"
+        tokenCountLabel.toolTipText = "Tokens in this document, counted by the active tokenizer"
     }
 
     /**
@@ -108,7 +109,7 @@ class TextWorldPanel(
         val statusBar = JPanel(BorderLayout()).apply {
             border = BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.divider),
-                BorderFactory.createEmptyBorder(6, 10, 8, 10)
+                BorderFactory.createEmptyBorder(5, 10, 12, 10)
             )
             add(statusLabel, BorderLayout.WEST)
             add(tokenCountLabel, BorderLayout.EAST)
@@ -180,8 +181,8 @@ class TextWorldPanel(
         }
 
         world.events.preferencesChanged.on(Dispatchers.Swing) {
-
             updateHighlights()
+            updateTokenCount()
         }
 
     }

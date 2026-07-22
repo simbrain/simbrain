@@ -331,14 +331,18 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
 
     /**
      * An edit resets the model and requeues the whole edited window for a watchable re-prefill —
-     * the conv caches make an exact prefix rewind impossible.
+     * the conv caches make an exact prefix rewind impossible. A window whose leading BOS marker
+     * was edited away gets it restored: every canonical window starts with BOS, and without it
+     * the model tends to end the text immediately. The next sync republishes the marker.
      */
     override fun applyWindowEdit(ids: IntArray) {
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        pending = ArrayDeque(ids.toList())
-        windowIds = ArrayList(ids.toList())
+        val window = if (ids.firstOrNull() == Lfm2ChatFormat.BOS_ID) ids.toList()
+            else listOf(Lfm2ChatFormat.BOS_ID) + ids.toList()
+        pending = ArrayDeque(window)
+        windowIds = ArrayList(window)
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null

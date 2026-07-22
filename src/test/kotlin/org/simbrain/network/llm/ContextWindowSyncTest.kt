@@ -147,6 +147,29 @@ class ContextWindowSyncTest {
     }
 
     @Test
+    fun `an edit that drops the BOS marker gets it restored and generation continues`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val rig = Rig(dir!!)
+        repeat(3) { rig.workspace.simpleIterate() }
+        rig.languageModel.stopGeneration()
+        repeat(2) { rig.workspace.simpleIterate() }
+
+        rig.world.text = "The capital of Germany is"
+        rig.workspace.simpleIterate()
+        rig.languageModel.resumeGeneration()
+
+        val windowTokens = rig.languageModel.loaded!!.tokenizer
+            .encode("The capital of Germany is").size
+        repeat(windowTokens + 6) { rig.workspace.simpleIterate() }
+        assertTrue(rig.world.text.startsWith("<|startoftext|>"),
+            "the restored marker republishes to the document, got: ${rig.world.text}")
+        assertTrue(rig.languageModel.text.contains("Berlin"),
+            "the model continues from the marker-less edit, got: ${rig.languageModel.text}")
+    }
+
+    @Test
     fun `an edit while generating rebuilds immediately and keeps generating`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")

@@ -108,7 +108,7 @@ class TextWorldPanel(
         val statusBar = JPanel(BorderLayout()).apply {
             border = BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.divider),
-                BorderFactory.createEmptyBorder(4, 10, 4, 10)
+                BorderFactory.createEmptyBorder(6, 10, 8, 10)
             )
             add(statusLabel, BorderLayout.WEST)
             add(tokenCountLabel, BorderLayout.EAST)

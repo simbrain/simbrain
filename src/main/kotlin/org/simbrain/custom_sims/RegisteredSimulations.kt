@@ -21,6 +21,7 @@ import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
+import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
@@ -107,6 +108,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("NETtalk") { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
+        item("Language model (LFM2.5-230M, beta)") { lfm2LanguageModel }
         item("Tiny language model (transformer)") { tinyLanguageModel }
     }
 

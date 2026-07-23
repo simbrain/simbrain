@@ -129,6 +129,21 @@ val lfm2LanguageModel = newSim {
             addButton("Reseed context from prompt") {
                 languageModel.seedFromPrompt()
             }
+
+            addSeparator()
+
+            val messageField = addTextField("Chat message", "")
+            fun sendChatMessage() {
+                val message = messageField.text.trim()
+                if (message.isEmpty()) return
+                languageModel.sendUserMessage(message)
+                messageField.text = ""
+                if (!workspace.updater.isRunning) workspace.run()
+            }
+            messageField.addActionListener { sendChatMessage() }
+            addButton("Send message") {
+                sendChatMessage()
+            }
         }.awaitLayout()
         controlPanel.setLocation(
             controlPanel.centeredXInColumn(SIM_WINDOW_GAP, textWorldWidth),
@@ -178,7 +193,9 @@ val lfm2LanguageModel = newSim {
 
         # Chat and Tools
 
-        Restart the simulation and choose `Chat` prompt mode to have the model answer your prompt as an assistant instead of continuing it verbatim. With `Enable demo tools` checked, asking something like "What's the weather in Paris?" makes the model emit a tool call, which Simbrain answers with demo data, and the model folds the result into its reply.
+        Restart the simulation and choose `Chat` prompt mode to have the model answer your prompt as an assistant instead of continuing it verbatim. Once its answer ends, type a follow-up in the control panel's `Chat message` field and press Enter (or `Send message`): Simbrain wraps your text in a templated user turn — watch it appear in the document with its `<|im_start|>` scaffolding — and the model writes its reply. The document is the whole conversation, and you can still edit it directly between turns.
+
+        With `Enable demo tools` checked, asking something like "What's the weather in Paris?" makes the model emit a tool call, which Simbrain answers with demo data, and the model folds the result into its reply.
 
         # Beta
 

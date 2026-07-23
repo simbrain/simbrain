@@ -138,6 +138,35 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `a sent message reopens a sealed chat and the model answers the follow-up`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
+        languageModel.prompt = "What is the capital of France?"
+        languageModel.promptMode = PromptMode.CHAT
+        languageModel.loadWeights()
+
+        var guard = 0
+        while (languageModel.canAdvance && guard++ < 256) languageModel.step()
+        assertTrue(languageModel.isSealed)
+        assertTrue(languageModel.text.contains("Paris"), "got: ${languageModel.text}")
+
+        languageModel.sendUserMessage("What is the capital of Germany?")
+        assertFalse(languageModel.isSealed, "the queued turn moves the stream past the end marker")
+        assertTrue(languageModel.canAdvance)
+        assertTrue(languageModel.contextWindow.contains(
+            "<|im_start|>user\nWhat is the capital of Germany?<|im_end|>"),
+            "the turn is templated into the window")
+
+        guard = 0
+        while (languageModel.canAdvance && guard++ < 256) languageModel.step()
+        assertTrue(languageModel.isSealed, "the follow-up answer seals again")
+        assertTrue(languageModel.text.substringAfterLast("Germany").contains("Berlin"),
+            "the model answers the follow-up, got: ${languageModel.text}")
+    }
+
+    @Test
     fun `coupling attributes are safe while weights are not loaded`() {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 64)
         assertEquals("", languageModel.generatedToken)
@@ -145,6 +174,7 @@ class LanguageModelTest {
         assertEquals("", languageModel.contextWindow)
         languageModel.injectText("hello")
         languageModel.contextWindow = "hello"
+        languageModel.sendUserMessage("hello")
         assertEquals("", languageModel.text)
     }
 

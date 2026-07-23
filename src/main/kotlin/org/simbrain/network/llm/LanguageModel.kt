@@ -14,6 +14,7 @@ import org.simbrain.util.Tokenizer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.Consumable
 import java.nio.file.Path
 import kotlin.math.exp
 
@@ -396,6 +397,33 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         }
         syncGate.invalidate()
         text += state.tokenizer.decode(ids, skipSpecials = true)
+    }
+
+    /**
+     * Appends a templated user turn and the open assistant turn to the stream — the chat
+     * counterpart of [injectText], with the template applied on this side of the coupling,
+     * like a chat runtime would. Sending a message moves a sealed stream past its end marker
+     * (the unfed marker is queued first, the same way a tool answer reopens the turn), so the
+     * next iterations walk the turn and generate the reply. Meant for chat mode.
+     */
+    @Synchronized
+    @Consumable
+    fun sendUserMessage(message: String) {
+        if (message.isBlank()) return
+        val state = loaded ?: return
+        val ids = state.tokenizer.encode(
+            Lfm2ChatFormat.turn("user", message.trim()) + Lfm2ChatFormat.GENERATION_PROMPT,
+            addSpecials = false,
+        )
+        if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
+        ids.forEach {
+            pending.addLast(it)
+            windowIds.add(it)
+        }
+        generatedCount = 0
+        syncGate.invalidate()
+        text += state.tokenizer.decode(ids, skipSpecials = true)
+        events.updated.fire()
     }
 
     /**

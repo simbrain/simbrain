@@ -35,8 +35,7 @@ class LanguageModelNodeSnapshot : UiSnapshotDef {
         languageModel.loadWeights()
         runBlocking { network.addNetworkModel(languageModel, usePlacementManager = false) }
 
-        languageModel.startGeneration()
-        while (languageModel.isGenerating) {
+        while (languageModel.canAdvance) {
             languageModel.step()
         }
         Thread.sleep(200)

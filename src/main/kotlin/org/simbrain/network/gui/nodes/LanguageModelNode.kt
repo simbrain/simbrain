@@ -37,9 +37,9 @@ import javax.swing.SwingUtilities
 /**
  * Canvas node for a [LanguageModel]: an interaction box for whole-node selection and dragging,
  * the compositor interior (which owns its own tile selection, moves, trace, and tooltips), and a
- * status line with the generated text. Generation is paced by the workspace: a loaded model is
- * armed automatically, so playing or stepping the network generates one token per iteration;
- * the context menu resets the context window for a fresh run.
+ * status line with the generated text. Generation is paced by the workspace: playing or
+ * stepping the network generates one token per iteration whenever the model can advance;
+ * the context menu reseeds the context window from the prompt.
  */
 class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageModel) : ScreenElement(networkPanel) {
 
@@ -164,13 +164,17 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             }
         val tail = languageModel.text.takeLast(90).replace('\n', ' ')
         return when {
-            languageModel.isGenerating ->
-                "Generating, token ${state.model.position}/${state.model.config.maxSeqLen} " +
+            languageModel.canAdvance ->
+                "Writing, token ${state.model.position}/${state.model.config.maxSeqLen} " +
                         "(play or step the network) — …$tail"
-            state.model.position >= state.model.config.maxSeqLen ->
-                "Context window full — right-click to restart from the prompt — …$tail"
+            languageModel.isWindowFull ->
+                "Context window full — right-click to reseed from the prompt — …$tail"
+            languageModel.isSealed ->
+                "Ended — edit the document or delete the end marker to continue — …$tail"
+            languageModel.budgetSpent ->
+                "Token budget spent — edit the document or raise the budget to continue — …$tail"
             languageModel.text.isEmpty() -> "Ready — play or step the network"
-            else -> "Stopped — right-click to resume — …$tail"
+            else -> "Idle — …$tail"
         }
     }
 
@@ -189,19 +193,8 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             add(createAction("Generation settings...") { propertyDialog.display() })
             val state = languageModel.loaded
             if (state != null) {
-                if (languageModel.isGenerating) {
-                    add(createAction("Stop generation") {
-                        languageModel.stopGeneration()
-                        refreshView()
-                    })
-                } else if (state.model.position < state.model.config.maxSeqLen) {
-                    add(createAction("Resume generation") {
-                        languageModel.resumeGeneration()
-                        refreshView()
-                    })
-                }
-                add(createAction("Restart generation from prompt") {
-                    languageModel.startGeneration()
+                add(createAction("Reseed context from prompt") {
+                    languageModel.seedFromPrompt()
                     refreshView()
                 })
                 addSeparator()

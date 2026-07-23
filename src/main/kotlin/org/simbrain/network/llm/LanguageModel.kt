@@ -31,9 +31,10 @@ enum class PromptMode(private val label: String) {
 /**
  * A language model on the network canvas: wraps the headless [Lfm2Model] and exposes its interior
  * through a [CompositorScene]. One network update generates one token, so the workspace play
- * button steps generation token by token. Loading weights arms generation automatically; a run
- * continues until the context window fills, the model emits end-of-text, or an optional token
- * budget is reached, and [startGeneration] resets the context window for a fresh run.
+ * button steps generation token by token. There is no run mode: loading weights seeds the window
+ * from the prompt, and the model advances until the stream seals at end-of-text, the context
+ * window fills, or an optional token budget is spent — after which edits, injections, or
+ * [seedFromPrompt] move it again.
  *
  * Only the weights directory, config, prompt, sampling parameters, and view state are serialized —
  * never the weights. On deserialization the model reloads from [weightsDirectory]; if the files
@@ -196,7 +197,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))
-        startGeneration()
+        seedFromPrompt()
         events.weightsLoaded.fire()
     }
 
@@ -230,8 +231,8 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
     }
 
-    /** Resets the model, encodes a fresh run from [prompt], and clears the tool-loop state. */
-    override fun onRestart(): IntArray? {
+    /** Resets the model, encodes a fresh window from [prompt], and clears the tool-loop state. */
+    override fun onSeed(): IntArray? {
         val state = loaded ?: return null
         state.model.reset()
         state.scene.reset()
@@ -244,11 +245,26 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         return ids
     }
 
-    override fun hasRunToContinue(): Boolean = pending.isNotEmpty() || sampledToken >= 0
+    override fun hasContinuation(): Boolean = sampledToken >= 0
 
-    /** A full context window cannot be resumed; [startGeneration] resets it. */
-    override fun canResume(): Boolean =
-        loaded?.let { it.model.position < it.model.config.maxSeqLen } == true
+    private val sealsAtEndOfText get() = stopAtEndOfText || promptMode == PromptMode.CHAT
+
+    /**
+     * The stream ends where the model ended it: a window whose last token is end-of-text is
+     * sealed until an edit, an injection, or a tool answer moves it past the marker.
+     */
+    val isSealed: Boolean
+        get() = sealsAtEndOfText && pending.isEmpty() &&
+            windowIds.lastOrNull() == loaded?.model?.config?.eosTokenId
+
+    val isWindowFull: Boolean
+        get() = loaded?.let { it.model.position >= it.model.config.maxSeqLen } == true
+
+    /** [tokensToGenerate] spent; edits and injections start a fresh budget. */
+    val budgetSpent: Boolean
+        get() = tokensToGenerate > 0 && generatedCount >= tokensToGenerate
+
+    override fun isHalted(): Boolean = loaded == null || isSealed || isWindowFull || budgetSpent
 
     context(Network)
     override fun update() {
@@ -258,22 +274,14 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     /**
      * Advances generation by one token: feeds the next pending token (or the last sampled token
      * once the queue is drained), publishes activations to the scene, and samples the next
-     * token. No-op unless a run is active.
+     * token. No-op unless [canAdvance].
      */
     @Synchronized
     fun step() {
-        val state = loaded ?: return
         lastGenerated = ""
-        if (!isGenerating) return
-        if (state.model.position >= state.model.config.maxSeqLen) {
-            isGenerating = false
-            return
-        }
+        val state = loaded ?: return
+        if (!canAdvance) return
         val id = if (pending.isNotEmpty()) pending.removeFirst() else sampledToken
-        if (id < 0) {
-            isGenerating = false
-            return
-        }
         val position = state.model.position
         val logits = state.model.forwardToken(id)
         state.scene.publish(position)
@@ -282,14 +290,10 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
             windowIds.add(sampledToken)
             syncGate.invalidate()
             trackToolCall(state, sampledToken)
-            val stopAtEos = stopAtEndOfText || promptMode == PromptMode.CHAT
-            if (stopAtEos && sampledToken == state.model.config.eosTokenId) {
-                val calls = pendingToolCalls
-                if (calls != null) {
+            if (sealsAtEndOfText && sampledToken == state.model.config.eosTokenId) {
+                pendingToolCalls?.let { calls ->
                     pendingToolCalls = null
                     answerToolCalls(state, calls)
-                } else {
-                    isGenerating = false
                 }
             } else {
                 lastGenerated = state.tokenizer.decode(
@@ -298,9 +302,6 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
                 )
                 text += lastGenerated
                 generatedCount++
-                if (tokensToGenerate > 0 && generatedCount >= tokensToGenerate) {
-                    isGenerating = false
-                }
             }
         }
         events.updated.fire()
@@ -323,6 +324,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     override fun onInjected(newText: String, ids: IntArray) {
         ids.forEach { windowIds.add(it) }
         text += newText
+        generatedCount = 0
     }
 
     /** The full committed token stream, decoded with specials kept — scaffolding included. */

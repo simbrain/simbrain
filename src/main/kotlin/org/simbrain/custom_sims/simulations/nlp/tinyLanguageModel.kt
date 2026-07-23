@@ -325,16 +325,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 dialog.display()
             }
 
-            addSeparator()
-
-            addButton("Resume generation") {
-                // Continues from whatever context the text world holds; falls back to the prompt
-                transformer.resumeGeneration()
-            }
-
-            addButton("Stop generation") {
-                transformer.stopGeneration()
-            }
         }.awaitLayout()
         controlPanel.setLocation(
             controlPanel.centeredXInColumn(SIM_WINDOW_GAP, textWorldWidth),
@@ -348,7 +338,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             PopupConfig(
                 title = "Language Model Prompt",
                 message = "To enter a prompt, add some text here. Then click Play (or Step) on the main toolbar — " +
-                    "each workspace step generates one token. Stop and resume generation from the control panel.",
+                    "each workspace step generates one token. Pause the workspace to edit the text; " +
+                    "it continues from your edit on the next Play.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 placement = PopupPlacement.BOTTOM_CENTER,
                 suppressionKey = "tiny_language_model_prompt_help",
@@ -403,7 +394,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         2. Click `Play` (or `Step`) in the main toolbar
         3. Each workspace step runs the full transformer on the current context and samples one new token
 
-        The transformer starts armed and idles until text arrives — its status line shows `waiting for input`. Use `Stop generation` / `Resume generation` in the control panel (or the transformer's right-click menu) to pause and continue. While stopped, editing the text replaces the model's context, and resuming continues from your edit.
+        There is no start or stop mode: the transformer writes whenever the workspace runs and there is text to continue — with an empty document its status line shows `waiting for input`. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
         Tokens you type that aren't in the vocabulary become zero rows in the input (the vocabulary comes from the training text — see `Show Vocabulary`).
 
@@ -497,13 +488,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
 /**
  * Wires the transformer's context window to the text world as a two-way document sync — the
- * sliding window streams into the text world while generating, and text typed there while the
- * run is stopped replaces the transformer's context — then arms generation, so typing a prompt
- * and pressing Play is all it takes: an armed transformer with no context idles waiting for
- * input. The transformer samples and feeds back its own tokens, so the old hand-ordered update
- * actions are gone — the default workspace update (couplings, then components) drives
- * everything. Recreating existing couplings on reopen is safe: the coupling manager stores
- * them in a set.
+ * sliding window streams into the text world while the model writes, and text typed there
+ * while the workspace is paused replaces the transformer's context. Typing a prompt and
+ * pressing Play is all it takes: there is no run mode, and a transformer with no context
+ * idles waiting for input. The transformer samples and feeds back its own tokens, so the old
+ * hand-ordered update actions are gone — the default workspace update (couplings, then
+ * components) drives everything. Recreating existing couplings on reopen is safe: the
+ * coupling manager stores them in a set.
  */
 fun SimulationScope.setupGeneration(workspace: Workspace) {
 
@@ -521,5 +512,4 @@ fun SimulationScope.setupGeneration(workspace: Workspace) {
             textWorld.getConsumer("setTextIfChanged"),
         )
     }
-    transformer.resumeGeneration()
 }

@@ -126,16 +126,8 @@ val lfm2LanguageModel = newSim {
 
             addSeparator()
 
-            addButton("Resume generation") {
-                languageModel.resumeGeneration()
-            }
-
-            addButton("Stop generation") {
-                languageModel.stopGeneration()
-            }
-
-            addButton("Restart from prompt") {
-                languageModel.startGeneration()
+            addButton("Reseed context from prompt") {
+                languageModel.seedFromPrompt()
             }
         }.awaitLayout()
         controlPanel.setLocation(
@@ -174,7 +166,7 @@ val lfm2LanguageModel = newSim {
         2. The `Document` window shows the model's context window — the prompt plus everything it has written. While the workspace runs, the document is read-only.
         3. Pause the workspace to edit the document. Your edit replaces the model's context, and the next `Play` continues from it.
 
-        Use the control panel (or the model's right-click menu) to stop, resume, or restart generation from the prompt, and to change the temperature or sampling strategy mid-run.
+        Generation ends on its own when the model writes its end-of-text marker — the visible `<|im_end|>` box at the end of the document. Delete the marker (or edit the text) and press `Play` to continue; use the control panel (or the model's right-click menu) to reseed the document from the prompt, and to change the temperature or sampling strategy mid-run.
 
         # Reading the Diagram
 

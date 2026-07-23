@@ -13,11 +13,17 @@ import java.awt.geom.Point2D
 /**
  * The generation protocol shared by the language model families: the coupling vocabulary
  * ([generatedToken] and [hiddenState] out, [injectText] and the [contextWindow] document sync
- * in), the armed run lifecycle, and the feed-queue discipline. Subclasses own the model math —
- * their update/step functions and the protected hooks at the bottom.
+ * in) and the feed-queue discipline. Subclasses own the model math — their update/step
+ * functions and the protected hooks at the bottom.
+ *
+ * There is no run mode: [canAdvance] derives whether the next workspace iteration moves
+ * generation forward — something to feed or continue from, and nothing halting it (a sealed
+ * stream, a full window, a spent budget; each family says which of those it has). Pausing is
+ * the workspace's job, and everything else is document manipulation: edits through
+ * [contextWindow] rebuild the context, and [seedFromPrompt] reseeds a fresh window.
  *
  * Feed queue: [pending] holds token ids waiting to enter the model one per iteration — the
- * prompt after [startGeneration], plus anything [injectText] appends. While non-empty the
+ * seed after [seedFromPrompt], plus anything [injectText] appends. While non-empty the
  * model is prefilling; once drained it feeds back its own sampled token. At any decode pause
  * one sampled-but-unfed token may already be in [text], so every injection path must queue it
  * first, keeping the context in [text]'s order.
@@ -30,21 +36,24 @@ import java.awt.geom.Point2D
 abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeContainer,
     ProvidesDisplayTokenizer {
 
-    /** Text generation restarts from; each subclass supplies its own editor metadata. */
+    /** Seed text for a fresh window; each subclass supplies its own editor metadata. */
     abstract var prompt: String
 
     /** How the next token is chosen from the distribution. */
     abstract var samplingStrategy: SamplingStrategy
 
-    /** Prompt plus generated continuation from the current run. */
+    /** Seed plus generated continuation from the current window. */
     var text: String = ""
         protected set
 
-    @Transient
-    var isGenerating = false
-        protected set
+    /**
+     * Whether the next workspace iteration advances generation: there is something to feed
+     * (or a context to continue) and no family-specific halt applies.
+     */
+    val canAdvance: Boolean
+        get() = (pending.isNotEmpty() || hasContinuation()) && !isHalted()
 
-    /** Token ids waiting to enter the model, one per iteration: prompt, then injections. */
+    /** Token ids waiting to enter the model, one per iteration: the seed, then injections. */
     @Transient
     protected var pending = ArrayDeque<Int>()
 
@@ -68,36 +77,18 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
             events.locationChanged.fire()
         }
 
-    /** Resets run state and starts a fresh generation run from [prompt]. */
+    /** Reseeds the window from [prompt] — a fresh document for a new or just-loaded model. */
     @Synchronized
-    fun startGeneration() {
-        val ids = onRestart() ?: return
+    fun seedFromPrompt() {
+        val ids = onSeed() ?: return
         pending = ArrayDeque(ids.toList())
         sampledToken = -1
         lastGenerated = ""
         syncGate.reset()
-        isGenerating = true
         events.updated.fire()
     }
 
-    @Synchronized
-    fun stopGeneration() {
-        isGenerating = false
-    }
-
-    /** Continues a stopped run where it left off, or starts fresh when there is none. */
-    @Synchronized
-    fun resumeGeneration() {
-        if (!hasRunToContinue()) {
-            startGeneration()
-            return
-        }
-        if (!canResume()) return
-        isGenerating = true
-        events.updated.fire()
-    }
-
-    /** Text of the token generated this iteration; empty while prefilling or stopped. */
+    /** Text of the token generated this iteration; empty while prefilling or halted. */
     @get:Producible
     val generatedToken: String
         get() = lastGenerated
@@ -111,9 +102,9 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
 
     /**
      * Encodes [newText] and appends it to the feed queue, extending prefill: the model walks
-     * the injected tokens one per iteration before resuming its own continuation. Does not
-     * start or resume a stopped run. Meant for advancing sources — a static string producer
-     * re-injects its value every coupling update.
+     * the injected tokens one per iteration before resuming its own continuation. Feeding the
+     * queue is what moves a waiting or sealed model forward. Meant for advancing sources — a
+     * static string producer re-injects its value every coupling update.
      */
     @Synchronized
     @Consumable
@@ -129,11 +120,10 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
 
     /**
      * The context window as text — exactly what the model reads. Producing follows an
-     * ownership rule: the window is published while a run is generating, plus until a stopped
-     * run's final window has echoed back, and is empty otherwise, so a paired document
-     * consumer is never clobbered while the user may be editing it. Consuming an unrecognized
-     * value is an edit: [applyWindowEdit] rebuilds the context, preserving the run state (a
-     * stopped model stays stopped until resumed).
+     * ownership rule: the window is published while the model is advancing, plus until a
+     * halted window has echoed back, and is empty otherwise, so a paired document consumer is
+     * never clobbered while the user may be editing it. Consuming an unrecognized value is an
+     * edit: [applyWindowEdit] rebuilds the context and the model continues from it.
      */
     @get:Producible
     @set:Consumable
@@ -141,12 +131,12 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
         @Synchronized
         get() {
             val window = windowText() ?: return ""
-            return syncGate.publish(window, isGenerating)
+            return syncGate.publish(window, canAdvance)
         }
         @Synchronized
         set(value) {
             val current = windowText() ?: return
-            if (!syncGate.isEdit(value, current, isGenerating)) return
+            if (!syncGate.isEdit(value, current, canAdvance)) return
             val ids = encodeText(value) ?: return
             if (ids.isEmpty()) return
             applyWindowEdit(ids)
@@ -157,7 +147,6 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
         }
 
     override suspend fun delete(): List<NetworkModel> {
-        stopGeneration()
         onDelete()
         events.deleted.fire(this)
         return listOf(this)
@@ -173,15 +162,16 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
     protected abstract fun applyWindowEdit(ids: IntArray)
 
     /**
-     * Resets model-specific state for a fresh run and returns the encoded prompt (setting
-     * [text] to match), or null when the model is not ready to run.
+     * Resets model-specific state for a fresh window and returns the encoded seed (setting
+     * [text] to match), or null when the model is not ready.
      */
-    protected abstract fun onRestart(): IntArray?
+    protected abstract fun onSeed(): IntArray?
 
-    /** Whether a paused run exists; when false, resuming falls back to [startGeneration]. */
-    protected abstract fun hasRunToContinue(): Boolean
+    /** Whether the model has a context to continue from once the feed queue drains. */
+    protected abstract fun hasContinuation(): Boolean
 
-    protected open fun canResume(): Boolean = true
+    /** Family-specific halts: a sealed stream, a full window, a spent budget. */
+    protected open fun isHalted(): Boolean = false
 
     /** Commits injected tokens: mirrors [ids] into model-side buffers and appends to [text]. */
     protected abstract fun onInjected(newText: String, ids: IntArray)

@@ -65,12 +65,12 @@ class Lfm2ToolLoopTest {
         languageModel.loadWeights()
 
         var steps = 0
-        while (languageModel.isGenerating && steps < 240) {
+        while (languageModel.canAdvance && steps < 240) {
             languageModel.step()
             steps++
         }
 
-        assertFalse(languageModel.isGenerating, "the run ends at the answer's im_end")
+        assertTrue(languageModel.isSealed, "the run seals at the answer's im_end")
         assertTrue(languageModel.text.contains("get_weather"),
             "the model called the tool, got: ${languageModel.text}")
         assertTrue(languageModel.text.contains("Sunny, 22 degrees C in Boston (demo data)"),
@@ -109,12 +109,12 @@ class Lfm2ToolLoopTest {
         script.addLast(eos)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.startGeneration()
+        languageModel.seedFromPrompt()
         val stepsToEos = promptIds.size + 2 + callIds.size + 1
         repeat(stepsToEos) { languageModel.step() }
 
-        assertTrue(languageModel.isGenerating,
-            "im_end with a pending tool call continues instead of stopping")
+        assertTrue(languageModel.canAdvance,
+            "im_end with a pending tool call continues instead of sealing")
         assertTrue(languageModel.text.contains("<|tool_call_start|>[get_weather(location='Boston')]"),
             "the call is visible in the text, got: ${languageModel.text}")
         assertTrue(languageModel.text.contains("Sunny, 22 degrees C in Boston (demo data)"),
@@ -128,7 +128,7 @@ class Lfm2ToolLoopTest {
         repeat(1 + turnIds.size) { languageModel.step() }
         assertEquals(positionAtInjection + 1 + turnIds.size, languageModel.loaded!!.model.position,
             "the closing im_end and the tool turn prefill through the model")
-        assertTrue(languageModel.isGenerating)
+        assertTrue(languageModel.canAdvance)
         assertTrue(languageModel.contextWindow.contains(
             "<|tool_response_start|>Sunny, 22 degrees C in Boston (demo data)<|tool_response_end|>"),
             "the window shows the tool turn")
@@ -164,20 +164,21 @@ class Lfm2ToolLoopTest {
         script.addLast(eos)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.startGeneration()
+        languageModel.seedFromPrompt()
         repeat(promptIds.size + 2 + callIds.size + 1) { languageModel.step() }
 
-        assertTrue(languageModel.isGenerating)
+        assertTrue(languageModel.canAdvance)
         assertTrue(languageModel.text.contains("error: unknown tool launch_rocket"),
             "got: ${languageModel.text}")
     }
 
     @Test
-    fun `a plain im_end with no pending call still stops the run`() {
+    fun `a plain im_end with no pending call seals the run`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
-        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
+        // The tool-advertising prompt alone is ~133 tokens; the window must hold it plus the EOS
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.prompt = "Hi"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.enableDemoTools = true
@@ -196,8 +197,8 @@ class Lfm2ToolLoopTest {
         script.addLast(languageModel.loaded!!.model.config.eosTokenId)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.startGeneration()
+        languageModel.seedFromPrompt()
         repeat(promptIds.size) { languageModel.step() }
-        assertFalse(languageModel.isGenerating)
+        assertTrue(languageModel.isSealed)
     }
 }

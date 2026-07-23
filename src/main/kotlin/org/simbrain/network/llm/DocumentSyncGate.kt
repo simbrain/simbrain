@@ -3,7 +3,7 @@ package org.simbrain.network.llm
 /**
  * The two-way document-sync protocol shared by the language model families' `contextWindow`
  * attribute. The gate enforces one ownership rule: the window is published while the model is
- * generating, plus until a stopped run's final window has been echoed back by a consumer —
+ * advancing, plus until a halted model's final window has been echoed back by a consumer —
  * and is silent otherwise, so a paired document is never clobbered while the user may be
  * editing it. On the consuming side, values found in the ring of recently published windows
  * are echoes (couplings lag their producer by one iteration); anything else is an edit.
@@ -15,8 +15,8 @@ class DocumentSyncGate {
     private var tailSynced = true
 
     /** Returns [current] when it should be published (recording it), or "" while silent. */
-    fun publish(current: String, generating: Boolean): String {
-        if (!generating && tailSynced) return ""
+    fun publish(current: String, advancing: Boolean): String {
+        if (!advancing && tailSynced) return ""
         ring.addLast(current)
         while (ring.size > 2) ring.removeFirst()
         return current
@@ -24,13 +24,13 @@ class DocumentSyncGate {
 
     /**
      * Classifies an incoming value: true means it is an edit the model should apply. Echoes
-     * return false; an echo of the live [current] window while stopped confirms the tail is
+     * return false; an echo of the live [current] window while halted confirms the tail is
      * synced, silencing the producer.
      */
-    fun isEdit(incoming: String, current: String, generating: Boolean): Boolean {
+    fun isEdit(incoming: String, current: String, advancing: Boolean): Boolean {
         if (incoming.isEmpty()) return false
         if (ring.contains(incoming)) {
-            if (!generating && incoming == current) tailSynced = true
+            if (!advancing && incoming == current) tailSynced = true
             return false
         }
         return true

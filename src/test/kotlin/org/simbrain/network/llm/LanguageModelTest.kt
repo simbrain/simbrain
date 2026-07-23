@@ -39,12 +39,11 @@ class LanguageModelTest {
         languageModel.loadWeights()
         assertTrue(languageModel.isLoaded)
 
-        languageModel.startGeneration()
-        assertTrue(languageModel.isGenerating)
+        assertTrue(languageModel.canAdvance)
         val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
 
         var steps = 0
-        while (languageModel.isGenerating) {
+        while (languageModel.canAdvance) {
             languageModel.step()
             steps++
             assertEquals(steps, languageModel.loaded!!.model.position, "one step is one forward pass")
@@ -58,7 +57,7 @@ class LanguageModelTest {
     }
 
     @Test
-    fun `loading arms generation and network iterations drive it one token per update`() {
+    fun `loading seeds the window and network iterations drive it one token per update`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
@@ -67,16 +66,12 @@ class LanguageModelTest {
         languageModel.loadWeights()
         runBlocking { net.addNetworkModel(languageModel) }
 
-        assertTrue(languageModel.isGenerating, "a loaded model is armed without an explicit start")
+        assertTrue(languageModel.canAdvance, "a loaded model is ready without an explicit start")
         assertEquals(0, languageModel.tokensToGenerate, "no token cap by default")
 
         net.update()
         net.update()
         assertEquals(2, languageModel.loaded!!.model.position)
-
-        languageModel.stopGeneration()
-        net.update()
-        assertEquals(2, languageModel.loaded!!.model.position, "a stopped model ignores network updates")
     }
 
     @Test
@@ -89,36 +84,37 @@ class LanguageModelTest {
         languageModel.tokensToGenerate = 40
         languageModel.loadWeights()
 
-        languageModel.startGeneration()
-        while (languageModel.isGenerating) {
+        while (languageModel.canAdvance) {
             languageModel.step()
         }
 
+        assertTrue(languageModel.isSealed, "the emitted end-of-text seals the stream")
         assertTrue(languageModel.text.contains("Paris"), "got: ${languageModel.text}")
         assertFalse(languageModel.text.contains("<|"), "special tokens must not be appended: ${languageModel.text}")
         assertTrue(languageModel.loaded!!.model.position < 64, "the run should stop at EOS well before the cache fills")
     }
 
     @Test
-    fun `steps are no-ops while stopped and resume continues the run`() {
+    fun `steps are no-ops once the stream seals and an edit moves it again`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.prompt = "The capital of France is"
         languageModel.loadWeights()
 
+        var guard = 0
+        while (languageModel.canAdvance && guard++ < 64) languageModel.step()
+        assertTrue(languageModel.isSealed)
+        val positionAtSeal = languageModel.loaded!!.model.position
         languageModel.step()
-        languageModel.stopGeneration()
-        val positionAtStop = languageModel.loaded!!.model.position
-        assertEquals(1, positionAtStop)
-        languageModel.step()
-        assertEquals(positionAtStop, languageModel.loaded!!.model.position)
-        assertFalse(languageModel.isGenerating)
+        assertEquals(positionAtSeal, languageModel.loaded!!.model.position,
+            "a sealed stream ignores steps")
 
-        languageModel.resumeGeneration()
-        assertTrue(languageModel.isGenerating)
+        languageModel.contextWindow = "The capital of Germany is"
+        assertFalse(languageModel.isSealed)
         languageModel.step()
-        assertEquals(positionAtStop + 1, languageModel.loaded!!.model.position)
+        assertEquals(1, languageModel.loaded!!.model.position, "the edit resets and replays")
     }
 
     @Test
@@ -131,7 +127,7 @@ class LanguageModelTest {
         languageModel.promptMode = PromptMode.CHAT
         languageModel.loadWeights()
 
-        while (languageModel.isGenerating) {
+        while (languageModel.canAdvance) {
             languageModel.step()
         }
 
@@ -216,15 +212,13 @@ class LanguageModelTest {
 
         val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
         repeat(promptTokens + 2) { languageModel.step() }
-        languageModel.stopGeneration()
 
         val injected = " The capital of Germany is"
         val injectedIds = languageModel.loaded!!.tokenizer.encode(injected, addSpecials = false).size
         languageModel.injectText(injected)
-        assertFalse(languageModel.isGenerating, "injection does not arm a run")
         assertTrue(languageModel.text.endsWith(injected))
+        assertTrue(languageModel.canAdvance, "a fed queue is ready to walk")
 
-        languageModel.resumeGeneration()
         val positionBefore = languageModel.loaded!!.model.position
         repeat(injectedIds) {
             languageModel.step()
@@ -270,7 +264,7 @@ class LanguageModelTest {
         assertFalse(restored.lensEnabled)
         assertEquals(11.0, restored.tileLayout?.get("embed")?.get(0))
         assertFalse(restored.isLoaded, "weights are never serialized")
-        assertFalse(restored.isGenerating)
+        assertFalse(restored.canAdvance, "an unloaded model cannot advance")
         assertNotNull(restored.events, "transient events must be rebuilt")
     }
 

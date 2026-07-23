@@ -504,7 +504,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
 
     context(Network)
     override fun update() {
-        if (isGenerating) step() else forwardContext()
+        if (canAdvance) step() else forwardContext()
     }
 
     /** Maps text to vocabulary ids through [tokenizer] and [tokenLabels]; unknown words drop. */
@@ -522,30 +522,29 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         return tokenizer.joinTokens(ids.map { labels.getOrNull(it) }.filterNotNull())
     }
 
-    /** Clears the context for a fresh run from [prompt]. */
-    override fun onRestart(): IntArray {
+    /** Clears the context for a fresh window from [prompt]. */
+    override fun onSeed(): IntArray {
         val ids = encode(prompt)
         contextTokens = IntArray(0)
         text = decode(ids)
         return ids
     }
 
-    override fun hasRunToContinue(): Boolean = pending.isNotEmpty() || contextTokens.isNotEmpty()
+    override fun hasContinuation(): Boolean = contextTokens.isNotEmpty() || sampledToken >= 0
 
-    /** An armed run with nothing to walk; it idles until context arrives (typed or coupled). */
+    /** Nothing to walk: the context is empty and nothing is queued, so it waits for text. */
     val waitingForInput: Boolean
-        get() = isGenerating && pending.isEmpty() && contextTokens.isEmpty()
+        get() = !canAdvance
 
     /**
      * Advances generation by one token: slides the next pending word (or the last sample) into
      * the context, runs a full forward pass, and samples the next word. Skips the iteration
-     * while an op micro-step walk is mid-flight; an empty context idles armed, waiting for
-     * input, so arming before the document sync delivers text is not a dead end.
+     * while an op micro-step walk is mid-flight; an empty context waits for input, so playing
+     * before the document sync delivers text is not a dead end.
      */
     @Synchronized
     fun step() {
         lastGenerated = ""
-        if (!isGenerating) return
         if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
         if (pending.isNotEmpty()) {
             setContext(contextTokens + pending.removeFirst())

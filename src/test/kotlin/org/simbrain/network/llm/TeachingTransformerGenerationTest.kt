@@ -19,21 +19,21 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
-    fun `armed generation walks the prompt then feeds back its own samples`() {
+    fun `seeding from the prompt walks it then feeds back the model's own samples`() {
         val transformer = model()
         transformer.prompt = "the cat sat"
-        transformer.startGeneration()
-        assertTrue(transformer.isGenerating)
+        transformer.seedFromPrompt()
+        assertTrue(transformer.canAdvance)
 
         transformer.step()
         assertEquals(1, transformer.contextTokens.size)
-        assertEquals("", transformer.generatedToken, "walking the prompt is prefill")
+        assertEquals("", transformer.generatedToken, "walking the seed is prefill")
         transformer.step()
         assertEquals("", transformer.generatedToken)
         transformer.step()
         assertEquals(3, transformer.contextTokens.size)
         assertTrue(transformer.generatedToken.isNotEmpty(),
-            "the last prompt word's prediction is accepted")
+            "the last seed word's prediction is accepted")
         assertTrue(transformer.text.startsWith("the cat sat"))
         assertEquals(4, transformer.text.split(" ").size)
 
@@ -47,7 +47,7 @@ class TeachingTransformerGenerationTest {
     fun `the context slides at capacity while the text keeps full history`() {
         val transformer = model()
         transformer.prompt = "the cat sat"
-        transformer.startGeneration()
+        transformer.seedFromPrompt()
         repeat(12) { transformer.step() }
         assertEquals(6, transformer.contextTokens.size, "context is capped at contextSize")
         assertEquals(13, transformer.text.split(" ").size, "text keeps the whole run")
@@ -64,15 +64,12 @@ class TeachingTransformerGenerationTest {
     fun `injected text enters the context before sampling resumes`() {
         val transformer = model()
         transformer.prompt = "the cat"
-        transformer.startGeneration()
+        transformer.seedFromPrompt()
         repeat(3) { transformer.step() }
-        transformer.stopGeneration()
 
         transformer.injectText("on the mat")
-        assertFalse(transformer.isGenerating, "injection does not arm a run")
         assertTrue(transformer.text.endsWith("on the mat"))
 
-        transformer.resumeGeneration()
         repeat(3) {
             transformer.step()
             assertEquals("", transformer.generatedToken,
@@ -84,24 +81,22 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
-    fun `an armed run with nothing to walk idles waiting for input`() {
+    fun `an empty context waits for input instead of writing`() {
         val transformer = TeachingTransformer(TeachingTransformerConfig(
             contextSize = 6, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1,
         ))
         transformer.prompt = "anything"
-        transformer.startGeneration()
+        transformer.seedFromPrompt()
         repeat(3) { transformer.step() }
-        assertTrue(transformer.isGenerating, "an empty context waits for input instead of disarming")
+        assertFalse(transformer.canAdvance, "nothing to walk and nothing to continue")
         assertTrue(transformer.waitingForInput)
         assertEquals("", transformer.generatedToken)
         assertEquals(0, transformer.hiddenState.size)
     }
 
     @Test
-    fun `context arriving while idle-armed starts generation without rearming`() {
+    fun `context arriving through the document starts generation by itself`() {
         val transformer = model()
-        transformer.startGeneration()
-        transformer.step()
         assertTrue(transformer.waitingForInput)
 
         transformer.contextWindow = "the cat"
@@ -113,7 +108,7 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
-    fun `armed at setup, a typed prompt and play generate through the couplings`() {
+    fun `a typed prompt and play generate through the couplings with no arming`() {
         val workspace = Workspace()
         val network = Network()
         workspace.addWorkspaceComponent(NetworkComponent("net", network))
@@ -133,15 +128,14 @@ class TeachingTransformerGenerationTest {
                 world.getConsumer("setTextIfChanged"),
             )
         }
-        transformer.resumeGeneration()
 
         repeat(2) { workspace.simpleIterate() }
-        assertTrue(transformer.waitingForInput, "an empty document leaves the armed run idling")
+        assertTrue(transformer.waitingForInput, "an empty document leaves the model idling")
 
         world.text = "the cat sat"
         repeat(4) { workspace.simpleIterate() }
         assertTrue(transformer.text.split(" ").size > 3,
-            "the typed prompt generates without re-arming, got: ${transformer.text}")
+            "the typed prompt generates with no arming step, got: ${transformer.text}")
         assertTrue(world.text.startsWith("the cat sat"))
     }
 
@@ -167,32 +161,22 @@ class TeachingTransformerGenerationTest {
                 world.getConsumer("setTextIfChanged"),
             )
         }
-        transformer.startGeneration()
+        transformer.seedFromPrompt()
 
         repeat(5) { workspace.simpleIterate() }
         assertEquals(5, transformer.contextTokens.size,
             "echoes must never read as edits (an edit would replace the context)")
         assertTrue(world.text.startsWith("the cat sat"))
 
-        transformer.stopGeneration()
-        repeat(2) { workspace.simpleIterate() }
-        assertEquals(transformer.text.split(" ").last(), world.text.split(" ").last(),
-            "the final window, freshest word included, reaches the document")
-        val synced = world.text
-        repeat(2) { workspace.simpleIterate() }
-        assertEquals(synced, world.text, "a quiet producer leaves the document alone")
-
         world.text = "the mat"
         workspace.simpleIterate()
-        assertEquals("the mat", transformer.decode(transformer.contextTokens),
-            "an edit replaces the context outright")
-        assertFalse(transformer.isGenerating)
-        assertEquals("the mat", world.text, "the quiet producer must not clobber the edit")
+        assertTrue(transformer.text.startsWith("the mat"),
+            "an edit replaces the context outright, got: ${transformer.text}")
+        assertTrue(world.text.startsWith("the mat"),
+            "the producer publishes the rebuilt window, not the old one")
 
-        transformer.resumeGeneration()
         repeat(3) { workspace.simpleIterate() }
         assertTrue(transformer.text.split(" ").size > 2,
             "generation continues from the edited context")
-        assertTrue(transformer.text.startsWith("the mat"))
     }
 }

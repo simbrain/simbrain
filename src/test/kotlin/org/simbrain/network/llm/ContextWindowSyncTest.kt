@@ -28,7 +28,7 @@ class ContextWindowSyncTest {
         return hub.listDirectoryEntries().firstOrNull { Lfm2Weights.isValidWeightsDirectory(it) }
     }
 
-    private class Rig(dir: Path) {
+    private class Rig(dir: Path, sealAtEndOfText: Boolean = false) {
         val workspace = Workspace()
         val world: TextWorld
         val languageModel: LanguageModel
@@ -41,7 +41,7 @@ class ContextWindowSyncTest {
             world = textWorldComponent.world
             languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
             languageModel.prompt = "The capital of France is"
-            languageModel.stopAtEndOfText = false
+            languageModel.stopAtEndOfText = sealAtEndOfText
             runBlocking { network.addNetworkModel(languageModel) }
             languageModel.loadWeights()
             with(workspace.couplingManager) {
@@ -75,19 +75,20 @@ class ContextWindowSyncTest {
     }
 
     @Test
-    fun `a stopped run syncs its final window then goes quiet`() {
+    fun `a sealed run syncs its final window then goes quiet`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
-        val rig = Rig(dir!!)
-        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.languageModel.prompt).size
-        repeat(promptTokens + 2) { rig.workspace.simpleIterate() }
-        rig.languageModel.stopGeneration()
+        val rig = Rig(dir!!, sealAtEndOfText = true)
+        var guard = 0
+        while (rig.languageModel.canAdvance && guard++ < 80) rig.workspace.simpleIterate()
+        assertTrue(rig.languageModel.isSealed, "the run ends at its own end-of-text")
 
         repeat(2) { rig.workspace.simpleIterate() }
         val synced = rig.world.text
         assertTrue(synced.contains(rig.languageModel.text),
             "the final window, last tokens included, reaches the document")
+        assertTrue(synced.endsWith("<|im_end|>"), "the seal is visible in the document")
 
         repeat(2) { rig.workspace.simpleIterate() }
         assertEquals(synced, rig.world.text, "a quiet producer leaves the document alone")
@@ -101,24 +102,20 @@ class ContextWindowSyncTest {
         val rig = Rig(dir!!)
         val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.languageModel.prompt).size
         repeat(promptTokens + 2) { rig.workspace.simpleIterate() }
-        rig.languageModel.stopGeneration()
-        repeat(2) { rig.workspace.simpleIterate() }
 
         val edited = "<|startoftext|>The capital of Germany is"
         assertNotEquals(rig.world.text, edited)
         rig.world.text = edited
         rig.workspace.simpleIterate()
 
-        assertEquals(0, rig.languageModel.loaded!!.model.position, "an edit resets the model for replay")
-        assertFalse(rig.languageModel.isGenerating, "a stopped model stays stopped after an edit")
-        assertEquals(edited, rig.world.text, "the quiet producer must not clobber the edit")
+        assertEquals(1, rig.languageModel.loaded!!.model.position,
+            "an edit resets the model and the same iteration's step starts the replay")
         assertTrue(rig.languageModel.text.contains("Germany"))
         assertFalse(rig.languageModel.text.contains("<|"), "the clean text strips scaffolding")
 
-        rig.languageModel.resumeGeneration()
         val windowTokens = rig.languageModel.loaded!!.tokenizer
             .encode(edited, addSpecials = false).size
-        repeat(windowTokens) { rig.workspace.simpleIterate() }
+        repeat(windowTokens - 1) { rig.workspace.simpleIterate() }
         assertEquals(windowTokens, rig.languageModel.loaded!!.model.position,
             "replay walks the edited window one token per iteration")
 
@@ -153,12 +150,9 @@ class ContextWindowSyncTest {
 
         val rig = Rig(dir!!)
         repeat(3) { rig.workspace.simpleIterate() }
-        rig.languageModel.stopGeneration()
-        repeat(2) { rig.workspace.simpleIterate() }
 
         rig.world.text = "The capital of Germany is"
         rig.workspace.simpleIterate()
-        rig.languageModel.resumeGeneration()
 
         val windowTokens = rig.languageModel.loaded!!.tokenizer
             .encode("The capital of Germany is").size
@@ -182,7 +176,7 @@ class ContextWindowSyncTest {
 
         assertEquals(1, rig.languageModel.loaded!!.model.position,
             "the rebuild lands before the same iteration's step")
-        assertTrue(rig.languageModel.isGenerating, "a generating model keeps generating through an edit")
+        assertTrue(rig.languageModel.canAdvance, "an advancing model keeps advancing through an edit")
         assertTrue(rig.world.text.startsWith("<|startoftext|>Count:"),
             "the document snaps to the rebuilt window, got: ${rig.world.text}")
     }

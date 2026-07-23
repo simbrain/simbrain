@@ -30,7 +30,7 @@ class LanguageModelNodeSnapshot : UiSnapshotDef {
         }
 
         val languageModel = LanguageModel(weightsDir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "The capital of France is"
+        languageModel.initialText = "The capital of France is"
         languageModel.tokensToGenerate = 24
         languageModel.loadWeights()
         runBlocking { network.addNetworkModel(languageModel, usePlacementManager = false) }

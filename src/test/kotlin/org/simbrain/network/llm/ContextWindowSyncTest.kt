@@ -29,6 +29,7 @@ class ContextWindowSyncTest {
     }
 
     private class Rig(dir: Path, sealAtEndOfText: Boolean = false) {
+        val promptText = "The capital of France is"
         val workspace = Workspace()
         val world: TextWorld
         val languageModel: LanguageModel
@@ -40,7 +41,7 @@ class ContextWindowSyncTest {
             workspace.addWorkspaceComponent(textWorldComponent)
             world = textWorldComponent.world
             languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-            languageModel.prompt = "The capital of France is"
+            languageModel.initialText = promptText
             languageModel.stopAtEndOfText = sealAtEndOfText
             runBlocking { network.addNetworkModel(languageModel) }
             languageModel.loadWeights()
@@ -63,7 +64,7 @@ class ContextWindowSyncTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val rig = Rig(dir!!)
-        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.languageModel.prompt).size
+        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
         val iterations = promptTokens + 3
         repeat(iterations) { rig.workspace.simpleIterate() }
 
@@ -71,7 +72,7 @@ class ContextWindowSyncTest {
             "echoes must never read as edits (a rebuild would reset the position)")
         assertTrue(rig.world.text.startsWith("<|startoftext|>"),
             "the window is honest: scaffolding included, got: ${rig.world.text}")
-        assertTrue(rig.world.text.contains(rig.languageModel.prompt))
+        assertTrue(rig.world.text.contains(rig.promptText))
     }
 
     @Test
@@ -117,7 +118,7 @@ class ContextWindowSyncTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val rig = Rig(dir!!)
-        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.languageModel.prompt).size
+        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
         repeat(promptTokens + 2) { rig.workspace.simpleIterate() }
 
         val edited = "<|startoftext|>The capital of Germany is"

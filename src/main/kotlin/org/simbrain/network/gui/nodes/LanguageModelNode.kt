@@ -168,12 +168,13 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 "Writing, token ${state.model.position}/${state.model.config.maxSeqLen} " +
                         "(play or step the network) — …$tail"
             languageModel.isWindowFull ->
-                "Context window full — right-click to reseed from the prompt — …$tail"
+                "Context window full — right-click to clear the window — …$tail"
             languageModel.isSealed ->
                 "Ended — edit the document or delete the end marker to continue — …$tail"
             languageModel.budgetSpent ->
                 "Token budget spent — edit the document or raise the budget to continue — …$tail"
-            languageModel.text.isEmpty() -> "Ready — play or step the network"
+            languageModel.text.isEmpty() ->
+                "Waiting for input — add text to a coupled document or send a chat message"
             else -> "Idle — …$tail"
         }
     }
@@ -193,8 +194,8 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             add(createAction("Generation settings...") { propertyDialog.display() })
             val state = languageModel.loaded
             if (state != null) {
-                add(createAction("Reseed context from prompt") {
-                    languageModel.seedFromPrompt()
+                add(createAction("Clear context window") {
+                    languageModel.clearWindow()
                     refreshView()
                 })
                 addSeparator()

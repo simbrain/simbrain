@@ -33,14 +33,15 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-        languageModel.prompt = "The capital of France is"
+        val seedText = "The capital of France is"
+        languageModel.initialText = seedText
         languageModel.tokensToGenerate = 3
         languageModel.stopAtEndOfText = false
         languageModel.loadWeights()
         assertTrue(languageModel.isLoaded)
 
         assertTrue(languageModel.canAdvance)
-        val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
 
         var steps = 0
         while (languageModel.canAdvance) {
@@ -49,8 +50,8 @@ class LanguageModelTest {
             assertEquals(steps, languageModel.loaded!!.model.position, "one step is one forward pass")
         }
 
-        assertEquals(promptTokens + 2, steps, "prompt feeding plus continuation sampled from the last prompt token on")
-        assertTrue(languageModel.text.startsWith(languageModel.prompt))
+        assertEquals(promptTokens + 2, steps, "seed feeding plus continuation sampled from the last seed token on")
+        assertTrue(languageModel.text.startsWith(seedText))
         assertTrue(languageModel.text.contains("Paris"), "greedy continuation should name Paris, got: ${languageModel.text}")
         val embedTile = languageModel.loaded!!.scene.tile("embed")
         assertTrue((0 until embedTile.cols).any { embedTile.valueAt(0, it) != 0f }, "scene received published rows")
@@ -63,10 +64,11 @@ class LanguageModelTest {
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.initialText = "The capital of France is"
         languageModel.loadWeights()
         runBlocking { net.addNetworkModel(languageModel) }
 
-        assertTrue(languageModel.canAdvance, "a loaded model is ready without an explicit start")
+        assertTrue(languageModel.canAdvance, "the one-shot initial text readies a fresh model")
         assertEquals(0, languageModel.tokensToGenerate, "no token cap by default")
 
         net.update()
@@ -80,7 +82,7 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-        languageModel.prompt = "The capital of France is"
+        languageModel.initialText = "The capital of France is"
         languageModel.tokensToGenerate = 40
         languageModel.loadWeights()
 
@@ -100,7 +102,7 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-        languageModel.prompt = "The capital of France is"
+        languageModel.initialText = "The capital of France is"
         languageModel.loadWeights()
 
         var guard = 0
@@ -123,9 +125,10 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
-        languageModel.prompt = "What is the capital of France?"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.loadWeights()
+        assertFalse(languageModel.canAdvance, "a chat model starts empty, waiting for a message")
+        languageModel.sendUserMessage("What is the capital of France?")
 
         while (languageModel.canAdvance) {
             languageModel.step()
@@ -143,9 +146,9 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "What is the capital of France?"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.loadWeights()
+        languageModel.sendUserMessage("What is the capital of France?")
 
         var guard = 0
         while (languageModel.canAdvance && guard++ < 256) languageModel.step()
@@ -190,7 +193,8 @@ class LanguageModelTest {
         workspace.addWorkspaceComponent(textWorldComponent)
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-        languageModel.prompt = "The capital of France is"
+        val seedText = "The capital of France is"
+        languageModel.initialText = seedText
         languageModel.stopAtEndOfText = false
         runBlocking { network.addNetworkModel(languageModel) }
         languageModel.loadWeights()
@@ -202,7 +206,7 @@ class LanguageModelTest {
             )
         }
 
-        val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
         repeat(promptTokens - 1) { workspace.simpleIterate() }
         assertEquals("", languageModel.generatedToken, "prefill produces no token")
         assertTrue(textWorldComponent.world.text.isEmpty(), "empty productions must not accumulate")
@@ -221,6 +225,7 @@ class LanguageModelTest {
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.selectedLayer = 4
+        languageModel.initialText = "The capital of France is"
         languageModel.loadWeights()
 
         languageModel.step()
@@ -236,11 +241,12 @@ class LanguageModelTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-        languageModel.prompt = "The capital of France is"
+        val seedText = "The capital of France is"
+        languageModel.initialText = seedText
         languageModel.stopAtEndOfText = false
         languageModel.loadWeights()
 
-        val promptTokens = languageModel.loaded!!.tokenizer.encode(languageModel.prompt).size
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
         repeat(promptTokens + 2) { languageModel.step() }
 
         val injected = " The capital of Germany is"
@@ -267,7 +273,6 @@ class LanguageModelTest {
         val net = Network()
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)
         languageModel.label = "LM"
-        languageModel.prompt = "Hello"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.systemPrompt = "Be brief."
         languageModel.tokensToGenerate = 7
@@ -284,7 +289,6 @@ class LanguageModelTest {
 
         assertEquals("/no/such/dir", restored.weightsDirectory)
         assertEquals(128, restored.maxSeqLen)
-        assertEquals("Hello", restored.prompt)
         assertEquals(PromptMode.CHAT, restored.promptMode)
         assertEquals("Be brief.", restored.systemPrompt)
         assertEquals(7, restored.tokensToGenerate)

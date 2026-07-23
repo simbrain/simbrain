@@ -32,12 +32,13 @@ enum class PromptMode(private val label: String) {
 /**
  * A language model on the network canvas: wraps the headless [Lfm2Model] and exposes its interior
  * through a [CompositorScene]. One network update generates one token, so the workspace play
- * button steps generation token by token. There is no run mode: loading weights seeds the window
- * from the prompt, and the model advances until the stream seals at end-of-text, the context
- * window fills, or an optional token budget is spent — after which edits, injections, or
- * [seedFromPrompt] move it again.
+ * button steps generation token by token. There is no run mode and no prompt: an optional
+ * [initialText] seeds the first window at load, the coupled document owns the context from
+ * then on, and the model advances until the stream seals at end-of-text, the context window
+ * fills, or an optional token budget is spent — after which edits, injections, or a sent
+ * chat message move it again.
  *
- * Only the weights directory, config, prompt, sampling parameters, and view state are serialized —
+ * Only the weights directory, config, sampling parameters, and view state are serialized —
  * never the weights. On deserialization the model reloads from [weightsDirectory]; if the files
  * are missing the model stays unloaded and the GUI offers to relocate or download them.
  *
@@ -59,18 +60,15 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     var maxSeqLen: Int = 512
         private set
 
-    override var prompt by GuiEditable(
-        initValue = "The capital of France is",
-        label = "Prompt",
-        description = "Text the model continues from. Generation restarts from this prompt.",
-        order = 1,
-    )
+    /** One-shot text the first load seeds the window with; the document owns it afterwards. */
+    @Transient
+    var initialText: String? = null
 
     var promptMode: PromptMode by GuiEditable(
         initValue = PromptMode.COMPLETION,
         label = "Prompt mode",
-        description = "Completion continues the prompt verbatim; " +
-            "chat wraps it as a user message the model answers",
+        description = "Completion continues the document verbatim; " +
+            "chat treats it as a conversation the model answers in",
         order = 2,
     )
 
@@ -84,7 +82,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     var tokensToGenerate by GuiEditable(
         initValue = 0,
         label = "Tokens to generate",
-        description = "Generation stops after this many tokens beyond the prompt; " +
+        description = "Generation stops after this many tokens beyond the fed context; " +
             "0 generates until the context window fills",
         min = 0,
         order = 4,
@@ -172,7 +170,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     @Transient
     private var generatedCount = 0
 
-    /** The committed token stream in [text] order: prompt, injections, accepted samples. */
+    /** The committed token stream in [text] order: seed, injections, accepted samples. */
     @Transient
     private var windowIds = ArrayList<Int>()
 
@@ -206,7 +204,8 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))
-        seedFromPrompt()
+        initialText?.takeIf { it.isNotBlank() }?.let { seedWindow(it) }
+        initialText = null
         events.weightsLoaded.fire()
     }
 
@@ -240,18 +239,36 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
     }
 
-    /** Resets the model, encodes a fresh window from [prompt], and clears the tool-loop state. */
-    override fun onSeed(): IntArray? {
-        val state = loaded ?: return null
+    /**
+     * Fills a fresh window with [textIn], queued for a watchable prefill. Used once at first
+     * load and available to harnesses; the document owns the window afterwards.
+     */
+    @Synchronized
+    fun seedWindow(textIn: String) {
+        val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        val ids = encodePrompt(state.tokenizer)
+        val ids = state.tokenizer.encode(textIn)
         windowIds = ArrayList(ids.toList())
+        pending = ArrayDeque(ids.toList())
+        sampledToken = -1
+        lastGenerated = ""
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null
-        text = prompt
-        return ids
+        text = textIn
+        syncGate.reset()
+        events.updated.fire()
+    }
+
+    override fun onClear() {
+        val state = loaded ?: return
+        state.model.reset()
+        state.scene.reset()
+        windowIds = ArrayList()
+        generatedCount = 0
+        toolCallBuffer = null
+        pendingToolCalls = null
     }
 
     override fun hasContinuation(): Boolean = sampledToken >= 0
@@ -402,17 +419,20 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     /**
      * Appends a templated user turn and the open assistant turn to the stream — the chat
      * counterpart of [injectText], with the template applied on this side of the coupling,
-     * like a chat runtime would. Sending a message moves a sealed stream past its end marker
-     * (the unfed marker is queued first, the same way a tool answer reopens the turn), so the
-     * next iterations walk the turn and generate the reply. Meant for chat mode.
+     * like a chat runtime would. On an empty window the message starts the conversation: the
+     * chat scaffolding (BOS, then a system turn carrying [systemPrompt] and the tool list) is
+     * prepended, so the first send produces exactly the canonical chat prompt. Sending into a
+     * sealed stream moves it past the end marker (the unfed marker is queued first, the same
+     * way a tool answer reopens the turn). Meant for chat mode.
      */
     @Synchronized
     @Consumable
     fun sendUserMessage(message: String) {
         if (message.isBlank()) return
         val state = loaded ?: return
+        val prefix = if (windowIds.isEmpty()) chatScaffolding() else ""
         val ids = state.tokenizer.encode(
-            Lfm2ChatFormat.turn("user", message.trim()) + Lfm2ChatFormat.GENERATION_PROMPT,
+            prefix + Lfm2ChatFormat.turn("user", message.trim()) + Lfm2ChatFormat.GENERATION_PROMPT,
             addSpecials = false,
         )
         if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
@@ -427,18 +447,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     }
 
     /**
-     * Encodes [prompt] for a fresh run. Chat mode builds the full templated string — BOS text
-     * included — and encodes with specials off, so the post-processor cannot add a second BOS;
-     * available tools are advertised as plain text in the system turn, per the template.
+     * The conversation opening a first message sits on: literal BOS text (encoded with
+     * specials off, so the post-processor cannot add a second BOS), then a system turn
+     * carrying [systemPrompt] and the plain-text tool advertisement, per the template.
      */
-    private fun encodePrompt(tokenizer: LlmTokenizer): IntArray = when (promptMode) {
-        PromptMode.COMPLETION -> tokenizer.encode(prompt)
-        PromptMode.CHAT -> {
-            val toolLine = activeTools().takeIf { it.isNotEmpty() }?.let(Lfm2ChatFormat::toolListLine)
-            val system = listOfNotNull(systemPrompt.takeIf { it.isNotEmpty() }, toolLine)
-                .joinToString("\n")
-            tokenizer.encode(Lfm2ChatFormat.chatPrompt(prompt, system), addSpecials = false)
-        }
+    private fun chatScaffolding(): String {
+        val toolLine = activeTools().takeIf { it.isNotEmpty() }?.let(Lfm2ChatFormat::toolListLine)
+        val system = listOfNotNull(systemPrompt.takeIf { it.isNotEmpty() }, toolLine)
+            .joinToString("\n")
+        return Lfm2ChatFormat.BOS +
+            if (system.isEmpty()) "" else Lfm2ChatFormat.turn("system", system)
     }
 
     private fun sampleToken(logits: FloatTensor): Int {
@@ -504,14 +522,21 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     class CreationTemplate : EditableObject {
 
         @UserParameter(
+            label = "Starting text",
+            description = "Seeds the first context window; the coupled document owns the window afterwards",
+            order = 1,
+        )
+        var startingText = "The capital of France is"
+
+        @UserParameter(
             label = "Max sequence length",
             description = "KV cache capacity and the display window; generation stops when it fills",
-            order = 1,
+            order = 2,
         )
         var maxSeqLen = 512
 
         fun create(weightsDirectory: String): LanguageModel =
-            LanguageModel(weightsDirectory, maxSeqLen)
+            LanguageModel(weightsDirectory, maxSeqLen).also { it.initialText = startingText }
 
         override val name = "Language Model"
     }

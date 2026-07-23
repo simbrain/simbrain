@@ -19,21 +19,20 @@ class TeachingTransformerGenerationTest {
     }
 
     @Test
-    fun `seeding from the prompt walks it then feeds back the model's own samples`() {
+    fun `injected text walks in one word per step then the model feeds back its own samples`() {
         val transformer = model()
-        transformer.prompt = "the cat sat"
-        transformer.seedFromPrompt()
+        transformer.injectText("the cat sat")
         assertTrue(transformer.canAdvance)
 
         transformer.step()
         assertEquals(1, transformer.contextTokens.size)
-        assertEquals("", transformer.generatedToken, "walking the seed is prefill")
+        assertEquals("", transformer.generatedToken, "walking the injected text is prefill")
         transformer.step()
         assertEquals("", transformer.generatedToken)
         transformer.step()
         assertEquals(3, transformer.contextTokens.size)
         assertTrue(transformer.generatedToken.isNotEmpty(),
-            "the last seed word's prediction is accepted")
+            "the last injected word's prediction is accepted")
         assertTrue(transformer.text.startsWith("the cat sat"))
         assertEquals(4, transformer.text.split(" ").size)
 
@@ -46,8 +45,7 @@ class TeachingTransformerGenerationTest {
     @Test
     fun `the context slides at capacity while the text keeps full history`() {
         val transformer = model()
-        transformer.prompt = "the cat sat"
-        transformer.seedFromPrompt()
+        transformer.injectText("the cat sat")
         repeat(12) { transformer.step() }
         assertEquals(6, transformer.contextTokens.size, "context is capped at contextSize")
         assertEquals(13, transformer.text.split(" ").size, "text keeps the whole run")
@@ -63,8 +61,7 @@ class TeachingTransformerGenerationTest {
     @Test
     fun `injected text enters the context before sampling resumes`() {
         val transformer = model()
-        transformer.prompt = "the cat"
-        transformer.seedFromPrompt()
+        transformer.injectText("the cat")
         repeat(3) { transformer.step() }
 
         transformer.injectText("on the mat")
@@ -85,8 +82,6 @@ class TeachingTransformerGenerationTest {
         val transformer = TeachingTransformer(TeachingTransformerConfig(
             contextSize = 6, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1,
         ))
-        transformer.prompt = "anything"
-        transformer.seedFromPrompt()
         repeat(3) { transformer.step() }
         assertFalse(transformer.canAdvance, "nothing to walk and nothing to continue")
         assertTrue(transformer.waitingForInput)
@@ -149,7 +144,6 @@ class TeachingTransformerGenerationTest {
         val world = textWorldComponent.world
 
         val transformer = model()
-        transformer.prompt = "the cat sat"
         runBlocking { network.addNetworkModel(transformer) }
         with(workspace.couplingManager) {
             createCoupling(
@@ -161,7 +155,7 @@ class TeachingTransformerGenerationTest {
                 world.getConsumer("setTextIfChanged"),
             )
         }
-        transformer.seedFromPrompt()
+        transformer.injectText("the cat sat")
 
         repeat(5) { workspace.simpleIterate() }
         assertEquals(5, transformer.contextTokens.size,

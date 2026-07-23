@@ -59,10 +59,10 @@ class Lfm2ToolLoopTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "What is the weather in Boston?"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.enableDemoTools = true
         languageModel.loadWeights()
+        languageModel.sendUserMessage("What is the weather in Boston?")
 
         var steps = 0
         while (languageModel.canAdvance && steps < 240) {
@@ -85,7 +85,6 @@ class Lfm2ToolLoopTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "What is the weather in Boston?"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.enableDemoTools = true
         languageModel.loadWeights()
@@ -93,7 +92,7 @@ class Lfm2ToolLoopTest {
 
         val promptIds = tokenizer.encode(
             Lfm2ChatFormat.chatPrompt(
-                languageModel.prompt,
+                "What is the weather in Boston?",
                 Lfm2ChatFormat.toolListLine(LanguageModel.demoTools),
             ),
             addSpecials = false,
@@ -109,7 +108,7 @@ class Lfm2ToolLoopTest {
         script.addLast(eos)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.seedFromPrompt()
+        languageModel.sendUserMessage("What is the weather in Boston?")
         val stepsToEos = promptIds.size + 2 + callIds.size + 1
         repeat(stepsToEos) { languageModel.step() }
 
@@ -140,7 +139,6 @@ class Lfm2ToolLoopTest {
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "Hi"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.enableDemoTools = true
         languageModel.loadWeights()
@@ -148,7 +146,7 @@ class Lfm2ToolLoopTest {
 
         val promptIds = tokenizer.encode(
             Lfm2ChatFormat.chatPrompt(
-                languageModel.prompt,
+                "Hi",
                 Lfm2ChatFormat.toolListLine(LanguageModel.demoTools),
             ),
             addSpecials = false,
@@ -164,7 +162,7 @@ class Lfm2ToolLoopTest {
         script.addLast(eos)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.seedFromPrompt()
+        languageModel.sendUserMessage("Hi")
         repeat(promptIds.size + 2 + callIds.size + 1) { languageModel.step() }
 
         assertTrue(languageModel.canAdvance)
@@ -179,7 +177,6 @@ class Lfm2ToolLoopTest {
 
         // The tool-advertising prompt alone is ~133 tokens; the window must hold it plus the EOS
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
-        languageModel.prompt = "Hi"
         languageModel.promptMode = PromptMode.CHAT
         languageModel.enableDemoTools = true
         languageModel.loadWeights()
@@ -187,7 +184,7 @@ class Lfm2ToolLoopTest {
 
         val promptIds = tokenizer.encode(
             Lfm2ChatFormat.chatPrompt(
-                languageModel.prompt,
+                "Hi",
                 Lfm2ChatFormat.toolListLine(LanguageModel.demoTools),
             ),
             addSpecials = false,
@@ -197,7 +194,7 @@ class Lfm2ToolLoopTest {
         script.addLast(languageModel.loaded!!.model.config.eosTokenId)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.seedFromPrompt()
+        languageModel.sendUserMessage("Hi")
         repeat(promptIds.size) { languageModel.step() }
         assertTrue(languageModel.isSealed)
     }

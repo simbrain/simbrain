@@ -18,24 +18,18 @@ import org.simbrain.world.textworld.TextWorldComponent
 
 class Lfm2LanguageModelOptions : EditableObject {
 
-    var prompt by GuiEditable(
-        initValue = "The capital of France is",
-        description = "Text the model starts from. In chat mode this is the user's first message.",
-        order = 10,
-    )
-
     var promptMode: PromptMode by GuiEditable(
         initValue = PromptMode.COMPLETION,
-        label = "Prompt mode",
-        description = "Completion continues the prompt verbatim; " +
-            "chat wraps it as a user message the model answers",
+        label = "Mode",
+        description = "Completion continues whatever the document holds; " +
+            "chat is a conversation driven from the control panel's message box",
         order = 20,
     )
 
     var systemPrompt by GuiEditable(
         initValue = "",
         label = "System prompt",
-        description = "Optional system message ahead of the user message; chat mode only",
+        description = "Optional system message opening the conversation; chat mode only",
         order = 30,
     )
 
@@ -75,7 +69,6 @@ val lfm2LanguageModel = newSim {
 
     val languageModel = LanguageModel("", options.maxSequenceLength).apply {
         label = "LFM2.5-230M"
-        prompt = options.prompt
         promptMode = options.promptMode
         systemPrompt = options.systemPrompt
         enableDemoTools = options.enableDemoTools
@@ -90,6 +83,10 @@ val lfm2LanguageModel = newSim {
     val textWorldComponent = addTextWorld("Document")
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
+    // The document is the seed: completion starts from editable text, chat from the message box
+    if (options.promptMode == PromptMode.COMPLETION) {
+        textWorldComponent.world.text = "The capital of France is"
+    }
 
     setupLfm2DocumentSync(workspace)
 
@@ -126,8 +123,9 @@ val lfm2LanguageModel = newSim {
 
             addSeparator()
 
-            addButton("Reseed context from prompt") {
-                languageModel.seedFromPrompt()
+            addButton("Clear document") {
+                textWorldComponent.world.text = ""
+                languageModel.clearWindow()
             }
 
             addSeparator()
@@ -183,7 +181,7 @@ val lfm2LanguageModel = newSim {
         3. When the model finishes — it writes its end-of-text marker, the visible `<|im_end|>` box — the workspace pauses itself and the document unlocks.
         4. Edit the document and press `Play` again. Your edit replaces the model's context and generation continues from it. You can also pause the workspace yourself at any time to edit mid-run.
 
-        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. Use the control panel (or the model's right-click menu) to reseed the document from the prompt, and to change the temperature or sampling strategy mid-run.
+        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. There is no prompt hiding anywhere — the document IS the model's entire input. `Clear document` in the control panel starts over from nothing, and the temperature and sampling strategy can change mid-run.
 
         # Reading the Diagram
 
@@ -193,7 +191,7 @@ val lfm2LanguageModel = newSim {
 
         # Chat and Tools
 
-        Restart the simulation and choose `Chat` prompt mode to have the model answer your prompt as an assistant instead of continuing it verbatim. Once its answer ends, type a follow-up in the control panel's `Chat message` field and press Enter (or `Send message`): Simbrain wraps your text in a templated user turn — watch it appear in the document with its `<|im_start|>` scaffolding — and the model writes its reply. The document is the whole conversation, and you can still edit it directly between turns.
+        Restart the simulation and choose `Chat` mode: the document starts empty, and the conversation is driven from the control panel's `Chat message` field. Type a message and press Enter (or `Send message`): Simbrain wraps your text in a templated user turn — the first message also lays down the conversation's opening scaffolding, system prompt included — and the model writes its reply. Watch the turns appear in the document with their `<|im_start|>` markers: the document is the whole conversation, and you can still edit it directly between turns.
 
         With `Enable demo tools` checked, asking something like "What's the weather in Paris?" makes the model emit a tool call, which Simbrain answers with demo data, and the model folds the result into its reply.
 

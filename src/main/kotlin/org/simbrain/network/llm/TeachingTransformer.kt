@@ -365,13 +365,6 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         order = 3,
     )
 
-    override var prompt by GuiEditable(
-        initValue = "",
-        label = "Prompt",
-        description = "Text generation restarts from; words outside the vocabulary are dropped",
-        order = 4,
-    )
-
     override var samplingStrategy: SamplingStrategy by GuiEditable(
         initValue = SamplingStrategy.Greedy,
         label = "Sampling strategy",
@@ -522,12 +515,8 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         return tokenizer.joinTokens(ids.map { labels.getOrNull(it) }.filterNotNull())
     }
 
-    /** Clears the context for a fresh window from [prompt]. */
-    override fun onSeed(): IntArray {
-        val ids = encode(prompt)
+    override fun onClear() {
         contextTokens = IntArray(0)
-        text = decode(ids)
-        return ids
     }
 
     override fun hasContinuation(): Boolean = contextTokens.isNotEmpty() || sampledToken >= 0

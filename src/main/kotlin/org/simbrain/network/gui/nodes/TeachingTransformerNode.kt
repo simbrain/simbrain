@@ -173,7 +173,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 while (model.plan.cursor != 0) teachingTransformer.stepInferenceOp()
             })
             addSeparator()
-            add(createAction("Reseed context from prompt") { teachingTransformer.seedFromPrompt() })
+            add(createAction("Clear context") { teachingTransformer.clearWindow() })
             addSeparator()
             add(JCheckBoxMenuItem("Gradient view", gradientView).apply {
                 addActionListener {

@@ -16,14 +16,15 @@ import java.awt.geom.Point2D
  * in) and the feed-queue discipline. Subclasses own the model math — their update/step
  * functions and the protected hooks at the bottom.
  *
- * There is no run mode: [canAdvance] derives whether the next workspace iteration moves
- * generation forward — something to feed or continue from, and nothing halting it (a sealed
- * stream, a full window, a spent budget; each family says which of those it has). Pausing is
- * the workspace's job, and everything else is document manipulation: edits through
- * [contextWindow] rebuild the context, and [seedFromPrompt] reseeds a fresh window.
+ * There is no run mode and no prompt: [canAdvance] derives whether the next workspace
+ * iteration moves generation forward — something to feed or continue from, and nothing
+ * halting it (a sealed stream, a full window, a spent budget; each family says which of
+ * those it has). Pausing is the workspace's job, and the coupled document is the single
+ * source of the context: edits through [contextWindow] rebuild it, [clearWindow] empties it,
+ * and on reopen the saved document replays itself into the model.
  *
- * Feed queue: [pending] holds token ids waiting to enter the model one per iteration — the
- * seed after [seedFromPrompt], plus anything [injectText] appends. While non-empty the
+ * Feed queue: [pending] holds token ids waiting to enter the model one per iteration —
+ * whatever [injectText] and the subclasses' seeding paths append. While non-empty the
  * model is prefilling; once drained it feeds back its own sampled token. At any decode pause
  * one sampled-but-unfed token may already be in [text], so every injection path must queue it
  * first, keeping the context in [text]'s order.
@@ -35,9 +36,6 @@ import java.awt.geom.Point2D
  */
 abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeContainer,
     ProvidesDisplayTokenizer {
-
-    /** Seed text for a fresh window; each subclass supplies its own editor metadata. */
-    abstract var prompt: String
 
     /** How the next token is chosen from the distribution. */
     abstract var samplingStrategy: SamplingStrategy
@@ -77,13 +75,18 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
             events.locationChanged.fire()
         }
 
-    /** Reseeds the window from [prompt] — a fresh document for a new or just-loaded model. */
+    /**
+     * Empties the window and run state; the model waits for new text. A coupled non-empty
+     * document restores itself on the next play (the document is the truth) — clear the
+     * document too for a full reset.
+     */
     @Synchronized
-    fun seedFromPrompt() {
-        val ids = onSeed() ?: return
-        pending = ArrayDeque(ids.toList())
+    fun clearWindow() {
+        onClear()
+        pending = ArrayDeque()
         sampledToken = -1
         lastGenerated = ""
+        text = ""
         syncGate.reset()
         events.updated.fire()
     }
@@ -161,11 +164,8 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
     /** Replaces the model's context with an edited window's [ids] and updates [text]. */
     protected abstract fun applyWindowEdit(ids: IntArray)
 
-    /**
-     * Resets model-specific state for a fresh window and returns the encoded seed (setting
-     * [text] to match), or null when the model is not ready.
-     */
-    protected abstract fun onSeed(): IntArray?
+    /** Resets model-specific state for an empty window. */
+    protected abstract fun onClear()
 
     /** Whether the model has a context to continue from once the feed queue drains. */
     protected abstract fun hasContinuation(): Boolean

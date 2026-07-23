@@ -95,6 +95,23 @@ class ContextWindowSyncTest {
     }
 
     @Test
+    fun `a finished run pauses the workspace after the end marker reaches the document`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+
+        val rig = Rig(dir!!, sealAtEndOfText = true)
+        rig.workspace.run()
+        var waited = 0
+        while (waited++ < 3000 && !(rig.languageModel.isSealed && !rig.workspace.updater.isRunning)) {
+            Thread.sleep(10)
+        }
+        assertTrue(rig.languageModel.isSealed, "the run seals on its own")
+        assertFalse(rig.workspace.updater.isRunning, "the workspace pauses itself when the run ends")
+        assertTrue(rig.world.text.endsWith("<|im_end|>"),
+            "the end marker reached the document before the pause, got: ${rig.world.text}")
+    }
+
+    @Test
     fun `an edited document rebuilds the context and replays it through prefill`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not present in the HF cache")

@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.AttributeContainer
@@ -113,6 +114,26 @@ class NetworkComponent : WorkspaceComponent {
 
     override suspend fun update() {
         network.updateSuspend(name)
+        pauseIfGenerationEnded()
+    }
+
+    private var generationPausePending = false
+
+    /**
+     * Pauses a running workspace one iteration after every pause-requesting language model has
+     * halted — end of text, full window, or spent budget. The grace iteration lets the couplings
+     * deliver the final window, end marker included, to any coupled document before the pause
+     * releases it for editing.
+     */
+    private fun pauseIfGenerationEnded() {
+        val requesting = network.getModels<LanguageModel>().filter { it.pauseWorkspaceAtEnd && it.isLoaded }
+        val ended = requesting.isNotEmpty() && requesting.none { it.canAdvance }
+        if (ended && generationPausePending) {
+            generationPausePending = false
+            workspace.stop()
+        } else {
+            generationPausePending = ended
+        }
     }
 
     override val xml: String

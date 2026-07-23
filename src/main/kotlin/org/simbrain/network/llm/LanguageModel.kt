@@ -115,12 +115,20 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         order = 7,
     )
 
+    var pauseWorkspaceAtEnd by GuiEditable(
+        initValue = true,
+        label = "Pause workspace when the run ends",
+        description = "Stop the workspace once generation halts — end of text, full window, or " +
+            "spent token budget — so a coupled document unlocks for editing",
+        order = 8,
+    )
+
     var enableDemoTools by GuiEditable(
         initValue = false,
         label = "Enable demo tools",
         description = "Advertise the built-in offline demo tools (current time, canned weather) " +
             "in chat mode and answer the model's calls to them",
-        order = 8,
+        order = 9,
     )
 
     /** Tools registered by simulations, advertised alongside the demo tools in chat mode. */

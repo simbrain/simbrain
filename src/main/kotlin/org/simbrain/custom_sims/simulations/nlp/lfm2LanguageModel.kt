@@ -142,8 +142,9 @@ val lfm2LanguageModel = newSim {
             PopupConfig(
                 title = "The Model's Document",
                 message = "This document is the model's context window. Press Play on the main " +
-                    "toolbar and watch it write, one token per step. Pause the workspace to edit " +
-                    "the text — the model continues from your edit on the next Play.",
+                    "toolbar and watch it write, one token per step — the workspace pauses by " +
+                    "itself when the model finishes. Edit the text and press Play again to " +
+                    "continue from your edit.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 suppressionKey = "lfm2_language_model_document_help",
                 placement = PopupPlacement.BOTTOM_CENTER,
@@ -164,9 +165,10 @@ val lfm2LanguageModel = newSim {
 
         1. Press `Play` (or `Step`) in the main toolbar. Each workspace step runs the full model once and samples one token.
         2. The `Document` window shows the model's context window — the prompt plus everything it has written. While the workspace runs, the document is read-only.
-        3. Pause the workspace to edit the document. Your edit replaces the model's context, and the next `Play` continues from it.
+        3. When the model finishes — it writes its end-of-text marker, the visible `<|im_end|>` box — the workspace pauses itself and the document unlocks.
+        4. Edit the document and press `Play` again. Your edit replaces the model's context and generation continues from it. You can also pause the workspace yourself at any time to edit mid-run.
 
-        Generation ends on its own when the model writes its end-of-text marker — the visible `<|im_end|>` box at the end of the document. Delete the marker (or edit the text) and press `Play` to continue; use the control panel (or the model's right-click menu) to reseed the document from the prompt, and to change the temperature or sampling strategy mid-run.
+        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. Use the control panel (or the model's right-click menu) to reseed the document from the prompt, and to change the temperature or sampling strategy mid-run.
 
         # Reading the Diagram
 

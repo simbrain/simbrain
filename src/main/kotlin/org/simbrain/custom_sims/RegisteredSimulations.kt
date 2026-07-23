@@ -21,6 +21,7 @@ import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
+import org.simbrain.custom_sims.simulations.neuroscience.nematodeThermotaxis
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -113,6 +114,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Neuroscience") {
+        item("C. elegans thermotaxis", beta = true) { nematodeThermotaxis }
         item("Spiking neuron") { spikingNeuron }
         item("Spiking neurons two inputs") { spikingNeuronTwoInputs }
         item("Spike responders") { spikeResponderSim }

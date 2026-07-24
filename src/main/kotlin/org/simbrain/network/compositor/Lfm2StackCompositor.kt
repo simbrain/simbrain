@@ -2,14 +2,21 @@ package org.simbrain.network.compositor
 
 import org.simbrain.network.llm.AttendMixOp
 import org.simbrain.network.llm.AttendScoresOp
+import org.simbrain.network.llm.CausalConvOp
+import org.simbrain.network.llm.HeadwiseNormRopeOp
 import org.simbrain.network.llm.Lfm2DecodeState
 import org.simbrain.network.llm.Lfm2Model
 import org.simbrain.network.llm.OffsetGateOp
+import org.simbrain.network.llm.RopeAnglesOp
 import org.simbrain.network.tensor.FloatTensor
+import org.simbrain.network.tensor.op.AddOp
 import org.simbrain.network.tensor.op.LinearOp
 import org.simbrain.network.tensor.op.OpPlan
+import org.simbrain.network.tensor.op.RmsNormOp
+import org.simbrain.network.tensor.op.SiluGateOp
 import org.simbrain.network.tensor.op.TensorOp
 import org.simbrain.network.tensor.op.TensorPort
+import kotlin.math.pow
 
 /**
  * The structure-first LFM2 scene: one layer-block anatomy is the diagram, and the layer
@@ -146,17 +153,8 @@ object Lfm2StackCompositor {
                 magnified = tokenAxisFloored || featureWidth(config.headDim / 2) < SLIVER_MIN_WIDTH
             })
         }
-        // q is the one trajectory no cache holds, so it is retained for EVERY attention layer:
-        // it is the sufficient statistic from which a flip re-derives the whole attention limb.
-        scene.addTile(VectorHistoryTile(
-            ports = attnLayers.map { plan.port("layers.$it.attn.q") },
-            rows = window, title = "q (${config.numHeads} heads)", kind = TileKind.ACTIVATION,
-            id = "block.attn.q", stackLayers = attnLayers, retainAllLayers = true,
-        ).apply {
-            width = featureWidth(config.numHeads * config.headDim)
-            height = tokenExtent
-            magnified = tokenAxisFloored
-        })
+        stackedHistory("block.attn.q", attnLayers, "q (${config.numHeads} heads)",
+            featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.q" }
         // k and v are one row in flight: their history IS the cache, so drawing it here too
         // would duplicate the cache tiles. q keeps its history — it has no cache anywhere.
         fun tokenVector(id: String, title: String) {
@@ -303,46 +301,102 @@ object Lfm2StackCompositor {
         }
 
         // Flip backfills: watched-layer retention means a flip to a layer outside the stash
-        // starts blank, then history is re-derived where the model's real state allows it —
-        // the attention limb from retained q against the live KV caches (through the real ops,
-        // so a derived row is exactly what live recording would have stored), and the spine
-        // checkpoints by copying the depth strip. Conv/mlp internals have no such source.
+        // starts blank, then the whole block is replayed from state that is still real. The
+        // depth strip retains every layer's residual checkpoints, so each past token's block
+        // input is known; replaying it through the real ops — the conv window rebuilt token by
+        // token from zero, attention against the live KV caches — re-derives every limb row
+        // exactly as live recording would have stored it.
         val qTile = scene.tile("block.attn.q") as VectorHistoryTile
         val weightsTile = scene.tile("block.attn.weights") as AttentionTile
         val contextTile = scene.tile("block.attn.context") as VectorHistoryTile
         val attnOutTile = scene.tile("block.attn.out") as VectorHistoryTile
         val blockInTile = scene.tile("block.in") as VectorHistoryTile
         val blockOutTile = scene.tile("block.resid") as VectorHistoryTile
-        val backfillState = Lfm2DecodeState()
-        val qScratch = TensorPort("backfill.q", FloatTensor(1, config.numHeads * config.headDim))
-        val weightsScratch = TensorPort("backfill.weights", FloatTensor(config.numHeads, config.maxSeqLen))
-        val contextScratch = TensorPort("backfill.context", FloatTensor(1, config.numHeads * config.headDim))
-        val attnOutScratch = TensorPort("backfill.out", FloatTensor(1, config.hiddenSize))
-        val qRow = FloatArray(config.numHeads * config.headDim)
-        val contextRow = FloatArray(config.numHeads * config.headDim)
-        val attnOutRow = FloatArray(config.hiddenSize)
+        val mixerTile = scene.tile("block.mixer_resid") as VectorHistoryTile
+        val convLimbTiles = listOf("block.conv.bcx", "block.conv.bx", "block.conv.raw",
+            "block.conv.gated", "block.conv.out").map { scene.tile(it) as VectorHistoryTile }
+        val mlpLimbTiles = listOf("block.mlp.gate", "block.mlp.up", "block.mlp.act",
+            "block.mlp.out").map { scene.tile(it) as VectorHistoryTile }
 
-        fun backfillAttentionLimb(layer: Int) {
-            val stackIndex = attnLayers.indexOf(layer)
-            if (stackIndex < 0) return
-            val scores = AttendScoresOp("backfill.scores", qScratch, plan.port("layers.$layer.attn.k_cache"),
-                weightsScratch, backfillState, config.numHeads, config.numKvHeads, config.headDim)
-            val mix = AttendMixOp("backfill.mix", weightsScratch, plan.port("layers.$layer.attn.v_cache"),
-                contextScratch, backfillState, config.numHeads, config.numKvHeads, config.headDim)
-            val outProj = LinearOp("backfill.out_proj",
-                plan.port("model.layers.$layer.self_attn.out_proj.weight"), contextScratch, attnOutScratch)
+        val backfillState = Lfm2DecodeState()
+        val invFreq = DoubleArray(config.headDim / 2) { 1.0 / config.ropeTheta.pow(2.0 * it / config.headDim) }
+        fun scratch(name: String, cols: Int, rows: Int = 1) =
+            TensorPort(name, FloatTensor(rows, cols).apply { fill(0f) })
+        val inScratch = scratch("backfill.in", config.hiddenSize)
+        val normedScratch = scratch("backfill.normed", config.hiddenSize)
+        val ropeCosScratch = scratch("backfill.rope.cos", config.headDim / 2)
+        val ropeSinScratch = scratch("backfill.rope.sin", config.headDim / 2)
+        val qRawScratch = scratch("backfill.q_raw", config.numHeads * config.headDim)
+        val qScratch = scratch("backfill.q", config.numHeads * config.headDim)
+        val weightsScratch = scratch("backfill.weights", config.maxSeqLen, rows = config.numHeads)
+        val contextScratch = scratch("backfill.context", config.numHeads * config.headDim)
+        val attnOutScratch = scratch("backfill.attn_out", config.hiddenSize)
+        val convCacheScratch = scratch("backfill.conv.cache", config.convKernel, rows = config.hiddenSize)
+        val convScratches = listOf("bcx" to 3 * config.hiddenSize, "bx" to config.hiddenSize,
+            "raw" to config.hiddenSize, "gated" to config.hiddenSize, "out" to config.hiddenSize)
+            .map { (name, cols) -> scratch("backfill.conv.$name", cols) }
+        val mixerScratch = scratch("backfill.mixer_resid", config.hiddenSize)
+        val ffnNormedScratch = scratch("backfill.ffn_normed", config.hiddenSize)
+        val mlpScratches = listOf("gate" to config.intermediateSize, "up" to config.intermediateSize,
+            "act" to config.intermediateSize, "out" to config.hiddenSize)
+            .map { (name, cols) -> scratch("backfill.mlp.$name", cols) }
+
+        fun replayBlock(layer: Int) {
+            val attn = layer in config.attentionLayers
+            val w = "model.layers.$layer"
+            val (bcx, bx, convRaw, gated, convOut) = convScratches
+            val (mlpGate, mlpUp, mlpAct, mlpOut) = mlpScratches
+            val mixerOut = if (attn) attnOutScratch else convOut
+            val ops = buildList {
+                add(RmsNormOp("backfill.operator_norm", inScratch,
+                    plan.port("$w.operator_norm.weight"), normedScratch, config.normEps))
+                if (attn) {
+                    add(RopeAnglesOp("backfill.rope_angles", ropeCosScratch, ropeSinScratch, invFreq, backfillState))
+                    add(LinearOp("backfill.q_proj", plan.port("$w.self_attn.q_proj.weight"), normedScratch, qRawScratch))
+                    add(HeadwiseNormRopeOp("backfill.q_norm_rope", qRawScratch,
+                        plan.port("$w.self_attn.q_layernorm.weight"), ropeCosScratch, ropeSinScratch,
+                        qScratch, config.numHeads, config.headDim, config.normEps))
+                    add(AttendScoresOp("backfill.scores", qScratch, plan.port("layers.$layer.attn.k_cache"),
+                        weightsScratch, backfillState, config.numHeads, config.numKvHeads, config.headDim))
+                    add(AttendMixOp("backfill.mix", weightsScratch, plan.port("layers.$layer.attn.v_cache"),
+                        contextScratch, backfillState, config.numHeads, config.numKvHeads, config.headDim))
+                    add(LinearOp("backfill.out_proj", plan.port("$w.self_attn.out_proj.weight"),
+                        contextScratch, attnOutScratch))
+                } else {
+                    add(LinearOp("backfill.in_proj", plan.port("$w.conv.in_proj.weight"), normedScratch, bcx))
+                    add(OffsetGateOp("backfill.b_gate", bcx, 0, bcx, 2 * config.hiddenSize, bx))
+                    add(CausalConvOp("backfill.causal_conv", bx, convCacheScratch,
+                        plan.port("$w.conv.conv.weight"), convRaw))
+                    add(OffsetGateOp("backfill.c_gate", convRaw, 0, bcx, config.hiddenSize, gated))
+                    add(LinearOp("backfill.conv.out_proj", plan.port("$w.conv.out_proj.weight"), gated, convOut))
+                }
+                add(AddOp("backfill.mixer_residual", inScratch, mixerOut, mixerScratch))
+                add(RmsNormOp("backfill.ffn_norm", mixerScratch, plan.port("$w.ffn_norm.weight"),
+                    ffnNormedScratch, config.normEps))
+                add(LinearOp("backfill.mlp.w1", plan.port("$w.feed_forward.w1.weight"), ffnNormedScratch, mlpGate))
+                add(LinearOp("backfill.mlp.w3", plan.port("$w.feed_forward.w3.weight"), ffnNormedScratch, mlpUp))
+                add(SiluGateOp("backfill.mlp.silu_gate", mlpGate, mlpUp, mlpAct))
+                add(LinearOp("backfill.mlp.w2", plan.port("$w.feed_forward.w2.weight"), mlpAct, mlpOut))
+            }
+            val fills = buildList {
+                if (attn) {
+                    add(qTile to qScratch)
+                    add(contextTile to contextScratch)
+                    add(attnOutTile to attnOutScratch)
+                } else {
+                    addAll(convLimbTiles.zip(convScratches))
+                }
+                add(mixerTile to mixerScratch)
+                addAll(mlpLimbTiles.zip(mlpScratches))
+            }
+            convCacheScratch.tensor.fill(0f)
+            val strip = stripTiles[layer]
             for (t in 0 until minOf(model.position, window)) {
-                qTile.copyHistoryRow(stackIndex, t, qRow)
-                qScratch.tensor.copyFrom(qRow)
+                inScratch.tensor.data.duplicate().put(strip.values, t * strip.cols, strip.cols)
                 backfillState.position = t
-                scores.forward()
-                mix.forward()
-                outProj.forward()
-                weightsTile.backfillRow(t, weightsScratch.tensor)
-                contextScratch.tensor.data.duplicate().get(contextRow)
-                contextTile.backfillRow(t, contextRow)
-                attnOutScratch.tensor.data.duplicate().get(attnOutRow)
-                attnOutTile.backfillRow(t, attnOutRow)
+                ops.forEach { it.forward() }
+                if (attn) weightsTile.backfillRow(t, weightsScratch.tensor)
+                for ((tile, port) in fills) tile.backfillRow(t, port.tensor)
             }
         }
 
@@ -356,7 +410,9 @@ object Lfm2StackCompositor {
             val layer = raw.mod(config.numLayers)
             scene.selectedLayer = layer
             val attnActive = layer in config.attentionLayers
-            val deriveAttention = attnActive && !weightsTile.hasHistoryFor(layer)
+            val limbHasHistory = if (attnActive) weightsTile.hasHistoryFor(layer)
+                else convLimbTiles.first().hasHistoryFor(layer)
+            val replay = !limbHasHistory || !mlpLimbTiles.first().hasHistoryFor(layer)
             val copyBlockIn = !blockInTile.hasHistoryFor(layer)
             val copyBlockOut = !blockOutTile.hasHistoryFor(layer)
             fun inactive(key: String) = (convSide(key) && attnActive) || (attnSide(key) && !attnActive)
@@ -369,7 +425,7 @@ object Lfm2StackCompositor {
                 val keys = listOf(endpointKey(edge.from), endpointKey(edge.to)) + edge.ops.map { alias(it.name) }
                 edge.dimmed = keys.any(::inactive)
             }
-            if (deriveAttention) backfillAttentionLimb(layer)
+            if (replay) replayBlock(layer)
             if (copyBlockIn) backfillFromStrip(blockInTile, stripTiles[layer])
             if (copyBlockOut) backfillFromStrip(blockOutTile, stripTiles[layer + 1])
             scene.highlightedTiles = setOf(stripTiles[layer], stripTiles[layer + 1])

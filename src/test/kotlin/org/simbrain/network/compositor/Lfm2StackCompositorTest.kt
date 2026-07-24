@@ -265,16 +265,40 @@ class Lfm2StackCompositorTest {
         }
 
         derived.layerSelector!!.invoke(4)
-        for (id in listOf("block.attn.weights", "block.attn.context", "block.attn.out")) {
+        for (id in listOf("block.attn.q", "block.attn.weights", "block.attn.context", "block.attn.out",
+            "block.mixer_resid", "block.mlp.gate", "block.mlp.up", "block.mlp.act", "block.mlp.out")) {
             assertTrue(recorded.tile(id).values.any { it != 0f }, "$id recorded something to compare")
             assertTrue(recorded.tile(id).values.contentEquals(derived.tile(id).values),
-                "$id must re-derive bit-exactly from q and the caches")
+                "$id must re-derive bit-exactly from the depth strip and the caches")
         }
     }
 
     @Test
-    fun `recently watched layers restore from the stash and older ones are evicted`() {
+    fun `a flip to an unwatched conv layer replays the whole block from the depth strip`() {
         val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
+        val model = syntheticModel(config)
+        val recorded = Lfm2StackCompositor.buildScene(model)
+        val derived = Lfm2StackCompositor.buildScene(model)
+        recorded.layerSelector!!.invoke(3)
+        repeat(5) {
+            model.forwardToken(it + 1)
+            recorded.publish(it)
+            derived.publish(it)
+        }
+
+        derived.layerSelector!!.invoke(3)
+        for (id in listOf("block.conv.bcx", "block.conv.bx", "block.conv.raw", "block.conv.gated",
+            "block.conv.out", "block.mixer_resid", "block.mlp.gate", "block.mlp.up", "block.mlp.act",
+            "block.mlp.out")) {
+            assertTrue(recorded.tile(id).values.any { it != 0f }, "$id recorded something to compare")
+            assertTrue(recorded.tile(id).values.contentEquals(derived.tile(id).values),
+                "$id must replay bit-exactly, the conv window rebuilt token by token")
+        }
+    }
+
+    @Test
+    fun `flips restore from the stash and replay what the stash has evicted`() {
+        val config = tinyConfig().copy(numLayers = 8, attentionLayers = setOf(2, 4))
         val model = syntheticModel(config)
         val scene = Lfm2StackCompositor.buildScene(model)
         repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
@@ -284,15 +308,18 @@ class Lfm2StackCompositorTest {
         assertTrue(watched.any { it != 0f })
 
         scene.layerSelector!!.invoke(1)
-        assertTrue(bx.values.all { it == 0f }, "a never-watched conv layer starts blank")
+        assertTrue(bx.values.any { it != 0f }, "a never-watched conv layer is replayed, not blank")
         scene.layerSelector!!.invoke(0)
         assertTrue(bx.values.contentEquals(watched), "flip-back restores the stashed history")
 
         scene.layerSelector!!.invoke(1)
         scene.layerSelector!!.invoke(3)
         scene.layerSelector!!.invoke(5)
+        scene.layerSelector!!.invoke(6)
+        assertFalse(bx.hasHistoryFor(0), "four conv flips push the watched layer out of the stash")
         scene.layerSelector!!.invoke(0)
-        assertTrue(bx.values.all { it == 0f }, "history beyond the stash is gone")
+        assertTrue(bx.values.contentEquals(watched),
+            "history beyond the stash is replayed back to exactly what recording stored")
     }
 
     @Test

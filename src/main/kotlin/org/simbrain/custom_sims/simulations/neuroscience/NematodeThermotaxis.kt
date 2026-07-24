@@ -72,9 +72,10 @@ val nematodeThermotaxis = newSim {
         tileMap.updateMapSize(34, 24)
         tileMap.fill("water_1")
     }
-    val worm = world.addEntity(world.width / 2.0, world.height / 2.0, EntityType.Isopod).apply {
+    val worm = world.addEntity(world.width / 2.0, world.height / 2.0, EntityType.Nematode).apply {
         name = "Model worm"
         heading = 0.0
+        distancePerAnimationFrame = 0.35
         isShowSensorsAndEffectors = false
         isShowTrail = true
     }
@@ -122,6 +123,7 @@ val nematodeThermotaxis = newSim {
         model.reset()
         worm.location = point(world.width / 2.0, world.height / 2.0)
         worm.heading = heading
+        worm.resetAnimation()
         listOf(afd, aib, aiy, aiz, dmn, vmn, cpg).forEach { it.activation = 0.0 }
     }
 
@@ -153,9 +155,9 @@ val nematodeThermotaxis = newSim {
             cpg.activation = result.cpgOutput
 
             var heading = worm.heading * PI / 180.0 + result.curvature * network.timeStep
-            val speed = 0.2 * network.timeStep * world.width / 136.0
-            var nextX = worm.x + speed * cos(heading)
-            var nextY = worm.y + speed * sin(heading)
+            val stepDistance = 0.2 * network.timeStep * world.width / 136.0
+            var nextX = worm.x + stepDistance * cos(heading)
+            var nextY = worm.y - stepDistance * sin(heading)
             val edgeMargin = 12.0
             if (nextX < edgeMargin || nextX > world.width - edgeMargin) {
                 heading = PI - heading
@@ -167,6 +169,7 @@ val nematodeThermotaxis = newSim {
             }
             worm.heading = heading * 180.0 / PI
             worm.location = point(nextX, nextY)
+            worm.recordTravelDistance(stepDistance)
         }
     }
 

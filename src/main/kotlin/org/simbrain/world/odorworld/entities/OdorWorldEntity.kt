@@ -221,7 +221,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             return
         }
 
-        accumulatedAnimationDistance += kotlin.math.abs(speed)
+        recordTravelDistance(kotlin.math.abs(speed))
 
         val (dx, dy) = velocity
 
@@ -458,6 +458,13 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     @Transient
     private var accumulatedAnimationDistance: Double = 0.0
+
+    /**
+     * Records movement performed outside [applyMovement] so distance-based animation can advance normally.
+     */
+    fun recordTravelDistance(distance: Double) {
+        accumulatedAnimationDistance += kotlin.math.abs(distance)
+    }
 
     /**
      * Consume accumulated movement distance and advance the animation frame accordingly.

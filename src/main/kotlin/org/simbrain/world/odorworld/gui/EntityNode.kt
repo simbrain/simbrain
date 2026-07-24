@@ -55,9 +55,11 @@ class EntityNode(
         }
 
         override fun paint(paintContext: PPaintContext) {
+            val bounds = boundsReference
+            if (ProceduralEntityRenderers.paintIfRegistered(entity, paintContext.graphics, bounds)) return
+
             val g = paintContext.graphics
             val image = entity.getCurrentImage()
-            val bounds = boundsReference
 
             val imgW = image.width.toDouble()
             val imgH = image.height.toDouble()
@@ -215,6 +217,7 @@ class EntityNode(
         updateSensorsEffectorsVisibility()
         entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
             updateSensorsEffectorsVisibility()
+            sprite.repaint()
         }
 
         entity.events.updated.on(dispatcher = Dispatchers.Swing) { update() }

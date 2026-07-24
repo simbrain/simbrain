@@ -56,6 +56,7 @@ sealed class EntityType(
     object Steve : EntityType("Steve", rotating = true, width = 96, height = 96)
     object Susi : EntityType("Susi", rotating = true, width = 96, height = 96)
     object Isopod : EntityType("Isopod", rotating = true, width = 18, height = 18, numFrames = 2)
+    object Nematode : EntityType("Nematode", rotating = true, width = 48, height = 48, numFrames = 4, headLocation = point(0.88, 0.5) )
     object Candy : EntityType("Candy", rotating = false, width = 35, height = 35)
     object Fork : EntityType("Fork", rotating = false, width = 16, height = 50)
     object Handle : EntityType("Handle", rotating = false, width = 75, height = 75)

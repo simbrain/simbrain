@@ -9,24 +9,16 @@ import java.nio.ByteOrder
 import java.nio.file.Files
 import java.nio.file.Path
 import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 
 /**
  * Compares the Kotlin LFM2 forward pass layer-by-layer against reference activations exported
  * from Python transformers by `src/test/python/lfm2_export_reference.py`. Skips unless the
- * model weights (HF cache) and the exported reference directory are both present locally.
+ * model weights and the exported reference directory are both present locally.
  */
 class Lfm2ParityTest {
 
-    private fun modelPath(): Path? {
-        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots")
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().asSequence()
-            .map { it.resolve("model.safetensors") }
-            .firstOrNull { it.exists() }
-    }
+    private fun modelPath(): Path? = Lfm2Weights.findWeightsDirectory()?.resolve("model.safetensors")
 
     private fun parityDir(): Path =
         Path.of(System.getProperty("user.home"), ".cache", "simbrain", "lfm2-parity")

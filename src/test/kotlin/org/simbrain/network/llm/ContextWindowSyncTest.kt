@@ -14,19 +14,10 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.TextWorldComponent
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class ContextWindowSyncTest {
 
-    private fun weightsDirectory(): Path? {
-        val hub = Path.of(
-            System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots"
-        )
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().firstOrNull { Lfm2Weights.isValidWeightsDirectory(it) }
-    }
+    private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
 
     private class Rig(dir: Path, sealAtEndOfText: Boolean = false) {
         val promptText = "The capital of France is"
@@ -61,7 +52,7 @@ class ContextWindowSyncTest {
     @Test
     fun `two-way document sync reaches a fixpoint without spurious rebuilds`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!)
         val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
@@ -78,7 +69,7 @@ class ContextWindowSyncTest {
     @Test
     fun `a sealed run syncs its final window then goes quiet`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!, sealAtEndOfText = true)
         var guard = 0
@@ -98,7 +89,7 @@ class ContextWindowSyncTest {
     @Test
     fun `a finished run pauses the workspace after the end marker reaches the document`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!, sealAtEndOfText = true)
         rig.workspace.run()
@@ -115,7 +106,7 @@ class ContextWindowSyncTest {
     @Test
     fun `an edited document rebuilds the context and replays it through prefill`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!)
         val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
@@ -145,7 +136,7 @@ class ContextWindowSyncTest {
     @Test
     fun `the synced document adopts the model's tokenizer and boxes its real tokens`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!)
         var waited = 0
@@ -164,7 +155,7 @@ class ContextWindowSyncTest {
     @Test
     fun `an edit that drops the BOS marker gets it restored and generation continues`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!)
         repeat(3) { rig.workspace.simpleIterate() }
@@ -184,7 +175,7 @@ class ContextWindowSyncTest {
     @Test
     fun `an edit while generating rebuilds immediately and keeps generating`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val rig = Rig(dir!!)
         repeat(3) { rig.workspace.simpleIterate() }

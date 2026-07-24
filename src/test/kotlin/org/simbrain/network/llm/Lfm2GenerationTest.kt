@@ -5,22 +5,15 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.tensor.Blas
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class Lfm2GenerationTest {
 
-    private fun snapshotDir(): Path? {
-        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots")
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().firstOrNull { it.resolve("model.safetensors").exists() }
-    }
+    private fun snapshotDir(): Path? = Lfm2Weights.findWeightsDirectory()
 
     @Test
     fun `greedy decoding produces text end to end`() {
         val snapshot = snapshotDir()
-        assumeTrue(snapshot != null, "LFM2 weights not present in HF cache")
+        assumeTrue(snapshot != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         Blas.numThreads = 4
         val params = Safetensors.load(snapshot!!.resolve("model.safetensors"))

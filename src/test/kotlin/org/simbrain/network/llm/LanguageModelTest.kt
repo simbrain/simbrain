@@ -13,24 +13,15 @@ import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.textworld.TextWorldComponent
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class LanguageModelTest {
 
-    private fun weightsDirectory(): Path? {
-        val hub = Path.of(
-            System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots"
-        )
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().firstOrNull { Lfm2Weights.isValidWeightsDirectory(it) }
-    }
+    private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
 
     @Test
     fun `one update generates one token and stops at the token budget`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
@@ -60,7 +51,7 @@ class LanguageModelTest {
     @Test
     fun `loading seeds the window and network iterations drive it one token per update`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
@@ -79,7 +70,7 @@ class LanguageModelTest {
     @Test
     fun `generation stops at the end-of-text token instead of feeding it back`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.initialText = "The capital of France is"
@@ -99,7 +90,7 @@ class LanguageModelTest {
     @Test
     fun `steps are no-ops once the stream seals and an edit moves it again`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.initialText = "The capital of France is"
@@ -122,7 +113,7 @@ class LanguageModelTest {
     @Test
     fun `chat mode answers the prompt and stops at the end of the assistant turn`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
         languageModel.promptMode = PromptMode.CHAT
@@ -143,7 +134,7 @@ class LanguageModelTest {
     @Test
     fun `a sent message reopens a sealed chat and the model answers the follow-up`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
@@ -184,7 +175,7 @@ class LanguageModelTest {
     @Test
     fun `generated tokens flow through a workspace coupling and prefill produces none`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val workspace = Workspace()
         val network = Network()
@@ -221,7 +212,7 @@ class LanguageModelTest {
     @Test
     fun `hidden state produces the selected layer's residual once tokens flow`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.selectedLayer = 4
@@ -238,7 +229,7 @@ class LanguageModelTest {
     @Test
     fun `injected text extends prefill before the model resumes its own continuation`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
@@ -305,7 +296,7 @@ class LanguageModelTest {
     @Test
     fun `loading a round-tripped model applies its saved view state to the scene`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)

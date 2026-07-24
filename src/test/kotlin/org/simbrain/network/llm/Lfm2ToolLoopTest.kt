@@ -6,19 +6,10 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class Lfm2ToolLoopTest {
 
-    private fun weightsDirectory(): Path? {
-        val hub = Path.of(
-            System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots"
-        )
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().firstOrNull { Lfm2Weights.isValidWeightsDirectory(it) }
-    }
+    private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
 
     @Test
     fun `parser reads single calls, quoted commas, multiple calls, and rejects garbage`() {
@@ -56,7 +47,7 @@ class Lfm2ToolLoopTest {
     @Test
     fun `the real model calls the demo weather tool and answers from its result`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
@@ -82,7 +73,7 @@ class Lfm2ToolLoopTest {
     @Test
     fun `a scripted tool call executes at the turn boundary and decoding continues`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
@@ -136,7 +127,7 @@ class Lfm2ToolLoopTest {
     @Test
     fun `an unknown tool call answers with an error and decoding continues`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
@@ -173,7 +164,7 @@ class Lfm2ToolLoopTest {
     @Test
     fun `a plain im_end with no pending call seals the run`() {
         val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not present in the HF cache")
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         // The tool-advertising prompt alone is ~133 tokens; the window must hold it plus the EOS
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)

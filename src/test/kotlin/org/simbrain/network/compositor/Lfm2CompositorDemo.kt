@@ -3,6 +3,7 @@ package org.simbrain.network.compositor
 import org.piccolo2d.PCanvas
 import org.simbrain.network.llm.Lfm2Config
 import org.simbrain.network.llm.Lfm2Model
+import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmTokenizer
 import org.simbrain.network.llm.Safetensors
 import org.simbrain.network.tensor.Blas
@@ -21,8 +22,6 @@ import javax.swing.JToolBar
 import javax.swing.SpinnerNumberModel
 import javax.swing.SwingUtilities
 import kotlin.concurrent.thread
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 /**
  * Standalone LFM2 structure-view demo: greedy decode streaming into one stacked layer-block
@@ -31,16 +30,13 @@ import kotlin.io.path.listDirectoryEntries
  * select, drag to move tiles, double-click a tile to trace its data-flow paths, hover for cell
  * values, mouse wheel to zoom, drag empty canvas to pan.
  *
- * Needs the LFM2.5-230M weights in the HF cache (run `uv run src/test/python/lfm2_export_reference.py`
- * once to fetch them). Run with:
+ * Needs the LFM2.5-230M weights (download them once in Simbrain, or run
+ * `uv run src/test/python/lfm2_export_reference.py`). Run with:
  * `./gradlew -PmainClass=org.simbrain.network.compositor.Lfm2CompositorDemoKt run` or from the IDE.
  */
 fun main() {
-    val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-        "models--LiquidAI--LFM2.5-230M", "snapshots")
-    val snapshot = (if (hub.exists()) hub.listDirectoryEntries() else emptyList())
-        .firstOrNull { it.resolve("model.safetensors").exists() }
-        ?: error("LFM2.5-230M weights not found in the HF cache; run lfm2_export_reference.py first")
+    val snapshot = Lfm2Weights.findWeightsDirectory()
+        ?: error("LFM2.5-230M weights not found; download them once in Simbrain or run lfm2_export_reference.py")
 
     Blas.numThreads = 4
     val config = Lfm2Config(maxSeqLen = 512)

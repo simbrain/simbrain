@@ -5,19 +5,10 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class Lfm2ChatFormatTest {
 
-    private fun tokenizerPath(): Path? {
-        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots")
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().asSequence()
-            .map { it.resolve("tokenizer.json") }
-            .firstOrNull { it.exists() }
-    }
+    private fun tokenizerPath(): Path? = Lfm2Weights.findWeightsDirectory()?.resolve("tokenizer.json")
 
     @Test
     fun `chat prompt renders the exact single-turn template`() {
@@ -44,7 +35,7 @@ class Lfm2ChatFormatTest {
     @Test
     fun `templated encoding matches python apply_chat_template ids`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             // Reference ids from transformers 5.13.0 apply_chat_template(add_generation_prompt=True)

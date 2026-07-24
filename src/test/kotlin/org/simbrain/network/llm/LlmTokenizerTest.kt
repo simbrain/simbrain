@@ -10,19 +10,11 @@ import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 import kotlin.io.path.readText
 
 class LlmTokenizerTest {
 
-    private fun tokenizerPath(): Path? {
-        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots")
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().asSequence()
-            .map { it.resolve("tokenizer.json") }
-            .firstOrNull { it.exists() }
-    }
+    private fun tokenizerPath(): Path? = Lfm2Weights.findWeightsDirectory()?.resolve("tokenizer.json")
 
     @Test
     fun `encoding matches python tokenizers ids and decode round trips`() {
@@ -46,7 +38,7 @@ class LlmTokenizerTest {
     @Test
     fun `specials-off encoding maps marker text to single ids and adds no bos`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             assertArrayEquals(intArrayOf(6), tokenizer.encode("<|im_start|>", addSpecials = false),
@@ -59,7 +51,7 @@ class LlmTokenizerTest {
     @Test
     fun `skip-specials decode drops scaffolding but keeps tool call markers`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             val ids = tokenizer.encode("Hello")

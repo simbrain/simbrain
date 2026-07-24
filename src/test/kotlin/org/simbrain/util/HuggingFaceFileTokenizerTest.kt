@@ -5,25 +5,17 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.network.llm.Lfm2Weights
 import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 class HuggingFaceFileTokenizerTest {
 
-    private fun tokenizerPath(): Path? {
-        val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-            "models--LiquidAI--LFM2.5-230M", "snapshots")
-        if (!hub.exists()) return null
-        return hub.listDirectoryEntries().asSequence()
-            .map { it.resolve("tokenizer.json") }
-            .firstOrNull { it.exists() }
-    }
+    private fun tokenizerPath(): Path? = Lfm2Weights.findWeightsDirectory()?.resolve("tokenizer.json")
 
     @Test
     fun `spans are contiguous, inclusive-end, and free of byte-level artifacts`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         val tokenizer = HuggingFaceFileTokenizer(path.toString())
         val text = "The capital of France is Paris."
@@ -45,7 +37,7 @@ class HuggingFaceFileTokenizerTest {
     @Test
     fun `literal chat scaffolding tokenizes to single whole-marker tokens`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not present in the HF cache")
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         val tokenizer = HuggingFaceFileTokenizer(path.toString())
         val tokens = tokenizer.tokenize("<|startoftext|><|im_start|>user\nHi<|im_end|>")

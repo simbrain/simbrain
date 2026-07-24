@@ -152,6 +152,13 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
             loaded?.scene?.lens?.enabled = value
         }
 
+    /** Live view ghosts recorded token history, showing only what is resident in the model. */
+    var liveView: Boolean = false
+        set(value) {
+            field = value
+            loaded?.scene?.liveView = value
+        }
+
     /** Saved tile positions by tile id, applied to the scene on load. */
     var tileLayout: HashMap<String, DoubleArray>? = null
 
@@ -219,6 +226,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         }
         (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
             ?.selectedHead = selectedHead
+        scene.liveView = liveView
         scene.lens?.apply {
             enabled = lensEnabled
             async = true

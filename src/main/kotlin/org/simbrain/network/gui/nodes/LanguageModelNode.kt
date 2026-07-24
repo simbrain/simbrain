@@ -212,6 +212,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 add(JCheckBoxMenuItem("Logit lens", languageModel.lensEnabled).apply {
                     addActionListener { languageModel.lensEnabled = isSelected }
                 })
+                add(JCheckBoxMenuItem("Show token history", !languageModel.liveView).apply {
+                    toolTipText = "Unchecked, past tokens ghost out: only the current token's " +
+                        "activations and the caches are actually in the model"
+                    addActionListener {
+                        languageModel.liveView = !isSelected
+                        compositorNode?.refreshDirtyTiles()
+                    }
+                })
             } else {
                 addSeparator()
                 add(createAction("Locate weights...") { locateWeights() })

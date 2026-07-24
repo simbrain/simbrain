@@ -16,8 +16,16 @@ import javax.swing.SwingUtilities
  * compositor interior, and the status line with the generated text. Needs the LFM2.5-230M weights
  * (HF cache or Simbrain cache).
  */
-class LanguageModelNodeSnapshot : UiSnapshotDef {
+open class LanguageModelNodeSnapshot : UiSnapshotDef {
     override val name = "language-model-node"
+
+    /** Live view ghosts recorded history rows, leaving only resident state at full strength. */
+    protected open val liveView = false
+
+    /** The live-view variant shrinks the window and fills it, so the ghosting reads at fit zoom. */
+    protected open val maxSeqLen = 256
+    protected open val tokensToGenerate = 24
+    protected open val stopAtEndOfText = true
 
     override fun build(): Component {
         val weightsDir = Lfm2Weights.findWeightsDirectory()
@@ -29,9 +37,11 @@ class LanguageModelNodeSnapshot : UiSnapshotDef {
             preferredSize = Dimension(1300, 1500)
         }
 
-        val languageModel = LanguageModel(weightsDir.toString(), maxSeqLen = 256)
+        val languageModel = LanguageModel(weightsDir.toString(), maxSeqLen = maxSeqLen)
         languageModel.initialText = "The capital of France is"
-        languageModel.tokensToGenerate = 24
+        languageModel.tokensToGenerate = tokensToGenerate
+        languageModel.stopAtEndOfText = stopAtEndOfText
+        languageModel.liveView = liveView
         languageModel.loadWeights()
         runBlocking { network.addNetworkModel(languageModel, usePlacementManager = false) }
 
@@ -47,4 +57,18 @@ class LanguageModelNodeSnapshot : UiSnapshotDef {
         Thread.sleep(200)
         return panel
     }
+}
+
+/**
+ * Live view over a well-filled window: history rows ghost to faint strength, the live row and
+ * the true resident state (KV caches, conv window, weights) keep full strength. The window is
+ * small and the budget large so most token rows hold data — at fit zoom a 256-row window with a
+ * ten-token run collapses data and live row into one pixel band and the ghosting is invisible.
+ */
+class LanguageModelNodeLiveViewSnapshot : LanguageModelNodeSnapshot() {
+    override val name = "language-model-node-live-view"
+    override val liveView = true
+    override val maxSeqLen = 48
+    override val tokensToGenerate = 36
+    override val stopAtEndOfText = false
 }

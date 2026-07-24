@@ -189,6 +189,8 @@ val lfm2LanguageModel = newSim {
 
         Hover over any cell to read its value; double-click a tile to trace its data-flow paths.
 
+        Most of what the tall tiles show is a *recording*: at each step the model only holds the current token's activations, and the diagram keeps the old rows so you can see the trajectory. Right-click the model and uncheck `Show token history` to see what is genuinely resident — past rows ghost out, one bright row sweeps down as it writes, and the only tiles left fully lit are the KV caches and the conv window. That is the model's entire memory, and it is why those caches exist.
+
         # Chat and Tools
 
         Restart the simulation and choose `Chat` mode: the document starts empty, and the conversation is driven from the control panel's `Chat message` field. Type a message and press Enter (or `Send message`): Simbrain wraps your text in a templated user turn — the first message also lays down the conversation's opening scaffolding, system prompt included — and the model writes its reply. Watch the turns appear in the document with their `<|im_start|>` markers: the document is the whole conversation, and you can still edit it directly between turns.

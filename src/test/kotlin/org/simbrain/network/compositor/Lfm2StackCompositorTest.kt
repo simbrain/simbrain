@@ -1,12 +1,16 @@
 package org.simbrain.network.compositor
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.llm.Lfm2Config
 import org.simbrain.network.llm.Lfm2Model
 import org.simbrain.network.tensor.FloatTensor
+import org.simbrain.network.tensor.op.TensorPort
+import java.awt.Color
 import java.util.Random
 
 class Lfm2StackCompositorTest {
@@ -433,5 +437,68 @@ class Lfm2StackCompositorTest {
         assertTrue(q.x != templated.getValue("block.attn.q").first || q.y != templated.getValue("block.attn.q").second,
             "an unmatched template falls back to rank columns instead of erroring")
         assertTrue(v.x != q.x, "rank columns separate v (rank 0) from q (behind its junction)")
+    }
+
+    @Test
+    fun `live view targets exactly the tiles that accumulate history`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
+        for (id in listOf("block.resid", "block.attn.q", "block.attn.weights", "block.mlp.act", "rope.cos", "embed")) {
+            assertTrue(scene.tile(id).accumulatesHistory, "$id records past tokens the model no longer holds")
+        }
+        for (id in listOf(
+            "block.attn.k", "block.attn.v", "block.attn.k_cache", "block.attn.v_cache",
+            "block.conv.cache", "block.w.self_attn.q_proj.weight", "block.w.conv.conv.weight",
+        )) {
+            assertFalse(scene.tile(id).accumulatesHistory, "$id mirrors state genuinely resident in the model")
+        }
+    }
+
+    @Test
+    fun `live view ghosts history rows and leaves the live row and resident state at full strength`() {
+        val model = syntheticModel()
+        val scene = Lfm2StackCompositor.buildScene(model)
+        repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
+
+        fun shade(tile: TensorTile) = IntArray(tile.rows).also {
+            tile.shadePatch(it, 1, 1, tile.rows, 0.0, tile.rows.toDouble(), 0.0, tile.cols.toDouble(),
+                Color.BLUE, Color.BLACK, Color.RED)
+        }
+
+        val resid = scene.tile("block.resid")
+        val weights = scene.tile("block.w.feed_forward.w1.weight")
+        val kCache = scene.tile("block.attn.k_cache")
+        val history = shade(resid)
+        val weightsBefore = shade(weights)
+        val cacheBefore = shade(kCache)
+
+        scene.liveView = true
+        val live = shade(resid)
+        assertEquals(history[2], live[2], "the live row keeps full strength")
+        assertNotEquals(history[0], live[0], "past rows drop to ghost strength")
+        assertNotEquals(history[1], live[1])
+        assertArrayEquals(weightsBefore, shade(weights), "weights are resident state, never ghosted")
+        assertArrayEquals(cacheBefore, shade(kCache), "the KV caches are the model's real memory")
+
+        scene.liveView = false
+        assertArrayEquals(history, shade(resid), "toggling back restores the recording losslessly")
+    }
+
+    @Test
+    fun `advancing the live row in live view reshades the outgoing row as ghost`() {
+        val port = TensorPort("unit", FloatTensor(1, 4))
+        val tile = VectorHistoryTile(port, rows = 8, title = "unit")
+        tile.liveView = true
+        fun publishRow(token: Int) {
+            for (i in 0 until 4) port.tensor.data.put(i, 0.5f)
+            port.tensor.markMutated()
+            tile.publish(token)
+        }
+
+        publishRow(0)
+        publishRow(1)
+        tile.consumeDirtyRows()
+        publishRow(2)
+        assertEquals(1..2, tile.consumeDirtyRows(),
+            "the outgoing live row's band must reshade to ghost strength alongside the new row")
     }
 }

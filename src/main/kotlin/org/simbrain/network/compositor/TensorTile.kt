@@ -14,6 +14,9 @@ enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
 /** How many recently watched layers a history tile stashes, so flip-back is instant and lossless. */
 const val HISTORY_STASH = 3
 
+/** Live-view strength of history rows: faint enough to read as a recording, not model state. */
+const val HISTORY_GHOST = 0.15f
+
 /**
  * A tile whose data source flips across model layers — the card stack behind a structure-first
  * view where one block anatomy is shown once and the layer dimension collapses into decks.
@@ -95,13 +98,35 @@ abstract class TensorTile(
     var strands = 1
 
     /**
+     * True when this tile's rows are a scene-side recording of past tokens rather than model
+     * state — the port only ever holds the current token's value. Live view ghosts these rows.
+     */
+    open val accumulatesHistory = false
+
+    /**
+     * Live view: history rows shade at [HISTORY_GHOST] strength, leaving the live row — the one
+     * row actually resident in the model's ports — at full strength. Tiles mirroring real state
+     * (weights, caches, full-pass tensors) are unaffected. Display-only: recording continues.
+     */
+    var liveView = false
+        set(value) {
+            if (field == value) return
+            field = value
+            if (accumulatesHistory) touch()
+        }
+
+    /**
      * The row holding the current token's just-published value, or -1 when rows aren't a token
      * axis (full-pass publishes). Rendered as a cursor: on history tiles it marks the one row
      * actually flowing through the graph this step; on the KV caches it marks the write frontier
      * (rows past it are stale).
      */
     var liveRow = -1
-        protected set
+        protected set(value) {
+            // In live view the outgoing row drops to ghost strength, so its band must reshade.
+            if (field != value && field >= 0 && liveView && accumulatesHistory) touchRow(field)
+            field = value
+        }
 
     /** Published data, row-major [rows] x [cols]. Read for tooltips and probes; written by [publish]. */
     val values = FloatArray(rows * cols)
@@ -189,11 +214,13 @@ abstract class TensorTile(
     ) {
         val scale = if (signedNorm) (if (absMax > 0f) 1f / absMax else 0f) else 1f
         val meanPool = kind == TileKind.WEIGHT
+        val ghosting = liveView && accumulatesHistory
         val rowSpan = rowTo - rowFrom
         val colSpan = colTo - colFrom
         for (y in 0 until destH) {
             val r0 = (rowFrom + rowSpan * y / destH).toInt().coerceIn(0, rows - 1)
             val r1 = ceil(rowFrom + rowSpan * (y + 1) / destH).toInt().coerceIn(r0 + 1, rows)
+            val ghostBand = ghosting && liveRow !in r0 until r1
             val destRow = destOffset + y * stride
             for (x in 0 until destW) {
                 val c0 = (colFrom + colSpan * x / destW).toInt().coerceIn(0, cols - 1)
@@ -226,7 +253,8 @@ abstract class TensorTile(
                         }
                     }
                 }
-                dest[destRow + x] = (pooled * scale).toSimbrainColor(neg, mid, pos)
+                val shown = pooled * scale * (if (ghostBand) HISTORY_GHOST else 1f)
+                dest[destRow + x] = shown.toSimbrainColor(neg, mid, pos)
             }
         }
     }
@@ -277,6 +305,8 @@ class VectorHistoryTile(
 
     constructor(port: TensorPort, rows: Int, title: String = port.name, kind: TileKind = TileKind.RESIDUAL) :
         this(listOf(port), rows, title, kind)
+
+    override val accumulatesHistory = true
 
     init {
         require(stackLayers.isEmpty() || stackLayers.size == ports.size) {
@@ -673,6 +703,8 @@ class AttentionTile(
     id: String = ports.first().name,
     override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(id, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION), LayerStacked {
+
+    override val accumulatesHistory = true
 
     init {
         strands = numHeads

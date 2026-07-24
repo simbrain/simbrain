@@ -221,8 +221,21 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     val selection = InteriorSelectionModel()
 
+    /**
+     * Ghosts every history-accumulating tile down to its live row — the one row actually
+     * resident in the model's ports — leaving true state (weights, caches, full-pass tensors)
+     * at full strength. Display-only: history keeps recording, so toggling back is lossless.
+     */
+    var liveView = false
+        set(value) {
+            if (field == value) return
+            field = value
+            for (tile in _tiles) tile.liveView = value
+        }
+
     fun addTile(tile: TensorTile) {
         require(_tiles.none { it.id == tile.id }) { "Duplicate tile id ${tile.id}" }
+        tile.liveView = liveView
         _tiles.add(tile)
     }
 

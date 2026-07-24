@@ -173,6 +173,8 @@ fun OdorWorldEntity.getAngleDiffFromOptimal(viewingAngle: Double, directionIndex
  * @return The BufferedImage for rendering
  */
 fun OdorWorldEntity.getImage(directionIndex: Int = 0, frameIndex: Int = animationFrame): BufferedImage {
+    ProceduralEntityImages.getImage(this, directionIndex, frameIndex)?.let { return it }
+
     val paths = entityType.imageBasePaths
 
     if (paths.isEmpty() || paths[0].isEmpty()) {

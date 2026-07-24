@@ -14,6 +14,7 @@ import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.odorworld.OdorWorldPanel
+import org.simbrain.world.odorworld.ProceduralEntityImages
 import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.getCurrentImage
@@ -56,9 +57,18 @@ class EntityNode(
 
         override fun paint(paintContext: PPaintContext) {
             val bounds = boundsReference
-            if (ProceduralEntityRenderers.paintIfRegistered(entity, paintContext.graphics, bounds)) return
-
             val g = paintContext.graphics
+            ProceduralEntityImages.getBaseImage(entity)?.let { image ->
+                g.translate(bounds.centerX, bounds.centerY)
+                g.rotate(-entity.heading.toRadian())
+                g.scale(bounds.width / image.width, bounds.height / image.height)
+                g.drawImage(image, -image.width / 2, -image.height / 2, null)
+                g.scale(image.width / bounds.width, image.height / bounds.height)
+                g.rotate(entity.heading.toRadian())
+                g.translate(-bounds.centerX, -bounds.centerY)
+                return
+            }
+
             val image = entity.getCurrentImage()
 
             val imgW = image.width.toDouble()

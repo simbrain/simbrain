@@ -4,6 +4,9 @@
  */
 package org.simbrain.custom_sims.simulations.neuroscience
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
@@ -11,17 +14,24 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
 import org.simbrain.util.point
+import org.simbrain.util.showMessageDialog
+import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.fitWorldToFrameSize
-import java.awt.Color
-import java.awt.Graphics2D
+import java.awt.*
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
+import java.awt.geom.Line2D
+import java.util.concurrent.atomic.AtomicBoolean
+import javax.swing.*
 import kotlin.math.*
 
-val nematodeThermotaxis = newSim {
+val nematodeThermotaxis = newSim { optionString ->
     workspace.clearWorkspace()
 
     val networkComponent = addNetworkComponent("Thermotaxis Circuit")
@@ -92,6 +102,9 @@ val nematodeThermotaxis = newSim {
             4.21550001866696
         )
     )
+    if (optionString == "validate") {
+        println(ThermotaxisAfdValidation.run().summary())
+    }
     var gradientDirection = 1.0
     var temperatureOffset = 0.0
     val circuitNeurons = listOf(afd, aib, aiy, aiz, dmn, vmn, cpg)
@@ -215,31 +228,115 @@ val nematodeThermotaxis = newSim {
     withGui {
         val networkWidth = 385
         val networkHeight = 447
+        val odorWorldDesktopComponent = worldComponent.getDesktopComponentAs<OdorWorldDesktopComponent>()
+
+        fun repaintThermalPlate() {
+            gradientOverlay.invalidatePaint()
+            odorWorldDesktopComponent.worldPanel.canvas.repaint()
+        }
+
+        var ensembleFrame: GenericJInternalFrame? = null
+        var ensembleFrameX = 100
+
+        fun showEnsembleTrajectories(result: ThermotaxisEnsembleResult) {
+            ensembleFrame?.dispose()
+            ensembleFrame = GenericJInternalFrame("Thermotaxis ensemble trajectories", true, true, true, true).apply {
+                layout = BorderLayout()
+                add(ThermotaxisEnsemblePanel(result), BorderLayout.CENTER)
+                setBounds(ensembleFrameX, 60, 680, 520)
+                defaultCloseOperation = JInternalFrame.DISPOSE_ON_CLOSE
+                isVisible = true
+            }
+            addInternalFrame(ensembleFrame)
+            ensembleFrame?.toFront()
+            ensembleFrame?.isSelected = true
+        }
+
         val controlPanel = createControlPanel("Thermotaxis Controls", 10, 10) {
             addButton("Reset up") { resetModel() }
             addButton("Reset left") { resetModel(180.0) }
             addButton("Reset right") { resetModel(0.0) }
-            addButton("Reverse gradient") {
+            addButton("Reverse gradient", context = Dispatchers.Swing) {
                 gradientDirection *= -1.0
-                gradientOverlay.invalidatePaint()
+                repaintThermalPlate()
             }
-            fun updateTemperatureOffset(delta: Double) {
+            suspend fun updateTemperatureOffset(delta: Double) = withContext(Dispatchers.Swing) {
                 temperatureOffset += delta
-                gradientOverlay.invalidatePaint()
+                repaintThermalPlate()
             }
             addButton("Warm plate") { updateTemperatureOffset(0.5) }
             addButton("Cool plate") { updateTemperatureOffset(-0.5) }
             addCheckBox("Show trail", true) { showTrail -> worm.isShowTrail = showTrail }
             addCheckBox("Show activity plot", false) { visible -> setActivityPlotVisible(visible) }
+            addButton("Show steering ensemble") {
+                val validationButton = this
+                val trajectories = 48
+                val cancelRequested = AtomicBoolean(false)
+                val progressWindow = withContext(Dispatchers.Swing) {
+                    validationButton.isEnabled = false
+                    ProgressWindow(trajectories, "Steering ensemble: 0 / $trajectories").apply progressWindow@{
+                        defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
+                        val cancelButton = JButton("Cancel").apply {
+                            addActionListener {
+                                cancelRequested.set(true)
+                                isEnabled = false
+                                text = "Cancelling..."
+                                this@progressWindow.text = "Cancelling after current trajectory..."
+                            }
+                        }
+                        add(JPanel(BorderLayout()).apply {
+                            border = BorderFactory.createEmptyBorder(0, 10, 10, 10)
+                            add(cancelButton, BorderLayout.CENTER)
+                        }, BorderLayout.SOUTH)
+                        addWindowListener(object : WindowAdapter() {
+                            override fun windowClosing(event: WindowEvent) {
+                                cancelRequested.set(true)
+                            }
+                        })
+                        pack()
+                        setLocationRelativeTo(null)
+                    }
+                }
+                try {
+                    val result = ThermotaxisEnsemble.run(
+                        trajectories = trajectories,
+                        onProgress = { completed, total ->
+                            SwingUtilities.invokeLater {
+                                progressWindow.value = completed
+                                progressWindow.text = "Steering ensemble: $completed / $total"
+                                progressWindow.progressBar.string = "$completed / $total"
+                            }
+                        },
+                        shouldCancel = { cancelRequested.get() }
+                    )
+                    withContext(Dispatchers.Swing) {
+                        progressWindow.close()
+                        if (result != null) {
+                            showEnsembleTrajectories(result)
+                        }
+                    }
+                } finally {
+                    withContext(Dispatchers.Swing) {
+                        validationButton.isEnabled = true
+                        if (progressWindow.isDisplayable) {
+                            progressWindow.close()
+                        }
+                    }
+                }
+            }
+            addButton("Validate AFD steering response") {
+                showMessageDialog(ThermotaxisAfdValidation.run().summary(), "Thermotaxis validation")
+            }
         }.awaitLayout()
         controlPanel.setLocation(10, 10)
         val networkX = controlPanel.rightEdgeWithGap()
         val worldX = networkX + networkWidth + SIM_WINDOW_GAP
+        ensembleFrameX = worldX - 30
         place(networkComponent, networkX, 10, networkWidth, networkHeight)
         place(worldComponent, worldX, 10, 621, networkHeight)
         place(activityPlot, worldX, 10 + networkHeight + SIM_WINDOW_GAP, 621, 210)
         setActivityPlotVisible(false)
-        worldComponent.getDesktopComponentAs<OdorWorldDesktopComponent>().apply {
+        odorWorldDesktopComponent.apply {
             val overlayLayer = PLayer().apply { addChild(gradientOverlay) }
             worldPanel.canvas.camera.addLayer(1, overlayLayer)
             fitWorldToFrameSize()
@@ -276,6 +373,12 @@ val nematodeThermotaxis = newSim {
         4. Clamp **AIB**, **AIY**, or **AIZ** to zero and compare its trail with the intact circuit. The original study found that ablating each of these interneurons impaired the characteristic thermotactic curving bias.
         5. Clamp **CPG** to zero, then zoom in on the trail. The local path should become straighter rather than following its small wiggly curves, reducing its initial sampling of the left–right gradient. Clamp **DMN (Output)** or **VMN (Output)** to test how a fixed dorsal or ventral motor output changes the path's turning bias.
         6. Use `Warm plate` or `Cool plate` to shift the temperature of the whole plate in 0.5°C steps. The colors and temperature labels update with the shift, and AFD receives the changed temperature signal.
+        7. Click `Show steering ensemble` to view 48 deterministic trajectories with evenly distributed starting headings. A progress window shows each completed trajectory and lets you cancel. This is an illustrative steering-only field, not a test of aggregate migration.
+        8. Click `Validate AFD steering response` to test the paper's circuit-level result that higher AFD activity produces a smaller long-timescale steering bias. The same check can be run headlessly with `./gradlew runSim -PsimName="C. elegans thermotaxis" -PoptionString=validate`.
+
+        Both checks use canonical conditions rather than the live plate controls, making their results reproducible. `Reverse gradient`, `Warm plate`, and `Cool plate` affect the live demonstration worm and its visible plate only; they do not alter the steering ensemble or AFD validation.
+
+        This validation tests the steering-only model shown here. The paper's full population assay additionally supplied experimentally measured, direction-dependent turning frequencies and exit directions; those behavioral turn statistics were not evolved by this circuit.
 
         # References
 
@@ -375,3 +478,179 @@ internal data class ThermotaxisWeights(
 )
 
 internal data class ThermotaxisStep(val afdState: Double, val outputs: DoubleArray, val cpgOutput: Double, val curvature: Double)
+
+internal object ThermotaxisEnsemble {
+
+    private const val plateWidth = 136.0
+    private const val plateHeight = 96.0
+    private const val edgeMargin = 12.0
+    private const val thermalGradient = 3.0
+    private const val timeStep = 0.1
+    private const val substepsPerTrajectory = 6_000
+
+    fun run(
+        trajectories: Int = 96,
+        substeps: Int = substepsPerTrajectory,
+        onProgress: (completed: Int, total: Int) -> Unit = { _, _ -> },
+        shouldCancel: () -> Boolean = { false }
+    ): ThermotaxisEnsembleResult? {
+        require(trajectories > 0) { "At least one trajectory is required" }
+        require(substeps > 0) { "At least one time step is required" }
+        val paths = mutableListOf<ThermotaxisPath>()
+        repeat(trajectories) { index ->
+            if (shouldCancel()) return null
+            paths += runTrajectory(2.0 * PI * index / trajectories, substeps)
+            onProgress(index + 1, trajectories)
+        }
+        val endpoints = paths.map { it.points.last().x }
+        val meanEndpointX = endpoints.average()
+        val warmSideFraction = endpoints.count { it > plateWidth / 2.0 }.toDouble() / trajectories
+        return ThermotaxisEnsembleResult(trajectories, substeps * timeStep, meanEndpointX, warmSideFraction, paths)
+    }
+
+    private fun runTrajectory(initialHeading: Double, substeps: Int): ThermotaxisPath {
+        val model = ThermotaxisModel(
+            states = DoubleArray(5),
+            biases = doubleArrayOf(0.261331049344628, -9.94979936474547, -11.8836526406511, -0.243075226129511, 4.21550001866696)
+        )
+        var x = plateWidth / 2.0
+        var y = plateHeight / 2.0
+        var heading = initialHeading
+        val points = mutableListOf(ThermotaxisPosition(x, y))
+        repeat(substeps) { step ->
+            val temperature = 17.0 + thermalGradient * (x / plateWidth - 0.5)
+            val curvature = model.step(temperature).curvature
+            heading += curvature * timeStep
+            val stepDistance = 0.2 * timeStep * plateWidth / 136.0
+            var nextX = x + stepDistance * cos(heading)
+            var nextY = y - stepDistance * sin(heading)
+            if (nextX < edgeMargin || nextX > plateWidth - edgeMargin) {
+                heading = PI - heading
+                nextX = nextX.coerceIn(edgeMargin, plateWidth - edgeMargin)
+            }
+            if (nextY < edgeMargin || nextY > plateHeight - edgeMargin) {
+                heading = -heading
+                nextY = nextY.coerceIn(edgeMargin, plateHeight - edgeMargin)
+            }
+            x = nextX
+            y = nextY
+            if ((step + 1) % 10 == 0 || step == substeps - 1) {
+                points += ThermotaxisPosition(x, y)
+            }
+        }
+        return ThermotaxisPath(points)
+    }
+}
+
+internal data class ThermotaxisEnsembleResult(
+    val trajectories: Int,
+    val durationSeconds: Double,
+    val meanEndpointX: Double,
+    val warmSideFraction: Double,
+    val paths: List<ThermotaxisPath>
+)
+
+internal data class ThermotaxisPosition(val x: Double, val y: Double)
+
+internal data class ThermotaxisPath(val points: List<ThermotaxisPosition>)
+
+internal object ThermotaxisAfdValidation {
+
+    fun run(): ThermotaxisAfdValidationResult {
+        val lowAfdBias = meanSteeringBias(0.0)
+        val highAfdBias = meanSteeringBias(2.0)
+        return ThermotaxisAfdValidationResult(lowAfdBias, highAfdBias)
+    }
+
+    private fun meanSteeringBias(afdValue: Double): Double {
+        val model = ThermotaxisModel(
+            states = DoubleArray(5),
+            biases = doubleArrayOf(0.261331049344628, -9.94979936474547, -11.8836526406511, -0.243075226129511, 4.21550001866696)
+        )
+        return (1..1_000)
+            .map { model.step(temperature = 17.0, activityOverrides = afdOverride(afdValue)).curvature }
+            .drop(200)
+            .average()
+            .let(::abs)
+    }
+
+    private fun afdOverride(value: Double) = MutableList<Double?>(7) { null }.apply { this[0] = value }
+}
+
+internal data class ThermotaxisAfdValidationResult(
+    val lowAfdSteeringBias: Double,
+    val highAfdSteeringBias: Double
+) {
+    val passes: Boolean get() = highAfdSteeringBias < lowAfdSteeringBias
+
+    fun summary(): String = """
+        AFD steering-response validation
+
+        Steering bias at low fixed AFD: ${"%.4f".format(lowAfdSteeringBias)} rad/s
+        Steering bias at high fixed AFD: ${"%.4f".format(highAfdSteeringBias)} rad/s
+        Result: ${if (passes) "PASS — higher AFD activity produces a straighter path." else "FAIL — higher AFD activity did not reduce steering bias."}
+
+        This reproduces Figure 6's circuit-level result in the fitted model. It does not reproduce the paper's full population migration assay, which also used empirical turning behavior.
+    """.trimIndent()
+}
+
+internal class ThermotaxisEnsemblePanel(private val result: ThermotaxisEnsembleResult) : JPanel() {
+
+    init {
+        preferredSize = java.awt.Dimension(660, 480)
+        background = Color.WHITE
+    }
+
+    override fun paintComponent(graphics: java.awt.Graphics) {
+        super.paintComponent(graphics)
+        val g = graphics.create() as Graphics2D
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        val plateX = 45.0
+        val plateY = 55.0
+        val plateWidth = width - 90.0
+        val plateHeight = height - 145.0
+        val toScreenX = { x: Double -> plateX + x / 136.0 * plateWidth }
+        val toScreenY = { y: Double -> plateY + y / 96.0 * plateHeight }
+        try {
+            repeat(20) { index ->
+                val fraction = index / 19.0f
+                g.color = Color(0.05f + 0.9f * fraction, 0.2f, 0.95f - 0.9f * fraction)
+                val left = plateX + index * plateWidth / 20.0
+                g.fillRect(left.toInt(), plateY.toInt(), (plateWidth / 20.0).toInt() + 1, plateHeight.toInt())
+            }
+            g.color = Color(255, 255, 255, 150)
+            g.fillRect((plateX + plateWidth / 2.0 - 1).toInt(), plateY.toInt(), 2, plateHeight.toInt())
+            g.color = Color.BLACK
+            g.stroke = BasicStroke(1.1f)
+            result.paths.forEach { path ->
+                path.points.zipWithNext().forEachIndexed { index, (from, to) ->
+                    val progress = (index + 1).toFloat() / (path.points.size - 1).coerceAtLeast(1)
+                    g.composite = AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.06f + 0.52f * progress)
+                    g.draw(Line2D.Double(toScreenX(from.x), toScreenY(from.y), toScreenX(to.x), toScreenY(to.y)))
+                }
+                val endpoint = path.points.last()
+                g.composite = AlphaComposite.SrcOver
+                g.color = Color.WHITE
+                g.fillOval((toScreenX(endpoint.x) - 3).toInt(), (toScreenY(endpoint.y) - 3).toInt(), 6, 6)
+                g.color = Color.BLACK
+                g.fillOval((toScreenX(endpoint.x) - 2).toInt(), (toScreenY(endpoint.y) - 2).toInt(), 4, 4)
+            }
+            g.composite = AlphaComposite.SrcOver
+            g.color = Color.WHITE
+            g.fillOval((toScreenX(68.0) - 4).toInt(), (toScreenY(48.0) - 4).toInt(), 8, 8)
+            g.color = Color.DARK_GRAY
+            g.drawOval((toScreenX(68.0) - 4).toInt(), (toScreenY(48.0) - 4).toInt(), 8, 8)
+            g.drawString("14°C", plateX.toInt(), (plateY - 10).toInt())
+            g.drawString("20°C", (plateX + plateWidth - 30).toInt(), (plateY - 10).toInt())
+            g.drawString("Shared start", (toScreenX(68.0) + 7).toInt(), (toScreenY(48.0) - 7).toInt())
+            g.color = Color.BLACK
+            g.drawString("${result.trajectories} steering-only trajectories, ${"%.0f".format(result.durationSeconds)} s each", 45, height - 76)
+            g.drawString("Mean final x: ${"%.2f".format(result.meanEndpointX)}; warm half: ${"%.1f".format(result.warmSideFraction * 100)}%", 45, height - 52)
+            g.color = Color.DARK_GRAY
+            g.drawString("This steering-only field has no directed migration prediction without the paper's turning policy.", 45, height - 28)
+            g.drawString("Faint-to-dark trails run from start to end; black dots mark final positions.", 45, height - 8)
+        } finally {
+            g.dispose()
+        }
+    }
+}

@@ -61,6 +61,13 @@ class NematodeThermotaxisTest {
         )
     }
 
+    @Test
+    fun `higher AFD activity reduces long-timescale steering bias`() {
+        val result = ThermotaxisAfdValidation.run()
+
+        assertTrue(result.passes, result.summary())
+    }
+
     private fun averageCurvature(afdValue: Double): Double = curvatureSamples(afdValue).average()
 
     private fun curvatureSamples(afdValue: Double): List<Double> {

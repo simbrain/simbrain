@@ -428,7 +428,10 @@ class CompositorNode(
                 it.strokePaint = if (badgeGlowing) palette.sourceHandle else palette.connectionLine
                 it.stroke = BasicStroke(if (badgeGlowing) 2.5f else 1f)
             }
-            liveMarker.paint = palette.sourceHandle
+            // Two cursor meanings, two colors: the row in flight on history tiles wears the
+            // accent; the write frontier on the caches wears the cross-time memory color.
+            liveMarker.paint = if (tile.accumulatesHistory) palette.sourceHandle
+                else blend(palette.coolNode, palette.connectionLine, 0.5)
             liveMarker.strokePaint = null
         }
 

@@ -498,7 +498,7 @@ class Lfm2StackCompositorTest {
         val weightsBefore = shade(weights)
         val cacheBefore = shade(kCache)
 
-        scene.liveView = true
+        scene.historyView = HistoryView.GHOSTED
         val live = shade(resid)
         assertEquals(history[2], live[2], "the live row keeps full strength")
         assertNotEquals(history[0], live[0], "past rows drop to ghost strength")
@@ -506,7 +506,7 @@ class Lfm2StackCompositorTest {
         assertArrayEquals(weightsBefore, shade(weights), "weights are resident state, never ghosted")
         assertArrayEquals(cacheBefore, shade(kCache), "the KV caches are the model's real memory")
 
-        scene.liveView = false
+        scene.historyView = HistoryView.FULL
         assertArrayEquals(history, shade(resid), "toggling back restores the recording losslessly")
     }
 
@@ -514,7 +514,7 @@ class Lfm2StackCompositorTest {
     fun `advancing the live row in live view reshades the outgoing row as ghost`() {
         val port = TensorPort("unit", FloatTensor(1, 4))
         val tile = VectorHistoryTile(port, rows = 8, title = "unit")
-        tile.liveView = true
+        tile.historyView = HistoryView.GHOSTED
         fun publishRow(token: Int) {
             for (i in 0 until 4) port.tensor.data.put(i, 0.5f)
             port.tensor.markMutated()
@@ -527,5 +527,71 @@ class Lfm2StackCompositorTest {
         publishRow(2)
         assertEquals(1..2, tile.consumeDirtyRows(),
             "the outgoing live row's band must reshade to ghost strength alongside the new row")
+    }
+
+    @Test
+    fun `no-history mode keeps only the live row and the depth strip keeps recording`() {
+        val model = syntheticModel()
+        val scene = Lfm2StackCompositor.buildScene(model)
+        repeat(2) { model.forwardToken(it + 1); scene.publish(it) }
+        scene.historyView = HistoryView.OFF
+        repeat(2) { model.forwardToken(it + 3); scene.publish(it + 2) }
+
+        val bx = scene.tile("block.conv.bx")
+        assertTrue((0 until bx.cols).any { bx.valueAt(3, it) != 0f }, "the live row still shows")
+        for (row in 0..2) {
+            assertTrue((0 until bx.cols).all { bx.valueAt(row, it) == 0f }, "row $row was dropped")
+        }
+        val strip = scene.tile("layers.0.resid")
+        for (row in 0..3) {
+            assertTrue((0 until strip.cols).any { strip.valueAt(row, it) != 0f },
+                "the strip keeps recording row $row as the replay source")
+        }
+    }
+
+    @Test
+    fun `flips with history off just reseed the live row`() {
+        val model = syntheticModel()
+        val scene = Lfm2StackCompositor.buildScene(model)
+        scene.historyView = HistoryView.OFF
+        repeat(3) { model.forwardToken(it + 1); scene.publish(it) }
+
+        val bx = scene.tile("block.conv.bx") as VectorHistoryTile
+        scene.layerSelector!!.invoke(1)
+        val port = model.plan.port("layers.1.conv.bx").tensor
+        for (i in 0 until bx.cols) {
+            assertEquals(port.data.get(i), bx.valueAt(2, i),
+                "the flip reseeds the live row from the new layer's port")
+        }
+        assertTrue((0 until bx.cols).all { bx.valueAt(0, it) == 0f }, "no history came along")
+        assertFalse(bx.hasHistoryFor(0), "nothing is stashed while history is off")
+    }
+
+    @Test
+    fun `leaving no-history mode replays everything that was dropped`() {
+        val model = syntheticModel()
+        val control = Lfm2StackCompositor.buildScene(model)
+        val scene = Lfm2StackCompositor.buildScene(model)
+        control.layerSelector!!.invoke(2)
+        scene.layerSelector!!.invoke(2)
+        scene.historyView = HistoryView.OFF
+        repeat(4) {
+            model.forwardToken(it + 1)
+            control.publish(it)
+            scene.publish(it)
+        }
+
+        val resid = scene.tile("block.resid")
+        assertTrue((0 until resid.cols).all { resid.valueAt(1, it) == 0f }, "past rows drop while off")
+
+        scene.historyView = HistoryView.FULL
+        for (id in listOf("block.in", "block.resid", "block.mixer_resid", "block.attn.q",
+            "block.attn.weights", "block.attn.context", "block.attn.out", "block.mlp.gate",
+            "block.mlp.up", "block.mlp.act", "block.mlp.out", "block.conv.bx",
+            "rope.cos", "rope.sin")) {
+            assertTrue(control.tile(id).values.any { it != 0f }, "$id recorded something to compare")
+            assertTrue(control.tile(id).values.contentEquals(scene.tile(id).values),
+                "$id must be re-derived bit-exactly when history returns")
+        }
     }
 }

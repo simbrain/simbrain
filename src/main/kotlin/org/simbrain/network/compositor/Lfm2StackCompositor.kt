@@ -281,6 +281,8 @@ object Lfm2StackCompositor {
                 y = blockTop + i * (STRIP_ROW_HEIGHT + STRIP_ROW_GAP)
                 width = STRIP_WIDTH
                 height = STRIP_ROW_HEIGHT
+                // The strip is the replay source, so it keeps recording in every view mode.
+                alwaysRecords = true
             }.also { scene.addTile(it) }
         }
         scene.lens = LogitLens(
@@ -341,7 +343,7 @@ object Lfm2StackCompositor {
             "act" to config.intermediateSize, "out" to config.hiddenSize)
             .map { (name, cols) -> scratch("backfill.mlp.$name", cols) }
 
-        fun replayBlock(layer: Int) {
+        fun replayBlock(layer: Int, includeSpine: Boolean = true) {
             val attn = layer in config.attentionLayers
             val w = "model.layers.$layer"
             val (bcx, bx, convRaw, gated, convOut) = convScratches
@@ -386,8 +388,10 @@ object Lfm2StackCompositor {
                 } else {
                     addAll(convLimbTiles.zip(convScratches))
                 }
-                add(mixerTile to mixerScratch)
-                addAll(mlpLimbTiles.zip(mlpScratches))
+                if (includeSpine) {
+                    add(mixerTile to mixerScratch)
+                    addAll(mlpLimbTiles.zip(mlpScratches))
+                }
             }
             convCacheScratch.tensor.fill(0f)
             val strip = stripTiles[layer]
@@ -410,11 +414,13 @@ object Lfm2StackCompositor {
             val layer = raw.mod(config.numLayers)
             scene.selectedLayer = layer
             val attnActive = layer in config.attentionLayers
+            // With history off there is nothing to backfill: flips just reseed the live row.
+            val noHistory = scene.historyView == HistoryView.OFF
             val limbHasHistory = if (attnActive) weightsTile.hasHistoryFor(layer)
                 else convLimbTiles.first().hasHistoryFor(layer)
-            val replay = !limbHasHistory || !mlpLimbTiles.first().hasHistoryFor(layer)
-            val copyBlockIn = !blockInTile.hasHistoryFor(layer)
-            val copyBlockOut = !blockOutTile.hasHistoryFor(layer)
+            val replay = !noHistory && (!limbHasHistory || !mlpLimbTiles.first().hasHistoryFor(layer))
+            val copyBlockIn = !noHistory && !blockInTile.hasHistoryFor(layer)
+            val copyBlockOut = !noHistory && !blockOutTile.hasHistoryFor(layer)
             fun inactive(key: String) = (convSide(key) && attnActive) || (attnSide(key) && !attnActive)
             for (tile in scene.tiles) {
                 (tile as? LayerStacked)?.takeIf { it.stackLayers.isNotEmpty() }?.showLayer(layer)
@@ -429,6 +435,26 @@ object Lfm2StackCompositor {
             if (copyBlockIn) backfillFromStrip(blockInTile, stripTiles[layer])
             if (copyBlockOut) backfillFromStrip(blockOutTile, stripTiles[layer + 1])
             scene.highlightedTiles = setOf(stripTiles[layer], stripTiles[layer + 1])
+        }
+
+        // Leaving no-history mode: everything dropped is re-derived — the shown block (and the
+        // dimmed limb's shown layer), the spine checkpoints, and the rope angle tables.
+        val ropeTiles = listOf(scene.tile("rope.cos"), scene.tile("rope.sin")).map { it as VectorHistoryTile }
+        scene.rebuildHistory = {
+            val layer = scene.selectedLayer
+            replayBlock(layer)
+            val dimmedLayer = if (layer in config.attentionLayers) convLimbTiles.first().shownLayer
+                else qTile.shownLayer
+            if (dimmedLayer >= 0) replayBlock(dimmedLayer, includeSpine = false)
+            backfillFromStrip(blockInTile, stripTiles[layer])
+            backfillFromStrip(blockOutTile, stripTiles[layer + 1])
+            val ropeOp = RopeAnglesOp("backfill.rope_angles", ropeCosScratch, ropeSinScratch, invFreq, backfillState)
+            for (t in 0 until minOf(model.position, window)) {
+                backfillState.position = t
+                ropeOp.forward()
+                ropeTiles[0].backfillRow(t, ropeCosScratch.tensor)
+                ropeTiles[1].backfillRow(t, ropeSinScratch.tensor)
+            }
         }
         scene.layerSelector?.invoke(0)
         return scene

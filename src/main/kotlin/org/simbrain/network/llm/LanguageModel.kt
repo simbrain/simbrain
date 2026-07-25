@@ -2,6 +2,7 @@ package org.simbrain.network.llm
 
 import org.simbrain.network.compositor.AttentionTile
 import org.simbrain.network.compositor.CompositorScene
+import org.simbrain.network.compositor.HistoryView
 import org.simbrain.network.compositor.Lfm2StackCompositor
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
@@ -152,11 +153,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
             loaded?.scene?.lens?.enabled = value
         }
 
-    /** Live view ghosts recorded token history, showing only what is resident in the model. */
-    var liveView: Boolean = false
+    /** How the scene treats token history: recorded, ghosted to the live row, or not kept. */
+    var historyView: HistoryView = HistoryView.FULL
         set(value) {
             field = value
-            loaded?.scene?.liveView = value
+            loaded?.scene?.historyView = value
         }
 
     /** Saved tile positions by tile id, applied to the scene on load. */
@@ -226,7 +227,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         }
         (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
             ?.selectedHead = selectedHead
-        scene.liveView = liveView
+        scene.historyView = historyView
         scene.lens?.apply {
             enabled = lensEnabled
             async = true
@@ -495,6 +496,9 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
 
     fun readResolve(): Any {
         events = LanguageModelEvents()
+        // Saves from before the field existed deserialize it to null despite the non-null type.
+        @Suppress("SENSELESS_COMPARISON")
+        if (historyView == null) historyView = HistoryView.FULL
         return this
     }
 

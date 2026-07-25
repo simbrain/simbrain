@@ -18,6 +18,16 @@ const val HISTORY_STASH = 3
 const val HISTORY_GHOST = 0.15f
 
 /**
+ * How the scene treats recorded token history. [FULL] shows the recording at full strength.
+ * [GHOSTED] dims history rows to [HISTORY_GHOST], leaving only the live row and resident state
+ * bright — recording continues underneath, so toggling back is lossless. [OFF] keeps no history
+ * at all: past rows are dropped as the live row advances, flips carry nothing to restore or
+ * stash, and leaving the mode re-derives history by replaying from the depth strip, which keeps
+ * recording in every mode as the replay source.
+ */
+enum class HistoryView { FULL, GHOSTED, OFF }
+
+/**
  * A tile whose data source flips across model layers — the card stack behind a structure-first
  * view where one block anatomy is shown once and the layer dimension collapses into decks.
  * [stackLayers] holds the model layer index behind each stack entry (empty for unstacked tiles);
@@ -99,21 +109,35 @@ abstract class TensorTile(
 
     /**
      * True when this tile's rows are a scene-side recording of past tokens rather than model
-     * state — the port only ever holds the current token's value. Live view ghosts these rows.
+     * state — the port only ever holds the current token's value. [historyView] governs how
+     * (and whether) these rows are kept and shown.
      */
     open val accumulatesHistory = false
 
     /**
-     * Live view: history rows shade at [HISTORY_GHOST] strength, leaving the live row — the one
-     * row actually resident in the model's ports — at full strength. Tiles mirroring real state
-     * (weights, caches, full-pass tensors) are unaffected. Display-only: recording continues.
+     * True for recording tiles that keep full history in every view mode — the depth strip,
+     * whose checkpoints are the source the scene replays block history from. Rendered ghosted
+     * in [HistoryView.OFF] instead of dropping rows.
      */
-    var liveView = false
+    var alwaysRecords = false
+
+    /**
+     * How this tile's recorded history renders — see [HistoryView]. Tiles mirroring real state
+     * (weights, caches, full-pass tensors) are unaffected.
+     */
+    var historyView = HistoryView.FULL
         set(value) {
             if (field == value) return
             field = value
-            if (accumulatesHistory) touch()
+            if (accumulatesHistory) {
+                if (value == HistoryView.OFF && !alwaysRecords) retainOnlyLiveRow()
+                touch()
+            }
         }
+
+    /** True when this tile drops past rows instead of recording them. */
+    protected val dropsHistory get() =
+        accumulatesHistory && !alwaysRecords && historyView == HistoryView.OFF
 
     /**
      * The row holding the current token's just-published value, or -1 when rows aren't a token
@@ -123,10 +147,32 @@ abstract class TensorTile(
      */
     var liveRow = -1
         protected set(value) {
-            // In live view the outgoing row drops to ghost strength, so its band must reshade.
-            if (field != value && field >= 0 && liveView && accumulatesHistory) touchRow(field)
+            if (field != value && field >= 0 && accumulatesHistory && !alwaysRecords) {
+                when (historyView) {
+                    HistoryView.FULL -> {}
+                    // In live view the outgoing row drops to ghost strength, so it must reshade.
+                    HistoryView.GHOSTED -> touchRow(field)
+                    HistoryView.OFF -> {
+                        clearRow(field)
+                        touchRow(field)
+                    }
+                }
+            }
             field = value
         }
+
+    /** Zeroes one outgoing row when history is off; subclasses clear parallel buffers too. */
+    protected open fun clearRow(row: Int) {
+        values.fill(0f, row * cols, (row + 1) * cols)
+    }
+
+    /** Drops recorded history to just the live row — entering [HistoryView.OFF]. */
+    @Synchronized
+    protected open fun retainOnlyLiveRow() {
+        for (r in 0 until rows) {
+            if (r != liveRow) values.fill(0f, r * cols, (r + 1) * cols)
+        }
+    }
 
     /** Published data, row-major [rows] x [cols]. Read for tooltips and probes; written by [publish]. */
     val values = FloatArray(rows * cols)
@@ -214,7 +260,10 @@ abstract class TensorTile(
     ) {
         val scale = if (signedNorm) (if (absMax > 0f) 1f / absMax else 0f) else 1f
         val meanPool = kind == TileKind.WEIGHT
-        val ghosting = liveView && accumulatesHistory
+        // With history off, non-strip tiles hold only the live row, so nothing needs dimming;
+        // the always-recording depth strip ghosts instead so resident state alone reads bright.
+        val ghosting = accumulatesHistory && (historyView == HistoryView.GHOSTED ||
+            (historyView == HistoryView.OFF && alwaysRecords))
         val rowSpan = rowTo - rowFrom
         val colSpan = colTo - colFrom
         for (y in 0 until destH) {
@@ -325,16 +374,42 @@ class VectorHistoryTile(
         val index = stackLayers.indexOf(layer)
         if (index < 0) return false
         if (index != selected) {
-            // Restore before stashing, so the incoming layer is never the eviction victim.
-            val restored = stash.remove(index)
-            if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
-            stash[selected] = values.copyOf()
-            selected = index
-            if (restored != null) System.arraycopy(restored, 0, values, 0, values.size)
-            else values.fill(0f)
+            if (dropsHistory) {
+                // Nothing to stash or restore: reseed the live row from the new layer's port.
+                selected = index
+                values.fill(0f)
+                reseedLiveRow()
+            } else {
+                // Restore before stashing, so the incoming layer is never the eviction victim.
+                val restored = stash.remove(index)
+                if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
+                stash[selected] = values.copyOf()
+                selected = index
+                if (restored != null) System.arraycopy(restored, 0, values, 0, values.size)
+                else values.fill(0f)
+            }
             touch()
         }
         return true
+    }
+
+    private fun reseedLiveRow() {
+        if (liveRow !in 0 until rows) return
+        val tensor = ports[selected].tensor
+        lastVersions[selected] = tensor.version
+        val base = liveRow * cols
+        for (i in 0 until cols) {
+            val v = tensor.data.get(i)
+            values[base + i] = v
+            magnitudes[i] = abs(v)
+        }
+        growScaleFromMagnitudes()
+    }
+
+    @Synchronized
+    override fun retainOnlyLiveRow() {
+        super.retainOnlyLiveRow()
+        stash.clear()
     }
 
     /** True when [layer]'s history is already in memory — shown or stashed. */
@@ -711,17 +786,47 @@ class AttentionTile(
         val index = stackLayers.indexOf(layer)
         if (index < 0) return false
         if (index != selected) {
-            // Restore before stashing, so the incoming layer is never the eviction victim.
-            val restored = stash.remove(index)
-            if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
-            stash[selected] = history.copyOf()
-            selected = index
-            if (restored != null) System.arraycopy(restored, 0, history, 0, history.size)
-            else history.fill(0f)
-            lastVersion = -1L
-            rebuildFromHistory()
+            if (dropsHistory) {
+                // Nothing to stash or restore: reseed the live row from the new layer's port.
+                selected = index
+                history.fill(0f)
+                lastVersion = -1L
+                if (liveRow in 0 until rows) {
+                    lastVersion = ports[selected].tensor.version
+                    record(liveRow, ports[selected].tensor)
+                }
+                rebuildFromHistory()
+            } else {
+                // Restore before stashing, so the incoming layer is never the eviction victim.
+                val restored = stash.remove(index)
+                if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
+                stash[selected] = history.copyOf()
+                selected = index
+                if (restored != null) System.arraycopy(restored, 0, history, 0, history.size)
+                else history.fill(0f)
+                lastVersion = -1L
+                rebuildFromHistory()
+            }
         }
         return true
+    }
+
+    override fun clearRow(row: Int) {
+        super.clearRow(row)
+        for (head in 0 until numHeads) {
+            history.fill(0f, (head * rows + row) * cols, (head * rows + row + 1) * cols)
+        }
+    }
+
+    @Synchronized
+    override fun retainOnlyLiveRow() {
+        super.retainOnlyLiveRow()
+        stash.clear()
+        for (head in 0 until numHeads) {
+            for (r in 0 until rows) {
+                if (r != liveRow) history.fill(0f, (head * rows + r) * cols, (head * rows + r + 1) * cols)
+            }
+        }
     }
 
     /** True when [layer]'s head histories are already in memory — shown or stashed. */

@@ -6,6 +6,7 @@ import org.piccolo2d.PCamera
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
+import org.simbrain.network.compositor.HistoryView
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.llm.LanguageModel
@@ -212,13 +213,23 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 add(JCheckBoxMenuItem("Logit lens", languageModel.lensEnabled).apply {
                     addActionListener { languageModel.lensEnabled = isSelected }
                 })
-                add(JCheckBoxMenuItem("Show token history", !languageModel.liveView).apply {
-                    toolTipText = "Unchecked, past tokens ghost out: only the current token's " +
-                        "activations and the caches are actually in the model"
-                    addActionListener {
-                        languageModel.liveView = !isSelected
-                        compositorNode?.refreshDirtyTiles()
-                    }
+                add(JMenu("Token history").apply {
+                    fun item(label: String, mode: HistoryView, tip: String) =
+                        JRadioButtonMenuItem(label, languageModel.historyView == mode).apply {
+                            toolTipText = tip
+                            addActionListener {
+                                languageModel.historyView = mode
+                                compositorNode?.refreshDirtyTiles()
+                            }
+                        }
+                    add(item("Show", HistoryView.FULL,
+                        "Record every token's activations and show the full history"))
+                    add(item("Ghost", HistoryView.GHOSTED,
+                        "Past tokens ghost out: only the current token's activations and the " +
+                            "caches are actually in the model"))
+                    add(item("Off", HistoryView.OFF,
+                        "Keep no token history: tiles show just the current token and layer " +
+                            "flips are instant; switching back re-derives the history"))
                 })
             } else {
                 addSeparator()

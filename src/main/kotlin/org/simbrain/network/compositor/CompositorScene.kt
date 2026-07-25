@@ -222,20 +222,24 @@ class CompositorScene(val graph: PlanGraph? = null) {
     val selection = InteriorSelectionModel()
 
     /**
-     * Ghosts every history-accumulating tile down to its live row — the one row actually
-     * resident in the model's ports — leaving true state (weights, caches, full-pass tensors)
-     * at full strength. Display-only: history keeps recording, so toggling back is lossless.
+     * How token history renders across the scene — see [HistoryView]. Leaving
+     * [HistoryView.OFF] re-derives the dropped history through [rebuildHistory].
      */
-    var liveView = false
+    var historyView = HistoryView.FULL
         set(value) {
             if (field == value) return
+            val droppedHistory = field == HistoryView.OFF
             field = value
-            for (tile in _tiles) tile.liveView = value
+            for (tile in _tiles) tile.historyView = value
+            if (droppedHistory) rebuildHistory?.invoke()
         }
+
+    /** Scene-builder hook replaying the shown layers' history after [HistoryView.OFF] ends. */
+    var rebuildHistory: (() -> Unit)? = null
 
     fun addTile(tile: TensorTile) {
         require(_tiles.none { it.id == tile.id }) { "Duplicate tile id ${tile.id}" }
-        tile.liveView = liveView
+        tile.historyView = historyView
         _tiles.add(tile)
     }
 

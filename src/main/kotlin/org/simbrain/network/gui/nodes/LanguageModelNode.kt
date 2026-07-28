@@ -9,6 +9,7 @@ import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.HistoryView
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
@@ -28,6 +29,7 @@ import org.simbrain.workspace.WorkspacePreferences
 import java.awt.geom.Point2D
 import java.beans.PropertyChangeListener
 import java.nio.file.Path
+import javax.swing.ButtonGroup
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JMenu
 import javax.swing.JOptionPane
@@ -181,7 +183,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     }
 
     override val propertyDialog: StandardDialog
-        get() = languageModel.createEditorDialog("Language Model Settings")
+        get() = languageModel.createEditorDialog("Edit ${languageModel.displayName}")
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -194,8 +196,8 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             add(createAction("Rename...") {
                 showInputDialog("Name:", languageModel.label)?.let { languageModel.label = it }
             })
+            add(createAction("Edit ${languageModel.displayName}...") { propertyDialog.display() })
             addSeparator()
-            add(createAction("Generation settings...") { propertyDialog.display() })
             val state = languageModel.loaded
             if (state != null) {
                 add(createAction("Clear context window") {
@@ -204,8 +206,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 })
                 addSeparator()
                 add(JMenu("Attention head").apply {
+                    val group = ButtonGroup()
                     (0 until state.model.config.numHeads).forEach { head ->
                         add(JRadioButtonMenuItem("Head $head", head == languageModel.selectedHead).apply {
+                            group.add(this)
                             addActionListener {
                                 languageModel.selectedHead = head
                                 compositorNode?.refreshDirtyTiles()
@@ -217,8 +221,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     addActionListener { languageModel.lensEnabled = isSelected }
                 })
                 add(JMenu("Token history").apply {
+                    val group = ButtonGroup()
                     fun item(label: String, mode: HistoryView, tip: String) =
                         JRadioButtonMenuItem(label, languageModel.historyView == mode).apply {
+                            group.add(this)
                             toolTipText = tip
                             addActionListener {
                                 languageModel.historyView = mode
@@ -235,8 +241,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                             "flips are instant; switching back re-derives the history"))
                 })
                 add(JMenu("Inactive limb").apply {
+                    val group = ButtonGroup()
                     fun item(label: String, hide: Boolean, tip: String) =
                         JRadioButtonMenuItem(label, languageModel.hideInactiveLimb == hide).apply {
+                            group.add(this)
                             toolTipText = tip
                             addActionListener {
                                 languageModel.hideInactiveLimb = hide
@@ -249,10 +257,11 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         "Show only the selected layer's anatomy; the unused limb disappears"))
                 })
             } else {
-                addSeparator()
                 add(createAction("Locate weights...") { locateWeights() })
                 add(createAction("Download weights (${Lfm2Weights.MODEL_NAME})...") { downloadWeights() })
             }
+            addSeparator()
+            add(networkPanel.networkComponent.createCouplingMenu(languageModel))
         }
 
     private fun locateWeights() {

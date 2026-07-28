@@ -3,11 +3,13 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
+import org.piccolo2d.PCamera
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.llm.TeachingTransformerModel
@@ -21,11 +23,15 @@ import org.simbrain.util.roundToString
 import org.simbrain.util.showInputDialog
 import org.simbrain.util.swingDispatcher
 import java.awt.geom.Point2D
+import java.beans.PropertyChangeListener
+import javax.swing.ButtonGroup
 import javax.swing.JButton
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JLabel
+import javax.swing.JMenu
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
+import javax.swing.JRadioButtonMenuItem
 
 /**
  * Canvas node for a [TeachingTransformer]: an interaction box, the compositor spine interior,
@@ -46,12 +52,17 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
 
     private var compositorNode: CompositorNode? = null
 
-    private var gradientView = false
+    /**
+     * The status line rides the interaction box's zoom counter-scale: both stay readable at
+     * overview zoom, and the status keeps clear of the box's enlarged footprint.
+     */
+    private val statusZoomListener = PropertyChangeListener { placeStatusText() }
 
     init {
         addChild(interactionBox)
         addChild(statusText)
         interactionBox.setText(teachingTransformer.displayName)
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, statusZoomListener)
 
         val events = teachingTransformer.events
         events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(teachingTransformer.displayName) }
@@ -90,21 +101,35 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             it.onLayoutChanged = { teachingTransformer.captureViewState() }
             addChild(it)
         }
+        // The interior's background can grow over the header as tiles move; keep the
+        // interaction box and status line painting (and picking) above it.
+        statusText.raiseToTop()
+        interactionBox.raiseToTop()
         placeChildren()
         refreshView()
     }
 
+    /**
+     * The header anchors at the node origin; the interior starts below the header line at its
+     * largest zoom counter-scale, so it never slides under the box or status as the camera
+     * zooms out.
+     */
     private fun placeChildren() {
         interactionBox.setOffset(0.0, 0.0)
-        val top = interactionBox.fullBoundsReference.height + 6.0
-        val interior = compositorNode
-        if (interior != null) {
+        placeStatusText()
+        val reserve = interactionBox.height * InteractionBox.zoomRescale(0.0) + 12.0
+        compositorNode?.let { interior ->
             val bounds = interior.fullBoundsReference
-            interior.offset(-bounds.x, top - bounds.y)
-            statusText.setOffset(0.0, top + interior.fullBoundsReference.height + 8.0)
-        } else {
-            statusText.setOffset(0.0, top)
+            interior.offset(-bounds.x, reserve - bounds.y)
         }
+    }
+
+    /** One header line: the status rides beside the box at the box's zoom counter-scale. */
+    private fun placeStatusText() {
+        val rescale = InteractionBox.zoomRescale(networkPanel.canvas.camera.viewScale)
+        statusText.scale = rescale
+        val box = interactionBox.fullBoundsReference
+        statusText.setOffset(box.width + 8.0 * rescale, (box.height - statusText.height * rescale) / 2)
     }
 
     private fun refreshView() {
@@ -147,7 +172,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
     }
 
     override val propertyDialog: StandardDialog
-        get() = teachingTransformer.createEditorDialog("Teaching Transformer Settings")
+        get() = teachingTransformer.createEditorDialog("Edit ${teachingTransformer.displayName}")
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -160,9 +185,8 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             add(createAction("Rename...") {
                 showInputDialog("Name:", teachingTransformer.label)?.let { teachingTransformer.label = it }
             })
-            addSeparator()
+            add(createAction("Edit ${teachingTransformer.displayName}...") { propertyDialog.display() })
             add(createAction("Train...") { trainingDialog().display() })
-            add(createAction("Settings...") { propertyDialog.display() })
             addSeparator()
             add(createAction("Step forward pass one op") {
                 teachingTransformer.stepInferenceOp()
@@ -176,13 +200,23 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 while (model.plan.cursor != 0) teachingTransformer.stepInferenceOp()
             })
             addSeparator()
-            add(createAction("Clear context") { teachingTransformer.clearWindow() })
+            add(createAction("Clear context window") { teachingTransformer.clearWindow() })
             addSeparator()
-            add(JCheckBoxMenuItem("Gradient view", gradientView).apply {
+            add(JMenu("Attention head").apply {
+                val group = ButtonGroup()
+                (0 until teachingTransformer.config.numHeads).forEach { head ->
+                    add(JRadioButtonMenuItem("Head $head", head == teachingTransformer.selectedHead).apply {
+                        group.add(this)
+                        addActionListener {
+                            teachingTransformer.selectedHead = head
+                            refreshView()
+                        }
+                    })
+                }
+            })
+            add(JCheckBoxMenuItem("Gradient view", teachingTransformer.gradientView).apply {
                 addActionListener {
-                    gradientView = isSelected
-                    teachingTransformer.scene.setGradientView(isSelected)
-                    teachingTransformer.scene.publish()
+                    teachingTransformer.gradientView = isSelected
                     refreshView()
                 }
             })
@@ -192,6 +226,8 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                     refreshView()
                 }
             })
+            addSeparator()
+            add(networkPanel.networkComponent.createCouplingMenu(teachingTransformer))
         }
 
     private fun trainingDialog(): StandardDialog {

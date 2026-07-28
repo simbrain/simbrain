@@ -78,6 +78,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         label = "System prompt",
         description = "Optional system message ahead of the user message; chat mode only",
         order = 3,
+        onUpdate = { enableWidget(widgetValue(LanguageModel::promptMode) == PromptMode.CHAT) },
     )
 
     var tokensToGenerate by GuiEditable(
@@ -129,6 +130,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         description = "Advertise the built-in offline demo tools (current time, canned weather) " +
             "in chat mode and answer the model's calls to them",
         order = 9,
+        onUpdate = { enableWidget(widgetValue(LanguageModel::promptMode) == PromptMode.CHAT) },
     )
 
     /** Tools registered by simulations, advertised alongside the demo tools in chat mode. */

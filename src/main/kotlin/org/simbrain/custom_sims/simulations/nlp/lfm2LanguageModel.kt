@@ -31,6 +31,7 @@ class Lfm2LanguageModelOptions : EditableObject {
         label = "System prompt",
         description = "Optional system message opening the conversation; chat mode only",
         order = 30,
+        onUpdate = { enableWidget(widgetValue(Lfm2LanguageModelOptions::promptMode) == PromptMode.CHAT) },
     )
 
     var enableDemoTools by GuiEditable(
@@ -39,6 +40,7 @@ class Lfm2LanguageModelOptions : EditableObject {
         description = "Advertise the built-in offline demo tools (current time, canned weather) " +
             "in chat mode; ask about the weather to see a tool call happen",
         order = 40,
+        onUpdate = { enableWidget(widgetValue(Lfm2LanguageModelOptions::promptMode) == PromptMode.CHAT) },
     )
 
     var maxSequenceLength by GuiEditable(

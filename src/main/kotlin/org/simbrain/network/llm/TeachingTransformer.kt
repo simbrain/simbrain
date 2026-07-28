@@ -395,6 +395,14 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
             scene.lens?.enabled = value
         }
 
+    /** Swaps tiles with gradient buffers to their backward view; forward values otherwise. */
+    var gradientView: Boolean = false
+        set(value) {
+            field = value
+            scene.setGradientView(value)
+            scene.publish()
+        }
+
     var selectedHead: Int = 0
         set(value) {
             field = value
@@ -460,6 +468,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         }
         decks().forEach { it.selectedSlice = selectedHead.coerceIn(0, it.slices - 1) }
         scene.lens?.enabled = lensEnabled
+        scene.setGradientView(gradientView)
     }
 
     /** Copies the scene's current tile positions and deck slice into the serialized view state. */
@@ -493,6 +502,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         copy.diagramScale = diagramScale
         copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
         copy.lensEnabled = lensEnabled
+        copy.gradientView = gradientView
         copy.selectedHead = selectedHead
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.junctionLayout = junctionLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }

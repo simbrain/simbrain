@@ -26,6 +26,7 @@ class GenerativeModelCopyTest {
         transformer.samplingTemperature = 0.5
         transformer.samplingStrategy = SamplingStrategy.TopK(3)
         transformer.selectedHead = 2
+        transformer.gradientView = true
         transformer.label = "Trained twin"
         return transformer
     }
@@ -51,6 +52,7 @@ class GenerativeModelCopyTest {
         assertEquals(3, (copy.samplingStrategy as SamplingStrategy.TopK).k)
         assertNotSame(original.samplingStrategy, copy.samplingStrategy)
         assertEquals(original.selectedHead, copy.selectedHead)
+        assertTrue(copy.gradientView, "the gradient view setting rides the copy")
         assertEquals(original.label, copy.label)
     }
 

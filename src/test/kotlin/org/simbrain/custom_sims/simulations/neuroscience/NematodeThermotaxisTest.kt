@@ -68,6 +68,30 @@ class NematodeThermotaxisTest {
         assertTrue(result.passes, result.summary())
     }
 
+    @Test
+    fun `population simulation loads author tables and produces bounded worm paths`() {
+        val result = requireNotNull(ThermotaxisPopulationSimulation.run(worms = 3, seconds = 3, seed = 7))
+
+        assertEquals(3, result.paths.size)
+        assertTrue(result.paths.all { it.points.size == 4 })
+        assertTrue(result.paths.flatMap { it.points }.all { it.x in 0.0..136.0 && it.y in 0.0..96.0 })
+    }
+
+    @Test
+    fun `reversed gradient mirrors empirical turn headings`() {
+        val heading = 0.7
+        val seed = (1..10_000).first { candidate ->
+            ThermotaxisTurnPolicy.select(17.0, 0.0, heading, kotlin.random.Random(candidate)) != null
+        }
+        val forward = requireNotNull(ThermotaxisTurnPolicy.select(17.0, 0.0, heading, kotlin.random.Random(seed)))
+        val reversed = requireNotNull(ThermotaxisTurnPolicy.select(17.0, 0.0, Math.PI - heading, kotlin.random.Random(seed), -1.0))
+
+        assertEquals(forward.label, reversed.label)
+        assertEquals(forward.durationSeconds, reversed.durationSeconds, 1e-12)
+        assertEquals(forward.displacement, reversed.displacement, 1e-12)
+        assertEquals(Math.PI - forward.heading, reversed.heading, 1e-12)
+    }
+
     private fun averageCurvature(afdValue: Double): Double = curvatureSamples(afdValue).average()
 
     private fun curvatureSamples(afdValue: Double): List<Double> {

@@ -18,7 +18,9 @@ import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.showMessageDialog
+import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
@@ -28,8 +30,10 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.geom.Line2D
 import java.util.concurrent.atomic.AtomicBoolean
+import java.util.concurrent.atomic.AtomicReference
 import javax.swing.*
 import kotlin.math.*
+import kotlin.random.Random
 
 val nematodeThermotaxis = newSim { optionString ->
     workspace.clearWorkspace()
@@ -90,8 +94,6 @@ val nematodeThermotaxis = newSim { optionString ->
         isShowTrail = true
     }
 
-    val activityPlot = addTimeSeriesComponent("Motor and sensory activity", listOf("AFD", "DMN", "VMN"))
-
     val model = ThermotaxisModel(
         states = DoubleArray(5),
         biases = doubleArrayOf(
@@ -105,8 +107,22 @@ val nematodeThermotaxis = newSim { optionString ->
     if (optionString == "validate") {
         println(ThermotaxisAfdValidation.run().summary())
     }
+    if (optionString == "turn-assay") {
+        val result = requireNotNull(ThermotaxisPopulationSimulation.run(worms = 12, seconds = 120, seed = 2021))
+        println(
+            "Population simulation: ${result.trajectories} worms, ${result.durationSeconds.toInt()} s each; " +
+                "mean final x = ${"%.2f".format(result.meanEndpointX)}, warm half = ${"%.1f".format(result.warmSideFraction * 100)}%"
+        )
+    }
     var gradientDirection = 1.0
     var temperatureOffset = 0.0
+    var useEmpiricalTurns = true
+    var turnTime = 0.0
+    var remainingTurnSteps = 0
+    var turnStepX = 0.0
+    var turnStepY = 0.0
+    var turnRandom = Random(Random.nextInt())
+    val activeTurnLabel = AtomicReference<String?>(null)
     val circuitNeurons = listOf(afd, aib, aiy, aiz, dmn, vmn, cpg)
 
     fun connectionWeight(synapse: org.simbrain.network.core.Synapse) =
@@ -138,6 +154,10 @@ val nematodeThermotaxis = newSim { optionString ->
         worm.heading = heading
         worm.resetAnimation()
         listOf(afd, aib, aiy, aiz, dmn, vmn, cpg).forEach { it.activation = 0.0 }
+        turnTime = 0.0
+        remainingTurnSteps = 0
+        turnRandom = Random(Random.nextInt())
+        activeTurnLabel.set(null)
     }
 
     resetModel()
@@ -167,10 +187,37 @@ val nematodeThermotaxis = newSim { optionString ->
             vmn.activation = result.outputs[4]
             cpg.activation = result.cpgOutput
 
-            var heading = worm.heading * PI / 180.0 + result.curvature * network.timeStep
-            val stepDistance = 0.2 * network.timeStep * world.width / 136.0
-            var nextX = worm.x + stepDistance * cos(heading)
-            var nextY = worm.y - stepDistance * sin(heading)
+            var heading = worm.heading * PI / 180.0
+            val plateXPosition = 136.0 * worm.x / world.width
+            val turn = if (useEmpiricalTurns && remainingTurnSteps == 0) {
+                ThermotaxisTurnPolicy.select(temperature, turnTime, heading, turnRandom, gradientDirection)
+            } else {
+                null
+            }
+            if (turn != null) {
+                heading = turn.heading
+                val duration = turn.durationSeconds.coerceAtLeast(network.timeStep)
+                turnStepX = network.timeStep * turn.displacement * cos(heading) / duration * world.width / 136.0
+                turnStepY = -network.timeStep * turn.displacement * sin(heading) / duration * world.height / 96.0
+                remainingTurnSteps = (duration / network.timeStep).roundToInt()
+                activeTurnLabel.set(turn.label)
+            }
+            val isTurning = useEmpiricalTurns && remainingTurnSteps > 0
+            val stepDistance: Double
+            var nextX: Double
+            var nextY: Double
+            if (isTurning) {
+                nextX = worm.x + turnStepX
+                nextY = worm.y + turnStepY
+                stepDistance = hypot(turnStepX, turnStepY)
+                remainingTurnSteps--
+            } else {
+                activeTurnLabel.set(null)
+                heading += result.curvature * network.timeStep
+                stepDistance = 0.2 * network.timeStep * world.width / 136.0
+                nextX = worm.x + stepDistance * cos(heading)
+                nextY = worm.y - stepDistance * sin(heading)
+            }
             val edgeMargin = 12.0
             if (nextX < edgeMargin || nextX > world.width - edgeMargin) {
                 heading = PI - heading
@@ -183,22 +230,7 @@ val nematodeThermotaxis = newSim { optionString ->
             worm.heading = heading * 180.0 / PI
             worm.location = point(nextX, nextY)
             worm.recordTravelDistance(stepDistance)
-        }
-    }
-
-    val activityPlotCouplings = mutableListOf<org.simbrain.workspace.couplings.Coupling>()
-
-    fun setActivityPlotVisible(visible: Boolean) {
-        activityPlot.isGuiOn = visible
-        if (visible) {
-            with(couplingManager) {
-                activityPlotCouplings += afd couple activityPlot.model.timeSeriesList[0]
-                activityPlotCouplings += dmn couple activityPlot.model.timeSeriesList[1]
-                activityPlotCouplings += vmn couple activityPlot.model.timeSeriesList[2]
-            }
-        } else {
-            couplingManager.removeCouplings(activityPlotCouplings)
-            activityPlotCouplings.clear()
+            turnTime += network.timeStep
         }
     }
 
@@ -219,6 +251,16 @@ val nematodeThermotaxis = newSim { optionString ->
             val rightLabel = "${"%.1f".format(rightTemperature)}°C"
             graphics.drawString(leftLabel, 8, 20)
             graphics.drawString(rightLabel, (world.width - 40).toInt(), 20)
+            activeTurnLabel.get()?.let { turnLabel ->
+                val label = "TURN: $turnLabel"
+                val labelWidth = graphics.fontMetrics.stringWidth(label) + 16
+                val labelX = ((world.width - labelWidth) / 2).toInt()
+                val labelY = (world.height - 30).toInt()
+                graphics.color = Color(0, 0, 0, 170)
+                graphics.fillRoundRect(labelX, labelY, labelWidth, 22, 8, 8)
+                graphics.color = Color.WHITE
+                graphics.drawString(label, labelX + 8, labelY + 16)
+            }
         }
     }.apply {
         pickable = false
@@ -267,14 +309,19 @@ val nematodeThermotaxis = newSim { optionString ->
             addButton("Warm plate") { updateTemperatureOffset(0.5) }
             addButton("Cool plate") { updateTemperatureOffset(-0.5) }
             addCheckBox("Show trail", true) { showTrail -> worm.isShowTrail = showTrail }
-            addCheckBox("Show activity plot", false) { visible -> setActivityPlotVisible(visible) }
-            addButton("Show steering ensemble") {
+            addCheckBox("Use empirical turns", true) { enabled ->
+                useEmpiricalTurns = enabled
+                if (!enabled) remainingTurnSteps = 0
+            }
+            addButton("Run population simulation") {
                 val validationButton = this
-                val trajectories = 48
+                val options = ThermotaxisPopulationSimulationOptions().showAPEOptionDialog("Population Simulation Options") ?: return@addButton
+                val trajectories = options.worms
+                val seconds = options.seconds
                 val cancelRequested = AtomicBoolean(false)
                 val progressWindow = withContext(Dispatchers.Swing) {
                     validationButton.isEnabled = false
-                    ProgressWindow(trajectories, "Steering ensemble: 0 / $trajectories").apply progressWindow@{
+                    ProgressWindow(trajectories, "Population simulation: preparing $trajectories worms").apply progressWindow@{
                         defaultCloseOperation = WindowConstants.DISPOSE_ON_CLOSE
                         val cancelButton = JButton("Cancel").apply {
                             addActionListener {
@@ -298,17 +345,23 @@ val nematodeThermotaxis = newSim { optionString ->
                     }
                 }
                 try {
-                    val result = ThermotaxisEnsemble.run(
-                        trajectories = trajectories,
-                        onProgress = { completed, total ->
-                            SwingUtilities.invokeLater {
-                                progressWindow.value = completed
-                                progressWindow.text = "Steering ensemble: $completed / $total"
-                                progressWindow.progressBar.string = "$completed / $total"
-                            }
-                        },
-                        shouldCancel = { cancelRequested.get() }
-                    )
+                val assayWeights = currentWeights()
+                val assayGradientDirection = gradientDirection
+                val assayTemperatureOffset = temperatureOffset
+                val result = ThermotaxisPopulationSimulation.run(
+                    worms = trajectories,
+                    seconds = seconds,
+                    weights = assayWeights,
+                    gradientDirection = assayGradientDirection,
+                    temperatureOffset = assayTemperatureOffset,
+                    onProgress = { completed, total ->
+                        SwingUtilities.invokeLater {
+                            progressWindow.value = completed
+                            progressWindow.text = "Population simulation: $completed of $total worms complete"
+                        }
+                    },
+                    shouldCancel = cancelRequested::get
+                )
                     withContext(Dispatchers.Swing) {
                         progressWindow.close()
                         if (result != null) {
@@ -324,9 +377,6 @@ val nematodeThermotaxis = newSim { optionString ->
                     }
                 }
             }
-            addButton("Validate AFD steering response") {
-                showMessageDialog(ThermotaxisAfdValidation.run().summary(), "Thermotaxis validation")
-            }
         }.awaitLayout()
         controlPanel.setLocation(10, 10)
         val networkX = controlPanel.rightEdgeWithGap()
@@ -334,8 +384,6 @@ val nematodeThermotaxis = newSim { optionString ->
         ensembleFrameX = worldX - 30
         place(networkComponent, networkX, 10, networkWidth, networkHeight)
         place(worldComponent, worldX, 10, 621, networkHeight)
-        place(activityPlot, worldX, 10 + networkHeight + SIM_WINDOW_GAP, 621, 210)
-        setActivityPlotVisible(false)
         odorWorldDesktopComponent.apply {
             val overlayLayer = PLayer().apply { addChild(gradientOverlay) }
             worldPanel.canvas.camera.addLayer(1, overlayLayer)
@@ -348,37 +396,35 @@ val nematodeThermotaxis = newSim { optionString ->
 
     addSidebarInfo(
         """
-        # C. elegans Thermotaxis: Steering Circuit
+        # Thermotaxis in Nematodes
 
-        This simulation presents one fitted neural circuit for thermotactic steering from Ikeda, Matsumoto, and Izquierdo (2021). The model worm moves on a 14°C–20°C thermal gradient, using its neural activity to continuously adjust its path.
-
-        # Evolutionary Search
-
-        The original study used an evolutionary algorithm to search for circuit parameters that reproduced observed thermotaxis and steering behavior. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation is one such evolved parameter set: a concrete member of the family of circuits that matched the behavioral data.
-
-        # Circuit Guide
-
-        - **AFD (Temperature)** is the thermosensory neuron. Its filtered response represents recent temperature history; the AFD–AIY link is chemical.
-        - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit.
-        - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the two motor neurons, producing the dorsal–ventral locomotor rhythm. Starting straight up, these small side-to-side wiggles sample the left–right temperature gradient and provide the temperature changes that AFD integrates. The wiggles are easiest to see by zooming in on the trail.
-        - **DMN (Output)** and **VMN (Output)** are dorsal and ventral neck motor neurons. Their difference in activity determines the instantaneous curvature of the path.
-
-        The AFD–AIB electrical gap junction is implemented as a pair of reciprocal synapses so it can be shown and edited in Simbrain. Its current is `conductance × (AFD activity − AIB state)`; the conductance is fixed while the activity difference changes over time.
+        This simulation illustrates thermotaxis—movement guided by temperature—in *Caenorhabditis elegans*. Here, “worm,” “nematode,” and *C. elegans* all refer to this small roundworm. Across a population and enough simulated time, worms should tend to migrate toward the warmer side of the 14°C–20°C plate. Their paths and turns are stochastic, however, so this tendency is not immediate and will not be obvious in every individual run. However using the population simulation it is easier to confirm this behavior, though migration is still statistical and may not always be observed.
 
         # What to Do
 
-        1. Click `Run` and follow the trail across the thermal plate. In hotter regions, the worm should move more straight; in colder regions, it should follow tighter, more circling paths.
-        2. Use `Reverse gradient` while the model is running to observe how the thermal signal and steering pattern adapt.
-        3. Select **AFD (Temperature)** in the network, press `Shift+F` to clamp it, then use the arrow keys to set its activation. Comparing low and high AFD values tests how the temperature signal changes the longer-scale steering bias.
-        4. Clamp **AIB**, **AIY**, or **AIZ** to zero and compare its trail with the intact circuit. The original study found that ablating each of these interneurons impaired the characteristic thermotactic curving bias.
-        5. Clamp **CPG** to zero, then zoom in on the trail. The local path should become straighter rather than following its small wiggly curves, reducing its initial sampling of the left–right gradient. Clamp **DMN (Output)** or **VMN (Output)** to test how a fixed dorsal or ventral motor output changes the path's turning bias.
-        6. Use `Warm plate` or `Cool plate` to shift the temperature of the whole plate in 0.5°C steps. The colors and temperature labels update with the shift, and AFD receives the changed temperature signal.
-        7. Click `Show steering ensemble` to view 48 deterministic trajectories with evenly distributed starting headings. A progress window shows each completed trajectory and lets you cancel. This is an illustrative steering-only field, not a test of aggregate migration.
-        8. Click `Validate AFD steering response` to test the paper's circuit-level result that higher AFD activity produces a smaller long-timescale steering bias. The same check can be run headlessly with `./gradlew runSim -PsimName="C. elegans thermotaxis" -PoptionString=validate`.
+        1. Click `Run` and watch the worm move. With `Use empirical turns` enabled, it changes direction stochastically as well as steering continuously; an individual trail may wander even though a population should tend toward warmth over time.
+        2. Click `Run population simulation` to view many trajectories together. The defaults are 12 worms for 1500 seconds; use more worms or longer runs for a clearer aggregate tendency. Reverse the gradient before starting a population simulation to see the warm-directed tendency reverse sides.
+        3. Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is straighter movement in hotter regions and tighter, more circling movement in colder regions, rather than reliable migration in one short run.
+        4. Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment. You can also clamp or edit circuit neurons and synapses to explore their effects.
 
-        Both checks use canonical conditions rather than the live plate controls, making their results reproducible. `Reverse gradient`, `Warm plate`, and `Cool plate` affect the live demonstration worm and its visible plate only; they do not alter the steering ensemble or AFD validation.
+        # Details of This Simulation
 
-        This validation tests the steering-only model shown here. The paper's full population assay additionally supplied experimentally measured, direction-dependent turning frequencies and exit directions; those behavioral turn statistics were not evolved by this circuit.
+        ## Evolutionary Search
+
+        The original study used an evolutionary algorithm to search for circuit parameters that reproduced observed thermotaxis and steering behavior. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation is one such evolved parameter set.
+
+        ## Circuit Guide
+
+        - **AFD (Temperature)** is the thermosensory neuron. Its filtered response represents recent temperature history; the AFD–AIY link is chemical.
+        - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit.
+        - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the motor neurons, producing small dorsal–ventral wiggles that sample the temperature gradient.
+        - **DMN (Output)** and **VMN (Output)** are dorsal and ventral neck motor neurons. Their activity difference determines instantaneous path curvature.
+
+        The AFD–AIB electrical gap junction is implemented as reciprocal synapses so it can be shown and edited in Simbrain. Its current is `conductance × (AFD activity − AIB state)`.
+
+        ## Empirical Turns
+
+        In addition to ordinary circuit-generated steering, the simulation can use measured abrupt turn events: **omega turns** are tight, loop-like reorientations; **reversals** move the worm backward; **reversal turns** combine a reversal with reorientation; and **shallow turns** are gentler heading changes. Their frequency, exit direction, duration, and displacement are fixed behavioral measurements from the paper, not evolved circuit behaviors.
 
         # References
 
@@ -479,6 +525,23 @@ internal data class ThermotaxisWeights(
 
 internal data class ThermotaxisStep(val afdState: Double, val outputs: DoubleArray, val cpgOutput: Double, val curvature: Double)
 
+internal class ThermotaxisPopulationSimulationOptions : EditableObject {
+
+    var worms by GuiEditable(
+        initValue = 12,
+        min = 1,
+        description = "Number of independently simulated worms. The paper used 100.",
+        order = 10
+    )
+
+    var seconds by GuiEditable(
+        initValue = 1500,
+        min = 1,
+        description = "Simulated duration per worm in seconds. The paper used 1800 seconds (30 minutes).",
+        order = 20
+    )
+}
+
 internal object ThermotaxisEnsemble {
 
     private const val plateWidth = 136.0
@@ -547,7 +610,9 @@ internal data class ThermotaxisEnsembleResult(
     val durationSeconds: Double,
     val meanEndpointX: Double,
     val warmSideFraction: Double,
-    val paths: List<ThermotaxisPath>
+    val paths: List<ThermotaxisPath>,
+    val gradientDirection: Double = 1.0,
+    val temperatureOffset: Double = 0.0
 )
 
 internal data class ThermotaxisPosition(val x: Double, val y: Double)
@@ -613,7 +678,7 @@ internal class ThermotaxisEnsemblePanel(private val result: ThermotaxisEnsembleR
         val toScreenY = { y: Double -> plateY + y / 96.0 * plateHeight }
         try {
             repeat(20) { index ->
-                val fraction = index / 19.0f
+                val fraction = if (result.gradientDirection > 0.0) index / 19.0f else 1.0f - index / 19.0f
                 g.color = Color(0.05f + 0.9f * fraction, 0.2f, 0.95f - 0.9f * fraction)
                 val left = plateX + index * plateWidth / 20.0
                 g.fillRect(left.toInt(), plateY.toInt(), (plateWidth / 20.0).toInt() + 1, plateHeight.toInt())
@@ -640,15 +705,13 @@ internal class ThermotaxisEnsemblePanel(private val result: ThermotaxisEnsembleR
             g.fillOval((toScreenX(68.0) - 4).toInt(), (toScreenY(48.0) - 4).toInt(), 8, 8)
             g.color = Color.DARK_GRAY
             g.drawOval((toScreenX(68.0) - 4).toInt(), (toScreenY(48.0) - 4).toInt(), 8, 8)
-            g.drawString("14°C", plateX.toInt(), (plateY - 10).toInt())
-            g.drawString("20°C", (plateX + plateWidth - 30).toInt(), (plateY - 10).toInt())
-            g.drawString("Shared start", (toScreenX(68.0) + 7).toInt(), (toScreenY(48.0) - 7).toInt())
+            val leftTemperature = if (result.gradientDirection > 0.0) 14.0 + result.temperatureOffset else 20.0 + result.temperatureOffset
+            val rightTemperature = if (result.gradientDirection > 0.0) 20.0 + result.temperatureOffset else 14.0 + result.temperatureOffset
+            g.drawString("${"%.1f".format(leftTemperature)}°C", plateX.toInt(), (plateY - 10).toInt())
+            g.drawString("${"%.1f".format(rightTemperature)}°C", (plateX + plateWidth - 38).toInt(), (plateY - 10).toInt())
             g.color = Color.BLACK
-            g.drawString("${result.trajectories} steering-only trajectories, ${"%.0f".format(result.durationSeconds)} s each", 45, height - 76)
+            g.drawString("${result.trajectories} population trajectories, ${"%.0f".format(result.durationSeconds)} s each", 45, height - 76)
             g.drawString("Mean final x: ${"%.2f".format(result.meanEndpointX)}; warm half: ${"%.1f".format(result.warmSideFraction * 100)}%", 45, height - 52)
-            g.color = Color.DARK_GRAY
-            g.drawString("This steering-only field has no directed migration prediction without the paper's turning policy.", 45, height - 28)
-            g.drawString("Faint-to-dark trails run from start to end; black dots mark final positions.", 45, height - 8)
         } finally {
             g.dispose()
         }

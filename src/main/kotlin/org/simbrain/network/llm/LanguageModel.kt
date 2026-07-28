@@ -160,6 +160,13 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
             loaded?.scene?.historyView = value
         }
 
+    /** When true, the limb the selected layer doesn't use is hidden instead of ghosted. */
+    var hideInactiveLimb: Boolean = false
+        set(value) {
+            field = value
+            loaded?.scene?.hideDimmed = value
+        }
+
     /** Saved tile positions by tile id, applied to the scene on load. */
     var tileLayout: HashMap<String, DoubleArray>? = null
 
@@ -228,6 +235,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
             ?.selectedHead = selectedHead
         scene.historyView = historyView
+        scene.hideDimmed = hideInactiveLimb
         scene.lens?.apply {
             enabled = lensEnabled
             async = true

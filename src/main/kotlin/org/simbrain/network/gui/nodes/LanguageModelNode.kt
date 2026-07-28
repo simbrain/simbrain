@@ -231,6 +231,20 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         "Keep no token history: tiles show just the current token and layer " +
                             "flips are instant; switching back re-derives the history"))
                 })
+                add(JMenu("Inactive limb").apply {
+                    fun item(label: String, hide: Boolean, tip: String) =
+                        JRadioButtonMenuItem(label, languageModel.hideInactiveLimb == hide).apply {
+                            toolTipText = tip
+                            addActionListener {
+                                languageModel.hideInactiveLimb = hide
+                                compositorNode?.refreshStackState()
+                            }
+                        }
+                    add(item("Ghost", false,
+                        "Keep the limb the selected layer doesn't use faintly visible"))
+                    add(item("Hide", true,
+                        "Show only the selected layer's anatomy; the unused limb disappears"))
+                })
             } else {
                 addSeparator()
                 add(createAction("Locate weights...") { locateWeights() })

@@ -187,7 +187,7 @@ val lfm2LanguageModel = newSim {
 
         Data flows top to bottom through the residual stream — the column of wide tiles. LFM2 is a hybrid: most blocks are short-convolution blocks, with a few attention blocks in between. Use the depth strip to select which layer's interior is shown, scroll over the attention deck to flip through heads, and watch the logit-lens readouts sharpen as you read down the stream.
 
-        Hover over any cell to read its value; double-click a tile to trace its data-flow paths.
+        Hover over any cell to read its value; double-click a tile to trace its data-flow paths. The limb the selected layer doesn't use stays faintly visible for orientation; right-click the model and set `Inactive limb` to `Hide` to clear it away entirely.
 
         Most of what the tall tiles show is a *recording*: at each step the model only holds the current token's activations, and the diagram keeps the old rows so you can see the trajectory. Right-click the model and set `Token history` to `Ghost` to see what is genuinely resident — past rows ghost out, one bright row sweeps down as it writes, and the only tiles left fully lit are the KV caches and the conv window. That is the model's entire memory, and it is why those caches exist. `Off` goes further and keeps no history at all — layer flips become instant, and switching back re-derives the recording from the depth strip.
 

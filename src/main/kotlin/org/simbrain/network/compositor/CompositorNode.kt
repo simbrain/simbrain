@@ -391,6 +391,11 @@ class CompositorNode(
         }
 
         fun syncDim() {
+            val shown = scene.isShown(tile)
+            visible = shown
+            pickable = shown
+            childrenPickable = shown
+            fan.visible = shown
             transparency = if (tile.dimmed) DIM_TRANSPARENCY else 1f
             fan.transparency = if (tile.dimmed) DIM_TRANSPARENCY else 1f
         }
@@ -582,6 +587,7 @@ class CompositorNode(
         val palette = NetworkTheme.current
         for (item in scene.selection.selected) {
             val vertex = item as? OpVertex ?: continue
+            if (!scene.isShown(vertex)) continue
             val b = vertex.endpointBounds
             opSelectionOverlay.addChild(
                 PPath.createRoundRectangle(
@@ -834,6 +840,7 @@ class CompositorNode(
         val placedObstacles = scene.tiles.filter { it !in satelliteTiles }.toMutableList()
         val badgedOps = tileNodes.mapNotNull { it.activationOp }.toSet()
         for (vertex in scene.opVertices) {
+            if (!scene.isShown(vertex)) continue
             OpGlyphNode(vertex.op).apply {
                 setOffset(vertex.x, vertex.y)
                 if (vertex.dimmed) transparency = DIM_TRANSPARENCY
@@ -858,6 +865,7 @@ class CompositorNode(
         // Undimmed edges render (and claim shared bead glyphs) first, so an op both limbs share
         // shows at full strength on the active limb's edge.
         for (edge in scene.edges.sortedBy { it.dimmed }) {
+            if (edge.dimmed && scene.hideDimmed) continue
             val traced = edge in scene.tracedEdges
             val memory = edge in scene.memoryEdges
             val tailSide = tailSides.getValue(edge)
@@ -1169,7 +1177,7 @@ class CompositorNode(
                     val point = event.getPositionRelativeTo(this@CompositorNode)
                     val rect = rectBetween(start, point)
                     val hit = scene.tilesIn(rect.x, rect.y, rect.width, rect.height) +
-                        scene.opVertices.filter { it.endpointBounds.intersects(rect) }
+                        scene.opVertices.filter { scene.isShown(it) && it.endpointBounds.intersects(rect) }
                     if (marqueeAdditive) scene.selection.add(hit) else scene.selection.set(hit)
                     syncSelection()
                 }

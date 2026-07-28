@@ -237,6 +237,18 @@ class CompositorScene(val graph: PlanGraph? = null) {
     /** Scene-builder hook replaying the shown layers' history after [HistoryView.OFF] ends. */
     var rebuildHistory: (() -> Unit)? = null
 
+    /**
+     * When true, dimmed interior pieces — the limb the selected layer doesn't use — are hidden
+     * entirely instead of ghosted. Hidden pieces don't render and don't hit-test.
+     */
+    var hideDimmed = false
+
+    /** True when [item] should currently render and hit-test; false only for hidden dimmed pieces. */
+    fun isShown(item: FlowEndpoint) = !hideDimmed || when (item) {
+        is TensorTile -> !item.dimmed
+        is OpVertex -> !item.dimmed
+    }
+
     fun addTile(tile: TensorTile) {
         require(_tiles.none { it.id == tile.id }) { "Duplicate tile id ${tile.id}" }
         tile.historyView = historyView
@@ -349,9 +361,9 @@ class CompositorScene(val graph: PlanGraph? = null) {
         lens?.reset()
     }
 
-    fun tileAt(sceneX: Double, sceneY: Double) = _tiles.lastOrNull { it.contains(sceneX, sceneY) }
+    fun tileAt(sceneX: Double, sceneY: Double) = _tiles.lastOrNull { isShown(it) && it.contains(sceneX, sceneY) }
 
-    fun tilesIn(x: Double, y: Double, w: Double, h: Double) = _tiles.filter { it.intersects(x, y, w, h) }
+    fun tilesIn(x: Double, y: Double, w: Double, h: Double) = _tiles.filter { isShown(it) && it.intersects(x, y, w, h) }
 
     /**
      * The tiles a mid-pass forward step has NOT yet reached: their writer op's schedule index is

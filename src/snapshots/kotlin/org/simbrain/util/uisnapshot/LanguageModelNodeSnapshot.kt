@@ -23,6 +23,9 @@ open class LanguageModelNodeSnapshot : UiSnapshotDef {
     /** How the scene treats token history: recorded, ghosted to the live row, or not kept. */
     protected open val historyView = HistoryView.FULL
 
+    /** When true, the limb the selected layer doesn't use is hidden instead of ghosted. */
+    protected open val hideInactiveLimb = false
+
     /** The live-view variant shrinks the window and fills it, so the ghosting reads at fit zoom. */
     protected open val maxSeqLen = 256
     protected open val tokensToGenerate = 24
@@ -43,6 +46,7 @@ open class LanguageModelNodeSnapshot : UiSnapshotDef {
         languageModel.tokensToGenerate = tokensToGenerate
         languageModel.stopAtEndOfText = stopAtEndOfText
         languageModel.historyView = historyView
+        languageModel.hideInactiveLimb = hideInactiveLimb
         languageModel.loadWeights()
         runBlocking { network.addNetworkModel(languageModel, usePlacementManager = false) }
 
@@ -81,4 +85,13 @@ open class LanguageModelNodeLiveViewSnapshot : LanguageModelNodeSnapshot() {
 class LanguageModelNodeNoHistorySnapshot : LanguageModelNodeLiveViewSnapshot() {
     override val name = "language-model-node-no-history"
     override val historyView = HistoryView.OFF
+}
+
+/**
+ * Hidden inactive limb: the selected layer is a conv layer, so the whole attention limb — tiles,
+ * junctions, edges — is absent instead of ghosted, leaving only the anatomy the layer uses.
+ */
+class LanguageModelNodeHiddenLimbSnapshot : LanguageModelNodeSnapshot() {
+    override val name = "language-model-node-hidden-limb"
+    override val hideInactiveLimb = true
 }

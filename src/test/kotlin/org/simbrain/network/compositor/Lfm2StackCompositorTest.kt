@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.llm.Lfm2Config
@@ -593,5 +594,31 @@ class Lfm2StackCompositorTest {
             assertTrue(control.tile(id).values.contentEquals(scene.tile(id).values),
                 "$id must be re-derived bit-exactly when history returns")
         }
+    }
+
+    @Test
+    fun `hiding the inactive limb removes it from hit-testing until a flip brings it back`() {
+        val scene = Lfm2StackCompositor.buildScene(syntheticModel())
+
+        val q = scene.tile("block.attn.q")
+        val gate = scene.tile("block.mlp.gate")
+        assertTrue(q.dimmed, "a conv layer is selected, so the attention limb is dimmed")
+        assertFalse(gate.dimmed, "the SwiGLU limb runs on every layer")
+
+        q.x = 5000.0; q.y = 5000.0
+        gate.x = 6000.0; gate.y = 6000.0
+        assertEquals(q, scene.tileAt(5001.0, 5001.0))
+
+        scene.hideDimmed = true
+        assertNull(scene.tileAt(5001.0, 5001.0), "hidden tiles don't hit-test")
+        assertEquals(gate, scene.tileAt(6001.0, 6001.0), "the active limb still does")
+        assertTrue(scene.tilesIn(4500.0, 4500.0, 2000.0, 2000.0).none { it.dimmed })
+        val scores = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.scores" }
+        assertFalse(scene.isShown(scores), "junctions on the hidden limb are hidden with it")
+
+        scene.layerSelector!!.invoke(2)
+        assertFalse(q.dimmed, "flipping to the attention layer brings the limb back")
+        assertEquals(q, scene.tileAt(5001.0, 5001.0))
+        assertTrue(scene.isShown(scores))
     }
 }

@@ -193,14 +193,24 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             add(networkPanel.networkActions.duplicateAction)
             add(networkPanel.networkActions.deleteAction)
             addSeparator()
-            add(createAction("Rename...") {
+            add(createAction(
+                name = "Rename...",
+                description = "Set the label shown on the model's header box",
+            ) {
                 showInputDialog("Name:", languageModel.label)?.let { languageModel.label = it }
             })
-            add(createAction("Edit ${languageModel.displayName}...") { propertyDialog.display() })
+            add(createAction(
+                name = "Edit ${languageModel.displayName}...",
+                description = "Set the generation properties: prompt mode, sampling, budget",
+            ) { propertyDialog.display() })
             addSeparator()
             val state = languageModel.loaded
             if (state != null) {
-                add(createAction("Clear context window") {
+                add(createAction(
+                    name = "Clear context window",
+                    description = "Empty the window; a coupled non-empty document restores " +
+                        "itself on the next play, so clear the document too for a full reset",
+                ) {
                     languageModel.clearWindow()
                     refreshView()
                 })
@@ -257,8 +267,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         "Show only the selected layer's anatomy; the unused limb disappears"))
                 })
             } else {
-                add(createAction("Locate weights...") { locateWeights() })
-                add(createAction("Download weights (${Lfm2Weights.MODEL_NAME})...") { downloadWeights() })
+                add(createAction(
+                    name = "Locate weights...",
+                    description = "Point Simbrain at a folder holding model.safetensors and tokenizer.json",
+                ) { locateWeights() })
+                add(createAction(
+                    name = "Download weights (${Lfm2Weights.MODEL_NAME})...",
+                    description = "Download the weights (~460 MB) from Hugging Face and cache them locally",
+                ) { downloadWeights() })
             }
             addSeparator()
             add(networkPanel.networkComponent.createCouplingMenu(languageModel))

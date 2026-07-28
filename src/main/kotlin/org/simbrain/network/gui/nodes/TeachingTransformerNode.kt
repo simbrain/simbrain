@@ -182,25 +182,47 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             add(networkPanel.networkActions.duplicateAction)
             add(networkPanel.networkActions.deleteAction)
             addSeparator()
-            add(createAction("Rename...") {
+            add(createAction(
+                name = "Rename...",
+                description = "Set the label shown on the model's header box",
+            ) {
                 showInputDialog("Name:", teachingTransformer.label)?.let { teachingTransformer.label = it }
             })
-            add(createAction("Edit ${teachingTransformer.displayName}...") { propertyDialog.display() })
-            add(createAction("Train...") { trainingDialog().display() })
+            add(createAction(
+                name = "Edit ${teachingTransformer.displayName}...",
+                description = "Set the learning rate, sampling, and diagram scale",
+            ) { propertyDialog.display() })
+            add(createAction(
+                name = "Train...",
+                description = "Open the trainer: run, stop, or step training and watch the loss curve",
+            ) { trainingDialog().display() })
             addSeparator()
-            add(createAction("Step forward pass one op") {
+            add(createAction(
+                name = "Step forward pass one op",
+                description = "Run the forward pass one operation at a time; the active op's glyph glows",
+            ) {
                 teachingTransformer.stepInferenceOp()
             })
-            add(createAction("Step training one op") {
+            add(createAction(
+                name = "Step training one op",
+                description = "Walk a whole training step op by op — forward, then backward filling gradients",
+            ) {
                 teachingTransformer.stepTrainingOp()
             })
-            add(createAction("Finish current step walk") {
+            add(createAction(
+                name = "Finish current step walk",
+                description = "Run the remaining ops of a walk in progress to the next clean boundary",
+            ) {
                 val model = teachingTransformer.model
                 while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) teachingTransformer.stepTrainingOp()
                 while (model.plan.cursor != 0) teachingTransformer.stepInferenceOp()
             })
             addSeparator()
-            add(createAction("Clear context window") { teachingTransformer.clearWindow() })
+            add(createAction(
+                name = "Clear context window",
+                description = "Empty the window; a coupled non-empty document restores " +
+                    "itself on the next play, so clear the document too for a full reset",
+            ) { teachingTransformer.clearWindow() })
             addSeparator()
             add(JMenu("Attention head").apply {
                 val group = ButtonGroup()

@@ -258,13 +258,11 @@ class PoolLayerTemplate : EditableObject {
 }
 
 fun NetworkPanel.showLanguageModelCreationDialog() {
-    LanguageModel.CreationTemplate().createEditorDialog { template ->
+    LanguageModel.CreationTemplate().createEditorDialog("Create Language Model") { template ->
         val languageModel = template.create("")
         if (languageModel.obtainWeightsInteractive(network)) {
             addLanguageModel(languageModel)
         }
-    }.also {
-        it.title = "Create Language Model"
     }.display()
 }
 
@@ -278,7 +276,7 @@ private fun NetworkPanel.addLanguageModel(languageModel: LanguageModel) {
 }
 
 fun NetworkPanel.showTeachingTransformerCreationDialog() {
-    TeachingTransformer.CreationTemplate().createEditorDialog { template ->
+    TeachingTransformer.CreationTemplate().createEditorDialog("Create Teaching Transformer") { template ->
         val teachingTransformer = template.create()
         network.addNetworkModelAsync(teachingTransformer)
         undoManager.addUndoableAction(
@@ -286,8 +284,6 @@ fun NetworkPanel.showTeachingTransformerCreationDialog() {
             undo = { teachingTransformer.delete() },
             redo = { network.addNetworkModel(teachingTransformer, usePlacementManager = false, useAutoAssignedId = false) }
         )
-    }.also {
-        it.title = "Create Teaching Transformer"
     }.display()
 }
 

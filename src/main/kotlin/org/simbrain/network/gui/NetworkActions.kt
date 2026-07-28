@@ -137,13 +137,15 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
     val addLanguageModelAction = networkPanel.createAction(
         name = "Add language model...",
-        description = "Add a language model (LFM2.5-230M) to the network",
+        description = "Add a language model (LFM2.5-230M) to the network (shift-l)",
+        keyboardShortcut = Shift + 'L',
     ) {
         showLanguageModelCreationDialog()
     }
     val addTeachingTransformerAction = networkPanel.createAction(
         name = "Add teaching transformer...",
-        description = "Add a small trainable transformer with an op-level teaching interior",
+        description = "Add a small trainable transformer with an op-level teaching interior (shift-m)",
+        keyboardShortcut = Shift + 'M',
     ) {
         showTeachingTransformerCreationDialog()
     }

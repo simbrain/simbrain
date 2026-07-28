@@ -151,11 +151,14 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
+            add(networkPanel.networkActions.cutAction)
+            add(networkPanel.networkActions.copyAction)
+            add(networkPanel.networkActions.pasteAction)
+            add(networkPanel.networkActions.duplicateAction)
+            add(networkPanel.networkActions.deleteAction)
+            addSeparator()
             add(createAction("Rename...") {
                 showInputDialog("Name:", teachingTransformer.label)?.let { teachingTransformer.label = it }
-            })
-            add(createAction(name = "Remove teaching transformer", coroutineScope = networkPanel.network) {
-                teachingTransformer.deleteBlocking()
             })
             addSeparator()
             add(createAction("Train...") { trainingDialog().display() })

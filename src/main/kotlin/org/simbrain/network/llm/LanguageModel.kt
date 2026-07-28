@@ -257,17 +257,48 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     }
 
     /**
+     * A copy carries the recipe, not the runtime: the weights path, settings, and view state,
+     * plus the committed window as seed text. The copy starts unloaded and loads like a fresh
+     * model; the seed replays through prefill, so it reaches the original's window state by
+     * recomputation rather than by copying caches.
+     */
+    fun copy(): LanguageModel = LanguageModel(weightsDirectory, maxSeqLen).also { copy ->
+        copy.label = label
+        copy.location = location
+        copy.promptMode = promptMode
+        copy.systemPrompt = systemPrompt
+        copy.tokensToGenerate = tokensToGenerate
+        copy.temperature = temperature
+        copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
+        copy.stopAtEndOfText = stopAtEndOfText
+        copy.pauseWorkspaceAtEnd = pauseWorkspaceAtEnd
+        copy.enableDemoTools = enableDemoTools
+        copy.tools = tools
+        copy.selectedLayer = selectedLayer
+        copy.selectedHead = selectedHead
+        copy.lensEnabled = lensEnabled
+        copy.historyView = historyView
+        copy.hideInactiveLimb = hideInactiveLimb
+        copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
+        copy.initialText = windowText()?.takeIf { it.isNotBlank() } ?: initialText
+    }
+
+    /**
      * Fills a fresh window with [textIn], queued for a watchable prefill. Used once at first
-     * load and available to harnesses; the document owns the window afterwards.
+     * load and available to harnesses; the document owns the window afterwards. Encoding
+     * leaves specials alone and guards the leading BOS, so a seed that is already a full
+     * window — a copied model's captured stream — round-trips without doubling the marker.
      */
     @Synchronized
     fun seedWindow(textIn: String) {
         val state = loaded ?: return
         state.model.reset()
         state.scene.reset()
-        val ids = state.tokenizer.encode(textIn)
-        windowIds = ArrayList(ids.toList())
-        pending = ArrayDeque(ids.toList())
+        val raw = state.tokenizer.encode(textIn, addSpecials = false)
+        val ids = if (raw.firstOrNull() == Lfm2ChatFormat.BOS_ID) raw.toList()
+            else listOf(Lfm2ChatFormat.BOS_ID) + raw.toList()
+        windowIds = ArrayList(ids)
+        pending = ArrayDeque(ids)
         sampledToken = -1
         lastGenerated = ""
         generatedCount = 0
@@ -507,6 +538,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         // Saves from before the field existed deserialize it to null despite the non-null type.
         @Suppress("SENSELESS_COMPARISON")
         if (historyView == null) historyView = HistoryView.FULL
+        // An uncoupled model reopens with text but no window; reseeding from the saved text
+        // restores it. Completion mode only: the chat transcript strips its turn scaffolding,
+        // so re-encoding it would build a structurally wrong window. A coupled document
+        // replays over the seed as an ordinary edit either way.
+        if (promptMode == PromptMode.COMPLETION && text.isNotBlank()) initialText = text
         return this
     }
 

@@ -185,11 +185,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
+            add(networkPanel.networkActions.cutAction)
+            add(networkPanel.networkActions.copyAction)
+            add(networkPanel.networkActions.pasteAction)
+            add(networkPanel.networkActions.duplicateAction)
+            add(networkPanel.networkActions.deleteAction)
+            addSeparator()
             add(createAction("Rename...") {
                 showInputDialog("Name:", languageModel.label)?.let { languageModel.label = it }
-            })
-            add(createAction(name = "Remove language model", coroutineScope = networkPanel.network) {
-                languageModel.deleteBlocking()
             })
             addSeparator()
             add(createAction("Generation settings...") { propertyDialog.display() })

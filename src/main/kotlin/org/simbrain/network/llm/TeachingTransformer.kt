@@ -469,6 +469,36 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         decks().firstOrNull()?.let { selectedHead = it.selectedSlice }
     }
 
+    /**
+     * A full snapshot: the config, the trained parameters, the corpus, the context window, and
+     * the settings and view state — everything serialization would carry. The copy trains and
+     * generates independently of the original from the moment it is made.
+     */
+    fun copy(): TeachingTransformer = TeachingTransformer(config).also { copy ->
+        model.params.forEach { (name, port) ->
+            copy.model.params[name]?.tensor?.copyFrom(port.tensor.toFloatArray())
+        }
+        copy.label = label
+        copy.location = location
+        copy.text = text
+        copy.tokenizer = tokenizer.copy() as Tokenizer<*>
+        copy.tokenLabels = tokenLabels?.let { ArrayList(it) }
+        copy.corpusTokenIds = corpusTokenIds?.copyOf()
+        copy.testCorpusTokenIds = testCorpusTokenIds?.copyOf()
+        copy.applyCorpusToTrainer()
+        copy.contextTokens = contextTokens.copyOf()
+        copy.learningRate = learningRate
+        copy.trainer.learningRate = learningRate.toFloat()
+        copy.samplingTemperature = samplingTemperature
+        copy.diagramScale = diagramScale
+        copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
+        copy.lensEnabled = lensEnabled
+        copy.selectedHead = selectedHead
+        copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
+        copy.junctionLayout = junctionLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
+        copy.rebuildScene()
+    }
+
     /** Sets the training (and optional testing) corpus as vocabulary token ids. */
     fun setCorpus(tokenIds: IntArray, testTokenIds: IntArray? = null) {
         corpusTokenIds = tokenIds

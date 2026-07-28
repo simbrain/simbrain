@@ -1,21 +1,30 @@
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.*
+import org.simbrain.network.llm.LanguageModel
+import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 
 /**
- * Buffer which holds network objects for cutting and pasting.
+ * Buffer which holds network objects for cutting and pasting. To make a new model type
+ * copy-pastable, add it to [canCopy] and give it a branch in the `createCopies` switch inside
+ * [paste] — [add] admits only [canCopy] types, so a type missing its branch fails visibly
+ * (it never enters the clipboard) instead of silently vanishing at paste time.
  */
 object Clipboard {
-    // To add new copy-pastable items, must update:
-    // 1) SimnetUtils.getCopy()
-    // 2) Network.addObjects
-    // 3) NetworkPanel.getSelectedModels()
     /**
      * Static list of cut or copied objects.
      */
     private var copiedObjects: List<NetworkModel> = ArrayList()
+
+    /** The model types [paste]'s `createCopies` knows how to copy. */
+    fun canCopy(model: NetworkModel): Boolean = when (model) {
+        is Neuron, is Synapse, is NetworkTextObject, is NeuronCollection, is SupervisedModel,
+        is NeuronArray, is ActivationSequence, is WeightMatrix, is SynapseGroup, is Subnetwork,
+        is LanguageModel, is TeachingTransformer -> true
+        else -> false
+    }
 
     /**
      * List of components which listen for changes to this clipboard.
@@ -60,7 +69,7 @@ object Clipboard {
         // recreated when that parent is copied. It must never be copied as a standalone free
         // text object, or duplicating leaves a stray overlapping readout near the original.
         copiedObjects = objects
-            .filter { it !in collectionObjects && it !is InfoText }
+            .filter { it !in collectionObjects && it !is InfoText && canCopy(it) }
 
         fireClipboardChanged()
     }
@@ -178,6 +187,16 @@ object Clipboard {
                         is Subnetwork -> {
                             add(item.copy())
                         }
+                        is LanguageModel -> {
+                            add(item.copy())
+                        }
+                        is TeachingTransformer -> {
+                            add(item.copy())
+                        }
+                        else -> error(
+                            "No copy branch for ${item::class.simpleName}; " +
+                                "Clipboard.add should not have admitted it"
+                        )
                     }
                 }
 

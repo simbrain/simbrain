@@ -29,6 +29,13 @@ interface SupervisedNetwork {
 
     fun initBiases()
 
+    /**
+     * The trainer this network should be trained with. Overridden by networks whose training differs
+     * from the standard row-at-a-time supervised pass, so that anything opening a training dialog gets
+     * the right one without having to know the network's type.
+     */
+    fun createTrainer(network: Network): SupervisedTrainer = SupervisedTrainer(network, this)
+
     fun possibleLossFunctions() = when(outputLayer.updateRule) {
         is SoftmaxRule -> listOf(BackpropLossFunction.CrossEntropy::class.java)
         else -> listOf(BackpropLossFunction.SSE::class.java, BackpropLossFunction.MSE::class.java, BackpropLossFunction.RMSE::class.java)

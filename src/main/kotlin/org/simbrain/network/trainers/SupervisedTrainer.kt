@@ -95,7 +95,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 /**
  * Manage iteration-based training algorithms for [SupervisedNetwork], which in turn has a [SupervisedTrainerConfig].
  */
-class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
+open class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedNetwork) : CoroutineScope {
 
     val job = SupervisorJob()
 
@@ -364,18 +364,43 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
             }
         }
 
-        val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
-
-        weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
-            wm.displayName to delta
-        }
-
         // accumulateBackprop sums per-row deltas. Average them here so the optimizer sees a
         // per-sample-equivalent gradient, regardless of batch size. Adam-family optimizers are
         // scale-invariant (the constant cancels in m̂/√v̂), but non-normalizing optimizers like
         // BasicOptimizer need this averaging to stay stable as batch size changes. CnnTrainer already
         // does the same scaling.
         val batchScale = 1.0 / rowRange.count().coerceAtLeast(1)
+
+        applyAccumulatedDeltas(
+            weightAccumulator,
+            synapseGroupAccumulator,
+            biasesAccumulator,
+            rawMatrixAccumulator,
+            batchScale,
+            probeContext
+        )
+
+        return error / rowRange.count()
+    }
+
+    /**
+     * Hand the accumulated deltas to the optimizer and write them into the network's parameters. One
+     * call is one optimizer step, so a trainer that updates more than once per iteration, such as
+     * [BPTTTrainer] with its one step per unrolled window, calls this repeatedly.
+     */
+    protected fun applyAccumulatedDeltas(
+        weightAccumulator: HashMap<WeightMatrix, Matrix>,
+        synapseGroupAccumulator: HashMap<SynapseGroup, Matrix>,
+        biasesAccumulator: HashMap<Layer, Matrix>,
+        rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+        batchScale: Double,
+        probeContext: StructuredProbe.MapProbe? = null
+    ) {
+        val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
+
+        weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
+            wm.displayName to delta
+        }
 
         weightAccumulator.forEach { (wm, delta) ->
             val weightsDelta = config.optimizer.computeDelta(wm.weights, delta.clone().mul(batchScale))
@@ -432,8 +457,6 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
         }
 
         probeContext?.write("rawMatrixAccumulator", rawMatrixAccumulator)
-
-        return error / rowRange.count()
     }
 
     /**
@@ -556,6 +579,12 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
          * Given the temporal nature of the rule, SequentialOnline should be used with SRN
          */
         fun srnTypeList() = listOf(SequentialOnline::class.java)
+
+        /**
+         * BPTT reads a whole epoch as one time-ordered sequence and then splits it into unrolled
+         * windows itself, applying an update per window, so it takes the full row range at once.
+         */
+        fun bpttTypeList() = listOf(Epoch::class.java)
 
         abstract override fun copy(): UpdateMethod
     }

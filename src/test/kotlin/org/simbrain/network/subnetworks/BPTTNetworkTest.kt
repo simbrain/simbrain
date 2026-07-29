@@ -169,10 +169,27 @@ class BPTTNetworkTest {
     @Test
     fun `test BPTT serialization`() {
         val net = Network()
-        val bptt = BPTTNetwork(10, 5, 10).apply { label = "BPTT" }
+        val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }
         net.addNetworkModelsAsync(bptt)
-        val xmlRep = getNetworkXStream().toXML(net)
-        val fromXml = getNetworkXStream().fromXML(xmlRep) as Network
-        assertNotNull(fromXml.getModelByLabel(BPTTNetwork::class.java, "BPTT"))
+        bptt.trainerConfig.truncationDepth = 7
+
+        val fromXml = getNetworkXStream().fromXML(getNetworkXStream().toXML(net)) as Network
+        val restored = fromXml.getModelByLabel(BPTTNetwork::class.java, "BPTT")
+        assertNotNull(restored)
+        requireNotNull(restored)
+
+        assertEquals(7, restored.trainerConfig.truncationDepth)
+        assertEquals(4, restored.hiddenLayer.size)
+
+        // Both ends of the recurrent matrix have to come back pointing at the restored hidden layer,
+        // or the reloaded network is no longer recurrent.
+        assertTrue(restored.hiddenToHidden.source === restored.hiddenLayer)
+        assertTrue(restored.hiddenToHidden.target === restored.hiddenLayer)
+
+        // layers is a transient lazy delegate, so a restored network has to be able to rebuild its
+        // update path and run before the GUI can train it.
+        assertEquals(3, restored.layers.size)
+        with(fromXml) { restored.update() }
+        runBlocking { BPTTTrainer(fromXml, restored).trainOnce() }
     }
 }

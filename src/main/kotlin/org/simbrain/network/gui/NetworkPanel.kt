@@ -424,6 +424,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is CompetitiveNetwork -> CompetitiveNetworkNode(this, subnetwork)
             is SOMNetwork -> SOMNetworkNode(this, subnetwork)
             is SRNNetwork -> SRNNode(this, subnetwork)
+            is BPTTNetwork -> BPTTNode(this, subnetwork)
             is RestrictedBoltzmannMachine -> RBMNode(this, subnetwork)
             is BackpropNetwork -> BackpropNetworkNode(this, subnetwork)
             is ClassifierNetwork -> SmileClassifierNode(this, subnetwork)

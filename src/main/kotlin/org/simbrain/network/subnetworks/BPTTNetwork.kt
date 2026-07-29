@@ -15,6 +15,10 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.network.util.Alignment
+import org.simbrain.network.util.Direction
+import org.simbrain.network.util.alignNetworkModels
+import org.simbrain.network.util.offsetNetworkModel
 import org.simbrain.util.UserParameter
 import org.simbrain.util.copy
 import org.simbrain.util.point
@@ -69,8 +73,22 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         hiddenToHidden.randomize()
         addModels(hiddenToHidden)
 
+        // The recurrent arrow is a fixed 200px circle drawn to the left of the hidden layer. At
+        // FeedForward's default spacing the neighbouring weight matrices' labels sit inside its
+        // vertical span, so the layers are spread out to clear it.
+        betweenLayerInterval = RECURRENT_LAYER_INTERVAL
+        listOf(inputLayer to hiddenLayer, hiddenLayer to outputLayer).forEach { (lower, upper) ->
+            alignNetworkModels(lower, upper, Alignment.VERTICAL)
+            offsetNetworkModel(
+                lower, upper, Direction.NORTH,
+                (betweenLayerInterval / 2).toDouble(), 100.0, 200.0
+            )
+        }
+
         trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
         testingSet = TrainingDataset(mutableListOf(), mutableListOf(), numInputNodes, numOutputNodes)
+
+        customInfo = InfoText(stateInfoText)
 
         setLocation(initialPosition.x, initialPosition.y)
     }
@@ -79,6 +97,27 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
     protected constructor() : super()
 
     override var trainerConfig = BPTTTrainerConfig(lossFunctionProvider = ::possibleLossFunctions)
+
+    /**
+     * Nullable rather than lateinit because [FeedForward]'s constructor sets a location, and
+     * [Subnetwork]'s location setter reads this before any of this class's initializers have run.
+     */
+    override var customInfo: InfoText? = null
+        private set
+
+    /**
+     * How many timesteps the network is unrolled over. Shown on the canvas because it is the one
+     * training setting that changes what the network is able to learn rather than just how fast.
+     */
+    val stateInfoText: String
+        get() = "Unrolled over ${trainerConfig.truncationDepth} steps"
+
+    fun updateStateInfoText() {
+        customInfo?.text = stateInfoText
+        events.customInfoUpdated.fire()
+    }
+
+    override fun onTrainerConfigChanged() = updateStateInfoText()
 
     override val name: String
         get() = "BPTT"
@@ -166,6 +205,7 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         copy.trainingSet = trainingSet.copy()
         copy.testingSet = testingSet.copy()
         copy.trainerConfig = trainerConfig.copy()
+        copy.customInfo = InfoText(copy.stateInfoText)
 
         return copy
     }
@@ -173,6 +213,14 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
     /**
      * Helper class for creating BPTT networks.
      */
+    companion object {
+        /**
+         * Vertical spacing between layers, wide enough that the hidden layer's recurrent arrow does
+         * not collide with the weight matrices above and below it.
+         */
+        const val RECURRENT_LAYER_INTERVAL = 500
+    }
+
     class BPTTCreator(val initialPosition: Point2D) : EditableObject {
 
         @UserParameter(label = "Number of inputs", order = 10)

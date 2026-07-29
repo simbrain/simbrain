@@ -10,6 +10,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
+import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.SOMNetwork
@@ -216,7 +217,11 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 
         val dataSetTabPane = JTabbedPane().apply {
             addTab("Training data", trainingDataSetPanel)
-            addTab("Testing data", testingDataSetPanel)
+            // Networks that never evaluate a testing set, such as a recurrent one whose output depends
+            // on the sequence preceding each row, would otherwise offer a tab that is never read.
+            if (trainerConfig.testConfiguration.enabled) {
+                addTab("Testing data", testingDataSetPanel)
+            }
         }
 
         trainer.events.beginTraining.on(Dispatchers.Default) { syncDataSet() }
@@ -420,6 +425,17 @@ fun UnsupervisedNetwork.makeTrainerPanel(): StandardDialog = getUnsupervisedTrai
 fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 
     val creator = SRNNetwork.SRNCreator(
+        network.placementManager.lastClickedLocation
+    )
+    return creator.createEditorDialog {
+        addSubnetworkAction(this@NetworkPanel) { creator.create() }
+    }
+
+}
+
+fun NetworkPanel.showBPTTCreationDialog(): StandardDialog {
+
+    val creator = BPTTNetwork.BPTTCreator(
         network.placementManager.lastClickedLocation
     )
     return creator.createEditorDialog {

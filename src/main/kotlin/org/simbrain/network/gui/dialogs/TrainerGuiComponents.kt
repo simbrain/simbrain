@@ -91,6 +91,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                 }
             }
             trainer.events.errorUpdated.fireAsync(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
+            supervisedNetwork.onTrainerConfigChanged()
         }.display()
     }
 

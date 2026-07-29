@@ -36,6 +36,12 @@ interface SupervisedNetwork {
      */
     fun createTrainer(network: Network): SupervisedTrainer = SupervisedTrainer(network, this)
 
+    /**
+     * Called after the user commits an edit to [trainerConfig]. Overridden by networks that surface
+     * one of its settings outside the trainer dialog, such as on the canvas.
+     */
+    fun onTrainerConfigChanged() {}
+
     fun possibleLossFunctions() = when(outputLayer.updateRule) {
         is SoftmaxRule -> listOf(BackpropLossFunction.CrossEntropy::class.java)
         else -> listOf(BackpropLossFunction.SSE::class.java, BackpropLossFunction.MSE::class.java, BackpropLossFunction.RMSE::class.java)

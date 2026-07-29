@@ -411,7 +411,11 @@ class SupervisedTrainer(val network: Network, val supervisedNetwork: SupervisedN
 
         val computeDeltaContext = probeContext?.createMapProbe("computeDelta")
 
-        biasesAccumulator.forEach { (na, delta) ->
+        // A clamped layer's activations are forced rather than computed, so its biases cannot affect
+        // anything the network produces. Applying deltas to them would let them drift on every batch,
+        // and under time-unrolled training that drift compounds once per timestep. Deltas are still
+        // accumulated above so that every Layer implementation stays comparable via probes.
+        biasesAccumulator.filterKeys { !it.isClamped }.forEach { (na, delta) ->
             val delta = config.optimizer.computeDelta(na.biases, delta.clone().mul(batchScale))
             computeDeltaContext?.write(na.displayName, delta)
             recordOptimizerUpdate(delta)

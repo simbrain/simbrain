@@ -312,4 +312,28 @@ class SupervisedTrainerTest {
         // Below threshold - should stop
         assertTrue(condition.validate(50, 0.123455))
     }
+
+    @Test
+    fun `training leaves clamped layer biases untouched but still trains unclamped ones`() = runBlocking {
+        val net = Network()
+        val bp = BackpropNetwork(intArrayOf(4, 3, 4), null)
+        net.addNetworkModelsAsync(bp)
+        val trainer = SupervisedTrainer(net, bp)
+
+        assertTrue(bp.inputLayer.isClamped) { "Test assumes a backprop input layer is clamped" }
+        val hiddenLayer = bp.layerList[1]
+        assertFalse(hiddenLayer.isClamped) { "Test assumes the hidden layer is not clamped" }
+
+        val clampedBefore = bp.inputLayer.biasArray.copyOf()
+        val unclampedBefore = hiddenLayer.biasArray.copyOf()
+
+        repeat(20) { trainer.trainOnce() }
+
+        assertArrayEquals(clampedBefore, bp.inputLayer.biasArray) {
+            "Biases of a clamped layer cannot affect its activations, so training must not move them"
+        }
+        assertFalse(unclampedBefore.contentEquals(hiddenLayer.biasArray)) {
+            "Unclamped layer biases should still be trained"
+        }
+    }
 }

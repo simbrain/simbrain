@@ -6,27 +6,18 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
 import org.simbrain.network.gui.isPanKeyDown
 import org.simbrain.network.llm.HeadwiseNormRopeOp
-import org.simbrain.network.tensor.op.LinearOp
-import org.simbrain.network.tensor.op.MatMulLinearOp
-import org.simbrain.network.tensor.op.MergeHeadsOp
-import org.simbrain.network.tensor.op.ReLUOp
-import org.simbrain.network.tensor.op.SplitHeadsOp
-import org.simbrain.network.tensor.op.TensorOp
+import org.simbrain.network.tensor.op.*
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.RasterCachedNode
 import org.simbrain.util.piccolo.SvgIconNode
 import java.awt.BasicStroke
 import java.awt.Color
-import java.awt.geom.AffineTransform
-import java.awt.geom.Area
-import java.awt.geom.Line2D
-import java.awt.geom.Path2D
-import java.awt.geom.Point2D
-import java.awt.geom.Rectangle2D
+import java.awt.geom.*
 import kotlin.math.abs
 import kotlin.math.atan2
 
@@ -52,6 +43,9 @@ class CompositorNode(
         paint = NetworkTheme.current.canvasBackground
         strokePaint = NetworkTheme.current.subnetOutline
     }.also { addChild(it) }
+
+    /** Bounds of the compositor's background border in this node's parent coordinates. */
+    fun outlineBoundsInParentCoordinates(): PBounds = PBounds(background.fullBoundsReference).also(::localToParent)
 
     /**
      * Fans and edges live in one raster-cached chrome layer: this vector work only changes on
@@ -1274,4 +1268,3 @@ class CompositorNode(
             (1..7).flatMap { listOf(-it * 0.06, it * 0.06) }.toDoubleArray()
     }
 }
-

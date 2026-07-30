@@ -3,8 +3,6 @@ package org.simbrain.network.gui.nodes
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
-import org.piccolo2d.PCamera
-import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.core.NetworkModel
@@ -13,56 +11,26 @@ import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.llm.TeachingTransformerModel
-import org.simbrain.util.NetworkTheme
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Theme
-import org.simbrain.util.createAction
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
-import org.simbrain.util.roundToString
-import org.simbrain.util.showInputDialog
-import org.simbrain.util.swingDispatcher
+import org.simbrain.util.*
 import java.awt.geom.Point2D
-import java.beans.PropertyChangeListener
-import javax.swing.ButtonGroup
-import javax.swing.JButton
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JLabel
-import javax.swing.JMenu
-import javax.swing.JPanel
-import javax.swing.JPopupMenu
-import javax.swing.JRadioButtonMenuItem
+import javax.swing.*
 
 /**
- * Canvas node for a [TeachingTransformer]: an interaction box, the compositor spine interior,
- * and a status line with training and stepping state. The flagship interaction is op-level
- * micro-stepping — step a forward pass or a whole training step one op at a time, with the
- * active op's glyph glowing, un-computed tiles dimmed, and the backward half filling gradient
- * views.
+ * Canvas node for a [TeachingTransformer]: an interaction box and the compositor spine interior.
+ * The flagship interaction is op-level micro-stepping — step a forward pass or a whole training
+ * step one op at a time, with the active op's glyph glowing, un-computed tiles dimmed, and the
+ * backward half filling gradient views.
  */
 class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransformer: TeachingTransformer) :
     ScreenElement(networkPanel) {
 
     private val interactionBox = TeachingTransformerInteractionBox(networkPanel)
 
-    private val statusText = PText().apply {
-        font = Theme.body
-        textPaint = NetworkTheme.current.valueText
-    }
-
     private var compositorNode: CompositorNode? = null
-
-    /**
-     * The status line rides the interaction box's zoom counter-scale: both stay readable at
-     * overview zoom, and the status keeps clear of the box's enlarged footprint.
-     */
-    private val statusZoomListener = PropertyChangeListener { placeStatusText() }
 
     init {
         addChild(interactionBox)
-        addChild(statusText)
         interactionBox.setText(teachingTransformer.displayName)
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, statusZoomListener)
 
         val events = teachingTransformer.events
         events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(teachingTransformer.displayName) }
@@ -98,38 +66,40 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             networkPanel.canvas,
             tokenLabel = { id -> teachingTransformer.tokenLabels?.getOrNull(id)?.let { "“$it”" } ?: "#$id" },
         ).also {
-            it.onLayoutChanged = { teachingTransformer.captureViewState() }
+            it.onLayoutChanged = {
+                teachingTransformer.captureViewState()
+                positionInteractionBox()
+            }
             addChild(it)
         }
-        // The interior's background can grow over the header as tiles move; keep the
-        // interaction box and status line painting (and picking) above it.
-        statusText.raiseToTop()
+        // The interior's background can grow over the interaction box; keep the box painting
+        // (and picking) above it.
         interactionBox.raiseToTop()
         placeChildren()
         refreshView()
     }
 
-    /**
-     * The header anchors at the node origin; the interior starts below the header line at its
-     * largest zoom counter-scale, so it never slides under the box or status as the camera
-     * zooms out.
-     */
+    /** The interaction box's bottom stays attached to the compositor's top border. */
     private fun placeChildren() {
-        interactionBox.setOffset(0.0, 0.0)
-        placeStatusText()
-        val reserve = interactionBox.height * InteractionBox.zoomRescale(0.0) + 12.0
         compositorNode?.let { interior ->
-            val bounds = interior.fullBoundsReference
-            interior.offset(-bounds.x, reserve - bounds.y)
+            val fullBounds = interior.fullBoundsReference
+            val outlineBounds = interior.outlineBoundsInParentCoordinates()
+            val outlineTop = interactionBox.fullBoundsReference.height + 6.0
+            interior.offset(-fullBounds.x, outlineTop - outlineBounds.y)
+            positionInteractionBox()
         }
     }
 
-    /** One header line: the status rides beside the box at the box's zoom counter-scale. */
-    private fun placeStatusText() {
-        val rescale = InteractionBox.zoomRescale(networkPanel.canvas.camera.viewScale)
-        statusText.scale = rescale
-        val box = interactionBox.fullBoundsReference
-        statusText.setOffset(box.width + 8.0 * rescale, (box.height - statusText.height * rescale) / 2)
+    override fun layoutChildren() {
+        if (compositorNode != null) positionInteractionBox()
+    }
+
+    private fun positionInteractionBox() {
+        val outlineBounds = compositorNode?.outlineBoundsInParentCoordinates() ?: return
+        interactionBox.centerFullBoundsOnPoint(
+            outlineBounds.centerX,
+            outlineBounds.y - interactionBox.fullBounds.height / 2 + 0.5,
+        )
     }
 
     private fun refreshView() {
@@ -139,36 +109,6 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             teachingTransformer.scene.staleTiles(model.plan.cursor),
         )
         compositorNode?.refreshDirtyTiles()
-        statusText.text = statusLine()
-    }
-
-    private fun statusLine(): String {
-        val trainer = teachingTransformer.trainer
-        val model = teachingTransformer.model
-        val generation = when {
-            teachingTransformer.waitingForInput -> "waiting for input"
-            else -> "writing (play or step the network)"
-        }
-        val phase = when (model.stepPhase) {
-            TeachingTransformerModel.StepPhase.IDLE ->
-                if (model.plan.cursor != 0) "stepping forward: ${teachingTransformer.pendingOp()?.name}" else null
-            TeachingTransformerModel.StepPhase.FORWARD -> "train step, forward: ${model.nextOp()?.name}"
-            TeachingTransformerModel.StepPhase.BACKWARD -> "train step, backward: ${model.nextOp()?.name}"
-        }
-        val training = when {
-            trainer.isRunning -> "training, iteration ${trainer.iteration}, loss ${trainer.lastTrainingError.roundToString(4)}"
-            trainer.iteration > 0 -> "trained ${trainer.iteration} iterations, loss ${trainer.lastTrainingError.roundToString(4)}"
-            else -> "untrained"
-        }
-        val context = teachingTransformer.contextTokens
-            .takeLast(8)
-            .joinToString(" ") { teachingTransformer.tokenLabels?.getOrNull(it) ?: "#$it" }
-        return listOfNotNull(
-            generation,
-            training,
-            phase,
-            if (context.isNotEmpty()) "context: …$context" else null,
-        ).joinToString("  ·  ")
     }
 
     override val propertyDialog: StandardDialog
@@ -283,7 +223,6 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
 
     override fun refreshTheme() {
         interactionBox.refreshTheme()
-        statusText.textPaint = NetworkTheme.current.valueText
         compositorNode?.refreshTheme()
     }
 

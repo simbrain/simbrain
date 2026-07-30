@@ -17,7 +17,6 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
-import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.io.File
 import javax.swing.JScrollPane
@@ -394,7 +393,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         2. Click `Play` (or `Step`) in the main toolbar
         3. Each workspace step runs the full transformer on the current context and samples one new token
 
-        There is no start or stop mode: the transformer writes whenever the workspace runs and there is text to continue — with an empty document its status line shows `waiting for input`. Pause the workspace to edit the text; the next `Play` continues from your edit.
+        There is no start or stop mode: the transformer writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
         Tokens you type that aren't in the vocabulary become zero rows in the input (the vocabulary comes from the training text — see `Show Vocabulary`).
 

@@ -2,8 +2,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.piccolo2d.PCamera
-import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.HistoryView
@@ -13,34 +11,16 @@ import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
-import org.simbrain.util.NetworkTheme
-import org.simbrain.util.RateLimitedEdtAction
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Theme
-import org.simbrain.util.createAction
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
-import org.simbrain.util.showDirectorySelectionDialog
-import org.simbrain.util.showInputDialog
-import org.simbrain.util.showWarningConfirmDialog
-import org.simbrain.util.showWarningDialog
-import org.simbrain.util.swingDispatcher
+import org.simbrain.util.*
 import org.simbrain.workspace.WorkspacePreferences
 import java.awt.geom.Point2D
-import java.beans.PropertyChangeListener
 import java.nio.file.Path
-import javax.swing.ButtonGroup
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JMenu
-import javax.swing.JOptionPane
-import javax.swing.JPopupMenu
-import javax.swing.JRadioButtonMenuItem
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 /**
  * Canvas node for a [LanguageModel]: an interaction box for whole-node selection and dragging,
- * the compositor interior (which owns its own tile selection, moves, trace, and tooltips), and a
- * status line with the generated text. Generation is paced by the workspace: playing or
+ * the compositor interior (which owns its own tile selection, moves, trace, and tooltips).
+ * Generation is paced by the workspace: playing or
  * stepping the network generates one token per iteration whenever the model can advance;
  * the context menu reseeds the context window from the prompt.
  */
@@ -48,26 +28,13 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private val interactionBox = LanguageModelInteractionBox(networkPanel)
 
-    private val statusText = PText().apply {
-        font = Theme.body
-        textPaint = NetworkTheme.current.valueText
-    }
-
     private var compositorNode: CompositorNode? = null
 
     private var loadError: String? = null
 
-    /**
-     * The status line rides the interaction box's zoom counter-scale: both stay readable at
-     * overview zoom, and the status keeps clear of the box's enlarged footprint.
-     */
-    private val statusZoomListener = PropertyChangeListener { placeStatusText() }
-
     init {
         addChild(interactionBox)
-        addChild(statusText)
         interactionBox.setText(languageModel.displayName)
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, statusZoomListener)
 
         val events = languageModel.events
         events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) }
@@ -107,40 +74,41 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 networkPanel.canvas,
                 tokenLabel = { id -> "“${state.tokenizer.decode(intArrayOf(id))}”" },
             ).also {
-                it.onLayoutChanged = { languageModel.captureViewState() }
+                it.onLayoutChanged = {
+                    languageModel.captureViewState()
+                    positionInteractionBox()
+                }
                 addChild(it)
             }
         }
-        // The interior's background can grow over the header as tiles move; keep the
-        // interaction box and status line painting (and picking) above it.
-        statusText.raiseToTop()
+        // The interior's background can grow over the interaction box; keep the box painting
+        // (and picking) above it.
         interactionBox.raiseToTop()
         placeChildren()
         refreshView()
     }
 
-    /**
-     * The header anchors at the node origin, not under the interior: the interior's bounds
-     * change as tiles move, and a bottom anchor would drift away from the box. The interior
-     * starts below the header line at its largest zoom counter-scale, so it never slides
-     * under the box or status as the camera zooms out.
-     */
+    /** The interaction box's bottom stays attached to the compositor's top border. */
     private fun placeChildren() {
-        interactionBox.setOffset(0.0, 0.0)
-        placeStatusText()
-        val reserve = interactionBox.height * InteractionBox.zoomRescale(0.0) + 12.0
         compositorNode?.let { interior ->
-            val bounds = interior.fullBoundsReference
-            interior.offset(-bounds.x, reserve - bounds.y)
+            val fullBounds = interior.fullBoundsReference
+            val outlineBounds = interior.outlineBoundsInParentCoordinates()
+            val outlineTop = interactionBox.fullBoundsReference.height + 6.0
+            interior.offset(-fullBounds.x, outlineTop - outlineBounds.y)
+            positionInteractionBox()
         }
     }
 
-    /** One header line: the status rides beside the box at the box's zoom counter-scale. */
-    private fun placeStatusText() {
-        val rescale = InteractionBox.zoomRescale(networkPanel.canvas.camera.viewScale)
-        statusText.scale = rescale
-        val box = interactionBox.fullBoundsReference
-        statusText.setOffset(box.width + 8.0 * rescale, (box.height - statusText.height * rescale) / 2)
+    override fun layoutChildren() {
+        if (compositorNode != null) positionInteractionBox()
+    }
+
+    private fun positionInteractionBox() {
+        val outlineBounds = compositorNode?.outlineBoundsInParentCoordinates() ?: return
+        interactionBox.centerFullBoundsOnPoint(
+            outlineBounds.centerX,
+            outlineBounds.y - interactionBox.fullBounds.height / 2 + 0.5,
+        )
     }
 
     /**
@@ -153,33 +121,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private fun refreshView() {
         compositorNode?.refreshDirtyTiles()
-        val line = statusLine()
-        if (statusText.text != line) statusText.text = line
-    }
-
-    private fun statusLine(): String {
-        loadError?.let { return "Weights failed to load: $it" }
-        val state = languageModel.loaded
-            ?: return if (languageModel.weightsDirectory.isEmpty()) {
-                "No weights — right-click to locate or download them"
-            } else {
-                "Loading weights…"
-            }
-        val tail = languageModel.text.takeLast(90).replace('\n', ' ')
-        return when {
-            languageModel.canAdvance ->
-                "Writing, token ${state.model.position}/${state.model.config.maxSeqLen} " +
-                        "(play or step the network) — …$tail"
-            languageModel.isWindowFull ->
-                "Context window full — right-click to clear the window — …$tail"
-            languageModel.isSealed ->
-                "Ended — edit the document or delete the end marker to continue — …$tail"
-            languageModel.budgetSpent ->
-                "Token budget spent — edit the document or raise the budget to continue — …$tail"
-            languageModel.text.isEmpty() ->
-                "Waiting for input — add text to a coupled document or send a chat message"
-            else -> "Idle — …$tail"
-        }
     }
 
     override val propertyDialog: StandardDialog
@@ -314,7 +255,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     override fun refreshTheme() {
         interactionBox.refreshTheme()
-        statusText.textPaint = NetworkTheme.current.valueText
         compositorNode?.refreshTheme()
     }
 

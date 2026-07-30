@@ -1,17 +1,14 @@
 package org.simbrain.network.llm
 
 import org.bytedeco.javacpp.FloatPointer
-import org.bytedeco.openblas.global.openblas_nolapack.CblasNoTrans
-import org.bytedeco.openblas.global.openblas_nolapack.CblasRowMajor
-import org.bytedeco.openblas.global.openblas_nolapack.CblasTrans
-import org.bytedeco.openblas.global.openblas_nolapack.cblas_sgemv
+import org.bytedeco.openblas.global.openblas_nolapack.*
+import org.simbrain.network.tensor.op.TensorOp
+import org.simbrain.network.tensor.op.TensorPort
 import java.nio.FloatBuffer
 import kotlin.math.cos
 import kotlin.math.exp
 import kotlin.math.sin
 import kotlin.math.sqrt
-import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.network.tensor.op.TensorPort
 
 /**
  * Decode-loop state shared by the position-dependent ops: which token is being fed and where it
@@ -30,6 +27,8 @@ class EmbedLookupOp(
     private val state: Lfm2DecodeState,
 ) : TensorOp(name) {
 
+    override fun displayTooltip() = "Token embedding\nLook up the learned vector for the current token."
+
     override val inputs = listOf(embed)
     override val outputs = listOf(out)
 
@@ -47,6 +46,8 @@ class RopeAnglesOp(
     private val invFreq: DoubleArray,
     private val state: Lfm2DecodeState,
 ) : TensorOp(name) {
+
+    override fun displayTooltip() = "Rotary position encoding\nCompute position information for this token, used by attention."
 
     override val inputs = emptyList<TensorPort>()
     override val outputs = listOf(cosOut, sinOut)
@@ -75,6 +76,8 @@ class HeadwiseNormRopeOp(
     private val headDim: Int,
     private val eps: Float,
 ) : TensorOp(name) {
+
+    override fun displayTooltip() = "Normalize and position attention heads\nNormalize each head, then add information about this token's position."
 
     override val inputs = listOf(src, weight, cosIn, sinIn)
     override val outputs = listOf(out)
@@ -115,6 +118,8 @@ class CacheWriteOp(
     private val state: Lfm2DecodeState,
 ) : TensorOp(name) {
 
+    override fun displayTooltip() = "Update attention memory\nStore this token's key or value so later tokens can attend to it."
+
     override val inputs = listOf(src)
     override val outputs = listOf(cache)
 
@@ -141,6 +146,8 @@ class AttendScoresOp(
     private val numKvHeads: Int,
     private val headDim: Int,
 ) : TensorOp(name) {
+
+    override fun displayTooltip() = "Attention weights\nCompare this token's query with earlier keys to decide which tokens matter most."
 
     override val inputs = listOf(q, kCache)
     override val outputs = listOf(weights)
@@ -189,6 +196,8 @@ class AttendMixOp(
     private val headDim: Int,
 ) : TensorOp(name) {
 
+    override fun displayTooltip() = "Attention output\nUse the attention weights to combine information from earlier tokens."
+
     override val inputs = listOf(weights, vCache)
     override val outputs = listOf(out)
 
@@ -219,6 +228,8 @@ class OffsetGateOp(
     val out: TensorPort,
 ) : TensorOp(name) {
 
+    override fun displayTooltip() = "Feature gate\nUse one stream of features to select information from another stream."
+
     override val inputs = listOf(a, b)
     override val outputs = listOf(out)
 
@@ -244,6 +255,8 @@ class CausalConvOp(
     val weight: TensorPort,
     val out: TensorPort,
 ) : TensorOp(name) {
+
+    override fun displayTooltip() = "Causal convolution\nMix information from this token and the previous few tokens."
 
     // The rolling window is genuinely read every step (and rewritten): declaring the read keeps
     // graph-derived displays honest about past tokens feeding the conv.

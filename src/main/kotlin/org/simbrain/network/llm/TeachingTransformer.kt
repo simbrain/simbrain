@@ -8,36 +8,45 @@ import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.TensorRole
+import org.simbrain.network.tensor.op.*
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.network.trainers.TapeTrainer
-import org.simbrain.util.SimpleTokenizer
-import org.simbrain.util.Tokenizer
-import org.simbrain.util.UserParameter
-import org.simbrain.util.WithXStreamPropertyConverter
-import org.simbrain.util.createXStreamPropertyConverter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.tokenize
 import java.nio.ByteBuffer
 import java.util.Base64
-import org.simbrain.network.tensor.op.AddOp
-import org.simbrain.network.tensor.op.BiasOp
-import org.simbrain.network.tensor.op.CausalMaskedRowSoftmaxOp
-import org.simbrain.network.tensor.op.Gradients
-import org.simbrain.network.tensor.op.HeadMixOp
-import org.simbrain.network.tensor.op.HeadScoresOp
-import org.simbrain.network.tensor.op.LayerNormOp
-import org.simbrain.network.tensor.op.MatMulLinearOp
-import org.simbrain.network.tensor.op.MergeHeadsOp
-import org.simbrain.network.tensor.op.OpPlan
-import org.simbrain.network.tensor.op.ReLUOp
-import org.simbrain.network.tensor.op.SeqEmbedOp
-import org.simbrain.network.tensor.op.SeqSoftmaxCrossEntropyOp
-import org.simbrain.network.tensor.op.SplitHeadsOp
-import org.simbrain.network.tensor.op.Tape
-import org.simbrain.network.tensor.op.TensorAdam
-import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.network.tensor.op.TensorPort
+import kotlin.collections.ArrayDeque
+import kotlin.collections.ArrayList
+import kotlin.collections.HashMap
+import kotlin.collections.LinkedHashMap
+import kotlin.collections.List
+import kotlin.collections.Map
+import kotlin.collections.associateTo
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.copyOf
+import kotlin.collections.copyOfRange
+import kotlin.collections.emptyList
+import kotlin.collections.filterIsInstance
+import kotlin.collections.filterNotNull
+import kotlin.collections.firstOrNull
+import kotlin.collections.forEach
+import kotlin.collections.forEachIndexed
+import kotlin.collections.getOrElse
+import kotlin.collections.getOrNull
+import kotlin.collections.indices
+import kotlin.collections.isEmpty
+import kotlin.collections.isNotEmpty
+import kotlin.collections.listOf
+import kotlin.collections.map
+import kotlin.collections.mapNotNull
+import kotlin.collections.mapValuesTo
+import kotlin.collections.plus
+import kotlin.collections.plusAssign
+import kotlin.collections.set
+import kotlin.collections.sum
+import kotlin.collections.toIntArray
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -118,9 +127,10 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
         val posTable = weightParam("embed.pos", seq, dim)
         val embedded = workspace("embed", seq, dim)
         embedOp = SeqEmbedOp("embed", embedTable, embedded)
-        ops += embedOp
+        ops += embedOp.withDisplayTooltip("Token embeddings", "Look up a learned vector for each token in the context.")
         var resid = workspace("resid0", seq, dim)
         ops += AddOp("add_pos", embedded, posTable, resid)
+            .withDisplayTooltip("Add position information", "Combine each token's embedding with its learned position vector.")
 
         for (l in 0 until c.numLayers) {
             val prefix = "layers.$l"
@@ -129,47 +139,67 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
             ops += LayerNormOp("$prefix.attn.norm", resid,
                 onesParam("$prefix.attn.norm.gamma", dim), zerosParam("$prefix.attn.norm.beta", dim),
                 attnNormed, c.normEps)
+                .withDisplayTooltip("Layer normalization", "Rescale the representation before attention processes it.")
             val q = workspace("$prefix.attn.q", seq, dim)
             val k = workspace("$prefix.attn.k", seq, dim)
             val v = workspace("$prefix.attn.v", seq, dim)
             ops += MatMulLinearOp("$prefix.attn.q_proj", weightParam("$prefix.attn.wq", dim, dim), attnNormed, q)
+                .withDisplayTooltip("Query projection", "Create a query vector for each attention head.")
             ops += MatMulLinearOp("$prefix.attn.k_proj", weightParam("$prefix.attn.wk", dim, dim), attnNormed, k)
+                .withDisplayTooltip("Key projection", "Create key vectors that queries can compare against.")
             ops += MatMulLinearOp("$prefix.attn.v_proj", weightParam("$prefix.attn.wv", dim, dim), attnNormed, v)
+                .withDisplayTooltip("Value projection", "Create the information attention can retrieve from each token.")
             val qHeads = workspace("$prefix.attn.q_heads", c.numHeads * seq, c.headDim)
             val kHeads = workspace("$prefix.attn.k_heads", c.numHeads * seq, c.headDim)
             val vHeads = workspace("$prefix.attn.v_heads", c.numHeads * seq, c.headDim)
             ops += SplitHeadsOp("$prefix.attn.q_split", q, qHeads, c.numHeads)
+                .withDisplayTooltip("Split query heads", "Separate the query vectors into independent attention heads.")
             ops += SplitHeadsOp("$prefix.attn.k_split", k, kHeads, c.numHeads)
+                .withDisplayTooltip("Split key heads", "Separate the key vectors into independent attention heads.")
             ops += SplitHeadsOp("$prefix.attn.v_split", v, vHeads, c.numHeads)
+                .withDisplayTooltip("Split value heads", "Separate the value vectors into independent attention heads.")
             val scores = workspace("$prefix.attn.scores", c.numHeads * seq, seq)
             ops += HeadScoresOp("$prefix.attn.score", qHeads, kHeads, scores, c.numHeads)
+                .withDisplayTooltip("Attention scores", "Compare each query with earlier keys to measure their relevance.")
             val attnWeights = workspace("$prefix.attn.weights", c.numHeads * seq, seq)
             ops += CausalMaskedRowSoftmaxOp("$prefix.attn.softmax", scores, attnWeights, c.numHeads)
+                .withDisplayTooltip("Attention weights", "Convert scores into weights; tokens cannot attend to future tokens.")
             val mixed = workspace("$prefix.attn.mixed", c.numHeads * seq, c.headDim)
             ops += HeadMixOp("$prefix.attn.mix", attnWeights, vHeads, mixed, c.numHeads)
+                .withDisplayTooltip("Mix values", "Use the attention weights to combine information from tokens in the context.")
             val merged = workspace("$prefix.attn.merged", seq, dim)
             ops += MergeHeadsOp("$prefix.attn.merge", mixed, merged, c.numHeads)
+                .withDisplayTooltip("Merge attention heads", "Join the independent head outputs into one representation.")
             val attnOut = workspace("$prefix.attn.out", seq, dim)
             ops += MatMulLinearOp("$prefix.attn.out_proj", weightParam("$prefix.attn.wo", dim, dim), merged, attnOut)
+                .withDisplayTooltip("Attention output projection", "Return the combined attention information to the model's main width.")
             val attnResid = workspace("$prefix.attn_resid", seq, dim)
             ops += AddOp("$prefix.attn_residual", resid, attnOut, attnResid)
+                .withDisplayTooltip("Residual addition", "Add the attention update to the running representation.")
 
             val mlpNormed = workspace("$prefix.mlp.normed", seq, dim)
             ops += LayerNormOp("$prefix.mlp.norm", attnResid,
                 onesParam("$prefix.mlp.norm.gamma", dim), zerosParam("$prefix.mlp.norm.beta", dim),
                 mlpNormed, c.normEps)
+                .withDisplayTooltip("Layer normalization", "Rescale the representation before the MLP processes it.")
             val hiddenRaw = workspace("$prefix.mlp.hidden_raw", seq, c.hiddenDim)
             val hidden = workspace("$prefix.mlp.hidden", seq, c.hiddenDim)
             val act = workspace("$prefix.mlp.act", seq, c.hiddenDim)
             val outRaw = workspace("$prefix.mlp.out_raw", seq, dim)
             val mlpOut = workspace("$prefix.mlp.out", seq, dim)
             ops += MatMulLinearOp("$prefix.mlp.up_proj", weightParam("$prefix.mlp.w1", c.hiddenDim, dim), mlpNormed, hiddenRaw)
+                .withDisplayTooltip("MLP expansion", "Expand the representation into a larger set of features.")
             ops += BiasOp("$prefix.mlp.up_bias", hiddenRaw, zerosParam("$prefix.mlp.b1", c.hiddenDim), hidden)
+                .withDisplayTooltip("Add bias", "Give each MLP feature its own learned offset.")
             ops += ReLUOp("$prefix.mlp.relu", hidden, act)
+                .withDisplayTooltip("ReLU activation", "Keep positive features and set negative features to zero.")
             ops += MatMulLinearOp("$prefix.mlp.down_proj", weightParam("$prefix.mlp.w2", dim, c.hiddenDim), act, outRaw)
+                .withDisplayTooltip("MLP compression", "Project the selected features back to the model's main width.")
             ops += BiasOp("$prefix.mlp.down_bias", outRaw, zerosParam("$prefix.mlp.b2", dim), mlpOut)
+                .withDisplayTooltip("Add bias", "Give each output feature its own learned offset.")
             val layerResid = workspace("$prefix.resid", seq, dim)
             ops += AddOp("$prefix.residual", attnResid, mlpOut, layerResid)
+                .withDisplayTooltip("Residual addition", "Add the MLP update to the running representation.")
             resid = layerResid
         }
 
@@ -177,11 +207,13 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
         ops += LayerNormOp("final_norm", resid,
             onesParam("final_norm.gamma", dim), zerosParam("final_norm.beta", dim),
             finalNormed, c.normEps)
+            .withDisplayTooltip("Output normalization", "Rescale the final representation before scoring next-token choices.")
         val logits = workspace("logits", seq, c.vocabSize)
         ops += MatMulLinearOp("unembed", weightParam("unembed.weight", c.vocabSize, dim), finalNormed, logits)
+            .withDisplayTooltip("Next-token scores", "Score every possible next token from the final representation.")
         ceOp = SeqSoftmaxCrossEntropyOp("cross_entropy", logits,
             workspace("probs", seq, c.vocabSize), workspace("loss", 1, 1))
-        ops += ceOp
+        ops += ceOp.withDisplayTooltip("Training loss", "Measure how far the predicted probabilities are from the expected next tokens.")
 
         return OpPlan(ops)
     }

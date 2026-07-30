@@ -1206,17 +1206,17 @@ class CompositorNode(
             val glyph = glyphsByOp.values.firstOrNull { it.containsScenePoint(point.x, point.y) }
             if (glyph != null) {
                 val parallel = opParallelism(glyph.op)
-                target.toolTipText = glyph.op.toString() + when {
+                target.toolTipText = glyph.op.displayTooltip() + when {
                     glyph.op is HeadwiseNormRopeOp ->
-                        " — $parallel per-head passes sharing one norm weight and the rope angles"
-                    parallel > 1 -> " — $parallel independent per-head passes"
+                        "\nThis happens independently in each of $parallel attention heads."
+                    parallel > 1 -> "\nThis happens independently in $parallel attention heads."
                     else -> ""
                 }
                 return
             }
             val badged = tileNodes.firstOrNull { it.badgeContains(point.x, point.y) }
             if (badged != null) {
-                target.toolTipText = badged.activationOp.toString()
+                target.toolTipText = badged.activationOp?.displayTooltip()
                 return
             }
             val cell = tile?.cellAt(point.x, point.y)

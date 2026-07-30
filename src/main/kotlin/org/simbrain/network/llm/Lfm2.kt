@@ -1,14 +1,7 @@
 package org.simbrain.network.llm
 
 import org.simbrain.network.tensor.FloatTensor
-import org.simbrain.network.tensor.op.HookHandle
-import org.simbrain.network.tensor.op.LinearOp
-import org.simbrain.network.tensor.op.AddOp
-import org.simbrain.network.tensor.op.OpPlan
-import org.simbrain.network.tensor.op.RmsNormOp
-import org.simbrain.network.tensor.op.SiluGateOp
-import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.network.tensor.op.TensorPort
+import org.simbrain.network.tensor.op.*
 import kotlin.math.pow
 
 /**
@@ -83,6 +76,7 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
             val normed = workspace("$prefix.operator_normed", c.hiddenSize)
             ops += RmsNormOp("$prefix.operator_norm", resid,
                 paramPort("$weightPrefix.operator_norm.weight"), normed, c.normEps)
+                .withDisplayTooltip("RMS normalization", "Rescale the representation before this layer processes it.")
 
             val mixerOut = if (i in c.attentionLayers) {
                 attentionOps(ops, prefix, weightPrefix, normed, ropeCos, ropeSin)
@@ -92,28 +86,37 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
 
             val mixerResid = workspace("$prefix.mixer_resid", c.hiddenSize)
             ops += AddOp("$prefix.mixer_residual", resid, mixerOut, mixerResid)
+                .withDisplayTooltip("Residual addition", "Add this layer's mixer update to the running representation.")
 
             val ffnNormed = workspace("$prefix.ffn_normed", c.hiddenSize)
             ops += RmsNormOp("$prefix.ffn_norm", mixerResid,
                 paramPort("$weightPrefix.ffn_norm.weight"), ffnNormed, c.normEps)
+                .withDisplayTooltip("RMS normalization", "Rescale the representation before the MLP processes it.")
             val mlpGate = workspace("$prefix.mlp.gate", c.intermediateSize)
             val mlpUp = workspace("$prefix.mlp.up", c.intermediateSize)
             val mlpAct = workspace("$prefix.mlp.act", c.intermediateSize)
             val mlpOut = workspace("$prefix.mlp.out", c.hiddenSize)
             ops += LinearOp("$prefix.mlp.w1", paramPort("$weightPrefix.feed_forward.w1.weight"), ffnNormed, mlpGate)
+                .withDisplayTooltip("SwiGLU gate projection", "Create gate values that decide which MLP features to keep.")
             ops += LinearOp("$prefix.mlp.w3", paramPort("$weightPrefix.feed_forward.w3.weight"), ffnNormed, mlpUp)
+                .withDisplayTooltip("SwiGLU value projection", "Create the MLP features that the gate will filter.")
             ops += SiluGateOp("$prefix.mlp.silu_gate", mlpGate, mlpUp, mlpAct)
+                .withDisplayTooltip("SwiGLU activation", "Use the gate values to select and scale the MLP features.")
             ops += LinearOp("$prefix.mlp.w2", paramPort("$weightPrefix.feed_forward.w2.weight"), mlpAct, mlpOut)
+                .withDisplayTooltip("MLP output projection", "Return the selected MLP features to the model's main width.")
 
             val layerResid = workspace("$prefix.resid", c.hiddenSize)
             ops += AddOp("$prefix.residual", mixerResid, mlpOut, layerResid)
+                .withDisplayTooltip("Residual addition", "Add the MLP update to the running representation.")
             resid = layerResid
         }
 
         val finalNormed = workspace("final_norm", c.hiddenSize)
         ops += RmsNormOp("embedding_norm", resid,
             paramPort("model.embedding_norm.weight"), finalNormed, c.normEps)
+            .withDisplayTooltip("Output normalization", "Rescale the final representation before scoring next-token choices.")
         ops += LinearOp("unembed", embedPort, finalNormed, workspace("logits", c.vocabSize))
+            .withDisplayTooltip("Next-token scores", "Score every possible next token from the final representation.")
 
         return OpPlan(ops)
     }
@@ -131,8 +134,11 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
         val kRaw = workspace("$prefix.attn.k_raw", c.kvDim)
         val v = workspace("$prefix.attn.v", c.kvDim)
         ops += LinearOp("$prefix.attn.q_proj", paramPort("$weightPrefix.self_attn.q_proj.weight"), normed, qRaw)
+            .withDisplayTooltip("Query projection", "Create one query vector for each attention head.")
         ops += LinearOp("$prefix.attn.k_proj", paramPort("$weightPrefix.self_attn.k_proj.weight"), normed, kRaw)
+            .withDisplayTooltip("Key projection", "Create key vectors that later queries can compare against.")
         ops += LinearOp("$prefix.attn.v_proj", paramPort("$weightPrefix.self_attn.v_proj.weight"), normed, v)
+            .withDisplayTooltip("Value projection", "Create the information that attention can retrieve from this token.")
 
         val q = workspace("$prefix.attn.q", c.numHeads * c.headDim)
         val k = workspace("$prefix.attn.k", c.kvDim)
@@ -157,6 +163,7 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
 
         val attnOut = workspace("$prefix.attn.out", c.hiddenSize)
         ops += LinearOp("$prefix.attn.out_proj", paramPort("$weightPrefix.self_attn.out_proj.weight"), context, attnOut)
+            .withDisplayTooltip("Attention output projection", "Combine the attention heads into the model's main representation.")
         return attnOut
     }
 
@@ -169,6 +176,7 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
         val c = config
         val bcx = workspace("$prefix.conv.bcx", 3 * c.hiddenSize)
         ops += LinearOp("$prefix.conv.in_proj", paramPort("$weightPrefix.conv.in_proj.weight"), normed, bcx)
+            .withDisplayTooltip("Convolution input projection", "Create the B, C, and x feature streams used by this mixer.")
 
         val bx = workspace("$prefix.conv.bx", c.hiddenSize)
         ops += OffsetGateOp("$prefix.conv.b_gate", bcx, 0, bcx, 2 * c.hiddenSize, bx)
@@ -184,6 +192,7 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
 
         val convOut = workspace("$prefix.conv.out", c.hiddenSize)
         ops += LinearOp("$prefix.conv.out_proj", paramPort("$weightPrefix.conv.out_proj.weight"), gated, convOut)
+            .withDisplayTooltip("Convolution output projection", "Return the filtered features to the model's main representation.")
         return convOut
     }
 

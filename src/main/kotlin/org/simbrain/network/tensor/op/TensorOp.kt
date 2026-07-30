@@ -18,6 +18,8 @@ class TensorPort(val name: String, val tensor: FloatTensor) {
  */
 abstract class TensorOp(val name: String) {
 
+    private var tooltip: String? = null
+
     abstract val inputs: List<TensorPort>
     abstract val outputs: List<TensorPort>
 
@@ -33,6 +35,18 @@ abstract class TensorOp(val name: String) {
      * the gradients of its inputs. Must accumulate, never overwrite — fan-out sums naturally.
      */
     open fun backward(grads: Gradients): Unit = error("Op $name has no backward")
+
+    /**
+     * Short, learner-facing text for a visual representation of this operation. This is kept
+     * separate from [toString], which deliberately exposes port names for diagnostics.
+     */
+    open fun displayTooltip(): String = tooltip ?: name
+
+    /** Assign a learner-facing title and explanation for a visual representation of this op. */
+    fun withDisplayTooltip(title: String, explanation: String): TensorOp {
+        tooltip = "$title\n$explanation"
+        return this
+    }
 
     override fun toString() =
         "$name(${inputs.joinToString { it.name }} -> ${outputs.joinToString { it.name }})"

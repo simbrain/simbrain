@@ -31,8 +31,21 @@ import java.awt.geom.Rectangle2D
 
 class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
 
+    /**
+     * One drawn activation strip. Holds its own rectangle because assigning to [SimbrainImage.image]
+     * resets a PImage's bounds to the pixel dimensions of the new image, which for a one-row strip would
+     * collapse it to a few pixels. A real layer node re-sets bounds after every image assignment for the
+     * same reason.
+     */
+    class Strip(private val image: SimbrainImage, private val rect: Rectangle2D) {
+        fun show(values: DoubleArray) {
+            image.image = values.toSimbrainColorImage(values.size, 1)
+            image.setBounds(rect.x, rect.y, rect.width, rect.height)
+        }
+    }
+
     /** The activation strips of one unrolled timestep, so later steps can be fed real values. */
-    class Column(val input: SimbrainImage, val hidden: SimbrainImage, val output: SimbrainImage)
+    class Column(val input: Strip, val hidden: Strip, val output: Strip)
 
     val columns = mutableListOf<Column>()
 
@@ -99,9 +112,9 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
      */
     fun showActivations(step: Int, input: DoubleArray, hidden: DoubleArray, output: DoubleArray) {
         val column = columns.getOrNull(step - 1) ?: return
-        listOf(column.input to input, column.hidden to hidden, column.output to output).forEach { (strip, values) ->
-            strip.image = values.toSimbrainColorImage(values.size, 1)
-        }
+        column.input.show(input)
+        column.hidden.show(hidden)
+        column.output.show(output)
     }
 
     /**
@@ -126,7 +139,7 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
      * real layer draws, plus a border and a label. Starts empty rather than showing whatever an
      * uninitialised array holds, so an unfed column reads as empty instead of as plausible values.
      */
-    private fun addLayerStandIn(layer: NeuronArray, rect: Rectangle2D, theme: NetworkTheme.Palette): SimbrainImage {
+    private fun addLayerStandIn(layer: NeuronArray, rect: Rectangle2D, theme: NetworkTheme.Palette): Strip {
         val strip = SimbrainImage().apply {
             image = DoubleArray(layer.size).toSimbrainColorImage(layer.size, 1)
             setBounds(rect.x, rect.y, rect.width, rect.height)
@@ -138,7 +151,7 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
             textPaint = theme.valueText
             centerFullBoundsOnPoint(rect.centerX, rect.y - LABEL_GAP)
         })
-        return strip
+        return Strip(strip, rect)
     }
 
     private fun addStepLabel(inputRect: Rectangle2D, text: String, theme: NetworkTheme.Palette) {

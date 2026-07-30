@@ -17,6 +17,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.toDoubleArray
 import org.simbrain.util.createAction
 import org.simbrain.util.display
 import org.simbrain.util.point
@@ -35,8 +36,11 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         events.customInfoUpdated.on(swingDispatcher) {
             unrolledViewNode?.rebuild()
             positionUnrolledView()
+            // A rebuild starts the columns empty, so the values on show have to be put back.
+            refreshUnrolledActivations()
         }
         events.locationChanged.on(swingDispatcher) { positionUnrolledView() }
+        events.displayDataUpdated.on(swingDispatcher) { refreshUnrolledActivations() }
         events.deleted.on(swingDispatcher) { detachUnrolledView() }
         syncUnrolledView()
     }
@@ -68,6 +72,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         super.refreshTheme()
         unrolledViewNode?.rebuild()
         positionUnrolledView()
+        refreshUnrolledActivations()
     }
 
     private fun syncUnrolledView() {
@@ -76,8 +81,24 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
                 unrolledViewNode = BPTTUnrolledView(bptt).also { addChild(it) }
             }
             positionUnrolledView()
+            refreshUnrolledActivations()
         } else {
             detachUnrolledView()
+        }
+    }
+
+    /**
+     * Push the most recent window's per-timestep activations into the drawn columns. Step zero is the
+     * rolled network itself, which draws its own values, so the columns take the steps after it.
+     */
+    private fun refreshUnrolledActivations() {
+        val view = unrolledViewNode ?: return
+        bptt.unrolledActivations.forEachIndexed { step, byLayer ->
+            if (step == 0) return@forEachIndexed
+            val input = byLayer[bptt.inputLayer] ?: return@forEachIndexed
+            val hidden = byLayer[bptt.hiddenLayer] ?: return@forEachIndexed
+            val output = byLayer[bptt.outputLayer] ?: return@forEachIndexed
+            view.showActivations(step, input.toDoubleArray(), hidden.toDoubleArray(), output.toDoubleArray())
         }
     }
 

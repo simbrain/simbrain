@@ -493,6 +493,8 @@ private class TimestepSnapshot(val inputs: Matrix, val activations: Matrix)
  * layer's activations at step t-1, so they are held out of the per-step sweep and handled here.
  * [initialStates] supplies the activations those source layers carry into the first step, defaulting
  * to zero. Truncation depth is the window length, which the caller chooses by chunking the sequence.
+ * [activationTrace], when supplied, receives each timestep's activations by layer, for a view that
+ * draws the unrolled network.
  *
  * The net inputs cached per timestep matter as much as the activations: a layer takes its derivative
  * with respect to the net input it saw at that step, so restoring activations alone would evaluate
@@ -513,6 +515,7 @@ fun LinkedHashSet<Layer>.accumulateBPTT(
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
     initialStates: Map<Layer, Matrix> = emptyMap(),
+    activationTrace: MutableList<Map<Layer, Matrix>>? = null,
 ): Double {
 
     require(inputSequence.isNotEmpty()) { "Cannot run BPTT over an empty sequence" }
@@ -537,6 +540,13 @@ fun LinkedHashSet<Layer>.accumulateBPTT(
     val timeline = inputSequence.map { input ->
         forwardPass(listOf(input), listOf(inputLayer))
         this@accumulateBPTT.associateWith { TimestepSnapshot(it.inputs.clone(), it.activations.clone()) }
+    }
+
+    // Snapshot activations are already clones and restore() clones again before writing them back, so
+    // handing them out here cannot be disturbed by the backward pass.
+    activationTrace?.run {
+        clear()
+        addAll(timeline.map { step -> step.mapValues { (_, snapshot) -> snapshot.activations } })
     }
 
     fun restore(snapshots: Map<Layer, TimestepSnapshot>) = snapshots.forEach { (layer, snapshot) ->

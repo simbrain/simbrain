@@ -80,6 +80,13 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
 
         var summedError = 0.0
 
+        // Carried explicitly rather than read back off the hidden layer, because when the unrolled view
+        // is showing, the layers are rewound to the start of the window for display and no longer hold
+        // the state the next window has to continue from.
+        var carriedHidden: Matrix = bpttNetwork.hiddenLayer.activations.clone()
+        val drawingUnrolledView = bpttNetwork.unrolledView
+        var traceToDraw: List<Map<Layer, Matrix>>? = null
+
         rows.chunked(bpttConfig.truncationDepth.coerceAtLeast(1)).forEachIndexed { windowIndex, window ->
 
             val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
@@ -92,9 +99,8 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
 
             // Carried from where the last window left the hidden layer, so memory survives the
             // truncation boundary even though the gradient stops there.
-            val carriedState = mapOf<Layer, Matrix>(
-                bpttNetwork.hiddenLayer to bpttNetwork.hiddenLayer.activations.clone()
-            )
+            val carriedState = mapOf<Layer, Matrix>(bpttNetwork.hiddenLayer to carriedHidden)
+            val activationTrace = if (drawingUnrolledView) mutableListOf<Map<Layer, Matrix>>() else null
 
             summedError += with(network) {
                 bpttNetwork.layers.accumulateBPTT(
@@ -108,9 +114,12 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
                     biasesAccumulator = biasesAccumulator,
                     rawMatrixAccumulator = rawMatrixAccumulator,
                     lossFunction = config.lossFunction,
-                    initialStates = carriedState
+                    initialStates = carriedState,
+                    activationTrace = activationTrace
                 )
             }
+
+            carriedHidden = bpttNetwork.hiddenLayer.activations.clone()
 
             applyAccumulatedDeltas(
                 weightAccumulator,
@@ -120,8 +129,32 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
                 1.0 / window.size,
                 probeContext?.createMapProbe("window-$windowIndex")
             )
+
+            activationTrace?.let { trace ->
+                // A sequence whose length is not a multiple of the truncation depth ends on a short
+                // window, and drawing that would blank most of the columns. Prefer the longest window
+                // seen, falling back to a short one only when the sequence never fills the depth.
+                val best = traceToDraw
+                if (best == null || trace.size >= best.size) {
+                    traceToDraw = trace.toList()
+                }
+            }
+        }
+
+        // Published once per pass rather than once per window: the columns only ever show one window,
+        // and the event reaches the event thread.
+        traceToDraw?.let { trace ->
+            bpttNetwork.publishUnrolledActivations(trace)
+            // The columns show the steps after the first, so the rolled network has to show the first for
+            // its own label to be true. accumulateBPTT leaves it at the window's end.
+            rewindToWindowStart(trace)
         }
 
         return summedError / rows.size
+    }
+
+    private fun rewindToWindowStart(trace: List<Map<Layer, Matrix>>) {
+        val firstStep = trace.firstOrNull() ?: return
+        firstStep.forEach { (layer, activations) -> layer.activations = activations.clone() }
     }
 }

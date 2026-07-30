@@ -6,6 +6,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.BPTTNetwork
+import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.util.point
 import java.awt.Component
 import java.awt.Dimension
@@ -15,7 +16,8 @@ import javax.swing.SwingUtilities
 /**
  * A BPTT network with its unrolled-over-time view switched on, which is the arrangement of figure
  * 16.3 in the source text: the network actually being trained on the left, its unrolled form beside
- * it. Checks that the diagram lines up with the rolled network and does not collide with it.
+ * it. Trained briefly first so the columns hold real per-timestep activations rather than the empty
+ * strips they start as.
  */
 class BPTTUnrolledSnapshot : UiSnapshotDef {
     override val name = "bptt_unrolled"
@@ -40,6 +42,17 @@ class BPTTUnrolledSnapshot : UiSnapshotDef {
         // the image is captured. Zoom-to-fit does cover the unrolled view in the running app, since it
         // unions screen element bounds and the view is a child of one.
         repeat(5) { SwingUtilities.invokeAndWait { } }
+
+        // Trained after the view is showing, since the trainer only collects per-timestep activations
+        // when something is drawing them.
+        runBlocking {
+            val trainer = BPTTTrainer(network, bptt)
+            repeat(20) { trainer.trainOnce() }
+        }
+        // The activation event is throttled, so give its window time to close before capturing.
+        Thread.sleep(300)
+        repeat(5) { SwingUtilities.invokeAndWait { } }
+
         SwingUtilities.invokeAndWait {
             val content = panel.canvas.layer.fullBounds
             panel.canvas.camera.setViewBounds(

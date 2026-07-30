@@ -167,6 +167,37 @@ class BPTTNetworkTest {
     }
 
     @Test
+    fun `training publishes a full window of activations rather than a trailing partial one`() = runBlocking {
+        val net = Network()
+        // Five rows at depth four splits into windows of four and one. Drawing the trailing window would
+        // blank all but the first unrolled column.
+        val bptt = BPTTNetwork(5, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.truncationDepth = 4
+        bptt.unrolledView = true
+
+        BPTTTrainer(net, bptt).trainOnce()
+
+        assertEquals(5, bptt.trainingSet.size)
+        assertEquals(4, bptt.unrolledActivations.size) {
+            "Expected the four step window, not the trailing single step one"
+        }
+    }
+
+    @Test
+    fun `activations are only collected while something is drawing them`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(5, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+
+        BPTTTrainer(net, bptt).trainOnce()
+
+        assertTrue(bptt.unrolledActivations.isEmpty()) {
+            "Per-timestep activations should not be gathered when the unrolled view is off"
+        }
+    }
+
+    @Test
     fun `test BPTT serialization`() {
         val net = Network()
         val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }

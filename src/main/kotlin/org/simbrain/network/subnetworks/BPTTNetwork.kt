@@ -127,6 +127,18 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
             events.displayModeChanged.fire()
         }
 
+    /**
+     * Activations at each timestep of the most recently trained window, by layer, for the unrolled view
+     * to draw. Empty until training runs with that view showing; the trainer only collects it then.
+     */
+    var unrolledActivations: List<Map<Layer, Matrix>> = emptyList()
+        private set
+
+    fun publishUnrolledActivations(trace: List<Map<Layer, Matrix>>) {
+        unrolledActivations = trace
+        events.displayDataUpdated.fire()
+    }
+
     override fun onTrainerConfigChanged() = updateStateInfoText()
 
     override val name: String

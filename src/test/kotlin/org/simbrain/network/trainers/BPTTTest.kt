@@ -157,6 +157,46 @@ class BPTTTest {
     }
 
     @Test
+    fun `the activation trace records every timestep in the window`() {
+        val fixture = RecurrentFixture(seed = 21, sequenceLength = 4)
+        val trace = mutableListOf<Map<Layer, Matrix>>()
+
+        with(fixture.net) {
+            fixture.layers.accumulateBPTT(
+                inputLayer = fixture.inputLayer,
+                outputLayer = fixture.outputLayer,
+                inputSequence = fixture.inputs,
+                targetSequence = fixture.targets,
+                temporalConnectors = listOf(fixture.hiddenToHidden),
+                weightAccumulator = HashMap(),
+                synapseGroupAccumulator = HashMap(),
+                biasesAccumulator = HashMap(),
+                rawMatrixAccumulator = HashMap(),
+                lossFunction = BackpropLossFunction.SSE,
+                activationTrace = trace
+            )
+        }
+
+        assertEquals(4, trace.size)
+
+        // The input layer is clamped to the sequence, so each step's entry has to be that step's input.
+        trace.forEachIndexed { step, byLayer ->
+            val recorded = byLayer.getValue(fixture.inputLayer)
+            for (i in 0 until recorded.nrow()) {
+                assertEquals(fixture.inputs[step][i, 0], recorded[i, 0], 1e-12) {
+                    "Trace step $step should hold that step's input"
+                }
+            }
+        }
+
+        // A recurrent network's hidden state depends on the sequence so far, so it must not be static.
+        val hiddenAcrossSteps = trace.map { it.getValue(fixture.hiddenLayer)[0, 0] }
+        assertTrue(hiddenAcrossSteps.distinct().size > 1) {
+            "Hidden activations were identical at every timestep, so the trace is not per-step"
+        }
+    }
+
+    @Test
     fun `bptt returns the loss summed over the window`() {
         val fixture = RecurrentFixture(seed = 11, sequenceLength = 5)
 

@@ -73,7 +73,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     private fun syncUnrolledView() {
         if (bptt.unrolledView) {
             if (unrolledViewNode == null) {
-                unrolledViewNode = BPTTUnrolledView(bptt).also { addChild(it) }
+                unrolledViewNode = BPTTUnrolledView(networkPanel, bptt).also { addChild(it) }
             }
             positionUnrolledView()
         } else {
@@ -86,13 +86,12 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         unrolledViewNode = null
     }
 
+    /**
+     * The columns place themselves from their layers' locations, which are offsets from the real
+     * layers, so the view needs no translation of its own.
+     */
     private fun positionUnrolledView() {
-        val view = unrolledViewNode ?: return
-        val bounds = outline.globalFullBounds
-        view.globalTranslation = point(
-            bounds.maxX + UNROLLED_VIEW_GAP,
-            bounds.y + (bounds.height - view.fullBounds.height) / 2
-        )
+        unrolledViewNode?.invalidateFullBounds()
     }
 
     companion object {

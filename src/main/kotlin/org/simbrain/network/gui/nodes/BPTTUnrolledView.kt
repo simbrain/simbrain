@@ -1,15 +1,25 @@
 /**
- * The unrolled-over-time picture of a [BPTTNetwork], drawn beside the rolled-up network.
+ * The unrolled-over-time view of a [BPTTNetwork]: real [NeuronArray] layers, rendered by the ordinary
+ * [NeuronArrayNode], extending rightward from the rolled-up network.
  *
- * This is an illustration rather than a view of model objects: unrolling in Simbrain is virtual, so
- * there is exactly one of each weight matrix no matter how many timesteps are drawn. Every column
- * here refers back to the same three matrices, which is the point the picture needs to make.
+ * The rolled network is the first timestep, so a truncation depth of four adds three columns.
+ *
+ * The layers here are real model objects but are deliberately not registered with the network. That
+ * keeps them out of serialization, out of the update loop, out of selection and deletion, and out of
+ * training, while still giving genuine activation rendering rather than a hand-drawn approximation.
+ * Connections are drawn as plain arrows rather than [WeightMatrixNode]s, because that node resolves its
+ * endpoints through the panel's model-to-node map, which an unregistered layer is absent from.
+ *
+ * Unrolling during training is virtual: there is one of each weight matrix however many columns are
+ * drawn, and every column's gradient is summed into it.
  */
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
@@ -17,113 +27,160 @@ import org.simbrain.util.point
 import org.simbrain.util.toPolygon
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
+import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.sin
 
-class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
+class BPTTUnrolledView(
+    private val networkPanel: NetworkPanel,
+    private val bptt: BPTTNetwork
+) : PNode() {
+
+    /** One unrolled timestep after the first. */
+    class Column(val input: NeuronArray, val hidden: NeuronArray, val output: NeuronArray)
+
+    val columns = mutableListOf<Column>()
+
+    private val layerNodes = mutableMapOf<NeuronArray, PNode>()
 
     init {
         rebuild()
     }
 
     /**
-     * Redraw from scratch. Called when the truncation depth changes, since that changes how many
-     * columns there are, and on a theme switch, since the colors are baked into the shapes.
+     * Rebuild from scratch. Needed when the truncation depth changes, since that changes the number of
+     * columns, and on a theme switch, since arrow colors are baked into the drawn shapes.
      */
     fun rebuild() {
         removeAllChildren()
+        columns.clear()
+        layerNodes.clear()
+
+        val extraSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
+        if (extraSteps == 0) return
 
         val theme = NetworkTheme.current
-        val steps = bptt.trainerConfig.truncationDepth.coerceIn(1, MAX_DRAWN_STEPS)
 
-        repeat(steps) { t ->
-            val x = t * COLUMN_PITCH
-
-            addBox(x, OUTPUT_Y, "Output", theme)
-            addBox(x, HIDDEN_Y, "Hidden", theme)
-            addBox(x, INPUT_Y, "Input", theme)
-
-            // Within a timestep the signal runs input to hidden to output, as in the rolled network.
-            addArrow(x + BOX_W / 2, INPUT_Y, x + BOX_W / 2, HIDDEN_Y + BOX_H, theme.connectorArrow)
-            addArrow(x + BOX_W / 2, HIDDEN_Y, x + BOX_W / 2, OUTPUT_Y + BOX_H, theme.connectorArrow)
-
-            // The one connection that crosses a timestep boundary. Highlighted because it is the
-            // weights whose gradient is summed over every column rather than computed once.
-            if (t > 0) {
-                addArrow(
-                    x - COLUMN_PITCH + BOX_W, HIDDEN_Y + BOX_H / 2,
-                    x, HIDDEN_Y + BOX_H / 2,
-                    theme.receptiveFieldTrace
-                )
-            }
-
-            addCaption(x, TIME_LABEL_Y, "t${if (t == 0) "" else "+$t"}", theme.valueText, BOX_W)
-        }
-
-        val truncated = bptt.trainerConfig.truncationDepth > MAX_DRAWN_STEPS
-        val note = buildString {
-            append("Every step shares the same three weight matrices")
-            if (truncated) {
-                append(" — showing $MAX_DRAWN_STEPS of ${bptt.trainerConfig.truncationDepth} steps")
+        repeat(extraSteps) { k ->
+            val offset = point(COLUMN_PITCH * (k + 1), 0.0)
+            val column = Column(
+                input = standInFor(bptt.inputLayer, offset),
+                hidden = standInFor(bptt.hiddenLayer, offset),
+                output = standInFor(bptt.outputLayer, offset)
+            )
+            columns.add(column)
+            listOf(column.input, column.hidden, column.output).forEach { layer ->
+                layerNodes[layer] = NeuronArrayNode(networkPanel, layer).also { addChild(it) }
             }
         }
-        addCaption(0.0, NOTE_Y, note, theme.valueText, steps * COLUMN_PITCH - COLUMN_GAP)
+
+        // Drawn after the layer nodes exist so their bounds are available to aim at.
+        addStepLabel(bptt.inputLayer, "t", theme.valueText)
+        columns.forEachIndexed { index, column ->
+            val previousHidden = if (index == 0) bptt.hiddenLayer else columns[index - 1].hidden
+            connect(column.input, column.hidden, theme.connectorArrow)
+            connect(column.hidden, column.output, theme.connectorArrow)
+            connect(previousHidden, column.hidden, theme.receptiveFieldTrace)
+            addStepLabel(column.input, "t+${index + 1}", theme.valueText)
+        }
     }
 
-    private fun addBox(x: Double, y: Double, label: String, theme: NetworkTheme.Palette) {
-        addChild(PPath.createRoundRectangle(x.toFloat(), y.toFloat(), BOX_W.toFloat(), BOX_H.toFloat(), 8f, 8f).apply {
-            paint = theme.tabFill
-            strokePaint = theme.nodeOutline
-            stroke = BasicStroke(1f)
-        })
-        addChild(PText(label).apply {
-            font = Theme.body
-            textPaint = theme.tabText
-            centerFullBoundsOnPoint(x + BOX_W / 2, y + BOX_H / 2)
-        })
+    /**
+     * An unregistered stand-in for one of the real layers at a later timestep. Clamped so nothing
+     * perturbs it, and positioned to line up with the layer it stands in for.
+     */
+    private fun standInFor(layer: NeuronArray, offset: Point2D) = NeuronArray(layer.size).apply {
+        label = layer.label
+        isClamped = true
+        // Zeroed rather than left at whatever a fresh array starts with, so an empty column reads as
+        // empty instead of as plausible-looking timestep values.
+        fillActivations(0.0)
+        gridMode = layer.gridMode
+        verticalLayout = layer.verticalLayout
+        location = point(layer.location.x + offset.x, layer.location.y + offset.y)
     }
 
-    private fun addCaption(x: Double, y: Double, text: String, color: Color, width: Double) {
+    /**
+     * A layer's drawn rectangle in this node's coordinates, taken from the model rather than from the
+     * layer node's bounds. A node's own path bounds are empty because its content sits in a child, and
+     * its full bounds would include the interaction box, which would push arrow endpoints out into
+     * empty space beside the layer. [ArrayLayerNode] pushes its border box size back onto the model,
+     * so these are the dimensions actually drawn.
+     */
+    private fun boundsOf(layer: NeuronArray): Rectangle2D {
+        val width = if (layer.width > 0) layer.width else FALLBACK_LAYER_WIDTH
+        val height = if (layer.height > 0) layer.height else FALLBACK_LAYER_HEIGHT
+        return globalToLocal(
+            Rectangle2D.Double(
+                layer.location.x - width / 2, layer.location.y - height / 2, width, height
+            ) as Rectangle2D
+        )
+    }
+
+    private fun connect(from: NeuronArray, to: NeuronArray, color: Color) {
+        val fromBounds = boundsOf(from)
+        val toBounds = boundsOf(to)
+        val start = point(fromBounds.centerX, fromBounds.centerY)
+        val end = point(toBounds.centerX, toBounds.centerY)
+        addArrow(edgePoint(fromBounds, start, end), edgePoint(toBounds, end, start), color)
+    }
+
+    /**
+     * Where the segment between the two centers leaves [bounds], so an arrow stops at a layer's edge
+     * instead of running underneath it.
+     */
+    private fun edgePoint(bounds: Rectangle2D, from: Point2D, towards: Point2D): Point2D {
+        val dx = towards.x - from.x
+        val dy = towards.y - from.y
+        if (dx == 0.0 && dy == 0.0) return from
+        val halfWidth = bounds.width / 2 + EDGE_PAD
+        val halfHeight = bounds.height / 2 + EDGE_PAD
+        val scale = minOf(
+            if (dx == 0.0) Double.MAX_VALUE else halfWidth / abs(dx),
+            if (dy == 0.0) Double.MAX_VALUE else halfHeight / abs(dy)
+        )
+        return point(from.x + dx * scale, from.y + dy * scale)
+    }
+
+    private fun addStepLabel(inputLayer: NeuronArray, text: String, color: Color) {
+        val bounds = boundsOf(inputLayer)
         addChild(PText(text).apply {
             font = Theme.label
             textPaint = color
-            centerFullBoundsOnPoint(x + width / 2, y)
+            centerFullBoundsOnPoint(bounds.centerX, bounds.maxY + STEP_LABEL_GAP)
         })
     }
 
-    private fun addArrow(x1: Double, y1: Double, x2: Double, y2: Double, color: Color) {
-        addChild(PPath.createLine(x1.toFloat(), y1.toFloat(), x2.toFloat(), y2.toFloat()).apply {
+    private fun addArrow(from: Point2D, to: Point2D, color: Color) {
+        addChild(PPath.createLine(from.x.toFloat(), from.y.toFloat(), to.x.toFloat(), to.y.toFloat()).apply {
             strokePaint = color
             stroke = BasicStroke(3f)
         })
-        val angle = atan2(y2 - y1, x2 - x1)
+        val angle = atan2(to.y - from.y, to.x - from.x)
         val head = listOf(
-            point(x2, y2),
-            point(x2 - ARROW_HEAD * cos(angle - ARROW_SPREAD), y2 - ARROW_HEAD * sin(angle - ARROW_SPREAD)),
-            point(x2 - ARROW_HEAD * cos(angle + ARROW_SPREAD), y2 - ARROW_HEAD * sin(angle + ARROW_SPREAD))
+            to,
+            point(to.x - ARROW_HEAD * cos(angle - ARROW_SPREAD), to.y - ARROW_HEAD * sin(angle - ARROW_SPREAD)),
+            point(to.x - ARROW_HEAD * cos(angle + ARROW_SPREAD), to.y - ARROW_HEAD * sin(angle + ARROW_SPREAD))
         ).toPolygon()
         addChild(PPath.Double(head, null).apply { paint = color })
     }
 
     companion object {
-        private const val BOX_W = 104.0
-        private const val BOX_H = 38.0
-        private const val COLUMN_GAP = 74.0
-        private const val COLUMN_PITCH = BOX_W + COLUMN_GAP
-        private const val ROW_PITCH = 190.0
-        private const val OUTPUT_Y = 0.0
-        private const val HIDDEN_Y = ROW_PITCH
-        private const val INPUT_Y = 2 * ROW_PITCH
-        private const val TIME_LABEL_Y = INPUT_Y + BOX_H + 20.0
-        private const val NOTE_Y = TIME_LABEL_Y + 30.0
+        private const val COLUMN_PITCH = 300.0
         private const val ARROW_HEAD = 12.0
         private const val ARROW_SPREAD = 0.45
+        private const val EDGE_PAD = 6.0
+        private const val STEP_LABEL_GAP = 22.0
+        private const val FALLBACK_LAYER_WIDTH = 100.0
+        private const val FALLBACK_LAYER_HEIGHT = 40.0
 
         /**
-         * A deep truncation window would draw a picture too wide to read, so the drawing stops here
-         * and says so rather than silently showing fewer steps than the network actually uses.
+         * A deep truncation window would draw a strip too wide to read, so the drawing stops here
+         * rather than silently implying the network unrolls less far than it does.
          */
-        const val MAX_DRAWN_STEPS = 8
+        const val MAX_EXTRA_COLUMNS = 7
     }
 }

@@ -244,14 +244,14 @@ class CompositorNode(
             visible = false
         }.also { addChild(it) }
 
-        /** The activation op producing this tile, shown as a corner badge instead of an edge glyph. */
+        /** The activation op producing this tile, shown above the tile instead of on its edge. */
         val activationOp: TensorOp? = scene.graph?.writer(tile.id)
             ?.takeIf { it is ReLUOp }
 
         val badge: PPath? = activationOp?.let { op ->
             PPath.createEllipse(-BADGE_RADIUS, -BADGE_RADIUS, 2 * BADGE_RADIUS, 2 * BADGE_RADIUS).apply {
                 pickable = false
-                setOffset(tile.width, 0.0)
+                setOffset(tile.width / 2, -BADGE_RADIUS - OP_GLYPH_GAP)
                 addChild(SvgIconNode(opIcon(op)!!, BADGE_ICON).apply {
                     setOffset(-BADGE_ICON / 2, -BADGE_ICON / 2)
                 })
@@ -456,7 +456,8 @@ class CompositorNode(
         }
 
         fun badgeContains(sceneX: Double, sceneY: Double) = activationOp != null &&
-            abs(sceneX - (tile.x + tile.width)) <= BADGE_RADIUS && abs(sceneY - tile.y) <= BADGE_RADIUS
+            abs(sceneX - (tile.x + tile.width / 2)) <= BADGE_RADIUS &&
+            abs(sceneY - (tile.y - BADGE_RADIUS - OP_GLYPH_GAP)) <= BADGE_RADIUS
     }
 
     private val tileNodes = scene.tiles.map { TileNode(it).also { node -> addChild(node) } }
@@ -991,7 +992,10 @@ class CompositorNode(
                 if (op !in glyphsByOp && (satellite != null || i in shownIndices)) {
                     OpGlyphNode(op).apply {
                         if (satellite != null) {
-                            setOffset(satellite.tile.x + satellite.tile.width, satellite.tile.y + satellite.tile.height)
+                            setOffset(
+                                satellite.tile.x + satellite.tile.width / 2,
+                                satellite.tile.y - GLYPH_RADIUS - OP_GLYPH_GAP,
+                            )
                         } else {
                             setOffset(at.x, at.y)
                         }
@@ -1255,6 +1259,7 @@ class CompositorNode(
         private const val PAGER_ARROW = 7.0
         private const val TICK_LENGTH = 4.0
         private const val GLYPH_RADIUS = 9.0
+        private const val OP_GLYPH_GAP = 3.0
         private const val OP_RING_PAD = 3.0
         private const val GLYPH_ICON = 12.0
         private const val BADGE_RADIUS = 10.0

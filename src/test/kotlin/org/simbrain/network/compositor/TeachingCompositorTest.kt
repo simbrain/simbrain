@@ -88,6 +88,19 @@ class TeachingCompositorTest {
     }
 
     @Test
+    fun `satellite op glyphs center above their parameter tiles`() {
+        val scene = TeachingCompositor.buildScene(model())
+        val node = CompositorNode(scene)
+
+        for (satellite in scene.satellites) {
+            val glyph = node.glyphFor(satellite.op) ?: continue
+            assertEquals(satellite.tile.x + satellite.tile.width / 2, glyph.xOffset, 1e-9)
+            assertTrue(glyph.yOffset < satellite.tile.y,
+                "${satellite.tile.title}'s operation glyph sits above its parameter tile")
+        }
+    }
+
+    @Test
     fun `forward pass fills spine deck and probability tiles through full-pass publish`() {
         val model = model()
         val scene = TeachingCompositor.buildScene(model)

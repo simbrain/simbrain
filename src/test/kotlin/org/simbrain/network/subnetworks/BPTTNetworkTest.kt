@@ -172,6 +172,7 @@ class BPTTNetworkTest {
         val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 7
+        bptt.unrolledView = true
 
         val fromXml = getNetworkXStream().fromXML(getNetworkXStream().toXML(net)) as Network
         val restored = fromXml.getModelByLabel(BPTTNetwork::class.java, "BPTT")
@@ -179,6 +180,7 @@ class BPTTNetworkTest {
         requireNotNull(restored)
 
         assertEquals(7, restored.trainerConfig.truncationDepth)
+        assertTrue(restored.unrolledView) { "The unrolled view toggle should survive a round trip" }
         assertEquals(4, restored.hiddenLayer.size)
 
         // Both ends of the recurrent matrix have to come back pointing at the restored hidden layer,

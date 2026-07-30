@@ -117,6 +117,16 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         events.customInfoUpdated.fire()
     }
 
+    /**
+     * Whether to draw the network unrolled over time alongside its rolled-up form. Purely a display
+     * choice: unrolling during training is virtual, so this changes nothing about the model.
+     */
+    var unrolledView: Boolean = false
+        set(value) {
+            field = value
+            events.displayModeChanged.fire()
+        }
+
     override fun onTrainerConfigChanged() = updateStateInfoText()
 
     override val name: String

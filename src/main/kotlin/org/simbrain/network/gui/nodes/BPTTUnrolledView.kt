@@ -24,8 +24,13 @@
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.PNode
+import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.flatten
+import org.simbrain.util.transposed
 import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
@@ -67,6 +72,31 @@ class BPTTUnrolledView(
     class Column(val input: Strip, val hidden: Strip, val output: Strip)
 
     /**
+     * A drawn copy of one of the real weight matrices, sitting on the arrow that applies it. Shows the
+     * matrix's actual weights, so every copy of a matrix looks identical, which is the point: they are
+     * one matrix, drawn once per timestep it is used at.
+     */
+    private class MatrixImage(
+        private val matrix: WeightMatrix,
+        private val image: SimbrainImage,
+        private val rect: Rectangle2D
+    ) {
+        lateinit var border: PPath
+            private set
+
+        fun refresh() {
+            val weights = matrix.weights
+            val rendered = weights.flatten().toSimbrainColorImage(weights.ncol(), weights.nrow())
+            // Follows the same preference a real node does, or a copy would stop matching the matrix it
+            // is a copy of the moment the user flips it.
+            image.image = if (NetworkPreferences.weightMatrixTargetSource) rendered else rendered.transposed()
+            image.setBounds(rect.x, rect.y, rect.width, rect.height)
+        }
+
+        fun attachBorder(): PPath = (image.addBorder() as PPath).also { border = it }
+    }
+
+    /**
      * The three weight matrices, each of which appears once per column even though only one of each
      * exists. Naming them is what lets every drawn instance of one be lit at once.
      */
@@ -79,6 +109,8 @@ class BPTTUnrolledView(
     val columns = mutableListOf<Column>()
 
     private val arrowsByWeights = mutableMapOf<SharedWeights, MutableList<BezierArrow>>()
+
+    private val matrixImagesByWeights = mutableMapOf<SharedWeights, MutableList<MatrixImage>>()
 
     private var caption: PText? = null
 
@@ -110,6 +142,7 @@ class BPTTUnrolledView(
         removeAllChildren()
         columns.clear()
         arrowsByWeights.clear()
+        matrixImagesByWeights.clear()
         caption = null
 
         val priorSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
@@ -149,16 +182,24 @@ class BPTTUnrolledView(
         addStepLabel(columnRects.last()[0], "t", theme)
 
         // Drawn last so they sit above the strips, and once every rectangle is known.
+        //
+        // Every arrow carries a picture of the matrix it applies, the way an unrolled diagram labels each
+        // column's connections. The rolled network already draws real nodes for its own matrices, so its
+        // arrows are left to those and only the drawn steps get copies.
         columnRects.forEachIndexed { index, rects ->
-            // The rolled network draws its own feed-forward matrices, so only the prior steps need them.
             if (index < columns.size) {
-                addArrow(rects[0], rects[1], SharedWeights.INPUT_TO_HIDDEN)
-                addArrow(rects[1], rects[2], SharedWeights.HIDDEN_TO_OUTPUT)
+                addArrow(rects[0], rects[1], SharedWeights.INPUT_TO_HIDDEN, withMatrix = true)
+                addArrow(rects[1], rects[2], SharedWeights.HIDDEN_TO_OUTPUT, withMatrix = true)
             }
             // The connection that crosses a timestep boundary. The last one carries the most recent prior
-            // step into the live network, which is what ties the drawing to the model.
+            // step into the live network, which is what ties the drawing to the model. That one's matrix
+            // is the real recurrent node, whose image box already sits along this arrow once its loop is
+            // hidden, so drawing a copy there too would show it twice.
             if (index > 0) {
-                addArrow(columnRects[index - 1][1], rects[1], SharedWeights.RECURRENT)
+                addArrow(
+                    columnRects[index - 1][1], rects[1], SharedWeights.RECURRENT,
+                    withMatrix = index < columns.size
+                )
             }
         }
 
@@ -186,6 +227,10 @@ class BPTTUnrolledView(
             val color = if (role == weights) theme.backwardTrace else theme.connectorArrow
             arrows.forEach { it.updateColor(color) }
         }
+        matrixImagesByWeights.forEach { (role, images) ->
+            val color = if (role == weights) theme.backwardTrace else theme.imageBorder
+            images.forEach { it.border.strokePaint = color }
+        }
         caption?.apply {
             text = if (weights == null) {
                 ""
@@ -199,6 +244,9 @@ class BPTTUnrolledView(
 
     /** How many arrows stand for [weights]. One per column if the connection was tagged correctly. */
     fun arrowCount(weights: SharedWeights) = arrowsByWeights[weights]?.size ?: 0
+
+    /** How many drawn copies of [weights] there are, one on each arrow a real node does not cover. */
+    fun matrixImageCount(weights: SharedWeights) = matrixImagesByWeights[weights]?.size ?: 0
 
     /**
      * Keep the drawing aligned with the rolled network as it is dragged. Children are laid out relative
@@ -226,6 +274,11 @@ class BPTTUnrolledView(
         column.input.show(input)
         column.hidden.show(hidden)
         column.output.show(output)
+    }
+
+    /** Re-read the real matrices, so the drawn copies keep up with training. */
+    fun refreshMatrices() {
+        matrixImagesByWeights.values.flatten().forEach { it.refresh() }
     }
 
     /**
@@ -286,11 +339,35 @@ class BPTTUnrolledView(
         })
     }
 
-    private fun addArrow(from: Rectangle2D, to: Rectangle2D, weights: SharedWeights) {
+    private fun addArrow(from: Rectangle2D, to: Rectangle2D, weights: SharedWeights, withMatrix: Boolean) {
         val arrow = bezierArrow { color = NetworkTheme.current.connectorArrow }
         addChild(arrow)
         arrow.layout(from.outlines, to.outlines, false)
         arrowsByWeights.getOrPut(weights) { mutableListOf() }.add(arrow)
+        if (withMatrix) {
+            addMatrixImage(weights, (from.centerX + to.centerX) / 2, (from.centerY + to.centerY) / 2)
+        }
+    }
+
+    /** A copy of one of the real matrices, centred on the arrow that applies it. */
+    private fun addMatrixImage(weights: SharedWeights, centerX: kotlin.Double, centerY: kotlin.Double) {
+        val matrix = matrixFor(weights) ?: return
+        val rect = Rectangle2D.Double(
+            centerX - MATRIX_SIZE / 2, centerY - MATRIX_SIZE / 2, MATRIX_SIZE, MATRIX_SIZE
+        )
+        val image = SimbrainImage()
+        addChild(image)
+        // The border reads the image's bounds, so the first render has to happen before it is added.
+        val matrixImage = MatrixImage(matrix, image, rect)
+        matrixImage.refresh()
+        addChild(matrixImage.attachBorder())
+        matrixImagesByWeights.getOrPut(weights) { mutableListOf() }.add(matrixImage)
+    }
+
+    private fun matrixFor(weights: SharedWeights) = when (weights) {
+        SharedWeights.INPUT_TO_HIDDEN -> bptt.wmList.getOrNull(0)
+        SharedWeights.HIDDEN_TO_OUTPUT -> bptt.wmList.getOrNull(1)
+        SharedWeights.RECURRENT -> bptt.hiddenToHidden
     }
 
     companion object {
@@ -298,6 +375,9 @@ class BPTTUnrolledView(
 
         /** Plain visual breathing room between the rolled network's drawn extent and the newest column. */
         private const val COLUMN_GAP = 90.0
+
+        /** Matches the image box a real [WeightMatrixNode] draws, so the copies read as the same thing. */
+        private const val MATRIX_SIZE = 90.0
         private const val LABEL_GAP = 14.0
         private const val STEP_LABEL_GAP = 24.0
         private const val CAPTION_GAP = 52.0

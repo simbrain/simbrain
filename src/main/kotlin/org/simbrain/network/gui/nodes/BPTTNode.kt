@@ -48,12 +48,16 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             refreshUnrolledActivations()
         }
         events.locationChanged.on(swingDispatcher) { positionUnrolledView() }
-        events.displayDataUpdated.on(swingDispatcher) { refreshUnrolledActivations() }
+        events.displayDataUpdated.on(swingDispatcher) {
+            refreshUnrolledActivations()
+            // Training moves the weights, and the drawn copies of the matrices have to follow.
+            unrolledViewNode?.refreshMatrices()
+        }
         events.deleted.on(swingDispatcher) { detachUnrolledView() }
         syncUnrolledView()
         if (bptt.unrolledView) {
             // Reached when a network is restored with the view already showing, where no toggle event
-            // will arrive to attach the hover handlers.
+            // will arrive, and where the weight matrix nodes do not exist yet to be looked up.
             networkPanel.network.launch(swingDispatcher) { attachSharedWeightHighlighting() }
         }
     }
@@ -141,14 +145,17 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     /**
      * The columns are placed against the rolled network's drawn extent rather than against its layers,
      * because it also draws its weight matrix nodes and a recurrent arrow that bulges out to the left,
-     * which is the side the columns are on. [outline] measures exactly that: it derives its bounds from
-     * the nodes registered with it, so reading it here cannot feed back through the unrolled view, which
-     * is a plain child of this node and not one of them.
+     * which is the side the columns are on.
      *
-     * Null before the outline has been laid out, which happens when a saved network is restored with the
+     * Measured from the subnetwork's contents rather than from the outline, because the outline now
+     * encloses the unrolled view as well, and positioning the view against bounds it is itself part of
+     * would feed back on itself.
+     *
+     * Null before the contents have been laid out, which happens when a saved network is restored with the
      * view already showing. [layoutChildren] retries once the measurement becomes available.
      */
-    private fun measureRolledLeftEdge(): kotlin.Double? = outline.fullBounds.takeUnless { it.isEmpty }?.x
+    private fun measureRolledLeftEdge(): kotlin.Double? =
+        outlinedObjectBounds.takeUnless { it.isEmpty }?.x
 
     override fun layoutChildren() {
         super.layoutChildren()
@@ -160,10 +167,31 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         }
     }
 
+    /**
+     * Hide the recurrent matrix's loop while the network is unrolled. The chain of arrows across the
+     * columns is that same connection drawn a step at a time, so showing both says it twice. Only the loop
+     * goes: the matrix itself stays visible and editable, and its image box already sits along the arrow
+     * carrying the previous step into the live one, which is where that application happens.
+     */
+    private fun syncRecurrentArrow() {
+        // Launched because the matrix's node may not have been built yet, which is the case when a saved
+        // network is restored with the view already showing.
+        networkPanel.network.launch(swingDispatcher) {
+            networkPanel.modelNodeMap.getImmediately<WeightMatrixNode>(bptt.hiddenToHidden)
+                ?.arrowVisible = !bptt.unrolledView
+        }
+    }
+
     private fun syncUnrolledView() {
+        syncRecurrentArrow()
         if (bptt.unrolledView) {
             if (unrolledViewNode == null) {
-                unrolledViewNode = BPTTUnrolledView(bptt, ::measureRolledLeftEdge).also { addChild(it) }
+                unrolledViewNode = BPTTUnrolledView(bptt, ::measureRolledLeftEdge).also {
+                    addChild(it)
+                    // Enclosed by the outline so the columns read as belonging to the subnetwork rather
+                    // than as loose drawing beside it.
+                    setDecoration(it)
+                }
             }
             positionUnrolledView()
             refreshUnrolledActivations()
@@ -198,6 +226,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     private fun detachUnrolledView() {
         unrolledViewNode?.let { removeChild(it) }
         unrolledViewNode = null
+        setDecoration(null)
     }
 
     private fun positionUnrolledView() {

@@ -55,6 +55,18 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     private val arrow = WeightMatrixArrow(this)
 
+    /**
+     * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
+     * it leaves the matrix visible and editable while some other drawing accounts for the connection.
+     * A self-connection unrolled over time is the case this exists for: the loop is the same thing as
+     * the chain of arrows across the unrolled timesteps, so drawing both says it twice.
+     */
+    var arrowVisible: Boolean
+        get() = arrow.visible
+        set(value) {
+            arrow.visible = value
+        }
+
     val interactionBox: WeightMatrixInteractionBox = WeightMatrixInteractionBox(networkPanel)
 
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }

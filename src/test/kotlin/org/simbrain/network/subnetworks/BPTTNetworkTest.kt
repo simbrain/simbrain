@@ -280,6 +280,27 @@ class BPTTNetworkTest {
     }
 
     @Test
+    fun `every drawn arrow carries a picture of the matrix it applies`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(4, 3, 4)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.truncationDepth = 4
+
+        val view = BPTTUnrolledView(bptt) { bptt.hiddenLayer.location.x - 200.0 }
+
+        // An arrow without its matrix reads as a bare connection while its neighbours are labelled, which
+        // is the inconsistency the copies exist to remove. The one exception is the arrow into the live
+        // column: the real recurrent node sits along it once its loop is hidden, so a copy there would
+        // draw the same matrix twice.
+        assertEquals(3, view.matrixImageCount(BPTTUnrolledView.SharedWeights.INPUT_TO_HIDDEN))
+        assertEquals(3, view.matrixImageCount(BPTTUnrolledView.SharedWeights.HIDDEN_TO_OUTPUT))
+        assertEquals(
+            view.arrowCount(BPTTUnrolledView.SharedWeights.RECURRENT) - 1,
+            view.matrixImageCount(BPTTUnrolledView.SharedWeights.RECURRENT)
+        ) { "Every recurrent arrow but the one the real node covers should carry a copy" }
+    }
+
+    @Test
     fun `test BPTT serialization`() {
         val net = Network()
         val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }

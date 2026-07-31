@@ -14,5 +14,6 @@ class TextWorldEvents: FlowEvents() {
     val cursorPositionChanged = NoArgAwaitableEvent()
     val atEnd = NoArgAwaitableEvent()
     val preferencesChanged = NoArgEvent()
+    val statusChanged = NoArgEvent()
 
 }

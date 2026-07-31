@@ -2,11 +2,7 @@ package org.simbrain.world.textworld
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.trainers.SamplingStrategy
-import org.simbrain.util.DependenciesInvalidatingCachedObject
-import org.simbrain.util.SimpleTokenizer
-import org.simbrain.util.Tokenizer
-import org.simbrain.util.TokenizerResult
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
@@ -106,6 +102,14 @@ class TextWorld : AttributeContainer, EditableObject {
         set(value) {
             field = value
             events.textChanged.fireAsync()
+        }
+
+    /** Optional contextual guidance displayed below the document by the desktop view. */
+    @Transient
+    var statusMessageProvider: (() -> String?)? = null
+        set(value) {
+            field = value
+            events.statusChanged.fire()
         }
 
     /**
@@ -379,7 +383,6 @@ class TextWorld : AttributeContainer, EditableObject {
     override val id = "Text World"
 
 }
-
 
 
 

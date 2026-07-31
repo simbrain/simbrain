@@ -14,11 +14,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JToolBar
+import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.BadLocationException
@@ -57,14 +53,23 @@ class TextWorldPanel(
         foreground = Theme.mutedText
     }
 
+    private var runLocked = false
+
+    private fun updateStatus() {
+        val message = when {
+            runLocked -> "Read-only while running"
+            else -> world.statusMessageProvider?.invoke()
+        }
+        statusLabel.text = message ?: " "
+        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else message
+        textArea.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else null
+    }
+
     /** Locks the text while the workspace runs; the status bar says why the caret is dead. */
     fun setRunLock(locked: Boolean) {
+        runLocked = locked
         textArea.isEditable = !locked
-        // The single space keeps the bar's height when there is nothing to say
-        statusLabel.text = if (locked) "Read-only while running" else " "
-        val explanation = if (locked) RUN_LOCK_EXPLANATION else null
-        statusLabel.toolTipText = explanation
-        textArea.toolTipText = explanation
+        updateStatus()
     }
 
     /** The count follows the token boxes: shown for token-focused worlds, quiet otherwise. */
@@ -133,6 +138,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateStatus()
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
@@ -142,6 +148,7 @@ class TextWorldPanel(
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
                 updateTokenCount()
+                updateStatus()
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
@@ -151,6 +158,7 @@ class TextWorldPanel(
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
                 updateTokenCount()
+                updateStatus()
             }
         })
 
@@ -170,6 +178,7 @@ class TextWorldPanel(
                 textArea.caretPosition = world.position
             }
             updateTokenCount()
+            updateStatus()
         }
 
         world.events.cursorPositionChanged.on(Dispatchers.Swing) {
@@ -183,6 +192,10 @@ class TextWorldPanel(
         world.events.preferencesChanged.on(Dispatchers.Swing) {
             updateHighlights()
             updateTokenCount()
+        }
+
+        world.events.statusChanged.on(Dispatchers.Swing) {
+            updateStatus()
         }
 
     }

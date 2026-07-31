@@ -252,6 +252,21 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
+    val vocabulary = tokenEmbedding.tokens.map(String::lowercase).toSet()
+    textWorldComponent.world.statusMessageProvider = {
+        val typedTokens = textWorldComponent.world.text.tokenize(tokenizer).map { it.token }
+        val unrecognized = typedTokens.filter { it.lowercase() !in vocabulary }.distinct()
+        when {
+            typedTokens.isEmpty() -> "Enter a vocabulary token to begin generation."
+            unrecognized.size == typedTokens.size ->
+                "No recognized tokens. Use a token from the vocabulary (see Show Vocabulary)."
+            unrecognized.isNotEmpty() ->
+                "Ignored token${if (unrecognized.size == 1) "" else "s"} not in the vocabulary: " +
+                    unrecognized.take(3).joinToString(", ") +
+                    if (unrecognized.size > 3) ", …" else ""
+            else -> null
+        }
+    }
 
     setupGeneration(workspace)
 
@@ -395,7 +410,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         There is no start or stop mode: the transformer writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
-        Tokens you type that aren't in the vocabulary become zero rows in the input (the vocabulary comes from the training text — see `Show Vocabulary`).
+        Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
 
         ## Step through the computation, one operation at a time
 

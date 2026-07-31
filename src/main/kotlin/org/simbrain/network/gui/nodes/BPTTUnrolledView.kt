@@ -38,7 +38,17 @@ import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.Rectangle2D
 
-class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
+/**
+ * @param rolledLeftEdge the left edge of the rolled network's drawn extent, in canvas coordinates, or
+ * null while that is not yet measurable. Supplied rather than read from the parent because the columns
+ * have to clear whatever the rolled network happens to draw, which is more than its layers: its weight
+ * matrix nodes, and a recurrent arrow whose circle bulges out to the left. Measuring it means this
+ * keeps working if any of that changes.
+ */
+class BPTTUnrolledView(
+    private val bptt: BPTTNetwork,
+    private val rolledLeftEdge: () -> Double?
+) : PNode() {
 
     /**
      * One drawn activation strip. Holds its own rectangle because assigning to [SimbrainImage.image]
@@ -76,6 +86,13 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
 
     private var captionAnchor: java.awt.geom.Point2D? = null
 
+    /**
+     * Whether the last [rebuild] managed to measure the rolled network. False means the columns are not
+     * drawn yet, since placing them without knowing what they have to clear would overlap it.
+     */
+    var laidOut = false
+        private set
+
     init {
         // Nothing here stands for a model object, so it should not respond to clicks, selection or
         // dragging the way a real layer node does.
@@ -96,10 +113,22 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
         caption = null
 
         val priorSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
-        if (priorSteps == 0) return
+        if (priorSteps == 0) {
+            laidOut = true
+            return
+        }
 
         val theme = NetworkTheme.current
         val realLayers = listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer)
+
+        // Where the nearest prior column may reach. Nothing is drawn until the rolled network can be
+        // measured, since guessing would put a column inside its outline.
+        val nearestRightEdge = rolledLeftEdge()?.minus(bptt.hiddenLayer.location.x)?.minus(COLUMN_GAP)
+        laidOut = nearestRightEdge != null
+        if (nearestRightEdge == null) return
+
+        val halfWidth = realLayers.maxOf { if (it.width > 0) it.width else FALLBACK_WIDTH } / 2
+        val nearestOffset = nearestRightEdge - halfWidth
 
         // Oldest first, so the last entry is the rolled network. Prior steps sit to its left, which is
         // why their offsets are negative.
@@ -107,7 +136,7 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
 
         repeat(priorSteps) { k ->
             val stepsBack = priorSteps - k
-            val rects = realLayers.map { rectFor(it, -(COLUMN_PITCH * stepsBack + ROLLED_NETWORK_CLEARANCE)) }
+            val rects = realLayers.map { rectFor(it, nearestOffset - COLUMN_PITCH * (stepsBack - 1)) }
             columnRects.add(rects)
 
             val strips = realLayers.zip(rects).map { (layer, rect) -> addLayerStandIn(layer, rect, theme) }
@@ -267,13 +296,8 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
     companion object {
         private const val COLUMN_PITCH = 300.0
 
-        /**
-         * Extra room between the rolled network and the nearest prior column. The rolled network is far
-         * wider than a drawn column, since it carries its weight matrix nodes and a recurrent arrow whose
-         * circle bulges out to the left, which is the side the prior steps are on. Without this the
-         * nearest column lands inside the subnetwork outline and under the recurrent matrix's label.
-         */
-        private const val ROLLED_NETWORK_CLEARANCE = 220.0
+        /** Plain visual breathing room between the rolled network's drawn extent and the newest column. */
+        private const val COLUMN_GAP = 90.0
         private const val LABEL_GAP = 14.0
         private const val STEP_LABEL_GAP = 24.0
         private const val CAPTION_GAP = 52.0

@@ -138,10 +138,32 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         highlightingAttached = true
     }
 
+    /**
+     * The columns are placed against the rolled network's drawn extent rather than against its layers,
+     * because it also draws its weight matrix nodes and a recurrent arrow that bulges out to the left,
+     * which is the side the columns are on. [outline] measures exactly that: it derives its bounds from
+     * the nodes registered with it, so reading it here cannot feed back through the unrolled view, which
+     * is a plain child of this node and not one of them.
+     *
+     * Null before the outline has been laid out, which happens when a saved network is restored with the
+     * view already showing. [layoutChildren] retries once the measurement becomes available.
+     */
+    private fun measureRolledLeftEdge(): kotlin.Double? = outline.fullBounds.takeUnless { it.isEmpty }?.x
+
+    override fun layoutChildren() {
+        super.layoutChildren()
+        val view = unrolledViewNode ?: return
+        if (!view.laidOut && measureRolledLeftEdge() != null) {
+            view.rebuild()
+            positionUnrolledView()
+            refreshUnrolledActivations()
+        }
+    }
+
     private fun syncUnrolledView() {
         if (bptt.unrolledView) {
             if (unrolledViewNode == null) {
-                unrolledViewNode = BPTTUnrolledView(bptt).also { addChild(it) }
+                unrolledViewNode = BPTTUnrolledView(bptt, ::measureRolledLeftEdge).also { addChild(it) }
             }
             positionUnrolledView()
             refreshUnrolledActivations()

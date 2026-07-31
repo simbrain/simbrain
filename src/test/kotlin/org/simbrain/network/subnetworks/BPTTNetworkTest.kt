@@ -262,7 +262,9 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 4
 
-        val view = BPTTUnrolledView(bptt)
+        // Stands in for the rolled network's measured extent, which on the canvas comes from the
+        // subnetwork outline. Only the count of columns and arrows is under test, not where they land.
+        val view = BPTTUnrolledView(bptt) { bptt.hiddenLayer.location.x - 200.0 }
         assertEquals(3, view.columns.size) { "Four steps means three columns plus the rolled network" }
         assertEquals(4, view.stepCount) { "The rolled network is the fourth step, not a fifth one" }
 

@@ -108,8 +108,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("NETtalk") { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
-        item("Language model (LFM2.5-230M, beta)") { lfm2LanguageModel }
-        item("Tiny language model (transformer)") { tinyLanguageModel }
+        item("Tiny Language Model") { tinyLanguageModel }
+        item("Pretrained Language Model (LFM2.5)") { lfm2LanguageModel }
     }
 
     dir("Neuroscience") {

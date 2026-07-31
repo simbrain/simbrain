@@ -29,7 +29,16 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
     /**
      * Margin around main box in pixels. Override to specify further.
      */
-    protected open val margin = 10.0
+    protected open val margin = DEFAULT_MARGIN
+
+    companion object {
+        /**
+         * Padding between a layer's contents and the border drawn around them, and so the amount by which
+         * the bounds a layer reports exceed what it draws. Anything mimicking a layer's appearance has to
+         * inset by the same amount.
+         */
+        const val DEFAULT_MARGIN = 10.0
+    }
 
     /**
      * All children should be added to this so that bound computations are correct.

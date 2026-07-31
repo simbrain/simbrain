@@ -28,9 +28,12 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.flatten
+import org.simbrain.util.toDoubleArray
 import org.simbrain.util.transposed
+import kotlin.math.ceil
 import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
@@ -52,24 +55,124 @@ import java.awt.geom.Rectangle2D
  */
 class BPTTUnrolledView(
     private val bptt: BPTTNetwork,
+    private val networkPanel: NetworkPanel,
     private val rolledLeftEdge: () -> Double?
 ) : PNode() {
 
     /**
-     * One drawn activation strip. Holds its own rectangle because assigning to [SimbrainImage.image]
-     * resets a PImage's bounds to the pixel dimensions of the new image, which for a one-row strip would
-     * collapse it to a few pixels. A real layer node re-sets bounds after every image assignment for the
-     * same reason.
+     * A layer drawn without a model behind it, following however the real layer is set to draw itself:
+     * as a horizontal strip, a vertical one, a square grid, or neuron circles, with a bias image beside
+     * the activations if that layer shows one. Reads the layer's own [NeuronArray.displayColumns] and
+     * modes, so a column cannot end up depicting the layer differently from the layer itself.
+     *
+     * The rectangle is held rather than recomputed because assigning to [SimbrainImage.image] resets a
+     * PImage's bounds to the pixel dimensions of the new image, which for a one-row strip would collapse
+     * it to a few pixels. A real layer node re-sets bounds after every assignment for the same reason.
      */
-    class Strip(private val image: SimbrainImage, private val rect: Rectangle2D) {
+    class LayerStandIn(
+        private val layer: NeuronArray,
+        rect: Rectangle2D,
+        private val parent: PNode,
+        networkPanel: NetworkPanel
+    ) {
+        /**
+         * What the layer actually draws. A layer's reported bounds include the padding between its
+         * contents and the border around them, so mimicking it means insetting by the same amount.
+         */
+        private val content = Rectangle2D.Double(
+            rect.x + ArrayLayerNode.DEFAULT_MARGIN,
+            rect.y + ArrayLayerNode.DEFAULT_MARGIN,
+            (rect.width - 2 * ArrayLayerNode.DEFAULT_MARGIN).coerceAtLeast(1.0),
+            (rect.height - 2 * ArrayLayerNode.DEFAULT_MARGIN).coerceAtLeast(1.0)
+        )
+
+        /**
+         * Where the activations go, and where the biases go when shown. A layer showing biases stacks the
+         * two images, along the short axis, so each takes half the space less the gap between them.
+         */
+        private val activationRect: Rectangle2D
+        private val biasRect: Rectangle2D?
+
+        init {
+            if (!layer.isShowBias) {
+                activationRect = content
+                biasRect = null
+            } else if (layer.verticalLayout && !layer.gridMode) {
+                val w = (content.width - ArrayLayerNode.DEFAULT_MARGIN) / 2
+                activationRect = Rectangle2D.Double(content.x, content.y, w, content.height)
+                biasRect = Rectangle2D.Double(
+                    content.x + w + ArrayLayerNode.DEFAULT_MARGIN, content.y, w, content.height
+                )
+            } else {
+                val h = (content.height - ArrayLayerNode.DEFAULT_MARGIN) / 2
+                activationRect = Rectangle2D.Double(content.x, content.y, content.width, h)
+                biasRect = Rectangle2D.Double(
+                    content.x, content.y + h + ArrayLayerNode.DEFAULT_MARGIN, content.width, h
+                )
+            }
+        }
+
+        private val circles: List<NeuronCircleNode>? = if (!layer.circleMode) null else {
+            List(layer.size) { NeuronCircleNode(networkPanel).also { parent.addChild(it) } }
+        }
+
+        private val activationImage: SimbrainImage? = if (layer.circleMode) null else {
+            SimbrainImage().also { parent.addChild(it) }
+        }
+
+        private val biasImage: SimbrainImage? = if (layer.circleMode || biasRect == null) null else {
+            SimbrainImage().also { parent.addChild(it) }
+        }
+
+        init {
+            if (circles != null) {
+                layoutCircles()
+                show(DoubleArray(layer.size))
+            }
+            biasImage?.let {
+                it.image = layer.biases.toDoubleArray()
+                    .toSimbrainColorImage(layer.displayColumns, layer.displayRows)
+                it.setBounds(biasRect!!.x, biasRect.y, biasRect.width, biasRect.height)
+                parent.addChild(it.addBorder())
+            }
+            activationImage?.let {
+                show(DoubleArray(layer.size))
+                parent.addChild(it.addBorder())
+            }
+        }
+
+        /**
+         * Circles sit on the same grid the real node uses, centred in the space the layer reports, since
+         * that space was measured from the real node laying out the same number of circles.
+         */
+        private fun layoutCircles() {
+            val cols = layer.displayColumns
+            val rows = ceil(layer.size.toDouble() / cols).toInt()
+            val originX = content.centerX - (cols - 1) * NeuronArrayNode.CIRCLE_SPACING / 2
+            val originY = content.centerY - (rows - 1) * NeuronArrayNode.CIRCLE_SPACING / 2
+            circles?.forEachIndexed { i, circle ->
+                circle.setOffset(
+                    originX + (i % cols) * NeuronArrayNode.CIRCLE_SPACING,
+                    originY + (i / cols) * NeuronArrayNode.CIRCLE_SPACING
+                )
+            }
+        }
+
         fun show(values: DoubleArray) {
-            image.image = values.toSimbrainColorImage(values.size, 1)
-            image.setBounds(rect.x, rect.y, rect.width, rect.height)
+            circles?.forEachIndexed { i, circle ->
+                circle.drawActivation(values.getOrElse(i) { 0.0 }, layer.updateRule.graphicalBounds)
+                circle.setClamped(layer.isClamped)
+                circle.setLabel(layer.labelArray.getOrNull(i))
+            }
+            activationImage?.let {
+                it.image = values.toSimbrainColorImage(layer.displayColumns, layer.displayRows)
+                it.setBounds(activationRect.x, activationRect.y, activationRect.width, activationRect.height)
+            }
         }
     }
 
-    /** The activation strips of one unrolled timestep, so earlier steps can be fed real values. */
-    class Column(val input: Strip, val hidden: Strip, val output: Strip)
+    /** The drawn layers of one unrolled timestep, so earlier steps can be fed real values. */
+    class Column(val input: LayerStandIn, val hidden: LayerStandIn, val output: LayerStandIn)
 
     /**
      * A drawn copy of one of the real weight matrices, sitting on the arrow that applies it. Shows the
@@ -125,6 +228,24 @@ class BPTTUnrolledView(
     var laidOut = false
         private set
 
+    private var builtFrom: List<Any> = emptyList()
+
+    /**
+     * What the drawing depends on beyond the activations it is fed: how each layer is set to draw itself,
+     * and how big it therefore is. A layer's size is pushed back from its node after it lays out, so it
+     * can lag a mode change by a frame, which is why this is compared rather than assumed.
+     */
+    private fun buildSignature(): List<Any> = listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer)
+        .flatMap {
+            listOf(
+                it.width, it.height, it.size,
+                it.gridMode, it.circleMode, it.verticalLayout, it.isShowBias
+            )
+        }
+
+    /** Whether anything the drawing was built from has changed since it was built. */
+    fun stale() = laidOut && buildSignature() != builtFrom
+
     init {
         // Nothing here stands for a model object, so it should not respond to clicks, selection or
         // dragging the way a real layer node does.
@@ -136,9 +257,11 @@ class BPTTUnrolledView(
 
     /**
      * Rebuild from scratch. Needed when the truncation depth changes, since that changes the number of
-     * columns, and on a theme switch, since colours are baked into the drawn shapes.
+     * columns, when a layer changes how it draws itself, and on a theme switch, since colours are baked
+     * into the drawn shapes.
      */
     fun rebuild() {
+        builtFrom = buildSignature()
         removeAllChildren()
         columns.clear()
         arrowsByWeights.clear()
@@ -312,23 +435,21 @@ class BPTTUnrolledView(
     }
 
     /**
-     * The appearance of a layer without a model behind it: the same colour-mapped activation strip a
-     * real layer draws, plus a border and a label. Starts empty rather than showing whatever an
-     * uninitialised array holds, so an unfed column reads as empty instead of as plausible values.
+     * The appearance of a layer without a model behind it: whatever the real layer draws, plus the border
+     * around it and a label. Starts empty rather than showing whatever an uninitialised array holds, so
+     * an unfed column reads as empty instead of as plausible values.
      */
-    private fun addLayerStandIn(layer: NeuronArray, rect: Rectangle2D, theme: NetworkTheme.Palette): Strip {
-        val strip = SimbrainImage().apply {
-            image = DoubleArray(layer.size).toSimbrainColorImage(layer.size, 1)
-            setBounds(rect.x, rect.y, rect.width, rect.height)
-        }
-        addChild(strip)
-        addChild(strip.addBorder())
+    private fun addLayerStandIn(layer: NeuronArray, rect: Rectangle2D, theme: NetworkTheme.Palette): LayerStandIn {
+        // Added before the contents, because the themed border box is filled with the background colour
+        // and would otherwise paint over everything inside it.
+        addChild(PPath.createRectangle(rect.x, rect.y, rect.width, rect.height).also { it.applyLayerBorderTheme() })
+        val standIn = LayerStandIn(layer, rect, this, networkPanel)
         addChild(PText(layer.label).apply {
             font = Theme.label
             textPaint = theme.valueText
             centerFullBoundsOnPoint(rect.centerX, rect.y - LABEL_GAP)
         })
-        return Strip(strip, rect)
+        return standIn
     }
 
     private fun addStepLabel(inputRect: Rectangle2D, text: String, theme: NetworkTheme.Palette) {

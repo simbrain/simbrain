@@ -54,6 +54,11 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             unrolledViewNode?.refreshMatrices()
         }
         events.deleted.on(swingDispatcher) { detachUnrolledView() }
+        // A layer changing how it draws itself changes what the columns should look like and how big they
+        // are. Only nudges the layout, since the new size is not known until that layer's node lays out.
+        listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer).forEach { layer ->
+            layer.events.visualPropertiesChanged.on(swingDispatcher) { invalidateLayout() }
+        }
         syncUnrolledView()
         if (bptt.unrolledView) {
             // Reached when a network is restored with the view already showing, where no toggle event
@@ -157,10 +162,16 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     private fun measureRolledLeftEdge(): kotlin.Double? =
         outlinedObjectBounds.takeUnless { it.isEmpty }?.x
 
+    /**
+     * Rebuilds the drawing once the rolled network becomes measurable, and again whenever a layer changes
+     * how it draws itself. Both are checked here rather than driven by an event because a layer's size is
+     * pushed back from its node only after that node lays out, so a mode change is not fully known at the
+     * moment it is announced.
+     */
     override fun layoutChildren() {
         super.layoutChildren()
         val view = unrolledViewNode ?: return
-        if (!view.laidOut && measureRolledLeftEdge() != null) {
+        if ((!view.laidOut && measureRolledLeftEdge() != null) || view.stale()) {
             view.rebuild()
             positionUnrolledView()
             refreshUnrolledActivations()
@@ -186,7 +197,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         syncRecurrentArrow()
         if (bptt.unrolledView) {
             if (unrolledViewNode == null) {
-                unrolledViewNode = BPTTUnrolledView(bptt, ::measureRolledLeftEdge).also {
+                unrolledViewNode = BPTTUnrolledView(bptt, networkPanel, ::measureRolledLeftEdge).also {
                     addChild(it)
                     // Enclosed by the outline so the columns read as belonging to the subnetwork rather
                     // than as loose drawing beside it.

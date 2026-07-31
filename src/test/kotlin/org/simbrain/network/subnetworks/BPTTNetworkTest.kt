@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.BPTTUnrolledView
 import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
@@ -258,13 +260,14 @@ class BPTTNetworkTest {
     @Test
     fun `the unrolled view draws a column and a full set of arrows for every step before the last`() = runBlocking {
         val net = Network()
+        val panel = NetworkPanel(NetworkComponent("test", net))
         val bptt = BPTTNetwork(4, 3, 4)
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 4
 
         // Stands in for the rolled network's measured extent, which on the canvas comes from the
         // subnetwork outline. Only the count of columns and arrows is under test, not where they land.
-        val view = BPTTUnrolledView(bptt) { bptt.hiddenLayer.location.x - 200.0 }
+        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
         assertEquals(3, view.columns.size) { "Four steps means three columns plus the rolled network" }
         assertEquals(4, view.stepCount) { "The rolled network is the fourth step, not a fifth one" }
 
@@ -280,13 +283,41 @@ class BPTTNetworkTest {
     }
 
     @Test
+    fun `a layer's drawn copies follow the grid it lays its activations out in`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(9, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+
+        // The columns are drawings, not layers, so nothing makes them follow a layer's display mode on
+        // their own. They read the same grid the layer's own node does, and this is that grid.
+        assertEquals(9, bptt.inputLayer.displayColumns) { "A flat layer is one row of all its neurons" }
+        assertEquals(1, bptt.inputLayer.displayRows)
+
+        bptt.inputLayer.gridMode = true
+        assertEquals(3, bptt.inputLayer.displayColumns) { "Nine neurons make a three by three grid" }
+        assertEquals(3, bptt.inputLayer.displayRows)
+
+        bptt.inputLayer.gridMode = false
+        bptt.inputLayer.verticalLayout = true
+        assertEquals(1, bptt.inputLayer.displayColumns) { "A vertical layer is a single column" }
+        assertEquals(9, bptt.inputLayer.displayRows)
+
+        // A grid is square rather than exactly as many cells as there are neurons, so the last row is
+        // partly empty rather than the grid being ragged.
+        bptt.outputLayer.gridMode = true
+        assertEquals(3, bptt.outputLayer.displayColumns)
+        assertEquals(3, bptt.outputLayer.displayRows) { "Five neurons still round up to a three by three" }
+    }
+
+    @Test
     fun `every drawn arrow carries a picture of the matrix it applies`() = runBlocking {
         val net = Network()
+        val panel = NetworkPanel(NetworkComponent("test", net))
         val bptt = BPTTNetwork(4, 3, 4)
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 4
 
-        val view = BPTTUnrolledView(bptt) { bptt.hiddenLayer.location.x - 200.0 }
+        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
 
         // An arrow without its matrix reads as a bare connection while its neighbours are labelled, which
         // is the inconsistency the copies exist to remove. The one exception is the arrow into the live

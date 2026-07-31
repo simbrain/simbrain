@@ -16,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.gui.nodes.BPTTUnrolledView
 import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.createDiagonalDataset
@@ -195,6 +196,27 @@ class BPTTNetworkTest {
         assertTrue(bptt.unrolledActivations.isEmpty()) {
             "Per-timestep activations should not be gathered when the unrolled view is off"
         }
+    }
+
+    @Test
+    fun `the unrolled view draws a column and a full set of arrows for every step after the first`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(4, 3, 4)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.truncationDepth = 4
+
+        val view = BPTTUnrolledView(bptt)
+        assertEquals(3, view.columns.size) { "Four steps means the network plus three columns" }
+
+        // Every connection has to be tagged with the weights it stands for, or hovering that matrix
+        // would light nothing.
+        BPTTUnrolledView.SharedWeights.entries.forEach { weights ->
+            assertEquals(3, view.arrowCount(weights)) { "Expected one $weights arrow per column" }
+        }
+
+        bptt.trainerConfig.truncationDepth = 1
+        view.rebuild()
+        assertEquals(0, view.columns.size) { "At depth one there is nothing to unroll" }
     }
 
     @Test

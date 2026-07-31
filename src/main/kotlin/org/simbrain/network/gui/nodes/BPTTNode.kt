@@ -21,6 +21,9 @@ import org.simbrain.util.toDoubleArray
 import org.simbrain.util.createAction
 import org.simbrain.util.display
 import org.simbrain.util.point
+import kotlinx.coroutines.launch
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.simbrain.util.swingDispatcher
 import javax.swing.JPopupMenu
 
@@ -29,9 +32,14 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
 
     private var unrolledViewNode: BPTTUnrolledView? = null
 
+    private var highlightingAttached = false
+
     init {
         val events = bptt.events
-        events.displayModeChanged.on(swingDispatcher) { syncUnrolledView() }
+        events.displayModeChanged.on(swingDispatcher) {
+            syncUnrolledView()
+            if (bptt.unrolledView) attachSharedWeightHighlighting()
+        }
         // Truncation depth changes the number of columns, and it is what the info text reports.
         events.customInfoUpdated.on(swingDispatcher) {
             unrolledViewNode?.rebuild()
@@ -43,6 +51,11 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         events.displayDataUpdated.on(swingDispatcher) { refreshUnrolledActivations() }
         events.deleted.on(swingDispatcher) { detachUnrolledView() }
         syncUnrolledView()
+        if (bptt.unrolledView) {
+            // Reached when a network is restored with the view already showing, where no toggle event
+            // will arrive to attach the hover handlers.
+            networkPanel.network.launch(swingDispatcher) { attachSharedWeightHighlighting() }
+        }
     }
 
     override val model: NetworkModel
@@ -57,6 +70,18 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
                 description = "Show the network unrolled over time next to its rolled-up form"
             ) {
                 bptt.unrolledView = !bptt.unrolledView
+            })
+            add(networkPanel.createAction(
+                name = "Unroll one more step",
+                description = "Increase the truncation depth, letting the gradient reach one step further back"
+            ) {
+                setTruncationDepth(bptt.trainerConfig.truncationDepth + 1)
+            })
+            add(networkPanel.createAction(
+                name = "Unroll one fewer step",
+                description = "Decrease the truncation depth, cutting the gradient off one step sooner"
+            ) {
+                setTruncationDepth(bptt.trainerConfig.truncationDepth - 1)
             })
             addSeparator()
 
@@ -73,6 +98,44 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         unrolledViewNode?.rebuild()
         positionUnrolledView()
         refreshUnrolledActivations()
+    }
+
+    /**
+     * Truncation depth doubles as a display setting here, since it is the number of unrolled columns.
+     * Updating the info text is what makes the view rebuild at the new depth.
+     */
+    private fun setTruncationDepth(depth: Int) {
+        bptt.trainerConfig.truncationDepth = depth.coerceAtLeast(1)
+        bptt.updateStateInfoText()
+    }
+
+    /**
+     * Hovering one of the real weight matrices lights every drawn instance of it in the unrolled view.
+     * This is the one thing the unrolled picture cannot say on its own: the columns look like separate
+     * matrices, and they are not.
+     */
+    private suspend fun attachSharedWeightHighlighting() {
+        if (highlightingAttached) return
+        val roles = listOf(
+            bptt.wmList[0] to BPTTUnrolledView.SharedWeights.INPUT_TO_HIDDEN,
+            bptt.wmList[1] to BPTTUnrolledView.SharedWeights.HIDDEN_TO_OUTPUT,
+            bptt.hiddenToHidden to BPTTUnrolledView.SharedWeights.RECURRENT
+        )
+        roles.forEach { (matrix, role) ->
+            // getImmediately rather than getNode: the latter blocks for ten seconds and then throws if a
+            // node is missing, which is not worth risking on the event thread for a decoration.
+            val node = networkPanel.modelNodeMap.getImmediately<WeightMatrixNode>(matrix) ?: return@forEach
+            node.imageBox.addInputEventListener(object : PBasicInputEventHandler() {
+                override fun mouseEntered(event: PInputEvent) {
+                    unrolledViewNode?.highlight(role)
+                }
+
+                override fun mouseExited(event: PInputEvent) {
+                    unrolledViewNode?.highlight(null)
+                }
+            })
+        }
+        highlightingAttached = true
     }
 
     private fun syncUnrolledView() {

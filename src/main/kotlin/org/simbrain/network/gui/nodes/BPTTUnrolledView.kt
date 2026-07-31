@@ -23,9 +23,11 @@ import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
 import org.simbrain.util.outlines
+import org.simbrain.util.point
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.toSimbrainColorImage
+import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.Rectangle2D
 
@@ -47,7 +49,25 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
     /** The activation strips of one unrolled timestep, so later steps can be fed real values. */
     class Column(val input: Strip, val hidden: Strip, val output: Strip)
 
+    /**
+     * The three weight matrices, each of which appears once per column even though only one of each
+     * exists. Naming them is what lets every drawn instance of one be lit at once.
+     */
+    enum class SharedWeights(val description: String) {
+        INPUT_TO_HIDDEN("Input to hidden"),
+        HIDDEN_TO_OUTPUT("Hidden to output"),
+        RECURRENT("Hidden to hidden")
+    }
+
     val columns = mutableListOf<Column>()
+
+    private val arrowsByWeights = mutableMapOf<SharedWeights, MutableList<BezierArrow>>()
+
+    private var caption: PText? = null
+
+    private var highlighted: SharedWeights? = null
+
+    private var captionAnchor: java.awt.geom.Point2D? = null
 
     init {
         // Nothing here stands for a model object, so it should not respond to clicks, selection or
@@ -65,6 +85,8 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
     fun rebuild() {
         removeAllChildren()
         columns.clear()
+        arrowsByWeights.clear()
+        caption = null
 
         val extraSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
         if (extraSteps == 0) return
@@ -90,12 +112,49 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
         // Drawn last so they sit above the strips, and once every rectangle is known.
         columnRects.forEachIndexed { index, rects ->
             if (index == 0) return@forEachIndexed
-            addArrow(rects[0], rects[1])
-            addArrow(rects[1], rects[2])
+            addArrow(rects[0], rects[1], SharedWeights.INPUT_TO_HIDDEN)
+            addArrow(rects[1], rects[2], SharedWeights.HIDDEN_TO_OUTPUT)
             // The connection that crosses a timestep boundary, from the previous column's hidden layer.
-            addArrow(columnRects[index - 1][1], rects[1])
+            addArrow(columnRects[index - 1][1], rects[1], SharedWeights.RECURRENT)
+        }
+
+        val lastInput = columnRects.last()[0]
+        val firstInput = columnRects.first()[0]
+        caption = PText("").apply {
+            font = Theme.label
+            textPaint = theme.backwardTrace
+        }.also { addChild(it) }
+        captionAnchor = point((firstInput.centerX + lastInput.centerX) / 2, firstInput.maxY + CAPTION_GAP)
+
+        highlight(highlighted)
+    }
+
+    /**
+     * Light every drawn instance of one weight matrix, so that the columns read as repeated uses of a
+     * single matrix rather than as separate ones. Passing null returns everything to normal.
+     */
+    fun highlight(weights: SharedWeights?) {
+        highlighted = weights
+        val theme = NetworkTheme.current
+        arrowsByWeights.forEach { (role, arrows) ->
+            // backwardTrace rather than receptiveFieldTrace: the latter is defined as the same value as
+            // connectorArrow in both themes, so highlighting with it changes nothing on screen.
+            val color = if (role == weights) theme.backwardTrace else theme.connectorArrow
+            arrows.forEach { it.updateColor(color) }
+        }
+        caption?.apply {
+            text = if (weights == null) {
+                ""
+            } else {
+                val steps = columns.size + 1
+                "${weights.description}: one matrix, used at all $steps steps, gradients summed"
+            }
+            captionAnchor?.let { centerFullBoundsOnPoint(it.x, it.y) }
         }
     }
+
+    /** How many arrows stand for [weights]. One per column if the connection was tagged correctly. */
+    fun arrowCount(weights: SharedWeights) = arrowsByWeights[weights]?.size ?: 0
 
     /**
      * Keep the drawing aligned with the rolled network as it is dragged. Children are laid out relative
@@ -162,16 +221,18 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
         })
     }
 
-    private fun addArrow(from: Rectangle2D, to: Rectangle2D) {
+    private fun addArrow(from: Rectangle2D, to: Rectangle2D, weights: SharedWeights) {
         val arrow = bezierArrow { color = NetworkTheme.current.connectorArrow }
         addChild(arrow)
         arrow.layout(from.outlines, to.outlines, false)
+        arrowsByWeights.getOrPut(weights) { mutableListOf() }.add(arrow)
     }
 
     companion object {
         private const val COLUMN_PITCH = 300.0
         private const val LABEL_GAP = 14.0
         private const val STEP_LABEL_GAP = 24.0
+        private const val CAPTION_GAP = 52.0
         private const val FALLBACK_WIDTH = 110.0
         private const val FALLBACK_HEIGHT = 30.0
 

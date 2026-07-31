@@ -31,7 +31,8 @@ object TeachingCompositor {
                 title = if (weightsTransposed) "${title}ᵀ" else title,
                 displayTransposed = weightsTransposed,
             ).apply {
-                width = s(size); height = s(size)
+                width = s(size)
+                height = s(size)
             })
         }
 
@@ -41,13 +42,16 @@ object TeachingCompositor {
                 kind = TileKind.WEIGHT,
                 title = title,
             ).apply {
-                width = s(BIAS_WIDTH); height = s(BIAS_HEIGHT).coerceAtLeast(6.0)
+                width = s(BIAS_WIDTH)
+                height = s(BIAS_HEIGHT).coerceAtLeast(6.0)
             })
         }
 
         fun activationTile(portName: String, title: String, w: Double = ACTIVATION_WIDTH, h: Double = ACTIVATION_HEIGHT) {
             scene.addTile(MatrixTile(model.plan.port(portName), title = title).apply {
-                width = s(w); height = s(h)
+                width = s(w)
+                height = s(h)
+                tracksLiveRow = true
             })
         }
 
@@ -58,7 +62,9 @@ object TeachingCompositor {
                 title = title,
                 quantileNorm = true,
             ).apply {
-                width = s(SPINE_WIDTH); height = s(SPINE_HEIGHT)
+                width = s(SPINE_WIDTH)
+                height = s(SPINE_HEIGHT)
+                tracksLiveRow = true
             })
         }
 
@@ -79,7 +85,8 @@ object TeachingCompositor {
                 slices = config.numHeads,
                 title = "attention",
             ).apply {
-                width = s(DECK_SIZE); height = s(DECK_SIZE)
+                width = s(DECK_SIZE)
+                height = s(DECK_SIZE)
             })
             weightTile("$prefix.attn.wo", "Wo", 60.0)
             activationTile("$prefix.attn.out", "attn out")
@@ -101,7 +108,9 @@ object TeachingCompositor {
             title = "next-token probabilities",
             signedNorm = false,
         ).apply {
-            width = s(SPINE_WIDTH); height = s(HEAD_HEIGHT)
+            width = s(SPINE_WIDTH)
+            height = s(HEAD_HEIGHT)
+            tracksLiveRow = true
         })
 
         scene.connectFromGraph()

@@ -133,6 +133,20 @@ class TeachingCompositorTest {
     }
 
     @Test
+    fun `full-pass sequence tiles track the active context row`() {
+        val model = model()
+        val scene = TeachingCompositor.buildScene(model)
+        model.setSample(intArrayOf(1, 2, 3))
+        model.forward()
+        scene.publish(2)
+
+        assertEquals(2, scene.tile("resid0").liveRow)
+        assertEquals(2, scene.tile("layers.0.attn.weights").liveRow)
+        assertEquals(2, scene.tile("probs").liveRow)
+        assertEquals(-1, scene.tile("layers.0.attn.wq").liveRow, "weights have no sequence cursor")
+    }
+
+    @Test
     fun `lens reads the selected position through the model's own head`() {
         val model = model()
         val scene = TeachingCompositor.buildScene(model)

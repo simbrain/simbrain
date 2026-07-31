@@ -17,36 +17,6 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import java.nio.ByteBuffer
 import java.util.Base64
 import kotlin.collections.ArrayDeque
-import kotlin.collections.ArrayList
-import kotlin.collections.HashMap
-import kotlin.collections.LinkedHashMap
-import kotlin.collections.List
-import kotlin.collections.Map
-import kotlin.collections.associateTo
-import kotlin.collections.component1
-import kotlin.collections.component2
-import kotlin.collections.copyOf
-import kotlin.collections.copyOfRange
-import kotlin.collections.emptyList
-import kotlin.collections.filterIsInstance
-import kotlin.collections.filterNotNull
-import kotlin.collections.firstOrNull
-import kotlin.collections.forEach
-import kotlin.collections.forEachIndexed
-import kotlin.collections.getOrElse
-import kotlin.collections.getOrNull
-import kotlin.collections.indices
-import kotlin.collections.isEmpty
-import kotlin.collections.isNotEmpty
-import kotlin.collections.listOf
-import kotlin.collections.map
-import kotlin.collections.mapNotNull
-import kotlin.collections.mapValuesTo
-import kotlin.collections.plus
-import kotlin.collections.plusAssign
-import kotlin.collections.set
-import kotlin.collections.sum
-import kotlin.collections.toIntArray
 import kotlin.math.sqrt
 import kotlin.random.Random
 
@@ -432,7 +402,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         set(value) {
             field = value
             scene.setGradientView(value)
-            scene.publish()
+            scene.publish(currentSequenceRow())
         }
 
     var selectedHead: Int = 0
@@ -677,7 +647,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         model.setSample(contextTokens)
         model.forward()
         scene.lens?.sourceRow = contextTokens.size - 1
-        scene.publish()
+        scene.publish(currentSequenceRow())
         events.updated.fire()
     }
 
@@ -710,7 +680,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
             model.beginSteppedTrainStep(tokens, targets)
         }
         val op = model.stepOp()
-        scene.publish()
+        scene.publish(config.contextSize - 1)
         events.updated.fire()
         return op
     }
@@ -724,7 +694,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
             scene.lens?.sourceRow = contextTokens.size - 1
         }
         val op = model.stepForwardOnly()
-        scene.publish()
+        scene.publish(currentSequenceRow())
         events.updated.fire()
         return op
     }
@@ -732,6 +702,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
     /** The op the next micro-step will run: mid-walk, mid-forward, or null at a clean boundary. */
     fun pendingOp(): TensorOp? = model.nextOp()
         ?: if (model.plan.cursor != 0) model.plan.ops[model.plan.cursor] else null
+
+    private fun currentSequenceRow() = (contextTokens.size - 1)
+        .takeIf { it >= 0 } ?: config.contextSize - 1
 
     override suspend fun onDelete() {
         trainer.stopTraining()

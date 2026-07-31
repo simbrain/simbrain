@@ -1,5 +1,6 @@
 package org.simbrain.network.compositor
 
+import org.simbrain.network.compositor.HistoryView.*
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.op.TensorPort
 import org.simbrain.util.toSimbrainColor
@@ -106,6 +107,9 @@ abstract class TensorTile(
      * first head-aware op (norm+rope) until the heads merge back at the output projection.
      */
     var strands = 1
+
+    /** Whether a whole-tensor tile should show the active sequence row passed to [publish]. */
+    var tracksLiveRow = false
 
     /**
      * True when this tile's rows are a scene-side recording of past tokens rather than model
@@ -577,6 +581,7 @@ class MatrixTile(
     override fun publish(tokenIndex: Int) {
         val source = if (showingGradient) gradientSource ?: return else tensor
         val gate = versionGated && !showingGradient
+        if (tracksLiveRow) liveRow = tokenIndex.takeIf { it in 0 until rows } ?: -1
         if (gate && source.version == lastVersion) return
         lastVersion = source.version
         if (displayTransposed) {

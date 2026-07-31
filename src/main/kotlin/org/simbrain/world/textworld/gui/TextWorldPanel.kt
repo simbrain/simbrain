@@ -55,6 +55,8 @@ class TextWorldPanel(
 
     private var runLocked = false
 
+    private var updatingTextArea = false
+
     private fun updateStatus() {
         val message = when {
             runLocked -> "Read-only while running"
@@ -133,6 +135,7 @@ class TextWorldPanel(
         // directly in the area).
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: changedUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
@@ -142,6 +145,7 @@ class TextWorldPanel(
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: insertUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
@@ -152,6 +156,7 @@ class TextWorldPanel(
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: removeUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
@@ -173,16 +178,21 @@ class TextWorldPanel(
             }
         })
         world.events.textChanged.on(Dispatchers.Swing.immediate) {
-            textArea.text = world.text
-            if (world.position <= textArea.document.length) {
-                textArea.caretPosition = world.position
+            if (textArea.text != world.text) {
+                updatingTextArea = true
+                try {
+                    textArea.text = world.text
+                } finally {
+                    updatingTextArea = false
+                }
             }
+            textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
             updateTokenCount()
             updateStatus()
         }
 
         world.events.cursorPositionChanged.on(Dispatchers.Swing) {
-            textArea.caretPosition = world.position
+            textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
         }
 
         world.events.currentTokenChanged.on(Dispatchers.Swing) {

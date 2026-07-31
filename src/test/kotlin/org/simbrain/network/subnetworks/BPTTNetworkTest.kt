@@ -8,6 +8,7 @@
 package org.simbrain.network.subnetworks
 
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -21,6 +22,7 @@ import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.copy
+import org.simbrain.util.toDoubleArray
 import smile.math.matrix.Matrix
 import kotlin.math.abs
 import kotlin.random.Random
@@ -168,10 +170,11 @@ class BPTTNetworkTest {
     }
 
     @Test
-    fun `training publishes a full window of activations rather than a trailing partial one`() = runBlocking {
+    fun `training publishes a full window even when the sequence ends on a short one`() = runBlocking {
         val net = Network()
-        // Five rows at depth four splits into windows of four and one. Drawing the trailing window would
-        // blank all but the first unrolled column.
+        // Five rows at depth four splits into windows of four and one. Publishing only the trailing
+        // window would blank all but the newest unrolled column, even though the steps that fill the
+        // rest are known: memory carries across the truncation boundary, so the windows are contiguous.
         val bptt = BPTTNetwork(5, 4, 5)
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 4
@@ -181,7 +184,60 @@ class BPTTNetworkTest {
 
         assertEquals(5, bptt.trainingSet.size)
         assertEquals(4, bptt.unrolledActivations.size) {
-            "Expected the four step window, not the trailing single step one"
+            "Expected four steps of history, not just the trailing single step window"
+        }
+    }
+
+    @Test
+    fun `the newest recorded step is the one the layers are left holding`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(5, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.truncationDepth = 4
+        bptt.unrolledView = true
+
+        BPTTTrainer(net, bptt).trainOnce()
+
+        // The whole look-back drawing rests on this. The rolled network renders its own activations and
+        // stands for the last step, so if the history ended anywhere other than where the layers actually
+        // are, the columns and the network beside them would be showing different moments in time.
+        val newest = bptt.unrolledActivations.last()
+        listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer).forEach { layer ->
+            assertArrayEquals(layer.activations.toDoubleArray(), newest[layer]?.toDoubleArray(), 1e-12) {
+                "${layer.label} disagrees with the last published step"
+            }
+        }
+    }
+
+    @Test
+    fun `ordinary iteration records one step at a time and keeps only the window`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(5, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.truncationDepth = 3
+        bptt.unrolledView = true
+
+        // Training is not the only thing that advances the network. A workspace tick and the training
+        // dialog's apply-row button both land in forwardPass, and each computes a single step, so the
+        // history has to accumulate rather than arrive all at once.
+        with(net) {
+            bptt.inputLayer.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 0.0, 0.0))
+            bptt.forwardPass()
+            assertEquals(1, bptt.unrolledActivations.size)
+            bptt.forwardPass()
+            assertEquals(2, bptt.unrolledActivations.size)
+
+            repeat(5) { bptt.forwardPass() }
+            assertEquals(3, bptt.unrolledActivations.size) {
+                "History should be capped at the truncation depth rather than growing without bound"
+            }
+
+            val newest = bptt.unrolledActivations.last()
+            assertArrayEquals(
+                bptt.hiddenLayer.activations.toDoubleArray(),
+                newest[bptt.hiddenLayer]?.toDoubleArray(),
+                1e-12
+            ) { "The last recorded step should be the one just computed" }
         }
     }
 
@@ -192,6 +248,7 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
 
         BPTTTrainer(net, bptt).trainOnce()
+        with(net) { repeat(3) { bptt.forwardPass() } }
 
         assertTrue(bptt.unrolledActivations.isEmpty()) {
             "Per-timestep activations should not be gathered when the unrolled view is off"
@@ -199,14 +256,15 @@ class BPTTNetworkTest {
     }
 
     @Test
-    fun `the unrolled view draws a column and a full set of arrows for every step after the first`() = runBlocking {
+    fun `the unrolled view draws a column and a full set of arrows for every step before the last`() = runBlocking {
         val net = Network()
         val bptt = BPTTNetwork(4, 3, 4)
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.truncationDepth = 4
 
         val view = BPTTUnrolledView(bptt)
-        assertEquals(3, view.columns.size) { "Four steps means the network plus three columns" }
+        assertEquals(3, view.columns.size) { "Four steps means three columns plus the rolled network" }
+        assertEquals(4, view.stepCount) { "The rolled network is the fourth step, not a fifth one" }
 
         // Every connection has to be tagged with the weights it stands for, or hovering that matrix
         // would light nothing.

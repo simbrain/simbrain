@@ -1,7 +1,14 @@
 /**
- * The unrolled-over-time view of a [BPTTNetwork], drawn extending rightward from the rolled-up network.
+ * The unrolled-over-time view of a [BPTTNetwork], drawn extending leftward from the rolled-up network.
  *
- * The rolled network is the first timestep, so a truncation depth of four adds three columns.
+ * The columns are the steps that led to the present one, so time reads left to right and the rolled
+ * network is the newest step, at the right. A truncation depth of four therefore draws three columns,
+ * labelled t-3 through t-1, with the live network as t.
+ *
+ * Looking backward rather than forward is what lets one picture serve both cases. Training computes a
+ * whole window at once and leaves the layers at its last step; ordinary iteration advances one step at
+ * a time and can only ever know the past. Both end with the live network holding the newest step, so
+ * both fill these columns the same way.
  *
  * Columns are drawn rather than built from model objects. An earlier version used real [NeuronArray]s
  * that were never registered with the network, which made them draggable and selectable, and any
@@ -46,7 +53,7 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
         }
     }
 
-    /** The activation strips of one unrolled timestep, so later steps can be fed real values. */
+    /** The activation strips of one unrolled timestep, so earlier steps can be fed real values. */
     class Column(val input: Strip, val hidden: Strip, val output: Strip)
 
     /**
@@ -88,34 +95,42 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
         arrowsByWeights.clear()
         caption = null
 
-        val extraSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
-        if (extraSteps == 0) return
+        val priorSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
+        if (priorSteps == 0) return
 
         val theme = NetworkTheme.current
         val realLayers = listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer)
 
+        // Oldest first, so the last entry is the rolled network. Prior steps sit to its left, which is
+        // why their offsets are negative.
         val columnRects = mutableListOf<List<Rectangle2D>>()
-        columnRects.add(realLayers.map { rectFor(it, 0.0) })
 
-        repeat(extraSteps) { k ->
-            val rects = realLayers.map { rectFor(it, COLUMN_PITCH * (k + 1)) }
+        repeat(priorSteps) { k ->
+            val stepsBack = priorSteps - k
+            val rects = realLayers.map { rectFor(it, -(COLUMN_PITCH * stepsBack + ROLLED_NETWORK_CLEARANCE)) }
             columnRects.add(rects)
 
             val strips = realLayers.zip(rects).map { (layer, rect) -> addLayerStandIn(layer, rect, theme) }
             columns.add(Column(strips[0], strips[1], strips[2]))
 
-            addStepLabel(rects[0], "t+${k + 1}", theme)
+            addStepLabel(rects[0], "t-$stepsBack", theme)
         }
 
-        addStepLabel(columnRects.first()[0], "t", theme)
+        columnRects.add(realLayers.map { rectFor(it, 0.0) })
+        addStepLabel(columnRects.last()[0], "t", theme)
 
         // Drawn last so they sit above the strips, and once every rectangle is known.
         columnRects.forEachIndexed { index, rects ->
-            if (index == 0) return@forEachIndexed
-            addArrow(rects[0], rects[1], SharedWeights.INPUT_TO_HIDDEN)
-            addArrow(rects[1], rects[2], SharedWeights.HIDDEN_TO_OUTPUT)
-            // The connection that crosses a timestep boundary, from the previous column's hidden layer.
-            addArrow(columnRects[index - 1][1], rects[1], SharedWeights.RECURRENT)
+            // The rolled network draws its own feed-forward matrices, so only the prior steps need them.
+            if (index < columns.size) {
+                addArrow(rects[0], rects[1], SharedWeights.INPUT_TO_HIDDEN)
+                addArrow(rects[1], rects[2], SharedWeights.HIDDEN_TO_OUTPUT)
+            }
+            // The connection that crosses a timestep boundary. The last one carries the most recent prior
+            // step into the live network, which is what ties the drawing to the model.
+            if (index > 0) {
+                addArrow(columnRects[index - 1][1], rects[1], SharedWeights.RECURRENT)
+            }
         }
 
         val lastInput = columnRects.last()[0]
@@ -166,18 +181,39 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
     }
 
     /**
-     * Feed one timestep's activations into the drawing. Steps are numbered from one, since step zero is
-     * the rolled network itself, which renders its own values.
+     * How many timesteps the drawing covers, counting the rolled network as the last of them. Callers
+     * need this to line a trace up against the columns, since a trace shorter than the window fills the
+     * newest columns and leaves the oldest empty.
+     */
+    val stepCount get() = columns.size + 1
+
+    /**
+     * Feed one timestep's activations into the drawing. Steps are numbered from zero at the oldest drawn
+     * column; the last step is the rolled network itself, which renders its own values and is ignored
+     * here.
      */
     fun showActivations(step: Int, input: DoubleArray, hidden: DoubleArray, output: DoubleArray) {
-        val column = columns.getOrNull(step - 1) ?: return
+        val column = columns.getOrNull(step) ?: return
         column.input.show(input)
         column.hidden.show(hidden)
         column.output.show(output)
     }
 
     /**
-     * A layer's drawn rectangle, relative to the hidden layer and shifted right by [dx]. Taken from the
+     * Blank every column. Called before each refresh so that a shortened history leaves the steps that
+     * have not happened yet empty rather than showing what used to be in them.
+     */
+    fun clearColumns() {
+        columns.forEach { column ->
+            column.input.show(DoubleArray(bptt.inputLayer.size))
+            column.hidden.show(DoubleArray(bptt.hiddenLayer.size))
+            column.output.show(DoubleArray(bptt.outputLayer.size))
+        }
+    }
+
+    /**
+     * A layer's drawn rectangle, relative to the hidden layer and shifted horizontally by [dx], which is
+     * negative for the steps that precede the rolled network. Taken from the
      * model rather than from node bounds: a layer node's own path bounds are empty because its content
      * sits in a child, and its full bounds would include the interaction box.
      */
@@ -230,6 +266,14 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
 
     companion object {
         private const val COLUMN_PITCH = 300.0
+
+        /**
+         * Extra room between the rolled network and the nearest prior column. The rolled network is far
+         * wider than a drawn column, since it carries its weight matrix nodes and a recurrent arrow whose
+         * circle bulges out to the left, which is the side the prior steps are on. Without this the
+         * nearest column lands inside the subnetwork outline and under the recurrent matrix's label.
+         */
+        private const val ROLLED_NETWORK_CLEARANCE = 220.0
         private const val LABEL_GAP = 14.0
         private const val STEP_LABEL_GAP = 24.0
         private const val CAPTION_GAP = 52.0
@@ -238,7 +282,8 @@ class BPTTUnrolledView(private val bptt: BPTTNetwork) : PNode() {
 
         /**
          * A deep truncation window would draw a strip too wide to read, so the drawing stops here
-         * rather than silently implying the network unrolls less far than it does.
+         * rather than silently implying the network unrolls less far than it does. The steps that are
+         * dropped are the oldest ones, since those are the ones the gradient reaches most weakly.
          */
         const val MAX_EXTRA_COLUMNS = 7
     }

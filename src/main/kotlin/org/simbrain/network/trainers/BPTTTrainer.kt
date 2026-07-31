@@ -80,12 +80,8 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
 
         var summedError = 0.0
 
-        // Carried explicitly rather than read back off the hidden layer, because when the unrolled view
-        // is showing, the layers are rewound to the start of the window for display and no longer hold
-        // the state the next window has to continue from.
-        var carriedHidden: Matrix = bpttNetwork.hiddenLayer.activations.clone()
         val drawingUnrolledView = bpttNetwork.unrolledView
-        var traceToDraw: List<Map<Layer, Matrix>>? = null
+        val sequenceTrace = if (drawingUnrolledView) mutableListOf<Map<Layer, Matrix>>() else null
 
         rows.chunked(bpttConfig.truncationDepth.coerceAtLeast(1)).forEachIndexed { windowIndex, window ->
 
@@ -99,7 +95,9 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
 
             // Carried from where the last window left the hidden layer, so memory survives the
             // truncation boundary even though the gradient stops there.
-            val carriedState = mapOf<Layer, Matrix>(bpttNetwork.hiddenLayer to carriedHidden)
+            val carriedState = mapOf<Layer, Matrix>(
+                bpttNetwork.hiddenLayer to bpttNetwork.hiddenLayer.activations.clone()
+            )
             val activationTrace = if (drawingUnrolledView) mutableListOf<Map<Layer, Matrix>>() else null
 
             summedError += with(network) {
@@ -119,8 +117,6 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
                 )
             }
 
-            carriedHidden = bpttNetwork.hiddenLayer.activations.clone()
-
             applyAccumulatedDeltas(
                 weightAccumulator,
                 synapseGroupAccumulator,
@@ -130,31 +126,21 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
                 probeContext?.createMapProbe("window-$windowIndex")
             )
 
-            activationTrace?.let { trace ->
-                // A sequence whose length is not a multiple of the truncation depth ends on a short
-                // window, and drawing that would blank most of the columns. Prefer the longest window
-                // seen, falling back to a short one only when the sequence never fills the depth.
-                val best = traceToDraw
-                if (best == null || trace.size >= best.size) {
-                    traceToDraw = trace.toList()
-                }
-            }
+            // Windows are appended into one continuous run. Memory carries across a truncation boundary
+            // even though the gradient does not, so consecutive windows really are consecutive in time,
+            // and a sequence whose length is not a multiple of the depth ends on a short window whose
+            // missing steps are simply the tail of the window before it.
+            activationTrace?.let { sequenceTrace?.addAll(it) }
         }
 
-        // Published once per pass rather than once per window: the columns only ever show one window,
-        // and the event reaches the event thread.
-        traceToDraw?.let { trace ->
-            bpttNetwork.publishUnrolledActivations(trace)
-            // The columns show the steps after the first, so the rolled network has to show the first for
-            // its own label to be true. accumulateBPTT leaves it at the window's end.
-            rewindToWindowStart(trace)
+        // Published once per pass rather than once per window, since the columns only ever hold as many
+        // steps as the network is unrolled over, and the last of those is the one the layers are left
+        // holding. No rewinding is needed: the view treats the rolled network as the newest step and the
+        // columns as the ones before it, which is exactly where accumulateBPTT leaves things.
+        sequenceTrace?.takeIf { it.isNotEmpty() }?.let {
+            bpttNetwork.publishUnrolledActivations(it.takeLast(bpttConfig.truncationDepth.coerceAtLeast(1)))
         }
 
         return summedError / rows.size
-    }
-
-    private fun rewindToWindowStart(trace: List<Map<Layer, Matrix>>) {
-        val firstStep = trace.firstOrNull() ?: return
-        firstStep.forEach { (layer, activations) -> layer.activations = activations.clone() }
     }
 }

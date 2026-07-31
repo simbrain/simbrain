@@ -128,14 +128,33 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         }
 
     /**
-     * Activations at each timestep of the most recently trained window, by layer, for the unrolled view
-     * to draw. Empty until training runs with that view showing; the trainer only collects it then.
+     * The last few timesteps' activations by layer, oldest first, for the unrolled view to draw. The
+     * final entry is always the step the layers currently hold, so the view can line the list up against
+     * its columns by treating the rolled network as the newest step.
+     *
+     * Filled two ways. Training publishes a whole unrolled window at once; ordinary iteration appends one
+     * step per update. Both leave the newest step in the live layers, so the two agree. Empty until
+     * something runs with the view showing, since neither path collects anything otherwise.
      */
     var unrolledActivations: List<Map<Layer, Matrix>> = emptyList()
         private set
 
+    /** Replace the history with a whole unrolled window, whose last step the layers are left holding. */
     fun publishUnrolledActivations(trace: List<Map<Layer, Matrix>>) {
         unrolledActivations = trace
+        events.displayDataUpdated.fire()
+    }
+
+    /**
+     * Append the step the layers currently hold, dropping anything that has fallen out of the window.
+     * Called after each ordinary forward pass, which is the only way the unrolled view can be filled
+     * outside training: one iteration computes one step, so the columns can only show what has already
+     * happened.
+     */
+    private fun recordTimestep() {
+        val step = listOf<Layer>(inputLayer, hiddenLayer, outputLayer).associateWith { it.activations.clone() }
+        val depth = trainerConfig.truncationDepth.coerceAtLeast(1)
+        unrolledActivations = (unrolledActivations + step).takeLast(depth)
         events.displayDataUpdated.fire()
     }
 
@@ -153,6 +172,8 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
     fun resetRecurrentState() {
         hiddenLayer.activations = Matrix(hiddenLayer.size, 1)
         hiddenLayer.clearInputs()
+        // The history describes steps that led to a state the network no longer has.
+        unrolledActivations = emptyList()
     }
 
     context(Network)
@@ -168,10 +189,16 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
     /**
      * One timestep. The recurrent matrix contributes the hidden layer's previous activations because
      * the ordered update path reaches the hidden layer before overwriting it.
+     *
+     * This is the single point every non-training advance passes through, whether from a workspace tick
+     * or from applying a row in the training dialog, which is why the history is recorded here. Training
+     * does not come this way: [org.simbrain.network.trainers.accumulateBPTT] drives the layers directly
+     * and publishes its window in one go.
      */
     context(Network)
     override fun forwardPass() {
         layers.forwardPass(listOf(inputLayer.activations), listOf(inputLayer))
+        if (unrolledView) recordTimestep()
     }
 
     // Forwarded from output layer

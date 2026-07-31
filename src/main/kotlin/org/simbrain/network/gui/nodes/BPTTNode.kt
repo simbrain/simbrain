@@ -151,13 +151,21 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     }
 
     /**
-     * Push the most recent window's per-timestep activations into the drawn columns. Step zero is the
-     * rolled network itself, which draws its own values, so the columns take the steps after it.
+     * Push the recorded timesteps into the drawn columns.
+     *
+     * The history's last entry is the step the layers currently hold, and the rolled network draws that
+     * one itself, so the list is lined up against the columns from the right. A history shorter than the
+     * window leaves the oldest columns empty, which is the honest picture just after a reset: those steps
+     * have not happened yet. A history longer than the drawing can show, which happens once the
+     * truncation depth passes the column cap, drops off its oldest end.
      */
     private fun refreshUnrolledActivations() {
         val view = unrolledViewNode ?: return
-        bptt.unrolledActivations.forEachIndexed { step, byLayer ->
-            if (step == 0) return@forEachIndexed
+        view.clearColumns()
+        val trace = bptt.unrolledActivations
+        val offset = view.stepCount - trace.size
+        trace.forEachIndexed { index, byLayer ->
+            val step = offset + index
             val input = byLayer[bptt.inputLayer] ?: return@forEachIndexed
             val hidden = byLayer[bptt.hiddenLayer] ?: return@forEachIndexed
             val output = byLayer[bptt.outputLayer] ?: return@forEachIndexed
@@ -172,9 +180,5 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
 
     private fun positionUnrolledView() {
         unrolledViewNode?.syncPosition()
-    }
-
-    companion object {
-        private const val UNROLLED_VIEW_GAP = 60.0
     }
 }

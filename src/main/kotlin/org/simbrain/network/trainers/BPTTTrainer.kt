@@ -46,6 +46,18 @@ class BPTTTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableO
         order = 3
     )
 
+    /**
+     * Read live rather than stored, so changing the truncation depth re-bands the table without anything
+     * having to be kept in sync. Same number the unrolled view draws its columns from, which is the point:
+     * the two pictures are of the same window.
+     */
+    override val rowGrouping: RowGrouping
+        get() = RowGrouping(
+            truncationDepth,
+            "Rows are timesteps. Shaded bands are the $truncationDepth-step windows the network is " +
+                    "unrolled over; the gradient does not cross a band boundary, though the hidden state does."
+        )
+
     override fun copy(): BPTTTrainerConfig {
         return copyCurrentInto(BPTTTrainerConfig()).also {
             it.updateType = updateType

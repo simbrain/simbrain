@@ -15,6 +15,7 @@ import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.SOMNetwork
 import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.network.trainers.RowGrouping
 import org.simbrain.network.trainers.SupervisedNetwork
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
@@ -32,8 +33,12 @@ import java.awt.event.WindowEvent
 import javax.swing.*
 import javax.swing.event.TableModelListener
 
-fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit): DataSetPanel {
-    
+fun TrainingDataset.createDataSetPanel(
+    parentDialog: StandardDialog? = null,
+    rowGrouping: () -> RowGrouping? = { null },
+    applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
+): DataSetPanel {
+
     fun createDataFrame(
         data: MutableList<MutableList<Double>>,
         rowNames: List<String>?,
@@ -58,7 +63,13 @@ fun TrainingDataset.createDataSetPanel(parentDialog: StandardDialog? = null, app
     val inputDataFrame = createDataFrame(inputs, inputRowNames, inputColumnNames, inputSize)
     val targetDataFrame = createDataFrame(targets, targetRowNames, targetColumnNames, targetSize)
 
-    return DataSetPanel(inputDataFrame, targetDataFrame, applyAction = applyAction, parentDialog = parentDialog)
+    return DataSetPanel(
+        inputDataFrame,
+        targetDataFrame,
+        applyAction = applyAction,
+        parentDialog = parentDialog,
+        rowGrouping = rowGrouping
+    )
 }
 
 fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog? = null) {
@@ -74,7 +85,8 @@ class DataSetPanel(
     val inputDataFrame: BasicDataFrame,
     val targetDataFrame: BasicDataFrame,
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit,
-    parentDialog: StandardDialog? = null
+    parentDialog: StandardDialog? = null,
+    private val rowGrouping: () -> RowGrouping? = { null }
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
@@ -105,15 +117,28 @@ class DataSetPanel(
 
     val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
 
+    /** Explains what the bands mean; there is nothing to say when the rows are independent examples. */
+    private val groupingCaption = JLabel().apply {
+        font = Theme.label
+        foreground = Theme.mutedText
+    }
+
     init {
+        // Both tables band off the same row index, so inputs and targets read as one sequence rather than
+        // as two separately striped grids.
+        listOf(inputs.table, targets.table).forEach { it.rowGroupSize = { rowGrouping()?.size } }
+
         layout = MigLayout("ins 8, gap 12px 6px")
         add(Theme.sectionLabel("Inputs"))
         add(Theme.sectionLabel("Targets"), "wrap")
         add(inputs, "grow, push")
         add(targets, "grow, push, wrap")
+        add(groupingCaption, "span, wrap, gaptop 4")
         add(JLabel("Edit rows:"), "split 2, gaptop 8")
         add(addRemoveRows)
-        
+
+        refreshRowGrouping()
+
         // Listen for table model changes to update validation
         val tableModelListener = TableModelListener {
             onRowCountChanged?.invoke(inputDataFrame.rowCount, targetDataFrame.rowCount)
@@ -121,6 +146,18 @@ class DataSetPanel(
         
         inputDataFrame.addTableModelListener(tableModelListener)
         targetDataFrame.addTableModelListener(tableModelListener)
+    }
+
+    /**
+     * Redraw the bands after whatever determines the grouping has changed. The tables read the size
+     * themselves at paint time; only the caption and the repaint have to be prompted.
+     */
+    fun refreshRowGrouping() {
+        val grouping = rowGrouping()
+        groupingCaption.text = grouping?.caption ?: ""
+        groupingCaption.isVisible = grouping != null
+        listOf(inputs, targets).forEach { it.repaint() }
+        revalidate()
     }
 
 }
@@ -164,7 +201,10 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
-        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(this@apply) { selectedRow ->
+        fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(
+            this@apply,
+            rowGrouping = { trainerConfig.rowGrouping }
+        ) { selectedRow ->
             commonApplyAction(
                 selectedRow
             )
@@ -198,6 +238,11 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         
         // Initial validation check
         updateOverallValidation()
+
+        // Truncation depth is edited in the properties dialog, and it is what the bands are drawn from.
+        trainerControls.onTrainerConfigEdited = {
+            listOf(trainingDataSetPanel, testingDataSetPanel).forEach { it.refreshRowGrouping() }
+        }
 
         fun DataSetPanel.exportMatrixDataSet() = TrainingDataset(
             inputs.table.model.get2DDoubleList().toMutableListOfLists(),

@@ -18,6 +18,15 @@ import kotlin.reflect.KFunction
 
 
 /**
+ * A trainer's habit of consuming rows in contiguous groups rather than one at a time, described so
+ * that the training data table can draw the group boundaries.
+ *
+ * @param size how many consecutive rows make up one group
+ * @param caption a sentence for the table explaining what the boundaries mean
+ */
+class RowGrouping(val size: Int, val caption: String)
+
+/**
  * Editable config object for supervised trainer.
  */
 open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableObject>>>? = null): CopyableObject {
@@ -74,6 +83,19 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
         description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
         order = 70
     )
+
+    /**
+     * Null when each row is an independent example, which is the case for every trainer that does not
+     * read its data as a sequence.
+     *
+     * Deliberately not a [GuiEditable]: it is derived from settings the user already has rather than
+     * being one of its own.
+     *
+     * Groups are assumed to start at row zero and to be the same size throughout, which is what makes a
+     * fixed banding in the table honest. A trainer using a sliding window would break that assumption,
+     * and should show the window currently being trained rather than a fixed grouping.
+     */
+    open val rowGrouping: RowGrouping? get() = null
 
     override val name = "Optimizer properties"
 

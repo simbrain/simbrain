@@ -22,6 +22,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.BPTTUnrolledView
 import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.network.trainers.SupervisedTrainer
+import org.simbrain.network.trainers.SupervisedTrainerConfig
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.copy
 import org.simbrain.util.toDoubleArray
@@ -329,6 +330,33 @@ class BPTTNetworkTest {
             view.arrowCount(BPTTUnrolledView.SharedWeights.RECURRENT) - 1,
             view.matrixImageCount(BPTTUnrolledView.SharedWeights.RECURRENT)
         ) { "Every recurrent arrow but the one the real node covers should carry a copy" }
+    }
+
+    @Test
+    fun `the training table's row groups are the windows the trainer actually uses`() {
+        val bptt = BPTTNetwork(4, 3, 4)
+
+        bptt.trainerConfig.truncationDepth = 3
+        assertEquals(3, bptt.trainerConfig.rowGrouping.size)
+
+        // Read live rather than stored, so a depth changed in the properties dialog re-bands the table
+        // without anything having to notice and copy the new value across.
+        bptt.trainerConfig.truncationDepth = 5
+        assertEquals(5, bptt.trainerConfig.rowGrouping.size)
+        assertTrue(bptt.trainerConfig.rowGrouping.caption.contains("5")) {
+            "The caption should name the depth it is describing"
+        }
+
+        assertEquals(5, bptt.trainerConfig.copy().rowGrouping.size) {
+            "A copied config should band the same way as the one it came from"
+        }
+    }
+
+    @Test
+    fun `a trainer whose rows are independent examples groups them not at all`() {
+        // The contrast is what makes the grouping meaningful: banding every training table would say
+        // nothing, since only a trainer reading its rows as a sequence has boundaries to draw.
+        assertEquals(null, SupervisedTrainerConfig().rowGrouping)
     }
 
     @Test

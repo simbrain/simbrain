@@ -92,8 +92,16 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             }
             trainer.events.errorUpdated.fireAsync(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
             supervisedNetwork.onTrainerConfigChanged()
+            onTrainerConfigEdited?.invoke()
         }.display()
     }
+
+    /**
+     * Run after the properties dialog commits, for parts of the training dialog that are drawn from the
+     * config but are not owned here, such as the data tables' window banding. A plain callback rather than
+     * an event, since this class owns the action and the dialog owns everything that has to react to it.
+     */
+    var onTrainerConfigEdited: (() -> Unit)? = null
 
     // Store references to buttons for validation updates
     private lateinit var stepButton: JButton

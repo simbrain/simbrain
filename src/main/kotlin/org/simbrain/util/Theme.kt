@@ -145,6 +145,27 @@ object Theme {
     @JvmStatic val cardBg: Color get() = UIManager.getColor("List.background") ?: Color(250, 250, 250)
     @JvmStatic val cardBorder: Color get() = UIManager.getColor("Component.borderColor") ?: Color(180, 180, 180)
 
+    /** Whether the active look and feel is a dark one. Every FlatLaf theme sets this flag. */
+    @JvmStatic val isDark: Boolean get() = UIManager.getBoolean("laf.dark")
+
+    /**
+     * Background for alternating bands of table rows: a wash of the text color over the table background.
+     *
+     * The dark fraction is more than twice the light one because the same proportional step is a much
+     * smaller absolute one against a near-black background than against white. Matched by eye to give
+     * roughly the same visible step in both themes.
+     *
+     * Not taken from the LaF's `Table.alternateRowColor`, which both FlatLaf themes leave unset.
+     */
+    @JvmStatic val rowBand: Color get() =
+        blend(foreground, UIManager.getColor("Table.background") ?: Color.WHITE, if (isDark) 0.22 else 0.07)
+
+    /**
+     * Divider between bands. Grid lines are already [divider], so this has to be clearly stronger or the
+     * boundary reads as just another row.
+     */
+    @JvmStatic val rowBandRule: Color get() = blend(foreground, UIManager.getColor("Table.background") ?: Color.WHITE, 0.5)
+
     const val dialogInsetVertical: Int = 8
     const val dialogInsetHorizontal: Int = 12
     const val sectionGap: Int = 12

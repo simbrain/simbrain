@@ -79,6 +79,9 @@ class HeadwiseNormRopeOp(
 
     override fun displayTooltip() = "Normalize and position attention heads\nNormalize each head, then add information about this token's position."
 
+    override fun displayShape() =
+        "1 × ${src.tensor.cols} / $numHeads heads → 1 × ${out.tensor.cols} / $numHeads heads"
+
     override val inputs = listOf(src, weight, cosIn, sinIn)
     override val outputs = listOf(out)
 
@@ -116,9 +119,15 @@ class CacheWriteOp(
     val src: TensorPort,
     val cache: TensorPort,
     private val state: Lfm2DecodeState,
+    private val numKvHeads: Int,
+    private val headDim: Int,
 ) : TensorOp(name) {
 
-    override fun displayTooltip() = "Update attention memory\nStore this token's key or value so later tokens can attend to it."
+    override fun displayTooltip() = "Update attention memory\nSplit this key/value vector into $numKvHeads head segments of $headDim values, then write them together as one new cache row."
+
+    override fun displayShape() =
+        "1 × ${src.tensor.cols} / $numKvHeads KV heads → current row of " +
+            "${cache.tensor.rows} × ${cache.tensor.cols} cache / $numKvHeads KV heads"
 
     override val inputs = listOf(src)
     override val outputs = listOf(cache)
@@ -148,6 +157,11 @@ class AttendScoresOp(
 ) : TensorOp(name) {
 
     override fun displayTooltip() = "Attention weights\nCompare this token's query with earlier keys to decide which tokens matter most."
+
+    override fun displayShape() =
+        "1 × ${q.tensor.cols} / $numHeads query heads + " +
+            "${kCache.tensor.rows} × ${kCache.tensor.cols} cache / $numKvHeads KV heads → " +
+            "$numHeads query-head rows × ${weights.tensor.cols} tokens"
 
     override val inputs = listOf(q, kCache)
     override val outputs = listOf(weights)
@@ -197,6 +211,11 @@ class AttendMixOp(
 ) : TensorOp(name) {
 
     override fun displayTooltip() = "Attention output\nUse the attention weights to combine information from earlier tokens."
+
+    override fun displayShape() =
+        "$numHeads query-head rows × ${weights.tensor.cols} tokens + " +
+            "${vCache.tensor.rows} × ${vCache.tensor.cols} cache / $numKvHeads KV heads → " +
+            "1 × ${out.tensor.cols} / $numHeads query heads"
 
     override val inputs = listOf(weights, vCache)
     override val outputs = listOf(out)

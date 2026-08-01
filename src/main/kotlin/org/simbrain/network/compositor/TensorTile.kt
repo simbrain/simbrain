@@ -73,6 +73,9 @@ abstract class TensorTile(
     val kind: TileKind = TileKind.ACTIVATION,
 ) : FlowEndpoint {
 
+    /** Learner-facing dimensions for hover text; specialized tiles add semantic axes such as heads. */
+    open val tooltipShape: String get() = "$rows rows × $cols columns"
+
     var x = 0.0
     var y = 0.0
     var width = cols.toDouble()
@@ -100,6 +103,9 @@ abstract class TensorTile(
 
     /** Labels for the column blocks the [columnTicks] delimit (size = ticks + 1), or empty. */
     var blockLabels: List<String> = emptyList()
+
+    /** Whether column ticks divide the full displayed tensor height instead of only marking its edges. */
+    var fullHeightColumnTicks = false
 
     /**
      * How many independent parallel streams the tile's value is split into — the strand count
@@ -635,6 +641,8 @@ class DeckTile(
     signedNorm, kind,
 ), LayerStacked {
 
+    override val tooltipShape: String get() = "$slices heads × $rows rows × $cols columns"
+
     init {
         strands = slices
     }
@@ -695,8 +703,8 @@ class DeckTile(
     private val cube = FloatArray(tensors.first().rows * tensors.first().cols)
     private var lastVersion = -1L
 
-    /** Custom label per selected slice; null falls back to "title · head N". */
-    var sliceLabel: ((Int) -> String)? = null
+    /** Additional hover text for the selected slice, such as a grouped-query head mapping. */
+    var sliceTooltip: ((Int) -> String)? = null
 
     var selectedSlice = 0
         set(value) {
@@ -758,11 +766,15 @@ class DeckTile(
 class AttentionTile(
     val ports: List<TensorPort>,
     val numHeads: Int,
+    val keyValueHeads: Int = numHeads,
     seqLen: Int,
     title: String = ports.first().name,
     id: String = ports.first().name,
     override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(id, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION), LayerStacked {
+
+    override val tooltipShape: String get() =
+        "$numHeads query heads → $keyValueHeads key/value heads; $rows query tokens × $cols key tokens"
 
     override val accumulatesHistory = true
 
@@ -771,7 +783,7 @@ class AttentionTile(
     }
 
     constructor(port: TensorPort, numHeads: Int, seqLen: Int, title: String = port.name) :
-        this(listOf(port), numHeads, seqLen, title)
+        this(listOf(port), numHeads, seqLen = seqLen, title = title)
 
     init {
         require(stackLayers.isEmpty() || stackLayers.size == ports.size) {

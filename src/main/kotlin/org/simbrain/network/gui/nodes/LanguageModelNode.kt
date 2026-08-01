@@ -213,6 +213,22 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     add(item("Hide", true,
                         "Show only the selected layer's anatomy; the unused limb disappears"))
                 })
+                add(JMenu("Layer depth").apply {
+                    val group = ButtonGroup()
+                    fun item(label: String, showCards: Boolean, tip: String) =
+                        JRadioButtonMenuItem(label, languageModel.showLayerCards == showCards).apply {
+                            group.add(this)
+                            toolTipText = tip
+                            addActionListener {
+                                languageModel.showLayerCards = showCards
+                                compositorNode?.refreshStackState()
+                            }
+                        }
+                    add(item("Show cards", true,
+                        "Show the layered-card depth cue behind each stacked tensor"))
+                    add(item("Current layer only", false,
+                        "Hide depth cards so each stacked tensor shows only its selected layer"))
+                })
             } else {
                 add(createAction(
                     name = "Locate weights...",

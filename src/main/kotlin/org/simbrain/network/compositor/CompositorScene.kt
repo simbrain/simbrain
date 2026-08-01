@@ -176,13 +176,6 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     var lens: LogitLens? = null
 
-    /**
-     * Edges carrying prior tokens' state into the current step — the KV-cache and conv-window
-     * reads. Everything else in the diagram is this-token dataflow, so these render in their
-     * own cross-time color.
-     */
-    var memoryEdges: Set<FlowEdge> = emptySet()
-
     /** Invoked when the user wheel-flips a deck or attention tile, e.g. to couple GQA decks. */
     var onHeadSelected: ((TensorTile, Int) -> Unit)? = null
 
@@ -261,7 +254,10 @@ class CompositorScene(val graph: PlanGraph? = null) {
      * When true, dimmed interior pieces — the limb the selected layer doesn't use — are hidden
      * entirely instead of ghosted. Hidden pieces don't render and don't hit-test.
      */
-    var hideDimmed = false
+    var hideDimmed = true
+
+    /** Whether stacked tiles show their depth-card fan behind the currently selected layer. */
+    var showLayerCards = false
 
     /** True when [item] should currently render and hit-test; false only for hidden dimmed pieces. */
     fun isShown(item: FlowEndpoint) = !hideDimmed || when (item) {

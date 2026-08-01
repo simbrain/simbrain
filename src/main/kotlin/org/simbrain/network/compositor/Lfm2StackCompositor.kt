@@ -1,21 +1,8 @@
 package org.simbrain.network.compositor
 
-import org.simbrain.network.llm.AttendMixOp
-import org.simbrain.network.llm.AttendScoresOp
-import org.simbrain.network.llm.CausalConvOp
-import org.simbrain.network.llm.HeadwiseNormRopeOp
-import org.simbrain.network.llm.Lfm2DecodeState
-import org.simbrain.network.llm.Lfm2Model
-import org.simbrain.network.llm.OffsetGateOp
-import org.simbrain.network.llm.RopeAnglesOp
+import org.simbrain.network.llm.*
 import org.simbrain.network.tensor.FloatTensor
-import org.simbrain.network.tensor.op.AddOp
-import org.simbrain.network.tensor.op.LinearOp
-import org.simbrain.network.tensor.op.OpPlan
-import org.simbrain.network.tensor.op.RmsNormOp
-import org.simbrain.network.tensor.op.SiluGateOp
-import org.simbrain.network.tensor.op.TensorOp
-import org.simbrain.network.tensor.op.TensorPort
+import org.simbrain.network.tensor.op.*
 import kotlin.math.pow
 
 /**
@@ -100,12 +87,15 @@ object Lfm2StackCompositor {
 
         fun stackedHistory(
             id: String, layers: List<Int>, title: String, w: Double,
-            kind: TileKind = TileKind.ACTIVATION, portOf: (Int) -> String,
+            kind: TileKind = TileKind.ACTIVATION,
+            h: Double = tokenExtent,
+            magnified: Boolean = tokenAxisFloored,
+            portOf: (Int) -> String,
         ) {
             scene.addTile(VectorHistoryTile(
                 ports = layers.map { plan.port(portOf(it)) },
                 rows = window, title = title, kind = kind, id = id, stackLayers = layers,
-            ).apply { width = w; height = tokenExtent; magnified = tokenAxisFloored })
+            ).apply { width = w; height = h; this.magnified = magnified })
         }
 
         fun stackedWeight(id: String, layers: List<Int>, title: String) {
@@ -154,15 +144,17 @@ object Lfm2StackCompositor {
             })
         }
         stackedHistory("block.attn.q", attnLayers, "q (${config.numHeads} heads)",
-            featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.q" }
-        // k and v are one row in flight: their history IS the cache, so drawing it here too
-        // would duplicate the cache tiles. q keeps its history — it has no cache anywhere.
+            featureWidth(config.numHeads * config.headDim), magnified = false) {
+                "layers.$it.attn.q"
+            }
+        // K and V are one row in flight: their history is the cache, so drawing it here too
+        // would duplicate the cache tiles. Q keeps its history because it has no cache anywhere.
         fun tokenVector(id: String, title: String) {
             scene.addTile(MatrixTile(
                 id = id, title = title,
                 tensors = attnLayers.map { plan.port("layers.$it.${id.removePrefix("block.")}").tensor },
                 stackLayers = attnLayers,
-            ).apply { width = featureWidth(config.kvDim); height = TOKEN_ROW_HEIGHT; magnified = true })
+            ).apply { width = featureWidth(config.kvDim); height = KV_WRITE_ROW_HEIGHT })
         }
         tokenVector("block.attn.k", "k (new cache row)")
         tokenVector("block.attn.v", "v (new cache row)")
@@ -186,7 +178,7 @@ object Lfm2StackCompositor {
         })
         scene.addTile(AttentionTile(
             ports = attnLayers.map { plan.port("layers.$it.attn.weights") },
-            numHeads = config.numHeads, seqLen = window,
+            numHeads = config.numHeads, keyValueHeads = config.numKvHeads, seqLen = window,
             title = "attention", id = "block.attn.weights", stackLayers = attnLayers,
         ).apply { width = tokenExtent; height = tokenExtent; magnified = tokenAxisFloored })
         stackedHistory("block.attn.context", attnLayers, "context", featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.context" }
@@ -206,10 +198,14 @@ object Lfm2StackCompositor {
         // query side against 8 on the key/value side, dying at the output projection.
         val headTicks = (1 until config.numHeads).map { it * config.headDim }
         val kvHeadTicks = (1 until config.numKvHeads).map { it * config.headDim }
-        scene.tile("block.attn.q").apply { columnTicks = headTicks; strands = config.numHeads }
+        scene.tile("block.attn.q").apply {
+            columnTicks = headTicks
+            fullHeightColumnTicks = true
+            strands = config.numHeads
+        }
         scene.tile("block.attn.context").apply { columnTicks = headTicks; strands = config.numHeads }
-        scene.tile("block.attn.k").apply { columnTicks = kvHeadTicks; strands = config.numKvHeads }
-        scene.tile("block.attn.v").apply { columnTicks = kvHeadTicks; strands = config.numKvHeads }
+        scene.tile("block.attn.k").apply { columnTicks = kvHeadTicks; fullHeightColumnTicks = true }
+        scene.tile("block.attn.v").apply { columnTicks = kvHeadTicks; fullHeightColumnTicks = true }
         scene.tile("block.conv.bcx").apply {
             columnTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
             blockLabels = listOf("B", "C", "x")
@@ -231,15 +227,16 @@ object Lfm2StackCompositor {
         CompositorLayout().apply(scene)
 
         // The GQA story: wheel-flipping the attention deck flips the cache decks to the serving
-        // KV group, and the cache arrows carry standing emphasis so the sharing path reads.
+        // KV group.
         val kCacheTile = scene.tile("block.attn.k_cache") as DeckTile
         val vCacheTile = scene.tile("block.attn.v_cache") as DeckTile
         val qPerKv = config.numHeads / config.numKvHeads
-        val servingLabel: (Int) -> String = { group ->
-            "$group/${config.numKvHeads} → q ${group * qPerKv}–${(group + 1) * qPerKv - 1}"
+        val servingTooltip: (Int) -> String = { group ->
+            "Current key/value head: $group/${config.numKvHeads}; serves query heads " +
+                "${group * qPerKv}–${(group + 1) * qPerKv - 1}."
         }
-        kCacheTile.sliceLabel = servingLabel
-        vCacheTile.sliceLabel = servingLabel
+        kCacheTile.sliceTooltip = servingTooltip
+        vCacheTile.sliceTooltip = servingTooltip
         scene.onHeadSelected = { tile, head ->
             if (tile is AttentionTile) {
                 val group = head / qPerKv
@@ -247,12 +244,6 @@ object Lfm2StackCompositor {
                 vCacheTile.selectedSlice = group
             }
         }
-        // Cross-time reads: the KV caches and the conv window both feed PAST tokens' state into
-        // the current step — the only edges in the diagram that aren't this-token dataflow.
-        scene.memoryEdges = scene.edges.filter { edge ->
-            (edge.from as? TensorTile)?.id?.let { it.endsWith("_cache") || it == "block.conv.cache" } == true
-        }.toSet()
-
         // Slice identity: the conv gates read chunks of the ticked bcx projection. Each edge
         // carries the chunk indices it reads — the gate's offsets located against the tile's
         // tick boundaries — rendered as identity-colored strands matching the segment bars.
@@ -468,6 +459,9 @@ object Lfm2StackCompositor {
 
     /** Floor for a single-token row strip (true height would be one token — a few px). */
     private const val TOKEN_ROW_HEIGHT = 12.0
+
+    /** Compact display height for a fused key/value write vector. */
+    private const val KV_WRITE_ROW_HEIGHT = 6.0
 
     /** Floor for the conv window / kernel tap strips (true height would be k tokens). */
     private const val TAP_STRIP_HEIGHT = 20.0

@@ -151,8 +151,8 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
 
         val kCache = workspace("$prefix.attn.k_cache", c.kvDim, rows = c.maxSeqLen)
         val vCache = workspace("$prefix.attn.v_cache", c.kvDim, rows = c.maxSeqLen)
-        ops += CacheWriteOp("$prefix.attn.k_cache_write", k, kCache, state)
-        ops += CacheWriteOp("$prefix.attn.v_cache_write", v, vCache, state)
+        ops += CacheWriteOp("$prefix.attn.k_cache_write", k, kCache, state, c.numKvHeads, c.headDim)
+        ops += CacheWriteOp("$prefix.attn.v_cache_write", v, vCache, state, c.numKvHeads, c.headDim)
 
         val weights = workspace("$prefix.attn.weights", c.maxSeqLen, rows = c.numHeads)
         ops += AttendScoresOp("$prefix.attn.scores", q, kCache, weights, state,

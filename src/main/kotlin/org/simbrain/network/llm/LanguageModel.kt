@@ -146,8 +146,8 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     private fun activeTools(): List<LlmTool> =
         if (enableDemoTools) tools + demoTools else tools
 
-    /** The model layer the structure view shows; the depth strip is the live selector. */
-    var selectedLayer: Int = 0
+    /** The model layer the structure view shows; default to the first attention/KV-cache layer. */
+    var selectedLayer: Int = 2
 
     var selectedHead: Int = 0
         set(value) {
@@ -169,10 +169,17 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         }
 
     /** When true, the limb the selected layer doesn't use is hidden instead of ghosted. */
-    var hideInactiveLimb: Boolean = false
+    var hideInactiveLimb: Boolean = true
         set(value) {
             field = value
             loaded?.scene?.hideDimmed = value
+        }
+
+    /** Whether the structure view shows depth-card fans behind stacked layer tiles. */
+    var showLayerCards: Boolean = false
+        set(value) {
+            field = value
+            loaded?.scene?.showLayerCards = value
         }
 
     /** Saved tile positions by tile id, applied to the scene on load. */
@@ -252,6 +259,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
             ?.selectedHead = selectedHead
         scene.historyView = historyView
         scene.hideDimmed = hideInactiveLimb
+        scene.showLayerCards = showLayerCards
         scene.lens?.apply {
             enabled = lensEnabled
             async = true
@@ -296,6 +304,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         copy.lensEnabled = lensEnabled
         copy.historyView = historyView
         copy.hideInactiveLimb = hideInactiveLimb
+        copy.showLayerCards = showLayerCards
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.probabilityCardLayout = probabilityCardLayout?.copyOf()
         copy.initialText = windowText()?.takeIf { it.isNotBlank() } ?: initialText

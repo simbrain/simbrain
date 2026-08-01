@@ -39,9 +39,28 @@ class CompositorNode(
     private val probabilityCardPosition: ((CompositorScene, Rectangle2D, TokenProbabilityCardNode) -> Point2D)? = null,
     private val onProbabilityCardMoved: ((Double, Double) -> Unit)? = null,
     private val cellReadout: (TensorTile, Int, Int) -> String = { tile, row, col ->
-        "${tile.title} [$row, $col] = ${"%.4f".format(tile.valueAt(row, col))}"
+        "Cell [$row, $col] = ${"%.4f".format(tile.valueAt(row, col))}"
     },
 ) : PNode() {
+
+    private fun opTooltip(op: TensorOp): String {
+        val (title, description) = op.displayTooltip().split("\n", limit = 2).let {
+            it.first() to it.getOrElse(1) { "" }
+        }
+        val parallel = opParallelism(op)
+        val parallelDescription = when {
+            op is HeadwiseNormRopeOp -> "This happens independently in each of $parallel attention heads."
+            parallel > 1 -> "This happens independently in $parallel attention heads."
+            else -> ""
+        }
+        return "Op: $title\nShape: ${op.displayShape()}\n" +
+            listOf(description, parallelDescription).filter(String::isNotEmpty).joinToString(" ")
+    }
+
+    private fun dataTooltipTitle(tile: TensorTile) = when (tile) {
+        is AttentionTile -> "Data: attention weights"
+        else -> "Data: ${tile.title}" + if (tile.kind == TileKind.WEIGHT) " matrix" else ""
+    }
 
     private val background = PPath.createRectangle(0.0, 0.0, 1.0, 1.0).apply {
         paint = NetworkTheme.current.canvasBackground
@@ -101,39 +120,15 @@ class CompositorNode(
     /** Pager containers, so the interior handler leaves their clicks to the arrow buttons. */
     private val pagerNodes = mutableListOf<PNode>()
 
-    /**
-     * A destination-labeled flip arrow: the triangle plus the layer number it pages to, so the
-     * skip-rhythm is readable at the interaction point — an attention tile offers 8 -> 10, a
-     * spine tile 8 -> 9.
-     */
-    private inner class PagerNode(direction: ArrowDirection, private val labelFirst: Boolean, onClick: () -> Unit) : PNode() {
+    /** A layer-flip arrow; the adjacent state indicator shows the currently selected layer. */
+    private inner class PagerNode(direction: ArrowDirection, onClick: () -> Unit) : PNode() {
         private val arrow = createArrowButton(direction, PAGER_ARROW) { onClick() }.also { addChild(it) }
-        private val text = PText().apply {
-            font = Theme.tiny
-            pickable = false
-        }.also { addChild(it) }
 
         init {
             pagerNodes.add(this)
         }
 
-        fun setLabel(value: String?) {
-            visible = value != null
-            pickable = visible
-            childrenPickable = visible
-            text.text = value ?: ""
-            text.textPaint = blend(NetworkTheme.current.valueText, NetworkTheme.current.canvasBackground, 0.65)
-            val textY = (arrow.fullBoundsReference.height - text.height) / 2
-            if (labelFirst) {
-                text.setOffset(0.0, textY)
-                arrow.setOffset(text.width, 0.0)
-            } else {
-                arrow.setOffset(0.0, 0.0)
-                text.setOffset(arrow.fullBoundsReference.width, textY)
-            }
-        }
-
-        val rowWidth: Double get() = if (visible) fullBoundsReference.width else 0.0
+        val rowWidth: Double get() = arrow.fullBoundsReference.width
     }
 
     private inner class TileNode(val tile: TensorTile) : PNode() {
@@ -207,28 +202,24 @@ class CompositorNode(
             font = Theme.small
         }.also { addChild(it) }
 
-        /** Layer pagers flanking the caption, labeled with the layer each flips to. */
+        /** Layer pagers flanking the caption. */
         val layerPagers: Pair<PagerNode, PagerNode>? = (tile as? LayerStacked)
             ?.takeIf { it.stackLayers.size > 1 }?.let { stacked ->
-                val left = PagerNode(ArrowDirection.LEFT, labelFirst = false) {
+                val left = PagerNode(ArrowDirection.LEFT) {
                     stacked.layerBefore(scene.selectedLayer)?.let { selectLayer(it) }
                 }.also { addChild(it) }
-                val right = PagerNode(ArrowDirection.RIGHT, labelFirst = true) {
+                val right = PagerNode(ArrowDirection.RIGHT) {
                     stacked.layerAfter(scene.selectedLayer)?.let { selectLayer(it) }
                 }.also { addChild(it) }
                 left to right
             }
 
-        /** Head pagers on a deck tile's right edge — the clickable form of the wheel flip. */
-        val headPagers: Pair<PNode, PNode>? =
+        /** Head pagers flanking the current head indicator. */
+        val headPagers: Pair<PagerNode, PagerNode>? =
             if (tile is DeckTile && tile.slices > 1 || tile is AttentionTile && tile.numHeads > 1) {
-                val up = createArrowButton(ArrowDirection.UP, PAGER_ARROW) { stepHead(tile, -1) }
-                val down = createArrowButton(ArrowDirection.DOWN, PAGER_ARROW) { stepHead(tile, 1) }
-                listOf(up, down).forEach {
-                    pagerNodes.add(it)
-                    addChild(it)
-                }
-                up to down
+                val left = PagerNode(ArrowDirection.LEFT) { stepHead(tile, -1) }.also { addChild(it) }
+                val right = PagerNode(ArrowDirection.RIGHT) { stepHead(tile, 1) }.also { addChild(it) }
+                left to right
             } else null
 
         /** Caption line two: where the tile is in its stacks, in a muted icon+number grammar. */
@@ -240,9 +231,6 @@ class CompositorNode(
                 font = Theme.tiny
                 pickable = false
             }.also { addChild(it) }
-        }
-        val headIcon: SvgIconNode? = headPagers?.let {
-            SvgIconNode("icons/stat-heads.svg", STATE_ICON).also { addChild(it) }
         }
         val headText: PText? = headPagers?.let {
             PText().apply {
@@ -293,20 +281,15 @@ class CompositorNode(
         fun syncLayout() {
             setOffset(tile.x, tile.y)
             fan.setOffset(tile.x, tile.y)
-            headPagers?.let { (up, down) ->
-                val h = up.fullBoundsReference.height
-                up.setOffset(tile.width + 2.0, tile.height / 2 - h)
-                down.setOffset(tile.width + 2.0, tile.height / 2)
-            }
             // Notches mark boundaries on both edges, dropping to one edge on tiles too thin for
             // opposing marks to stay visually separate.
             val marks = Path2D.Double()
-            val columnTick = minOf(TICK_LENGTH, tile.height / 4)
+            val columnTick = if (tile.fullHeightColumnTicks) tile.height else minOf(TICK_LENGTH, tile.height / 4)
             for (c in tile.columnTicks) {
                 val tx = c.toDouble() / tile.cols * tile.width
                 marks.moveTo(tx, 0.0)
                 marks.lineTo(tx, columnTick)
-                if (tile.height >= TICK_LENGTH * 4) {
+                if (!tile.fullHeightColumnTicks && tile.height >= TICK_LENGTH * 4) {
                     marks.moveTo(tx, tile.height - columnTick)
                     marks.lineTo(tx, tile.height)
                 }
@@ -359,47 +342,60 @@ class CompositorNode(
             }
             headText?.let {
                 it.text = when (tile) {
-                    is DeckTile -> tile.sliceLabel?.invoke(tile.selectedSlice)
-                        ?: "${tile.selectedSlice}/${tile.slices}"
+                    is DeckTile -> "${tile.selectedSlice}/${tile.slices}"
                     is AttentionTile -> "${tile.selectedHead}/${tile.numHeads}"
                     else -> ""
                 }
                 it.textPaint = muted
             }
+            val showLayerControls = scene.showLayerCards && layerPagers != null
             layerPagers?.let { (left, right) ->
-                val stacked = tile as LayerStacked
-                left.setLabel(stacked.layerBefore(scene.selectedLayer)?.toString())
-                right.setLabel(stacked.layerAfter(scene.selectedLayer)?.toString())
+                left.visible = showLayerControls
+                right.visible = showLayerControls
             }
+            layerIcon?.visible = showLayerControls
+            layerText?.visible = showLayerControls
 
-            // Assemble the state row centered under the name: ‹6 [stack]8 10›  [heads]5/16
+            // Stack layer and head controls when both are visible, keeping each selector readable.
             val rowTop = tile.height + 4.0 + label.height
             val gap = 3.0
-            val groupGap = 8.0
-            var rowWidth = 0.0
-            layerPagers?.let { (left, right) ->
-                rowWidth += left.rowWidth + gap + STATE_ICON + 1.0 + layerText!!.width + gap + right.rowWidth
-            }
-            headIcon?.let {
-                if (rowWidth > 0) rowWidth += groupGap
-                rowWidth += STATE_ICON + 1.0 + headText!!.width
-            }
-            var x = (tile.width - rowWidth) / 2
+            var stateX = 0.0
+            var stateY = rowTop
             fun place(node: PNode, width: Double, height: Double) {
-                node.setOffset(x, rowTop + (PAGER_ROW_HEIGHT - height) / 2)
-                x += width
+                node.setOffset(stateX, stateY + (PAGER_ROW_HEIGHT - height) / 2)
+                stateX += width
             }
-            layerPagers?.let { (left, right) ->
+            if (showLayerControls) layerPagers?.let { (left, right) ->
+                val rowWidth = left.rowWidth + gap + STATE_ICON + 1.0 + layerText!!.width + gap + right.rowWidth
+                stateX = (tile.width - rowWidth) / 2
                 place(left, left.rowWidth + gap, left.fullBoundsReference.height)
                 place(layerIcon!!, STATE_ICON + 1.0, STATE_ICON)
                 place(layerText!!, layerText.width + gap, layerText.height)
                 place(right, right.rowWidth, right.fullBoundsReference.height)
+                stateY += PAGER_ROW_HEIGHT
             }
-            headIcon?.let {
-                if (layerPagers != null) x += groupGap
-                place(it, STATE_ICON + 1.0, STATE_ICON)
+            headPagers?.let { (left, right) ->
+                val rowWidth = left.rowWidth + gap + headText!!.width + gap + right.rowWidth
+                stateX = (tile.width - rowWidth) / 2
+                place(left, left.rowWidth + gap, left.fullBoundsReference.height)
                 place(headText!!, headText.width, headText.height)
+                place(right, right.rowWidth, right.fullBoundsReference.height)
             }
+        }
+
+        fun headSelectorContains(sceneX: Double, sceneY: Double): Boolean {
+            fun contains(node: PNode?) = node?.fullBoundsReference?.let { bounds ->
+                sceneX in tile.x + bounds.minX..tile.x + bounds.maxX &&
+                    sceneY in tile.y + bounds.minY..tile.y + bounds.maxY
+            } ?: false
+            return contains(headPagers?.first) || contains(headText) || contains(headPagers?.second)
+        }
+
+        fun headSelectorTooltip() = when (tile) {
+            is DeckTile -> tile.sliceTooltip?.invoke(tile.selectedSlice)
+                ?: "Current head: ${tile.selectedSlice}/${tile.slices}."
+            is AttentionTile -> "Current query head: ${tile.selectedHead}/${tile.numHeads}."
+            else -> null
         }
 
         fun syncDim() {
@@ -466,6 +462,7 @@ class CompositorNode(
             }
             for ((layer, card) in slotCards) {
                 val selected = layer == scene.selectedLayer
+                card.visible = scene.showLayerCards
                 card.paint = palette.canvasBackground
                 card.strokePaint = if (selected) palette.sourceHandle else palette.imageBorder
                 card.stroke = BasicStroke(if (selected) 1.5f else 1f)
@@ -891,7 +888,6 @@ class CompositorNode(
         for (edge in scene.edges.sortedBy { it.dimmed }) {
             if (edge.dimmed && scene.hideDimmed) continue
             val traced = edge in scene.tracedEdges
-            val memory = edge in scene.memoryEdges
             val tailSide = tailSides.getValue(edge)
             val headSide = headSides.getValue(edge)
             val tail = tailSide.p(tailFractions.getValue(edge))
@@ -904,9 +900,6 @@ class CompositorNode(
             val ribbonColor = when {
                 edge.dimmed -> palette.connectionLine
                 traced -> palette.receptiveFieldTrace
-                // Cache reads carry PAST tokens' state into this step; a muted cool tint keeps
-                // that cross-time flow distinct without spending the selection accent on it.
-                memory -> blend(palette.coolNode, palette.connectionLine, 0.5)
                 else -> palette.connectionLine
             }
             val thickness = if (traced) RIBBON_THICKNESS + 2f else RIBBON_THICKNESS
@@ -969,7 +962,6 @@ class CompositorNode(
                 transparency = when {
                     edge.dimmed -> 0.15f
                     traced -> 0.8f
-                    memory -> 0.6f
                     else -> 0.5f
                 }
                 pickable = false
@@ -1238,22 +1230,23 @@ class CompositorNode(
             val target = canvas ?: return
             val glyph = glyphsByOp.values.firstOrNull { it.containsScenePoint(point.x, point.y) }
             if (glyph != null) {
-                val parallel = opParallelism(glyph.op)
-                target.toolTipText = glyph.op.displayTooltip() + when {
-                    glyph.op is HeadwiseNormRopeOp ->
-                        "\nThis happens independently in each of $parallel attention heads."
-                    parallel > 1 -> "\nThis happens independently in $parallel attention heads."
-                    else -> ""
-                }
+                target.toolTipText = opTooltip(glyph.op)
                 return
             }
             val badged = tileNodes.firstOrNull { it.badgeContains(point.x, point.y) }
             if (badged != null) {
-                target.toolTipText = badged.activationOp?.displayTooltip()
+                target.toolTipText = badged.activationOp?.let(::opTooltip)
+                return
+            }
+            val headSelector = tileNodes.firstOrNull { it.headSelectorContains(point.x, point.y) }
+            if (headSelector != null) {
+                target.toolTipText = headSelector.headSelectorTooltip()
                 return
             }
             val cell = tile?.cellAt(point.x, point.y)
-            target.toolTipText = if (tile != null && cell != null) cellReadout(tile, cell.first, cell.second) else null
+            target.toolTipText = if (tile != null && cell != null) {
+                "${dataTooltipTitle(tile)}\nShape: ${tile.tooltipShape}\n${cellReadout(tile, cell.first, cell.second)}"
+            } else null
         }
 
         override fun mouseExited(event: PInputEvent) {

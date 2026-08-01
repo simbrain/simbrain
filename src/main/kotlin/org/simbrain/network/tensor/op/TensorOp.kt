@@ -42,6 +42,12 @@ abstract class TensorOp(val name: String) {
      */
     open fun displayTooltip(): String = tooltip ?: name
 
+    /** Concise input-to-output tensor dimensions for compositor hover text. */
+    open fun displayShape(): String {
+        fun TensorPort.shape() = "${tensor.rows} × ${tensor.cols}"
+        return "${inputs.joinToString(" + ") { it.shape() }} → ${outputs.joinToString(" + ") { it.shape() }}"
+    }
+
     /** Assign a learner-facing title and explanation for a visual representation of this op. */
     fun withDisplayTooltip(title: String, explanation: String): TensorOp {
         tooltip = "$title\n$explanation"

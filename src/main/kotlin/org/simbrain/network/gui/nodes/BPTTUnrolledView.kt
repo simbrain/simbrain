@@ -45,6 +45,8 @@ import org.simbrain.util.toSimbrainColorImage
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.Rectangle2D
+import kotlin.math.max
+import kotlin.math.round
 
 /**
  * @param rolledLeftEdge the left edge of the rolled network's drawn extent, in canvas coordinates, or
@@ -241,7 +243,15 @@ class BPTTUnrolledView(
                 it.width, it.height, it.size,
                 it.gridMode, it.circleMode, it.verticalLayout, it.isShowBias
             )
-        }
+        // The rolled network's own drawn extent, which the columns are placed against. Included because it
+        // moves for reasons the layers alone do not predict: a wider hidden layer pushes the recurrent
+        // arrow further out, and that happens a layout pass after the width itself changes. Without it the
+        // columns stay where a narrower network put them and are overdrawn by the arrow.
+        //
+        // Safe to read here because the measurement covers the subnetwork's contents only and not this
+        // drawing, so it cannot depend on the layout it is used to decide. Rounded so that sub-pixel
+        // jitter cannot keep asking for rebuilds.
+        } + listOfNotNull(rolledLeftEdge()?.let { round(it) })
 
     /** Whether anything the drawing was built from has changed since it was built. */
     fun stale() = laidOut && buildSignature() != builtFrom
@@ -283,8 +293,14 @@ class BPTTUnrolledView(
         laidOut = nearestRightEdge != null
         if (nearestRightEdge == null) return
 
-        val halfWidth = realLayers.maxOf { if (it.width > 0) it.width else FALLBACK_WIDTH } / 2
-        val nearestOffset = nearestRightEdge - halfWidth
+        val widestLayer = realLayers.maxOf { if (it.width > 0) it.width else FALLBACK_WIDTH }
+        val nearestOffset = nearestRightEdge - widestLayer / 2
+
+        // Derived rather than fixed because a layer can be much wider than any constant would anticipate:
+        // eight neurons drawn as circles are wider than three drawn as a strip. Columns have to clear each
+        // other and the recurrent matrix copy that sits on the arrow between them, or a wide layer ends up
+        // drawn on top of its own connections.
+        val columnPitch = max(MIN_COLUMN_PITCH, widestLayer + MATRIX_SIZE + 2 * MATRIX_CLEARANCE)
 
         // Oldest first, so the last entry is the rolled network. Prior steps sit to its left, which is
         // why their offsets are negative.
@@ -292,7 +308,7 @@ class BPTTUnrolledView(
 
         repeat(priorSteps) { k ->
             val stepsBack = priorSteps - k
-            val rects = realLayers.map { rectFor(it, nearestOffset - COLUMN_PITCH * (stepsBack - 1)) }
+            val rects = realLayers.map { rectFor(it, nearestOffset - columnPitch * (stepsBack - 1)) }
             columnRects.add(rects)
 
             val strips = realLayers.zip(rects).map { (layer, rect) -> addLayerStandIn(layer, rect, theme) }
@@ -492,7 +508,11 @@ class BPTTUnrolledView(
     }
 
     companion object {
-        private const val COLUMN_PITCH = 300.0
+        /** Floor for the spacing between drawn columns, used when the layers are narrow enough not to set it. */
+        private const val MIN_COLUMN_PITCH = 300.0
+
+        /** Breathing room on either side of a matrix copy sitting between two columns. */
+        private const val MATRIX_CLEARANCE = 30.0
 
         /** Plain visual breathing room between the rolled network's drawn extent and the newest column. */
         private const val COLUMN_GAP = 90.0

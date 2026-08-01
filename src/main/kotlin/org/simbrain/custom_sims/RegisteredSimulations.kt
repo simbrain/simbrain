@@ -172,6 +172,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Recurrent networks") {
         item("Recurrent net") { recurrentProjection }
         item("Recurrent net (array)") { recurrentNetArrayBased }
+        item("Delayed recall (BPTT)") { bpttDelayedRecall }
     }
 
     dir("Reinforcement learning") {

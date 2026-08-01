@@ -88,11 +88,16 @@ open class FeedForward : Subnetwork {
 
     override fun onCommit() {}
 
+    /**
+     * A supplied [randomizer] applies to weights and biases alike; the differently scaled defaults are used
+     * only when none is given. Passing one used to have no effect at all, which quietly made even a seeded
+     * distribution produce a different network every time.
+     */
     override fun randomize(randomizer: ProbabilityDistribution?) {
-        wmList.forEach { wm -> wm.randomize(NormalDistribution(0.0, .1)) }
+        wmList.forEach { wm -> wm.randomize(randomizer ?: NormalDistribution(0.0, .1)) }
         (layerList - inputLayer).forEach {
             it.clear()
-            it.randomizeBiases(NormalDistribution(0.0, .01))
+            it.randomizeBiases(randomizer ?: NormalDistribution(0.0, .01))
         }
     }
 

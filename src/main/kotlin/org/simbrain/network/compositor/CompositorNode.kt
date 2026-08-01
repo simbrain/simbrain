@@ -34,6 +34,10 @@ class CompositorNode(
     val scene: CompositorScene,
     private val canvas: PCanvas? = null,
     private val tokenLabel: (Int) -> String = { "#$it" },
+    private val probabilitySnapshot: () -> TokenProbabilitySnapshot? = { null },
+    private val probabilityCardStyle: TokenProbabilityCardStyle = TokenProbabilityCardStyle(),
+    private val probabilityCardPosition: ((CompositorScene, Rectangle2D, TokenProbabilityCardNode) -> Point2D)? = null,
+    private val onProbabilityCardMoved: ((Double, Double) -> Unit)? = null,
     private val cellReadout: (TensorTile, Int, Int) -> String = { tile, row, col ->
         "${tile.title} [$row, $col] = ${"%.4f".format(tile.valueAt(row, col))}"
     },
@@ -53,6 +57,20 @@ class CompositorNode(
      * image instead of re-rasterizing every antialiased ribbon, strand, and card.
      */
     private val chromeLayer = RasterCachedNode().also { addChild(it) }
+
+    private val probabilityCardOverlay = scene.overlays.firstOrNull { it.id == PROBABILITY_CARD_ID }
+        ?: InteriorOverlay(PROBABILITY_CARD_ID, probabilityCardStyle.width, probabilityCardStyle.height).also(scene::addOverlay)
+
+    private val probabilityCard = TokenProbabilityCardNode(tokenLabel, probabilityCardStyle).also {
+        it.onMoved = {
+            probabilityCardOverlay.x = it.offset.x
+            probabilityCardOverlay.y = it.offset.y
+            onProbabilityCardMoved?.invoke(it.offset.x, it.offset.y)
+            relayout()
+            onLayoutChanged?.invoke()
+        }
+        addChild(it)
+    }
 
     /**
      * Tile card fans paint UNDER the edges, front tiles above them: a pipe runs over the card
@@ -504,6 +522,7 @@ class CompositorNode(
         rebuildEdges()
         relayout()
         refreshDirtyTiles()
+        probabilityCard.raiseToTop()
         addInputEventListener(InteriorInputHandler())
     }
 
@@ -514,6 +533,7 @@ class CompositorNode(
             it.syncLiveRow()
         }
         lensRows.forEach { it.refresh() }
+        probabilityCard.refresh(probabilitySnapshot())
     }
 
     /** Re-derives node offsets, edges, return lanes, lens placement, and bounds from tile rects. */
@@ -535,6 +555,15 @@ class CompositorNode(
         if (edgeBounds.width > 0 && edgeBounds.height > 0) {
             bounds.add(Rectangle2D.Double(edgeBounds.x, edgeBounds.y, edgeBounds.width, edgeBounds.height))
         }
+        if (probabilityCardOverlay.x.isNaN() || probabilityCardOverlay.y.isNaN()) {
+            val cardPosition = probabilityCardPosition?.invoke(scene, bounds, probabilityCard)
+                ?: Point2D.Double(bounds.x - LENS_SPACE + MARGIN, bounds.maxY + 18.0)
+            probabilityCardOverlay.x = cardPosition.x
+            probabilityCardOverlay.y = cardPosition.y
+        }
+        probabilityCard.setOffset(probabilityCardOverlay.x, probabilityCardOverlay.y)
+        val cardBounds = probabilityCard.fullBoundsReference
+        bounds.add(Rectangle2D.Double(cardBounds.x, cardBounds.y, cardBounds.width, cardBounds.height))
         background.reset()
         background.append(
             Rectangle2D.Double(
@@ -1241,6 +1270,7 @@ class CompositorNode(
     private enum class Mode { NONE, MOVE, MARQUEE }
 
     companion object {
+        private const val PROBABILITY_CARD_ID = "probability-card"
         private const val MARGIN = 40.0
         private const val DRAG_RELAYOUT_MS = 33L
         private const val LENS_SPACE = 220.0

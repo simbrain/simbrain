@@ -3,6 +3,7 @@ package org.simbrain.network.llm
 import org.simbrain.network.compositor.CompositorScene
 import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.compositor.TeachingCompositor
+import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
@@ -417,6 +418,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
     /** Saved junction glyph centers by op name, applied to the scene on load. */
     var junctionLayout: HashMap<String, DoubleArray>? = null
 
+    /** Saved position of the next-token probability card. */
+    var probabilityCardLayout: DoubleArray? = null
+
     @Transient
     override var events: TeachingTransformerEvents = TeachingTransformerEvents()
         private set
@@ -431,6 +435,12 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
 
     @Transient
     private var windowCursor = 0
+
+    /** Immutable display data for the next-token card; rebuilt after each completed forward pass. */
+    @Transient
+    @Volatile
+    var tokenProbabilitySnapshot: TokenProbabilitySnapshot? = null
+        private set
 
     constructor(config: TeachingTransformerConfig) : this() {
         this.config = config
@@ -508,6 +518,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         copy.selectedHead = selectedHead
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.junctionLayout = junctionLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
+        copy.probabilityCardLayout = probabilityCardLayout?.copyOf()
         copy.rebuildScene()
     }
 
@@ -591,8 +602,12 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         acceptSample()
     }
 
-    private fun sampleNext(): Int =
-        sampleOverride?.invoke() ?: samplingStrategy.sample(nextTokenDistribution())
+    private fun sampleNext(): Int {
+        val distribution = nextTokenDistribution()
+        val sample = sampleOverride?.invoke() ?: samplingStrategy.sample(distribution)
+        tokenProbabilitySnapshot = TokenProbabilitySnapshot.full(distribution, sample)
+        return sample
+    }
 
     private fun acceptSample() {
         val label = tokenLabels?.getOrNull(sampledToken) ?: return

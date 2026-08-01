@@ -91,6 +91,18 @@ class FlowEdge(
 class TileSatellite(val tile: TensorTile, val edge: FlowEdge, val op: TensorOp)
 
 /**
+ * A movable compositor interior element that has bounds and persists with the scene's view, but
+ * is not a tensor or data-flow endpoint. Probability cards use this status.
+ */
+class InteriorOverlay(
+    val id: String,
+    val width: Double,
+    val height: Double,
+    var x: Double = Double.NaN,
+    var y: Double = Double.NaN,
+)
+
+/**
  * Self-contained selection over interior endpoints — tiles and op vertices — shaped like the
  * network canvas selection model (add/remove/toggle/set/clear plus change notification) but
  * deliberately separate from it — interior objects aren't network models, so global selection
@@ -147,6 +159,14 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     private val _tiles = mutableListOf<TensorTile>()
     val tiles: List<TensorTile> get() = _tiles
+
+    private val _overlays = mutableListOf<InteriorOverlay>()
+    val overlays: List<InteriorOverlay> get() = _overlays
+
+    fun addOverlay(overlay: InteriorOverlay) {
+        require(_overlays.none { it.id == overlay.id }) { "Duplicate overlay id ${overlay.id}" }
+        _overlays += overlay
+    }
 
     var edges: List<FlowEdge> = emptyList()
         private set

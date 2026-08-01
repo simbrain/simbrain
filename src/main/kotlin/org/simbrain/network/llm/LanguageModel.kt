@@ -1,9 +1,6 @@
 package org.simbrain.network.llm
 
-import org.simbrain.network.compositor.AttentionTile
-import org.simbrain.network.compositor.CompositorScene
-import org.simbrain.network.compositor.HistoryView
-import org.simbrain.network.compositor.Lfm2StackCompositor
+import org.simbrain.network.compositor.*
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
@@ -100,6 +97,15 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         order = 5,
     )
 
+    var probabilityCardCandidates by GuiEditable(
+        initValue = 8,
+        label = "Probability card candidates",
+        description = "Number of highest-probability next tokens shown in the canvas card",
+        min = 1,
+        max = 20,
+        order = 5,
+    )
+
     override var samplingStrategy: SamplingStrategy by GuiEditable(
         initValue = SamplingStrategy.Greedy,
         label = "Sampling strategy",
@@ -172,6 +178,9 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     /** Saved tile positions by tile id, applied to the scene on load. */
     var tileLayout: HashMap<String, DoubleArray>? = null
 
+    /** Saved position of the next-token probability card. */
+    var probabilityCardLayout: DoubleArray? = null
+
     @Transient
     override var events: LanguageModelEvents = LanguageModelEvents()
         private set
@@ -186,6 +195,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
 
     @Transient
     private var generatedCount = 0
+
+    @Transient
+    @Volatile
+    var tokenProbabilitySnapshot: TokenProbabilitySnapshot? = null
+        private set
 
     /** The committed token stream in [text] order: seed, injections, accepted samples. */
     @Transient
@@ -271,6 +285,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         copy.systemPrompt = systemPrompt
         copy.tokensToGenerate = tokensToGenerate
         copy.temperature = temperature
+        copy.probabilityCardCandidates = probabilityCardCandidates
         copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
         copy.stopAtEndOfText = stopAtEndOfText
         copy.pauseWorkspaceAtEnd = pauseWorkspaceAtEnd
@@ -282,6 +297,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         copy.historyView = historyView
         copy.hideInactiveLimb = hideInactiveLimb
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
+        copy.probabilityCardLayout = probabilityCardLayout?.copyOf()
         copy.initialText = windowText()?.takeIf { it.isNotBlank() } ?: initialText
     }
 
@@ -360,8 +376,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         val id = if (pending.isNotEmpty()) pending.removeFirst() else sampledToken
         val position = state.model.position
         val logits = state.model.forwardToken(id)
-        state.scene.publish(position)
         sampledToken = sampleToken(logits)
+        tokenProbabilitySnapshot = TokenProbabilitySnapshot.topK(
+            logits, probabilityCardCandidates, sampledToken, temperature,
+        )
+        state.scene.publish(position)
         if (pending.isEmpty()) {
             windowIds.add(sampledToken)
             syncGate.invalidate()

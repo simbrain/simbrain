@@ -73,6 +73,12 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 state.scene,
                 networkPanel.canvas,
                 tokenLabel = { id -> "“${state.tokenizer.decode(intArrayOf(id))}”" },
+                probabilitySnapshot = { languageModel.tokenProbabilitySnapshot },
+                probabilityCardPosition = { scene, bounds, _ ->
+                    languageModel.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) }
+                        ?: Point2D.Double(bounds.x - 24.0, scene.tile("block.resid").y)
+                },
+                onProbabilityCardMoved = { x, y -> languageModel.probabilityCardLayout = doubleArrayOf(x, y) },
             ).also {
                 it.onLayoutChanged = {
                     languageModel.captureViewState()

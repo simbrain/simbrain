@@ -5,6 +5,8 @@ import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
+import org.simbrain.network.compositor.TokenProbabilityCardStyle
+import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
@@ -65,6 +67,25 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             teachingTransformer.scene,
             networkPanel.canvas,
             tokenLabel = { id -> teachingTransformer.tokenLabels?.getOrNull(id)?.let { "“$it”" } ?: "#$id" },
+            probabilitySnapshot = {
+                teachingTransformer.tokenProbabilitySnapshot
+                    ?: teachingTransformer.tokenLabels?.let { TokenProbabilitySnapshot.full(DoubleArray(it.size), -1) }
+            },
+            probabilityCardStyle = TokenProbabilityCardStyle(
+                title = "current-position token probabilities",
+                width = 1020.0,
+                height = 315.0,
+                columns = 18,
+                visibleRows = 5,
+            ),
+            probabilityCardPosition = { scene, _, card ->
+                teachingTransformer.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) } ?: run {
+                    val logits = scene.tile("logits")
+                    val unembedding = scene.tile("unembed.weight")
+                    Point2D.Double(logits.x + logits.width + 85.0, unembedding.y + unembedding.height / 2)
+                }
+            },
+            onProbabilityCardMoved = { x, y -> teachingTransformer.probabilityCardLayout = doubleArrayOf(x, y) },
         ).also {
             it.onLayoutChanged = {
                 teachingTransformer.captureViewState()
@@ -230,7 +251,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
 
         override val contextMenu: JPopupMenu get() = this@TeachingTransformerNode.contextMenu
 
-        override val propertyDialog: StandardDialog get() = this@TeachingTransformerNode.propertyDialog
+        override val propertyDialog: StandardDialog get() = trainingDialog()
 
         override val model: NetworkModel get() = this@TeachingTransformerNode.teachingTransformer
     }

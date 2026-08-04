@@ -14,6 +14,9 @@ import javax.swing.SwingUtilities
  * whose length is not a multiple of the depth. A row inside a banded window is selected, since the band
  * and the selection highlight both set a row's background and the selection has to win.
  *
+ * The data also declares five row sequences, drawn as heavier rules. Their length is deliberately not the
+ * truncation depth, so the two divisions land in different places and it is clear which is which.
+ *
  * Worth rendering under `-Ptheme=dark` as well: the band and the rule are the parts most likely to
  * vanish into the background in one theme or the other.
  */
@@ -26,7 +29,10 @@ class BPTTTrainerDataBandsSnapshot : UiSnapshotDef {
             inputs = MutableList(ROWS) { row -> MutableList(3) { col -> if (col == row % 3) 1.0 else 0.0 } },
             targets = MutableList(ROWS) { row -> MutableList(3) { col -> if (col == (row + 1) % 3) 1.0 else 0.0 } },
             inputSize = 3,
-            targetSize = 3
+            targetSize = 3,
+            // Five row sequences against a depth of four, so the two divisions deliberately fall in
+            // different places and can be told apart.
+            sequenceLength = 5
         )
 
         lateinit var panel: Component

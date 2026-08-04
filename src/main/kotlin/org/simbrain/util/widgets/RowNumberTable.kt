@@ -3,6 +3,7 @@ package org.simbrain.util.widgets
 import org.simbrain.util.Theme
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainDataFrame
+import org.simbrain.util.table.SEQUENCE_RULE_THICKNESS
 import org.simbrain.util.table.SimbrainJTable
 import org.simbrain.util.table.paintRowGroupRules
 import org.simbrain.util.table.rowBandColor
@@ -82,6 +83,7 @@ class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, Prope
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         paintRowGroupRules(this, g, groupSize)
+        paintRowGroupRules(this, g, (main as? SimbrainJTable)?.sequenceSize?.invoke(), SEQUENCE_RULE_THICKNESS)
     }
 
     /*

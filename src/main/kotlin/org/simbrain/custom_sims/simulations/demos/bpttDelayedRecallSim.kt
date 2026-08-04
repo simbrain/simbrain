@@ -222,11 +222,18 @@ private const val TEST_SEED = 2
 private val SYMBOL_NAMES = listOf("A", "B", "C")
 
 /**
- * One symbol per trial, laid out as a single continuous sequence.
+ * One symbol per trial, laid out as a single continuous stream.
  *
  * Every step needs a target because the loss is summed over the whole unrolled window, so the delay steps
  * are given an all-zero target rather than being masked out. The network therefore also has to learn to
  * stay silent until asked, which is a fair part of the task rather than an artifact of the encoding.
+ *
+ * Deliberately leaves [TrainingDataset.sequenceLength] unset even though these trials really are
+ * independent, which is the one place this simulation does not do the ordinary thing. Declaring the
+ * sequences would make the trainer cut windows inside each trial, so no window could ever straddle a
+ * trial and the truncation depth would stop mattering except as a cap. The whole point on show here is
+ * what happens when it does straddle, so the stream form is what the simulation needs. Anything modelling
+ * genuinely independent sequences should set it.
  */
 fun buildDelayedRecallSequence(trials: Int, random: Random): TrainingDataset {
     val inputs = mutableListOf<MutableList<Double>>()

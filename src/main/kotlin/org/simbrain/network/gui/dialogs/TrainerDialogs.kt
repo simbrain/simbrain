@@ -68,7 +68,8 @@ fun TrainingDataset.createDataSetPanel(
         targetDataFrame,
         applyAction = applyAction,
         parentDialog = parentDialog,
-        rowGrouping = rowGrouping
+        rowGrouping = rowGrouping,
+        sequenceLength = sequenceLength
     )
 }
 
@@ -86,7 +87,9 @@ class DataSetPanel(
     val targetDataFrame: BasicDataFrame,
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit,
     parentDialog: StandardDialog? = null,
-    private val rowGrouping: () -> RowGrouping? = { null }
+    private val rowGrouping: () -> RowGrouping? = { null },
+    /** Carried so the panel can draw sequence boundaries and hand it back on commit. */
+    val sequenceLength: Int? = null
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
@@ -126,7 +129,10 @@ class DataSetPanel(
     init {
         // Both tables band off the same row index, so inputs and targets read as one sequence rather than
         // as two separately striped grids.
-        listOf(inputs.table, targets.table).forEach { it.rowGroupSize = { rowGrouping()?.size } }
+        listOf(inputs.table, targets.table).forEach {
+            it.rowGroupSize = { rowGrouping()?.size }
+            it.sequenceSize = { sequenceLength }
+        }
 
         layout = MigLayout("ins 8, gap 12px 6px")
         add(Theme.sectionLabel("Inputs"))
@@ -154,10 +160,19 @@ class DataSetPanel(
      */
     fun refreshRowGrouping() {
         val grouping = rowGrouping()
-        groupingCaption.text = grouping?.caption ?: ""
-        groupingCaption.isVisible = grouping != null
+        val sequences = sequenceLength?.let { "Heavier lines every $it rows divide independent sequences." }
+        val text = listOfNotNull(grouping?.caption, sequences).joinToString(" ")
+        // Wrapped to the width of the tables it describes. Left as one line, a caption this long sets the
+        // dialog's width by itself and leaves the tables swimming in it.
+        val wrapWidth = (inputs.preferredSize.width + targets.preferredSize.width).coerceAtLeast(MIN_CAPTION_WIDTH)
+        groupingCaption.text = if (text.isEmpty()) "" else "<html><body style='width:${wrapWidth}px'>$text"
+        groupingCaption.isVisible = text.isNotEmpty()
         listOf(inputs, targets).forEach { it.repaint() }
         revalidate()
+    }
+
+    companion object {
+        private const val MIN_CAPTION_WIDTH = 400
     }
 
 }
@@ -252,7 +267,10 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             inputRowNames = inputDataFrame.rowNames.map { it.toString() } as List<String>?,
             targetRowNames = targetDataFrame.rowNames.map { it.toString() } as List<String>?,
             inputColumnNames = inputDataFrame.columnNames,
-            targetColumnNames = targetDataFrame.columnNames
+            targetColumnNames = targetDataFrame.columnNames,
+            // The table cannot edit this, but the dialog rebuilds the dataset wholesale on commit, so
+            // leaving it out would quietly drop the sequence structure the moment anyone opened the dialog.
+            sequenceLength = sequenceLength
         )
 
         fun syncDataSet() {

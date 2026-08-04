@@ -230,18 +230,26 @@ fun rowBandColor(row: Int, groupSize: Int?): Color? =
  * Painted over the finished table rather than applied as a cell border, so it spans the full width in one
  * piece and does not compete with the border a focused cell draws.
  */
-fun paintRowGroupRules(table: JTable, g: Graphics, groupSize: Int?) {
+fun paintRowGroupRules(table: JTable, g: Graphics, groupSize: Int?, thickness: Int = ROW_GROUP_RULE_THICKNESS) {
     if (groupSize == null || groupSize < 1) return
     g.color = Theme.rowBandRule
     var row = groupSize
     while (row < table.rowCount) {
         val top = table.getCellRect(row, 0, true).y
-        g.fillRect(0, top - ROW_GROUP_RULE_THICKNESS / 2, table.width, ROW_GROUP_RULE_THICKNESS)
+        g.fillRect(0, top - thickness / 2, table.width, thickness)
         row += groupSize
     }
 }
 
 private const val ROW_GROUP_RULE_THICKNESS = 2
+
+/**
+ * Sequence boundaries are drawn heavier than window boundaries because they are the stronger division: a
+ * window merely stops the gradient, while a sequence boundary is a point the data says nothing carries
+ * across at all. Where a trainer cuts windows within sequences the two coincide, and the heavier rule
+ * simply wins.
+ */
+const val SEQUENCE_RULE_THICKNESS = 5
 
 class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) : JTable(model), CoroutineScope {
 
@@ -264,6 +272,12 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
      * determines it changes. Returning null, the default, leaves the table looking as it always has.
      */
     var rowGroupSize: () -> Int? = { null }
+
+    /**
+     * How many consecutive rows form one independent sequence, drawn as a heavier rule than the group
+     * boundaries. Null, the default, means the rows are not divided that way.
+     */
+    var sequenceSize: () -> Int? = { null }
 
     init {
         columnSelectionAllowed = true
@@ -465,6 +479,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
         paintRowGroupRules(this, g, rowGroupSize())
+        paintRowGroupRules(this, g, sequenceSize(), SEQUENCE_RULE_THICKNESS)
     }
 
     override fun scrollRectToVisible(aRect: Rectangle) {

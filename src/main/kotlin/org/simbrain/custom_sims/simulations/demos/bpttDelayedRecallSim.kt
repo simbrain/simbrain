@@ -152,11 +152,11 @@ val bpttDelayedRecall = newSim {
            because there is no gradient path from a recall back to the cue it answers, so the recurrent
            weights are never shaped to preserve anything. Depths of `1` and `3` behave the same way.
 
-        3. Reset and try `4`, one short of a trial. This is the interesting one: it lands part way, and
-           varies a lot between runs. A window reaching back four steps covers the last blank step but not
-           the cue, which is enough to improve how the output layer reads whatever the recurrent weights
-           happen to leak forward, and not enough to improve the leak itself. Reset and retrain a few times
-           to see how unstable it is compared to $TRIAL_LENGTH.
+        3. At any depth below $TRIAL_LENGTH, watch the `Output` layer instead of the accuracy figure. The
+           same unit lights up on every recall whatever symbol was shown: the network settles on one
+           constant answer and scores whatever share of the data that symbol happens to hold. A figure
+           somewhere between chance and correct looks like partial memory and is not; nothing is being
+           recalled at all. Only at $TRIAL_LENGTH does the answer start varying with the cue.
 
         4. Try `6` or `7`, more than a trial. These still solve the task, but slightly less dependably than
            $TRIAL_LENGTH does, and the reason is worth a moment. Truncation here is by fixed chunks rather
@@ -178,6 +178,10 @@ val bpttDelayedRecall = newSim {
         the trials, which is the same fact the accuracy is reporting.
 
         # References
+
+        The task is a construction for this simulation, not a reproduction of a published experiment,
+        though delaying a cue and then probing for it is a long established paradigm. The reference below
+        is for the training algorithm rather than for the task.
 
         Werbos, P. J. (1990). [*Backpropagation through time: what it does and how to
         do it.*](https://doi.org/10.1109/5.58337) Proceedings of the IEEE, 78(10), 1550-1560.

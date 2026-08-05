@@ -14,9 +14,9 @@ import kotlin.random.Random
 internal object ThermotaxisPopulationSimulation {
 
     private const val dt = 0.1
-    private const val width = 136.0
-    private const val height = 96.0
-    private const val stepDistance = 0.02
+    private const val width = PLATE_WIDTH
+    private const val height = PLATE_HEIGHT
+    private const val stepDistance = CRAWLING_SPEED * dt
     fun run(
         worms: Int = 12,
         seconds: Int = 120,
@@ -64,7 +64,8 @@ internal object ThermotaxisPopulationSimulation {
         var turnStepY = 0.0
         val points = mutableListOf(ThermotaxisPosition(x, y))
         repeat(seconds * 10) { step ->
-            val temperature = 17.0 + temperatureOffset + gradientDirection * 3.0 * (x / width - 0.5) * 2.0
+            val temperature = PLATE_CENTER_TEMPERATURE + temperatureOffset +
+                gradientDirection * PLATE_GRADIENT * (2.0 * x / width - 1.0)
             if (remainingTurnSteps > 0) {
                 x += turnStepX
                 y += turnStepY
@@ -97,8 +98,6 @@ internal object ThermotaxisPopulationSimulation {
         return ThermotaxisPath(points)
     }
 }
-
-private val fittedBiases = doubleArrayOf(0.261331049344628, -9.94979936474547, -11.8836526406511, -0.243075226129511, 4.21550001866696)
 
 internal data class ThermotaxisTurn(
     val heading: Double,

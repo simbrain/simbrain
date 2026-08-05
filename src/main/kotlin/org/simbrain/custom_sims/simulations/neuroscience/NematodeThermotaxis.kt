@@ -1,6 +1,8 @@
 /**
  * A visual, steering-only implementation of the fitted thermotaxis circuit in
- * Ikeda, Matsumoto, and Izquierdo (2021).
+ * Ikeda, Matsumoto, and Izquierdo (2021), using parameter set #67 from the paper's S1 Table, which is the
+ * set the paper plots in Figure 7. The circuit here is verified step for step against a recorded run of the
+ * authors' C++ implementation; see ThermotaxisTraceRecorder and NematodeThermotaxisTest.
  */
 package org.simbrain.custom_sims.simulations.neuroscience
 
@@ -29,8 +31,10 @@ import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.geom.Line2D
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
+import java.util.zip.GZIPInputStream
 import javax.swing.*
 import kotlin.math.*
 import kotlin.random.Random
@@ -62,21 +66,22 @@ val nematodeThermotaxis = newSim { optionString ->
             upperBound = 15.0
         }
 
-    val afdToAibGap = addConnection(afd, aib, 2.98878639079434)
-    val aibToAfdGap = addConnection(aib, afd, 2.98878639079434)
-    val afdToAiy = addConnection(afd, aiy, -6.86431476903374)
-    val aibToAiy = addConnection(aib, aiy, -3.22231085979830)
-    val aibToDmn = addConnection(aib, dmn, -6.54395366094551)
-    val aiyToAiz = addConnection(aiy, aiz, 4.60507293122372)
-    val aizToAib = addConnection(aiz, aib, -6.18485677383669)
-    val aizToDmn = addConnection(aiz, dmn, 12.5176985752213)
-    val aizToVmn = addConnection(aiz, vmn, -14.1246289219806)
-    val dmnToDmn = addConnection(dmn, dmn, 4.87761445986278)
-    val dmnToVmn = addConnection(dmn, vmn, -1.70971858601307)
-    val vmnToDmn = addConnection(vmn, dmn, 7.23275421563747)
-    val vmnToVmn = addConnection(vmn, vmn, -5.06198070709775)
-    val cpgToDmn = addConnection(cpg, dmn, 12.5352695337539)
-    val cpgToVmn = addConnection(cpg, vmn, -12.5352695337539)
+    val fitted = ThermotaxisWeights()
+    val afdToAibGap = addConnection(afd, aib, fitted.afdToAibGap)
+    val aibToAfdGap = addConnection(aib, afd, fitted.afdToAibGap)
+    val afdToAiy = addConnection(afd, aiy, fitted.afdToAiy)
+    val aibToAiy = addConnection(aib, aiy, fitted.aibToAiy)
+    val aibToDmn = addConnection(aib, dmn, fitted.aibToDmn)
+    val aiyToAiz = addConnection(aiy, aiz, fitted.aiyToAiz)
+    val aizToAib = addConnection(aiz, aib, fitted.aizToAib)
+    val aizToDmn = addConnection(aiz, dmn, fitted.aizToDmn)
+    val aizToVmn = addConnection(aiz, vmn, fitted.aizToVmn)
+    val dmnToDmn = addConnection(dmn, dmn, fitted.dmnToDmn)
+    val dmnToVmn = addConnection(dmn, vmn, fitted.dmnToVmn)
+    val vmnToDmn = addConnection(vmn, dmn, fitted.vmnToDmn)
+    val vmnToVmn = addConnection(vmn, vmn, fitted.vmnToVmn)
+    val cpgToDmn = addConnection(cpg, dmn, fitted.cpgToDmn)
+    val cpgToVmn = addConnection(cpg, vmn, fitted.cpgToVmn)
 
     val worldComponent = addOdorWorldComponent("Thermal Plate")
     val world = worldComponent.world.apply {
@@ -94,16 +99,10 @@ val nematodeThermotaxis = newSim { optionString ->
         isShowTrail = true
     }
 
-    val model = ThermotaxisModel(
-        states = DoubleArray(5),
-        biases = doubleArrayOf(
-            0.261331049344628,
-            -9.94979936474547,
-            -11.8836526406511,
-            -0.243075226129511,
-            4.21550001866696
-        )
-    )
+    val model = ThermotaxisModel(states = DoubleArray(5), biases = fittedBiases)
+    if (optionString == "record-trace") {
+        println(ThermotaxisTraceRecorder.run().let { "Wrote ${it.rows} rows to ${it.file}" })
+    }
     if (optionString == "validate") {
         println(ThermotaxisAfdValidation.run().summary())
     }
@@ -404,23 +403,25 @@ val nematodeThermotaxis = newSim { optionString ->
 
         1. Click `Run` and watch the worm move. With `Use empirical turns` enabled, it changes direction stochastically as well as steering continuously; an individual trail may wander even though a population should tend toward warmth over time.
         2. Click `Run population simulation` to view many trajectories together. The defaults are 12 worms for 1500 seconds; use more worms or longer runs for a clearer aggregate tendency. Reverse the gradient before starting a population simulation to see the warm-directed tendency reverse sides.
-        3. Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is straighter movement in hotter regions and tighter, more circling movement in colder regions, rather than reliable migration in one short run.
+        3. Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is tight, circling movement when the worm heads toward the cold and much straighter movement when it heads toward the warm, rather than reliable migration in one short run.
         4. Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment. You can also clamp or edit circuit neurons and synapses to explore their effects.
 
         # Details of This Simulation
 
         ## Evolutionary Search
 
-        The original study used an evolutionary algorithm to search for circuit parameters that reproduced observed thermotaxis and steering behavior. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation is one such evolved parameter set.
+        The original study used an evolutionary algorithm to search for circuit parameters that reproduced observed thermotaxis and steering behavior. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation uses set #67 from the paper's S1 Table, the same set the paper plots in Figure 7.
 
         ## Circuit Guide
 
-        - **AFD (Temperature)** is the thermosensory neuron. Its filtered response represents recent temperature history; the AFD–AIY link is chemical.
-        - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit.
+        - **AFD (Temperature)** is the thermosensory neuron. It responds to *change* in temperature rather than its absolute value: its measured response function is convolved over the previous 100 seconds and is biphasic, so a steady temperature leaves AFD near rest while warming drives it positive and cooling drives it negative.
+        - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit. The AFD–AIY link is chemical, and all three track AFD closely: the paper reports correlations of 0.99, 0.98, and 0.99 between AFD and each of them.
         - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the motor neurons, producing small dorsal–ventral wiggles that sample the temperature gradient.
         - **DMN (Output)** and **VMN (Output)** are dorsal and ventral neck motor neurons. Their activity difference determines instantaneous path curvature.
 
         The AFD–AIB electrical gap junction is implemented as reciprocal synapses so it can be shown and edited in Simbrain. Its current is `conductance × (AFD activity − AIB state)`.
+
+        Each neuron has two values worth distinguishing. Its *state* is a membrane potential relative to rest, which can be any size and is what the paper plots in Figure 7A. Its *activation*, shown on the canvas here, is the sigmoid of that state plus a bias, so it is squashed into the range 0 to 1 and is what travels along synapses. A neuron whose bias pushes it far into either tail of the sigmoid can therefore look flat on the canvas while its underlying state is still moving. Run the simulation with the `record-trace` option to write both to a CSV.
 
         ## Empirical Turns
 
@@ -438,12 +439,12 @@ internal class ThermotaxisModel(
     private val biases: DoubleArray
 ) {
     private val dt = 0.1
-    private val temperatureHistory = DoubleArray(1000) { 17.0 }
+    private val temperatureHistory = DoubleArray(afdResponseKernel.size) { PLATE_CENTER_TEMPERATURE }
     private var time = 0.0
 
     fun reset() {
         states.fill(0.0)
-        temperatureHistory.fill(17.0)
+        temperatureHistory.fill(PLATE_CENTER_TEMPERATURE)
         time = 0.0
     }
 
@@ -456,8 +457,7 @@ internal class ThermotaxisModel(
         temperatureHistory.copyInto(temperatureHistory, 0, 1)
         temperatureHistory[temperatureHistory.lastIndex] = temperature
         val sensedAfdState = temperatureHistory.indices.sumOf { index ->
-            val lag = (temperatureHistory.lastIndex - index) * dt
-            responseKernel(lag) * thresholdResponse(temperatureHistory[index]) * dt
+            afdResponseKernel[index] * thresholdResponse(temperatureHistory[index])
         }
         val afdState = activityOverrides[0] ?: sensedAfdState
         fun output(index: Int): Double {
@@ -466,12 +466,13 @@ internal class ThermotaxisModel(
         val outputs = states.indices.map(::output).toDoubleArray()
         val inputs = doubleArrayOf(
             weights.afdToAibGap * (afdState - states[0]) + weights.aizToAib * outputs[2],
-            weights.afdToAiy * sigmoid(afdState - 12.6471320830562) + weights.aibToAiy * outputs[0],
+            weights.afdToAiy * sigmoid(afdState + AFD_BIAS) + weights.aibToAiy * outputs[0],
             weights.aiyToAiz * outputs[1],
             weights.aibToDmn * outputs[0] + weights.aizToDmn * outputs[2] + weights.dmnToDmn * outputs[3] + weights.vmnToDmn * outputs[4],
             weights.aizToVmn * outputs[2] + weights.dmnToVmn * outputs[3] + weights.vmnToVmn * outputs[4]
         )
-        val oscillator = activityOverrides[6] ?: sin(2.0 * PI * time / 4.2)
+        time += dt
+        val oscillator = activityOverrides[6] ?: sin(2.0 * PI * time / OSCILLATOR_PERIOD)
         inputs[3] += weights.cpgToDmn * oscillator
         inputs[4] += weights.cpgToVmn * oscillator
         states.indices.forEach { index ->
@@ -479,24 +480,25 @@ internal class ThermotaxisModel(
             states[index] = if (override == null) {
                 states[index] + dt * (inputs[index] - states[index])
             } else {
-                logit(override)
+                logit(override) - biases[index]
             }
         }
         val updatedOutputs = states.indices.map(::output).toDoubleArray()
-        time += dt
-        val neuromuscularWeight = 13.1309355602490 * PI / 180.0
-        return ThermotaxisStep(afdState, updatedOutputs, oscillator, neuromuscularWeight * (updatedOutputs[3] - updatedOutputs[4]))
+        return ThermotaxisStep(
+            afdState,
+            states.copyOf(),
+            updatedOutputs,
+            oscillator,
+            NEUROMUSCULAR_WEIGHT * (updatedOutputs[3] - updatedOutputs[4])
+        )
     }
 
-    private fun thresholdResponse(temperature: Double): Double = if (temperature < 14.4248659160223) {
+    private fun thresholdResponse(temperature: Double): Double = if (temperature < THRESHOLD_TEMPERATURE) {
         0.0
     } else {
-        val difference = temperature - 14.4248659160223
-        difference.pow(9.56568480432967) / (56.1383589609848 + difference.pow(9.56568480432967))
+        val difference = (temperature - THRESHOLD_TEMPERATURE).pow(HILL_COEFFICIENT)
+        difference / (DISSOCIATION_CONSTANT + difference)
     }
-
-    private fun responseKernel(lag: Double): Double = exp(-0.434236245297562 * lag) *
-        (1.437310682312189 - 0.434236245297562 * 0.342912724081394 * lag)
 
     private fun sigmoid(value: Double): Double = 1.0 / (1.0 + exp(-value))
 
@@ -506,24 +508,76 @@ internal class ThermotaxisModel(
     }
 }
 
+internal const val PLATE_CENTER_TEMPERATURE = 17.0
+internal const val PLATE_GRADIENT = 3.0
+internal const val PLATE_WIDTH = 136.0
+internal const val PLATE_HEIGHT = 96.0
+internal const val CRAWLING_SPEED = 0.2
+internal const val OSCILLATOR_PERIOD = 4.2
+
+private const val AFD_BIAS = 11.57
+private const val THRESHOLD_TEMPERATURE = 15.54
+private const val DISSOCIATION_CONSTANT = 69.22
+private const val HILL_COEFFICIENT = 4.80
+private val NEUROMUSCULAR_WEIGHT = 34.68 * PI / 180.0
+
+/**
+ * Biases for AIB, AIY, AIZ, DMN and VMN, read from the S1 Table row for parameter set #67 along with the
+ * weights in [ThermotaxisWeights] and the sensory constants above. Fresh array per call because the model
+ * that receives it also owns a mutable state array of the same shape.
+ */
+internal val fittedBiases
+    get() = doubleArrayOf(1.10, 2.02, -11.90, -4.49, 9.82)
+
+/**
+ * The measured AFD response function, sampled every 0.1 s over the 100 s window of Eq 1. Index 0 is the
+ * oldest sample and the last index is the newest, matching the ordering of the temperature history it is
+ * convolved against. The kernel is biphasic and nearly zero-sum, so AFD differentiates its input; replacing
+ * it with a purely decaying approximation turns the neuron into a low-pass filter and silences the circuit.
+ */
+private val afdResponseKernel: DoubleArray by lazy {
+    val stream = requireNotNull(ThermotaxisModel::class.java.getResourceAsStream(AFD_RESPONSE_RESOURCE)) {
+        "Missing AFD response function resource $AFD_RESPONSE_RESOURCE"
+    }
+    val decoded = Base64.getMimeDecoder().decode(stream.readBytes())
+    GZIPInputStream(decoded.inputStream()).bufferedReader().readLines()
+        .filter { it.isNotBlank() }
+        .map { it.trim().toDouble() }
+        .toDoubleArray()
+        .also { require(it.size == 1000) { "Expected 1000 AFD response samples, found ${it.size}" } }
+}
+
+private const val AFD_RESPONSE_RESOURCE =
+    "/org/simbrain/custom_sims/neuroscience/thermotaxis/afd_response.csv.gz.b64"
+
 internal data class ThermotaxisWeights(
-    val afdToAibGap: Double = 2.98878639079434,
-    val afdToAiy: Double = -6.86431476903374,
-    val aibToAiy: Double = -3.22231085979830,
-    val aibToDmn: Double = -6.54395366094551,
-    val aiyToAiz: Double = 4.60507293122372,
-    val aizToAib: Double = -6.18485677383669,
-    val aizToDmn: Double = 12.5176985752213,
-    val aizToVmn: Double = -14.1246289219806,
-    val dmnToDmn: Double = 4.87761445986278,
-    val dmnToVmn: Double = -1.70971858601307,
-    val vmnToDmn: Double = 7.23275421563747,
-    val vmnToVmn: Double = -5.06198070709775,
-    val cpgToDmn: Double = 12.5352695337539,
-    val cpgToVmn: Double = -12.5352695337539
+    val afdToAibGap: Double = 2.62,
+    val afdToAiy: Double = -9.25,
+    val aibToAiy: Double = 8.98,
+    val aibToDmn: Double = 13.34,
+    val aiyToAiz: Double = 14.81,
+    val aizToAib: Double = -10.55,
+    val aizToDmn: Double = -1.53,
+    val aizToVmn: Double = -8.75,
+    val dmnToDmn: Double = -9.82,
+    val dmnToVmn: Double = -6.32,
+    val vmnToDmn: Double = 4.19,
+    val vmnToVmn: Double = -1.75,
+    val cpgToDmn: Double = 9.92,
+    val cpgToVmn: Double = -9.92
 )
 
-internal data class ThermotaxisStep(val afdState: Double, val outputs: DoubleArray, val cpgOutput: Double, val curvature: Double)
+/**
+ * One circuit update. [states] are membrane potentials relative to rest, which is what the paper plots;
+ * [outputs] are the sigmoid activations those states produce, which is what propagates through synapses.
+ */
+internal data class ThermotaxisStep(
+    val afdState: Double,
+    val states: DoubleArray,
+    val outputs: DoubleArray,
+    val cpgOutput: Double,
+    val curvature: Double
+)
 
 internal class ThermotaxisPopulationSimulationOptions : EditableObject {
 
@@ -542,69 +596,6 @@ internal class ThermotaxisPopulationSimulationOptions : EditableObject {
     )
 }
 
-internal object ThermotaxisEnsemble {
-
-    private const val plateWidth = 136.0
-    private const val plateHeight = 96.0
-    private const val edgeMargin = 12.0
-    private const val thermalGradient = 3.0
-    private const val timeStep = 0.1
-    private const val substepsPerTrajectory = 6_000
-
-    fun run(
-        trajectories: Int = 96,
-        substeps: Int = substepsPerTrajectory,
-        onProgress: (completed: Int, total: Int) -> Unit = { _, _ -> },
-        shouldCancel: () -> Boolean = { false }
-    ): ThermotaxisEnsembleResult? {
-        require(trajectories > 0) { "At least one trajectory is required" }
-        require(substeps > 0) { "At least one time step is required" }
-        val paths = mutableListOf<ThermotaxisPath>()
-        repeat(trajectories) { index ->
-            if (shouldCancel()) return null
-            paths += runTrajectory(2.0 * PI * index / trajectories, substeps)
-            onProgress(index + 1, trajectories)
-        }
-        val endpoints = paths.map { it.points.last().x }
-        val meanEndpointX = endpoints.average()
-        val warmSideFraction = endpoints.count { it > plateWidth / 2.0 }.toDouble() / trajectories
-        return ThermotaxisEnsembleResult(trajectories, substeps * timeStep, meanEndpointX, warmSideFraction, paths)
-    }
-
-    private fun runTrajectory(initialHeading: Double, substeps: Int): ThermotaxisPath {
-        val model = ThermotaxisModel(
-            states = DoubleArray(5),
-            biases = doubleArrayOf(0.261331049344628, -9.94979936474547, -11.8836526406511, -0.243075226129511, 4.21550001866696)
-        )
-        var x = plateWidth / 2.0
-        var y = plateHeight / 2.0
-        var heading = initialHeading
-        val points = mutableListOf(ThermotaxisPosition(x, y))
-        repeat(substeps) { step ->
-            val temperature = 17.0 + thermalGradient * (x / plateWidth - 0.5)
-            val curvature = model.step(temperature).curvature
-            heading += curvature * timeStep
-            val stepDistance = 0.2 * timeStep * plateWidth / 136.0
-            var nextX = x + stepDistance * cos(heading)
-            var nextY = y - stepDistance * sin(heading)
-            if (nextX < edgeMargin || nextX > plateWidth - edgeMargin) {
-                heading = PI - heading
-                nextX = nextX.coerceIn(edgeMargin, plateWidth - edgeMargin)
-            }
-            if (nextY < edgeMargin || nextY > plateHeight - edgeMargin) {
-                heading = -heading
-                nextY = nextY.coerceIn(edgeMargin, plateHeight - edgeMargin)
-            }
-            x = nextX
-            y = nextY
-            if ((step + 1) % 10 == 0 || step == substeps - 1) {
-                points += ThermotaxisPosition(x, y)
-            }
-        }
-        return ThermotaxisPath(points)
-    }
-}
-
 internal data class ThermotaxisEnsembleResult(
     val trajectories: Int,
     val durationSeconds: Double,
@@ -619,43 +610,62 @@ internal data class ThermotaxisPosition(val x: Double, val y: Double)
 
 internal data class ThermotaxisPath(val points: List<ThermotaxisPosition>)
 
+/**
+ * Sweeps AFD activity while holding temperature fixed and measures the resulting steering bias, reproducing
+ * the AFD-versus-curvature panel of Figure 7B. For the fitted parameter set the relationship is V-shaped
+ * rather than monotonic: curvature is largest when AFD is low, falls to a minimum at an intermediate level,
+ * and rises again as AFD grows.
+ */
 internal object ThermotaxisAfdValidation {
 
+    private const val transientSteps = 200
+    private const val measuredSteps = 840
+
     fun run(): ThermotaxisAfdValidationResult {
-        val lowAfdBias = meanSteeringBias(0.0)
-        val highAfdBias = meanSteeringBias(2.0)
-        return ThermotaxisAfdValidationResult(lowAfdBias, highAfdBias)
+        val profile = (-30..20).map { level ->
+            val afdValue = level * 0.1
+            afdValue to meanSteeringBias(afdValue)
+        }
+        return ThermotaxisAfdValidationResult(profile)
     }
 
     private fun meanSteeringBias(afdValue: Double): Double {
-        val model = ThermotaxisModel(
-            states = DoubleArray(5),
-            biases = doubleArrayOf(0.261331049344628, -9.94979936474547, -11.8836526406511, -0.243075226129511, 4.21550001866696)
-        )
-        return (1..1_000)
-            .map { model.step(temperature = 17.0, activityOverrides = afdOverride(afdValue)).curvature }
-            .drop(200)
+        val model = ThermotaxisModel(states = DoubleArray(5), biases = fittedBiases)
+        val override = MutableList<Double?>(7) { null }.apply { this[0] = afdValue }
+        return (1..transientSteps + measuredSteps)
+            .map { model.step(temperature = PLATE_CENTER_TEMPERATURE, activityOverrides = override).curvature }
+            .drop(transientSteps)
             .average()
             .let(::abs)
     }
-
-    private fun afdOverride(value: Double) = MutableList<Double?>(7) { null }.apply { this[0] = value }
 }
 
-internal data class ThermotaxisAfdValidationResult(
-    val lowAfdSteeringBias: Double,
-    val highAfdSteeringBias: Double
-) {
-    val passes: Boolean get() = highAfdSteeringBias < lowAfdSteeringBias
+internal data class ThermotaxisAfdValidationResult(val profile: List<Pair<Double, Double>>) {
+
+    private val minimum get() = profile.minBy { it.second }
+
+    val minimizingAfd get() = minimum.first
+
+    val minimumSteeringBias get() = minimum.second
+
+    val coldSteeringBias get() = profile.first().second
+
+    /** The minimum must be interior, and steering at low AFD must be clearly stronger than at that minimum. */
+    val passes: Boolean
+        get() = minimum != profile.first() && minimum != profile.last() &&
+            coldSteeringBias > 2.0 * minimumSteeringBias
+
+    private fun degrees(radians: Double) = "%.2f".format(radians * 180.0 / PI)
 
     fun summary(): String = """
         AFD steering-response validation
 
-        Steering bias at low fixed AFD: ${"%.4f".format(lowAfdSteeringBias)} rad/s
-        Steering bias at high fixed AFD: ${"%.4f".format(highAfdSteeringBias)} rad/s
-        Result: ${if (passes) "PASS — higher AFD activity produces a straighter path." else "FAIL — higher AFD activity did not reduce steering bias."}
+        Steering bias at lowest AFD (${"%.1f".format(profile.first().first)}): ${degrees(coldSteeringBias)} deg/s
+        Minimum steering bias: ${degrees(minimumSteeringBias)} deg/s at AFD = ${"%.1f".format(minimizingAfd)}
+        Steering bias at highest AFD (${"%.1f".format(profile.last().first)}): ${degrees(profile.last().second)} deg/s
+        Result: ${if (passes) "PASS — steering is strongest at low AFD and reaches a minimum at an intermediate level." else "FAIL — no interior minimum in the AFD-to-curvature relationship."}
 
-        This reproduces Figure 6's circuit-level result in the fitted model. It does not reproduce the paper's full population migration assay, which also used empirical turning behavior.
+        This reproduces the AFD-versus-curvature panel of Figure 7B for parameter set #67. It does not reproduce the paper's full population migration assay, which also used empirical turning behavior.
     """.trimIndent()
 }
 

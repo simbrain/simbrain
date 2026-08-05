@@ -139,8 +139,8 @@ val bpttCurriculum = newSim {
 
         3. Look at the `Output` layer after the second run. It answers with the same symbol every trial
            regardless of the cue, exactly as a network trained at too shallow a depth does in the
-           [Delayed recall](Delayed recall) simulation. Failing to discover the memory rule and failing to
-           have a deep enough window look identical from the outside, because they are the same failure.
+           `Delayed recall` simulation. Failing to discover the memory rule and failing to have a deep
+           enough window look identical from the outside, because they are the same failure.
 
         4. Raise `Truncation depth` in the trainer properties and retrain on long gaps only. It improves,
            but far less reliably than the ladder of short gaps did, which is the point: matching the depth

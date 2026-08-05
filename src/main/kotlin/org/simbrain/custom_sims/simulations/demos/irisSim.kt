@@ -125,7 +125,7 @@ val irisClassifier = newSim {
     
     Daisy Mayorga
     
-    [Jeff Yoshimi](www.jeffyoshimi.net)
+    [Jeff Yoshimi](https://www.jeffyoshimi.net)
     
     Kanly Thao
     

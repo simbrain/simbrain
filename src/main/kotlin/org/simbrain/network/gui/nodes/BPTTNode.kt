@@ -46,6 +46,9 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             positionUnrolledView()
             // A rebuild starts the columns empty, so the values on show have to be put back.
             refreshUnrolledActivations()
+            // A different truncation depth is a different number of columns, so the network is now a
+            // different width.
+            if (unrolledViewNode != null) requestZoomToFit()
         }
         events.locationChanged.on(swingDispatcher) { positionUnrolledView() }
         events.displayDataUpdated.on(swingDispatcher) {
@@ -175,6 +178,9 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             view.rebuild()
             positionUnrolledView()
             refreshUnrolledActivations()
+            // Reached when the columns are first drawn, and whenever a layer changes how wide it draws
+            // itself, both of which change the extent the canvas should be fitted to.
+            requestZoomToFit()
         }
     }
 
@@ -209,6 +215,9 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         } else {
             detachUnrolledView()
         }
+        // Both directions change the extent: showing the columns widens the network by several times,
+        // and hiding them narrows it back again.
+        requestZoomToFit()
     }
 
     /**
@@ -242,5 +251,21 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
 
     private fun positionUnrolledView() {
         unrolledViewNode?.syncPosition()
+    }
+
+    /**
+     * Ask the canvas to fit itself around the network again. The drawn columns are part of what the
+     * subnetwork covers, so showing them, hiding them, or changing how many there are moves where the
+     * network ends, and a view fitted to the previous extent leaves them off the edge of the screen.
+     *
+     * Only called where that extent actually changes, and not from [positionUnrolledView], which also runs
+     * while the user is dragging the network about; re-fitting on every drag would fight them for control
+     * of the camera.
+     *
+     * A request rather than a zoom, so that it stays the panel's decision: it is ignored when the user has
+     * turned auto zoom off, and repeated requests collapse into one.
+     */
+    private fun requestZoomToFit() {
+        networkPanel.network.events.zoomToFitPage.fire()
     }
 }

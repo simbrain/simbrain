@@ -11,6 +11,7 @@ import org.jfree.chart.renderer.category.StandardBarPainter
 import org.jfree.chart.renderer.xy.StandardXYBarPainter
 import org.jfree.chart.renderer.xy.XYBarRenderer
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
+import org.jfree.chart.title.PaintScaleLegend
 import org.simbrain.util.Theme
 import java.awt.BasicStroke
 import java.awt.Color
@@ -81,6 +82,11 @@ fun JFreeChart.applySimbrainChartTheme() {
     legend?.let {
         it.backgroundPaint = chartBg
         it.itemPaint = text
+    }
+    // Colorbars are subtitles rather than plot axes, so themeAxis below never reaches their axis.
+    subtitles.filterIsInstance<PaintScaleLegend>().forEach {
+        it.backgroundPaint = chartBg
+        themeAxis(it.axis, text, gridline)
     }
     when (val p = plot) {
         is XYPlot -> {

@@ -10,6 +10,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.plot.heatmap.HeatMapComponent
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesModel
@@ -138,6 +139,12 @@ suspend fun SimulationScope.addRasterPlot(name: String): RasterPlotComponent {
     val rasterComponent = RasterPlotComponent(name)
     workspace.addWorkspaceComponent(rasterComponent)
     return rasterComponent
+}
+
+suspend fun SimulationScope.addHeatMap(name: String): HeatMapComponent {
+    val heatMapComponent = HeatMapComponent(name)
+    workspace.addWorkspaceComponent(heatMapComponent)
+    return heatMapComponent
 }
 
 fun SimulationScope.addImageWorld(name: String): ImageWorldComponent {

@@ -12,6 +12,8 @@ import org.simbrain.plot.histogram.HistogramComponent;
 import org.simbrain.plot.histogram.HistogramDesktopComponent;
 import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartDesktopComponent;
+import org.simbrain.plot.heatmap.HeatMapComponent;
+import org.simbrain.plot.heatmap.HeatMapDesktopComponent;
 import org.simbrain.plot.pixelplot.PixelPlotComponent;
 import org.simbrain.plot.pixelplot.PixelPlotDesktopComponent;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -110,6 +112,9 @@ public class AbstractComponentFactory {
 
         putWorkspaceComponentFactory("Raster plot", () -> new RasterPlotComponent(""));
         putGuiComponentFactory(RasterPlotComponent.class, RasterPlotDesktopComponent::new);
+
+        putWorkspaceComponentFactory("Heat map", () -> new HeatMapComponent(""));
+        putGuiComponentFactory(HeatMapComponent.class, HeatMapDesktopComponent::new);
 
         putWorkspaceComponentFactory("Document viewer", DocViewerComponent::new);
         putGuiComponentFactory(DocViewerComponent.class, DocViewerDesktopComponent::new);

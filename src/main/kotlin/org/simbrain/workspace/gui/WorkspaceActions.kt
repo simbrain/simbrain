@@ -249,6 +249,7 @@ class WorkspaceActions {
 
     val plotActions = listOf(
         createComponentFactoryAction("Bar chart", "menu_icons/BarChart.png"),
+        createComponentFactoryAction("Heat map", "menu_icons/HeatMap.png"),
         createComponentFactoryAction("Histogram", "menu_icons/histogram.png"),
         createComponentFactoryAction("Pie chart", "menu_icons/PieChart.png"),
         createComponentFactoryAction("Pixel plot", "menu_icons/PixelPlot.png"),

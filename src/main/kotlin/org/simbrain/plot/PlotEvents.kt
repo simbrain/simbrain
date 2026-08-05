@@ -18,3 +18,5 @@ class RasterPlotEvents: PlotEvents() {
     val rasterConsumerRemoved = OneArgEvent<RasterModel.RasterConsumer>()
 }
 
+class HeatMapEvents: PlotEvents()
+

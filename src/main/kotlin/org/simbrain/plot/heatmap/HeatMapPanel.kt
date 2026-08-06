@@ -1,3 +1,11 @@
+/**
+ * Swing/JFreeChart view for the heat map.
+ *
+ * The colorbar is a chart *subtitle* rather than a plot axis, which is why [applySimbrainChartTheme]
+ * had to learn about [PaintScaleLegend] and why it must run after the legend is added. The paint scale
+ * is replaced rather than mutated on each refresh because its bounds are immutable and auto-range moves
+ * them as data arrives.
+ */
 package org.simbrain.plot.heatmap
 
 import net.miginfocom.swing.MigLayout
@@ -79,13 +87,27 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
         colorBarAxis.setRange(scale.lowerBound, scale.upperBound)
         chart.subtitles.filterIsInstance<PaintScaleLegend>().forEach { it.scale = scale }
         plot.dataset = heatMapModel.dataset()
-        // Blocks are anchored at their center, so the axes need half a cell of padding to avoid
-        // clipping the first and last row and column.
-        plot.domainAxis.setRange(
-            (heatMapModel.times.firstOrNull()?.toDouble() ?: 0.0) - 0.5,
-            (heatMapModel.times.lastOrNull()?.toDouble() ?: 1.0) + 0.5
-        )
+
+        val columnWidth = columnSpacing()
+        renderer.blockWidth = columnWidth
+        // Blocks are anchored at their center, so each axis needs half a cell of padding to avoid
+        // clipping the first and last row and column. Times are sorted rather than read off the ends
+        // because workspace time can be reset mid-run, which would otherwise invert the range.
+        val earliest = heatMapModel.times.minOrNull()?.toDouble() ?: 0.0
+        val latest = heatMapModel.times.maxOrNull()?.toDouble() ?: 1.0
+        plot.domainAxis.setRange(earliest - columnWidth / 2, latest + columnWidth / 2)
         plot.rangeAxis.setRange(-0.5, heatMapModel.rowCount.coerceAtLeast(1) - 0.5)
+    }
+
+    /**
+     * Width of one cell along the domain axis. The axis carries workspace time, which usually advances
+     * one unit per column but need not — a plot fed every few iterations would otherwise draw
+     * one-unit stripes separated by gaps — so the smallest observed gap is used as the cell width.
+     */
+    private fun columnSpacing(): Double {
+        val gaps = heatMapModel.times.sorted().zipWithNext { earlier, later -> later - earlier }
+            .filter { it > 0 }
+        return gaps.minOrNull()?.toDouble() ?: 1.0
     }
 
     private fun currentPaintScale(): ChartColorMapPaintScale {

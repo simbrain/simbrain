@@ -1,3 +1,6 @@
+/**
+ * Desktop frame for the heat map, attaching the standard plot menu bar to [HeatMapPanel].
+ */
 package org.simbrain.plot.heatmap
 
 import org.simbrain.plot.actions.PlotActionManager
@@ -36,7 +39,7 @@ class HeatMapDesktopComponent(frame: GenericFrame, component: HeatMapComponent) 
             add(JMenuItem("Preferences...").apply { addActionListener { heatMapPanel.showPropertiesDialog() } })
         }
         val helpMenu = JMenu("Help").apply {
-            add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/plots/heatMap.html")))
+            add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/plots/")))
         }
         bar.add(fileMenu)
         bar.add(editMenu)

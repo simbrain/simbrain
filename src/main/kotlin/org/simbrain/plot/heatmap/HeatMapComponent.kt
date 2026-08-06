@@ -1,3 +1,6 @@
+/**
+ * Workspace component wrapper for the heat map, owning its serialization.
+ */
 package org.simbrain.plot.heatmap
 
 import com.thoughtworks.xstream.XStream

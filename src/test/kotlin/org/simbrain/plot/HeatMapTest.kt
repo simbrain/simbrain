@@ -8,6 +8,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.plot.heatmap.HeatMapComponent
 import org.simbrain.plot.heatmap.HeatMapModel
+import org.simbrain.plot.heatmap.HeatMapPanel
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
@@ -128,6 +129,55 @@ class HeatMapTest {
     }
 
     @Test
+    fun `a constant matrix of large values still yields a positive-length color range`() {
+        val model = HeatMapModel()
+        listOf(1.0, 16384.0, 1e5, -5e4, 1e9).forEach { constant ->
+            model.clearData()
+            model.setValues(DoubleArray(4) { constant })
+
+            val range = model.colorRange()
+            assertTrue(
+                range.endInclusive - range.start > 0.0,
+                "Color range collapsed to zero length at constant $constant"
+            )
+        }
+    }
+
+    @Test
+    fun `an inverted fixed color range is corrected rather than left degenerate`() {
+        hmc.model.isAutoRange = false
+        hmc.model.rangeLowerBound = 1e6
+        hmc.model.rangeUpperBound = 0.0
+
+        val range = hmc.model.colorRange()
+
+        assertTrue(range.endInclusive > range.start, "Expected a positive-length range, got $range")
+    }
+
+    @Test
+    fun `columns retain their rows when the coupled array shrinks`() {
+        val model = HeatMapModel()
+        model.setValues(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
+        model.setValues(doubleArrayOf(5.0, 6.0))
+
+        assertEquals(4, model.rowCount)
+        val dataset = model.dataset()
+        assertEquals(8, dataset.getItemCount(0))
+        assertEquals(4.0, dataset.getZ(0, 3))
+        assertEquals(6.0, dataset.getZ(0, 5))
+        assertEquals(null, dataset.getZ(0, 6), "Cells past a short column's end should have no value")
+    }
+
+    @Test
+    fun `cells with no value are transparent rather than the bottom of the color map`() {
+        val scale = ChartColorMapPaintScale(0.0, 1.0) { ChartColorMap.HOT }
+
+        assertEquals(NO_DATA, scale.getPaint(Double.NaN))
+        assertEquals(0, NO_DATA.alpha)
+        assertTrue(NO_DATA != ChartColorMap.HOT.color(0.0))
+    }
+
+    @Test
     fun `the consumer the coupled plot menu looks up is reachable by method reference`() {
         with(workspace.couplingManager) {
             na.getProducer(na::activationArray) couple hmc.model.getConsumer(HeatMapModel::setValues)
@@ -138,6 +188,37 @@ class HeatMapTest {
 
         assertEquals(1, workspace.couplingManager.couplings.size)
         assertEquals(listOf(1.0, 2.0, 3.0, 4.0), hmc.model.columns.last().toList())
+    }
+
+    @Test
+    fun `a workspace time reset does not invert the domain range`() {
+        val model = HeatMapModel()
+        var now = 500
+        model.timeSupplier = { now }
+        model.setValues(doubleArrayOf(1.0, 2.0))
+        now = 0
+        model.setValues(doubleArrayOf(3.0, 4.0))
+
+        val range = HeatMapPanel(model).chartPanel.chart.xyPlot.domainAxis.range
+
+        assertTrue(range.length > 0.0, "Domain range was inverted after a time reset: $range")
+    }
+
+    @Test
+    fun `block width follows the spacing between recorded times`() {
+        val model = HeatMapModel()
+        var now = 0
+        model.timeSupplier = { now }
+        listOf(0, 5, 10, 15).forEach { time ->
+            now = time
+            model.setValues(doubleArrayOf(1.0, 2.0))
+        }
+
+        val range = HeatMapPanel(model).chartPanel.chart.xyPlot.domainAxis.range
+
+        // Four columns five time units apart, each 5 wide, so the axis spans -2.5 to 17.5.
+        assertEquals(-2.5, range.lowerBound, 1e-9)
+        assertEquals(17.5, range.upperBound, 1e-9)
     }
 
     @Test

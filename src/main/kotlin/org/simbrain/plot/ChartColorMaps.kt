@@ -46,8 +46,13 @@ enum class ChartColorMap(private val label: String, private val diverging: Boole
 
     override fun toString() = label
 
-    /** Color for [fraction] of the way along the ramp; values outside 0..1 clamp to the endpoints. */
+    /**
+     * Color for [fraction] of the way along the ramp; values outside 0..1 clamp to the endpoints and a
+     * non-finite fraction yields [NO_DATA], which is transparent so missing cells show the plot
+     * background rather than masquerading as the bottom of the scale.
+     */
     fun color(fraction: Double): Color {
+        if (!fraction.isFinite()) return NO_DATA
         val stops = anchors()
         val clamped = fraction.coerceIn(0.0, 1.0)
         val upper = stops.indexOfFirst { it.first >= clamped }.coerceAtLeast(1)
@@ -64,6 +69,9 @@ enum class ChartColorMap(private val label: String, private val diverging: Boole
 
     private fun lerp(from: Int, to: Int, t: Double) = (from + (to - from) * t).toInt().coerceIn(0, 255)
 }
+
+/** Rendered for cells with no value, e.g. past the end of a column shorter than the widest one. */
+val NO_DATA: Color = Color(0, 0, 0, 0)
 
 private val jetAnchors = listOf(
     0.0 to Color(0, 0, 128), 0.125 to Color(0, 0, 255), 0.375 to Color(0, 255, 255),
@@ -93,6 +101,7 @@ class ChartColorMapPaintScale(
     override fun getUpperBound() = upper
 
     override fun getPaint(value: Double): Paint {
+        if (!value.isFinite()) return NO_DATA
         val span = upper - lower
         val fraction = if (span <= 0.0) 0.0 else (value - lower) / span
         return colorMap().color(fraction)

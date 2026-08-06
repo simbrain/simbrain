@@ -18,6 +18,7 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
 import javax.swing.SwingUtilities
+import kotlin.math.abs
 
 class HeatMapModel : AttributeContainer, EditableObject {
 
@@ -79,8 +80,12 @@ class HeatMapModel : AttributeContainer, EditableObject {
         order = 60
     )
 
-    /** Number of rows, taken from the width of the most recent column. Zero until data arrives. */
-    val rowCount get() = columns.lastOrNull()?.size ?: 0
+    /**
+     * Number of rows, taken from the widest retained column so that a coupled array which changes
+     * size mid-run keeps its earlier, longer columns intact. Cells past a shorter column's end have
+     * no value and render as background rather than as a real reading.
+     */
+    val rowCount get() = columns.maxOfOrNull { it.size } ?: 0
 
     val columnCount get() = columns.size
 
@@ -107,11 +112,28 @@ class HeatMapModel : AttributeContainer, EditableObject {
      * widened to a non-degenerate interval so a constant-valued matrix still renders.
      */
     fun colorRange(): ClosedFloatingPointRange<Double> {
-        if (!isAutoRange) return rangeLowerBound..maxOf(rangeUpperBound, rangeLowerBound + 1e-12)
-        val values = columns.asSequence().flatMap { it.asSequence() }.filter { it.isFinite() }
-        val low = values.minOrNull() ?: 0.0
-        val high = values.maxOrNull() ?: 1.0
-        return if (high - low < 1e-12) low..(low + 1e-12) else low..high
+        if (!isAutoRange) return widen(rangeLowerBound, maxOf(rangeUpperBound, rangeLowerBound))
+        var low = Double.MAX_VALUE
+        var high = -Double.MAX_VALUE
+        columns.forEach { column ->
+            column.forEach { value ->
+                if (value.isFinite()) {
+                    if (value < low) low = value
+                    if (value > high) high = value
+                }
+            }
+        }
+        return if (low > high) widen(0.0, 1.0) else widen(low, high)
+    }
+
+    /**
+     * Guarantees a positive-length interval, which the colorbar axis requires. The epsilon has to
+     * scale with the values themselves: a fixed one is smaller than an ulp once the magnitude passes
+     * a few thousand, and would leave the interval degenerate.
+     */
+    private fun widen(low: Double, high: Double): ClosedFloatingPointRange<Double> {
+        val epsilon = maxOf(1e-12, abs(low) * 1e-9)
+        return if (high - low < epsilon) low..(low + epsilon) else low..high
     }
 
     fun dataset(): XYZDataset = HeatMapDataset(this)
@@ -119,10 +141,9 @@ class HeatMapModel : AttributeContainer, EditableObject {
     private fun trimToWindow() {
         if (!fixedWidth) return
         val excess = columns.size - windowSize.coerceAtLeast(1)
-        repeat(excess.coerceAtLeast(0)) {
-            columns.removeAt(0)
-            times.removeAt(0)
-        }
+        if (excess <= 0) return
+        columns.subList(0, excess).clear()
+        times.subList(0, excess).clear()
     }
 
     private fun onEventThread(block: () -> Unit) {
@@ -135,6 +156,8 @@ class HeatMapModel : AttributeContainer, EditableObject {
     }
 
     override val id: String get() = "Heat map"
+
+    override val name: String get() = "Heat map"
 }
 
 /**

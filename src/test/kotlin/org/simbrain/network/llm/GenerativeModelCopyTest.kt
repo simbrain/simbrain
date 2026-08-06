@@ -76,13 +76,11 @@ class GenerativeModelCopyTest {
         val original = LanguageModel("/nowhere/weights", maxSeqLen = 128)
         original.label = "LFM2.5-230M"
         original.promptMode = PromptMode.CHAT
-        original.systemPrompt = "Be brief."
         original.tokensToGenerate = 7
         original.temperature = 0.7
         original.samplingStrategy = SamplingStrategy.TopP(0.9)
         original.stopAtEndOfText = false
         original.pauseWorkspaceAtEnd = false
-        original.enableDemoTools = true
         original.selectedLayer = 5
         original.selectedHead = 3
         original.lensEnabled = false
@@ -98,14 +96,12 @@ class GenerativeModelCopyTest {
         assertEquals(128, copy.maxSeqLen)
         assertEquals(original.label, copy.label)
         assertEquals(PromptMode.CHAT, copy.promptMode)
-        assertEquals("Be brief.", copy.systemPrompt)
         assertEquals(7, copy.tokensToGenerate)
         assertEquals(0.7, copy.temperature)
         assertEquals(0.9, (copy.samplingStrategy as SamplingStrategy.TopP).p)
         assertNotSame(original.samplingStrategy, copy.samplingStrategy)
         assertFalse(copy.stopAtEndOfText)
         assertFalse(copy.pauseWorkspaceAtEnd)
-        assertTrue(copy.enableDemoTools)
         assertEquals(5, copy.selectedLayer)
         assertEquals(3, copy.selectedHead)
         assertFalse(copy.lensEnabled)

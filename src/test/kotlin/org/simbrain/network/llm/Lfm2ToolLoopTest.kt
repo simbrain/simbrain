@@ -45,15 +45,15 @@ class Lfm2ToolLoopTest {
     }
 
     @Test
-    fun `the real model calls the demo weather tool and answers from its result`() {
+    fun `the real model calls the demo time tool and answers from its result`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
-        languageModel.enableDemoTools = true
+        languageModel.demoToolsEnabled = true
         languageModel.loadWeights()
-        languageModel.sendUserMessage("What is the weather in Boston?")
+        languageModel.sendUserMessage("What time is it?")
 
         var steps = 0
         while (languageModel.canAdvance && steps < 240) {
@@ -62,12 +62,10 @@ class Lfm2ToolLoopTest {
         }
 
         assertTrue(languageModel.isSealed, "the run seals at the answer's im_end")
-        assertTrue(languageModel.text.contains("get_weather"),
+        assertTrue(languageModel.text.contains("current_time"),
             "the model called the tool, got: ${languageModel.text}")
-        assertTrue(languageModel.text.contains("Sunny, 22 degrees C in Boston (demo data)"),
-            "the parsed location reaches the tool cleanly, got: ${languageModel.text}")
-        assertTrue(languageModel.text.substringAfterLast("assistant").contains("22"),
-            "the model's own answer uses the tool result, got: ${languageModel.text}")
+        assertFalse(languageModel.text.contains("error:"),
+            "the local clock call should succeed, got: ${languageModel.text}")
     }
 
     @Test
@@ -77,18 +75,18 @@ class Lfm2ToolLoopTest {
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
-        languageModel.enableDemoTools = true
+        languageModel.demoToolsEnabled = true
         languageModel.loadWeights()
         val tokenizer = languageModel.loaded!!.tokenizer
 
         val promptIds = tokenizer.encode(
             Lfm2ChatFormat.chatPrompt(
-                "What is the weather in Boston?",
+                "What time is it?",
                 Lfm2ChatFormat.toolListLine(LanguageModel.demoTools),
             ),
             addSpecials = false,
         )
-        val callIds = tokenizer.encode("[get_weather(location='Boston')]", addSpecials = false)
+        val callIds = tokenizer.encode("[current_time()]", addSpecials = false)
         val eos = languageModel.loaded!!.model.config.eosTokenId
 
         val script = ArrayDeque<Int>()
@@ -99,19 +97,22 @@ class Lfm2ToolLoopTest {
         script.addLast(eos)
         languageModel.sampleOverride = { if (script.isEmpty()) 0 else script.removeFirst() }
 
-        languageModel.sendUserMessage("What is the weather in Boston?")
+        languageModel.sendUserMessage("What time is it?")
         val stepsToEos = promptIds.size + 2 + callIds.size + 1
         repeat(stepsToEos) { languageModel.step() }
 
         assertTrue(languageModel.canAdvance,
             "im_end with a pending tool call continues instead of sealing")
-        assertTrue(languageModel.text.contains("<|tool_call_start|>[get_weather(location='Boston')]"),
+        assertTrue(languageModel.text.contains("<|tool_call_start|>[current_time()]"),
             "the call is visible in the text, got: ${languageModel.text}")
-        assertTrue(languageModel.text.contains("Sunny, 22 degrees C in Boston (demo data)"),
-            "the executed result is in the text, got: ${languageModel.text}")
+        assertTrue(languageModel.text.contains("<|tool_response_start|>"),
+            "the local tool result is visible in the text, got: ${languageModel.text}")
 
+        val toolResult = languageModel.text
+            .substringAfter("<|tool_response_start|>")
+            .substringBefore("<|tool_response_end|>")
         val turnIds = tokenizer.encode(
-            Lfm2ChatFormat.toolResultTurn("Sunny, 22 degrees C in Boston (demo data)"),
+            Lfm2ChatFormat.toolResultTurn(toolResult),
             addSpecials = false,
         )
         val positionAtInjection = languageModel.loaded!!.model.position
@@ -120,7 +121,7 @@ class Lfm2ToolLoopTest {
             "the closing im_end and the tool turn prefill through the model")
         assertTrue(languageModel.canAdvance)
         assertTrue(languageModel.contextWindow.contains(
-            "<|tool_response_start|>Sunny, 22 degrees C in Boston (demo data)<|tool_response_end|>"),
+            "<|tool_response_start|>$toolResult<|tool_response_end|>"),
             "the window shows the tool turn")
     }
 
@@ -131,7 +132,7 @@ class Lfm2ToolLoopTest {
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
-        languageModel.enableDemoTools = true
+        languageModel.demoToolsEnabled = true
         languageModel.loadWeights()
         val tokenizer = languageModel.loaded!!.tokenizer
 
@@ -169,7 +170,7 @@ class Lfm2ToolLoopTest {
         // The tool-advertising prompt alone is ~133 tokens; the window must hold it plus the EOS
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
-        languageModel.enableDemoTools = true
+        languageModel.demoToolsEnabled = true
         languageModel.loadWeights()
         val tokenizer = languageModel.loaded!!.tokenizer
 

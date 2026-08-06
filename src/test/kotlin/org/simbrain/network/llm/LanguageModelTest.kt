@@ -265,7 +265,6 @@ class LanguageModelTest {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)
         languageModel.label = "LM"
         languageModel.promptMode = PromptMode.CHAT
-        languageModel.systemPrompt = "Be brief."
         languageModel.tokensToGenerate = 7
         languageModel.temperature = 0.7
         languageModel.selectedLayer = 4
@@ -281,7 +280,6 @@ class LanguageModelTest {
         assertEquals("/no/such/dir", restored.weightsDirectory)
         assertEquals(128, restored.maxSeqLen)
         assertEquals(PromptMode.CHAT, restored.promptMode)
-        assertEquals("Be brief.", restored.systemPrompt)
         assertEquals(7, restored.tokensToGenerate)
         assertEquals(0.7, restored.temperature)
         assertEquals(4, restored.selectedLayer)

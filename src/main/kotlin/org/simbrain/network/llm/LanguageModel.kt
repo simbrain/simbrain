@@ -70,14 +70,6 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         order = 2,
     )
 
-    var systemPrompt by GuiEditable(
-        initValue = "",
-        label = "System prompt",
-        description = "Optional system message ahead of the user message; chat mode only",
-        order = 3,
-        onUpdate = { enableWidget(widgetValue(LanguageModel::promptMode) == PromptMode.CHAT) },
-    )
-
     var tokensToGenerate by GuiEditable(
         initValue = 0,
         label = "Tokens to generate",
@@ -130,21 +122,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         order = 8,
     )
 
-    var enableDemoTools by GuiEditable(
-        initValue = false,
-        label = "Enable demo tools",
-        description = "Advertise the built-in offline demo tools (current time, canned weather) " +
-            "in chat mode and answer the model's calls to them",
-        order = 9,
-        onUpdate = { enableWidget(widgetValue(LanguageModel::promptMode) == PromptMode.CHAT) },
-    )
+    /** Whether the local demonstration tools are advertised when a chat session begins. */
+    @Transient
+    var demoToolsEnabled = false
 
-    /** Tools registered by simulations, advertised alongside the demo tools in chat mode. */
+    /** Tools registered by simulations, advertised alongside enabled built-in tools in chat mode. */
     @Transient
     var tools: List<LlmTool> = emptyList()
 
     private fun activeTools(): List<LlmTool> =
-        if (enableDemoTools) tools + demoTools else tools
+        tools + if (demoToolsEnabled) demoTools else emptyList()
 
     /** The model layer the structure view shows; default to the first attention/KV-cache layer. */
     var selectedLayer: Int = 2
@@ -290,14 +277,12 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         copy.label = label
         copy.location = location
         copy.promptMode = promptMode
-        copy.systemPrompt = systemPrompt
         copy.tokensToGenerate = tokensToGenerate
         copy.temperature = temperature
         copy.probabilityCardCandidates = probabilityCardCandidates
         copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
         copy.stopAtEndOfText = stopAtEndOfText
         copy.pauseWorkspaceAtEnd = pauseWorkspaceAtEnd
-        copy.enableDemoTools = enableDemoTools
         copy.tools = tools
         copy.selectedLayer = selectedLayer
         copy.selectedHead = selectedHead
@@ -498,7 +483,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
      * Appends a templated user turn and the open assistant turn to the stream — the chat
      * counterpart of [injectText], with the template applied on this side of the coupling,
      * like a chat runtime would. On an empty window the message starts the conversation: the
-     * chat scaffolding (BOS, then a system turn carrying [systemPrompt] and the tool list) is
+     * chat scaffolding (BOS and, when enabled, the tool list) is
      * prepended, so the first send produces exactly the canonical chat prompt. Sending into a
      * sealed stream moves it past the end marker (the unfed marker is queued first, the same
      * way a tool answer reopens the turn). Meant for chat mode.
@@ -525,14 +510,13 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     }
 
     /**
-     * The conversation opening a first message sits on: literal BOS text (encoded with
-     * specials off, so the post-processor cannot add a second BOS), then a system turn
-     * carrying [systemPrompt] and the plain-text tool advertisement, per the template.
+     * The conversation opening contains literal BOS text (encoded with specials off, so the
+     * post-processor cannot add a second BOS) and, when tools are active, a system turn
+     * advertising them.
      */
     private fun chatScaffolding(): String {
         val toolLine = activeTools().takeIf { it.isNotEmpty() }?.let(Lfm2ChatFormat::toolListLine)
-        val system = listOfNotNull(systemPrompt.takeIf { it.isNotEmpty() }, toolLine)
-            .joinToString("\n")
+        val system = toolLine.orEmpty()
         return Lfm2ChatFormat.BOS +
             if (system.isEmpty()) "" else Lfm2ChatFormat.turn("system", system)
     }
@@ -584,7 +568,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
 
     companion object {
 
-        /** Offline built-in tools for the tool-calling demo; [enableDemoTools] advertises them. */
+        /** Offline built-in tools for the tool-calling demonstration. */
         val demoTools: List<LlmTool> = listOf(
             LlmTool(
                 name = "current_time",
@@ -594,35 +578,23 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
                 java.time.LocalDateTime.now()
                     .format(java.time.format.DateTimeFormatter.ofPattern("EEEE, MMMM d yyyy, h:mm a"))
             },
-            LlmTool(
-                name = "get_weather",
-                description = "Get the current weather at a location",
-                parameters = """{"type": "object", "properties": {"location": """ +
-                    """{"type": "string", "description": "City name"}}, "required": ["location"]}""",
-            ) { arguments ->
-                "Sunny, 22 degrees C in ${arguments["location"] ?: "your location"} (demo data)"
-            },
         )
     }
 
     class CreationTemplate : EditableObject {
 
         @UserParameter(
-            label = "Starting text",
-            description = "Seeds the first context window; the coupled document owns the window afterwards",
+            label = "Context window size",
+            description = "Maximum number of tokens the model can retain (up to 32,000). " +
+                "Larger windows use substantially more memory; 512 is recommended for most computers.",
+            minimumValue = 1.0,
+            maximumValue = 32_000.0,
             order = 1,
         )
-        var startingText = "The capital of France is"
-
-        @UserParameter(
-            label = "Max sequence length",
-            description = "KV cache capacity and the display window; generation stops when it fills",
-            order = 2,
-        )
-        var maxSeqLen = 512
+        var contextWindowSize = 512
 
         fun create(weightsDirectory: String): LanguageModel =
-            LanguageModel(weightsDirectory, maxSeqLen).also { it.initialText = startingText }
+            LanguageModel(weightsDirectory, contextWindowSize)
 
         override val name = "Language Model"
     }

@@ -12,6 +12,8 @@ class DocumentSyncGate {
 
     private val ring = ArrayDeque<String>()
 
+    val hasPublishedNonEmptyWindow get() = ring.any(String::isNotEmpty)
+
     private var tailSynced = true
 
     /** Returns [current] when it should be published (recording it), or "" while silent. */

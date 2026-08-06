@@ -139,6 +139,10 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
         @Synchronized
         set(value) {
             val current = windowText() ?: return
+            if (value.isEmpty()) {
+                if (syncGate.hasPublishedNonEmptyWindow && (current.isNotEmpty() || canAdvance)) clearWindow()
+                return
+            }
             if (!syncGate.isEdit(value, current, canAdvance)) return
             val ids = encodeText(value) ?: return
             if (ids.isEmpty()) return

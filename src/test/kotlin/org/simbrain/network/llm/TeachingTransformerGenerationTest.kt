@@ -173,4 +173,38 @@ class TeachingTransformerGenerationTest {
         assertTrue(transformer.text.split(" ").size > 2,
             "generation continues from the edited context")
     }
+
+    @Test
+    fun `clearing a coupled document clears the model context`() {
+        val workspace = Workspace()
+        val network = Network()
+        workspace.addWorkspaceComponent(NetworkComponent("net", network))
+        val textWorldComponent = TextWorldComponent("text")
+        workspace.addWorkspaceComponent(textWorldComponent)
+        val world = textWorldComponent.world
+
+        val transformer = model()
+        runBlocking { network.addNetworkModel(transformer) }
+        with(workspace.couplingManager) {
+            createCoupling(
+                world.getProducer("getText"),
+                transformer.getConsumer("setContextWindow"),
+            )
+            createCoupling(
+                transformer.getProducer("getContextWindow"),
+                world.getConsumer("setTextIfChanged"),
+            )
+        }
+
+        world.text = "the cat sat"
+        repeat(3) { workspace.simpleIterate() }
+        assertTrue(transformer.contextTokens.isNotEmpty())
+
+        world.text = ""
+        workspace.simpleIterate()
+
+        assertTrue(transformer.contextTokens.isEmpty())
+        assertTrue(transformer.waitingForInput)
+        assertEquals("", world.text)
+    }
 }

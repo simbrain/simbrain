@@ -10,6 +10,14 @@ import org.simbrain.workspace.Producible
 import java.awt.Color
 import kotlin.math.min
 
+enum class DocumentStructureDisplay(private val label: String) {
+    OFF("Off"),
+    ROLE_COLORS("Role colors"),
+    CONVERSATION_FOCUS("Conversation focus");
+
+    override fun toString() = label
+}
+
 /**
  * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
  * with a neural network.
@@ -99,6 +107,13 @@ class TextWorld : AttributeContainer, EditableObject {
      * [org.simbrain.util.ProvidesDisplayTokenizer] is created; embedding lookups are unaffected.
      */
     var displayTokenizer: Tokenizer<*>? = null
+        set(value) {
+            field = value
+            events.textChanged.fireAsync()
+        }
+
+    @Transient
+    var documentStructureDisplay = DocumentStructureDisplay.OFF
         set(value) {
             field = value
             events.textChanged.fireAsync()
@@ -383,6 +398,3 @@ class TextWorld : AttributeContainer, EditableObject {
     override val id = "Text World"
 
 }
-
-
-

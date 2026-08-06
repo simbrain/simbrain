@@ -96,6 +96,7 @@ class TextWorldPanel(
         this.layout = BorderLayout()
         textArea.lineWrap = true
         textArea.text = world.text
+        textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
         textArea.margin = Insets(6, 8, 8, 8)
         inputScrollPane =
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
@@ -141,6 +142,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
                 updateStatus()
             }
 
@@ -151,6 +153,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
                 updateTokenCount()
                 updateStatus()
             }
@@ -162,6 +165,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
                 updateTokenCount()
                 updateStatus()
             }
@@ -187,6 +191,8 @@ class TextWorldPanel(
                 }
             }
             textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
+            textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+            updateHighlights()
             updateTokenCount()
             updateStatus()
         }
@@ -288,7 +294,6 @@ class TextWorldPanel(
             System.err.checkError()
         }
     }
-
 
     fun removeHighlights(textComp: JTextComponent) {
         val hilite = textComp.highlighter

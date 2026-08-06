@@ -188,6 +188,8 @@ withGui {
 
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
+For labelled control-panel fields, put explanatory tooltips on the left-hand label as well as the field itself. In `ControlPanelKt`, use `labelToolTip = "..."` with `addComboBox` or `addTextField`; users may discover a control by hovering its label rather than its input.
+
 ## Documentation
 
 Simulation documentation may be added with `addSidebarInfo(...)` or a doc viewer when appropriate. Use one coherent documentation block per simulation and follow the standard template below unless there is a clear reason to deviate.

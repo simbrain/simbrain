@@ -164,7 +164,13 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
     }
 
-    fun addTextField(label: String, initValue: String, tab: String? = null, onChange: (String) -> Unit = {}) =
+    fun addTextField(
+        label: String,
+        initValue: String,
+        tab: String? = null,
+        labelToolTip: String? = null,
+        onChange: (String) -> Unit = {},
+    ) =
         JTextField(initValue).also { textField ->
             textField.document.addDocumentListener(object : DocumentListener {
                 override fun insertUpdate(e: DocumentEvent?) {
@@ -180,7 +186,7 @@ class ControlPanelKt(title: String = "Control Panel"):
                 }
             })
             launch(Dispatchers.Swing) {
-                getTab(tab).addItem(label, textField)
+                getTab(tab).addItem(label, textField).toolTipText = labelToolTip
             }
         }
 
@@ -235,6 +241,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         items: List<T>,
         initialSelection: T? = null,
         tab: String? = null,
+        labelToolTip: String? = null,
         crossinline onChange: (T) -> Unit = {}
     ) = JComboBox(items.toTypedArray()).also { comboBox ->
         if (initialSelection != null) {
@@ -248,7 +255,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             if (label.isEmpty()) {
                 getTab(tab).addItem(comboBox)
             } else {
-                getTab(tab).addItem(label, comboBox)
+                getTab(tab).addItem(label, comboBox).toolTipText = labelToolTip
             }
             pack()
         }

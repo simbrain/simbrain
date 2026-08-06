@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.plot.heatmap.HeatMapComponent
+import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
@@ -124,6 +125,19 @@ class HeatMapTest {
         assertEquals(ChartColorMap.JET.color(0.0), scale.getPaint(-1.0))
         assertEquals(ChartColorMap.JET.color(0.5), scale.getPaint(0.0))
         assertEquals(ChartColorMap.JET.color(1.0), scale.getPaint(1.0))
+    }
+
+    @Test
+    fun `the consumer the coupled plot menu looks up is reachable by method reference`() {
+        with(workspace.couplingManager) {
+            na.getProducer(na::activationArray) couple hmc.model.getConsumer(HeatMapModel::setValues)
+        }
+        na.activationArray = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
+
+        workspace.simpleIterate()
+
+        assertEquals(1, workspace.couplingManager.couplings.size)
+        assertEquals(listOf(1.0, 2.0, 3.0, 4.0), hmc.model.columns.last().toList())
     }
 
     @Test

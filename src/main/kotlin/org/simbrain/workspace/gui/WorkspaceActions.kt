@@ -4,6 +4,8 @@ import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
+import org.simbrain.plot.heatmap.HeatMapComponent
+import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.plot.histogram.HistogramComponent
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.piechart.PieChartComponent
@@ -418,6 +420,18 @@ class WorkspaceActions {
     )
 
     @JvmOverloads
+    fun createCoupledHeatMapAction(producer: Producer, objectName: String, plotType: String = "Heat map") = createCoupledPlotAction(
+        producer = producer,
+        plotType = plotType,
+        objectName = objectName,
+        iconPath = "menu_icons/HeatMap.png",
+        componentCreator = { name -> HeatMapComponent(name) },
+        consumerProvider = {
+            it.model.getConsumer(HeatMapModel::setValues)
+        }
+    )
+
+    @JvmOverloads
     fun createCoupledPixelPlotAction(producer: Producer, objectName: String, plotType: String = "Pixel plot") = createCoupledPlotAction(
         producer = producer,
         plotType = plotType,
@@ -445,6 +459,7 @@ class WorkspaceActions {
     fun createCoupledPlotMenu(producer: Producer, objectName: String, menuTitle: String = "Couple plots"): JMenu {
         val menu = JMenu(menuTitle)
         menu.add(createCoupledBarChartAction(producer, objectName))
+        menu.add(createCoupledHeatMapAction(producer, objectName))
         menu.add(createCoupledPieChartAction(producer, objectName))
         menu.add(createCoupledPixelPlotAction(producer, objectName))
         menu.add(createCoupledProjectionPlotAction(producer, objectName))

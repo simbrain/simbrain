@@ -74,15 +74,11 @@ class TextWorldPanel(
         updateStatus()
     }
 
-    /** The count follows the token boxes: shown for token-focused worlds, quiet otherwise. */
+    /** Shows the token count even when token boundaries are hidden. */
     private fun updateTokenCount() {
-        if (!world.showTokenBoundaries) {
-            tokenCountLabel.text = ""
-            tokenCountLabel.toolTipText = null
-            return
-        }
         val count = world.tokens.size
-        tokenCountLabel.text = if (count == 1) "1 token" else "$count tokens"
+        tokenCountLabel.text = world.tokenCountLabelProvider?.invoke()
+            ?: if (count == 1) "1 token" else "$count tokens"
         tokenCountLabel.toolTipText = "Tokens in this document, counted by the active tokenizer"
     }
 
@@ -212,6 +208,7 @@ class TextWorldPanel(
 
         world.events.statusChanged.on(Dispatchers.Swing) {
             updateStatus()
+            updateTokenCount()
         }
 
     }

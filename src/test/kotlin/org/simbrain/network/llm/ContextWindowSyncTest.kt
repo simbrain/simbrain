@@ -1,10 +1,7 @@
 package org.simbrain.network.llm
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -32,6 +29,7 @@ class ContextWindowSyncTest {
             workspace.addWorkspaceComponent(textWorldComponent)
             world = textWorldComponent.world
             languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+            languageModel.showPromptProcessing = true
             languageModel.initialText = promptText
             languageModel.stopAtEndOfText = sealAtEndOfText
             runBlocking { network.addNetworkModel(languageModel) }

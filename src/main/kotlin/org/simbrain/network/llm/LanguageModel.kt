@@ -70,6 +70,14 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         order = 2,
     )
 
+    var showPromptProcessing by GuiEditable(
+        initValue = false,
+        label = "Show prompt processing",
+        description = "Animate prompt tokens one workspace iteration at a time; disable to prefill " +
+            "the pending prompt immediately",
+        order = 3,
+    )
+
     var tokensToGenerate by GuiEditable(
         initValue = 0,
         label = "Tokens to generate",
@@ -80,7 +88,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     )
 
     var temperature by GuiEditable(
-        initValue = 1.0,
+        initValue = 0.1,
         label = "Temperature",
         description = "Softmax temperature applied to the logits before sampling",
         min = 0.01,
@@ -99,7 +107,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     )
 
     override var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.Greedy,
+        initValue = SamplingStrategy.TopK(50),
         label = "Sampling strategy",
         description = "How the next token is chosen from the distribution",
         showDetails = false,
@@ -277,6 +285,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
         copy.label = label
         copy.location = location
         copy.promptMode = promptMode
+        copy.showPromptProcessing = showPromptProcessing
         copy.tokensToGenerate = tokensToGenerate
         copy.temperature = temperature
         copy.probabilityCardCandidates = probabilityCardCandidates
@@ -354,7 +363,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
 
     context(Network)
     override fun update() {
-        step()
+        if (showPromptProcessing || pending.isEmpty()) {
+            step()
+        } else {
+            while (pending.isNotEmpty() && canAdvance) step()
+        }
     }
 
     /**

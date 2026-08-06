@@ -127,6 +127,14 @@ class TextWorld : AttributeContainer, EditableObject {
             events.statusChanged.fire()
         }
 
+    /** Optional text for the token-count area at the lower right of the document view. */
+    @Transient
+    var tokenCountLabelProvider: (() -> String?)? = null
+        set(value) {
+            field = value
+            events.statusChanged.fire()
+        }
+
     /**
      * When true, the text is read-only while the workspace is running, so a model streaming
      * into this document is never edited mid-iteration — pause the workspace to edit, and the

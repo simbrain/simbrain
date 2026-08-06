@@ -1,15 +1,13 @@
 package org.simbrain.network.llm
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.textworld.TextWorldComponent
 import java.nio.file.Path
@@ -17,6 +15,14 @@ import java.nio.file.Path
 class LanguageModelTest {
 
     private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
+
+    @Test
+    fun `language model defaults match the LFM2 generation configuration`() {
+        val languageModel = LanguageModel()
+
+        assertEquals(0.1, languageModel.temperature)
+        assertEquals(50, (languageModel.samplingStrategy as SamplingStrategy.TopK).k)
+    }
 
     @Test
     fun `one update generates one token and stops at the token budget`() {
@@ -55,6 +61,7 @@ class LanguageModelTest {
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.showPromptProcessing = true
         languageModel.initialText = "The capital of France is"
         languageModel.loadWeights()
         runBlocking { net.addNetworkModel(languageModel) }
@@ -65,6 +72,29 @@ class LanguageModelTest {
         net.update()
         net.update()
         assertEquals(2, languageModel.loaded!!.model.position)
+    }
+
+    @Test
+    fun `prompt processing defaults to immediate prefill in one network update`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val net = Network()
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        val seedText = "The capital of France is"
+        languageModel.initialText = seedText
+        languageModel.loadWeights()
+        runBlocking { net.addNetworkModel(languageModel) }
+
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
+        net.update()
+
+        assertEquals(promptTokens, languageModel.loaded!!.model.position)
+        assertEquals("", languageModel.generatedToken, "prefill produces no generated token")
+
+        net.update()
+        assertEquals(promptTokens + 1, languageModel.loaded!!.model.position)
+        assertTrue(languageModel.generatedToken.isNotEmpty(), "decoding remains one token per update")
     }
 
     @Test
@@ -185,6 +215,7 @@ class LanguageModelTest {
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
+        languageModel.showPromptProcessing = true
         languageModel.initialText = seedText
         languageModel.stopAtEndOfText = false
         runBlocking { network.addNetworkModel(languageModel) }
@@ -265,6 +296,7 @@ class LanguageModelTest {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)
         languageModel.label = "LM"
         languageModel.promptMode = PromptMode.CHAT
+        languageModel.showPromptProcessing = false
         languageModel.tokensToGenerate = 7
         languageModel.temperature = 0.7
         languageModel.selectedLayer = 4
@@ -280,6 +312,7 @@ class LanguageModelTest {
         assertEquals("/no/such/dir", restored.weightsDirectory)
         assertEquals(128, restored.maxSeqLen)
         assertEquals(PromptMode.CHAT, restored.promptMode)
+        assertFalse(restored.showPromptProcessing)
         assertEquals(7, restored.tokensToGenerate)
         assertEquals(0.7, restored.temperature)
         assertEquals(4, restored.selectedLayer)

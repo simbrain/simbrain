@@ -4,7 +4,6 @@ import kotlinx.coroutines.Dispatchers
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.llm.LanguageModel
-import org.simbrain.network.llm.Lfm2ChatFormat
 import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -58,7 +57,7 @@ val lfm2LanguageModel = newSim {
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.showTokenBoundaries = false
-    textWorldComponent.world.text = "The capital of France is"
+    textWorldComponent.world.text = "Here is a brief two-paragraph parable:"
 
     setupLfm2DocumentSync(workspace)
 
@@ -140,9 +139,9 @@ val lfm2LanguageModel = newSim {
             PopupConfig(
                 title = "The Model's Document",
                 message = "This document is the model's context window. Press Play on the main " +
-                    "toolbar and watch it write, one token per step — the workspace pauses by " +
-                    "itself when the model finishes. Edit the text and press Play again to " +
-                    "continue from your edit.",
+                    "toolbar to prefill it immediately, then watch generated tokens arrive one " +
+                    "per step — the workspace pauses itself when the model finishes. Edit the " +
+                    "text and press Play again to continue from your edit.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 suppressionKey = "lfm2_language_model_document_help",
                 placement = PopupPlacement.BOTTOM_CENTER,
@@ -161,7 +160,7 @@ val lfm2LanguageModel = newSim {
 
         # Completion (Default)
 
-        Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. It runs one sampled token per workspace step, then stops when it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document.
+        Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. It immediately pre-fills the document, then runs one sampled token per workspace step until it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document. Enable `Show prompt processing` in `Settings` to animate prefill one token at a time.
 
         The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. There is no prompt hiding anywhere — the document IS the model's entire input. `Reset` in the control panel clears both the document and the model's context, and the temperature and sampling strategy can change mid-run.
 
@@ -218,6 +217,10 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
     val textWorld = workspace.componentList.filterIsInstance<TextWorldComponent>().first().world
     textWorld.documentStructureDisplay = DocumentStructureDisplay.CONVERSATION_FOCUS
     textWorld.showTokenBoundaries = false
+    textWorld.tokenCountLabelProvider = {
+        val used = textWorld.tokens.size
+        "$used used / ${(languageModel.maxSeqLen - used).coerceAtLeast(0)} remaining"
+    }
 
     with(workspace.couplingManager) {
         createCoupling(

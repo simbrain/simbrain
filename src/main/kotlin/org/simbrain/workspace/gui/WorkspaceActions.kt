@@ -476,7 +476,7 @@ class WorkspaceActions {
      * number of units.
      */
     @JvmOverloads
-    fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Create image input", postActionBlock:
+    fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Add image world", postActionBlock:
         () -> Unit = {}) = desktopPane.createAction(
         name = menuTitle,
         iconPath = "menu_icons/photo.png",

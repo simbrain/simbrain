@@ -59,7 +59,7 @@ val rbmSim = newSim {
             ## Creating Custom Patterns
 
             To create your own patterns for training:
-            1. Right-click on the visible layer and select `Add coupled image world`.
+            1. Right-click on the visible layer and select `Add image world`.
             2. In the Image World, load images or draw custom patterns.
             3. The pattern will automatically appear in the visible layer.
             4. Right-click on the RBM network and select `Add Current Pattern to Training Data`.

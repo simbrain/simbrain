@@ -450,8 +450,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             })
             contextMenu.addSeparator()
 
-            // Add coupled image world submenu
-            val imageWorldMenu = JMenu("Add coupled image world")
+            // Image input submenu
+            val imageWorldMenu = JMenu("Add image world")
             for (c in 0 until tensorLayer.shape.channels) {
                 imageWorldMenu.add(actionManager.createTensorChannelImageInput(tensorLayer, c))
             }

@@ -1266,7 +1266,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     fun createNeuronCollectionCoupledImageWorld(collection: NeuronCollection) = actionManager.createImageInput(
         collection.getConsumer(NeuronCollection::activationArray),
         collection.size,
-        menuTitle = "Add coupled image world",
+        menuTitle = "Add image world",
         postActionBlock = { collection.isClamped = true }
     )
 

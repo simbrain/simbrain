@@ -98,7 +98,7 @@ val tinyMNIST = newSim {
         - Manually try specific training or testing images. To do this, under the `Inputs` toolbar, go to the table of interest and click the button with this tooltip: `Apply current row as
         input to network` when hovered. Then observe how it classifies written digits. The values of the output layer correspond to the probability it assigns the input to a digit `0-9`.
 
-        - Draw your own image. Right click on the image layer and select `Add coupled image world` then draw your own image and see how the network does. It generally does poorly since it
+        - Draw your own image. Right click on the image layer and select `Add image world` then draw your own image and see how the network does. It generally does poorly since it
         was trained on anti-aliased images.
 
         # Credits

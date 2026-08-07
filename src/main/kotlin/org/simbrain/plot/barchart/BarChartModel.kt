@@ -79,7 +79,6 @@ class BarChartModel : AttributeContainer, EditableObject {
      */
     @Consumable
     fun setBarValues(newPoint: DoubleArray) {
-        println("setBarValues called with: ${newPoint.contentToString()}")
         try {
             SwingUtilities.invokeAndWait {
                 // Take care of size mismatches

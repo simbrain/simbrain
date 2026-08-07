@@ -23,6 +23,25 @@ class CouplingTest {
     private val network = Network().also { workspace.addWorkspaceComponent(NetworkComponent("net1", it)) }
 
     @Test
+    fun `concurrent attribute container removal and clear does not throw`() {
+        repeat(25) {
+            val neurons = List(20) { Neuron() }
+            with(couplingManager) {
+                neurons.forEach { neuron ->
+                    createCoupling(neuron.getProducer("getActivation"), neuron.getConsumer("addInputValue"))
+                }
+            }
+            val remover = Thread {
+                neurons.forEach { couplingManager.removeAttributeContainer(it) }
+            }
+            remover.start()
+            couplingManager.clear()
+            remover.join()
+            assertEquals(0, couplingManager.couplings.size)
+        }
+    }
+
+    @Test
     fun `ensure producers from multiple identical gets are equal`() {
         val neuron = Neuron()
         with(couplingManager) {

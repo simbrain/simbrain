@@ -36,7 +36,9 @@ class CouplingManager(val workspace: Workspace) {
     private val _couplings = LinkedHashSet<Coupling>()
 
     private val cachedCouplingList = CachedObject {
-        Collections.unmodifiableList(_couplings.toList())
+        synchronized(_couplings) {
+            Collections.unmodifiableList(_couplings.toList())
+        }
     }
 
     /**
@@ -325,24 +327,30 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     fun removeAttributeContainer(attributeContainer: AttributeContainer) {
-        attributeContainerCouplings[attributeContainer]?.let {
-            it.forEach { coupling ->
-                _couplings.remove(coupling)
-                cachedCouplingList.invalidate()
-                if (coupling.consumer.baseObject !== attributeContainer) {
-                    attributeContainerCouplings[coupling.consumer.baseObject]?.remove(coupling)
+        val removed = synchronized(_couplings) {
+            attributeContainerCouplings[attributeContainer]?.let {
+                it.forEach { coupling ->
+                    _couplings.remove(coupling)
+                    cachedCouplingList.invalidate()
+                    if (coupling.consumer.baseObject !== attributeContainer) {
+                        attributeContainerCouplings[coupling.consumer.baseObject]?.remove(coupling)
+                    }
+                    if (coupling.producer.baseObject !== attributeContainer) {
+                        attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
+                    }
                 }
-                if (coupling.producer.baseObject !== attributeContainer) {
-                    attributeContainerCouplings[coupling.producer.baseObject]?.remove(coupling)
-                }
+                it.toList()
+            }.also {
+                attributeContainerCouplings.remove(attributeContainer)
             }
-            events.couplingsRemoved.fire(it.toList())
         }
-        attributeContainerCouplings.remove(attributeContainer)
+        if (removed != null) {
+            events.couplingsRemoved.fire(removed)
+        }
     }
 
     fun clear() {
-        removeCouplings(_couplings.toList())
+        removeCouplings(synchronized(_couplings) { _couplings.toList() })
     }
 
 }

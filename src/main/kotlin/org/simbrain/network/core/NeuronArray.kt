@@ -73,6 +73,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             value.copyInto(field)
             events.visualPropertiesChanged.fire()
             field = value
+            events.labelArrayChanged.fire()
         }
 
     @get:Producible

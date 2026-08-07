@@ -15,7 +15,6 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import javax.swing.SwingUtilities
 
 class HeatMapTest {
 
@@ -209,13 +208,14 @@ class HeatMapTest {
         nc.network.addNetworkModelAsync(collection)
 
         with(workspace.couplingManager) { collection couple hmc.model }
-        SwingUtilities.invokeAndWait { }
 
-        assertEquals(listOf("Input", "Output"), hmc.model.rowLabels)
+        awaitUntil(message = "Row labels were not initialized from neuron labels") {
+            hmc.model.rowLabels == listOf("Input", "Output")
+        }
         neurons[1].label = "Target"
-        workspace.simpleIterate()
-        SwingUtilities.invokeAndWait { }
-        assertEquals(listOf("Input", "Target"), hmc.model.rowLabels)
+        awaitUntil(message = "Row labels did not follow the neuron rename without an iteration") {
+            hmc.model.rowLabels == listOf("Input", "Target")
+        }
     }
 
     @Test

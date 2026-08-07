@@ -14,10 +14,10 @@ import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.HeatMapEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.runOnEventThread
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
-import javax.swing.SwingUtilities
 import kotlin.math.abs
 
 class HeatMapModel : AttributeContainer, EditableObject {
@@ -95,7 +95,7 @@ class HeatMapModel : AttributeContainer, EditableObject {
 
     @Consumable(description = "Append a column of values")
     fun setValues(values: DoubleArray) {
-        onEventThread {
+        runOnEventThread {
             columns.add(values.copyOf())
             times.add(if (::timeSupplier.isInitialized) timeSupplier() else times.size)
             trimToWindow()
@@ -104,7 +104,7 @@ class HeatMapModel : AttributeContainer, EditableObject {
     }
 
     fun clearData() {
-        onEventThread {
+        runOnEventThread {
             columns.clear()
             times.clear()
             events.propertyChanged.fire()
@@ -112,7 +112,7 @@ class HeatMapModel : AttributeContainer, EditableObject {
     }
 
     fun setRowLabels(labels: List<String>) {
-        onEventThread {
+        runOnEventThread {
             rowLabels = labels
             events.propertyChanged.fire()
         }
@@ -149,10 +149,6 @@ class HeatMapModel : AttributeContainer, EditableObject {
         if (excess <= 0) return
         columns.subList(0, excess).clear()
         times.subList(0, excess).clear()
-    }
-
-    private fun onEventThread(block: () -> Unit) {
-        if (SwingUtilities.isEventDispatchThread()) block() else SwingUtilities.invokeAndWait(block)
     }
 
     private fun readResolve(): Any {

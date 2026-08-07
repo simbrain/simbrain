@@ -6,10 +6,10 @@ import org.simbrain.plot.chartSeriesColor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.runOnEventThread
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
-import javax.swing.SwingUtilities
 
 /**
  * Data for a JFreeChart bar chart.
@@ -79,32 +79,36 @@ class BarChartModel : AttributeContainer, EditableObject {
      */
     @Consumable
     fun setBarValues(newPoint: DoubleArray) {
-        try {
-            SwingUtilities.invokeAndWait {
-                // Take care of size mismatches
-                if (newPoint.size != numBars) {
-                    dataset.clear()
-                    numBars = newPoint.size
-                }
-
-                // Write the data
-                for (i in newPoint.indices) {
-                    if (i < barNames.size) {
-                        dataset.setValue(newPoint[i], "Values", barNames[i])
-                    } else {
-                        // TODO: May need to go to this condition for if barNames is empty
-                        dataset.setValue(newPoint[i], "Values", "" + (i + 1))
-                    }
-                }
+        runOnEventThread {
+            // Take care of size mismatches
+            if (newPoint.size != numBars) {
+                dataset.clear()
+                numBars = newPoint.size
             }
-        } catch (e: Exception) {
-            throw RuntimeException(e)
+
+            // Write the data
+            for (i in newPoint.indices) {
+                dataset.setValue(newPoint[i], "Values", barName(i))
+            }
         }
     }
 
+    /**
+     * Set the bar names and immediately rename any bars already in the dataset, so a label change shows
+     * without waiting for the next value update.
+     */
     fun setBarNames(names: Array<String>) {
-        this.barNames = names
+        runOnEventThread {
+            barNames = names
+            if (dataset.columnCount > 0) {
+                val values = (0 until dataset.columnCount).map { dataset.getValue(0, it) }
+                dataset.clear()
+                values.forEachIndexed { i, value -> dataset.setValue(value, "Values", barName(i)) }
+            }
+        }
     }
+
+    private fun barName(i: Int) = if (i < barNames.size) barNames[i] else "${i + 1}"
 
     override val name: String
         get() = "Bar chart"

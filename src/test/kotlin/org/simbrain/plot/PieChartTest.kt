@@ -62,6 +62,21 @@ class PieChartTest {
 
 
     @Test
+    fun `slice names follow neuron renames without an iteration`() {
+        ng.activationArray = doubleArrayOf(.5, .5)
+        workspace.simpleIterate()
+        awaitUntil(message = "Slices were not named after the neurons") {
+            pieChart.dataset.keys == listOf(ng.getNeuron(0).displayName, ng.getNeuron(1).displayName)
+        }
+
+        ng.getNeuron(0).label = "Renamed"
+        awaitUntil(message = "Slice name did not follow the neuron rename without an iteration") {
+            pieChart.dataset.keys.firstOrNull() == "Renamed"
+        }
+        assertEquals(.5, pieChart.dataset.getValue(0).toDouble(), .01)
+    }
+
+    @Test
     fun `equal values should lead to equal pie slices`() {
         ng.activationArray = doubleArrayOf(1.5, 1.5)
         workspace.simpleIterate()

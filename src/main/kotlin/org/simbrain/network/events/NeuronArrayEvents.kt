@@ -8,4 +8,9 @@ import org.simbrain.util.FlowEvents
 class NeuronArrayEvents: LocationEvents() {
     val visualPropertiesChanged = NoArgEvent()
     val updateRuleChanged = NoArgEvent()
+
+    /**
+     * The array's per-neuron labels changed.
+     */
+    val labelArrayChanged = NoArgEvent()
 }

@@ -14,4 +14,5 @@ class WorkspaceComponentEvents: FlowEvents() {
     val componentClosing = NoArgEvent()
     val attributeContainerAdded = AwaitableEvent<AttributeContainer>()
     val attributeContainerRemoved = OneArgEvent<AttributeContainer>()
+    val attributeContainerChanged = OneArgEvent<AttributeContainer>()
 }

@@ -3,6 +3,7 @@ package org.simbrain.network
 import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.subnetworks.Subnetwork
@@ -43,13 +44,22 @@ class NetworkComponent : WorkspaceComponent {
     }
 
     /**
+     * Models whose label events are already relayed as [fireAttributeContainerChanged], so re-adding a model
+     * (e.g. through undo) does not stack duplicate subscriptions.
+     */
+    private val labelRelayedModels = HashSet<NetworkModel>()
+
+    /**
      * Initialize attribute types and listeners.
      */
     private fun init() {
         val event = network.events
 
+        network.allModelsDeep.forEach(::relayLabelChanges)
+
         event.modelAdded.on(Dispatchers.Default) { m ->
             setChangedSinceLastSave(true)
+            relayLabelChanges(m)
             if (m is AttributeContainer) {
                 fireAttributeContainerAdded(m)
             }
@@ -82,6 +92,24 @@ class NetworkComponent : WorkspaceComponent {
         //        event.onTextAdded(t -> setChangedSinceLastSave(true));
         //
         //        event.onTextRemoved(t -> setChangedSinceLastSave(true));
+    }
+
+    /**
+     * Forward label changes on couplable models to [fireAttributeContainerChanged] so coupled consumers
+     * (e.g. plots showing per-neuron labels) can refresh.
+     */
+    private fun relayLabelChanges(model: NetworkModel) {
+        if (!labelRelayedModels.add(model)) return
+        when (model) {
+            is NeuronCollection -> model.events.labelArrayChanged.on(Dispatchers.Default) {
+                fireAttributeContainerChanged(model)
+            }
+            is NeuronArray -> model.events.labelArrayChanged.on(Dispatchers.Default) {
+                fireAttributeContainerChanged(model)
+            }
+            is Subnetwork -> model.modelList.deepAll.forEach(::relayLabelChanges)
+            else -> {}
+        }
     }
 
     override val attributeContainers: List<AttributeContainer>

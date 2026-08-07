@@ -34,6 +34,15 @@ public class PieChartComponent extends WorkspaceComponent {
                 model.setSliceNames(c.getProducer().getLabelArray());
             }
         });
+
+        // Refresh slice labels when the producing container reports a label change, e.g. a neuron rename
+        getWorkspace().getCouplingManager().getEvents().getAttributeContainerChanged().on(Dispatchers.getDefault(), container -> {
+            for (var c : getWorkspace().getCouplingManager().getCouplings()) {
+                if (c.getConsumer().getBaseObject() == model && c.getProducer().getBaseObject() == container) {
+                    model.setSliceNames(c.getProducer().getLabelArray());
+                }
+            }
+        });
     }
 
     /**

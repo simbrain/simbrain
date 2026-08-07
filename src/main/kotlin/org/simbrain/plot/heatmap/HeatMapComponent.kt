@@ -25,6 +25,11 @@ class HeatMapComponent @JvmOverloads constructor(
             value.couplingManager.events.couplingAdded.on { coupling ->
                 updateRowLabels(coupling)
             }
+            value.couplingManager.events.attributeContainerChanged.on { container ->
+                couplingManager.couplings
+                    .filter { it.producer.baseObject === container }
+                    .forEach(::updateRowLabels)
+            }
         }
 
     init {
@@ -38,10 +43,6 @@ class HeatMapComponent @JvmOverloads constructor(
     }
 
     override fun hasChangedSinceLastSave() = false
-
-    override suspend fun update() {
-        couplingManager.couplings.forEach(::updateRowLabels)
-    }
 
     override val xml: String get() = heatMapXStream.toXML(model)
 

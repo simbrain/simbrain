@@ -151,6 +151,13 @@ abstract class WorkspaceComponent(name: String) {
     fun fireAttributeContainerRemoved(removedContainer: AttributeContainer) = events.attributeContainerRemoved.fire(removedContainer)
 
     /**
+     * Notify listeners that an existing [AttributeContainer]'s couplable state has changed in a way consumers may
+     * want to re-read, e.g. its labels. Relayed workspace-wide via
+     * [org.simbrain.workspace.couplings.CouplingEvents.attributeContainerChanged].
+     */
+    fun fireAttributeContainerChanged(changedContainer: AttributeContainer) = events.attributeContainerChanged.fire(changedContainer)
+
+    /**
      * Called after a global update ends.
      */
     fun doStopped() {

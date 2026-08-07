@@ -6,6 +6,7 @@ import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.WithXStreamPropertyConverter
 import org.simbrain.util.createXStreamPropertyConverter
+import org.simbrain.util.runOnEventThread
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
@@ -196,6 +197,23 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         xy.description = description
         dataset.addSeries(xy)
         return xy
+    }
+
+    /**
+     * Rename the existing series in place, preserving their data. Expects one description per series. Keys
+     * move through unique placeholders first because [XYSeriesCollection] vetoes a rename that would
+     * momentarily collide with another series' current key.
+     */
+    fun renameTimeSeries(descriptions: List<String>) {
+        if (descriptions.size != timeSeriesList.size) return
+        runOnEventThread {
+            timeSeriesList.forEachIndexed { i, ts -> ts.series.key = "\u200B__renaming__$i" }
+            timeSeriesList.zip(descriptions).forEach { (ts, description) ->
+                ts.series.key = description
+                ts.description = description
+                ts.series.fireSeriesChanged()
+            }
+        }
     }
 
     /**

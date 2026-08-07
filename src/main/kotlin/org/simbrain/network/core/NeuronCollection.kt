@@ -212,6 +212,7 @@ class NeuronCollection : Layer, CopyableObject {
     fun addNeuron(neuron: Neuron) {
         neuronList.add(neuron)
         addListener(neuron)
+        events.labelArrayChanged.fire()
     }
 
     private fun addNeurons(neurons: Collection<Neuron>) {
@@ -220,8 +221,10 @@ class NeuronCollection : Layer, CopyableObject {
 
     internal fun addListener(n: Neuron) {
         n.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
+        n.events.labelChanged.on(Dispatchers.Default) { _, _ -> events.labelArrayChanged.fire() }
         n.events.deleted.on(Dispatchers.Default) { neuron ->
             neuronList.remove(neuron)
+            events.labelArrayChanged.fire()
             if (isEmpty) {
                 delete()
             }
@@ -230,10 +233,12 @@ class NeuronCollection : Layer, CopyableObject {
 
     fun removeNeuron(neuron: Neuron?) {
         neuronList.remove(neuron)
+        events.labelArrayChanged.fire()
     }
 
     fun removeAllNeurons() {
         neuronList.clear()
+        events.labelArrayChanged.fire()
     }
 
     fun containsNeuron(n: Neuron?): Boolean = neuronList.contains(n)

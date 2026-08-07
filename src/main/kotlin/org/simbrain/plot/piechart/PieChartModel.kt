@@ -5,9 +5,9 @@ import org.jfree.data.general.DefaultPieDataset
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.runOnEventThread
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
-import javax.swing.SwingUtilities
 import kotlin.math.abs
 
 /**
@@ -32,10 +32,21 @@ class PieChartModel : AttributeContainer, EditableObject {
     private var isUninitialized: Boolean? = null
 
     /**
-     * Names for the "slices" in the barchart. Can be set via coupling events
-     * in [PieChartComponent].
+     * Names for the "slices" in the pie chart. Can be set via coupling events in [PieChartComponent].
+     * Setting new names renames any slices already in the dataset, so a label change shows without
+     * waiting for the next value update.
      */
     var sliceNames = arrayOf<String>()
+        set(value) {
+            runOnEventThread {
+                field = value
+                if (isUninitialized == false && dataset.itemCount > 0) {
+                    val values = (0 until dataset.itemCount).map { dataset.getValue(it) }
+                    dataset.clear()
+                    values.forEachIndexed { i, v -> dataset.setValue(sliceName(i), v) }
+                }
+            }
+        }
 
     /**
      * Track how many slices there are. If an array with a different number of
@@ -71,35 +82,29 @@ class PieChartModel : AttributeContainer, EditableObject {
         if (vector.isEmpty()) {
             throw IllegalArgumentException("Pie chart supplied with empty array")
         }
-        try {
-            SwingUtilities.invokeAndWait {
-                updatePieStatus()
+        runOnEventThread {
+            updatePieStatus()
 
-                // Take care of size mismatches
-                if (vector.size != numSlices) {
-                    dataset.clear()
-                    numSlices = vector.size
-                }
-
-                val total = vector.sumOf { abs(it) }
-
-                // For minimal activation case just show a single pie slice
-                if (total < emptyPieThreshold) {
-                    emptyPie()
-                    return@invokeAndWait
-                }
-                for (i in vector.indices) {
-                    if (i < sliceNames.size) {
-                        dataset.setValue(sliceNames[i], abs(vector[i] / total))
-                    } else {
-                        dataset.setValue("$i", abs(vector[i] / total))
-                    }
-                }
+            // Take care of size mismatches
+            if (vector.size != numSlices) {
+                dataset.clear()
+                numSlices = vector.size
             }
-        } catch (e: Exception) {
-            throw RuntimeException(e)
+
+            val total = vector.sumOf { abs(it) }
+
+            // For minimal activation case just show a single pie slice
+            if (total < emptyPieThreshold) {
+                emptyPie()
+                return@runOnEventThread
+            }
+            for (i in vector.indices) {
+                dataset.setValue(sliceName(i), abs(vector[i] / total))
+            }
         }
     }
+
+    private fun sliceName(i: Int) = if (i < sliceNames.size) sliceNames[i] else "$i"
 
     override val name: String
         get() = "Pie chart"

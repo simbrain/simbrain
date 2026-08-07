@@ -18,6 +18,14 @@ import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.min
 
 
+/**
+ * Run [block] on the event dispatch thread, directly if already on it, else blocking via
+ * [SwingUtilities.invokeAndWait]. Use for model mutations that Swing views observe (e.g. JFreeChart datasets).
+ */
+fun runOnEventThread(block: () -> Unit) {
+    if (SwingUtilities.isEventDispatchThread()) block() else SwingUtilities.invokeAndWait(block)
+}
+
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
     addWindowListener(object : WindowAdapter() {
         override fun windowClosed(e: WindowEvent?) {

@@ -144,6 +144,9 @@ class Workspace: CoroutineScope {
                 attributeContainer!!
             )
         }
+        component.events.attributeContainerChanged.on(Dispatchers.Default) { attributeContainer ->
+            couplingManager.events.attributeContainerChanged.fire(attributeContainer)
+        }
     }
 
     fun removeWorkspaceComponent(component: WorkspaceComponent) {

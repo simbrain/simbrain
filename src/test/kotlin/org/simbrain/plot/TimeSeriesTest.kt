@@ -8,6 +8,9 @@ import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addTimeSeriesComponent
 import org.simbrain.custom_sims.couplingManager
 import org.simbrain.custom_sims.newSim
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeurons
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
@@ -51,6 +54,63 @@ class TimeSeriesTest {
             assertEquals(0.0, newTimeSeriesComponent.model.timeSeriesList[1].series.getY(3) as Double, 0.0)
         }
         runBlocking { sim.run() }
+    }
+
+    @Test
+    fun `array coupling names series after neuron labels and follows renames`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neurons = List(3) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons[0].label = "Alpha"
+        neurons[1].label = "Beta"
+        neurons[2].label = "Gamma"
+        val collection = NeuronCollection(neurons)
+        network.addNetworkModelAsync(collection)
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
+
+        awaitUntil(message = "Series were not named after neuron labels") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
+        }
+
+        workspace.simpleIterate()
+        assertEquals(1, timeSeriesComponent.model.timeSeriesList[1].series.itemCount)
+
+        neurons[1].label = "Delta"
+        awaitUntil(message = "Series name did not follow the neuron rename") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Delta", "Gamma")
+        }
+        // The legend renders series keys, so those must follow the rename too, and data must be preserved
+        assertEquals(listOf("Alpha", "Delta", "Gamma"), timeSeriesComponent.model.timeSeriesList.map { it.series.key })
+        assertEquals(1, timeSeriesComponent.model.timeSeriesList[1].series.itemCount)
+    }
+
+    @Test
+    fun `duplicate labels are disambiguated in positional order`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neurons = List(3) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons[0].label = "Alpha"
+        neurons[1].label = "Beta"
+        neurons[2].label = "Alpha"
+        val collection = NeuronCollection(neurons)
+        network.addNetworkModelAsync(collection)
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
+
+        awaitUntil(message = "Duplicate labels were not disambiguated in positional order") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha[0]", "Beta", "Alpha[1]")
+        }
     }
 
     @Test

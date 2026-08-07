@@ -7,13 +7,11 @@ import org.simbrain.network.compositor.CompositorScene
 import org.simbrain.network.compositor.Lfm2StackCompositor
 import org.simbrain.network.llm.Lfm2Config
 import org.simbrain.network.llm.Lfm2Model
+import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmTokenizer
 import org.simbrain.network.llm.Safetensors
 import org.simbrain.network.tensor.Blas
 import java.awt.Dimension
-import java.nio.file.Path
-import kotlin.io.path.exists
-import kotlin.io.path.listDirectoryEntries
 
 /**
  * Renders the LFM2 structure view after a real 48-token greedy decode ("The capital of France
@@ -40,11 +38,8 @@ class Lfm2StackAttnSnapshot : UiSnapshotDef {
 }
 
 private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
-    val hub = Path.of(System.getProperty("user.home"), ".cache", "huggingface", "hub",
-        "models--LiquidAI--LFM2.5-230M", "snapshots")
-    val weightsDir = (if (hub.exists()) hub.listDirectoryEntries() else emptyList())
-        .firstOrNull { it.resolve("model.safetensors").exists() }
-        ?: error("LFM2.5-230M weights not found in the HF cache")
+    val weightsDir = Lfm2Weights.findWeightsDirectory()
+        ?: error("LFM2.5-230M weights not found in the Simbrain or HF cache")
 
     Blas.numThreads = 4
     val config = Lfm2Config(maxSeqLen = 512)

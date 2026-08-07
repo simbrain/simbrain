@@ -105,12 +105,16 @@ class Lfm2ToolLoopTest {
             "im_end with a pending tool call continues instead of sealing")
         assertTrue(languageModel.text.contains("<|tool_call_start|>[current_time()]"),
             "the call is visible in the text, got: ${languageModel.text}")
-        assertTrue(languageModel.text.contains("<|tool_response_start|>"),
-            "the local tool result is visible in the text, got: ${languageModel.text}")
-
-        val toolResult = languageModel.text
+        // The window keeps the response markers; the visible text renders the result without them.
+        val window = languageModel.contextWindow
+        assertTrue(window.contains("<|tool_response_start|>"),
+            "the local tool result reaches the window, got: $window")
+        val toolResult = window
             .substringAfter("<|tool_response_start|>")
             .substringBefore("<|tool_response_end|>")
+        assertTrue(languageModel.text.contains(toolResult),
+            "the tool result is visible in the text, got: ${languageModel.text}")
+
         val turnIds = tokenizer.encode(
             Lfm2ChatFormat.toolResultTurn(toolResult),
             addSpecials = false,

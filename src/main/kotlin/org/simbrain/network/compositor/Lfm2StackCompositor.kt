@@ -204,8 +204,16 @@ object Lfm2StackCompositor {
             strands = config.numHeads
         }
         scene.tile("block.attn.context").apply { columnTicks = headTicks; strands = config.numHeads }
-        scene.tile("block.attn.k").apply { columnTicks = kvHeadTicks; fullHeightColumnTicks = true }
-        scene.tile("block.attn.v").apply { columnTicks = kvHeadTicks; fullHeightColumnTicks = true }
+        scene.tile("block.attn.k").apply {
+            columnTicks = kvHeadTicks
+            fullHeightColumnTicks = true
+            strands = config.numKvHeads
+        }
+        scene.tile("block.attn.v").apply {
+            columnTicks = kvHeadTicks
+            fullHeightColumnTicks = true
+            strands = config.numKvHeads
+        }
         scene.tile("block.conv.bcx").apply {
             columnTicks = listOf(config.hiddenSize, 2 * config.hiddenSize)
             blockLabels = listOf("B", "C", "x")

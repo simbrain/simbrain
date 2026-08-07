@@ -412,9 +412,12 @@ class Lfm2StackCompositorTest {
         scene.onHeadSelected?.invoke(attention, 3)
         assertEquals(3 / qPerKv, kCache.selectedSlice)
         assertEquals(3 / qPerKv, vCache.selectedSlice)
-        assertEquals("1/2 \u2192 q 2\u20133", kCache.sliceLabel!!.invoke(kCache.selectedSlice))
-        assertTrue(scene.memoryEdges.any { (it.from as? TensorTile)?.id == "block.attn.k_cache" })
-        assertTrue(scene.memoryEdges.any { (it.from as? TensorTile)?.id == "block.conv.cache" },
+        assertEquals(
+            "Current key/value head: 1/2; serves query heads 2\u20133.",
+            kCache.sliceTooltip!!.invoke(kCache.selectedSlice)
+        )
+        assertTrue(scene.edges.any { (it.from as? TensorTile)?.id == "block.attn.k_cache" })
+        assertTrue(scene.edges.any { (it.from as? TensorTile)?.id == "block.conv.cache" },
             "the conv window read is cross-time flow too")
     }
 
@@ -607,7 +610,8 @@ class Lfm2StackCompositorTest {
 
         q.x = 5000.0; q.y = 5000.0
         gate.x = 6000.0; gate.y = 6000.0
-        assertEquals(q, scene.tileAt(5001.0, 5001.0))
+        scene.hideDimmed = false
+        assertEquals(q, scene.tileAt(5001.0, 5001.0), "ghosted tiles still hit-test")
 
         scene.hideDimmed = true
         assertNull(scene.tileAt(5001.0, 5001.0), "hidden tiles don't hit-test")

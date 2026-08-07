@@ -28,7 +28,7 @@ class GenerativeModelTest {
             // the description must still dispatch to each instance's own label
             val first = languageModel.getProducer("getHiddenState")
             val second = transformer.getProducer("getHiddenState")
-            assertTrue(first.simpleDescription.contains("layer 0 residual"),
+            assertTrue(first.simpleDescription.contains("layer ${languageModel.selectedLayer} residual"),
                 "got: ${first.simpleDescription}")
             assertTrue(second.simpleDescription.contains("final residual"),
                 "got: ${second.simpleDescription}")

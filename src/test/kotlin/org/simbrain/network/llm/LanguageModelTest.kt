@@ -89,11 +89,14 @@ class LanguageModelTest {
         val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
         net.update()
 
-        assertEquals(promptTokens, languageModel.loaded!!.model.position)
-        assertEquals("", languageModel.generatedToken, "prefill produces no generated token")
+        assertEquals(promptTokens, languageModel.loaded!!.model.position,
+            "one update consumes the whole prompt")
+        assertTrue(languageModel.generatedToken.isNotEmpty(),
+            "the last prompt token's own forward pass samples the first continuation")
 
         net.update()
-        assertEquals(promptTokens + 1, languageModel.loaded!!.model.position)
+        assertEquals(promptTokens + 1, languageModel.loaded!!.model.position,
+            "decoding then advances one token per update")
         assertTrue(languageModel.generatedToken.isNotEmpty(), "decoding remains one token per update")
     }
 

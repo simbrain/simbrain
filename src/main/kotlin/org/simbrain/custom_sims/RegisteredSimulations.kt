@@ -88,6 +88,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
         item("Serial order memory (toy)", beta = true) { serialOrderMemory }
         item("Temporal attention network", beta = true) { denisonNet }
+        item("Temporal attention network (paper model)", beta = true) { denisonNetPaper }
     }
 
     dir("Behaviorism") {

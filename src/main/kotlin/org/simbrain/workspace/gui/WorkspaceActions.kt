@@ -457,7 +457,9 @@ class WorkspaceActions {
 
     @JvmOverloads
     fun createCoupledPlotMenu(producer: Producer, objectName: String, menuTitle: String = "Couple plots"): JMenu {
-        val menu = JMenu(menuTitle)
+        val menu = JMenu(menuTitle).apply {
+            icon = Icons.small("menu_icons/TimeSeries.png")
+        }
         menu.add(createCoupledBarChartAction(producer, objectName))
         menu.add(createCoupledHeatMapAction(producer, objectName))
         menu.add(createCoupledPieChartAction(producer, objectName))

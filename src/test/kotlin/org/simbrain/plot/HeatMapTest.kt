@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.heatmap.HeatMapComponent
 import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.plot.heatmap.HeatMapPanel
@@ -13,6 +15,7 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
+import javax.swing.SwingUtilities
 
 class HeatMapTest {
 
@@ -25,6 +28,14 @@ class HeatMapTest {
         nc.network.addNetworkModelAsync(na)
         workspace.addWorkspaceComponent(nc)
         workspace.addWorkspaceComponent(hmc)
+    }
+
+    @Test
+    fun `defaults use an auto-ranged cool to hot scale centered at zero`() {
+        assertEquals(ChartColorMap.COOL_TO_HOT, hmc.model.colorMap)
+        assertTrue(hmc.model.isAutoRange)
+        assertEquals(-1.0, hmc.model.colorRange().start, 1e-12)
+        assertEquals(1.0, hmc.model.colorRange().endInclusive, 1e-12)
     }
 
     @Test
@@ -64,7 +75,7 @@ class HeatMapTest {
         workspace.simpleIterate()
 
         val range = hmc.model.colorRange()
-        assertEquals(-2.0, range.start, 1e-12)
+        assertEquals(-7.0, range.start, 1e-12)
         assertEquals(7.0, range.endInclusive, 1e-12)
     }
 
@@ -78,7 +89,7 @@ class HeatMapTest {
 
         workspace.simpleIterate()
 
-        assertEquals(0.0, hmc.model.colorRange().start, 1e-12)
+        assertEquals(-1.0, hmc.model.colorRange().start, 1e-12)
         assertEquals(1.0, hmc.model.colorRange().endInclusive, 1e-12)
     }
 
@@ -188,6 +199,23 @@ class HeatMapTest {
 
         assertEquals(1, workspace.couplingManager.couplings.size)
         assertEquals(listOf(1.0, 2.0, 3.0, 4.0), hmc.model.columns.last().toList())
+    }
+
+    @Test
+    fun `neuron collection row labels initialize and follow label changes`() {
+        val neurons = listOf(Neuron().apply { label = "Input" }, Neuron().apply { label = "Output" })
+        val collection = NeuronCollection(neurons)
+        nc.network.addNetworkModelsAsync(neurons)
+        nc.network.addNetworkModelAsync(collection)
+
+        with(workspace.couplingManager) { collection couple hmc.model }
+        SwingUtilities.invokeAndWait { }
+
+        assertEquals(listOf("Input", "Output"), hmc.model.rowLabels)
+        neurons[1].label = "Target"
+        workspace.simpleIterate()
+        SwingUtilities.invokeAndWait { }
+        assertEquals(listOf("Input", "Target"), hmc.model.rowLabels)
     }
 
     @Test

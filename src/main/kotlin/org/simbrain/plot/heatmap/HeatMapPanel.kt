@@ -13,6 +13,7 @@ import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.NumberAxis
+import org.jfree.chart.axis.SymbolAxis
 import org.jfree.chart.plot.XYPlot
 import org.jfree.chart.renderer.xy.XYBlockRenderer
 import org.jfree.chart.title.PaintScaleLegend
@@ -55,10 +56,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
             standardTickUnits = NumberAxis.createIntegerTickUnits()
         }
         // Row 1 reads at the top, the orientation used for stacked-trial and population plots.
-        val rangeAxis = NumberAxis("Row").apply {
-            standardTickUnits = NumberAxis.createIntegerTickUnits()
-            isInverted = true
-        }
+        val rangeAxis = createRowAxis()
         plot = XYPlot(heatMapModel.dataset(), domainAxis, rangeAxis, renderer)
         chart = JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, false)
         chartPanel.chart = chart
@@ -96,7 +94,9 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
         val earliest = heatMapModel.times.minOrNull()?.toDouble() ?: 0.0
         val latest = heatMapModel.times.maxOrNull()?.toDouble() ?: 1.0
         plot.domainAxis.setRange(earliest - columnWidth / 2, latest + columnWidth / 2)
-        plot.rangeAxis.setRange(-0.5, heatMapModel.rowCount.coerceAtLeast(1) - 0.5)
+        plot.rangeAxis = createRowAxis().apply {
+            setRange(-0.5, heatMapModel.rowCount.coerceAtLeast(1) - 0.5)
+        }
     }
 
     /**
@@ -113,6 +113,13 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
     private fun currentPaintScale(): ChartColorMapPaintScale {
         val range = heatMapModel.colorRange()
         return ChartColorMapPaintScale(range.start, range.endInclusive) { heatMapModel.colorMap }
+    }
+
+    private fun createRowAxis() = SymbolAxis(
+        "Row",
+        Array(heatMapModel.rowCount.coerceAtLeast(1)) { row -> heatMapModel.rowLabels.getOrNull(row) ?: row.toString() }
+    ).apply {
+        isInverted = true
     }
 
     private fun addClearButton() {

@@ -36,7 +36,7 @@ class HeatMapModel : AttributeContainer, EditableObject {
         private set
 
     var colorMap by GuiEditable(
-        initValue = ChartColorMap.JET,
+        initValue = ChartColorMap.COOL_TO_HOT,
         label = "Color map",
         description = "How values are mapped to colors",
         order = 10
@@ -45,12 +45,12 @@ class HeatMapModel : AttributeContainer, EditableObject {
     var isAutoRange by GuiEditable(
         initValue = true,
         label = "Auto range",
-        description = "If true, the color scale spans the values currently in the window, rather than a fixed range",
+        description = "If true, the color scale expands symmetrically around zero to span the values currently in the window",
         order = 20
     )
 
     var rangeLowerBound by GuiEditable(
-        initValue = 0.0,
+        initValue = -1.0,
         label = "Color range lower bound",
         description = "Value mapped to the low end of the color map when auto range is off",
         onUpdate = { enableWidget(!widgetValue(HeatMapModel::isAutoRange)) },
@@ -81,13 +81,17 @@ class HeatMapModel : AttributeContainer, EditableObject {
     )
 
     /**
-     * Number of rows, taken from the widest retained column so that a coupled array which changes
-     * size mid-run keeps its earlier, longer columns intact. Cells past a shorter column's end have
-     * no value and render as background rather than as a real reading.
+     * Number of rows, taken from the widest retained column or the available row labels so a coupled
+     * neuron collection is labelled before its first values arrive. Cells past a shorter column's end
+     * have no value and render as background rather than as a real reading.
      */
-    val rowCount get() = columns.maxOfOrNull { it.size } ?: 0
+    val rowCount get() = maxOf(columns.maxOfOrNull { it.size } ?: 0, rowLabels.size)
 
     val columnCount get() = columns.size
+
+    /** Labels displayed for the rows, ordinarily supplied by a coupled neuron collection. */
+    var rowLabels: List<String> = emptyList()
+        private set
 
     @Consumable(description = "Append a column of values")
     fun setValues(values: DoubleArray) {
@@ -107,33 +111,34 @@ class HeatMapModel : AttributeContainer, EditableObject {
         }
     }
 
-    /**
-     * The color scale's current bounds. In auto-range mode this is the span of the retained data,
-     * widened to a non-degenerate interval so a constant-valued matrix still renders.
-     */
-    fun colorRange(): ClosedFloatingPointRange<Double> {
-        if (!isAutoRange) return widen(rangeLowerBound, maxOf(rangeUpperBound, rangeLowerBound))
-        var low = Double.MAX_VALUE
-        var high = -Double.MAX_VALUE
-        columns.forEach { column ->
-            column.forEach { value ->
-                if (value.isFinite()) {
-                    if (value < low) low = value
-                    if (value > high) high = value
-                }
-            }
+    fun setRowLabels(labels: List<String>) {
+        onEventThread {
+            rowLabels = labels
+            events.propertyChanged.fire()
         }
-        return if (low > high) widen(0.0, 1.0) else widen(low, high)
     }
 
     /**
-     * Guarantees a positive-length interval, which the colorbar axis requires. The epsilon has to
-     * scale with the values themselves: a fixed one is smaller than an ulp once the magnitude passes
-     * a few thousand, and would leave the interval degenerate.
+     * The color scale's current bounds, always symmetric around zero so the midpoint color retains
+     * its meaning. Auto-range chooses the magnitude from retained data; the default fixed range
+     * keeps colors stable as incoming values change.
      */
-    private fun widen(low: Double, high: Double): ClosedFloatingPointRange<Double> {
-        val epsilon = maxOf(1e-12, abs(low) * 1e-9)
-        return if (high - low < epsilon) low..(low + epsilon) else low..high
+    fun colorRange(): ClosedFloatingPointRange<Double> {
+        if (!isAutoRange) return symmetricRange(maxOf(abs(rangeLowerBound), abs(rangeUpperBound)))
+        var magnitude = 0.0
+        columns.forEach { column ->
+            column.forEach { value ->
+                if (value.isFinite()) {
+                    magnitude = maxOf(magnitude, abs(value))
+                }
+            }
+        }
+        return symmetricRange(magnitude)
+    }
+
+    private fun symmetricRange(magnitude: Double): ClosedFloatingPointRange<Double> {
+        val safeMagnitude = if (magnitude > 0.0) magnitude else 1.0
+        return -safeMagnitude..safeMagnitude
     }
 
     fun dataset(): XYZDataset = HeatMapDataset(this)

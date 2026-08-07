@@ -7,7 +7,9 @@ import com.thoughtworks.xstream.XStream
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.workspace.AttributeContainer
+import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.couplings.Coupling
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -15,6 +17,15 @@ class HeatMapComponent @JvmOverloads constructor(
     name: String,
     val model: HeatMapModel = HeatMapModel()
 ) : WorkspaceComponent(name) {
+
+    override var workspace: Workspace
+        get() = super.workspace
+        set(value) {
+            super.workspace = value
+            value.couplingManager.events.couplingAdded.on { coupling ->
+                updateRowLabels(coupling)
+            }
+        }
 
     init {
         model.timeSupplier = { workspace.time }
@@ -28,7 +39,20 @@ class HeatMapComponent @JvmOverloads constructor(
 
     override fun hasChangedSinceLastSave() = false
 
+    override suspend fun update() {
+        couplingManager.couplings.forEach(::updateRowLabels)
+    }
+
     override val xml: String get() = heatMapXStream.toXML(model)
+
+    private fun updateRowLabels(coupling: Coupling) {
+        if (coupling.consumer.baseObject === model) {
+            val labels = coupling.producer.labelArray.map { it ?: "" }
+            if (labels.isNotEmpty() && labels != model.rowLabels) {
+                model.setRowLabels(labels)
+            }
+        }
+    }
 
     companion object {
 

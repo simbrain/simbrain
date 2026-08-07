@@ -80,13 +80,6 @@ class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : Edi
         order = 36,
     )
 
-    var samplingStrategy: SamplingStrategy by GuiEditable(
-        initValue = SamplingStrategy.TopP(),
-        description = "How to sample from the next-token distribution to produce new tokens",
-        showDetails = false,
-        order = 50,
-    )
-
     var tokenizer by GuiEditable(
         initValue = SimpleTokenizer(usePunctuation = true) as Tokenizer<*>,
         description = "Options for tokenizing the text",
@@ -122,6 +115,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     var workspaceIterations = 0
     var enableConsoleOutput = false
     var learningRate = 0.001
+    var samplingStrategy: SamplingStrategy = SamplingStrategy.TopP()
 
     val options = if (optionString?.isNotEmpty() == true) {
         // Parse parameters from gradle
@@ -130,6 +124,18 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         workspaceIterations = jsonOptions.optInt("workspaceIterations", 0)
         enableConsoleOutput = jsonOptions.optBoolean("enableConsoleOutput", false)
         learningRate = jsonOptions.optDouble("learningRate", 0.001)
+
+        val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topp")
+        samplingStrategy = when (samplingStrategyStr.lowercase()) {
+            "greedy" -> SamplingStrategy.Greedy
+            "topk" -> SamplingStrategy.TopK(
+                k = jsonOptions.optInt("topK", 5),
+            )
+            "topp" -> SamplingStrategy.TopP(
+                p = jsonOptions.optDouble("topP", 0.9),
+            )
+            else -> SamplingStrategy.TopK(k = 5)
+        }
 
         TinyLanguageModelOptions().apply {
             contextSize = jsonOptions.optInt("contextSize", contextSize)
@@ -146,19 +152,6 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             trainTestSplit = jsonOptions.optDouble("trainTestSplit", trainTestSplit)
             if (jsonOptions.has("usePunctuation")) {
                 tokenizer = SimpleTokenizer(usePunctuation = jsonOptions.getBoolean("usePunctuation")) as Tokenizer<*>
-            }
-
-            // Parse sampling strategy
-            val samplingStrategyStr = jsonOptions.optString("samplingStrategy", "topp")
-            samplingStrategy = when (samplingStrategyStr.lowercase()) {
-                "greedy" -> SamplingStrategy.Greedy
-                "topk" -> SamplingStrategy.TopK(
-                    k = jsonOptions.optInt("topK", 5),
-                )
-                "topp" -> SamplingStrategy.TopP(
-                    p = jsonOptions.optDouble("topP", 0.9),
-                )
-                else -> SamplingStrategy.TopK(k = 5)
             }
         }
     } else {
@@ -241,7 +234,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     }
 
     transformer.tokenizer = tokenizer
-    transformer.samplingStrategy = options.samplingStrategy
+    transformer.samplingStrategy = samplingStrategy
 
     with(network) {
         addNetworkModels(transformer)

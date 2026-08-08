@@ -13,9 +13,11 @@ import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapseAsync
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.getDesktopComponentAs
 import org.simbrain.util.place
@@ -123,6 +125,8 @@ val nematodeThermotaxis = newSim { optionString ->
     var turnRandom = Random(Random.nextInt())
     val activeTurnLabel = AtomicReference<String?>(null)
     val circuitNeurons = listOf(afd, aib, aiy, aiz, dmn, vmn, cpg)
+    val circuitNeuronCollection = NeuronCollection(circuitNeurons).apply { label = "Circuit neurons" }
+    network.addNetworkModelAsync(circuitNeuronCollection)
 
     fun connectionWeight(synapse: org.simbrain.network.core.Synapse) =
         if (synapse in network.flatSynapseList) synapse.strength else 0.0
@@ -278,6 +282,7 @@ val nematodeThermotaxis = newSim { optionString ->
 
         var ensembleFrame: GenericJInternalFrame? = null
         var ensembleFrameX = 100
+        var heatMapX = 0
 
         fun showEnsembleTrajectories(result: ThermotaxisEnsembleResult) {
             ensembleFrame?.dispose()
@@ -311,6 +316,19 @@ val nematodeThermotaxis = newSim { optionString ->
             addCheckBox("Use empirical turns", true) { enabled ->
                 useEmpiricalTurns = enabled
                 if (!enabled) remainingTurnSteps = 0
+            }
+            addButton("Add activation heat map") {
+                val heatMapButton = this
+                val heatMap = addHeatMap("Circuit activation heat map")
+                heatMap.model.fixedWidth = false
+                with(couplingManager) {
+                    circuitNeuronCollection.getProducer(circuitNeuronCollection::activationArray) couple
+                        heatMap.model.getConsumer(HeatMapModel::setValues)
+                }
+                withContext(Dispatchers.Swing) {
+                    place(heatMap, heatMapX, networkHeight + 2 * SIM_WINDOW_GAP, 700, 300)
+                    heatMapButton.isEnabled = false
+                }
             }
             addButton("Run population simulation") {
                 val validationButton = this
@@ -381,6 +399,7 @@ val nematodeThermotaxis = newSim { optionString ->
         val networkX = controlPanel.rightEdgeWithGap()
         val worldX = networkX + networkWidth + SIM_WINDOW_GAP
         ensembleFrameX = worldX - 30
+        heatMapX = networkX
         place(networkComponent, networkX, 10, networkWidth, networkHeight)
         place(worldComponent, worldX, 10, 621, networkHeight)
         odorWorldDesktopComponent.apply {
@@ -397,27 +416,32 @@ val nematodeThermotaxis = newSim { optionString ->
         """
         # Thermotaxis in Nematodes
 
-        This simulation illustrates thermotaxis—movement guided by temperature—in *Caenorhabditis elegans*. Here, “worm,” “nematode,” and *C. elegans* all refer to this small roundworm. Across a population and enough simulated time, worms should tend to migrate toward the warmer side of the 14°C–20°C plate. Their paths and turns are stochastic, however, so this tendency is not immediate and will not be obvious in every individual run. However using the population simulation it is easier to confirm this behavior, though migration is still statistical and may not always be observed.
+       This simulation models directed migration, movement guided toward warmer or colder regions of a temperature gradient, in *Caenorhabditis elegans*. This differs from isothermal migration, in which worms seek and remain near a preferred temperature. (Here, “worm,” “nematode,” and *C. elegans* all refer to the same small roundworm.) The model is both behaviorally and neurally realistic: it shows what real nematodes do and the neural activations are similar to those observed in real nematodes.
+       
+       Although these nematodes have 302 neurons, the process described in the [PNAS study](https://www.pnas.org/doi/abs/10.1073/pnas.1918528117) identified these eight as essential to directed migration. Across a population and enough simulated time, worms  tend to migrate toward the warmer side of the 14°C–20°C plate. Their paths and turns are stochastic, however, so this tendency is not immediate and will not be obvious in every individual run. 
+
+        Tip: For better performance, minimize the network window while the simulation is running.
 
         # What to Do
 
         1. Click `Run` and watch the worm move. With `Use empirical turns` enabled, it changes direction stochastically as well as steering continuously; an individual trail may wander even though a population should tend toward warmth over time.
         2. Click `Run population simulation` to view many trajectories together. The defaults are 12 worms for 1500 seconds; use more worms or longer runs for a clearer aggregate tendency. Reverse the gradient before starting a population simulation to see the warm-directed tendency reverse sides.
         3. Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is tight, circling movement when the worm heads toward the cold and much straighter movement when it heads toward the warm, rather than reliable migration in one short run.
-        4. Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment. You can also clamp or edit circuit neurons and synapses to explore their effects.
+        4. Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment.
+        5. Click `Add activation heat map` to graph the seven circuit neurons over time.
 
         # Details of This Simulation
 
         ## Evolutionary Search
 
-        The original study used an evolutionary algorithm to search for circuit parameters that reproduced observed thermotaxis and steering behavior. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation uses set #67 from the paper's S1 Table, the same set the paper plots in Figure 7.
+        The original study used an evolutionary algorithm to search for circuit parameters that reproduced the behavior of real nematodes during directed migration and steering. Each search evolved a population of 96 parameter sets for 300 generations and retained its best-performing individual. This simulation uses set #67 from the paper's S1 Table, the same set the paper plots in Figure 7.
 
         ## Circuit Guide
 
         - **AFD (Temperature)** is the thermosensory neuron. It responds to *change* in temperature rather than its absolute value: its measured response function is convolved over the previous 100 seconds and is biphasic, so a steady temperature leaves AFD near rest while warming drives it positive and cooling drives it negative.
         - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit. The AFD–AIY link is chemical, and all three track AFD closely: the paper reports correlations of 0.99, 0.98, and 0.99 between AFD and each of them.
         - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the motor neurons, producing small dorsal–ventral wiggles that sample the temperature gradient.
-        - **DMN (Output)** and **VMN (Output)** are dorsal and ventral neck motor neurons. Their activity difference determines instantaneous path curvature.
+        - **DMN (Output)** and **VMN (Output)** are abbreviations for larger, highly correlated dorsal and ventral neck motor-neuron groups, as discussed in the PNAS study. Their activity difference determines instantaneous path curvature.
 
         The AFD–AIB electrical gap junction is implemented as reciprocal synapses so it can be shown and edited in Simbrain. Its current is `conductance × (AFD activity − AIB state)`.
 
@@ -427,9 +451,17 @@ val nematodeThermotaxis = newSim { optionString ->
 
         In addition to ordinary circuit-generated steering, the simulation can use measured abrupt turn events: **omega turns** are tight, loop-like reorientations; **reversals** move the worm backward; **reversal turns** combine a reversal with reorientation; and **shallow turns** are gentler heading changes. Their frequency, exit direction, duration, and displacement are fixed behavioral measurements from the paper, not evolved circuit behaviors.
 
+
+        ## Implementation Note
+
+        This is a custom implementation of the fitted circuit that largely bypasses Simbrain's ordinary neuron-update machinery. Consequently, most parameters shown when you double-click a node do not affect the model or are not meaningful to edit. Clamping and connection strengths are deliberate exceptions used to support limited exploration. A future simulation will implement the circuit entirely with native Simbrain components.
+
         # References
 
         Ikeda, M., Matsumoto, H., & Izquierdo, E. J. (2021). [Persistent thermal input controls steering behavior in Caenorhabditis elegans](https://doi.org/10.1371/journal.pcbi.1007916). _PLoS Computational Biology, 17_(1), e1007916.
+
+        Ikeda, M., Nakano, S., Giles, A. C., Xu, L., Costa, W. S., Gottschalk, A., & Mori, I. (2020). [Context-dependent operation of neural circuits underlies a navigation behavior in *Caenorhabditis elegans*](https://www.pnas.org/doi/abs/10.1073/pnas.1918528117). _Proceedings of the National Academy of Sciences, 117_(11), 6178–6188.
+
         """.trimIndent()
     )
 }

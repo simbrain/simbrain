@@ -115,7 +115,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Neuroscience") {
-        item("C. elegans thermotaxis", beta = true) { nematodeThermotaxis }
         item("Spiking neuron") { spikingNeuron }
         item("Spiking neurons two inputs") { spikingNeuronTwoInputs }
         item("Spike responders") { spikeResponderSim }
@@ -123,6 +122,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("STDP") { stdpSim }
         item("Spiking Network") { spikingNetworkSimulation }
         item("E/I Balance") { excitatoryInhibitoryBalance }
+        item("Nematode simulation") { nematodeThermotaxis }
         item("Cortical layers", beta = true) { corticalLayers }
          //item("Cortical areas") { cortexKuramoto }
     }

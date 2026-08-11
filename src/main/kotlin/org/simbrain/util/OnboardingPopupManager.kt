@@ -130,7 +130,7 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
     /**
      * Dismiss all active popups
      */
-    fun dismissAll() {
+    suspend fun dismissAll() = withContext(Dispatchers.Swing) {
         activePopups.clear()
         glassPane.isVisible = false
         glassPane.repaint()

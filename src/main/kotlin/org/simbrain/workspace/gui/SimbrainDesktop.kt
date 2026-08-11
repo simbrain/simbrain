@@ -3,20 +3,19 @@ package org.simbrain.workspace.gui
 import bsh.Interpreter
 import bsh.util.JConsole
 import com.formdev.flatlaf.FlatLaf
-import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
-import org.jfree.chart.ChartPanel
-import org.simbrain.plot.applySimbrainChartTheme
-import org.simbrain.util.widgets.applyLafSyntaxTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
+import org.jfree.chart.ChartPanel
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
@@ -24,9 +23,11 @@ import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
+import org.simbrain.util.widgets.applyLafSyntaxTheme
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
+import org.simbrain.workspace.gui.SimbrainDesktop.applyThemeIfChanged
 import org.simbrain.workspace.updater.PerformanceMonitor
 import java.awt.*
 import java.awt.event.*
@@ -1010,7 +1011,7 @@ object SimbrainDesktop {
     /**
      * Clear desktop of all components. Show a save-as dialog if there have been changes.
      */
-    fun clearDesktop() {
+    suspend fun clearDesktop() {
 
         workspace.stop()
 
@@ -1034,7 +1035,8 @@ object SimbrainDesktop {
     /**
      * Helper method to clear all components from the desktop.
      */
-    private fun clearComponents() {
+    private suspend fun clearComponents() {
+        onboardingManager.dismissAll()
         workspaceComponentDesktopComponentMap.clear()
         workspace.clearWorkspace()
     }

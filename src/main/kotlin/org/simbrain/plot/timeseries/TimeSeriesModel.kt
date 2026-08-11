@@ -294,7 +294,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      *
      * @param ts the time series to remove.
      */
-    private fun removeTimeSeries(ts: TimeSeries) {
+    fun removeTimeSeries(ts: TimeSeries) {
         runOnEventThread {
             dataset.removeSeries(ts.series)
             timeSeriesList.remove(ts)

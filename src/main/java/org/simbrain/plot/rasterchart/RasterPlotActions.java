@@ -80,29 +80,4 @@ public class RasterPlotActions {
         };
     }
 
-    /**
-     * Add a data source.
-     *
-     * @param rasterPanel reference to time series plot panel
-     * @return the action
-     */
-    public static Action getRemoveSourceAction(final RasterPlotPanel rasterPanel) {
-        return new AbstractAction() {
-
-            // Initialize
-            {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getSmallIcon("Eraser.png"));
-                putValue(NAME, "Remove");
-                putValue(SHORT_DESCRIPTION, "Remove a data source");
-            }
-
-            public void actionPerformed(ActionEvent arg0) {
-                rasterPanel.getRasterModel().removeDataSource();
-            }
-
-        };
-    }
-
-
 }

@@ -289,6 +289,7 @@ class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
         graphPanel.removeAllButtonsFromToolBar()
+        graphPanel.seriesRemovalEnabled = false
 
         add(graphPanel, "growx, growy, push") // Make graph fill the panel
 

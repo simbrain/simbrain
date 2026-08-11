@@ -113,16 +113,21 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     }
 
     /**
-     * Removes a data source from the chart.
+     * Removes the last data source from the chart.
      */
     fun removeDataSource() {
-        val lastSeriesIndex = dataset.seriesCount - 1
-        if (lastSeriesIndex >= 0) {
-            dataset.removeSeries(lastSeriesIndex)
-            val rc = rasterConsumerList[lastSeriesIndex]
-            events.rasterConsumerRemoved.fire(rc)
-            rasterConsumerList.remove(rc)
-        }
+        rasterConsumerList.lastOrNull()?.let { removeDataSource(it) }
+    }
+
+    /**
+     * Removes a specific data source from the chart. Consumers after it shift down one series in the
+     * dataset, so their indices are decremented to keep each one pointing at the same [XYSeries].
+     */
+    fun removeDataSource(consumer: RasterConsumer) {
+        if (!rasterConsumerList.remove(consumer)) return
+        dataset.removeSeries(consumer.index)
+        rasterConsumerList.forEach { if (it.index > consumer.index) it.index-- }
+        events.rasterConsumerRemoved.fire(consumer)
     }
 
     val numDataSources get() = dataset.seriesCount

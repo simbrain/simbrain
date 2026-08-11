@@ -1,3 +1,8 @@
+/**
+ * Swing panel for a [TimeSeriesModel]: the JFreeChart line chart plus a custom legend strip and
+ * toolbar. The legend is Swing rather than JFreeChart's in-chart title so each series can carry a
+ * hoverable remove control; series are deleted from there, not from a toolbar button.
+ */
 package org.simbrain.plot.timeseries
 
 import net.miginfocom.swing.MigLayout
@@ -7,6 +12,8 @@ import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.ValueMarker
+import org.jfree.chart.renderer.AbstractRenderer
+import org.simbrain.plot.ChartLegendPanel
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
@@ -25,9 +32,25 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
     val buttonPanel: JPanel = JPanel()
 
-    private var deleteButton: JButton? = null
-
     private var addButton: JButton? = null
+
+    /**
+     * Swing replacement for JFreeChart's in-chart legend, so each entry can host a remove control.
+     */
+    private val legendPanel = ChartLegendPanel()
+
+    /** The series keys the legend was last built from, to detect renames cheaply on redraw. */
+    private var builtLegendKeys: List<String> = emptyList()
+
+    /**
+     * Whether the legend shows a remove control per series. Trainer panels turn this off because
+     * their series are owned by the trainer, not the user.
+     */
+    var seriesRemovalEnabled = true
+        set(value) {
+            field = value
+            rebuildLegend()
+        }
 
     /**
      * Range markers tracked so their values participate in [updateChartSettings] auto-range
@@ -42,26 +65,26 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
         addClearGraphDataButton()
         addPreferencesButton()
-        addAddDeleteButtons()
+        addAddSeriesButton()
 
         add(chartPanel, "wrap")
+        add(legendPanel, "growx, wrap")
         add(buttonPanel)
 
         timeSeriesModel.events.propertyChanged.on { this.updateChartSettings() }
+        timeSeriesModel.events.timeSeriesAdded.on { rebuildLegend() }
+        timeSeriesModel.events.timeSeriesRemoved.on { rebuildLegend() }
 
         val title = ""
         val xLabel = "Time"
         val yLabel = "Value"
-        val showLegend = true
-        val useTooltips = true
-        val generateUrls = false
         chart = ChartFactory.createXYLineChart(
             title,
             xLabel,
             yLabel,
             timeSeriesModel.dataset,
             PlotOrientation.VERTICAL,
-            true,
+            false,
             true,
             false
         )
@@ -69,10 +92,33 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         chart.applySimbrainChartTheme()
 
         updateChartSettings()
+        rebuildLegend()
 
         chart.addProgressListener {
             updateChartSettings()
+            // Renames happen in place without an add/remove event; catch them as the chart redraws
+            if (builtLegendKeys != currentLegendKeys()) rebuildLegend()
         }
+    }
+
+    private fun currentLegendKeys() = timeSeriesModel.timeSeriesList.map { it.series.key.toString() }
+
+    private fun rebuildLegend() {
+        builtLegendKeys = currentLegendKeys()
+        // Pin palette assignment to series order: lookupSeriesPaint hands out the next palette color
+        // to whoever asks first, and swatches otherwise ask in reverse z-order during painting.
+        (chart.xyPlot.renderer as? AbstractRenderer)?.let { renderer ->
+            timeSeriesModel.timeSeriesList.indices.forEach { renderer.lookupSeriesPaint(it) }
+        }
+        legendPanel.setEntries(timeSeriesModel.timeSeriesList.mapIndexed { index, ts ->
+            ChartLegendPanel.Entry(
+                label = ts.series.key.toString(),
+                paint = { (chart.xyPlot.renderer as? AbstractRenderer)?.lookupSeriesPaint(index) },
+                onRemove = if (seriesRemovalEnabled) {
+                    { timeSeriesModel.removeTimeSeries(ts) }
+                } else null
+            )
+        })
     }
 
     fun updateChartSettings() {
@@ -175,12 +221,9 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         buttonPanel.removeAll()
     }
 
-    fun addAddDeleteButtons() {
-        deleteButton = JButton("Delete")
-        deleteButton!!.action = TimeSeriesPlotActions.getRemoveSourceAction(this)
+    fun addAddSeriesButton() {
         addButton = JButton("Add")
         addButton!!.action = TimeSeriesPlotActions.getAddSourceAction(this)
-        buttonPanel.add(deleteButton)
         buttonPanel.add(addButton)
     }
 

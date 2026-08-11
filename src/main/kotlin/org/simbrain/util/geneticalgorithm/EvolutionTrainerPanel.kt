@@ -164,6 +164,7 @@ class FitnessTimeSeries(runner: EvolutionRunner, evaluatorParams: EvaluatorParam
         graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Generation"
         graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = evaluatorParams.stoppingCondition.name
         graphPanel.removeAllButtonsFromToolBar()
+        graphPanel.seriesRemovalEnabled = false
         add(graphPanel, "grow, push")
 
         model.addTimeSeries("${evaluatorParams.evaluationPercentile}th pct")

@@ -359,6 +359,7 @@ class CnnErrorTimeSeries(trainer: CnnTrainer) : JPanel() {
         graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
 
         graphPanel.removeAllButtonsFromToolBar()
+        graphPanel.seriesRemovalEnabled = false
 
         add(graphPanel, "growx, growy, push")
 

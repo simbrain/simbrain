@@ -5,6 +5,7 @@ import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.compositor.TeachingCompositor
 import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkDebugInfoProvider
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.FloatTensor
@@ -314,7 +315,7 @@ class TeachingTransformerEvents : LocationEvents() {
  * word-level vocabulary: text maps through [tokenizer] and [tokenLabels], and words outside
  * the vocabulary are dropped.
  */
-class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() {
+class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(), NetworkDebugInfoProvider {
 
     override val displayTokenizer: Tokenizer<*>
         get() = tokenizer
@@ -488,6 +489,22 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel() 
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
         junctionLayout = scene.opVertices.associateTo(HashMap()) { it.op.name to doubleArrayOf(it.x, it.y) }
         decks().firstOrNull()?.let { selectedHead = it.selectedSlice }
+    }
+
+    override fun appendNetworkDebugInfo(builder: StringBuilder, indent: String) {
+        builder.appendLine("${indent}Transformer: context=${config.contextSize}, embedding=${config.embedDim}, " +
+            "heads=${config.numHeads}, layers=${config.numLayers}, hidden=${config.hiddenDim}, vocabulary=${config.vocabSize}")
+        builder.appendLine("${indent}Interior tiles (${scene.tiles.size}):")
+        scene.tiles.forEach { tile ->
+            builder.appendLine("${indent}  [${tile::class.simpleName}] ${tile.id} (${tile.title})  " +
+                "rect: (${tile.x.roundToString(1)}, ${tile.y.roundToString(1)}) " +
+                "${tile.width.roundToString(1)} x ${tile.height.roundToString(1)}")
+        }
+        builder.appendLine("${indent}Interior operations (${scene.opVertices.size}):")
+        scene.opVertices.forEach { vertex ->
+            builder.appendLine("${indent}  [${vertex.op::class.simpleName}] ${vertex.op.name}  " +
+                "loc: (${vertex.x.roundToString(1)}, ${vertex.y.roundToString(1)})")
+        }
     }
 
     /**

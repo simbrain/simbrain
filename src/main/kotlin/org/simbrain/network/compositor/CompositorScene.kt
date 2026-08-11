@@ -174,6 +174,20 @@ class CompositorScene(val graph: PlanGraph? = null) {
     var opVertices: List<OpVertex> = emptyList()
         private set
 
+    /** Mirrors the complete data-flow layout vertically while preserving all horizontal placement. */
+    fun flipVertically() {
+        val satelliteTiles = satellites.mapTo(HashSet()) { it.tile }
+        val anchors = tiles.filter { it !in satelliteTiles }
+        val endpoints = anchors + opVertices
+        if (endpoints.isEmpty()) return
+        val top = endpoints.minOf { it.routeRect.minY }
+        val bottom = endpoints.maxOf { it.routeRect.maxY }
+        anchors.forEach { tile -> tile.y = top + bottom - tile.y - tile.height }
+        opVertices.forEach { vertex -> vertex.y = top + bottom - vertex.y }
+        returnLanesAbove = !returnLanesAbove
+        deriveReturnWaypoints()
+    }
+
     var lens: LogitLens? = null
 
     /** Invoked when the user wheel-flips a deck or attention tile, e.g. to couple GQA decks. */
@@ -205,6 +219,9 @@ class CompositorScene(val graph: PlanGraph? = null) {
     /** Lane-routing intents for limb return edges, recorded by the layout pass. */
     var returnLanes: Map<FlowEdge, ReturnLaneRoute> = emptyMap()
 
+    /** Whether return lanes run above their limb strips, matching an upward-flowing scene. */
+    private var returnLanesAbove = false
+
     /**
      * Declarative grid templates for limb interiors, set by the scene's compositor. The layout
      * pass lays a limb out from the first template whose keys exactly cover its endpoints;
@@ -213,21 +230,25 @@ class CompositorScene(val graph: PlanGraph? = null) {
     var limbTemplates: List<LimbTemplate> = emptyList()
 
     /**
-     * Re-derives return-edge waypoints from the current rects: each lane runs below everything
+     * Re-derives return-edge waypoints from the current rects: each lane runs beside everything
      * hanging in its gap, drops right of its source (or the whole group, for upper strips), and
      * re-enters toward its spine target. Runs on every relayout, so dragging a tile — or
      * applying a saved layout — pulls the lanes along with it.
      */
     fun deriveReturnWaypoints() {
         for ((edge, route) in returnLanes) {
-            val laneY = route.clearItems.maxOf { it.routeRect.maxY } + LANE_GAP * (route.lane + 1)
-            var dropX = edge.from.routeRect.maxX + 40.0
+            val laneY = if (returnLanesAbove) {
+                route.clearItems.minOf { it.routeRect.minY } - LANE_GAP * (route.lane + 1)
+            } else {
+                route.clearItems.maxOf { it.routeRect.maxY } + LANE_GAP * (route.lane + 1)
+            }
+            var dropX = edge.from.routeRect.maxX + 24.0
             if (route.clearsGroupRight) {
-                dropX = maxOf(dropX, route.clearItems.maxOf { it.routeRect.maxX } + 40.0)
+                dropX = maxOf(dropX, route.clearItems.maxOf { it.routeRect.maxX } + 24.0)
             }
             edge.waypoints = listOf(
                 Point2D.Double(dropX, laneY),
-                Point2D.Double(edge.to.routeRect.maxX + 60.0, laneY),
+                Point2D.Double(edge.to.routeRect.maxX + 36.0, laneY),
             )
         }
     }

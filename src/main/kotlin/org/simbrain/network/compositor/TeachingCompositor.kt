@@ -10,7 +10,7 @@ import org.simbrain.network.llm.TeachingTransformerModel
  * multi-head attention deck, and a logit lens docked beside every checkpoint. Edges, their op
  * glyphs, and all tile positions are derived from the plan graph — never hand-wired.
  *
- * Data flows top-down: embeddings at the top, logits and the prediction at the bottom.
+ * Data flows bottom-up: embeddings at the bottom, logits and the prediction at the top.
  */
 object TeachingCompositor {
 
@@ -114,7 +114,11 @@ object TeachingCompositor {
         })
 
         scene.connectFromGraph()
-        CompositorLayout(scale).apply(scene)
+        CompositorLayout(
+            scale,
+            verticalFlow = VerticalFlow.BOTTOM_TO_TOP,
+            density = LayoutDensity.COMPACT,
+        ).apply(scene)
 
         for (tile in scene.tiles) {
             (tile as? MatrixTile)?.gradientSource = model.grads.of(tile.tensor)

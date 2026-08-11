@@ -232,7 +232,7 @@ object Lfm2StackCompositor {
             """,
             rowGaps = listOf(12.0, 12.0, null),
         ))
-        CompositorLayout().apply(scene)
+        CompositorLayout(verticalFlow = VerticalFlow.BOTTOM_TO_TOP).apply(scene)
 
         // The GQA story: wheel-flipping the attention deck flips the cache decks to the serving
         // KV group.
@@ -271,13 +271,13 @@ object Lfm2StackCompositor {
         // rows select the layer whose block the diagram shows.
         val residPorts = listOf(plan.port("embed")) + allLayers.map { plan.port("layers.$it.resid") }
         val blockLeft = scene.tiles.minOf { it.x }
-        val blockTop = scene.tiles.minOf { it.y }
+        val blockBottom = scene.tiles.maxOf { it.y + it.height }
         val stripTiles = residPorts.mapIndexed { i, port ->
             val label = if (i == 0) "embed" else
                 "layer ${i - 1} (${if (i - 1 in config.attentionLayers) "attn" else "conv"})"
             VectorHistoryTile(port, window, label).apply {
                 x = blockLeft - STRIP_CLEARANCE - STRIP_WIDTH
-                y = blockTop + i * (STRIP_ROW_HEIGHT + STRIP_ROW_GAP)
+                y = blockBottom - STRIP_ROW_HEIGHT - i * (STRIP_ROW_HEIGHT + STRIP_ROW_GAP)
                 width = STRIP_WIDTH
                 height = STRIP_ROW_HEIGHT
                 // The strip is the replay source, so it keeps recording in every view mode.
@@ -480,5 +480,5 @@ object Lfm2StackCompositor {
     private const val STRIP_WIDTH = 170.0
     private const val STRIP_ROW_HEIGHT = 26.0
     private const val STRIP_ROW_GAP = 20.0
-    private const val STRIP_CLEARANCE = 320.0
+    private const val STRIP_CLEARANCE = 100.0
 }

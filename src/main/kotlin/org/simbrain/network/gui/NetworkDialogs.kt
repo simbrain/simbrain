@@ -628,6 +628,9 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
             }
         }
         sb.appendLine(line)
+        if (model is NetworkDebugInfoProvider) {
+            model.appendNetworkDebugInfo(sb, "$indent  ")
+        }
     }
 
     sb.appendLine("=== Network Debug Info ===")

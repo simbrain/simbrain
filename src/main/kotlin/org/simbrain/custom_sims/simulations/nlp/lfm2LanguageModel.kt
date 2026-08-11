@@ -172,7 +172,7 @@ val lfm2LanguageModel = newSim {
 
         # Reading the Diagram
 
-        Data flows top to bottom through the residual stream — the column of wide tiles. LFM2 is a hybrid: most blocks are short-convolution blocks, with a few attention blocks in between. Use the depth strip to select which layer's interior is shown, scroll over the attention deck to flip through heads, and watch the logit-lens readouts sharpen as you read down the stream.
+        Data flows bottom to top through the residual stream — the column of wide tiles. LFM2 is a hybrid: most blocks are short-convolution blocks, with a few attention blocks in between. Use the depth strip to select which layer's interior is shown, scroll over the attention deck to flip through heads, and watch the logit-lens readouts sharpen as you read up the stream.
 
         Hover over any cell to read its value; double-click a tile to trace its data-flow paths. The limb the selected layer doesn't use stays faintly visible for orientation; right-click the model and set `Inactive limb` to `Hide` to clear it away entirely.
 

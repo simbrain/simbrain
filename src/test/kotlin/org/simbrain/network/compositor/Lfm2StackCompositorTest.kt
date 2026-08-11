@@ -1,18 +1,13 @@
 package org.simbrain.network.compositor
 
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.llm.Lfm2Config
 import org.simbrain.network.llm.Lfm2Model
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.op.TensorPort
 import java.awt.Color
-import java.util.Random
+import java.util.*
 
 class Lfm2StackCompositorTest {
 
@@ -429,7 +424,7 @@ class Lfm2StackCompositorTest {
         val v = scene.tile("block.attn.v")
         assertEquals(q.x, k.x, 1e-9, "q, k, and v share the vector column's left edge")
         assertEquals(k.x, v.x, 1e-9)
-        assertTrue(q.y + q.height < k.y && k.y + k.height < v.y, "lanes stack q, k, v top down")
+        assertTrue(q.y > k.y + k.height && k.y > v.y + v.height, "lanes stack q, k, v bottom up")
 
         val kCache = scene.tile("block.attn.k_cache")
         val vCache = scene.tile("block.attn.v_cache")
@@ -452,7 +447,7 @@ class Lfm2StackCompositorTest {
         val kRope = scene.opVertices.first { scene.graph!!.alias(it.op.name) == "block.attn.k_norm_rope" }
         val cos = scene.tile("rope.cos")
         val sin = scene.tile("rope.sin")
-        assertTrue(qRope.y < cos.y && cos.y + cos.height / 2 < kRope.y)
+        assertTrue(qRope.y > cos.y && cos.y + cos.height / 2 > kRope.y)
         assertTrue(cos.x + cos.width < sin.x, "cos and sin sit side by side in one cell")
         assertEquals(cos.y, sin.y, 1e-9)
     }

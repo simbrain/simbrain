@@ -2,6 +2,7 @@ package org.simbrain.network.llm
 
 import org.simbrain.network.compositor.*
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkDebugInfoProvider
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.Blas
@@ -12,6 +13,7 @@ import org.simbrain.util.Tokenizer
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.roundToString
 import org.simbrain.workspace.Consumable
 import java.nio.file.Path
 import kotlin.math.exp
@@ -44,7 +46,7 @@ enum class PromptMode(private val label: String) {
  * needing the tokenizer or unembedding stays on this side of the coupling. All attributes are
  * safe to call while weights are unloaded (empty results, no-op consumption).
  */
-class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
+class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), NetworkDebugInfoProvider {
 
     /** The model's real tokenization, for consumers drawing token boundaries; path-derived. */
     override val displayTokenizer: Tokenizer<*>
@@ -273,6 +275,28 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel() {
     fun captureViewState() {
         val scene = loaded?.scene ?: return
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
+    }
+
+    override fun appendNetworkDebugInfo(builder: StringBuilder, indent: String) {
+        builder.appendLine("${indent}LFM2.5-230M: loaded=$isLoaded, context=$maxSeqLen, " +
+            "selected layer=$selectedLayer, selected head=$selectedHead, history=$historyView")
+        val scene = loaded?.scene
+        if (scene == null) {
+            builder.appendLine("${indent}Interior unavailable until weights are loaded.")
+            return
+        }
+        builder.appendLine("${indent}Interior tiles (${scene.tiles.size}):")
+        scene.tiles.forEach { tile ->
+            val layers = (tile as? LayerStacked)?.stackLayers?.joinToString(prefix = " layers=") ?: ""
+            builder.appendLine("${indent}  [${tile::class.simpleName}] ${tile.id} (${tile.title})$layers  " +
+                "rect: (${tile.x.roundToString(1)}, ${tile.y.roundToString(1)}) " +
+                "${tile.width.roundToString(1)} x ${tile.height.roundToString(1)}")
+        }
+        builder.appendLine("${indent}Interior operations (${scene.opVertices.size}):")
+        scene.opVertices.forEach { vertex ->
+            builder.appendLine("${indent}  [${vertex.op::class.simpleName}] ${vertex.op.name}  " +
+                "loc: (${vertex.x.roundToString(1)}, ${vertex.y.roundToString(1)})")
+        }
     }
 
     /**

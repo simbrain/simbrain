@@ -20,20 +20,30 @@ package org.simbrain.network.compositor
  * parameter tiles sit above the endpoint they feed. Satellite tiles are untouched — their rects
  * derive from edge curves at render time, with column gaps and spine gaps opened to fit them.
  */
+enum class VerticalFlow { TOP_TO_BOTTOM, BOTTOM_TO_TOP }
+
+/** TODO for Yulin: "Vertical flow density" */
+enum class LayoutDensity { STANDARD, COMPACT }
+
 class CompositorLayout(
     scale: Double = 1.0,
     private val spineAxisX: Double = 0.0,
+    private val verticalFlow: VerticalFlow = VerticalFlow.TOP_TO_BOTTOM,
+    private val density: LayoutDensity = LayoutDensity.STANDARD,
 ) {
+
+    private val compact get() = density == LayoutDensity.COMPACT
 
     // Gaps scale with the diagram but keep floors: labels, glyphs, and the lens strip stay at
     // fixed point sizes, so a shrunken diagram still needs room for them.
-    private val rowGap = (90.0 * scale).coerceAtLeast(70.0)
-    private val junctionGap = (64.0 * scale).coerceAtLeast(48.0)
-    private val columnGap = (110.0 * scale).coerceAtLeast(90.0)
-    private val stackGap = (70.0 * scale).coerceAtLeast(45.0)
-    private val limbClearance = 220.0 + 20.0 * scale
-    private val paramGap = (30.0 * scale).coerceAtLeast(20.0)
-    private val interLimbGap = (60.0 * scale).coerceAtLeast(50.0)
+    private val rowGap = ((if (compact) 70.0 else 90.0) * scale).coerceAtLeast(if (compact) 54.0 else 70.0)
+    private val junctionGap = ((if (compact) 52.0 else 64.0) * scale).coerceAtLeast(if (compact) 42.0 else 48.0)
+    private val columnGap = ((if (compact) 85.0 else 110.0) * scale).coerceAtLeast(if (compact) 70.0 else 90.0)
+    private val stackGap = ((if (compact) 50.0 else 70.0) * scale).coerceAtLeast(if (compact) 36.0 else 45.0)
+    private val limbClearance = (if (compact) 175.0 else 220.0) + 20.0 * scale
+    private val paramGap = ((if (compact) 24.0 else 30.0) * scale).coerceAtLeast(20.0)
+    private val interLimbGap = ((if (compact) 45.0 else 60.0) * scale).coerceAtLeast(if (compact) 36.0 else 50.0)
+    private val spineSatelliteClearance = if (compact) 70.0 else 100.0
     private val laneGap = LANE_GAP
     private val cellItemGap = (24.0 * scale).coerceAtLeast(18.0)
 
@@ -236,7 +246,7 @@ class CompositorLayout(
             val to = spineIndex[satellite.edge.to] ?: continue
             for (boundary in from until to) {
                 spineSatelliteNeed[boundary] =
-                    maxOf(spineSatelliteNeed[boundary] ?: 0.0, satellite.tile.height + 100.0)
+                    maxOf(spineSatelliteNeed[boundary] ?: 0.0, satellite.tile.height + spineSatelliteClearance)
             }
         }
         val gapNeed = DoubleArray((spine.size - 1).coerceAtLeast(0)) { i ->
@@ -350,6 +360,7 @@ class CompositorLayout(
                 null -> {}
             }
         }
+        if (verticalFlow == VerticalFlow.BOTTOM_TO_TOP) scene.flipVertically()
     }
 
 }

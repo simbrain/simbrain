@@ -367,13 +367,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         # Reading the Diagram
 
-        The transformer's interior is a live diagram of its computation. Data flows top to bottom.
+        The transformer's interior is a live diagram of its computation. Data flows bottom to top.
 
         ## The residual stream is the spine
 
-        The column of wide tiles running down the diagram is the **residual stream** — the transformer's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the top, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and **adds** it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
+        The column of wide tiles running up the diagram is the **residual stream** — the transformer's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the bottom, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and **adds** it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
 
-        The straight vertical segments of the spine are the **skip connections**: information travels down them unchanged, which is why early information is still available at the bottom. The attention and MLP blocks are side branches that leave the spine and rejoin it.
+        The straight vertical segments of the spine are the **skip connections**: information travels up them unchanged, which is why early information is still available at the top. The attention and MLP blocks are side branches that leave the spine and rejoin it.
 
         ## The attention heads are a deck
 
@@ -385,9 +385,9 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         The small circled icons on the connecting lines are the **operations**: ⊕ addition, × matrix multiply, a bell curve for layer norm, σ for the masked softmax, and a target for the cross-entropy loss. The activation function appears as a corner badge on the tile it produces (the hockey-stick icon on `hidden` is the ReLU). Hover over any icon to see the operation's input and output tensors.
 
-        The small readouts beside each spine tile are the **logit lens**: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read down the spine — the bottom reading is the model's actual prediction.
+        The small readouts beside each spine tile are the **logit lens**: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read up the spine — the top reading is the model's actual prediction.
 
-        The `next-token probabilities` tile at the bottom holds one probability distribution per row. After training you will see it develop crisp structure.
+        The `next-token probabilities` tile at the top holds one probability distribution per row. After training you will see it develop crisp structure.
 
         # What to Do
 

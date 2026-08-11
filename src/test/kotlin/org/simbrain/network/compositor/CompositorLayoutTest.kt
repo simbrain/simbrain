@@ -30,8 +30,8 @@ class CompositorLayoutTest {
             assertEquals(axis, scene.centerX(id), 1e-9, "$id sits on the spine axis")
         }
         val ys = spineIds.map { scene.tile(it).y }
-        assertEquals(ys.sorted(), ys, "spine flows strictly top-down")
-        assertTrue(ys.zipWithNext().all { (a, b) -> b > a })
+        assertEquals(ys.sortedDescending(), ys, "spine flows strictly bottom-up")
+        assertTrue(ys.zipWithNext().all { (a, b) -> b < a })
     }
 
     @Test
@@ -46,8 +46,8 @@ class CompositorLayoutTest {
         val v = scene.tile("layers.0.attn.v")
         assertEquals(q.x, k.x, 1e-9, "q, k, and v share the limb's first column")
         assertEquals(k.x, v.x, 1e-9)
-        assertTrue(q.y + q.height <= k.y && k.y + k.height <= v.y,
-            "column siblings stack down in declaration order so fan-in curves clear each other")
+        assertTrue(q.y >= k.y + k.height && k.y >= v.y + v.height,
+            "column siblings stack upward in declaration order so fan-in curves clear each other")
 
         val branch = scene.tile("resid0")
         val rejoin = scene.tile("layers.0.attn_resid")
@@ -58,7 +58,7 @@ class CompositorLayoutTest {
         val stripCenter = (q.y + v.y + v.height) / 2
         assertEquals(branch.y + branch.height / 2, stripCenter, 1e-6,
             "the limb strip centers on the checkpoint that feeds it")
-        assertTrue(rejoin.y > v.y + v.height, "the rejoin checkpoint sits below the strip")
+        assertTrue(rejoin.y + rejoin.height < v.y, "the rejoin checkpoint sits above the strip")
     }
 
     @Test
@@ -81,8 +81,8 @@ class CompositorLayoutTest {
         val junction = scene.opVertices.first { it.op.name == "add_pos" }
         val table = scene.tile("embed.table")
         val pos = scene.tile("embed.pos")
-        assertTrue(table.y + table.height < junction.y, "embedding sits above the +")
-        assertTrue(pos.y + pos.height < junction.y, "positions sit above the +")
+        assertTrue(table.y > junction.y, "embedding sits below the +")
+        assertTrue(pos.y > junction.y, "positions sit below the +")
         assertTrue(table.x + table.width <= pos.x, "the group lays out left to right")
         val groupCenter = (table.x + (pos.x + pos.width)) / 2
         assertEquals(junction.x, groupCenter, 1e-9, "the parameter row centers on the junction")
@@ -95,8 +95,8 @@ class CompositorLayoutTest {
         val rejoin = scene.opVertices.first { it.op.name == "layers.0.attn_residual" }
         assertTrue(rejoin.placed)
         assertEquals(axis, rejoin.x, 1e-9, "the residual ⊕ sits on the trunk")
-        assertTrue(rejoin.y > scene.tile("layers.0.attn.out").y, "the ⊕ ranks after the limb output")
-        assertTrue(rejoin.y < scene.tile("layers.0.attn_resid").y, "the ⊕ ranks before the checkpoint it writes")
+        assertTrue(rejoin.y < scene.tile("layers.0.attn.out").y, "the ⊕ ranks after the limb output")
+        assertTrue(rejoin.y > scene.tile("layers.0.attn_resid").y, "the ⊕ ranks before the checkpoint it writes")
         val scores = scene.opVertices.first { it.op.name == "layers.0.attn.score" }
         assertTrue(scores.x > scene.tile("resid0").x + scene.tile("resid0").width, "limb junctions stay in the limb")
     }
@@ -113,7 +113,7 @@ class CompositorLayoutTest {
         val q = scene.tile("layers.0.attn.q")
         val logits = scene.tile("logits")
         val probs = scene.tile("probs")
-        assertTrue(probs.y >= logits.y + logits.height + 70.0, "row gap keeps its label-room floor")
+        assertTrue(logits.y >= probs.y + probs.height + 54.0, "row gap keeps its label-room floor")
         assertTrue(q.x >= resid0.x + resid0.width + 220.0, "the fixed-size lens strip keeps its clearance")
     }
 
@@ -127,21 +127,24 @@ class CompositorLayoutTest {
         assertEquals(2, edge.waypoints.size)
         val route = scene.returnLanes.getValue(edge)
         val laneBefore = edge.waypoints.first().y
-        assertTrue(laneBefore > route.clearItems.maxOf { it.routeRect.maxY },
-            "the lane runs below everything hanging in the gap")
+        assertTrue(laneBefore < route.clearItems.minOf { it.routeRect.minY },
+            "the lane runs above everything hanging in the gap")
 
-        val lowest = route.clearItems.filterIsInstance<TensorTile>().maxBy { it.y + it.height }
-        lowest.y += 300.0
+        val highest = route.clearItems.filterIsInstance<TensorTile>().minBy { it.y }
+        highest.y -= 300.0
         scene.deriveReturnWaypoints()
-        assertEquals(laneBefore + 300.0, edge.waypoints.first().y, 1e-9,
-            "the lane follows the dragged strip down")
+        assertEquals(laneBefore - 300.0, edge.waypoints.first().y, 1e-9,
+            "the lane follows the dragged strip up")
     }
 
     @Test
     fun `layout is deterministic across repeated application`() {
         val scene = scene(layers = 2)
         val before = scene.tiles.associate { it.id to (it.x to it.y) }
-        CompositorLayout().apply(scene)
+        CompositorLayout(
+            verticalFlow = VerticalFlow.BOTTOM_TO_TOP,
+            density = LayoutDensity.COMPACT,
+        ).apply(scene)
         val after = scene.tiles.associate { it.id to (it.x to it.y) }
         assertEquals(before, after)
     }

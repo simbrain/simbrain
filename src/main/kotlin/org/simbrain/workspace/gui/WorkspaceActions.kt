@@ -365,6 +365,7 @@ class WorkspaceActions {
         workspace.addWorkspaceComponent(component)
         producers.forEach { producer ->
             with(workspace.couplingManager) {
+                // The component names the series from the producing side once coupled, and keeps them current
                 val timeSeries = component.addTimeSeries(producer.simpleDescription)
                 producer couple timeSeries.getConsumer(TimeSeriesModel.TimeSeries::setValue)
             }

@@ -17,6 +17,7 @@ import org.simbrain.workspace.AttributeContainer
  */
 abstract class TensorConnector(val source: TensorLayer, val target: TensorLayer) :
     NetworkModel(), EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @Transient
     override var events: TensorConnectorEvents = TensorConnectorEvents()

@@ -14,6 +14,7 @@ import org.simbrain.util.*
 import org.simbrain.util.SimbrainConstants.Polarity
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
@@ -45,7 +46,7 @@ class NeuronCollection : Layer, CopyableObject {
     @Transient
     override val events: NeuronCollectionEvents = NeuronCollectionEvents()
 
-    @get:Producible(arrayDescriptionMethod = "getLabelArray")
+    @get:Producible(arrayComponentsMethod = "getAttributeComponents")
     @set:Consumable
     @UserParameter("Activation Array", "Activations", order = 10)
     override var activationArray: DoubleArray
@@ -77,7 +78,7 @@ class NeuronCollection : Layer, CopyableObject {
             biasArray = value.toDoubleArray()
         }
 
-    @get:Producible
+    @get:Producible(arrayComponentsMethod = "getAttributeComponents")
     override val spikes: DoubleArray
         get() = neuronList.map {
             if ((it.dataHolder as? SpikingScalarData)?.spiked == true) 1.0 else 0.0
@@ -229,6 +230,16 @@ class NeuronCollection : Layer, CopyableObject {
                 delete()
             }
         }
+    }
+
+    /**
+     * Put a neuron back after its deletion was undone. Unlike [addNeuron] this does not listen to the neuron
+     * again, because deleting it never stopped listening, but it does report the membership change so that
+     * anything naming the collection's components, such as a coupled plot, can catch up.
+     */
+    fun restoreNeuron(neuron: Neuron) {
+        neuronList.add(neuron)
+        events.labelArrayChanged.fire()
     }
 
     fun removeNeuron(neuron: Neuron?) {
@@ -384,6 +395,16 @@ class NeuronCollection : Layer, CopyableObject {
         get() = neuronList
             .map { if (it.label.isNullOrEmpty()) it.id else it.label }
             .toTypedArray()
+
+    /**
+     * One entry per member neuron, keyed by neuron id so a consumer can follow a neuron's data when
+     * membership changes, and named by its label when it has one.
+     */
+    val attributeComponents: List<AttributeComponent>
+        get() = neuronList.map { neuron ->
+            val id = neuron.id ?: System.identityHashCode(neuron).toString()
+            AttributeComponent(id, if (neuron.label.isNullOrEmpty()) id else neuron.label!!)
+        }
 
     val isEmpty: Boolean
         get() = neuronList.isEmpty()

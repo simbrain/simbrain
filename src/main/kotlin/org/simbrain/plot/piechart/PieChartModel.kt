@@ -32,18 +32,24 @@ class PieChartModel : AttributeContainer, EditableObject {
     private var isUninitialized: Boolean? = null
 
     /**
-     * Names for the "slices" in the pie chart. Can be set via coupling events in [PieChartComponent].
-     * Setting new names renames any slices already in the dataset, so a label change shows without
-     * waiting for the next value update.
+     * Names of the incoming array's components, one per slice. Set via coupling events in
+     * [PieChartComponent]. Setting new names renames any slices already in the dataset, so a label change
+     * shows without waiting for the next value update.
      */
-    var sliceNames = arrayOf<String>()
+    var componentNames = listOf<String>()
         set(value) {
             runOnEventThread {
                 field = value
                 if (isUninitialized == false && dataset.itemCount > 0) {
-                    val values = (0 until dataset.itemCount).map { dataset.getValue(it) }
+                    // The producer now sends one value per name, so the slices are rebuilt to match: one
+                    // whose neuron was deleted goes rather than lingering under a stand-in number, and one
+                    // whose neuron came back shows at zero until the next update rather than being missing.
+                    val previous = (0 until dataset.itemCount).map { dataset.getValue(it) }
                     dataset.clear()
-                    values.forEachIndexed { i, v -> dataset.setValue(sliceName(i), v) }
+                    numSlices = if (value.isEmpty()) previous.size else value.size
+                    (0 until numSlices).forEach { i ->
+                        dataset.setValue(componentName(i), previous.getOrNull(i) ?: 0.0)
+                    }
                 }
             }
         }
@@ -99,12 +105,12 @@ class PieChartModel : AttributeContainer, EditableObject {
                 return@runOnEventThread
             }
             for (i in vector.indices) {
-                dataset.setValue(sliceName(i), abs(vector[i] / total))
+                dataset.setValue(componentName(i), abs(vector[i] / total))
             }
         }
     }
 
-    private fun sliceName(i: Int) = if (i < sliceNames.size) sliceNames[i] else "$i"
+    private fun componentName(i: Int) = componentNames.getOrElse(i) { "$i" }
 
     override val name: String
         get() = "Pie chart"

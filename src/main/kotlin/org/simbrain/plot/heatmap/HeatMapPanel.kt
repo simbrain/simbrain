@@ -117,7 +117,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
 
     private fun createRowAxis() = SymbolAxis(
         "Row",
-        Array(heatMapModel.rowCount.coerceAtLeast(1)) { row -> heatMapModel.rowLabels.getOrNull(row) ?: row.toString() }
+        Array(heatMapModel.rowCount.coerceAtLeast(1)) { row -> heatMapModel.componentNames.getOrNull(row) ?: row.toString() }
     ).apply {
         isInverted = true
     }

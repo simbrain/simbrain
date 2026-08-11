@@ -24,6 +24,7 @@ class SynapseGroup @JvmOverloads constructor(
     var connectionStrategy: ConnectionStrategy = AllToAll(),
     synapses: MutableList<Synapse> = connectionStrategy.connectNeurons(source.neuronList, target.neuronList).toMutableList()
 ) : NetworkModel(), AttributeContainer {
+    override val attributeName get() = displayName
 
     /**
      * Randomizer for all weights, regardless of polarity. Applying it can change the polarity of a weight.

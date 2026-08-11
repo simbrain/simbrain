@@ -1,6 +1,7 @@
 package org.simbrain.workspace
 
 import org.pmw.tinylog.Logger
+import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingManager
 import org.simbrain.workspace.events.WorkspaceComponentEvents
 import java.io.File
@@ -156,6 +157,34 @@ abstract class WorkspaceComponent(name: String) {
      * [org.simbrain.workspace.couplings.CouplingEvents.attributeContainerChanged].
      */
     fun fireAttributeContainerChanged(changedContainer: AttributeContainer) = events.attributeContainerChanged.fire(changedContainer)
+
+    /**
+     * Invoke [handler] whenever what a producer coupled into one of this component's [attributeContainers]
+     * should be called may have changed: when such a coupling is created, and when the producing container
+     * reports a change such as a relabeled neuron. Plots use this to name series, bars, slices, or axis ticks
+     * from the producing side rather than fixing names when the plot is created.
+     *
+     * The handler receives the consuming container, so a component with several couplable containers, such as
+     * a time series plot whose individual series can each be coupled to, can tell which one is affected, and
+     * the producer, so it can take names alone ([Producer.getDisplayNames]), keyed components
+     * ([Producer.getDisplayComponents]) when it holds per-component state to preserve, or the attribute's own
+     * name ([Producer.getSimpleDescription]) when it displays the attribute as a whole. Components and names
+     * are empty for a producer that declares none, which handlers must cope with.
+     */
+    fun onCoupledProducer(handler: (consumer: AttributeContainer, producer: Producer) -> Unit) {
+        fun handle(coupling: Coupling) {
+            val consumingContainer = coupling.consumer.baseObject
+            if (attributeContainers.any { it === consumingContainer }) {
+                handler(consumingContainer, coupling.producer)
+            }
+        }
+        workspace.couplingManager.events.couplingAdded.on { handle(it) }
+        workspace.couplingManager.events.attributeContainerChanged.on { changed ->
+            workspace.couplingManager.couplings
+                .filter { it.producer.baseObject === changed }
+                .forEach { handle(it) }
+        }
+    }
 
     /**
      * Called after a global update ends.

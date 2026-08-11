@@ -51,10 +51,9 @@ class BarChartModel : AttributeContainer, EditableObject {
     var lowerBound = 0.0
 
     /**
-     * Names for the bars in the barchart. Set via coupling events in
-     * [BarChartComponent].
+     * Names of the incoming array's components, one per bar. Set via coupling events in [BarChartComponent].
      */
-    private var barNames = arrayOf<String>()
+    private var componentNames = listOf<String>()
 
     /**
      * Track how many bars there are. If an array with a different number of
@@ -88,27 +87,33 @@ class BarChartModel : AttributeContainer, EditableObject {
 
             // Write the data
             for (i in newPoint.indices) {
-                dataset.setValue(newPoint[i], "Values", barName(i))
+                dataset.setValue(newPoint[i], "Values", componentName(i))
             }
         }
     }
 
     /**
-     * Set the bar names and immediately rename any bars already in the dataset, so a label change shows
-     * without waiting for the next value update.
+     * Set the component names and immediately rename any bars already in the dataset, so a label change
+     * shows without waiting for the next value update.
      */
-    fun setBarNames(names: Array<String>) {
+    fun setComponentNames(names: List<String>) {
         runOnEventThread {
-            barNames = names
+            componentNames = names
             if (dataset.columnCount > 0) {
-                val values = (0 until dataset.columnCount).map { dataset.getValue(0, it) }
+                // The producer now sends one value per name, so the bars are rebuilt to match: one whose
+                // neuron was deleted goes rather than lingering under a stand-in number, and one whose
+                // neuron came back shows at zero until the next update rather than being missing.
+                val previous = (0 until dataset.columnCount).map { dataset.getValue(0, it) }
                 dataset.clear()
-                values.forEachIndexed { i, value -> dataset.setValue(value, "Values", barName(i)) }
+                numBars = if (names.isEmpty()) previous.size else names.size
+                (0 until numBars).forEach { i ->
+                    dataset.setValue(previous.getOrNull(i) ?: 0.0, "Values", componentName(i))
+                }
             }
         }
     }
 
-    private fun barName(i: Int) = if (i < barNames.size) barNames[i] else "${i + 1}"
+    private fun componentName(i: Int) = componentNames.getOrElse(i) { "${i + 1}" }
 
     override val name: String
         get() = "Bar chart"

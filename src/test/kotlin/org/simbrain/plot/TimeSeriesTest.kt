@@ -14,6 +14,7 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeurons
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
+import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.plot.timeseries.createTimeSeriesModel
 import org.simbrain.workspace.Workspace
 
@@ -91,6 +92,131 @@ class TimeSeriesTest {
     }
 
     @Test
+    fun `deleting a neuron drops only its series and keeps the others' data`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neurons = List(3) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons[0].label = "Alpha"
+        neurons[1].label = "Beta"
+        neurons[2].label = "Gamma"
+        val collection = NeuronCollection(neurons)
+        network.addNetworkModelAsync(collection)
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
+
+        awaitUntil(message = "Series were not named after neuron labels") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
+        }
+        repeat(3) { workspace.simpleIterate() }
+        assertEquals(listOf(3, 3, 3), timeSeriesComponent.model.timeSeriesList.map { it.series.itemCount })
+
+        runBlocking { neurons[1].delete() }
+
+        awaitUntil(message = "The deleted neuron's series was not dropped") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Gamma")
+        }
+        // The surviving neurons are untouched by their neighbour's deletion, so they keep their history
+        assertEquals(listOf(3, 3), timeSeriesComponent.model.timeSeriesList.map { it.series.itemCount })
+        assertEquals(listOf("Alpha", "Gamma"), timeSeriesComponent.model.timeSeriesList.map { it.series.key })
+    }
+
+    @Test
+    fun `adding a neuron gives it a new series without disturbing the others`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neurons = List(2) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons[0].label = "Alpha"
+        neurons[1].label = "Beta"
+        val collection = NeuronCollection(neurons)
+        network.addNetworkModelAsync(collection)
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
+
+        awaitUntil { timeSeriesComponent.model.timeSeriesList.size == 2 }
+        repeat(3) { workspace.simpleIterate() }
+
+        val added = Neuron().apply { label = "Gamma" }
+        network.addNetworkModelAsync(added)
+        collection.addNeuron(added)
+
+        awaitUntil(message = "The added neuron did not get a series") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
+        }
+        assertEquals(listOf(3, 3, 0), timeSeriesComponent.model.timeSeriesList.map { it.series.itemCount })
+    }
+
+    @Test
+    fun `scalar couplings name series after the producing neuron and follow renames`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neurons = List(3) { Neuron() }
+        neurons.forEach { network.addNetworkModelAsync(it) }
+        neurons[0].label = "Alpha"
+        neurons[1].label = "Beta"
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        with(workspace.couplingManager) {
+            neurons.forEach { neuron ->
+                val series = timeSeriesComponent.addTimeSeries("placeholder ${neuron.id}")
+                neuron.getProducer("getActivation") couple series.getConsumer(TimeSeriesModel.TimeSeries::setValue)
+            }
+        }
+
+        // Every series comes from an activation, so the method name adds nothing and is left off. The third
+        // neuron has no label, so it falls back to its id.
+        awaitUntil(message = "Series were not named after the producing neurons") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } ==
+                    listOf("Alpha", "Beta", neurons[2].id)
+        }
+
+        workspace.simpleIterate()
+        neurons[1].label = "Delta"
+        awaitUntil(message = "Series name did not follow the neuron rename") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } ==
+                    listOf("Alpha", "Delta", neurons[2].id)
+        }
+        assertEquals(1, timeSeriesComponent.model.timeSeriesList[1].series.itemCount)
+    }
+
+    @Test
+    fun `scalar couplings keep the method name when it is what distinguishes the series`() {
+        val workspace = Workspace()
+        val networkComponent = NetworkComponent("Network")
+        workspace.addWorkspaceComponent(networkComponent)
+        val network = networkComponent.network
+        val neuron = Neuron()
+        network.addNetworkModelAsync(neuron)
+        neuron.label = "Alpha"
+
+        val timeSeriesComponent = TimeSeriesPlotComponent("TimeSeries")
+        workspace.addWorkspaceComponent(timeSeriesComponent)
+        with(workspace.couplingManager) {
+            listOf("getActivation", "getBias").forEach { method ->
+                val series = timeSeriesComponent.addTimeSeries("placeholder $method")
+                neuron.getProducer(method) couple series.getConsumer(TimeSeriesModel.TimeSeries::setValue)
+            }
+        }
+
+        awaitUntil(message = "Series from one neuron's two attributes were not distinguished by method name") {
+            timeSeriesComponent.model.timeSeriesList.map { it.description } ==
+                    listOf("Alpha:Activation", "Alpha:Bias")
+        }
+    }
+
+    @Test
     fun `duplicate labels are disambiguated in positional order`() {
         val workspace = Workspace()
         val networkComponent = NetworkComponent("Network")
@@ -111,6 +237,26 @@ class TimeSeriesTest {
         awaitUntil(message = "Duplicate labels were not disambiguated in positional order") {
             timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha[0]", "Beta", "Alpha[1]")
         }
+    }
+
+    @Test
+    fun `a series with no data yet does not blank the chart`() {
+        val model = TimeSeriesModel()
+        var time = 0
+        model.timeSupplier = { time }
+        val populated = model.addTimeSeries("Alpha")
+        repeat(3) {
+            time = it
+            populated.setValue(it.toDouble() + 1)
+        }
+        // Stands in for the series added when a deleted neuron is restored: it has no values until the
+        // next update, and an empty JFreeChart series reports its bounds as NaN
+        model.addTimeSeries("Beta")
+
+        val range = TimeSeriesPlotPanel(model).chartPanel.chart.xyPlot.rangeAxis.range
+
+        assertFalse(range.lowerBound.isNaN() || range.upperBound.isNaN(), "Range went NaN: $range")
+        assertTrue(range.lowerBound <= 1.0 && range.upperBound >= 3.0, "Range excludes the data: $range")
     }
 
     @Test

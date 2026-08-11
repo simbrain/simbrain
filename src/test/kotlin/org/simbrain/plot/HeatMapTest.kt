@@ -210,11 +210,11 @@ class HeatMapTest {
         with(workspace.couplingManager) { collection couple hmc.model }
 
         awaitUntil(message = "Row labels were not initialized from neuron labels") {
-            hmc.model.rowLabels == listOf("Input", "Output")
+            hmc.model.componentNames == listOf("Input", "Output")
         }
         neurons[1].label = "Target"
         awaitUntil(message = "Row labels did not follow the neuron rename without an iteration") {
-            hmc.model.rowLabels == listOf("Input", "Target")
+            hmc.model.componentNames == listOf("Input", "Target")
         }
     }
 

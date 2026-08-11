@@ -15,6 +15,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
+import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -76,6 +77,13 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             events.labelArrayChanged.fire()
         }
 
+    /**
+     * One entry per component of the array, named by [labelArray]. The array is a fixed-size vector whose
+     * components have no identity of their own, so the position serves as the key.
+     */
+    val attributeComponents: List<AttributeComponent>
+        get() = labelArray.mapIndexed { index, label -> AttributeComponent("$index", label) }
+
     @get:Producible
     @UserParameter("Bias Array", "Biases", order = 3)
     override var biases: Matrix = Matrix(inputSize, 1)
@@ -94,7 +102,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     /**
      * see [NeuronCollection.spikes]
      */
-    @get:Producible
+    @get:Producible(arrayComponentsMethod = "getAttributeComponents")
     override val spikes: DoubleArray
         get() = (dataHolder as? SpikingMatrixData)?.spikes?.map { if (it) 1.0 else 0.0 }?.toDoubleArray() ?: DoubleArray(
             size
@@ -203,7 +211,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         this.dataHolder = other.dataHolder.copy()
     }
 
-    @get:Producible(arrayDescriptionMethod = "getLabelArray")
+    @get:Producible(arrayComponentsMethod = "getAttributeComponents")
     @set:Consumable
     override var activationArray: DoubleArray
         get() = activations.toDoubleArray()

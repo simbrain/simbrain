@@ -1,5 +1,6 @@
 package org.simbrain.workspace.couplings
 
+import org.pmw.tinylog.Logger
 import org.simbrain.workspace.*
 import java.lang.reflect.Method
 
@@ -80,7 +81,13 @@ class CouplingCache(val couplingManager: CouplingManager) {
                 ?: throw IllegalArgumentException("Method ${method.name} is not producible.")
 
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
-        val arrayDescriptionMethod = javaClass.findMethod(annotation.arrayDescriptionMethod)
+        val arrayComponentsMethod = javaClass.findMethod(annotation.arrayComponentsMethod)
+        if (annotation.arrayComponentsMethod.isNotEmpty() && arrayComponentsMethod == null) {
+            Logger.warn(
+                "${javaClass.simpleName}.${method.name} names an arrayComponentsMethod " +
+                        "\"${annotation.arrayComponentsMethod}\" that does not exist, so its components are unnamed."
+            )
+        }
 
         val customPriorityMethod = javaClass.findMethod(annotation.customPriorityMethod)
         val priority = customPriorityMethod?.invoke(this) as? Int ?: annotation.priority
@@ -90,7 +97,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
                 .description(annotation.description)
                 .priority(priority)
                 .customDescription(customDescription)
-                .arrayDescriptionMethod(arrayDescriptionMethod)
+                .arrayComponentsMethod(arrayComponentsMethod)
                 .build()
     }(this)
 

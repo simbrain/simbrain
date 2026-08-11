@@ -6,11 +6,11 @@ import org.simbrain.plot.XYSeriesConverter
 import org.simbrain.plot.timeseries.TimeSeriesModel.TimeSeries
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.getSimbrainXStream
+import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.Producer
+import org.simbrain.workspace.disambiguateNames
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
-import org.simbrain.workspace.couplings.Coupling
 import java.io.InputStream
 import java.io.OutputStream
 
@@ -22,17 +22,12 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
             // Workspace object is not available in the constructor.
             super.workspace = workspace
 
-            workspace.couplingManager.events.couplingAdded.on { c: Coupling ->
-                // A new array coupling is being added to this time series
-                if (c.consumer.baseObject === model) {
-                    applyProducerLabels(c.producer)
+            onCoupledProducer { consumer, producer ->
+                if (consumer === model) {
+                    model.syncTimeSeries(producer.displayComponents)
+                } else if (consumer is TimeSeries) {
+                    applyScalarNames()
                 }
-            }
-
-            workspace.couplingManager.events.attributeContainerChanged.on { container ->
-                workspace.couplingManager.couplings
-                    .filter { it.consumer.baseObject === model && it.producer.baseObject === container }
-                    .forEach { applyProducerLabels(it.producer) }
             }
 
             model.events.timeSeriesAdded.on(Dispatchers.Default) { addedContainer: TimeSeries ->
@@ -45,27 +40,28 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
         }
 
     /**
-     * Name the model's series after the producer's label array, e.g. neuron labels: renaming in place when the
-     * series count already matches (preserving collected data), rebuilding otherwise. Duplicate labels are
-     * disambiguated with a positional suffix.
+     * Name the series that are themselves targets of scalar couplings, as produced by plotting a selection of
+     * neurons. The producing attribute's name is enough on its own when every such series comes from the same
+     * kind of attribute, e.g. all activations; the method name is appended only when it is what distinguishes
+     * them, e.g. one neuron's activation plotted alongside its bias. They are named as a set because adding a
+     * coupling can change which of those two forms applies to the series already present.
      */
-    private fun applyProducerLabels(producer: Producer) {
-        val rawLabels = producer.labelArray.map { it ?: "" }
-        if (rawLabels.isEmpty()) return
-        val duplicateCounts = rawLabels.groupingBy { it }.eachCount()
-        val timesSeen = HashMap<String, Int>()
-        val labels = rawLabels.map { label ->
-            val index = timesSeen.merge(label, 1, Int::plus)!! - 1
-            if ((duplicateCounts[label] ?: 0) > 1) "$label[$index]" else label
-        }
-        when {
-            labels == model.timeSeriesList.map { it.description } -> {}
-            labels.size == model.timeSeriesList.size -> model.renameTimeSeries(labels)
-            else -> {
-                model.removeAllTimeSeries()
-                labels.forEach { model.addTimeSeries(it) }
+    private fun applyScalarNames() {
+        val scalarCouplings = couplingManager.couplings
+            .filter { coupling -> model.timeSeriesList.any { it === coupling.consumer.baseObject } }
+        if (scalarCouplings.isEmpty()) return
+        val methodDistinguishes = scalarCouplings.map { it.producer.simpleMethodName }.toSet().size > 1
+        val names = scalarCouplings
+            .mapIndexed { index, coupling ->
+                val producer = coupling.producer
+                AttributeComponent(
+                    "$index",
+                    if (methodDistinguishes) producer.simpleDescription else producer.containerDisplayName
+                )
             }
-        }
+            .disambiguateNames()
+            .map { it.name }
+        model.renameEachTimeSeries(scalarCouplings.map { it.consumer.baseObject as TimeSeries }.zip(names))
     }
 
     override val attributeContainers: List<AttributeContainer>

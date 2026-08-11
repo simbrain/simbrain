@@ -30,14 +30,14 @@ public @interface Producible {
     /**
      * (For attributes of type double[] only).
      * <br>
-     * The name of a method that returns an array of Strings which describe
-     * each component of the double array produced by this producer.  Example:
-     * a neuron array could return an array of neuron labels ["Neuron 1", "Neuron 2",..]
-     * that could then be used as bar-chart labels.
+     * The name of a method returning a {@code List<AttributeComponent>} describing each component of the
+     * array produced by this producer: a stable key and a display name apiece. Example: a neuron collection
+     * returns its neurons' ids paired with their labels, which a bar chart uses to name its bars and a time
+     * series uses to follow a neuron's series when the collection's membership changes.
      *
-     * @return the name of the array description method.
+     * @return the name of the array components method.
      */
-    String arrayDescriptionMethod() default "";
+    String arrayComponentsMethod() default "";
 
     /**
      * Whether this method should be visible in the coupling panels and menus by default. User

@@ -19,6 +19,7 @@ import java.awt.geom.Point2D
  * methods as needed for custom behavior.
  */
 abstract class Subnetwork : LocatableModel(), EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @Transient
     override val events: SubnetworkEvents = SubnetworkEvents()

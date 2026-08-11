@@ -9,7 +9,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kotlinx.coroutines.Dispatchers;
+import kotlin.Unit;
 
 /**
  * Pie chart component.
@@ -29,19 +29,10 @@ public class PieChartComponent extends WorkspaceComponent {
         // This is a bit of a hack because the workspace is not available in the constructor.
         super.setWorkspace(workspace);
 
-        getWorkspace().getCouplingManager().getEvents().getCouplingAdded().on(Dispatchers.getDefault(), c -> {
-            if (c.getConsumer().getBaseObject() == model) {
-                model.setSliceNames(c.getProducer().getLabelArray());
-            }
-        });
-
-        // Refresh slice labels when the producing container reports a label change, e.g. a neuron rename
-        getWorkspace().getCouplingManager().getEvents().getAttributeContainerChanged().on(Dispatchers.getDefault(), container -> {
-            for (var c : getWorkspace().getCouplingManager().getCouplings()) {
-                if (c.getConsumer().getBaseObject() == model && c.getProducer().getBaseObject() == container) {
-                    model.setSliceNames(c.getProducer().getLabelArray());
-                }
-            }
+        // Name the slices from the producing side, both when coupled and when a producer is relabeled
+        onCoupledProducer((consumer, producer) -> {
+            model.setComponentNames(producer.getDisplayNames());
+            return Unit.INSTANCE;
         });
     }
 

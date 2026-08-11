@@ -5,6 +5,9 @@ import org.simbrain.workspace.couplings.Coupling;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * The part of a {@link Coupling} that send values to a {@link Consumable}.
@@ -13,11 +16,11 @@ import java.lang.reflect.Type;
 public class Producer extends Attribute {
 
     /**
-     * See {@link Producible#arrayDescriptionMethod()}.
+     * See {@link Producible#arrayComponentsMethod()}.
      * So far the only use cases are for producers. If consumer uses cases
      * are found this can be moved to the attribute level.
      */
-    private Method arrayDescriptionMethod;
+    private Method arrayComponentsMethod;
 
     /**
      * Contruct a producer.
@@ -60,20 +63,43 @@ public class Producer extends Attribute {
     }
 
     /**
-     * See {@link Producible#arrayDescriptionMethod()}.
-     * @return an array of string descriptions, one for each component of the
-     *  value this producer returns.
+     * The components of what this producer sends, in order, or empty when it declares no
+     * {@link Producible#arrayComponentsMethod()}. Names here are raw, so they may repeat; see
+     * {@link #getDisplayComponents()} for the form a consumer should show.
      */
-    public String[] getLabelArray() {
-        if (arrayDescriptionMethod == null) {
-            return new String[]{};
-        } else {
-            try {
-                return (String[]) arrayDescriptionMethod.invoke(baseObject);
-            } catch (IllegalAccessException | InvocationTargetException ex) {
-                throw new AssertionError(ex);
-            }
+    @SuppressWarnings("unchecked")
+    public List<AttributeComponent> getComponents() {
+        if (arrayComponentsMethod == null) {
+            return new ArrayList<>();
         }
+        try {
+            List<AttributeComponent> components = (List<AttributeComponent>) arrayComponentsMethod.invoke(baseObject);
+            // A plain ArrayList, not List.of/stream().toList(): these end up stored on plot models, and XStream
+            // refuses to restore the serialization proxy that Java's immutable lists write themselves as.
+            return components == null ? new ArrayList<>() : new ArrayList<>(components);
+        } catch (IllegalAccessException | InvocationTargetException ex) {
+            throw new AssertionError(ex);
+        }
+    }
+
+    /**
+     * The components of what this producer sends, ready to display: as {@link #getComponents()} but with
+     * repeated names given a positional suffix so a consumer can tell them apart. Consumers naming a whole
+     * attribute rather than its components, such as a single time series fed by a scalar coupling, should use
+     * {@link #getSimpleDescription()} instead.
+     */
+    public List<AttributeComponent> getDisplayComponents() {
+        return AttributeComponentKt.disambiguateNames(getComponents());
+    }
+
+    /**
+     * The display names of {@link #getDisplayComponents()}, for consumers that only label what they show and
+     * keep no per-component state.
+     */
+    public List<String> getDisplayNames() {
+        return getDisplayComponents().stream()
+                .map(AttributeComponent::getName)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 
     /**
@@ -109,13 +135,13 @@ public class Producer extends Attribute {
 
         /**
          * Set an array description method.
-         * {@see Producible#arrayDescriptionMethod()}.
+         * {@see Producible#arrayComponentsMethod()}.
          *
-         * @param arrayDescriptionMethod the array description method to set
+         * @param arrayComponentsMethod the array description method to set
          * @return the Builder instance (for use in chained initialization)
          */
-        public ProducerBuilder arrayDescriptionMethod(Method arrayDescriptionMethod) {
-            product.arrayDescriptionMethod = arrayDescriptionMethod;
+        public ProducerBuilder arrayComponentsMethod(Method arrayComponentsMethod) {
+            product.arrayComponentsMethod = arrayComponentsMethod;
             return this;
         }
 

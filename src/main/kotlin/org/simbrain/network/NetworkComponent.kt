@@ -100,6 +100,13 @@ class NetworkComponent : WorkspaceComponent {
      */
     private fun relayLabelChanges(model: NetworkModel) {
         if (!labelRelayedModels.add(model)) return
+        if (model is AttributeContainer) {
+            // A model's own label names it in coupling descriptions, so plots naming series from a scalar
+            // coupling need to hear about it, not just the array-label changes below.
+            model.events.labelChanged.on(Dispatchers.Default) { _, _ ->
+                fireAttributeContainerChanged(model)
+            }
+        }
         when (model) {
             is NeuronCollection -> model.events.labelArrayChanged.on(Dispatchers.Default) {
                 fireAttributeContainerChanged(model)

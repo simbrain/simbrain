@@ -85,12 +85,12 @@ class HeatMapModel : AttributeContainer, EditableObject {
      * neuron collection is labelled before its first values arrive. Cells past a shorter column's end
      * have no value and render as background rather than as a real reading.
      */
-    val rowCount get() = maxOf(columns.maxOfOrNull { it.size } ?: 0, rowLabels.size)
+    val rowCount get() = maxOf(columns.maxOfOrNull { it.size } ?: 0, componentNames.size)
 
     val columnCount get() = columns.size
 
-    /** Labels displayed for the rows, ordinarily supplied by a coupled neuron collection. */
-    var rowLabels: List<String> = emptyList()
+    /** Names of the incoming array's components, one per row, ordinarily from a coupled neuron collection. */
+    var componentNames: List<String> = emptyList()
         private set
 
     @Consumable(description = "Append a column of values")
@@ -111,9 +111,9 @@ class HeatMapModel : AttributeContainer, EditableObject {
         }
     }
 
-    fun setRowLabels(labels: List<String>) {
+    fun setComponentNames(names: List<String>) {
         runOnEventThread {
-            rowLabels = labels
+            componentNames = names
             events.propertyChanged.fire()
         }
     }

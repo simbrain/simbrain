@@ -29,6 +29,8 @@ import java.awt.geom.Rectangle2D
  * @author Yulin Li
  */
 abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
+    override val attributeName get() = displayName
+
     // TODO: Currently Smile Matrices are the "lingua Franca" for different layers.
     //  Keep an eye on Kotlin's Multik as a possible alternative
     /**

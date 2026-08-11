@@ -33,6 +33,7 @@ import java.awt.geom.Point2D
  * @author Zoë Tosi
  */
 class Neuron : LocatableModel, EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @XStreamConstructor
     @JvmOverloads

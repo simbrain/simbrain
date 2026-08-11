@@ -28,6 +28,7 @@ import java.util.*
  * @author Zoë Tosi
  */
 class Synapse : NetworkModel, EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     private var _strength = 1.0
 

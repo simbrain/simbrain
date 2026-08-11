@@ -83,8 +83,13 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
         if (timeSeriesModel.isAutoRange) {
 
-            val dataMin = timeSeriesModel.timeSeriesList.minOfOrNull { it.series.minY } ?: 0.0
-            val dataMax = timeSeriesModel.timeSeriesList.maxOfOrNull { it.series.maxY } ?: 0.0
+            // A series holding no data yet reports NaN bounds, as one just added for a restored neuron does.
+            // Letting that reach the range would make the whole range NaN and the chart would draw nothing
+            // until that one series received its first value.
+            val dataMin = timeSeriesModel.timeSeriesList
+                .mapNotNull { it.series.minY.takeUnless(Double::isNaN) }.minOrNull() ?: 0.0
+            val dataMax = timeSeriesModel.timeSeriesList
+                .mapNotNull { it.series.maxY.takeUnless(Double::isNaN) }.maxOrNull() ?: 0.0
             val markerMin = rangeMarkers.minOfOrNull { it.value } ?: dataMin
             val markerMax = rangeMarkers.maxOfOrNull { it.value } ?: dataMax
             val min = min(dataMin, markerMin)

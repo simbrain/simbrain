@@ -292,9 +292,11 @@ class CouplingManager(val workspace: Workspace) {
      * Update all couplings by setting the consumers to take the values of their producers.
      */
     fun updateCouplings() {
-        synchronized(_couplings) {
-            couplings.forEach { it.update() }
-        }
+        // Deliberately not holding the _couplings monitor across the updates. Consumers can block on the
+        // event thread, as the chart models do when they touch a dataset that is being painted, while the
+        // event thread in turn reads this coupling list; holding the lock over both deadlocks them against
+        // each other. [couplings] is already an immutable snapshot, so iterating it needs no lock.
+        couplings.forEach { it.update() }
     }
 
     /**

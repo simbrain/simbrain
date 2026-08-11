@@ -133,7 +133,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             is NeuronCollection -> {
                 (model as? Neuron)?.let { neuron ->
                     network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
-                    parent.neuronList.add(neuron)
+                    parent.restoreNeuron(neuron)
                     // The awaited addNetworkModel above already created the neuron's node, so a non-blocking
                     // peek finds it; recreate only if it is somehow absent. Attach to the collection node.
                     (modelNodeMap.peek(parent) as? NeuronCollectionNode)?.let { collectionNode ->

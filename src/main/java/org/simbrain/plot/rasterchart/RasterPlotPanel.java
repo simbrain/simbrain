@@ -4,6 +4,7 @@ import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.SymbolAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
@@ -75,11 +76,28 @@ public class RasterPlotPanel extends JPanel {
             false // Configure chart to generate URLs?
         );
         renderer = ((XYPlot) chart.getPlot()).getRenderer();
+        applyRowAxis();
         updateChartSettings();
         model.getEvents().getPropertyChanged().on(SwingUtilsKt.getSwingDispatcher(), this::updateChartSettings);
         chartPanel.setChart(chart);
         ChartThemeKt.applySimbrainChartTheme(chart);
 
+    }
+
+    /**
+     * Show the incoming array's component names down the row axis, e.g. neuron labels, falling back to the
+     * row index for rows the producer did not name.
+     */
+    private void applyRowAxis() {
+        int rows = Math.max(Math.max(model.getRowCount(), model.getComponentNames().size()), 1);
+        String[] labels = new String[rows];
+        for (int row = 0; row < rows; row++) {
+            java.util.List<String> names = model.getComponentNames();
+            labels[row] = row < names.size() ? names.get(row) : String.valueOf(row);
+        }
+        SymbolAxis axis = new SymbolAxis("Value(s)", labels);
+        axis.setRange(-0.5, rows - 0.5);
+        chart.getXYPlot().setRangeAxis(axis);
     }
 
     public void updateChartSettings() {
@@ -93,6 +111,8 @@ public class RasterPlotPanel extends JPanel {
         renderer.setSeriesShape(1, shape2);
         renderer.setSeriesShape(2, shape1);
         renderer.setSeriesShape(3, shape2);
+
+        applyRowAxis();
 
         // Handle domain properties
         if (model.isFixedWidth()) {

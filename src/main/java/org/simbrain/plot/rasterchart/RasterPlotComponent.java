@@ -10,6 +10,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import kotlinx.coroutines.Dispatchers;
+import kotlin.Unit;
 
 /**
  * Represents raster data.
@@ -40,6 +41,29 @@ public class RasterPlotComponent extends WorkspaceComponent {
     private void initEvents() {
         model.getEvents().getRasterConsumerAdded().on(Dispatchers.getDefault(), this::fireAttributeContainerAdded);
         model.getEvents().getRasterConsumerRemoved().on(Dispatchers.getDefault(), this::fireAttributeContainerRemoved);
+    }
+
+    @Override
+    public void setWorkspace(Workspace workspace) {
+        // The workspace is not available in the constructor
+        super.setWorkspace(workspace);
+
+        // Rows of the plot are the components of the arrays sent in, so a coupled producer names them. All the
+        // raster consumers share one row axis, so names are taken from whichever coupling supplies them
+        // first, recomputed each time so that later changes to that producer's labels still come through.
+        onCoupledProducer((consumer, producer) -> {
+            List<String> names = model.getRasterConsumerList().stream()
+                    .flatMap(rasterConsumer -> getWorkspace().getCouplingManager().getCouplings().stream()
+                            .filter(coupling -> coupling.getConsumer().getBaseObject() == rasterConsumer))
+                    .map(coupling -> coupling.getProducer().getDisplayNames())
+                    .filter(displayNames -> !displayNames.isEmpty())
+                    .findFirst()
+                    .orElseGet(ArrayList::new);
+            if (!names.equals(model.getComponentNames())) {
+                model.setComponentNames(names);
+            }
+            return Unit.INSTANCE;
+        });
     }
 
     public RasterModel getModel() {

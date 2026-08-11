@@ -100,6 +100,15 @@ public abstract class Attribute {
     }
 
     /**
+     * The name used for this attribute's container in descriptions: the container's
+     * {@link AttributeContainer#getAttributeName()} when it provides one, else {@link #getId()}.
+     */
+    public String getContainerDisplayName() {
+        String attributeName = baseObject.getAttributeName();
+        return attributeName == null || attributeName.isEmpty() ? getId() : attributeName;
+    }
+
+    /**
      * Used in {@link org.simbrain.workspace.gui.couplingmanager.AttributePanel}'s
      * custom cell renderer.
      */
@@ -125,11 +134,17 @@ public abstract class Attribute {
 
         // Description is based on id + a provided description
         if (!description.isEmpty()) {
-            return containerName + getId() + ":" + description;
+            return containerName + getContainerDisplayName() + ":" + description;
         }
 
-        // Description is based on id and a simplified version of the method name
-        // simpleMethodName gets rid of get and set, add spaces, and capitalize first letter
+        return containerName + getContainerDisplayName() + ":" + getSimpleMethodName();
+    }
+
+    /**
+     * The method name in display form, with the get/set prefix removed, camel case split into words, and the
+     * first letter capitalized. E.g. "getActivation" becomes "Activation".
+     */
+    public String getSimpleMethodName() {
         String simpleMethodName = method.getName();
         if (method.getName().startsWith("get")) {
             simpleMethodName = simpleMethodName.replaceFirst("get", "");
@@ -137,8 +152,7 @@ public abstract class Attribute {
             simpleMethodName = simpleMethodName.replaceFirst("set", "");
         }
         simpleMethodName = Utils.splitCamelCase(simpleMethodName);
-        simpleMethodName = Utils.upperCaseFirstLetter(simpleMethodName.toLowerCase());
-        return containerName + getId() + ":" + simpleMethodName;
+        return Utils.upperCaseFirstLetter(simpleMethodName.toLowerCase());
     }
 
     private String getCustomDescription() {

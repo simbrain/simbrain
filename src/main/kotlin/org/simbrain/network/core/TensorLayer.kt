@@ -59,6 +59,7 @@ enum class TensorActivation {
  * are summed with biases, an activation function is applied, and inputs are cleared.
  */
 class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @UserParameter(label = "Activation Function", description = "Element-wise activation", order = 10)
     var activationFunction: TensorActivation = TensorActivation.LINEAR

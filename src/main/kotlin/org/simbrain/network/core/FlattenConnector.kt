@@ -17,6 +17,7 @@ import org.simbrain.workspace.AttributeContainer
  */
 class FlattenConnector(val source: TensorLayer, val target: NeuronArray) :
     NetworkModel(), EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @Transient
     override var events: TensorConnectorEvents = TensorConnectorEvents()

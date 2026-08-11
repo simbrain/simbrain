@@ -74,6 +74,25 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     var events = RasterPlotEvents()
         private set
 
+    /**
+     * Names of the incoming array's components, one per row of the plot, ordinarily from a coupled neuron
+     * collection. Rows beyond the names supplied fall back to their index.
+     */
+    var componentNames: List<String> = emptyList()
+        private set
+
+    fun setComponentNames(names: List<String>) {
+        componentNames = names
+        events.propertyChanged.fire()
+    }
+
+    /**
+     * Highest row index the plot can show, used to size the row axis. Rows come from the components of the
+     * arrays sent in, so this is the longest array seen or the number of names supplied.
+     */
+    var rowCount: Int = 0
+        private set
+
     init {
         addDataSources(INITIAL_DATA_SOURCES)
         if (timeSupplier != null) {
@@ -164,6 +183,10 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
                     var udpated = false
                     var i = 0
                     val n = values.size
+                    if (n > rowCount) {
+                        rowCount = n
+                        events.propertyChanged.fire()
+                    }
                     while (i < n) {
                         if (values[i] >= spikeThreshold) {
                             dataset.getSeries(index).add(timeSupplier.get(), i)

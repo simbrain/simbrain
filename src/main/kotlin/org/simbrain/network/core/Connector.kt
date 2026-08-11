@@ -10,6 +10,7 @@ import smile.math.matrix.Matrix
  * Dense connectors, i.e. weight matrices, are the most obvious example. More information is in the layer javadocs.
  */
 abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(), EditableObject, AttributeContainer {
+    override val attributeName get() = displayName
 
     @Transient
     override val events: ConnectorEvents = ConnectorEvents()

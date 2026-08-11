@@ -9,10 +9,12 @@ import org.simbrain.util.createXStreamPropertyConverter
 import org.simbrain.util.runOnEventThread
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
 import java.lang.reflect.InvocationTargetException
+import java.util.concurrent.CopyOnWriteArrayList
 import javax.swing.SwingUtilities
 
 /**
@@ -104,9 +106,10 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     )
 
     /**
-     * List of time series objects which can be coupled to.
+     * List of time series objects which can be coupled to. Copy-on-write because the chart panel walks it on
+     * the event thread during every repaint, while couplings can add to it from the workspace update thread.
      */
-    val timeSeriesList: MutableList<TimeSeries> = ArrayList()
+    val timeSeriesList: MutableList<TimeSeries> = CopyOnWriteArrayList()
 
     @Transient
     var events = TimeSeriesEvents()
@@ -170,8 +173,12 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      * @return a reference to the series, or null if the model is in scalar mode
      */
     fun addTimeSeries(description: String): TimeSeries {
-        val sts = TimeSeries(addXYSeries(description))
-        timeSeriesList.add(sts)
+        lateinit var sts: TimeSeries
+        // On the event thread because the dataset is being painted from there
+        runOnEventThread {
+            sts = TimeSeries(addXYSeries(description))
+            timeSeriesList.add(sts)
+        }
         events.timeSeriesAdded.fire(sts)
         return sts
     }
@@ -192,11 +199,18 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      * Adds an xy series to the chart with the specified description.
      */
     private fun addXYSeries(description: String): XYSeries {
-        val xy = XYSeries(description)
-        xy.maximumItemCount = windowSize
-        xy.description = description
+        val xy = newXYSeries(description)
         dataset.addSeries(xy)
         return xy
+    }
+
+    /**
+     * A series configured like the chart's others but not yet added to the dataset, for callers that control
+     * dataset membership and ordering themselves.
+     */
+    private fun newXYSeries(description: String) = XYSeries(description).apply {
+        maximumItemCount = windowSize
+        this.description = description
     }
 
     /**
@@ -206,9 +220,18 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      */
     fun renameTimeSeries(descriptions: List<String>) {
         if (descriptions.size != timeSeriesList.size) return
+        renameEachTimeSeries(timeSeriesList.zip(descriptions))
+    }
+
+    /**
+     * Rename the given series in place, preserving their data, leaving any series not named here untouched.
+     * See [renameTimeSeries] for why the keys move through placeholders.
+     */
+    fun renameEachTimeSeries(renames: List<Pair<TimeSeries, String>>) {
+        if (renames.none { (ts, description) -> ts.description != description }) return
         runOnEventThread {
-            timeSeriesList.forEachIndexed { i, ts -> ts.series.key = "\u200B__renaming__$i" }
-            timeSeriesList.zip(descriptions).forEach { (ts, description) ->
+            renames.forEachIndexed { i, (ts, _) -> ts.series.key = "\u200B__renaming__$i" }
+            renames.forEach { (ts, description) ->
                 ts.series.key = description
                 ts.description = description
                 ts.series.fireSeriesChanged()
@@ -217,14 +240,53 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     /**
+     * Make the series match [components] one for one, following each component by its
+     * [AttributeComponent.key] rather than by position. A component already on the chart keeps its series and
+     * therefore its history, one that has gone has its series removed, and a new one gets a new series, so
+     * deleting a neuron from a coupled collection costs only that neuron's data.
+     *
+     * Series carrying no key yet, from a plot that was just created or reopened from a file, adopt the
+     * incoming keys positionally when the counts line up, rather than being discarded and rebuilt.
+     */
+    fun syncTimeSeries(components: List<AttributeComponent>) {
+        if (components.isEmpty()) return
+        runOnEventThread {
+            if (timeSeriesList.none { it.componentKey != null } && timeSeriesList.size == components.size) {
+                timeSeriesList.zip(components).forEach { (ts, component) -> ts.componentKey = component.key }
+            }
+            val existingByKey = timeSeriesList.filter { it.componentKey != null }.associateBy { it.componentKey }
+            // Park every key out of the way first: XYSeriesCollection rejects a key that momentarily
+            // collides with another series', which reordering and renaming together can easily produce.
+            timeSeriesList.forEachIndexed { i, ts -> ts.series.key = "\u200B__syncing__$i" }
+            val ordered = components.map { component ->
+                (existingByKey[component.key] ?: TimeSeries(newXYSeries(component.name)).also {
+                    events.timeSeriesAdded.fire(it)
+                }).apply {
+                    componentKey = component.key
+                    series.key = component.name
+                    description = component.name
+                }
+            }
+            timeSeriesList.filter { removed -> ordered.none { it === removed } }
+                .forEach { events.timeSeriesRemoved.fire(it) }
+            dataset.removeAllSeries()
+            ordered.forEach { dataset.addSeries(it.series) }
+            timeSeriesList.clear()
+            timeSeriesList.addAll(ordered)
+            ordered.forEach { it.series.fireSeriesChanged() }
+        }
+    }
+
+    /**
      * Remove all [TimeSeries] objects.
      */
     fun removeAllTimeSeries() {
-        for (ts in timeSeriesList) {
-            dataset.removeSeries(ts.series)
-            events.timeSeriesRemoved.fire(ts)
+        val removed = timeSeriesList.toList()
+        runOnEventThread {
+            removed.forEach { dataset.removeSeries(it.series) }
+            timeSeriesList.clear()
         }
-        timeSeriesList.clear()
+        removed.forEach { events.timeSeriesRemoved.fire(it) }
     }
 
     /**
@@ -233,8 +295,10 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      * @param ts the time series to remove.
      */
     private fun removeTimeSeries(ts: TimeSeries) {
-        dataset.removeSeries(ts.series)
-        timeSeriesList.remove(ts)
+        runOnEventThread {
+            dataset.removeSeries(ts.series)
+            timeSeriesList.remove(ts)
+        }
         events.timeSeriesRemoved.fire(ts)
     }
 
@@ -313,6 +377,13 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         var description: String
             get() = series.description
             set(value) {series.description = value}
+
+        /**
+         * Which component of a coupled array producer this series follows, as an
+         * [org.simbrain.workspace.AttributeComponent.key], or null for a series not driven by an array
+         * coupling. See [syncTimeSeries].
+         */
+        var componentKey: String? = null
 
         @Consumable
         fun setValue(value: Double) {

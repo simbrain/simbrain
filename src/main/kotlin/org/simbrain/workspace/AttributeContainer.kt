@@ -12,6 +12,14 @@ interface AttributeContainer {
     val id: String?
 
     /**
+     * Human-readable name for this container in coupling descriptions and plot labels. Defaults to [id]; override
+     * to prefer a user-supplied name, e.g. a network model's label. Deliberately distinct from
+     * `NetworkModel.displayName` so that classes inheriting both do not have to disambiguate.
+     */
+    val attributeName: String?
+        get() = id
+
+    /**
      * Name of the parent containers. Used for display only.
      */
     var containerName: String?

@@ -29,6 +29,23 @@ class RasterPlotTest {
     }
 
     @Test
+    fun `rows are named from the coupled producer and follow label changes`() {
+        na.labelArray = arrayOf("a", "b", "c", "d", "e")
+        with(workspace.couplingManager) {
+            na couple rpc.model.rasterConsumerList[0]
+        }
+
+        awaitUntil(message = "Raster rows were not named from the producer") {
+            rpc.model.componentNames == listOf("a", "b", "c", "d", "e")
+        }
+
+        na.labelArray = arrayOf("a", "Beta", "c", "d", "e")
+        awaitUntil(message = "Raster row names did not follow the label change") {
+            rpc.model.componentNames == listOf("a", "Beta", "c", "d", "e")
+        }
+    }
+
+    @Test
     fun `test raster plot communication`() {
         with(workspace.couplingManager) {
             na couple rpc.model.rasterConsumerList[0]

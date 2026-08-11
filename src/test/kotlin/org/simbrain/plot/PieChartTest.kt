@@ -56,8 +56,8 @@ class PieChartTest {
         // There should be two "slices" of the pie
         assertEquals(2,pieChart.dataset.itemCount)
         // Keys should be "Neuron 1" and "Neuron 2"
-        assertEquals(ng.getNeuron(0).displayName, pieChart.sliceNames[0])
-        assertEquals(ng.getNeuron(1).displayName, pieChart.sliceNames[1])
+        assertEquals(ng.getNeuron(0).displayName, pieChart.componentNames[0])
+        assertEquals(ng.getNeuron(1).displayName, pieChart.componentNames[1])
     }
 
 
@@ -98,8 +98,8 @@ class PieChartTest {
         val xml = pcc.xml
         val deserializedPieChart = PieChartModel.getXStream().fromXML(xml) as PieChartModel
         assertEquals(2,deserializedPieChart.dataset.itemCount)
-        assertEquals(ng.getNeuron(0).displayName, deserializedPieChart.sliceNames[0])
-        assertEquals(ng.getNeuron(1).displayName, deserializedPieChart.sliceNames[1])
+        assertEquals(ng.getNeuron(0).displayName, deserializedPieChart.componentNames[0])
+        assertEquals(ng.getNeuron(1).displayName, deserializedPieChart.componentNames[1])
         assertEquals(.33, deserializedPieChart.dataset.getValue(0).toDouble(), .01)
         assertEquals(.66, deserializedPieChart.dataset.getValue(1).toDouble(), .01)
     }

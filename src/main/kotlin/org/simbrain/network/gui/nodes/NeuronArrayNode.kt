@@ -19,6 +19,7 @@ import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
@@ -646,9 +647,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,
                 menuTitle = "Add image world",
-                postActionBlock = {
+                postActionBlock = { imageWorld ->
                     neuronArray.gridMode = true
                     neuronArray.isClamped = true
+                    SimbrainDesktop.placeBeside(imageWorld, networkPanel.networkComponent)
+                    networkPanel.networkActions.showImageWorldClampHint(neuronArray)
                 }
             ))
             contextMenu.add(

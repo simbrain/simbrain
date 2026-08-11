@@ -75,9 +75,10 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
             
             // Use SwingUtilities.convertRectangle for reliable coordinate conversion
             try {
+                val targetRegion = config.targetBounds
                 SwingUtilities.convertRectangle(
-                    config.targetComponent.parent ?: config.targetComponent,
-                    config.targetComponent.bounds,
+                    if (targetRegion != null) config.targetComponent else config.targetComponent.parent ?: config.targetComponent,
+                    targetRegion ?: config.targetComponent.bounds,
                     glassPane
                 )
             } catch (e: Exception) {
@@ -104,7 +105,16 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
             Rectangle(config.position.x, config.position.y, 0, 0)
         }
         
-        val popup = OnboardingPopup(config, targetBounds) { dismissedPopup ->
+        val resolvedConfig = if (config.placement == PopupPlacement.AUTO_VERTICAL) {
+            val availableHeight = glassPane.height.takeIf { it > 0 } ?: rootFrame.height
+            val spaceAbove = targetBounds.y
+            val spaceBelow = availableHeight - targetBounds.y - targetBounds.height
+            config.copy(placement = if (spaceAbove > spaceBelow) PopupPlacement.TOP_CENTER else PopupPlacement.BOTTOM_CENTER)
+        } else {
+            config
+        }
+
+        val popup = OnboardingPopup(resolvedConfig, targetBounds) { dismissedPopup ->
             activePopups.remove(dismissedPopup)
             glassPane.repaint()
             if (activePopups.isEmpty()) {
@@ -153,6 +163,7 @@ data class PopupConfig(
     val title: String,
     val message: String,
     val targetComponent: JComponent? = null,
+    val targetBounds: Rectangle? = null,
     val position: Point = Point(100, 100),
     val placement: PopupPlacement = PopupPlacement.BOTTOM_RIGHT,
     val suppressionKey: String? = null,
@@ -167,7 +178,7 @@ data class PopupConfig(
  * Where to place the popup relative to the target component
  */
 enum class PopupPlacement {
-    TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_CENTER, BOTTOM_CENTER, LEFT, RIGHT
+    TOP_LEFT, TOP_RIGHT, BOTTOM_LEFT, BOTTOM_RIGHT, TOP_CENTER, BOTTOM_CENTER, LEFT, RIGHT, AUTO_VERTICAL
 }
 
 /**
@@ -271,6 +282,7 @@ private class OnboardingPopup(
                 targetBounds.y + (targetBounds.height - popupHeight) / 2,
                 popupWidth, popupHeight
             )
+            PopupPlacement.AUTO_VERTICAL -> error("Automatic placement must be resolved before creating a popup")
         }
     }
     
@@ -373,6 +385,7 @@ private class OnboardingPopup(
                 Point(bounds.x, bounds.y + bounds.height / 2 - arrowSize / 2), // top base
                 Point(bounds.x, bounds.y + bounds.height / 2 + arrowSize / 2)  // bottom base
             )
+            PopupPlacement.AUTO_VERTICAL -> null
             else -> null
         }
         

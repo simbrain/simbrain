@@ -478,7 +478,7 @@ class WorkspaceActions {
      */
     @JvmOverloads
     fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Add image world", postActionBlock:
-        () -> Unit = {}) = desktopPane.createAction(
+        suspend (ImageWorldComponent) -> Unit = {}) = desktopPane.createAction(
         name = menuTitle,
         iconPath = "menu_icons/photo.png",
         description = "Create image input",
@@ -492,7 +492,7 @@ class WorkspaceActions {
         with(workspace.couplingManager) {
             producer couple consumer
         }
-        postActionBlock()
+        postActionBlock(component)
     }
 
     /**

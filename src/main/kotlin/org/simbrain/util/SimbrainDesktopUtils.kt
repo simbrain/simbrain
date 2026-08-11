@@ -69,6 +69,20 @@ suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
+/**
+ * Place [component] immediately to the right of [reference], falling back to the reference's left edge only when
+ * the new component would otherwise be completely offscreen.
+ */
+suspend fun SimbrainDesktop.placeBeside(component: WorkspaceComponent, reference: WorkspaceComponent) {
+    val referenceBounds = getDesktopComponent(reference).parentFrame.bounds
+    val componentFrame = getDesktopComponent(component).parentFrame
+    val rightX = referenceBounds.x + referenceBounds.width + 20
+    val x = if (rightX < desktopPane.width) rightX else referenceBounds.x
+    withContext(Dispatchers.Swing) {
+        componentFrame.setLocation(x, referenceBounds.y)
+    }
+}
+
 suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     withGui {
         val desktopComponent = getDesktopComponent(workspaceComponent)

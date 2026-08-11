@@ -26,9 +26,11 @@ import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BorderLayout
 import java.awt.event.KeyEvent
+import java.awt.geom.Rectangle2D
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -1267,8 +1269,39 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         collection.getConsumer(NeuronCollection::activationArray),
         collection.size,
         menuTitle = "Add image world",
-        postActionBlock = { collection.isClamped = true }
+        postActionBlock = { imageWorld ->
+            collection.isClamped = true
+            SimbrainDesktop.placeBeside(imageWorld, networkPanel.networkComponent)
+            showImageWorldClampHint(collection)
+        }
     )
+
+    suspend fun showImageWorldClampHint(target: NetworkModel) {
+        val targetNode = networkPanel.getNode(target)
+        val fullBounds = targetNode.fullBounds
+        val canvasBounds = networkPanel.canvas.camera.viewToLocal(
+            Rectangle2D.Double(fullBounds.x, fullBounds.y, fullBounds.width, fullBounds.height)
+        ).bounds
+        SimbrainDesktop.onboardingManager.showPopup(
+            PopupConfig(
+                title = "Image world input",
+                message = "You coupled an image world to this ${imageWorldTargetType(target)}. It was clamped so it can clearly display image input, but this can also lead to unexpected behaviors. If needed you can also couple the image world manually using 'Add inputs'. Note that if you remove the image world, you may need to unclamp ${imageWorldClampTarget(target)}.",
+                targetComponent = networkPanel.canvas,
+                targetBounds = canvasBounds,
+                placement = PopupPlacement.AUTO_VERTICAL,
+                suppressionKey = "image_world_input_clamps_target",
+                style = PopupStyle.WARNING
+            )
+        )
+    }
+
+    private fun imageWorldTargetType(target: NetworkModel) = when (target) {
+        is NeuronArray -> "neuron array"
+        is NeuronCollection -> "neuron collection"
+        else -> "network model"
+    }
+
+    private fun imageWorldClampTarget(target: NetworkModel) = if (target is NeuronCollection) "its nodes" else "it"
 
 }
 

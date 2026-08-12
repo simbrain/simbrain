@@ -29,7 +29,6 @@ class ContextWindowSyncTest {
             workspace.addWorkspaceComponent(textWorldComponent)
             world = textWorldComponent.world
             languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-            languageModel.showPromptProcessing = true
             languageModel.initialText = promptText
             languageModel.stopAtEndOfText = sealAtEndOfText
             runBlocking { network.addNetworkModel(languageModel) }

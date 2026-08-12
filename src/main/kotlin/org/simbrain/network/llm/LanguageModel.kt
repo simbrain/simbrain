@@ -72,14 +72,6 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         order = 2,
     )
 
-    var showPromptProcessing by GuiEditable(
-        initValue = false,
-        label = "Show prompt processing",
-        description = "Animate prompt tokens one workspace iteration at a time; disable to prefill " +
-            "the pending prompt immediately",
-        order = 3,
-    )
-
     var tokensToGenerate by GuiEditable(
         initValue = 0,
         label = "Tokens to generate",
@@ -309,7 +301,6 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         copy.label = label
         copy.location = location
         copy.promptMode = promptMode
-        copy.showPromptProcessing = showPromptProcessing
         copy.tokensToGenerate = tokensToGenerate
         copy.temperature = temperature
         copy.probabilityCardCandidates = probabilityCardCandidates
@@ -387,11 +378,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
 
     context(Network)
     override fun update() {
-        if (showPromptProcessing || pending.isEmpty()) {
-            step()
-        } else {
-            while (pending.isNotEmpty() && canAdvance) step()
-        }
+        step()
     }
 
     /**

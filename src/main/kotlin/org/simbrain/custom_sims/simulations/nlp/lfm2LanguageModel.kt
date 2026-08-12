@@ -139,9 +139,9 @@ val lfm2LanguageModel = newSim {
             PopupConfig(
                 title = "The Model's Document",
                 message = "This document is the model's context window. Press Play on the main " +
-                    "toolbar to prefill it immediately, then watch generated tokens arrive one " +
-                    "per step — the workspace pauses itself when the model finishes. Edit the " +
-                    "text and press Play again to continue from your edit.",
+                    "toolbar to watch the model read it one token per step, then generate its " +
+                    "continuation the same way — the workspace pauses itself when the model " +
+                    "finishes. Edit the text and press Play again to continue from your edit.",
                 targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
                 suppressionKey = "lfm2_language_model_document_help",
                 placement = PopupPlacement.BOTTOM_CENTER,
@@ -160,7 +160,7 @@ val lfm2LanguageModel = newSim {
 
         # Completion (Default)
 
-        Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. It immediately pre-fills the document, then runs one sampled token per workspace step until it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document. Enable `Show prompt processing` in `Settings` to animate prefill one token at a time.
+        Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. Every workspace step is one forward pass: the model first reads the document one token per step (prompt processing), then generates one sampled token per step until it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document.
 
         The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. There is no prompt hiding anywhere — the document IS the model's entire input. `Reset` in the control panel clears both the document and the model's context, and the temperature and sampling strategy can change mid-run.
 

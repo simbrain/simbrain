@@ -162,7 +162,7 @@ val lfm2LanguageModel = newSim {
 
         Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. Every workspace step is one forward pass: the model first reads the document one token per step (prompt processing), then generates one sampled token per step until it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document.
 
-        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. There is no prompt hiding anywhere — the document IS the model's entire input. `Reset` in the control panel clears both the document and the model's context, and the temperature and sampling strategy can change mid-run.
+        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. After an edit the model re-reads only from near the change — the unchanged beginning of the document is still in its caches, the way real inference servers reuse a prompt prefix. There is no prompt hiding anywhere — the document IS the model's entire input. `Reset` in the control panel clears both the document and the model's context, and the temperature and sampling strategy can change mid-run.
 
         # Chat
 

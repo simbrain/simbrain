@@ -302,6 +302,49 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `an edit near the end of a long window rewinds to a checkpoint and continues exactly`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val seed = "One two three four five six seven eight nine ten eleven twelve thirteen " +
+            "fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two " +
+            "twenty-three twenty-four twenty-five twenty-six twenty-seven twenty-eight twenty-nine " +
+            "thirty thirty-one thirty-two thirty-three thirty-four thirty-five"
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
+        languageModel.samplingStrategy = SamplingStrategy.Greedy
+        languageModel.stopAtEndOfText = false
+        languageModel.initialText = seed
+        languageModel.loadWeights()
+
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seed).size
+        assertTrue(promptTokens > 40, "the seed must reach past the first checkpoint, got $promptTokens")
+        repeat(promptTokens) { languageModel.step() }
+
+        val editedWindow = languageModel.contextWindow.replace("thirty-five", "forty")
+        languageModel.contextWindow = editedWindow
+        val positionAfterEdit = languageModel.loaded!!.model.position
+        assertTrue(positionAfterEdit >= 32,
+            "the edit rewinds to a conv checkpoint, not to zero (position $positionAfterEdit)")
+        assertTrue(positionAfterEdit < promptTokens, "the edited tail itself is requeued")
+
+        var guard = 0
+        while (languageModel.isPromptProcessing && guard++ < 256) languageModel.step()
+        repeat(4) { languageModel.step() }
+
+        val fresh = LanguageModel(dir.toString(), maxSeqLen = 128)
+        fresh.samplingStrategy = SamplingStrategy.Greedy
+        fresh.stopAtEndOfText = false
+        fresh.loadWeights()
+        fresh.seedWindow(editedWindow)
+        guard = 0
+        while (fresh.isPromptProcessing && guard++ < 256) fresh.step()
+        repeat(4) { fresh.step() }
+
+        assertEquals(fresh.contextWindow, languageModel.contextWindow,
+            "the checkpoint-rewound continuation must match a from-scratch replay exactly")
+    }
+
+    @Test
     fun `network round trip preserves configuration and view state without weights`() {
         val net = Network()
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 128)

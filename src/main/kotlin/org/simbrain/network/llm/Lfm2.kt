@@ -221,4 +221,29 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
         state.position = 0
         convCaches.forEach { it.fill(0f) }
     }
+
+    /** The rolling conv-cache contents at the current position, for checkpointed rewinds. */
+    fun snapshotConvState(): List<FloatArray> = convCaches.map { cache ->
+        FloatArray(cache.size) { cache.data.get(it) }
+    }
+
+    /**
+     * Restores decoding to [position] with the conv caches captured there by [snapshotConvState].
+     * The conv windows are the only destructively rolled state; the KV caches need no restore
+     * because rows at and beyond [position] are simply stale — exactly as after [reset] — and
+     * every attention read is bounded by the position. The next [forwardToken] continues from
+     * [position] as if decoding had never gone past it.
+     */
+    fun rewindTo(position: Int, convState: List<FloatArray>) {
+        require(position in 0..config.maxSeqLen) { "Position $position outside 0..${config.maxSeqLen}" }
+        require(convState.size == convCaches.size) {
+            "Expected ${convCaches.size} conv caches, got ${convState.size}"
+        }
+        convCaches.zip(convState).forEach { (cache, saved) ->
+            require(saved.size == cache.size) { "Conv snapshot size ${saved.size} != cache size ${cache.size}" }
+            for (i in saved.indices) cache.data.put(i, saved[i])
+            cache.markMutated()
+        }
+        state.position = position
+    }
 }

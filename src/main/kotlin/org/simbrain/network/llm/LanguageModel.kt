@@ -211,6 +211,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
     @Transient
     private var windowIds = ArrayList<Int>()
 
+    private class ConvCheckpoint(val position: Int, val convState: List<FloatArray>)
+
+    /** Periodic conv-cache snapshots, so an edit rewinds to a nearby position instead of zero. */
+    @Transient
+    private var checkpoints = ArrayList<ConvCheckpoint>()
+
+    /** Bounds checkpoint memory to ~16 snapshots regardless of the context window size. */
+    private val checkpointInterval: Int
+        get() = maxOf(32, maxSeqLen / 16)
+
     /** Sampled ids between the tool-call markers; null while not capturing a call. */
     @Transient
     private var toolCallBuffer: MutableList<Int>? = null
@@ -345,6 +355,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
             else listOf(Lfm2ChatFormat.BOS_ID) + raw.toList()
         windowIds = ArrayList(ids)
         pending = ArrayDeque(ids)
+        checkpoints = ArrayList()
         sampledToken = -1
         lastGenerated = ""
         currentSpan = IntArray(0)
@@ -361,6 +372,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         state.model.reset()
         state.scene.reset()
         windowIds = ArrayList()
+        checkpoints = ArrayList()
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null
@@ -406,6 +418,9 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         val id = if (fromQueue) pending.removeFirst() else sampledToken
         val position = state.model.position
         val logits = state.model.forwardToken(id)
+        if (state.model.position % checkpointInterval == 0) {
+            checkpoints.add(ConvCheckpoint(state.model.position, state.model.snapshotConvState()))
+        }
         sampledToken = sampleToken(logits)
         tokenProbabilitySnapshot = TokenProbabilitySnapshot.topK(
             logits, probabilityCardCandidates, sampledToken, temperature,
@@ -474,24 +489,54 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         loaded?.let { it.tokenizer.decode(windowIds.toIntArray()) }
 
     /**
-     * An edit resets the model and requeues the whole edited window for a watchable re-prefill —
-     * the conv caches make an exact prefix rewind impossible. A window whose leading BOS marker
-     * was edited away gets it restored: every canonical window starts with BOS, and without it
-     * the model tends to end the text immediately. The next sync republishes the marker.
+     * An edit rebuilds the context and requeues a watchable re-prefill, reusing the cached
+     * prefix where it can: the attention KV caches rewind by position alone, and the conv
+     * caches — the one destructively rolled state — restore from the nearest periodic
+     * checkpoint at or before the edit point, so only the tokens from that checkpoint on
+     * replay instead of the whole window. With no usable checkpoint the model resets and
+     * replays from the top, exactly as before. A window whose leading BOS marker was edited
+     * away gets it restored: every canonical window starts with BOS, and without it the model
+     * tends to end the text immediately. The next sync republishes the marker.
      */
     override fun applyWindowEdit(ids: IntArray) {
         val state = loaded ?: return
-        state.model.reset()
-        state.scene.reset()
         val window = if (ids.firstOrNull() == Lfm2ChatFormat.BOS_ID) ids.toList()
             else listOf(Lfm2ChatFormat.BOS_ID) + ids.toList()
-        pending = ArrayDeque(window)
+        val reusable = reusablePrefixLength(window)
+        // A checkpoint at the window's full length would leave nothing to feed; the last
+        // replayed token's forward pass is what samples the continuation.
+        val checkpoint = checkpoints.lastOrNull { it.position <= reusable && it.position < window.size }
+        if (checkpoint == null) {
+            state.model.reset()
+            state.scene.reset()
+            checkpoints = ArrayList()
+            pending = ArrayDeque(window)
+        } else {
+            state.model.rewindTo(checkpoint.position, checkpoint.convState)
+            state.scene.truncateFrom(checkpoint.position)
+            while (checkpoints.isNotEmpty() && checkpoints.last().position > checkpoint.position) {
+                checkpoints.removeAt(checkpoints.size - 1)
+            }
+            pending = ArrayDeque(window.subList(checkpoint.position, window.size))
+        }
         windowIds = ArrayList(window)
         currentSpan = IntArray(0)
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null
         text = state.tokenizer.decode(ids, skipSpecials = true)
+    }
+
+    /**
+     * How many leading tokens of the edited [window] the model's caches still cover: the first
+     * divergence from the committed stream, bounded by what has actually been fed. Diffed
+     * against the BOS-restored window, since [windowIds] always carries the leading marker.
+     */
+    private fun reusablePrefixLength(window: List<Int>): Int {
+        val fed = minOf(loaded?.model?.position ?: 0, windowIds.size, window.size)
+        var i = 0
+        while (i < fed && windowIds[i] == window[i]) i++
+        return i
     }
 
     private fun trackToolCall(state: LoadedState, id: Int) {

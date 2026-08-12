@@ -398,6 +398,15 @@ class CompositorScene(val graph: PlanGraph? = null) {
         lens?.reset()
     }
 
+    /**
+     * Drops every recording tile's rows at and beyond [row] after a prefix-reuse rewind, so
+     * rewound positions don't linger as if they were still part of the stream. The lens keeps
+     * no per-position state and needs nothing.
+     */
+    fun truncateFrom(row: Int) {
+        for (tile in _tiles) tile.truncateFrom(row)
+    }
+
     fun tileAt(sceneX: Double, sceneY: Double) = _tiles.lastOrNull { isShown(it) && it.contains(sceneX, sceneY) }
 
     fun tilesIn(x: Double, y: Double, w: Double, h: Double) = _tiles.filter { isShown(it) && it.intersects(x, y, w, h) }

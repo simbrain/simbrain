@@ -238,6 +238,21 @@ abstract class TensorTile(
         touch()
     }
 
+    /**
+     * Clears recorded rows at and beyond [row] after a prefix-reuse rewind: positions before
+     * [row] stay valid and the rewound positions will be republished as the model re-feeds (or
+     * never return, if the new stream ends earlier). Only scene-side recordings need clearing —
+     * tiles mirroring live model state re-copy from their source on the next publish.
+     */
+    @Synchronized
+    open fun truncateFrom(row: Int) {
+        if (!accumulatesHistory || row >= rows) return
+        val from = row.coerceAtLeast(0)
+        values.fill(0f, from * cols, rows * cols)
+        if (liveRow >= from) liveRow = if (from > 0) from - 1 else -1
+        touch()
+    }
+
     /** Forgets the signed-normalization scale — for view switches to differently-scaled data. */
     protected fun resetScale() {
         absMax = 0f
@@ -419,6 +434,14 @@ class VectorHistoryTile(
     @Synchronized
     override fun retainOnlyLiveRow() {
         super.retainOnlyLiveRow()
+        stash.clear()
+    }
+
+    /** Stashed layers hold rewound rows too, so a rewind drops them; flips re-replay instead. */
+    @Synchronized
+    override fun truncateFrom(row: Int) {
+        if (row >= rows) return
+        super.truncateFrom(row)
         stash.clear()
     }
 
@@ -844,6 +867,18 @@ class AttentionTile(
                 if (r != liveRow) history.fill(0f, (head * rows + r) * cols, (head * rows + r + 1) * cols)
             }
         }
+    }
+
+    /** Stashed layers hold rewound rows too, so a rewind drops them; flips re-replay instead. */
+    @Synchronized
+    override fun truncateFrom(row: Int) {
+        if (row >= rows) return
+        super.truncateFrom(row)
+        val from = row.coerceAtLeast(0)
+        for (head in 0 until numHeads) {
+            history.fill(0f, (head * rows + from) * cols, (head + 1) * rows * cols)
+        }
+        stash.clear()
     }
 
     /** True when [layer]'s head histories are already in memory — shown or stashed. */

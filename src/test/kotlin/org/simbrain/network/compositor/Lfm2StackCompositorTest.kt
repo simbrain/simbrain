@@ -319,6 +319,36 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `a prefix-reuse truncation clears rewound rows and drops stashed histories`() {
+        val model = syntheticModel()
+        val scene = Lfm2StackCompositor.buildScene(model)
+        repeat(5) { model.forwardToken(it + 1); scene.publish(it) }
+
+        val bx = scene.tile("block.conv.bx") as VectorHistoryTile
+        scene.layerSelector!!.invoke(1)
+        assertTrue(bx.hasHistoryFor(0), "flipping away stashes the watched layer")
+
+        val resid = scene.tile("block.resid")
+        val attention = scene.tile("block.attn.weights")
+        val strip = scene.tile("layers.0.resid")
+        val prefixRow = (0 until resid.cols).map { resid.valueAt(1, it) }
+        assertTrue((0 until resid.cols).any { resid.valueAt(4, it) != 0f })
+
+        scene.truncateFrom(3)
+        assertEquals(prefixRow, (0 until resid.cols).map { resid.valueAt(1, it) },
+            "rows before the rewind point survive")
+        for (row in 3..4) {
+            assertTrue((0 until resid.cols).all { resid.valueAt(row, it) == 0f }, "resid row $row cleared")
+            assertTrue((0 until attention.cols).all { attention.valueAt(row, it) == 0f },
+                "attention row $row cleared")
+            assertTrue((0 until strip.cols).all { strip.valueAt(row, it) == 0f },
+                "depth strip row $row cleared — it is the replay source")
+        }
+        assertEquals(2, resid.liveRow, "the cursor falls back to the last valid row")
+        assertFalse(bx.hasHistoryFor(0), "stashed histories hold rewound rows, so a rewind drops them")
+    }
+
+    @Test
     fun `the depth strip selects layers and highlights the block's span`() {
         val config = tinyConfig()
         val scene = Lfm2StackCompositor.buildScene(syntheticModel(config))

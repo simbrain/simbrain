@@ -249,7 +249,11 @@ withGui {
 
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
+Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled text fields, apply the same tooltip to both the field and its label by passing `toolTip` to `addTextField(...)`. Explain the controls and their workflow in the simulation sidebar's `# What to Do` section. Tooltips support quick discovery; the sidebar should provide the complete workflow.
+
 ## Documentation
+
+When documenting a simulation control panel, use a separate bullet or line for each control so users can scan its purpose quickly.
 
 Simulation documentation may be added with `addSidebarInfo(...)` or a doc viewer when appropriate. Use one coherent documentation block per simulation and follow the standard template below unless there is a clear reason to deviate.
 

@@ -164,6 +164,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Continuous Hopfield") { hopfieldSimContinuous }
         item("Restricted Boltzmann machine") { rbmSim }
         item("Room schema") { roomSchemaSim }
+        item("Modern Hopfield Network (Beta)") { modernHopfieldSim }
     }
 
     dir("Machine learning") {

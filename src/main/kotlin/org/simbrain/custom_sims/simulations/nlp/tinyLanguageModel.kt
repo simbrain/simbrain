@@ -377,7 +377,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             addSeparator()
 
             // Temperature control with slider and text field
-            addSliderWithTextField("Temperature", 0.01, 2.0, (softmaxSequence.updateRule as SoftmaxRule).temperature, 0.01) { temp ->
+            addSliderWithTextField("Temperature", 0.01, 2.0, (softmaxSequence.updateRule as SoftmaxRule).temperature, 0.01, showValueField = true) { temp ->
                 (softmaxSequence.updateRule as SoftmaxRule).temperature = temp
             }
             

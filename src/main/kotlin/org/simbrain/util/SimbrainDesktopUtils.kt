@@ -18,10 +18,7 @@ import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.workspace.serialization.WorkspaceSerializer
-import java.awt.BorderLayout
-import java.awt.FlowLayout
-import java.awt.Point
-import java.awt.Rectangle
+import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
@@ -178,8 +175,15 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
     }
 
-    fun addTextField(label: String, initValue: String, tab: String? = null, onChange: (String) -> Unit = {}) =
+    fun addTextField(
+        label: String,
+        initValue: String,
+        tab: String? = null,
+        toolTip: String? = null,
+        onChange: (String) -> Unit = {}
+    ) =
         JTextField(initValue).also { textField ->
+            textField.toolTipText = toolTip
             textField.document.addDocumentListener(object : DocumentListener {
                 override fun insertUpdate(e: DocumentEvent?) {
                     onChange(textField.text)
@@ -194,7 +198,7 @@ class ControlPanelKt(title: String = "Control Panel"):
                 }
             })
             launch(Dispatchers.Swing) {
-                getTab(tab).addItem(label, textField)
+                getTab(tab).addItem(label, textField).toolTipText = toolTip
             }
         }
 
@@ -321,8 +325,11 @@ class ControlPanelKt(title: String = "Control Panel"):
         maxValue: Double,
         initValue: Double,
         increment: Double = 0.1,
+        showValueField: Boolean = false,
+        showTicks: Boolean = false,
         textFieldColumns: Int = 5,
         tab: String? = null,
+        toolTip: String? = null,
         onChange: suspend (Double) -> Unit = {}
     ) {
         val slider = JSlider(
@@ -330,33 +337,55 @@ class ControlPanelKt(title: String = "Control Panel"):
             (maxValue / increment).toInt(),
             (initValue / increment).toInt()
         )
-        
-        val textField = JFormattedTextField(NumberFormat.getNumberInstance().apply {
-            minimumFractionDigits = 1
-            maximumFractionDigits = 2
-        })
-        textField.columns = textFieldColumns
-        textField.value = initValue
+        slider.toolTipText = toolTip
+        if (showTicks) {
+            slider.paintTicks = true
+            slider.paintLabels = true
+            val minSliderValue = (minValue / increment).toInt()
+            val maxSliderValue = (maxValue / increment).toInt()
+            val majorTickSpacing = ((maxSliderValue - minSliderValue) / 4).coerceAtLeast(1)
+            slider.majorTickSpacing = majorTickSpacing
+            slider.minorTickSpacing = (majorTickSpacing / 2).coerceAtLeast(1)
+            slider.labelTable = Hashtable<Int, JLabel>().apply {
+                put(minSliderValue, JLabel(String.format("%.1f", minValue)))
+                put((minSliderValue + maxSliderValue) / 2, JLabel(String.format("%.1f", (minValue + maxValue) / 2)))
+                put(maxSliderValue, JLabel(String.format("%.1f", maxValue)))
+            }
+        }
+
+        val valueSpinner = if (showValueField) {
+            JFormattedTextField(NumberFormat.getNumberInstance().apply {
+                minimumFractionDigits = 1
+                maximumFractionDigits = 2
+            }).apply {
+                columns = textFieldColumns
+                value = initValue
+                toolTipText = toolTip
+            }
+        } else null
         
         // Create a panel to hold both slider and text field
         val panel = JPanel()
         panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
         panel.add(slider)
-        panel.add(Box.createHorizontalStrut(10))
-        panel.add(textField)
+        valueSpinner?.let {
+            it.maximumSize = Dimension(it.preferredSize.width, it.preferredSize.height)
+            it.alignmentY = 0.5f
+            panel.add(Box.createHorizontalStrut(10))
+            panel.add(it)
+        }
         
         // Slider updates text field and calls onChange
         slider.addChangeListener {
             val value = slider.value * increment
-            textField.value = value
+            valueSpinner?.value = value
             launch {
                 onChange(value)
             }
         }
         
-        // Text field updates slider and calls onChange
-        textField.addPropertyChangeListener("value") {
-            val value = (textField.value as? Number)?.toDouble() ?: initValue
+        valueSpinner?.addPropertyChangeListener("value") {
+            val value = (valueSpinner.value as? Number)?.toDouble() ?: initValue
             val clampedValue = value.coerceIn(minValue, maxValue)
             slider.value = (clampedValue / increment).toInt()
             launch {
@@ -365,7 +394,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
         
         launch(Dispatchers.Swing) {
-            getTab(tab).addItem(label, panel)
+            getTab(tab).addItem(label, panel).toolTipText = toolTip
             pack()
         }
     }

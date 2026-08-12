@@ -249,11 +249,11 @@ withGui {
 
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
-Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled text fields, apply the same tooltip to both the field and its label by passing `toolTip` to `addTextField(...)`. Explain the controls and their workflow in the simulation sidebar's `# What to Do` section. Tooltips support quick discovery; the sidebar should provide the complete workflow.
+Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled text fields, apply the same tooltip to both the field and its label by passing `toolTip` to `addTextField(...)`. Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
 
 ## Documentation
 
-When documenting a simulation control panel, use a separate bullet or line for each control so users can scan its purpose quickly.
+When documenting a simulation control panel, include a `# Control Panel` or `## Control Panel Settings` section. Use a separate bullet or paragraph for every visible control, including buttons and dialog controls, describing its purpose and any important outcome or workflow. This is the standard for simulations with interactive controls, not an optional extra.
 
 Simulation documentation may be added with `addSidebarInfo(...)` or a doc viewer when appropriate. Use one coherent documentation block per simulation and follow the standard template below unless there is a clear reason to deviate.
 
@@ -286,7 +286,7 @@ Standard template and intent:
 - `# Simulation Details`
   Technical background and specifics of the simulation. Use `##` subsections when needed.
 - `## Control Panel Settings`
-  Optional subsection for simulations with control panels. Place it near the top of the documentation, usually under `# Simulation Details`, when the controls are important for interpreting or running the simulation. Briefly explain what each setting changes, or point users to tooltips when the UI already explains the controls well.
+  Required subsection for simulations with control panels. Place it near the top of the documentation or use a top-level `# Control Panel` when the controls are central to the workflow. Give every visible control its own line; explain what it changes, what it opens, and what the user should expect from it. Put this section before `# What to Do` so readers can consult the control reference before following the workflow.
 - `# What to Do`
   Explain how to run the simulation and what the user should try. Use `##` subsections for demos, experiments, or exploration paths when helpful.
 - `# Links`

@@ -58,6 +58,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Feed-Forward MNIST") { tinyMNIST }
         item("CNN MNIST") { cnnMNIST }
+        item("Delayed recall (BPTT)", beta = true) { bpttDelayedRecall }
+        item("Curriculum (BPTT)", beta = true) { bpttCurriculum }
     }
 
     dir("Braitenberg") {
@@ -86,7 +88,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        item("Serial order memory (toy)", beta = true) { serialOrderMemory }
+        item("Botvinick-Plaut serial recall (BPTT)", beta = true) { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
         item("Temporal attention network (paper model)", beta = true) { denisonNetPaper }
     }
@@ -174,8 +176,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Recurrent networks") {
         item("Recurrent net") { recurrentProjection }
         item("Recurrent net (array)") { recurrentNetArrayBased }
-        item("Delayed recall (BPTT)") { bpttDelayedRecall }
-        item("Curriculum (BPTT)") { bpttCurriculum }
     }
 
     dir("Reinforcement learning") {

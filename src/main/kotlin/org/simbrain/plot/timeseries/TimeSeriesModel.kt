@@ -158,10 +158,14 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     /**
-     * Adds a [TimeSeries] with a default description.
+     * Adds a [TimeSeries] with a default description, skipping numbers still in use so that removing a series
+     * from the middle of the chart does not make the next add collide with a surviving key.
      */
     fun addTimeSeries() {
-        val description = "Series " + (timeSeriesList.size + 1)
+        val usedKeys = timeSeriesList.map { it.series.key.toString() }.toSet()
+        val description = generateSequence(1) { it + 1 }
+            .map { "Series $it" }
+            .first { it !in usedKeys }
         addTimeSeries(description)
     }
 

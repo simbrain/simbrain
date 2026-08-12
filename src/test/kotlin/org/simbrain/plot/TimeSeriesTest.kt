@@ -288,6 +288,20 @@ class TimeSeriesTest {
     }
 
     @Test
+    fun `default names skip numbers still in use after a mid-list removal`() {
+        val model = TimeSeriesModel()
+        model.timeSupplier = { 0 }
+        model.addTimeSeries(3)
+        assertEquals(listOf("Series 1", "Series 2", "Series 3"), model.timeSeriesList.map { it.description })
+
+        model.removeTimeSeries(model.timeSeriesList[0])
+        model.addTimeSeries()
+
+        assertEquals(listOf("Series 2", "Series 3", "Series 1"), model.timeSeriesList.map { it.description })
+        assertEquals(3, model.dataset.seriesCount)
+    }
+
+    @Test
     fun `test time series data management`() = runBlocking {
         val workspace = Workspace()
         val timeSeriesModel = workspace.createTimeSeriesModel()

@@ -22,13 +22,14 @@ class TextWorldSpanHighlightSnapshot : UiSnapshotDef {
         world.showTokenBoundaries = false
         world.text = "<|startoftext|>Here is a brief two-paragraph parable:\n\n" +
             "In a small village, there lived a wise old man named Elder."
-        world.statusMessageProvider = { "Processing prompt — token 13 of 30" }
+        world.statusMessageProvider = { "Finished — edit the text to continue" }
+        world.tokenCountLabelProvider = { "147 used / 365 remaining" }
         val start = world.text.indexOf("village")
         world.setHighlightSpan(intArrayOf(start, start + "village".length))
         lateinit var panel: TextWorldPanel
         SwingUtilities.invokeAndWait {
             panel = TextWorldPanel(world)
-            panel.preferredSize = Dimension(460, 300)
+            panel.preferredSize = Dimension(400, 300)
             panel.updateHighlights()
         }
         return panel

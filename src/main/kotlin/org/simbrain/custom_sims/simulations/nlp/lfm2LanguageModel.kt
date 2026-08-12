@@ -228,7 +228,7 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
                 "Processing prompt — token ${languageModel.fedTokenCount} of ${languageModel.windowTokenCount}"
             languageModel.isSealed -> if (languageModel.promptMode == PromptMode.CHAT)
                 "Reply finished — send the next message"
-            else "Finished — edit the text or remove the end marker to continue"
+            else "Finished — edit the text to continue"
             languageModel.isWindowFull -> "Context window full — Reset to start over"
             languageModel.budgetSpent -> "Token limit reached — edit the text to continue"
             languageModel.canAdvance -> "Generating — ${languageModel.generatedCount} tokens so far"

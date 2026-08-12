@@ -108,12 +108,14 @@ class TextWorldPanel(
         add(topToolBar,  BorderLayout.NORTH)
 
         // Status bar
-        val statusBar = JPanel(BorderLayout()).apply {
+        // The message rides CENTER so it ellipsizes on narrow windows (the tooltip carries the
+        // full text) instead of painting through the token count in EAST.
+        val statusBar = JPanel(BorderLayout(12, 0)).apply {
             border = BorderFactory.createCompoundBorder(
                 BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.divider),
                 BorderFactory.createEmptyBorder(5, 10, 12, 10)
             )
-            add(statusLabel, BorderLayout.WEST)
+            add(statusLabel, BorderLayout.CENTER)
             add(tokenCountLabel, BorderLayout.EAST)
         }
         add(statusBar, BorderLayout.SOUTH)

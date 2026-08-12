@@ -409,7 +409,7 @@ val spiveyNet = newSim {
 
         # Credits
         
-        [Suzanne Garcia](www.linkedin.com/in/suzanne-garcia5537bb293)
+        [Suzanne Garcia](https://www.linkedin.com/in/suzanne-garcia5537bb293)
         
         Olivia Gawel
         

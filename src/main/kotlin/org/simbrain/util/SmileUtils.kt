@@ -144,7 +144,10 @@ fun TrainingDataset.copy(): TrainingDataset = TrainingDataset(
     inputSize = inputSize,
     targetSize = targetSize,
     inputRowNames = inputRowNames?.toMutableList(),
-    targetRowNames = targetRowNames?.toMutableList()
+    targetRowNames = targetRowNames?.toMutableList(),
+    inputColumnNames = inputColumnNames?.toMutableList(),
+    targetColumnNames = targetColumnNames?.toMutableList(),
+    sequenceLength = sequenceLength
 )
 
 /**

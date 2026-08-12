@@ -15,12 +15,28 @@ class TrainingDataset(
     val inputRowNames: List<String>? = null,
     val targetRowNames: List<String>? = null,
     val inputColumnNames: List<String>? = null,
-    val targetColumnNames: List<String>? = null
+    val targetColumnNames: List<String>? = null,
+    /**
+     * How many consecutive rows make up one independent sequence, or null when the rows are one
+     * continuous stream. A trainer with memory that carries between rows resets it at each boundary.
+     *
+     * Lives here rather than on a trainer because it describes the data: it is the same whatever the
+     * truncation depth or optimizer, it should survive being exported and read back, and it is what the
+     * training table needs in order to draw the boundaries.
+     *
+     * Sequences all have the same length, which is the only case the rest of the machinery is complete
+     * for. Ragged sequences would need padded rows excluded from the loss, and nothing masks the loss
+     * today. A final short sequence is allowed; it is simply the tail of the data.
+     */
+    val sequenceLength: Int? = null
 ): Iterable<Pair<List<Double>, List<Double>>> {
 
     init {
         if (inputs.size != targets.size) {
             throw IllegalArgumentException("inputs and targets must be the same size")
+        }
+        if (sequenceLength != null && sequenceLength < 1) {
+            throw IllegalArgumentException("sequenceLength must be at least 1, was $sequenceLength")
         }
         if (inputs.isNotEmpty()) {
             inputs.forEach { input ->

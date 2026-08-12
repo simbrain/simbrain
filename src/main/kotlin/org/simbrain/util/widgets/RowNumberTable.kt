@@ -3,10 +3,15 @@ package org.simbrain.util.widgets
 import org.simbrain.util.Theme
 import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.util.table.SimbrainDataFrame
+import org.simbrain.util.table.SEQUENCE_RULE_THICKNESS
+import org.simbrain.util.table.SimbrainJTable
+import org.simbrain.util.table.paintRowGroupRules
+import org.simbrain.util.table.rowBandColor
 import java.awt.Color
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Font
+import java.awt.Graphics
 import java.beans.PropertyChangeEvent
 import java.beans.PropertyChangeListener
 import javax.swing.JScrollPane
@@ -18,6 +23,7 @@ import javax.swing.event.ChangeListener
 import javax.swing.event.TableModelEvent
 import javax.swing.event.TableModelListener
 import javax.swing.table.DefaultTableCellRenderer
+import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableColumn
 
 /*
@@ -58,6 +64,26 @@ class RowNumberTable(private val main: JTable) : JTable(), ChangeListener, Prope
         super.addNotify()
         //  Keep scrolling of the row table in sync with the main table.
         (parent as? JViewport)?.addChangeListener(this)
+    }
+
+    /**
+     * Taken from the main table so the row numbers band along with it. Without this the bands stop at the
+     * edge of the data and the row header reads as a separate, ungrouped table.
+     */
+    private val groupSize: Int? get() = (main as? SimbrainJTable)?.rowGroupSize?.invoke()
+
+    override fun prepareRenderer(renderer: TableCellRenderer, row: Int, column: Int): Component {
+        val component = super.prepareRenderer(renderer, row, column)
+        // Only the banded case needs setting here, unlike in the main table: [RowNumberRenderer] resets the
+        // background to the header's on every cell, so nothing is left over to bleed.
+        rowBandColor(row, groupSize)?.let { component.background = it }
+        return component
+    }
+
+    override fun paintComponent(g: Graphics) {
+        super.paintComponent(g)
+        paintRowGroupRules(this, g, groupSize)
+        paintRowGroupRules(this, g, (main as? SimbrainJTable)?.sequenceSize?.invoke(), SEQUENCE_RULE_THICKNESS)
     }
 
     /*

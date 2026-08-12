@@ -81,20 +81,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun layoutNeuronCircles() {
         if (!neuronArray.circleMode) return
-        val ncol = if (neuronArray.gridMode) {
-            ceil(sqrt(neuronArray.size.toDouble())).toInt()
-        } else if (neuronArray.verticalLayout) {
-            1
-        } else {
-            neuronArray.size
-        }
-        val offset = 50.0
+        val ncol = neuronArray.displayColumns
         neuronCircles.forEachIndexed { i, circle ->
             val row = i / ncol
             val col = i % ncol
             circle.setOffset(
-                col * offset,
-                row * offset
+                col * CIRCLE_SPACING,
+                row * CIRCLE_SPACING
             )
         }
     }
@@ -496,6 +489,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     companion object {
         /** Outline color used to mark pixels in the per-pixel selection. */
         val PIXEL_SELECTION_COLOR: Color = Color(255, 200, 0)
+
+        /** Centre-to-centre spacing of the circles drawn in circle mode. */
+        const val CIRCLE_SPACING = 50.0
     }
 
     override val contextMenu: JPopupMenu

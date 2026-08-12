@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes
 
+import org.piccolo2d.PNode
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.InfoText
 import org.simbrain.network.core.LocatableModel
@@ -230,6 +231,23 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         val nodes = HashSet(outlinedObjects)
         outline.resetOutlinedNodes(nodes)
     }
+
+    /**
+     * Have the outline enclose a node that illustrates the subnetwork without standing for any model
+     * object in it, so that the drawing reads as belonging to the subnetwork. Nothing else treats it as
+     * contents: it is not offset with the group and not counted by [outlinedObjectBounds].
+     */
+    protected fun setDecoration(node: PNode?) {
+        outline.setDecorations(listOfNotNull(node))
+    }
+
+    /**
+     * Bounds of the nodes that stand for the subnetwork's contents, excluding anything passed to
+     * [setDecoration]. A decoration positioned against the outline has to measure this instead, or it
+     * would be reacting to bounds it is itself part of.
+     */
+    protected val outlinedObjectBounds: PBounds
+        get() = PBounds().apply { outlinedObjects.forEach { add(it.fullBounds) } }
 
     fun setInfoTextNode(infoTextNode: ScreenElement) {
         this.infoTextNode = infoTextNode

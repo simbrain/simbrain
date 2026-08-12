@@ -20,6 +20,8 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
+import kotlin.math.ceil
+import kotlin.math.sqrt
 
 /**
  * A "neuron array" backed by a Smile Matrix. Stored as a column vector.
@@ -163,6 +165,28 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         set(showBias) {
             field = showBias
             events.visualPropertiesChanged.fire()
+        }
+
+    /**
+     * The grid the activations are laid out in when drawn: a square for grid mode, a single column for a
+     * vertical array, a single row otherwise. A grid is square rather than exactly [size] cells, so the
+     * last row may be partly empty.
+     *
+     * Lives here rather than in the node because the modes it reads do, and because anything mimicking
+     * this array's appearance needs the same answer.
+     */
+    val displayColumns: Int
+        get() = when {
+            gridMode -> ceil(sqrt(size.toDouble())).toInt()
+            verticalLayout -> 1
+            else -> size
+        }
+
+    val displayRows: Int
+        get() = when {
+            gridMode -> ceil(sqrt(size.toDouble())).toInt()
+            verticalLayout -> size
+            else -> 1
         }
 
     @Transient

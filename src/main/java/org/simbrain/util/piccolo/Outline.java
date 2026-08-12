@@ -33,6 +33,12 @@ public class Outline extends PNode {
 
     private Collection<? extends ScreenElement> outlinedNodes = null;
 
+    /**
+     * Nodes that the outline should enclose but which do not stand for a model object, such as a
+     * drawn-on illustration of the subnetwork. They contribute bounds and nothing else.
+     */
+    private Collection<? extends PNode> decorations = java.util.Collections.emptySet();
+
     private boolean dirtyBounds = false;
 
     private final PropertyChangeListener markBoundsDirty = (evt) -> dirtyBounds = true;
@@ -62,11 +68,27 @@ public class Outline extends PNode {
         invalidateFullBounds();
     }
 
+    /**
+     * Set nodes that the outline should enclose without their standing for any model object. Unlike
+     * {@link #resetOutlinedNodes}, these are plain nodes, so nothing else about the subnetwork treats
+     * them as contents.
+     */
+    public void setDecorations(Collection<? extends PNode> decorations) {
+        this.decorations.forEach(node -> node.removePropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
+        decorations.forEach(node -> node.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
+        this.decorations = decorations;
+        dirtyBounds = true;
+        invalidateFullBounds();
+    }
+
     @Override
     public boolean validateFullBounds() {
         if (dirtyBounds) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
+                bounds.add(node.getFullBounds());
+            }
+            for (PNode node : decorations) {
                 bounds.add(node.getFullBounds());
             }
             updateBound(bounds.x, bounds.y, bounds.width, bounds.height);

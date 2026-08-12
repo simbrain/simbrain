@@ -352,6 +352,40 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     rawMatrixAccumulator: HashMap<Matrix, Matrix>,
     lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
     probe: StructuredProbe? = null,
+): Double = backwardSweep(
+    targetValues,
+    outputLayer,
+    weightAccumulator,
+    synapseGroupAccumulator,
+    biasesAccumulator,
+    rawMatrixAccumulator,
+    lossFunction,
+    probe
+)
+
+/**
+ * A single backward pass over the layer path for one input/target pair. Shared by
+ * [accumulateBackprop], which uses it once, and [accumulateBPTT], which uses it once per timestep.
+ *
+ * [seededErrors] pre-loads error signals for layers that receive gradient from outside this sweep;
+ * BPTT uses it to feed a later timestep's error into an earlier one. [skipConnectors] leaves the
+ * named connectors alone so that a caller can compute their deltas against a different timestep's
+ * source activations. [processedErrors], when supplied, collects each layer's post-derivative error
+ * signal, which is what a recurrent connection's delta is built from.
+ */
+context(Network)
+private fun LinkedHashSet<Layer>.backwardSweep(
+    targetValues: Matrix,
+    outputLayer: Layer,
+    weightAccumulator: HashMap<WeightMatrix, Matrix>,
+    synapseGroupAccumulator: HashMap<SynapseGroup, Matrix>,
+    biasesAccumulator: HashMap<Layer, Matrix>,
+    rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+    lossFunction: BackpropLossFunction,
+    probe: StructuredProbe?,
+    seededErrors: Map<Layer, Matrix> = emptyMap(),
+    skipConnectors: Set<Connector> = emptySet(),
+    processedErrors: MutableMap<Layer, Matrix>? = null,
 ): Double {
 
     val probeContext = probe?.createMapProbe("accumulateBackprop")
@@ -376,9 +410,12 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
     // Map that associates layers with their error signals
     val layerErrorSignals = mutableMapOf<Layer, Matrix>()
-    
+
+    // Cloned because processError mutates error signals in place, and a seed is owned by the caller
+    seededErrors.forEach { (layer, signal) -> layerErrorSignals[layer] = signal.clone() }
+
     // Initialize the output layer's error signal
-    layerErrorSignals[outputLayer] = errorSignal
+    layerErrorSignals[outputLayer] = layerErrorSignals[outputLayer]?.add(errorSignal) ?: errorSignal
 
     // Go through layers from output to input
     reversedLayers.forEach { layer ->
@@ -394,11 +431,14 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
 
         layerContext?.write("processedErrorSignal") { processedErrorSignal.clone() }
 
+        processedErrors?.put(layer, processedErrorSignal.clone())
+
         // Process weight matrices feeding into the current layer.
         // For each one we:
         //  1. compute and accumulate a weight delta using source activations
         //  2. "backpropagate" the error signals by accumulating them for the specific source layer
         layer.incomingConnectors.forEach { connector ->
+            if (connector in skipConnectors) return@forEach
             val connectorContext = layerContext?.createMapProbe(connector.displayName)
             val wm = connector as WeightMatrix
             val weightDeltas = wm.computeWeightDeltas(processedErrorSignal)
@@ -433,6 +473,129 @@ fun LinkedHashSet<Layer>.accumulateBackprop(
     }
 
     return scalarError
+}
+
+private class TimestepSnapshot(val inputs: Matrix, val activations: Matrix)
+
+/**
+ * Backprop through time over one window of a time-ordered sequence.
+ *
+ * The window is run forward first, caching every layer's net inputs and activations at each
+ * timestep. The backward pass then walks from the last timestep to the first, carrying the error at
+ * a temporal connector's source layer into the step before it.
+ *
+ * Deltas from every timestep land in the same accumulators under the same weight matrix keys, so
+ * [SupervisedTrainer.trainBatch] applies one update built from the summed gradient. That summation
+ * is what ties the unrolled copies of a weight matrix to each other.
+ *
+ * [temporalConnectors] are the connections that cross a timestep boundary, typically a layer
+ * connected to itself. Their weight deltas pair the target layer's error at step t with the source
+ * layer's activations at step t-1, so they are held out of the per-step sweep and handled here.
+ * [initialStates] supplies the activations those source layers carry into the first step, defaulting
+ * to zero. Truncation depth is the window length, which the caller chooses by chunking the sequence.
+ * [activationTrace], when supplied, receives each timestep's activations by layer, for a view that
+ * draws the unrolled network.
+ *
+ * The net inputs cached per timestep matter as much as the activations: a layer takes its derivative
+ * with respect to the net input it saw at that step, so restoring activations alone would evaluate
+ * every derivative at the wrong operating point.
+ *
+ * Returns the loss summed over the window.
+ */
+context(Network)
+fun LinkedHashSet<Layer>.accumulateBPTT(
+    inputLayer: Layer,
+    outputLayer: Layer,
+    inputSequence: List<Matrix>,
+    targetSequence: List<Matrix>,
+    temporalConnectors: List<WeightMatrix>,
+    weightAccumulator: HashMap<WeightMatrix, Matrix>,
+    synapseGroupAccumulator: HashMap<SynapseGroup, Matrix>,
+    biasesAccumulator: HashMap<Layer, Matrix>,
+    rawMatrixAccumulator: HashMap<Matrix, Matrix>,
+    lossFunction: BackpropLossFunction = BackpropLossFunction.SSE,
+    initialStates: Map<Layer, Matrix> = emptyMap(),
+    activationTrace: MutableList<Map<Layer, Matrix>>? = null,
+): Double {
+
+    require(inputSequence.isNotEmpty()) { "Cannot run BPTT over an empty sequence" }
+    require(inputSequence.size == targetSequence.size) {
+        "Sequence has ${inputSequence.size} inputs but ${targetSequence.size} targets"
+    }
+    temporalConnectors.forEach { wm ->
+        require(wm.source !is ActivationSequenceProcessor && wm.target !is ActivationSequenceProcessor) {
+            "Temporal connectors must join plain vector layers, but ${wm.displayName} does not"
+        }
+        require(wm.source in this && wm.target in this) {
+            "Temporal connector ${wm.displayName} reaches outside the update path being trained"
+        }
+    }
+
+    val priorActivations = temporalConnectors.map { it.source }.distinct().associateWith { layer ->
+        val initial = initialStates[layer]?.clone() ?: Matrix(layer.activations.nrow(), layer.activations.ncol())
+        layer.activations = initial.clone()
+        initial
+    }
+
+    val timeline = inputSequence.map { input ->
+        forwardPass(listOf(input), listOf(inputLayer))
+        this@accumulateBPTT.associateWith { TimestepSnapshot(it.inputs.clone(), it.activations.clone()) }
+    }
+
+    // Snapshot activations are already clones and restore() clones again before writing them back, so
+    // handing them out here cannot be disturbed by the backward pass.
+    activationTrace?.run {
+        clear()
+        addAll(timeline.map { step -> step.mapValues { (_, snapshot) -> snapshot.activations } })
+    }
+
+    fun restore(snapshots: Map<Layer, TimestepSnapshot>) = snapshots.forEach { (layer, snapshot) ->
+        layer.activations = snapshot.activations.clone()
+        layer.inputs.copyFrom(snapshot.inputs)
+    }
+
+    val skipConnectors = temporalConnectors.toSet()
+    val carriedErrors = mutableMapOf<Layer, Matrix>()
+    var summedError = 0.0
+
+    for (t in inputSequence.indices.reversed()) {
+        restore(timeline[t])
+
+        val processedErrors = mutableMapOf<Layer, Matrix>()
+        summedError += backwardSweep(
+            targetSequence[t],
+            outputLayer,
+            weightAccumulator,
+            synapseGroupAccumulator,
+            biasesAccumulator,
+            rawMatrixAccumulator,
+            lossFunction,
+            null,
+            seededErrors = carriedErrors,
+            skipConnectors = skipConnectors,
+            processedErrors = processedErrors
+        )
+
+        carriedErrors.clear()
+        temporalConnectors.forEach { wm ->
+            val targetError = processedErrors[wm.target] ?: return@forEach
+            val sourceActivations = if (t == 0) {
+                priorActivations.getValue(wm.source)
+            } else {
+                timeline[t - 1].getValue(wm.source).activations
+            }
+            weightAccumulator.getOrPut(wm) {
+                Matrix(wm.weights.nrow(), wm.weights.ncol())
+            }.add(targetError.mm(sourceActivations.transpose()))
+            val incoming = wm.backpropagateError(targetError)
+            carriedErrors[wm.source] = carriedErrors[wm.source]?.add(incoming) ?: incoming
+        }
+    }
+
+    // Leave the network where the window ended rather than where the backward pass finished
+    restore(timeline.last())
+
+    return summedError
 }
 
 /**

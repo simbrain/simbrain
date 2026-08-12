@@ -14,6 +14,7 @@ import java.awt.*
 import java.awt.event.*
 import java.util.*
 import javax.swing.*
+import javax.swing.table.TableCellRenderer
 import javax.swing.table.TableModel
 import javax.swing.text.JTextComponent
 import kotlin.math.max
@@ -215,6 +216,41 @@ class DataViewerScrollPane(val table: JTable, useRowHeaders: Boolean = true): JS
 
 }
 
+/**
+ * Background for [row] in a table grouped into blocks of [groupSize], or null to leave the row alone.
+ * Every other group is banded, so the boundaries read without either group looking like the special one.
+ */
+fun rowBandColor(row: Int, groupSize: Int?): Color? =
+    if (groupSize == null || groupSize < 1) null
+    else if ((row / groupSize) % 2 == 1) Theme.rowBand else null
+
+/**
+ * Draw a rule across [table] wherever a new group of [groupSize] rows begins.
+ *
+ * Painted over the finished table rather than applied as a cell border, so it spans the full width in one
+ * piece and does not compete with the border a focused cell draws.
+ */
+fun paintRowGroupRules(table: JTable, g: Graphics, groupSize: Int?, thickness: Int = ROW_GROUP_RULE_THICKNESS) {
+    if (groupSize == null || groupSize < 1) return
+    g.color = Theme.rowBandRule
+    var row = groupSize
+    while (row < table.rowCount) {
+        val top = table.getCellRect(row, 0, true).y
+        g.fillRect(0, top - thickness / 2, table.width, thickness)
+        row += groupSize
+    }
+}
+
+private const val ROW_GROUP_RULE_THICKNESS = 2
+
+/**
+ * Sequence boundaries are drawn heavier than window boundaries because they are the stronger division: a
+ * window merely stops the gradient, while a sequence boundary is a point the data says nothing carries
+ * across at all. Where a trainer cuts windows within sequences the two coincide, and the heavier rule
+ * simply wins.
+ */
+const val SEQUENCE_RULE_THICKNESS = 5
+
 class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) : JTable(model), CoroutineScope {
 
     private var job = SupervisorJob()
@@ -227,6 +263,21 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
      * If false, null entries cannot be edited.
      */
     var allowNullEditing by model::allowNullEditing
+
+    /**
+     * How many consecutive rows form one group, for tables whose rows are consumed in blocks rather than
+     * one at a time. Groups are drawn as alternating bands separated by a rule.
+     *
+     * A function rather than a value so the size is read at paint time and cannot go stale when whatever
+     * determines it changes. Returning null, the default, leaves the table looking as it always has.
+     */
+    var rowGroupSize: () -> Int? = { null }
+
+    /**
+     * How many consecutive rows form one independent sequence, drawn as a heavier rule than the group
+     * boundaries. Null, the default, means the rows are not divided that way.
+     */
+    var sequenceSize: () -> Int? = { null }
 
     init {
         columnSelectionAllowed = true
@@ -413,6 +464,22 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     override fun isCellEditable(row: Int, column: Int): Boolean {
         return model.isMutable
+    }
+
+    override fun prepareRenderer(renderer: TableCellRenderer, row: Int, column: Int): Component {
+        val component = super.prepareRenderer(renderer, row, column)
+        // Set on both branches: renderers are shared and reused across cells, so a color left over from a
+        // banded row would otherwise bleed into the unbanded one after it.
+        if (!isCellSelected(row, column)) {
+            component.background = rowBandColor(row, rowGroupSize()) ?: background
+        }
+        return component
+    }
+
+    override fun paintComponent(g: Graphics) {
+        super.paintComponent(g)
+        paintRowGroupRules(this, g, rowGroupSize())
+        paintRowGroupRules(this, g, sequenceSize(), SEQUENCE_RULE_THICKNESS)
     }
 
     override fun scrollRectToVisible(aRect: Rectangle) {

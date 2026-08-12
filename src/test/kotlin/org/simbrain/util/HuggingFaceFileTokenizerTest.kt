@@ -47,6 +47,18 @@ class HuggingFaceFileTokenizerTest {
     }
 
     @Test
+    fun `tokenization is not truncated at the tokenizer file's model max length`() {
+        val path = tokenizerPath()
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+
+        val tokenizer = HuggingFaceFileTokenizer(path.toString())
+        val text = "word ".repeat(1200).trim()
+        val tokens = tokenizer.tokenize(text)
+        assertTrue(tokens.size > 512, "expected more than 512 tokens, got ${tokens.size}")
+        assertEquals(text.length - 1, tokens.last().end, "spans must cover the entire text")
+    }
+
+    @Test
     fun `a missing tokenizer file tokenizes to nothing instead of failing`() {
         val tokenizer = HuggingFaceFileTokenizer("/no/such/tokenizer.json")
         assertTrue(tokenizer.tokenize("some text").isEmpty())

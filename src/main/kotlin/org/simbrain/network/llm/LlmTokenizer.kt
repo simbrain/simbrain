@@ -12,7 +12,7 @@ import java.nio.file.Path
  */
 class LlmTokenizer(path: Path) : AutoCloseable {
 
-    private val tokenizer = HuggingFaceTokenizer.newInstance(path)
+    private val tokenizer = HuggingFaceTokenizer.newInstance(path, mapOf("truncation" to "false"))
 
     fun encode(text: String, addSpecials: Boolean = true): IntArray {
         val ids = tokenizer.encode(text, addSpecials, false).ids

@@ -49,6 +49,17 @@ class LlmTokenizerTest {
     }
 
     @Test
+    fun `encoding is not truncated at the tokenizer file's model max length`() {
+        val path = tokenizerPath()
+        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+
+        LlmTokenizer(path!!).use { tokenizer ->
+            val ids = tokenizer.encode("word ".repeat(1200), addSpecials = false)
+            assertTrue(ids.size > 512, "expected more than 512 ids, got ${ids.size}")
+        }
+    }
+
+    @Test
     fun `skip-specials decode drops scaffolding but keeps tool call markers`() {
         val path = tokenizerPath()
         assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")

@@ -38,7 +38,7 @@ class HuggingFaceFileTokenizer(path: String = "") : Tokenizer<HuggingFaceFileTok
         loaded?.let { if (it.first == path) return it.second }
         val file = Path.of(path)
         if (!file.exists()) return null
-        return runCatching { HuggingFaceTokenizer.newInstance(file) }.getOrNull()
+        return runCatching { HuggingFaceTokenizer.newInstance(file, mapOf("truncation" to "false")) }.getOrNull()
             ?.also { loaded = path to it }
     }
 

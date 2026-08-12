@@ -170,6 +170,35 @@ class ContextWindowSyncTest {
     }
 
     @Test
+    fun `a span coupling sweeps the document highlight as the model reads`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val rig = Rig(dir!!)
+        with(rig.workspace.couplingManager) {
+            createCoupling(
+                rig.languageModel.getProducer("getCurrentTokenSpan"),
+                rig.world.getConsumer("setHighlightSpan"),
+            )
+        }
+
+        rig.workspace.simpleIterate()
+        assertNull(rig.world.highlightSpan, "couplings run before the first step, so no span yet")
+
+        rig.workspace.simpleIterate()
+        val first = rig.world.highlightSpan
+        assertNotNull(first)
+        assertEquals(0, first!![0])
+        assertEquals("<|startoftext|>", rig.world.text.substring(first[0], first[1]),
+            "the first swept token is the BOS marker the model read")
+
+        rig.workspace.simpleIterate()
+        val second = rig.world.highlightSpan!!
+        assertEquals(first[1], second[0], "prefill spans tile the document in reading order")
+        assertTrue(second[1] <= rig.world.text.length)
+    }
+
+    @Test
     fun `an edit while generating rebuilds immediately and keeps generating`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")

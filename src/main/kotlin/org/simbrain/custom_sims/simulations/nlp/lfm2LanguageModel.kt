@@ -4,6 +4,7 @@ import kotlinx.coroutines.Dispatchers
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.llm.LanguageModel
+import org.simbrain.network.llm.PromptMode
 import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -54,7 +55,6 @@ val lfm2LanguageModel = newSim {
     languageModel.location = point(0, 0)
 
     val textWorldComponent = addTextWorld("Document")
-    textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.showTokenBoundaries = false
     textWorldComponent.world.text = "Here is a brief two-paragraph parable:"
@@ -221,6 +221,20 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
         val used = textWorld.tokens.size
         "$used used / ${(languageModel.maxSeqLen - used).coerceAtLeast(0)} remaining"
     }
+    textWorld.statusMessageProvider = {
+        when {
+            !languageModel.isLoaded -> null
+            languageModel.isPromptProcessing ->
+                "Processing prompt — token ${languageModel.fedTokenCount} of ${languageModel.windowTokenCount}"
+            languageModel.isSealed -> if (languageModel.promptMode == PromptMode.CHAT)
+                "Reply finished — send the next message"
+            else "Finished — edit the text or remove the end marker to continue"
+            languageModel.isWindowFull -> "Context window full — Reset to start over"
+            languageModel.budgetSpent -> "Token limit reached — edit the text to continue"
+            languageModel.canAdvance -> "Generating — ${languageModel.generatedCount} tokens so far"
+            else -> null
+        }
+    }
 
     with(workspace.couplingManager) {
         createCoupling(
@@ -230,6 +244,10 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
         createCoupling(
             languageModel.getProducer("getContextWindow"),
             textWorld.getConsumer("setTextIfChanged"),
+        )
+        createCoupling(
+            languageModel.getProducer("getCurrentTokenSpan"),
+            textWorld.getConsumer("setHighlightSpan"),
         )
     }
     languageModel.events.weightsLoaded.on(Dispatchers.Default) {

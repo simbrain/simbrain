@@ -182,6 +182,35 @@ class TextWorld : AttributeContainer, EditableObject {
         events.currentTokenChanged.fire(tokenList[_currentTokenIndex])
     }
 
+    /**
+     * Char range highlighted in place of the current token when set — driven by a generative
+     * model's [org.simbrain.network.llm.GenerativeModel.currentTokenSpan] producer so the
+     * highlight follows the token the model is processing rather than this world's own
+     * cursor. Shown subject to [highlightCurrentToken], like any current-token highlight.
+     * Cleared when the user edits the text.
+     */
+    @Transient
+    var highlightSpan: IntArray? = null
+        private set
+
+    /**
+     * Sets the model-driven highlight range; an empty or degenerate [span] clears it. A
+     * per-iteration coupling delivers unchanged spans without event churn.
+     */
+    @Consumable
+    fun setHighlightSpan(span: IntArray) {
+        val newSpan = if (span.size == 2 && span[1] > span[0]) span else null
+        if (newSpan contentEquals highlightSpan) return
+        highlightSpan = newSpan
+        events.highlightSpanChanged.fire()
+    }
+
+    fun clearHighlightSpan() {
+        if (highlightSpan == null) return
+        highlightSpan = null
+        events.highlightSpanChanged.fire()
+    }
+
     @UserParameter(
         label = "Auto advance",
         description = "If true, automatically advance selected token on update.",
@@ -210,10 +239,12 @@ class TextWorld : AttributeContainer, EditableObject {
     var samplingStrategy: SamplingStrategy = SamplingStrategy.TopP()
 
     /**
-     * Set main text without firing an event.
+     * Set main text without firing an event. Used for direct user edits, which also retire
+     * any model-driven highlight.
      */
     fun setTextNoEvent(newText: String) {
         _text = newText
+        clearHighlightSpan()
     }
 
     /**

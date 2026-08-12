@@ -55,6 +55,14 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
     @Transient
     protected var pending = ArrayDeque<Int>()
 
+    /** Whether the feed queue is non-empty: the model is reading fed text, not generating. */
+    val isPromptProcessing: Boolean
+        get() = pending.isNotEmpty()
+
+    /** Backing span for [currentTokenSpan]; subclasses update it as they process tokens. */
+    @Transient
+    protected var currentSpan: IntArray = IntArray(0)
+
     /** The freshest sampled token, which may not have entered the model's context yet. */
     @Transient
     protected var sampledToken = -1
@@ -86,6 +94,7 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
         pending = ArrayDeque()
         sampledToken = -1
         lastGenerated = ""
+        currentSpan = IntArray(0)
         text = ""
         syncGate.reset()
         events.updated.fire()
@@ -95,6 +104,16 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
     @get:Producible
     val generatedToken: String
         get() = lastGenerated
+
+    /**
+     * Char range `[start, end)` in [contextWindow]'s text of the token this iteration
+     * processed — the token being read while the feed queue drains, or the freshly sampled
+     * token during generation. Empty while idle. Couple to a text world's highlight-span
+     * consumer to sweep a highlight across the document as the model works.
+     */
+    @get:Producible
+    val currentTokenSpan: IntArray
+        get() = currentSpan
 
     /** The model's hidden state at the current position; [hiddenStateLabel] says which one. */
     @get:Producible(customDescriptionMethod = "hiddenStateDescription")

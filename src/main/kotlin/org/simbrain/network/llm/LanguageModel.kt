@@ -189,8 +189,18 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
 
     val isLoaded get() = loaded != null
 
+    /** Tokens generated since the last edit or injection; drives the [tokensToGenerate] budget. */
     @Transient
-    private var generatedCount = 0
+    var generatedCount = 0
+        private set
+
+    /** Tokens the model has processed from the current window. */
+    val fedTokenCount: Int
+        get() = loaded?.model?.position ?: 0
+
+    /** Tokens committed to the window, fed or still queued. */
+    val windowTokenCount: Int
+        get() = windowIds.size
 
     @Transient
     @Volatile
@@ -337,6 +347,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         pending = ArrayDeque(ids)
         sampledToken = -1
         lastGenerated = ""
+        currentSpan = IntArray(0)
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null
@@ -391,7 +402,8 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         lastGenerated = ""
         val state = loaded ?: return
         if (!canAdvance) return
-        val id = if (pending.isNotEmpty()) pending.removeFirst() else sampledToken
+        val fromQueue = pending.isNotEmpty()
+        val id = if (fromQueue) pending.removeFirst() else sampledToken
         val position = state.model.position
         val logits = state.model.forwardToken(id)
         sampledToken = sampleToken(logits)
@@ -399,8 +411,10 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
             logits, probabilityCardCandidates, sampledToken, temperature,
         )
         state.scene.publish(position)
+        var spanIndex = if (fromQueue) position else -1
         if (pending.isEmpty()) {
             windowIds.add(sampledToken)
+            if (!fromQueue) spanIndex = windowIds.lastIndex
             syncGate.invalidate()
             trackToolCall(state, sampledToken)
             if (sealsAtEndOfText && sampledToken == state.model.config.eosTokenId) {
@@ -417,7 +431,22 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
                 generatedCount++
             }
         }
+        currentSpan = tokenSpan(spanIndex)
         events.updated.fire()
+    }
+
+    /**
+     * Char range of the [index]th window token in [windowText]'s coordinates, computed from
+     * prefix decode lengths so special tokens and byte-level merges land exactly where the
+     * synced document renders them.
+     */
+    private fun tokenSpan(index: Int): IntArray {
+        val state = loaded ?: return IntArray(0)
+        if (index < 0 || index >= windowIds.size) return IntArray(0)
+        val start = if (index == 0) 0
+            else state.tokenizer.decode(windowIds.subList(0, index).toIntArray()).length
+        val end = state.tokenizer.decode(windowIds.subList(0, index + 1).toIntArray()).length
+        return if (end > start) intArrayOf(start, end) else IntArray(0)
     }
 
     /** The residual stream at [selectedLayer] for the last processed token. */
@@ -458,6 +487,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
             else listOf(Lfm2ChatFormat.BOS_ID) + ids.toList()
         pending = ArrayDeque(window)
         windowIds = ArrayList(window)
+        currentSpan = IntArray(0)
         generatedCount = 0
         toolCallBuffer = null
         pendingToolCalls = null

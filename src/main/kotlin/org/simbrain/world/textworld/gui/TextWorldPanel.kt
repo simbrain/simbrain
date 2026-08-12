@@ -58,12 +58,10 @@ class TextWorldPanel(
     private var updatingTextArea = false
 
     private fun updateStatus() {
-        val message = when {
-            runLocked -> "Read-only while running"
-            else -> world.statusMessageProvider?.invoke()
-        }
+        val provided = world.statusMessageProvider?.invoke()
+        val message = provided ?: if (runLocked) "Read-only while running" else null
         statusLabel.text = message ?: " "
-        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else message
+        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else provided
         textArea.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else null
     }
 
@@ -120,6 +118,7 @@ class TextWorldPanel(
         }
         add(statusBar, BorderLayout.SOUTH)
         updateTokenCount()
+        updateStatus()
 
         // Reset text position when user clicks in text area
         textArea.addMouseListener(object : MouseAdapter() {
@@ -201,6 +200,11 @@ class TextWorldPanel(
             updateHighlights()
         }
 
+        world.events.highlightSpanChanged.on(Dispatchers.Swing) {
+            updateHighlights()
+            updateStatus()
+        }
+
         world.events.preferencesChanged.on(Dispatchers.Swing) {
             updateHighlights()
             updateTokenCount()
@@ -225,6 +229,21 @@ class TextWorldPanel(
         
         if (world.showTokenBoundaries) {
             world.tokens.forEach(::highlightToken)
+        }
+        world.highlightSpan?.let { span ->
+            val start = span[0].coerceIn(0, docLength)
+            val end = span[1].coerceIn(start, docLength)
+            if (end > start) {
+                highlight(start, end)
+                try {
+                    textArea.modelToView(start)?.let { rect ->
+                        textArea.scrollRectToVisible(rect)
+                    }
+                } catch (e: BadLocationException) {
+                    // Span temporarily out of sync with the text area, ignore
+                }
+            }
+            return
         }
         world.tokens.getOrNull(world.currentTokenIndex)?.let { token ->
             // Double-check token is within document bounds

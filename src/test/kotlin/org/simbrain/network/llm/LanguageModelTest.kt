@@ -216,6 +216,42 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `the current token span tracks reading during prefill and the fresh token during generation`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        val seedText = "The capital of France is"
+        languageModel.initialText = seedText
+        languageModel.stopAtEndOfText = false
+        languageModel.tokensToGenerate = 4
+        languageModel.loadWeights()
+
+        assertEquals(0, languageModel.currentTokenSpan.size, "no span before the first step")
+
+        val promptTokens = languageModel.loaded!!.tokenizer.encode(seedText).size
+        var previousEnd = 0
+        repeat(promptTokens) {
+            languageModel.step()
+            val span = languageModel.currentTokenSpan
+            assertEquals(previousEnd, span[0], "prefill spans tile the window in reading order")
+            assertTrue(span[1] > span[0])
+            previousEnd = span[1]
+        }
+        assertEquals("<|startoftext|>$seedText".length, previousEnd,
+            "the sweep covered exactly the seeded window")
+
+        languageModel.step()
+        val genSpan = languageModel.currentTokenSpan
+        val window = languageModel.contextWindow
+        assertEquals(window.length, genSpan[1], "generation highlights the appended token")
+        assertEquals(languageModel.generatedToken, window.substring(genSpan[0], genSpan[1]))
+
+        languageModel.contextWindow = "<|startoftext|>Numbers: one two"
+        assertEquals(0, languageModel.currentTokenSpan.size, "an edit clears the span")
+    }
+
+    @Test
     fun `hidden state produces the selected layer's residual once tokens flow`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")

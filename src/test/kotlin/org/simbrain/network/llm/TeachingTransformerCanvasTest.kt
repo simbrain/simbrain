@@ -1,9 +1,12 @@
 package org.simbrain.network.llm
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
@@ -94,5 +97,101 @@ class TeachingTransformerCanvasTest {
         }
         assertEquals(2 * teaching.model.plan.ops.size, steps, "forward plus backward, one op each")
         assertTrue(teaching.trainer.trainingWindows.isNotEmpty())
+    }
+
+    @Test
+    fun `training step is refused while a forward-only walk is mid-flight`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2, 3))
+        assertNotNull(teaching.stepInferenceOp())
+        val cursor = teaching.model.plan.cursor
+        assertNull(teaching.stepTrainingOp(), "mid-forward walk must not arm a training step")
+        assertEquals(cursor, teaching.model.plan.cursor)
+        assertTrue(teaching.stepWalkInProgress)
+        teaching.finishStepWalk()
+        assertFalse(teaching.stepWalkInProgress)
+        assertEquals(0, teaching.model.plan.cursor)
+        assertNotNull(teaching.stepTrainingOp(), "training walk arms once the forward walk is done")
+    }
+
+    @Test
+    fun `step status narrates the walk's data source and op progress`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2, 3))
+        assertNull(teaching.stepStatusText(), "at rest on the context there is nothing to narrate")
+
+        val opCount = teaching.model.plan.ops.size
+        teaching.stepInferenceOp()
+        assertEquals("context — forward op 2/$opCount", teaching.stepStatusText())
+        teaching.finishStepWalk()
+        assertNull(teaching.stepStatusText(), "a finished forward walk leaves the context showing")
+
+        teaching.stepTrainingOp()
+        assertEquals("training window 1/14 — forward op 2/$opCount", teaching.stepStatusText())
+        while (teaching.model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) teaching.stepTrainingOp()
+        assertEquals("training window 1/14 — backward op 1/$opCount", teaching.stepStatusText())
+        teaching.finishStepWalk()
+        assertEquals("training window 1/14 — trained, weights updated", teaching.stepStatusText(),
+            "the label persists while the tiles still show the training window")
+
+        teaching.forwardContext()
+        assertNull(teaching.stepStatusText(), "a context forward pass reclaims the display")
+    }
+
+    @Test
+    fun `a workspace iteration completes a walk in progress instead of skipping`() {
+        val net = Network()
+        val teaching = canvasModel()
+        runBlocking { net.addNetworkModel(teaching) }
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2, 3))
+
+        teaching.stepTrainingOp()
+        net.update()
+        assertFalse(teaching.stepWalkInProgress, "the iteration finishes the walk to the clean boundary")
+        assertEquals("training window 1/14 — trained, weights updated", teaching.stepStatusText())
+        assertNull(teaching.tokenProbabilitySnapshot, "finishing the walk is the whole iteration — no generation")
+
+        net.update()
+        assertNull(teaching.stepStatusText(), "generation resumes and reclaims the display")
+        assertNotNull(teaching.tokenProbabilitySnapshot)
+    }
+
+    @Test
+    fun `training walk status shows the window text and its continuation target`() {
+        val teaching = canvasModel()
+        teaching.tokenLabels = arrayListOf("a", "b", "c", "d", "e")
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.stepTrainingOp()
+        val status = teaching.stepStatusText()
+        assertNotNull(status)
+        assertTrue(status!!.startsWith("training window 1/14 “a b c d e a” → “b” — forward op 2/"), status)
+    }
+
+    @Test
+    fun `refused steps explain themselves through the step refused event`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        val refusals = mutableListOf<TeachingTransformer.StepRefusal>()
+        teaching.events.stepRefused.on(Dispatchers.Unconfined) { refusals.add(it) }
+
+        teaching.stepInferenceOp()
+        assertEquals(TeachingTransformer.StepRefusal.EMPTY_CONTEXT, refusals.last())
+
+        teaching.finishStepWalk()
+        assertEquals(TeachingTransformer.StepRefusal.NO_WALK_IN_PROGRESS, refusals.last())
+
+        teaching.setContext(intArrayOf(1, 2, 3))
+        assertNotNull(teaching.stepInferenceOp())
+        teaching.stepTrainingOp()
+        assertEquals(TeachingTransformer.StepRefusal.FORWARD_WALK_IN_PROGRESS, refusals.last())
+
+        teaching.finishStepWalk()
+        assertNotNull(teaching.stepTrainingOp())
+        teaching.stepInferenceOp()
+        assertEquals(TeachingTransformer.StepRefusal.TRAINING_WALK_IN_PROGRESS, refusals.last())
+        assertEquals(4, refusals.size, "successful steps fire nothing")
     }
 }

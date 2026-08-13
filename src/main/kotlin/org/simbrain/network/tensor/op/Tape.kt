@@ -82,6 +82,9 @@ class Tape {
     /** The op whose VJP [stepBackward] will run next, or null when no pass is in progress. */
     fun peekBackward(): TensorOp? = if (isBackwardInProgress) entries[backCursor].op else null
 
+    /** 1-based ordinal of the next VJP within the backward pass, or 0 when no pass is in progress. */
+    val backwardStepNumber: Int get() = if (isBackwardInProgress) entries.size - backCursor else 0
+
     /**
      * Runs the single next recorded op's VJP (micro-stepping in reverse), fires backward hooks,
      * and returns the op. Check [isBackwardInProgress] to see whether entries remain.

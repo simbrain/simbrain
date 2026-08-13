@@ -507,6 +507,26 @@ class CompositorNode(
      */
     private val opSelectionOverlay = PNode().apply { pickable = false }.also { addChild(it) }
 
+    /** Step-walk readout pinned inside the outline's top-left corner; hidden with no status. */
+    private val stepStatus = PText().apply {
+        font = Theme.small
+        textPaint = NetworkTheme.current.valueText
+        pickable = false
+        visible = false
+    }.also { addChild(it) }
+
+    private var stepStatusIsNotice = false
+
+    private fun placeStepStatus() {
+        val bounds = background.boundsReference
+        stepStatus.setOffset(bounds.x + 14.0, bounds.y + 10.0)
+    }
+
+    private fun paintStepStatus() {
+        val palette = NetworkTheme.current
+        stepStatus.textPaint = if (stepStatusIsNotice) palette.spiking else palette.valueText
+    }
+
     private var marquee: PPath? = null
 
     /** Invoked after every tier-1 relayout, e.g. so a host can persist tile positions. */
@@ -568,6 +588,7 @@ class CompositorNode(
                 bounds.width + 2 * MARGIN + LENS_SPACE, bounds.height + 2 * MARGIN
             ), false
         )
+        placeStepStatus()
         syncOpSelectionOverlay()
         onLayoutChanged?.invoke()
     }
@@ -577,6 +598,7 @@ class CompositorNode(
         val palette = NetworkTheme.current
         background.paint = palette.canvasBackground
         background.strokePaint = palette.subnetOutline
+        paintStepStatus()
         tileNodes.forEach {
             it.raster.markStale()
             it.syncHighlight()
@@ -1072,11 +1094,13 @@ class CompositorNode(
     }
 
     /**
-     * Micro-stepping render state: glows [currentOp]'s glyph and dims every tile in [stale]
-     * (the not-yet-recomputed half of the pass). Dimming is pure transparency over the cached
-     * rasters — no reshading. Pass (null, empty) at a step boundary to clear.
+     * Micro-stepping render state: glows [currentOp]'s glyph, dims every tile in [stale]
+     * (the not-yet-recomputed half of the pass), and shows [status] — the walk's data source and
+     * progress — in the outline's top-left corner. A [notice] status is an attention flash (why a
+     * step was refused) and paints in the warning color. Dimming is pure transparency over the
+     * cached rasters — no reshading. Pass (null, empty, null) at a step boundary to clear.
      */
-    fun syncStepState(currentOp: TensorOp?, stale: Set<TensorTile>) {
+    fun syncStepState(currentOp: TensorOp?, stale: Set<TensorTile>, status: String? = null, notice: Boolean = false) {
         currentStepOp = currentOp
         staleTiles = stale
         glyphsByOp.values.forEach { it.glowing = it.op == currentOp }
@@ -1084,6 +1108,11 @@ class CompositorNode(
             it.raster.transparency = if (it.tile in stale) STALE_TRANSPARENCY else 1f
             it.badgeGlowing = currentOp != null && it.activationOp == currentOp
         }
+        stepStatusIsNotice = notice
+        stepStatus.text = status ?: ""
+        stepStatus.visible = status != null
+        paintStepStatus()
+        if (status != null) placeStepStatus()
     }
 
     private inner class InteriorInputHandler : PBasicInputEventHandler() {

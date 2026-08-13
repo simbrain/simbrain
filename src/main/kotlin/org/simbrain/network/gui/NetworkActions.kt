@@ -12,6 +12,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
+import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
@@ -560,6 +561,32 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = KeyCombination(KeyEvent.VK_SPACE)
     ) {
         networkPanel.network.update()
+    }
+
+    val stepTransformerForwardOpAction = networkPanel.createAction(
+        name = "Step forward pass one op",
+        description = "Run the selected transformer's forward pass one operation at a time; " +
+            "the active op's glyph glows (f)",
+        keyboardShortcut = KeyCombination('F')
+    ) {
+        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepInferenceOp() }
+    }
+
+    val stepTransformerTrainingOpAction = networkPanel.createAction(
+        name = "Step training one op",
+        description = "Walk the selected transformer through a whole training step op by op — " +
+            "forward, then backward filling gradients (b)",
+        keyboardShortcut = KeyCombination('B')
+    ) {
+        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepTrainingOp() }
+    }
+
+    val finishTransformerStepWalkAction = networkPanel.createAction(
+        name = "Finish current step walk",
+        description = "Run the remaining ops of a walk in progress to the next clean boundary (shift-b)",
+        keyboardShortcut = Shift + 'B'
+    ) {
+        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.finishStepWalk() }
     }
 
     // val addDeepNetAction = if (Utils.isM1Mac()) {

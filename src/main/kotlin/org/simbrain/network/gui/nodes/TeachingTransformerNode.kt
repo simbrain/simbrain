@@ -12,7 +12,6 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TeachingTransformer
-import org.simbrain.network.llm.TeachingTransformerModel
 import org.simbrain.util.*
 import java.awt.geom.Point2D
 import javax.swing.*
@@ -40,6 +39,15 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         events.modelRebuilt.on(swingDispatcher) { rebuildInterior() }
         events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
         events.updateGraphics.on(swingDispatcher) { refreshView() }
+        events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) }
+        // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
+        events.updated.on(swingDispatcher) {
+            if (stepNotice != null) {
+                stepNotice = null
+                stepNoticeTimer.stop()
+                refreshView()
+            }
+        }
         teachingTransformer.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
 
         rebuildInterior()
@@ -123,11 +131,39 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         )
     }
 
+    /** A transient explanation of why a step was refused, shown in place of the walk status. */
+    private var stepNotice: String? = null
+
+    private val stepNoticeTimer = Timer(3500) {
+        stepNotice = null
+        refreshView()
+    }.apply { isRepeats = false }
+
+    private fun flashStepNotice(refusal: TeachingTransformer.StepRefusal) {
+        stepNotice = when (refusal) {
+            TeachingTransformer.StepRefusal.TRAINING_WALK_IN_PROGRESS ->
+                "a training walk is under way — step it (b) or finish it (shift-b) first"
+            TeachingTransformer.StepRefusal.FORWARD_WALK_IN_PROGRESS ->
+                "a forward walk is under way — step it (f) or finish it (shift-b) first"
+            TeachingTransformer.StepRefusal.EMPTY_CONTEXT ->
+                "the context window is empty — nothing to run forward"
+            TeachingTransformer.StepRefusal.NO_TRAINING_WINDOWS ->
+                "no training corpus — nothing to train on"
+            TeachingTransformer.StepRefusal.NO_WALK_IN_PROGRESS ->
+                "no walk under way — start one with f (forward pass) or b (training)"
+        }
+        stepNoticeTimer.restart()
+        refreshView()
+    }
+
     private fun refreshView() {
         val model = teachingTransformer.model
+        val notice = stepNotice
         compositorNode?.syncStepState(
             teachingTransformer.pendingOp(),
             teachingTransformer.scene.staleTiles(model.plan.cursor),
+            notice ?: teachingTransformer.stepStatusText(),
+            notice != null,
         )
         compositorNode?.refreshDirtyTiles()
     }
@@ -158,25 +194,10 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 description = "Open the trainer: run, stop, or step training and watch the loss curve",
             ) { trainingDialog().display() })
             addSeparator()
-            add(createAction(
-                name = "Step forward pass one op",
-                description = "Run the forward pass one operation at a time; the active op's glyph glows",
-            ) {
-                teachingTransformer.stepInferenceOp()
-            })
-            add(createAction(
-                name = "Step training one op",
-                description = "Walk a whole training step op by op — forward, then backward filling gradients",
-            ) {
-                teachingTransformer.stepTrainingOp()
-            })
-            add(createAction(
-                name = "Finish current step walk",
-                description = "Run the remaining ops of a walk in progress to the next clean boundary",
-            ) {
-                val model = teachingTransformer.model
-                while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) teachingTransformer.stepTrainingOp()
-                while (model.plan.cursor != 0) teachingTransformer.stepInferenceOp()
+            add(networkPanel.networkActions.stepTransformerForwardOpAction)
+            add(networkPanel.networkActions.stepTransformerTrainingOpAction)
+            add(JMenuItem(networkPanel.networkActions.finishTransformerStepWalkAction).apply {
+                isEnabled = teachingTransformer.stepWalkInProgress
             })
             addSeparator()
             add(createAction(

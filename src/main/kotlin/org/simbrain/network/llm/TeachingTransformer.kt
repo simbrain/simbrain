@@ -298,6 +298,9 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
 
 class TeachingTransformerEvents : LocationEvents() {
     val modelRebuilt = NoArgEvent()
+
+    /** A step request declined, with why — the GUI surfaces the reason as a transient notice. */
+    val stepRefused = OneArgEvent<TeachingTransformer.StepRefusal>()
 }
 
 /**
@@ -437,6 +440,22 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     @Transient
     private var windowCursor = 0
 
+    /** Set while the scene shows a training window rather than the context; cleared by [forwardContext]. */
+    @Transient
+    private var sceneShowsTrainingWindow = false
+
+    @Transient
+    private var walkWindowOrdinal = 0
+
+    @Transient
+    private var walkWindowCount = 0
+
+    @Transient
+    private var walkWindowPreview: String? = null
+
+    @Transient
+    private var walkWindowTarget: String? = null
+
     /** Immutable display data for the next-token card; rebuilt after each completed forward pass. */
     @Transient
     @Volatile
@@ -566,7 +585,12 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     context(Network)
+    /** A walk in progress absorbs the iteration: finish to the clean boundary now, generate next tick. */
     override fun update() {
+        if (stepWalkInProgress) {
+            finishStepWalk()
+            return
+        }
         if (canAdvance) step() else forwardContext()
     }
 
@@ -597,9 +621,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
 
     /**
      * Advances generation by one token: slides the next pending word (or the last sample) into
-     * the context, runs a full forward pass, and samples the next word. Skips the iteration
-     * while an op micro-step walk is mid-flight; an empty context waits for input, so playing
-     * before the document sync delivers text is not a dead end.
+     * the context, runs a full forward pass, and samples the next word. A mid-flight op walk is
+     * completed by [update] before this runs; the guard here just protects direct calls. An empty
+     * context waits for input, so playing before the document sync delivers text is not a dead end.
      */
     @Synchronized
     fun step() {
@@ -676,6 +700,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     fun forwardContext() {
         if (contextTokens.isEmpty()) return
         if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
+        sceneShowsTrainingWindow = false
         model.setSample(contextTokens)
         model.forward()
         scene.lens?.sourceRow = contextTokens.size - 1
@@ -702,11 +727,27 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
      * Advances a micro-stepped training walk by one op, arming a fresh walk on the next training
      * window when idle. Returns the op that ran, or null with no training windows.
      */
+    enum class StepRefusal {
+        TRAINING_WALK_IN_PROGRESS, FORWARD_WALK_IN_PROGRESS, EMPTY_CONTEXT, NO_TRAINING_WINDOWS, NO_WALK_IN_PROGRESS
+    }
+
     fun stepTrainingOp(): TensorOp? {
         if (model.stepPhase == TeachingTransformerModel.StepPhase.IDLE) {
+            if (model.plan.cursor != 0) {
+                events.stepRefused.fire(StepRefusal.FORWARD_WALK_IN_PROGRESS)
+                return null
+            }
             val windows = trainer.trainingWindows
-            if (windows.isEmpty()) return null
+            if (windows.isEmpty()) {
+                events.stepRefused.fire(StepRefusal.NO_TRAINING_WINDOWS)
+                return null
+            }
             val (tokens, targets) = windows[windowCursor % windows.size]
+            walkWindowOrdinal = windowCursor % windows.size + 1
+            walkWindowCount = windows.size
+            walkWindowPreview = decode(tokens)
+            walkWindowTarget = decode(intArrayOf(targets.last()))
+            sceneShowsTrainingWindow = true
             windowCursor++
             trainer.learningRate = learningRate.toFloat()
             model.beginSteppedTrainStep(tokens, targets)
@@ -719,9 +760,16 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
 
     /** Advances a plain forward pass on the current context by one op. */
     fun stepInferenceOp(): TensorOp? {
-        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) return null
+        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) {
+            events.stepRefused.fire(StepRefusal.TRAINING_WALK_IN_PROGRESS)
+            return null
+        }
         if (model.plan.cursor == 0) {
-            if (contextTokens.isEmpty()) return null
+            if (contextTokens.isEmpty()) {
+                events.stepRefused.fire(StepRefusal.EMPTY_CONTEXT)
+                return null
+            }
+            sceneShowsTrainingWindow = false
             model.setSample(contextTokens)
             scene.lens?.sourceRow = contextTokens.size - 1
         }
@@ -731,9 +779,58 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         return op
     }
 
+    /** Runs the remaining ops of a walk in progress to the next clean boundary. */
+    fun finishStepWalk() {
+        if (!stepWalkInProgress) {
+            events.stepRefused.fire(StepRefusal.NO_WALK_IN_PROGRESS)
+            return
+        }
+        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) stepTrainingOp()
+        while (model.plan.cursor != 0) stepInferenceOp()
+    }
+
+    /** True while an op micro-step walk (training or forward-only) is mid-flight. */
+    val stepWalkInProgress: Boolean
+        get() = model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0
+
     /** The op the next micro-step will run: mid-walk, mid-forward, or null at a clean boundary. */
     fun pendingOp(): TensorOp? = model.nextOp()
         ?: if (model.plan.cursor != 0) model.plan.ops[model.plan.cursor] else null
+
+    /**
+     * One line saying what the diagram is showing and where a step walk is: the walk's data source
+     * (context, or which training window with its continuation target — the targets are the window
+     * shifted by one, so window plus final target is the whole training pair) plus op-level
+     * progress. Stays up after a training walk finishes — the tiles keep showing that window until
+     * the next forward pass on the context clears it. Null when the scene shows the plain context
+     * at rest.
+     */
+    fun stepStatusText(): String? {
+        val source = if (sceneShowsTrainingWindow) {
+            // Elide the front so the target stays adjacent to the text it continues.
+            val preview = walkWindowPreview?.let { if (it.length > 30) "…" + it.takeLast(30) else it }
+            val target = walkWindowTarget
+            buildString {
+                append("training window $walkWindowOrdinal/$walkWindowCount")
+                if (!preview.isNullOrEmpty()) {
+                    append(" “$preview”")
+                    if (!target.isNullOrEmpty()) append(" → “$target”")
+                }
+            }
+        } else "context"
+        val opCount = model.plan.ops.size
+        return when (model.stepPhase) {
+            TeachingTransformerModel.StepPhase.FORWARD ->
+                "$source — forward op ${model.plan.cursor + 1}/$opCount"
+            TeachingTransformerModel.StepPhase.BACKWARD ->
+                "$source — backward op ${model.tape.backwardStepNumber}/${model.tape.size}"
+            TeachingTransformerModel.StepPhase.IDLE -> when {
+                model.plan.cursor != 0 -> "$source — forward op ${model.plan.cursor + 1}/$opCount"
+                sceneShowsTrainingWindow -> "$source — trained, weights updated"
+                else -> null
+            }
+        }
+    }
 
     private fun currentSequenceRow() = (contextTokens.size - 1)
         .takeIf { it >= 0 } ?: config.contextSize - 1

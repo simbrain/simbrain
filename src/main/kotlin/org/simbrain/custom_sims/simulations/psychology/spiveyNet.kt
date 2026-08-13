@@ -29,7 +29,7 @@ val spiveyNet = newSim {
     var conditionText = ""
 
     // Network
-    val networkComponent = addNetworkComponent("Spivey Net")
+    val networkComponent = addNetworkComponent("Normalized Recurrence")
     val net = networkComponent.network
 
     val currentStatus = NetworkTextObject("").apply {
@@ -113,19 +113,26 @@ val spiveyNet = newSim {
         }
     }
 
+    fun NeuronCollection.setNormalizedActivations(activations: DoubleArray) {
+        setActivations(activations)
+        neuronList.normalize()
+    }
+
     net.updateManager.clear()
-    workspace.addUpdateAction("Spivey Net Update", position = 0) {
+    workspace.addUpdateAction("Normalized Recurrence Update", position = 0) {
 
         // Assume lexical nodes have been updated by a control panel button
         with(net) {
             lexicalNodes.neuronList.forEach { it.accumulateFanInInputs() }
             lexicalNodes.neuronList.forEach { it.update() }
             lexicalNodes.neuronList.normalize()
+            visualNodes.neuronList.normalize()
             integrationNodes.neuronList.forEach { it.accumulateFanInInputs() }
             integrationNodes.neuronList.forEach { it.update() }
-            visualNodes.neuronList.normalize()
+            integrationNodes.neuronList.normalize()
             mouseNodes.neuronList.forEach { it.accumulateFanInInputs() }
             mouseNodes.neuronList.forEach { it.update() }
+            mouseNodes.neuronList.normalize()
         }
 
         // Eye movements
@@ -136,25 +143,25 @@ val spiveyNet = newSim {
             // Cohort condition. Spivey does it using visual activations.
             if (targetIndex == 0 && competitorIndex == 1) {
                 if (Math.random() < candleActivation) {
-                    eyesNodes.setActivations(doubleArrayOf(.55, .45, 0.0, 0.0))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.55, .45, 0.0, 0.0))
                 } else {
-                    eyesNodes.setActivations(doubleArrayOf(.45, .55, 0.0, 0.0))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.45, .55, 0.0, 0.0))
                 }
             }
             // Control Condition
             if (targetIndex == 0 && competitorIndex == 3) {
                 if (Math.random() < candleActivation) {
-                    eyesNodes.setActivations(doubleArrayOf(.55, 0.0, 0.0, .45))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.55, 0.0, 0.0, .45))
                 } else {
-                    eyesNodes.setActivations(doubleArrayOf(.45, 0.0, 0.0, 0.55))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.45, 0.0, 0.0, 0.55))
                 }
             }
             // Rhyme condition
             if (targetIndex == 0 && competitorIndex == 2) {
                 if (Math.random() < candleActivation) {
-                    eyesNodes.setActivations(doubleArrayOf(.55, 0.0, 0.45, 0.0))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.55, 0.0, 0.45, 0.0))
                 } else {
-                    eyesNodes.setActivations(doubleArrayOf(.45, 0.0, 0.55, 0.0))
+                    eyesNodes.setNormalizedActivations(doubleArrayOf(.45, 0.0, 0.55, 0.0))
                 }
             }
         }
@@ -213,7 +220,7 @@ val spiveyNet = newSim {
         competitorObject.entityType = EntityType.Fork
         competitorIndex = 3
         resetExperiment()
-        visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
+        visualNodes.setNormalizedActivations(doubleArrayOf(1.0, 0.0, 0.0, 1.0))
     }
 
     suspend fun applyCohortCondition() {
@@ -224,7 +231,7 @@ val spiveyNet = newSim {
         targetIndex = 0
         competitorObject.entityType = EntityType.Candy
         competitorIndex = 1
-        visualNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
+        visualNodes.setNormalizedActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
     }
 
     suspend fun applyRhymeCondition() {
@@ -235,7 +242,7 @@ val spiveyNet = newSim {
         competitorObject.entityType = EntityType.Handle
         competitorIndex = 2
         resetExperiment()
-        visualNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
+        visualNodes.setNormalizedActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
     }
 
     withGui {
@@ -266,27 +273,27 @@ val spiveyNet = newSim {
                 eye.drawTrailWithoutRunningWorkspace = true
                 when (timeIndex) {
                     0 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
+                        lexicalNodes.setNormalizedActivations(doubleArrayOf(1.0, 1.0, 0.0, 0.0))
                         currentStatus.text = "$conditionText\nLexical: now hearing /k/"
                     }
 
                     1 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        lexicalNodes.setNormalizedActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
                         currentStatus.text = "$conditionText\nLexical: now hearing /a/"
                     }
 
                     2 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        lexicalNodes.setNormalizedActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
                         currentStatus.text = "$conditionText\nLexical: now hearing /n/"
                     }
 
                     3 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
+                        lexicalNodes.setNormalizedActivations(doubleArrayOf(1.0, 1.0, 1.0, 0.0))
                         currentStatus.text = "$conditionText\nLexical: now hearing /d/"
                     }
 
                     4 -> {
-                        lexicalNodes.setActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
+                        lexicalNodes.setNormalizedActivations(doubleArrayOf(1.0, 0.0, 1.0, 0.0))
                         currentStatus.text = "$conditionText\nLexical: now hearing /l/"
                     }
 
@@ -314,8 +321,7 @@ val spiveyNet = newSim {
         """ 
         # Mouse and Eye Tracking
         
-        This is a localist attractor network based on (Spivey, 2025) that simulates mouse trajectories relative to visual and auditory inputs.
-         It is a computational model of behavioral studies described in (Spivey et al., 2005). It is not a model of learning
+        This is a Normalized Recurrence localist attractor network based on (Spivey, 2025) that simulates eye movements  and mouse trajectories. It is not a model of learning
          but rather an illustration of how a relatively simple, structured network can simulate the intricate
          real-time interplay between language comprehension, visual attention, and motor behavior. 
          It shows how cognition  is not a series of isolated stages, but a fluid, embodied process deeply shaped by perception 
@@ -323,7 +329,7 @@ val spiveyNet = newSim {
          
         The visual world localist attractor network is a computational model that serves as a linking hypothesis between 
         internal cognitive processes (specifically in spoken word recognition) and observable motor outputs like 
-        eye movements and mouse trajectories in the [Visual World Paradigm](https://people.clas.ufl.edu/jvaldeskroff/files/SecondLang_Chapter.pdf). 
+        eye movements and mouse trajectories in the [Visual World Paradigm](https://www.sciencedirect.com/science/article/pii/S0006899325005281). 
         The core idea is that cognition and action are dynamically interconnected: what we look at or move toward not 
         only reflects but also influences what we're thinking. Spivey's model integrates parallel lexical activations, 
         visual input, and motor output with feedback loops especially from eye position to 
@@ -337,15 +343,13 @@ val spiveyNet = newSim {
         
         # Simulation Details
         
-        In the studies in (Spivey et al., 2005) participants were shown two objects and told which to point to.
-        The scientists tracked their mouse and eyes as they pointed to the requested objects. This is the kind of data
-        that were gathered, shown below.
+        In the Spivey et al. (2005) study, participants were shown two objects and told to click one with their mouse. The scientists tracked the continuous trajectory of the mouse movement as participants pointed to the named object. This is the kind of data that was gathered:
          
          <img src="//localfiles/simulations/images/visualWorld/spiveyMouseTrace.png" alt="Mouse trace icon" height="200">
         
         There were three main conditions:
         
-         1. **Control condition**: candle target and fork competitor. Eyes should go straight to target without being influenced by the competitor,
+         1. **Canonical Control condition**: candle target and fork competitor. (There was not just one control: they used dozens of objects on various trials).Eyes should go straight to target without being influenced by the competitor,
             because candle and fork have very different phonemic representations. In this condition eye position should settle on the candle quickly,
             with little or no dwell time on the fork. The mouse trace should be close to a straight path to the candle, with little or no bulge
             toward the fork.
@@ -363,7 +367,7 @@ val spiveyNet = newSim {
         
         ## Compare conditions
         
-        **To compare mouse traces across conditions, switch directly between `Control`, `Cohort`, and `Rhyming` without pressing `Reset`.**
+        **To compare mouse traces across conditions:** switch directly between `Control`, `Cohort`, and `Rhyming` without pressing `Reset`.
         Those condition buttons start a new trial but preserve the existing trails, so multiple trajectories can remain visible together.
         
         1. Control Condition
@@ -389,8 +393,8 @@ val spiveyNet = newSim {
        
         ## To plot activations 
         
-        In (Spivey, 2025), the central figure is Figure 5 which shows time series plots for activations in different parts of the network,
-        which illustrates the dynamics governing the mouse traces. Shown below.
+        In (Spivey, 2025) time series plots for activations in different parts of the network are shown,
+        which illustrate the dynamics governing the mouse traces. 
         
         <img src="//localfiles/simulations/images/visualWorld/spiveyActivationDynamics.png" alt="Activation dynamics icon" height="200">
         

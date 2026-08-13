@@ -68,7 +68,7 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         addAddSeriesButton()
 
         add(chartPanel, "wrap")
-        add(legendPanel, "growx, wrap")
+        add(legendPanel, "growx, pushx, wmin 0, wrap")
         add(buttonPanel)
 
         timeSeriesModel.events.propertyChanged.on { this.updateChartSettings() }

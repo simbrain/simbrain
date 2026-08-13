@@ -6,9 +6,9 @@ import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.WithXStreamPropertyConverter
 import org.simbrain.util.createXStreamPropertyConverter
-import org.simbrain.util.runOnEventThread
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.runOnEventThread
 import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable

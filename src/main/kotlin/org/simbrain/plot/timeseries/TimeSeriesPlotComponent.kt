@@ -6,15 +6,14 @@ import org.simbrain.plot.XYSeriesConverter
 import org.simbrain.plot.timeseries.TimeSeriesModel.TimeSeries
 import org.simbrain.util.DoubleArrayConverter
 import org.simbrain.util.getSimbrainXStream
-import org.simbrain.workspace.AttributeComponent
-import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.disambiguateNames
-import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.*
 import java.io.InputStream
 import java.io.OutputStream
 
 class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model: TimeSeriesModel = TimeSeriesModel()) : WorkspaceComponent(name) {
+
+    /** Whether scalar couplings automatically replace series names with their producers' names. */
+    var useScalarCouplingNames = true
 
     override var workspace: Workspace
         get() = super.workspace
@@ -25,7 +24,7 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
             onCoupledProducer { consumer, producer ->
                 if (consumer === model) {
                     model.syncTimeSeries(producer.displayComponents)
-                } else if (consumer is TimeSeries) {
+                } else if (consumer is TimeSeries && useScalarCouplingNames) {
                     applyScalarNames()
                 }
             }

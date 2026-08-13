@@ -7,14 +7,9 @@
 package org.simbrain.plot
 
 import org.simbrain.util.Theme
-import java.awt.Color
-import java.awt.Cursor
-import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Paint
-import java.awt.RenderingHints
+import java.awt.*
+import java.awt.event.ComponentAdapter
+import java.awt.event.ComponentEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.JComponent
@@ -22,6 +17,15 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
+
+    init {
+        addComponentListener(object : ComponentAdapter() {
+            override fun componentResized(event: ComponentEvent) {
+                revalidate()
+                parent?.revalidate()
+            }
+        })
+    }
 
     /**
      * One legend row. [paint] is queried at paint time so swatches track the renderer's current
@@ -35,10 +39,43 @@ class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
 
     fun setEntries(entries: List<Entry>) {
         removeAll()
+        layout = FlowLayout(FlowLayout.CENTER, 12, 2)
         entries.forEach { add(entryComponent(it)) }
         revalidate()
         repaint()
     }
+
+    /**
+     * Reports the height of every wrapped row at the current width.
+     *
+     * FlowLayout wraps components while laying out but otherwise reports a one-row preferred size,
+     * which would cause the parent plot layout to clip later legend rows.
+     */
+    override fun getPreferredSize(): Dimension {
+        val fallback = super.getPreferredSize()
+        val availableWidth = width.takeIf { it > 0 } ?: parent?.width?.takeIf { it > 0 } ?: return fallback
+        val flowLayout = layout as? FlowLayout ?: return fallback
+        val maxRowWidth = availableWidth - insets.left - insets.right - flowLayout.hgap * 2
+        if (maxRowWidth <= 0) return fallback
+
+        var rowWidth = 0
+        var rowHeight = 0
+        var totalHeight = flowLayout.vgap
+        components.filter { it.isVisible }.forEach { component ->
+            val preferred = component.preferredSize
+            if (rowWidth > 0 && rowWidth + flowLayout.hgap + preferred.width > maxRowWidth) {
+                totalHeight += rowHeight + flowLayout.vgap
+                rowWidth = 0
+                rowHeight = 0
+            }
+            rowWidth += if (rowWidth == 0) preferred.width else flowLayout.hgap + preferred.width
+            rowHeight = maxOf(rowHeight, preferred.height)
+        }
+        if (rowWidth > 0) totalHeight += rowHeight + flowLayout.vgap
+        return Dimension(availableWidth, totalHeight + insets.top + insets.bottom)
+    }
+
+    override fun getMinimumSize(): Dimension = preferredSize
 
     private fun entryComponent(entry: Entry): JComponent {
         val row = JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply { isOpaque = false }

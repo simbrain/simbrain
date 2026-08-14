@@ -10,6 +10,8 @@ import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
 import org.simbrain.network.gui.isPanKeyDown
+import org.simbrain.network.gui.nodes.NEURON_DIAMETER
+import org.simbrain.network.gui.nodes.NeuronCircleNode
 import org.simbrain.network.llm.HeadwiseNormRopeOp
 import org.simbrain.network.tensor.op.*
 import org.simbrain.util.*
@@ -80,7 +82,7 @@ class CompositorNode(
     private val probabilityCardOverlay = scene.overlays.firstOrNull { it.id == PROBABILITY_CARD_ID }
         ?: InteriorOverlay(PROBABILITY_CARD_ID, probabilityCardStyle.width, probabilityCardStyle.height).also(scene::addOverlay)
 
-    private val probabilityCard = TokenProbabilityCardNode(tokenLabel, probabilityCardStyle).also {
+    private val probabilityCard = TokenProbabilityCardNode(tokenLabel, probabilityCardStyle, ::viewScale).also {
         it.onMoved = {
             probabilityCardOverlay.x = it.offset.x
             probabilityCardOverlay.y = it.offset.y
@@ -478,21 +480,22 @@ class CompositorNode(
     private val tileNodes = scene.tiles.map { TileNode(it).also { node -> addChild(node) } }
     private val tileNodesById = tileNodes.associateBy { it.tile.id }
 
+    private fun viewScale() = canvas?.camera?.viewScale ?: 1.0
+
     private inner class LensRowNode(val index: Int) : PNode() {
-        val swatch = PPath.createRectangle(0.0, 0.0, 14.0, 14.0).apply {
-            strokePaint = NetworkTheme.current.imageBorder
+        val circle = NeuronCircleNode(::viewScale).apply {
+            setOffset(LENS_CIRCLE_RADIUS, LENS_CIRCLE_RADIUS)
         }.also { addChild(it) }
         val text = PText().apply {
             font = Theme.small
-            setOffset(20.0, 1.0)
+            setOffset(2 * LENS_CIRCLE_RADIUS + 6.0, LENS_CIRCLE_RADIUS - 7.0)
         }.also { addChild(it) }
 
         fun refresh() {
             val lens = scene.lens ?: return
             val reading = lens.readings[index]
-            val palette = NetworkTheme.current
-            swatch.paint = Color(reading.prob.toSimbrainColor(palette.coolNode, palette.neutralMidpoint, palette.hotNode))
-            text.textPaint = palette.valueText
+            circle.drawActivation(reading.prob.toDouble(), -1.0..1.0)
+            text.textPaint = NetworkTheme.current.valueText
             text.text = "${tokenLabel(reading.tokenId)}  ${"%.2f".format(reading.prob)}"
         }
     }
@@ -570,7 +573,7 @@ class CompositorNode(
         for (row in lensRows) {
             val sourceId = scene.lens?.sources?.get(row.index)?.name ?: continue
             val tile = tileNodesById[sourceId]?.tile ?: continue
-            row.setOffset(tile.x - LENS_SPACE, tile.y + tile.height / 2 - 8.0)
+            row.setOffset(tile.x - LENS_SPACE, tile.y + tile.height / 2 - LENS_CIRCLE_RADIUS)
         }
         val bounds = scene.tiles.fold(null as Rectangle2D?) { acc, tile ->
             val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 34)
@@ -1305,6 +1308,7 @@ class CompositorNode(
         private const val MARGIN = 40.0
         private const val DRAG_RELAYOUT_MS = 33L
         private const val LENS_SPACE = 220.0
+        private const val LENS_CIRCLE_RADIUS = NEURON_DIAMETER / 2.0
         private const val DECK_STEP = 2.0
 
         /** One diagonal step for everything head-indexed — deck cards, op-deck cards, edge

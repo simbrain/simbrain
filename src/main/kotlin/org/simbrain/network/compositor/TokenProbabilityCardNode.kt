@@ -7,25 +7,25 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.simbrain.network.gui.ArrowDirection
 import org.simbrain.network.gui.createArrowButton
+import org.simbrain.network.gui.nodes.NEURON_DIAMETER
+import org.simbrain.network.gui.nodes.NeuronCircleNode
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
-import org.simbrain.util.toSimbrainColor
-import java.awt.BasicStroke
-import java.awt.Color
 import java.awt.geom.Point2D
 
 data class TokenProbabilityCardStyle(
     val title: String = "next-token probabilities",
     val width: Double = 230.0,
-    val height: Double = 210.0,
+    val height: Double = 300.0,
     val columns: Int = 5,
     val visibleRows: Int = 4,
 )
 
-/** Compact canvas card for a copied next-token distribution. */
+/** Compact canvas card for a copied next-token distribution, one neuron circle per token. */
 class TokenProbabilityCardNode(
     private val tokenLabel: (Int) -> String,
     private val style: TokenProbabilityCardStyle = TokenProbabilityCardStyle(),
+    private val scalingFactor: () -> Double = { 1.0 },
 ) : PNode() {
 
     val cardWidth get() = style.width
@@ -108,7 +108,7 @@ class TokenProbabilityCardNode(
         entries.forEachIndexed { index, entry ->
             val col = index % style.columns
             val row = index / style.columns
-            addEntry(value, entry, PADDING + col * cellStep, HEADER_HEIGHT + row * cellStep, cellSize, true)
+            addEntry(value, entry, PADDING + (col + 0.5) * cellStep, HEADER_HEIGHT + (row + 0.5) * cellStep, true)
         }
         if (value.entries.size > visibleCells) {
             content.addChild(PText("${firstVisible + 1}-${firstVisible + entries.size} / ${value.entries.size}").apply {
@@ -122,34 +122,39 @@ class TokenProbabilityCardNode(
 
     private fun ranked(value: TokenProbabilitySnapshot) {
         value.entries.forEachIndexed { index, entry ->
-            addEntry(value, entry, PADDING, HEADER_HEIGHT + index * ROW_STEP, ROW_WIDTH, false)
+            addEntry(value, entry, PADDING + RADIUS, HEADER_HEIGHT + index * ROW_STEP + RADIUS, false)
         }
     }
 
-    private fun addEntry(value: TokenProbabilitySnapshot, entry: TokenProbabilitySnapshot.Entry, x: Double, y: Double, size: Double, grid: Boolean) {
-        val palette = NetworkTheme.current
-        content.addChild(PPath.createRectangle(x, y, if (grid) size else 12.0, if (grid) size else 12.0).apply {
-            paint = Color(entry.probability.toFloat().toSimbrainColor(palette.coolNode, palette.neutralMidpoint, palette.hotNode))
-            strokePaint = if (entry.tokenId == value.sampledTokenId) palette.sourceHandle else palette.imageBorder
-            stroke = BasicStroke(if (entry.tokenId == value.sampledTokenId) 2f else 1f)
-        })
+    /** One neuron circle centered at (x, y); grid cells label above, ranked rows label beside. */
+    private fun addEntry(value: TokenProbabilitySnapshot, entry: TokenProbabilitySnapshot.Entry, x: Double, y: Double, grid: Boolean) {
+        val sampled = entry.tokenId == value.sampledTokenId
         val label = tokenLabel(entry.tokenId).replace("\n", " ").take(if (grid) 11 else 28)
-        content.addChild(PText(if (grid) label else "$label  ${"%.1f".format(entry.probability * 100)}%").apply {
-            font = Theme.tiny
-            textPaint = palette.valueText
-            setOffset(if (grid) x - 2.0 else x + 18.0, if (grid) y + size + 1.0 else y - 1.0)
+        content.addChild(NeuronCircleNode(scalingFactor).apply {
+            customStrokeColor = if (sampled) NetworkTheme.current.sourceHandle else null
+            setClamped(sampled)
+            drawActivation(entry.probability, -1.0..1.0)
+            if (grid) setLabel(label)
+            setOffset(x, y)
             pickable = false
         })
+        if (!grid) {
+            content.addChild(PText("$label  ${"%.1f".format(entry.probability * 100)}%").apply {
+                font = Theme.tiny
+                textPaint = NetworkTheme.current.valueText
+                setOffset(x + RADIUS + 6.0, y - 6.0)
+                pickable = false
+            })
+        }
     }
 
     private val cellStep get() = (style.width - 2 * PADDING) / style.columns
-    private val cellSize get() = minOf(34.0, cellStep - 8.0)
     private val visibleCells get() = style.columns * style.visibleRows
 
     companion object {
         private const val PADDING = 10.0
         private const val HEADER_HEIGHT = 32.0
-        private const val ROW_STEP = 20.0
-        private const val ROW_WIDTH = 200.0
+        private const val RADIUS = NEURON_DIAMETER / 2.0
+        private const val ROW_STEP = NEURON_DIAMETER + 8.0
     }
 }

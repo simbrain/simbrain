@@ -14,7 +14,9 @@ import java.awt.Color
 import java.awt.Font
 import kotlin.math.min
 
-class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
+class NeuronCircleNode(private val scalingFactor: () -> kotlin.Double = { 1.0 }): PPath.Double() {
+
+    constructor(networkPanel: NetworkPanel) : this({ networkPanel.scalingFactor })
 
     private val circle = createEllipse(
         (0 - NEURON_DIAMETER / 2).toFloat(),
@@ -70,7 +72,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     private var activation: kotlin.Double = 0.0
     private var graphicalBounds = -1.0..1.0
 
-    var isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+    var isTextVisible = scalingFactor() > TEXT_VISIBILITY_THRESHOLD
         private set(value) {
             if (field != value) {
                 field = value
@@ -141,7 +143,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
 
     fun forceUpdateActivationText() {
         // Force text visibility check and update regardless of scaling factor
-        isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+        isTextVisible = scalingFactor() > TEXT_VISIBILITY_THRESHOLD
         updateActivationText()
     }
 
@@ -177,7 +179,7 @@ class NeuronCircleNode(val networkPanel: NetworkPanel): PPath.Double() {
     }
 
     override fun paint(paintContext: PPaintContext?) {
-        isTextVisible = networkPanel.scalingFactor > TEXT_VISIBILITY_THRESHOLD
+        isTextVisible = scalingFactor() > TEXT_VISIBILITY_THRESHOLD
         super.paint(paintContext)
     }
 }

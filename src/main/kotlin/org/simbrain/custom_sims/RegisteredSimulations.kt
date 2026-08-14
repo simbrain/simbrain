@@ -109,6 +109,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny Language Model") { tinyLanguageModel }
+        // The "(Beta)" prefix is deliberate (per Jeff): discoverable without the beta opt-in,
+        // while still flagged as beta.
         item("(Beta) Pretrained Language Model (LFM2.5)") { lfm2LanguageModel }
     }
 

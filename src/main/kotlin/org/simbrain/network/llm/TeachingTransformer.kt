@@ -359,6 +359,10 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         min = 0.0,
         increment = 0.0005,
         order = 1,
+        setter = { value ->
+            field = value
+            baseObject.trainer.learningRate = value.toFloat()
+        },
     )
 
     var samplingTemperature by GuiEditable(

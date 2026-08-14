@@ -10,6 +10,15 @@ import org.simbrain.network.tensor.op.Gradients
 class TeachingTransformerTest {
 
     @Test
+    fun `setting learningRate propagates to the trainer`() {
+        val teaching = TeachingTransformer(TeachingTransformerConfig(
+            contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 9, numLayers = 1
+        ))
+        teaching.learningRate = 0.02
+        assertEquals(0.02f, teaching.trainer.learningRate, "the headless option path sets only the property")
+    }
+
+    @Test
     fun `whole plan is trainable and analytic gradients match finite differences`() {
         val model = TeachingTransformerModel(TeachingTransformerConfig(
             contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 9, numLayers = 2

@@ -245,9 +245,109 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
-    val vocabulary = tokenEmbedding.tokens.map(String::lowercase).toSet()
-    textWorldComponent.world.statusMessageProvider = {
-        val typedTokens = textWorldComponent.world.text.tokenize(tokenizer).map { it.token }
+
+    setupGeneration(workspace)
+    setupTinyLmGui(workspace)
+
+    withGui {
+        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
+        SimbrainDesktop.onboardingManager.showPopup(
+            PopupConfig(
+                title = "Language Model Prompt",
+                message = "To enter a prompt, add some text here. Then click Play (or Step) on the main toolbar — " +
+                    "each workspace step generates one token. Pause the workspace to edit the text; " +
+                    "it continues from your edit on the next Play.",
+                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
+                placement = PopupPlacement.BOTTOM_CENTER,
+                suppressionKey = "tiny_language_model_prompt_help",
+                style = PopupStyle.SUCCESS
+            )
+        )
+    }
+
+    transformer.location = point(0, 0)
+
+    // Run training and workspace iterations if specified (for headless mode)
+    if (trainingIterations > 0 || workspaceIterations > 0) {
+
+        if (enableConsoleOutput) {
+            println("Starting headless execution...")
+            println("Training iterations: $trainingIterations")
+            println("Workspace iterations: $workspaceIterations")
+            println("Learning rate: $learningRate")
+            println("Context size: $contextSize")
+            println("Embedding dimension: $embeddingDimension")
+            println("Heads: ${options.numHeads}, layers: ${options.numLayers}")
+            println("Training windows: ${transformer.trainer.trainingWindows.size}")
+            println("Test windows: ${transformer.trainer.testingWindows.size}")
+            println()
+        }
+
+        try {
+            if (trainingIterations > 0) {
+                if (enableConsoleOutput) println("Starting training...")
+                runBlocking {
+                    repeat(trainingIterations) { iteration ->
+                        transformer.trainer.trainOnce()
+                        if (enableConsoleOutput) {
+                            val accuracy = transformer.trainer.lastTrainingAccuracy
+                                ?.let { ", Accuracy: ${"%.1f".format(it * 100)}%" } ?: ""
+                            println("Iteration ${iteration + 1}/$trainingIterations, " +
+                                "Train Loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}$accuracy")
+                        }
+                    }
+                }
+                if (enableConsoleOutput) println("Training completed.")
+            }
+
+            if (workspaceIterations > 0) {
+                if (enableConsoleOutput) println("Starting workspace iterations...")
+                repeat(workspaceIterations) { iteration ->
+                    workspace.iterateSuspend()
+                    if (enableConsoleOutput && (iteration + 1) % 10 == 0) {
+                        println("Workspace iteration ${iteration + 1}/$workspaceIterations")
+                    }
+                }
+                if (enableConsoleOutput) println("Workspace iterations completed.")
+            }
+        } catch (e: Exception) {
+            println("ERROR during execution: ${e.message}")
+            e.printStackTrace()
+            throw e
+        }
+
+        if (enableConsoleOutput) {
+            println("Headless execution completed successfully!")
+            println("Final training loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}")
+        }
+    }
+
+}.registerReopenFunction { workspace ->
+    setupGeneration(workspace)
+    setupTinyLmGui(workspace)
+}
+
+/**
+ * Wires the transformer's context window to the text world as a two-way document sync — the
+ * sliding window streams into the text world while the model writes, and text typed there
+ * while the workspace is paused replaces the transformer's context. Typing a prompt and
+ * pressing Play is all it takes: there is no run mode, and a transformer with no context
+ * idles waiting for input. The transformer samples and feeds back its own tokens, so the old
+ * hand-ordered update actions are gone — the default workspace update (couplings, then
+ * components) drives everything. Recreating existing couplings on reopen is safe: the
+ * coupling manager stores them in a set.
+ */
+fun SimulationScope.setupGeneration(workspace: Workspace) {
+
+    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
+    val transformer = network.getModels<TeachingTransformer>().first()
+    val textWorld = workspace.componentList.filterIsInstance<TextWorldComponent>().first().world
+
+    textWorld.highlightCurrentToken = false
+    textWorld.autoAdvance = false
+    val vocabulary = (transformer.tokenLabels ?: arrayListOf()).map(String::lowercase).toSet()
+    textWorld.statusMessageProvider = {
+        val typedTokens = textWorld.text.tokenize(transformer.tokenizer).map { it.token }
         val unrecognized = typedTokens.filter { it.lowercase() !in vocabulary }.distinct()
         when {
             typedTokens.isEmpty() -> "Enter a vocabulary token to begin generation."
@@ -261,60 +361,62 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         }
     }
 
-    setupGeneration(workspace)
+    with(workspace.couplingManager) {
+        createCoupling(
+            textWorld.getProducer("getText"),
+            transformer.getConsumer("setContextWindow"),
+        )
+        createCoupling(
+            transformer.getProducer("getContextWindow"),
+            textWorld.getConsumer("setTextIfChanged"),
+        )
+    }
+}
+
+/** The sim's desktop chrome — control panel, window placement, sidebar — rebuilt on reopen too. */
+private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
+    val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
+    val transformer = networkComponent.network.getModels<TeachingTransformer>().first()
+    val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
+
+    fun showTextDialog(dialogTitle: String, content: String) {
+        val textArea = SimbrainTextArea().apply {
+            text = content
+            isEditable = false
+            rows = 20
+            columns = 40
+            lineWrap = true
+            wrapStyleWord = true
+        }
+        val scrollPane = JScrollPane(textArea)
+        swingInvokeLater {
+            StandardDialog().apply {
+                title = dialogTitle
+                contentPane = scrollPane
+                isModal = false
+                setAsDoneDialog()
+                makeVisible()
+            }
+        }
+    }
 
     withGui {
         val textWorldWidth = 401
         val textWorldHeight = 372
-        // Create control panel for language model controls
         val controlPanel = createControlPanel("Language Model Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
 
             addButton("Show Vocabulary") {
-                val tokensText = tokenEmbedding.tokens.joinToString("\n")
-                val textArea = SimbrainTextArea().apply {
-                    text = tokensText
-                    isEditable = false
-                    rows = 20
-                    columns = 40
-                    lineWrap = true
-                    wrapStyleWord = true
-                }
-                val scrollPane = JScrollPane(textArea)
-                swingInvokeLater {
-                    StandardDialog().apply {
-                        title = "Vocabulary (${tokenEmbedding.tokens.size} tokens)"
-                        contentPane = scrollPane
-                        isModal = false
-                        setAsDoneDialog()
-                        makeVisible()
-                    }
-                }
+                val labels = transformer.tokenLabels ?: arrayListOf()
+                showTextDialog("Vocabulary (${labels.size} tokens)", labels.joinToString("\n"))
             }
 
             addButton("Show Training Text") {
-                val textArea = SimbrainTextArea().apply {
-                    text = trainingTextFinal
-                    isEditable = false
-                    rows = 20
-                    columns = 40
-                    lineWrap = true
-                    wrapStyleWord = true
-                }
-                val scrollPane = JScrollPane(textArea)
-                swingInvokeLater {
-                    StandardDialog().apply {
-                        title = "Training Text"
-                        contentPane = scrollPane
-                        isModal = false
-                        setAsDoneDialog()
-                        makeVisible()
-                    }
-                }
+                val corpus = transformer.corpusTokenIds?.let(transformer::decode) ?: "No training corpus"
+                showTextDialog("Training Text", corpus)
             }
 
             addSeparator()
 
-            // Temperature control with slider and text field
             addSliderWithTextField("Temperature", 0.01, 2.0, transformer.samplingTemperature, 0.01) { temp ->
                 transformer.samplingTemperature = temp
             }
@@ -339,26 +441,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         )
         place(textWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, textWorldWidth, textWorldHeight)
         place(networkComponent, SIM_WINDOW_GAP + textWorldWidth + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 900, 700)
-
-        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
-        SimbrainDesktop.onboardingManager.showPopup(
-            PopupConfig(
-                title = "Language Model Prompt",
-                message = "To enter a prompt, add some text here. Then click Play (or Step) on the main toolbar — " +
-                    "each workspace step generates one token. Pause the workspace to edit the text; " +
-                    "it continues from your edit on the next Play.",
-                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
-                placement = PopupPlacement.BOTTOM_CENTER,
-                suppressionKey = "tiny_language_model_prompt_help",
-                style = PopupStyle.SUCCESS
-            )
-        )
     }
 
-    transformer.location = point(0, 0)
+    addSidebarInfo(TINY_LM_SIDEBAR)
+}
 
-    addSidebarInfo(
-        """
+private val TINY_LM_SIDEBAR = """
         # Tiny Language Model
 
         A small GPT-style language model built from explicit tensor operations. This simulation demonstrates how a transformer processes text and how training changes its internals. Every intermediate value in the computation is visible: the residual stream, the attention heads, the weight matrices, and the gradients that flow backward during training.
@@ -432,91 +520,3 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         Designed by Jeff Yoshimi and Yulin Li. Thanks to Sergio Ponce de Leon, Ben Fried, and many students at UC Merced for helping with the design.
 
         """.trimIndent()
-    )
-
-    // Run training and workspace iterations if specified (for headless mode)
-    if (trainingIterations > 0 || workspaceIterations > 0) {
-
-        if (enableConsoleOutput) {
-            println("Starting headless execution...")
-            println("Training iterations: $trainingIterations")
-            println("Workspace iterations: $workspaceIterations")
-            println("Learning rate: $learningRate")
-            println("Context size: $contextSize")
-            println("Embedding dimension: $embeddingDimension")
-            println("Heads: ${options.numHeads}, layers: ${options.numLayers}")
-            println("Training windows: ${transformer.trainer.trainingWindows.size}")
-            println("Test windows: ${transformer.trainer.testingWindows.size}")
-            println()
-        }
-
-        try {
-            if (trainingIterations > 0) {
-                if (enableConsoleOutput) println("Starting training...")
-                runBlocking {
-                    repeat(trainingIterations) { iteration ->
-                        transformer.trainer.trainOnce()
-                        if (enableConsoleOutput) {
-                            val accuracy = transformer.trainer.lastTrainingAccuracy
-                                ?.let { ", Accuracy: ${"%.1f".format(it * 100)}%" } ?: ""
-                            println("Iteration ${iteration + 1}/$trainingIterations, " +
-                                "Train Loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}$accuracy")
-                        }
-                    }
-                }
-                if (enableConsoleOutput) println("Training completed.")
-            }
-
-            if (workspaceIterations > 0) {
-                if (enableConsoleOutput) println("Starting workspace iterations...")
-                repeat(workspaceIterations) { iteration ->
-                    workspace.iterateSuspend()
-                    if (enableConsoleOutput && (iteration + 1) % 10 == 0) {
-                        println("Workspace iteration ${iteration + 1}/$workspaceIterations")
-                    }
-                }
-                if (enableConsoleOutput) println("Workspace iterations completed.")
-            }
-        } catch (e: Exception) {
-            println("ERROR during execution: ${e.message}")
-            e.printStackTrace()
-            throw e
-        }
-
-        if (enableConsoleOutput) {
-            println("Headless execution completed successfully!")
-            println("Final training loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}")
-        }
-    }
-
-}.registerReopenFunction { workspace ->
-    setupGeneration(workspace)
-}
-
-/**
- * Wires the transformer's context window to the text world as a two-way document sync — the
- * sliding window streams into the text world while the model writes, and text typed there
- * while the workspace is paused replaces the transformer's context. Typing a prompt and
- * pressing Play is all it takes: there is no run mode, and a transformer with no context
- * idles waiting for input. The transformer samples and feeds back its own tokens, so the old
- * hand-ordered update actions are gone — the default workspace update (couplings, then
- * components) drives everything. Recreating existing couplings on reopen is safe: the
- * coupling manager stores them in a set.
- */
-fun SimulationScope.setupGeneration(workspace: Workspace) {
-
-    val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
-    val transformer = network.getModels<TeachingTransformer>().first()
-    val textWorld = workspace.componentList.filterIsInstance<TextWorldComponent>().first().world
-
-    with(workspace.couplingManager) {
-        createCoupling(
-            textWorld.getProducer("getText"),
-            transformer.getConsumer("setContextWindow"),
-        )
-        createCoupling(
-            transformer.getProducer("getContextWindow"),
-            textWorld.getConsumer("setTextIfChanged"),
-        )
-    }
-}

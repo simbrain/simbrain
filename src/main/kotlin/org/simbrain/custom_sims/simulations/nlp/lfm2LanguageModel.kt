@@ -35,7 +35,7 @@ class Lfm2LanguageModelOptions : EditableObject {
  * text world document. The weights (~460 MB) are downloaded from Hugging Face on first use;
  * Simbrain never bundles them.
  */
-val lfm2LanguageModel = newSim {
+val lfm2LanguageModel = newSim("lfm2_language_model") {
 
     val options = Lfm2LanguageModelOptions().showAPEOptionDialog("LFM2 Language Model")
         ?: return@newSim
@@ -60,6 +60,34 @@ val lfm2LanguageModel = newSim {
     textWorldComponent.world.text = "Here is a brief two-paragraph parable:"
 
     setupLfm2DocumentSync(workspace)
+    setupLfm2Gui(workspace)
+
+    withGui {
+        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
+        SimbrainDesktop.onboardingManager.showPopup(
+            PopupConfig(
+                title = "The Model's Document",
+                message = "This document is the model's context window. Press Play on the main " +
+                    "toolbar to watch the model read it one token per step, then generate its " +
+                    "continuation the same way — the workspace pauses itself when the model " +
+                    "finishes. Edit the text and press Play again to continue from your edit.",
+                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
+                suppressionKey = "lfm2_language_model_document_help",
+                placement = PopupPlacement.BOTTOM_CENTER,
+                style = PopupStyle.SUCCESS,
+            )
+        )
+    }
+}.registerReopenFunction { workspace ->
+    setupLfm2DocumentSync(workspace)
+    setupLfm2Gui(workspace)
+}
+
+/** The sim's desktop chrome — control panel, window placement, sidebar — rebuilt on reopen too. */
+private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
+    val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
+    val languageModel = networkComponent.network.getModels<LanguageModel>().first()
+    val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
 
     withGui {
         val textWorldWidth = 420
@@ -90,7 +118,7 @@ val lfm2LanguageModel = newSim {
 
             val toolOptions = listOf("None", "Current time")
             addComboBox(
-                "Tools", toolOptions, toolOptions.first(),
+                "Tools", toolOptions, if (languageModel.demoToolsEnabled) "Current time" else "None",
                 labelToolTip = "Choose tools to include when a new chat context begins; press Reset before sending",
             ) { selection ->
                 languageModel.demoToolsEnabled = selection == "Current time"
@@ -99,7 +127,7 @@ val lfm2LanguageModel = newSim {
             }
 
             addComboBox(
-                "Color theme", DocumentStructureDisplay.entries, DocumentStructureDisplay.CONVERSATION_FOCUS,
+                "Color theme", DocumentStructureDisplay.entries, textWorldComponent.world.documentStructureDisplay,
                 labelToolTip = "Choose how chat roles, system text, and tool calls appear in the document",
             ) { display ->
                 textWorldComponent.world.documentStructureDisplay = display
@@ -116,6 +144,7 @@ val lfm2LanguageModel = newSim {
                 toolTipText = "In Chat prompt mode, add a user turn and generate an assistant reply"
             }
             fun sendChatMessage() {
+                if (!languageModel.isLoaded) return
                 val message = messageField.text.trim()
                 if (message.isEmpty()) return
                 languageModel.sendUserMessage(message)
@@ -133,21 +162,6 @@ val lfm2LanguageModel = newSim {
         )
         place(textWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, textWorldWidth, textWorldHeight)
         place(networkComponent, SIM_WINDOW_GAP + textWorldWidth + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 1000, 760)
-
-        val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
-        SimbrainDesktop.onboardingManager.showPopup(
-            PopupConfig(
-                title = "The Model's Document",
-                message = "This document is the model's context window. Press Play on the main " +
-                    "toolbar to watch the model read it one token per step, then generate its " +
-                    "continuation the same way — the workspace pauses itself when the model " +
-                    "finishes. Edit the text and press Play again to continue from your edit.",
-                targetComponent = textWorldDesktopComponent as javax.swing.JComponent,
-                suppressionKey = "lfm2_language_model_document_help",
-                placement = PopupPlacement.BOTTOM_CENTER,
-                style = PopupStyle.SUCCESS,
-            )
-        )
     }
 
     addSidebarInfo(
@@ -199,8 +213,6 @@ val lfm2LanguageModel = newSim {
         This simulation is a beta: it exists partly to exercise the language-model UX. If a status line confuses you, a control feels missing, or an edit does something surprising, that is exactly the feedback it is for.
         """.trimIndent()
     )
-}.registerReopenFunction { workspace ->
-    setupLfm2DocumentSync(workspace)
 }
 
 /**
@@ -223,7 +235,8 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
     }
     textWorld.statusMessageProvider = {
         when {
-            !languageModel.isLoaded -> null
+            !languageModel.isLoaded ->
+                "Weights not loaded — right-click the model in the Network window to locate or download them"
             languageModel.isPromptProcessing ->
                 "Processing prompt — token ${languageModel.fedTokenCount} of ${languageModel.windowTokenCount}"
             languageModel.isSealed -> if (languageModel.promptMode == PromptMode.CHAT)

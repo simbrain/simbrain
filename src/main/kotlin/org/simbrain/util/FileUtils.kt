@@ -10,6 +10,9 @@ import java.net.URL
 import java.net.http.HttpClient
 import java.net.http.HttpRequest
 import java.net.http.HttpResponse
+import java.nio.file.AtomicMoveNotSupportedException
+import java.nio.file.Files
+import java.nio.file.StandardCopyOption
 import java.security.DigestOutputStream
 import java.security.MessageDigest
 import java.util.zip.GZIPInputStream
@@ -211,15 +214,13 @@ fun fetchDataWithCache(urlString: String): String? {
  */
 fun downloadFile(url: String, target: File, expectedChecksum: String? = null): Boolean {
     val digest: MessageDigest? = if (expectedChecksum != null) {
-        val algorithm = when (expectedChecksum.length) {
-            32   -> "MD5"
-            40   -> "SHA-1"
-            64   -> "SHA-256"
-            else -> { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return false }
-        }
-        MessageDigest.getInstance(algorithm)
+        digestFor(expectedChecksum)
+            ?: run { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return false }
     } else null
 
+    // Stream into a sibling .part and promote atomically, so an abrupt exit mid-download can
+    // never leave a truncated file under the final name for the cache to trust.
+    val part = File(target.path + ".part")
     var progressWindow: ProgressWindow? = null
     try {
         val client = HttpClient.newBuilder()
@@ -239,7 +240,7 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
         response.body().use { input ->
             // Wrap output in DigestOutputStream when checksum verification is requested,
             // computing the hash inline during download without a second file read.
-            val fileOut = FileOutputStream(target)
+            val fileOut = FileOutputStream(part)
             val output = if (digest != null) DigestOutputStream(fileOut, digest) else fileOut
             output.use { out ->
                 val buffer = ByteArray(8192)
@@ -256,7 +257,7 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
     } catch (e: Exception) {
         progressWindow?.close()
         showWarningDialog("Error downloading ${target.name}: ${e.message}")
-        target.delete()
+        part.delete()
         return false
     }
 
@@ -264,11 +265,35 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
         val actual = digest.digest().joinToString("") { "%02x".format(it) }
         if (!actual.equals(expectedChecksum, ignoreCase = true)) {
             showWarningDialog("Checksum mismatch for ${target.name}.\nExpected: $expectedChecksum\nActual:   $actual")
-            target.delete()
+            part.delete()
             return false
         }
     }
+    try {
+        Files.move(part.toPath(), target.toPath(), StandardCopyOption.ATOMIC_MOVE, StandardCopyOption.REPLACE_EXISTING)
+    } catch (e: AtomicMoveNotSupportedException) {
+        Files.move(part.toPath(), target.toPath(), StandardCopyOption.REPLACE_EXISTING)
+    }
     return true
+}
+
+private fun digestFor(expectedChecksum: String): MessageDigest? = when (expectedChecksum.length) {
+    32 -> MessageDigest.getInstance("MD5")
+    40 -> MessageDigest.getInstance("SHA-1")
+    64 -> MessageDigest.getInstance("SHA-256")
+    else -> null
+}
+
+/** Hashes [file] with the algorithm inferred from [expectedChecksum]'s length and compares. */
+fun verifyChecksum(file: File, expectedChecksum: String): Boolean {
+    val digest = digestFor(expectedChecksum) ?: return false
+    file.inputStream().use { input ->
+        val buffer = ByteArray(65536)
+        var read: Int
+        while (input.read(buffer).also { read = it } != -1) digest.update(buffer, 0, read)
+    }
+    val actual = digest.digest().joinToString("") { "%02x".format(it) }
+    return actual.equals(expectedChecksum, ignoreCase = true)
 }
 
 /**
@@ -282,10 +307,22 @@ fun fetchFileWithCache(url: String, subDirectory: String, expectedChecksum: Stri
     val dir = File(getSystemCacheDirectory(), subDirectory)
     dir.mkdirs()
     val target = File(dir, fileName)
+    val marker = File(dir, "$fileName.verified")
     if (target.exists() && target.length() > 0) {
-        return target
+        if (expectedChecksum == null) return target
+        val expectedMarker = "$expectedChecksum:${target.length()}"
+        if (marker.exists() && marker.readText().trim() == expectedMarker) return target
+        // One full hash on first sight (or after a size change), then the marker is trusted.
+        if (verifyChecksum(target, expectedChecksum)) {
+            marker.writeText(expectedMarker)
+            return target
+        }
+        target.delete()
+        marker.delete()
     }
-    return if (downloadFile(url, target, expectedChecksum)) target else null
+    if (!downloadFile(url, target, expectedChecksum)) return null
+    if (expectedChecksum != null) marker.writeText("$expectedChecksum:${target.length()}")
+    return target
 }
 
 /**

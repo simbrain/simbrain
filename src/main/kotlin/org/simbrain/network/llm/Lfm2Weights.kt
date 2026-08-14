@@ -36,8 +36,12 @@ object Lfm2Weights {
     private const val TOKENIZER_SHA256 = "df1d8d5ec5d091b460562ffd545e4a5e91d17d4a0db7ebe733be34ed374377bd"
     private const val CACHE_SUBDIRECTORY = "lfm2.5-230m"
 
-    fun isValidWeightsDirectory(dir: Path) =
-        dir.resolve("model.safetensors").exists() && dir.resolve("tokenizer.json").exists()
+    fun isValidWeightsDirectory(dir: Path): Boolean {
+        val weights = dir.resolve("model.safetensors")
+        val tokenizer = dir.resolve("tokenizer.json")
+        return weights.exists() && weights.toFile().length() > 0 &&
+            tokenizer.exists() && tokenizer.toFile().length() > 0
+    }
 
     /**
      * Finds an existing weights directory: the remembered preference, then the Simbrain cache,

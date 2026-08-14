@@ -241,8 +241,14 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
      * Loads weights and tokenizer from [weightsDirectory] and builds the compositor scene. Heavy
      * (~1 GB of tensors, a few seconds) — call off the EDT. Throws if the directory is invalid.
      */
+    @Transient
+    private var loadedFromDirectory: String? = null
+
     @Synchronized
     fun loadWeights() {
+        // A repeat load from the same directory (e.g. a second node created by undo while the
+        // first load ran) would rebuild ~1 GB of state and desync the window; skip it.
+        if (loaded != null && loadedFromDirectory == weightsDirectory) return
         val dir = Path.of(weightsDirectory)
         check(Lfm2Weights.isValidWeightsDirectory(dir)) {
             "No model.safetensors and tokenizer.json in $weightsDirectory"
@@ -251,6 +257,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))
+        loadedFromDirectory = weightsDirectory
         initialText?.takeIf { it.isNotBlank() }?.let { seedWindow(it) }
         initialText = null
         events.weightsLoaded.fire()

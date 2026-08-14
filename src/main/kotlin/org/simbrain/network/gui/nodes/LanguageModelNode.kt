@@ -32,8 +32,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private var compositorNode: CompositorNode? = null
 
-    private var loadError: String? = null
-
     init {
         addChild(interactionBox)
         interactionBox.setText(languageModel.displayName)
@@ -42,7 +40,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         val subscriptions = listOf(
             events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) },
             events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
-            events.weightsLoaded.on(swingDispatcher) { rebuildInterior() },
+            events.weightsLoaded.on(swingDispatcher) {
+                interactionBox.setText(languageModel.displayName)
+                rebuildInterior()
+            },
             events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
             events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() },
         )
@@ -271,14 +272,29 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         }
     }
 
+    @Volatile
+    private var isLoading = false
+
     private fun loadInBackground() {
-        loadError = null
-        SwingUtilities.invokeLater { refreshView() }
+        if (isLoading) return
+        isLoading = true
         networkPanel.network.launch(Dispatchers.Default) {
-            runCatching { languageModel.loadWeights() }.onFailure {
-                loadError = it.message ?: it.javaClass.simpleName
-                SwingUtilities.invokeLater { refreshView() }
+            try {
+                languageModel.loadWeights()
+            } catch (e: OutOfMemoryError) {
+                reportLoadFailure("Out of memory loading the weights — try a smaller context window.")
+            } catch (e: Exception) {
+                reportLoadFailure(e.message ?: e.javaClass.simpleName)
+            } finally {
+                isLoading = false
             }
+        }
+    }
+
+    private fun reportLoadFailure(message: String) {
+        SwingUtilities.invokeLater {
+            interactionBox.setText("${languageModel.displayName} — weights failed to load")
+            showWarningDialog("Could not load weights for ${languageModel.displayName}:\n$message")
         }
     }
 

@@ -270,6 +270,58 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `an over-budget attention tile keeps one head and replays on head flip`() {
+        val config = tinyConfig()
+        val model = syntheticModel(config)
+        val full = Lfm2StackCompositor.buildScene(model)
+        val single = Lfm2StackCompositor.buildScene(model, attentionHistoryBudget = 0L)
+        full.layerSelector!!.invoke(2)
+        single.layerSelector!!.invoke(2)
+        repeat(5) {
+            model.forwardToken(it + 1)
+            full.publish(it)
+            single.publish(it)
+        }
+        val fullTile = full.tile("block.attn.weights") as AttentionTile
+        val singleTile = single.tile("block.attn.weights") as AttentionTile
+        assertTrue(fullTile.values.any { it != 0f }, "recording produced something to compare")
+        assertTrue(fullTile.values.contentEquals(singleTile.values),
+            "while recording, the single-head tile matches the full-retention tile")
+
+        fullTile.selectedHead = 2
+        singleTile.selectedHead = 2
+        assertTrue(fullTile.values.any { it != 0f })
+        assertTrue(fullTile.values.contentEquals(singleTile.values),
+            "the single-head flip must re-derive head 2 exactly from the replay path")
+    }
+
+    @Test
+    fun `single-head stashes restore only for the head that captured them`() {
+        val p0 = TensorPort("l0", FloatTensor(2, 8).apply { for (i in 0 until size) data.put(i, i + 1f) })
+        val p1 = TensorPort("l1", FloatTensor(2, 8).apply { for (i in 0 until size) data.put(i, i + 100f) })
+        val tile = AttentionTile(
+            ports = listOf(p0, p1), numHeads = 2, seqLen = 8,
+            stackLayers = listOf(0, 1), historyBudget = 0L,
+        )
+        tile.showLayer(0)
+        tile.publish(0)
+        tile.showLayer(1)
+        assertTrue(tile.hasHistoryFor(0), "the stash serves the head it captured")
+
+        tile.selectedHead = 1
+        assertFalse(tile.hasHistoryFor(0),
+            "a stash captured for head 0 cannot serve head 1; the flip must re-derive")
+    }
+
+    @Test
+    fun `attention tile construction rejects windows that overflow the history buffer`() {
+        val port = TensorPort("w", FloatTensor(2, 8))
+        assertThrows(IllegalArgumentException::class.java) {
+            AttentionTile(ports = listOf(port), numHeads = 16, seqLen = 50_000, historyBudget = 0L)
+        }
+    }
+
+    @Test
     fun `an async replay lands off the submitting thread and matches the synchronous result`() {
         val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
         val model = syntheticModel(config)

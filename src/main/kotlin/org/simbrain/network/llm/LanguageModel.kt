@@ -719,10 +719,10 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
 
         @UserParameter(
             label = "Context window size",
-            description = "Maximum number of tokens the model can retain (up to 32,000). " +
+            description = "Maximum number of tokens the model can retain (up to 8,192). " +
                 "Larger windows use substantially more memory; 512 is recommended for most computers.",
             minimumValue = 1.0,
-            maximumValue = 32_000.0,
+            maximumValue = 8192.0,
             order = 1,
         )
         var contextWindowSize = 512

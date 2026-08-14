@@ -23,7 +23,7 @@ import kotlin.math.pow
  */
 object Lfm2StackCompositor {
 
-    fun buildScene(model: Lfm2Model): CompositorScene {
+    fun buildScene(model: Lfm2Model, attentionHistoryBudget: Long = ATTENTION_HISTORY_BUDGET): CompositorScene {
         val config = model.config
         val plan = model.plan
         // One sequence axis: every token-axis tile spans the model's full context window, so
@@ -180,6 +180,7 @@ object Lfm2StackCompositor {
             ports = attnLayers.map { plan.port("layers.$it.attn.weights") },
             numHeads = config.numHeads, keyValueHeads = config.numKvHeads, seqLen = window,
             title = "attention", id = "block.attn.weights", stackLayers = attnLayers,
+            historyBudget = attentionHistoryBudget,
         ).apply { width = tokenExtent; height = tokenExtent; magnified = tokenAxisFloored })
         stackedHistory("block.attn.context", attnLayers, "context", featureWidth(config.numHeads * config.headDim)) { "layers.$it.attn.context" }
         stackedHistory("block.attn.out", attnLayers, "attn out", featureWidth(config.hiddenSize)) { "layers.$it.attn.out" }
@@ -457,6 +458,14 @@ object Lfm2StackCompositor {
                 ropeOp.forward()
                 ropeTiles[0].backfillRow(t, ropeCosScratch.tensor)
                 ropeTiles[1].backfillRow(t, ropeSinScratch.tensor)
+            }
+        }
+        // Single-head retention: a head flip that dropped its recorded rows re-derives them
+        // for the shown attention layer through the same replay path as a layer flip.
+        weightsTile.onHeadDataDropped = {
+            if (scene.historyView != HistoryView.OFF && scene.selectedLayer in config.attentionLayers) {
+                val layer = scene.selectedLayer
+                scene.replayRunner { replayBlock(layer, includeSpine = false) }
             }
         }
         scene.layerSelector?.invoke(0)

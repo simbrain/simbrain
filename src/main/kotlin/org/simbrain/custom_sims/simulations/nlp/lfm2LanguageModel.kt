@@ -19,10 +19,10 @@ class Lfm2LanguageModelOptions : EditableObject {
     var contextWindowSize by GuiEditable(
         initValue = 512,
         label = "Context window size",
-        description = "Maximum number of tokens the model can retain (up to 32,000). " +
+        description = "Maximum number of tokens the model can retain (up to 8,192). " +
             "Larger windows use substantially more memory; 512 is recommended for most computers.",
         min = 1,
-        max = 32_000,
+        max = 8192,
         order = 1,
     )
 

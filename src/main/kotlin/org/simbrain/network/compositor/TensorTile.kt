@@ -15,6 +15,14 @@ enum class TileKind { ACTIVATION, RESIDUAL, WEIGHT, ATTENTION, GRADIENT }
 /** How many recently watched layers a history tile stashes, so flip-back is instant and lossless. */
 const val HISTORY_STASH = 3
 
+/**
+ * Float budget above which an [AttentionTile] keeps history for the selected head only,
+ * re-deriving other heads through the scene's replay path. All-heads retention is quadratic in
+ * the context window (numHeads x window^2 floats, ~268 MB at 16 heads and 2048 tokens), so
+ * large windows trade instant head flips for bounded memory.
+ */
+const val ATTENTION_HISTORY_BUDGET: Long = 32L * 1024 * 1024
+
 /** Live-view strength of history rows: faint enough to read as a recording, not model state. */
 const val HISTORY_GHOST = 0.15f
 
@@ -176,6 +184,12 @@ abstract class TensorTile(
     protected open fun retainOnlyLiveRow() {
         for (r in 0 until rows) {
             if (r != liveRow) values.fill(0f, r * cols, (r + 1) * cols)
+        }
+    }
+
+    init {
+        require(rows.toLong() * cols <= Int.MAX_VALUE) {
+            "Tile $id shape $rows x $cols overflows its backing buffer"
         }
     }
 
@@ -807,6 +821,7 @@ class AttentionTile(
     title: String = ports.first().name,
     id: String = ports.first().name,
     override val stackLayers: List<Int> = emptyList(),
+    historyBudget: Long = ATTENTION_HISTORY_BUDGET,
 ) : TensorTile(id, title, seqLen, seqLen, signedNorm = false, kind = TileKind.ATTENTION), LayerStacked {
 
     override val tooltipShape: String get() =
@@ -827,11 +842,24 @@ class AttentionTile(
         }
     }
 
-    private val history = FloatArray(numHeads * rows * cols)
+    /**
+     * All-heads retention only under the budget: above it, [values] is the sole record — for
+     * [selectedHead] — and flips to other heads re-derive through the scene's replay path.
+     */
+    private val fullHeadHistory = numHeads.toLong() * rows * cols <= historyBudget
+
+    private val history = FloatArray(if (fullHeadHistory) numHeads * rows * cols else 0)
     private val stash = LinkedHashMap<Int, FloatArray>()
     private val stashedAt = HashMap<Int, Int>()
+    private val stashHeads = HashMap<Int, Int>()
     private var lastVersion = -1L
     private var selected = 0
+    private var recordedHead = 0
+
+    /** Fires when a single-head flip drops the recorded rows; the host re-derives via replay. */
+    var onHeadDataDropped: ((Int) -> Unit)? = null
+
+    private fun payload() = if (fullHeadHistory) history else values
 
     override val shownLayer get() = stackLayers.getOrElse(selected) { -1 }
 
@@ -844,24 +872,36 @@ class AttentionTile(
                 // Nothing to stash or restore: reseed the live row from the new layer's port.
                 selected = index
                 history.fill(0f)
+                if (!fullHeadHistory) values.fill(0f)
                 lastVersion = -1L
                 if (liveRow in 0 until rows) {
                     lastVersion = ports[selected].tensor.version
                     record(liveRow, ports[selected].tensor)
                 }
-                rebuildFromHistory()
+                if (fullHeadHistory) rebuildFromHistory() else touch()
             } else {
                 // Restore before stashing, so the incoming layer is never the eviction victim.
                 val restored = stash.remove(index)
+                val restoredHead = stashHeads.remove(index)
                 stashedAt.remove(index)
-                if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
-                stash[selected] = history.copyOf()
+                if (stash.size >= HISTORY_STASH) {
+                    val evicted = stash.keys.first()
+                    stash.remove(evicted)
+                    stashedAt.remove(evicted)
+                    stashHeads.remove(evicted)
+                }
+                stash[selected] = payload().copyOf()
                 stashedAt[selected] = liveRow
+                stashHeads[selected] = recordedHead
                 selected = index
-                if (restored != null) System.arraycopy(restored, 0, history, 0, history.size)
-                else history.fill(0f)
+                if (restored != null) {
+                    System.arraycopy(restored, 0, payload(), 0, restored.size)
+                    if (!fullHeadHistory && restoredHead != null) recordedHead = restoredHead
+                } else {
+                    payload().fill(0f)
+                }
                 lastVersion = -1L
-                rebuildFromHistory()
+                if (fullHeadHistory) rebuildFromHistory() else touch()
             }
         }
         return true
@@ -876,10 +916,12 @@ class AttentionTile(
             if ((stashedAt[key] ?: -1) < tokenIndex) keys.remove()
         }
         stashedAt.keys.retainAll(stash.keys)
+        stashHeads.keys.retainAll(stash.keys)
     }
 
     override fun clearRow(row: Int) {
         super.clearRow(row)
+        if (!fullHeadHistory) return
         for (head in 0 until numHeads) {
             history.fill(0f, (head * rows + row) * cols, (head * rows + row + 1) * cols)
         }
@@ -890,6 +932,8 @@ class AttentionTile(
         super.retainOnlyLiveRow()
         stash.clear()
         stashedAt.clear()
+        stashHeads.clear()
+        if (!fullHeadHistory) return
         for (head in 0 until numHeads) {
             for (r in 0 until rows) {
                 if (r != liveRow) history.fill(0f, (head * rows + r) * cols, (head * rows + r + 1) * cols)
@@ -903,26 +947,38 @@ class AttentionTile(
         if (row >= rows) return
         super.truncateFrom(row)
         val from = row.coerceAtLeast(0)
-        for (head in 0 until numHeads) {
-            history.fill(0f, (head * rows + from) * cols, (head + 1) * rows * cols)
+        if (fullHeadHistory) {
+            for (head in 0 until numHeads) {
+                history.fill(0f, (head * rows + from) * cols, (head + 1) * rows * cols)
+            }
         }
         stash.clear()
         stashedAt.clear()
+        stashHeads.clear()
     }
 
-    /** True when [layer]'s head histories are already in memory — shown or stashed. */
+    /** True when [layer]'s history for the current head is already in memory — shown or stashed. */
     @Synchronized
     fun hasHistoryFor(layer: Int): Boolean {
         val index = stackLayers.indexOf(layer)
-        return index >= 0 && (index == selected || index in stash)
+        if (index < 0) return false
+        if (index == selected) return true
+        if (index !in stash) return false
+        return fullHeadHistory || stashHeads[index] == selectedHead
     }
+
+    /** True when [head]'s rows are in memory: always in full retention, else only the recorded head. */
+    @Synchronized
+    fun hasHeadHistory(head: Int): Boolean = fullHeadHistory || head == recordedHead
 
     override fun reset() {
         super.reset()
         history.fill(0f)
         stash.clear()
         stashedAt.clear()
+        stashHeads.clear()
         lastVersion = -1L
+        recordedHead = selectedHead
     }
 
     var selectedHead = 0
@@ -930,9 +986,23 @@ class AttentionTile(
             require(value in 0 until numHeads) { "Head $value out of range 0..${numHeads - 1}" }
             if (field != value) {
                 field = value
-                rebuildFromHistory()
+                if (fullHeadHistory) rebuildFromHistory() else dropHeadRows()
             }
         }
+
+    /** Single-head flip: the recorded rows are for another head; reseed the live row and ask
+     *  the host to re-derive the rest. */
+    @Synchronized
+    private fun dropHeadRows() {
+        values.fill(0f)
+        recordedHead = selectedHead
+        if (liveRow in 0 until rows) {
+            lastVersion = ports[selected].tensor.version
+            record(liveRow, ports[selected].tensor)
+        }
+        touch()
+        onHeadDataDropped?.invoke(selectedHead)
+    }
 
     @Synchronized
     override fun publish(tokenIndex: Int) {
@@ -954,22 +1024,32 @@ class AttentionTile(
 
     private fun record(tokenIndex: Int, tensor: FloatTensor) {
         val seen = minOf(tokenIndex + 1, cols)
-        for (head in 0 until numHeads) {
-            val src = head * tensor.cols
-            val dst = (head * rows + tokenIndex) * cols
-            for (j in 0 until seen) {
-                history[dst + j] = tensor.data.get(src + j)
+        if (fullHeadHistory) {
+            for (head in 0 until numHeads) {
+                val src = head * tensor.cols
+                val dst = (head * rows + tokenIndex) * cols
+                for (j in 0 until seen) {
+                    history[dst + j] = tensor.data.get(src + j)
+                }
             }
+            System.arraycopy(
+                history, (selectedHead * rows + tokenIndex) * cols,
+                values, tokenIndex * cols, cols
+            )
+        } else {
+            val src = selectedHead * tensor.cols
+            val dst = tokenIndex * cols
+            for (j in 0 until cols) {
+                values[dst + j] = if (j < seen) tensor.data.get(src + j) else 0f
+            }
+            recordedHead = selectedHead
         }
-        System.arraycopy(
-            history, (selectedHead * rows + tokenIndex) * cols,
-            values, tokenIndex * cols, cols
-        )
         touchRow(tokenIndex)
     }
 
     @Synchronized
     private fun rebuildFromHistory() {
+        if (!fullHeadHistory) return
         System.arraycopy(history, selectedHead * rows * cols, values, 0, rows * cols)
         touch()
     }

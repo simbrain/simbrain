@@ -23,6 +23,9 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BaseMultiResolutionImage
 import java.awt.image.BufferedImage
 
+/** True when the canvas pan modifier is held — cmd on macOS, ctrl elsewhere. */
+val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
+
 class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandler() {
 
     private enum class Mode { SELECTION, PAN, DRAG }
@@ -49,8 +52,6 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      * Stores the original autoZoom state to restore after dragging.
      */
     private var previousAutoZoomState: Boolean = true
-
-    private val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
 
     private val selectionMarquee by lazy {
         with(marqueeStartPosition) { SelectionMarquee(x.toFloat(), y.toFloat()) }.also {

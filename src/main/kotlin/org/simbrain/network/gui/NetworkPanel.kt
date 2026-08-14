@@ -15,11 +15,14 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
+import org.simbrain.network.llm.LanguageModel
+import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -178,9 +181,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             it.events.colorPreferencesChanged.fire()
             it.events.updateGraphics.fire()
         }
-        network.getModels<TransformerBlock>().forEach {
-            it.events.updateGraphics.fire()
-        }
         // Re-apply theme-derived colors that nodes cache at construction (not driven by a model event):
         // neuron fill/outline/text, group/subnet tabs, free text, subnet outlines, arrows, and image
         // borders. A single traversal, since this runs on every preference commit and theme switch.
@@ -313,7 +313,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is Synapse -> createNode(model)
             is NeuronArray -> createNode(model)
             is ActivationSequence -> createNode(model)
-            is TransformerBlock -> createNode(model)
+            is LanguageModel -> createNode(model)
+            is TeachingTransformer -> createNode(model)
             is NeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
             is TensorLayer -> createNode(model)
@@ -350,7 +351,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
 
-    suspend fun createNode(transformerBlock: TransformerBlock) = addScreenElement { TransformerBlockNode(this, transformerBlock) }
+    suspend fun createNode(languageModel: LanguageModel) = addScreenElement { LanguageModelNode(this, languageModel) }
+
+    suspend fun createNode(teachingTransformer: TeachingTransformer) =
+        addScreenElement { TeachingTransformerNode(this, teachingTransformer) }
 
     suspend fun createNode(classifier: ClassifierNetwork) = addScreenElement {
         SmileClassifierNode(this, classifier)
@@ -829,6 +833,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
+    /**
+     * Full-canvas repaint after a network update, rate-limited to the workspace repaint
+     * preference: a fast update loop would otherwise queue a full frame per iteration, and the
+     * post-update barrier then waits behind those paints — display cadence ends up pacing the
+     * model. Slow and stepped updates still repaint immediately, and a trailing repaint always
+     * renders the final state.
+     */
+    private val repaintOnUpdate = RateLimitedEdtAction({ WorkspacePreferences.repaintIntervalMs }) { repaint() }
+
     private fun initEventHandlers() {
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
@@ -851,7 +864,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
             updated.on(Dispatchers.Swing.immediate) {
-                repaint()
+                repaintOnUpdate()
                 timeLabel.update()
             }
             zoomToFitPage.on(Dispatchers.Swing) {

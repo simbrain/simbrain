@@ -1,6 +1,9 @@
 package org.simbrain.world.textworld
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import org.simbrain.util.ProvidesDisplayTokenizer
+import org.simbrain.util.Tokenizer
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.projection.KDTreeConvertor
 import org.simbrain.workspace.AttributeContainer
@@ -43,10 +46,37 @@ class TextWorldComponent : WorkspaceComponent {
      */
     private fun init() {
         world.events.atEnd.on(Dispatchers.Default) {
-            if (world.stopAtEnd) {
+            if (world.stopAtEnd && workspace.updater.isRunning) {
                 workspace.stop()
             }
         }
+    }
+
+    /**
+     * When a document coupling into this world is created from a producer that knows its own
+     * tokenization, adopt that tokenizer for display, so token boxes match the source's truth,
+     * and lock the document while the workspace runs, so the stream is never edited
+     * mid-iteration.
+     */
+    private var couplingAddedJob: Job? = null
+
+    override fun onWorkspaceAttached() {
+        couplingAddedJob = workspace.couplingManager.events.couplingAdded.on(Dispatchers.Default) { coupling ->
+            val provider = coupling.producer.baseObject
+            if (coupling.consumer.baseObject === world &&
+                coupling.consumer.method.name in textDocumentConsumers &&
+                provider is ProvidesDisplayTokenizer
+            ) {
+                world.displayTokenizer = provider.displayTokenizer.copy() as Tokenizer<*>
+                world.lockWhileRunning = true
+            }
+        }
+    }
+
+    override fun close() {
+        couplingAddedJob?.cancel()
+        couplingAddedJob = null
+        super.close()
     }
 
     override fun save(output: OutputStream, format: String?) {
@@ -61,6 +91,9 @@ class TextWorldComponent : WorkspaceComponent {
         get() = listOf<AttributeContainer>(world)
 
     companion object {
+
+        private val textDocumentConsumers = setOf("setTextIfChanged", "addTextAtEnd", "addTextAtCursor")
+
         fun open(input: InputStream, name: String, format: String?): TextWorldComponent {
             val newWorld = getTextWorldXStream().fromXML(input) as TextWorld
             return TextWorldComponent(name, newWorld)

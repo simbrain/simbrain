@@ -13,6 +13,9 @@ import org.simbrain.network.gui.dialogs.createTestInputPanel
 import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
+import org.simbrain.network.llm.LanguageModel
+import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
@@ -254,17 +257,33 @@ class PoolLayerTemplate : EditableObject {
     override val name = "Pooling Layer"
 }
 
-fun NetworkPanel.showTransformerBlockCreationDialog() {
-    TransformerBlock.CreationTemplate().createEditorDialog {
-        val transformerBlock = it.create()
-        network.addNetworkModelAsync(transformerBlock)
+fun NetworkPanel.showLanguageModelCreationDialog() {
+    LanguageModel.CreationTemplate().createEditorDialog("Create Language Model") { template ->
+        val languageModel = template.create("")
+        if (languageModel.obtainWeightsInteractive(network)) {
+            addLanguageModel(languageModel)
+        }
+    }.display()
+}
+
+private fun NetworkPanel.addLanguageModel(languageModel: LanguageModel) {
+    network.addNetworkModelAsync(languageModel)
+    undoManager.addUndoableAction(
+        description = "Add language model ${languageModel.id}",
+        undo = { languageModel.delete() },
+        redo = { network.addNetworkModel(languageModel, usePlacementManager = false, useAutoAssignedId = false) }
+    )
+}
+
+fun NetworkPanel.showTeachingTransformerCreationDialog() {
+    TeachingTransformer.CreationTemplate().createEditorDialog("Create Teaching Transformer") { template ->
+        val teachingTransformer = template.create()
+        network.addNetworkModelAsync(teachingTransformer)
         undoManager.addUndoableAction(
-            description = "Add transformer block ${transformerBlock.id}",
-            undo = { transformerBlock.delete() },
-            redo = { network.addNetworkModel(transformerBlock, usePlacementManager = false, useAutoAssignedId = false) }
+            description = "Add teaching transformer ${teachingTransformer.id}",
+            undo = { teachingTransformer.delete() },
+            redo = { network.addNetworkModel(teachingTransformer, usePlacementManager = false, useAutoAssignedId = false) }
         )
-    }.also {
-        it.title = "Create Transformer Block"
     }.display()
 }
 
@@ -609,6 +628,9 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
             }
         }
         sb.appendLine(line)
+        if (model is NetworkDebugInfoProvider) {
+            model.appendNetworkDebugInfo(sb, "$indent  ")
+        }
     }
 
     sb.appendLine("=== Network Debug Info ===")

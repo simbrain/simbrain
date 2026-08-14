@@ -2,16 +2,21 @@ package org.simbrain.world.textworld
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.trainers.SamplingStrategy
-import org.simbrain.util.DependenciesInvalidatingCachedObject
-import org.simbrain.util.SimpleTokenizer
-import org.simbrain.util.TokenizerResult
-import org.simbrain.util.UserParameter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.awt.Color
 import kotlin.math.min
+
+enum class DocumentStructureDisplay(private val label: String) {
+    OFF("Off"),
+    ROLE_COLORS("Role colors"),
+    CONVERSATION_FOCUS("Conversation focus");
+
+    override fun toString() = label
+}
 
 /**
  * TextWorld is an environment for modeling speech and reading and other linguistic phenomena and their interactions
@@ -56,12 +61,28 @@ class TextWorld : AttributeContainer, EditableObject {
     /**
      * The main "world text" associated with this world (which displays in the main window).
      */
+    @get:Producible
     var text: String
         get() = _text
         set(value) {
             _text = value
             events.textChanged.fireAsync()
         }
+
+    /**
+     * Replaces the whole document, but only when [newText] actually differs — a per-iteration
+     * coupling from a document producer syncs through this without endless change events. The
+     * cursor follows [addTextAtEnd]'s convention: pinned to the end with the newest token
+     * current, so the view tracks a growing document.
+     */
+    @Consumable
+    fun setTextIfChanged(newText: String) {
+        if (newText.isEmpty() || newText == _text) return
+        text = newText
+        position = _text.length
+        events.cursorPositionChanged.fireAsync()
+        currentTokenIndex = tokens.lastIndex
+    }
 
     @UserParameter(
         label = "Tokenizer",
@@ -79,9 +100,57 @@ class TextWorld : AttributeContainer, EditableObject {
             } ?: throw UnsupportedOperationException("Cannot change tokenizer when training document is not set.")
         }
 
+    /**
+     * When set, token boxes, highlighting, and [currentToken] follow this tokenizer instead of
+     * the embedding's — so a document synced from a language model shows the model's true token
+     * boundaries. Adopted automatically when a document coupling from a
+     * [org.simbrain.util.ProvidesDisplayTokenizer] is created; embedding lookups are unaffected.
+     */
+    var displayTokenizer: Tokenizer<*>? = null
+        set(value) {
+            field = value
+            events.textChanged.fireAsync()
+        }
+
+    @Transient
+    var documentStructureDisplay = DocumentStructureDisplay.OFF
+        set(value) {
+            field = value
+            events.textChanged.fireAsync()
+        }
+
+    /** Optional contextual guidance displayed below the document by the desktop view. */
+    @Transient
+    var statusMessageProvider: (() -> String?)? = null
+        set(value) {
+            field = value
+            events.statusChanged.fire()
+        }
+
+    /** Optional text for the token-count area at the lower right of the document view. */
+    @Transient
+    var tokenCountLabelProvider: (() -> String?)? = null
+        set(value) {
+            field = value
+            events.statusChanged.fire()
+        }
+
+    /**
+     * When true, the text is read-only while the workspace is running, so a model streaming
+     * into this document is never edited mid-iteration — pause the workspace to edit, and the
+     * settled edit is consumed on the next Play or Step. Adopted automatically alongside
+     * [displayTokenizer] when a document coupling from a generative model is created.
+     */
+    @UserParameter(
+        label = "Read-only while running",
+        description = "Lock the text while the workspace is running; pause to edit.",
+        order = 6
+    )
+    var lockWhileRunning = false
+
     @delegate:Transient
-    var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer) {
-        tokenizer.tokenize(text)
+    var tokens by DependenciesInvalidatingCachedObject(::text, ::tokenEmbedding, ::tokenizer, ::displayTokenizer) {
+        (displayTokenizer ?: tokenizer).tokenize(text)
     }
 
     @Transient
@@ -113,6 +182,35 @@ class TextWorld : AttributeContainer, EditableObject {
         events.currentTokenChanged.fire(tokenList[_currentTokenIndex])
     }
 
+    /**
+     * Char range highlighted in place of the current token when set — driven by a generative
+     * model's [org.simbrain.network.llm.GenerativeModel.currentTokenSpan] producer so the
+     * highlight follows the token the model is processing rather than this world's own
+     * cursor. Shown subject to [highlightCurrentToken], like any current-token highlight.
+     * Cleared when the user edits the text.
+     */
+    @Transient
+    var highlightSpan: IntArray? = null
+        private set
+
+    /**
+     * Sets the model-driven highlight range; an empty or degenerate [span] clears it. A
+     * per-iteration coupling delivers unchanged spans without event churn.
+     */
+    @Consumable
+    fun setHighlightSpan(span: IntArray) {
+        val newSpan = if (span.size == 2 && span[1] > span[0]) span else null
+        if (newSpan contentEquals highlightSpan) return
+        highlightSpan = newSpan
+        events.highlightSpanChanged.fire()
+    }
+
+    fun clearHighlightSpan() {
+        if (highlightSpan == null) return
+        highlightSpan = null
+        events.highlightSpanChanged.fire()
+    }
+
     @UserParameter(
         label = "Auto advance",
         description = "If true, automatically advance selected token on update.",
@@ -141,10 +239,12 @@ class TextWorld : AttributeContainer, EditableObject {
     var samplingStrategy: SamplingStrategy = SamplingStrategy.TopP()
 
     /**
-     * Set main text without firing an event.
+     * Set main text without firing an event. Used for direct user edits, which also retire
+     * any model-driven highlight.
      */
     fun setTextNoEvent(newText: String) {
         _text = newText
+        clearHighlightSpan()
     }
 
     /**
@@ -257,10 +357,16 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Add a text to the end of the world text.
+     * Add a text to the end of the world text. Empty strings are ignored so per-iteration
+     * couplings from sources that only sometimes produce a token add no stray spacing.
      */
     @Consumable
-    fun addTextAtEnd(newText: String, spacing: String = " ") {
+    fun addTextAtEnd(newText: String) {
+        if (newText.isEmpty()) return
+        addTextAtEnd(newText, " ")
+    }
+
+    fun addTextAtEnd(newText: String, spacing: String) {
         runBlocking {
             _text += "$spacing$newText"
             events.textChanged.fire()
@@ -331,7 +437,3 @@ class TextWorld : AttributeContainer, EditableObject {
     override val id = "Text World"
 
 }
-
-
-
-

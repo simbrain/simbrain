@@ -11,8 +11,10 @@ class TextWorldEvents: FlowEvents() {
     val textChanged = NoArgAwaitableEvent()
     val tokenVectorMapChanged = NoArgEvent()
     val currentTokenChanged = AwaitableEvent<TokenizerResult>()
+    val highlightSpanChanged = NoArgEvent()
     val cursorPositionChanged = NoArgAwaitableEvent()
     val atEnd = NoArgAwaitableEvent()
     val preferencesChanged = NoArgEvent()
+    val statusChanged = NoArgEvent()
 
 }

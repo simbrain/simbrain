@@ -2,9 +2,11 @@ package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.trainers.SupervisedNetwork
@@ -274,16 +276,22 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
 }
 
 
-class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
+class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPanel() {
+
+    constructor(trainer: SupervisedTrainer) : this(trainer.events, { trainer.iteration })
 
     val graphPanel: TimeSeriesPlotPanel
+
+    private val errorRemover: () -> Unit
+
+    private val resetJob: Job
 
     init {
         layout = MigLayout("ins 0, gap 0px 0px")
 
         // TODO: Consider passing some of these values in
         val model = TimeSeriesModel()
-        model.timeSupplier = { trainer.iteration }
+        model.timeSupplier = iterationSupplier
         model.rangeLowerBound = 0.0
         model.rangeUpperBound = 5.0
         model.fixedWidth = true
@@ -304,19 +312,25 @@ class ErrorTimeSeries(trainer: SupervisedTrainer) : JPanel() {
 
         model.addTimeSeries("Training Error")
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            model.addData(0, trainer.iteration.toDouble(), trainingStats.trainingError)
+        errorRemover = events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
+            model.addData(0, iterationSupplier().toDouble(), trainingStats.trainingError)
             trainingStats.testingError?.let {
                 if (model.timeSeriesList.size == 1) {
                     model.addTimeSeries("Testing Error")
                 }
-                model.addData(1, trainer.iteration.toDouble(), it)
+                model.addData(1, iterationSupplier().toDouble(), it)
             }
         }
 
-        trainer.events.iterationReset.on(Dispatchers.Swing) {
+        resetJob = events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
+    }
+
+    /** Detaches the plot from the trainer's events; for dialogs whose trainer outlives them. */
+    fun dispose() {
+        errorRemover()
+        resetJob.cancel()
     }
 }
 

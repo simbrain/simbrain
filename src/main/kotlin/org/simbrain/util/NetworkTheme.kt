@@ -53,6 +53,8 @@ object NetworkTheme {
         val receptiveFieldTrace: Color,
         val backwardTrace: Color,
         val rowHighlight: Color,
+        /** Categorical identity colors for small heterogeneous slice sets (a fused projection's chunks). */
+        val chunkColors: List<Color>,
     )
 
     val lightPalette = Palette(
@@ -81,6 +83,7 @@ object NetworkTheme {
         receptiveFieldTrace = Color(0xB86E00),
         backwardTrace = Color(0x2C6FB5),
         rowHighlight = Color(0, 200, 255, 160),
+        chunkColors = listOf(Color(0x00897B), Color(0x7B1FA2), Color(0xC2185B)),
     )
 
     val darkPalette = Palette(
@@ -109,6 +112,7 @@ object NetworkTheme {
         receptiveFieldTrace = Color(0xF2A33C),
         backwardTrace = Color(0x6FB1E6),
         rowHighlight = Color(90, 210, 255, 160),
+        chunkColors = listOf(Color(0x46B8A9), Color(0xB07BD6), Color(0xE0669A)),
     )
 
     /**

@@ -180,7 +180,8 @@ class ControlPanelKt(title: String = "Control Panel"):
         initValue: String,
         tab: String? = null,
         toolTip: String? = null,
-        onChange: (String) -> Unit = {}
+        labelToolTip: String? = null,
+        onChange: (String) -> Unit = {},
     ) =
         JTextField(initValue).also { textField ->
             textField.toolTipText = toolTip
@@ -198,7 +199,7 @@ class ControlPanelKt(title: String = "Control Panel"):
                 }
             })
             launch(Dispatchers.Swing) {
-                getTab(tab).addItem(label, textField).toolTipText = toolTip
+                getTab(tab).addItem(label, textField).toolTipText = labelToolTip ?: toolTip
             }
         }
 
@@ -253,6 +254,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         items: List<T>,
         initialSelection: T? = null,
         tab: String? = null,
+        labelToolTip: String? = null,
         crossinline onChange: (T) -> Unit = {}
     ) = JComboBox(items.toTypedArray()).also { comboBox ->
         if (initialSelection != null) {
@@ -266,7 +268,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             if (label.isEmpty()) {
                 getTab(tab).addItem(comboBox)
             } else {
-                getTab(tab).addItem(label, comboBox)
+                getTab(tab).addItem(label, comboBox).toolTipText = labelToolTip
             }
             pack()
         }

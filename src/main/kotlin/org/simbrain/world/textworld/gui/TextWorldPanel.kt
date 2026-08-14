@@ -2,6 +2,7 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.widgets.SimbrainTextArea
 import org.simbrain.world.textworld.TextWorld
@@ -13,10 +14,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JToolBar
+import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
 import javax.swing.text.BadLocationException
@@ -45,6 +43,43 @@ class TextWorldPanel(
      */
     val inputScrollPane: JScrollPane
 
+    private val statusLabel = JLabel(" ").apply {
+        font = Theme.label
+        foreground = Theme.mutedText
+    }
+
+    private val tokenCountLabel = JLabel().apply {
+        font = Theme.label
+        foreground = Theme.mutedText
+    }
+
+    private var runLocked = false
+
+    private var updatingTextArea = false
+
+    private fun updateStatus() {
+        val provided = world.statusMessageProvider?.invoke()
+        val message = provided ?: if (runLocked) "Read-only while running" else null
+        statusLabel.text = message ?: " "
+        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else provided
+        textArea.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else null
+    }
+
+    /** Locks the text while the workspace runs; the status bar says why the caret is dead. */
+    fun setRunLock(locked: Boolean) {
+        runLocked = locked
+        textArea.isEditable = !locked
+        updateStatus()
+    }
+
+    /** Shows the token count even when token boundaries are hidden. */
+    private fun updateTokenCount() {
+        val count = world.tokens.size
+        tokenCountLabel.text = world.tokenCountLabelProvider?.invoke()
+            ?: if (count == 1) "1 token" else "$count tokens"
+        tokenCountLabel.toolTipText = "Tokens in this document, counted by the active tokenizer"
+    }
+
     /**
      * Initialize the panel with an open / close toolbar.
      *
@@ -53,12 +88,16 @@ class TextWorldPanel(
     init {
 
         this.layout = BorderLayout()
-        border = BorderFactory.createEmptyBorder(0, 10, 0, 10)
         textArea.lineWrap = true
         textArea.text = world.text
+        textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+        textArea.margin = Insets(6, 8, 8, 8)
         inputScrollPane =
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
-        add(inputScrollPane)
+        add(JPanel(BorderLayout()).apply {
+            border = BorderFactory.createEmptyBorder(6, 10, 8, 10)
+            add(inputScrollPane)
+        })
 
         // Top toolbar
         val topToolBar = JToolBar()
@@ -68,12 +107,20 @@ class TextWorldPanel(
         topToolBar.add(world.textWorldPrefs)
         add(topToolBar,  BorderLayout.NORTH)
 
-        // Bottom toolbar
-        val bottomToolbarPanel = JPanel()
-        bottomToolbarPanel.layout = FlowLayout(FlowLayout.LEFT)
-        val toolbarModeSelect = JToolBar()
-        bottomToolbarPanel.add(toolbarModeSelect)
-        add(bottomToolbarPanel, BorderLayout.SOUTH)
+        // Status bar
+        // The message rides CENTER so it ellipsizes on narrow windows (the tooltip carries the
+        // full text) instead of painting through the token count in EAST.
+        val statusBar = JPanel(BorderLayout(12, 0)).apply {
+            border = BorderFactory.createCompoundBorder(
+                BorderFactory.createMatteBorder(1, 0, 0, 0, Theme.divider),
+                BorderFactory.createEmptyBorder(5, 10, 12, 10)
+            )
+            add(statusLabel, BorderLayout.CENTER)
+            add(tokenCountLabel, BorderLayout.EAST)
+        }
+        add(statusBar, BorderLayout.SOUTH)
+        updateTokenCount()
+        updateStatus()
 
         // Reset text position when user clicks in text area
         textArea.addMouseListener(object : MouseAdapter() {
@@ -86,27 +133,38 @@ class TextWorldPanel(
         // directly in the area).
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: changedUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
+                updateStatus()
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: insertUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
+                updateTokenCount()
+                updateStatus()
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
+                if (updatingTextArea) return
                 // System.out.println("readerworld: removeUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
+                updateHighlights()
+                updateTokenCount()
+                updateStatus()
             }
         })
 
@@ -121,23 +179,42 @@ class TextWorldPanel(
             }
         })
         world.events.textChanged.on(Dispatchers.Swing.immediate) {
-            textArea.text = world.text
-            if (world.position <= textArea.document.length) {
-                textArea.caretPosition = world.position
+            if (textArea.text != world.text) {
+                updatingTextArea = true
+                try {
+                    textArea.text = world.text
+                } finally {
+                    updatingTextArea = false
+                }
             }
+            textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
+            textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+            updateHighlights()
+            updateTokenCount()
+            updateStatus()
         }
 
         world.events.cursorPositionChanged.on(Dispatchers.Swing) {
-            textArea.caretPosition = world.position
+            textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
         }
 
         world.events.currentTokenChanged.on(Dispatchers.Swing) {
             updateHighlights()
         }
 
-        world.events.preferencesChanged.on(Dispatchers.Swing) {
-
+        world.events.highlightSpanChanged.on(Dispatchers.Swing) {
             updateHighlights()
+            updateStatus()
+        }
+
+        world.events.preferencesChanged.on(Dispatchers.Swing) {
+            updateHighlights()
+            updateTokenCount()
+        }
+
+        world.events.statusChanged.on(Dispatchers.Swing) {
+            updateStatus()
+            updateTokenCount()
         }
 
     }
@@ -154,6 +231,21 @@ class TextWorldPanel(
         
         if (world.showTokenBoundaries) {
             world.tokens.forEach(::highlightToken)
+        }
+        world.highlightSpan?.let { span ->
+            val start = span[0].coerceIn(0, docLength)
+            val end = span[1].coerceIn(start, docLength)
+            if (end > start) {
+                highlight(start, end)
+                try {
+                    textArea.modelToView(start)?.let { rect ->
+                        textArea.scrollRectToVisible(rect)
+                    }
+                } catch (e: BadLocationException) {
+                    // Span temporarily out of sync with the text area, ignore
+                }
+            }
+            return
         }
         world.tokens.getOrNull(world.currentTokenIndex)?.let { token ->
             // Double-check token is within document bounds
@@ -193,6 +285,12 @@ class TextWorldPanel(
 
     internal inner class MyHighlightPainter(color: Color?) : DefaultHighlightPainter(color)
 
+    companion object {
+        private const val RUN_LOCK_EXPLANATION =
+            "The workspace is running, so this document is read-only. " +
+                "Pause the workspace to edit — the edit is applied on the next Play or Step."
+    }
+
     fun highlight(begin: Int, end: Int) {
         if (!world.highlightCurrentToken) return
         // An instance of the private subclass of the default highlight painter
@@ -214,7 +312,6 @@ class TextWorldPanel(
             System.err.checkError()
         }
     }
-
 
     fun removeHighlights(textComp: JTextComponent) {
         val hilite = textComp.highlighter

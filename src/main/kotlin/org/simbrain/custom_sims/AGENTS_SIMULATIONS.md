@@ -249,7 +249,7 @@ withGui {
 
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
-Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled text fields, apply the same tooltip to both the field and its label by passing `toolTip` to `addTextField(...)`. Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
+Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled fields, apply an explanatory tooltip to both the field and its label; use `toolTip = "..."` with `addTextField(...)` and `labelToolTip = "..."` when a distinct label tooltip is needed. Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
 
 ## Documentation
 

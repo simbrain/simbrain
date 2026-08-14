@@ -26,6 +26,9 @@ open class LanguageModelNodeSnapshot : UiSnapshotDef {
     /** When true, the limb the selected layer doesn't use is hidden instead of ghosted. */
     protected open val hideInactiveLimb = false
 
+    /** When false, the logit lens is off: no rows and no reserved strip left of the tiles. */
+    protected open val lensEnabled = true
+
     /** The live-view variant shrinks the window and fills it, so the ghosting reads at fit zoom. */
     protected open val maxSeqLen = 256
     protected open val tokensToGenerate = 24
@@ -47,6 +50,7 @@ open class LanguageModelNodeSnapshot : UiSnapshotDef {
         languageModel.stopAtEndOfText = stopAtEndOfText
         languageModel.historyView = historyView
         languageModel.hideInactiveLimb = hideInactiveLimb
+        languageModel.lensEnabled = lensEnabled
         languageModel.loadWeights()
         runBlocking { network.addNetworkModel(languageModel, usePlacementManager = false) }
 
@@ -94,4 +98,10 @@ class LanguageModelNodeNoHistorySnapshot : LanguageModelNodeLiveViewSnapshot() {
 class LanguageModelNodeHiddenLimbSnapshot : LanguageModelNodeSnapshot() {
     override val name = "language-model-node-hidden-limb"
     override val hideInactiveLimb = true
+}
+
+/** Logit lens off: the reading rows are gone and the outline no longer reserves their strip. */
+class LanguageModelNodeLensOffSnapshot : LanguageModelNodeSnapshot() {
+    override val name = "language-model-node-lens-off"
+    override val lensEnabled = false
 }

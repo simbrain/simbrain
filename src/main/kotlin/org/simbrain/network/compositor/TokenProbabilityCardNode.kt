@@ -139,7 +139,7 @@ class TokenProbabilityCardNode(
             pickable = false
         })
         if (!grid) {
-            content.addChild(PText("$label  ${"%.1f".format(entry.probability * 100)}%").apply {
+            content.addChild(PText(label).apply {
                 font = Theme.tiny
                 textPaint = NetworkTheme.current.valueText
                 setOffset(x + RADIUS + 6.0, y - 6.0)

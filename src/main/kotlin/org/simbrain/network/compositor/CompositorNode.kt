@@ -496,12 +496,14 @@ class CompositorNode(
             val reading = lens.readings[index]
             circle.drawActivation(reading.prob.toDouble(), -1.0..1.0)
             text.textPaint = NetworkTheme.current.valueText
-            text.text = "${tokenLabel(reading.tokenId)}  ${"%.2f".format(reading.prob)}"
+            text.text = tokenLabel(reading.tokenId)
         }
     }
 
     private val lensRows = scene.lens?.sources?.indices?.map { LensRowNode(it).also { node -> addChild(node) } }
         ?: emptyList()
+
+    private fun lensShown() = lensRows.isNotEmpty() && scene.lens?.enabled != false
 
     /**
      * Selection rings around selected op glyphs. The glyphs themselves live in the chrome
@@ -556,12 +558,24 @@ class CompositorNode(
         probabilityCard.refresh(probabilitySnapshot())
     }
 
-    /** A disabled lens stops computing, so hide its rows rather than leaving stale readings up. */
+    private var lensRowsAttached = true
+
+    /**
+     * A disabled lens stops computing, so detach its rows rather than leaving stale readings up —
+     * detaching (not just hiding) keeps them out of the full bounds, so toggling also releases
+     * the strip the outline reserves for them.
+     */
     private fun refreshLensRows() {
-        val lensOn = scene.lens?.enabled != false
+        val lensOn = lensShown()
         lensRows.forEach {
-            it.visible = lensOn
             it.refresh()
+            if (lensOn && it.parent == null) addChild(it)
+            if (!lensOn) it.removeFromParent()
+        }
+        if (lensOn != lensRowsAttached) {
+            lensRowsAttached = lensOn
+            if (lensOn) probabilityCard.raiseToTop()
+            relayout()
         }
     }
 
@@ -584,9 +598,10 @@ class CompositorNode(
         if (edgeBounds.width > 0 && edgeBounds.height > 0) {
             bounds.add(Rectangle2D.Double(edgeBounds.x, edgeBounds.y, edgeBounds.width, edgeBounds.height))
         }
+        val lensSpace = if (lensShown()) LENS_SPACE else 0.0
         if (probabilityCardOverlay.x.isNaN() || probabilityCardOverlay.y.isNaN()) {
             val cardPosition = probabilityCardPosition?.invoke(scene, bounds, probabilityCard)
-                ?: Point2D.Double(bounds.x - LENS_SPACE + MARGIN, bounds.maxY + 18.0)
+                ?: Point2D.Double(bounds.x - lensSpace + MARGIN, bounds.maxY + 18.0)
             probabilityCardOverlay.x = cardPosition.x
             probabilityCardOverlay.y = cardPosition.y
         }
@@ -596,8 +611,8 @@ class CompositorNode(
         background.reset()
         background.append(
             Rectangle2D.Double(
-                bounds.x - MARGIN - LENS_SPACE, bounds.y - MARGIN,
-                bounds.width + 2 * MARGIN + LENS_SPACE, bounds.height + 2 * MARGIN
+                bounds.x - MARGIN - lensSpace, bounds.y - MARGIN,
+                bounds.width + 2 * MARGIN + lensSpace, bounds.height + 2 * MARGIN
             ), false
         )
         placeStepStatus()

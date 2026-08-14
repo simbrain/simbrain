@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
@@ -272,6 +273,10 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
 
     val graphPanel: TimeSeriesPlotPanel
 
+    private val errorRemover: () -> Unit
+
+    private val resetJob: Job
+
     init {
         layout = MigLayout("ins 0, gap 0px 0px")
 
@@ -297,7 +302,7 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
 
         model.addTimeSeries("Training Error")
 
-        events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
+        errorRemover = events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
             model.addData(0, iterationSupplier().toDouble(), trainingStats.trainingError)
             trainingStats.testingError?.let {
                 if (model.timeSeriesList.size == 1) {
@@ -307,9 +312,15 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
             }
         }
 
-        events.iterationReset.on(Dispatchers.Swing) {
+        resetJob = events.iterationReset.on(Dispatchers.Swing) {
             model.clearData()
         }
+    }
+
+    /** Detaches the plot from the trainer's events; for dialogs whose trainer outlives them. */
+    fun dispose() {
+        errorRemover()
+        resetJob.cancel()
     }
 }
 

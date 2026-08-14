@@ -13,6 +13,9 @@ import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TeachingTransformer
 import org.simbrain.util.*
+import java.awt.Dialog
+import java.awt.event.WindowAdapter
+import java.awt.event.WindowEvent
 import java.awt.geom.Point2D
 import javax.swing.*
 
@@ -233,25 +236,55 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
         val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
 
+        val trainButton = JButton("Train").apply { addActionListener { trainer.launch { trainer.startTraining() } } }
+        val stopButton = JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } }
+        val stepButton = JButton("Step").apply { addActionListener { trainer.launch { trainer.trainOnce() } } }
+        fun syncButtons(running: Boolean) {
+            trainButton.isEnabled = !running
+            stepButton.isEnabled = !running
+            stopButton.isEnabled = running
+        }
+        syncButtons(trainer.isRunning)
+
+        val errorTimeSeries = ErrorTimeSeries(trainer.events) { trainer.iteration }
         val panel = JPanel(MigLayout("ins 10, wrap 4", "[][][][grow]"))
-        panel.add(JButton("Train").apply { addActionListener { trainer.launch { trainer.startTraining() } } })
-        panel.add(JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } })
-        panel.add(JButton("Step").apply { addActionListener { trainer.launch { trainer.trainOnce() } } })
+        panel.add(trainButton)
+        panel.add(stopButton)
+        panel.add(stepButton)
         panel.add(iterationsLabel)
         panel.add(lossLabel)
         panel.add(accuracyLabel)
         panel.add(windowsLabel, "span 2")
-        panel.add(ErrorTimeSeries(trainer.events) { trainer.iteration }, "span 4, grow, push")
+        panel.add(errorTimeSeries, "span 4, grow, push")
 
-        trainer.events.errorUpdated.on(swingDispatcher) { stats ->
+        val beginRemover = trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }
+        val endJob = trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }
+        val statsRemover = trainer.events.errorUpdated.on(swingDispatcher) { stats ->
             iterationsLabel.text = "Iterations: ${trainer.iteration}"
             lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
             accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
         }
+        // The trainer outlives this dialog, so detach everything it registered; closing also
+        // stops a running training.
+        panel.onWindowClose {
+            beginRemover()
+            endJob.cancel()
+            statsRemover()
+            errorTimeSeries.dispose()
+            trainer.launch { trainer.stopTraining() }
+        }
 
-        return StandardDialog(panel).apply {
-            title = "Train ${teachingTransformer.displayName}"
-            isModal = false
+        val parentWindow = SwingUtilities.getWindowAncestor(networkPanel)
+        return StandardDialog(parentWindow as? JFrame, "Train ${teachingTransformer.displayName}").apply {
+            contentPane = panel
+            isModal = true
+            isAlwaysOnTop = false
+            modalityType = Dialog.ModalityType.APPLICATION_MODAL
+            addWindowFocusListener(object : WindowAdapter() {
+                override fun windowGainedFocus(e: WindowEvent?) {
+                    toFront()
+                }
+            })
         }
     }
 

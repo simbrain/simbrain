@@ -12,25 +12,21 @@
  */
 package org.simbrain.custom_sims.simulations.demos
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.addTimeSeriesComponent
-import org.simbrain.custom_sims.createControlPanel
-import org.simbrain.custom_sims.newSim
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.subnetworks.BPTTNetwork
-import org.simbrain.network.trainers.BPTTTrainer
-import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.util.format
-import org.simbrain.util.place
+import org.simbrain.custom_sims.*
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.ALPHABET_SIZE
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.DELAY
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.HIDDEN_UNITS
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.LEARNING_RATE
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.TRAINING_TRIALS
 import org.simbrain.custom_sims.simulations.demos.DelayedRecall.TRIAL_LENGTH
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.subnetworks.BPTTNetwork
+import org.simbrain.network.trainers.BPTTTrainer
+import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.util.format
+import org.simbrain.util.place
 import org.simbrain.util.point
 import kotlin.random.Random
 
@@ -46,6 +42,7 @@ val bpttDelayedRecall = newSim {
     bptt.inputLayer.labelArray = (SYMBOL_NAMES + "recall").toTypedArray()
     bptt.outputLayer.labelArray = SYMBOL_NAMES.toTypedArray()
     bptt.layers.filterIsInstance<NeuronArray>().forEach { it.circleMode = true }
+    (bptt.inputLayer.updateRule as LinearRule).upperBound = 1.0
 
     bptt.trainingSet = buildDelayedRecallSequence(TRAINING_TRIALS, Random(TRAINING_SEED))
     bptt.trainerConfig.truncationDepth = TRIAL_LENGTH

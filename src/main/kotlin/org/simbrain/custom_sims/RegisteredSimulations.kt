@@ -26,7 +26,10 @@ import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulatio
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
-import org.simbrain.custom_sims.simulations.psychology.*
+import org.simbrain.custom_sims.simulations.psychology.categoricalPerception
+import org.simbrain.custom_sims.simulations.psychology.heatColdSim
+import org.simbrain.custom_sims.simulations.psychology.serialOrderContextMemory
+import org.simbrain.custom_sims.simulations.psychology.spiveyNet
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
 import org.simbrain.util.StructureDir
@@ -58,8 +61,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Feed-Forward MNIST") { tinyMNIST }
         item("CNN MNIST") { cnnMNIST }
-        item("Delayed recall (BPTT)", beta = true) { bpttDelayedRecall }
-        item("Curriculum (BPTT)", beta = true) { bpttCurriculum }
+        // item("Delayed recall (BPTT)") { bpttDelayedRecall }
+        // item("Curriculum (BPTT)") { bpttCurriculum }
     }
 
     dir("Braitenberg") {
@@ -88,7 +91,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        item("Botvinick-Plaut serial recall (BPTT)", beta = true) { botvinickPlautSerialRecall }
+        // item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
     }
 

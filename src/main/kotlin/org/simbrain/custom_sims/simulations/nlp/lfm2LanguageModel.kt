@@ -54,7 +54,7 @@ val lfm2LanguageModel = newSim("lfm2_language_model") {
     }
     languageModel.location = point(0, 0)
 
-    val textWorldComponent = addTextWorld("Document")
+    val textWorldComponent = addTextWorld("Context Window")
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.showTokenBoundaries = false
     textWorldComponent.world.text = "Here is a brief two-paragraph parable:"
@@ -168,33 +168,44 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
         """
         # LFM2.5-230M in Simbrain
 
-        A real, full-scale language model — [LFM2.5-230M](https://huggingface.co/LiquidAI/LFM2.5-230M) by Liquid AI — running entirely inside Simbrain. Nothing is mocked and no network calls are made during generation: every matrix multiply happens in this process, and the diagram on the network canvas is the model's actual interior, repainted as it computes.
+        A full-scale language model running entirely inside Simbrain. The model is [LFM2.5-230M](https://huggingface.co/LiquidAI/LFM2.5-230M) (LFM stands for liquid foundation model) from Liquid AI. The weights (~460 MB) are downloaded from Hugging Face on first use and cached locally. They are licensed under the [LFM Open License v1.0](https://www.liquid.ai/lfm-license).
 
-        The weights (~460 MB) are downloaded from Hugging Face on first use and cached locally. They are licensed under the [LFM Open License v1.0](https://www.liquid.ai/lfm-license).
+        The model uses a combination of convolutions to reduce the size of the input stream and standard [attention](https://huggingface.co/docs/transformers/main/attention) heads, along with caching and optimization strategies such as the [KV cache](https://huggingface.co/docs/transformers/en/kv_cache) and query-based attention.
 
-        # Completion (Default)
+        A new set of graphical tools was developed to display such a complex network. Several modes are possible for displaying the network, accessible via the context window. A central graphical element is the layer nodes on the left side. Each box corresponds to one layer and ask you click on these layers the full set of components in that layer is revealed in the main window. The final layer shows which tokens in the vocabulary are most probable. The top element is often the one added to the context window in the next iteration.
 
-        Completion is what happens when you press the desktop `Play` button with the default `Completion` prompt mode. The model continues the `Document` verbatim: no chat markers are added. Every workspace step is one forward pass: the model first reads the document one token per step (prompt processing), then generates one sampled token per step until it emits `<|im_end|>`, fills the context window, or reaches the optional token limit. Simbrain pauses and unlocks the document.
+        Information flows from bottom to top and the activations of the layer nodes fill up row by row as the context window is processed. Each token corresponds to one row. You will see many elements slow fill up row by row as context is used.
 
-        The `<|im_end|>` marker seals the stream: as long as the document ends with it, the model considers the text finished. Delete the marker (or edit the text anywhere) to continue. After an edit the model re-reads only from near the change — the unchanged beginning of the document is still in its caches, the way real inference servers reuse a prompt prefix. There is no prompt hiding anywhere — the document IS the model's entire input. `Reset` in the control panel clears both the document and the model's context, and the temperature and sampling strategy can change mid-run.
+        All tokens, including those that are usually hidden in a standard AI chat, are visible. A color theme can be selected which can be used to make the status of different tokens clear. The bottom of the context window contains important information about how tokens are being processed.
 
-        # Chat
+        This simulation is marked as beta: it is a complex simulation, and our sense of how best to present the information is evolving. Your feedback is welcome!
+        
+        # Control Panel 
 
-        Select `Chat` in `Settings`, then press `Reset` to start a fresh conversation. Type into `Chat message` and press Enter (or `Send message`). Simbrain adds `<|startoftext|>`, a complete `<|im_start|>user` turn, and an open `<|im_start|>assistant` turn, then starts `Play` automatically. The reply runs until it emits `<|im_end|>`, which closes the assistant turn; Simbrain pauses and unlocks the document for the next message.
+        - `Temperature` controls how varied the generated tokens are.
+        - `Settings...` changes the prompt mode, token limit, sampling strategy, and other generation settings.
+        - `Reset` clears the context window and starts a new model context.
+        - `Tools` enables the optional `Current time` tool for a new chat context.
+        - `Color theme` changes how chat roles, system text, and tool calls appear.
+        - In `Chat` prompt mode, enter text in `Chat message` and use `Send message` (or press Enter) to add a user turn and generate a reply.
 
-        You can switch between `Completion` and `Chat` in `Settings` at any time and inspect or edit the `Document` to see the exact token stream. Completion leaves the document alone; chat adds its turn markers only when you send a message.
+        # How to interact with the network
+
+        The simplest way to interact with the network is by simply entering text in the context window and pressing play. The network will run until it hits `<|im_end|>`. Initially it processes the existing prompt then it switches to generating new tokens, as indicated by the status bar.
+
+        You can also enter a chat message, which adorns the message with appropriate tokens so you can have a familiar chat style interaction without having to manually encode those.
 
         # Reading the Diagram
 
-        Data flows bottom to top through the residual stream — the column of wide tiles. LFM2 is a hybrid: most blocks are short-convolution blocks, with a few attention blocks in between. Use the depth strip to select which layer's interior is shown, scroll over the attention deck to flip through heads, and watch the logit-lens readouts sharpen as you read up the stream.
+        Data flows bottom to top through the residual stream. LFM2 is a hybrid: most blocks are short-convolution blocks, with a few attention blocks in between. Use the depth strip to select which layer's interior is shown, scroll over the attention deck to flip through heads, and watch the logit-lens readouts sharpen as you read up the stream.
 
         Hover over any cell to read its value; double-click a tile to trace its data-flow paths. The limb the selected layer doesn't use stays faintly visible for orientation; right-click the model and set `Inactive limb` to `Hide` to clear it away entirely.
 
-        Most of what the tall tiles show is a *recording*: at each step the model only holds the current token's activations, and the diagram keeps the old rows so you can see the trajectory. Right-click the model and set `Token history` to `Ghost` to see what is genuinely resident — past rows ghost out, one bright row sweeps down as it writes, and the only tiles left fully lit are the KV caches and the conv window. That is the model's entire memory, and it is why those caches exist. `Off` goes further and keeps no history at all — layer flips become instant, and switching back re-derives the recording from the depth strip.
+        Most of what the tall tiles show is a recording: at each step the model only holds the current token's activations, and the diagram keeps the old rows so you can see the trajectory. Right-click the model and set `Token history` to `Ghost` to see what is genuinely resident: past rows ghost out, one bright row sweeps down as it writes, and the only tiles left fully lit are the KV caches and the conv window. That is the model's entire memory, and it is why those caches exist. `Off` goes further and keeps no history at all. Layer flips become instant, and switching back re-derives the recording from the depth strip.
 
         # Special Tokens
 
-        Bold neutral text in the `Document` is a special token: a single token with a control meaning rather than ordinary language. LFM2 uses a ChatML-like format in which `<|im_start|>` and `<|im_end|>` mean _start of the message_ and _end of the message_; Liquid AI does not expand `im` further. `Conversation focus` is the default color theme; it fades the harness so the conversation stands out. `Role colors` renders user text blue, assistant text green, system text violet, and tool activity teal.
+        Neutral text in the `Context Window` can be a special token: a single token with a control meaning rather than ordinary language. LFM2 uses a ChatML-like format in which `<|im_start|>` and `<|im_end|>` mean _start of the message_ and _end of the message_; Liquid AI does not expand `im` further. `Conversation focus` is the default color theme; it fades the harness so the conversation stands out. `Role colors` renders user text blue, assistant text green, system text violet, and tool activity teal.
 
         - `<|startoftext|>` begins every document. Simbrain adds it automatically if you omit it.
         - `<|im_start|>user` opens a user turn; `<|im_start|>assistant` opens the reply the model is expected to write.
@@ -202,15 +213,13 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
         - `<|tool_call_start|>` / `<|tool_call_end|>` surround a model tool request.
         - `<|tool_response_start|>` / `<|tool_response_end|>` surround a tool result.
 
-        The role names (`user`, `assistant`, `system`, and `tool`) are ordinary text immediately after `<|im_start|>`; they are bold too because they are part of the harness, not text normally shown in a chat interface. You can edit any marker to see how changing the harness changes the model's behavior. LFM2 has additional special tokens for other tasks; see the [full tokenizer list](https://huggingface.co/LiquidAI/LFM2-Tokenizer#special-tokens).
+        The role names (`user`, `assistant`, `system`, and `tool`) are ordinary text immediately after `<|im_start|>` and are part of the harness, not text normally shown in a chat interface. You can edit any marker to see how changing the harness changes the model's behavior. LFM2 has additional special tokens for other tasks; see the [full tokenizer list](https://huggingface.co/LiquidAI/LFM2-Tokenizer#special-tokens).
 
         # Tools
 
         Select `Current time` from `Tools`, then start a fresh conversation with `Reset`. The model is then told about the local `current_time` tool. Ask “What time is it?” The model decides whether to emit a tool call; when it does, Simbrain reads this computer's clock, adds a `tool` result turn, and lets the model continue its reply.
 
-        # Beta
 
-        This simulation is a beta: it exists partly to exercise the language-model UX. If a status line confuses you, a control feels missing, or an edit does something surprising, that is exactly the feedback it is for.
         """.trimIndent()
     )
 }

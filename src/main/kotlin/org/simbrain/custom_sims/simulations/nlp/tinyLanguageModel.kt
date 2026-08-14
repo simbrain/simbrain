@@ -453,35 +453,44 @@ private val TINY_LM_SIDEBAR = """
 
         For a detailed walk-through on LLMs and transformer models that complements this discussion see the chapter on transformers [here](https://downloads.jeffyoshimi.net/NeuralNetworksCogsci.pdf).
 
-        # Reading the Diagram
+        # Simulation Details
+
+        ## Control Panel Settings
+
+        - `Show Vocabulary` displays the tokens the model recognizes.
+        - `Show Training Text` displays the training corpus.
+        - `Temperature` controls how varied the generated tokens are.
+        - `Configure Sampling Strategy...` changes how the next token is selected.
+
+        ## Reading the Diagram
 
         The transformer's interior is a live diagram of its computation. Data flows bottom to top.
 
         ## The residual stream is the spine
 
-        The column of wide tiles running up the diagram is the **residual stream** — the transformer's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the bottom, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and **adds** it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
+        The column of wide tiles running up the diagram is the residual stream: the transformer's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the bottom, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and adds it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
 
-        The straight vertical segments of the spine are the **skip connections**: information travels up them unchanged, which is why early information is still available at the top. The attention and MLP blocks are side branches that leave the spine and rejoin it.
+        The straight vertical segments of the spine are skip connections: information travels up them unchanged, which is why early information is still available at the top. The attention and MLP blocks are side branches that leave the spine and rejoin it.
 
         ## The attention heads are a deck
 
-        The triangular tile is the attention pattern — row `i`, column `j` shows how much position `i` attends to position `j`. The upper triangle is exactly zero because of the **causal mask**: a token can only look backward, never at the future. The stacked cards behind it are the other heads; **scroll the mouse wheel over the deck to flip through heads**. Each head learns its own attention pattern.
+        The triangular tile is the attention pattern — row `i`, column `j` shows how much position `i` attends to position `j`. The upper triangle is exactly zero because of the causal mask: a token can only look backward, never at the future. The stacked cards behind it are the other heads; scroll the mouse wheel over the deck to flip through heads. Each head learns its own attention pattern.
 
         ## Weights, operations, and the lens
 
-        Tiles with heavy orange borders are **weight matrices** — the model's learned parameters. They ride directly on the line that uses them: Wq/Wk/Wv sit on the curves into q/k/v, W1 and W2 on the MLP path (each followed by its thin **bias strip**, showing the actual bias vector), Wo on the attention output, and the unembedding on the way into the logits. They only change during training.
+        Tiles with heavy orange borders are weight matrices — the model's learned parameters. They ride directly on the line that uses them: Wq/Wk/Wv sit on the curves into q/k/v, W1 and W2 on the MLP path (each followed by its thin bias strip, showing the actual bias vector), Wo on the attention output, and the unembedding on the way into the logits. They only change during training.
 
-        The small circled icons on the connecting lines are the **operations**: ⊕ addition, × matrix multiply, a bell curve for layer norm, σ for the masked softmax, and a target for the cross-entropy loss. The activation function appears as a corner badge on the tile it produces (the hockey-stick icon on `hidden` is the ReLU). Hover over any icon to see the operation's input and output tensors.
+        The small circled icons on the connecting lines are operations: ⊕ addition, × matrix multiply, a bell curve for layer norm, σ for the masked softmax, and a target for the cross-entropy loss. The activation function appears as a corner badge on the tile it produces (the hockey-stick icon on `hidden` is the ReLU). Hover over any icon to see the operation's input and output tensors.
 
-        The small readouts beside each spine tile are the **logit lens**: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read up the spine — the top reading is the model's actual prediction.
+        The small readouts beside each spine tile are the logit lens: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read up the spine — the top reading is the model's actual prediction.
 
-        The `next-token probabilities` tile at the top holds one probability distribution per row. After training you will see it develop crisp structure.
+        The `current position token probabilities` display at the top shows a circle for each token in the vocabulary and the probability associated with each. A red circle is draw around the token that will be selected on the next iteration, which is generally one of the more probable ones (see "sampling strategy" in docs for more information on how this selection is made).
 
         # What to Do
 
         ## Train the model
 
-        The model starts untrained. Right-click the transformer's title tab and choose **Train...**, then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
+        The model starts untrained. Right-click the transformer's title tab and choose `Train...`, then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
 
         ## Generate text
 
@@ -495,18 +504,19 @@ private val TINY_LM_SIDEBAR = """
 
         ## Step through the computation, one operation at a time
 
-        This is the heart of the simulation. Right-click the transformer:
+        Right-click the transformer:
 
-        - **Step forward pass one op** runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings down to the probabilities.
-        - **Step training one op** walks an entire training step: the forward pass op by op, then the loss, then **every gradient in reverse order** back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on **Gradient view** to see the gradient values themselves flowing backward through the tiles.
-        - **Finish current step walk** completes a walk you started.
+        - `Step forward pass one op` runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings down to the probabilities.
+        - `Step training one op` walks an entire training step: the forward pass op by op, then the loss, then every gradient in reverse order back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on `Gradient view` to see the gradient values themselves flowing backward through the tiles.
+        - `Finish current step walk` completes a walk you started.
+        
+        The keyboard shortcuts F and B are useful to do this quickly.
 
         ## Explore
 
-        - **Double-click a tile** to trace its data-flow paths through the diagram; double-click again to clear.
-        - **Hover over any cell** to read its exact value; drag tiles to rearrange the diagram.
+        - Double-click a tile to trace its data-flow paths through the diagram; double-click again to clear.
+        - Hover over any cell to read its exact value; drag tiles to rearrange the diagram.
         - Adjust `Temperature` and the sampling strategy in the control panel and compare generated text.
-        - If the diagram is too large next to other components, lower **Diagram scale** in the transformer's Settings — tiles and spacing shrink while labels stay readable.
         - Try more heads or layers in the startup dialog. With two layers you can watch the logit lens improve across both.
 
         ## Saving

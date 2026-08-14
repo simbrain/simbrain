@@ -549,8 +549,17 @@ class CompositorNode(
             it.raster.syncContent()
             it.syncLiveRow()
         }
-        lensRows.forEach { it.refresh() }
+        refreshLensRows()
         probabilityCard.refresh(probabilitySnapshot())
+    }
+
+    /** A disabled lens stops computing, so hide its rows rather than leaving stale readings up. */
+    private fun refreshLensRows() {
+        val lensOn = scene.lens?.enabled != false
+        lensRows.forEach {
+            it.visible = lensOn
+            it.refresh()
+        }
     }
 
     /** Re-derives node offsets, edges, return lanes, lens placement, and bounds from tile rects. */
@@ -606,7 +615,7 @@ class CompositorNode(
             it.syncLabel()
         }
         rebuildEdges()
-        lensRows.forEach { it.refresh() }
+        refreshLensRows()
         syncOpSelectionOverlay()
     }
 

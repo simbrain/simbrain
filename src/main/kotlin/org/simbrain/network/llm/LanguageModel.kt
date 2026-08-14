@@ -264,8 +264,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
                 it.y = xy[1]
             }
         }
-        (scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile)
-            ?.selectedHead = selectedHead
+        val attention = scene.tiles.firstOrNull { it.id == "block.attn.weights" } as? AttentionTile
+        attention?.selectedHead = selectedHead
+        // Chain onto the compositor's GQA coupling so a pager flip lands in the serialized head,
+        // and replay the restored head through it so the k/v cache decks start on the right group.
+        val headSelect = scene.onHeadSelected
+        scene.onHeadSelected = { tile, head ->
+            headSelect?.invoke(tile, head)
+            if (tile is AttentionTile) selectedHead = head
+        }
+        attention?.let { scene.onHeadSelected?.invoke(it, selectedHead) }
         scene.historyView = historyView
         scene.hideDimmed = hideInactiveLimb
         scene.showLayerCards = showLayerCards

@@ -55,6 +55,29 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `head selection round-trips between the pager, the serialized state, and the kv caches`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 32)
+        languageModel.selectedHead = 5
+        languageModel.loadWeights()
+
+        val scene = languageModel.loaded!!.scene
+        val config = languageModel.loaded!!.model.config
+        val qPerKv = config.numHeads / config.numKvHeads
+        val attention = scene.tile("block.attn.weights") as org.simbrain.network.compositor.AttentionTile
+        val kCache = scene.tile("block.attn.k_cache") as org.simbrain.network.compositor.DeckTile
+        assertEquals(5, attention.selectedHead, "the restored head lands on the attention tile")
+        assertEquals(5 / qPerKv, kCache.selectedSlice, "the restored head places the kv caches on its group")
+
+        attention.selectedHead = 9
+        scene.onHeadSelected!!.invoke(attention, 9)
+        assertEquals(9, languageModel.selectedHead, "a pager flip lands in the serialized view state")
+        assertEquals(9 / qPerKv, kCache.selectedSlice, "the pager flip still moves the kv caches")
+    }
+
+    @Test
     fun `loading seeds the window and network iterations drive it one token per update`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")

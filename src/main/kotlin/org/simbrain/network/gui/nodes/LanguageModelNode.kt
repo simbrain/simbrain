@@ -162,20 +162,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     refreshView()
                 })
                 addSeparator()
-                add(JMenu("Attention head").apply {
-                    val group = ButtonGroup()
-                    (0 until state.model.config.numHeads).forEach { head ->
-                        add(JRadioButtonMenuItem("Head $head", head == languageModel.selectedHead).apply {
-                            group.add(this)
-                            addActionListener {
-                                languageModel.selectedHead = head
-                                compositorNode?.refreshDirtyTiles()
-                            }
-                        })
-                    }
-                })
                 add(JCheckBoxMenuItem("Logit lens", languageModel.lensEnabled).apply {
-                    addActionListener { languageModel.lensEnabled = isSelected }
+                    toolTipText = "Decode the residual stream at each depth into the token it implies " +
+                        "so far — one vocabulary-sized projection per row per token, so decoding is " +
+                        "faster with it off; the rows hide while off"
+                    addActionListener {
+                        languageModel.lensEnabled = isSelected
+                        compositorNode?.refreshDirtyTiles()
+                    }
                 })
                 add(JMenu("Token history").apply {
                     val group = ButtonGroup()

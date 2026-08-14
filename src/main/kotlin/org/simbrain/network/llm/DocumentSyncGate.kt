@@ -27,11 +27,15 @@ class DocumentSyncGate {
     /**
      * Classifies an incoming value: true means it is an edit the model should apply. Echoes
      * return false; an echo of the live [current] window while halted confirms the tail is
-     * synced, silencing the producer.
+     * synced, silencing the producer. The older ring entry only counts as an echo while the
+     * one-iteration coupling lag can still exist — while advancing, or after halting until the
+     * tail is confirmed. Once confirmed, a document that matches the previous window is a real
+     * edit: the user deleted the last token.
      */
     fun isEdit(incoming: String, current: String, advancing: Boolean): Boolean {
         if (incoming.isEmpty()) return false
-        if (ring.contains(incoming)) {
+        val lagPossible = advancing || !tailSynced
+        if (incoming == ring.lastOrNull() || (lagPossible && ring.contains(incoming))) {
             if (!advancing && incoming == current) tailSynced = true
             return false
         }

@@ -119,20 +119,29 @@ class NetworkComponent : WorkspaceComponent {
 
     private var generationPausePending = false
 
+    private var generationPauseFired = false
+
     /**
      * Pauses a running workspace one iteration after every pause-requesting language model has
      * halted — end of text, full window, or spent budget. The grace iteration lets the couplings
      * deliver the final window, end marker included, to any coupled document before the pause
-     * releases it for editing.
+     * releases it for editing. Fires once per halt episode and re-arms only when some model can
+     * advance again; iterate-style runs, which ignore stop(), are left alone.
      */
     private fun pauseIfGenerationEnded() {
         val requesting = network.getModels<LanguageModel>().filter { it.pauseWorkspaceAtEnd && it.isLoaded }
         val ended = requesting.isNotEmpty() && requesting.none { it.canAdvance }
-        if (ended && generationPausePending) {
+        if (!ended) {
             generationPausePending = false
-            workspace.stop()
-        } else {
-            generationPausePending = ended
+            generationPauseFired = false
+        } else if (!generationPauseFired) {
+            if (generationPausePending) {
+                generationPausePending = false
+                generationPauseFired = true
+                if (workspace.updater.isRunning) workspace.stop()
+            } else {
+                generationPausePending = true
+            }
         }
     }
 

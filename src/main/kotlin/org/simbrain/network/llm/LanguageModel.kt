@@ -500,6 +500,12 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         loaded?.tokenizer?.encode(textIn, addSpecials = false)
 
     override fun onInjected(newText: String, ids: IntArray) {
+        // Every canonical window starts with BOS; the first injection restores it to both the
+        // committed stream and the feed queue, mirroring seedWindow and applyWindowEdit.
+        if (windowIds.isEmpty() && ids.firstOrNull() != Lfm2ChatFormat.BOS_ID) {
+            windowIds.add(Lfm2ChatFormat.BOS_ID)
+            pending.addFirst(Lfm2ChatFormat.BOS_ID)
+        }
         ids.forEach { windowIds.add(it) }
         text += newText
         generatedCount = 0
@@ -527,18 +533,26 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         // A checkpoint at the window's full length would leave nothing to feed; the last
         // replayed token's forward pass is what samples the continuation.
         val checkpoint = checkpoints.lastOrNull { it.position <= reusable && it.position < window.size }
-        if (checkpoint == null) {
-            state.model.reset()
-            state.scene.reset()
-            checkpoints = ArrayList()
-            pending = ArrayDeque(window)
-        } else {
-            state.model.rewindTo(checkpoint.position, checkpoint.convState)
-            state.scene.truncateFrom(checkpoint.position)
-            while (checkpoints.isNotEmpty() && checkpoints.last().position > checkpoint.position) {
-                checkpoints.removeAt(checkpoints.size - 1)
+        when {
+            // Pure append with the caches already exactly at the reuse point: nothing to
+            // rewind or truncate, just feed the new suffix.
+            reusable == state.model.position && reusable < window.size -> {
+                pending = ArrayDeque(window.subList(reusable, window.size))
             }
-            pending = ArrayDeque(window.subList(checkpoint.position, window.size))
+            checkpoint == null -> {
+                state.model.reset()
+                state.scene.reset()
+                checkpoints = ArrayList()
+                pending = ArrayDeque(window)
+            }
+            else -> {
+                state.model.rewindTo(checkpoint.position, checkpoint.convState)
+                state.scene.truncateFrom(checkpoint.position)
+                while (checkpoints.isNotEmpty() && checkpoints.last().position > checkpoint.position) {
+                    checkpoints.removeAt(checkpoints.size - 1)
+                }
+                pending = ArrayDeque(window.subList(checkpoint.position, window.size))
+            }
         }
         windowIds = ArrayList(window)
         currentSpan = IntArray(0)

@@ -55,6 +55,54 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `injecting into an empty window prepends BOS to the window and the feed queue`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 32)
+        languageModel.stopAtEndOfText = false
+        languageModel.loadWeights()
+        val injected = languageModel.loaded!!.tokenizer.encode("Hello world", addSpecials = false).size
+        languageModel.injectText("Hello world")
+
+        assertTrue(languageModel.contextWindow.startsWith(Lfm2ChatFormat.BOS),
+            "the committed stream regains its leading BOS marker")
+        val textBefore = languageModel.text
+        repeat(injected) { languageModel.step() }
+        assertEquals(injected, languageModel.loaded!!.model.position)
+        assertEquals(textBefore, languageModel.text,
+            "with BOS prepended, one queued token still remains, so nothing sampled yet")
+        languageModel.step()
+        assertEquals(injected + 1, languageModel.loaded!!.model.position,
+            "BOS fed as the first token, so the queue held one more than the injected ids")
+    }
+
+    @Test
+    fun `a pure append skips rewind and feeds only the new tokens`() {
+        val dir = weightsDirectory()
+        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.initialText = "The capital of France is"
+        languageModel.tokensToGenerate = 1
+        languageModel.stopAtEndOfText = false
+        languageModel.loadWeights()
+        while (languageModel.canAdvance) languageModel.step()
+        val positionBefore = languageModel.loaded!!.model.position
+        val embedTile = languageModel.loaded!!.scene.tile("embed")
+        assertTrue((0 until embedTile.cols).any { embedTile.valueAt(0, it) != 0f })
+
+        languageModel.contextWindow = languageModel.contextWindow + " Paris"
+        assertEquals(positionBefore, languageModel.loaded!!.model.position,
+            "a pure append must not rewind or reset the caches")
+        assertTrue((0 until embedTile.cols).any { embedTile.valueAt(0, it) != 0f },
+            "scene rows survive the append untruncated")
+        assertTrue(languageModel.canAdvance, "the appended tokens queue for feeding")
+        languageModel.step()
+        assertEquals(positionBefore + 1, languageModel.loaded!!.model.position)
+    }
+
+    @Test
     fun `head selection round-trips between the pager, the serialized state, and the kv caches`() {
         val dir = weightsDirectory()
         assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")

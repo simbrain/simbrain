@@ -46,7 +46,7 @@ class TextWorldComponent : WorkspaceComponent {
      */
     private fun init() {
         world.events.atEnd.on(Dispatchers.Default) {
-            if (world.stopAtEnd) {
+            if (world.stopAtEnd && workspace.updater.isRunning) {
                 workspace.stop()
             }
         }

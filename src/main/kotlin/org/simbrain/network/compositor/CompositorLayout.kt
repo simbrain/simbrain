@@ -189,16 +189,18 @@ class CompositorLayout(
 
             private fun columnOf(e: FlowEndpoint) = gridColOf[e] ?: localRank.getValue(e)
 
-            // Column boundaries crossed by a satellite-carrying edge open to fit the riding tile.
+            // Column boundaries crossed by a satellite-carrying edge open to fit the riding
+            // tiles; satellites sharing one edge (a weight and its bias) need room side by side.
             val columnGaps = DoubleArray(
                 ((if (template != null) gridColWidths.size else columns.size) - 1).coerceAtLeast(0)
             ) { columnGap }.also { gaps ->
-                for (satellite in scene.satellites) {
-                    if (limbOf[satellite.edge.from] != id || limbOf[satellite.edge.to] != id) continue
-                    val from = columnOf(satellite.edge.from)
-                    val to = columnOf(satellite.edge.to)
-                    for (boundary in from until to) {
-                        gaps[boundary] = maxOf(gaps[boundary], satellite.tile.width + 100.0)
+                val ridersByEdge = scene.satellites
+                    .filter { limbOf[it.edge.from] == id && limbOf[it.edge.to] == id }
+                    .groupBy { it.edge }
+                for ((edge, riders) in ridersByEdge) {
+                    val need = riders.sumOf { it.tile.width } + 40.0 * (riders.size - 1) + 100.0
+                    for (boundary in columnOf(edge.from) until columnOf(edge.to)) {
+                        gaps[boundary] = maxOf(gaps[boundary], need)
                     }
                 }
             }

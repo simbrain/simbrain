@@ -86,11 +86,13 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 columns = 18,
                 visibleRows = 5,
             ),
-            probabilityCardPosition = { scene, _, card ->
+            probabilityCardPosition = { scene, bounds, card ->
                 teachingTransformer.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) } ?: run {
-                    val logits = scene.tile("logits")
-                    val unembedding = scene.tile("unembed.weight")
-                    Point2D.Double(logits.x + logits.width + 85.0, unembedding.y + unembedding.height / 2)
+                    // Top of the diagram, centered in the open space right of the spine.
+                    val probs = scene.tile("probs")
+                    val left = probs.x + probs.width + 40.0
+                    val x = left + ((bounds.maxX - left - card.cardWidth) / 2).coerceAtLeast(0.0)
+                    Point2D.Double(x, probs.y)
                 }
             },
             onProbabilityCardMoved = { x, y -> teachingTransformer.probabilityCardLayout = doubleArrayOf(x, y) },

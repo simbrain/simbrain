@@ -9,13 +9,14 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getNetworkXStream
 
 class TeachingTransformerCanvasTest {
 
-    private fun canvasModel() = TeachingTransformer(TeachingTransformerConfig(
-        contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = 1
+    private fun canvasModel(numLayers: Int = 1) = TeachingTransformer(TeachingTransformerConfig(
+        contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = numLayers
     ))
 
     @Test
@@ -38,19 +39,25 @@ class TeachingTransformerCanvasTest {
     @Test
     fun `trained weights survive a network round trip through xstream`() {
         val net = Network()
-        val teaching = canvasModel()
+        val teaching = canvasModel(numLayers = 2)
         teaching.label = "TT"
         teaching.tokenLabels = arrayListOf("a", "b", "c", "d", "e")
         teaching.setCorpus(IntArray(30) { it % 5 }, IntArray(12) { it % 5 })
-        teaching.tileLayout = hashMapOf("resid0" to doubleArrayOf(12.0, 34.0))
-        teaching.junctionLayout = hashMapOf("layers.0.attn_residual" to doubleArrayOf(56.0, 78.0))
-        teaching.selectedHead = 2
-        teaching.lensEnabled = false
+        teaching.scene.tile("resid0").x = 12.0
+        teaching.scene.tile("resid0").y = 34.0
+        val rejoinVertex = teaching.scene.opVertices.first { it.op.name == "layers.0.attn_residual" }
+        rejoinVertex.x = 56.0
+        rejoinVertex.y = 78.0
         teaching.learningRate = 0.005
         teaching.setContext(intArrayOf(1, 2, 3, 4))
+        val decks = teaching.scene.tiles.filterIsInstance<DeckTile>()
+        decks[0].selectedSlice = 2
+        decks[1].selectedSlice = 1
+        teaching.scene.onHeadSelected!!.invoke(decks[1], 1)
         runBlocking { net.addNetworkModel(teaching) }
 
         repeat(5) { teaching.model.trainStep(intArrayOf(0, 1, 2, 3, 4, 0), intArrayOf(1, 2, 3, 4, 0, 1)) }
+        teaching.gradientView = true
         val trainedWq = teaching.model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()
         val trainedEmbed = teaching.model.params.getValue("embed.table").tensor.toFloatArray()
 
@@ -62,8 +69,11 @@ class TeachingTransformerCanvasTest {
         assertEquals(3, restored.config.numHeads)
         assertEquals(listOf("a", "b", "c", "d", "e"), restored.tokenLabels)
         assertEquals(0.005, restored.learningRate)
-        assertEquals(2, restored.selectedHead)
-        assertEquals(false, restored.lensEnabled)
+        val restoredDecks = restored.scene.tiles.filterIsInstance<DeckTile>()
+        assertEquals(2, restoredDecks[0].selectedSlice, "a pager flip lands in the save without a layout change")
+        assertEquals(1, restoredDecks[1].selectedSlice, "each layer's deck keeps its own head")
+        assertFalse(restored.gradientView, "gradients aren't saved, so the gradient view resets on load")
+        assertFalse(restored.hasGradients)
         assertArrayEquals(intArrayOf(1, 2, 3, 4), restored.contextTokens)
         assertNotNull(restored.events, "transient events must be rebuilt")
 
@@ -168,6 +178,27 @@ class TeachingTransformerCanvasTest {
         val status = teaching.stepStatusText()
         assertNotNull(status)
         assertTrue(status!!.startsWith("training window 1/14 “a b c d e a” → “b” — forward op 2/"), status)
+    }
+
+    @Test
+    fun `gradient view auto-enables for the backward half and reverts when the context returns`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2, 3))
+        assertFalse(teaching.gradientView)
+
+        assertFalse(teaching.hasGradients, "no backward pass has run yet")
+        teaching.stepTrainingOp()
+        assertFalse(teaching.gradientView, "the forward half shows forward values")
+        assertFalse(teaching.hasGradients, "the forward half hasn't written gradients yet")
+        while (teaching.model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) teaching.stepTrainingOp()
+        assertTrue(teaching.gradientView, "the backward half swaps to gradients")
+        assertTrue(teaching.hasGradients)
+        teaching.finishStepWalk()
+        assertTrue(teaching.gradientView, "the finished walk's gradients stay up for inspection")
+
+        teaching.forwardContext()
+        assertFalse(teaching.gradientView, "the context forward pass restores the user's setting")
     }
 
     @Test

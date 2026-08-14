@@ -210,6 +210,10 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
         return loss.tensor.data.get(0)
     }
 
+    /** True once a backward pass has written gradients; false until then and after a rebuild. */
+    var gradientsComputed = false
+        private set
+
     /** One tape-recorded forward + backward + Adam update on [tokens]/[targets]; returns the loss. */
     @Synchronized
     fun trainStep(tokens: IntArray, targets: IntArray): Float {
@@ -219,6 +223,7 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
         plan.forward(tape)
         val lossValue = loss.tensor.data.get(0)
         tape.backward(loss, grads)
+        gradientsComputed = true
         applyOptimizer()
         return lossValue
     }
@@ -267,6 +272,7 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
             StepPhase.FORWARD -> plan.stepOp(tape).also {
                 if (plan.cursor == 0) {
                     tape.beginBackward(loss, grads)
+                    gradientsComputed = true
                     stepPhase = StepPhase.BACKWARD
                 }
             }
@@ -396,12 +402,6 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         }
     }
 
-    var lensEnabled: Boolean = true
-        set(value) {
-            field = value
-            scene.lens?.enabled = value
-        }
-
     /** Swaps tiles with gradient buffers to their backward view; forward values otherwise. */
     var gradientView: Boolean = false
         set(value) {
@@ -410,11 +410,37 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
             scene.publish(currentSequenceRow())
         }
 
-    var selectedHead: Int = 0
-        set(value) {
-            field = value
-            decks().forEach { it.selectedSlice = value.coerceIn(0, it.slices - 1) }
+    /** Whether there is a computed gradient to show — false until a backward pass runs. */
+    val hasGradients: Boolean get() = model.gradientsComputed
+
+    /** The user's [gradientView] while a training walk's backward half auto-overrides it. */
+    @Transient
+    private var gradientViewBeforeWalk: Boolean? = null
+
+    /**
+     * Turns [gradientView] on for the backward half of a training walk and restores the user's
+     * setting when the context reclaims the scene — the gradients stay up after the walk finishes,
+     * alongside the training-window status, until the next forward pass on the context.
+     */
+    private fun autoGradientView(enable: Boolean) {
+        if (enable) {
+            if (gradientViewBeforeWalk == null) {
+                gradientViewBeforeWalk = gradientView
+                if (!gradientView) gradientView = true
+            }
+        } else {
+            gradientViewBeforeWalk?.let { prior ->
+                gradientViewBeforeWalk = null
+                if (gradientView != prior) gradientView = prior
+            }
         }
+    }
+
+    /** Whole-model head view from old saves; [deckSlices] supersedes it as the load fallback. */
+    private var selectedHead: Int = 0
+
+    /** Saved head slice per attention deck by tile id, applied to the scene on load. */
+    var deckSlices: HashMap<String, Int>? = null
 
     /** Saved tile positions by tile id, applied to the scene on load. */
     var tileLayout: HashMap<String, DoubleArray>? = null
@@ -475,6 +501,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         weights?.forEach { (name, values) ->
             model.params[name]?.tensor?.takeIf { it.size == values.size }?.copyFrom(values)
         }
+        // Only weights survive a rebuild; the gradients this view showed are gone.
+        gradientView = false
+        gradientViewBeforeWalk = null
         trainer = TapeTrainer(model)
         trainer.learningRate = learningRate.toFloat()
         applyCorpusToTrainer()
@@ -498,16 +527,17 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
                 it.placed = true
             }
         }
-        decks().forEach { it.selectedSlice = selectedHead.coerceIn(0, it.slices - 1) }
-        scene.lens?.enabled = lensEnabled
+        decks().forEach { it.selectedSlice = (deckSlices?.get(it.id) ?: selectedHead).coerceIn(0, it.slices - 1) }
         scene.setGradientView(gradientView)
+        // A pager flip doesn't move any tile, so capture it directly rather than waiting for a layout change.
+        scene.onHeadSelected = { _, _ -> captureViewState() }
     }
 
-    /** Copies the scene's current tile positions and deck slice into the serialized view state. */
+    /** Copies the scene's current tile positions and per-deck head slices into the serialized view state. */
     fun captureViewState() {
         tileLayout = scene.tiles.associateTo(HashMap()) { it.id to doubleArrayOf(it.x, it.y) }
         junctionLayout = scene.opVertices.associateTo(HashMap()) { it.op.name to doubleArrayOf(it.x, it.y) }
-        decks().firstOrNull()?.let { selectedHead = it.selectedSlice }
+        deckSlices = decks().associateTo(HashMap()) { it.id to it.selectedSlice }
     }
 
     override fun appendNetworkDebugInfo(builder: StringBuilder, indent: String) {
@@ -549,9 +579,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         copy.samplingTemperature = samplingTemperature
         copy.diagramScale = diagramScale
         copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
-        copy.lensEnabled = lensEnabled
-        copy.gradientView = gradientView
-        copy.selectedHead = selectedHead
+        copy.deckSlices = decks().associateTo(HashMap()) { it.id to it.selectedSlice }
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.junctionLayout = junctionLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.probabilityCardLayout = probabilityCardLayout?.copyOf()
@@ -701,6 +729,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         if (contextTokens.isEmpty()) return
         if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
         sceneShowsTrainingWindow = false
+        autoGradientView(false)
         model.setSample(contextTokens)
         model.forward()
         scene.lens?.sourceRow = contextTokens.size - 1
@@ -750,9 +779,11 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
             sceneShowsTrainingWindow = true
             windowCursor++
             trainer.learningRate = learningRate.toFloat()
+            autoGradientView(false)
             model.beginSteppedTrainStep(tokens, targets)
         }
         val op = model.stepOp()
+        if (model.stepPhase == TeachingTransformerModel.StepPhase.BACKWARD) autoGradientView(true)
         scene.publish(config.contextSize - 1)
         events.updated.fire()
         return op
@@ -770,6 +801,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
                 return null
             }
             sceneShowsTrainingWindow = false
+            autoGradientView(false)
             model.setSample(contextTokens)
             scene.lens?.sourceRow = contextTokens.size - 1
         }

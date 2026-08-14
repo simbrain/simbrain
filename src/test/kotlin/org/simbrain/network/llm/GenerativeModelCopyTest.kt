@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertNotSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.compositor.HistoryView
 import org.simbrain.network.trainers.SamplingStrategy
 
@@ -25,7 +26,7 @@ class GenerativeModelCopyTest {
         transformer.learningRate = 0.005
         transformer.samplingTemperature = 0.5
         transformer.samplingStrategy = SamplingStrategy.TopK(3)
-        transformer.selectedHead = 2
+        transformer.scene.tiles.filterIsInstance<DeckTile>().first().selectedSlice = 2
         transformer.gradientView = true
         transformer.label = "Trained twin"
         return transformer
@@ -51,8 +52,10 @@ class GenerativeModelCopyTest {
         assertEquals(original.samplingTemperature, copy.samplingTemperature)
         assertEquals(3, (copy.samplingStrategy as SamplingStrategy.TopK).k)
         assertNotSame(original.samplingStrategy, copy.samplingStrategy)
-        assertEquals(original.selectedHead, copy.selectedHead)
-        assertTrue(copy.gradientView, "the gradient view setting rides the copy")
+        assertEquals(2, copy.scene.tiles.filterIsInstance<DeckTile>().first().selectedSlice,
+            "the deck's head slice rides the copy")
+        assertFalse(copy.gradientView, "gradients don't ride the copy, so neither does the gradient view")
+        assertFalse(copy.hasGradients)
         assertEquals(original.label, copy.label)
     }
 

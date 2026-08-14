@@ -206,27 +206,14 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                     "itself on the next play, so clear the document too for a full reset",
             ) { teachingTransformer.clearWindow() })
             addSeparator()
-            add(JMenu("Attention head").apply {
-                val group = ButtonGroup()
-                (0 until teachingTransformer.config.numHeads).forEach { head ->
-                    add(JRadioButtonMenuItem("Head $head", head == teachingTransformer.selectedHead).apply {
-                        group.add(this)
-                        addActionListener {
-                            teachingTransformer.selectedHead = head
-                            refreshView()
-                        }
-                    })
-                }
-            })
-            add(JCheckBoxMenuItem("Gradient view", teachingTransformer.gradientView).apply {
+            add(JCheckBoxMenuItem("Show last training gradients", teachingTransformer.gradientView).apply {
+                isEnabled = teachingTransformer.hasGradients
+                toolTipText = "Swap each tile to the gradients its last backward pass wrote; tiles " +
+                    "without gradients keep their forward values. Switches itself on for the backward " +
+                    "half of a training walk and back off when the context returns. Available once a " +
+                    "training step has run"
                 addActionListener {
                     teachingTransformer.gradientView = isSelected
-                    refreshView()
-                }
-            })
-            add(JCheckBoxMenuItem("Logit lens", teachingTransformer.lensEnabled).apply {
-                addActionListener {
-                    teachingTransformer.lensEnabled = isSelected
                     refreshView()
                 }
             })

@@ -22,7 +22,6 @@ package org.simbrain.network.compositor
  */
 enum class VerticalFlow { TOP_TO_BOTTOM, BOTTOM_TO_TOP }
 
-/** TODO for Yulin: "Vertical flow density" */
 enum class LayoutDensity { STANDARD, COMPACT }
 
 class CompositorLayout(

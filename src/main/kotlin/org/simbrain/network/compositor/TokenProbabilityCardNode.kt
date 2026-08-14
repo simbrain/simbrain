@@ -40,6 +40,7 @@ class TokenProbabilityCardNode(
     private var firstVisible = 0
     private var dragOffset: Point2D? = null
     var onMoved: (() -> Unit)? = null
+    var onMoveFinished: (() -> Unit)? = null
     private val previous = createArrowButton(ArrowDirection.LEFT) { scroll(-style.visibleRows) }.also { addChild(it) }
     private val next = createArrowButton(ArrowDirection.RIGHT) { scroll(style.visibleRows) }.also { addChild(it) }
 
@@ -68,7 +69,10 @@ class TokenProbabilityCardNode(
             }
 
             override fun mouseReleased(event: PInputEvent) {
-                dragOffset = null
+                if (dragOffset != null) {
+                    dragOffset = null
+                    onMoveFinished?.invoke()
+                }
                 event.isHandled = true
             }
 
@@ -82,23 +86,26 @@ class TokenProbabilityCardNode(
     fun refresh(value: TokenProbabilitySnapshot?) {
         if (value == snapshot) return
         snapshot = value
-        firstVisible = firstVisible.coerceAtMost(maxOf(0, (value?.entries?.size ?: 0) - visibleCells))
+        val visible = if (value?.showAll == true) visibleCells else rankedVisibleRows
+        firstVisible = firstVisible.coerceAtMost(maxOf(0, (value?.entries?.size ?: 0) - visible))
         rebuild()
     }
 
     fun scroll(deltaRows: Int) {
         val value = snapshot ?: return
-        if (!value.showAll) return
-        firstVisible = (firstVisible + deltaRows * style.columns)
-            .coerceIn(0, maxOf(0, value.entries.size - visibleCells))
+        val delta = if (value.showAll) deltaRows * style.columns
+            else Integer.signum(deltaRows) * rankedVisibleRows
+        val visible = if (value.showAll) visibleCells else rankedVisibleRows
+        firstVisible = (firstVisible + delta).coerceIn(0, maxOf(0, value.entries.size - visible))
         rebuild()
     }
 
     private fun rebuild() {
         content.removeAllChildren()
         val value = snapshot
-        previous.visible = value?.showAll == true && firstVisible > 0
-        next.visible = value?.showAll == true && firstVisible + visibleCells < value.entries.size
+        val visible = if (value?.showAll == true) visibleCells else rankedVisibleRows
+        previous.visible = value != null && firstVisible > 0
+        next.visible = value != null && firstVisible + visible < value.entries.size
         value ?: return
         if (value.showAll) grid(value) else ranked(value)
     }
@@ -121,8 +128,17 @@ class TokenProbabilityCardNode(
     }
 
     private fun ranked(value: TokenProbabilitySnapshot) {
-        value.entries.forEachIndexed { index, entry ->
+        val entries = value.entries.drop(firstVisible).take(rankedVisibleRows)
+        entries.forEachIndexed { index, entry ->
             addEntry(value, entry, PADDING + RADIUS, HEADER_HEIGHT + index * ROW_STEP + RADIUS, false)
+        }
+        if (value.entries.size > rankedVisibleRows) {
+            content.addChild(PText("${firstVisible + 1}-${firstVisible + entries.size} / ${value.entries.size}").apply {
+                font = Theme.tiny
+                textPaint = NetworkTheme.current.valueText
+                setOffset(PADDING, style.height - 15.0)
+                pickable = false
+            })
         }
     }
 
@@ -151,9 +167,14 @@ class TokenProbabilityCardNode(
     private val cellStep get() = (style.width - 2 * PADDING) / style.columns
     private val visibleCells get() = style.columns * style.visibleRows
 
+    /** Rows the ranked list can show inside the card's fixed height; the rest page. */
+    private val rankedVisibleRows get() =
+        maxOf(1, ((style.height - HEADER_HEIGHT - FOOTER_HEIGHT) / ROW_STEP).toInt())
+
     companion object {
         private const val PADDING = 10.0
         private const val HEADER_HEIGHT = 32.0
+        private const val FOOTER_HEIGHT = 24.0
         private const val RADIUS = NEURON_DIAMETER / 2.0
         private const val ROW_STEP = NEURON_DIAMETER + 8.0
     }

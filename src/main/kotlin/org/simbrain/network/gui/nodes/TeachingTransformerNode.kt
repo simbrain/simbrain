@@ -8,6 +8,7 @@ import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.TokenProbabilityCardStyle
 import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
@@ -100,6 +101,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             },
             onProbabilityCardMoved = { x, y -> teachingTransformer.probabilityCardLayout = doubleArrayOf(x, y) },
             lensSpace = 120.0,
+            isPanMode = { networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Pan },
         ).also {
             it.onLayoutChanged = {
                 teachingTransformer.captureViewState()

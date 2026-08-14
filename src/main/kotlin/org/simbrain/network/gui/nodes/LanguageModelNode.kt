@@ -6,6 +6,7 @@ import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.HistoryView
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.llm.LanguageModel
@@ -79,6 +80,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                         ?: Point2D.Double(bounds.x - 24.0, scene.tile("block.resid").y)
                 },
                 onProbabilityCardMoved = { x, y -> languageModel.probabilityCardLayout = doubleArrayOf(x, y) },
+                isPanMode = { networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Pan },
             ).also {
                 it.onLayoutChanged = {
                     languageModel.captureViewState()

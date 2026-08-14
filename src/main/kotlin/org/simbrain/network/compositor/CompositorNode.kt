@@ -45,6 +45,8 @@ class CompositorNode(
     },
     /** Width of the strip reserved left of the tiles for the logit-lens rows. */
     private val lensSpace: Double = 220.0,
+    /** True while the host panel's hand/pan tool is active; presses then pass to the canvas. */
+    private val isPanMode: () -> Boolean = { false },
 ) : PNode() {
 
     private fun opTooltip(op: TensorOp): String {
@@ -89,10 +91,27 @@ class CompositorNode(
             probabilityCardOverlay.x = it.offset.x
             probabilityCardOverlay.y = it.offset.y
             onProbabilityCardMoved?.invoke(it.offset.x, it.offset.y)
+            relayoutThrottled()
+        }
+        it.onMoveFinished = {
             relayout()
             onLayoutChanged?.invoke()
         }
         addChild(it)
+    }
+
+    /**
+     * Edge relayout during a drag is throttled: edges trail the dragged item by at most one
+     * throttle window, and release runs an exact relayout.
+     */
+    private var lastDragRelayout = 0L
+
+    private fun relayoutThrottled() {
+        val now = System.currentTimeMillis()
+        if (now - lastDragRelayout >= DRAG_RELAYOUT_MS) {
+            lastDragRelayout = now
+            relayout()
+        }
     }
 
     /**
@@ -734,6 +753,7 @@ class CompositorNode(
 
         var glowing = false
             set(value) {
+                if (field == value) return
                 field = value
                 syncTheme()
             }
@@ -1152,8 +1172,9 @@ class CompositorNode(
 
         override fun mousePressed(event: PInputEvent) {
             if (!event.isLeftMouseButton) return
-            // With the pan key held the canvas handler owns the gesture; leave it unhandled.
-            if (event.isPanKeyDown) return
+            // With the pan key held or the hand tool active the canvas handler owns the
+            // gesture; leave it unhandled.
+            if (event.isPanKeyDown || isPanMode()) return
             // Pager clicks belong to their arrow buttons; don't start a marquee under them.
             var picked: PNode? = event.pickedNode
             while (picked != null) {
@@ -1188,21 +1209,6 @@ class CompositorNode(
             pressPoint = point
             syncSelection()
             event.isHandled = true
-        }
-
-        /**
-         * Dragged tiles track the pointer every event, but the full edge relayout (routing,
-         * satellites, glyphs) is throttled: edges trail the tile by at most one throttle window,
-         * and release runs an exact relayout.
-         */
-        private var lastDragRelayout = 0L
-
-        private fun relayoutThrottled() {
-            val now = System.currentTimeMillis()
-            if (now - lastDragRelayout >= DRAG_RELAYOUT_MS) {
-                lastDragRelayout = now
-                relayout()
-            }
         }
 
         override fun mouseDragged(event: PInputEvent) {

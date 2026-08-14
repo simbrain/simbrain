@@ -110,7 +110,10 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
         }
         if (tile.contentVersion != shadedVersion || regionChanged || patch == null) {
             var cache = patch
-            val cacheReusable = cache != null && cache.width >= patchW && cache.height >= patchH
+            // Reusable when large enough but not grossly oversized: a deep zoom would otherwise
+            // ratchet the image to a permanent high-water mark (up to 64 MB per node).
+            val cacheReusable = cache != null && cache.width >= patchW && cache.height >= patchH &&
+                cache.width.toLong() * cache.height <= 4L * patchW * patchH
             if (!cacheReusable) {
                 cache = BufferedImage(patchW, patchH, BufferedImage.TYPE_INT_RGB)
                 patch = cache
@@ -141,7 +144,10 @@ class TilePatchNode(val tile: TensorTile) : PNode() {
             var y = bandY0
             while (y < bandY1) {
                 val chunk = min(SCRATCH_ROWS, bandY1 - y)
-                if (scratch.size < patchW * chunk) scratch = IntArray(patchW * chunk)
+                val needed = patchW * chunk
+                if (scratch.size < needed || scratch.size > 4 * max(needed, patchW * SCRATCH_ROWS)) {
+                    scratch = IntArray(needed)
+                }
                 tile.shadePatch(
                     scratch, patchW, patchW, chunk,
                     rowFrom + rowSpan * y / patchH, rowFrom + rowSpan * (y + chunk) / patchH,

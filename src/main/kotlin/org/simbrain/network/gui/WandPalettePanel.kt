@@ -2,18 +2,9 @@ package org.simbrain.network.gui
 
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.util.Icons
-import org.simbrain.util.Theme
-import org.simbrain.util.blend
-import org.simbrain.util.displayInDialog
-import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
-import org.simbrain.util.showErrorDialog
-import org.simbrain.util.showOpenDialog
-import org.simbrain.util.showSaveDialog
-import org.simbrain.util.showWarningConfirmDialog
-import org.simbrain.util.showWarningDialog
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
@@ -358,6 +349,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         // highlight while the wand is the current edit mode (driven by editMode below).
         mainButton = JToggleButton().apply {
             putClientProperty("JButton.buttonType", "toolBarButton")
+            isFocusable = false
             icon = WandButtonIcon(palette, 18)
             addActionListener {
                 updateWandCursor()
@@ -369,6 +361,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         // Dropdown button - shows palette popup
         dropdownButton = JButton().apply {
             putClientProperty("JButton.buttonType", "toolBarButton")
+            isFocusable = false
             toolTipText = "Select wand action"
             icon = DropdownArrowIcon(6, 18)
             addActionListener {

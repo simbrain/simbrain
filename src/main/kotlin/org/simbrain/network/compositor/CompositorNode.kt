@@ -43,6 +43,8 @@ class CompositorNode(
     private val cellReadout: (TensorTile, Int, Int) -> String = { tile, row, col ->
         "Cell [$row, $col] = ${"%.4f".format(tile.valueAt(row, col))}"
     },
+    /** Width of the strip reserved left of the tiles for the logit-lens rows. */
+    private val lensSpace: Double = 220.0,
 ) : PNode() {
 
     private fun opTooltip(op: TensorOp): String {
@@ -587,7 +589,7 @@ class CompositorNode(
         for (row in lensRows) {
             val sourceId = scene.lens?.sources?.get(row.index)?.name ?: continue
             val tile = tileNodesById[sourceId]?.tile ?: continue
-            row.setOffset(tile.x - LENS_SPACE, tile.y + tile.height / 2 - LENS_CIRCLE_RADIUS)
+            row.setOffset(tile.x - lensSpace, tile.y + tile.height / 2 - LENS_CIRCLE_RADIUS)
         }
         val bounds = scene.tiles.fold(null as Rectangle2D?) { acc, tile ->
             val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 34)
@@ -598,10 +600,10 @@ class CompositorNode(
         if (edgeBounds.width > 0 && edgeBounds.height > 0) {
             bounds.add(Rectangle2D.Double(edgeBounds.x, edgeBounds.y, edgeBounds.width, edgeBounds.height))
         }
-        val lensSpace = if (lensShown()) LENS_SPACE else 0.0
+        val lensStrip = if (lensShown()) lensSpace else 0.0
         if (probabilityCardOverlay.x.isNaN() || probabilityCardOverlay.y.isNaN()) {
             val cardPosition = probabilityCardPosition?.invoke(scene, bounds, probabilityCard)
-                ?: Point2D.Double(bounds.x - lensSpace + MARGIN, bounds.maxY + 18.0)
+                ?: Point2D.Double(bounds.x - lensStrip + MARGIN, bounds.maxY + 18.0)
             probabilityCardOverlay.x = cardPosition.x
             probabilityCardOverlay.y = cardPosition.y
         }
@@ -611,8 +613,8 @@ class CompositorNode(
         background.reset()
         background.append(
             Rectangle2D.Double(
-                bounds.x - MARGIN - lensSpace, bounds.y - MARGIN,
-                bounds.width + 2 * MARGIN + lensSpace, bounds.height + 2 * MARGIN
+                bounds.x - MARGIN - lensStrip, bounds.y - MARGIN,
+                bounds.width + 2 * MARGIN + lensStrip, bounds.height + 2 * MARGIN
             ), false
         )
         placeStepStatus()
@@ -1322,7 +1324,6 @@ class CompositorNode(
         private const val PROBABILITY_CARD_ID = "probability-card"
         private const val MARGIN = 40.0
         private const val DRAG_RELAYOUT_MS = 33L
-        private const val LENS_SPACE = 220.0
         private const val LENS_CIRCLE_RADIUS = NEURON_DIAMETER / 2.0
         private const val DECK_STEP = 2.0
 

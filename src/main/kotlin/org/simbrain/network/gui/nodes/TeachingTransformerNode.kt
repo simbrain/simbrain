@@ -94,6 +94,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 }
             },
             onProbabilityCardMoved = { x, y -> teachingTransformer.probabilityCardLayout = doubleArrayOf(x, y) },
+            lensSpace = 120.0,
         ).also {
             it.onLayoutChanged = {
                 teachingTransformer.captureViewState()

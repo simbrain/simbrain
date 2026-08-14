@@ -27,10 +27,7 @@ import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
-import org.simbrain.custom_sims.simulations.psychology.categoricalPerception
-import org.simbrain.custom_sims.simulations.psychology.heatColdSim
-import org.simbrain.custom_sims.simulations.psychology.serialOrderContextMemory
-import org.simbrain.custom_sims.simulations.psychology.spiveyNet
+import org.simbrain.custom_sims.simulations.psychology.*
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
 import org.simbrain.util.StructureDir
@@ -92,7 +89,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        // item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
+        item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
     }
 

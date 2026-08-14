@@ -6,7 +6,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 import kotlin.io.path.exists
@@ -20,7 +19,7 @@ class LlmTokenizerTest {
     fun `encoding matches python tokenizers ids and decode round trips`() {
         val path = tokenizerPath()
         val manifestPath = Path.of(System.getProperty("user.home"), ".cache", "simbrain", "lfm2-parity", "manifest.json")
-        assumeTrue(path != null && manifestPath.exists(),
+        assumeOrRequireLfm2(path != null && manifestPath.exists(),
             "LFM2 tokenizer or parity manifest not present; run lfm2_export_reference.py first")
 
         LlmTokenizer(path!!).use { tokenizer ->
@@ -38,7 +37,7 @@ class LlmTokenizerTest {
     @Test
     fun `specials-off encoding maps marker text to single ids and adds no bos`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+        assumeOrRequireLfm2(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             assertArrayEquals(intArrayOf(6), tokenizer.encode("<|im_start|>", addSpecials = false),
@@ -51,7 +50,7 @@ class LlmTokenizerTest {
     @Test
     fun `encoding is not truncated at the tokenizer file's model max length`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+        assumeOrRequireLfm2(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             val ids = tokenizer.encode("word ".repeat(1200), addSpecials = false)
@@ -62,7 +61,7 @@ class LlmTokenizerTest {
     @Test
     fun `skip-specials decode drops scaffolding but keeps tool call markers`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+        assumeOrRequireLfm2(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             val ids = tokenizer.encode("Hello")

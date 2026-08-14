@@ -2,7 +2,6 @@ package org.simbrain.network.llm
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -14,7 +13,6 @@ import java.nio.file.Path
 
 class LanguageModelTest {
 
-    private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
 
     @Test
     fun `language model defaults match the LFM2 generation configuration`() {
@@ -26,8 +24,7 @@ class LanguageModelTest {
 
     @Test
     fun `one update generates one token and stops at the token budget`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
@@ -56,8 +53,7 @@ class LanguageModelTest {
 
     @Test
     fun `injecting into an empty window prepends BOS to the window and the feed queue`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 32)
         languageModel.stopAtEndOfText = false
@@ -79,8 +75,7 @@ class LanguageModelTest {
 
     @Test
     fun `a pure append skips rewind and feeds only the new tokens`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.initialText = "The capital of France is"
@@ -104,8 +99,7 @@ class LanguageModelTest {
 
     @Test
     fun `head selection round-trips between the pager, the serialized state, and the kv caches`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 32)
         languageModel.selectedHead = 5
@@ -127,8 +121,7 @@ class LanguageModelTest {
 
     @Test
     fun `loading seeds the window and network iterations drive it one token per update`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
@@ -146,8 +139,7 @@ class LanguageModelTest {
 
     @Test
     fun `generation stops at the end-of-text token instead of feeding it back`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.initialText = "The capital of France is"
@@ -166,8 +158,7 @@ class LanguageModelTest {
 
     @Test
     fun `steps are no-ops once the stream seals and an edit moves it again`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.initialText = "The capital of France is"
@@ -189,8 +180,7 @@ class LanguageModelTest {
 
     @Test
     fun `chat mode answers the prompt and stops at the end of the assistant turn`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
         languageModel.promptMode = PromptMode.CHAT
@@ -210,8 +200,7 @@ class LanguageModelTest {
 
     @Test
     fun `a sent message reopens a sealed chat and the model answers the follow-up`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 256)
         languageModel.promptMode = PromptMode.CHAT
@@ -251,8 +240,7 @@ class LanguageModelTest {
 
     @Test
     fun `generated tokens flow through a workspace coupling and prefill produces none`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val workspace = Workspace()
         val network = Network()
@@ -288,8 +276,7 @@ class LanguageModelTest {
 
     @Test
     fun `the current token span tracks reading during prefill and the fresh token during generation`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
@@ -324,8 +311,7 @@ class LanguageModelTest {
 
     @Test
     fun `hidden state produces the selected layer's residual once tokens flow`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         languageModel.selectedLayer = 4
@@ -341,8 +327,7 @@ class LanguageModelTest {
 
     @Test
     fun `injected text extends prefill before the model resumes its own continuation`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
         val seedText = "The capital of France is"
@@ -374,8 +359,7 @@ class LanguageModelTest {
 
     @Test
     fun `an edit near the end of a long window rewinds to a checkpoint and continues exactly`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val seed = "One two three four five six seven eight nine ten eleven twelve thirteen " +
             "fourteen fifteen sixteen seventeen eighteen nineteen twenty twenty-one twenty-two " +
@@ -449,8 +433,7 @@ class LanguageModelTest {
 
     @Test
     fun `loading a round-tripped model applies its saved view state to the scene`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
         val net = Network()
         val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)

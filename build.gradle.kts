@@ -230,7 +230,18 @@ tasks.test {
     // JavaCPP caps off-heap allocation at the heap max by default; the LFM2 parity test loads ~1 GB of weights.
     systemProperty("org.bytedeco.javacpp.maxbytes", "0")
     systemProperty("org.bytedeco.javacpp.maxphysicalbytes", "0")
+    // Turns the LFM2 weights assumption into a failure on machines that must run the LLM suite.
+    systemProperty("simbrain.requireLfm2Weights", System.getProperty("simbrain.requireLfm2Weights") ?: "false")
     useJUnitPlatform()
+    testLogging {
+        events("skipped")
+    }
+    afterSuite(KotlinClosure2<TestDescriptor, TestResult, Unit>({ descriptor, result ->
+        if (descriptor.parent == null) {
+            println("Tests: ${result.testCount} run, ${result.successfulTestCount} passed, " +
+                "${result.failedTestCount} failed, ${result.skippedTestCount} skipped")
+        }
+    }))
 }
 
 // Sample invocation:

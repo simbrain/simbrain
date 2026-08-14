@@ -2,7 +2,6 @@ package org.simbrain.network.llm
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import java.nio.file.Path
 
@@ -35,7 +34,7 @@ class Lfm2ChatFormatTest {
     @Test
     fun `templated encoding matches python apply_chat_template ids`() {
         val path = tokenizerPath()
-        assumeTrue(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
+        assumeOrRequireLfm2(path != null, "LFM2 tokenizer not found in the Simbrain or HF cache")
 
         LlmTokenizer(path!!).use { tokenizer ->
             // Reference ids from transformers 5.13.0 apply_chat_template(add_generation_prompt=True)

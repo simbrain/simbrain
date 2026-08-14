@@ -1,8 +1,9 @@
 package org.simbrain.network.llm
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.*
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -13,8 +14,6 @@ import org.simbrain.world.textworld.TextWorldComponent
 import java.nio.file.Path
 
 class ContextWindowSyncTest {
-
-    private fun weightsDirectory(): Path? = Lfm2Weights.findWeightsDirectory()
 
     private class Rig(dir: Path, sealAtEndOfText: Boolean = false) {
         val promptText = "The capital of France is"
@@ -48,10 +47,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `two-way document sync reaches a fixpoint without spurious rebuilds`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
         val iterations = promptTokens + 3
         repeat(iterations) { rig.workspace.simpleIterate() }
@@ -65,10 +63,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `a sealed run syncs its final window then goes quiet`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!, sealAtEndOfText = true)
+        val rig = Rig(dir, sealAtEndOfText = true)
         var guard = 0
         while (rig.languageModel.canAdvance && guard++ < 80) rig.workspace.simpleIterate()
         assertTrue(rig.languageModel.isSealed, "the run ends at its own end-of-text")
@@ -85,27 +82,30 @@ class ContextWindowSyncTest {
 
     @Test
     fun `a finished run pauses the workspace after the end marker reaches the document`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!, sealAtEndOfText = true)
-        rig.workspace.run()
-        var waited = 0
-        while (waited++ < 3000 && !(rig.languageModel.isSealed && !rig.workspace.updater.isRunning)) {
-            Thread.sleep(10)
+        val rig = Rig(dir, sealAtEndOfText = true)
+        try {
+            rig.workspace.run()
+            runBlocking {
+                withTimeout(30_000) {
+                    while (!(rig.languageModel.isSealed && !rig.workspace.updater.isRunning)) delay(10)
+                }
+            }
+            assertTrue(rig.languageModel.isSealed, "the run seals on its own")
+            assertFalse(rig.workspace.updater.isRunning, "the workspace pauses itself when the run ends")
+            assertTrue(rig.world.text.endsWith("<|im_end|>"),
+                "the end marker reached the document before the pause, got: ${rig.world.text}")
+        } finally {
+            rig.workspace.stop()
         }
-        assertTrue(rig.languageModel.isSealed, "the run seals on its own")
-        assertFalse(rig.workspace.updater.isRunning, "the workspace pauses itself when the run ends")
-        assertTrue(rig.world.text.endsWith("<|im_end|>"),
-            "the end marker reached the document before the pause, got: ${rig.world.text}")
     }
 
     @Test
     fun `an edited document rebuilds the context and replays it through prefill`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
         repeat(promptTokens + 2) { rig.workspace.simpleIterate() }
 
@@ -132,10 +132,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `the synced document adopts the model's tokenizer and boxes its real tokens`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         var waited = 0
         while (rig.world.displayTokenizer == null && waited++ < 100) {
             Thread.sleep(10)
@@ -151,10 +150,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `an edit that drops the BOS marker gets it restored and generation continues`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         repeat(3) { rig.workspace.simpleIterate() }
 
         rig.world.text = "The capital of Germany is"
@@ -171,10 +169,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `a span coupling sweeps the document highlight as the model reads`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         with(rig.workspace.couplingManager) {
             createCoupling(
                 rig.languageModel.getProducer("getCurrentTokenSpan"),
@@ -200,10 +197,9 @@ class ContextWindowSyncTest {
 
     @Test
     fun `an edit while generating rebuilds immediately and keeps generating`() {
-        val dir = weightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        val dir = assumeOrRequireWeights()
 
-        val rig = Rig(dir!!)
+        val rig = Rig(dir)
         repeat(3) { rig.workspace.simpleIterate() }
 
         rig.world.text = "<|startoftext|>Count: one two three"

@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNotSame
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.compositor.HistoryView
@@ -118,7 +117,7 @@ class GenerativeModelCopyTest {
     @Test
     fun `language model copy captures the committed window as its seed`() {
         val dir = Lfm2Weights.findWeightsDirectory()
-        assumeTrue(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
+        assumeOrRequireLfm2(dir != null, "LFM2 weights not found in the Simbrain or HF cache")
 
         val original = LanguageModel(dir.toString(), maxSeqLen = 64)
         original.initialText = "The capital of France is"

@@ -2,7 +2,6 @@ package org.simbrain.network.llm
 
 import org.json.JSONObject
 import org.junit.jupiter.api.Assertions.assertTrue
-import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.tensor.Blas
 import java.nio.ByteOrder
@@ -34,7 +33,7 @@ class Lfm2ParityTest {
     fun `forward pass matches transformers reference layer by layer`() {
         val weights = modelPath()
         val manifestPath = parityDir().resolve("manifest.json")
-        assumeTrue(weights != null && manifestPath.exists(),
+        assumeOrRequireLfm2(weights != null && manifestPath.exists(),
             "LFM2 weights or parity reference not present; run lfm2_export_reference.py first")
 
         Blas.numThreads = 1

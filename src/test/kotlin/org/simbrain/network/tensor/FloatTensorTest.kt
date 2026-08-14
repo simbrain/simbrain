@@ -157,8 +157,11 @@ class FloatTensorTest {
         val v0 = out.version
         matmul(a, b, out)
         assertEquals(v0 + 1, out.version)
+        val aVersion = a.version
+        val bVersion = b.version
         dot(a.reshaped(1, 9), b.reshaped(1, 9))
-        assertEquals(v0 + 1, out.version)
+        assertEquals(aVersion, a.version, "a pure read must not bump its operands")
+        assertEquals(bVersion, b.version, "a pure read must not bump its operands")
         out.transformInPlace { it * 2f }
         assertEquals(v0 + 2, out.version)
     }

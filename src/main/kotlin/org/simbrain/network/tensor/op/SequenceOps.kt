@@ -31,8 +31,10 @@ class SeqEmbedOp(name: String, val table: TensorPort, val out: TensorPort) : Ten
         val src = table.tensor.data
         val dst = out.tensor.data
         val dim = out.tensor.cols
+        val vocab = table.tensor.rows
         for (r in 0 until out.tensor.rows) {
             val id = tokenIds[r]
+            require(id < vocab) { "token id $id out of vocabulary ($vocab)" }
             for (c in 0 until dim) {
                 dst.put(r * dim + c, if (id >= 0) src.get(id * dim + c) else 0f)
             }
@@ -267,6 +269,7 @@ class SeqSoftmaxCrossEntropyOp(
             for (c in 0 until cols) p.put(r * cols + c, p.get(r * cols + c) * invSum)
             val target = targetIds[r]
             if (target >= 0) {
+                require(target < cols) { "target id $target out of vocabulary ($cols)" }
                 totalLoss += -ln(p.get(r * cols + target))
                 supervised++
             }

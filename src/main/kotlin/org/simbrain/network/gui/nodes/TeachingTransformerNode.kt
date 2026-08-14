@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.util.PBounds
@@ -38,21 +39,28 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         interactionBox.setText(teachingTransformer.displayName)
 
         val events = teachingTransformer.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(teachingTransformer.displayName) }
-        events.locationChanged.on(swingDispatcher) { pullLocationFromModel() }
-        events.modelRebuilt.on(swingDispatcher) { rebuildInterior() }
-        events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
-        events.updateGraphics.on(swingDispatcher) { refreshView() }
-        events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) }
-        // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
-        events.updated.on(swingDispatcher) {
-            if (stepNotice != null) {
-                stepNotice = null
-                stepNoticeTimer.stop()
-                refreshView()
-            }
+        val subscriptions = listOf(
+            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(teachingTransformer.displayName) },
+            events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
+            events.modelRebuilt.on(swingDispatcher) { rebuildInterior() },
+            events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
+            events.updateGraphics.on(swingDispatcher) { refreshView() },
+            events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) },
+            // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
+            events.updated.on(swingDispatcher) {
+                if (stepNotice != null) {
+                    stepNotice = null
+                    stepNoticeTimer.stop()
+                    refreshView()
+                }
+            },
+        )
+        val errorRemover = teachingTransformer.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
+        // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
+        events.deleted.on(Dispatchers.Default) {
+            subscriptions.forEach(Job::cancel)
+            errorRemover()
         }
-        teachingTransformer.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
 
         rebuildInterior()
         pullLocationFromModel()

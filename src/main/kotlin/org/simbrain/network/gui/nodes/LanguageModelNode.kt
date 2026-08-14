@@ -1,6 +1,7 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
@@ -38,11 +39,15 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         interactionBox.setText(languageModel.displayName)
 
         val events = languageModel.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) }
-        events.locationChanged.on(swingDispatcher) { pullLocationFromModel() }
-        events.weightsLoaded.on(swingDispatcher) { rebuildInterior() }
-        events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
-        events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() }
+        val subscriptions = listOf(
+            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) },
+            events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
+            events.weightsLoaded.on(swingDispatcher) { rebuildInterior() },
+            events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
+            events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() },
+        )
+        // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
+        events.deleted.on(Dispatchers.Default) { subscriptions.forEach(Job::cancel) }
 
         rebuildInterior()
         pullLocationFromModel()

@@ -1,6 +1,7 @@
 package org.simbrain.world.textworld
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import org.simbrain.util.ProvidesDisplayTokenizer
 import org.simbrain.util.Tokenizer
 import org.simbrain.util.getSimbrainXStream
@@ -57,8 +58,10 @@ class TextWorldComponent : WorkspaceComponent {
      * and lock the document while the workspace runs, so the stream is never edited
      * mid-iteration.
      */
+    private var couplingAddedJob: Job? = null
+
     override fun onWorkspaceAttached() {
-        workspace.couplingManager.events.couplingAdded.on(Dispatchers.Default) { coupling ->
+        couplingAddedJob = workspace.couplingManager.events.couplingAdded.on(Dispatchers.Default) { coupling ->
             val provider = coupling.producer.baseObject
             if (coupling.consumer.baseObject === world &&
                 coupling.consumer.method.name in textDocumentConsumers &&
@@ -68,6 +71,12 @@ class TextWorldComponent : WorkspaceComponent {
                 world.lockWhileRunning = true
             }
         }
+    }
+
+    override fun close() {
+        couplingAddedJob?.cancel()
+        couplingAddedJob = null
+        super.close()
     }
 
     override fun save(output: OutputStream, format: String?) {

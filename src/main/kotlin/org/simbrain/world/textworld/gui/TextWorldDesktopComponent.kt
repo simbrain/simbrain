@@ -61,6 +61,9 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
      */
     private val world: TextWorld
 
+    /** Unsubscribes the run-lock handlers from the workspace updater when this view closes. */
+    private var runLockRemovers: List<() -> Unit> = emptyList()
+
     /**
      * Creates a new frame of type TextWorld.
      *
@@ -76,8 +79,10 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         frame.pack()
 
         val updater = component.workspace.updater
-        updater.events.runStarted.on(Dispatchers.Swing) { panel.setRunLock(world.lockWhileRunning) }
-        updater.events.runFinished.on(Dispatchers.Swing) { panel.setRunLock(false) }
+        runLockRemovers = listOf(
+            updater.events.runStarted.on(Dispatchers.Swing) { panel.setRunLock(world.lockWhileRunning) },
+            updater.events.runFinished.on(Dispatchers.Swing) { panel.setRunLock(false) },
+        )
         panel.setRunLock(world.lockWhileRunning && updater.isRunning)
 
         // Force component to fill up parent panel
@@ -89,6 +94,12 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             }
         })
         parentFrame.pack()
+    }
+
+    override fun close() {
+        super.close()
+        runLockRemovers.forEach { it() }
+        runLockRemovers = emptyList()
     }
 
     /**

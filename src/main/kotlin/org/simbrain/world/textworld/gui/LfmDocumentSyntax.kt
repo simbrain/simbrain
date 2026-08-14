@@ -18,11 +18,19 @@ import javax.swing.text.Segment
 
 private const val LFM_DOCUMENT_STYLE = "text/lfm-document"
 
+private const val APPLIED_STRUCTURE_KEY = "simbrain.appliedDocumentStructure"
+
 fun RSyntaxTextArea.applyDocumentStructureDisplay(display: DocumentStructureDisplay) {
     if (display == DocumentStructureDisplay.OFF) {
         syntaxEditingStyle = SyntaxConstants.SYNTAX_STYLE_NONE
+        putClientProperty(APPLIED_STRUCTURE_KEY, null)
         return
     }
+    // Reassigning the scheme forces a full re-highlight; skip when nothing changed, since this
+    // runs on every text change (once per generated token).
+    val applied = display to UIManager.getBoolean("laf.dark")
+    if (getClientProperty(APPLIED_STRUCTURE_KEY) == applied) return
+    putClientProperty(APPLIED_STRUCTURE_KEY, applied)
     val factory = TokenMakerFactory.getDefaultInstance()
     if (factory is AbstractTokenMakerFactory) {
         factory.putMapping(LFM_DOCUMENT_STYLE, LfmDocumentTokenMaker::class.java.name)

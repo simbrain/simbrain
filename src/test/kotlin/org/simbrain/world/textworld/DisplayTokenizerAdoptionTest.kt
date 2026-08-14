@@ -27,11 +27,12 @@ class DisplayTokenizerAdoptionTest {
         val workspace = Workspace()
         val world: TextWorld
         val transformer: TeachingTransformer
+        val textWorldComponent: TextWorldComponent
 
         init {
             val network = Network()
             workspace.addWorkspaceComponent(NetworkComponent("net", network))
-            val textWorldComponent = TextWorldComponent("text")
+            textWorldComponent = TextWorldComponent("text")
             workspace.addWorkspaceComponent(textWorldComponent)
             world = textWorldComponent.world
             transformer = TeachingTransformer(TeachingTransformerConfig(
@@ -80,5 +81,21 @@ class DisplayTokenizerAdoptionTest {
             "only text-document consumers adopt a display tokenizer")
         assertFalse(rig.world.lockWhileRunning,
             "a non-document coupling does not lock the world")
+    }
+
+    @Test
+    fun `closing a text world component cancels its coupling listener`() {
+        val rig = Rig()
+        rig.textWorldComponent.close()
+
+        with(rig.workspace.couplingManager) {
+            createCoupling(
+                rig.transformer.getProducer("getContextWindow"),
+                rig.world.getConsumer("setTextIfChanged"),
+            )
+        }
+        Thread.sleep(300)
+        assertNull(rig.world.displayTokenizer,
+            "a closed component's adoption listener must not fire")
     }
 }

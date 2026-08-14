@@ -204,6 +204,22 @@ class CompositorScene(val graph: PlanGraph? = null) {
     var selectedLayer = -1
 
     /**
+     * Runs a layer flip's data half — tile [LayerStacked.showLayer] flips plus any history
+     * replay. Inline by default, which keeps scenes synchronous for tests and the teaching
+     * model; hosts with a live decode thread install an async latest-wins runner so flips stay
+     * cheap on the EDT and can never interleave with each other.
+     */
+    var replayRunner: (block: () -> Unit) -> Unit = { it() }
+
+    /** True while an async [replayRunner] has work submitted but not yet landed. */
+    @Volatile
+    var replayPending = false
+
+    /** Set by an async [replayRunner] when landed work needs a full stack-state re-render. */
+    @Volatile
+    var stackStateDirty = false
+
+    /**
      * Total model layers behind a stacked scene, or 0 when the scene has no layer dimension.
      * Renderers use it to draw every layer deck on the same slot axis: one slot per model
      * layer, with gaps where a tile's stack skips layers.
@@ -265,7 +281,7 @@ class CompositorScene(val graph: PlanGraph? = null) {
             val droppedHistory = field == HistoryView.OFF
             field = value
             for (tile in _tiles) tile.historyView = value
-            if (droppedHistory) rebuildHistory?.invoke()
+            if (droppedHistory) rebuildHistory?.let { replayRunner(it) }
         }
 
     /** Scene-builder hook replaying the shown layers' history after [HistoryView.OFF] ends. */

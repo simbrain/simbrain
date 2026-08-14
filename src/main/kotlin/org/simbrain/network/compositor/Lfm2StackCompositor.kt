@@ -413,27 +413,31 @@ object Lfm2StackCompositor {
             val layer = raw.mod(config.numLayers)
             scene.selectedLayer = layer
             val attnActive = layer in config.attentionLayers
-            // With history off there is nothing to backfill: flips just reseed the live row.
-            val noHistory = scene.historyView == HistoryView.OFF
-            val limbHasHistory = if (attnActive) weightsTile.hasHistoryFor(layer)
-                else convLimbTiles.first().hasHistoryFor(layer)
-            val replay = !noHistory && (!limbHasHistory || !mlpLimbTiles.first().hasHistoryFor(layer))
-            val copyBlockIn = !noHistory && !blockInTile.hasHistoryFor(layer)
-            val copyBlockOut = !noHistory && !blockOutTile.hasHistoryFor(layer)
             fun inactive(key: String) = (convSide(key) && attnActive) || (attnSide(key) && !attnActive)
-            for (tile in scene.tiles) {
-                (tile as? LayerStacked)?.takeIf { it.stackLayers.isNotEmpty() }?.showLayer(layer)
-                tile.dimmed = inactive(tile.id)
-            }
+            for (tile in scene.tiles) tile.dimmed = inactive(tile.id)
             for (vertex in scene.opVertices) vertex.dimmed = inactive(alias(vertex.op.name))
             for (edge in scene.edges) {
                 val keys = listOf(endpointKey(edge.from), endpointKey(edge.to)) + edge.ops.map { alias(it.name) }
                 edge.dimmed = keys.any(::inactive)
             }
-            if (replay) replayBlock(layer)
-            if (copyBlockIn) backfillFromStrip(blockInTile, stripTiles[layer])
-            if (copyBlockOut) backfillFromStrip(blockOutTile, stripTiles[layer + 1])
             scene.highlightedTiles = setOf(stripTiles[layer], stripTiles[layer + 1])
+            // The tile flips and any replay run as one unit on the runner, so a superseded
+            // flip can never stash half-derived history or interleave with another flip.
+            scene.replayRunner {
+                // With history off there is nothing to backfill: flips just reseed the live row.
+                val noHistory = scene.historyView == HistoryView.OFF
+                val limbHasHistory = if (attnActive) weightsTile.hasHistoryFor(layer)
+                    else convLimbTiles.first().hasHistoryFor(layer)
+                val replay = !noHistory && (!limbHasHistory || !mlpLimbTiles.first().hasHistoryFor(layer))
+                val copyBlockIn = !noHistory && !blockInTile.hasHistoryFor(layer)
+                val copyBlockOut = !noHistory && !blockOutTile.hasHistoryFor(layer)
+                for (tile in scene.tiles) {
+                    (tile as? LayerStacked)?.takeIf { it.stackLayers.isNotEmpty() }?.showLayer(layer)
+                }
+                if (replay) replayBlock(layer)
+                if (copyBlockIn) backfillFromStrip(blockInTile, stripTiles[layer])
+                if (copyBlockOut) backfillFromStrip(blockOutTile, stripTiles[layer + 1])
+            }
         }
 
         // Leaving no-history mode: everything dropped is re-derived — the shown block (and the

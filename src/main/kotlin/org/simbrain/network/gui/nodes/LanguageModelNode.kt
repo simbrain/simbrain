@@ -126,7 +126,13 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     private val refreshViewThrottled = RateLimitedEdtAction({ WorkspacePreferences.repaintIntervalMs }) { refreshView() }
 
     private fun refreshView() {
-        compositorNode?.refreshDirtyTiles()
+        val node = compositorNode ?: return
+        if (node.scene.stackStateDirty) {
+            node.scene.stackStateDirty = false
+            node.refreshStackState()
+        } else {
+            node.refreshDirtyTiles()
+        }
     }
 
     override val propertyDialog: StandardDialog

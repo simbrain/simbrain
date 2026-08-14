@@ -288,6 +288,18 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
             selectedLayer = scene.selectedLayer
         }
         scene.layerSelector?.invoke(selectedLayer)
+        // Install the async runner only after the synchronous initial select above, so the
+        // scene arrives fully derived. Replay work then runs off the EDT under the model
+        // monitor, mutually exclusive with step() and rewinds.
+        val replayWorker = LatestWinsRunner(LatestWinsRunner.sharedWorker) {
+            scene.replayPending = false
+            scene.stackStateDirty = true
+            events.updateGraphics.fire()
+        }
+        scene.replayRunner = { block ->
+            scene.replayPending = true
+            replayWorker.submit { synchronized(this) { block() } }
+        }
         return scene
     }
 
@@ -325,6 +337,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
      * model; the seed replays through prefill, so it reaches the original's window state by
      * recomputation rather than by copying caches.
      */
+    @Synchronized
     fun copy(): LanguageModel = LanguageModel(weightsDirectory, maxSeqLen).also { copy ->
         copy.label = label
         copy.location = location

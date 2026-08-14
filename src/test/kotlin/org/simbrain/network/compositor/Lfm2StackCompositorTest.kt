@@ -270,6 +270,46 @@ class Lfm2StackCompositorTest {
     }
 
     @Test
+    fun `an async replay lands off the submitting thread and matches the synchronous result`() {
+        val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
+        val model = syntheticModel(config)
+        val sync = Lfm2StackCompositor.buildScene(model)
+        val async = Lfm2StackCompositor.buildScene(model)
+        val lock = Any()
+        val landed = java.util.concurrent.atomic.AtomicInteger(0)
+        val workerThread = java.util.concurrent.atomic.AtomicReference<String>()
+        val runner = LatestWinsRunner(LatestWinsRunner.sharedWorker) { landed.incrementAndGet() }
+        async.replayRunner = { block ->
+            async.replayPending = true
+            runner.submit {
+                synchronized(lock) {
+                    workerThread.set(Thread.currentThread().name)
+                    block()
+                }
+            }
+        }
+
+        repeat(5) {
+            model.forwardToken(it + 1)
+            sync.publish(it)
+            async.publish(it)
+        }
+        sync.layerSelector!!.invoke(4)
+        async.layerSelector!!.invoke(4)
+
+        val deadline = System.currentTimeMillis() + 10_000
+        while (landed.get() == 0 && System.currentTimeMillis() < deadline) Thread.sleep(10)
+        assertTrue(landed.get() > 0, "async replay must land within the timeout")
+        assertEquals("compositor-replay", workerThread.get())
+        for (id in listOf("block.attn.q", "block.attn.weights", "block.attn.context", "block.attn.out",
+            "block.mixer_resid", "block.mlp.gate", "block.mlp.up", "block.mlp.act", "block.mlp.out")) {
+            assertTrue(sync.tile(id).values.any { it != 0f }, "$id derived something to compare")
+            assertTrue(sync.tile(id).values.contentEquals(async.tile(id).values),
+                "$id must match the synchronous derivation")
+        }
+    }
+
+    @Test
     fun `a flip to an unwatched conv layer replays the whole block from the depth strip`() {
         val config = tinyConfig().copy(numLayers = 6, attentionLayers = setOf(2, 4))
         val model = syntheticModel(config)

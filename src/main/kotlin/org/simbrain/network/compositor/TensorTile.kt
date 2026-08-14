@@ -157,16 +157,11 @@ abstract class TensorTile(
      */
     var liveRow = -1
         protected set(value) {
-            if (field != value && field >= 0 && accumulatesHistory && !alwaysRecords) {
-                when (historyView) {
-                    HistoryView.FULL -> {}
-                    // In live view the outgoing row drops to ghost strength, so it must reshade.
-                    HistoryView.GHOSTED -> touchRow(field)
-                    HistoryView.OFF -> {
-                        clearRow(field)
-                        touchRow(field)
-                    }
-                }
+            if (field != value && field >= 0 && accumulatesHistory && historyView != HistoryView.FULL) {
+                // The outgoing row drops to ghost strength (or clears), so it must reshade.
+                // Always-recording tiles ghost in OFF view too, but never clear: real memory.
+                if (historyView == HistoryView.OFF && !alwaysRecords) clearRow(field)
+                touchRow(field)
             }
             field = value
         }
@@ -388,6 +383,7 @@ class VectorHistoryTile(
     }
 
     private val stash = LinkedHashMap<Int, FloatArray>()
+    private val stashedAt = HashMap<Int, Int>()
     private val lastVersions = LongArray(ports.size) { -1L }
     private val magnitudes = FloatArray(cols)
     private var selected = 0
@@ -407,8 +403,10 @@ class VectorHistoryTile(
             } else {
                 // Restore before stashing, so the incoming layer is never the eviction victim.
                 val restored = stash.remove(index)
+                stashedAt.remove(index)
                 if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
                 stash[selected] = values.copyOf()
+                stashedAt[selected] = liveRow
                 selected = index
                 if (restored != null) System.arraycopy(restored, 0, values, 0, values.size)
                 else values.fill(0f)
@@ -416,6 +414,17 @@ class VectorHistoryTile(
             touch()
         }
         return true
+    }
+
+    /** Tokens published past a stash's capture point leave it permanently short; drop it. */
+    private fun dropStaleStashes(tokenIndex: Int) {
+        if (stash.isEmpty()) return
+        val keys = stash.keys.iterator()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            if ((stashedAt[key] ?: -1) < tokenIndex) keys.remove()
+        }
+        stashedAt.keys.retainAll(stash.keys)
     }
 
     private fun reseedLiveRow() {
@@ -435,6 +444,7 @@ class VectorHistoryTile(
     override fun retainOnlyLiveRow() {
         super.retainOnlyLiveRow()
         stash.clear()
+        stashedAt.clear()
     }
 
     /** Stashed layers hold rewound rows too, so a rewind drops them; flips re-replay instead. */
@@ -443,6 +453,7 @@ class VectorHistoryTile(
         if (row >= rows) return
         super.truncateFrom(row)
         stash.clear()
+        stashedAt.clear()
     }
 
     /** True when [layer]'s history is already in memory — shown or stashed. */
@@ -455,6 +466,7 @@ class VectorHistoryTile(
     override fun reset() {
         super.reset()
         stash.clear()
+        stashedAt.clear()
         lastVersions.fill(-1L)
     }
 
@@ -462,6 +474,7 @@ class VectorHistoryTile(
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
         liveRow = tokenIndex
+        dropStaleStashes(tokenIndex)
         val tensor = ports[selected].tensor
         if (tensor.version == lastVersions[selected]) return
         lastVersions[selected] = tensor.version
@@ -816,6 +829,7 @@ class AttentionTile(
 
     private val history = FloatArray(numHeads * rows * cols)
     private val stash = LinkedHashMap<Int, FloatArray>()
+    private val stashedAt = HashMap<Int, Int>()
     private var lastVersion = -1L
     private var selected = 0
 
@@ -839,8 +853,10 @@ class AttentionTile(
             } else {
                 // Restore before stashing, so the incoming layer is never the eviction victim.
                 val restored = stash.remove(index)
+                stashedAt.remove(index)
                 if (stash.size >= HISTORY_STASH) stash.remove(stash.keys.first())
                 stash[selected] = history.copyOf()
+                stashedAt[selected] = liveRow
                 selected = index
                 if (restored != null) System.arraycopy(restored, 0, history, 0, history.size)
                 else history.fill(0f)
@@ -849,6 +865,17 @@ class AttentionTile(
             }
         }
         return true
+    }
+
+    /** Tokens published past a stash's capture point leave it permanently short; drop it. */
+    private fun dropStaleStashes(tokenIndex: Int) {
+        if (stash.isEmpty()) return
+        val keys = stash.keys.iterator()
+        while (keys.hasNext()) {
+            val key = keys.next()
+            if ((stashedAt[key] ?: -1) < tokenIndex) keys.remove()
+        }
+        stashedAt.keys.retainAll(stash.keys)
     }
 
     override fun clearRow(row: Int) {
@@ -862,6 +889,7 @@ class AttentionTile(
     override fun retainOnlyLiveRow() {
         super.retainOnlyLiveRow()
         stash.clear()
+        stashedAt.clear()
         for (head in 0 until numHeads) {
             for (r in 0 until rows) {
                 if (r != liveRow) history.fill(0f, (head * rows + r) * cols, (head * rows + r + 1) * cols)
@@ -879,6 +907,7 @@ class AttentionTile(
             history.fill(0f, (head * rows + from) * cols, (head + 1) * rows * cols)
         }
         stash.clear()
+        stashedAt.clear()
     }
 
     /** True when [layer]'s head histories are already in memory — shown or stashed. */
@@ -892,6 +921,7 @@ class AttentionTile(
         super.reset()
         history.fill(0f)
         stash.clear()
+        stashedAt.clear()
         lastVersion = -1L
     }
 
@@ -908,6 +938,7 @@ class AttentionTile(
     override fun publish(tokenIndex: Int) {
         if (tokenIndex !in 0 until rows) return
         liveRow = tokenIndex
+        dropStaleStashes(tokenIndex)
         val tensor = ports[selected].tensor
         if (tensor.version == lastVersion) return
         lastVersion = tensor.version

@@ -114,4 +114,38 @@ class TensorTileDirtyRowsTest {
 
         assertArrayEquals(full, banded)
     }
+
+    @Test
+    fun `a stash captured before later tokens is dropped so the flip replays instead`() {
+        val a = TensorPort("a", FloatTensor(1, 8))
+        val b = TensorPort("b", FloatTensor(1, 8))
+        val tile = VectorHistoryTile(listOf(a, b), rows = 8, stackLayers = listOf(0, 1), id = "stacked")
+        a.tensor.copyFrom(FloatArray(8) { 0.5f })
+        tile.showLayer(0)
+        tile.publish(0)
+
+        tile.showLayer(1)
+        assertEquals(true, tile.hasHistoryFor(0), "the flipped-out layer starts stashed")
+
+        b.tensor.copyFrom(FloatArray(8) { 0.4f })
+        tile.publish(1)
+        assertEquals(false, tile.hasHistoryFor(0),
+            "a stash captured at token 0 can never gain token 1; it must drop")
+        assertEquals(true, tile.hasHistoryFor(1), "the shown layer keeps recording")
+    }
+
+    @Test
+    fun `ghosted view reshades the outgoing live row on always-recording tiles`() {
+        val (tile, port) = historyTile()
+        tile.alwaysRecords = true
+        tile.historyView = HistoryView.GHOSTED
+        port.tensor.copyFrom(FloatArray(8) { 0.5f })
+        tile.publish(0)
+        tile.consumeDirtyRows()
+
+        tile.publish(1)
+        val dirty = tile.consumeDirtyRows()
+        assertEquals(true, dirty == null || 0 in dirty,
+            "the outgoing live row must reshade to ghost strength, dirty was $dirty")
+    }
 }

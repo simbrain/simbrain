@@ -2,6 +2,7 @@ package org.simbrain.network.llm
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -224,5 +225,42 @@ class TeachingTransformerCanvasTest {
         teaching.stepInferenceOp()
         assertEquals(TeachingTransformer.StepRefusal.TRAINING_WALK_IN_PROGRESS, refusals.last())
         assertEquals(4, refusals.size, "successful steps fire nothing")
+    }
+
+    @Test
+    fun `op steps refuse with trainer running and resume after stop`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2, 3))
+        teaching.trainer.stoppingCondition.maxIterations = 100_000
+        val refusals = mutableListOf<TeachingTransformer.StepRefusal>()
+        teaching.events.stepRefused.on(Dispatchers.Unconfined) { refusals.add(it) }
+
+        runBlocking { withTimeout(30_000) { teaching.trainer.startTraining() } }
+        assertTrue(teaching.trainer.isRunning)
+        assertNull(teaching.stepTrainingOp())
+        assertNull(teaching.stepInferenceOp())
+        assertEquals(
+            listOf(TeachingTransformer.StepRefusal.TRAINER_RUNNING, TeachingTransformer.StepRefusal.TRAINER_RUNNING),
+            refusals.takeLast(2)
+        )
+
+        runBlocking { withTimeout(30_000) { teaching.trainer.stopTraining() } }
+        assertFalse(teaching.trainer.isRunning)
+        assertNotNull(teaching.stepTrainingOp())
+        teaching.finishStepWalk()
+    }
+
+    @Test
+    fun `training walk points the lens at the final window row`() {
+        val teaching = canvasModel()
+        teaching.setCorpus(IntArray(20) { it % 5 })
+        teaching.setContext(intArrayOf(1, 2))
+        teaching.forwardContext()
+        assertEquals(1, teaching.scene.lens!!.sourceRow, "context forward reads the last context row")
+
+        assertNotNull(teaching.stepTrainingOp())
+        assertEquals(5, teaching.scene.lens!!.sourceRow, "training walk reads the window's final row")
+        teaching.finishStepWalk()
     }
 }

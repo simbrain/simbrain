@@ -239,6 +239,10 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
     var stepPhase = StepPhase.IDLE
         private set
 
+    /** True while a stepped walk or a partial forward pass holds the plan mid-flight. */
+    val midWalk: Boolean
+        get() = stepPhase != StepPhase.IDLE || plan.cursor != 0
+
     /**
      * Arms a micro-stepped training step on [tokens]/[targets]: subsequent [stepOp] calls run one
      * op at a time — the whole forward pass, then every VJP in reverse, then the Adam update —
@@ -504,6 +508,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         // Only weights survive a rebuild; the gradients this view showed are gone.
         gradientView = false
         gradientViewBeforeWalk = null
+        // Transient, so null mid-deserialization despite the type.
+        @Suppress("SENSELESS_COMPARISON")
+        if (trainer != null) trainer.job.cancel()
         trainer = TapeTrainer(model)
         trainer.learningRate = learningRate.toFloat()
         applyCorpusToTrainer()
@@ -562,8 +569,11 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
      * generates independently of the original from the moment it is made.
      */
     fun copy(): TeachingTransformer = TeachingTransformer(config).also { copy ->
-        model.params.forEach { (name, port) ->
-            copy.model.params[name]?.tensor?.copyFrom(port.tensor.toFloatArray())
+        synchronized(model) {
+            model.params.forEach { (name, port) ->
+                copy.model.params[name]?.tensor?.copyFrom(port.tensor.toFloatArray())
+            }
+            copy.contextTokens = contextTokens.copyOf()
         }
         copy.label = label
         copy.location = location
@@ -573,7 +583,6 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         copy.corpusTokenIds = corpusTokenIds?.copyOf()
         copy.testCorpusTokenIds = testCorpusTokenIds?.copyOf()
         copy.applyCorpusToTrainer()
-        copy.contextTokens = contextTokens.copyOf()
         copy.learningRate = learningRate
         copy.trainer.learningRate = learningRate.toFloat()
         copy.samplingTemperature = samplingTemperature
@@ -653,10 +662,10 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
      * completed by [update] before this runs; the guard here just protects direct calls. An empty
      * context waits for input, so playing before the document sync delivers text is not a dead end.
      */
-    @Synchronized
-    fun step() {
+    fun step(): Unit = synchronized(model) {
+        if (trainer.isRunning) return
         lastGenerated = ""
-        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
+        if (model.midWalk) return
         if (pending.isNotEmpty()) {
             setContext(contextTokens + pending.removeFirst())
             forwardContext()
@@ -725,9 +734,10 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     /** Runs a full forward pass on the current context and publishes it to the scene. */
-    fun forwardContext() {
+    fun forwardContext(): Unit = synchronized(model) {
+        if (trainer.isRunning) return
         if (contextTokens.isEmpty()) return
-        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0) return
+        if (model.midWalk) return
         sceneShowsTrainingWindow = false
         autoGradientView(false)
         model.setSample(contextTokens)
@@ -757,11 +767,18 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
      * window when idle. Returns the op that ran, or null with no training windows.
      */
     enum class StepRefusal {
-        TRAINING_WALK_IN_PROGRESS, FORWARD_WALK_IN_PROGRESS, EMPTY_CONTEXT, NO_TRAINING_WINDOWS, NO_WALK_IN_PROGRESS
+        TRAINING_WALK_IN_PROGRESS, FORWARD_WALK_IN_PROGRESS, EMPTY_CONTEXT, NO_TRAINING_WINDOWS,
+        NO_WALK_IN_PROGRESS, TRAINER_RUNNING
     }
 
-    fun stepTrainingOp(): TensorOp? {
+    fun stepTrainingOp(): TensorOp? = synchronized(model) {
         if (model.stepPhase == TeachingTransformerModel.StepPhase.IDLE) {
+            // Walk-start guards only: finishStepWalk drains via this method, so a mid-walk
+            // refusal would loop forever.
+            if (trainer.isRunning) {
+                events.stepRefused.fire(StepRefusal.TRAINER_RUNNING)
+                return null
+            }
             if (model.plan.cursor != 0) {
                 events.stepRefused.fire(StepRefusal.FORWARD_WALK_IN_PROGRESS)
                 return null
@@ -784,18 +801,23 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         }
         val op = model.stepOp()
         if (model.stepPhase == TeachingTransformerModel.StepPhase.BACKWARD) autoGradientView(true)
+        scene.lens?.sourceRow = config.contextSize - 1
         scene.publish(config.contextSize - 1)
         events.updated.fire()
         return op
     }
 
     /** Advances a plain forward pass on the current context by one op. */
-    fun stepInferenceOp(): TensorOp? {
+    fun stepInferenceOp(): TensorOp? = synchronized(model) {
         if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) {
             events.stepRefused.fire(StepRefusal.TRAINING_WALK_IN_PROGRESS)
             return null
         }
         if (model.plan.cursor == 0) {
+            if (trainer.isRunning) {
+                events.stepRefused.fire(StepRefusal.TRAINER_RUNNING)
+                return null
+            }
             if (contextTokens.isEmpty()) {
                 events.stepRefused.fire(StepRefusal.EMPTY_CONTEXT)
                 return null
@@ -812,7 +834,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     /** Runs the remaining ops of a walk in progress to the next clean boundary. */
-    fun finishStepWalk() {
+    fun finishStepWalk(): Unit = synchronized(model) {
         if (!stepWalkInProgress) {
             events.stepRefused.fire(StepRefusal.NO_WALK_IN_PROGRESS)
             return
@@ -823,7 +845,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
 
     /** True while an op micro-step walk (training or forward-only) is mid-flight. */
     val stepWalkInProgress: Boolean
-        get() = model.stepPhase != TeachingTransformerModel.StepPhase.IDLE || model.plan.cursor != 0
+        get() = model.midWalk
 
     /** The op the next micro-step will run: mid-walk, mid-forward, or null at a clean boundary. */
     fun pendingOp(): TensorOp? = model.nextOp()

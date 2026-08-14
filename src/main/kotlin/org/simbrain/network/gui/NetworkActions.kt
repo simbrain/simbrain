@@ -1,6 +1,7 @@
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
@@ -563,11 +564,16 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         networkPanel.network.update()
     }
 
+    /** One lane for the op-step keys, so auto-repeat queues FIFO instead of racing the pool. */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val opStepContext = Dispatchers.Default.limitedParallelism(1)
+
     val stepTransformerForwardOpAction = networkPanel.createAction(
         name = "Step forward pass one op",
         description = "Run the selected transformer's forward pass one operation at a time; " +
             "the active op's glyph glows (f)",
-        keyboardShortcut = KeyCombination('F')
+        keyboardShortcut = KeyCombination('F'),
+        coroutineContext = opStepContext
     ) {
         selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepInferenceOp() }
     }
@@ -576,7 +582,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         name = "Step training one op",
         description = "Walk the selected transformer through a whole training step op by op — " +
             "forward, then backward filling gradients (b)",
-        keyboardShortcut = KeyCombination('B')
+        keyboardShortcut = KeyCombination('B'),
+        coroutineContext = opStepContext
     ) {
         selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepTrainingOp() }
     }
@@ -584,7 +591,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val finishTransformerStepWalkAction = networkPanel.createAction(
         name = "Finish current step walk",
         description = "Run the remaining ops of a walk in progress to the next clean boundary (shift-b)",
-        keyboardShortcut = Shift + 'B'
+        keyboardShortcut = Shift + 'B',
+        coroutineContext = opStepContext
     ) {
         selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.finishStepWalk() }
     }

@@ -1,5 +1,6 @@
 package org.simbrain.network.trainers
 
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -60,6 +61,7 @@ class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
     var lastTestingAccuracy: Double? = null
         private set
 
+    @Volatile
     var isRunning = false
         private set
 
@@ -70,12 +72,21 @@ class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
     init {
         launch {
             for ((task, signal) in processorChannel) {
-                when (task) {
-                    Task.Start -> startHandler()
-                    Task.Train -> trainOnceHandler()
-                    Task.Stop -> stopHandler()
+                try {
+                    when (task) {
+                        Task.Start -> startHandler()
+                        Task.Train -> trainOnceHandler()
+                        Task.Stop -> stopHandler()
+                    }
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                    synchronized(model) { isRunning = false }
+                    events.endTraining.fire()
+                } finally {
+                    signal.complete(Unit)
                 }
-                signal.complete(Unit)
             }
         }
     }
@@ -99,18 +110,25 @@ class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
     }
 
     private suspend fun startHandler() {
-        stoppingCondition.resetEarlyStopping()
-        isRunning = true
+        synchronized(model) {
+            if (model.midWalk) return
+            stoppingCondition.resetEarlyStopping()
+            isRunning = true
+        }
         events.beginTraining.fire()
         submitTask(Task.Train)
     }
 
     private fun stopHandler() {
-        isRunning = false
+        synchronized(model) { isRunning = false }
         events.endTraining.fire()
     }
 
     private suspend fun trainOnceHandler() {
+        if (synchronized(model) { model.midWalk }) {
+            stopHandler()
+            return
+        }
         if (trainingWindows.isEmpty()) {
             stopHandler()
             return
@@ -120,8 +138,18 @@ class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
         var totalLoss = 0.0
         var accuracySum = 0.0
         for ((tokens, targets) in trainingWindows) {
-            totalLoss += model.trainStep(tokens, targets)
-            if (computeAccuracy) accuracySum += accuracyOf(targets)
+            val walkStarted = synchronized(model) {
+                if (model.midWalk) true
+                else {
+                    totalLoss += model.trainStep(tokens, targets)
+                    if (computeAccuracy) accuracySum += accuracyOf(targets)
+                    false
+                }
+            }
+            if (walkStarted) {
+                stopHandler()
+                return
+            }
         }
         lastTrainingError = totalLoss / trainingWindows.size
         lastTrainingAccuracy = if (computeAccuracy) accuracySum / trainingWindows.size else null
@@ -133,9 +161,19 @@ class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
             var testLoss = 0.0
             var testAccuracySum = 0.0
             for ((tokens, targets) in testingWindows) {
-                model.setSample(tokens, targets)
-                testLoss += model.forward()
-                if (computeAccuracy) testAccuracySum += accuracyOf(targets)
+                val walkStarted = synchronized(model) {
+                    if (model.midWalk) true
+                    else {
+                        model.setSample(tokens, targets)
+                        testLoss += model.forward()
+                        if (computeAccuracy) testAccuracySum += accuracyOf(targets)
+                        false
+                    }
+                }
+                if (walkStarted) {
+                    stopHandler()
+                    return
+                }
             }
             testError = testLoss / testingWindows.size
             if (computeAccuracy) {

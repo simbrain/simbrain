@@ -154,6 +154,8 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 "no training corpus — nothing to train on"
             TeachingTransformer.StepRefusal.NO_WALK_IN_PROGRESS ->
                 "no walk under way — start one with f (forward pass) or b (training)"
+            TeachingTransformer.StepRefusal.TRAINER_RUNNING ->
+                "training is running — stop it before stepping ops"
         }
         stepNoticeTimer.restart()
         refreshView()

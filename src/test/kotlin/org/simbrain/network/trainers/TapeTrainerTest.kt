@@ -91,6 +91,37 @@ class TapeTrainerTest {
     }
 
     @Test
+    fun `a train task arriving mid step walk stops cleanly instead of hanging`() {
+        val trainer = trainer()
+        val (tokens, targets) = trainer.trainingWindows.first()
+        trainer.model.beginSteppedTrainStep(tokens, targets)
+
+        runBlocking { withTimeout(10_000) { trainer.trainOnce() } }
+        assertFalse(trainer.isRunning)
+        assertEquals(0, trainer.iteration, "the walk-guarded train task must not run an epoch")
+
+        while (trainer.model.midWalk) trainer.model.stepOp()
+        runBlocking { withTimeout(10_000) { trainer.trainOnce() } }
+        assertEquals(1, trainer.iteration, "the task loop must survive the refused train task")
+    }
+
+    @Test
+    fun `starting training while a walk is armed refuses without firing beginTraining`() {
+        val trainer = trainer()
+        var began = 0
+        trainer.events.beginTraining.on { began++ }
+        val (tokens, targets) = trainer.trainingWindows.first()
+        trainer.model.beginSteppedTrainStep(tokens, targets)
+
+        runBlocking {
+            withTimeout(10_000) { trainer.startTraining() }
+            delay(100)
+        }
+        assertFalse(trainer.isRunning)
+        assertEquals(0, began)
+    }
+
+    @Test
     fun `resetting the iteration counter fires the reset event and resets adam`() {
         val trainer = trainer()
         var resets = 0

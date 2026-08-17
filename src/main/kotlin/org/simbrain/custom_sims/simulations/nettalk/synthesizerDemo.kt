@@ -63,6 +63,8 @@ val synthesizerDemo = newSim {
         feature vector` shows the last articulatory vector received. Open `Settings` to
         experiment with voices, accents, speed, pitch, amplitude, and feature-vector
         buffering.
+        
+        Note: problems with this sim have been reported on some machines, which should be fixed in a release soon.
 
         # Simulation Details
 

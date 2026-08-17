@@ -117,6 +117,8 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     phoneme-like speech output. A task-specific reader panel presents the text and centered
     letter window, while a separate `SpeechSynthesizerComponent` speaks from the network's
     26-dimensional articulatory feature output.
+    
+    Note: problems with this sim have been reported on some machines, which should be fixed in a release soon.
 
     # Simulation Details
 

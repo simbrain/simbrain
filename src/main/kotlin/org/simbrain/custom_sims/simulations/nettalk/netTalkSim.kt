@@ -167,7 +167,8 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
     - Coupling: `Network.outputLayer.activationArray` -> `SpeechSynthesizer.speakFeatureVector`.
     - Update action `Flush NETtalk word at boundary` calls
       `SpeechSynthesizer.flushFeatureBuffer()` when the reader passes a non-letter
-      character, so the synthesizer speaks one word at a time (in BUFFERED mode).
+      character or reaches the end of the text, so the synthesizer speaks one word at
+      a time (in BUFFERED mode). Editing the text clears any partially buffered word.
 
     # What to Do
 
@@ -208,10 +209,16 @@ fun SimulationScope.wireNetTalk(workspace: Workspace, reader: NettalkReader) {
         bp.inputLayer.setActivations(reader.currentWindow)
     }
     workspace.addUpdateAction("Flush NETtalk word at boundary") {
+        // End of text counts as a boundary: the reader wraps straight back to the first character,
+        // so without this a single word with no trailing punctuation would buffer forever in silence.
         val ch = reader.currentLetter.firstOrNull()
-        if (ch != null && !ch.isLetter()) {
+        val atEndOfText = reader.position == reader.text.length - 1
+        if (ch != null && (!ch.isLetter() || atEndOfText)) {
             synthesizer.flushFeatureBuffer()
         }
+    }
+    reader.events.textChanged.on {
+        synthesizer.clearFeatureBuffer()
     }
     workspace.addUpdateAction("Advance NETtalk reader") {
         reader.update()

@@ -1,3 +1,9 @@
+/**
+ * Speech synthesis model backed by the bundled eSpeak-ng library. Accepts plain text, phoneme
+ * strings, or NETtalk-style articulatory feature vectors (decoded and optionally buffered until an
+ * external word-boundary flush). Playback is serialized through a single worker; see [speechChannel]
+ * for the deliberate backpressure contract.
+ */
 package org.simbrain.world.speechsynthesizer
 
 import kotlinx.coroutines.*
@@ -17,7 +23,7 @@ class SpeechSynthesizer : SoundGenerator() {
     var codecType: PhonemeCodecType = PhonemeCodecType.NETTALK
         set(value) {
             field = value
-            featureBuffer.setLength(0)
+            clearFeatureBuffer()
             events.codecChanged.fire()
         }
 
@@ -86,6 +92,12 @@ class SpeechSynthesizer : SoundGenerator() {
     @Volatile
     private var scope: CoroutineScope = newScope()
 
+    /**
+     * Rendezvous capacity is deliberate: while audio is in flight, callers (couplings, click
+     * handlers) block in [enqueue] until the worker is ready for the next job. This backpressure
+     * paces a running simulation to the speech rate instead of letting utterances queue without
+     * bound. Do not make this buffered or drop-on-full without revisiting that contract.
+     */
     @Transient
     @Volatile
     private var speechChannel: Channel<Job> = Channel(capacity = Channel.RENDEZVOUS)
@@ -95,10 +107,17 @@ class SpeechSynthesizer : SoundGenerator() {
     private var cancelRequested: Boolean = false
 
     @Transient
-    private val transcriptionBuffer = StringBuilder()
+    private var transcriptionBuffer = StringBuilder()
+
+    /**
+     * Guards [featureBuffer], which is appended from the simulation thread while GUI threads can
+     * clear it (e.g. when the text being read is edited).
+     */
+    @Transient
+    private var featureBufferLock = Any()
 
     @Transient
-    private val featureBuffer = StringBuilder()
+    private var featureBuffer = StringBuilder()
 
     @Transient
     private var lastFeatureVector: DoubleArray = DoubleArray(codec.inputDimension)
@@ -151,8 +170,11 @@ class SpeechSynthesizer : SoundGenerator() {
                 }
             }
             BufferingMode.BUFFERED -> {
-                featureBuffer.append(decoded.symbol)
-                if (maxBufferSize > 0 && featureBuffer.length >= maxBufferSize) {
+                val capReached = synchronized(featureBufferLock) {
+                    featureBuffer.append(decoded.symbol)
+                    maxBufferSize > 0 && featureBuffer.length >= maxBufferSize
+                }
+                if (capReached) {
                     flushFeatureBuffer()
                 }
             }
@@ -165,13 +187,28 @@ class SpeechSynthesizer : SoundGenerator() {
     }
 
     fun flushFeatureBuffer() {
-        if (featureBuffer.isEmpty()) return
-        val espeak = codec.symbolsToEspeak(featureBuffer.toString())
-        featureBuffer.setLength(0)
+        val symbols = synchronized(featureBufferLock) {
+            val current = featureBuffer.toString()
+            featureBuffer.setLength(0)
+            current
+        }
+        if (symbols.isEmpty()) return
+        val espeak = codec.symbolsToEspeak(symbols)
         if (espeak.isNotBlank()) {
             enqueue(Job(espeak, asPhonemes = true, label = espeak))
         }
     }
+
+    /**
+     * Discard any buffered feature-vector phonemes without speaking them. Use when the source
+     * material changes (e.g. the text being read is edited) and a partial word is no longer valid.
+     */
+    fun clearFeatureBuffer() {
+        synchronized(featureBufferLock) { featureBuffer.setLength(0) }
+    }
+
+    internal val featureBufferLength: Int
+        get() = synchronized(featureBufferLock) { featureBuffer.length }
 
     fun restoreDefaults() {
         voice = Voice.EN_US
@@ -197,7 +234,7 @@ class SpeechSynthesizer : SoundGenerator() {
         speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
-        featureBuffer.setLength(0)
+        clearFeatureBuffer()
         events.speakingChanged.fire("")
         startWorker()
     }
@@ -272,6 +309,10 @@ class SpeechSynthesizer : SoundGenerator() {
         speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
+        transcriptionBuffer = StringBuilder()
+        featureBufferLock = Any()
+        featureBuffer = StringBuilder()
+        lastFeatureVector = DoubleArray(codec.inputDimension)
         startWorker()
         return this
     }

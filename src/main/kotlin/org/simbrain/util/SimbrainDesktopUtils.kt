@@ -96,6 +96,16 @@ class ControlPanelKt(title: String = "Control Panel"):
     @Transient
     override var coroutineContext = Dispatchers.Default + job
 
+    /**
+     * Default context for button and checkbox tasks. Runs them one at a time in click order, so that
+     * two rapid clicks cannot interleave their writes to shared model state (e.g. two pattern buttons
+     * each looping over the same neurons). A task that suspends releases the thread, so a queued task
+     * (e.g. a stop button) can still run while a long task awaits workspace iteration. Pass an explicit
+     * context with its own dispatcher to opt a task out of this serialization.
+     */
+    @Transient
+    private val buttonTaskContext = Dispatchers.Default.limitedParallelism(1)
+
     val centralPanel = JPanel(BorderLayout()).apply {
         val scrollPane = JScrollPane(this)
         scrollPane.border = null
@@ -167,7 +177,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         task: suspend JButton.(ActionEvent) -> Unit
     ) = JButton(label).also { button ->
         button.addActionListener {
-            launch(context) { button.task(it) }
+            launch(buttonTaskContext + context) { button.task(it) }
         }
         launch(Dispatchers.Swing) {
             getTab(tab).addItem(button)
@@ -404,7 +414,7 @@ class ControlPanelKt(title: String = "Control Panel"):
     fun addCheckBox(label: String, checked: Boolean, tab: String? = null, onChange: suspend (Boolean) -> Unit = {}) =
         JCheckBox().also { checkBox ->
             checkBox.addActionListener {
-                launch {
+                launch(buttonTaskContext) {
                     onChange(checkBox.isSelected)
                 }
             }
@@ -459,7 +469,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             task: suspend JButton.(ActionEvent) -> Unit
         ) = JButton(label).also { button ->
             button.addActionListener {
-                parent.launch(context) { button.task(it) }
+                parent.launch(parent.buttonTaskContext + context) { button.task(it) }
             }
             panel.add(button)
         }

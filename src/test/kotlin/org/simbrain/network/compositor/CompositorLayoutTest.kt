@@ -138,6 +138,25 @@ class CompositorLayoutTest {
     }
 
     @Test
+    fun `return drops rise from the source center when the path to the lane is clear`() {
+        val scene = scene()
+        val edge = scene.edges.first {
+            (it.from as? TensorTile)?.id == "layers.0.attn.out" && it.to is OpVertex
+        }
+        val out = scene.tile("layers.0.attn.out")
+        assertEquals(out.x + out.width / 2, edge.waypoints.first().x, 1e-9,
+            "an unobstructed return rises straight from its source")
+
+        val blocker = scene.returnLanes.getValue(edge).clearItems
+            .filterIsInstance<TensorTile>().first { it !== out }
+        blocker.x = out.x
+        blocker.y = out.y - blocker.height - 10.0
+        scene.deriveReturnWaypoints()
+        assertTrue(edge.waypoints.first().x >= out.x + out.width,
+            "a blocked return drops beside its source instead")
+    }
+
+    @Test
     fun `layout is deterministic across repeated application`() {
         val scene = scene(layers = 2)
         val before = scene.tiles.associate { it.id to (it.x to it.y) }

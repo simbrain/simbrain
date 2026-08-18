@@ -258,9 +258,20 @@ class CompositorScene(val graph: PlanGraph? = null) {
             } else {
                 route.clearItems.maxOf { it.routeRect.maxY } + LANE_GAP * (route.lane + 1)
             }
-            var dropX = edge.from.routeRect.maxX + 24.0
+            val from = edge.from.routeRect
+            var dropX = from.maxX + 24.0
             if (route.clearsGroupRight) {
                 dropX = maxOf(dropX, route.clearItems.maxOf { it.routeRect.maxX } + 24.0)
+            } else {
+                // The sideways drop exists to clear the source tile, but when the path straight
+                // up (or down) to the lane is unobstructed the spline doubles back through the
+                // offset knot and renders as a hook; rise from the tile's center instead.
+                val riseTop = if (returnLanesAbove) laneY else from.maxY
+                val riseBottom = if (returnLanesAbove) from.minY else laneY
+                val corridor = Rectangle2D.Double(from.minX, riseTop, from.width + 16.0, riseBottom - riseTop)
+                if (route.clearItems.none { it !== edge.from && it.routeRect.intersects(corridor) }) {
+                    dropX = from.centerX
+                }
             }
             edge.waypoints = listOf(
                 Point2D.Double(dropX, laneY),

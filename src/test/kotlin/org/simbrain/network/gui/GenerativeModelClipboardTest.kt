@@ -8,28 +8,28 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.PromptMode
-import org.simbrain.network.llm.TeachingTransformer
-import org.simbrain.network.llm.TeachingTransformerConfig
+import org.simbrain.network.llm.TinyLanguageModel
+import org.simbrain.network.llm.TinyLmConfig
 
 class GenerativeModelClipboardTest : NetworkPanelDeleteUndoTestBase() {
 
-    private fun addTransformer(): TeachingTransformer {
-        val transformer = TeachingTransformer(TeachingTransformerConfig(
+    private fun addTransformer(): TinyLanguageModel {
+        val languageModel = TinyLanguageModel(TinyLmConfig(
             contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = 1
         ))
-        transformer.model.trainStep(intArrayOf(0, 1, 2, 3, 4, 0), intArrayOf(1, 2, 3, 4, 0, 1))
-        runBlocking { network.addNetworkModel(transformer) }
-        return transformer
+        languageModel.model.trainStep(intArrayOf(0, 1, 2, 3, 4, 0), intArrayOf(1, 2, 3, 4, 0, 1))
+        runBlocking { network.addNetworkModel(languageModel) }
+        return languageModel
     }
 
     @Test
-    fun `pasting a teaching transformer creates an independent trained twin and undo removes it`() = runBlocking {
+    fun `pasting a tiny language model creates an independent trained twin and undo removes it`() = runBlocking {
         val original = addTransformer()
 
         Clipboard.add(listOf(original))
         Clipboard.paste(panel)
 
-        val transformers = network.getModels<TeachingTransformer>()
+        val transformers = network.getModels<TinyLanguageModel>()
         assertEquals(2, transformers.size)
         val copy = transformers.first { it !== original }
         assertNotSame(original.model, copy.model)
@@ -40,9 +40,9 @@ class GenerativeModelClipboardTest : NetworkPanelDeleteUndoTestBase() {
         )
 
         panel.undoManager.undo()
-        assertEquals(1, network.getModels<TeachingTransformer>().size, "undo removes the pasted copy")
+        assertEquals(1, network.getModels<TinyLanguageModel>().size, "undo removes the pasted copy")
         panel.undoManager.redo()
-        assertEquals(2, network.getModels<TeachingTransformer>().size, "redo restores it")
+        assertEquals(2, network.getModels<TinyLanguageModel>().size, "redo restores it")
     }
 
     @Test
@@ -64,16 +64,16 @@ class GenerativeModelClipboardTest : NetworkPanelDeleteUndoTestBase() {
     }
 
     @Test
-    fun `deleting a selected teaching transformer is undoable`() = runBlocking {
-        val transformer = addTransformer()
-        val trained = transformer.model.params.getValue("embed.table").tensor.toFloatArray()
+    fun `deleting a selected tiny language model is undoable`() = runBlocking {
+        val languageModel = addTransformer()
+        val trained = languageModel.model.params.getValue("embed.table").tensor.toFloatArray()
 
-        selectOnly(transformer)
+        selectOnly(languageModel)
         panel.deleteSelectedObjects()
-        assertTrue(network.getModels<TeachingTransformer>().isEmpty())
+        assertTrue(network.getModels<TinyLanguageModel>().isEmpty())
 
         panel.undoManager.undo()
-        val restored = network.getModels<TeachingTransformer>()
+        val restored = network.getModels<TinyLanguageModel>()
         assertEquals(1, restored.size, "undo restores the deleted model")
         assertArrayEquals(trained, restored.first().model.params.getValue("embed.table").tensor.toFloatArray(),
             "the restored model keeps its trained parameters (same instance, not a rebuild)")

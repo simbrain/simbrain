@@ -4,8 +4,8 @@ import kotlinx.coroutines.runBlocking
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.llm.TeachingTransformer
-import org.simbrain.network.llm.TeachingTransformerConfig
+import org.simbrain.network.llm.TinyLanguageModel
+import org.simbrain.network.llm.TinyLmConfig
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -21,7 +21,7 @@ import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.io.File
 import javax.swing.JScrollPane
 
-class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : EditableObject {
+class TinyLmSimOptions(var showTransformerOptions: Boolean = true) : EditableObject {
 
     var contextSize by GuiEditable(
         initValue = 24,
@@ -33,7 +33,7 @@ class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : Edi
         description = "Width of the residual stream. Must be divisible by the number of attention heads.",
         initValue = 20,
         order = 20,
-        conditionallyVisibleBy = TinyLanguageModelOptions::showTransformerOptions,
+        conditionallyVisibleBy = TinyLmSimOptions::showTransformerOptions,
     )
 
     var numHeads by GuiEditable(
@@ -41,7 +41,7 @@ class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : Edi
         description = "Number of attention heads. Must divide the embedding dimension.",
         initValue = 4,
         order = 22,
-        conditionallyVisibleBy = TinyLanguageModelOptions::showTransformerOptions,
+        conditionallyVisibleBy = TinyLmSimOptions::showTransformerOptions,
     )
 
     var numLayers by GuiEditable(
@@ -49,7 +49,7 @@ class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : Edi
         description = "Number of transformer layers",
         initValue = 1,
         order = 24,
-        conditionallyVisibleBy = TinyLanguageModelOptions::showTransformerOptions,
+        conditionallyVisibleBy = TinyLmSimOptions::showTransformerOptions,
     )
 
     var hiddenSize by GuiEditable(
@@ -108,7 +108,7 @@ class TinyLanguageModelOptions(var showTransformerOptions: Boolean = true) : Edi
  * - learningRate: Learning rate for the Adam optimizer (default: 0.001)
  * - samplingStrategy: how to sample from the distribution to produce new tokens
  */
-val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
+val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
 
     // Training and debugging parameters
     var trainingIterations = 0
@@ -137,7 +137,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             else -> SamplingStrategy.TopK(k = 5)
         }
 
-        TinyLanguageModelOptions().apply {
+        TinyLmSimOptions().apply {
             contextSize = jsonOptions.optInt("contextSize", contextSize)
             embeddingDimension = jsonOptions.optInt("embeddingDimension", embeddingDimension)
             numHeads = jsonOptions.optInt("numHeads", numHeads)
@@ -156,7 +156,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         }
     } else {
         // Use GUI dialog for interactive mode
-        TinyLanguageModelOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+        TinyLmSimOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
     }
 
     workspace.clearWorkspace()
@@ -201,13 +201,13 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
     val network = networkComponent.network
 
     // Vocabulary index of a token, resolved through the embedding (-1 for unknown tokens,
-    // which the transformer embeds as zero rows)
+    // which the model embeds as zero rows)
     fun tokenId(token: String): Int = tokenEmbedding.get(token).indexOfFirst { it != 0.0 }
 
     fun tokenIds(text: String): IntArray =
         text.tokenize(tokenizer).map { tokenId(it.token) }.toIntArray()
 
-    val transformer = TeachingTransformer(TeachingTransformerConfig(
+    val languageModel = TinyLanguageModel(TinyLmConfig(
         contextSize = contextSize,
         embedDim = embeddingDimension,
         numHeads = options.numHeads,
@@ -219,11 +219,11 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         tokenLabels = ArrayList(tokenEmbedding.tokens)
         this.learningRate = learningRate
     }
-    transformer.setCorpus(
+    languageModel.setCorpus(
         tokenIds(trainingTextFinal),
         testTextFinal.takeIf { it.isNotEmpty() }?.let(::tokenIds),
     )
-    if (transformer.trainer.testingWindows.isEmpty() && testTextFinal.isNotEmpty()) {
+    if (languageModel.trainer.testingWindows.isEmpty() && testTextFinal.isNotEmpty()) {
         withGui {
             showWarningDialog(
                 "Warning: Test set is empty because there is insufficient test data.\n\n" +
@@ -233,14 +233,14 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         }
     }
 
-    transformer.tokenizer = tokenizer
-    transformer.samplingStrategy = samplingStrategy
+    languageModel.tokenizer = tokenizer
+    languageModel.samplingStrategy = samplingStrategy
 
     with(network) {
-        addNetworkModels(transformer)
+        addNetworkModels(languageModel)
     }
 
-    // Text World showing the transformer's sliding context window, editable while stopped
+    // Text World showing the model's sliding context window, editable while stopped
     val textWorldComponent = addTextWorld("Text Inputs")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.highlightCurrentToken = false
@@ -265,7 +265,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
         )
     }
 
-    transformer.location = point(0, 0)
+    languageModel.location = point(0, 0)
 
     // Run training and workspace iterations if specified (for headless mode)
     if (trainingIterations > 0 || workspaceIterations > 0) {
@@ -278,8 +278,8 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
             println("Context size: $contextSize")
             println("Embedding dimension: $embeddingDimension")
             println("Heads: ${options.numHeads}, layers: ${options.numLayers}")
-            println("Training windows: ${transformer.trainer.trainingWindows.size}")
-            println("Test windows: ${transformer.trainer.testingWindows.size}")
+            println("Training windows: ${languageModel.trainer.trainingWindows.size}")
+            println("Test windows: ${languageModel.trainer.testingWindows.size}")
             println()
         }
 
@@ -288,12 +288,12 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
                 if (enableConsoleOutput) println("Starting training...")
                 runBlocking {
                     repeat(trainingIterations) { iteration ->
-                        transformer.trainer.trainOnce()
+                        languageModel.trainer.trainOnce()
                         if (enableConsoleOutput) {
-                            val accuracy = transformer.trainer.lastTrainingAccuracy
+                            val accuracy = languageModel.trainer.lastTrainingAccuracy
                                 ?.let { ", Accuracy: ${"%.1f".format(it * 100)}%" } ?: ""
                             println("Iteration ${iteration + 1}/$trainingIterations, " +
-                                "Train Loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}$accuracy")
+                                "Train Loss: ${"%.6f".format(languageModel.trainer.lastTrainingError)}$accuracy")
                         }
                     }
                 }
@@ -318,7 +318,7 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 
         if (enableConsoleOutput) {
             println("Headless execution completed successfully!")
-            println("Final training loss: ${"%.6f".format(transformer.trainer.lastTrainingError)}")
+            println("Final training loss: ${"%.6f".format(languageModel.trainer.lastTrainingError)}")
         }
     }
 
@@ -328,11 +328,11 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 }
 
 /**
- * Wires the transformer's context window to the text world as a two-way document sync — the
+ * Wires the model's context window to the text world as a two-way document sync — the
  * sliding window streams into the text world while the model writes, and text typed there
- * while the workspace is paused replaces the transformer's context. Typing a prompt and
- * pressing Play is all it takes: there is no run mode, and a transformer with no context
- * idles waiting for input. The transformer samples and feeds back its own tokens, so the old
+ * while the workspace is paused replaces the model's context. Typing a prompt and
+ * pressing Play is all it takes: there is no run mode, and a model with no context
+ * idles waiting for input. The model samples and feeds back its own tokens, so the old
  * hand-ordered update actions are gone — the default workspace update (couplings, then
  * components) drives everything. Recreating existing couplings on reopen is safe: the
  * coupling manager stores them in a set.
@@ -340,14 +340,14 @@ val tinyLanguageModel = newSim("tiny_language_model") { optionString ->
 fun SimulationScope.setupGeneration(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
-    val transformer = network.getModels<TeachingTransformer>().first()
+    val languageModel = network.getModels<TinyLanguageModel>().first()
     val textWorld = workspace.componentList.filterIsInstance<TextWorldComponent>().first().world
 
     textWorld.highlightCurrentToken = false
     textWorld.autoAdvance = false
-    val vocabulary = (transformer.tokenLabels ?: arrayListOf()).map(String::lowercase).toSet()
+    val vocabulary = (languageModel.tokenLabels ?: arrayListOf()).map(String::lowercase).toSet()
     textWorld.statusMessageProvider = {
-        val typedTokens = textWorld.text.tokenize(transformer.tokenizer).map { it.token }
+        val typedTokens = textWorld.text.tokenize(languageModel.tokenizer).map { it.token }
         val unrecognized = typedTokens.filter { it.lowercase() !in vocabulary }.distinct()
         when {
             typedTokens.isEmpty() -> "Enter a vocabulary token to begin generation."
@@ -364,10 +364,10 @@ fun SimulationScope.setupGeneration(workspace: Workspace) {
     with(workspace.couplingManager) {
         createCoupling(
             textWorld.getProducer("getText"),
-            transformer.getConsumer("setContextWindow"),
+            languageModel.getConsumer("setContextWindow"),
         )
         createCoupling(
-            transformer.getProducer("getContextWindow"),
+            languageModel.getProducer("getContextWindow"),
             textWorld.getConsumer("setTextIfChanged"),
         )
     }
@@ -376,7 +376,7 @@ fun SimulationScope.setupGeneration(workspace: Workspace) {
 /** The sim's desktop chrome — control panel, window placement, sidebar — rebuilt on reopen too. */
 private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
     val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
-    val transformer = networkComponent.network.getModels<TeachingTransformer>().first()
+    val languageModel = networkComponent.network.getModels<TinyLanguageModel>().first()
     val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
 
     fun showTextDialog(dialogTitle: String, content: String) {
@@ -406,29 +406,29 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
         val controlPanel = createControlPanel("Language Model Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
 
             addButton("Show Vocabulary") {
-                val labels = transformer.tokenLabels ?: arrayListOf()
+                val labels = languageModel.tokenLabels ?: arrayListOf()
                 showTextDialog("Vocabulary (${labels.size} tokens)", labels.joinToString("\n"))
             }
 
             addButton("Show Training Text") {
-                val corpus = transformer.corpusTokenIds?.let(transformer::decode) ?: "No training corpus"
+                val corpus = languageModel.corpusTokenIds?.let(languageModel::decode) ?: "No training corpus"
                 showTextDialog("Training Text", corpus)
             }
 
             addSeparator()
 
-            addSliderWithTextField("Temperature", 0.01, 2.0, transformer.samplingTemperature, 0.01) { temp ->
-                transformer.samplingTemperature = temp
+            addSliderWithTextField("Temperature", 0.01, 2.0, languageModel.samplingTemperature, 0.01) { temp ->
+                languageModel.samplingTemperature = temp
             }
 
             addButton("Configure Sampling Strategy...") {
-                val wrapper = objectWrapper("Sampling Strategy", transformer.samplingStrategy.copy() as SamplingStrategy)
+                val wrapper = objectWrapper("Sampling Strategy", languageModel.samplingStrategy.copy() as SamplingStrategy)
                 val editor = AnnotatedPropertyEditor(wrapper)
                 val dialog = StandardDialog(editor).apply {
                     title = "Configure Sampling Strategy"
                     addCommitTask {
                         editor.commitChanges()
-                        transformer.samplingStrategy = wrapper.editingObject as SamplingStrategy
+                        languageModel.samplingStrategy = wrapper.editingObject as SamplingStrategy
                     }
                 }
                 dialog.display()
@@ -464,11 +464,11 @@ private val TINY_LM_SIDEBAR = """
 
         ## Reading the Diagram
 
-        The transformer's interior is a live diagram of its computation. Data flows bottom to top.
+        The model's interior is a live diagram of its computation. Data flows bottom to top.
 
         ## The residual stream is the spine
 
-        The column of wide tiles running up the diagram is the residual stream: the transformer's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the bottom, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and adds it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
+        The column of wide tiles running up the diagram is the residual stream: the model's working memory. Each tile is a real matrix with one row per context position and one column per embedding dimension. At the bottom, token embeddings plus learned position vectors write the initial state (`residual in`). Each layer then reads the stream, computes a correction, and adds it back at the ⊕ junctions: once for attention (`residual + attn`), once for the MLP (`residual + mlp`).
 
         The straight vertical segments of the spine are skip connections: information travels up them unchanged, which is why early information is still available at the top. The attention and MLP blocks are side branches that leave the spine and rejoin it.
 
@@ -490,21 +490,21 @@ private val TINY_LM_SIDEBAR = """
 
         ## Train the model
 
-        The model starts untrained. Right-click the transformer's title tab and choose `Train...`, then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
+        The model starts untrained. Right-click the model's title tab and choose `Train...`, then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
 
         ## Generate text
 
         1. Type a prompt in the `Text Inputs` component
         2. Click `Play` (or `Step`) in the main toolbar
-        3. Each workspace step runs the full transformer on the current context and samples one new token
+        3. Each workspace step runs the full model on the current context and samples one new token
 
-        There is no start or stop mode: the transformer writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
+        There is no start or stop mode: the model writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
         Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
 
         ## Step through the computation, one operation at a time
 
-        Right-click the transformer:
+        Right-click the model:
 
         - `Step forward pass one op` runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings down to the probabilities.
         - `Step training one op` walks an entire training step: the forward pass op by op, then the loss, then every gradient in reverse order back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on `Gradient view` to see the gradient values themselves flowing backward through the tiles.

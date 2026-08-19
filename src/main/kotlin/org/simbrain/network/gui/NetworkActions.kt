@@ -13,7 +13,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
@@ -146,12 +146,12 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         showLanguageModelCreationDialog()
     }
-    val addTeachingTransformerAction = networkPanel.createAction(
-        name = "Add teaching transformer...",
-        description = "Add a small trainable transformer with an op-level teaching interior (shift-m)",
+    val addTinyLanguageModelAction = networkPanel.createAction(
+        name = "Add tiny language model...",
+        description = "Add a small trainable language model with an op-level teaching interior (shift-m)",
         keyboardShortcut = Shift + 'M',
     ) {
-        showTeachingTransformerCreationDialog()
+        showTinyLanguageModelCreationDialog()
     }
     val addClassifierAction = createAction("Add classifier") {
         networkPanel.showClassifierCreationDialog()
@@ -572,22 +572,22 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val stepTransformerForwardOpAction = networkPanel.createAction(
         name = "Step forward pass one op",
-        description = "Run the selected transformer's forward pass one operation at a time; " +
+        description = "Run the selected model's forward pass one operation at a time; " +
             "the active op's glyph glows (f)",
         keyboardShortcut = KeyCombination('F'),
         coroutineContext = opStepContext
     ) {
-        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepInferenceOp() }
+        selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.stepInferenceOp() }
     }
 
     val stepTransformerTrainingOpAction = networkPanel.createAction(
         name = "Step training one op",
-        description = "Walk the selected transformer through a whole training step op by op — " +
+        description = "Walk the selected model through a whole training step op by op — " +
             "forward, then backward filling gradients (b)",
         keyboardShortcut = KeyCombination('B'),
         coroutineContext = opStepContext
     ) {
-        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.stepTrainingOp() }
+        selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.stepTrainingOp() }
     }
 
     val finishTransformerStepWalkAction = networkPanel.createAction(
@@ -596,7 +596,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = Shift + 'B',
         coroutineContext = opStepContext
     ) {
-        selectionManager.filterSelectedModels<TeachingTransformer>().forEach { it.finishStepWalk() }
+        selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.finishStepWalk() }
     }
 
     // val addDeepNetAction = if (Utils.isM1Mac()) {

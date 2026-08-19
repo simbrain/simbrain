@@ -3,16 +3,16 @@ package org.simbrain.network.compositor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.network.llm.TeachingTransformerConfig
-import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.llm.TinyLmConfig
+import org.simbrain.network.llm.TinyLmModel
 import org.simbrain.network.tensor.op.AddOp
 import org.simbrain.network.tensor.op.LayerNormOp
 import org.simbrain.network.tensor.op.MatMulLinearOp
 import kotlin.math.abs
 
-class TeachingCompositorTest {
+class TinyLmCompositorTest {
 
-    private fun model() = TeachingTransformerModel(TeachingTransformerConfig(
+    private fun model() = TinyLmModel(TinyLmConfig(
         contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = 1
     ))
 
@@ -23,7 +23,7 @@ class TeachingCompositorTest {
 
     @Test
     fun `spine checkpoints chain through junction adds and limb streams converge on their ops`() {
-        val scene = TeachingCompositor.buildScene(model())
+        val scene = TinyLmCompositor.buildScene(model())
         val edges = scene.edges.associateBy { it.from.key() to it.to.key() }
         val junctions = scene.opVertices.associateBy { it.op.name }
 
@@ -54,7 +54,7 @@ class TeachingCompositorTest {
 
     @Test
     fun `head-stacked segments carry per-head strands and merge collapses the fan`() {
-        val scene = TeachingCompositor.buildScene(model())
+        val scene = TinyLmCompositor.buildScene(model())
         val edges = scene.edges.associateBy { it.from.key() to it.to.key() }
         assertEquals(2, edges.getValue("layers.0.attn.q" to "layers.0.attn.score").strands,
             "after the split the flow is one strand per head")
@@ -68,7 +68,7 @@ class TeachingCompositorTest {
 
     @Test
     fun `weight and bias tiles ride the edges carrying their consuming ops`() {
-        val scene = TeachingCompositor.buildScene(model())
+        val scene = TinyLmCompositor.buildScene(model())
         val satellites = scene.satellites.associateBy { it.tile.id }
 
         val wq = satellites.getValue("layers.0.attn.wq")
@@ -89,7 +89,7 @@ class TeachingCompositorTest {
 
     @Test
     fun `satellite op glyphs center above their parameter tiles`() {
-        val scene = TeachingCompositor.buildScene(model())
+        val scene = TinyLmCompositor.buildScene(model())
         val node = CompositorNode(scene)
 
         for (satellite in scene.satellites) {
@@ -103,7 +103,7 @@ class TeachingCompositorTest {
     @Test
     fun `forward pass fills spine deck and probability tiles through full-pass publish`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         model.setSample(intArrayOf(1, 2, 3, 4, 0))
         model.forward()
         scene.publish()
@@ -135,7 +135,7 @@ class TeachingCompositorTest {
     @Test
     fun `full-pass sequence tiles track the active context row`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         model.setSample(intArrayOf(1, 2, 3))
         model.forward()
         scene.publish(2)
@@ -149,7 +149,7 @@ class TeachingCompositorTest {
     @Test
     fun `lens reads the selected position through the model's own head`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         model.setSample(intArrayOf(1, 2, 3))
         model.forward()
         val lens = scene.lens!!
@@ -167,7 +167,7 @@ class TeachingCompositorTest {
     @Test
     fun `stale tiles shrink as a stepped pass advances and clear at the boundary`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         assertTrue(scene.staleTiles(0).isEmpty(), "nothing is stale at a step boundary")
 
         model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4, 0), intArrayOf(2, 3, 4, 0, 1))
@@ -178,22 +178,22 @@ class TeachingCompositorTest {
         assertTrue(scene.tile("embed.table") !in afterEmbed, "parameter tiles are never stale")
 
         var lastSize = afterEmbed.size
-        while (model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) {
+        while (model.stepPhase == TinyLmModel.StepPhase.FORWARD) {
             model.stepOp()
             val stale = scene.staleTiles(model.plan.cursor)
             assertTrue(stale.size <= lastSize, "stale set only shrinks during the pass")
             lastSize = stale.size
         }
         assertTrue(scene.staleTiles(model.plan.cursor).isEmpty())
-        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) model.stepOp()
+        while (model.stepPhase != TinyLmModel.StepPhase.IDLE) model.stepOp()
     }
 
     @Test
     fun `gradient view swaps tiles to gradient buffers and back`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4, 0), intArrayOf(2, 3, 4, 0, 1))
-        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) model.stepOp()
+        while (model.stepPhase != TinyLmModel.StepPhase.IDLE) model.stepOp()
 
         scene.publish()
         val wq = scene.tile("layers.0.attn.wq") as MatrixTile
@@ -213,7 +213,7 @@ class TeachingCompositorTest {
     @Test
     fun `weight tiles refresh when a training step bumps parameter versions`() {
         val model = model()
-        val scene = TeachingCompositor.buildScene(model)
+        val scene = TinyLmCompositor.buildScene(model)
         model.setSample(intArrayOf(1, 2, 3, 4, 0))
         model.forward()
         scene.publish()

@@ -9,8 +9,8 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.events.TrainingStats
-import org.simbrain.network.llm.TeachingTransformerConfig
-import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.llm.TinyLmConfig
+import org.simbrain.network.llm.TinyLmModel
 
 class TapeTrainerTest {
 
@@ -21,7 +21,7 @@ class TapeTrainerTest {
         }
 
     private fun trainer(): TapeTrainer {
-        val model = TeachingTransformerModel(TeachingTransformerConfig(
+        val model = TinyLmModel(TinyLmConfig(
             contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = 1
         ), seed = 7L)
         return TapeTrainer(model).apply {

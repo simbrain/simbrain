@@ -2,7 +2,7 @@ package org.simbrain.network.gui
 
 import org.simbrain.network.core.*
 import org.simbrain.network.llm.LanguageModel
-import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 
@@ -22,7 +22,7 @@ object Clipboard {
     fun canCopy(model: NetworkModel): Boolean = when (model) {
         is Neuron, is Synapse, is NetworkTextObject, is NeuronCollection, is SupervisedModel,
         is NeuronArray, is ActivationSequence, is WeightMatrix, is SynapseGroup, is Subnetwork,
-        is LanguageModel, is TeachingTransformer -> true
+        is LanguageModel, is TinyLanguageModel -> true
         else -> false
     }
 
@@ -190,7 +190,7 @@ object Clipboard {
                         is LanguageModel -> {
                             add(item.copy())
                         }
-                        is TeachingTransformer -> {
+                        is TinyLanguageModel -> {
                             add(item.copy())
                         }
                         else -> error(

@@ -19,8 +19,8 @@ import org.simbrain.network.core.TensorActivation
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.core.TensorShape
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.llm.TeachingTransformer
-import org.simbrain.network.llm.TeachingTransformerConfig
+import org.simbrain.network.llm.TinyLanguageModel
+import org.simbrain.network.llm.TinyLmConfig
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
@@ -273,11 +273,11 @@ class KitchenSinkSnapshot : UiSnapshotDef {
             val flatten = FlattenConnector(poolOut, flat).apply { label = "Flatten" }
             network.addNetworkModel(flatten, usePlacementManager = false)
 
-            // Row 6: TeachingTransformer (residual spine, weight tiles, attention deck, op glyphs).
-            val teaching = TeachingTransformer(TeachingTransformerConfig(
+            // Row 6: TinyLanguageModel (residual spine, weight tiles, attention deck, op glyphs).
+            val teaching = TinyLanguageModel(TinyLmConfig(
                 contextSize = 7, embedDim = 8, numHeads = 2, hiddenDim = 12, vocabSize = 6, numLayers = 1
             )).apply {
-                label = "Teaching transformer"
+                label = "Tiny language model"
             }
             network.addNetworkModel(teaching, usePlacementManager = false)
             teaching.location = point(-600.0, 950.0)

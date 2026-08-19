@@ -1,9 +1,9 @@
 package org.simbrain.network.compositor
 
-import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.llm.TinyLmModel
 
 /**
- * Assembles the compositor scene for a [TeachingTransformerModel]: the residual stream as a
+ * Assembles the compositor scene for a [TinyLmModel]: the residual stream as a
  * vertical spine of real seq x dim checkpoint tiles (the trunk between checkpoints IS the skip
  * connection), with the attention and MLP limbs branching right and rejoining the spine at
  * add-glyph junctions, weight and bias tiles riding the edges that carry their ops, the
@@ -12,10 +12,10 @@ import org.simbrain.network.llm.TeachingTransformerModel
  *
  * Data flows bottom-up: embeddings at the bottom, logits and the prediction at the top.
  */
-object TeachingCompositor {
+object TinyLmCompositor {
 
     fun buildScene(
-        model: TeachingTransformerModel,
+        model: TinyLmModel,
         weightsTransposed: Boolean = false,
         scale: Double = 1.0,
     ): CompositorScene {

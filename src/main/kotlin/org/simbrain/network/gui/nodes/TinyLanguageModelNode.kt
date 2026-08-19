@@ -13,7 +13,7 @@ import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
-import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.util.*
 import java.awt.Dialog
 import java.awt.event.WindowAdapter
@@ -22,25 +22,25 @@ import java.awt.geom.Point2D
 import javax.swing.*
 
 /**
- * Canvas node for a [TeachingTransformer]: an interaction box and the compositor spine interior.
+ * Canvas node for a [TinyLanguageModel]: an interaction box and the compositor spine interior.
  * The flagship interaction is op-level micro-stepping — step a forward pass or a whole training
  * step one op at a time, with the active op's glyph glowing, un-computed tiles dimmed, and the
  * backward half filling gradient views.
  */
-class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransformer: TeachingTransformer) :
+class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: TinyLanguageModel) :
     ScreenElement(networkPanel) {
 
-    private val interactionBox = TeachingTransformerInteractionBox(networkPanel)
+    private val interactionBox = TinyLanguageModelInteractionBox(networkPanel)
 
     private var compositorNode: CompositorNode? = null
 
     init {
         addChild(interactionBox)
-        interactionBox.setText(teachingTransformer.displayName)
+        interactionBox.setText(tinyLanguageModel.displayName)
 
-        val events = teachingTransformer.events
+        val events = tinyLanguageModel.events
         val subscriptions = listOf(
-            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(teachingTransformer.displayName) },
+            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(tinyLanguageModel.displayName) },
             events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
             events.modelRebuilt.on(swingDispatcher) { rebuildInterior() },
             events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
@@ -55,7 +55,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 }
             },
         )
-        val errorRemover = teachingTransformer.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
+        val errorRemover = tinyLanguageModel.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
         // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
         events.deleted.on(Dispatchers.Default) {
             subscriptions.forEach(Job::cancel)
@@ -66,17 +66,17 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         pullLocationFromModel()
     }
 
-    override val model: NetworkModel get() = teachingTransformer
+    override val model: NetworkModel get() = tinyLanguageModel
 
     override val isDraggable = true
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
-        teachingTransformer.location =
-            Point2D.Double(teachingTransformer.location.x + dx, teachingTransformer.location.y + dy)
+        tinyLanguageModel.location =
+            Point2D.Double(tinyLanguageModel.location.x + dx, tinyLanguageModel.location.y + dy)
     }
 
     private fun pullLocationFromModel() {
-        setOffset(teachingTransformer.location.x, teachingTransformer.location.y)
+        setOffset(tinyLanguageModel.location.x, tinyLanguageModel.location.y)
     }
 
     override fun isIntersecting(bound: PBounds?): Boolean = interactionBox.isIntersecting(bound)
@@ -84,12 +84,12 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
     private fun rebuildInterior() {
         compositorNode?.removeFromParent()
         compositorNode = CompositorNode(
-            teachingTransformer.scene,
+            tinyLanguageModel.scene,
             networkPanel.canvas,
-            tokenLabel = { id -> teachingTransformer.tokenLabels?.getOrNull(id)?.let { "“$it”" } ?: "#$id" },
+            tokenLabel = { id -> tinyLanguageModel.tokenLabels?.getOrNull(id)?.let { "“$it”" } ?: "#$id" },
             probabilitySnapshot = {
-                teachingTransformer.tokenProbabilitySnapshot
-                    ?: teachingTransformer.tokenLabels?.let { TokenProbabilitySnapshot.full(DoubleArray(it.size), -1) }
+                tinyLanguageModel.tokenProbabilitySnapshot
+                    ?: tinyLanguageModel.tokenLabels?.let { TokenProbabilitySnapshot.full(DoubleArray(it.size), -1) }
             },
             probabilityCardStyle = TokenProbabilityCardStyle(
                 title = "current-position token probabilities",
@@ -99,7 +99,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 visibleRows = 5,
             ),
             probabilityCardPosition = { scene, bounds, card ->
-                teachingTransformer.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) } ?: run {
+                tinyLanguageModel.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) } ?: run {
                     // Top of the diagram, centered in the open space right of the spine.
                     val probs = scene.tile("probs")
                     val left = probs.x + probs.width + 40.0
@@ -107,12 +107,12 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                     Point2D.Double(x, probs.y)
                 }
             },
-            onProbabilityCardMoved = { x, y -> teachingTransformer.probabilityCardLayout = doubleArrayOf(x, y) },
+            onProbabilityCardMoved = { x, y -> tinyLanguageModel.probabilityCardLayout = doubleArrayOf(x, y) },
             lensSpace = 120.0,
             isPanMode = { networkPanel.mouseCursor == MouseEventHandler.MouseCursor.Pan },
         ).also {
             it.onLayoutChanged = {
-                teachingTransformer.captureViewState()
+                tinyLanguageModel.captureViewState()
                 positionInteractionBox()
             }
             addChild(it)
@@ -155,19 +155,19 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         refreshView()
     }.apply { isRepeats = false }
 
-    private fun flashStepNotice(refusal: TeachingTransformer.StepRefusal) {
+    private fun flashStepNotice(refusal: TinyLanguageModel.StepRefusal) {
         stepNotice = when (refusal) {
-            TeachingTransformer.StepRefusal.TRAINING_WALK_IN_PROGRESS ->
+            TinyLanguageModel.StepRefusal.TRAINING_WALK_IN_PROGRESS ->
                 "a training walk is under way — step it (b) or finish it (shift-b) first"
-            TeachingTransformer.StepRefusal.FORWARD_WALK_IN_PROGRESS ->
+            TinyLanguageModel.StepRefusal.FORWARD_WALK_IN_PROGRESS ->
                 "a forward walk is under way — step it (f) or finish it (shift-b) first"
-            TeachingTransformer.StepRefusal.EMPTY_CONTEXT ->
+            TinyLanguageModel.StepRefusal.EMPTY_CONTEXT ->
                 "the context window is empty — nothing to run forward"
-            TeachingTransformer.StepRefusal.NO_TRAINING_WINDOWS ->
+            TinyLanguageModel.StepRefusal.NO_TRAINING_WINDOWS ->
                 "no training corpus — nothing to train on"
-            TeachingTransformer.StepRefusal.NO_WALK_IN_PROGRESS ->
+            TinyLanguageModel.StepRefusal.NO_WALK_IN_PROGRESS ->
                 "no walk under way — start one with f (forward pass) or b (training)"
-            TeachingTransformer.StepRefusal.TRAINER_RUNNING ->
+            TinyLanguageModel.StepRefusal.TRAINER_RUNNING ->
                 "training is running — stop it before stepping ops"
         }
         stepNoticeTimer.restart()
@@ -175,19 +175,19 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
     }
 
     private fun refreshView() {
-        val model = teachingTransformer.model
+        val model = tinyLanguageModel.model
         val notice = stepNotice
         compositorNode?.syncStepState(
-            teachingTransformer.pendingOp(),
-            teachingTransformer.scene.staleTiles(model.plan.cursor),
-            notice ?: teachingTransformer.stepStatusText(),
+            tinyLanguageModel.pendingOp(),
+            tinyLanguageModel.scene.staleTiles(model.plan.cursor),
+            notice ?: tinyLanguageModel.stepStatusText(),
             notice != null,
         )
         compositorNode?.refreshDirtyTiles()
     }
 
     override val propertyDialog: StandardDialog
-        get() = teachingTransformer.createEditorDialog("Edit ${teachingTransformer.displayName}")
+        get() = tinyLanguageModel.createEditorDialog("Edit ${tinyLanguageModel.displayName}")
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -201,10 +201,10 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
                 name = "Rename...",
                 description = "Set the label shown on the model's header box",
             ) {
-                showInputDialog("Name:", teachingTransformer.label)?.let { teachingTransformer.label = it }
+                showInputDialog("Name:", tinyLanguageModel.label)?.let { tinyLanguageModel.label = it }
             })
             add(createAction(
-                name = "Edit ${teachingTransformer.displayName}...",
+                name = "Edit ${tinyLanguageModel.displayName}...",
                 description = "Set the learning rate, sampling, and diagram scale",
             ) { propertyDialog.display() })
             add(createAction(
@@ -215,32 +215,32 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
             add(networkPanel.networkActions.stepTransformerForwardOpAction)
             add(networkPanel.networkActions.stepTransformerTrainingOpAction)
             add(JMenuItem(networkPanel.networkActions.finishTransformerStepWalkAction).apply {
-                isEnabled = teachingTransformer.stepWalkInProgress
+                isEnabled = tinyLanguageModel.stepWalkInProgress
             })
             addSeparator()
             add(createAction(
                 name = "Clear context window",
                 description = "Empty the window; a coupled non-empty document restores " +
                     "itself on the next play, so clear the document too for a full reset",
-            ) { teachingTransformer.clearWindow() })
+            ) { tinyLanguageModel.clearWindow() })
             addSeparator()
-            add(JCheckBoxMenuItem("Show last training gradients", teachingTransformer.gradientView).apply {
-                isEnabled = teachingTransformer.hasGradients
+            add(JCheckBoxMenuItem("Show last training gradients", tinyLanguageModel.gradientView).apply {
+                isEnabled = tinyLanguageModel.hasGradients
                 toolTipText = "Swap each tile to the gradients its last backward pass wrote; tiles " +
                     "without gradients keep their forward values. Switches itself on for the backward " +
                     "half of a training walk and back off when the context returns. Available once a " +
                     "training step has run"
                 addActionListener {
-                    teachingTransformer.gradientView = isSelected
+                    tinyLanguageModel.gradientView = isSelected
                     refreshView()
                 }
             })
             addSeparator()
-            add(networkPanel.networkComponent.createCouplingMenu(teachingTransformer))
+            add(networkPanel.networkComponent.createCouplingMenu(tinyLanguageModel))
         }
 
     private fun trainingDialog(): StandardDialog {
-        val trainer = teachingTransformer.trainer
+        val trainer = tinyLanguageModel.trainer
         val iterationsLabel = JLabel("Iterations: ${trainer.iteration}")
         val lossLabel = JLabel("Loss: ${trainer.lastTrainingError.roundToString(4)}")
         val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
@@ -285,7 +285,7 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         }
 
         val parentWindow = SwingUtilities.getWindowAncestor(networkPanel)
-        return StandardDialog(parentWindow as? JFrame, "Train ${teachingTransformer.displayName}").apply {
+        return StandardDialog(parentWindow as? JFrame, "Train ${tinyLanguageModel.displayName}").apply {
             contentPane = panel
             isModal = true
             isAlwaysOnTop = false
@@ -303,12 +303,12 @@ class TeachingTransformerNode(networkPanel: NetworkPanel, val teachingTransforme
         compositorNode?.refreshTheme()
     }
 
-    private inner class TeachingTransformerInteractionBox(net: NetworkPanel) : InteractionBox(net) {
+    private inner class TinyLanguageModelInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
-        override val contextMenu: JPopupMenu get() = this@TeachingTransformerNode.contextMenu
+        override val contextMenu: JPopupMenu get() = this@TinyLanguageModelNode.contextMenu
 
         override val propertyDialog: StandardDialog get() = trainingDialog()
 
-        override val model: NetworkModel get() = this@TeachingTransformerNode.teachingTransformer
+        override val model: NetworkModel get() = this@TinyLanguageModelNode.tinyLanguageModel
     }
 }

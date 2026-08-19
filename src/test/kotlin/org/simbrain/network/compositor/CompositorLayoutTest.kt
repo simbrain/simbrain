@@ -3,13 +3,13 @@ package org.simbrain.network.compositor
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.network.llm.TeachingTransformerConfig
-import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.llm.TinyLmConfig
+import org.simbrain.network.llm.TinyLmModel
 
 class CompositorLayoutTest {
 
-    private fun scene(layers: Int = 1) = TeachingCompositor.buildScene(TeachingTransformerModel(
-        TeachingTransformerConfig(
+    private fun scene(layers: Int = 1) = TinyLmCompositor.buildScene(TinyLmModel(
+        TinyLmConfig(
             contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = layers
         )
     ))
@@ -103,10 +103,10 @@ class CompositorLayoutTest {
 
     @Test
     fun `diagram scale shrinks tiles but keeps the fixed-size lens and label room`() {
-        val model = TeachingTransformerModel(TeachingTransformerConfig(
+        val model = TinyLmModel(TinyLmConfig(
             contextSize = 5, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 7, numLayers = 1
         ))
-        val scene = TeachingCompositor.buildScene(model, scale = 0.5)
+        val scene = TinyLmCompositor.buildScene(model, scale = 0.5)
         val resid0 = scene.tile("resid0")
         assertEquals(85.0, resid0.width, 1e-9, "tile geometry scales")
         assertEquals(60.0, resid0.height, 1e-9)

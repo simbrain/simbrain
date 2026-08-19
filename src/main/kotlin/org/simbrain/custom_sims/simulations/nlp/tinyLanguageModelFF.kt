@@ -21,7 +21,7 @@ import kotlin.math.min
  */
 val tinyLanguageModelFF = newSim {
 
-    val options = TinyLanguageModelOptions(false).showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    val options = TinyLmSimOptions(false).showAPEOptionDialog("Tiny Language Model") ?: return@newSim
 
     workspace.clearWorkspace()
 

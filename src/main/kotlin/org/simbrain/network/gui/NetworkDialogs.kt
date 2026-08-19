@@ -14,7 +14,7 @@ import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.llm.LanguageModel
-import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
@@ -275,14 +275,14 @@ private fun NetworkPanel.addLanguageModel(languageModel: LanguageModel) {
     )
 }
 
-fun NetworkPanel.showTeachingTransformerCreationDialog() {
-    TeachingTransformer.CreationTemplate().createEditorDialog("Create Teaching Transformer") { template ->
-        val teachingTransformer = template.create()
-        network.addNetworkModelAsync(teachingTransformer)
+fun NetworkPanel.showTinyLanguageModelCreationDialog() {
+    TinyLanguageModel.CreationTemplate().createEditorDialog("Create Tiny Language Model") { template ->
+        val tinyLanguageModel = template.create()
+        network.addNetworkModelAsync(tinyLanguageModel)
         undoManager.addUndoableAction(
-            description = "Add teaching transformer ${teachingTransformer.id}",
-            undo = { teachingTransformer.delete() },
-            redo = { network.addNetworkModel(teachingTransformer, usePlacementManager = false, useAutoAssignedId = false) }
+            description = "Add tiny language model ${tinyLanguageModel.id}",
+            undo = { tinyLanguageModel.delete() },
+            redo = { network.addNetworkModel(tinyLanguageModel, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.display()
 }

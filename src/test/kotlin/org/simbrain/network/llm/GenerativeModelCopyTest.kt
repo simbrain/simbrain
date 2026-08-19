@@ -12,27 +12,27 @@ import org.simbrain.network.trainers.SamplingStrategy
 
 class GenerativeModelCopyTest {
 
-    private fun trainedTransformer(): TeachingTransformer {
-        val transformer = TeachingTransformer(TeachingTransformerConfig(
+    private fun trainedTransformer(): TinyLanguageModel {
+        val languageModel = TinyLanguageModel(TinyLmConfig(
             contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = 1
         ))
-        transformer.tokenLabels = ArrayList(listOf("a", "b", "c", "d", "e"))
-        transformer.setCorpus(IntArray(40) { it % 5 }, IntArray(20) { it % 5 })
+        languageModel.tokenLabels = ArrayList(listOf("a", "b", "c", "d", "e"))
+        languageModel.setCorpus(IntArray(40) { it % 5 }, IntArray(20) { it % 5 })
         val tokens = intArrayOf(0, 1, 2, 3, 4, 0)
         val targets = intArrayOf(1, 2, 3, 4, 0, 1)
-        repeat(5) { transformer.model.trainStep(tokens, targets) }
-        transformer.setContext(intArrayOf(2, 3, 4))
-        transformer.learningRate = 0.005
-        transformer.samplingTemperature = 0.5
-        transformer.samplingStrategy = SamplingStrategy.TopK(3)
-        transformer.scene.tiles.filterIsInstance<DeckTile>().first().selectedSlice = 2
-        transformer.gradientView = true
-        transformer.label = "Trained twin"
-        return transformer
+        repeat(5) { languageModel.model.trainStep(tokens, targets) }
+        languageModel.setContext(intArrayOf(2, 3, 4))
+        languageModel.learningRate = 0.005
+        languageModel.samplingTemperature = 0.5
+        languageModel.samplingStrategy = SamplingStrategy.TopK(3)
+        languageModel.scene.tiles.filterIsInstance<DeckTile>().first().selectedSlice = 2
+        languageModel.gradientView = true
+        languageModel.label = "Trained twin"
+        return languageModel
     }
 
     @Test
-    fun `teaching transformer copy carries the trained parameters and full state`() {
+    fun `tiny language model copy carries the trained parameters and full state`() {
         val original = trainedTransformer()
         val copy = original.copy()
 
@@ -59,7 +59,7 @@ class GenerativeModelCopyTest {
     }
 
     @Test
-    fun `teaching transformer copy trains independently of the original`() {
+    fun `tiny language model copy trains independently of the original`() {
         val original = trainedTransformer()
         val copy = original.copy()
 

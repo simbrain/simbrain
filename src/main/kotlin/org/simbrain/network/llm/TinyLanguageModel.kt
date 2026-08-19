@@ -2,7 +2,7 @@ package org.simbrain.network.llm
 
 import org.simbrain.network.compositor.CompositorScene
 import org.simbrain.network.compositor.DeckTile
-import org.simbrain.network.compositor.TeachingCompositor
+import org.simbrain.network.compositor.TinyLmCompositor
 import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkDebugInfoProvider
@@ -22,7 +22,7 @@ import kotlin.collections.ArrayDeque
 import kotlin.math.sqrt
 import kotlin.random.Random
 
-data class TeachingTransformerConfig(
+data class TinyLmConfig(
     val contextSize: Int = 24,
     val embedDim: Int = 20,
     val numHeads: Int = 4,
@@ -39,7 +39,7 @@ data class TeachingTransformerConfig(
 }
 
 /**
- * Headless GPT-style teaching transformer, expressed as one explicit [OpPlan] spanning
+ * Headless GPT-style tiny language model, expressed as one explicit [OpPlan] spanning
  * embed -> (attention -> MLP) x numLayers -> unembed -> sequence cross-entropy. There is no
  * block class: a "layer" is a `layers.<l>.*` range of port names, so [org.simbrain.network.tensor.op.OpPlan.cursor]
  * micro-steps the whole model and one [Tape] records the full loss-to-param path.
@@ -49,7 +49,7 @@ data class TeachingTransformerConfig(
  * residuals: the residual trunk is a pure identity path (the visual spine's skip connection);
  * layer norm sits at the entry of each attention/MLP limb.
  */
-class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long = 42L) {
+class TinyLmModel(val config: TinyLmConfig, seed: Long = 42L) {
 
     private val rng = Random(seed)
 
@@ -306,15 +306,15 @@ class TeachingTransformerModel(val config: TeachingTransformerConfig, seed: Long
     }
 }
 
-class TeachingTransformerEvents : LocationEvents() {
+class TinyLanguageModelEvents : LocationEvents() {
     val modelRebuilt = NoArgEvent()
 
     /** A step request declined, with why — the GUI surfaces the reason as a transient notice. */
-    val stepRefused = OneArgEvent<TeachingTransformer.StepRefusal>()
+    val stepRefused = OneArgEvent<TinyLanguageModel.StepRefusal>()
 }
 
 /**
- * The teaching transformer on the network canvas: wraps the headless [TeachingTransformerModel],
+ * The tiny language model on the network canvas: wraps the headless [TinyLmModel],
  * its [TapeTrainer], and the compositor spine scene. Each network update runs a full forward pass
  * on the current context, so the workspace drives generation while the interior shows the whole
  * computation.
@@ -328,15 +328,15 @@ class TeachingTransformerEvents : LocationEvents() {
  * word-level vocabulary: text maps through [tokenizer] and [tokenLabels], and words outside
  * the vocabulary are dropped.
  */
-class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(), NetworkDebugInfoProvider {
+class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), NetworkDebugInfoProvider {
 
     override val displayTokenizer: Tokenizer<*>
         get() = tokenizer
 
-    var config: TeachingTransformerConfig = TeachingTransformerConfig()
+    var config: TinyLmConfig = TinyLmConfig()
         private set
 
-    var model: TeachingTransformerModel = TeachingTransformerModel(config)
+    var model: TinyLmModel = TinyLmModel(config)
         private set
 
     /** Vocabulary index to token string, for lens readouts and status text. */
@@ -460,11 +460,11 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     var probabilityCardLayout: DoubleArray? = null
 
     @Transient
-    override var events: TeachingTransformerEvents = TeachingTransformerEvents()
+    override var events: TinyLanguageModelEvents = TinyLanguageModelEvents()
         private set
 
     @Transient
-    var scene: CompositorScene = TeachingCompositor.buildScene(model)
+    var scene: CompositorScene = TinyLmCompositor.buildScene(model)
         private set
 
     @Transient
@@ -496,7 +496,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     var tokenProbabilitySnapshot: TokenProbabilitySnapshot? = null
         private set
 
-    constructor(config: TeachingTransformerConfig) : this() {
+    constructor(config: TinyLmConfig) : this() {
         this.config = config
         rebuildRuntime(null)
     }
@@ -505,7 +505,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
 
     /** Rebuilds the headless model, trainer, and scene — after deserialization or a config change. */
     private fun rebuildRuntime(weights: Map<String, FloatArray>?) {
-        model = TeachingTransformerModel(config)
+        model = TinyLmModel(config)
         weights?.forEach { (name, values) ->
             model.params[name]?.tensor?.takeIf { it.size == values.size }?.copyFrom(values)
         }
@@ -523,7 +523,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     private fun rebuildScene() {
-        scene = TeachingCompositor.buildScene(model, scale = diagramScale)
+        scene = TinyLmCompositor.buildScene(model, scale = diagramScale)
         appliedDiagramScale = diagramScale
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
@@ -552,7 +552,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     override fun appendNetworkDebugInfo(builder: StringBuilder, indent: String) {
-        builder.appendLine("${indent}Transformer: context=${config.contextSize}, embedding=${config.embedDim}, " +
+        builder.appendLine("${indent}Model: context=${config.contextSize}, embedding=${config.embedDim}, " +
             "heads=${config.numHeads}, layers=${config.numLayers}, hidden=${config.hiddenDim}, vocabulary=${config.vocabSize}")
         builder.appendLine("${indent}Interior tiles (${scene.tiles.size}):")
         scene.tiles.forEach { tile ->
@@ -572,7 +572,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
      * the settings and view state — everything serialization would carry. The copy trains and
      * generates independently of the original from the moment it is made.
      */
-    fun copy(): TeachingTransformer = TeachingTransformer(config).also { copy ->
+    fun copy(): TinyLanguageModel = TinyLanguageModel(config).also { copy ->
         synchronized(model) {
             model.params.forEach { (name, port) ->
                 copy.model.params[name]?.tensor?.copyFrom(port.tensor.toFloatArray())
@@ -776,7 +776,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     fun stepTrainingOp(): TensorOp? = synchronized(model) {
-        if (model.stepPhase == TeachingTransformerModel.StepPhase.IDLE) {
+        if (model.stepPhase == TinyLmModel.StepPhase.IDLE) {
             // Walk-start guards only: finishStepWalk drains via this method, so a mid-walk
             // refusal would loop forever.
             if (trainer.isRunning) {
@@ -804,7 +804,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
             model.beginSteppedTrainStep(tokens, targets)
         }
         val op = model.stepOp()
-        if (model.stepPhase == TeachingTransformerModel.StepPhase.BACKWARD) autoGradientView(true)
+        if (model.stepPhase == TinyLmModel.StepPhase.BACKWARD) autoGradientView(true)
         scene.lens?.sourceRow = config.contextSize - 1
         scene.publish(config.contextSize - 1)
         events.updated.fire()
@@ -813,7 +813,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
 
     /** Advances a plain forward pass on the current context by one op. */
     fun stepInferenceOp(): TensorOp? = synchronized(model) {
-        if (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) {
+        if (model.stepPhase != TinyLmModel.StepPhase.IDLE) {
             events.stepRefused.fire(StepRefusal.TRAINING_WALK_IN_PROGRESS)
             return null
         }
@@ -843,7 +843,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
             events.stepRefused.fire(StepRefusal.NO_WALK_IN_PROGRESS)
             return
         }
-        while (model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) stepTrainingOp()
+        while (model.stepPhase != TinyLmModel.StepPhase.IDLE) stepTrainingOp()
         while (model.plan.cursor != 0) stepInferenceOp()
     }
 
@@ -878,11 +878,11 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         } else "context"
         val opCount = model.plan.ops.size
         return when (model.stepPhase) {
-            TeachingTransformerModel.StepPhase.FORWARD ->
+            TinyLmModel.StepPhase.FORWARD ->
                 "$source — forward op ${model.plan.cursor + 1}/$opCount"
-            TeachingTransformerModel.StepPhase.BACKWARD ->
+            TinyLmModel.StepPhase.BACKWARD ->
                 "$source — backward op ${model.tape.backwardStepNumber}/${model.tape.size}"
-            TeachingTransformerModel.StepPhase.IDLE -> when {
+            TinyLmModel.StepPhase.IDLE -> when {
                 model.plan.cursor != 0 -> "$source — forward op ${model.plan.cursor + 1}/$opCount"
                 sceneShowsTrainingWindow -> "$source — trained, weights updated"
                 else -> null
@@ -898,12 +898,12 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
     }
 
     fun readResolve(): Any {
-        events = TeachingTransformerEvents()
+        events = TinyLanguageModelEvents()
         return this
     }
 
     override fun toString(): String = buildString {
-        appendLine("Name: $displayName (teaching transformer)")
+        appendLine("Name: $displayName (tiny language model)")
         appendLine("Config: context ${config.contextSize}, embed ${config.embedDim}, " +
                 "${config.numHeads} heads, ${config.numLayers} layer(s), vocab ${config.vocabSize}")
         append("Trained iterations: ${trainer.iteration}")
@@ -929,7 +929,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
         @UserParameter(label = "Layers", description = "Transformer layers", order = 6)
         var numLayers = 1
 
-        fun create(): TeachingTransformer = TeachingTransformer(TeachingTransformerConfig(
+        fun create(): TinyLanguageModel = TinyLanguageModel(TinyLmConfig(
             contextSize = contextSize,
             embedDim = embedDim,
             numHeads = numHeads,
@@ -938,7 +938,7 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
             numLayers = numLayers,
         ))
 
-        override val name = "Teaching Transformer"
+        override val name = "Tiny Language Model"
     }
 
     companion object : WithXStreamPropertyConverter {
@@ -948,9 +948,9 @@ class TeachingTransformer @XStreamConstructor constructor() : GenerativeModel(),
          * captured live at marshal time; on unmarshal the runtime is rebuilt from the restored
          * config and the saved weights are copied back in.
          */
-        override val xStreamPropertyConverter = createXStreamPropertyConverter<TeachingTransformer>(
+        override val xStreamPropertyConverter = createXStreamPropertyConverter<TinyLanguageModel>(
             marshal = {
-                on(TeachingTransformer::model) { writer, _ ->
+                on(TinyLanguageModel::model) { writer, _ ->
                     writer.startNode("model")
                     params.forEach { (name, port) ->
                         writer.startNode("param")

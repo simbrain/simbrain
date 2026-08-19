@@ -10,9 +10,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.textworld.TextWorldComponent
 
-class TeachingTransformerGenerationTest {
+class TinyLanguageModelGenerationTest {
 
-    private fun model() = TeachingTransformer(TeachingTransformerConfig(
+    private fun model() = TinyLanguageModel(TinyLmConfig(
         contextSize = 6, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1,
     )).apply {
         tokenLabels = arrayListOf("the", "cat", "sat", "on", "mat", "dog")
@@ -20,86 +20,86 @@ class TeachingTransformerGenerationTest {
 
     @Test
     fun `injected text walks in one word per step then the model feeds back its own samples`() {
-        val transformer = model()
-        transformer.injectText("the cat sat")
-        assertTrue(transformer.canAdvance)
+        val languageModel = model()
+        languageModel.injectText("the cat sat")
+        assertTrue(languageModel.canAdvance)
 
-        transformer.step()
-        assertEquals(1, transformer.contextTokens.size)
-        assertEquals("", transformer.generatedToken, "walking the injected text is prefill")
-        transformer.step()
-        assertEquals("", transformer.generatedToken)
-        transformer.step()
-        assertEquals(3, transformer.contextTokens.size)
-        assertTrue(transformer.generatedToken.isNotEmpty(),
+        languageModel.step()
+        assertEquals(1, languageModel.contextTokens.size)
+        assertEquals("", languageModel.generatedToken, "walking the injected text is prefill")
+        languageModel.step()
+        assertEquals("", languageModel.generatedToken)
+        languageModel.step()
+        assertEquals(3, languageModel.contextTokens.size)
+        assertTrue(languageModel.generatedToken.isNotEmpty(),
             "the last injected word's prediction is accepted")
-        assertTrue(transformer.text.startsWith("the cat sat"))
-        assertEquals(4, transformer.text.split(" ").size)
+        assertTrue(languageModel.text.startsWith("the cat sat"))
+        assertEquals(4, languageModel.text.split(" ").size)
 
-        transformer.step()
-        assertEquals(4, transformer.contextTokens.size, "the accepted word slides into the context")
-        assertEquals(5, transformer.text.split(" ").size)
-        assertEquals(8, transformer.hiddenState.size)
+        languageModel.step()
+        assertEquals(4, languageModel.contextTokens.size, "the accepted word slides into the context")
+        assertEquals(5, languageModel.text.split(" ").size)
+        assertEquals(8, languageModel.hiddenState.size)
     }
 
     @Test
     fun `the context slides at capacity while the text keeps full history`() {
-        val transformer = model()
-        transformer.injectText("the cat sat")
-        repeat(12) { transformer.step() }
-        assertEquals(6, transformer.contextTokens.size, "context is capped at contextSize")
-        assertEquals(13, transformer.text.split(" ").size, "text keeps the whole run")
+        val languageModel = model()
+        languageModel.injectText("the cat sat")
+        repeat(12) { languageModel.step() }
+        assertEquals(6, languageModel.contextTokens.size, "context is capped at contextSize")
+        assertEquals(13, languageModel.text.split(" ").size, "text keeps the whole run")
     }
 
     @Test
     fun `words outside the vocabulary are dropped by the encoder`() {
-        val transformer = model()
-        assertEquals(2, transformer.encode("the ZORP cat").size)
-        assertEquals("the cat", transformer.decode(transformer.encode("the ZORP cat")))
+        val languageModel = model()
+        assertEquals(2, languageModel.encode("the ZORP cat").size)
+        assertEquals("the cat", languageModel.decode(languageModel.encode("the ZORP cat")))
     }
 
     @Test
     fun `injected text enters the context before sampling resumes`() {
-        val transformer = model()
-        transformer.injectText("the cat")
-        repeat(3) { transformer.step() }
+        val languageModel = model()
+        languageModel.injectText("the cat")
+        repeat(3) { languageModel.step() }
 
-        transformer.injectText("on the mat")
-        assertTrue(transformer.text.endsWith("on the mat"))
+        languageModel.injectText("on the mat")
+        assertTrue(languageModel.text.endsWith("on the mat"))
 
         repeat(3) {
-            transformer.step()
-            assertEquals("", transformer.generatedToken,
+            languageModel.step()
+            assertEquals("", languageModel.generatedToken,
                 "walking the unfed sample and injected words is prefill")
         }
-        transformer.step()
-        assertTrue(transformer.generatedToken.isNotEmpty(),
+        languageModel.step()
+        assertTrue(languageModel.generatedToken.isNotEmpty(),
             "the last injected word's prediction resumes generation")
     }
 
     @Test
     fun `an empty context waits for input instead of writing`() {
-        val transformer = TeachingTransformer(TeachingTransformerConfig(
+        val languageModel = TinyLanguageModel(TinyLmConfig(
             contextSize = 6, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1,
         ))
-        repeat(3) { transformer.step() }
-        assertFalse(transformer.canAdvance, "nothing to walk and nothing to continue")
-        assertTrue(transformer.waitingForInput)
-        assertEquals("", transformer.generatedToken)
-        assertEquals(0, transformer.hiddenState.size)
+        repeat(3) { languageModel.step() }
+        assertFalse(languageModel.canAdvance, "nothing to walk and nothing to continue")
+        assertTrue(languageModel.waitingForInput)
+        assertEquals("", languageModel.generatedToken)
+        assertEquals(0, languageModel.hiddenState.size)
     }
 
     @Test
     fun `context arriving through the document starts generation by itself`() {
-        val transformer = model()
-        assertTrue(transformer.waitingForInput)
+        val languageModel = model()
+        assertTrue(languageModel.waitingForInput)
 
-        transformer.contextWindow = "the cat"
-        assertFalse(transformer.waitingForInput)
-        transformer.step()
-        assertTrue(transformer.generatedToken.isNotEmpty(),
+        languageModel.contextWindow = "the cat"
+        assertFalse(languageModel.waitingForInput)
+        languageModel.step()
+        assertTrue(languageModel.generatedToken.isNotEmpty(),
             "the delivered context generates on the next step")
-        assertTrue(transformer.text.startsWith("the cat"))
+        assertTrue(languageModel.text.startsWith("the cat"))
     }
 
     @Test
@@ -111,26 +111,26 @@ class TeachingTransformerGenerationTest {
         workspace.addWorkspaceComponent(textWorldComponent)
         val world = textWorldComponent.world
 
-        val transformer = model()
-        runBlocking { network.addNetworkModel(transformer) }
+        val languageModel = model()
+        runBlocking { network.addNetworkModel(languageModel) }
         with(workspace.couplingManager) {
             createCoupling(
                 world.getProducer("getText"),
-                transformer.getConsumer("setContextWindow"),
+                languageModel.getConsumer("setContextWindow"),
             )
             createCoupling(
-                transformer.getProducer("getContextWindow"),
+                languageModel.getProducer("getContextWindow"),
                 world.getConsumer("setTextIfChanged"),
             )
         }
 
         repeat(2) { workspace.simpleIterate() }
-        assertTrue(transformer.waitingForInput, "an empty document leaves the model idling")
+        assertTrue(languageModel.waitingForInput, "an empty document leaves the model idling")
 
         world.text = "the cat sat"
         repeat(4) { workspace.simpleIterate() }
-        assertTrue(transformer.text.split(" ").size > 3,
-            "the typed prompt generates with no arming step, got: ${transformer.text}")
+        assertTrue(languageModel.text.split(" ").size > 3,
+            "the typed prompt generates with no arming step, got: ${languageModel.text}")
         assertTrue(world.text.startsWith("the cat sat"))
     }
 
@@ -143,34 +143,34 @@ class TeachingTransformerGenerationTest {
         workspace.addWorkspaceComponent(textWorldComponent)
         val world = textWorldComponent.world
 
-        val transformer = model()
-        runBlocking { network.addNetworkModel(transformer) }
+        val languageModel = model()
+        runBlocking { network.addNetworkModel(languageModel) }
         with(workspace.couplingManager) {
             createCoupling(
                 world.getProducer("getText"),
-                transformer.getConsumer("setContextWindow"),
+                languageModel.getConsumer("setContextWindow"),
             )
             createCoupling(
-                transformer.getProducer("getContextWindow"),
+                languageModel.getProducer("getContextWindow"),
                 world.getConsumer("setTextIfChanged"),
             )
         }
-        transformer.injectText("the cat sat")
+        languageModel.injectText("the cat sat")
 
         repeat(5) { workspace.simpleIterate() }
-        assertEquals(5, transformer.contextTokens.size,
+        assertEquals(5, languageModel.contextTokens.size,
             "echoes must never read as edits (an edit would replace the context)")
         assertTrue(world.text.startsWith("the cat sat"))
 
         world.text = "the mat"
         workspace.simpleIterate()
-        assertTrue(transformer.text.startsWith("the mat"),
-            "an edit replaces the context outright, got: ${transformer.text}")
+        assertTrue(languageModel.text.startsWith("the mat"),
+            "an edit replaces the context outright, got: ${languageModel.text}")
         assertTrue(world.text.startsWith("the mat"),
             "the producer publishes the rebuilt window, not the old one")
 
         repeat(3) { workspace.simpleIterate() }
-        assertTrue(transformer.text.split(" ").size > 2,
+        assertTrue(languageModel.text.split(" ").size > 2,
             "generation continues from the edited context")
     }
 
@@ -183,28 +183,28 @@ class TeachingTransformerGenerationTest {
         workspace.addWorkspaceComponent(textWorldComponent)
         val world = textWorldComponent.world
 
-        val transformer = model()
-        runBlocking { network.addNetworkModel(transformer) }
+        val languageModel = model()
+        runBlocking { network.addNetworkModel(languageModel) }
         with(workspace.couplingManager) {
             createCoupling(
                 world.getProducer("getText"),
-                transformer.getConsumer("setContextWindow"),
+                languageModel.getConsumer("setContextWindow"),
             )
             createCoupling(
-                transformer.getProducer("getContextWindow"),
+                languageModel.getProducer("getContextWindow"),
                 world.getConsumer("setTextIfChanged"),
             )
         }
 
         world.text = "the cat sat"
         repeat(3) { workspace.simpleIterate() }
-        assertTrue(transformer.contextTokens.isNotEmpty())
+        assertTrue(languageModel.contextTokens.isNotEmpty())
 
         world.text = ""
         workspace.simpleIterate()
 
-        assertTrue(transformer.contextTokens.isEmpty())
-        assertTrue(transformer.waitingForInput)
+        assertTrue(languageModel.contextTokens.isEmpty())
+        assertTrue(languageModel.waitingForInput)
         assertEquals("", world.text)
     }
 }

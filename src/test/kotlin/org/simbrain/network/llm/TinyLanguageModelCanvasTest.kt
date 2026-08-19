@@ -14,9 +14,9 @@ import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getNetworkXStream
 
-class TeachingTransformerCanvasTest {
+class TinyLanguageModelCanvasTest {
 
-    private fun canvasModel(numLayers: Int = 1) = TeachingTransformer(TeachingTransformerConfig(
+    private fun canvasModel(numLayers: Int = 1) = TinyLanguageModel(TinyLmConfig(
         contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = numLayers
     ))
 
@@ -63,7 +63,7 @@ class TeachingTransformerCanvasTest {
         val trainedEmbed = teaching.model.params.getValue("embed.table").tensor.toFloatArray()
 
         val xml = getNetworkXStream().toXML(net)
-        val restored = (getNetworkXStream().fromXML(xml) as Network).getModels<TeachingTransformer>().first()
+        val restored = (getNetworkXStream().fromXML(xml) as Network).getModels<TinyLanguageModel>().first()
 
         assertEquals("TT", restored.label)
         assertEquals(6, restored.config.contextSize)
@@ -102,7 +102,7 @@ class TeachingTransformerCanvasTest {
         var steps = 0
         assertNotNull(teaching.stepTrainingOp())
         steps++
-        while (teaching.model.stepPhase != TeachingTransformerModel.StepPhase.IDLE) {
+        while (teaching.model.stepPhase != TinyLmModel.StepPhase.IDLE) {
             teaching.stepTrainingOp()
             steps++
         }
@@ -141,7 +141,7 @@ class TeachingTransformerCanvasTest {
 
         teaching.stepTrainingOp()
         assertEquals("training window 1/14 — forward op 2/$opCount", teaching.stepStatusText())
-        while (teaching.model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) teaching.stepTrainingOp()
+        while (teaching.model.stepPhase == TinyLmModel.StepPhase.FORWARD) teaching.stepTrainingOp()
         assertEquals("training window 1/14 — backward op 1/$opCount", teaching.stepStatusText())
         teaching.finishStepWalk()
         assertEquals("training window 1/14 — trained, weights updated", teaching.stepStatusText(),
@@ -192,7 +192,7 @@ class TeachingTransformerCanvasTest {
         teaching.stepTrainingOp()
         assertFalse(teaching.gradientView, "the forward half shows forward values")
         assertFalse(teaching.hasGradients, "the forward half hasn't written gradients yet")
-        while (teaching.model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) teaching.stepTrainingOp()
+        while (teaching.model.stepPhase == TinyLmModel.StepPhase.FORWARD) teaching.stepTrainingOp()
         assertTrue(teaching.gradientView, "the backward half swaps to gradients")
         assertTrue(teaching.hasGradients)
         teaching.finishStepWalk()
@@ -206,24 +206,24 @@ class TeachingTransformerCanvasTest {
     fun `refused steps explain themselves through the step refused event`() {
         val teaching = canvasModel()
         teaching.setCorpus(IntArray(20) { it % 5 })
-        val refusals = mutableListOf<TeachingTransformer.StepRefusal>()
+        val refusals = mutableListOf<TinyLanguageModel.StepRefusal>()
         teaching.events.stepRefused.on(Dispatchers.Unconfined) { refusals.add(it) }
 
         teaching.stepInferenceOp()
-        assertEquals(TeachingTransformer.StepRefusal.EMPTY_CONTEXT, refusals.last())
+        assertEquals(TinyLanguageModel.StepRefusal.EMPTY_CONTEXT, refusals.last())
 
         teaching.finishStepWalk()
-        assertEquals(TeachingTransformer.StepRefusal.NO_WALK_IN_PROGRESS, refusals.last())
+        assertEquals(TinyLanguageModel.StepRefusal.NO_WALK_IN_PROGRESS, refusals.last())
 
         teaching.setContext(intArrayOf(1, 2, 3))
         assertNotNull(teaching.stepInferenceOp())
         teaching.stepTrainingOp()
-        assertEquals(TeachingTransformer.StepRefusal.FORWARD_WALK_IN_PROGRESS, refusals.last())
+        assertEquals(TinyLanguageModel.StepRefusal.FORWARD_WALK_IN_PROGRESS, refusals.last())
 
         teaching.finishStepWalk()
         assertNotNull(teaching.stepTrainingOp())
         teaching.stepInferenceOp()
-        assertEquals(TeachingTransformer.StepRefusal.TRAINING_WALK_IN_PROGRESS, refusals.last())
+        assertEquals(TinyLanguageModel.StepRefusal.TRAINING_WALK_IN_PROGRESS, refusals.last())
         assertEquals(4, refusals.size, "successful steps fire nothing")
     }
 
@@ -233,7 +233,7 @@ class TeachingTransformerCanvasTest {
         teaching.setCorpus(IntArray(20) { it % 5 })
         teaching.setContext(intArrayOf(1, 2, 3))
         teaching.trainer.stoppingCondition.maxIterations = 100_000
-        val refusals = mutableListOf<TeachingTransformer.StepRefusal>()
+        val refusals = mutableListOf<TinyLanguageModel.StepRefusal>()
         teaching.events.stepRefused.on(Dispatchers.Unconfined) { refusals.add(it) }
 
         runBlocking { withTimeout(30_000) { teaching.trainer.startTraining() } }
@@ -241,7 +241,7 @@ class TeachingTransformerCanvasTest {
         assertNull(teaching.stepTrainingOp())
         assertNull(teaching.stepInferenceOp())
         assertEquals(
-            listOf(TeachingTransformer.StepRefusal.TRAINER_RUNNING, TeachingTransformer.StepRefusal.TRAINER_RUNNING),
+            listOf(TinyLanguageModel.StepRefusal.TRAINER_RUNNING, TinyLanguageModel.StepRefusal.TRAINER_RUNNING),
             refusals.takeLast(2)
         )
 

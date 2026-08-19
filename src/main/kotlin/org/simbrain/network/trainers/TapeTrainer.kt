@@ -9,16 +9,16 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
-import org.simbrain.network.llm.TeachingTransformerModel
+import org.simbrain.network.llm.TinyLmModel
 
 /**
- * Trainer for tape-backed op-plan models ([TeachingTransformerModel]): the same outer loop the
+ * Trainer for tape-backed op-plan models ([TinyLmModel]): the same outer loop the
  * classic [SupervisedTrainer] runs — serialized task queue, iteration counting, stopping
  * conditions, test cadence, [TrainerEvents] feeding the same plots and readouts — but the
  * per-iteration body is one epoch of tape train steps over token windows instead of Smile
  * backprop over flattened one-hot rows.
  */
-class TapeTrainer(val model: TeachingTransformerModel) : CoroutineScope {
+class TapeTrainer(val model: TinyLmModel) : CoroutineScope {
 
     val job = SupervisorJob()
 

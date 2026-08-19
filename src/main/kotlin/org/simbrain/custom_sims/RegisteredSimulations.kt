@@ -24,7 +24,7 @@ import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBal
 import org.simbrain.custom_sims.simulations.neuroscience.nematodeThermotaxis
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
-import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModel
+import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.custom_sims.simulations.psychology.*
@@ -113,7 +113,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("NETtalk") { nettalkComponentSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
-        item("Tiny Language Model") { tinyLanguageModel }
+        item("Tiny Language Model") { tinyLanguageModelSim }
         // The "(Beta)" prefix is deliberate (per Jeff): discoverable without the beta opt-in,
         // while still flagged as beta.
         item("(Beta) Pretrained Language Model (LFM2.5)") { lfm2LanguageModel }

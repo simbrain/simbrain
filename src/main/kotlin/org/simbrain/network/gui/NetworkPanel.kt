@@ -16,7 +16,7 @@ import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.llm.LanguageModel
-import org.simbrain.network.llm.TeachingTransformer
+import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
@@ -314,7 +314,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             is NeuronArray -> createNode(model)
             is ActivationSequence -> createNode(model)
             is LanguageModel -> createNode(model)
-            is TeachingTransformer -> createNode(model)
+            is TinyLanguageModel -> createNode(model)
             is NeuronCollection -> createNode(model)
             is SynapseGroup -> createNode(model)
             is TensorLayer -> createNode(model)
@@ -353,8 +353,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(languageModel: LanguageModel) = addScreenElement { LanguageModelNode(this, languageModel) }
 
-    suspend fun createNode(teachingTransformer: TeachingTransformer) =
-        addScreenElement { TeachingTransformerNode(this, teachingTransformer) }
+    suspend fun createNode(tinyLanguageModel: TinyLanguageModel) =
+        addScreenElement { TinyLanguageModelNode(this, tinyLanguageModel) }
 
     suspend fun createNode(classifier: ClassifierNetwork) = addScreenElement {
         SmileClassifierNode(this, classifier)

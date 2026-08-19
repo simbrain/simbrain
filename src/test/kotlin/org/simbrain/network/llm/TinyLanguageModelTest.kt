@@ -7,11 +7,11 @@ import org.simbrain.network.tensor.op.GradientCheck
 import org.simbrain.network.tensor.op.Tape
 import org.simbrain.network.tensor.op.Gradients
 
-class TeachingTransformerTest {
+class TinyLanguageModelTest {
 
     @Test
     fun `setting learningRate propagates to the trainer`() {
-        val teaching = TeachingTransformer(TeachingTransformerConfig(
+        val teaching = TinyLanguageModel(TinyLmConfig(
             contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 9, numLayers = 1
         ))
         teaching.learningRate = 0.02
@@ -20,7 +20,7 @@ class TeachingTransformerTest {
 
     @Test
     fun `whole plan is trainable and analytic gradients match finite differences`() {
-        val model = TeachingTransformerModel(TeachingTransformerConfig(
+        val model = TinyLmModel(TinyLmConfig(
             contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 10, vocabSize = 9, numLayers = 2
         ))
         assertTrue(model.plan.trainable, "every op on the loss path must have a VJP")
@@ -47,10 +47,10 @@ class TeachingTransformerTest {
 
     @Test
     fun `model overfits a tiny cyclic corpus and predicts its continuation`() {
-        val config = TeachingTransformerConfig(
+        val config = TinyLmConfig(
             contextSize = 6, embedDim = 12, numHeads = 3, hiddenDim = 16, vocabSize = 5, numLayers = 1
         )
-        val model = TeachingTransformerModel(config, seed = 7L)
+        val model = TinyLmModel(config, seed = 7L)
 
         val corpus = IntArray(40) { it % 5 }
         val windows = (0 until corpus.size - config.contextSize).map { start ->
@@ -83,17 +83,17 @@ class TeachingTransformerTest {
 
     @Test
     fun `stepped train step walks forward then backward then applies the optimizer`() {
-        val model = TeachingTransformerModel(TeachingTransformerConfig(
+        val model = TinyLmModel(TinyLmConfig(
             contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1
         ))
         val opCount = model.plan.ops.size
         val weightBefore = model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()
 
         model.beginSteppedTrainStep(intArrayOf(1, 2, 3, 4), intArrayOf(2, 3, 4, 5))
-        assertEquals(TeachingTransformerModel.StepPhase.FORWARD, model.stepPhase)
+        assertEquals(TinyLmModel.StepPhase.FORWARD, model.stepPhase)
 
         val forwardOps = mutableListOf<String>()
-        while (model.stepPhase == TeachingTransformerModel.StepPhase.FORWARD) {
+        while (model.stepPhase == TinyLmModel.StepPhase.FORWARD) {
             assertEquals(model.nextOp()!!.name, model.plan.ops[model.plan.cursor].name)
             forwardOps.add(model.stepOp().name)
         }
@@ -102,30 +102,30 @@ class TeachingTransformerTest {
         assertTrue(model.loss.tensor.data.get(0) > 0f, "forward completion produced a loss")
 
         val backwardOps = mutableListOf<String>()
-        while (model.stepPhase == TeachingTransformerModel.StepPhase.BACKWARD) {
+        while (model.stepPhase == TinyLmModel.StepPhase.BACKWARD) {
             backwardOps.add(model.stepOp().name)
         }
         assertEquals(forwardOps.reversed(), backwardOps, "backward visits the same ops in reverse")
-        assertEquals(TeachingTransformerModel.StepPhase.IDLE, model.stepPhase)
+        assertEquals(TinyLmModel.StepPhase.IDLE, model.stepPhase)
         assertTrue(!weightBefore.contentEquals(model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()),
             "completing the walk applied the Adam update")
     }
 
     @Test
     fun `stepped and atomic train steps produce the same loss trajectory`() {
-        val config = TeachingTransformerConfig(
+        val config = TinyLmConfig(
             contextSize = 4, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1
         )
         val tokens = intArrayOf(1, 2, 3, 4)
         val targets = intArrayOf(2, 3, 4, 5)
 
-        val atomic = TeachingTransformerModel(config, seed = 11L)
+        val atomic = TinyLmModel(config, seed = 11L)
         val atomicLosses = (0 until 3).map { atomic.trainStep(tokens, targets) }
 
-        val stepped = TeachingTransformerModel(config, seed = 11L)
+        val stepped = TinyLmModel(config, seed = 11L)
         val steppedLosses = (0 until 3).map {
             stepped.beginSteppedTrainStep(tokens, targets)
-            while (stepped.stepPhase != TeachingTransformerModel.StepPhase.IDLE) stepped.stepOp()
+            while (stepped.stepPhase != TinyLmModel.StepPhase.IDLE) stepped.stepOp()
             stepped.loss.tensor.data.get(0)
         }
         assertEquals(atomicLosses, steppedLosses)
@@ -133,7 +133,7 @@ class TeachingTransformerTest {
 
     @Test
     fun `short contexts pad with unsupervised positions and still produce a finite loss`() {
-        val model = TeachingTransformerModel(TeachingTransformerConfig(
+        val model = TinyLmModel(TinyLmConfig(
             contextSize = 8, embedDim = 8, numHeads = 2, hiddenDim = 8, vocabSize = 6, numLayers = 1
         ))
         model.setSample(intArrayOf(1, 2), intArrayOf(2, 3))

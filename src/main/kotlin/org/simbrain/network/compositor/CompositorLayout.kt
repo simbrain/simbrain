@@ -22,27 +22,61 @@ package org.simbrain.network.compositor
  */
 enum class VerticalFlow { TOP_TO_BOTTOM, BOTTOM_TO_TOP }
 
-enum class LayoutDensity { STANDARD, COMPACT }
+/**
+ * A gap that scales with the diagram but keeps a floor: labels, glyphs, and the lens strip stay
+ * at fixed point sizes, so a shrunken diagram still needs room for them.
+ */
+internal class Gap(val base: Double, val floor: Double) {
+    fun at(scale: Double) = (base * scale).coerceAtLeast(floor)
+}
+
+enum class LayoutDensity(
+    internal val rowGap: Gap,
+    internal val junctionGap: Gap,
+    internal val columnGap: Gap,
+    internal val stackGap: Gap,
+    internal val paramGap: Gap,
+    internal val interLimbGap: Gap,
+    internal val limbClearanceBase: Double,
+    internal val spineSatelliteClearance: Double,
+) {
+    STANDARD(
+        rowGap = Gap(90.0, floor = 70.0),
+        junctionGap = Gap(64.0, floor = 48.0),
+        columnGap = Gap(110.0, floor = 90.0),
+        stackGap = Gap(70.0, floor = 45.0),
+        paramGap = Gap(30.0, floor = 20.0),
+        interLimbGap = Gap(60.0, floor = 50.0),
+        limbClearanceBase = 220.0,
+        spineSatelliteClearance = 100.0,
+    ),
+    COMPACT(
+        rowGap = Gap(70.0, floor = 54.0),
+        junctionGap = Gap(52.0, floor = 42.0),
+        columnGap = Gap(85.0, floor = 70.0),
+        stackGap = Gap(50.0, floor = 36.0),
+        paramGap = Gap(24.0, floor = 20.0),
+        interLimbGap = Gap(45.0, floor = 36.0),
+        limbClearanceBase = 175.0,
+        spineSatelliteClearance = 70.0,
+    ),
+}
 
 class CompositorLayout(
     scale: Double = 1.0,
     private val spineAxisX: Double = 0.0,
     private val verticalFlow: VerticalFlow = VerticalFlow.TOP_TO_BOTTOM,
-    private val density: LayoutDensity = LayoutDensity.STANDARD,
+    density: LayoutDensity = LayoutDensity.STANDARD,
 ) {
 
-    private val compact get() = density == LayoutDensity.COMPACT
-
-    // Gaps scale with the diagram but keep floors: labels, glyphs, and the lens strip stay at
-    // fixed point sizes, so a shrunken diagram still needs room for them.
-    private val rowGap = ((if (compact) 70.0 else 90.0) * scale).coerceAtLeast(if (compact) 54.0 else 70.0)
-    private val junctionGap = ((if (compact) 52.0 else 64.0) * scale).coerceAtLeast(if (compact) 42.0 else 48.0)
-    private val columnGap = ((if (compact) 85.0 else 110.0) * scale).coerceAtLeast(if (compact) 70.0 else 90.0)
-    private val stackGap = ((if (compact) 50.0 else 70.0) * scale).coerceAtLeast(if (compact) 36.0 else 45.0)
-    private val limbClearance = (if (compact) 175.0 else 220.0) + 20.0 * scale
-    private val paramGap = ((if (compact) 24.0 else 30.0) * scale).coerceAtLeast(20.0)
-    private val interLimbGap = ((if (compact) 45.0 else 60.0) * scale).coerceAtLeast(if (compact) 36.0 else 50.0)
-    private val spineSatelliteClearance = if (compact) 70.0 else 100.0
+    private val rowGap = density.rowGap.at(scale)
+    private val junctionGap = density.junctionGap.at(scale)
+    private val columnGap = density.columnGap.at(scale)
+    private val stackGap = density.stackGap.at(scale)
+    private val limbClearance = density.limbClearanceBase + 20.0 * scale
+    private val paramGap = density.paramGap.at(scale)
+    private val interLimbGap = density.interLimbGap.at(scale)
+    private val spineSatelliteClearance = density.spineSatelliteClearance
     private val laneGap = LANE_GAP
     private val cellItemGap = (24.0 * scale).coerceAtLeast(18.0)
 

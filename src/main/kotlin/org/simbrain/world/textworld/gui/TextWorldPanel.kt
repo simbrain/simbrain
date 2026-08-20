@@ -67,6 +67,8 @@ class TextWorldPanel(
 
     private var restylePending = false
 
+    private var highlightUpdatePending = false
+
     private fun updateStatus() {
         val provided = world.statusMessageProvider?.invoke()
         val message = provided ?: if (runLocked) "Read-only while running" else null
@@ -151,7 +153,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
-                updateHighlights()
+                scheduleHighlightUpdate()
                 updateTokenCount()
                 updateStatus()
                 scheduleRestyle()
@@ -163,7 +165,7 @@ class TextWorldPanel(
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
                 world.setPosition(validPosition, false)
-                updateHighlights()
+                scheduleHighlightUpdate()
                 updateTokenCount()
                 updateStatus()
                 scheduleRestyle()
@@ -248,6 +250,22 @@ class TextWorldPanel(
         SwingUtilities.invokeLater {
             restylePending = false
             restyleDocument()
+        }
+    }
+
+    /**
+     * Rehighlights after the current document mutation completes. [updateHighlights] forces a
+     * text layout via modelToView, which cannot run from inside a document listener: the
+     * pane's views have not absorbed the edit yet, the stale layout throws, and the exception
+     * aborts the listener chain before the UI's own view updater runs, leaving the view tree
+     * permanently out of sync with the document.
+     */
+    private fun scheduleHighlightUpdate() {
+        if (highlightUpdatePending) return
+        highlightUpdatePending = true
+        SwingUtilities.invokeLater {
+            highlightUpdatePending = false
+            updateHighlights()
         }
     }
 

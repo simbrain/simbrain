@@ -892,24 +892,25 @@ class CompositorNode(
     }
 
     /**
-     * Slides a satellite along its curve away from the op's nominal slot until it stops
-     * overlapping already-placed tiles; when every pocket is blocked, settles for the candidate
-     * with the least overlap.
+     * Slides an edge-strung item (satellite tile or op glyph) along its curve away from its
+     * nominal slot until its [footprint] stops overlapping already-placed obstacles; when every
+     * pocket is blocked, settles for the candidate with the least overlap.
      */
-    private fun satelliteT(route: BezierRoute, tile: TensorTile, slotT: Double, obstacles: List<TensorTile>): Double {
+    private fun clearedT(
+        route: BezierRoute,
+        slotT: Double,
+        obstacles: List<Rectangle2D>,
+        footprint: (Point2D) -> Rectangle2D,
+    ): Double {
         var bestT = slotT
         var bestOverlap = Double.MAX_VALUE
-        for (offset in SATELLITE_NUDGES) {
+        for (offset in SLOT_NUDGES) {
             val t = slotT + offset
             if (t < 0.1 || t > 0.9) continue
-            val at = route.pointAt(t)
-            val box = Rectangle2D.Double(
-                at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
-                tile.width + 24, tile.height + 24
-            )
+            val box = footprint(route.pointAt(t))
             val overlap = obstacles.sumOf { o ->
-                val w = minOf(box.maxX, o.x + o.width) - maxOf(box.x, o.x)
-                val h = minOf(box.maxY, o.y + o.height) - maxOf(box.y, o.y)
+                val w = minOf(box.maxX, o.maxX) - maxOf(box.x, o.x)
+                val h = minOf(box.maxY, o.maxY) - maxOf(box.y, o.y)
                 if (w > 0 && h > 0) w * h else 0.0
             }
             if (overlap == 0.0) return t
@@ -921,6 +922,24 @@ class CompositorNode(
         return bestT
     }
 
+    /** The box a satellite [tile] would claim centered at [at], with breathing room. */
+    private fun satelliteFootprint(tile: TensorTile, at: Point2D) = Rectangle2D.Double(
+        at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
+        tile.width + 24, tile.height + 24
+    )
+
+    /** The box [op]'s glyph would claim centered at [at]: the stage strip plus its card fan. */
+    private fun glyphFootprint(op: TensorOp, at: Point2D): Rectangle2D {
+        val stages = glyphStages(op)
+        val halfWidth = GLYPH_RADIUS * (stages?.size?.toDouble() ?: 1.8)
+        val halfHeight = GLYPH_RADIUS * if (stages != null) 1.0 else 0.8
+        val fan = HEAD_STEP * (opParallelism(op) - 1)
+        return Rectangle2D.Double(
+            at.x - halfWidth - fan - GLYPH_CLEARANCE, at.y - halfHeight - fan - GLYPH_CLEARANCE,
+            2 * (halfWidth + GLYPH_CLEARANCE) + fan, 2 * (halfHeight + GLYPH_CLEARANCE) + fan
+        )
+    }
+
     private fun rebuildEdges() {
         val palette = NetworkTheme.current
         edgeLayer.removeAllChildren()
@@ -929,7 +948,8 @@ class CompositorNode(
         placeLooseVertices()
         val satellitesByEdge = scene.satellites.groupBy { it.edge }
         val satelliteTiles = scene.satellites.map { it.tile }.toSet()
-        val placedObstacles = scene.tiles.filter { it !in satelliteTiles }.toMutableList()
+        val placedObstacles = scene.tiles.filter { it !in satelliteTiles && scene.isShown(it) }
+            .map { it.bounds }.toMutableList()
         val badgedOps = tileNodes.mapNotNull { it.activationOp }.toSet()
         for (vertex in scene.opVertices) {
             if (!scene.isShown(vertex)) continue
@@ -1070,18 +1090,26 @@ class CompositorNode(
             for ((i, op) in visibleOps.withIndex()) {
                 val slotT = (i + 1).toDouble() / (visibleOps.size + 1)
                 val satellite = satellitesByOp[op]
-                val at = if (satellite != null) {
-                    route.pointAt(satelliteT(route, satellite.tile, slotT, placedObstacles))
-                } else {
-                    route.pointAt(slotT)
+                val makesGlyph = op !in glyphsByOp && (satellite != null || i in shownIndices)
+                // Both satellites and bare glyphs slide along their curve out from under tiles
+                // (and glyphs out from under already-placed glyphs), so no bead hides behind a
+                // node it merely routes past.
+                val at = when {
+                    satellite != null -> route.pointAt(
+                        clearedT(route, slotT, placedObstacles) { satelliteFootprint(satellite.tile, it) }
+                    )
+                    makesGlyph -> route.pointAt(
+                        clearedT(route, slotT, placedObstacles) { glyphFootprint(op, it) }
+                    )
+                    else -> route.pointAt(slotT)
                 }
                 if (satellite != null) {
                     satellite.tile.x = at.x - satellite.tile.width / 2
                     satellite.tile.y = at.y - satellite.tile.height / 2
-                    placedObstacles.add(satellite.tile)
+                    placedObstacles.add(satellite.tile.bounds)
                     tileNodesById.getValue(satellite.tile.id).syncLayout()
                 }
-                if (op !in glyphsByOp && (satellite != null || i in shownIndices)) {
+                if (makesGlyph) {
                     OpGlyphNode(op).apply {
                         if (satellite != null) {
                             setOffset(
@@ -1090,6 +1118,7 @@ class CompositorNode(
                             )
                         } else {
                             setOffset(at.x, at.y)
+                            placedObstacles.add(glyphFootprint(op, at))
                         }
                         if (edge.dimmed) transparency = DIM_TRANSPARENCY
                         glyphsByOp[op] = this
@@ -1346,6 +1375,9 @@ class CompositorNode(
         private const val PAGER_ARROW = 7.0
         private const val TICK_LENGTH = 4.0
         private const val GLYPH_RADIUS = 9.0
+
+        /** Padding around a glyph's footprint when nudging it clear of tiles along its edge. */
+        private const val GLYPH_CLEARANCE = 4.0
         private const val OP_GLYPH_GAP = 3.0
         private const val OP_RING_PAD = 3.0
         private const val GLYPH_ICON = 12.0
@@ -1356,7 +1388,7 @@ class CompositorNode(
         private const val LIVE_MARKER_SIZE = 6.0
         private const val RIBBON_THICKNESS = 5f
         private val TIP_LENGTH = RIBBON_THICKNESS * 2 * sin60deg
-        private val SATELLITE_NUDGES = doubleArrayOf(0.0) +
+        private val SLOT_NUDGES = doubleArrayOf(0.0) +
             (1..7).flatMap { listOf(-it * 0.06, it * 0.06) }.toDoubleArray()
     }
 }

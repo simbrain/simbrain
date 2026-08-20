@@ -450,4 +450,44 @@ class LanguageModelTest {
         assertEquals(123.0, scene.tile("embed").x)
         assertEquals(456.0, scene.tile("embed").y)
     }
+
+    @Test
+    fun `streaming decode withholds incomplete multi-byte characters until they complete`() {
+        val dir = assumeOrRequireWeights()
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
+        languageModel.initialText = "The capital"
+        languageModel.stopAtEndOfText = false
+        languageModel.loadWeights()
+        val emojiIds = languageModel.loaded!!.tokenizer.encode("😀", addSpecials = false)
+        assertTrue(emojiIds.size > 1, "byte-level BPE splits an emoji across tokens")
+
+        // The step that drains the feed queue commits its own sample, so the override scripts
+        // the emoji's byte tokens starting from that step.
+        var scripted = 0
+        languageModel.sampleOverride = { emojiIds[scripted.coerceAtMost(emojiIds.lastIndex)] }
+        while (languageModel.isPromptProcessing) languageModel.step()
+        scripted++
+        val windowAfterFirst = languageModel.contextWindow
+
+        assertEquals("", languageModel.generatedToken, "mid-character token emits nothing")
+        assertFalse(windowAfterFirst.contains('\uFFFD'), "no replacement characters rendered")
+
+        while (scripted < emojiIds.size - 1) {
+            languageModel.step()
+            scripted++
+            assertEquals("", languageModel.generatedToken)
+            assertEquals(windowAfterFirst, languageModel.contextWindow, "window unchanged mid-character")
+            assertTrue(languageModel.currentTokenSpan.isEmpty(), "nothing rendered to highlight yet")
+        }
+
+        languageModel.step()
+        assertEquals("😀", languageModel.generatedToken, "completed character emitted whole")
+        assertTrue(languageModel.contextWindow.endsWith("😀"))
+        assertFalse(languageModel.contextWindow.contains('\uFFFD'))
+        assertTrue(languageModel.text.endsWith("😀"))
+        val span = languageModel.currentTokenSpan
+        assertEquals(2, span[1] - span[0], "span covers the whole surrogate pair")
+        assertEquals(languageModel.contextWindow.length, span[1])
+    }
 }

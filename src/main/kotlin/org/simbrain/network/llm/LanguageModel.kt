@@ -466,10 +466,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
                     answerToolCalls(state, calls)
                 }
             } else {
-                lastGenerated = state.tokenizer.decode(
-                    intArrayOf(sampledToken),
-                    skipSpecials = promptMode == PromptMode.CHAT,
-                )
+                // Delta of successive whole-window decodes, not a single-token decode: a
+                // byte-fallback token holding part of a multi-byte character decodes alone to
+                // replacement characters. The delta emits nothing while a character is
+                // incomplete and the whole character once its last byte lands.
+                val skipSpecials = promptMode == PromptMode.CHAT
+                val ids = windowIds.toIntArray()
+                val before = state.tokenizer.decode(ids.copyOf(ids.size - 1), skipSpecials)
+                    .withoutIncompleteTail()
+                val after = state.tokenizer.decode(ids, skipSpecials).withoutIncompleteTail()
+                lastGenerated = if (after.length > before.length) after.substring(before.length) else ""
                 text += lastGenerated
                 generatedCount++
             }
@@ -481,14 +487,18 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
     /**
      * Char range of the [index]th window token in [windowText]'s coordinates, computed from
      * prefix decode lengths so special tokens and byte-level merges land exactly where the
-     * synced document renders them.
+     * synced document renders them. Prefix decodes are trimmed like [windowText], keeping the
+     * coordinates aligned: a token ending mid-character gets an empty span (the character is
+     * not rendered yet), and the token completing it spans the whole character.
      */
     private fun tokenSpan(index: Int): IntArray {
         val state = loaded ?: return IntArray(0)
         if (index < 0 || index >= windowIds.size) return IntArray(0)
         val start = if (index == 0) 0
-            else state.tokenizer.decode(windowIds.subList(0, index).toIntArray()).length
-        val end = state.tokenizer.decode(windowIds.subList(0, index + 1).toIntArray()).length
+            else state.tokenizer.decode(windowIds.subList(0, index).toIntArray())
+                .withoutIncompleteTail().length
+        val end = state.tokenizer.decode(windowIds.subList(0, index + 1).toIntArray())
+            .withoutIncompleteTail().length
         return if (end > start) intArrayOf(start, end) else IntArray(0)
     }
 
@@ -518,9 +528,16 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         generatedCount = 0
     }
 
-    /** The full committed token stream, decoded with specials kept — scaffolding included. */
+    /**
+     * The full committed token stream, decoded with specials kept — scaffolding included. A
+     * trailing incomplete multi-byte character (byte-fallback tokens still waiting for their
+     * remaining bytes) decodes to a replacement character; it is withheld until the character
+     * completes, so the synced document never shows a half-streamed character. Trimming here
+     * keeps publish and edit-detection consistent: both sides of [contextWindow] compare
+     * against the same text.
+     */
     override fun windowText(): String? =
-        loaded?.let { it.tokenizer.decode(windowIds.toIntArray()) }
+        loaded?.let { it.tokenizer.decode(windowIds.toIntArray()).withoutIncompleteTail() }
 
     /**
      * An edit rebuilds the context and requeues a watchable re-prefill, reusing the cached
@@ -740,3 +757,11 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         override val name = "Language Model"
     }
 }
+
+/**
+ * Drops the trailing replacement-character run an incomplete multi-byte character decodes to
+ * (the tokenizer's lossy UTF-8 collapses a truncated trailing sequence to one U+FFFD).
+ * Completed characters never decode to replacement characters, so only an in-flight tail is
+ * affected; a genuine trailing U+FFFD in the stream is hidden until any character follows it.
+ */
+private fun String.withoutIncompleteTail() = trimEnd('\uFFFD')

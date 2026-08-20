@@ -1,10 +1,18 @@
+/**
+ * The text world's document view: a [SimbrainTextPane] (plain Swing styled text, so emoji, RTL
+ * scripts and combining marks render — RSyntaxTextArea could not draw them) kept in two-way
+ * sync with [TextWorld.text], plus token/span highlighting, role/structure coloring via
+ * [applyDocumentStructureDisplay], and the status bar. Programmatic syncs replace the document
+ * wholesale and bypass undo; user edits flow back through setTextNoEvent and trigger a
+ * coalesced restyle.
+ */
 package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
-import org.simbrain.util.widgets.SimbrainTextArea
+import org.simbrain.util.widgets.SimbrainTextPane
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.extractEmbeddingFromCurrentText
 import org.simbrain.world.textworld.textWorldPrefs
@@ -36,7 +44,7 @@ class TextWorldPanel(
     /**
      * Text area for inputting text into networks.
      */
-    val textArea = SimbrainTextArea()
+    val textArea = SimbrainTextPane()
 
     /**
      * The main scroll panel.
@@ -56,6 +64,8 @@ class TextWorldPanel(
     private var runLocked = false
 
     private var updatingTextArea = false
+
+    private var restylePending = false
 
     private fun updateStatus() {
         val provided = world.statusMessageProvider?.invoke()
@@ -88,9 +98,8 @@ class TextWorldPanel(
     init {
 
         this.layout = BorderLayout()
-        textArea.lineWrap = true
-        textArea.text = world.text
-        textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+        textArea.replaceTextWithoutUndo(world.text)
+        restyleDocument()
         textArea.margin = Insets(6, 8, 8, 8)
         inputScrollPane =
             JScrollPane(textArea, JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_NEVER)
@@ -133,19 +142,11 @@ class TextWorldPanel(
         // directly in the area).
         textArea.document.addDocumentListener(object : DocumentListener {
             override fun changedUpdate(arg0: DocumentEvent) {
-                if (updatingTextArea) return
-                // System.out.println("readerworld: changedUpdate");
-                world.setTextNoEvent(textArea.text)
-                // Clamp caret position to valid range to avoid race condition
-                val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
-                world.setPosition(validPosition, false)
-                updateHighlights()
-                updateStatus()
+                // Attribute-only changes: all styling sweeps run through restyleDocument.
             }
 
             override fun insertUpdate(arg0: DocumentEvent) {
                 if (updatingTextArea) return
-                // System.out.println("readerworld: insertUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
@@ -153,11 +154,11 @@ class TextWorldPanel(
                 updateHighlights()
                 updateTokenCount()
                 updateStatus()
+                scheduleRestyle()
             }
 
             override fun removeUpdate(arg0: DocumentEvent) {
                 if (updatingTextArea) return
-                // System.out.println("readerworld: removeUpdate");
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
@@ -165,6 +166,7 @@ class TextWorldPanel(
                 updateHighlights()
                 updateTokenCount()
                 updateStatus()
+                scheduleRestyle()
             }
         })
 
@@ -182,13 +184,13 @@ class TextWorldPanel(
             if (textArea.text != world.text) {
                 updatingTextArea = true
                 try {
-                    textArea.text = world.text
+                    textArea.replaceTextWithoutUndo(world.text)
                 } finally {
                     updatingTextArea = false
                 }
             }
             textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
-            textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+            restyleDocument()
             updateHighlights()
             updateTokenCount()
             updateStatus()
@@ -217,6 +219,36 @@ class TextWorldPanel(
             updateTokenCount()
         }
 
+    }
+
+    /**
+     * Repaints the role/structure coloring over the whole document. Styling fires document
+     * change events and must stay out of both the world-sync listener and the undo history,
+     * so it runs guarded and with undo suspended. Also invoked on a live theme switch by
+     * [org.simbrain.workspace.gui.SimbrainDesktop], since the palette is theme-dependent.
+     */
+    fun restyleDocument() {
+        updatingTextArea = true
+        try {
+            textArea.withUndoSuspended {
+                textArea.applyDocumentStructureDisplay(world.documentStructureDisplay)
+            }
+        } finally {
+            updatingTextArea = false
+        }
+    }
+
+    /**
+     * Restyles after the current document mutation completes: attributes cannot be changed
+     * from inside a document listener, and rapid edits coalesce into one sweep.
+     */
+    private fun scheduleRestyle() {
+        if (restylePending) return
+        restylePending = true
+        SwingUtilities.invokeLater {
+            restylePending = false
+            restyleDocument()
+        }
     }
 
     fun updateHighlights() {

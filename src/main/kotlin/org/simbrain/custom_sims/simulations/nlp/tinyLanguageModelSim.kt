@@ -12,12 +12,13 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.propertyeditor.objectWrapper
-import org.simbrain.util.widgets.SimbrainTextArea
+import org.simbrain.util.widgets.SimbrainTextPane
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
+import java.awt.Dimension
 import java.io.File
 import javax.swing.JScrollPane
 
@@ -380,15 +381,18 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
     val textWorldComponent = workspace.componentList.filterIsInstance<TextWorldComponent>().first()
 
     fun showTextDialog(dialogTitle: String, content: String) {
-        val textArea = SimbrainTextArea().apply {
+        val textArea = SimbrainTextPane().apply {
             text = content
             isEditable = false
-            rows = 20
-            columns = 40
-            lineWrap = true
-            wrapStyleWord = true
+            caretPosition = 0
         }
-        val scrollPane = JScrollPane(textArea)
+        val scrollPane = JScrollPane(
+            textArea,
+            JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED,
+            JScrollPane.HORIZONTAL_SCROLLBAR_NEVER,
+        ).apply {
+            preferredSize = Dimension(440, 420)
+        }
         swingInvokeLater {
             StandardDialog().apply {
                 title = dialogTitle

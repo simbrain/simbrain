@@ -1,48 +1,74 @@
 package org.simbrain.world.textworld.gui
 
-import org.fife.ui.rsyntaxtextarea.TokenTypes
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import javax.swing.text.Segment
 
 class LfmDocumentSyntaxTest {
 
+    private fun regionAt(runs: List<StructureRun>, index: Int) =
+        runs.first { index >= it.start && index < it.end }.region
+
     @Test
-    fun `token maker emits only supported syntax style indices`() {
-        val maker = LfmDocumentTokenMaker()
+    fun `runs are contiguous and cover the whole text`() {
         val text = "<|im_start|>system\nList of tools: [current_time]<|im_end|>\n" +
             "<|tool_call_start|>[current_time()]<|tool_call_end|>"
-        var token = maker.getTokenList(Segment(text.toCharArray(), 0, text.length), 42, 0)
-        while (token != null) {
-            assertTrue(token.type in 0 until TokenTypes.DEFAULT_NUM_TOKEN_TYPES, "${token.type}: ${token.lexeme}")
-            token = token.nextToken
-        }
+        val runs = documentStructureRuns(text)
+        assertEquals(0, runs.first().start)
+        assertEquals(text.length, runs.last().end)
+        runs.zipWithNext().forEach { (a, b) -> assertEquals(a.end, b.start) }
     }
 
     @Test
     fun `system turn styling carries onto later lines`() {
-        val maker = LfmDocumentTokenMaker()
-        val opening = "<|im_start|>system"
-        assertEquals(TokenTypes.RESERVED_WORD, maker.getLastTokenTypeOnLine(
-            Segment(opening.toCharArray(), 0, opening.length),
-            TokenTypes.NULL,
-        ))
+        val text = "<|im_start|>system\nYou are helpful.\nBe brief."
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.SYSTEM_CONTENT, regionAt(runs, text.indexOf("Be brief")))
     }
 
     @Test
-    fun `user and assistant turns retain distinct token types`() {
-        val maker = LfmDocumentTokenMaker()
-        val user = "<|im_start|>user"
-        val assistant = "<|im_start|>assistant"
+    fun `user and assistant turns retain distinct regions`() {
+        val text = "<|im_start|>user\nhi<|im_end|><|im_start|>assistant\nhello"
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.USER_LABEL, regionAt(runs, text.indexOf("user")))
+        assertEquals(DocumentRegion.USER_CONTENT, regionAt(runs, text.indexOf("hi")))
+        assertEquals(DocumentRegion.ASSISTANT_LABEL, regionAt(runs, text.indexOf("assistant")))
+        assertEquals(DocumentRegion.ASSISTANT_CONTENT, regionAt(runs, text.indexOf("hello")))
+    }
 
-        assertEquals(TokenTypes.LITERAL_STRING_DOUBLE_QUOTE, maker.getLastTokenTypeOnLine(
-            Segment(user.toCharArray(), 0, user.length),
-            TokenTypes.NULL,
-        ))
-        assertEquals(TokenTypes.LITERAL_CHAR, maker.getLastTokenTypeOnLine(
-            Segment(assistant.toCharArray(), 0, assistant.length),
-            TokenTypes.NULL,
-        ))
+    @Test
+    fun `markers and tool content are recognized`() {
+        val text = "<|tool_call_start|>[current_time()]<|tool_call_end|>after"
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.MARKER, regionAt(runs, 0))
+        assertEquals(DocumentRegion.TOOL_CONTENT, regionAt(runs, text.indexOf("[current_time")))
+        assertEquals(DocumentRegion.ORDINARY, regionAt(runs, text.indexOf("after")))
+    }
+
+    @Test
+    fun `unterminated marker is styled as current content`() {
+        val text = "<|im_start|>user\nhello <|im_en"
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.USER_CONTENT, regionAt(runs, text.indexOf("<|im_en")))
+        assertEquals(text.length, runs.last().end)
+    }
+
+    @Test
+    fun `tool list line is split out of system content but prose lines are not`() {
+        val text = "<|im_start|>system\nYou are helpful.\nList of tools: [{\"name\": \"current_time\"}]\nBe brief."
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.SYSTEM_CONTENT, regionAt(runs, text.indexOf("You are helpful")))
+        assertEquals(DocumentRegion.TOOL_LIST, regionAt(runs, text.indexOf("List of tools")))
+        assertEquals(DocumentRegion.SYSTEM_CONTENT, regionAt(runs, text.indexOf("Be brief")))
+        assertEquals(0, runs.first().start)
+        assertEquals(text.length, runs.last().end)
+        runs.zipWithNext().forEach { (a, b) -> assertEquals(a.end, b.start) }
+    }
+
+    @Test
+    fun `unknown role labels are structural and reset content to ordinary`() {
+        val text = "<|im_start|>tool\nresult"
+        val runs = documentStructureRuns(text)
+        assertEquals(DocumentRegion.OTHER_LABEL, regionAt(runs, text.indexOf("tool")))
+        assertEquals(DocumentRegion.ORDINARY, regionAt(runs, text.indexOf("result")))
     }
 }

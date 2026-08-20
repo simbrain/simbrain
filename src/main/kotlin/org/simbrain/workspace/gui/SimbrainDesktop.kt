@@ -15,6 +15,7 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.world.textworld.gui.TextWorldPanel
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
@@ -600,6 +601,7 @@ object SimbrainDesktop {
                 is JTable -> c.gridColor = Theme.divider
                 is NetworkPanel -> c.preferenceLoader()
                 is RSyntaxTextArea -> c.applyLafSyntaxTheme()
+                is TextWorldPanel -> c.restyleDocument()
             }
             if (c is Container) c.components.forEach(::walk)
         }

@@ -5,6 +5,7 @@
  */
 package org.simbrain.plot.timeseries
 
+import kotlinx.coroutines.Job
 import net.miginfocom.swing.MigLayout
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
@@ -13,10 +14,12 @@ import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.ValueMarker
 import org.jfree.chart.renderer.AbstractRenderer
+import org.simbrain.plot.AdaptiveChartRepainter
 import org.simbrain.plot.ChartLegendPanel
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
+import org.simbrain.util.swingDispatcher
 import java.awt.Dimension
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -59,6 +62,8 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
      */
     private val rangeMarkers = mutableListOf<ValueMarker>()
 
+    private var propertyChangedSubscription: Job? = null
+
     init {
         preferredSize = PREFERRED_SIZE
         layout = MigLayout("ins 0, gap 0px 0px")
@@ -67,11 +72,12 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         addPreferencesButton()
         addAddSeriesButton()
 
-        add(chartPanel, "wrap")
+        // The chart absorbs resize slack; the legend and buttons keep their natural height
+        add(chartPanel, "grow, push, wrap")
         add(legendPanel, "growx, pushx, wmin 0, wrap")
         add(buttonPanel)
 
-        timeSeriesModel.events.propertyChanged.on { this.updateChartSettings() }
+        propertyChangedSubscription = timeSeriesModel.events.propertyChanged.on(swingDispatcher) { this.updateChartSettings() }
         timeSeriesModel.events.timeSeriesAdded.on { rebuildLegend() }
         timeSeriesModel.events.timeSeriesRemoved.on { rebuildLegend() }
 
@@ -90,6 +96,8 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         )
         chartPanel.chart = chart
         chart.applySimbrainChartTheme()
+        // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
+        AdaptiveChartRepainter(chartPanel).install()
 
         updateChartSettings()
         rebuildLegend()
@@ -215,6 +223,13 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
 
     /**
+     * Detach from the model; call when the panel is permanently removed while the model lives on.
+     */
+    fun dispose() {
+        propertyChangedSubscription?.cancel()
+    }
+
+    /**
      * Used when customzing buttons on this panel.
      */
     fun removeAllButtonsFromToolBar() {
@@ -242,8 +257,10 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
     }
 
     fun showPropertiesDialog() {
+        // The event reaches this panel's own updateChartSettings listener, and lets other views of the
+        // model, such as the desktop component's recurrence tabs, react to the changed settings.
         val dialog = timeSeriesModel.createEditorDialog { e: TimeSeriesModel? ->
-            updateChartSettings()
+            timeSeriesModel.events.propertyChanged.fire()
         }
         dialog.display()
     }

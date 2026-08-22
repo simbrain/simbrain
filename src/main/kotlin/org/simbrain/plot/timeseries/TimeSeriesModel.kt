@@ -2,6 +2,7 @@ package org.simbrain.plot.timeseries
 
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.WithXStreamPropertyConverter
@@ -103,6 +104,76 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         description = "Size of window when fixed width is used.",
         conditionallyEnabledBy = TimeSeriesModel::fixedWidth,
         order = 70
+    )
+
+    /**
+     * Which plots the desktop window shows. Window composition rather than plot data, so deliberately
+     * not user-editable here: embedded plot panels (trainer dialogs, simulations) have no recurrence
+     * views, and their preferences dialog should not offer a selector that does nothing. It is
+     * controlled from the desktop component's toolbar and View menu, and lives on the model only so
+     * it persists with the plot.
+     */
+    var recurrenceView = RecurrenceView.TIME_SERIES
+
+    var recurrenceMode by GuiEditable(
+        initValue = RecurrenceMode.THRESHOLD,
+        label = "Mode",
+        description = "Threshold marks pairs of times whose states are within the threshold distance; " +
+                "spectrum colors every pair by its distance",
+        tab = "Recurrence",
+        order = 110
+    )
+
+    var recurrenceThreshold by GuiEditable(
+        initValue = 0.1,
+        label = "Threshold",
+        description = "Fraction of the largest pairwise distance in the window within which two states " +
+                "count as recurrent",
+        min = 0.0,
+        max = 1.0,
+        onUpdate = { enableWidget(widgetValue(TimeSeriesModel::recurrenceMode) == RecurrenceMode.THRESHOLD) },
+        tab = "Recurrence",
+        order = 120
+    )
+
+    var recurrenceColorMap by GuiEditable(
+        initValue = ChartColorMap.JET,
+        label = "Color map",
+        description = "How distances are mapped to colors in spectrum mode",
+        onUpdate = { enableWidget(widgetValue(TimeSeriesModel::recurrenceMode) == RecurrenceMode.SPECTRUM) },
+        tab = "Recurrence",
+        order = 130
+    )
+
+    var recurrenceEmbeddingDimension by GuiEditable(
+        initValue = 1,
+        label = "Embedding dimension",
+        description = "Number of consecutive samples treated as one state via time-delay embedding; " +
+                "1 compares raw values",
+        min = 1,
+        tab = "Recurrence",
+        order = 140
+    )
+
+    var recurrenceEmbeddingDelay by GuiEditable(
+        initValue = 1,
+        label = "Embedding delay",
+        description = "Lag in samples between the components of each embedded state",
+        min = 1,
+        onUpdate = { enableWidget(widgetValue(TimeSeriesModel::recurrenceEmbeddingDimension) > 1) },
+        tab = "Recurrence",
+        order = 150
+    )
+
+    var recurrenceMaxPoints by GuiEditable(
+        initValue = 200,
+        label = "Max points",
+        description = "Most recent points of the series used for the recurrence matrix, bounding its size " +
+                "when the series grows without a fixed width",
+        min = 2,
+        max = RECURRENCE_MAX_POINTS_LIMIT,
+        tab = "Recurrence",
+        order = 160
     )
 
     /**
@@ -335,6 +406,13 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         get() = "Time Series"
 
     companion object: WithXStreamPropertyConverter {
+
+        /**
+         * Hard ceiling on points per recurrence matrix: the n-squared rebuild runs on the event
+         * thread, so an unbounded value would freeze the interface or exhaust memory.
+         */
+        const val RECURRENCE_MAX_POINTS_LIMIT = 500
+
         override val xStreamPropertyConverter = createXStreamPropertyConverter<TimeSeriesModel>(
             marshal = {
                 on(TimeSeriesModel::timeSeriesList) { writer, context ->
@@ -406,6 +484,25 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
             get() = description
 
     }
+}
+
+/**
+ * How a recurrence plot renders the pairwise distances between a series' states.
+ */
+enum class RecurrenceMode(private val label: String) {
+    THRESHOLD("Threshold"), SPECTRUM("Spectrum");
+
+    override fun toString() = label
+}
+
+/**
+ * Which plots the time series window shows, so the user can focus on the line chart, the recurrence
+ * structure, or watch both at once.
+ */
+enum class RecurrenceView(private val label: String) {
+    TIME_SERIES("Time series only"), BOTH("Time series and recurrence"), RECURRENCE("Recurrence only");
+
+    override fun toString() = label
 }
 
 fun Workspace.createTimeSeriesModel(): TimeSeriesModel {

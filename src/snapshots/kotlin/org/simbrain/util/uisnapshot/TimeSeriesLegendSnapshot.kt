@@ -1,7 +1,7 @@
 /**
  * Snapshot of [org.simbrain.plot.timeseries.TimeSeriesPlotPanel]'s Swing legend strip: per-series
- * color swatch, name, and the muted per-series remove control that replaced the delete-last button.
- * Hover styling can't be captured here; only the resting state is the subject.
+ * color swatch and name. The per-series remove control is revealed only on hover, which can't be
+ * captured here; the resting state with no visible remove controls is the subject.
  */
 package org.simbrain.util.uisnapshot
 

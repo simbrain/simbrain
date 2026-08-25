@@ -1,10 +1,11 @@
 /**
  * Swing legend strip shared by chart panels that replace JFreeChart's in-chart legend, which is
  * painted pixels and so cannot host interactive controls. Each entry shows a swatch in the series'
- * plot color, the series name, and optionally a muted remove control that brightens on hover.
- * Entries can also act as visibility toggles: clicking the swatch or name shows or hides the
- * series, and a hidden entry renders with a hollow swatch and muted name. Owning panels rebuild
- * the strip via [setEntries] when their series change.
+ * plot color, the series name, and optionally a remove control that is only revealed while the
+ * pointer is over the entry; the control keeps its slot when unrevealed so the legend never
+ * reflows under the mouse. Entries can also act as visibility toggles: clicking the swatch or name
+ * shows or hides the series, and a hidden entry renders with a hollow swatch and muted name.
+ * Owning panels rebuild the strip via [setEntries] when their series change.
  */
 package org.simbrain.plot
 
@@ -17,8 +18,9 @@ import java.awt.event.MouseEvent
 import javax.swing.JComponent
 import javax.swing.JLabel
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 
-class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
+class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, ENTRY_HGAP, ENTRY_VGAP)) {
 
     init {
         addComponentListener(object : ComponentAdapter() {
@@ -45,7 +47,7 @@ class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
 
     fun setEntries(entries: List<Entry>) {
         removeAll()
-        layout = FlowLayout(FlowLayout.CENTER, 12, 2)
+        layout = FlowLayout(FlowLayout.CENTER, ENTRY_HGAP, ENTRY_VGAP)
         entries.forEach { add(entryComponent(it)) }
         revalidate()
         repaint()
@@ -84,6 +86,7 @@ class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
     override fun getMinimumSize(): Dimension = preferredSize
 
     private fun entryComponent(entry: Entry): JComponent {
+        var rowHovered = false
         val row = JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)).apply { isOpaque = false }
 
         val swatch = object : JComponent() {
@@ -124,7 +127,13 @@ class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
         entry.onRemove?.let { onRemove ->
             val removeLabel = object : JLabel("✕") {
                 var hover = false
-                override fun getForeground(): Color = if (hover) Theme.foreground else Theme.mutedText
+                // Painted transparent until the pointer is over the entry; it keeps its slot in the
+                // row either way, so revealing it never shifts the legend layout under the mouse
+                override fun getForeground(): Color = when {
+                    !rowHovered -> TRANSPARENT
+                    hover -> Theme.foreground
+                    else -> Theme.mutedText
+                }
             }
             removeLabel.toolTipText = "Remove ${entry.label}"
             removeLabel.cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
@@ -144,8 +153,38 @@ class ChartLegendPanel : JPanel(FlowLayout(FlowLayout.CENTER, 12, 2)) {
                 }
             })
             row.add(removeLabel)
+
+            // Entering a child fires mouseExited on the row, so the reveal listener sits on the row
+            // and every child, and an exit only unreveals once the pointer has truly left the row
+            val revealListener = object : MouseAdapter() {
+                override fun mouseEntered(e: MouseEvent) {
+                    if (!rowHovered) {
+                        rowHovered = true
+                        row.repaint()
+                    }
+                }
+
+                override fun mouseExited(e: MouseEvent) {
+                    val point = SwingUtilities.convertPoint(e.component, e.point, row)
+                    if (!row.contains(point)) {
+                        rowHovered = false
+                        row.repaint()
+                    }
+                }
+            }
+            (listOf(row) + row.components.toList()).forEach { it.addMouseListener(revealListener) }
         }
 
         return row
+    }
+
+    companion object {
+        /** Gap between legend entries; kept tight because each entry already trails its own
+         * unrevealed remove slot, which reads as part of the spacing. */
+        private const val ENTRY_HGAP = 6
+
+        private const val ENTRY_VGAP = 2
+
+        private val TRANSPARENT = Color(0, 0, 0, 0)
     }
 }

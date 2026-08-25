@@ -1,7 +1,8 @@
 /**
  * Swing panel for a [TimeSeriesModel]: the JFreeChart line chart plus a custom legend strip and
- * toolbar. The legend is Swing rather than JFreeChart's in-chart title so each series can carry a
- * hoverable remove control; series are deleted from there, not from a toolbar button.
+ * toolbar. The legend is Swing rather than JFreeChart's in-chart title so each series can carry
+ * interactive controls: a hoverable remove control, and clicking an entry's swatch or name toggles
+ * that series' visibility. Hidden series keep accumulating data and are excluded from auto-range.
  */
 package org.simbrain.plot.timeseries
 
@@ -62,7 +63,8 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
      */
     private val rangeMarkers = mutableListOf<ValueMarker>()
 
-    private var propertyChangedSubscription: Job? = null
+    /** Model-side registrations, undone in [dispose] because the model can outlive this panel. */
+    private val modelSubscriptions = mutableListOf<Job>()
 
     init {
         preferredSize = PREFERRED_SIZE
@@ -77,9 +79,15 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         add(legendPanel, "growx, pushx, wmin 0, wrap")
         add(buttonPanel)
 
-        propertyChangedSubscription = timeSeriesModel.events.propertyChanged.on(swingDispatcher) { this.updateChartSettings() }
-        timeSeriesModel.events.timeSeriesAdded.on { rebuildLegend() }
-        timeSeriesModel.events.timeSeriesRemoved.on { rebuildLegend() }
+        modelSubscriptions += timeSeriesModel.events.propertyChanged.on(swingDispatcher) { this.updateChartSettings() }
+        modelSubscriptions += timeSeriesModel.events.timeSeriesAdded.on { rebuildLegend() }
+        modelSubscriptions += timeSeriesModel.events.timeSeriesRemoved.on { rebuildLegend() }
+        modelSubscriptions += timeSeriesModel.events.timeSeriesVisibilityChanged.on(swingDispatcher) {
+            rebuildLegend()
+            updateChartSettings()
+            // The renderer flags were applied without notification; one change event repaints the chart
+            chart.fireChartChanged()
+        }
 
         val title = ""
         val xLabel = "Time"
@@ -117,6 +125,13 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
         // to whoever asks first, and swatches otherwise ask in reverse z-order during painting.
         (chart.xyPlot.renderer as? AbstractRenderer)?.let { renderer ->
             timeSeriesModel.timeSeriesList.indices.forEach { renderer.lookupSeriesPaint(it) }
+            // Visibility is index-keyed renderer state, so reapply it whenever series membership or
+            // order may have changed; no notify because this can run inside a chart redraw
+            timeSeriesModel.timeSeriesList.forEachIndexed { index, ts ->
+                if (renderer.isSeriesVisible(index) != ts.visible) {
+                    renderer.setSeriesVisible(index, ts.visible, false)
+                }
+            }
         }
         legendPanel.setEntries(timeSeriesModel.timeSeriesList.mapIndexed { index, ts ->
             ChartLegendPanel.Entry(
@@ -124,7 +139,9 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
                 paint = { (chart.xyPlot.renderer as? AbstractRenderer)?.lookupSeriesPaint(index) },
                 onRemove = if (seriesRemovalEnabled) {
                     { timeSeriesModel.removeTimeSeries(ts) }
-                } else null
+                } else null,
+                visible = { ts.visible },
+                onToggleVisibility = { ts.visible = !ts.visible }
             )
         })
     }
@@ -139,10 +156,12 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
             // A series holding no data yet reports NaN bounds, as one just added for a restored neuron does.
             // Letting that reach the range would make the whole range NaN and the chart would draw nothing
-            // until that one series received its first value.
-            val dataMin = timeSeriesModel.timeSeriesList
+            // until that one series received its first value. Hidden series sit out of auto-range so
+            // hiding a large-amplitude series lets the remaining ones fill the plot.
+            val rangedSeries = timeSeriesModel.timeSeriesList.filter { it.visible }
+            val dataMin = rangedSeries
                 .mapNotNull { it.series.minY.takeUnless(Double::isNaN) }.minOrNull() ?: 0.0
-            val dataMax = timeSeriesModel.timeSeriesList
+            val dataMax = rangedSeries
                 .mapNotNull { it.series.maxY.takeUnless(Double::isNaN) }.maxOrNull() ?: 0.0
             val markerMin = rangeMarkers.minOfOrNull { it.value } ?: dataMin
             val markerMax = rangeMarkers.maxOfOrNull { it.value } ?: dataMax
@@ -226,7 +245,8 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
      * Detach from the model; call when the panel is permanently removed while the model lives on.
      */
     fun dispose() {
-        propertyChangedSubscription?.cancel()
+        modelSubscriptions.forEach { it.cancel() }
+        modelSubscriptions.clear()
     }
 
     /**

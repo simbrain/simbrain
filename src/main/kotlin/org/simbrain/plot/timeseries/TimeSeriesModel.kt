@@ -419,6 +419,8 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
                     writer.startNode("timeSeriesList")
                     forEach {
                         writer.startNode("timeSeries")
+                        // The attribute rides on the wrapper node, which XYSeriesConverter never reads
+                        if (!it.visible) writer.addAttribute("visible", "false")
                         context.convertAnother(it.series)
                         writer.endNode()
                     }
@@ -428,9 +430,11 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
                 on("timeSeriesList") { reader, context ->
                     while (reader.hasMoreChildren()) {
                         reader.moveDown()
+                        val visible = reader.getAttribute("visible")?.toBoolean() ?: true
                         val series = context.convertAnother(reader.value, XYSeries::class.java) as XYSeries
                         withConstructedObject {
                             val sts = TimeSeries(series)
+                            sts.visible = visible
                             timeSeriesList.add(sts)
                             dataset.addSeries(sts.series)
                             events.timeSeriesAdded.fire(sts)
@@ -466,6 +470,17 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
          * coupling. See [syncTimeSeries].
          */
         var componentKey: String? = null
+
+        /**
+         * Whether the series is drawn in the chart. Hiding is purely a view concern: data keeps
+         * accumulating through couplings and reappears intact when the series is shown again.
+         */
+        var visible: Boolean = true
+            set(value) {
+                if (field == value) return
+                field = value
+                events.timeSeriesVisibilityChanged.fire(this)
+            }
 
         @Consumable
         fun setValue(value: Double) {

@@ -1,6 +1,7 @@
 package org.simbrain.plot
 
 import kotlinx.coroutines.runBlocking
+import org.jfree.chart.renderer.AbstractRenderer
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -257,6 +258,53 @@ class TimeSeriesTest {
 
         assertFalse(range.lowerBound.isNaN() || range.upperBound.isNaN(), "Range went NaN: $range")
         assertTrue(range.lowerBound <= 1.0 && range.upperBound >= 3.0, "Range excludes the data: $range")
+    }
+
+    @Test
+    fun `hiding a series drops it from the renderer and auto-range until shown again`() {
+        val model = TimeSeriesModel()
+        var time = 0
+        model.timeSupplier = { time }
+        val small = model.addTimeSeries("Small")
+        val large = model.addTimeSeries("Large")
+        repeat(3) {
+            time = it
+            small.setValue(it.toDouble())
+            large.setValue(it * 100.0)
+        }
+        val panel = TimeSeriesPlotPanel(model)
+        val plot = panel.chartPanel.chart.xyPlot
+        assertTrue(plot.rangeAxis.range.upperBound >= 200.0)
+
+        large.visible = false
+        awaitUntil(message = "Hiding did not reach the renderer") {
+            !(plot.renderer as AbstractRenderer).isSeriesVisible(1)
+        }
+        awaitUntil(message = "Auto-range still includes the hidden series") {
+            plot.rangeAxis.range.upperBound < 100.0
+        }
+
+        large.visible = true
+        awaitUntil(message = "Showing did not reach the renderer") {
+            (plot.renderer as AbstractRenderer).isSeriesVisible(1)
+        }
+        // Hiding is view-only, so the series kept its history
+        assertEquals(3, large.series.itemCount)
+    }
+
+    @Test
+    fun `series visibility survives serialization`() {
+        val model = TimeSeriesModel()
+        model.timeSupplier = { 0 }
+        model.addTimeSeries("Alpha")
+        model.addTimeSeries("Beta")
+        model.timeSeriesList[1].visible = false
+
+        val xml = TimeSeriesPlotComponent.timeSeriesXStream.toXML(model)
+        val restored = TimeSeriesPlotComponent.timeSeriesXStream.fromXML(xml) as TimeSeriesModel
+
+        assertEquals(listOf("Alpha", "Beta"), restored.timeSeriesList.map { it.description })
+        assertEquals(listOf(true, false), restored.timeSeriesList.map { it.visible })
     }
 
     @Test

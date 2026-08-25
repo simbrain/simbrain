@@ -11,6 +11,7 @@ open class PlotEvents: FlowEvents() {
 class TimeSeriesEvents: PlotEvents() {
     val timeSeriesAdded = OneArgEvent<TimeSeriesModel.TimeSeries>()
     val timeSeriesRemoved = OneArgEvent<TimeSeriesModel.TimeSeries>()
+    val timeSeriesVisibilityChanged = OneArgEvent<TimeSeriesModel.TimeSeries>()
 }
 
 class RasterPlotEvents: PlotEvents() {

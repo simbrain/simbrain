@@ -100,6 +100,7 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
         }
         modelSubscriptions += plotModel.events.timeSeriesAdded.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
         modelSubscriptions += plotModel.events.timeSeriesRemoved.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
+        modelSubscriptions += plotModel.events.timeSeriesVisibilityChanged.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
         // Renames happen in place without an add/remove event; catch them as data flows
         plotModel.dataset.addChangeListener(titleSyncListener)
         // Aligned panels pull the line chart's range on their own refreshes, which auto-range keeps
@@ -213,13 +214,14 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
     }
 
     /**
-     * Make the tabs match the model's series one for one, following series identity so a surviving
-     * series keeps its panel across reorders and removals.
+     * Make the tabs match the model's visible series one for one, following series identity so a
+     * surviving series keeps its panel across reorders and removals. A hidden series drops its tab
+     * and gets a fresh panel when shown again.
      */
     private fun rebuildTabs() {
         val selected = recurrenceTabs.selectedComponent
         recurrenceTabs.removeAll()
-        val current = plotModel.timeSeriesList.toList()
+        val current = plotModel.timeSeriesList.filter { it.visible }
         recurrencePanels.keys.filter { ts -> current.none { it === ts } }
             .forEach { recurrencePanels.remove(it)?.dispose() }
         current.forEach { ts ->

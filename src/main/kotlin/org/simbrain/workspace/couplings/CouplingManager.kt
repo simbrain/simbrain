@@ -189,14 +189,20 @@ class CouplingManager(val workspace: Workspace) {
         couplingCache.getCompatibleVisibleConsumers(this, component)
 
     /**
-     * Create a coupling from a producer and consumer of the same type.
+     * Create a coupling from a producer and consumer, optionally through a chain of transforms that
+     * must type-check end to end (see [Coupling.create]).
      *
      * @param producer producer part of the coupling
      * @param consumer consumer part of the coupling
      * @return the newly creating coupling
      */
     @JvmOverloads
-    fun createCoupling(producer: Producer?, consumer: Consumer?, fireEvents: Boolean = true) = Coupling.create(producer, consumer).also {
+    fun createCoupling(
+        producer: Producer?,
+        consumer: Consumer?,
+        fireEvents: Boolean = true,
+        transforms: List<CouplingOperation<*, *>> = emptyList()
+    ) = Coupling.create(producer, consumer, transforms).also {
         synchronized(_couplings) {
             _couplings.add(it)
             cachedCouplingList.invalidate()
@@ -214,10 +220,24 @@ class CouplingManager(val workspace: Workspace) {
     infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
 
     /**
+     * A producer with transforms staged behind it, so a transformed coupling reads as a chain:
+     * `producer via ScaleOperation(2.0) via CoerceInOperation(0.0, 1.0) couple consumer`.
+     */
+    class TransformedProducer(val producer: Producer, val transforms: List<CouplingOperation<*, *>>)
+
+    infix fun Producer.via(transform: CouplingOperation<*, *>) = TransformedProducer(this, listOf(transform))
+
+    infix fun TransformedProducer.via(transform: CouplingOperation<*, *>) =
+        TransformedProducer(producer, transforms + transform)
+
+    infix fun TransformedProducer.couple(consumer: Consumer?) =
+        createCoupling(producer, consumer, transforms = transforms)
+
+    /**
      * Couple the first type-matched producer-consumer pair, where these are ordered by preference.
      */
     fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
-        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> a.type == b.type }
+        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> attributeTypesMatch(a.type, b.type) }
             .sortedBy { (a, b) -> a.priority + b.priority + (if (a.type == String::class.java) 1 else 0) }.firstOrNull() ?: throw RuntimeException(
             "No compatible attributes found between $producingContainer and $consumingContainer"
         )

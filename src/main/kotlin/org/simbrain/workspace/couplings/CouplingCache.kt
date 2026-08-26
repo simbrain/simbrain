@@ -212,7 +212,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
             val methods = getProducibleMethods(clazz)
                     .filter { getVisibility(it) }
-                    .filter { it.producibleType == consumer.type }
+                    .filter { attributeTypesMatch(it.producibleType, consumer.type) }
             containers.forEach { container ->
                 methods.forEach { method ->
                     yield(container.getProducer(method))
@@ -228,7 +228,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
             val methods = getConsumableMethods(clazz)
                     .filter { getVisibility(it) }
-                    .filter { it.consumableType == producer.type }
+                    .filter { attributeTypesMatch(producer.type, it.consumableType) }
             containers.forEach { container ->
                 methods.forEach { method ->
                     yield(container.getConsumer(method))

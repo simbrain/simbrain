@@ -247,6 +247,17 @@ fun Method.validateAttributeMethod() {
     }
 }
 
+/**
+ * Whether a value flowing from an attribute or transform of type [from] can be delivered to one of type
+ * [to]. Boxed wrappers and primitives are interchangeable — reflection boxes and unboxes at the call
+ * boundary — so a nullable `Double?` producer (boxed on the JVM) matches a plain `double` consumer; a
+ * null value is skipped before delivery rather than unboxed.
+ */
+fun attributeTypesMatch(from: Type, to: Type): Boolean = from.normalized == to.normalized
+
+private val Type.normalized: Type
+    get() = (this as? Class<*>)?.let { wrapperToPrimitive[it] } ?: this
+
 private val wrapperToPrimitive: Map<Class<*>, Class<*>> = mapOf(
     java.lang.Double::class.java to java.lang.Double.TYPE,
     java.lang.Float::class.java to java.lang.Float.TYPE,

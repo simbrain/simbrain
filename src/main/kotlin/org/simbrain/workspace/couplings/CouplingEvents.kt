@@ -19,4 +19,12 @@ class CouplingEvents: FlowEvents() {
      */
     val attributeContainerChanged = OneArgEvent<AttributeContainer>()
 
+    /**
+     * A coupling's update threw. The update loop logs the first failure per coupling and continues
+     * with the remaining couplings; this event fires on every failure so the GUI can surface them.
+     */
+    val couplingFailed = OneArgEvent<CouplingFailure>()
+
 }
+
+data class CouplingFailure(val coupling: Coupling, val cause: Throwable)

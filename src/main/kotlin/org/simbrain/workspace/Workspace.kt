@@ -3,6 +3,7 @@ package org.simbrain.workspace
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
+import javax.swing.SwingUtilities
 import org.pmw.tinylog.Logger
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
@@ -196,13 +197,26 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Stops iteration of all couplings on all components.
+     * Stops iteration of all couplings on all components. Cooperative: the in-flight iteration
+     * finishes first. Calling again while that iteration is still in flight escalates to [stopNow].
      */
     fun stop() {
         for (wc in componentList) {
             wc.stop()
         }
         updater.stop()
+        updateStopped()
+    }
+
+    /**
+     * Stops and cancels the in-flight iteration, abandoning the current step. For iterations stuck in
+     * a suspend attribute; prefer [stop] when the workspace is responding.
+     */
+    fun stopNow() {
+        for (wc in componentList) {
+            wc.stop()
+        }
+        updater.stopNow()
         updateStopped()
     }
 
@@ -257,9 +271,15 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Updates synchronously for specified number of iterations.
+     * Updates synchronously for specified number of iterations. Must not be called on the event
+     * dispatch thread; see [WorkspaceUpdater.runBlocking] for why.
      */
     fun simpleIterate(iterations: Int) {
+        check(!SwingUtilities.isEventDispatchThread()) {
+            "Blocking workspace iteration must not run on the event dispatch thread: suspend " +
+                    "consumables wait for event thread handlers, which deadlocks against a blocked " +
+                    "event thread. Use iterateAsync instead."
+        }
         runBlocking {
             iterateSuspend(iterations)
         }

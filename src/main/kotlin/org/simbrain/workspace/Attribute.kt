@@ -14,6 +14,7 @@ package org.simbrain.workspace
 
 import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.LOW_PRIORITY
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
 import java.lang.reflect.Type
@@ -271,6 +272,9 @@ private val wrapperToPrimitive: Map<Class<*>, Class<*>> = mapOf(
 
 private fun invokePlain(method: Method, receiver: Any, vararg args: Any?): Any? = try {
     method.invoke(receiver, *args)
+} catch (ex: InvocationTargetException) {
+    // Surface what the attribute method actually threw, so failure reporting shows the real cause
+    throw ex.cause ?: RuntimeException(ex)
 } catch (ex: ReflectiveOperationException) {
     throw RuntimeException(ex)
 } catch (ex: IllegalArgumentException) {
@@ -281,13 +285,15 @@ private fun invokePlain(method: Method, receiver: Any, vararg args: Any?): Any? 
  * Invoke the JVM form of a suspend function through plain reflection: pass the caller's own continuation
  * as the trailing argument. Synchronous completion returns the value straight through; a genuine
  * suspension returns COROUTINE_SUSPENDED and the coroutine machinery takes over. Exceptions thrown before
- * the first suspension surface as InvocationTargetException and are wrapped like plain invocations;
+ * the first suspension surface as InvocationTargetException and are unwrapped to their real cause;
  * exceptions after a resumption propagate as themselves.
  */
 private suspend fun invokeSuspending(method: Method, receiver: Any, vararg args: Any?): Any? = try {
     suspendCoroutineUninterceptedOrReturn { continuation: Continuation<Any?> ->
         method.invoke(receiver, *args, continuation)
     }
+} catch (ex: InvocationTargetException) {
+    throw ex.cause ?: RuntimeException(ex)
 } catch (ex: ReflectiveOperationException) {
     throw RuntimeException(ex)
 } catch (ex: IllegalArgumentException) {

@@ -1,11 +1,14 @@
 package org.simbrain.workspace.couplings
 
+import kotlinx.coroutines.CancellationException
+import org.pmw.tinylog.Logger
 import org.simbrain.util.CachedObject
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.lang.reflect.Method
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.*
 import kotlin.reflect.jvm.javaMethod
 
@@ -52,6 +55,12 @@ class CouplingManager(val workspace: Workspace) {
     private val attributeContainerCouplings = HashMap<AttributeContainer, LinkedHashSet<Coupling>>()
 
     val methodVisibilities = HashMap<Method, Boolean>()
+
+    /**
+     * Couplings whose update failure has already been logged, so a coupling broken every tick logs
+     * once. Cleared per coupling on removal, so a recreated coupling reports afresh.
+     */
+    private val reportedFailures: MutableSet<Coupling> = ConcurrentHashMap.newKeySet()
 
     /**
      * List of listeners to fire updates when couplings are changed.
@@ -312,13 +321,28 @@ class CouplingManager(val workspace: Workspace) {
      * Update all couplings by setting the consumers to take the values of their producers. Suspends
      * whenever a coupling's attribute methods do; couplings are updated sequentially so many-to-one
      * consumers see a deterministic order.
+     *
+     * A coupling whose update throws does not stop the rest: the failure is logged once per coupling,
+     * [CouplingEvents.couplingFailed] fires, and the remaining couplings still update. Cancellation is
+     * control flow, not failure, and propagates.
      */
     suspend fun updateCouplings() {
         // Deliberately not holding the _couplings monitor across the updates. Consumers can block on the
         // event thread, as the chart models do when they touch a dataset that is being painted, while the
         // event thread in turn reads this coupling list; holding the lock over both deadlocks them against
         // each other. [couplings] is already an immutable snapshot, so iterating it needs no lock.
-        couplings.forEach { it.update() }
+        couplings.forEach { coupling ->
+            try {
+                coupling.update()
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (reportedFailures.add(coupling)) {
+                    Logger.error("Coupling ${coupling.id} failed to update; further failures of this coupling are not logged: $e")
+                }
+                events.couplingFailed.fire(CouplingFailure(coupling, e))
+            }
+        }
     }
 
     /**
@@ -332,6 +356,7 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
+        reportedFailures.remove(coupling)
         synchronized(_couplings) {
             _couplings.remove(coupling)
             cachedCouplingList.invalidate()
@@ -354,6 +379,7 @@ class CouplingManager(val workspace: Workspace) {
         val removed = synchronized(_couplings) {
             attributeContainerCouplings[attributeContainer]?.let {
                 it.forEach { coupling ->
+                    reportedFailures.remove(coupling)
                     _couplings.remove(coupling)
                     cachedCouplingList.invalidate()
                     if (coupling.consumer.baseObject !== attributeContainer) {

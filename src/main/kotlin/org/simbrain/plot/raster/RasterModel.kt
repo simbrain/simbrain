@@ -8,11 +8,11 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
-import java.lang.reflect.InvocationTargetException
+import kotlinx.coroutines.withContext
 import java.util.function.Supplier
-import javax.swing.SwingUtilities
 
 /**
  * Data model for a raster plot.
@@ -182,31 +182,23 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
          * Example 2: [0.0, 0.6, -0.3, 0.0, 1.0] would show 2 dots vertically at the 2nd and 5th position at the current time
          */
         @Consumable
-        fun setValues(values: DoubleArray) {
-            try {
-                SwingUtilities.invokeAndWait {
-                    var udpated = false
-                    var i = 0
-                    val n = values.size
-                    if (n > rowCount) {
-                        rowCount = n
-                        events.propertyChanged.fire()
-                    }
-                    while (i < n) {
-                        if (values[i] >= spikeThreshold) {
-                            dataset.getSeries(index).add(timeSupplier.get(), i)
-                            udpated = true
-                        }
-                        i++
-                    }
-                    if (!udpated) {
-                        dataset.getSeries(index).add(timeSupplier.get(), null)
-                    }
+        suspend fun setValues(values: DoubleArray) = withContext(swingDispatcher) {
+            var updated = false
+            var i = 0
+            val n = values.size
+            if (n > rowCount) {
+                rowCount = n
+                events.propertyChanged.fire()
+            }
+            while (i < n) {
+                if (values[i] >= spikeThreshold) {
+                    dataset.getSeries(index).add(timeSupplier.get(), i)
+                    updated = true
                 }
-            } catch (e: InterruptedException) {
-                throw RuntimeException(e)
-            } catch (e: InvocationTargetException) {
-                throw RuntimeException(e)
+                i++
+            }
+            if (!updated) {
+                dataset.getSeries(index).add(timeSupplier.get(), null)
             }
         }
 

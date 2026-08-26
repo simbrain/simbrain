@@ -248,7 +248,7 @@ class TimeSeriesTest {
         val populated = model.addTimeSeries("Alpha")
         repeat(3) {
             time = it
-            populated.setValue(it.toDouble() + 1)
+            runBlocking { populated.setValue(it.toDouble() + 1) }
         }
         // Stands in for the series added when a deleted neuron is restored: it has no values until the
         // next update, and an empty JFreeChart series reports its bounds as NaN
@@ -269,8 +269,10 @@ class TimeSeriesTest {
         val large = model.addTimeSeries("Large")
         repeat(3) {
             time = it
-            small.setValue(it.toDouble())
-            large.setValue(it * 100.0)
+            runBlocking {
+                small.setValue(it.toDouble())
+                large.setValue(it * 100.0)
+            }
         }
         val panel = TimeSeriesPlotPanel(model)
         val plot = panel.chartPanel.chart.xyPlot

@@ -1,13 +1,18 @@
 /**
  * Speech synthesis model backed by the bundled eSpeak-ng library. Accepts plain text, phoneme
  * strings, or NETtalk-style articulatory feature vectors (decoded and optionally buffered until an
- * external word-boundary flush). Playback is serialized through a single worker; see [speechChannel]
- * for the deliberate backpressure contract.
+ * external word-boundary flush). Playback is serialized through a rendezvous [PacedWorker]: the
+ * suspend consumables wait in [enqueue] until the worker is ready for the next utterance, pacing a
+ * running simulation to the speech rate instead of letting utterances queue without bound.
  */
 package org.simbrain.world.speechsynthesizer
 
-import kotlinx.coroutines.*
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import org.simbrain.util.PacedWorker
 import org.simbrain.util.UserParameter
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -35,7 +40,7 @@ class SpeechSynthesizer : SoundGenerator() {
     var bufferingMode: BufferingMode = BufferingMode.BUFFERED
         set(value) {
             field = value
-            if (value == BufferingMode.IMMEDIATE) flushFeatureBuffer()
+            if (value == BufferingMode.IMMEDIATE) flushFeatureBufferInBackground()
         }
 
     @UserParameter(
@@ -90,17 +95,15 @@ class SpeechSynthesizer : SoundGenerator() {
 
     @Transient
     @Volatile
-    private var scope: CoroutineScope = newScope()
+    private var worker: PacedWorker<Job> = newWorker()
 
     /**
-     * Rendezvous capacity is deliberate: while audio is in flight, callers (couplings, click
-     * handlers) block in [enqueue] until the worker is ready for the next job. This backpressure
-     * paces a running simulation to the speech rate instead of letting utterances queue without
-     * bound. Do not make this buffered or drop-on-full without revisiting that contract.
+     * For non-suspend callers, such as GUI property setters, that need to reach the suspend speech
+     * path fire-and-forget.
      */
     @Transient
     @Volatile
-    private var speechChannel: Channel<Job> = Channel(capacity = Channel.RENDEZVOUS)
+    private var bridgeScope: CoroutineScope = newBridgeScope()
 
     @Transient
     @Volatile
@@ -138,26 +141,22 @@ class SpeechSynthesizer : SoundGenerator() {
     val featureVector: DoubleArray
         get() = lastFeatureVector.copyOf()
 
-    init {
-        startWorker()
-    }
-
     @Consumable(description = "Speak ordinary text.")
-    fun speakText(text: String) {
+    suspend fun speakText(text: String) {
         if (text.isBlank()) return
         appendTranscription(text.trim(), separator = " ")
         enqueue(Job(text, asPhonemes = false, label = text))
     }
 
     @Consumable(description = "Speak an eSpeak-ng phoneme string.")
-    fun speakPhonemes(phonemes: String) {
+    suspend fun speakPhonemes(phonemes: String) {
         if (phonemes.isBlank()) return
         appendTranscription(phonemes.trim(), separator = " ")
         enqueue(Job(phonemes, asPhonemes = true, label = phonemes))
     }
 
     @Consumable(description = "Decode a feature vector to a phoneme with the selected decoder and speak it.")
-    fun speakFeatureVector(vector: DoubleArray) {
+    suspend fun speakFeatureVector(vector: DoubleArray) {
         if (vector.size != codec.inputDimension) return
         lastFeatureVector = vector.copyOf()
         val decoded = codec.decodeFeatures(vector)
@@ -182,11 +181,11 @@ class SpeechSynthesizer : SoundGenerator() {
     }
 
     @Consumable(description = "Flush the buffered feature-vector phonemes when signal >= 1.0.")
-    fun flushOnSignal(signal: Double) {
+    suspend fun flushOnSignal(signal: Double) {
         if (signal >= 1.0) flushFeatureBuffer()
     }
 
-    fun flushFeatureBuffer() {
+    suspend fun flushFeatureBuffer() {
         val symbols = synchronized(featureBufferLock) {
             val current = featureBuffer.toString()
             featureBuffer.setLength(0)
@@ -197,6 +196,13 @@ class SpeechSynthesizer : SoundGenerator() {
         if (espeak.isNotBlank()) {
             enqueue(Job(espeak, asPhonemes = true, label = espeak))
         }
+    }
+
+    /**
+     * Fire-and-forget flush for non-suspend callers such as GUI property setters.
+     */
+    fun flushFeatureBufferInBackground() {
+        bridgeScope.launch { flushFeatureBuffer() }
     }
 
     /**
@@ -227,21 +233,17 @@ class SpeechSynthesizer : SoundGenerator() {
 
     fun flush() {
         cancelRequested = true
-        scope.cancel()
-        speechChannel.close()
+        worker.reset()
         line.flush()
-        scope = newScope()
-        speechChannel = Channel(capacity = Channel.RENDEZVOUS)
         cancelRequested = false
         currentlySpeaking = ""
         clearFeatureBuffer()
         events.speakingChanged.fire("")
-        startWorker()
     }
 
-    private fun enqueue(job: Job) {
+    private suspend fun enqueue(job: Job) {
         if (!EspeakRuntime.ensureInitialized()) return
-        runBlocking { speechChannel.send(job) }
+        worker.submit(job)
     }
 
     private fun appendTranscription(value: String, separator: String) {
@@ -253,15 +255,9 @@ class SpeechSynthesizer : SoundGenerator() {
         events.transcriptionChanged.fire()
     }
 
-    private fun newScope() = CoroutineScope(Dispatchers.IO + SupervisorJob())
+    private fun newWorker() = PacedWorker<Job>(Dispatchers.IO) { runOne(it) }
 
-    private fun startWorker() {
-        scope.launch {
-            for (job in speechChannel) {
-                runOne(job)
-            }
-        }
-    }
+    private fun newBridgeScope() = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
     private fun runOne(job: Job) {
         EspeakRuntime.setVoice(voice.id)
@@ -298,22 +294,21 @@ class SpeechSynthesizer : SoundGenerator() {
     }
 
     override fun close() {
-        scope.cancel()
-        speechChannel.close()
+        worker.close()
+        bridgeScope.cancel()
         super.close()
     }
 
     fun readResolve(): Any {
         events = SpeechSynthesizerEvents()
-        scope = newScope()
-        speechChannel = Channel(capacity = Channel.RENDEZVOUS)
+        worker = newWorker()
+        bridgeScope = newBridgeScope()
         cancelRequested = false
         currentlySpeaking = ""
         transcriptionBuffer = StringBuilder()
         featureBufferLock = Any()
         featureBuffer = StringBuilder()
         lastFeatureVector = DoubleArray(codec.inputDimension)
-        startWorker()
         return this
     }
 

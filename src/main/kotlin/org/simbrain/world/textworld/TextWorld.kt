@@ -1,6 +1,5 @@
 package org.simbrain.world.textworld
 
-import kotlinx.coroutines.runBlocking
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -322,7 +321,7 @@ class TextWorld : AttributeContainer, EditableObject {
      * Display the string associated with the closest matching vector in the embedding
      */
     @Consumable()
-    fun displayClosestWord(key: DoubleArray) {
+    suspend fun displayClosestWord(key: DoubleArray) {
         // Using addTextAtCursor produces strange results. Must be better synced with cursor.
         addTextAtEnd(tokenEmbedding.getClosestWord(key))
     }
@@ -347,33 +346,33 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Add a text to the end of the world text.
+     * Add a text at the cursor position, suspending until the display has absorbed the change so a
+     * running simulation is paced to what is actually shown.
      */
     @Consumable
-    fun addTextAtCursor(newText: String) {
-        text = StringBuilder(text).insert(position, " $newText ").toString()
+    suspend fun addTextAtCursor(newText: String) {
+        _text = StringBuilder(_text).insert(position, " $newText ").toString()
         position += newText.length + 1
-        events.textChanged.fireAndBlock()
+        events.textChanged.fire()
     }
 
     /**
-     * Add a text to the end of the world text. Empty strings are ignored so per-iteration
-     * couplings from sources that only sometimes produce a token add no stray spacing.
+     * Add a text to the end of the world text, suspending until the display has absorbed the change so
+     * a running simulation is paced to what is actually shown. Empty strings are ignored so
+     * per-iteration couplings from sources that only sometimes produce a token add no stray spacing.
      */
     @Consumable
-    fun addTextAtEnd(newText: String) {
+    suspend fun addTextAtEnd(newText: String) {
         if (newText.isEmpty()) return
         addTextAtEnd(newText, " ")
     }
 
-    fun addTextAtEnd(newText: String, spacing: String) {
-        runBlocking {
-            _text += "$spacing$newText"
-            events.textChanged.fire()
-            position = _text.length
-            events.cursorPositionChanged.fire()
-            currentTokenIndex = tokens.lastIndex
-        }
+    suspend fun addTextAtEnd(newText: String, spacing: String) {
+        _text += "$spacing$newText"
+        events.textChanged.fire()
+        position = _text.length
+        events.cursorPositionChanged.fire()
+        currentTokenIndex = tokens.lastIndex
     }
 
     /**

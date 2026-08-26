@@ -10,13 +10,13 @@ import org.simbrain.util.createXStreamPropertyConverter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.runOnEventThread
+import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
-import java.lang.reflect.InvocationTargetException
+import kotlinx.coroutines.withContext
 import java.util.concurrent.CopyOnWriteArrayList
-import javax.swing.SwingUtilities
 
 /**
  * Data model for a time series plot. A time series consumes an array of
@@ -259,14 +259,18 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     @Consumable
-    fun setValues(array: DoubleArray) {
+    suspend fun setValues(array: DoubleArray) {
         if (timeSeriesList.isEmpty()) {
             addTimeSeries(array.size)
         }
-        var i = 0
-        while (i < array.size && i < timeSeriesList.size) {
-            timeSeriesList[i].setValue(array[i])
-            i++
+        // One hop to the event thread for the whole tick, not one per series, so frames can never
+        // catch a half-updated tick
+        withContext(swingDispatcher) {
+            var i = 0
+            while (i < array.size && i < timeSeriesList.size) {
+                timeSeriesList[i].addValueOnEventThread(array[i])
+                i++
+            }
         }
     }
 
@@ -483,16 +487,17 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
             }
 
         @Consumable
-        fun setValue(value: Double) {
-            try {
-                SwingUtilities.invokeAndWait {
-                    series.add(timeSupplier(), value as Number)
-                }
-            } catch (e: InterruptedException) {
-                e.printStackTrace()
-            } catch (e: InvocationTargetException) {
-                e.printStackTrace()
+        suspend fun setValue(value: Double) {
+            withContext(swingDispatcher) {
+                addValueOnEventThread(value)
             }
+        }
+
+        /**
+         * Adds a point directly; only call on the event thread, where the dataset is painted.
+         */
+        internal fun addValueOnEventThread(value: Double) {
+            series.add(timeSupplier(), value as Number)
         }
 
         override val id: String

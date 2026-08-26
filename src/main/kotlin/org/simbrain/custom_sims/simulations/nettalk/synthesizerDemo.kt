@@ -1,5 +1,8 @@
 package org.simbrain.custom_sims.simulations.nettalk
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.simbrain.custom_sims.*
 import org.simbrain.util.nettalk.NettalkPhonology
 import org.simbrain.util.place
@@ -128,6 +131,7 @@ val synthesizerDemo = newSim {
 }
 
 private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
+    val speakScope = CoroutineScope(Dispatchers.Default)
     var phoneme = 'a'
     var stress = '0'
 
@@ -175,8 +179,11 @@ private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
             }, BorderLayout.CENTER)
             add(JButton("Speak feature vector").apply {
                 addActionListener {
-                    synthesizer.speakFeatureVector(currentVector())
-                    synthesizer.flushFeatureBuffer()
+                    // Raw Swing listener; the suspend speech path paces itself off the event thread
+                    speakScope.launch {
+                        synthesizer.speakFeatureVector(currentVector())
+                        synthesizer.flushFeatureBuffer()
+                    }
                 }
             }, BorderLayout.SOUTH)
         }, BorderLayout.SOUTH)

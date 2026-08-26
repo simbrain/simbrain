@@ -2,6 +2,7 @@ package org.simbrain.plot.histogram;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
@@ -246,6 +247,8 @@ public class HistogramPanel extends JPanel {
             SwingUtilsKt.showErrorDialog(isEx.getMessage());
         }
         mainPanel = new ChartPanel(mainChart);
+        // Per-notification repaints only mark the chart dirty; frames are self-clocked
+        new AdaptiveChartRepainter((ChartPanel) mainPanel).install();
 
     }
 

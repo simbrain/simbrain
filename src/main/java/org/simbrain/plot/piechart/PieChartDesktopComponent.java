@@ -2,6 +2,7 @@ package org.simbrain.plot.piechart;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
 import org.simbrain.plot.ChartThemeKt;
 import org.simbrain.plot.actions.PlotActionManager;
@@ -40,6 +41,8 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         chart = ChartFactory.createPieChart("", getWorkspaceComponent().getModel().getDataset(), true, true, false);
         ChartThemeKt.applySimbrainChartTheme(chart);
         chartPanel.setChart(chart);
+        // Per-notification repaints only mark the chart dirty; frames are self-clocked
+        new AdaptiveChartRepainter(chartPanel).install();
     }
 
     private void createAttachMenuBar() {

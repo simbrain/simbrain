@@ -3,6 +3,7 @@ package org.simbrain.plot.barchart;
 import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
 import org.simbrain.plot.ChartThemeKt;
@@ -85,6 +86,8 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
         if (!getWorkspaceComponent().getModel().isAutoRange()) {
             chart.getCategoryPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerBound(), getWorkspaceComponent().getModel().getUpperBound());
         }
+        // Per-notification repaints only mark the chart dirty; frames are self-clocked
+        new AdaptiveChartRepainter(chartPanel).install();
 
         // Add a chart setting listener
         // getWorkspaceComponent().getModel().addChartSettingsListener(new ChartSettingsListener() {

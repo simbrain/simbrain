@@ -10,6 +10,7 @@ package org.simbrain.plot.heatmap
 
 import net.miginfocom.swing.MigLayout
 import org.jfree.chart.ChartPanel
+import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.NumberAxis
@@ -70,6 +71,8 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
         )
 
         chart.applySimbrainChartTheme()
+        // Per-notification repaints only mark the chart dirty; frames are self-clocked
+        AdaptiveChartRepainter(chartPanel).install()
         refresh()
 
         heatMapModel.events.propertyChanged.on(swingDispatcher) { refresh() }

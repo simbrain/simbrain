@@ -177,13 +177,14 @@ class CouplingTransformDialog(
     private fun editSelectedOperation() {
         val operation = chainList.selectedValue ?: return
         val editor = AnnotatedPropertyEditor(operation)
-        StandardDialog().apply {
+        // Owned by this dialog so it stays above it and remains interactable while this dialog is modal
+        StandardDialog(this, "Edit ${operation.name}").apply {
             setContentPane(editor)
-            title = "Edit ${operation.name}"
             addCommitTask {
                 editor.commitChanges()
                 chainList.repaint()
             }
+            isModal = true
             pack()
             setLocationRelativeTo(this@CouplingTransformDialog)
             isVisible = true

@@ -258,9 +258,9 @@ class ImageProcessingPipelineDialog(
             // If the operation has configurable parameters, show config dialog
             if (hasConfigurableParameters(operation)) {
                 val editor = AnnotatedPropertyEditor(operation)
-                val configDialog = StandardDialog()
+                // Owned by this dialog so it cannot fall behind it
+                val configDialog = StandardDialog(this, "Configure ${operation.name}")
                 configDialog.setContentPane(editor)
-                configDialog.title = "Configure ${operation.name}"
                 configDialog.addCommitTask {
                     editor.commitChanges()
                     pipeline.addOperation(operation)
@@ -289,9 +289,9 @@ class ImageProcessingPipelineDialog(
         val selectedOperation = activeOperationsList.selectedValue
         if (selectedOperation != null) {
             val editor = AnnotatedPropertyEditor(selectedOperation)
-            val dialog = StandardDialog()
+            // Owned by this dialog so it cannot fall behind it
+            val dialog = StandardDialog(this, "Edit ${selectedOperation.name}")
             dialog.setContentPane(editor)
-            dialog.title = "Edit ${selectedOperation.name}"
             dialog.addCommitTask {
                 editor.commitChanges()
                 activeOperationsList.repaint()

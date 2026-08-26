@@ -1,10 +1,13 @@
 package org.simbrain.workspace.gui;
 
 import org.simbrain.util.ResourceManager;
+import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
+
+import static org.simbrain.workspace.gui.CouplingTransformDialogKt.showTransformEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -58,6 +61,26 @@ public class CouplingListPanel extends JPanel {
     };
 
     /**
+     * Action which edits the transform chain of the selected coupling.
+     */
+    Action editTransformsAction = new AbstractAction() {
+        {
+            putValue(NAME, "Edit transforms...");
+            putValue(SHORT_DESCRIPTION, "Edit the transform chain applied between the selected coupling's producer and consumer");
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent arg0) {
+            java.util.List<Coupling> selected = getSelectedCouplings();
+            if (selected.size() != 1) {
+                SwingUtilsKt.showWarningDialog("Select a single coupling to edit its transforms.", "Edit Transforms");
+                return;
+            }
+            showTransformEditor(CouplingListPanel.this, desktop.getWorkspace(), selected.get(0));
+        }
+    };
+
+    /**
      * Creates a new coupling list panel using the applicable desktop and
      * coupling lists.
      *
@@ -89,10 +112,12 @@ public class CouplingListPanel extends JPanel {
         listScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         listScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
 
-        // Allows the user to delete couplings within the list frame.
+        // Allows the user to delete couplings or edit their transforms within the list frame.
         JPanel buttonPanel = new JPanel();
         JButton deleteCouplingButton = new JButton(deleteCouplingsAction);
         buttonPanel.add(deleteCouplingButton);
+        JButton editTransformsButton = new JButton(editTransformsAction);
+        buttonPanel.add(editTransformsButton);
 
         // Add scroll pane to JPanel
         add(listScroll, BorderLayout.CENTER);
@@ -104,6 +129,7 @@ public class CouplingListPanel extends JPanel {
         events.getCouplingAdded().on(c -> updateCouplingsList());
         events.getCouplingRemoved().on(c -> updateCouplingsList());
         events.getCouplingsRemoved().on(cl -> updateCouplingsList());
+        events.getCouplingChanged().on(c -> updateCouplingsList());
 
     }
 

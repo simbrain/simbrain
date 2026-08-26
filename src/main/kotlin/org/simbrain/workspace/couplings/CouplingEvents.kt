@@ -13,6 +13,12 @@ class CouplingEvents: FlowEvents() {
     val couplingsRemoved = OneArgEvent<Iterable<Coupling>>()
 
     /**
+     * A coupling was replaced in place with an edited transform chain; carries the replacement. See
+     * [CouplingManager.setTransforms].
+     */
+    val couplingChanged = OneArgEvent<Coupling>()
+
+    /**
      * Workspace-wide relay of [org.simbrain.workspace.events.WorkspaceComponentEvents.attributeContainerChanged],
      * so consumers of a coupling (e.g. plots) can react to changes on the producing side, such as label changes,
      * without subscribing to every component.

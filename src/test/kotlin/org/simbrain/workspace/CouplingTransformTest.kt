@@ -211,6 +211,32 @@ class CouplingTransformTest {
     }
 
     @Test
+    fun `setTransforms replaces the chain in place and preserves update order`() {
+        val container = TransformTestContainer().apply { scalar = 2.0 }
+        with(couplingManager) {
+            val first = container.getProducer("produceScalar") couple container.getConsumer("consumeScalar")
+            val second = container.getProducer("produceArray") couple container.getConsumer("consumeArray")
+            val replaced = setTransforms(first, listOf(ScaleOperation(3.0)))
+            assertEquals(listOf(replaced, second), couplings)
+        }
+        runBlocking { couplingManager.updateCouplings() }
+        assertEquals(6.0, container.received)
+    }
+
+    @Test
+    fun `setTransforms rejects a chain that does not fit the endpoints`() {
+        val container = TransformTestContainer().apply { scalar = 1.0 }
+        val coupling = with(couplingManager) {
+            container.getProducer("produceScalar") couple container.getConsumer("consumeScalar")
+        }
+        assertThrows<MismatchedAttributesException> {
+            couplingManager.setTransforms(coupling, listOf(MeanOperation()))
+        }
+        runBlocking { couplingManager.updateCouplings() }
+        assertEquals(1.0, container.received)
+    }
+
+    @Test
     fun `transform chain survives workspace serialization`() {
         val networkComponent = NetworkComponent("Net")
         workspace.addWorkspaceComponent(networkComponent)

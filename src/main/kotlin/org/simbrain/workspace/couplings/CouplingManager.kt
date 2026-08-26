@@ -301,6 +301,28 @@ class CouplingManager(val workspace: Workspace) {
     infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling> =
         createOneToOneCouplings(this, consumers)
 
+    /**
+     * Replace [coupling]'s transform chain, returning the replacement coupling. The replacement keeps
+     * the original's position in the update order, so many-to-one delivery order is unaffected.
+     * Validates the new chain against the endpoints ([Coupling.chainError]) before touching anything.
+     */
+    @Throws(MismatchedAttributesException::class)
+    fun setTransforms(coupling: Coupling, transforms: List<CouplingOperation<*, *>>): Coupling {
+        val replacement = Coupling.create(coupling.producer, coupling.consumer, transforms)
+        synchronized(_couplings) {
+            require(_couplings.contains(coupling)) { "Coupling ${coupling.id} is not managed by this workspace" }
+            val ordered = _couplings.toList()
+            _couplings.clear()
+            ordered.forEach { _couplings.add(if (it == coupling) replacement else it) }
+            cachedCouplingList.invalidate()
+            attributeContainerCouplings[coupling.producer.baseObject]?.apply { remove(coupling); add(replacement) }
+            attributeContainerCouplings[coupling.consumer.baseObject]?.apply { remove(coupling); add(replacement) }
+            reportedFailures.remove(coupling)
+        }
+        events.couplingChanged.fire(replacement)
+        return replacement
+    }
+
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach { coupling ->
             removeCouplingWithoutFiringEvent(coupling)

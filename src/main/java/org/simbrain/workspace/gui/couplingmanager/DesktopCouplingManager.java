@@ -9,6 +9,7 @@ import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingListPanel;
+import org.simbrain.workspace.gui.CouplingTransformDialogKt;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 import smile.math.matrix.Matrix;
@@ -96,8 +97,12 @@ public class DesktopCouplingManager extends JPanel {
         addCouplingsButton.setActionCommand("addCouplings");
         addCouplingsButton.addActionListener((e) -> addCouplings());
 
+        JButton addWithTransformsButton = new JButton("Add With Transforms...");
+        addWithTransformsButton.setToolTipText("Create one coupling from the selected producer and consumer through a transform chain; the endpoint types may differ when a transform bridges them");
+        addWithTransformsButton.addActionListener((e) -> addCouplingWithTransforms());
+
         JPanel trailingControls = SwingUtilsKt.buttonRow(
-            new Component[]{helpButton, couplingMethodComboBox, addCouplingsButton},
+            new Component[]{helpButton, couplingMethodComboBox, addCouplingsButton, addWithTransformsButton},
             FlowLayout.RIGHT,
             Theme.componentGap
         );
@@ -152,6 +157,21 @@ public class DesktopCouplingManager extends JPanel {
         } catch (MismatchedAttributesException e) {
             SwingUtilsKt.showWarningDialog(e.getMessage(), "Unmatched Attributes");
         }
+    }
+
+    /**
+     * Open the transform editor for one selected producer and one selected consumer, creating the
+     * coupling on commit. This is the path for couplings whose endpoint types differ.
+     */
+    private void addCouplingWithTransforms() {
+        List<Producer> producers = (List<Producer>) producerPanel.getSelectedAttributes();
+        List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
+
+        if (producers.size() != 1 || consumers.size() != 1) {
+            SwingUtilsKt.showWarningDialog("Select exactly one producer and one consumer\nto create a coupling with transforms.", "Add With Transforms");
+            return;
+        }
+        CouplingTransformDialogKt.showTransformEditorForNewCoupling(this, desktop.getWorkspace(), producers.get(0), consumers.get(0));
     }
 
     /**

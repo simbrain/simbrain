@@ -95,24 +95,33 @@ class Coupling private constructor(
             if (producer == null || consumer == null) {
                 throw IllegalArgumentException("Producer and Consumer cannot be null")
             }
+            chainError(producer, consumer, transforms)?.let { throw MismatchedAttributesException(it) }
+            return Coupling(producer, consumer, transforms)
+        }
+
+        /**
+         * Why this chain does not type-check between these endpoints, or null when it does. Used both
+         * by [create] and for live validation in the transform editor.
+         */
+        fun chainError(
+            producer: Producer,
+            consumer: Consumer,
+            transforms: List<CouplingOperation<*, *>>
+        ): String? {
             var current: Type = producer.type
             var upstream = producer.toString()
             for (transform in transforms) {
                 if (!attributeTypesMatch(current, transform.inputType)) {
-                    throw MismatchedAttributesException(
-                        "$upstream type $current does not match transform ${transform.name} " +
-                                "input type ${transform.inputType}"
-                    )
+                    return "$upstream type $current does not match transform ${transform.name} " +
+                            "input type ${transform.inputType}"
                 }
                 current = transform.outputType
                 upstream = "transform ${transform.name}"
             }
             if (!attributeTypesMatch(current, consumer.type)) {
-                throw MismatchedAttributesException(
-                    "$upstream type $current does not match consumer type ${consumer.type}"
-                )
+                return "$upstream type $current does not match consumer type ${consumer.type}"
             }
-            return Coupling(producer, consumer, transforms)
+            return null
         }
     }
 }

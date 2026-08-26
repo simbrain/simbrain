@@ -289,9 +289,11 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     /**
-     * Update all couplings by setting the consumers to take the values of their producers.
+     * Update all couplings by setting the consumers to take the values of their producers. Suspends
+     * whenever a coupling's attribute methods do; couplings are updated sequentially so many-to-one
+     * consumers see a deterministic order.
      */
-    fun updateCouplings() {
+    suspend fun updateCouplings() {
         // Deliberately not holding the _couplings monitor across the updates. Consumers can block on the
         // event thread, as the chart models do when they touch a dataset that is being painted, while the
         // event thread in turn reads this coupling list; holding the lock over both deadlocks them against

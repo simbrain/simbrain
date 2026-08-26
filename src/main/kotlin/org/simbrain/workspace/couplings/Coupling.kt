@@ -23,14 +23,14 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
 
     /**
      * This is the main action!  Set the value of the consumer based on the
-     * value of the producer.
+     * value of the producer. Suspends when either attribute method does.
      *
      * Note that values are passed by reference, so that it is up to the producing or
      * consuming methods to make defensive copies as needed.
      * (cf http://www.javapractices.com/topic/TopicAction.do?Id=15)).
      */
-    fun update() {
-        consumer.setValue(producer.value)
+    suspend fun update() {
+        consumer.setValue(producer.getValue())
     }
 
     val type: Type
@@ -86,11 +86,15 @@ class Coupling private constructor(val producer: Producer, val consumer: Consume
 }
 
 /**
- * Return whether the specified method is producible. Ignore versions of the function that take arguments.
+ * Return whether the specified method is producible: annotated, and taking no arguments beyond the
+ * trailing continuation of a suspend function. Versions of the function that take arguments are ignored.
  */
-fun Method.isProducible() = isAnnotationPresent(Producible::class.java) && parameters.isEmpty()
+fun Method.isProducible() = isAnnotationPresent(Producible::class.java) &&
+        parameterCount == (if (isSuspendAttribute) 1 else 0)
 
 /**
- * Return whether the specified method is consumable.
+ * Return whether the specified method is consumable: annotated, and taking exactly the value argument
+ * plus, for a suspend function, its trailing continuation.
  */
-fun Method.isConsumable() = isAnnotationPresent(Consumable::class.java) && parameters.size == 1
+fun Method.isConsumable() = isAnnotationPresent(Consumable::class.java) &&
+        parameterCount == (if (isSuspendAttribute) 2 else 1)

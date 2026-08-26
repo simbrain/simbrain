@@ -25,6 +25,7 @@ import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.BorderLayout
 import java.awt.Dimension
+import java.awt.FlowLayout
 import java.awt.GraphicsEnvironment
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -89,7 +90,9 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
     init {
         layout = BorderLayout()
         createAttachMenuBar()
-        add(createToolbar(), BorderLayout.NORTH)
+        // Wrapped in a flow panel like the projection plot's toolbar, so the toolbar keeps its
+        // preferred size with a small margin instead of being stretched by the border layout
+        add(JPanel(FlowLayout(FlowLayout.LEFT)).apply { add(createToolbar()) }, BorderLayout.NORTH)
         add(centerPanel, BorderLayout.CENTER)
         rebuildLayout()
         syncControls()

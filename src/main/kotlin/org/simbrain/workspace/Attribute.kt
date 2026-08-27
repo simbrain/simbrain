@@ -12,8 +12,12 @@
  */
 package org.simbrain.workspace
 
+import org.simbrain.util.Theme
 import org.simbrain.util.Utils
 import org.simbrain.workspace.couplings.LOW_PRIORITY
+import smile.math.matrix.Matrix
+import java.awt.Color
+import javax.swing.UIManager
 import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.ParameterizedType
@@ -255,6 +259,34 @@ fun Method.validateAttributeMethod() {
  * null value is skipped before delivery rather than unboxed.
  */
 fun attributeTypesMatch(from: Type, to: Type): Boolean = from.normalized == to.normalized
+
+/**
+ * Human-readable name for an attribute or transform endpoint type, e.g. "Number" rather than "double"
+ * or "Array" rather than "class [D". Used in coupling GUI labels and type-mismatch messages.
+ */
+val Type.attributeTypeName: String
+    get() = when (this.normalized) {
+        java.lang.Double.TYPE -> "Number"
+        DoubleArray::class.java -> "Array"
+        String::class.java -> "Text"
+        else -> (this as? Class<*>)?.simpleName ?: toString()
+    }
+
+/**
+ * Display color for an attribute or transform endpoint type in coupling lists, legends, and the
+ * transform editor. Resolved from the look and feel's accent palette on every read, so the colors
+ * follow theme switches; the literal fallbacks approximate the FlatLaf light palette. Returned as a
+ * plain Color, never a UIResource, so a component foreground set to it survives updateUI sweeps.
+ */
+val Type.attributeTypeColor: Color
+    get() = when (this.normalized) {
+        DoubleArray::class.java -> solid(UIManager.getColor("Actions.Green") ?: Color(89, 168, 105))
+        String::class.java -> solid(UIManager.getColor("Actions.Blue") ?: Color(56, 159, 214))
+        Matrix::class.java -> solid(UIManager.getColor("Actions.Yellow") ?: Color(237, 162, 0))
+        else -> solid(Theme.foreground)
+    }
+
+private fun solid(color: Color) = Color(color.red, color.green, color.blue)
 
 private val Type.normalized: Type
     get() = (this as? Class<*>)?.let { wrapperToPrimitive[it] } ?: this

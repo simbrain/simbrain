@@ -51,9 +51,9 @@ class Coupling private constructor(
 
     val description: String
         get() = if (transforms.isEmpty()) {
-            "$producer > $consumer"
+            "$producer → $consumer"
         } else {
-            "$producer > ${transforms.joinToString(" > ") { it.displayLabel }} > $consumer"
+            "$producer → ${transforms.joinToString(" → ") { it.displayLabel }} → $consumer"
         }
 
     override fun toString() = description
@@ -112,14 +112,15 @@ class Coupling private constructor(
             var upstream = producer.toString()
             for (transform in transforms) {
                 if (!attributeTypesMatch(current, transform.inputType)) {
-                    return "$upstream type $current does not match transform ${transform.name} " +
-                            "input type ${transform.inputType}"
+                    return "$upstream yields ${current.attributeTypeName}, but transform " +
+                            "${transform.name} takes ${transform.inputType.attributeTypeName}"
                 }
                 current = transform.outputType
                 upstream = "transform ${transform.name}"
             }
             if (!attributeTypesMatch(current, consumer.type)) {
-                return "$upstream type $current does not match consumer type ${consumer.type}"
+                return "$upstream yields ${current.attributeTypeName}, but the consumer takes " +
+                        consumer.type.attributeTypeName
             }
             return null
         }

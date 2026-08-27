@@ -19,6 +19,8 @@ import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.MismatchedAttributesException
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.attributeTypeColor
+import org.simbrain.workspace.attributeTypeName
 import org.simbrain.workspace.attributeTypesMatch
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingOperation
@@ -40,6 +42,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
+import javax.swing.ToolTipManager
 
 class CouplingTransformDialog(
     private val producer: Producer,
@@ -56,7 +59,19 @@ class CouplingTransformDialog(
     private val chainListModel = DefaultListModel<CouplingOperation<*, *>>()
     private val chainList = JList(chainListModel)
     private val availableListModel = DefaultListModel<Class<out CouplingOperation<*, *>>>()
-    private val availableList = JList(availableListModel)
+
+    private val availableList = object : JList<Class<out CouplingOperation<*, *>>>(availableListModel) {
+        override fun getToolTipText(event: MouseEvent): String? {
+            val index = locationToIndex(event.point).takeIf { it >= 0 } ?: return null
+            if (!getCellBounds(index, index).contains(event.point)) return null
+            val operation = prototypes[model.getElementAt(index)] ?: return null
+            val slotType = typeAt(insertIndex)
+            if (attributeTypesMatch(slotType, operation.inputType)) return null
+            return "Takes ${operation.inputType.attributeTypeName}, but the chain carries " +
+                    "${slotType.attributeTypeName} at item ${insertIndex + 1}"
+        }
+    }
+
     private val statusLabel = JLabel()
     private val addButton = JButton()
 
@@ -74,10 +89,11 @@ class CouplingTransformDialog(
     }
 
     init {
-        title = "Transforms: ${producer.simpleDescription} > ${consumer.simpleDescription}"
+        title = "Transforms: ${producer.simpleDescription} \u2192 ${consumer.simpleDescription}"
         setContentPane(buildContent())
         addCommitTask { onCommit(chain.toList()) }
         couplingOperationTypes.forEach { @Suppress("UNCHECKED_CAST") availableListModel.addElement(it as Class<out CouplingOperation<*, *>>) }
+        ToolTipManager.sharedInstance().registerComponent(availableList)
         refreshChainList()
         pack()
     }
@@ -89,11 +105,11 @@ class CouplingTransformDialog(
         val endpointsPanel = JPanel(FlowLayout(FlowLayout.LEFT, Theme.componentGap, 0)).apply {
             border = Theme.sectionBorder("Coupling")
             add(JLabel("From:"))
-            add(JLabel("${producer.simpleDescription} (${typeDisplay(producer.type)})").apply {
+            add(JLabel("${producer.simpleDescription} (${producer.type.attributeTypeName})").apply {
                 foreground = DesktopCouplingManager.getColor(producer.type)
             })
             add(JLabel("To:"))
-            add(JLabel("${consumer.simpleDescription} (${typeDisplay(consumer.type)})").apply {
+            add(JLabel("${consumer.simpleDescription} (${consumer.type.attributeTypeName})").apply {
                 foreground = DesktopCouplingManager.getColor(consumer.type)
             })
         }
@@ -121,9 +137,10 @@ class CouplingTransformDialog(
             ): Component {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
                 prototypes[value]?.let {
-                    text = "${it.name} (${typeDisplay(it.inputType)} > ${typeDisplay(it.outputType)})"
+                    val dimmed = !fitsAtInsertion(it)
+                    text = operationLabel(it.name, it, plain = dimmed || isSelected)
                     // Grey out what cannot follow the chain at the insertion point
-                    if (!isSelected && !fitsAtInsertion(it)) {
+                    if (dimmed && !isSelected) {
                         foreground = Theme.mutedText
                     }
                 }
@@ -176,8 +193,9 @@ class CouplingTransformDialog(
             ): Component {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
                 if (value is CouplingOperation<*, *>) {
-                    text = "${index + 1}. ${describe(value)}"
-                    if (!isSelected && index == firstMismatchIndex) {
+                    val mismatched = index == firstMismatchIndex
+                    text = operationLabel("${index + 1}. ${value.displayLabel}", value, plain = mismatched || isSelected)
+                    if (!isSelected && mismatched) {
                         foreground = Theme.errorText
                     }
                 }
@@ -266,7 +284,7 @@ class CouplingTransformDialog(
         val error = Coupling.chainError(producer, consumer, chain)
         if (error == null) {
             statusLabel.text = "Chain types match: " +
-                    (listOf(typeDisplay(producer.type)) + chain.map { typeDisplay(it.outputType) }).joinToString(" > ")
+                    (listOf(producer.type.attributeTypeName) + chain.map { it.outputType.attributeTypeName }).joinToString(" \u2192 ")
             statusLabel.foreground = Theme.mutedText
             okButton.isEnabled = true
         } else {
@@ -277,16 +295,24 @@ class CouplingTransformDialog(
         chainList.repaint()
     }
 
-    private fun describe(operation: CouplingOperation<*, *>) =
-        "${operation.displayLabel} (${typeDisplay(operation.inputType)} > ${typeDisplay(operation.outputType)})"
+    /**
+     * "Label (In \u2192 Out)" with the type names tinted in their data-type colors; [plain] drops the
+     * markup so selection and error foregrounds stay readable.
+     */
+    private fun operationLabel(label: String, operation: CouplingOperation<*, *>, plain: Boolean): String {
+        val input = operation.inputType
+        val output = operation.outputType
+        return if (plain) {
+            "$label (${input.attributeTypeName} \u2192 ${output.attributeTypeName})"
+        } else {
+            "<html>$label (<font color='${input.attributeTypeColor.hex}'>${input.attributeTypeName}</font> \u2192 " +
+                    "<font color='${output.attributeTypeColor.hex}'>${output.attributeTypeName}</font>)</html>"
+        }
+    }
 }
 
-private fun typeDisplay(type: Type): String = when (type) {
-    Double::class.java, java.lang.Double::class.java -> "Number"
-    DoubleArray::class.java -> "Array"
-    String::class.java -> "Text"
-    else -> (type as? Class<*>)?.simpleName ?: type.toString()
-}
+private val java.awt.Color.hex: String
+    get() = "#%02x%02x%02x".format(red, green, blue)
 
 /**
  * Edit the transform chain of an existing coupling; OK replaces the coupling's chain in place.

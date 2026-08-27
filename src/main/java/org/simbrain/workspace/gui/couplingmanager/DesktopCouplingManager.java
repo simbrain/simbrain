@@ -5,6 +5,7 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.workspace.AttributeKt;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.Producer;
@@ -176,22 +177,14 @@ public class DesktopCouplingManager extends JPanel {
 
     /**
      * Associates attribute and coupling data types (classes) with colors used
-     * in displaying attributes and couplings.
+     * in displaying attributes and couplings. Delegates to the theme-aware
+     * palette so the colors follow the active look and feel.
      *
      * @param dataType the data type to associate with a color
      * @return the color associated with a data type
      */
     public static Color getColor(Type dataType) {
-        if (dataType == double.class) {
-            return Color.black;
-        } else if (dataType == double[].class) {
-            return Color.green.darker().darker();
-        } else if (dataType == String.class) {
-            return Color.blue.brighter();
-        } else if (dataType == Matrix.class) {
-            return new Color(255, 140, 0);
-        }
-        return Color.black;
+        return AttributeKt.getAttributeTypeColor(dataType);
     }
 
 }

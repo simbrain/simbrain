@@ -237,6 +237,25 @@ class CouplingTransformTest {
     }
 
     @Test
+    fun `operation display labels fold in parameter values`() {
+        assertEquals("Scale ×0.5", ScaleOperation(0.5).displayLabel)
+        assertEquals("Scale ×2", ScaleOperation(2.0).displayLabel)
+        assertEquals("Coerce in [0, 1]", CoerceInOperation(0.0, 1.0).displayLabel)
+        assertEquals("Threshold ≥ 1.5", ThresholdOperation(1.5).displayLabel)
+        assertEquals("Element [3]", ElementOperation(3).displayLabel)
+        assertEquals("Mean", MeanOperation().displayLabel)
+    }
+
+    @Test
+    fun `coupling descriptions show the chain with parameter values`() {
+        val container = TransformTestContainer()
+        val coupling = with(couplingManager) {
+            container.getProducer("produceScalar") via ScaleOperation(0.5) couple container.getConsumer("consumeScalar")
+        }
+        assertEquals(true, "Scale ×0.5" in coupling.description) { coupling.description }
+    }
+
+    @Test
     fun `transform chain survives workspace serialization`() {
         val networkComponent = NetworkComponent("Net")
         workspace.addWorkspaceComponent(networkComponent)

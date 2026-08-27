@@ -53,7 +53,7 @@ class Coupling private constructor(
         get() = if (transforms.isEmpty()) {
             "$producer > $consumer"
         } else {
-            "$producer > ${transforms.joinToString(" > ") { it.name }} > $consumer"
+            "$producer > ${transforms.joinToString(" > ") { it.displayLabel }} > $consumer"
         }
 
     override fun toString() = description

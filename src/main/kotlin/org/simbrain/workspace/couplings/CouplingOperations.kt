@@ -34,6 +34,8 @@ class ScaleOperation() : ScalarOperation() {
 
     override val name = "Scale"
 
+    override val displayLabel get() = "Scale ×${factor.compact()}"
+
     override suspend fun apply(input: Double) = input * factor
 
     override fun copy() = ScaleOperation(factor)
@@ -52,6 +54,8 @@ class OffsetOperation() : ScalarOperation() {
     )
 
     override val name = "Offset"
+
+    override val displayLabel get() = "Offset ${if (amount < 0) "−${(-amount).compact()}" else "+${amount.compact()}"}"
 
     override suspend fun apply(input: Double) = input + amount
 
@@ -79,6 +83,8 @@ class CoerceInOperation() : ScalarOperation() {
 
     override val name = "Coerce in"
 
+    override val displayLabel get() = "Coerce in [${min.compact()}, ${max.compact()}]"
+
     override suspend fun apply(input: Double) = input.coerceIn(min, max)
 
     override fun copy() = CoerceInOperation(min, max)
@@ -101,6 +107,8 @@ class ThresholdOperation() : ScalarOperation() {
 
     override val name = "Threshold"
 
+    override val displayLabel get() = "Threshold ≥ ${threshold.compact()}"
+
     override suspend fun apply(input: Double) = input.takeIf { it >= threshold }
 
     override fun copy() = ThresholdOperation(threshold)
@@ -122,6 +130,8 @@ class DeadbandOperation() : ScalarOperation() {
     )
 
     override val name = "Deadband"
+
+    override val displayLabel get() = "Deadband ±${epsilon.compact()}"
 
     override suspend fun apply(input: Double) = input.takeIf { abs(it) >= epsilon }
 
@@ -190,6 +200,8 @@ class ElementOperation() : ArrayToScalarOperation() {
 
     override val name = "Element"
 
+    override val displayLabel get() = "Element [$index]"
+
     override suspend fun apply(input: DoubleArray) = input.getOrNull(index)
 
     override fun copy() = ElementOperation(index)
@@ -217,6 +229,8 @@ class BroadcastOperation() : CouplingOperation<Double, DoubleArray>() {
 
     override val name = "Broadcast"
 
+    override val displayLabel get() = "Broadcast ×$size"
+
     override suspend fun apply(input: Double) = DoubleArray(size) { input }
 
     override fun copy() = BroadcastOperation(size)
@@ -239,6 +253,9 @@ class NormalizeOperation : CouplingOperation<DoubleArray, DoubleArray>() {
 
     override fun copy() = NormalizeOperation()
 }
+
+private fun Double.compact(): String =
+    if (this == toLong().toDouble()) toLong().toString() else toString()
 
 val couplingOperationTypes: List<Class<out CopyableObject>> = listOf(
     ScaleOperation::class.java,

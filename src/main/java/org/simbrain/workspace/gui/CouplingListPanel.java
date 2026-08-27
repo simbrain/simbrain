@@ -12,6 +12,8 @@ import static org.simbrain.workspace.gui.CouplingTransformDialogKt.showTransform
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -105,6 +107,18 @@ public class CouplingListPanel extends JPanel {
         // Populates the coupling list with data.
         couplings.setListData(this.couplingList.toArray());
         couplings.setCellRenderer(new CouplingCellRenderer());
+        couplings.setToolTipText("Double-click a coupling to edit its transforms");
+        couplings.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2) {
+                    int index = couplings.locationToIndex(e.getPoint());
+                    if (index >= 0 && couplings.getCellBounds(index, index).contains(e.getPoint())) {
+                        showTransformEditor(CouplingListPanel.this, desktop.getWorkspace(), (Coupling) couplings.getModel().getElementAt(index));
+                    }
+                }
+            }
+        });
 
         // Scroll pane for showing lists larger than viewing window and setting
         // maximum size

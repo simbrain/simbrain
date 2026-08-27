@@ -38,9 +38,15 @@ abstract class CouplingOperation<I, O> : CopyableObject {
 
     abstract override fun copy(): CouplingOperation<I, O>
 
+    /**
+     * The name with this instance's parameter values folded in, e.g. "Scale ×0.5", so chain listings
+     * show what the operation actually does. Parameterless operations fall back to the plain name.
+     */
+    open val displayLabel: String get() = name
+
     override fun getTypeList() = couplingOperationTypes
 
-    override fun toString() = name
+    override fun toString() = displayLabel
 }
 
 /**

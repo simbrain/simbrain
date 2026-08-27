@@ -19,6 +19,7 @@ import org.simbrain.workspace.Consumer
 import org.simbrain.workspace.MismatchedAttributesException
 import org.simbrain.workspace.Producer
 import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.attributeTypesMatch
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingOperation
 import org.simbrain.workspace.couplings.couplingOperationTypes
@@ -57,6 +58,13 @@ class CouplingTransformDialog(
     private val availableListModel = DefaultListModel<Class<out CouplingOperation<*, *>>>()
     private val availableList = JList(availableListModel)
     private val statusLabel = JLabel()
+    private val addButton = JButton()
+
+    /**
+     * Index of the first operation whose input does not match what the chain feeds it, or -1 when
+     * every link fits; the chain renderer marks that operation.
+     */
+    private var firstMismatchIndex = -1
 
     /**
      * One throwaway instance per operation type, for display names and endpoint types in the list.
@@ -112,7 +120,13 @@ class CouplingTransformDialog(
                 list: JList<*>?, value: Any?, index: Int, isSelected: Boolean, cellHasFocus: Boolean
             ): Component {
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
-                prototypes[value]?.let { text = describe(it) }
+                prototypes[value]?.let {
+                    text = "${it.name} (${typeDisplay(it.inputType)} > ${typeDisplay(it.outputType)})"
+                    // Grey out what cannot follow the chain at the insertion point
+                    if (!isSelected && !fitsAtInsertion(it)) {
+                        foreground = Theme.mutedText
+                    }
+                }
                 return this
             }
         }
@@ -121,10 +135,34 @@ class CouplingTransformDialog(
                 if (e.clickCount == 2) addSelectedOperation()
             }
         })
+        availableList.addListSelectionListener { updateAddButton() }
 
         panel.add(JScrollPane(availableList).apply { preferredSize = Dimension(210, 220) }, BorderLayout.CENTER)
-        panel.add(JButton("Add").apply { addActionListener { addSelectedOperation() } }, BorderLayout.SOUTH)
+        panel.add(addButton.apply { addActionListener { addSelectedOperation() } }, BorderLayout.SOUTH)
         return panel
+    }
+
+    /**
+     * Where the next Add lands: after the selected chain item, or at the end when nothing is selected.
+     */
+    private val insertIndex: Int
+        get() = if (chainList.selectedIndex >= 0) chainList.selectedIndex + 1 else chain.size
+
+    /**
+     * The type flowing into position [index]: what the operation before it yields, or the producer's
+     * type at the head of the chain.
+     */
+    private fun typeAt(index: Int): java.lang.reflect.Type =
+        chain.getOrNull(index - 1)?.outputType ?: producer.type
+
+    private fun fitsAtInsertion(operation: CouplingOperation<*, *>) =
+        attributeTypesMatch(typeAt(insertIndex), operation.inputType)
+
+    private fun updateAddButton() {
+        addButton.text = "Add as item ${insertIndex + 1}"
+        val selected = availableList.selectedValue?.let { prototypes[it] }
+        addButton.isEnabled = selected != null && fitsAtInsertion(selected)
+        availableList.repaint()
     }
 
     private fun buildChainPanel(): JPanel {
@@ -139,6 +177,9 @@ class CouplingTransformDialog(
                 super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus)
                 if (value is CouplingOperation<*, *>) {
                     text = "${index + 1}. ${describe(value)}"
+                    if (!isSelected && index == firstMismatchIndex) {
+                        foreground = Theme.errorText
+                    }
                 }
                 return this
             }
@@ -148,6 +189,7 @@ class CouplingTransformDialog(
                 if (e.clickCount == 2) editSelectedOperation()
             }
         })
+        chainList.addListSelectionListener { updateAddButton() }
 
         panel.add(JScrollPane(chainList).apply { preferredSize = Dimension(260, 220) }, BorderLayout.CENTER)
 
@@ -169,9 +211,11 @@ class CouplingTransformDialog(
 
     private fun addSelectedOperation() {
         val type = availableList.selectedValue ?: return
-        chain.add(type.getDeclaredConstructor().newInstance() as CouplingOperation<*, *>)
+        if (prototypes[type]?.let { fitsAtInsertion(it) } != true) return
+        val position = insertIndex
+        chain.add(position, type.getDeclaredConstructor().newInstance() as CouplingOperation<*, *>)
         refreshChainList()
-        chainList.selectedIndex = chain.lastIndex
+        chainList.selectedIndex = position
     }
 
     private fun editSelectedOperation() {
@@ -212,9 +256,13 @@ class CouplingTransformDialog(
         chainListModel.clear()
         chain.forEach { chainListModel.addElement(it) }
         updateStatus()
+        updateAddButton()
     }
 
     private fun updateStatus() {
+        firstMismatchIndex = chain.indices.firstOrNull { index ->
+            !attributeTypesMatch(typeAt(index), chain[index].inputType)
+        } ?: -1
         val error = Coupling.chainError(producer, consumer, chain)
         if (error == null) {
             statusLabel.text = "Chain types match: " +
@@ -226,10 +274,11 @@ class CouplingTransformDialog(
             statusLabel.foreground = Theme.errorText
             okButton.isEnabled = false
         }
+        chainList.repaint()
     }
 
     private fun describe(operation: CouplingOperation<*, *>) =
-        "${operation.name} (${typeDisplay(operation.inputType)} > ${typeDisplay(operation.outputType)})"
+        "${operation.displayLabel} (${typeDisplay(operation.inputType)} > ${typeDisplay(operation.outputType)})"
 }
 
 private fun typeDisplay(type: Type): String = when (type) {

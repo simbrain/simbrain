@@ -15,11 +15,15 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.workspace.couplings.BroadcastOperation
 import org.simbrain.workspace.couplings.CoerceInOperation
 import org.simbrain.workspace.couplings.ElementOperation
+import org.simbrain.workspace.couplings.ArrayToMatrixOperation
+import org.simbrain.workspace.couplings.MatrixToArrayOperation
 import org.simbrain.workspace.couplings.MeanOperation
 import org.simbrain.workspace.couplings.OnChangeOperation
 import org.simbrain.workspace.couplings.ScaleOperation
 import org.simbrain.workspace.couplings.ThresholdOperation
+import org.simbrain.workspace.gui.inferTargetArraySize
 import org.simbrain.workspace.serialization.WorkspaceSerializer
+import smile.math.matrix.Matrix
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -53,6 +57,35 @@ class TransformTestContainer : AttributeContainer {
     fun consumeArray(value: DoubleArray) {
         receivedArray = value
         deliveries++
+    }
+}
+
+class MatrixTestContainer : AttributeContainer {
+    override val id = "Matrix container"
+
+    var matrix: Matrix = Matrix.column(doubleArrayOf(4.0, 5.0, 6.0))
+    var receivedMatrix: Matrix? = null
+
+    @Producible
+    fun produceMatrix(): Matrix = matrix
+
+    @Consumable
+    fun consumeMatrix(value: Matrix) {
+        receivedMatrix = value
+    }
+}
+
+class AmbiguousSizeContainer : AttributeContainer {
+    override val id = "Ambiguous container"
+
+    @Producible
+    fun produceSmall() = doubleArrayOf(1.0, 2.0)
+
+    @Producible
+    fun produceLarge() = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
+
+    @Consumable
+    fun consumeArray(value: DoubleArray) {
     }
 }
 
@@ -234,6 +267,56 @@ class CouplingTransformTest {
         }
         runBlocking { couplingManager.updateCouplings() }
         assertEquals(1.0, container.received)
+    }
+
+    @Test
+    fun `array producers can feed matrix consumers through the cast`() {
+        val source = TransformTestContainer()
+        val target = MatrixTestContainer()
+        with(couplingManager) {
+            source.getProducer("produceArray") via ArrayToMatrixOperation() couple target.getConsumer("consumeMatrix")
+        }
+        runBlocking { couplingManager.updateCouplings() }
+        val received = target.receivedMatrix!!
+        assertEquals(3, received.nrow())
+        assertEquals(1, received.ncol())
+        assertEquals(2.0, received.get(1, 0))
+    }
+
+    @Test
+    fun `matrix producers can feed array consumers through the cast`() {
+        val source = MatrixTestContainer()
+        val target = TransformTestContainer()
+        with(couplingManager) {
+            source.getProducer("produceMatrix") via MatrixToArrayOperation() couple target.getConsumer("consumeArray")
+        }
+        runBlocking { couplingManager.updateCouplings() }
+        assertArrayEquals(doubleArrayOf(4.0, 5.0, 6.0), target.receivedArray)
+    }
+
+    @Test
+    fun `target array size is inferred from the consumer container's producers`() {
+        val container = TransformTestContainer()
+        val consumer = with(couplingManager) { container.getConsumer("consumeScalar") }
+        assertEquals(3, inferTargetArraySize(workspace, consumer))
+
+        val matrixContainer = MatrixTestContainer()
+        val matrixConsumer = with(couplingManager) { matrixContainer.getConsumer("consumeMatrix") }
+        assertEquals(3, inferTargetArraySize(workspace, matrixConsumer))
+
+        val ambiguous = AmbiguousSizeContainer()
+        val ambiguousConsumer = with(couplingManager) { ambiguous.getConsumer("consumeArray") }
+        assertEquals(null, inferTargetArraySize(workspace, ambiguousConsumer))
+    }
+
+    @Test
+    fun `tryGetValueNow samples plain producers and skips suspending ones`() {
+        val plain = TransformTestContainer()
+        val suspending = SuspendAttributeContainer()
+        with(couplingManager) {
+            assertEquals(3, (plain.getProducer("produceArray").tryGetValueNow() as DoubleArray).size)
+            assertEquals(null, suspending.getProducer("produceDouble").tryGetValueNow())
+        }
     }
 
     @Test

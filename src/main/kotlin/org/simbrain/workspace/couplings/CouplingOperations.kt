@@ -7,7 +7,9 @@
 package org.simbrain.workspace.couplings
 
 import org.simbrain.util.propertyeditor.CopyableObject
+import org.simbrain.util.flatten
 import org.simbrain.util.propertyeditor.GuiEditable
+import smile.math.matrix.Matrix
 import kotlin.math.abs
 
 abstract class ScalarOperation : CouplingOperation<Double, Double>() {
@@ -254,6 +256,39 @@ class NormalizeOperation : CouplingOperation<DoubleArray, DoubleArray>() {
     override fun copy() = NormalizeOperation()
 }
 
+/**
+ * Wraps an array as a single-column matrix, the orientation Simbrain uses for activations, so array
+ * producers such as a data world row can feed matrix consumers such as a neuron array's inputs.
+ */
+class ArrayToMatrixOperation : CouplingOperation<DoubleArray, Matrix>() {
+
+    override val inputType: Class<*> get() = DoubleArray::class.java
+    override val outputType: Class<*> get() = Matrix::class.java
+
+    override val name = "To matrix"
+
+    override suspend fun apply(input: DoubleArray): Matrix = Matrix.column(input)
+
+    override fun copy() = ArrayToMatrixOperation()
+}
+
+/**
+ * Flattens a matrix to an array in row-major order, matching [org.simbrain.util.flatten]; a column
+ * vector comes out as the plain vector, so matrix producers such as neuron array activations can feed
+ * array consumers such as plots or a data world row.
+ */
+class MatrixToArrayOperation : CouplingOperation<Matrix, DoubleArray>() {
+
+    override val inputType: Class<*> get() = Matrix::class.java
+    override val outputType: Class<*> get() = DoubleArray::class.java
+
+    override val name = "To array"
+
+    override suspend fun apply(input: Matrix): DoubleArray = input.flatten()
+
+    override fun copy() = MatrixToArrayOperation()
+}
+
 private fun Double.compact(): String =
     if (this == toLong().toDouble()) toLong().toString() else toString()
 
@@ -270,4 +305,6 @@ val couplingOperationTypes: List<Class<out CopyableObject>> = listOf(
     ElementOperation::class.java,
     BroadcastOperation::class.java,
     NormalizeOperation::class.java,
+    ArrayToMatrixOperation::class.java,
+    MatrixToArrayOperation::class.java,
 )

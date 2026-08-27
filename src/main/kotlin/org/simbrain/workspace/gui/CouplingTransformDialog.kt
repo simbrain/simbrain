@@ -23,9 +23,11 @@ import org.simbrain.workspace.attributeTypeColor
 import org.simbrain.workspace.attributeTypeName
 import org.simbrain.workspace.attributeTypesMatch
 import org.simbrain.workspace.couplings.Coupling
+import org.simbrain.workspace.couplings.BroadcastOperation
 import org.simbrain.workspace.couplings.CouplingOperation
 import org.simbrain.workspace.couplings.couplingOperationTypes
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
+import smile.math.matrix.Matrix
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
@@ -48,6 +50,7 @@ class CouplingTransformDialog(
     private val producer: Producer,
     private val consumer: Consumer,
     initialTransforms: List<CouplingOperation<*, *>>,
+    private val broadcastSizeHint: Int? = null,
     private val onCommit: (List<CouplingOperation<*, *>>) -> Unit
 ) : StandardDialog() {
 
@@ -231,7 +234,12 @@ class CouplingTransformDialog(
         val type = availableList.selectedValue ?: return
         if (prototypes[type]?.let { fitsAtInsertion(it) } != true) return
         val position = insertIndex
-        chain.add(position, type.getDeclaredConstructor().newInstance() as CouplingOperation<*, *>)
+        val operation = type.getDeclaredConstructor().newInstance() as CouplingOperation<*, *>
+        // Default a broadcast to the size the consumer's container carries, when that could be sampled
+        if (operation is BroadcastOperation && broadcastSizeHint != null) {
+            operation.size = broadcastSizeHint
+        }
+        chain.add(position, operation)
         refreshChainList()
         chainList.selectedIndex = position
     }
@@ -311,6 +319,27 @@ class CouplingTransformDialog(
     }
 }
 
+/**
+ * The array size the consumer's side of a coupling carries, or null when it cannot be determined:
+ * sampled from the array and matrix producers on the consumer's own container (a neuron array's
+ * activations, a data world's row), which by convention match what its consumers accept. Only
+ * non-suspending producers are sampled, and only an unambiguous answer counts — if the container's
+ * producers disagree about the size, there is no hint.
+ */
+fun inferTargetArraySize(workspace: Workspace, consumer: Consumer): Int? = with(workspace.couplingManager) {
+    consumer.baseObject.producers
+        .mapNotNull { candidate ->
+            when (val value = candidate.tryGetValueNow()) {
+                is DoubleArray -> value.size
+                is Matrix -> value.size().toInt()
+                else -> null
+            }
+        }
+        .distinct()
+        .singleOrNull()
+        ?.takeIf { it > 0 }
+}
+
 private val java.awt.Color.hex: String
     get() = "#%02x%02x%02x".format(red, green, blue)
 
@@ -318,7 +347,10 @@ private val java.awt.Color.hex: String
  * Edit the transform chain of an existing coupling; OK replaces the coupling's chain in place.
  */
 fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coupling) {
-    CouplingTransformDialog(coupling.producer, coupling.consumer, coupling.transforms) { transforms ->
+    CouplingTransformDialog(
+        coupling.producer, coupling.consumer, coupling.transforms,
+        broadcastSizeHint = inferTargetArraySize(workspace, coupling.consumer)
+    ) { transforms ->
         try {
             workspace.couplingManager.setTransforms(coupling, transforms)
         } catch (e: MismatchedAttributesException) {
@@ -335,7 +367,10 @@ fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coup
  * this is the affordance for couplings whose endpoint types differ (e.g. array to number via a mean).
  */
 fun showTransformEditorForNewCoupling(parent: Component?, workspace: Workspace, producer: Producer, consumer: Consumer) {
-    CouplingTransformDialog(producer, consumer, emptyList()) { transforms ->
+    CouplingTransformDialog(
+        producer, consumer, emptyList(),
+        broadcastSizeHint = inferTargetArraySize(workspace, consumer)
+    ) { transforms ->
         try {
             workspace.couplingManager.createCoupling(producer, consumer, transforms = transforms)
         } catch (e: MismatchedAttributesException) {

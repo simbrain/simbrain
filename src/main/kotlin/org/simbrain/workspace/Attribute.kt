@@ -147,6 +147,13 @@ class Producer(
     }
 
     /**
+     * The current value when it can be read without suspending, else null. For GUI hints, such as
+     * defaulting a broadcast size to the size the consumer's container carries; the update path uses
+     * [getValue].
+     */
+    fun tryGetValueNow(): Any? = if (isSuspending) null else invokePlain(method, baseObject)
+
+    /**
      * The components of what this producer sends, in order, or empty when it declares no
      * [Producible.arrayComponentsMethod]. Names here are raw, so they may repeat; see [displayComponents]
      * for the form a consumer should show.

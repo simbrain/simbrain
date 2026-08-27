@@ -32,6 +32,7 @@ import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.FlowLayout
+import java.awt.Window
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.lang.reflect.Type
@@ -44,6 +45,7 @@ import javax.swing.JPanel
 import javax.swing.JScrollPane
 import javax.swing.JSplitPane
 import javax.swing.ListSelectionModel
+import javax.swing.SwingUtilities
 import javax.swing.ToolTipManager
 
 class CouplingTransformDialog(
@@ -51,8 +53,9 @@ class CouplingTransformDialog(
     private val consumer: Consumer,
     initialTransforms: List<CouplingOperation<*, *>>,
     private val broadcastSizeHint: Int? = null,
+    owner: Window? = null,
     private val onCommit: (List<CouplingOperation<*, *>>) -> Unit
-) : StandardDialog() {
+) : StandardDialog(owner, "") {
 
     /**
      * The chain under edit. Copies, so parameter edits and cancel never touch a live coupling.
@@ -340,6 +343,13 @@ fun inferTargetArraySize(workspace: Workspace, consumer: Consumer): Int? = with(
         ?.takeIf { it > 0 }
 }
 
+/**
+ * The window a spawning component lives in, so the editor can be owned by it: ownership, not
+ * modality, is what keeps a dialog stacked above its parent.
+ */
+private val Component?.windowAncestor: Window?
+    get() = this as? Window ?: this?.let { SwingUtilities.getWindowAncestor(it) }
+
 private val java.awt.Color.hex: String
     get() = "#%02x%02x%02x".format(red, green, blue)
 
@@ -349,7 +359,8 @@ private val java.awt.Color.hex: String
 fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coupling) {
     CouplingTransformDialog(
         coupling.producer, coupling.consumer, coupling.transforms,
-        broadcastSizeHint = inferTargetArraySize(workspace, coupling.consumer)
+        broadcastSizeHint = inferTargetArraySize(workspace, coupling.consumer),
+        owner = parent.windowAncestor
     ) { transforms ->
         try {
             workspace.couplingManager.setTransforms(coupling, transforms)
@@ -369,7 +380,8 @@ fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coup
 fun showTransformEditorForNewCoupling(parent: Component?, workspace: Workspace, producer: Producer, consumer: Consumer) {
     CouplingTransformDialog(
         producer, consumer, emptyList(),
-        broadcastSizeHint = inferTargetArraySize(workspace, consumer)
+        broadcastSizeHint = inferTargetArraySize(workspace, consumer),
+        owner = parent.windowAncestor
     ) { transforms ->
         try {
             workspace.couplingManager.createCoupling(producer, consumer, transforms = transforms)

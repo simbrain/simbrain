@@ -2,6 +2,7 @@ package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import java.util.concurrent.ConcurrentHashMap
 import javax.swing.SwingUtilities
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
@@ -48,12 +49,20 @@ class WorkspaceUpdater(val workspace: Workspace) {
     val updateManager: UpdateActionManager = UpdateActionManager(this)
 
     /**
-     * The job of the iteration currently inside [doUpdate], so a stop can escalate to cancelling it
+     * The jobs of every iteration currently inside [doUpdate] — entry points can overlap, e.g. a
+     * running loop plus a GUI-triggered single iterate — so a stop can escalate to cancelling them
      * when a suspend attribute or update action hangs instead of coming back to the loop's
      * [isRunning] check.
      */
-    @Volatile
-    private var currentIterationJob: Job? = null
+    private val activeIterationJobs: MutableSet<Job> = ConcurrentHashMap.newKeySet()
+
+    /**
+     * Whether some iteration is inside [doUpdate] right now. With [isRunning] already false, this is
+     * the signal a stop request did not come back — the GUI stop action escalates to [stopNow] on a
+     * repeated press in that state.
+     */
+    val hasActiveIteration: Boolean
+        get() = activeIterationJobs.isNotEmpty()
 
     /**
      * Reset time to 0.
@@ -64,26 +73,22 @@ class WorkspaceUpdater(val workspace: Workspace) {
 
     /**
      * Requests a cooperative stop: the current iteration finishes and the loop exits, which keeps the
-     * step deterministic. A repeated stop request while the same iteration is still in flight
-     * escalates to [stopNow], so a second press of the stop button interrupts an iteration that is
-     * stuck in a suspend attribute.
+     * step deterministic. Safe to call redundantly — programmatic callers do — so escalation is not
+     * automatic here; a caller that knows the user wants out, such as the stop button on a repeated
+     * press, uses [stopNow].
      */
     fun stop() {
-        if (!isRunning && currentIterationJob != null) {
-            stopNow()
-            return
-        }
         isRunning = false
     }
 
     /**
-     * Stops and also cancels the in-flight iteration cooperatively, abandoning whatever step was in
+     * Stops and also cancels the in-flight iterations cooperatively, abandoning whatever step was in
      * progress. Suspend attributes are cancelled at their suspension points; blocking work must watch
      * its own abort flag.
      */
     fun stopNow() {
         isRunning = false
-        currentIterationJob?.cancel()
+        activeIterationJobs.toList().forEach { it.cancel() }
     }
 
     /**
@@ -220,7 +225,8 @@ class WorkspaceUpdater(val workspace: Workspace) {
         time++
         Logger.trace("starting: $time")
         withContext(workspace.coroutineContext) {
-            currentIterationJob = coroutineContext.job
+            val iterationJob = coroutineContext.job
+            activeIterationJobs.add(iterationJob)
             try {
                 for (action in updateManager.actionList + updateManager.nonRemovableActions) {
                     with(PerformanceMonitor) {
@@ -228,7 +234,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
                     }
                 }
             } finally {
-                currentIterationJob = null
+                activeIterationJobs.remove(iterationJob)
             }
         }
         events.workspaceUpdated.fire()

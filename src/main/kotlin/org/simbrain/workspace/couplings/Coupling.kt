@@ -20,15 +20,22 @@ class Coupling private constructor(
 
     /**
      * This is the main action!  Set the value of the consumer based on the value of the producer, run
-     * through the transform chain. Suspends when an attribute method or transform does. A null from the
-     * producer or from any transform means "nothing this tick": the consumer is not invoked.
+     * through the transform chain. Suspends when an attribute method or transform does. A null from any
+     * transform means "nothing this tick": the consumer is not invoked. A null from the producer is
+     * delivered when the coupling has no transforms and the consumer's parameter tolerates null — the
+     * behavior nullable couplings always had, e.g. clearing a label — and otherwise also skips the tick.
      *
      * Note that values are passed by reference, so that it is up to the producing or
      * consuming methods to make defensive copies as needed.
      * (cf http://www.javapractices.com/topic/TopicAction.do?Id=15)).
      */
     suspend fun update() {
-        var value = producer.getValue() ?: return
+        var value = producer.getValue() ?: run {
+            if (transforms.isEmpty() && consumer.acceptsNull) {
+                consumer.setValue(null)
+            }
+            return
+        }
         for (transform in transforms) {
             value = transform.applyErased(value) ?: return
         }
@@ -43,11 +50,13 @@ class Coupling private constructor(
         get() = producer.type
 
     /**
-     * Identifies the coupling by its endpoints alone, so ids stay stable for archives regardless of
-     * transforms.
+     * Identifies the coupling by its endpoints, plus the transform chain when there is one, since
+     * same-endpoint couplings with different chains can coexist and lookups by id must tell them
+     * apart. Coupling archives identify endpoints by attribute, not by this id.
      */
     val id: String
-        get() = "${producer.id} > ${consumer.id}"
+        get() = "${producer.id} > ${consumer.id}" +
+                if (transforms.isEmpty()) "" else " [${transforms.joinToString(", ") { it.displayLabel }}]"
 
     val description: String
         get() = if (transforms.isEmpty()) {

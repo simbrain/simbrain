@@ -126,6 +126,23 @@ public class UpdateActionManager {
 
         couplingEvents.getCouplingsRemoved().on(Dispatchers.getDefault(), cl -> cl.forEach(c -> removeAction(couplingActionMap.remove(c))));
 
+        // A transform edit replaces the coupling instance; swap any action driving the old one in place
+        couplingEvents.getCouplingChanged().on(Dispatchers.getDefault(), change -> {
+            UpdateCoupling oldAction = couplingActionMap.remove(change.getOld());
+            UpdateCoupling newAction = new UpdateCoupling(change.getReplacement());
+            couplingActionMap.put(change.getReplacement(), newAction);
+            if (oldAction != null) {
+                int position = actionList.indexOf(oldAction);
+                if (position >= 0) {
+                    actionList.set(position, newAction);
+                    for (UpdateManagerListener listener : listeners) {
+                        listener.actionRemoved(oldAction);
+                        listener.actionAdded(newAction);
+                    }
+                }
+            }
+        });
+
     }
 
     /**

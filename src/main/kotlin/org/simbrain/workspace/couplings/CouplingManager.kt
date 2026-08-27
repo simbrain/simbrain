@@ -311,6 +311,9 @@ class CouplingManager(val workspace: Workspace) {
         val replacement = Coupling.create(coupling.producer, coupling.consumer, transforms)
         synchronized(_couplings) {
             require(_couplings.contains(coupling)) { "Coupling ${coupling.id} is not managed by this workspace" }
+            check(_couplings.none { it != coupling && it == replacement }) {
+                "An identical coupling already exists: ${replacement.description}"
+            }
             val ordered = _couplings.toList()
             _couplings.clear()
             ordered.forEach { _couplings.add(if (it == coupling) replacement else it) }
@@ -319,7 +322,7 @@ class CouplingManager(val workspace: Workspace) {
             attributeContainerCouplings[coupling.consumer.baseObject]?.apply { remove(coupling); add(replacement) }
             reportedFailures.remove(coupling)
         }
-        events.couplingChanged.fire(replacement)
+        events.couplingChanged.fire(CouplingChange(coupling, replacement))
         return replacement
     }
 
@@ -356,11 +359,15 @@ class CouplingManager(val workspace: Workspace) {
         couplings.forEach { coupling ->
             try {
                 coupling.update()
+                if (reportedFailures.isNotEmpty()) {
+                    // A recovered coupling reports afresh if it fails again for a new reason
+                    reportedFailures.remove(coupling)
+                }
             } catch (e: CancellationException) {
                 throw e
             } catch (e: Exception) {
                 if (reportedFailures.add(coupling)) {
-                    Logger.error("Coupling ${coupling.id} failed to update; further failures of this coupling are not logged: $e")
+                    Logger.error(e, "Coupling ${coupling.id} failed to update; further failures of this coupling are not logged")
                 }
                 events.couplingFailed.fire(CouplingFailure(coupling, e))
             }

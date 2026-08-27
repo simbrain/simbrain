@@ -25,6 +25,7 @@ import java.lang.reflect.Type
 import java.lang.reflect.WildcardType
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.intrinsics.suspendCoroutineUninterceptedOrReturn
+import kotlin.reflect.jvm.kotlinFunction
 
 /**
  * An object with a getter or setter method that a coupling can invoke to produce or consume a value,
@@ -200,6 +201,15 @@ class Consumer(
     override val type: Type = method.consumableType
 
     /**
+     * Whether the value parameter tolerates null. Read once from Kotlin metadata; a Java method or one
+     * with no metadata accepts null, matching what plain reflection always allowed. A transform-less
+     * coupling delivers a producer's null to a null-accepting consumer (e.g. a nullable label setter)
+     * and skips the tick otherwise; see [org.simbrain.workspace.couplings.Coupling.update].
+     */
+    val acceptsNull: Boolean =
+        method.kotlinFunction?.parameters?.getOrNull(1)?.type?.isMarkedNullable ?: true
+
+    /**
      * Update the consumer by setting its value, suspending if the underlying method does.
      */
     suspend fun setValue(value: Any?) {
@@ -246,16 +256,14 @@ val Method.consumableType: Type
 
 /**
  * Reject attribute methods whose JVM form cannot be invoked the way this layer invokes them. Called once
- * per method when the coupling cache first builds an attribute for it.
+ * per method when the coupling cache first builds an attribute for it. Default parameter values are
+ * fine: with @JvmOverloads the annotation lands on an invocable no-default overload, and reflection
+ * never routes through the synthetic `$default` bridge.
  */
 fun Method.validateAttributeMethod() {
     require(!name.contains('-')) {
         "Attribute method ${declaringClass.simpleName}.$name has a mangled JVM name, which means a value " +
                 "class appears in its signature. Value classes are not supported in attribute methods."
-    }
-    require(declaringClass.methods.none { it.name == "$name\$default" }) {
-        "Attribute method ${declaringClass.simpleName}.$name has default parameter values, which are not " +
-                "supported in attribute methods."
     }
 }
 

@@ -147,7 +147,13 @@ class WorkspaceActions {
         description = "Stop workspace (Esc)",
         coroutineScope = workspace
     ) {
-        workspace.stop()
+        // A repeated press with the iteration still in flight means it is stuck in a suspend
+        // attribute; escalate to cancelling it
+        if (!workspace.updater.isRunning && workspace.updater.hasActiveIteration) {
+            workspace.stopNow()
+        } else {
+            workspace.stop()
+        }
     }
 
     val openCouplingManagerAction = desktopPane.createAction(

@@ -78,9 +78,20 @@ class InvalidAttributeContainer : AttributeContainer {
     @Consumable
     fun consumeScore(score: Score) {
     }
+}
+
+class DefaultArgContainer : AttributeContainer {
+    override val id = "Default-arg container"
+
+    var received = 0.0
+
+    @Producible
+    @JvmOverloads
+    fun produceWithDefault(scale: Double = 2.0) = 3.0 * scale
 
     @Consumable
     fun consumeWithDefault(value: Double = 0.0) {
+        received = value
     }
 }
 
@@ -181,11 +192,12 @@ class SuspendCouplingTest {
     }
 
     @Test
-    fun `default parameter values are rejected with a clear error`() {
-        val container = InvalidAttributeContainer()
-        val exception = assertThrows<IllegalArgumentException> {
-            with(couplingManager) { container.getConsumer("consumeWithDefault") }
+    fun `attribute methods with default parameter values still couple`() {
+        val container = DefaultArgContainer()
+        with(couplingManager) {
+            container.getProducer("produceWithDefault") couple container.getConsumer("consumeWithDefault")
         }
-        assertTrue("efault parameter" in exception.message!!) { "Unexpected message: ${exception.message}" }
+        runBlocking { couplingManager.updateCouplings() }
+        assertEquals(6.0, container.received)
     }
 }

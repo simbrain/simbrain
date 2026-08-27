@@ -329,19 +329,22 @@ class CouplingTransformDialog(
  * non-suspending producers are sampled, and only an unambiguous answer counts — if the container's
  * producers disagree about the size, there is no hint.
  */
-fun inferTargetArraySize(workspace: Workspace, consumer: Consumer): Int? = with(workspace.couplingManager) {
-    consumer.baseObject.producers
-        .mapNotNull { candidate ->
-            when (val value = candidate.tryGetValueNow()) {
-                is DoubleArray -> value.size
-                is Matrix -> value.size().toInt()
-                else -> null
+fun inferTargetArraySize(workspace: Workspace, consumer: Consumer): Int? = runCatching {
+    with(workspace.couplingManager) {
+        consumer.baseObject.producers
+            .mapNotNull { candidate ->
+                // A hint only; a getter that objects to being sampled simply contributes nothing
+                when (val value = runCatching { candidate.tryGetValueNow() }.getOrNull()) {
+                    is DoubleArray -> value.size
+                    is Matrix -> value.size().toInt()
+                    else -> null
+                }
             }
-        }
-        .distinct()
-        .singleOrNull()
-        ?.takeIf { it > 0 }
-}
+            .distinct()
+            .singleOrNull()
+            ?.takeIf { it > 0 }
+    }
+}.getOrNull()
 
 /**
  * The window a spawning component lives in, so the editor can be owned by it: ownership, not
@@ -364,8 +367,10 @@ fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coup
     ) { transforms ->
         try {
             workspace.couplingManager.setTransforms(coupling, transforms)
-        } catch (e: MismatchedAttributesException) {
-            showWarningDialog(e.message ?: "Transform chain does not match the coupling", "Transforms")
+        } catch (e: Exception) {
+            // Includes the coupling having been removed while the dialog was open, and an edit that
+            // collides with an identical existing coupling
+            showWarningDialog(e.message ?: "Could not apply the transform chain", "Transforms")
         }
     }.apply {
         setLocationRelativeTo(parent)
@@ -385,8 +390,8 @@ fun showTransformEditorForNewCoupling(parent: Component?, workspace: Workspace, 
     ) { transforms ->
         try {
             workspace.couplingManager.createCoupling(producer, consumer, transforms = transforms)
-        } catch (e: MismatchedAttributesException) {
-            showWarningDialog(e.message ?: "Transform chain does not match the endpoints", "Transforms")
+        } catch (e: Exception) {
+            showWarningDialog(e.message ?: "Could not create the coupling", "Transforms")
         }
     }.apply {
         setLocationRelativeTo(parent)

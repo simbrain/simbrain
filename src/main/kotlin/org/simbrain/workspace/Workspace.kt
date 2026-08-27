@@ -198,7 +198,8 @@ class Workspace: CoroutineScope {
 
     /**
      * Stops iteration of all couplings on all components. Cooperative: the in-flight iteration
-     * finishes first. Calling again while that iteration is still in flight escalates to [stopNow].
+     * finishes first, and redundant calls are harmless. The GUI stop action escalates a repeated
+     * press to [stopNow] when the iteration has not come back.
      */
     fun stop() {
         for (wc in componentList) {

@@ -75,6 +75,23 @@ class MatrixTestContainer : AttributeContainer {
     }
 }
 
+class NullableConsumerContainer : AttributeContainer {
+    override val id = "Nullable consumer container"
+
+    var maybe: Double? = null
+    var receivedNullable: Double? = null
+    var nullableDeliveries = 0
+
+    @Producible
+    fun produceMaybe(): Double? = maybe
+
+    @Consumable
+    fun consumeNullable(value: Double?) {
+        receivedNullable = value
+        nullableDeliveries++
+    }
+}
+
 class AmbiguousSizeContainer : AttributeContainer {
     override val id = "Ambiguous container"
 
@@ -187,6 +204,46 @@ class CouplingTransformTest {
         container.scalar = 2.0
         runBlocking { couplingManager.updateCouplings() }
         assertEquals(2, container.deliveries)
+    }
+
+    @Test
+    fun `null is delivered to a null-accepting consumer on a transform-less coupling`() {
+        val container = NullableConsumerContainer()
+        with(couplingManager) {
+            container.getProducer("produceMaybe") couple container.getConsumer("consumeNullable")
+        }
+        runBlocking { couplingManager.updateCouplings() }
+        assertEquals(1, container.nullableDeliveries)
+        assertEquals(null, container.receivedNullable)
+
+        container.maybe = 2.5
+        runBlocking { couplingManager.updateCouplings() }
+        assertEquals(2, container.nullableDeliveries)
+        assertEquals(2.5, container.receivedNullable)
+    }
+
+    @Test
+    fun `setTransforms rejects an edit that would collide with an identical coupling`() {
+        val container = TransformTestContainer()
+        val transformed = with(couplingManager) {
+            container.getProducer("produceScalar") couple container.getConsumer("consumeScalar")
+            container.getProducer("produceScalar") via ScaleOperation(2.0) couple container.getConsumer("consumeScalar")
+        }
+        assertThrows<IllegalStateException> {
+            couplingManager.setTransforms(transformed, emptyList())
+        }
+        assertEquals(2, couplingManager.couplings.size)
+    }
+
+    @Test
+    fun `coupling ids distinguish transform chains between the same endpoints`() {
+        val container = TransformTestContainer()
+        with(couplingManager) {
+            val plain = container.getProducer("produceScalar") couple container.getConsumer("consumeScalar")
+            val transformed =
+                container.getProducer("produceScalar") via ScaleOperation(2.0) couple container.getConsumer("consumeScalar")
+            assertEquals(false, plain.id == transformed.id)
+        }
     }
 
     @Test

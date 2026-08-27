@@ -28,6 +28,7 @@ import org.simbrain.util.widgets.applyLafSyntaxTheme
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
+import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.gui.SimbrainDesktop.applyThemeIfChanged
 import org.simbrain.workspace.updater.PerformanceMonitor
 import java.awt.*
@@ -287,6 +288,19 @@ object SimbrainDesktop {
             lastTimestep = 0
             updateTimeLabel()
         }
+        // Surface the first failure of each coupling; the update loop keeps running the rest
+        val warnedCouplings = mutableSetOf<Coupling>()
+        workspace.couplingManager.events.couplingFailed.on(Dispatchers.Swing) { failure ->
+            if (warnedCouplings.add(failure.coupling)) {
+                showWarningDialog(
+                    "Coupling ${failure.coupling.description} failed to update and will keep failing " +
+                            "silently until fixed:\n${failure.cause}",
+                    "Coupling Failed"
+                )
+            }
+        }
+        workspace.couplingManager.events.couplingRemoved.on { warnedCouplings.remove(it) }
+
         events.componentAdded.on(Dispatchers.Swing.immediate) { addDesktopComponent(it) }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on

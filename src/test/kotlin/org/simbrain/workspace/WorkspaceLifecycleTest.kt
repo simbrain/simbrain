@@ -100,7 +100,7 @@ class WorkspaceLifecycleTest {
     }
 
     @Test
-    fun `a repeated stop request escalates and cancels a stuck iteration`() {
+    fun `a stuck iteration is detectable after a cooperative stop and stopNow rescues it`() {
         val container = LifecycleTestContainer()
         with(couplingManager) {
             container.getProducer("produceScalar") couple container.getConsumer("consumeAndHang")
@@ -109,9 +109,14 @@ class WorkspaceLifecycleTest {
             val runJob = launch(Dispatchers.Default) { workspace.updater.run() }
             withTimeout(10_000) { container.hangReached.await() }
 
+            // Repeated cooperative stops are safe no-ops; the stuck iteration stays visible, which is
+            // what lets the GUI stop action escalate on a repeated press
+            workspace.stop()
             workspace.stop()
             assertTrue(runJob.isActive, "Cooperative stop should not interrupt the stuck iteration")
-            workspace.stop()
+            assertTrue(workspace.updater.hasActiveIteration)
+
+            workspace.stopNow()
             withTimeout(10_000) { runJob.join() }
             assertFalse(workspace.updater.isRunning)
         }

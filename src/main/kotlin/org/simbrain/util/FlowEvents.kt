@@ -126,8 +126,14 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             handlers.forEach { (dispatcher, handler) -> launch(dispatcher) { handler(value) } }
         }
 
-        /** Deliver [value] to all current handlers: directly when un-throttled, else through the shaping collector. */
+        /**
+         * Deliver [value] to all current handlers: directly when un-throttled, else through the shaping
+         * collector. With no handlers there is nothing to deliver, so the shaping machinery is skipped
+         * entirely — headless workspaces, such as evolution fitness evaluations, fire these events at
+         * high rates and must not pay for per-emission debounce timer scheduling.
+         */
         protected fun fireShaped(value: T) {
+            if (handlers.isEmpty()) return
             if (interval == 0) dispatch(value) else raw.tryEmit(value)
         }
 

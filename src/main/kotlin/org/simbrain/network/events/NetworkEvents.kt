@@ -8,8 +8,10 @@ import org.simbrain.util.FlowEvents
  * All Network events are defined here. Main docs at [FlowEvents].
  */
 class NetworkEvents: FlowEvents() {
-    val zoomToFitPage = NoArgEvent(interval = 20)
-    val boundsChanged = NoArgEvent(interval = 20)
+    // Throttle, not debounce: auto-zoom refires these continuously while the network updates, and a
+    // debounce never sees a quiet window then — an explicit zoom-to-fit press would starve forever
+    val zoomToFitPage = NoArgEvent(interval = 20, timingMode = TimingMode.Throttle)
+    val boundsChanged = NoArgEvent(interval = 20, timingMode = TimingMode.Throttle)
     val zoomModeChanged = OneArgEvent<Boolean>()
     val updated = NoArgAwaitableEvent()
     val modelAdded = AwaitableEvent<NetworkModel>()

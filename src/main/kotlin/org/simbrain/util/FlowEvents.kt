@@ -68,8 +68,8 @@ internal fun warnIfFireAndBlockOnEdt() {
  *
  * - **Fire-and-forget pub/sub** ([NoArgEvent], [OneArgEvent], [ChangedEvent], [BatchOneArgEvent]). Handlers
  *   register SYNCHRONOUSLY: `on()` adds the handler to a [CopyOnWriteArrayList] the instant it returns (like the
- *   old bus), so a `fire()` immediately after `on()` can never miss it (for un-throttled events; throttled /
- *   debounced events may drop a fire issued in the brief window before their shaping collector subscribes).
+ *   old bus), so a `fire()` immediately after `on()` can never miss it; the shaped events' flow replays the
+ *   latest value across the gap before their lazily started shaping collector attaches.
  *   `fire()` never blocks and is safe from any thread. Handlers run on the Swing EDT BY DEFAULT (so the common
  *   "model changed -> repaint" handler is EDT-safe without ceremony); pass [Dispatchers.Default] explicitly for
  *   background / model / headless handlers. `on()` returns a [Job]; `cancel()` it to unsubscribe (from Java,
@@ -122,7 +122,10 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         private val handlers = CopyOnWriteArrayList<Pair<CoroutineDispatcher, suspend (T) -> Unit>>()
 
         private val raw by lazy {
-            MutableSharedFlow<T>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
+            // replay = 1: the shaping collector attaches asynchronously on the first subscription, and a
+            // fire landing in that gap must not vanish — one-shot setup fires such as a neuron
+            // collection's initial outline request have nothing to refire them
+            MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
         }
 
         private val shapingStarted = AtomicBoolean(false)
@@ -220,7 +223,7 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
     @OptIn(FlowPreview::class)
     inner class BatchOneArgEvent<T>(val interval: Int, val timingMode: TimingMode = TimingMode.Debounce) {
 
-        private val raw = MutableSharedFlow<T>(extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
+        private val raw = MutableSharedFlow<T>(replay = 1, extraBufferCapacity = 64, onBufferOverflow = BufferOverflow.SUSPEND)
         private val buffer = ConcurrentLinkedQueue<T>()
         private val handlers = CopyOnWriteArrayList<Pair<CoroutineDispatcher, suspend (List<T>) -> Unit>>()
 

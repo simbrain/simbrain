@@ -155,6 +155,21 @@ class FlowEventsTest {
     }
 
     @Test
+    fun `a fire immediately after the first subscription is not lost`() = runBlocking {
+        // The shaping collector attaches asynchronously on first on(); a one-shot fire in that gap,
+        // like a neuron collection's initial outline request, must still be delivered
+        repeat(20) { attempt ->
+            val events = FlowEvents()
+            val event = events.OneArgEvent<Int>(interval = 10, timingMode = FlowEvents.TimingMode.Throttle)
+            val received = CompletableDeferred<Int>()
+            event.on(Dispatchers.Default) { received.complete(it) }
+            event.fire(attempt)
+            assertEquals(attempt, withTimeout(2000) { received.await() })
+            events.close()
+        }
+    }
+
+    @Test
     fun `throttle still delivers a single isolated fire`() = runBlocking {
         val events = FlowEvents()
         val event = events.OneArgEvent<Int>(interval = 50, timingMode = FlowEvents.TimingMode.Throttle)

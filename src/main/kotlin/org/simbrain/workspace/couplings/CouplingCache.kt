@@ -80,6 +80,8 @@ class CouplingCache(val couplingManager: CouplingManager) {
         val annotation = method.getAnnotation(Producible::class.java)
                 ?: throw IllegalArgumentException("Method ${method.name} is not producible.")
 
+        method.validateAttributeMethod()
+
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
         val arrayComponentsMethod = javaClass.findMethod(annotation.arrayComponentsMethod)
         if (annotation.arrayComponentsMethod.isNotEmpty() && arrayComponentsMethod == null) {
@@ -92,13 +94,14 @@ class CouplingCache(val couplingManager: CouplingManager) {
         val customPriorityMethod = javaClass.findMethod(annotation.customPriorityMethod)
         val priority = customPriorityMethod?.invoke(this) as? Int ?: annotation.priority
 
-
-        fun (attributeContainer: AttributeContainer) = Producer.builder(attributeContainer, method)
-                .description(annotation.description)
-                .priority(priority)
-                .customDescription(customDescription)
-                .arrayComponentsMethod(arrayComponentsMethod)
-                .build()
+        fun (attributeContainer: AttributeContainer) = Producer(
+                attributeContainer,
+                method,
+                description = annotation.description,
+                priority = priority,
+                customDescriptionMethod = customDescription,
+                arrayComponentsMethod = arrayComponentsMethod
+        )
     }(this)
 
     fun AttributeContainer.getConsumer(methodName: String): Consumer {
@@ -115,16 +118,20 @@ class CouplingCache(val couplingManager: CouplingManager) {
         val annotation = method.getAnnotation(Consumable::class.java)
                 ?: throw IllegalArgumentException("Method ${method.name} is not consumable.")
 
+        method.validateAttributeMethod()
+
         val customDescription = javaClass.findMethod(annotation.customDescriptionMethod)
 
         val customPriorityMethod = javaClass.findMethod(annotation.customPriorityMethod)
         val priority = customPriorityMethod?.invoke(this) as? Int ?: annotation.priority
 
-        fun (attributeContainer: AttributeContainer) = Consumer.builder(attributeContainer, method)
-                .priority(priority)
-                .description(annotation.description)
-                .customDescription(customDescription)
-                .build()
+        fun (attributeContainer: AttributeContainer) = Consumer(
+                attributeContainer,
+                method,
+                description = annotation.description,
+                priority = priority,
+                customDescriptionMethod = customDescription
+        )
     }(this)
 
     fun getProducers(attributeContainer: AttributeContainer): Sequence<Producer> = sequence {
@@ -205,7 +212,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
             val methods = getProducibleMethods(clazz)
                     .filter { getVisibility(it) }
-                    .filter { it.returnType == consumer.type }
+                    .filter { attributeTypesMatch(it.producibleType, consumer.type) }
             containers.forEach { container ->
                 methods.forEach { method ->
                     yield(container.getProducer(method))
@@ -221,7 +228,7 @@ class CouplingCache(val couplingManager: CouplingManager) {
         workspaceComponent.attributeContainers.groupBy { it.javaClass }.entries.forEach { (clazz, containers) ->
             val methods = getConsumableMethods(clazz)
                     .filter { getVisibility(it) }
-                    .filter { it.parameterTypes[0] == producer.type }
+                    .filter { attributeTypesMatch(producer.type, it.consumableType) }
             containers.forEach { container ->
                 methods.forEach { method ->
                     yield(container.getConsumer(method))

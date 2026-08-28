@@ -1,11 +1,14 @@
 package org.simbrain.workspace.couplings
 
+import kotlinx.coroutines.CancellationException
+import org.pmw.tinylog.Logger
 import org.simbrain.util.CachedObject
 import org.simbrain.util.cartesianProduct
 import org.simbrain.workspace.*
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.lang.reflect.Method
 import java.util.*
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.*
 import kotlin.reflect.jvm.javaMethod
 
@@ -52,6 +55,12 @@ class CouplingManager(val workspace: Workspace) {
     private val attributeContainerCouplings = HashMap<AttributeContainer, LinkedHashSet<Coupling>>()
 
     val methodVisibilities = HashMap<Method, Boolean>()
+
+    /**
+     * Couplings whose update failure has already been logged, so a coupling broken every tick logs
+     * once. Cleared per coupling on removal, so a recreated coupling reports afresh.
+     */
+    private val reportedFailures: MutableSet<Coupling> = ConcurrentHashMap.newKeySet()
 
     /**
      * List of listeners to fire updates when couplings are changed.
@@ -189,14 +198,20 @@ class CouplingManager(val workspace: Workspace) {
         couplingCache.getCompatibleVisibleConsumers(this, component)
 
     /**
-     * Create a coupling from a producer and consumer of the same type.
+     * Create a coupling from a producer and consumer, optionally through a chain of transforms that
+     * must type-check end to end (see [Coupling.create]).
      *
      * @param producer producer part of the coupling
      * @param consumer consumer part of the coupling
      * @return the newly creating coupling
      */
     @JvmOverloads
-    fun createCoupling(producer: Producer?, consumer: Consumer?, fireEvents: Boolean = true) = Coupling.create(producer, consumer).also {
+    fun createCoupling(
+        producer: Producer?,
+        consumer: Consumer?,
+        fireEvents: Boolean = true,
+        transforms: List<CouplingOperation<*, *>> = emptyList()
+    ) = Coupling.create(producer, consumer, transforms).also {
         synchronized(_couplings) {
             _couplings.add(it)
             cachedCouplingList.invalidate()
@@ -214,10 +229,24 @@ class CouplingManager(val workspace: Workspace) {
     infix fun Producer?.couple(consumer: Consumer?) = createCoupling(this, consumer)
 
     /**
+     * A producer with transforms staged behind it, so a transformed coupling reads as a chain:
+     * `producer via ScaleOperation(2.0) via CoerceInOperation(0.0, 1.0) couple consumer`.
+     */
+    class TransformedProducer(val producer: Producer, val transforms: List<CouplingOperation<*, *>>)
+
+    infix fun Producer.via(transform: CouplingOperation<*, *>) = TransformedProducer(this, listOf(transform))
+
+    infix fun TransformedProducer.via(transform: CouplingOperation<*, *>) =
+        TransformedProducer(producer, transforms + transform)
+
+    infix fun TransformedProducer.couple(consumer: Consumer?) =
+        createCoupling(producer, consumer, transforms = transforms)
+
+    /**
      * Couple the first type-matched producer-consumer pair, where these are ordered by preference.
      */
     fun createCoupling(producingContainer: AttributeContainer, consumingContainer: AttributeContainer): Coupling {
-        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> a.type == b.type }
+        val (producer, consumer) = (producingContainer.producers cartesianProduct consumingContainer.consumers).filter { (a, b) -> attributeTypesMatch(a.type, b.type) }
             .sortedBy { (a, b) -> a.priority + b.priority + (if (a.type == String::class.java) 1 else 0) }.firstOrNull() ?: throw RuntimeException(
             "No compatible attributes found between $producingContainer and $consumingContainer"
         )
@@ -272,6 +301,31 @@ class CouplingManager(val workspace: Workspace) {
     infix fun Collection<AttributeContainer>.couple(consumers: Collection<AttributeContainer>): List<Coupling> =
         createOneToOneCouplings(this, consumers)
 
+    /**
+     * Replace [coupling]'s transform chain, returning the replacement coupling. The replacement keeps
+     * the original's position in the update order, so many-to-one delivery order is unaffected.
+     * Validates the new chain against the endpoints ([Coupling.chainError]) before touching anything.
+     */
+    @Throws(MismatchedAttributesException::class)
+    fun setTransforms(coupling: Coupling, transforms: List<CouplingOperation<*, *>>): Coupling {
+        val replacement = Coupling.create(coupling.producer, coupling.consumer, transforms)
+        synchronized(_couplings) {
+            require(_couplings.contains(coupling)) { "Coupling ${coupling.id} is not managed by this workspace" }
+            check(_couplings.none { it != coupling && it == replacement }) {
+                "An identical coupling already exists: ${replacement.description}"
+            }
+            val ordered = _couplings.toList()
+            _couplings.clear()
+            ordered.forEach { _couplings.add(if (it == coupling) replacement else it) }
+            cachedCouplingList.invalidate()
+            attributeContainerCouplings[coupling.producer.baseObject]?.apply { remove(coupling); add(replacement) }
+            attributeContainerCouplings[coupling.consumer.baseObject]?.apply { remove(coupling); add(replacement) }
+            reportedFailures.remove(coupling)
+        }
+        events.couplingChanged.fire(CouplingChange(coupling, replacement))
+        return replacement
+    }
+
     fun removeCouplings(couplings: List<Coupling>) {
         couplings.forEach { coupling ->
             removeCouplingWithoutFiringEvent(coupling)
@@ -289,14 +343,35 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     /**
-     * Update all couplings by setting the consumers to take the values of their producers.
+     * Update all couplings by setting the consumers to take the values of their producers. Suspends
+     * whenever a coupling's attribute methods do; couplings are updated sequentially so many-to-one
+     * consumers see a deterministic order.
+     *
+     * A coupling whose update throws does not stop the rest: the failure is logged once per coupling,
+     * [CouplingEvents.couplingFailed] fires, and the remaining couplings still update. Cancellation is
+     * control flow, not failure, and propagates.
      */
-    fun updateCouplings() {
+    suspend fun updateCouplings() {
         // Deliberately not holding the _couplings monitor across the updates. Consumers can block on the
         // event thread, as the chart models do when they touch a dataset that is being painted, while the
         // event thread in turn reads this coupling list; holding the lock over both deadlocks them against
         // each other. [couplings] is already an immutable snapshot, so iterating it needs no lock.
-        couplings.forEach { it.update() }
+        couplings.forEach { coupling ->
+            try {
+                coupling.update()
+                if (reportedFailures.isNotEmpty()) {
+                    // A recovered coupling reports afresh if it fails again for a new reason
+                    reportedFailures.remove(coupling)
+                }
+            } catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                if (reportedFailures.add(coupling)) {
+                    Logger.error(e, "Coupling ${coupling.id} failed to update; further failures of this coupling are not logged")
+                }
+                events.couplingFailed.fire(CouplingFailure(coupling, e))
+            }
+        }
     }
 
     /**
@@ -310,6 +385,7 @@ class CouplingManager(val workspace: Workspace) {
     }
 
     private fun removeCouplingWithoutFiringEvent(coupling: Coupling) {
+        reportedFailures.remove(coupling)
         synchronized(_couplings) {
             _couplings.remove(coupling)
             cachedCouplingList.invalidate()
@@ -332,6 +408,7 @@ class CouplingManager(val workspace: Workspace) {
         val removed = synchronized(_couplings) {
             attributeContainerCouplings[attributeContainer]?.let {
                 it.forEach { coupling ->
+                    reportedFailures.remove(coupling)
                     _couplings.remove(coupling)
                     cachedCouplingList.invalidate()
                     if (coupling.consumer.baseObject !== attributeContainer) {

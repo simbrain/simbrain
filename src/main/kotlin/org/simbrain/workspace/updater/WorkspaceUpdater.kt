@@ -2,6 +2,8 @@ package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
+import java.util.concurrent.ConcurrentHashMap
+import javax.swing.SwingUtilities
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.events.WorkspaceUpdaterEvents
@@ -47,6 +49,22 @@ class WorkspaceUpdater(val workspace: Workspace) {
     val updateManager: UpdateActionManager = UpdateActionManager(this)
 
     /**
+     * The jobs of every iteration currently inside [doUpdate] — entry points can overlap, e.g. a
+     * running loop plus a GUI-triggered single iterate — so a stop can escalate to cancelling them
+     * when a suspend attribute or update action hangs instead of coming back to the loop's
+     * [isRunning] check.
+     */
+    private val activeIterationJobs: MutableSet<Job> = ConcurrentHashMap.newKeySet()
+
+    /**
+     * Whether some iteration is inside [doUpdate] right now. With [isRunning] already false, this is
+     * the signal a stop request did not come back — the GUI stop action escalates to [stopNow] on a
+     * repeated press in that state.
+     */
+    val hasActiveIteration: Boolean
+        get() = activeIterationJobs.isNotEmpty()
+
+    /**
      * Reset time to 0.
      */
     fun resetTime() {
@@ -54,10 +72,23 @@ class WorkspaceUpdater(val workspace: Workspace) {
     }
 
     /**
-     * Stops the update thread.
+     * Requests a cooperative stop: the current iteration finishes and the loop exits, which keeps the
+     * step deterministic. Safe to call redundantly — programmatic callers do — so escalation is not
+     * automatic here; a caller that knows the user wants out, such as the stop button on a repeated
+     * press, uses [stopNow].
      */
     fun stop() {
         isRunning = false
+    }
+
+    /**
+     * Stops and also cancels the in-flight iterations cooperatively, abandoning whatever step was in
+     * progress. Suspend attributes are cancelled at their suspension points; blocking work must watch
+     * its own abort flag.
+     */
+    fun stopNow() {
+        isRunning = false
+        activeIterationJobs.toList().forEach { it.cancel() }
     }
 
     /**
@@ -76,6 +107,10 @@ class WorkspaceUpdater(val workspace: Workspace) {
                     doUpdate()
                 }
             }
+        } catch (e: CancellationException) {
+            // Rethrows when this caller itself was cancelled; a cancellation from [stopNow] hitting the
+            // in-flight iteration instead ends the run normally
+            currentCoroutineContext().ensureActive()
         } finally {
             isRunning = false
             for (component in workspace.componentList) {
@@ -98,6 +133,8 @@ class WorkspaceUpdater(val workspace: Workspace) {
             withContext(workspace.coroutineContext) {
                 doUpdate()
             }
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
         } finally {
             events.runFinished.fire()
             isRunning = false
@@ -108,13 +145,18 @@ class WorkspaceUpdater(val workspace: Workspace) {
     }
 
     fun runBlocking() {
+        assertNotOnEventThread()
         isRunning = true
         for (wc in workspace.componentList) {
             wc.isRunning = true
         }
         runBlocking {
             events.runStarted.fire()
-            doUpdate()
+            try {
+                doUpdate()
+            } catch (e: CancellationException) {
+                coroutineContext.ensureActive()
+            }
             events.runFinished.fire()
         }
         isRunning = false
@@ -138,15 +180,20 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fire()
-        repeat(numIterations) {
-            doUpdate()
+        try {
+            repeat(numIterations) {
+                doUpdate()
+            }
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
+        } finally {
+            isRunning = false
+            finishingTask()
+            for (component in workspace.componentList) {
+                component.isRunning = false
+            }
+            events.runFinished.fire()
         }
-        isRunning = false
-        finishingTask()
-        for (component in workspace.componentList) {
-            component.isRunning = false
-        }
-        events.runFinished.fire()
     }
 
     suspend fun iterateWhile(predicate: () -> Boolean) {
@@ -155,31 +202,51 @@ class WorkspaceUpdater(val workspace: Workspace) {
             wc.isRunning = true
         }
         events.runStarted.fireAsync()
-        do {
-            doUpdate()
-        } while (predicate())
-        isRunning = false
-        for (component in workspace.componentList) {
-            component.isRunning = false
+        try {
+            do {
+                doUpdate()
+            } while (predicate())
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
+        } finally {
+            isRunning = false
+            for (component in workspace.componentList) {
+                component.isRunning = false
+            }
+            events.runFinished.fireAsync()
         }
-        events.runFinished.fireAsync()
     }
 
     /**
-     * Executes the main workspace update.
+     * Executes the main workspace update. The iteration's job is exposed to [stopNow] for the duration,
+     * so a stuck iteration can be cancelled from outside.
      */
     private suspend fun doUpdate() {
         time++
         Logger.trace("starting: $time")
         withContext(workspace.coroutineContext) {
-            for (action in updateManager.actionList + updateManager.nonRemovableActions) {
-                with(PerformanceMonitor) {
-                    action()
+            val iterationJob = coroutineContext.job
+            activeIterationJobs.add(iterationJob)
+            try {
+                for (action in updateManager.actionList + updateManager.nonRemovableActions) {
+                    with(PerformanceMonitor) {
+                        action()
+                    }
                 }
+            } finally {
+                activeIterationJobs.remove(iterationJob)
             }
         }
         events.workspaceUpdated.fire()
         Logger.trace("done: $time")
+    }
+
+    private fun assertNotOnEventThread() {
+        check(!SwingUtilities.isEventDispatchThread()) {
+            "Blocking workspace iteration must not run on the event dispatch thread: suspend " +
+                    "consumables wait for event thread handlers, which deadlocks against a blocked " +
+                    "event thread. Use a launched iteration (e.g. Workspace.iterateAsync) instead."
+        }
     }
 
     init {

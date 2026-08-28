@@ -7,6 +7,7 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
+import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.labels.CustomXYToolTipGenerator
@@ -232,6 +233,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
     val chartPanel = ChartPanel(chart).also {
         add(it)
+        // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
+        AdaptiveChartRepainter(it).install()
     }
 
     // Bottom stuff

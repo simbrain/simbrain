@@ -159,7 +159,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
                 ?: throw IllegalStateException("could not find component for coupling consumer <${coupling.consumer}>"),
             coupling.consumer
         )
-        archive.addCoupling(ArchivedCoupling(producer, consumer))
+        archive.addCoupling(ArchivedCoupling(producer, consumer, coupling.transforms))
     }
 
     /**
@@ -288,7 +288,12 @@ class WorkspaceSerializer(val workspace: Workspace) {
             for (archivedCoupling in archive.archivedCouplings) {
                 val producer = archivedCoupling.createProducer(workspace)
                 val consumer = archivedCoupling.createConsumer(workspace)
-                workspace.couplingManager.createCoupling(producer, consumer, false)
+                // Null transforms means a pre-transform archive; restore as a plain coupling
+                workspace.couplingManager.createCoupling(
+                    producer, consumer,
+                    fireEvents = false,
+                    transforms = archivedCoupling.transforms.orEmpty()
+                )
             }
         }
     }

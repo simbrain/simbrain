@@ -1,5 +1,6 @@
 package org.simbrain.workspace
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -49,7 +50,7 @@ class CouplingUpdateDeadlockTest {
 
         val finished = Thread {
             repeat(300) {
-                workspace.couplingManager.updateCouplings()
+                runBlocking { workspace.couplingManager.updateCouplings() }
                 // Keep the cached list invalidated so each read has to rebuild it, which is what takes the lock
                 with(workspace.couplingManager) {
                     val extra = Neuron().also { n -> networkComponent.network.addNetworkModelAsync(n) }

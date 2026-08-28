@@ -1,5 +1,6 @@
 package org.simbrain.plot
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -58,7 +59,7 @@ class TimeSeriesConcurrencyTest {
         // setValues creates the series on first use, from whichever thread is running the couplings
         repeat(50) {
             time = it
-            model.setValues(DoubleArray(6) { component -> component.toDouble() })
+            runBlocking { model.setValues(DoubleArray(6) { component -> component.toDouble() }) }
         }
         reader.join()
 

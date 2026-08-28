@@ -5,10 +5,12 @@ import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
 import org.simbrain.util.widgets.ShowHelpAction;
+import org.simbrain.workspace.AttributeKt;
 import org.simbrain.workspace.Consumer;
 import org.simbrain.workspace.MismatchedAttributesException;
 import org.simbrain.workspace.Producer;
 import org.simbrain.workspace.gui.CouplingListPanel;
+import org.simbrain.workspace.gui.CouplingTransformDialogKt;
 import org.simbrain.workspace.gui.SimbrainDesktop;
 import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsumer;
 import smile.math.matrix.Matrix;
@@ -96,8 +98,12 @@ public class DesktopCouplingManager extends JPanel {
         addCouplingsButton.setActionCommand("addCouplings");
         addCouplingsButton.addActionListener((e) -> addCouplings());
 
+        JButton addWithTransformsButton = new JButton("Add With Transforms...");
+        addWithTransformsButton.setToolTipText("Create one coupling from the selected producer and consumer through a transform chain; the endpoint types may differ when a transform bridges them");
+        addWithTransformsButton.addActionListener((e) -> addCouplingWithTransforms());
+
         JPanel trailingControls = SwingUtilsKt.buttonRow(
-            new Component[]{helpButton, couplingMethodComboBox, addCouplingsButton},
+            new Component[]{helpButton, couplingMethodComboBox, addCouplingsButton, addWithTransformsButton},
             FlowLayout.RIGHT,
             Theme.componentGap
         );
@@ -155,23 +161,30 @@ public class DesktopCouplingManager extends JPanel {
     }
 
     /**
+     * Open the transform editor for one selected producer and one selected consumer, creating the
+     * coupling on commit. This is the path for couplings whose endpoint types differ.
+     */
+    private void addCouplingWithTransforms() {
+        List<Producer> producers = (List<Producer>) producerPanel.getSelectedAttributes();
+        List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
+
+        if (producers.size() != 1 || consumers.size() != 1) {
+            SwingUtilsKt.showWarningDialog("Select exactly one producer and one consumer\nto create a coupling with transforms.", "Add With Transforms");
+            return;
+        }
+        CouplingTransformDialogKt.showTransformEditorForNewCoupling(this, desktop.getWorkspace(), producers.get(0), consumers.get(0));
+    }
+
+    /**
      * Associates attribute and coupling data types (classes) with colors used
-     * in displaying attributes and couplings.
+     * in displaying attributes and couplings. Delegates to the theme-aware
+     * palette so the colors follow the active look and feel.
      *
      * @param dataType the data type to associate with a color
      * @return the color associated with a data type
      */
     public static Color getColor(Type dataType) {
-        if (dataType == double.class) {
-            return Color.black;
-        } else if (dataType == double[].class) {
-            return Color.green.darker().darker();
-        } else if (dataType == String.class) {
-            return Color.blue.brighter();
-        } else if (dataType == Matrix.class) {
-            return new Color(255, 140, 0);
-        }
-        return Color.black;
+        return AttributeKt.getAttributeTypeColor(dataType);
     }
 
 }

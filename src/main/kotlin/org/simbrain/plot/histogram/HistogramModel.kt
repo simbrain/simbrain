@@ -2,10 +2,11 @@ package org.simbrain.plot.histogram
 
 import org.jfree.data.xy.IntervalXYDataset
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries
+import kotlinx.coroutines.withContext
+import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
-import javax.swing.SwingUtilities
 
 /**
  * Underlying model for the histogram data, in the form of a list of double
@@ -72,8 +73,8 @@ class HistogramModel(
      * @param histData the array of histogram data
      */
     @Consumable
-    fun addData(histData: DoubleArray) {
-        SwingUtilities.invokeAndWait { addDataToDataSeries(histData, 0) }
+    suspend fun addData(histData: DoubleArray) {
+        withContext(swingDispatcher) { addDataToDataSeries(histData, 0) }
     }
 
     fun applyCurrentData() {

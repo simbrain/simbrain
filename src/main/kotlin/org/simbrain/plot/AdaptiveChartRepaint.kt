@@ -23,7 +23,7 @@ import java.awt.event.HierarchyEvent
 import java.awt.event.HierarchyListener
 import javax.swing.SwingUtilities
 
-class AdaptiveChartRepainter(
+class AdaptiveChartRepainter @JvmOverloads constructor(
     private val chartPanel: ChartPanel,
     private val minFrameMillis: Int = DEFAULT_MIN_FRAME_MILLIS,
     private val staleLatchMillis: Int = STALE_LATCH_MILLIS

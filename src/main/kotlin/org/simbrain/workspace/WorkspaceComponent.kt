@@ -169,9 +169,9 @@ abstract class WorkspaceComponent(name: String) {
      *
      * The handler receives the consuming container, so a component with several couplable containers, such as
      * a time series plot whose individual series can each be coupled to, can tell which one is affected, and
-     * the producer, so it can take names alone ([Producer.getDisplayNames]), keyed components
-     * ([Producer.getDisplayComponents]) when it holds per-component state to preserve, or the attribute's own
-     * name ([Producer.getSimpleDescription]) when it displays the attribute as a whole. Components and names
+     * the producer, so it can take names alone ([Producer.displayNames]), keyed components
+     * ([Producer.displayComponents]) when it holds per-component state to preserve, or the attribute's own
+     * name ([Producer.simpleDescription]) when it displays the attribute as a whole. Components and names
      * are empty for a producer that declares none, which handlers must cope with.
      */
     fun onCoupledProducer(handler: (consumer: AttributeContainer, producer: Producer) -> Unit) {

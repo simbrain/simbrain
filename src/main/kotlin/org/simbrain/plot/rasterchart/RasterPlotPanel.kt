@@ -9,6 +9,7 @@ package org.simbrain.plot.rasterchart
 
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
+import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.SymbolAxis
 import org.jfree.chart.plot.PlotOrientation
@@ -81,6 +82,8 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
         rasterModel.events.rasterConsumerRemoved.on { rebuildLegend() }
         chartPanel.chart = chart
         chart.applySimbrainChartTheme()
+        // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
+        AdaptiveChartRepainter(chartPanel).install()
         rebuildLegend()
     }
 

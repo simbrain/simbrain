@@ -249,6 +249,21 @@ class EvolutionRunner(
     private var initialized = false
     private var stoppedByTarget = false
 
+    /**
+     * Raised the moment a stop is requested, ahead of the queued Stop task, so a generation already
+     * queued behind the Stop is skipped instead of running one full trailing generation. Cleared when
+     * evolution is explicitly started or stepped again.
+     */
+    @Volatile
+    private var stopRequested = false
+
+    /**
+     * The job evaluating the current generation's population, so a stop can cancel the evaluations
+     * in flight rather than waiting a whole generation out.
+     */
+    @Volatile
+    private var currentEvalJob: Job? = null
+
     private val processorChannel = Channel<Pair<EvolutionTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
 
     sealed class EvolutionTask {
@@ -277,14 +292,18 @@ class EvolutionRunner(
     }
 
     suspend fun startEvolving() {
+        stopRequested = false
         submitTask(EvolutionTask.Start).await()
     }
 
     suspend fun stopEvolving() {
+        stopRequested = true
+        currentEvalJob?.cancel()
         submitTask(EvolutionTask.Stop).await()
     }
 
     suspend fun evolveOnce() {
+        stopRequested = false
         submitTask(EvolutionTask.Evolve).await()
     }
 
@@ -306,11 +325,27 @@ class EvolutionRunner(
     }
 
     private suspend fun evolveOnceHandler() {
+        if (stopRequested) {
+            // A Stop is already queued; skip the generation instead of running a trailing one
+            return
+        }
         initPopulation()
         generation++
 
-        val fitnessScores = coroutineScope {
-            population.map { async { it.eval() } }.awaitAll()
+        val fitnessScores = try {
+            coroutineScope {
+                currentEvalJob = coroutineContext.job
+                try {
+                    population.map { async { it.eval() } }.awaitAll()
+                } finally {
+                    currentEvalJob = null
+                }
+            }
+        } catch (e: CancellationException) {
+            currentCoroutineContext().ensureActive()
+            // A stop cancelled the evaluations; abandon this generation, whose Stop is already queued
+            generation--
+            return
         }
         val scored = (population zip metadata zip fitnessScores).map { (simMeta, fitness) ->
             simMeta.first to simMeta.second.copy(fitness = fitness)
@@ -335,6 +370,10 @@ class EvolutionRunner(
         population = nextGen.map { it.first }
         metadata = nextGen.map { it.second }
 
+        if (stopRequested) {
+            // The stop's own task is already in the queue; queue nothing more
+            return
+        }
         if (isRunning) {
             if (stoppingFunction(state)) {
                 stoppedByTarget = true

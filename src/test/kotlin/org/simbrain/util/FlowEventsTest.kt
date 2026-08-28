@@ -133,22 +133,24 @@ class FlowEventsTest {
     }
 
     @Test
-    fun `throttle delivers only the latest value fired within a window`() = runBlocking {
+    fun `throttle delivers the first fire immediately and the latest at the window's end`() = runBlocking {
         val events = FlowEvents()
         val event = events.OneArgEvent<Int>(interval = 50, timingMode = FlowEvents.TimingMode.Throttle)
         val received = Collections.synchronizedList(mutableListOf<Int>())
 
         event.on(Dispatchers.Default) { received.add(it) }
-        delay(100) // let the shared sample collector subscribe
+        delay(100) // let the shaping collector subscribe
 
         event.fire(1)
+        delay(10) // let the leading edge through before the burst
         event.fire(2)
-        event.fire(3) // all within one 50ms window
-        delay(200)    // past the sample window
+        event.fire(3) // within the same 50ms window as 2
+        delay(200)    // past the window
 
-        // sample() is trailing-edge: intermediate fires are dropped and only the latest survives.
-        // The old leading-edge throttle would have delivered 1 instead.
-        assertEquals(listOf(3), received.toList())
+        // The throttle is leading-and-trailing with intermediate fires conflated: the first fire
+        // responds immediately (so an explicit user action is never postponed) and the latest value
+        // still lands at the end of the window, so the final state is always delivered.
+        assertEquals(listOf(1, 3), received.toList())
         events.close()
     }
 

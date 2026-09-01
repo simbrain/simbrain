@@ -270,6 +270,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 val index = findIndexOfType(WeightMatrixNode::class)
                 canvas.layer.addChild(index + 1, node)
             }
+            is GapJunctionNode -> {
+                val index = findIndexOfType(SynapseNode::class)
+                canvas.layer.addChild(index + 1, node)
+            }
             is SynapseGroupNode -> {
                 val index = findIndexOfType(SynapseNode::class)
                 canvas.layer.addChild(index + 1, node)
@@ -311,6 +315,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         return when (model) {
             is Neuron -> createNode(model)
             is Synapse -> createNode(model)
+            is GapJunction -> createNode(model)
             is NeuronArray -> createNode(model)
             is ActivationSequence -> createNode(model)
             is LanguageModel -> createNode(model)
@@ -339,6 +344,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val source = modelNodeMap.get<NeuronNode>(synapse.source)
         val target = modelNodeMap.get<NeuronNode>(synapse.target)
         SynapseNode(this, source, target, synapse)
+    }
+
+    suspend fun createNode(gapJunction: GapJunction) = addScreenElement {
+        GapJunctionNode(this, gapJunction)
     }
 
     suspend fun createNode(neuronArray: NeuronArray) = addScreenElement { NeuronArrayNode(this, neuronArray) }

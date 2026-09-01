@@ -14,7 +14,7 @@ import org.simbrain.util.addi
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class SigmoidalRule : AbstractSigmoidalRule() {
+class SigmoidalRule : AbstractSigmoidalRule<EmptyScalarData, EmptyMatrixData>() {
 
     override val timeType: Network.TimeType = Network.TimeType.DISCRETE
 

@@ -25,7 +25,11 @@ abstract class NpcBehavior : CopyableObject {
     override fun getTypeList() = npcBehaviorTypes
 }
 
-val npcBehaviorTypes: List<Class<out CopyableObject>> = listOf(
+/**
+ * Behavior types offered in the entity dialog's dropdown. Mutable so that behaviors defined outside the
+ * world package (e.g. simulation-specific ones) can register themselves and remain visible and editable.
+ */
+val npcBehaviorTypes: MutableList<Class<out CopyableObject>> = mutableListOf(
     NoOpBehavior::class.java,
     Pursue::class.java,
     Evade::class.java,

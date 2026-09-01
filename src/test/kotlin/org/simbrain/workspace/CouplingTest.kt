@@ -174,7 +174,7 @@ class CouplingTest {
     fun `check if all consumers are created on a neuron`() {
         val neuron = Neuron()
         network.addNetworkModelAsync(neuron)
-        val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel", "setBias")
+        val expected = setOf("setActivation", "addInputValue", "addInputValue", "setLabel", "setBias", "setTemperatureInput")
         val actual = with(couplingManager) { neuron.consumers.map { it.method.name }.toSet() }
         val diff = expected complement actual
         assertTrue(diff.isIdentical(),"$diff")

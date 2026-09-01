@@ -19,6 +19,7 @@ import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.trainers.computeOrderedUpdatePath
+import org.simbrain.network.updaterules.interfaces.MembranePotentialProvider
 import org.simbrain.network.util.Alignment
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -702,6 +703,49 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 SHORT_DESCRIPTION,
                 "Create appropriate connection between selected source and target entities"
                         + if (!canConnect) " (Disabled: $reason)" else ""
+            )
+        }
+
+        updateAction()
+
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
+    }
+
+    val connectWithGapJunction = networkPanel.createAction(
+        name = "Connect selected neurons with gap junction",
+        description = "Create a bidirectional electrical coupling between two selected neurons",
+    ) {
+        val neurons = selectionManager.filterSelectedModels<Neuron>()
+        if (neurons.size != 2) return@createAction
+        if (neurons.any { neuron -> neuron.updateRule !is MembranePotentialProvider }) return@createAction
+        if (neurons[0].gapJunctions.any { junction -> junction.connects(neurons[0], neurons[1]) }) return@createAction
+        val junction = GapJunction(neurons[0], neurons[1])
+        if (network.addNetworkModelAsync(junction) == null) return@createAction
+        undoManager.addUndoableAction(
+            description = "Add gap junction",
+            undo = { junction.delete() },
+            redo = {
+                junction.afterRestore()
+                network.addNetworkModelAsync(junction, useAutoAssignedId = false)
+            }
+        )
+    }.also {
+        fun updateAction() {
+            val neurons = networkPanel.selectionManager.filterSelectedModels<Neuron>()
+            val reason = when {
+                neurons.size != 2 -> "select exactly two neurons"
+                neurons.any { neuron -> neuron.updateRule !is MembranePotentialProvider } ->
+                    "both neuron update rules must expose a membrane potential"
+                neurons[0].gapJunctions.any { junction -> junction.connects(neurons[0], neurons[1]) } ->
+                    "a gap junction already connects these neurons"
+                else -> null
+            }
+            it.isEnabled = reason == null
+            it.putValue(
+                SHORT_DESCRIPTION,
+                "Connect two selected neurons with a gap junction" +
+                    if (reason != null) " (Disabled: $reason)" else ""
             )
         }
 

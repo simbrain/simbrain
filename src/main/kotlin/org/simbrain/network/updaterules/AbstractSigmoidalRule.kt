@@ -1,10 +1,15 @@
+/**
+ * Shared parameters and copy logic for the discrete and continuous sigmoidal rules, generic over their
+ * data holders so subclasses can keep per-neuron state (e.g. the continuous rule's integrated net
+ * activation).
+ */
 package org.simbrain.network.updaterules
 
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.EmptyMatrixData
-import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.MatrixDataHolder
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -16,7 +21,8 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  *
  * @author Zoë Tosi
  */
-abstract class AbstractSigmoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(),
+abstract class AbstractSigmoidalRule<out DS : ScalarDataHolder, out DM : MatrixDataHolder> :
+    NeuronUpdateRule<DS, DM>(),
     DifferentiableUpdateRule, NoisyUpdateRule, BoundedUpdateRule {
 
     @UserParameter(label = "Implementation", order = 10)
@@ -41,21 +47,13 @@ abstract class AbstractSigmoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMa
 
     override var addNoise: Boolean = false
 
-    override fun createScalarData(): EmptyScalarData {
-        return EmptyScalarData
-    }
-
-    override fun createMatrixData(size: Int): EmptyMatrixData {
-        return EmptyMatrixData
-    }
-
     /**
      * Copy the overlapping bits of the rule for subclasses.
      *
      * @param sr the sigmoid rule to copy
      * @return the copy.
      */
-    protected fun copy(sr: AbstractSigmoidalRule): AbstractSigmoidalRule {
+    protected fun copy(sr: AbstractSigmoidalRule<*, *>): AbstractSigmoidalRule<*, *> {
         sr.type = type
         sr.slope = slope
         sr.addNoise = addNoise

@@ -45,6 +45,7 @@ val NetworkPanel.editMenu
             // TODO: Sync this with "2" and "3" ways of connecting both neuron groups and free neurons
             add(connectWithWeightMatrix)
             add(connectWithSynapseGroup)
+            add(connectWithGapJunction)
             addSeparator()
             add(showLayoutDialogAction)
             addSeparator()
@@ -171,6 +172,7 @@ fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
         addSeparator()
         add(clearSourceNeurons)
         add(setSourceNeurons)
+        add(connectWithGapJunction)
         addSeparator()
 
         // Preferences

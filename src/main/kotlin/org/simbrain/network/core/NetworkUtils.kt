@@ -35,6 +35,7 @@ fun updatingOrder(obj: NetworkModel): Int = when (obj) {
     is SynapseGroup -> 60
     is Subnetwork -> 70
     is Synapse -> 80
+    is GapJunction -> 82
     is SupervisedModel -> 90
     else -> 55
 }

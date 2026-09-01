@@ -1,3 +1,8 @@
+/**
+ * The free scalar neuron: activation, bias, and clamping state, an update rule with its data holder,
+ * synaptic fan-in/fan-out, gap-junction endpoints, and the input-accumulation pass that pulls weighted
+ * synaptic input, gap-junction current, and bias together before the rule applies.
+ */
 package org.simbrain.network.core
 
 import org.simbrain.network.events.NeuronEvents
@@ -5,6 +10,7 @@ import org.simbrain.network.gui.createTooltipText
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.TemperatureReceivingData
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.ClippedUpdateRule
 import org.simbrain.network.util.ScalarDataHolder
@@ -152,6 +158,14 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         private set
 
     /**
+     * Gap junctions this neuron is an endpoint of. Unordered because junctions have no source/target
+     * distinction. Like the fan lists, rebuilt on deserialization by [GapJunction]'s constructor.
+     */
+    @Transient
+    var gapJunctions: MutableSet<GapJunction> = LinkedHashSet()
+        private set
+
+    /**
      * Central x-coordinate of this neuron in 2-space.
      */
     var x = 0.0
@@ -259,6 +273,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override fun accumulateInputs() {
         fanIn.forEach { it.updatePSR() }
         addInputValue(weightedInputs)
+        accumulateGapJunctionCurrents()
         addInputValue(bias)
     }
 
@@ -270,6 +285,31 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     fun accumulateFanInInputs() {
         fanIn.forEach { it.updatePSR() }
         addInputValue(weightedInputs)
+        accumulateGapJunctionCurrents()
+    }
+
+    private fun accumulateGapJunctionCurrents() {
+        if (gapJunctions.isNotEmpty()) {
+            addInputValue(gapJunctions.sumOf { it.currentInto(this) })
+        }
+    }
+
+    fun addGapJunction(junction: GapJunction) {
+        gapJunctions.add(junction)
+    }
+
+    /**
+     * Delivers a temperature sample to a thermosensory data holder, e.g. for
+     * [org.simbrain.network.updaterules.AfdThermoreceptorRule]. Separate from [addInputValue] so
+     * temperature does not mix with synaptic or gap-junction current. No-op for other rules.
+     */
+    @Consumable(defaultVisibility = false)
+    fun setTemperatureInput(temperature: Double) {
+        (dataHolder as? TemperatureReceivingData)?.receiveTemperature(temperature)
+    }
+
+    fun removeGapJunction(junction: GapJunction) {
+        gapJunctions.remove(junction)
     }
 
     context(Network)
@@ -666,13 +706,32 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
     override val name: String
         get() = id!!
 
+    /**
+     * Repairs a deserialized data holder whose class no longer matches what the update rule expects,
+     * e.g. a save written before a rule's state moved into a new holder type. The dynamical state is
+     * lost but the network loads and updates instead of throwing.
+     */
+    fun readResolve(): Any {
+        val proposedDataHolder = updateRule.createScalarData()
+        if (dataHolder::class != proposedDataHolder::class) {
+            dataHolder = proposedDataHolder
+        }
+        return this
+    }
+
     override suspend fun delete(): List<NetworkModel> {
         val synapses = deleteConnectedSynapses()
+        val junctions = deleteGapJunctions()
         events.deleted.fire(this)
         return buildList<NetworkModel> {
             add(this@Neuron)
             addAll(synapses)
+            addAll(junctions)
         }
+    }
+
+    private suspend fun deleteGapJunctions(): List<GapJunction> {
+        return gapJunctions.toList().also { junctions -> junctions.forEach { it.delete() } }
     }
 
     /**

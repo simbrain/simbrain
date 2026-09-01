@@ -24,6 +24,9 @@ internal object ThermotaxisPopulationSimulation {
         weights: ThermotaxisWeights = ThermotaxisWeights(),
         gradientDirection: Double = 1.0,
         temperatureOffset: Double = 0.0,
+        centerTemperature: Double = PLATE_CENTER_TEMPERATURE,
+        halfSpan: Double = PLATE_GRADIENT,
+        bufferedSemantics: Boolean = false,
         onProgress: (completed: Int, total: Int) -> Unit = { _, _ -> },
         shouldCancel: () -> Boolean = { false }
     ): ThermotaxisEnsembleResult? {
@@ -32,7 +35,10 @@ internal object ThermotaxisPopulationSimulation {
         val paths = mutableListOf<ThermotaxisPath>()
         repeat(worms) { index ->
             if (shouldCancel()) return null
-            paths += runWorm(seconds, Random(seed + index), weights, gradientDirection, temperatureOffset)
+            paths += runWorm(
+                seconds, Random(seed + index), weights, gradientDirection, temperatureOffset,
+                centerTemperature, halfSpan, bufferedSemantics
+            )
             onProgress(index + 1, worms)
         }
         val endpoints = paths.map { it.points.last().x }
@@ -52,9 +58,12 @@ internal object ThermotaxisPopulationSimulation {
         random: Random,
         weights: ThermotaxisWeights,
         gradientDirection: Double,
-        temperatureOffset: Double
+        temperatureOffset: Double,
+        centerTemperature: Double = PLATE_CENTER_TEMPERATURE,
+        halfSpan: Double = PLATE_GRADIENT,
+        bufferedSemantics: Boolean = false
     ): ThermotaxisPath {
-        val model = ThermotaxisModel(DoubleArray(5), fittedBiases)
+        val model = ThermotaxisModel(DoubleArray(5), fittedBiases, bufferedSemantics = bufferedSemantics)
         var x = width / 2 + random.nextDouble(-5.0, 5.0)
         var y = height / 2 + random.nextDouble(-5.0, 5.0)
         var heading = random.nextDouble(0.0, 2 * PI)
@@ -64,8 +73,8 @@ internal object ThermotaxisPopulationSimulation {
         var turnStepY = 0.0
         val points = mutableListOf(ThermotaxisPosition(x, y))
         repeat(seconds * 10) { step ->
-            val temperature = PLATE_CENTER_TEMPERATURE + temperatureOffset +
-                gradientDirection * PLATE_GRADIENT * (2.0 * x / width - 1.0)
+            val temperature = centerTemperature + temperatureOffset +
+                gradientDirection * halfSpan * (2.0 * x / width - 1.0)
             if (remainingTurnSteps > 0) {
                 x += turnStepX
                 y += turnStepY

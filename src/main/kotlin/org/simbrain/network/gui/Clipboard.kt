@@ -20,7 +20,7 @@ object Clipboard {
 
     /** The model types [paste]'s `createCopies` knows how to copy. */
     fun canCopy(model: NetworkModel): Boolean = when (model) {
-        is Neuron, is Synapse, is NetworkTextObject, is NeuronCollection, is SupervisedModel,
+        is Neuron, is Synapse, is GapJunction, is NetworkTextObject, is NeuronCollection, is SupervisedModel,
         is NeuronArray, is ActivationSequence, is WeightMatrix, is SynapseGroup, is Subnetwork,
         is LanguageModel, is TinyLanguageModel -> true
         else -> false
@@ -124,6 +124,13 @@ object Clipboard {
                                     item
                                 )
                                 add(newSynapse)
+                            }
+                        }
+                        is GapJunction -> {
+                            val endpoint1 = neuronMappings[item.neuron1]
+                            val endpoint2 = neuronMappings[item.neuron2]
+                            if (endpoint1 != null && endpoint2 != null) {
+                                add(GapJunction(endpoint1, endpoint2, item))
                             }
                         }
                         is InfoText -> {

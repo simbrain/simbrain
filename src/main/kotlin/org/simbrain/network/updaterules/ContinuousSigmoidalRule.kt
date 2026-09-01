@@ -1,9 +1,17 @@
+/**
+ * Leaky-integrator sigmoidal rule. The integrated net activation lives in [ContinuousSigmoidalData] so it
+ * can be inspected, serialized with the neuron, and exposed as a membrane potential to electrical
+ * connections such as gap junctions.
+ */
 package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.updaterules.interfaces.MembranePotentialProvider
+import org.simbrain.network.util.EmptyMatrixData
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.GuiEditable
 
 /**
  * **Continuous Sigmoidal Rule** provides various squashing function
@@ -13,7 +21,8 @@ import org.simbrain.util.UserParameter
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
+class ContinuousSigmoidalRule() : AbstractSigmoidalRule<ContinuousSigmoidalData, EmptyMatrixData>(),
+    MembranePotentialProvider {
 
     /**
      * The **time constant** of these neurons. If **timeConstant *
@@ -38,21 +47,25 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
     var leakConstant: Double = 1.0
 
     /**
-     * The net value of this neuron. This is the value that is integrated over
-     * time and then passed to the squashing function. NOTE: the net inputs are
-     * integrated and that value is passed through a squashing function to give
-     * the neurons activation. The activation post-squashing is NOT what is
-     * being numerically integrated.
+     * Shifts the squashing function without entering the integrator, so the output is
+     * squash(netActivation + outputBias). Unlike the neuron's bias, which is added to the input and
+     * integrated through the leaky dynamics, this bias takes effect immediately.
      */
-    private var netActivation = 0.0
-
-    private var inputTerm = 0.0
+    var outputBias by GuiEditable(
+        initValue = 0.0,
+        label = "Output bias",
+        description = "Added to the integrated net activation just before the squashing function. " +
+            "Unlike the neuron bias, it is not integrated and shifts the output immediately.",
+        increment = .1,
+        order = 3
+    )
 
     override fun copy(): ContinuousSigmoidalRule {
         var sn = ContinuousSigmoidalRule()
         sn = (super.copy(sn) as ContinuousSigmoidalRule)
         sn.timeConstant = timeConstant
         sn.leakConstant = leakConstant
+        sn.outputBias = outputBias
         return sn
     }
 
@@ -72,20 +85,27 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
      * x_i(t + dt) = x_i(t) * (1 - a*dt/c) + (dt/c) * sum(w_ij * r_j(t))
      */
     context(Network)
-    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+    override fun apply(neuron: Neuron, data: ContinuousSigmoidalData) {
         val dt: Double = timeStep
 
-        inputTerm = if (addNoise) {
+        val inputTerm = if (addNoise) {
             dt / timeConstant * (neuron.input + noiseGenerator.sampleDouble())
         } else {
             dt / timeConstant * (neuron.input)
         }
 
-        netActivation = netActivation * (1 - (leakConstant * dt / timeConstant)) + inputTerm
+        data.netActivation = data.netActivation * (1 - (leakConstant * dt / timeConstant)) + inputTerm
 
-        neuron.activation = type.valueOf(netActivation, upperBound, lowerBound, this.slope)
+        neuron.activation = type.valueOf(data.netActivation + outputBias, upperBound, lowerBound, this.slope)
     }
 
+    override fun createScalarData(): ContinuousSigmoidalData {
+        return ContinuousSigmoidalData()
+    }
+
+    override fun membranePotential(neuron: Neuron): Double {
+        return (neuron.dataHolder as? ContinuousSigmoidalData)?.netActivation ?: 0.0
+    }
 
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
@@ -97,12 +117,24 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule() {
         return type.derivVal(value, up, lw, diff)
     }
 
-    override fun clear(neuron: Neuron) {
-        super.clear(neuron)
-        netActivation = 0.0
-    }
-
     override val name: String
         get() = "Sigmoidal (Continuous)"
 
+}
+
+class ContinuousSigmoidalData(
+    @UserParameter(
+        label = "Net activation",
+        description = "The integrated net input that is passed through the squashing function."
+    )
+    var netActivation: Double = 0.0
+) : ScalarDataHolder {
+
+    override fun copy(): ContinuousSigmoidalData {
+        return ContinuousSigmoidalData(netActivation)
+    }
+
+    override fun clear() {
+        netActivation = 0.0
+    }
 }

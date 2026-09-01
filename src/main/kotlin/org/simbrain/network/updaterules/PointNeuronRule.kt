@@ -28,6 +28,9 @@ import kotlin.math.abs
 @APETabOder( "Main", "Conductances")
 class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMatrixData>() {
 
+    override fun membranePotential(neuron: Neuron): Double =
+        (neuron.dataHolder as? PointNeuronScalarData)?.membranePotential ?: neuron.activation
+
     @UserParameter(
         label = "Output function",
         description = "Current output function.",

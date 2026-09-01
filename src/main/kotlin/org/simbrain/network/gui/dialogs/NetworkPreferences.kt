@@ -58,6 +58,15 @@ object NetworkPreferences: PreferenceHolder() {
     val connectionLineColor: Color get() = connectionLineColorTheme.resolved
 
     @UserParameter(
+        label = "Gap junction color",
+        description = "Color of gap junction lines and channel glyphs",
+        tab = "Colors",
+        order = 45
+    )
+    var gapJunctionColorTheme by ThemeColorPreference(NetworkTheme.pair { it.gapJunction })
+    val gapJunctionColor: Color get() = gapJunctionColorTheme.resolved
+
+    @UserParameter(
         label = "Spiking color",
         description = "Color used to highlight neurons and connections when spiking",
         tab = "Colors",

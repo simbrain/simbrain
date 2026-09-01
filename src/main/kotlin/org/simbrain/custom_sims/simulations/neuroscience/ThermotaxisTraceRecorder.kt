@@ -45,17 +45,30 @@ internal object ThermotaxisTraceRecorder {
         seconds: Int = 1800,
         weights: ThermotaxisWeights = ThermotaxisWeights(),
         biases: DoubleArray = fittedBiases,
-        dorsalVentral: Double = 1.0
+        dorsalVentral: Double = 1.0,
+        bufferedSemantics: Boolean = false
+    ): List<ThermotaxisTraceRow> {
+        val model = ThermotaxisModel(states = DoubleArray(5), biases = biases, bufferedSemantics = bufferedSemantics)
+        return trace(seconds, dorsalVentral) { temperature -> model.step(temperature, weights) }
+    }
+
+    /**
+     * Same open-loop protocol against an arbitrary circuit stepper, so the fitted model and the native
+     * Simbrain network implementation can produce directly comparable traces.
+     */
+    fun trace(
+        seconds: Int,
+        dorsalVentral: Double = 1.0,
+        stepper: (temperature: Double) -> ThermotaxisStep
     ): List<ThermotaxisTraceRow> {
         require(seconds > 0) { "At least one second is required" }
-        val model = ThermotaxisModel(states = DoubleArray(5), biases = biases)
         var x = 0.0
         var y = 0.0
         var heading = 0.0
         val speed = CRAWLING_SPEED * dt
         return (1..seconds * 10).map { index ->
             val temperature = PLATE_CENTER_TEMPERATURE + PLATE_GRADIENT * x / halfWidth
-            val step = model.step(temperature, weights)
+            val step = stepper(temperature)
             heading += dorsalVentral * step.curvature * dt
             x += speed * cos(heading)
             y += speed * sin(heading)

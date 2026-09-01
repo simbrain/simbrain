@@ -1,6 +1,7 @@
 package org.simbrain.network.core
 
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.interfaces.MembranePotentialProvider
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
 
@@ -13,7 +14,15 @@ import org.simbrain.network.util.SpikingScalarData
  * @author Jeff Yoshimi
  * @author Zoë Tosi
  */
-abstract class SpikingNeuronUpdateRule<DS : SpikingScalarData, DM : SpikingMatrixData> : NeuronUpdateRule<DS, DM>() {
+abstract class SpikingNeuronUpdateRule<DS : SpikingScalarData, DM : SpikingMatrixData> : NeuronUpdateRule<DS, DM>(),
+    MembranePotentialProvider {
+
+    /**
+     * Spiking rules store their membrane voltage in the activation by convention; rules that keep the
+     * potential elsewhere (e.g. in their data holder) should override.
+     */
+    override fun membranePotential(neuron: Neuron): Double = neuron.activation
+
     override fun clear(neuron: Neuron) {
         super.clear(neuron)
         neuron.fanIn.forEach { it.clear() }

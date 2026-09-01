@@ -76,6 +76,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + '2') { connectSelectedModelsDefault(allowSelfConnection = true) }
     bind("2") { connectSelectedModelsDefault() }
     bind("3") { connectSelectedModelsCustom() }
+    bindTo("4", networkActions.connectWithGapJunction)
     bindTo("6", networkActions.selectIncomingWeightsAction)
     bindTo("7", networkActions.selectOutgoingWeightsAction)
     bind("8") {

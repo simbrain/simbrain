@@ -1,8 +1,10 @@
 /**
- * A visual, steering-only implementation of the fitted thermotaxis circuit in
- * Ikeda, Matsumoto, and Izquierdo (2021), using parameter set #67 from the paper's S1 Table, which is the
- * set the paper plots in Figure 7. The circuit here is verified step for step against a recorded run of the
- * authors' C++ implementation; see ThermotaxisTraceRecorder and NematodeThermotaxisTest.
+ * The fitted thermotaxis circuit of Ikeda, Matsumoto, and Izquierdo (2021), using parameter set #67 from
+ * the paper's S1 Table, the set the paper plots in Figure 7. The live simulation runs the circuit on
+ * native Simbrain components (see ThermotaxisNativeCircuit); the [ThermotaxisModel] in this file is the
+ * headless reference twin, verified step for step against a recorded run of the authors' C++
+ * implementation and against the native circuit — see ThermotaxisTraceRecorder, NematodeThermotaxisTest,
+ * and ThermotaxisNetworkParityTest. The model also powers the fast population assay.
  */
 package org.simbrain.custom_sims.simulations.neuroscience
 
@@ -13,10 +15,12 @@ import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.custom_sims.*
+import org.simbrain.network.core.GapJunction
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.addNeuron
-import org.simbrain.network.core.addSynapseAsync
-import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.core.Synapse
+import org.simbrain.network.updaterules.AfdThermoreceptorRule
+import org.simbrain.workspace.couplings.ScaleOperation
 import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.getDesktopComponentAs
@@ -27,63 +31,38 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
+import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.fitWorldToFrameSize
+import org.simbrain.world.odorworld.sensors.TemperatureSensor
+import org.simbrain.world.odorworld.sensors.ThermalGradient
 import java.awt.*
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.geom.Line2D
-import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicReference
-import java.util.zip.GZIPInputStream
 import javax.swing.*
 import kotlin.math.*
-import kotlin.random.Random
 
 val nematodeThermotaxis = newSim { optionString ->
     workspace.clearWorkspace()
 
     val networkComponent = addNetworkComponent("Thermotaxis Circuit")
-    val network = networkComponent.network.apply { timeStep = 0.1 }
+    val network = networkComponent.network
+    val circuit = ThermotaxisNativeCircuit.build(network)
 
-    suspend fun neuron(label: String, x: Double, y: Double) = network.addNeuron {
-        this.label = label
-        location = point(x, y)
-        updateRule = LinearRule()
+    circuit.afd.apply { label = "AFD (Temperature)"; location = point(190.0, 400.0) }
+    circuit.aib.location = point(290.0, 320.0)
+    circuit.aiy.location = point(90.0, 320.0)
+    circuit.aiz.location = point(190.0, 230.0)
+    circuit.dmn.apply { label = "DMN (Output)"; location = point(280.0, 135.0) }
+    circuit.vmn.apply { label = "VMN (Output)"; location = point(100.0, 135.0) }
+    circuit.cpg.location = point(190.0, 45.0)
+    circuit.synapses.values.forEach {
+        it.lowerBound = -15.0
+        it.upperBound = 15.0
     }
-
-    val afd = neuron("AFD (Temperature)", 190.0, 400.0)
-    val aib = neuron("AIB", 290.0, 320.0)
-    val aiy = neuron("AIY", 90.0, 320.0)
-    val aiz = neuron("AIZ", 190.0, 230.0)
-    val dmn = neuron("DMN (Output)", 280.0, 135.0)
-    val vmn = neuron("VMN (Output)", 100.0, 135.0)
-    val cpg = neuron("CPG", 190.0, 45.0)
-
-    fun addConnection(source: org.simbrain.network.core.Neuron, target: org.simbrain.network.core.Neuron, weight: Double) =
-        network.addSynapseAsync(source, target) {
-            strength = weight
-            lowerBound = -15.0
-            upperBound = 15.0
-        }
-
-    val fitted = ThermotaxisWeights()
-    val afdToAibGap = addConnection(afd, aib, fitted.afdToAibGap)
-    val aibToAfdGap = addConnection(aib, afd, fitted.afdToAibGap)
-    val afdToAiy = addConnection(afd, aiy, fitted.afdToAiy)
-    val aibToAiy = addConnection(aib, aiy, fitted.aibToAiy)
-    val aibToDmn = addConnection(aib, dmn, fitted.aibToDmn)
-    val aiyToAiz = addConnection(aiy, aiz, fitted.aiyToAiz)
-    val aizToAib = addConnection(aiz, aib, fitted.aizToAib)
-    val aizToDmn = addConnection(aiz, dmn, fitted.aizToDmn)
-    val aizToVmn = addConnection(aiz, vmn, fitted.aizToVmn)
-    val dmnToDmn = addConnection(dmn, dmn, fitted.dmnToDmn)
-    val dmnToVmn = addConnection(dmn, vmn, fitted.dmnToVmn)
-    val vmnToDmn = addConnection(vmn, dmn, fitted.vmnToDmn)
-    val vmnToVmn = addConnection(vmn, vmn, fitted.vmnToVmn)
-    val cpgToDmn = addConnection(cpg, dmn, fitted.cpgToDmn)
-    val cpgToVmn = addConnection(cpg, vmn, fitted.cpgToVmn)
 
     val worldComponent = addOdorWorldComponent("Thermal Plate")
     val world = worldComponent.world.apply {
@@ -101,7 +80,26 @@ val nematodeThermotaxis = newSim { optionString ->
         isShowTrail = true
     }
 
-    val model = ThermotaxisModel(states = DoubleArray(5), biases = fittedBiases)
+    val gradient = ThermalGradient()
+    val temperatureSensor = TemperatureSensor().apply { this.gradient = gradient }
+    worm.addSensor(temperatureSensor)
+    val turningLeft = Turning(Turning.LEFT)
+    val turningRight = Turning(Turning.RIGHT)
+    worm.addEffector(turningLeft)
+    worm.addEffector(turningRight)
+    val wormBehavior = ThermotaxisWormBehavior().apply { this.gradient = gradient }
+    worm.behavior = wormBehavior
+
+    val steeringDegreesPerStep = NEUROMUSCULAR_WEIGHT * network.timeStep * 180.0 / PI
+    with(couplingManager) {
+        temperatureSensor.getProducer(temperatureSensor::currentValue) couple
+            circuit.afd.getConsumer(Neuron::setTemperatureInput)
+        circuit.dmn.getProducer(circuit.dmn::activation) via ScaleOperation(steeringDegreesPerStep) couple
+            turningLeft.getConsumer(Turning::setAmount)
+        circuit.vmn.getProducer(circuit.vmn::activation) via ScaleOperation(steeringDegreesPerStep) couple
+            turningRight.getConsumer(Turning::setAmount)
+    }
+
     if (optionString == "record-trace") {
         println(ThermotaxisTraceRecorder.run().let { "Wrote ${it.rows} rows to ${it.file}" })
     }
@@ -115,146 +113,72 @@ val nematodeThermotaxis = newSim { optionString ->
                 "mean final x = ${"%.2f".format(result.meanEndpointX)}, warm half = ${"%.1f".format(result.warmSideFraction * 100)}%"
         )
     }
-    var gradientDirection = 1.0
-    var temperatureOffset = 0.0
-    var useEmpiricalTurns = true
-    var turnTime = 0.0
-    var remainingTurnSteps = 0
-    var turnStepX = 0.0
-    var turnStepY = 0.0
-    var turnRandom = Random(Random.nextInt())
-    val activeTurnLabel = AtomicReference<String?>(null)
-    val circuitNeurons = listOf(afd, aib, aiy, aiz, dmn, vmn, cpg)
-    val circuitNeuronCollection = NeuronCollection(circuitNeurons).apply { label = "Circuit neurons" }
+    val circuitNeuronCollection = NeuronCollection(circuit.neurons).apply { label = "Circuit neurons" }
     network.addNetworkModelAsync(circuitNeuronCollection)
 
-    fun connectionWeight(synapse: org.simbrain.network.core.Synapse) =
+    fun connectionWeight(synapse: Synapse) =
         if (synapse in network.flatSynapseList) synapse.strength else 0.0
 
     fun currentWeights(): ThermotaxisWeights {
-        val gapConductance = minOf(connectionWeight(afdToAibGap), connectionWeight(aibToAfdGap))
+        val junction = circuit.gapJunction
+        val gapConductance = if (junction in network.getModels<GapJunction>() && junction.isEnabled) {
+            junction.conductance
+        } else {
+            0.0
+        }
+        fun weight(key: String) = connectionWeight(circuit.synapses.getValue(key))
         return ThermotaxisWeights(
             afdToAibGap = gapConductance,
-            afdToAiy = connectionWeight(afdToAiy),
-            aibToAiy = connectionWeight(aibToAiy),
-            aibToDmn = connectionWeight(aibToDmn),
-            aiyToAiz = connectionWeight(aiyToAiz),
-            aizToAib = connectionWeight(aizToAib),
-            aizToDmn = connectionWeight(aizToDmn),
-            aizToVmn = connectionWeight(aizToVmn),
-            dmnToDmn = connectionWeight(dmnToDmn),
-            dmnToVmn = connectionWeight(dmnToVmn),
-            vmnToDmn = connectionWeight(vmnToDmn),
-            vmnToVmn = connectionWeight(vmnToVmn),
-            cpgToDmn = connectionWeight(cpgToDmn),
-            cpgToVmn = connectionWeight(cpgToVmn)
+            afdToAiy = weight("afdToAiy"),
+            aibToAiy = weight("aibToAiy"),
+            aibToDmn = weight("aibToDmn"),
+            aiyToAiz = weight("aiyToAiz"),
+            aizToAib = weight("aizToAib"),
+            aizToDmn = weight("aizToDmn"),
+            aizToVmn = weight("aizToVmn"),
+            dmnToDmn = weight("dmnToDmn"),
+            dmnToVmn = weight("dmnToVmn"),
+            vmnToDmn = weight("vmnToDmn"),
+            vmnToVmn = weight("vmnToVmn"),
+            cpgToDmn = weight("cpgToDmn"),
+            cpgToVmn = weight("cpgToVmn")
         )
     }
 
-    fun resetModel(heading: Double = 90.0) {
-        model.reset()
+    fun resetSimulation(heading: Double = 90.0) {
+        circuit.reset()
+        wormBehavior.reset()
         worm.location = point(world.width / 2.0, world.height / 2.0)
         worm.heading = heading
         worm.resetAnimation()
-        listOf(afd, aib, aiy, aiz, dmn, vmn, cpg).forEach { it.activation = 0.0 }
-        turnTime = 0.0
-        remainingTurnSteps = 0
-        turnRandom = Random(Random.nextInt())
-        activeTurnLabel.set(null)
+        // Prime AFD's temperature history from the worm's actual starting temperature. Couplings run
+        // before component updates, so without this the first delivered sample would be the sensor's
+        // uninitialized 0 °C and the whole 100 s history would prime cold, producing a long false
+        // AFD transient.
+        temperatureSensor.update(worm)
+        circuit.afd.setTemperatureInput(temperatureSensor.currentValue)
     }
 
-    resetModel()
-
-    network.updateManager.clear()
-    workspace.addUpdateAction("Thermotaxis steering", position = 0) {
-        repeat(5) {
-            val plateX = 136.0 * (worm.x / world.width - 0.5)
-            val temperature = 17.0 + temperatureOffset + gradientDirection * 3.0 * plateX / 68.0
-            val result = model.step(
-                temperature = temperature,
-                weights = currentWeights(),
-                activityOverrides = circuitNeurons.map { neuron ->
-                    when {
-                        neuron !in network.flatNeuronList -> 0.0
-                        neuron.clamped -> neuron.activation
-                        else -> null
-                    }
-                }
-            )
-
-            afd.activation = result.afdState
-            aib.activation = result.outputs[0]
-            aiy.activation = result.outputs[1]
-            aiz.activation = result.outputs[2]
-            dmn.activation = result.outputs[3]
-            vmn.activation = result.outputs[4]
-            cpg.activation = result.cpgOutput
-
-            var heading = worm.heading * PI / 180.0
-            val plateXPosition = 136.0 * worm.x / world.width
-            val turn = if (useEmpiricalTurns && remainingTurnSteps == 0) {
-                ThermotaxisTurnPolicy.select(temperature, turnTime, heading, turnRandom, gradientDirection)
-            } else {
-                null
-            }
-            if (turn != null) {
-                heading = turn.heading
-                val duration = turn.durationSeconds.coerceAtLeast(network.timeStep)
-                turnStepX = network.timeStep * turn.displacement * cos(heading) / duration * world.width / 136.0
-                turnStepY = -network.timeStep * turn.displacement * sin(heading) / duration * world.height / 96.0
-                remainingTurnSteps = (duration / network.timeStep).roundToInt()
-                activeTurnLabel.set(turn.label)
-            }
-            val isTurning = useEmpiricalTurns && remainingTurnSteps > 0
-            val stepDistance: Double
-            var nextX: Double
-            var nextY: Double
-            if (isTurning) {
-                nextX = worm.x + turnStepX
-                nextY = worm.y + turnStepY
-                stepDistance = hypot(turnStepX, turnStepY)
-                remainingTurnSteps--
-            } else {
-                activeTurnLabel.set(null)
-                heading += result.curvature * network.timeStep
-                stepDistance = 0.2 * network.timeStep * world.width / 136.0
-                nextX = worm.x + stepDistance * cos(heading)
-                nextY = worm.y - stepDistance * sin(heading)
-            }
-            val edgeMargin = 12.0
-            if (nextX < edgeMargin || nextX > world.width - edgeMargin) {
-                heading = PI - heading
-                nextX = nextX.coerceIn(edgeMargin, world.width - edgeMargin)
-            }
-            if (nextY < edgeMargin || nextY > world.height - edgeMargin) {
-                heading = -heading
-                nextY = nextY.coerceIn(edgeMargin, world.height - edgeMargin)
-            }
-            worm.heading = heading * 180.0 / PI
-            worm.location = point(nextX, nextY)
-            worm.recordTravelDistance(stepDistance)
-            turnTime += network.timeStep
-        }
-    }
+    resetSimulation()
 
     val gradientOverlay = object : PNode() {
         override fun paint(paintContext: PPaintContext) {
             val graphics = paintContext.graphics as Graphics2D
             val bandWidth = world.width / 20.0
             repeat(20) { index ->
-                val directionFraction = if (gradientDirection > 0.0) index / 19.0f else 1.0f - index / 19.0f
-                val fraction = (directionFraction + (temperatureOffset / 6.0).toFloat()).coerceIn(0.0f, 1.0f)
+                val directionFraction = if (gradient.direction > 0.0) index / 19.0f else 1.0f - index / 19.0f
+                val fraction = (directionFraction + (gradient.offset / 6.0).toFloat()).coerceIn(0.0f, 1.0f)
                 graphics.color = Color(0.05f + 0.9f * fraction, 0.2f, 0.95f - 0.9f * fraction, 0.48f)
                 graphics.fillRect((index * bandWidth).toInt(), 0, bandWidth.toInt() + 1, world.height.toInt())
             }
             graphics.color = Color.WHITE
-            val leftTemperature = if (gradientDirection > 0.0) 14.0 + temperatureOffset else 20.0 + temperatureOffset
-            val rightTemperature = if (gradientDirection > 0.0) 20.0 + temperatureOffset else 14.0 + temperatureOffset
+            val leftTemperature = gradient.temperatureAt(point(0.0, 0.0), world)
+            val rightTemperature = gradient.temperatureAt(point(world.width, 0.0), world)
             val leftLabel = "${"%.1f".format(leftTemperature)}°C"
             val rightLabel = "${"%.1f".format(rightTemperature)}°C"
             graphics.drawString(leftLabel, 8, 20)
             graphics.drawString(rightLabel, (world.width - 40).toInt(), 20)
-            activeTurnLabel.get()?.let { turnLabel ->
+            wormBehavior.activeTurnLabel?.let { turnLabel ->
                 val label = "TURN: $turnLabel"
                 val labelWidth = graphics.fontMetrics.stringWidth(label) + 16
                 val labelX = ((world.width - labelWidth) / 2).toInt()
@@ -299,23 +223,23 @@ val nematodeThermotaxis = newSim { optionString ->
         }
 
         val controlPanel = createControlPanel("Thermotaxis Controls", 10, 10) {
-            addButton("Reset up") { resetModel() }
-            addButton("Reset left") { resetModel(180.0) }
-            addButton("Reset right") { resetModel(0.0) }
+            addButton("Reset up") { resetSimulation() }
+            addButton("Reset left") { resetSimulation(180.0) }
+            addButton("Reset right") { resetSimulation(0.0) }
             addButton("Reverse gradient", context = Dispatchers.Swing) {
-                gradientDirection *= -1.0
+                gradient.direction *= -1.0
                 repaintThermalPlate()
             }
             suspend fun updateTemperatureOffset(delta: Double) = withContext(Dispatchers.Swing) {
-                temperatureOffset += delta
+                gradient.offset += delta
                 repaintThermalPlate()
             }
             addButton("Warm plate") { updateTemperatureOffset(0.5) }
             addButton("Cool plate") { updateTemperatureOffset(-0.5) }
             addCheckBox("Show trail", true) { showTrail -> worm.isShowTrail = showTrail }
             addCheckBox("Use empirical turns", true) { enabled ->
-                useEmpiricalTurns = enabled
-                if (!enabled) remainingTurnSteps = 0
+                wormBehavior.useEmpiricalTurns = enabled
+                if (!enabled) wormBehavior.cancelTurn()
             }
             addButton("Add activation heat map") {
                 val heatMapButton = this
@@ -363,14 +287,17 @@ val nematodeThermotaxis = newSim { optionString ->
                 }
                 try {
                 val assayWeights = currentWeights()
-                val assayGradientDirection = gradientDirection
-                val assayTemperatureOffset = temperatureOffset
+                val assayGradientDirection = gradient.direction
+                val assayTemperatureOffset = gradient.offset
                 val result = ThermotaxisPopulationSimulation.run(
                     worms = trajectories,
                     seconds = seconds,
                     weights = assayWeights,
                     gradientDirection = assayGradientDirection,
                     temperatureOffset = assayTemperatureOffset,
+                    centerTemperature = gradient.centerTemperature,
+                    halfSpan = gradient.spanDegrees / 2.0,
+                    bufferedSemantics = true,
                     onProgress = { completed, total ->
                         SwingUtilities.invokeLater {
                             progressWindow.value = completed
@@ -409,7 +336,7 @@ val nematodeThermotaxis = newSim { optionString ->
             gradientOverlay.invalidatePaint()
             worldPanel.canvas.repaint()
         }
-        resetModel()
+        resetSimulation()
     }
 
     addSidebarInfo(
@@ -420,7 +347,7 @@ val nematodeThermotaxis = newSim { optionString ->
        
        Although these nematodes have 302 neurons, the process described in the [PNAS study](https://www.pnas.org/doi/abs/10.1073/pnas.1918528117) identified these eight as essential to directed migration. Across a population and enough simulated time, worms  tend to migrate toward the warmer side of the 14°C–20°C plate. Their paths and turns are stochastic, however, so this tendency is not immediate and will not be obvious in every individual run. 
 
-        Tip: For better performance, minimize the network window while the simulation is running.
+        Tip: For better performance, minimize the network window while the simulation is running. Each workspace iteration advances the model by one 0.1-second step, so long migrations take many iterations; use the workspace run controls to let it run.
 
         # What to Do
 
@@ -443,9 +370,9 @@ val nematodeThermotaxis = newSim { optionString ->
         - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the motor neurons, producing small dorsal–ventral wiggles that sample the temperature gradient.
         - **DMN (Output)** and **VMN (Output)** are abbreviations for larger, highly correlated dorsal and ventral neck motor-neuron groups, as discussed in the PNAS study. Their activity difference determines instantaneous path curvature.
 
-        The AFD–AIB electrical gap junction is implemented as reciprocal synapses so it can be shown and edited in Simbrain. Its current is `conductance × (AFD activity − AIB state)`.
+        The AFD–AIB electrical gap junction is a real bidirectional Simbrain gap junction, drawn as a line with a paired-bars channel glyph at its midpoint. It has a single conductance and no direction: it passes `conductance × (V other − V this)` into both endpoints simultaneously, computed from the neurons' internal membrane states.
 
-        Each neuron has two values worth distinguishing. Its *state* is a membrane potential relative to rest, which can be any size and is what the paper plots in Figure 7A. Its *activation*, shown on the canvas here, is the sigmoid of that state plus a bias, so it is squashed into the range 0 to 1 and is what travels along synapses. A neuron whose bias pushes it far into either tail of the sigmoid can therefore look flat on the canvas while its underlying state is still moving. Run the simulation with the `record-trace` option to write both to a CSV.
+        Each neuron has two values worth distinguishing. Its *state* is a membrane potential relative to rest, which can be any size and is what the paper plots in Figure 7A; double-click a neuron and open its state variables to see it. Its *activation* is the sigmoid of that state plus a bias, squashed into the range 0 to 1, and is what travels along chemical synapses. A neuron whose bias pushes it far into either tail of the sigmoid can therefore look flat while its underlying state is still moving. AFD's node displays its raw state, since that is the meaningful sensory quantity. Run the simulation with the `record-trace` option to write both to a CSV.
 
         ## Empirical Turns
 
@@ -454,7 +381,7 @@ val nematodeThermotaxis = newSim { optionString ->
 
         ## Implementation Note
 
-        This is a custom implementation of the fitted circuit that largely bypasses Simbrain's ordinary neuron-update machinery. Consequently, most parameters shown when you double-click a node do not affect the model or are not meaningful to edit. Clamping and connection strengths are deliberate exceptions used to support limited exploration. A future simulation will implement the circuit entirely with native Simbrain components.
+        The circuit runs entirely on native Simbrain components: a thermoreceptor update rule for AFD, continuous sigmoidal rules with output biases for the interneurons and motor neurons, a sinusoidal activity generator for the CPG, ordinary chemical synapses, and a bidirectional gap junction. Temperature reaches AFD through a coupling from a temperature sensor on the worm, and the motor neurons steer the worm through couplings to its turning effectors, so everything you edit by double-clicking a node or connection is the real model. The empirical stochastic turns are a behavioral policy attached to the worm rather than circuit dynamics. This implementation is verified step for step against the authors' C++ implementation; see NematodeThermotaxisTest and ThermotaxisNetworkParityTest.
 
         # References
 
@@ -466,18 +393,30 @@ val nematodeThermotaxis = newSim { optionString ->
     )
 }
 
+/**
+ * When [bufferedSemantics] is set, the AFD state and CPG oscillator feed the interneuron inputs with a
+ * one-step delay, while the reported trace columns stay current-step. This reproduces the semantics of
+ * Simbrain's buffered network update, where every input is computed from previous-step values, and serves
+ * as the parity reference for the native-component implementation of this circuit. The default preserves
+ * the original same-step semantics verified against the authors' C++ implementation.
+ */
 internal class ThermotaxisModel(
     private val states: DoubleArray,
-    private val biases: DoubleArray
+    private val biases: DoubleArray,
+    private val bufferedSemantics: Boolean = false
 ) {
     private val dt = 0.1
     private val temperatureHistory = DoubleArray(afdResponseKernel.size) { PLATE_CENTER_TEMPERATURE }
     private var time = 0.0
+    private var previousAfdState = 0.0
+    private var previousOscillator = 0.0
 
     fun reset() {
         states.fill(0.0)
         temperatureHistory.fill(PLATE_CENTER_TEMPERATURE)
         time = 0.0
+        previousAfdState = 0.0
+        previousOscillator = 0.0
     }
 
     fun step(
@@ -492,21 +431,25 @@ internal class ThermotaxisModel(
             afdResponseKernel[index] * thresholdResponse(temperatureHistory[index])
         }
         val afdState = activityOverrides[0] ?: sensedAfdState
+        val afdForInputs = if (bufferedSemantics) previousAfdState else afdState
         fun output(index: Int): Double {
             return activityOverrides[index + 1] ?: sigmoid(states[index] + biases[index])
         }
         val outputs = states.indices.map(::output).toDoubleArray()
         val inputs = doubleArrayOf(
-            weights.afdToAibGap * (afdState - states[0]) + weights.aizToAib * outputs[2],
-            weights.afdToAiy * sigmoid(afdState + AFD_BIAS) + weights.aibToAiy * outputs[0],
+            weights.afdToAibGap * (afdForInputs - states[0]) + weights.aizToAib * outputs[2],
+            weights.afdToAiy * sigmoid(afdForInputs + AFD_BIAS) + weights.aibToAiy * outputs[0],
             weights.aiyToAiz * outputs[1],
             weights.aibToDmn * outputs[0] + weights.aizToDmn * outputs[2] + weights.dmnToDmn * outputs[3] + weights.vmnToDmn * outputs[4],
             weights.aizToVmn * outputs[2] + weights.dmnToVmn * outputs[3] + weights.vmnToVmn * outputs[4]
         )
         time += dt
         val oscillator = activityOverrides[6] ?: sin(2.0 * PI * time / OSCILLATOR_PERIOD)
-        inputs[3] += weights.cpgToDmn * oscillator
-        inputs[4] += weights.cpgToVmn * oscillator
+        val oscillatorForInputs = if (bufferedSemantics) previousOscillator else oscillator
+        inputs[3] += weights.cpgToDmn * oscillatorForInputs
+        inputs[4] += weights.cpgToVmn * oscillatorForInputs
+        previousAfdState = afdState
+        previousOscillator = oscillator
         states.indices.forEach { index ->
             val override = activityOverrides[index + 1]
             states[index] = if (override == null) {
@@ -547,11 +490,11 @@ internal const val PLATE_HEIGHT = 96.0
 internal const val CRAWLING_SPEED = 0.2
 internal const val OSCILLATOR_PERIOD = 4.2
 
-private const val AFD_BIAS = 11.57
+internal const val AFD_BIAS = 11.57
 private const val THRESHOLD_TEMPERATURE = 15.54
 private const val DISSOCIATION_CONSTANT = 69.22
 private const val HILL_COEFFICIENT = 4.80
-private val NEUROMUSCULAR_WEIGHT = 34.68 * PI / 180.0
+internal val NEUROMUSCULAR_WEIGHT = 34.68 * PI / 180.0
 
 /**
  * Biases for AIB, AIY, AIZ, DMN and VMN, read from the S1 Table row for parameter set #67 along with the
@@ -562,25 +505,11 @@ internal val fittedBiases
     get() = doubleArrayOf(1.10, 2.02, -11.90, -4.49, 9.82)
 
 /**
- * The measured AFD response function, sampled every 0.1 s over the 100 s window of Eq 1. Index 0 is the
- * oldest sample and the last index is the newest, matching the ordering of the temperature history it is
- * convolved against. The kernel is biphasic and nearly zero-sum, so AFD differentiates its input; replacing
- * it with a purely decaying approximation turns the neuron into a low-pass filter and silences the circuit.
+ * The measured AFD response function, shared with [AfdThermoreceptorRule]. The kernel is biphasic and
+ * nearly zero-sum, so AFD differentiates its input; replacing it with a purely decaying approximation
+ * turns the neuron into a low-pass filter and silences the circuit.
  */
-private val afdResponseKernel: DoubleArray by lazy {
-    val stream = requireNotNull(ThermotaxisModel::class.java.getResourceAsStream(AFD_RESPONSE_RESOURCE)) {
-        "Missing AFD response function resource $AFD_RESPONSE_RESOURCE"
-    }
-    val decoded = Base64.getMimeDecoder().decode(stream.readBytes())
-    GZIPInputStream(decoded.inputStream()).bufferedReader().readLines()
-        .filter { it.isNotBlank() }
-        .map { it.trim().toDouble() }
-        .toDoubleArray()
-        .also { require(it.size == 1000) { "Expected 1000 AFD response samples, found ${it.size}" } }
-}
-
-private const val AFD_RESPONSE_RESOURCE =
-    "/org/simbrain/custom_sims/neuroscience/thermotaxis/afd_response.csv.gz.b64"
+private val afdResponseKernel: DoubleArray get() = AfdThermoreceptorRule.responseKernel
 
 internal data class ThermotaxisWeights(
     val afdToAibGap: Double = 2.62,
@@ -653,16 +582,16 @@ internal object ThermotaxisAfdValidation {
     private const val transientSteps = 200
     private const val measuredSteps = 840
 
-    fun run(): ThermotaxisAfdValidationResult {
+    fun run(bufferedSemantics: Boolean = false): ThermotaxisAfdValidationResult {
         val profile = (-30..20).map { level ->
             val afdValue = level * 0.1
-            afdValue to meanSteeringBias(afdValue)
+            afdValue to meanSteeringBias(afdValue, bufferedSemantics)
         }
         return ThermotaxisAfdValidationResult(profile)
     }
 
-    private fun meanSteeringBias(afdValue: Double): Double {
-        val model = ThermotaxisModel(states = DoubleArray(5), biases = fittedBiases)
+    private fun meanSteeringBias(afdValue: Double, bufferedSemantics: Boolean = false): Double {
+        val model = ThermotaxisModel(states = DoubleArray(5), biases = fittedBiases, bufferedSemantics = bufferedSemantics)
         val override = MutableList<Double?>(7) { null }.apply { this[0] = afdValue }
         return (1..transientSteps + measuredSteps)
             .map { model.step(temperature = PLATE_CENTER_TEMPERATURE, activityOverrides = override).curvature }

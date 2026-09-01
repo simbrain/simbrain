@@ -237,6 +237,7 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 val scalarUpdateRules = listOf(
     AdditiveRule::class.java,
     AdExIFRule::class.java,
+    AfdThermoreceptorRule::class.java,
     AllostaticUpdateRule::class.java,
     BinaryRule::class.java,
     ContinuousSigmoidalRule::class.java,

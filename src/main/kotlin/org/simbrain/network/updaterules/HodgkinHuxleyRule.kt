@@ -2,6 +2,7 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.interfaces.MembranePotentialProvider
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
@@ -17,7 +18,10 @@ import kotlin.math.exp
  * Adapted from software written by Anthony Fodor, with help from Jonathan
  * Vickrey.
  */
-class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule {
+class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule,
+    MembranePotentialProvider {
+
+    override fun membranePotential(neuron: Neuron): Double = neuron.activation
     /**
      * Sodium Channels
      */

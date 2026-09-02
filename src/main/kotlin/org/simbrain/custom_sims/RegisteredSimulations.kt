@@ -30,6 +30,7 @@ import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5P
 import org.simbrain.custom_sims.simulations.psychology.*
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
+import org.simbrain.custom_sims.simulations.tutorials.localistAndDistributedRepresentations
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -185,6 +186,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
         item("Braitenberg Program Learning", beta = true) { braitenbergRLPrograms }
+    }
+
+    dir("Tutorials") {
+        item("Localist and distributed representations") { localistAndDistributedRepresentations }
     }
 
     dir("Vision") {

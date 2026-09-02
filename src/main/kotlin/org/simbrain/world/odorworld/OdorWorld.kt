@@ -88,6 +88,14 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     )
     var isUseCameraCentering: Boolean = true
 
+    @UserParameter(
+        label = "Lock frame aspect ratio to world",
+        description = "Keep the viewport the same shape as the world so that zooming all the way out shows " +
+                "the whole world with nothing clipped. Constrains how the window can be resized.",
+        order = 25
+    )
+    var lockAspectRatio: Boolean = false
+
     /**
      * Entity Id generator.
      */

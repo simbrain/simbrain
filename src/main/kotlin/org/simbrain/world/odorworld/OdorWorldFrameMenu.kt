@@ -33,7 +33,7 @@ class OdorWorldFrameMenu(private val parent: OdorWorldDesktopComponent, private 
     private val helpItem = JMenuItem("World help")
 
     init {
-        odorWorldActions = parent.getWorldPanel().odorWorldActions
+        odorWorldActions = parent.worldPanel.odorWorldActions
     }
 
     fun setUpMenus() {

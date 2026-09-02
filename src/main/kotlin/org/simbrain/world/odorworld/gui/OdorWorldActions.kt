@@ -55,7 +55,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         iconPath = "menu_icons/Tools.png",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        world.createEditorDialog().apply { title = "World Properties" }.display()
+        world.createEditorDialog(titleName = "World Properties") { it.events.propertiesChanged.fire() }.display()
     }
 
     val showPropertyDialogAction = odorWorldPanel.createAction(

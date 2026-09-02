@@ -1,15 +1,20 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
+import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.piccolo.TileMap
+import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
@@ -21,6 +26,7 @@ import java.awt.BasicStroke
 import java.awt.Color
 import java.awt.Graphics2D
 import java.util.function.Consumer
+import javax.swing.JInternalFrame
 import javax.swing.JLabel
 import kotlin.math.cos
 import kotlin.math.max
@@ -152,19 +158,6 @@ val actorCritic = newSim {
     actorWts.forEach(Consumer { w: Synapse -> w.lowerBound = 0.0 })
 
     val gridCoupling = couplingManager.createCoupling(gridSensor, sensorNeurons)
-
-    // Time Series
-    val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries("Reward, TD Error", seriesNames = listOf("Reward", "Value", "TD Error"))
-    plot.apply {
-        model.isAutoRange = true
-        //model.rangeUpperBound = 2.0
-        //model.rangeLowerBound = -1.0
-        model.fixedWidth = true
-        events.componentMinimized.fire(true)
-    }
-    val rewardPlot = couplingManager.createCoupling(reward, rewardSeries)
-    val valuePlot = couplingManager.createCoupling(value, valueSeries)
-    val errorPlot = couplingManager.createCoupling(tdError, tdErrorSeries)
 
     var showValues = false
     var showGrid = true
@@ -313,10 +306,6 @@ val actorCritic = newSim {
             mouse.applyGridMovement()
         }
     })
-    workspace.updater.updateManager.addAction(UpdateCoupling(rewardPlot))
-    workspace.updater.updateManager.addAction(UpdateCoupling(valuePlot))
-    workspace.updater.updateManager.addAction(UpdateCoupling(errorPlot))
-
     // Doc viewer
     addSidebarInfo(
     """
@@ -328,7 +317,7 @@ val actorCritic = newSim {
     
     The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to positive value (near rewards like cheese) and red proportional to negative value (near punishments like poison). Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed. Similarly, red regions form around the poison as the agent learns to avoid it.  
         
-    A [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window is minimized that shows how `reward`, `value`, and `TD error` unfold as the simulation runs.
+    Use the `Show Time Series` button to open a [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window showing how `reward`, `value`, and `TD error` unfold as the simulation runs.
        
     Tip: To get the simulation to run faster, minimize the network window or make the weights in the network invisible (network > view > toggle weight visibility)
        
@@ -371,6 +360,8 @@ val actorCritic = newSim {
     7) `Show Grid`: Toggles the colored value overlay on the world tiles. When checked, green tiles indicate locations with positive learned value and red tiles indicate locations with negative learned value.
 
     8) `Show Values`: Toggles numeric value labels on the world tiles so you can inspect the learned value estimate for each location directly.
+
+    9) `Show Time Series`: Opens or hides the plot of reward, value, and TD error over time.
     
     ## Time Series
     
@@ -431,6 +422,60 @@ val actorCritic = newSim {
         fun refreshValueOverlay() {
             valueOverlay.invalidatePaint()
             odorWorldDesktopComponent.worldPanel.canvas.repaint()
+        }
+
+        var plotFrame: JInternalFrame? = null
+        var timeSeriesPlot: TimeSeriesPlotComponent? = null
+        var timeSeriesCouplings = emptyList<Coupling>()
+        var timeSeriesUpdateActions = emptyList<UpdateCoupling>()
+        var plotX = 0
+        val plotY = SIM_WINDOW_GAP + 500 + SIM_WINDOW_GAP
+
+        suspend fun showTimeSeries() {
+            val existingFrame = plotFrame
+            if (existingFrame != null) {
+                existingFrame.isIcon = false
+                existingFrame.toFront()
+                return
+            }
+
+            val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
+                "Reward, TD Error",
+                seriesNames = listOf("Reward", "Value", "TD Error")
+            )
+            plot.apply {
+                model.isAutoRange = true
+                model.fixedWidth = true
+            }
+            timeSeriesCouplings = listOf(
+                couplingManager.createCoupling(reward, rewardSeries),
+                couplingManager.createCoupling(value, valueSeries),
+                couplingManager.createCoupling(tdError, tdErrorSeries)
+            )
+            timeSeriesUpdateActions = timeSeriesCouplings.map(::UpdateCoupling)
+            timeSeriesUpdateActions.forEach(workspace.updater.updateManager::addAction)
+
+            withContext(Dispatchers.Swing) {
+                place(plot, plotX, plotY, 520, 300)
+                timeSeriesPlot = plot
+                plotFrame = getDesktopComponent(plot).parentFrame as? JInternalFrame
+                plotFrame?.apply {
+                    isClosable = false
+                    toFront()
+                }
+            }
+        }
+
+        suspend fun hideTimeSeries() {
+            timeSeriesUpdateActions.forEach(workspace.updater.updateManager::removeAction)
+            couplingManager.removeCouplings(timeSeriesCouplings)
+            withContext(Dispatchers.Swing) {
+                timeSeriesPlot?.let(workspace::removeWorkspaceComponent)
+            }
+            plotFrame = null
+            timeSeriesPlot = null
+            timeSeriesCouplings = emptyList()
+            timeSeriesUpdateActions = emptyList()
         }
 
         // Control panel
@@ -510,12 +555,25 @@ val actorCritic = newSim {
                 resetMouse()
                 progressLabel.text = "Status: Reset"
             }
+
+            addSeparator()
+
+            val timeSeriesButton = addButton("Show Time Series") {
+                if (plotFrame == null) {
+                    showTimeSeries()
+                    this@addButton.text = "Hide Time Series"
+                } else {
+                    hideTimeSeries()
+                    this@addButton.text = "Show Time Series"
+                }
+            }
+            timeSeriesButton.toolTipText = "Create or remove the reward, value, and TD error plot"
         }.awaitLayout()
 
         val mainX = controlPanel.rightEdgeWithGap()
+        plotX = mainX + 520 + SIM_WINDOW_GAP
         place(networkComponent, mainX, SIM_WINDOW_GAP, 520, 600)
         place(odorWorldComponent, mainX + 520 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 500)
-        place(plot, mainX + 520 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 500 + SIM_WINDOW_GAP, 520, 300)
     }
 
 }

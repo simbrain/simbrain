@@ -1,3 +1,9 @@
+/**
+ * The `newSim` DSL: [NewSimulation] wraps a build task and optional reopen function, and [SimulationScope]
+ * plus the extension functions below give simulation bodies convenient access to the workspace and desktop.
+ * Anything a body records on the workspace, such as [exposeTypes], is saved with it and restored on reopen
+ * without the body running again.
+ */
 package org.simbrain.custom_sims
 
 import kotlinx.coroutines.CoroutineScope
@@ -34,6 +40,7 @@ import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizerComponent
 import org.simbrain.world.textworld.TextWorldComponent
 import java.io.File
+import kotlin.reflect.KClass
 
 class SimulationScope private constructor(
     val desktop: SimbrainDesktop?,
@@ -65,7 +72,13 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
 
     override val coroutineContext = Dispatchers.Default + job
 
-    private lateinit var reopenFunction: suspend SimulationScope.(workspace: Workspace) -> Unit
+    private var reopenFunction: (suspend SimulationScope.(workspace: Workspace) -> Unit)? = null
+
+    /**
+     * True when a reopen function is registered, so a saved workspace with this simulation's id can rebuild
+     * the parts (control panels, custom update actions) that are not serialized.
+     */
+    val canReopen: Boolean get() = reopenFunction != null
 
     suspend fun run(desktop: SimbrainDesktop? = null, optionString: String? = null) {
         with(SimulationScope(desktop)) {
@@ -86,10 +99,11 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
     }
 
     suspend fun reopen(workspace: Workspace, desktop: SimbrainDesktop? = null) {
+        val reopen = reopenFunction ?: return
         with(SimulationScope(desktop)) {
             workspace.simulationBuildLock.withLock {
                 withContext(SimulationBuildContext) {
-                    reopenFunction(workspace)
+                    reopen(workspace)
                 }
             }
         }
@@ -102,6 +116,12 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
  * @param id a unique id for workspace to identify which simulation to run upon deserialization
  */
 fun newSim(id: String? = null, block: suspend SimulationScope.(optionString: String?) -> Unit) = NewSimulation(id, block)
+
+/**
+ * Show [org.simbrain.util.propertyeditor.HiddenTypeOption] types in this workspace's type dropdowns. Call it after
+ * any `clearWorkspace()` in the simulation body, since clearing resets the exposed set.
+ */
+fun SimulationScope.exposeTypes(vararg types: KClass<*>) = workspace.exposeTypes(*types)
 
 fun SimulationScope.addNetworkComponent(name: String, config: NetworkComponent.() -> Unit = { }): NetworkComponent {
     return NetworkComponent(name)

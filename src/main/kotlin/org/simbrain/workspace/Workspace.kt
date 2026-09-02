@@ -28,6 +28,7 @@ import org.simbrain.workspace.updater.WorkspaceUpdater
 import java.io.*
 import java.util.*
 import kotlin.coroutines.CoroutineContext
+import kotlin.reflect.KClass
 
 /**
  * Coroutine context marker present while a simulation build block (the body of `newSim { }` or a
@@ -86,6 +87,21 @@ class Workspace: CoroutineScope {
     var currentFile: File? = null
 
     var simulationId: String? = null
+
+    /**
+     * Qualified names of [org.simbrain.util.propertyeditor.HiddenTypeOption] classes this workspace shows in
+     * type dropdowns. Simulations populate it through [exposeTypes] and it is saved with the workspace.
+     * Nullable only because XStream leaves the field unset when reading files that predate it.
+     */
+    private var exposedTypeNames: MutableSet<String>? = LinkedHashSet()
+
+    val exposedTypes: Set<String> get() = exposedTypeNames ?: emptySet()
+
+    fun exposeTypes(vararg types: KClass<*>) = exposeTypeNames(types.mapNotNull { it.qualifiedName })
+
+    fun exposeTypeNames(names: Collection<String>) {
+        exposedTypeNames = (exposedTypeNames ?: LinkedHashSet()).apply { addAll(names) }
+    }
 
     /**
      * A persistent representation of the time (the updater's state is not persisted).
@@ -296,6 +312,7 @@ class Workspace: CoroutineScope {
         setWorkspaceChanged(false)
         currentFile = null
         simulationId = ""
+        exposedTypeNames = LinkedHashSet()
         couplingManager.clear()
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
@@ -398,15 +415,7 @@ class Workspace: CoroutineScope {
                     serializer.deserialize(FileInputStream(theFile), progressCallback)
                 }
                 currentFile = theFile
-                simulations.items.firstNotNullOfOrNull { (_, sim) ->
-                    (sim as? NewSimulation)?.let { newSim ->
-                        if (newSim.id != null && newSim.id == simulationId) {
-                            newSim
-                        } else {
-                            null
-                        }
-                    }
-                }?.reopen(this, if (useDesktop) SimbrainDesktop else null)
+                findSimulation()?.reopen(this, if (useDesktop) SimbrainDesktop else null)
                 setWorkspaceChanged(false)
                 events.workspaceOpened.fire()
             }
@@ -509,6 +518,13 @@ class Workspace: CoroutineScope {
     }
 
     /**
+     * The registered simulation whose id matches [simulationId], if any.
+     */
+    fun findSimulation(): NewSimulation? = simulations.items.firstNotNullOfOrNull { (_, sim) ->
+        (sim as? NewSimulation)?.takeIf { it.id != null && it.id == simulationId }
+    }
+
+    /**
      * Check if the workspace has custom update actions that won't be restored on reopen.
      * Returns true if there are custom workspace-level or network-level update actions.
      */
@@ -544,9 +560,10 @@ class Workspace: CoroutineScope {
 
     /**
      * Check if saving this workspace would be problematic (has features that won't restore).
-     * Returns true if the workspace has custom update actions or control panels but no simulationId.
+     * Returns true if the workspace has custom update actions or control panels but no simulation that can
+     * reopen them.
      */
     fun isSaveProblematic(desktop: SimbrainDesktop?): Boolean {
-        return (hasCustomUpdateActions() || hasControlPanels(desktop)) && simulationId == null
+        return (hasCustomUpdateActions() || hasControlPanels(desktop)) && findSimulation()?.canReopen != true
     }
 }

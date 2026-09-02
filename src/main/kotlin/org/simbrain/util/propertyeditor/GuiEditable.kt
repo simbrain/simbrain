@@ -1,3 +1,9 @@
+/**
+ * The [GuiEditable] property delegate and the widgets the annotated property editor builds from it. Widgets
+ * own their own Swing components and commit values back through the delegate; [ObjectWidget] additionally
+ * offers a type dropdown, whose entries are filtered through [TypeOptionVisibility] so that
+ * [HiddenTypeOption] types appear only when the workspace exposes them or they are already in use.
+ */
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.*
@@ -1216,25 +1222,29 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
      * object’s type to be edited. Otherwise, simply embed the object with its own APE.
      */
     private fun getTypeMap(parameter: GuiEditable<O, T>): Map<String, KClass<*>>? {
-        if (parameter.typeMapProvider != null) {
-            return when(parameter.typeMapProvider.parameters.size) {
+        val candidates: List<KClass<*>> = if (parameter.typeMapProvider != null) {
+            when (parameter.typeMapProvider.parameters.size) {
                 0 -> parameter.typeMapProvider.call()
                 1 -> parameter.typeMapProvider.call(value)
                 else -> throw IllegalStateException("Only no-arg functions or member functions of the value type (${value::class.simpleName}) are supported")
-            }.associate { it.kotlin.displayName to it.kotlin }
+            }.map { it.kotlin }
+        } else {
+            (parameter.value)::class.sealedClassSiblings()
+                ?: (parameter.value as? CopyableObject)?.getTypeList()?.map { it.kotlin }
+                ?: return null
         }
-        (parameter.value)::class.sealedClassSiblings()?.let { subClasses ->
-            return@getTypeMap subClasses.associateBy { it.displayName }
-        }
-        (parameter.value as? CopyableObject)?.let { copyableObject ->
-            copyableObject.getTypeList()?.let { typeList ->
-                return@getTypeMap typeList.associate { it.kotlin.displayName to it.kotlin }
-            }
-        }
-        return null
+        val typesInUse = objectList.map { it::class }
+        return candidates
+            .filter { TypeOptionVisibility.isVisible(it, typesInUse) }
+            .associateBy { it.displayName }
     }
 
     private val typeMap = getTypeMap(parameter)
+
+    /**
+     * Display names of the types currently offered in the dropdown, in dropdown order.
+     */
+    val typeOptions: List<String> get() = typeMap?.keys?.toList() ?: emptyList()
 
     private val editorPanelContainer = JPanel()
 
@@ -1339,3 +1349,26 @@ class ObjectWidget<O : EditableObject, T : EditableObject>(
 
 @Target(AnnotationTarget.CLASS)
 annotation class APETabOder(vararg val tabs: String)
+
+/**
+ * Marks a type that stays out of type dropdowns (see [ObjectWidget]) unless the current workspace exposes it
+ * or an object being edited already uses it. Use it for types that only make sense inside a particular
+ * simulation, which exposes them with `exposeTypes` in its `newSim` body.
+ */
+@Target(AnnotationTarget.CLASS)
+annotation class HiddenTypeOption
+
+/**
+ * Decides whether a [HiddenTypeOption] type appears in a type dropdown. The desktop installs
+ * [exposedTypeNamesProvider] so the decision follows the open workspace; without a desktop only types
+ * already in use are shown.
+ */
+object TypeOptionVisibility {
+
+    var exposedTypeNamesProvider: () -> Set<String> = { emptySet() }
+
+    fun isVisible(type: KClass<*>, typesInUse: Collection<KClass<*>>): Boolean {
+        if (!type.java.isAnnotationPresent(HiddenTypeOption::class.java)) return true
+        return type in typesInUse || type.qualifiedName in exposedTypeNamesProvider()
+    }
+}

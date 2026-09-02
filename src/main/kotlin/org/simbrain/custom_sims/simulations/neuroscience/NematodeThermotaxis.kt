@@ -45,8 +45,9 @@ import java.util.concurrent.atomic.AtomicReference
 import javax.swing.*
 import kotlin.math.*
 
-val nematodeThermotaxis = newSim { optionString ->
+val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
     workspace.clearWorkspace()
+    exposeTypes(AfdThermoreceptorRule::class)
 
     val networkComponent = addNetworkComponent("Thermotaxis Circuit")
     val network = networkComponent.network

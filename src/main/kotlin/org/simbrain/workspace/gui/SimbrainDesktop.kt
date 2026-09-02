@@ -18,6 +18,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.world.textworld.gui.TextWorldPanel
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
+import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
@@ -260,6 +261,7 @@ object SimbrainDesktop {
     }
 
     init {
+        TypeOptionVisibility.exposedTypeNamesProvider = { workspace.exposedTypes }
         frame.iconImages = listOf(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
             ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),

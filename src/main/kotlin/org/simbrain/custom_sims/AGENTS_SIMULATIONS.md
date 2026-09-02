@@ -144,6 +144,17 @@ val mySim = newSim("unique_id") {
 }
 ```
 
+Give every simulation an id. Without one, the save dialog warns that control panels and custom update actions will not be restored. An id alone silences nothing: the warning also requires a reopen function.
+
+**Simulation-only types in dropdowns:** annotate a rule or other `CopyableObject` type with `@HiddenTypeOption` to keep it out of property editor type dropdowns by default, then expose it from the simulation body. The exposed set lives on the workspace, is saved with it, and is reset by `clearWorkspace()`, so call `exposeTypes` after any clear.
+```kotlin
+val mySim = newSim("unique_id") {
+    workspace.clearWorkspace()
+    exposeTypes(MySpecialRule::class)
+    // ...
+}
+```
+
 ## Component API
 
 **Adding components:**

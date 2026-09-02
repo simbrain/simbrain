@@ -313,6 +313,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
             workspace.updateDelay = archive.workspaceParameters.updateDelay
             workspace.updater.time = archive.workspaceParameters.savedTime
             workspace.simulationId = archive.workspaceParameters.simulationId
+            workspace.exposeTypeNames(archive.workspaceParameters.exposedTypes)
             workspace.initIdManager()
         }
     }

@@ -24,7 +24,7 @@ import kotlin.math.sin
 /**
  * Create a reservoir simulation...
  */
-val objectTrackingSim = newSim {
+val objectTrackingSim = newSim("object_tracking") {
 
     // Number of reservoir neurons
     val numResNeurons = 200
@@ -43,6 +43,7 @@ val objectTrackingSim = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
+    exposeTypes(AllostaticUpdateRule::class)
     val networkComponent = addNetworkComponent("Spontaneous Object Tracking")
     val network = networkComponent.network
 

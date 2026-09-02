@@ -1,10 +1,13 @@
 package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.AfdThermoreceptorRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
 import org.simbrain.util.SimbrainConstants.NULL_STRING
@@ -85,6 +88,29 @@ class AnnotatedPropertyEditorTest {
         ape.commitChanges()
         assertEquals(.25, n1.activation)
         assertEquals(.25, n2.activation)
+    }
+
+    @Test
+    fun `hidden type option appears in the update rule dropdown only when in use or exposed`() {
+        fun updateRuleOptions(vararg neurons: Neuron): List<String> {
+            val ape = AnnotatedPropertyEditor(neurons.toList())
+            return (ape.propertyNameWidgetMap["updateRule"] as ObjectWidget).typeOptions
+        }
+        val hiddenName = AfdThermoreceptorRule::class.displayName
+        val linearName = LinearRule::class.displayName
+
+        assertFalse(updateRuleOptions(Neuron(LinearRule())).contains(hiddenName))
+        assertTrue(updateRuleOptions(Neuron(AfdThermoreceptorRule())).contains(hiddenName))
+        assertTrue(updateRuleOptions(Neuron(LinearRule()), Neuron(AfdThermoreceptorRule())).contains(hiddenName))
+        assertTrue(updateRuleOptions(Neuron(LinearRule())).contains(linearName))
+
+        val previousProvider = TypeOptionVisibility.exposedTypeNamesProvider
+        try {
+            TypeOptionVisibility.exposedTypeNamesProvider = { setOf(AfdThermoreceptorRule::class.qualifiedName!!) }
+            assertTrue(updateRuleOptions(Neuron(LinearRule())).contains(hiddenName))
+        } finally {
+            TypeOptionVisibility.exposedTypeNamesProvider = previousProvider
+        }
     }
 
     @Test

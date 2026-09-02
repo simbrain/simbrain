@@ -8,6 +8,7 @@ import org.simbrain.network.core.SpikingNeuronUpdateRule
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.HiddenTypeOption
 import java.lang.Double.max
 
 /**
@@ -20,6 +21,7 @@ import java.lang.Double.max
  * (3) a variable target activation level, initialized at Tn = 1;
  * (4) and a variable spiking threshold T’n, which was = always equal to 2Tn
  */
+@HiddenTypeOption
 class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
 
     @UserParameter(label = "leakRate")

@@ -19,7 +19,7 @@ import java.util.*
 /**
  * See https://www.sciencedirect.com/science/article/pii/S0006899321004352
  */
-val allostaticPatternCompletion = newSim {
+val allostaticPatternCompletion = newSim("allostatic_pattern_completion") {
 
     // TODOS:
     // - Encapsulate state machine into a class
@@ -76,6 +76,7 @@ val allostaticPatternCompletion = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
+    exposeTypes(AllostaticUpdateRule::class)
     val networkComponent = addNetworkComponent("Allostatic Pattern Completion")
     val network = networkComponent.network
 

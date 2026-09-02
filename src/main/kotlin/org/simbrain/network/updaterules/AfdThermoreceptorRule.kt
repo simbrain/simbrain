@@ -16,6 +16,7 @@ import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.HiddenTypeOption
 import java.util.Base64
 import java.util.zip.GZIPInputStream
 import kotlin.math.exp
@@ -28,6 +29,7 @@ interface TemperatureReceivingData {
     fun receiveTemperature(temperatureCelsius: Double)
 }
 
+@HiddenTypeOption
 class AfdThermoreceptorRule : NeuronUpdateRule<AfdScalarData, EmptyMatrixData>(), MembranePotentialProvider {
 
     @UserParameter(

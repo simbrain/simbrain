@@ -14,7 +14,6 @@ import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
 import org.simbrain.util.*
-import org.simbrain.workspace.WorkspacePreferences
 import java.awt.geom.Point2D
 import java.nio.file.Path
 import javax.swing.*
@@ -126,12 +125,12 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     }
 
     /**
-     * Generation-driven refreshes coalesce to the workspace repaint rate limit: syncing dirty
+     * Generation-driven refreshes coalesce at [HIGH_RATE_GUI_REFRESH_INTERVAL_MS]: syncing dirty
      * tiles invalidates most of the interior, so at full decode speed a refresh per token would
      * queue a full repaint per token. User-initiated paths (flips, menu actions) call
      * [refreshView] directly.
      */
-    private val refreshViewThrottled = RateLimitedEdtAction({ WorkspacePreferences.repaintIntervalMs }) { refreshView() }
+    private val refreshViewThrottled = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
 
     private fun refreshView() {
         val node = compositorNode ?: return

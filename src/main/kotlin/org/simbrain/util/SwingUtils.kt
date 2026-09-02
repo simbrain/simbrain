@@ -695,15 +695,20 @@ fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: I
 }
 
 /**
+ * Default cadence for coalescing GUI refreshes caused by very fast model updates.
+ *
+ * This was introduced to prevent language-model token generation from being paced by the display.
+ * It is kept generic because other high-rate simulations can use the same protection.
+ */
+const val HIGH_RATE_GUI_REFRESH_INTERVAL_MS = 33L
+
+/**
  * Runs [action] on the EDT at most once per [intervalMs]: immediately when the interval has
  * elapsed (manual stepping stays responsive), otherwise as one trailing run when the window
  * closes, so the final state always lands. Coalesces per-iteration GUI work under fast update
- * loops instead of queueing a frame per iteration. The interval is re-read on every call, so a
- * provider backed by a preference applies changes live.
+ * loops instead of queueing a frame per iteration.
  */
-class RateLimitedEdtAction(private val intervalMs: () -> Long, private val action: () -> Unit) {
-
-    constructor(intervalMs: Long, action: () -> Unit) : this({ intervalMs }, action)
+class RateLimitedEdtAction(private val intervalMs: Long, private val action: () -> Unit) {
 
     private var last = 0L
 
@@ -715,11 +720,11 @@ class RateLimitedEdtAction(private val intervalMs: () -> Long, private val actio
     operator fun invoke() {
         val now = System.currentTimeMillis()
         val elapsed = now - last
-        if (elapsed >= intervalMs()) {
+        if (elapsed >= intervalMs) {
             last = now
             action()
         } else if (!trailing.isRunning) {
-            trailing.initialDelay = (intervalMs() - elapsed).toInt().coerceAtLeast(1)
+            trailing.initialDelay = (intervalMs - elapsed).toInt().coerceAtLeast(1)
             trailing.restart()
         }
     }

@@ -5,20 +5,6 @@ import org.simbrain.util.*
 object WorkspacePreferences: PreferenceHolder() {
 
     @UserParameter(
-        label = "Repaint rate limit (fps)",
-        description = "Fastest rate at which running simulations repaint. Faster update loops " +
-            "decouple from the display and run at full speed; manual stepping and slower " +
-            "simulations still repaint on every update.",
-        minimumValue = 1.0,
-        maximumValue = 240.0,
-        order = 7
-    )
-    var repaintRateLimitFps by IntegerPreference(30)
-
-    /** [repaintRateLimitFps] as the millisecond interval rate limiters consume. */
-    val repaintIntervalMs: Long get() = 1000L / repaintRateLimitFps.coerceIn(1, 1000)
-
-    @UserParameter(
         label = "Show info dock by default",
         description = "Show simulation info by default",
         order = 10

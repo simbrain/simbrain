@@ -20,6 +20,7 @@ import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Rectangle
+import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
@@ -349,14 +350,35 @@ class OdorWorldPanel(
 
         canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
 
-        // Repaint whenever window is opened or changed.
+        // Repaint whenever window is opened or changed. With the aspect lock on, a view that showed the whole
+        // world before the resize keeps showing the whole world after it instead of drifting to a partial view.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                scalingFactor = scalingFactor // force invoke setter
+                val previousCanvasSize = lastCanvasSize
+                lastCanvasSize = canvas.size
+                if (world.lockAspectRatio && previousCanvasSize != null && showedWholeWorld(previousCanvasSize)) {
+                    canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+                } else {
+                    scalingFactor = scalingFactor // force invoke setter
+                }
             }
         })
 
         odorWorldActions.createSelectAllAction()
+    }
+
+    private var lastCanvasSize: Dimension? = null
+
+    /**
+     * True if the camera, at its current scale, spanned the world along at least one axis when the canvas had
+     * [canvasSize]. The camera never shows area outside the world, so spanning one axis means fully zoomed out.
+     */
+    private fun showedWholeWorld(canvasSize: Dimension): Boolean {
+        val viewScale = canvas.camera.viewScale
+        if (viewScale <= 0.0) return false
+        val viewWidth = canvasSize.width / viewScale
+        val viewHeight = canvasSize.height / viewScale
+        return viewWidth >= world.width - 0.5 || viewHeight >= world.height - 0.5
     }
 
     private fun renderAllLayers(world: OdorWorld) {

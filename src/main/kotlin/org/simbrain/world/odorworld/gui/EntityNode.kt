@@ -26,7 +26,6 @@ import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
 import java.util.stream.Collectors
-import javax.swing.JMenuItem
 import javax.swing.JPopupMenu
 import kotlin.math.abs
 import kotlin.math.cos
@@ -378,10 +377,12 @@ class EntityNode(
     }
 
     fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
-        add(odorWorldPanel.odorWorldActions.showPropertyDialogAction)
-        add(odorWorldPanel.odorWorldActions.deleteSelectedAction())
-        addSeparator()
-        add(JMenuItem(odorWorldPanel.odorWorldActions.toggleTrailAction(entity)))
+        with(odorWorldPanel.odorWorldActions) {
+            add(editEntityAction)
+            add(deleteSelectedAction)
+            addSeparator()
+            add(createShowTrailMenuItem(entity))
+        }
         addSeparator()
         add(
             SimbrainDesktop.actionManager.createCoupledDataWorldAction(

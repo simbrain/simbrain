@@ -237,15 +237,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         return entity
     }
 
-    suspend fun addTile() {
-        tileMap.setTile(
-            lastClickedPosition.x.toInt() / tileMap.tileWidth,
-            lastClickedPosition.y.toInt() / tileMap.tileHeight,
-            61,
-            selectedLayer
-        )
-    }
-
     /**
      * Returns the entity with the given id, or, failing that, a given name. If
      * no entity is found return null.

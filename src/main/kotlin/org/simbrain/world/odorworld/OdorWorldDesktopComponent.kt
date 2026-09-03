@@ -1,6 +1,6 @@
 /**
- * Desktop wrapper for an odor world: hosts the [OdorWorldPanel], owns the frame menu, and sizes the parent
- * frame to the world. When the world's aspect lock is on it also declares the canvas as
+ * Desktop wrapper for an odor world: hosts the [OdorWorldPanel], installs the menu bar built in OdorWorldMenus.kt,
+ * and sizes the parent frame to the world. When the world's aspect lock is on it also declares the canvas as
  * [AspectRatioLockedContent] so the desktop manager constrains interactive resizes to the world's shape.
  */
 package org.simbrain.world.odorworld
@@ -22,8 +22,6 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
 
     val worldPanel: OdorWorldPanel = OdorWorldPanel(component, component.world)
 
-    var menu: OdorWorldFrameMenu
-
     private val world get() = worldPanel.world
 
     override val lockedAspectRatio: Double?
@@ -34,9 +32,7 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
     init {
         layout = BorderLayout()
         add("Center", worldPanel)
-        menu = OdorWorldFrameMenu(this, world)
-        menu.setUpMenus()
-        parentFrame.jMenuBar = menu
+        parentFrame.jMenuBar = createMenuBar()
 
         world.events.tileMapChanged.on { fitFrameToWorldSize() }
         world.events.propertiesChanged.on { applyAspectLock() }

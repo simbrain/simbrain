@@ -1,29 +1,40 @@
+/**
+ * Holder for the odor world's user actions. Each action is created once and shared by the menu bar, toolbar and
+ * context menus, so keyboard shortcuts are registered a single time and enabled state stays consistent everywhere.
+ * Selection-dependent actions re-evaluate their enabled state on selection and entity add/remove events.
+ */
 package org.simbrain.world.odorworld.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
+import org.simbrain.world.odorworld.OdorWorldPreferences
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.layerEditor
 import org.simbrain.world.odorworld.showTilePicker
+import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
+import javax.swing.JCheckBoxMenuItem
 import javax.swing.JMenu
-import javax.swing.JMenuItem
+import javax.swing.JRadioButtonMenuItem
 
 class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 
-    fun createSelectAllAction() = odorWorldPanel.createAction(
+    val selectAllAction = odorWorldPanel.createConditionallyEnabledAction(
         name = "Select all",
         description = "Select all entities (Cmd/Ctrl-A)",
-        keyboardShortcut = CmdOrCtrl + 'A'
+        keyboardShortcuts = listOf(CmdOrCtrl + 'A'),
+        enablingCondition = { world.entityList.isNotEmpty() }
     ) {
-        odorWorldPanel.selectionManager.addAll(odorWorldPanel.canvas.layer.allNodes.filterIsInstance<EntityNode>().toMutableSet())
+        selectionManager.addAll(canvas.layer.allNodes.filterIsInstance<EntityNode>().toMutableSet())
     }
 
-    fun addAgentAction() = odorWorldPanel.createAction(
+    val addAgentAction = odorWorldPanel.createAction(
         name = "Add agent",
         description = "Add a new agent to the world. A mouse by default. Double click to edit (Cmd/Ctrl-P)",
         iconPath = "menu_icons/mouse_icon.png",
@@ -32,7 +43,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         world.addAgent()
     }
 
-    fun addEntityAction() = odorWorldPanel.createAction(
+    val addEntityAction = odorWorldPanel.createAction(
         name = "Add entity",
         description = "Add a new entity to the world. Cheese by default. Double click to edit (p)",
         iconPath = "menu_icons/swiss_icon.png",
@@ -41,15 +52,27 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         world.addEntity()
     }
 
-    fun deleteSelectedAction() = odorWorldPanel.createAction(
+    val deleteSelectedAction = odorWorldPanel.createConditionallyEnabledAction(
         name = "Delete selected entities",
         description = "Delete selected entities (Delete or Backspace)",
-        keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE))
+        iconPath = "menu_icons/minus.png",
+        keyboardShortcuts = listOf(KeyCombination(KeyEvent.VK_DELETE), KeyCombination(KeyEvent.VK_BACK_SPACE)),
+        enablingCondition = { selectedEntityNodes.isNotEmpty() }
     ) {
-        odorWorldPanel.deleteSelectedEntities()
+        deleteSelectedEntities()
     }
 
-    fun showWorldPropertiesAction() = odorWorldPanel.createAction(
+    val editEntityAction = odorWorldPanel.createConditionallyEnabledAction(
+        name = "Edit entity...",
+        description = "Edit the first selected entity (Cmd/Ctrl-E)",
+        iconPath = "menu_icons/Properties.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + 'E'),
+        enablingCondition = { selectedEntityNodes.isNotEmpty() }
+    ) {
+        editSelectedEntities()
+    }
+
+    val showWorldPropertiesAction = odorWorldPanel.createAction(
         name = "Properties...",
         description = "Show odor world properties (Cmd/Ctrl-,)",
         iconPath = "menu_icons/Tools.png",
@@ -58,81 +81,118 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         world.createEditorDialog(titleName = "World Properties") { it.events.propertiesChanged.fire() }.display()
     }
 
-    val showPropertyDialogAction = odorWorldPanel.createAction(
-        name = "Edit entity...",
-        description = "Edit selected entity (Cmd/Ctrl-E)",
-        iconPath = "menu_icons/Properties.png",
-        keyboardShortcut = CmdOrCtrl + 'E'
+    val loadTileMapAction = odorWorldPanel.createAction(
+        name = "Load tile map...",
+        description = "Replace the current tile map with one loaded from a Tiled (tmx) file"
     ) {
-        odorWorldPanel.editSelectedEntities()
+        val chooser = SFileChooser(OdorWorldPreferences.tileMapDirectory, "Load TMX Tilemap", null, true)
+        chooser.addExtension("tmx")
+        chooser.showOpenDialog()?.let { file ->
+            world.tileMap = loadTileMap(file)
+            OdorWorldPreferences.tileMapDirectory = chooser.currentLocation!!
+        }
     }
 
-    // TODO: Add images and to toolbar
-    val addTileAction
-        get() = odorWorldPanel.createAction("Add tile to ${odorWorldPanel.world.selectedLayer.name}...") {
-            showTilePicker(world.tileMap.tileSets) {
-                val (x,y) = world.tileMap.pixelToGridCoordinate(world.lastClickedPosition)
-                world.tileMap.setTile(x, y, it, world.selectedLayer)
+    val addTileAction = odorWorldPanel.createAction(
+        name = "Add tile...",
+        description = "Set the tile at the last clicked position on the selected layer"
+    ) {
+        showTilePicker(world.tileMap.tileSets) {
+            val (x, y) = world.tileMap.pixelToGridCoordinate(world.lastClickedPosition)
+            world.tileMap.setTile(x, y, it, world.selectedLayer)
+        }
+    }
+
+    val fillLayerAction = odorWorldPanel.createAction(
+        name = "Fill layer...",
+        description = "Fill every cell of the selected layer with one tile"
+    ) {
+        showTilePicker(world.tileMap.tileSets) {
+            world.tileMap.fill(it, world.selectedLayer)
+        }
+    }
+
+    /**
+     * Submenu of radio items for choosing the layer that tile editing acts on. Rebuilt each time it opens so it
+     * reflects layers added or removed in the layer editor.
+     */
+    fun createChooseLayerMenu() = JMenu("Choose layer").apply {
+        fun populate() {
+            removeAll()
+            val world = odorWorldPanel.world
+            world.tileMap.layers.forEach { layer ->
+                add(JRadioButtonMenuItem(layer.name).apply {
+                    isSelected = layer == world.selectedLayer
+                    addActionListener { world.selectedLayer = layer }
+                })
             }
         }
+        populate()
+        onMenuSelected { populate() }
+    }
 
-    val fillLayerAction
-        get() = odorWorldPanel.createAction("Fill layer ${odorWorldPanel.world.selectedLayer.name}...") {
-            showTilePicker(world.tileMap.tileSets) {
-                world.tileMap.fill(it, world.selectedLayer)
-            }
+    val editLayersAction = odorWorldPanel.createAction(
+        name = "Edit layers...",
+        description = "Add, remove, rename and reorder tile map layers"
+    ) {
+        world.layerEditor().display()
+    }
+
+    val clearTileMapAction = odorWorldPanel.createAction(
+        name = "Clear tile map...",
+        description = "Replace the tile map with an empty one of the given size in tiles"
+    ) {
+        val size = object : EditableObject {
+            var width by GuiEditable(initValue = canvas.camera.width.toInt() / world.tileMap.tileWidth)
+            var height by GuiEditable(initValue = canvas.camera.height.toInt() / world.tileMap.tileHeight)
         }
-
-    fun createChooseLayerMenu(world: OdorWorld) = JMenu("Choose layer").apply {
-        world.tileMap.layers.forEach { layer ->
-            add(JMenuItem(layer.name).apply {
-                addActionListener {
-                    world.selectedLayer = layer
-                }
-            })
+        AnnotatedPropertyEditor(size).displayInDialog {
+            world.tileMap.updateMapSize(size.width, size.height)
         }
     }
 
-    val editLayersAction
-        get() = odorWorldPanel.createAction("Edit layers...") {
-            world.layerEditor().display()
-        }
-
-    val clearAllTrails = odorWorldPanel.createAction("Clear all trails") {
-        world.entityList.map {
-            it.clearTrail()
-        }
+    val clearAllTrailsAction = odorWorldPanel.createAction(
+        name = "Clear all trails",
+        description = "Erase the trail behind every entity"
+    ) {
+        world.entityList.forEach { it.clearTrail() }
     }
 
-    val toggleAllTrails = odorWorldPanel.createAction(name = "Toggle all trails", description = "Toggle all trails (t)", keyboardShortcut = 'T') {
-        val firstEntityHasTrail = world.entityList.firstOrNull()?.isShowTrail ?: false
-        world.entityList.map {
-            it.isShowTrail = !firstEntityHasTrail
+    /**
+     * True if at least one entity is showing its trail; the "Show trails" checkbox reflects this.
+     */
+    val anyTrailShown get() = odorWorldPanel.world.entityList.any { it.isShowTrail }
+
+    /**
+     * Shows or hides trails on every entity. From a checkbox menu item the checkbox state wins; from the keyboard
+     * shortcut it toggles.
+     */
+    val showAllTrailsAction = odorWorldPanel.createAction(
+        name = "Show trails",
+        description = "Show or hide the trail behind every entity (t)",
+        keyboardShortcut = 'T'
+    ) { e ->
+        val show = (e?.source as? JCheckBoxMenuItem)?.isSelected ?: !anyTrailShown
+        world.entityList.forEach { it.isShowTrail = show }
+    }
+
+    fun createShowTrailMenuItem(entity: OdorWorldEntity) = JCheckBoxMenuItem(
+        odorWorldPanel.createAction(name = "Show trail", description = "Show the trail behind ${entity.name}") { e ->
+            entity.isShowTrail = (e?.source as? JCheckBoxMenuItem)?.isSelected ?: !entity.isShowTrail
         }
-    }
+    ).apply { isSelected = entity.isShowTrail }
 
-    val turnOffTrails = odorWorldPanel.createAction("Turn off trails") {
-        world.entityList.map {
-            it.isShowTrail = false
-        }
-    }
-
-    @JvmOverloads
-    fun toggleTrailAction(entity: OdorWorldEntity) = odorWorldPanel.createAction("Toggle show trails") {
-        entity.isShowTrail = !entity.isShowTrail
-    }
-
-    fun resetZoomAction() = odorWorldPanel.createAction(
-        "Reset zoom",
-        description = "Resetting the zoom. Entities will appear at their original size (in pixels) (Cmd/Ctrl-0)",
+    val resetZoomAction = odorWorldPanel.createAction(
+        name = "Reset zoom",
+        description = "Reset the zoom so entities appear at their original size in pixels (Cmd/Ctrl-0)",
         iconPath = "menu_icons/ZoomReset.png",
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0
     }
 
-    fun zoomInAction() = odorWorldPanel.createAction(
-        "Zoom in",
+    val zoomInAction = odorWorldPanel.createAction(
+        name = "Zoom in",
         description = "Zoom in (Cmd/Ctrl-+ or Cmd/Ctrl-=)",
         iconPath = "menu_icons/ZoomIn.png",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_ADD, CmdOrCtrl + KeyEvent.VK_EQUALS)
@@ -140,8 +200,8 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         scalingFactor *= 1.1
     }
 
-    fun zoomOutAction() = odorWorldPanel.createAction(
-        "Zoom out",
+    val zoomOutAction = odorWorldPanel.createAction(
+        name = "Zoom out",
         description = "Zoom out (Cmd/Ctrl-- or Cmd/Ctrl-_)",
         iconPath = "menu_icons/ZoomOut.png",
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
@@ -149,23 +209,39 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         scalingFactor /= 1.1
     }
 
-    fun clearTileMapAction() = odorWorldPanel.createAction("Clear tile map...") {
-        val size = object : EditableObject {
-            var width by GuiEditable(
-                initValue = odorWorldPanel.canvas.camera.width.toInt() / world.tileMap.tileWidth
-            )
-
-            var height by GuiEditable(
-                initValue = odorWorldPanel.canvas.camera.height.toInt() / world.tileMap.tileHeight
-            )
-        }
-
-        val editorPanel = AnnotatedPropertyEditor(size)
-
-        editorPanel.displayInDialog {
-            world.tileMap.updateMapSize(size.width, size.height)
-        }
-
+    val showToolbarAction = odorWorldPanel.createAction(
+        name = "Toolbar",
+        description = "Show or hide the toolbar"
+    ) { e ->
+        mainToolBar.isVisible = (e?.source as? JCheckBoxMenuItem)?.isSelected ?: !mainToolBar.isVisible
     }
 
 }
+
+/**
+ * [createAction] whose enabled state follows [enablingCondition], re-evaluated whenever the selection changes or an
+ * entity is added to or removed from the world.
+ */
+private fun OdorWorldPanel.createConditionallyEnabledAction(
+    name: String,
+    description: String = name,
+    iconPath: String? = null,
+    keyboardShortcuts: List<KeyCombination> = listOf(),
+    enablingCondition: OdorWorldPanel.() -> Boolean,
+    block: suspend OdorWorldPanel.(e: ActionEvent) -> Unit
+) = createAction(
+    name = name,
+    description = description,
+    iconPath = iconPath,
+    keyboardShortcuts = keyboardShortcuts,
+    initBlock = {
+        fun updateEnabled() {
+            isEnabled = enablingCondition()
+        }
+        updateEnabled()
+        selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateEnabled() }
+        world.events.entityAdded.on(Dispatchers.Swing) { updateEnabled() }
+        world.events.entityRemoved.on(Dispatchers.Swing) { updateEnabled() }
+    },
+    block = block
+)

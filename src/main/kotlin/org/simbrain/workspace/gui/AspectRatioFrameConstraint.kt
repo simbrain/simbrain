@@ -11,6 +11,7 @@
  */
 package org.simbrain.workspace.gui
 
+import org.simbrain.util.genericframe.GenericFrame
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.Rectangle
@@ -105,6 +106,13 @@ fun JComponent.aspectLock(): Pair<Double, Dimension>? {
     if (target.width <= 0 || target.height <= 0) return null
     return ratio to Dimension(width - target.width, height - target.height)
 }
+
+/**
+ * [bounds] adjusted to this frame's aspect lock, or unchanged when the frame is unlocked, not a Swing
+ * component, or not yet laid out. Programmatic placement should route through this so it agrees with drags.
+ */
+fun GenericFrame.constrainToAspectLock(bounds: Rectangle): Rectangle =
+    (this as? JComponent)?.aspectLock()?.let { (ratio, offset) -> constrainFrameBounds(bounds, offset, ratio) } ?: bounds
 
 /**
  * Desktop manager that filters interactive resizes and maximizes through the aspect lock declared by a frame's

@@ -64,6 +64,7 @@ val actorCritic = newSim {
         tileMap = TileMap(numTilesInADimension * tileGridRatio, numTilesInADimension * tileGridRatio)
         isObjectsBlockMovement = false
         wrapAround = false
+        lockAspectRatio = true
     }
 
     val tileSize = world.tileMap.tileWidth

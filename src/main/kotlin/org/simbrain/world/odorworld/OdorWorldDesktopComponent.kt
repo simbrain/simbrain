@@ -67,12 +67,11 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
     }
 
     /**
-     * Snap the current frame to the world's shape without otherwise changing its size. No-op when unlocked.
+     * Snap the current frame to the world's shape, shrinking one axis to fit. No-op when unlocked.
      */
     fun applyAspectLock() {
         val ratio = lockedAspectRatio ?: return
-        val bounds = parentFrame.bounds
-        parentFrame.bounds = constrainFrameBounds(bounds, bounds, frameChromeOffset(), ratio)
+        parentFrame.bounds = constrainFrameBounds(parentFrame.bounds, frameChromeOffset(), ratio)
     }
 
     /**

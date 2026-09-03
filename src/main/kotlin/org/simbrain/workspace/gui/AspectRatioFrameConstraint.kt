@@ -19,7 +19,6 @@ import javax.swing.DefaultDesktopManager
 import javax.swing.JComponent
 import javax.swing.JInternalFrame
 import javax.swing.SwingConstants
-import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.roundToInt
 
@@ -55,13 +54,13 @@ fun fitToBox(ratio: Double, boxWidth: Int, boxHeight: Int): Dimension {
  * Adjusts a proposed frame rectangle so that the content region (frame minus [chromeOffset]) has [ratio].
  *
  * [direction] is the resize handle being dragged as a [SwingConstants] compass value, or 0 when unknown.
- * Edge drags let the dragged axis drive the other; corner and unknown drags let the axis that moved more
- * (relative to [current]) drive. West and north drags keep the opposite edge anchored so the frame does not
- * slide under the cursor.
+ * Edge drags let the dragged axis drive the other. Corner and unknown drags keep the result inside the proposed
+ * rectangle, so the axis that changed less wins. The decision depends only on the proposed rectangle, never on
+ * the previously constrained bounds, so consecutive drag steps cannot flip between the two axes. West and north
+ * drags keep the opposite edge anchored so the frame does not slide under the cursor.
  */
 fun constrainFrameBounds(
     proposed: Rectangle,
-    current: Rectangle,
     chromeOffset: Dimension,
     ratio: Double,
     direction: Int = 0
@@ -73,11 +72,7 @@ fun constrainFrameBounds(
     val widthDrives = when (direction) {
         SwingConstants.EAST, SwingConstants.WEST -> true
         SwingConstants.NORTH, SwingConstants.SOUTH -> false
-        else -> {
-            val widthChange = relativeChange(contentWidth, current.width - chromeOffset.width)
-            val heightChange = relativeChange(contentHeight, current.height - chromeOffset.height)
-            widthChange >= heightChange
-        }
+        else -> contentWidth / ratio <= contentHeight
     }
     val content = if (widthDrives) {
         Dimension(contentWidth, max(1, (contentWidth / ratio).roundToInt()))
@@ -95,8 +90,6 @@ fun constrainFrameBounds(
     val y = if (anchorsBottomEdge) proposed.y + proposed.height - frameHeight else proposed.y
     return Rectangle(x, y, frameWidth, frameHeight)
 }
-
-private fun relativeChange(proposed: Int, current: Int) = abs(proposed - current).toDouble() / max(current, 1)
 
 /**
  * Ratio and live chrome offset for a frame whose content declares an aspect lock, or null when unlocked
@@ -133,9 +126,7 @@ class AspectLockingDesktopManager : DefaultDesktopManager() {
 
     override fun resizeFrame(f: JComponent, newX: Int, newY: Int, newWidth: Int, newHeight: Int) {
         val (ratio, offset) = f.aspectLock() ?: return super.resizeFrame(f, newX, newY, newWidth, newHeight)
-        val bounds = constrainFrameBounds(
-            Rectangle(newX, newY, newWidth, newHeight), f.bounds, offset, ratio, resizeDirection
-        )
+        val bounds = constrainFrameBounds(Rectangle(newX, newY, newWidth, newHeight), offset, ratio, resizeDirection)
         super.resizeFrame(f, bounds.x, bounds.y, bounds.width, bounds.height)
     }
 

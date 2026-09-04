@@ -58,7 +58,7 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
         val boxHeight = min(world.height.toInt() + offset.height, defaultMaxSize) - offset.height
         val content = lockedAspectRatio?.let { fitToBox(it, boxWidth, boxHeight) } ?: Dimension(boxWidth, boxHeight)
         parentFrame.preferredSize = Dimension(content.width + offset.width, content.height + offset.height)
-        SwingUtilities.invokeLater { worldPanel.scalingFactor = 1.0 }
+        SwingUtilities.invokeLater { if (worldPanel.autoZoom) worldPanel.zoomToFit() else worldPanel.scalingFactor = 1.0 }
         parentFrame.pack()
     }
 

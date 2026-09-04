@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
@@ -14,6 +15,7 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
+import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
@@ -30,6 +32,7 @@ import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.Timer
 import javax.swing.*
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -115,6 +118,19 @@ class OdorWorldPanel(
         canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
         repaint()
     }
+
+    /**
+     * When true the whole world is kept in view across resizes and world size changes, as with the network's
+     * auto-zoom. Manual zooming turns it off.
+     */
+    var autoZoom = true
+        set(value) {
+            field = value
+            world.events.zoomModeChanged.fire(value)
+            if (value) {
+                zoomToFit()
+            }
+        }
 
     fun debugToolTips() {
         if (tileSelectionModel != null) {
@@ -346,6 +362,9 @@ class OdorWorldPanel(
             override fun mouseWheelRotated(event: PInputEvent) {
                 val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                 val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
+                if (abs(swingEvent.preciseWheelRotation) > 2) {
+                    autoZoom = false
+                }
                 canvas.scale(1 / newScale)
             }
         })
@@ -362,13 +381,15 @@ class OdorWorldPanel(
 
         zoomToFit()
 
-        // Repaint whenever window is opened or changed. With the aspect lock on, a view that showed the whole
-        // world before the resize keeps showing the whole world after it instead of drifting to a partial view.
+        // Repaint whenever window is opened or changed. With auto-zoom on, or with the aspect lock on and a view
+        // that showed the whole world before the resize, the whole world stays in view instead of drifting to a
+        // partial view.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
                 val previousCanvasSize = lastCanvasSize
                 lastCanvasSize = canvas.size
-                if (world.lockAspectRatio && previousCanvasSize != null && showedWholeWorld(previousCanvasSize)) {
+                val keepWholeWorld = world.lockAspectRatio && previousCanvasSize != null && showedWholeWorld(previousCanvasSize)
+                if (autoZoom || keepWholeWorld) {
                     zoomToFit()
                 } else {
                     scalingFactor = scalingFactor // force invoke setter
@@ -595,7 +616,16 @@ class OdorWorldPanel(
             add(zoomInAction)
             add(zoomOutAction)
             add(resetZoomAction)
-            add(zoomToFitAction)
+            add(SimbrainToggleButton(
+                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png"),
+                stateGetter = { autoZoom },
+                stateSetter = { autoZoom = it },
+                tooltipGenerator = { isOn -> "Auto-zoom is ${if (isOn) "on" else "off"}" }
+            ).apply {
+                world.events.zoomModeChanged.on(Dispatchers.Swing) {
+                    updateFromExternalState()
+                }
+            })
         }
     }
 

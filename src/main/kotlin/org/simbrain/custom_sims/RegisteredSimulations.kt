@@ -60,8 +60,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Three layer auto-encoder") { backpropAutoEncoder }
         item("Feed-Forward MNIST") { tinyMNIST }
         item("CNN MNIST") { cnnMNIST }
-        // item("Delayed recall (BPTT)") { bpttDelayedRecall }
-        // item("Curriculum (BPTT)") { bpttCurriculum }
+        item("Remember one symbol (BPTT)", beta = true) { bpttRememberSymbol }
+        item("Pattern generator (BPTT)", beta = true) { bpttPatternGenerator }
     }
 
     dir("Braitenberg") {

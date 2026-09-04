@@ -360,40 +360,45 @@ class MatrixEditor(matrix: Matrix, rowNames: List<String>? = null, columnNames: 
 /**
  * Panel with buttons to add or removes rows from the end of the provided tables
  */
-class AddRemoveRows(val tables: List<SimbrainJTable>) : JPanel() {
+class AddRemoveRows(
+    val tables: List<SimbrainJTable>,
+    private val rowsPerOperation: () -> Int = { 1 },
+    private val unitName: String = "row"
+) : JPanel() {
 
     init {
         layout = MigLayout("ins 0, gap 8px")
-        // Add row
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/AddTableRow.png")
-            toolTipText = "Insert row at bottom of input and target tables"
+            toolTipText = "Add ${if (unitName == "row") "a" else "one"} $unitName to input and target tables"
             addActionListener {
-                tables.forEach { it.model.insertRowAtBottom() }
+                repeat(rowsPerOperation().coerceAtLeast(1)) { tables.forEach { it.model.insertRowAtBottom() } }
             }
         })
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/DeleteTableRow.png")
-            toolTipText = "Delete last row of input and target tables"
+            toolTipText = "Remove the last $unitName from input and target tables"
             addActionListener {
-                tables.forEach { it.model.deleteLastRow() }
+                val count = rowsPerOperation().coerceAtLeast(1)
+                repeat(count) { tables.forEach { table -> if (table.model.rowCount > 0) table.model.deleteLastRow() } }
             }
         })
-        // Set number of rows
         add(JButton().apply {
             icon = ResourceManager.getSmallIcon("menu_icons/PenToSquare.png")
-            toolTipText = "Set number of rows in input and target tables"
+            toolTipText = "Set number of $unitName in input and target tables"
             addActionListener {
                 val currentRows = if (tables.isNotEmpty()) tables[0].model.rowCount else 0
-                val input = showInputDialog("Enter number of rows:", currentRows.toString())
+                val rowsPerUnit = rowsPerOperation().coerceAtLeast(1)
+                val currentUnits = currentRows / rowsPerUnit
+                val input = showInputDialog("Enter number of $unitName:", currentUnits.toString())
                 
                 input?.let { inputStr ->
                     try {
-                        val numRows = inputStr.toInt()
-                        if (numRows >= 0) {
-                            tables.forEach { it.model.setNumRows(numRows) }
+                        val numUnits = inputStr.toInt()
+                        if (numUnits >= 0) {
+                            tables.forEach { it.model.setNumRows(numUnits * rowsPerUnit) }
                         } else {
-                            showErrorDialog("Number of rows must be non-negative", "Invalid Input")
+                            showErrorDialog("Number of $unitName must be non-negative", "Invalid Input")
                         }
                     } catch (e: NumberFormatException) {
                         showErrorDialog("Please enter a valid integer", "Invalid Input")

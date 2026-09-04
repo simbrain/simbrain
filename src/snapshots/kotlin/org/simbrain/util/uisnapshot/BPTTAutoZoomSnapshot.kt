@@ -41,7 +41,7 @@ class BPTTAutoZoomSnapshot : UiSnapshotDef {
         repeat(5) { SwingUtilities.invokeAndWait { } }
 
         SwingUtilities.invokeAndWait {
-            bptt.trainerConfig.truncationDepth = 5
+            bptt.trainerConfig.sequenceLength = 5
             bptt.updateStateInfoText()
             bptt.unrolledView = true
         }

@@ -12,19 +12,14 @@
  */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.launch
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.BPTTNetwork
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.createAction
-import org.simbrain.util.display
-import org.simbrain.util.point
-import kotlinx.coroutines.launch
-import org.piccolo2d.event.PBasicInputEventHandler
-import org.piccolo2d.event.PInputEvent
-import org.simbrain.util.swingDispatcher
+import org.simbrain.util.*
 import javax.swing.JPopupMenu
 
 class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
@@ -83,18 +78,6 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             ) {
                 bptt.unrolledView = !bptt.unrolledView
             })
-            add(networkPanel.createAction(
-                name = "Unroll one more step",
-                description = "Increase the truncation depth, letting the gradient reach one step further back"
-            ) {
-                setTruncationDepth(bptt.trainerConfig.truncationDepth + 1)
-            })
-            add(networkPanel.createAction(
-                name = "Unroll one fewer step",
-                description = "Decrease the truncation depth, cutting the gradient off one step sooner"
-            ) {
-                setTruncationDepth(bptt.trainerConfig.truncationDepth - 1)
-            })
             addSeparator()
 
             add(networkPanel.createAction(name = "Train...") {
@@ -110,15 +93,6 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         unrolledViewNode?.rebuild()
         positionUnrolledView()
         refreshUnrolledActivations()
-    }
-
-    /**
-     * Truncation depth doubles as a display setting here, since it is the number of unrolled columns.
-     * Updating the info text is what makes the view rebuild at the new depth.
-     */
-    private fun setTruncationDepth(depth: Int) {
-        bptt.trainerConfig.truncationDepth = depth.coerceAtLeast(1)
-        bptt.updateStateInfoText()
     }
 
     /**

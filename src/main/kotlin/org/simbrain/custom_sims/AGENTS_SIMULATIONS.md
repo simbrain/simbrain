@@ -258,6 +258,12 @@ withGui {
 }
 ```
 
+Use `createControlPanel`'s `addButton`, `addSeparator`, and related helpers for ordinary controls. They
+handle the panel's native vertical layout and asynchronous Swing setup. Add a custom Swing component only
+when the standard controls cannot express the UI; give any status component a fixed preferred size so
+changing its text cannot resize the internal frame. After creating a panel, call `awaitLayout()` before
+placing another component relative to it with `rightEdgeWithGap()` or `bottomEdgeWithGap()`.
+
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
 Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled fields, apply an explanatory tooltip to both the field and its label; use `toolTip = "..."` with `addTextField(...)` and `labelToolTip = "..."` when a distinct label tooltip is needed. Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.

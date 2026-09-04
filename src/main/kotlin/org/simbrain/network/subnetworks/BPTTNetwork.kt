@@ -106,11 +106,11 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         private set
 
     /**
-     * How many timesteps the network is unrolled over. Shown on the canvas because it is the one
-     * training setting that changes what the network is able to learn rather than just how fast.
+     * The fixed number of timesteps in every training sequence. The canvas shows this complete
+     * computation rather than a separate display depth.
      */
     val stateInfoText: String
-        get() = "Unrolled over ${trainerConfig.truncationDepth} steps"
+        get() = "Sequences of ${trainerConfig.sequenceLength} steps"
 
     fun updateStateInfoText() {
         customInfo?.text = stateInfoText
@@ -142,7 +142,7 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
     /** Replace the history with a whole unrolled window, whose last step the layers are left holding. */
     fun publishUnrolledActivations(trace: List<Map<Layer, Matrix>>) {
         unrolledActivations = trace
-        events.displayDataUpdated.fire()
+            events.displayDataUpdated.fire()
     }
 
     /**
@@ -153,8 +153,8 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
      */
     private fun recordTimestep() {
         val step = listOf<Layer>(inputLayer, hiddenLayer, outputLayer).associateWith { it.activations.clone() }
-        val depth = trainerConfig.truncationDepth.coerceAtLeast(1)
-        unrolledActivations = (unrolledActivations + step).takeLast(depth)
+        val length = trainerConfig.sequenceLength.coerceAtLeast(1)
+        unrolledActivations = (unrolledActivations + step).takeLast(length)
         events.displayDataUpdated.fire()
     }
 
@@ -174,6 +174,7 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         hiddenLayer.clearInputs()
         // The history describes steps that led to a state the network no longer has.
         unrolledActivations = emptyList()
+        events.displayDataUpdated.fire()
     }
 
     context(Network)
@@ -236,7 +237,7 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
             Input Layer: ${inputLayer.size} neurons
             Hidden Layer: ${hiddenLayer.size} neurons
             Output Layer: ${outputLayer.size} neurons
-            Truncation Depth: ${trainerConfig.truncationDepth}
+            Sequence Length: ${trainerConfig.sequenceLength}
         """.trimIndent()
     }
 

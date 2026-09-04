@@ -143,6 +143,25 @@ object Steering {
             }
         }
 
+        world.maze?.let { maze ->
+            val reach = feelerLength + max(entity.width, entity.height)
+            for (wall in maze.wallSegments(world.gridCellPixelSize)) {
+                val nearX = entity.x.coerceIn(wall.x1, wall.x2)
+                val nearY = entity.y.coerceIn(wall.y1, wall.y2)
+                val dx = nearX - entity.x
+                val dy = nearY - entity.y
+                if (dx * dx + dy * dy > reach * reach) continue
+                obsBoxes.add(
+                    doubleArrayOf(
+                        wall.x1 - agentHalfW,
+                        wall.y1 - agentHalfH,
+                        (wall.x2 - wall.x1) + entity.width,
+                        (wall.y2 - wall.y1) + entity.height
+                    )
+                )
+            }
+        }
+
         val baseHeading = entity.heading
         var bestScore = Double.NEGATIVE_INFINITY
         var bestHeading = baseHeading

@@ -14,6 +14,7 @@ import org.simbrain.util.plus
 import org.simbrain.util.point
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.world.odorworld.effectors.Effector
+import org.simbrain.world.odorworld.entities.Bound
 import org.simbrain.world.odorworld.entities.Bounded
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -21,7 +22,6 @@ import org.simbrain.world.odorworld.events.OdorWorldEvents
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
 import java.util.concurrent.CopyOnWriteArrayList
-import java.util.function.Consumer
 
 /**
  * A 2d environment. Contains a list of [OdorWorldEntity]s, which can either be agents or static objects.
@@ -52,6 +52,15 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
             field = value
             this.selectedLayer = value.layers[0]
             events.tileMapChanged.fire()
+        }
+
+    /**
+     * Optional maze walls laid over the tile grid. Cells are [gridCellSizeInTiles] tiles on a side.
+     */
+    var maze: Maze? = null
+        set(value) {
+            field = value
+            events.mazeChanged.fire()
         }
 
     /**
@@ -87,6 +96,111 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
                 "agent. Turn off in particular when not using tilemaps.", order = 20
     )
     var isUseCameraCentering: Boolean = true
+
+    /**
+     * Side length, in tiles, of one cell for grid movement and maze walls.
+     */
+    @UserParameter(
+        label = "Grid cell size (tiles)",
+        description = "Side length in tiles of one cell for grid movement and maze walls",
+        minimumValue = 1.0,
+        order = 30
+    )
+    var gridCellSizeInTiles: Int = 2
+        set(value) {
+            field = value.coerceAtLeast(1)
+            events.mazeChanged.fire()
+        }
+
+    /**
+     * How long an animated grid step takes. Zero moves entities instantly.
+     */
+    @UserParameter(
+        label = "Grid step duration (ms)",
+        description = "Wall-clock time over which a grid step is animated. 0 moves the entity instantly.",
+        minimumValue = 0.0,
+        order = 31
+    )
+    var gridStepDurationMs: Int = 150
+        set(value) {
+            field = value.coerceAtLeast(0)
+        }
+
+    val gridCellPixelSize: Double
+        get() = (gridCellSizeInTiles * tileMap.tileWidth).toDouble()
+
+    val gridColumns: Int
+        get() = tileMap.width / gridCellSizeInTiles
+
+    val gridRows: Int
+        get() = tileMap.height / gridCellSizeInTiles
+
+    fun cellCenter(column: Int, row: Int): Point2D =
+        point((column + 0.5) * gridCellPixelSize, (row + 0.5) * gridCellPixelSize)
+
+    /**
+     * Grid cell containing a pixel location, as (column, row). Not clamped to the map.
+     */
+    fun cellAt(location: Point2D): Pair<Int, Int> =
+        Math.floorDiv(location.x.toInt(), gridCellPixelSize.toInt()) to
+                Math.floorDiv(location.y.toInt(), gridCellPixelSize.toInt())
+
+    /**
+     * Replace the maze with a perfect maze of the given size, resizing the tile map when it does not already
+     * hold [columns] by [rows] cells of [cellSizeInTiles] tiles.
+     */
+    fun generateMaze(columns: Int, rows: Int, cellSizeInTiles: Int = gridCellSizeInTiles, seed: Long? = null) {
+        gridCellSizeInTiles = cellSizeInTiles
+        val widthInTiles = columns * cellSizeInTiles
+        val heightInTiles = rows * cellSizeInTiles
+        if (tileMap.width != widthInTiles || tileMap.height != heightInTiles) {
+            tileMap.updateMapSize(widthInTiles, heightInTiles)
+        }
+        maze = Maze.recursiveBacktracker(columns, rows, seed)
+    }
+
+    fun clearMaze() {
+        maze = null
+    }
+
+    /**
+     * What stops [entity] from stepping one cell from ([column], [row]) in [direction], or null when the step is
+     * open. Checks maze walls, the map edge, blocking tiles, and other entities when those block movement.
+     */
+    fun gridStepBlocker(column: Int, row: Int, direction: GridDirection, entity: OdorWorldEntity? = null): Bounded? {
+        val cellSize = gridCellPixelSize
+        maze?.let { m ->
+            if (m.isInside(column, row)) {
+                m.blockingWall(column, row, direction, cellSize)?.let { return it }
+            }
+        }
+        val (targetColumn, targetRow) = gridStepTarget(column, row, direction) ?: return this
+        val center = cellCenter(targetColumn, targetRow)
+        val halfCell = cellSize / 2 - 0.5
+        if (tileMap.isAreaBlocked(center.x, center.y, halfCell, halfCell)) {
+            return Bound(center.x, center.y, cellSize, cellSize)
+        }
+        if (isObjectsBlockMovement && entity != null) {
+            val landing = Bound(center.x, center.y, entity.width, entity.height)
+            entityList.firstOrNull { it !== entity && landing.intersect(it).intersect }?.let { return it }
+        }
+        return null
+    }
+
+    /**
+     * The cell reached by stepping from ([column], [row]) in [direction], wrapping when the world wraps and there
+     * is no maze, or null when the step leaves the map.
+     */
+    fun gridStepTarget(column: Int, row: Int, direction: GridDirection): Pair<Int, Int>? {
+        var targetColumn = column + direction.dx
+        var targetRow = row + direction.dy
+        if (wrapAround && maze == null) {
+            targetColumn = Math.floorMod(targetColumn, gridColumns)
+            targetRow = Math.floorMod(targetRow, gridRows)
+        }
+        if (targetColumn !in 0 until gridColumns || targetRow !in 0 until gridRows) return null
+        return targetColumn to targetRow
+    }
 
     /**
      * Entity Id generator.
@@ -127,7 +241,9 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      * Update world.
      */
     suspend fun update() {
-        entityList.forEach(Consumer { obj: OdorWorldEntity -> obj.update() })
+        for (entity in entityList) {
+            entity.update()
+        }
         events.updated.fire()
     }
 
@@ -375,6 +491,8 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
             val bounds = ArrayList<Bounded>()
 
             bounds.addAll(tileMap.collisionBounds)
+
+            maze?.let { bounds.addAll(it.collisionBounds(gridCellPixelSize)) }
 
             if (isObjectsBlockMovement) {
                 bounds.addAll(entityList)

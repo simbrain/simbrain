@@ -1,5 +1,6 @@
 package org.simbrain.world.odorworld.entities
 
+import kotlinx.coroutines.delay
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
@@ -7,6 +8,7 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Producible
+import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.behaviors.NoOpBehavior
 import org.simbrain.world.odorworld.behaviors.NpcBehavior
@@ -20,7 +22,15 @@ import org.simbrain.world.odorworld.sensors.*
 import java.awt.geom.Point2D
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlin.math.cos
+import kotlin.math.sign
 import kotlin.math.sin
+
+/**
+ * How an entity moves through the world. Continuous movement uses speed and heading with pixel-level collision.
+ * Grid movement steps one [OdorWorld.gridCellSizeInTiles] cell at a time, turns in right angles, and honors maze
+ * walls; speed only matters as a sign and the entity always rests on a cell center.
+ */
+enum class MovementMode { CONTINUOUS, GRID }
 
 class OdorWorldEntity @JvmOverloads constructor(
     val world: OdorWorld,
@@ -94,6 +104,25 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     override val width: Double = entityType.width.toDouble()
     override val height: Double = entityType.height.toDouble()
+
+    var movementMode by GuiEditable(
+        initValue = MovementMode.CONTINUOUS,
+        label = "Movement mode",
+        description = "Continuous: speed and heading with pixel collision. Grid: one cell per step, right-angle " +
+                "turns, maze walls block steps.",
+        order = 5,
+        setter = {
+            field = it
+            if (it == MovementMode.GRID) snapToCellCenter()
+        }
+    )
+
+    /**
+     * True while an animated grid step is in progress. Further grid steps are ignored until it finishes.
+     */
+    @Transient
+    var isInTransit: Boolean = false
+        private set
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -201,12 +230,118 @@ class OdorWorldEntity @JvmOverloads constructor(
         get() = world
 
     /**
+     * The grid cell this entity is in, as (column, row).
+     */
+    val cell: Pair<Int, Int>
+        get() = world.cellAt(location)
+
+    val facingDirection: GridDirection
+        get() = GridDirection.fromHeading(heading)
+
+    fun snapToCellCenter() {
+        val (column, row) = cell
+        location = world.cellCenter(
+            column.coerceIn(0, (world.gridColumns - 1).coerceAtLeast(0)),
+            row.coerceIn(0, (world.gridRows - 1).coerceAtLeast(0))
+        )
+        heading = facingDirection.heading
+    }
+
+    /**
+     * Rotate by [delta] degrees. In grid mode any nonzero turn is a quarter turn in that direction.
+     */
+    fun turn(delta: Double) {
+        heading = if (movementMode == MovementMode.GRID) {
+            if (delta == 0.0) heading else facingDirection.heading + 90.0 * sign(delta)
+        } else {
+            heading + delta
+        }
+    }
+
+    /**
+     * Step one grid cell in [direction] without animation. Returns false, leaving the location unchanged and
+     * firing [EntityEvents.collided], when a wall, blocking tile, map edge, or blocking entity is in the way.
+     */
+    fun stepOneCell(direction: GridDirection, face: Boolean = true): Boolean {
+        val target = beginGridStep(direction, face) ?: return false
+        recordTravelDistance(location.distance(target))
+        location = target
+        return true
+    }
+
+    /**
+     * Like [stepOneCell] but animates the move over [OdorWorld.gridStepDurationMs], suspending until the entity
+     * arrives. Returns false without moving if a step is already in transit or the step is blocked.
+     */
+    suspend fun moveOneCell(direction: GridDirection, face: Boolean = true): Boolean {
+        if (isInTransit) return false
+        val target = beginGridStep(direction, face) ?: return false
+        val frameMs = 16L
+        val steps = (world.gridStepDurationMs / frameMs).toInt()
+        val start = location
+        val distance = start.distance(target)
+        if (steps <= 1) {
+            recordTravelDistance(distance)
+            location = target
+            return true
+        }
+        isInTransit = true
+        try {
+            for (i in 1..steps) {
+                val t = i.toDouble() / steps
+                location = point(start.x + (target.x - start.x) * t, start.y + (target.y - start.y) * t)
+                recordTravelDistance(distance / steps)
+                world.events.frameAdvanced.fire()
+                if (i < steps) delay(frameMs)
+            }
+        } finally {
+            isInTransit = false
+        }
+        return true
+    }
+
+    /**
+     * Shared start of a grid step: faces [direction] when [face] is set, then returns the target cell center or
+     * null (after firing [EntityEvents.collided]) when the step is blocked.
+     */
+    private fun beginGridStep(direction: GridDirection, face: Boolean): Point2D? {
+        if (face) heading = direction.heading
+        val (column, row) = cell
+        world.gridStepBlocker(column, row, direction, this)?.let {
+            events.collided.fire(it)
+            return null
+        }
+        val (targetColumn, targetRow) = world.gridStepTarget(column, row, direction) ?: return null
+        return world.cellCenter(targetColumn, targetRow)
+    }
+
+    /**
+     * Grid-mode reading of the movement state: a nonzero [dtheta] is a quarter turn, and a nonzero [speed] asks
+     * for one cell forward or backward. Returns the direction to step, or null when standing still.
+     */
+    private fun consumeGridCommand(): GridDirection? {
+        if (dtheta != 0.0) turn(dtheta)
+        val currentSpeed = speed
+        if (currentSpeed == 0.0) {
+            wasStuckLastTick = false
+            return null
+        }
+        return if (currentSpeed > 0) facingDirection else facingDirection.opposite
+    }
+
+    /**
      * Before moving, see if there are any collisions. If there are, change the landing spot of the movement to a
      * point before the collision occurs.
      *
      * Collisions are detected using the AABB algorithm: https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection
+     *
+     * In [MovementMode.GRID] this instead performs an instant grid step.
      */
     fun applyMovement() {
+        if (movementMode == MovementMode.GRID) {
+            consumeGridCommand()?.let { wasStuckLastTick = !stepOneCell(it, face = false) }
+            return
+        }
         if (dtheta != 0.0) {
             heading += dtheta
         }
@@ -268,9 +403,13 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
     }
 
-    fun update() {
+    suspend fun update() {
         behavior.update(this)
-        applyMovement()
+        if (movementMode == MovementMode.GRID) {
+            consumeGridCommand()?.let { wasStuckLastTick = !moveOneCell(it, face = false) }
+        } else {
+            applyMovement()
+        }
         if (isSensorsEnabled) {
             sensors.forEach { it.update(this) }
         }

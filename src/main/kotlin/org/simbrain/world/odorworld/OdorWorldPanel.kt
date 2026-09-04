@@ -81,6 +81,11 @@ class OdorWorldPanel(
     private var layerImageList: List<PImage?>
 
     /**
+     * Draws maze walls above the tile layers and below entities.
+     */
+    val mazeNode = MazeNode(world)
+
+    /**
      * Set to true while the user is dragging an entity, to suppress camera centering.
      */
     var isDraggingEntity = false
@@ -232,6 +237,7 @@ class OdorWorldPanel(
         // Add tile map
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
+        canvas.layer.addChild(mazeNode)
 
         // Remove default event handlers
         val panEventHandler: PInputEventListener = canvas.panEventHandler
@@ -363,6 +369,7 @@ class OdorWorldPanel(
         canvas.layer.removeAllChildren()
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
+        canvas.layer.addChild(mazeNode)
         for (oe in world.entityList) {
             val node = EntityNode(oe)
             canvas.layer.addChild(node)

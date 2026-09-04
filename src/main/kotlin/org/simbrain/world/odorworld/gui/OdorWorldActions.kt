@@ -209,6 +209,15 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         scalingFactor /= 1.1
     }
 
+    val zoomToFitAction = odorWorldPanel.createAction(
+        name = "Zoom to fit",
+        description = "Zoom so the whole world is visible (Cmd/Ctrl-Shift-0)",
+        iconPath = "menu_icons/ZoomFitPage.png",
+        keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0 + Shift
+    ) {
+        zoomToFit()
+    }
+
     val showToolbarAction = odorWorldPanel.createAction(
         name = "Toolbar",
         description = "Show or hide the toolbar"

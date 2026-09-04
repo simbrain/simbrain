@@ -66,6 +66,7 @@ val OdorWorldPanel.viewMenu
             add(zoomInAction)
             add(zoomOutAction)
             add(resetZoomAction)
+            add(zoomToFitAction)
             addSeparator()
             val showTrails = JCheckBoxMenuItem(showAllTrailsAction)
             add(showTrails)

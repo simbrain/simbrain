@@ -104,7 +104,17 @@ class OdorWorldPanel(
             val currentScalingFactor = canvas.camera.viewScale
             val scalingFactorRatio = scalingFactor / currentScalingFactor
             canvas.scale(scalingFactorRatio)
+            repaint()
         }
+
+    /**
+     * Zoom so the whole world is visible. Actions run off the Swing thread, so the repaint is requested explicitly
+     * rather than relying on Piccolo's paint invalidation, which only schedules a repaint from the event thread.
+     */
+    fun zoomToFit() {
+        canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+        repaint()
+    }
 
     fun debugToolTips() {
         if (tileSelectionModel != null) {
@@ -350,7 +360,7 @@ class OdorWorldPanel(
 
         world.events.tileMapChanged.fire()
 
-        canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+        zoomToFit()
 
         // Repaint whenever window is opened or changed. With the aspect lock on, a view that showed the whole
         // world before the resize keeps showing the whole world after it instead of drifting to a partial view.
@@ -359,7 +369,7 @@ class OdorWorldPanel(
                 val previousCanvasSize = lastCanvasSize
                 lastCanvasSize = canvas.size
                 if (world.lockAspectRatio && previousCanvasSize != null && showedWholeWorld(previousCanvasSize)) {
-                    canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+                    zoomToFit()
                 } else {
                     scalingFactor = scalingFactor // force invoke setter
                 }
@@ -585,6 +595,7 @@ class OdorWorldPanel(
             add(zoomInAction)
             add(zoomOutAction)
             add(resetZoomAction)
+            add(zoomToFitAction)
         }
     }
 

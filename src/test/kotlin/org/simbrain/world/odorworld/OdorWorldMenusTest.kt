@@ -63,7 +63,7 @@ class OdorWorldMenusTest {
     @Test
     fun `view menu exposes zoom and trails`() {
         val labels = panel.viewMenu.itemLabels()
-        assertEquals(listOf("Zoom in", "Zoom out", "Reset zoom", "Show trails", "Toolbar"), labels)
+        assertEquals(listOf("Zoom in", "Zoom out", "Reset zoom", "Zoom to fit", "Show trails", "Toolbar"), labels)
     }
 
     @Test

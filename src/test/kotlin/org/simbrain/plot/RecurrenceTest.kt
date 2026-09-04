@@ -8,13 +8,7 @@ import org.jfree.chart.axis.AxisSpace
 import org.jfree.data.Range
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-import org.simbrain.plot.timeseries.DomainAlignment
-import org.simbrain.plot.timeseries.RecurrenceMode
-import org.simbrain.plot.timeseries.RecurrencePanel
-import org.simbrain.plot.timeseries.RecurrenceView
-import org.simbrain.plot.timeseries.TimeSeriesModel
-import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.plot.timeseries.computeRecurrenceMatrix
+import org.simbrain.plot.timeseries.*
 import javax.swing.SwingUtilities
 import kotlin.math.abs
 import kotlin.math.sin
@@ -61,7 +55,6 @@ class RecurrenceTest {
         model.recurrenceColorMap = ChartColorMap.GRAYSCALE
         model.recurrenceEmbeddingDimension = 3
         model.recurrenceEmbeddingDelay = 2
-        model.recurrenceMaxPoints = 50
 
         val xml = TimeSeriesPlotComponent.timeSeriesXStream.toXML(model)
         val restored = TimeSeriesPlotComponent.timeSeriesXStream.fromXML(xml) as TimeSeriesModel
@@ -72,7 +65,6 @@ class RecurrenceTest {
         assertEquals(ChartColorMap.GRAYSCALE, restored.recurrenceColorMap)
         assertEquals(3, restored.recurrenceEmbeddingDimension)
         assertEquals(2, restored.recurrenceEmbeddingDelay)
-        assertEquals(50, restored.recurrenceMaxPoints)
     }
 
     @Test

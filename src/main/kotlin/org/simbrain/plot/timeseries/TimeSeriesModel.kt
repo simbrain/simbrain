@@ -1,21 +1,17 @@
 package org.simbrain.plot.timeseries
 
+import kotlinx.coroutines.withContext
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.TimeSeriesEvents
-import org.simbrain.util.UserParameter
-import org.simbrain.util.WithXStreamPropertyConverter
-import org.simbrain.util.createXStreamPropertyConverter
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.runOnEventThread
-import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeComponent
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
-import kotlinx.coroutines.withContext
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -163,17 +159,6 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         onUpdate = { enableWidget(widgetValue(TimeSeriesModel::recurrenceEmbeddingDimension) > 1) },
         tab = "Recurrence",
         order = 150
-    )
-
-    var recurrenceMaxPoints by GuiEditable(
-        initValue = 200,
-        label = "Max points",
-        description = "Most recent points of the series used for the recurrence matrix, bounding its size " +
-                "when the series grows without a fixed width",
-        min = 2,
-        max = RECURRENCE_MAX_POINTS_LIMIT,
-        tab = "Recurrence",
-        order = 160
     )
 
     /**
@@ -410,12 +395,6 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         get() = "Time Series"
 
     companion object: WithXStreamPropertyConverter {
-
-        /**
-         * Hard ceiling on points per recurrence matrix: the n-squared rebuild runs on the event
-         * thread, so an unbounded value would freeze the interface or exhaust memory.
-         */
-        const val RECURRENCE_MAX_POINTS_LIMIT = 500
 
         override val xStreamPropertyConverter = createXStreamPropertyConverter<TimeSeriesModel>(
             marshal = {

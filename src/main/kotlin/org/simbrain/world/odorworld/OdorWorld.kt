@@ -97,6 +97,14 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     )
     var isUseCameraCentering: Boolean = true
 
+    @UserParameter(
+        label = "Lock frame aspect ratio to world",
+        description = "Keep the viewport the same shape as the world so that zooming all the way out shows " +
+                "the whole world with nothing clipped. Constrains how the window can be resized.",
+        order = 25
+    )
+    var lockAspectRatio: Boolean = false
+
     /**
      * Side length, in tiles, of one cell for grid movement and maze walls.
      */
@@ -343,15 +351,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         entity.location = findPlacementLocation(lastClickedPosition)
         entity.addDefaultSensorsEffectors()
         return entity
-    }
-
-    suspend fun addTile() {
-        tileMap.setTile(
-            lastClickedPosition.x.toInt() / tileMap.tileWidth,
-            lastClickedPosition.y.toInt() / tileMap.tileHeight,
-            61,
-            selectedLayer
-        )
     }
 
     /**

@@ -431,8 +431,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     val panEditModeAction = networkPanel.createAction(
         name = "Pan",
-        description = "Pan",
-        iconPath = "menu_icons/Hand.png"
+        description = "Pan (h)",
+        iconPath = "menu_icons/Hand.png",
+        keyboardShortcut = KeyCombination('H')
     ) {
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Pan
         autoZoom = false
@@ -890,7 +891,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val newNetworkActions
         get() = listOf(
             addSubnetAction("Backprop") { BackpropCreationDialog(networkPanel) },
-            // addSubnetAction("BPTT (backprop through time)") { networkPanel.showBPTTCreationDialog() },
+            addSubnetAction("BPTT (backprop through time)") { networkPanel.showBPTTCreationDialog() },
             addSubnetAction("Competitive network") { CompetitiveCreationDialog(networkPanel) },
             addSubnetAction("Convolutional neural network") { CnnCreationDialog(networkPanel) },
             addSubnetAction("Feed forward network") { FeedForwardCreationDialog(networkPanel) },

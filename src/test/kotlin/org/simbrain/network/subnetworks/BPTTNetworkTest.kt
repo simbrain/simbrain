@@ -1,23 +1,19 @@
 /**
  * Tests for [BPTTNetwork] and [BPTTTrainer].
  *
- * The equivalence test is the important one: at truncation depth 1 a BPTT network computes exactly
+ * The equivalence test is the important one: at sequence length 1 a BPTT network computes exactly
  * what an SRN computes, because both stop the gradient after a single step. That pins the claim the
  * two subnetworks are built to contrast.
  */
 package org.simbrain.network.subnetworks
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
-import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.BPTTUnrolledView
 import org.simbrain.network.trainers.BPTTTrainer
@@ -42,6 +38,7 @@ class BPTTNetworkTest {
             bptt.randomize()
             bptt.update()
             bptt.trainerConfig.learningRate = 0.01
+            bptt.trainerConfig.sequenceLength = 10
 
             val trainer = BPTTTrainer(net, bptt)
             runBlocking {
@@ -54,7 +51,7 @@ class BPTTNetworkTest {
     }
 
     @Test
-    fun `bptt at truncation depth one matches an srn given the same weights`() {
+    fun `bptt at sequence length one matches an srn given the same weights`() {
         val net = Network()
         val srn = SRNNetwork(4, 3, 4)
         val bptt = BPTTNetwork(4, 3, 4)
@@ -88,7 +85,7 @@ class BPTTNetworkTest {
 
         srn.trainerConfig.learningRate = 0.01
         bptt.trainerConfig.learningRate = 0.01
-        bptt.trainerConfig.truncationDepth = 1
+        bptt.trainerConfig.sequenceLength = 1
 
         val srnTrainer = SupervisedTrainer(net, srn)
         val bpttTrainer = BPTTTrainer(net, bptt)
@@ -104,7 +101,7 @@ class BPTTNetworkTest {
         }
 
         assertEquals(srnTrainer.lastTrainingError, bpttTrainer.lastTrainingError, 1e-10) {
-            "Training error should track an SRN's at truncation depth 1"
+            "Training error should track an SRN's at sequence length 1"
         }
 
         fun assertMatricesEqual(expected: Matrix, actual: Matrix, what: String) {
@@ -123,8 +120,8 @@ class BPTTNetworkTest {
     }
 
     @Test
-    fun `truncation depth changes what the network learns`() {
-        fun trainWithDepth(depth: Int): Matrix {
+    fun `sequence length changes what the network learns`() {
+        fun trainWithSequenceLength(sequenceLength: Int): Matrix {
             val net = Network()
             val bptt = BPTTNetwork(4, 3, 4)
             net.addNetworkModelsAsync(bptt)
@@ -140,22 +137,22 @@ class BPTTNetworkTest {
 
             bptt.trainingSet = createDiagonalDataset(4, 4, shiftAmount = 1)
             bptt.trainerConfig.learningRate = 0.01
-            bptt.trainerConfig.truncationDepth = depth
+            bptt.trainerConfig.sequenceLength = sequenceLength
 
             val trainer = BPTTTrainer(net, bptt)
             runBlocking { repeat(20) { trainer.trainOnce() } }
             return bptt.hiddenToHidden.weights.clone()
         }
 
-        val shallow = trainWithDepth(1)
-        val deep = trainWithDepth(4)
+        val shallow = trainWithSequenceLength(1)
+        val deep = trainWithSequenceLength(4)
 
         val largestDifference = (0 until shallow.nrow()).flatMap { i ->
             (0 until shallow.ncol()).map { j -> abs(shallow[i, j] - deep[i, j]) }
         }.max()
 
         assertTrue(largestDifference > 1e-6) {
-            "Recurrent weights came out the same at depth 1 and depth 4, so truncation depth is not wired through"
+            "Recurrent weights came out the same at sequence lengths 1 and 4, so sequence length is not wired through"
         }
     }
 
@@ -173,21 +170,18 @@ class BPTTNetworkTest {
     }
 
     @Test
-    fun `training publishes a full window even when the sequence ends on a short one`() = runBlocking {
+    fun `training publishes the final complete sequence`() = runBlocking {
         val net = Network()
-        // Five rows at depth four splits into windows of four and one. Publishing only the trailing
-        // window would blank all but the newest unrolled column, even though the steps that fill the
-        // rest are known: memory carries across the truncation boundary, so the windows are contiguous.
         val bptt = BPTTNetwork(5, 4, 5)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 4
+        bptt.trainerConfig.sequenceLength = 5
         bptt.unrolledView = true
 
         BPTTTrainer(net, bptt).trainOnce()
 
         assertEquals(5, bptt.trainingSet.size)
         assertEquals(4, bptt.unrolledActivations.size) {
-            "Expected four steps of history, not just the trailing single step window"
+            "Expected the complete five-step sequence"
         }
     }
 
@@ -196,7 +190,7 @@ class BPTTNetworkTest {
         val net = Network()
         val bptt = BPTTNetwork(5, 4, 5)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 4
+        bptt.trainerConfig.sequenceLength = 4
         bptt.unrolledView = true
 
         BPTTTrainer(net, bptt).trainOnce()
@@ -217,7 +211,7 @@ class BPTTNetworkTest {
         val net = Network()
         val bptt = BPTTNetwork(5, 4, 5)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 3
+        bptt.trainerConfig.sequenceLength = 3
         bptt.unrolledView = true
 
         // Training is not the only thing that advances the network. A workspace tick and the training
@@ -232,7 +226,7 @@ class BPTTNetworkTest {
 
             repeat(5) { bptt.forwardPass() }
             assertEquals(3, bptt.unrolledActivations.size) {
-                "History should be capped at the truncation depth rather than growing without bound"
+                "History should be capped at the sequence length rather than growing without bound"
             }
 
             val newest = bptt.unrolledActivations.last()
@@ -264,7 +258,7 @@ class BPTTNetworkTest {
         val panel = NetworkPanel(NetworkComponent("test", net))
         val bptt = BPTTNetwork(4, 3, 4)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 4
+        bptt.trainerConfig.sequenceLength = 4
 
         // Stands in for the rolled network's measured extent, which on the canvas comes from the
         // subnetwork outline. Only the count of columns and arrows is under test, not where they land.
@@ -278,7 +272,7 @@ class BPTTNetworkTest {
             assertEquals(3, view.arrowCount(weights)) { "Expected one $weights arrow per column" }
         }
 
-        bptt.trainerConfig.truncationDepth = 1
+        bptt.trainerConfig.sequenceLength = 1
         view.rebuild()
         assertEquals(0, view.columns.size) { "At depth one there is nothing to unroll" }
     }
@@ -316,7 +310,7 @@ class BPTTNetworkTest {
         val panel = NetworkPanel(NetworkComponent("test", net))
         val bptt = BPTTNetwork(4, 3, 4)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 4
+        bptt.trainerConfig.sequenceLength = 4
 
         val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
 
@@ -336,12 +330,12 @@ class BPTTNetworkTest {
     fun `the training table's row groups are the windows the trainer actually uses`() {
         val bptt = BPTTNetwork(4, 3, 4)
 
-        bptt.trainerConfig.truncationDepth = 3
+        bptt.trainerConfig.sequenceLength = 3
         assertEquals(3, bptt.trainerConfig.rowGrouping.size)
 
         // Read live rather than stored, so a depth changed in the properties dialog re-bands the table
         // without anything having to notice and copy the new value across.
-        bptt.trainerConfig.truncationDepth = 5
+        bptt.trainerConfig.sequenceLength = 5
         assertEquals(5, bptt.trainerConfig.rowGrouping.size)
         assertTrue(bptt.trainerConfig.rowGrouping.caption.contains("5")) {
             "The caption should name the depth it is describing"
@@ -364,7 +358,7 @@ class BPTTNetworkTest {
         val net = Network()
         val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.truncationDepth = 7
+        bptt.trainerConfig.sequenceLength = 7
         bptt.unrolledView = true
 
         val fromXml = getNetworkXStream().fromXML(getNetworkXStream().toXML(net)) as Network
@@ -372,7 +366,7 @@ class BPTTNetworkTest {
         assertNotNull(restored)
         requireNotNull(restored)
 
-        assertEquals(7, restored.trainerConfig.truncationDepth)
+        assertEquals(7, restored.trainerConfig.sequenceLength)
         assertTrue(restored.unrolledView) { "The unrolled view toggle should survive a round trip" }
         assertEquals(4, restored.hiddenLayer.size)
 

@@ -17,6 +17,7 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
+import org.simbrain.workspace.gui.constrainToAspectLock
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.awt.*
 import java.awt.event.ActionEvent
@@ -49,20 +50,23 @@ suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, placem
     val (location, width, height) = Placement().apply { placement() }
     withContext(Dispatchers.Main) {
         val desktopComponent = getDesktopComponent(workspaceComponent)
-        val bounds = desktopComponent.parentFrame.bounds
-        desktopComponent.parentFrame.bounds = Rectangle(
-            location?.x ?: bounds.x,
-            location?.y ?: bounds.y,
-            width ?: bounds.width,
-            height ?: bounds.height
+        val frame = desktopComponent.parentFrame
+        val bounds = frame.bounds
+        frame.bounds = frame.constrainToAspectLock(
+            Rectangle(
+                location?.x ?: bounds.x,
+                location?.y ?: bounds.y,
+                width ?: bounds.width,
+                height ?: bounds.height
+            )
         )
     }
 }
 
 suspend fun SimbrainDesktop.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     withContext(Dispatchers.Main) {
-        val desktopComponent = getDesktopComponent(workspaceComponent)
-        desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+        val frame = getDesktopComponent(workspaceComponent).parentFrame
+        frame.bounds = frame.constrainToAspectLock(Rectangle(x, y, width, height))
     }
 }
 
@@ -82,8 +86,8 @@ suspend fun SimbrainDesktop.placeBeside(component: WorkspaceComponent, reference
 
 suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int, y: Int, width: Int, height: Int) {
     withGui {
-        val desktopComponent = getDesktopComponent(workspaceComponent)
-        desktopComponent.parentFrame.bounds = Rectangle(x, y, width, height)
+        val frame = getDesktopComponent(workspaceComponent).parentFrame
+        frame.bounds = frame.constrainToAspectLock(Rectangle(x, y, width, height))
     }
 }
 

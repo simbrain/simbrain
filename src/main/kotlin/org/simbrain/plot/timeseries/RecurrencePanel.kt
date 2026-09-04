@@ -29,11 +29,7 @@ import org.jfree.chart.ui.RectangleInsets
 import org.jfree.data.Range
 import org.jfree.data.general.DatasetChangeListener
 import org.jfree.data.xy.AbstractXYZDataset
-import org.simbrain.plot.AdaptiveChartRepainter
-import org.simbrain.plot.ChartColorMapPaintScale
-import org.simbrain.plot.NO_DATA
-import org.simbrain.plot.applySimbrainChartTheme
-import org.simbrain.plot.chartSeriesColor
+import org.simbrain.plot.*
 import org.simbrain.util.MinIntervalGate
 import org.simbrain.util.swingDispatcher
 import java.awt.BorderLayout
@@ -173,11 +169,8 @@ class RecurrencePanel(
         dirty = false
         refreshGate.stamp()
         val series = timeSeries.series
-        val maxPoints = model.recurrenceMaxPoints.coerceIn(2, TimeSeriesModel.RECURRENCE_MAX_POINTS_LIMIT)
-        val start = (series.itemCount - maxPoints).coerceAtLeast(0)
-        val windowSize = series.itemCount - start
-        val times = DoubleArray(windowSize) { series.getX(start + it).toDouble() }
-        val values = DoubleArray(windowSize) { series.getY(start + it).toDouble() }
+        val times = DoubleArray(series.itemCount) { series.getX(it).toDouble() }
+        val values = DoubleArray(series.itemCount) { series.getY(it).toDouble() }
         val distances = computeRecurrenceMatrix(values, model.recurrenceEmbeddingDimension, model.recurrenceEmbeddingDelay)
 
         // Each embedded state is anchored at the time of its first sample

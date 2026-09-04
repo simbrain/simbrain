@@ -1,11 +1,15 @@
+/**
+ * Standalone key bindings on the odor world canvas: manual driving of the selected agent and two developer debugging
+ * views. Shortcuts that belong to a menu action are declared on the action in OdorWorldActions.kt instead.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.launch
-import org.simbrain.util.Ctrl
+import org.simbrain.util.CmdOrCtrl
+import org.simbrain.util.Shift
 import org.simbrain.util.bind
 import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import java.awt.event.KeyEvent
 
 /**
  * Manual keys drive grid-mode entities one cell or one quarter turn per press; continuous entities keep the
@@ -13,8 +17,7 @@ import java.awt.event.KeyEvent
  */
 fun OdorWorldPanel.addKeyBindings() {
     canvas.apply {
-        // Debug tooltip test
-        bind("B") {
+        bind(CmdOrCtrl + Shift + 'B') {
             debugToolTips()
         }
 
@@ -108,8 +111,7 @@ fun OdorWorldPanel.addKeyBindings() {
             }
         }
 
-        // Debug Piccolo
-        bind(Ctrl + KeyEvent.VK_P) {
+        bind(CmdOrCtrl + Shift + 'P') {
             showPNodeDebugger()
         }
     }

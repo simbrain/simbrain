@@ -2,7 +2,7 @@
  * The unrolled-over-time view of a [BPTTNetwork], drawn extending leftward from the rolled-up network.
  *
  * The columns are the steps that led to the present one, so time reads left to right and the rolled
- * network is the newest step, at the right. A truncation depth of four therefore draws three columns,
+ * network is the newest step, at the right. A sequence length of four therefore draws three columns,
  * labelled t-3 through t-1, with the live network as t.
  *
  * Looking backward rather than forward is what lets one picture serve both cases. Training computes a
@@ -30,21 +30,14 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
-import org.simbrain.util.flatten
-import org.simbrain.util.toDoubleArray
-import org.simbrain.util.transposed
-import kotlin.math.ceil
 import org.simbrain.network.subnetworks.BPTTNetwork
-import org.simbrain.util.NetworkTheme
-import org.simbrain.util.Theme
-import org.simbrain.util.outlines
-import org.simbrain.util.point
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
-import org.simbrain.util.toSimbrainColorImage
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.Rectangle2D
+import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.round
 
@@ -266,7 +259,7 @@ class BPTTUnrolledView(
     }
 
     /**
-     * Rebuild from scratch. Needed when the truncation depth changes, since that changes the number of
+     * Rebuild from scratch. Needed when the sequence length changes, since that changes the number of
      * columns, when a layer changes how it draws itself, and on a theme switch, since colours are baked
      * into the drawn shapes.
      */
@@ -278,7 +271,7 @@ class BPTTUnrolledView(
         matrixImagesByWeights.clear()
         caption = null
 
-        val priorSteps = (bptt.trainerConfig.truncationDepth - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
+        val priorSteps = (bptt.trainerConfig.sequenceLength - 1).coerceIn(0, MAX_EXTRA_COLUMNS)
         if (priorSteps == 0) {
             laidOut = true
             return

@@ -10,14 +10,9 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.gui.nodes.subnetworkNodes.BackpropNetworkNode
-import org.simbrain.network.subnetworks.BPTTNetwork
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.CompetitiveNetwork
-import org.simbrain.network.subnetworks.SOMNetwork
-import org.simbrain.network.subnetworks.SRNNetwork
+import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.RowGrouping
 import org.simbrain.network.trainers.SupervisedNetwork
-import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
@@ -36,6 +31,9 @@ import javax.swing.event.TableModelListener
 fun TrainingDataset.createDataSetPanel(
     parentDialog: StandardDialog? = null,
     rowGrouping: () -> RowGrouping? = { null },
+    sequenceLength: () -> Int? = { null },
+    rowsPerEdit: () -> Int = { 1 },
+    editUnitName: String = "row",
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit
 ): DataSetPanel {
 
@@ -69,7 +67,9 @@ fun TrainingDataset.createDataSetPanel(
         applyAction = applyAction,
         parentDialog = parentDialog,
         rowGrouping = rowGrouping,
-        sequenceLength = sequenceLength
+        sequenceLength = sequenceLength,
+        rowsPerEdit = rowsPerEdit,
+        editUnitName = editUnitName
     )
 }
 
@@ -88,8 +88,9 @@ class DataSetPanel(
     applyAction: suspend DataSetPanel.(selectedRow: Int) -> Unit,
     parentDialog: StandardDialog? = null,
     private val rowGrouping: () -> RowGrouping? = { null },
-    /** Carried so the panel can draw sequence boundaries and hand it back on commit. */
-    val sequenceLength: Int? = null
+    private val sequenceLength: () -> Int? = { null },
+    rowsPerEdit: () -> Int = { 1 },
+    editUnitName: String = "row"
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
@@ -118,7 +119,7 @@ class DataSetPanel(
         applyCommonTrainerAttributes(parentDialog)
     }
 
-    val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table))
+    val addRemoveRows = AddRemoveRows(listOf(inputs.table, targets.table), rowsPerEdit, editUnitName)
 
     /** Explains what the bands mean; there is nothing to say when the rows are independent examples. */
     private val groupingCaption = JLabel().apply {
@@ -131,7 +132,7 @@ class DataSetPanel(
         // as two separately striped grids.
         listOf(inputs.table, targets.table).forEach {
             it.rowGroupSize = { rowGrouping()?.size }
-            it.sequenceSize = { sequenceLength }
+            it.sequenceSize = sequenceLength
         }
 
         layout = MigLayout("ins 8, gap 12px 6px")
@@ -140,7 +141,7 @@ class DataSetPanel(
         add(inputs, "grow, push")
         add(targets, "grow, push, wrap")
         add(groupingCaption, "span, wrap, gaptop 4")
-        add(JLabel("Edit rows:"), "split 2, gaptop 8")
+        add(JLabel("Edit ${if (editUnitName == "row") "rows" else "sequences"}:"), "split 2, gaptop 8")
         add(addRemoveRows)
 
         refreshRowGrouping()
@@ -160,7 +161,7 @@ class DataSetPanel(
      */
     fun refreshRowGrouping() {
         val grouping = rowGrouping()
-        val sequences = sequenceLength?.let { "Heavier lines every $it rows divide independent sequences." }
+        val sequences = sequenceLength()?.let { "Heavier lines every $it rows divide independent sequences." }
         val text = listOfNotNull(grouping?.caption, sequences).joinToString(" ")
         // Wrapped to the width of the tables it describes. Left as one line, a caption this long sets the
         // dialog's width by itself and leaves the tables swimming in it.
@@ -216,9 +217,14 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             }
         }
 
+        val bpttConfig = (supervisedNetwork as? BPTTNetwork)?.trainerConfig
+
         fun createDataSetPanel(dataSet: TrainingDataset) = dataSet.createDataSetPanel(
             this@apply,
-            rowGrouping = { trainerConfig.rowGrouping }
+            rowGrouping = { trainerConfig.rowGrouping },
+            sequenceLength = { bpttConfig?.sequenceLength },
+            rowsPerEdit = { bpttConfig?.sequenceLength ?: 1 },
+            editUnitName = if (bpttConfig == null) "row" else "sequence"
         ) { selectedRow ->
             commonApplyAction(
                 selectedRow
@@ -254,7 +260,6 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
         // Initial validation check
         updateOverallValidation()
 
-        // Truncation depth is edited in the properties dialog, and it is what the bands are drawn from.
         trainerControls.onTrainerConfigEdited = {
             listOf(trainingDataSetPanel, testingDataSetPanel).forEach { it.refreshRowGrouping() }
         }
@@ -267,10 +272,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
             inputRowNames = inputDataFrame.rowNames.map { it.toString() } as List<String>?,
             targetRowNames = targetDataFrame.rowNames.map { it.toString() } as List<String>?,
             inputColumnNames = inputDataFrame.columnNames,
-            targetColumnNames = targetDataFrame.columnNames,
-            // The table cannot edit this, but the dialog rebuilds the dataset wholesale on commit, so
-            // leaving it out would quietly drop the sequence structure the moment anyone opened the dialog.
-            sequenceLength = sequenceLength
+            targetColumnNames = targetDataFrame.columnNames
         )
 
         fun syncDataSet() {

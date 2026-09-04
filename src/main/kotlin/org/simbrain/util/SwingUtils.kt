@@ -13,6 +13,8 @@ import java.beans.PropertyChangeEvent
 import java.io.File
 import javax.swing.*
 import javax.swing.border.CompoundBorder
+import javax.swing.event.MenuEvent
+import javax.swing.event.MenuListener
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.min
@@ -159,6 +161,17 @@ fun JDialog.display(
         requestFocus()
     }
 
+}
+
+/**
+ * Runs [block] each time this menu is opened, so items can be rebuilt or their state refreshed before they are seen.
+ */
+fun JMenu.onMenuSelected(block: JMenu.() -> Unit) {
+    addMenuListener(object : MenuListener {
+        override fun menuSelected(e: MenuEvent?) = block()
+        override fun menuDeselected(e: MenuEvent?) {}
+        override fun menuCanceled(e: MenuEvent?) {}
+    })
 }
 
 inline fun Component.onDoubleClick(crossinline block: MouseEvent.() -> Unit) {

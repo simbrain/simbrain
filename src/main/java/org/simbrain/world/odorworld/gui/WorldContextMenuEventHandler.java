@@ -46,6 +46,11 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
             mouseEvent.setHandled(true);
             JPopupMenu menu;
             if (pickedNode.getParent() instanceof EntityNode entity) {
+                // Selection-based items in the entity menu should act on the clicked entity
+                if (!odorWorldPanel.isSelected(entity)) {
+                    odorWorldPanel.clearSelection();
+                    odorWorldPanel.getSelectionManager().add(entity);
+                }
                 menu = entity.createContextMenu(odorWorldPanel);
             } else {
                 menu = odorWorldPanel.getContextMenu();

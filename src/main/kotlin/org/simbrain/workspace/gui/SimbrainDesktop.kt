@@ -77,7 +77,7 @@ object SimbrainDesktop {
 
     val workspace = Workspace()
 
-    val desktopPane: JDesktopPane = JDesktopPane()
+    val desktopPane: JDesktopPane = JDesktopPane().apply { desktopManager = AspectLockingDesktopManager() }
 
     /**
      * Name to display in Simbrain desktop window.

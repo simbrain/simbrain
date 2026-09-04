@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
@@ -14,12 +15,14 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
+import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Rectangle
+import java.awt.Dimension
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
@@ -29,6 +32,7 @@ import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.Timer
 import javax.swing.*
+import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -92,6 +96,8 @@ class OdorWorldPanel(
 
     val odorWorldActions: OdorWorldActions = OdorWorldActions(this)
 
+    val mainToolBar = createMainToolBar()
+
     /**
      * The current zoom level of the canvas.
      *
@@ -106,6 +112,29 @@ class OdorWorldPanel(
             val currentScalingFactor = canvas.camera.viewScale
             val scalingFactorRatio = scalingFactor / currentScalingFactor
             canvas.scale(scalingFactorRatio)
+            repaint()
+        }
+
+    /**
+     * Zoom so the whole world is visible. Actions run off the Swing thread, so the repaint is requested explicitly
+     * rather than relying on Piccolo's paint invalidation, which only schedules a repaint from the event thread.
+     */
+    fun zoomToFit() {
+        canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+        repaint()
+    }
+
+    /**
+     * When true the whole world is kept in view across resizes and world size changes, as with the network's
+     * auto-zoom. Manual zooming turns it off.
+     */
+    var autoZoom = true
+        set(value) {
+            field = value
+            world.events.zoomModeChanged.fire(value)
+            if (value) {
+                zoomToFit()
+            }
         }
 
     fun debugToolTips() {
@@ -230,7 +259,7 @@ class OdorWorldPanel(
 
         layout = BorderLayout()
         this.add("Center", canvas)
-        add("North", createMainToolBar())
+        add("North", mainToolBar)
 
         canvas.isFocusable = true
 
@@ -339,6 +368,9 @@ class OdorWorldPanel(
             override fun mouseWheelRotated(event: PInputEvent) {
                 val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                 val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
+                if (abs(swingEvent.preciseWheelRotation) > 2) {
+                    autoZoom = false
+                }
                 canvas.scale(1 / newScale)
             }
         })
@@ -353,16 +385,37 @@ class OdorWorldPanel(
 
         world.events.tileMapChanged.fire()
 
-        canvas.setViewBounds(Rectangle2D.Double(0.0, 0.0, world.width, world.height))
+        zoomToFit()
 
-        // Repaint whenever window is opened or changed.
+        // Repaint whenever window is opened or changed. With auto-zoom on, or with the aspect lock on and a view
+        // that showed the whole world before the resize, the whole world stays in view instead of drifting to a
+        // partial view.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                scalingFactor = scalingFactor // force invoke setter
+                val previousCanvasSize = lastCanvasSize
+                lastCanvasSize = canvas.size
+                val keepWholeWorld = world.lockAspectRatio && previousCanvasSize != null && showedWholeWorld(previousCanvasSize)
+                if (autoZoom || keepWholeWorld) {
+                    zoomToFit()
+                } else {
+                    scalingFactor = scalingFactor // force invoke setter
+                }
             }
         })
+    }
 
-        odorWorldActions.createSelectAllAction()
+    private var lastCanvasSize: Dimension? = null
+
+    /**
+     * True if the camera, at its current scale, spanned the world along at least one axis when the canvas had
+     * [canvasSize]. The camera never shows area outside the world, so spanning one axis means fully zoomed out.
+     */
+    private fun showedWholeWorld(canvasSize: Dimension): Boolean {
+        val viewScale = canvas.camera.viewScale
+        if (viewScale <= 0.0) return false
+        val viewWidth = canvasSize.width / viewScale
+        val viewHeight = canvasSize.height / viewScale
+        return viewWidth >= world.width - 0.5 || viewHeight >= world.height - 0.5
     }
 
     private fun renderAllLayers(world: OdorWorld) {
@@ -479,15 +532,17 @@ class OdorWorldPanel(
      * Popup menu when not clicking on entity. On an entity see [EntityNode.createContextMenu]
      */
     fun getContextMenu() = JPopupMenu().apply {
-        add(JMenuItem(odorWorldActions.addAgentAction()))
-        add(JMenuItem(odorWorldActions.addEntityAction()))
-        addSeparator()
-        add(JMenuItem(odorWorldActions.addTileAction))
-        add(JMenuItem(odorWorldActions.fillLayerAction))
-        add(odorWorldActions.createChooseLayerMenu(world))
-        add(odorWorldActions.editLayersAction)
-        addSeparator()
-        add(JMenuItem(odorWorldActions.showWorldPropertiesAction()))
+        with(odorWorldActions) {
+            add(addAgentAction)
+            add(addEntityAction)
+            addSeparator()
+            add(addTileAction)
+            add(fillLayerAction)
+            add(createChooseLayerMenu())
+            add(editLayersAction)
+            addSeparator()
+            add(showWorldPropertiesAction)
+        }
     }
 
     fun clearSelection() {
@@ -559,13 +614,26 @@ class OdorWorldPanel(
         get() = manualMovementKeyState > 0
 
     private fun createMainToolBar() = JToolBar().apply {
-        add(odorWorldActions.addAgentAction())
-        add(odorWorldActions.addEntityAction())
-        addSeparator()
-        add(odorWorldActions.zoomInAction())
-        add(odorWorldActions.zoomOutAction())
-        addSeparator()
-        add(odorWorldActions.resetZoomAction())
+        with(odorWorldActions) {
+            add(addAgentAction)
+            add(addEntityAction)
+            addSeparator()
+            add(deleteSelectedAction)
+            addSeparator()
+            add(zoomInAction)
+            add(zoomOutAction)
+            add(resetZoomAction)
+            add(SimbrainToggleButton(
+                icon = ResourceManager.getSmallIcon("menu_icons/ZoomFitPage.png"),
+                stateGetter = { autoZoom },
+                stateSetter = { autoZoom = it },
+                tooltipGenerator = { isOn -> "Auto-zoom is ${if (isOn) "on" else "off"}" }
+            ).apply {
+                world.events.zoomModeChanged.on(Dispatchers.Swing) {
+                    updateFromExternalState()
+                }
+            })
+        }
     }
 
     fun editSelectedEntities() {

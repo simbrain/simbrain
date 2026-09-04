@@ -104,11 +104,10 @@ class WorldMouseHandler(
                 if (it != null) {
                     odorWorldPanel.editSelectedEntities()
                 } else {
-                    // TODO: On right click, show sub-menu with layers, then show dialog below
                     val tileMap = odorWorldPanel.world.tileMap
-                    showTilePicker(tileMap.tileSets, event.getCurrentTileId()) { tileId: Int? ->
+                    showTilePicker(tileMap.tileSets, event.getCurrentTileId()) { tileId ->
                         val p = tileMap.pixelToGridCoordinate(world.lastClickedPosition)
-                        odorWorldPanel.world.tileMap.setTile(p.x, p.y, tileId!!)
+                        tileMap.setTile(p.x, p.y, tileId, world.selectedLayer)
                     }
                 }
             }

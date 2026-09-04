@@ -88,6 +88,8 @@ class OdorWorldPanel(
 
     val odorWorldActions: OdorWorldActions = OdorWorldActions(this)
 
+    val mainToolBar = createMainToolBar()
+
     /**
      * The current zoom level of the canvas.
      *
@@ -226,7 +228,7 @@ class OdorWorldPanel(
 
         layout = BorderLayout()
         this.add("Center", canvas)
-        add("North", createMainToolBar())
+        add("North", mainToolBar)
 
         canvas.isFocusable = true
 
@@ -363,8 +365,6 @@ class OdorWorldPanel(
                 }
             }
         })
-
-        odorWorldActions.createSelectAllAction()
     }
 
     private var lastCanvasSize: Dimension? = null
@@ -494,15 +494,17 @@ class OdorWorldPanel(
      * Popup menu when not clicking on entity. On an entity see [EntityNode.createContextMenu]
      */
     fun getContextMenu() = JPopupMenu().apply {
-        add(JMenuItem(odorWorldActions.addAgentAction()))
-        add(JMenuItem(odorWorldActions.addEntityAction()))
-        addSeparator()
-        add(JMenuItem(odorWorldActions.addTileAction))
-        add(JMenuItem(odorWorldActions.fillLayerAction))
-        add(odorWorldActions.createChooseLayerMenu(world))
-        add(odorWorldActions.editLayersAction)
-        addSeparator()
-        add(JMenuItem(odorWorldActions.showWorldPropertiesAction()))
+        with(odorWorldActions) {
+            add(addAgentAction)
+            add(addEntityAction)
+            addSeparator()
+            add(addTileAction)
+            add(fillLayerAction)
+            add(createChooseLayerMenu())
+            add(editLayersAction)
+            addSeparator()
+            add(showWorldPropertiesAction)
+        }
     }
 
     fun clearSelection() {
@@ -574,13 +576,16 @@ class OdorWorldPanel(
         get() = manualMovementKeyState > 0
 
     private fun createMainToolBar() = JToolBar().apply {
-        add(odorWorldActions.addAgentAction())
-        add(odorWorldActions.addEntityAction())
-        addSeparator()
-        add(odorWorldActions.zoomInAction())
-        add(odorWorldActions.zoomOutAction())
-        addSeparator()
-        add(odorWorldActions.resetZoomAction())
+        with(odorWorldActions) {
+            add(addAgentAction)
+            add(addEntityAction)
+            addSeparator()
+            add(deleteSelectedAction)
+            addSeparator()
+            add(zoomInAction)
+            add(zoomOutAction)
+            add(resetZoomAction)
+        }
     }
 
     fun editSelectedEntities() {

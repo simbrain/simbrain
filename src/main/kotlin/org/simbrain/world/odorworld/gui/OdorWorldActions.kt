@@ -12,6 +12,7 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.OdorWorldPanel
 import org.simbrain.world.odorworld.OdorWorldPreferences
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -151,6 +152,25 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         }
     }
 
+    val addMazeAction = odorWorldPanel.createAction(
+        name = "Add maze...",
+        description = "Lay a new perfect maze over the world, resizing the tile map to fit the chosen cells"
+    ) {
+        val settings = MazeSettings(world)
+        settings.createEditorDialog(titleName = "Add Maze") {
+            val seed = if (it.useSeed) it.seed.toLong() else null
+            world.generateMaze(it.columns, it.rows, it.cellSizeInTiles, seed)
+        }.display()
+    }
+
+    val clearMazeAction = odorWorldPanel.createConditionallyEnabledAction(
+        name = "Clear maze",
+        description = "Remove the maze walls, leaving the tile map as it is",
+        enablingCondition = { world.maze != null }
+    ) {
+        world.clearMaze()
+    }
+
     val clearAllTrailsAction = odorWorldPanel.createAction(
         name = "Clear all trails",
         description = "Erase the trail behind every entity"
@@ -230,8 +250,53 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
 }
 
 /**
- * [createAction] whose enabled state follows [enablingCondition], re-evaluated whenever the selection changes or an
- * entity is added to or removed from the world.
+ * Settings for [OdorWorldActions.addMazeAction], seeded from the world's current grid.
+ */
+class MazeSettings(world: OdorWorld) : EditableObject {
+
+    var columns by GuiEditable(
+        initValue = world.gridColumns.coerceAtLeast(1),
+        label = "Columns",
+        description = "Number of maze cells across",
+        min = 1,
+        order = 1
+    )
+
+    var rows by GuiEditable(
+        initValue = world.gridRows.coerceAtLeast(1),
+        label = "Rows",
+        description = "Number of maze cells down",
+        min = 1,
+        order = 2
+    )
+
+    var cellSizeInTiles by GuiEditable(
+        initValue = world.gridCellSizeInTiles,
+        label = "Cell size (tiles)",
+        description = "Side length of one cell in tiles. Agents in grid movement mode step one cell at a time.",
+        min = 1,
+        order = 3
+    )
+
+    var useSeed by GuiEditable(
+        initValue = false,
+        label = "Use seed",
+        description = "Generate the same maze every time from the seed below",
+        order = 4
+    )
+
+    var seed by GuiEditable(
+        initValue = 1,
+        label = "Seed",
+        description = "Random seed for the maze layout",
+        conditionallyEnabledBy = MazeSettings::useSeed,
+        order = 5
+    )
+}
+
+/**
+ * [createAction] whose enabled state follows [enablingCondition], re-evaluated whenever the selection changes, an
+ * entity is added to or removed from the world, or the maze changes.
  */
 private fun OdorWorldPanel.createConditionallyEnabledAction(
     name: String,
@@ -253,6 +318,7 @@ private fun OdorWorldPanel.createConditionallyEnabledAction(
         selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateEnabled() }
         world.events.entityAdded.on(Dispatchers.Swing) { updateEnabled() }
         world.events.entityRemoved.on(Dispatchers.Swing) { updateEnabled() }
+        world.events.mazeChanged.on(Dispatchers.Swing) { updateEnabled() }
     },
     block = block
 )

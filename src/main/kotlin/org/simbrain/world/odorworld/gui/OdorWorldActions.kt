@@ -189,6 +189,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0
     ) {
         scalingFactor = 1.0
+        autoZoom = false
     }
 
     val zoomInAction = odorWorldPanel.createAction(
@@ -198,6 +199,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_ADD, CmdOrCtrl + KeyEvent.VK_EQUALS)
     ) {
         scalingFactor *= 1.1
+        autoZoom = false
     }
 
     val zoomOutAction = odorWorldPanel.createAction(
@@ -207,6 +209,15 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         keyboardShortcuts = listOf(CmdOrCtrl + KeyEvent.VK_SUBTRACT, CmdOrCtrl + KeyEvent.VK_MINUS)
     ) {
         scalingFactor /= 1.1
+        autoZoom = false
+    }
+
+    val toggleAutoZoomAction = odorWorldPanel.createAction(
+        name = "Auto-zoom",
+        description = "Keep the whole world in view (Cmd/Ctrl-Shift-0)",
+        keyboardShortcut = CmdOrCtrl + KeyEvent.VK_0 + Shift
+    ) { event ->
+        autoZoom = (event?.source as? JCheckBoxMenuItem)?.state ?: !autoZoom
     }
 
     val showToolbarAction = odorWorldPanel.createAction(

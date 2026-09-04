@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.workspace.gui.SimbrainDesktop
+import java.awt.event.ActionEvent
 import javax.swing.JMenu
 import javax.swing.SwingUtilities
 
@@ -63,7 +64,21 @@ class OdorWorldMenusTest {
     @Test
     fun `view menu exposes zoom and trails`() {
         val labels = panel.viewMenu.itemLabels()
-        assertEquals(listOf("Zoom in", "Zoom out", "Reset zoom", "Show trails", "Toolbar"), labels)
+        assertEquals(listOf("Zoom in", "Zoom out", "Reset zoom", "Auto-zoom", "Show trails", "Toolbar"), labels)
+    }
+
+    @Test
+    fun `manual zoom turns auto-zoom off and toggling it back on fits the world`() {
+        SwingUtilities.invokeAndWait { panel.canvas.setSize(400, 300) }
+        assertTrue(panel.autoZoom)
+        SwingUtilities.invokeAndWait { panel.odorWorldActions.zoomInAction.actionPerformed(ActionEvent(panel, ActionEvent.ACTION_PERFORMED, null)) }
+        awaitOnEdt { !panel.autoZoom }
+        SwingUtilities.invokeAndWait { panel.odorWorldActions.toggleAutoZoomAction.actionPerformed(ActionEvent(panel, ActionEvent.ACTION_PERFORMED, null)) }
+        awaitOnEdt { panel.autoZoom }
+        awaitOnEdt {
+            val view = panel.canvas.camera.viewBounds
+            view.width >= world.width - 0.5 || view.height >= world.height - 0.5
+        }
     }
 
     @Test

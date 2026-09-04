@@ -66,6 +66,8 @@ val OdorWorldPanel.viewMenu
             add(zoomInAction)
             add(zoomOutAction)
             add(resetZoomAction)
+            val autoZoomItem = JCheckBoxMenuItem(toggleAutoZoomAction)
+            add(autoZoomItem)
             addSeparator()
             val showTrails = JCheckBoxMenuItem(showAllTrailsAction)
             add(showTrails)
@@ -73,6 +75,7 @@ val OdorWorldPanel.viewMenu
             val showToolbar = JCheckBoxMenuItem(showToolbarAction)
             add(showToolbar)
             onMenuSelected {
+                autoZoomItem.isSelected = autoZoom
                 showTrails.isSelected = anyTrailShown
                 showToolbar.isSelected = mainToolBar.isVisible
             }

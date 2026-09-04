@@ -2,6 +2,9 @@ package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
@@ -17,6 +20,7 @@ import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
@@ -35,6 +39,11 @@ import javax.swing.*
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
+
+/**
+ * Pause between held-key grid steps when a step is instant or blocked.
+ */
+private const val HELD_GRID_STEP_PAUSE_MS = 80L
 
 /**
  * **OdorWorldPanel** represent the OdorWorld.
@@ -461,6 +470,54 @@ class OdorWorldPanel(
             null
         } else {
             tileStack[0]
+        }
+    }
+
+    private val gridDriveLock = Any()
+
+    private var heldGridDirections: List<GridDirection> = emptyList()
+
+    private var gridDriveJob: Job? = null
+
+    /**
+     * Start or keep driving the selected grid-mode entity one cell at a time in [direction] until
+     * [releaseGridDirection]. The most recently pressed direction wins while several are held.
+     */
+    fun pressGridDirection(direction: GridDirection) {
+        synchronized(gridDriveLock) {
+            heldGridDirections = heldGridDirections - direction + direction
+            if (gridDriveJob?.isActive != true) {
+                gridDriveJob = world.launch { driveHeldGridDirections() }
+            }
+        }
+    }
+
+    fun releaseGridDirection(direction: GridDirection) {
+        synchronized(gridDriveLock) {
+            heldGridDirections = heldGridDirections - direction
+        }
+    }
+
+    /**
+     * Steps cell after cell while a direction is held. An animated step suspends for its own duration; instant
+     * and blocked steps pause briefly so the entity neither teleports across the map nor spins on a wall.
+     */
+    private suspend fun driveHeldGridDirections() {
+        while (true) {
+            val direction = synchronized(gridDriveLock) {
+                heldGridDirections.lastOrNull().also { if (it == null) gridDriveJob = null }
+            } ?: return
+            val entity = firstSelectedRotatingEntity?.takeIf { it.movementMode == MovementMode.GRID }
+            if (entity == null) {
+                synchronized(gridDriveLock) {
+                    heldGridDirections = emptyList()
+                    gridDriveJob = null
+                }
+                return
+            }
+            val moved = entity.moveOneCell(direction)
+            centerCameraToSelectedEntity()
+            if (!moved || world.gridStepDurationMs <= 0) delay(HELD_GRID_STEP_PAUSE_MS)
         }
     }
 

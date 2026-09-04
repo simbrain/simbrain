@@ -3,9 +3,13 @@ package org.simbrain.world.odorworld.behaviors
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.GridDirection
+import org.simbrain.world.odorworld.Maze
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.abs
 
@@ -224,5 +228,73 @@ class BehaviorsTest {
         assertEquals(9.0, copy.driftDegreesPerTick)
         assertEquals(32, copy.numRays)
         assertTrue(copy !== original)
+    }
+
+    private fun gridWorld() = OdorWorld().apply {
+        tileMap = TileMap(8, 8)
+        gridCellSizeInTiles = 2
+        gridStepDurationMs = 0
+        wrapAround = false
+        isObjectsBlockMovement = false
+    }
+
+    private suspend fun gridAgent(world: OdorWorld, column: Int, row: Int): OdorWorldEntity {
+        val agent = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(agent)
+        agent.location = world.cellCenter(column, row)
+        agent.heading = 0.0
+        agent.movementMode = MovementMode.GRID
+        return agent
+    }
+
+    @Test
+    fun `Pursue in grid mode steps one cell toward the target along a cardinal direction`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(0, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0 }
+        world.update()
+        assertEquals(0 to 1, agent.cell)
+        assertEquals(GridDirection.SOUTH, agent.facingDirection)
+        assertEquals(0.0, agent.movement.speed, 0.001)
+    }
+
+    @Test
+    fun `Pursue in grid mode goes around a maze wall instead of into it`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.openGrid(4, 4).apply { setWall(0, 0, GridDirection.SOUTH, true) }
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(0, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0 }
+        world.update()
+        assertEquals(1 to 0, agent.cell)
+        assertFalse(agent.wasStuckLastTick)
+    }
+
+    @Test
+    fun `Wander in grid mode keeps the entity on cell centers with a cardinal heading`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.recursiveBacktracker(4, 4, seed = 3L)
+        val agent = gridAgent(world, 1, 1)
+        agent.behavior = Wander()
+        repeat(12) { world.update() }
+        val (column, row) = agent.cell
+        assertEquals(world.cellCenter(column, row), agent.location)
+        assertTrue(agent.heading % 90.0 == 0.0, "heading should be cardinal, got ${agent.heading}")
+    }
+
+    @Test
+    fun `stop in grid mode clears a pending step`() {
+        val world = gridWorld()
+        val agent = OdorWorldEntity(world, EntityType.Mouse)
+        agent.movementMode = MovementMode.GRID
+        Steering.applyHeading(agent, 270.0, 2.0, 10.0)
+        assertEquals(GridDirection.SOUTH, agent.pendingGridStep)
+        Steering.stop(agent, "done")
+        assertNull(agent.pendingGridStep)
     }
 }

@@ -4,7 +4,6 @@
  */
 package org.simbrain.world.odorworld
 
-import kotlinx.coroutines.launch
 import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.Shift
 import org.simbrain.util.bind
@@ -12,8 +11,9 @@ import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 
 /**
- * Manual keys drive grid-mode entities one cell or one quarter turn per press; continuous entities keep the
- * held-key speed and turn state managed by the panel's movement timer.
+ * Manual keys drive grid-mode entities in absolute cardinal directions (up is north, left is west) for as long as
+ * the key is held, cell after cell; continuous entities keep the held-key speed and turn state managed by the
+ * panel's movement timer.
  */
 fun OdorWorldPanel.addKeyBindings() {
     canvas.apply {
@@ -23,18 +23,22 @@ fun OdorWorldPanel.addKeyBindings() {
 
         fun OdorWorldEntity.isGrid() = movementMode == MovementMode.GRID
 
+        fun pressGrid(direction: GridDirection): Boolean {
+            val entity = firstSelectedRotatingEntity?.takeIf { it.isGrid() } ?: return false
+            pressGridDirection(direction)
+            return true
+        }
+
         // Manual Forward Motion
         bind("pressed W", "pressed UP") {
-            firstSelectedRotatingEntity?.takeIf { it.isGrid() }?.let { entity ->
-                world.launch { entity.moveOneCell(entity.facingDirection, face = false) }
-                return@bind
-            }
+            if (pressGrid(GridDirection.NORTH)) return@bind
             setManualMovementKeyState("w", true)
             firstSelectedRotatingEntity?.let {
                 it.manualMovement.speed = 1.0
             }
         }
         bind("released W", "released UP") {
+            releaseGridDirection(GridDirection.NORTH)
             setManualMovementKeyState("w", false)
             firstSelectedRotatingEntity?.let { entity ->
                 // case where w and s are both being pressed
@@ -48,16 +52,14 @@ fun OdorWorldPanel.addKeyBindings() {
 
         // Manual Backward Motion
         bind("pressed S", "pressed DOWN") {
-            firstSelectedRotatingEntity?.takeIf { it.isGrid() }?.let { entity ->
-                world.launch { entity.moveOneCell(entity.facingDirection.opposite, face = false) }
-                return@bind
-            }
+            if (pressGrid(GridDirection.SOUTH)) return@bind
             setManualMovementKeyState("s", true)
             firstSelectedRotatingEntity?.let {
                 it.manualMovement.speed = -1.0
             }
         }
         bind("released S", "released DOWN") {
+            releaseGridDirection(GridDirection.SOUTH)
             setManualMovementKeyState("s", false)
             firstSelectedRotatingEntity?.let { entity ->
                 // case where w and s are both being pressed
@@ -71,14 +73,12 @@ fun OdorWorldPanel.addKeyBindings() {
 
         // Manual Left Turn
         bind("pressed A", "pressed LEFT") {
-            firstSelectedRotatingEntity?.takeIf { it.isGrid() }?.let { entity ->
-                entity.turn(90.0)
-                return@bind
-            }
+            if (pressGrid(GridDirection.WEST)) return@bind
             setManualMovementKeyState("a", true)
             firstSelectedRotatingEntity?.manualMovement?.turnLeft()
         }
         bind("released A", "released LEFT") {
+            releaseGridDirection(GridDirection.WEST)
             setManualMovementKeyState("a", false)
             firstSelectedRotatingEntity?.let { entity ->
                 // case where a and d are both being pressed
@@ -92,14 +92,12 @@ fun OdorWorldPanel.addKeyBindings() {
 
         // Manual Right Turn
         bind("pressed D", "pressed RIGHT") {
-            firstSelectedRotatingEntity?.takeIf { it.isGrid() }?.let { entity ->
-                entity.turn(-90.0)
-                return@bind
-            }
+            if (pressGrid(GridDirection.EAST)) return@bind
             setManualMovementKeyState("d", true)
             firstSelectedRotatingEntity?.manualMovement?.turnRight()
         }
         bind("released D", "released RIGHT") {
+            releaseGridDirection(GridDirection.EAST)
             setManualMovementKeyState("d", false)
             firstSelectedRotatingEntity?.let { entity ->
                 // case where a and d are both being pressed

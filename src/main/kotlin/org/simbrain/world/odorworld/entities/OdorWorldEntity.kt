@@ -124,6 +124,13 @@ class OdorWorldEntity @JvmOverloads constructor(
     var isInTransit: Boolean = false
         private set
 
+    /**
+     * One-shot cardinal step requested by an [NpcBehavior] for the next update in [MovementMode.GRID]. Takes
+     * priority over [speed] and [dtheta] and is cleared once consumed.
+     */
+    @Transient
+    var pendingGridStep: GridDirection? = null
+
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
 
@@ -315,6 +322,8 @@ class OdorWorldEntity @JvmOverloads constructor(
         return world.cellCenter(targetColumn, targetRow)
     }
 
+    private fun takePendingGridStep(): GridDirection? = pendingGridStep.also { pendingGridStep = null }
+
     /**
      * Grid-mode reading of the movement state: a nonzero [dtheta] is a quarter turn, and a nonzero [speed] asks
      * for one cell forward or backward. Returns the direction to step, or null when standing still.
@@ -339,7 +348,12 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     fun applyMovement() {
         if (movementMode == MovementMode.GRID) {
-            consumeGridCommand()?.let { wasStuckLastTick = !stepOneCell(it, face = false) }
+            val behaviorStep = takePendingGridStep()
+            if (behaviorStep != null) {
+                wasStuckLastTick = !stepOneCell(behaviorStep)
+            } else {
+                consumeGridCommand()?.let { wasStuckLastTick = !stepOneCell(it, face = false) }
+            }
             return
         }
         if (dtheta != 0.0) {
@@ -406,7 +420,12 @@ class OdorWorldEntity @JvmOverloads constructor(
     suspend fun update() {
         behavior.update(this)
         if (movementMode == MovementMode.GRID) {
-            consumeGridCommand()?.let { wasStuckLastTick = !moveOneCell(it, face = false) }
+            val behaviorStep = takePendingGridStep()
+            if (behaviorStep != null) {
+                wasStuckLastTick = !moveOneCell(behaviorStep)
+            } else {
+                consumeGridCommand()?.let { wasStuckLastTick = !moveOneCell(it, face = false) }
+            }
         } else {
             applyMovement()
         }

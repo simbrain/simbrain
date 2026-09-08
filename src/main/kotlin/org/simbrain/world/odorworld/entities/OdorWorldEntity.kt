@@ -103,8 +103,11 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.moved.fire()
         }
 
-    override val width: Double = entityType.width.toDouble()
-    override val height: Double = entityType.height.toDouble()
+    override val width: Double
+        get() = entityType.width.toDouble()
+
+    override val height: Double
+        get() = entityType.height.toDouble()
 
     var movementMode by GuiEditable(
         initValue = MovementMode.CONTINUOUS,

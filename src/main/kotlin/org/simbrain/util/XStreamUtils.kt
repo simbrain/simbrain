@@ -266,14 +266,14 @@ fun createConstructorCallingConverter(
                         property.setter.call(convertedObject, value)
                         property.isAccessible = oldAccessible
                     } else {
-                        // property is a val
+                        // property is a val; one with no backing field is computed, so a value saved for it by an
+                        // older version is simply dropped
                         property.javaField?.let { field ->
                             val oldAccessible = field.isAccessible
                             field.isAccessible = true
                             field.set(convertedObject, value)
                             field.isAccessible = oldAccessible
                         }
-                            ?: throw IllegalArgumentException("Property $property for class ${cls.simpleName} does not have a backing field.")
                     }
                 }
             }

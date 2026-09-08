@@ -1,6 +1,6 @@
 package org.simbrain.world.odorworld.entities
 
-import kotlinx.coroutines.delay
+import kotlinx.coroutines.CompletableDeferred
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
@@ -27,8 +27,9 @@ import kotlin.math.sin
 
 /**
  * How an entity moves through the world. Continuous movement uses speed and heading with pixel-level collision.
- * Grid movement steps one [OdorWorld.gridCellSizeInTiles] cell at a time, turns in right angles, and honors maze
- * walls; speed only matters as a sign and the entity always rests on a cell center.
+ * Grid movement travels one [OdorWorld.gridCellSizeInTiles] cell at a time at [OdorWorldEntity.gridSpeed] pixels
+ * per update, turns in right angles, and honors maze walls; the coupled speed only matters as a sign, new steps
+ * are only accepted at cell centers, and the entity always comes to rest on one.
  */
 enum class MovementMode { CONTINUOUS, GRID }
 
@@ -113,16 +114,36 @@ class OdorWorldEntity @JvmOverloads constructor(
         order = 5,
         setter = {
             field = it
-            if (it == MovementMode.GRID) snapToCellCenter()
+            if (it == MovementMode.GRID) snapToCellCenter() else cancelTransit()
         }
     )
 
     /**
-     * True while an animated grid step is in progress. Further grid steps are ignored until it finishes.
+     * Pixels moved per update while travelling between cells in [MovementMode.GRID]. At or above the cell size a
+     * step completes in one update. NPC behaviors set this from their max speed, as they set linear speed in
+     * continuous mode.
+     */
+    var gridSpeed by GuiEditable(
+        initValue = 8.0,
+        label = "Grid speed",
+        description = "Pixels per update while moving between cells in grid mode. At or above the cell size a " +
+                "step takes a single update.",
+        min = 0.01,
+        order = 6
+    )
+
+    /**
+     * Center of the cell being travelled to while a grid step is in progress, or null at rest.
      */
     @Transient
-    var isInTransit: Boolean = false
+    var transitTarget: Point2D? = null
         private set
+
+    val isInTransit: Boolean
+        get() = transitTarget != null
+
+    @Transient
+    private var arrival: CompletableDeferred<Unit>? = null
 
     /**
      * One-shot cardinal step requested by an [NpcBehavior] for the next update in [MovementMode.GRID]. Takes
@@ -130,6 +151,13 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     @Transient
     var pendingGridStep: GridDirection? = null
+
+    /**
+     * Direction held on the manual driving keys, consumed at every cell center until cleared. Takes priority over
+     * behaviors and couplings, as manual movement does in continuous mode.
+     */
+    @Transient
+    var manualGridDirection: GridDirection? = null
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -266,45 +294,69 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     /**
-     * Step one grid cell in [direction] without animation. Returns false, leaving the location unchanged and
-     * firing [EntityEvents.collided], when a wall, blocking tile, map edge, or blocking entity is in the way.
+     * Move one grid cell in [direction] within this call. Returns false, leaving the location unchanged and
+     * firing [EntityEvents.collided], when a wall, blocking tile, map edge, or blocking entity is in the way, or
+     * when a step is already in transit.
      */
-    fun stepOneCell(direction: GridDirection, face: Boolean = true): Boolean {
+    fun stepOneCell(direction: GridDirection, face: Boolean = true): Boolean =
+        requestGridStep(direction, face, instant = true)
+
+    /**
+     * Begin a grid step in [direction]. When [instant], the entity lands on the target cell now; otherwise it enters
+     * transit and later calls to [advanceTransit] carry it there. Returns false without moving when the step is
+     * blocked or one is already in transit.
+     */
+    fun requestGridStep(
+        direction: GridDirection,
+        face: Boolean = true,
+        instant: Boolean = gridSpeed >= world.gridCellPixelSize
+    ): Boolean {
+        if (isInTransit) return false
         val target = beginGridStep(direction, face) ?: return false
-        recordTravelDistance(location.distance(target))
-        location = target
+        if (instant) {
+            arriveAt(target)
+        } else {
+            transitTarget = target
+            arrival = CompletableDeferred()
+        }
         return true
     }
 
     /**
-     * Like [stepOneCell] but animates the move over [OdorWorld.gridStepDurationMs], suspending until the entity
-     * arrives. Returns false without moving if a step is already in transit or the step is blocked.
+     * [requestGridStep] followed by suspending until the entity arrives. Arrival is driven by the world's
+     * updates, so do not await this from inside a workspace update action unless the step is instant.
      */
     suspend fun moveOneCell(direction: GridDirection, face: Boolean = true): Boolean {
-        if (isInTransit) return false
-        val target = beginGridStep(direction, face) ?: return false
-        val frameMs = 16L
-        val steps = (world.gridStepDurationMs / frameMs).toInt()
-        val start = location
-        val distance = start.distance(target)
-        if (steps <= 1) {
-            recordTravelDistance(distance)
-            location = target
-            return true
-        }
-        isInTransit = true
-        try {
-            for (i in 1..steps) {
-                val t = i.toDouble() / steps
-                location = point(start.x + (target.x - start.x) * t, start.y + (target.y - start.y) * t)
-                recordTravelDistance(distance / steps)
-                world.events.frameAdvanced.fire()
-                if (i < steps) delay(frameMs)
-            }
-        } finally {
-            isInTransit = false
-        }
+        if (!requestGridStep(direction, face)) return false
+        arrival?.await()
         return true
+    }
+
+    /**
+     * Carry an in-progress grid step [distance] pixels closer to its target, arriving when that is enough.
+     */
+    fun advanceTransit(distance: Double) {
+        val target = transitTarget ?: return
+        val remaining = location.distance(target)
+        if (distance >= remaining) {
+            arriveAt(target)
+            return
+        }
+        val t = distance / remaining
+        recordTravelDistance(distance)
+        location = point(x + (target.x - x) * t, y + (target.y - y) * t)
+    }
+
+    private fun cancelTransit() {
+        transitTarget = null
+        arrival?.complete(Unit)
+        arrival = null
+    }
+
+    private fun arriveAt(target: Point2D) {
+        recordTravelDistance(location.distance(target))
+        location = target
+        cancelTransit()
     }
 
     /**
@@ -323,6 +375,18 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     private fun takePendingGridStep(): GridDirection? = pendingGridStep.also { pendingGridStep = null }
+
+    /**
+     * The next grid step to begin, with whether to face it: manual keys first, then a behavior's request, then the
+     * coupled movement channels. Requests lower in the order are discarded, as manual movement overrides the rest
+     * in continuous mode.
+     */
+    private fun chooseGridStep(): Pair<GridDirection, Boolean>? {
+        val behaviorStep = takePendingGridStep()
+        manualGridDirection?.let { return it to true }
+        behaviorStep?.let { return it to true }
+        return consumeGridCommand()?.let { it to false }
+    }
 
     /**
      * Grid-mode reading of the movement state: a nonzero [dtheta] is a quarter turn, and a nonzero [speed] asks
@@ -344,16 +408,17 @@ class OdorWorldEntity @JvmOverloads constructor(
      *
      * Collisions are detected using the AABB algorithm: https://learnopengl.com/In-Practice/2D-Game/Collisions/Collision-detection
      *
-     * In [MovementMode.GRID] this instead performs an instant grid step.
+     * In [MovementMode.GRID] this instead begins or continues a grid step at the manual movement increment per
+     * call, which is what the panel's key-driving timer needs.
      */
     fun applyMovement() {
         if (movementMode == MovementMode.GRID) {
-            val behaviorStep = takePendingGridStep()
-            if (behaviorStep != null) {
-                wasStuckLastTick = !stepOneCell(behaviorStep)
-            } else {
-                consumeGridCommand()?.let { wasStuckLastTick = !stepOneCell(it, face = false) }
+            if (!isInTransit) {
+                chooseGridStep()?.let { (direction, face) ->
+                    wasStuckLastTick = !requestGridStep(direction, face, instant = false)
+                }
             }
+            advanceTransit(manualMovement.manualStraightMovementIncrement)
             return
         }
         if (dtheta != 0.0) {
@@ -417,16 +482,21 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
     }
 
+    /**
+     * One world iteration. In [MovementMode.GRID] the behavior only runs at cell centers, where a new step may
+     * begin; the step then advances by [gridSpeed] each iteration, so sensors report the real position on the way.
+     */
     suspend fun update() {
-        behavior.update(this)
         if (movementMode == MovementMode.GRID) {
-            val behaviorStep = takePendingGridStep()
-            if (behaviorStep != null) {
-                wasStuckLastTick = !moveOneCell(behaviorStep)
-            } else {
-                consumeGridCommand()?.let { wasStuckLastTick = !moveOneCell(it, face = false) }
+            if (!isInTransit) {
+                behavior.update(this)
+                chooseGridStep()?.let { (direction, face) ->
+                    wasStuckLastTick = !requestGridStep(direction, face)
+                }
             }
+            advanceTransit(gridSpeed)
         } else {
+            behavior.update(this)
             applyMovement()
         }
         if (isSensorsEnabled) {

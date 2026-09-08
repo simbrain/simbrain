@@ -2,9 +2,6 @@ package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
@@ -39,11 +36,6 @@ import javax.swing.*
 import kotlin.math.abs
 import kotlin.math.min
 import kotlin.math.pow
-
-/**
- * Pause between held-key grid steps when a step is instant or blocked.
- */
-private const val HELD_GRID_STEP_PAUSE_MS = 80L
 
 /**
  * **OdorWorldPanel** represent the OdorWorld.
@@ -473,58 +465,36 @@ class OdorWorldPanel(
         }
     }
 
-    private val gridDriveLock = Any()
-
     private var heldGridDirections: List<GridDirection> = emptyList()
 
-    private var gridDriveJob: Job? = null
-
     /**
-     * Start or keep driving the selected grid-mode entity one cell at a time in [direction] until
-     * [releaseGridDirection]. The most recently pressed direction wins while several are held.
+     * Hold [direction] on the selected grid-mode entity so it steps that way at every cell center until
+     * [releaseGridDirection]. The most recently pressed direction wins while several are held. With the world
+     * stopped the movement timer carries the steps; while it runs, the world's updates do.
      */
     fun pressGridDirection(direction: GridDirection) {
-        synchronized(gridDriveLock) {
-            heldGridDirections = heldGridDirections - direction + direction
-            if (gridDriveJob?.isActive != true) {
-                gridDriveJob = world.launch { driveHeldGridDirections() }
-            }
-        }
+        heldGridDirections = heldGridDirections - direction + direction
+        firstSelectedRotatingEntity?.manualGridDirection = direction
     }
 
     fun releaseGridDirection(direction: GridDirection) {
-        synchronized(gridDriveLock) {
-            heldGridDirections = heldGridDirections - direction
+        heldGridDirections = heldGridDirections - direction
+        val remaining = heldGridDirections.lastOrNull()
+        if (remaining == null) {
+            world.entityList.forEach { it.manualGridDirection = null }
+        } else {
+            firstSelectedRotatingEntity?.manualGridDirection = remaining
         }
     }
 
     /**
-     * Steps cell after cell while a direction is held. An animated step suspends for its own duration; instant
-     * and blocked steps pause briefly so the entity neither teleports across the map nor spins on a wall.
+     * Movement timer tick while the world is stopped: applies held keys, and keeps carrying a grid step that is
+     * already in transit after the keys are released so the entity settles on a cell center.
      */
-    private suspend fun driveHeldGridDirections() {
-        while (true) {
-            val direction = synchronized(gridDriveLock) {
-                heldGridDirections.lastOrNull().also { if (it == null) gridDriveJob = null }
-            } ?: return
-            val entity = firstSelectedRotatingEntity?.takeIf { it.movementMode == MovementMode.GRID }
-            if (entity == null) {
-                synchronized(gridDriveLock) {
-                    heldGridDirections = emptyList()
-                    gridDriveJob = null
-                }
-                return
-            }
-            val moved = entity.moveOneCell(direction)
-            centerCameraToSelectedEntity()
-            if (!moved || world.gridStepDurationMs <= 0) delay(HELD_GRID_STEP_PAUSE_MS)
-        }
-    }
-
     fun manualMovementUpdate() {
-        val entityNode = firstSelectedEntityNode
-        if (entityNode != null && isManualMovementMode) {
-            val entity = entityNode.entity
+        val entityNode = firstSelectedEntityNode ?: return
+        val entity = entityNode.entity
+        if (isManualMovementMode || entity.isInTransit) {
             entity.applyMovement()
             entityNode.advance()
             centerCameraToSelectedEntity()
@@ -668,7 +638,7 @@ class OdorWorldPanel(
     }
 
     private val isManualMovementMode: Boolean
-        get() = manualMovementKeyState > 0
+        get() = manualMovementKeyState > 0 || heldGridDirections.isNotEmpty()
 
     private fun createMainToolBar() = JToolBar().apply {
         with(odorWorldActions) {

@@ -137,11 +137,11 @@ class Pursue : NpcBehavior() {
             .filter { fromHere.distanceAt(it) != UNREACHABLE }
             .minByOrNull { fromHere.distanceAt(it) }
         if (goal == null) {
-            commitGridStep(entity, null, "Pursue: no path to any $targetType")
+            commitGridStep(entity, null, maxSpeed, "Pursue: no path to any $targetType")
             return
         }
         if (goal == here) {
-            commitGridStep(entity, null, "Pursue: reached $targetType")
+            commitGridStep(entity, null, maxSpeed, "Pursue: reached $targetType")
             return
         }
         val toGoal = world.gridDistancesFrom(goal)
@@ -154,16 +154,16 @@ class Pursue : NpcBehavior() {
             .minWithOrNull(compareBy<Pair<GridDirection, Int>> { it.second }.thenBy { if (it.first == facing) 0 else 1 })
             ?.first
         if (step == null) {
-            commitGridStep(entity, null, "Pursue: no path to $targetType")
+            commitGridStep(entity, null, maxSpeed, "Pursue: no path to $targetType")
             return
         }
         val nextCell = world.gridStepTarget(here.first, here.second, step)
         if (nextCell == goal && world.isObjectsBlockMovement) {
             entity.heading = step.heading
-            commitGridStep(entity, null, "Pursue: next to $targetType")
+            commitGridStep(entity, null, maxSpeed, "Pursue: next to $targetType")
             return
         }
-        commitGridStep(entity, step, "Pursue: ${toGoal.distanceAt(here)} steps to $targetType")
+        commitGridStep(entity, step, maxSpeed, "Pursue: ${toGoal.distanceAt(here)} steps to $targetType")
     }
 
     override fun copy(): Pursue = Pursue().also {

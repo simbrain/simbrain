@@ -235,7 +235,6 @@ class BehaviorsTest {
     private fun gridWorld() = OdorWorld().apply {
         tileMap = TileMap(8, 8)
         gridCellSizeInTiles = 2
-        gridStepDurationMs = 0
         wrapAround = false
         isObjectsBlockMovement = false
     }
@@ -249,6 +248,8 @@ class BehaviorsTest {
         return agent
     }
 
+    private val wholeCell = 64.0
+
     @Test
     fun `Pursue in grid mode steps one cell toward the target along a cardinal direction`() = runBlocking {
         val world = gridWorld()
@@ -256,11 +257,28 @@ class BehaviorsTest {
         val target = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(target)
         target.location = world.cellCenter(0, 3)
-        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0 }
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = wholeCell }
         world.update()
         assertEquals(0 to 1, agent.cell)
         assertEquals(GridDirection.SOUTH, agent.facingDirection)
         assertEquals(0.0, agent.movement.speed, 0.001)
+    }
+
+    @Test
+    fun `a behavior's max speed sets the grid transit speed`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(0, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = 16.0 }
+        world.update()
+        assertEquals(16.0, agent.gridSpeed)
+        assertTrue(agent.isInTransit)
+        assertEquals(0 to 0, agent.cell)
+        repeat(3) { world.update() }
+        assertFalse(agent.isInTransit)
+        assertEquals(0 to 1, agent.cell)
     }
 
     @Test
@@ -271,7 +289,7 @@ class BehaviorsTest {
         val target = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(target)
         target.location = world.cellCenter(3, 3)
-        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 1000.0 }
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
         val pathLength = world.gridDistancesFrom(0 to 0).distanceAt(3 to 3)
         assertTrue(pathLength > 0)
         repeat(pathLength) {
@@ -291,7 +309,7 @@ class BehaviorsTest {
         val target = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(target)
         target.location = world.cellCenter(2, 0)
-        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0 }
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = wholeCell }
         world.update()
         assertEquals(1 to 0, agent.cell)
         world.update()
@@ -308,7 +326,7 @@ class BehaviorsTest {
         val threat = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(threat)
         threat.location = world.cellCenter(0, 0)
-        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
         world.update()
         assertEquals(2 to 0, agent.cell)
         world.update()
@@ -330,7 +348,7 @@ class BehaviorsTest {
         val threat = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(threat)
         threat.location = world.cellCenter(0, 0)
-        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
         world.update()
         world.update()
         assertEquals(3 to 0, agent.cell)
@@ -341,7 +359,7 @@ class BehaviorsTest {
         val world = gridWorld()
         world.maze = Maze.recursiveBacktracker(4, 4, seed = 3L)
         val agent = gridAgent(world, 1, 1)
-        agent.behavior = Wander()
+        agent.behavior = Wander().also { it.maxSpeed = wholeCell }
         val visited = mutableSetOf<Pair<Int, Int>>()
         repeat(60) {
             world.update()
@@ -358,7 +376,7 @@ class BehaviorsTest {
         val world = gridWorld()
         world.maze = Maze.openGrid(4, 4)
         val agent = gridAgent(world, 0, 0)
-        agent.behavior = Wander().also { it.gridTurnChance = 0.0 }
+        agent.behavior = Wander().also { it.gridTurnChance = 0.0; it.maxSpeed = wholeCell }
         world.update()
         world.update()
         world.update()

@@ -45,11 +45,13 @@ fun OdorWorld.isCellOnGrid(cell: GridCell) = cell.first in 0 until gridColumns &
 fun Array<IntArray>.distanceAt(cell: GridCell): Int = this[cell.first][cell.second]
 
 /**
- * Queues [direction] as [entity]'s next grid step (or stops it when null), zeroing the continuous movement
- * channels so nothing else moves the entity this tick, and records [notes] for the steering overlay.
+ * Queues [direction] as [entity]'s next grid step (or stops it when null) travelling at [speed] pixels per
+ * update, zeroing the continuous movement channels so nothing else moves the entity this tick, and records
+ * [notes] for the steering overlay.
  */
-fun commitGridStep(entity: OdorWorldEntity, direction: GridDirection?, notes: String) {
+fun commitGridStep(entity: OdorWorldEntity, direction: GridDirection?, speed: Double, notes: String) {
     entity.pendingGridStep = direction
+    if (direction != null && speed > 0) entity.gridSpeed = speed
     entity.movement.speed = 0.0
     entity.movement.dtheta = 0.0
     if (entity.showSteeringDebug) {

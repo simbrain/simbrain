@@ -143,7 +143,7 @@ class Evade : NpcBehavior() {
         }
         val current = threatDistance(here)
         if (current == Int.MAX_VALUE) {
-            commitGridStep(entity, null, "Evade: no $threatType can reach this cell")
+            commitGridStep(entity, null, maxSpeed, "Evade: no $threatType can reach this cell")
             return
         }
         val facing = entity.facingDirection
@@ -153,10 +153,10 @@ class Evade : NpcBehavior() {
             }
             .maxWithOrNull(compareBy<Pair<GridDirection, Int>> { it.second }.thenBy { if (it.first == facing) 1 else 0 })
         if (best == null || best.second <= current) {
-            commitGridStep(entity, null, "Evade: holding, $current steps from $threatType")
+            commitGridStep(entity, null, maxSpeed, "Evade: holding, $current steps from $threatType")
             return
         }
-        commitGridStep(entity, best.first, "Evade: ${best.second} steps from $threatType")
+        commitGridStep(entity, best.first, maxSpeed, "Evade: ${best.second} steps from $threatType")
     }
 
     override fun copy(): Evade = Evade().also {

@@ -11,7 +11,8 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import javax.swing.SwingUtilities
 
 /**
- * Held-key driving of a grid-mode entity through the panel.
+ * Held-key driving of a grid-mode entity through the panel while the world is stopped, where the panel's
+ * movement timer carries each step at the manual movement increment.
  */
 class GridDrivingTest {
 
@@ -19,7 +20,6 @@ class GridDrivingTest {
     private val world = component.world.apply {
         tileMap = TileMap(12, 12)
         gridCellSizeInTiles = 2
-        gridStepDurationMs = 0
         wrapAround = false
         isObjectsBlockMovement = false
         isUseCameraCentering = false
@@ -35,6 +35,7 @@ class GridDrivingTest {
             world.addEntity(96.0, 96.0, EntityType.Mouse).apply {
                 heading = 0.0
                 movementMode = MovementMode.GRID
+                manualMovement.manualStraightMovementIncrement = 16.0
             }
         }
         await { panel.selectedEntityModels.contains(mouse) }
@@ -57,8 +58,9 @@ class GridDrivingTest {
         panel.releaseGridDirection(GridDirection.SOUTH)
         assertEquals(1, mouse.cell.first)
         assertEquals(GridDirection.SOUTH, mouse.facingDirection)
-        Thread.sleep(200)
+        await { !mouse.isInTransit }
         val restingCell = mouse.cell
+        assertEquals(world.cellCenter(restingCell.first, restingCell.second), mouse.location)
         Thread.sleep(200)
         assertEquals(restingCell, mouse.cell)
     }
@@ -82,6 +84,7 @@ class GridDrivingTest {
         Thread.sleep(300)
         panel.releaseGridDirection(GridDirection.EAST)
         assertEquals(1 to 1, mouse.cell)
+        assertEquals(world.cellCenter(1, 1), mouse.location)
         assertEquals(GridDirection.EAST, mouse.facingDirection)
     }
 }

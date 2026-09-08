@@ -207,11 +207,13 @@ object Steering {
     /**
      * Steers toward [targetHeading], turning at most [maxTurn] degrees this tick at [speed]. In
      * [MovementMode.GRID] this instead queues a one-cell step in the cardinal direction nearest
-     * [targetHeading] when [speed] is positive; [maxTurn] does not apply since grid entities face each step.
+     * [targetHeading] travelling at [speed] pixels per update when [speed] is positive; [maxTurn] does not apply
+     * since grid entities face each step.
      */
     fun applyHeading(entity: OdorWorldEntity, targetHeading: Double, speed: Double, maxTurn: Double) {
         if (entity.movementMode == MovementMode.GRID) {
             entity.pendingGridStep = if (speed > 0) GridDirection.fromHeading(targetHeading) else null
+            if (speed > 0) entity.gridSpeed = speed
             entity.movement.dtheta = 0.0
             entity.movement.speed = 0.0
             entity.steeringDebug?.let {

@@ -1,5 +1,7 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -17,7 +19,6 @@ class GridMovementTest {
     private fun gridWorld(cells: Int = 4) = OdorWorld().apply {
         tileMap = TileMap(cells * 2, cells * 2)
         gridCellSizeInTiles = 2
-        gridStepDurationMs = 0
         wrapAround = false
         isObjectsBlockMovement = false
     }
@@ -99,14 +100,106 @@ class GridMovementTest {
     }
 
     @Test
-    fun `animated step arrives at the target cell`() = runBlocking {
-        val world = gridWorld().apply { gridStepDurationMs = 48 }
+    fun `a requested step advances by grid speed each update and sensors see the way there`() = runBlocking {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        world.addEntity(OdorWorldEntity(world, EntityType.Swiss).apply { location = world.cellCenter(1, 3) })
+        mouse.location = world.cellCenter(1, 1)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = 16.0
+        val cheeseSensor = mouse.addObjectSensor(EntityType.Swiss, 0.0, 0.0, 400.0)
+        world.update()
+        val atRest = cheeseSensor.currentValue
+        assertTrue(mouse.requestGridStep(GridDirection.SOUTH))
+        assertTrue(mouse.isInTransit)
+        world.update()
+        assertEquals(point(96.0, 112.0), mouse.location)
+        assertTrue(cheeseSensor.currentValue > atRest, "sensor should read the intermediate position")
+        assertEquals(1 to 1, mouse.cell)
+        world.update()
+        world.update()
+        assertTrue(mouse.isInTransit)
+        world.update()
+        assertEquals(world.cellCenter(1, 2), mouse.location)
+        assertFalse(mouse.isInTransit)
+    }
+
+    @Test
+    fun `moveOneCell suspends until world updates carry the entity to the next cell`() = runBlocking {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        mouse.location = world.cellCenter(1, 1)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = 32.0
+        val move = async(start = CoroutineStart.UNDISPATCHED) { mouse.moveOneCell(GridDirection.EAST) }
+        assertFalse(move.isCompleted)
+        assertTrue(mouse.isInTransit)
+        world.update()
+        assertFalse(move.isCompleted)
+        world.update()
+        assertTrue(move.await())
+        assertEquals(2 to 1, mouse.cell)
+        assertEquals(world.cellCenter(2, 1), mouse.location)
+    }
+
+    @Test
+    fun `grid speed at the cell size moves a whole cell in one update`() = runBlocking {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        mouse.location = world.cellCenter(1, 1)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = world.gridCellPixelSize
+        assertTrue(mouse.moveOneCell(GridDirection.SOUTH))
+        assertEquals(1 to 2, mouse.cell)
+        assertFalse(mouse.isInTransit)
+    }
+
+    @Test
+    fun `no new step is accepted while one is in transit`() {
+        val world = gridWorld()
         val mouse = OdorWorldEntity(world, EntityType.Mouse)
         mouse.location = world.cellCenter(1, 1)
         mouse.movementMode = MovementMode.GRID
-        assertTrue(mouse.moveOneCell(GridDirection.SOUTH))
-        assertEquals(world.cellCenter(1, 2), mouse.location)
+        mouse.gridSpeed = 8.0
+        assertTrue(mouse.requestGridStep(GridDirection.SOUTH))
+        assertFalse(mouse.requestGridStep(GridDirection.EAST))
+        assertFalse(mouse.stepOneCell(GridDirection.EAST))
+        mouse.advanceTransit(1000.0)
+        assertEquals(1 to 2, mouse.cell)
+        assertTrue(mouse.stepOneCell(GridDirection.EAST))
+    }
+
+    @Test
+    fun `switching to continuous mode cancels a transit`() {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        mouse.location = world.cellCenter(1, 1)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = 8.0
+        assertTrue(mouse.requestGridStep(GridDirection.SOUTH))
+        mouse.movementMode = MovementMode.CONTINUOUS
         assertFalse(mouse.isInTransit)
+    }
+
+    @Test
+    fun `manual key direction is consumed at every cell center`() = runBlocking {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        mouse.location = world.cellCenter(0, 0)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = world.gridCellPixelSize
+        mouse.manualGridDirection = GridDirection.EAST
+        world.update()
+        world.update()
+        assertEquals(2 to 0, mouse.cell)
+        assertEquals(0.0, mouse.heading)
+        mouse.manualGridDirection = null
+        world.update()
+        assertEquals(2 to 0, mouse.cell)
     }
 
     @Test
@@ -131,6 +224,7 @@ class GridMovementTest {
         mouse.location = world.cellCenter(1, 1)
         mouse.heading = 0.0
         mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = world.gridCellPixelSize
         mouse.movement.speed = 5.0
         world.update()
         assertEquals(2 to 1, mouse.cell)

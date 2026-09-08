@@ -120,20 +120,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
             events.mazeChanged.fire()
         }
 
-    /**
-     * How long an animated grid step takes. Zero moves entities instantly.
-     */
-    @UserParameter(
-        label = "Grid step duration (ms)",
-        description = "Wall-clock time over which a grid step is animated. 0 moves the entity instantly.",
-        minimumValue = 0.0,
-        order = 31
-    )
-    var gridStepDurationMs: Int = 150
-        set(value) {
-            field = value.coerceAtLeast(0)
-        }
-
     val gridCellPixelSize: Double
         get() = (gridCellSizeInTiles * tileMap.tileWidth).toDouble()
 

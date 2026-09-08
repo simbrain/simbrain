@@ -1,5 +1,6 @@
 package org.simbrain.workspace.updater
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
 import java.util.concurrent.ConcurrentHashMap
@@ -238,6 +239,7 @@ class WorkspaceUpdater(val workspace: Workspace) {
             }
         }
         events.workspaceUpdated.fire()
+        if (workspace.updateDelay > 0) delay(workspace.updateDelay.toLong())
         Logger.trace("done: $time")
     }
 

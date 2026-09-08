@@ -98,7 +98,7 @@ class Wander : NpcBehavior() {
         val world = entity.world
         val open = world.openGridDirections(entity.cell)
         if (open.isEmpty()) {
-            commitGridStep(entity, null, "Wander: boxed in")
+            commitGridStep(entity, null, maxSpeed, "Wander: boxed in")
             return
         }
         val facing = entity.facingDirection
@@ -108,7 +108,7 @@ class Wander : NpcBehavior() {
             sideways.isNotEmpty() -> sideways.random()
             else -> open.random()
         }
-        commitGridStep(entity, step, if (step == facing) "Wander: straight" else "Wander: turning $step")
+        commitGridStep(entity, step, maxSpeed, if (step == facing) "Wander: straight" else "Wander: turning $step")
     }
 
     override fun copy(): Wander = Wander().also {

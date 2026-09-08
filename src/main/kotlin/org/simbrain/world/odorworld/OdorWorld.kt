@@ -1,3 +1,9 @@
+/**
+ * Model of a 2D odor world: a tile map, the entities living on it, optional maze walls, and the rules for what
+ * blocks movement. Owns grid geometry (cell size, cell centers, step targets) on behalf of grid-mode entities and
+ * the NPC behaviors, and exposes the collidable bounds that continuous movers sweep against. The panel and desktop
+ * component render it; they never decide movement.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
@@ -114,7 +120,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         minimumValue = 1.0,
         order = 30
     )
-    var gridCellSizeInTiles: Int = 2
+    var gridCellSizeInTiles: Int = DEFAULT_GRID_CELL_SIZE_IN_TILES
         set(value) {
             field = value.coerceAtLeast(1)
             events.mazeChanged.fire()
@@ -123,11 +129,14 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     val gridCellPixelSize: Double
         get() = (gridCellSizeInTiles * tileMap.tileWidth).toDouble()
 
+    /**
+     * Cells across the map. A cell larger than the map still counts as one cell.
+     */
     val gridColumns: Int
-        get() = tileMap.width / gridCellSizeInTiles
+        get() = (tileMap.width / gridCellSizeInTiles).coerceAtLeast(1)
 
     val gridRows: Int
-        get() = tileMap.height / gridCellSizeInTiles
+        get() = (tileMap.height / gridCellSizeInTiles).coerceAtLeast(1)
 
     fun cellCenter(column: Int, row: Int): Point2D =
         point((column + 0.5) * gridCellPixelSize, (row + 0.5) * gridCellPixelSize)
@@ -164,8 +173,8 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     fun gridStepBlocker(column: Int, row: Int, direction: GridDirection, entity: OdorWorldEntity? = null): Bounded? {
         val cellSize = gridCellPixelSize
         maze?.let { m ->
-            if (m.isInside(column, row)) {
-                m.blockingWall(column, row, direction, cellSize)?.let { return it }
+            if (m.hasEdgeWall(column, row, direction)) {
+                return m.edgeWall(column, row, direction, cellSize)
             }
         }
         val (targetColumn, targetRow) = gridStepTarget(column, row, direction) ?: return this
@@ -455,6 +464,8 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      */
     private fun readResolve(): Any {
         events = OdorWorldEvents()
+        // worlds saved before grid movement existed come back with the field at its JVM default
+        if (gridCellSizeInTiles < 1) gridCellSizeInTiles = DEFAULT_GRID_CELL_SIZE_IN_TILES
 
         entityList.forEach { entity ->
             entity.events.deleted.on(Dispatchers.Default) { handleEntityDelete(it) }
@@ -516,3 +527,5 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
          */
         get() = location
 }
+
+private const val DEFAULT_GRID_CELL_SIZE_IN_TILES = 2

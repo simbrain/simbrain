@@ -315,6 +315,7 @@ class Workspace: CoroutineScope {
         setWorkspaceChanged(false)
         currentFile = null
         simulationId = ""
+        updateDelay = 0
         exposedTypeNames = LinkedHashSet()
         couplingManager.clear()
         events.workspaceCleared.fire()

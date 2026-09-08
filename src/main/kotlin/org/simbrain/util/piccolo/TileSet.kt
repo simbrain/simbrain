@@ -125,17 +125,27 @@ class TileSet(
      * @param gid index of the tile
      * @return the image of the tile
      */
+    @Transient
+    private var tileImageCache: HashMap<Int, Image>? = null
+
+    /**
+     * The image for [gid]. Sub-images share the tileset's pixels, so they are cached per gid; the floor caster
+     * asks for one per rendered pixel.
+     */
     fun getTileImage(gid: Int): Image {
-        val index = gid - firstgid
-        return if (index !in 0..tilecount) {
-            transparentTexture(tilewidth, tileheight)
-        } else {
-            image.image!!.getSubimage(
+        val cache = tileImageCache ?: HashMap<Int, Image>().also { tileImageCache = it }
+        return cache.getOrPut(gid) {
+            val index = gid - firstgid
+            if (index !in 0..tilecount) {
+                transparentTexture(tilewidth, tileheight)
+            } else {
+                image.image!!.getSubimage(
                     index % columns * (tilewidth + spacing),
                     index / columns * (tileheight + spacing),
                     tilewidth,
                     tileheight
-            )
+                )
+            }
         }
     }
 

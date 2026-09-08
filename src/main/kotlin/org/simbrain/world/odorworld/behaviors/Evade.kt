@@ -133,6 +133,10 @@ class Evade : NpcBehavior() {
     private fun updateGrid(entity: OdorWorldEntity, threats: List<OdorWorldEntity>) {
         val world = entity.world
         val here = entity.cell
+        if (!world.isCellOnGrid(here)) {
+            commitGridStep(entity, null, maxSpeed, "Evade: off the grid")
+            return
+        }
         val threatMaps = threats
             .map { world.cellAt(it.location) }
             .filter { world.isCellOnGrid(it) }

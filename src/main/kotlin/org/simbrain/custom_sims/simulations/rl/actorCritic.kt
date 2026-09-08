@@ -283,7 +283,7 @@ val actorCritic = newSim {
                 "West" -> GridDirection.WEST
                 else -> return@let
             }
-            mouse.moveOneCell(direction)
+            mouse.stepOneCell(direction)
         }
     })
     // Doc viewer
@@ -471,8 +471,14 @@ val actorCritic = newSim {
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
             val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
-            val tfUpdateDelay = addTextField("Update Delay (ms)", "" + workspace.updateDelay)
-            val tfMazeSeed = addTextField("Maze Seed", "")
+            val tfUpdateDelay = addTextField(
+                "Update Delay (ms)", "" + workspace.updateDelay,
+                toolTip = "Pause after each step so the agent can be watched. 0 trains as fast as possible."
+            )
+            val tfMazeSeed = addTextField(
+                "Maze Seed", "",
+                toolTip = "Whole number that picks a fixed maze layout. Leave blank for a random maze each time."
+            )
             addCheckBox("Show Grid", showGrid) {
                 showGrid = it
                 refreshValueOverlay()
@@ -485,10 +491,10 @@ val actorCritic = newSim {
                 val seed = tfMazeSeed.text.trim().toLongOrNull()
                 world.generateMaze(numTilesInADimension, numTilesInADimension, tileGridRatio, seed)
                 resetMouse()
-            }
+            }.apply { toolTipText = "Lay a new perfect maze over the grid and return the mouse to its start" }
             addButton("Clear Maze") {
                 world.clearMaze()
-            }
+            }.apply { toolTipText = "Remove the maze walls" }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)
@@ -501,10 +507,10 @@ val actorCritic = newSim {
                     epsilon = tfEpsilon.text.toDouble()
                     cheeseReward = tfCheeseReward.text.toDouble()
                     poisonReward = tfPoisonReward.text.toDouble()
-                    workspace.updateDelay = tfUpdateDelay.text.toInt()
 
                     this@addButton.isEnabled = false
                     try {
+                        workspace.updateDelay = tfUpdateDelay.text.trim().toIntOrNull() ?: 0
 
                         stop = false
 

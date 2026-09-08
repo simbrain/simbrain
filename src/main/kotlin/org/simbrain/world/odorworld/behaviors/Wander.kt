@@ -1,6 +1,7 @@
 package org.simbrain.world.odorworld.behaviors
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.nextBoolean
 import org.simbrain.util.shortestAngleDelta
 import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -104,7 +105,7 @@ class Wander : NpcBehavior() {
         val facing = entity.facingDirection
         val sideways = open.filter { it != facing && it != facing.opposite }
         val step = when {
-            facing in open && (sideways.isEmpty() || Random.nextDouble() >= gridTurnChance) -> facing
+            facing in open && (sideways.isEmpty() || !Random.nextBoolean(gridTurnChance)) -> facing
             sideways.isNotEmpty() -> sideways.random()
             else -> open.random()
         }

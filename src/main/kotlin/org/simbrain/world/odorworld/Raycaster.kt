@@ -210,11 +210,7 @@ class Raycaster(private val screenWidth: Int, private val screenHeight: Int) {
         val cellSize: Double,
         val wallWorldHeight: Double
     ) {
-        val darkColor = Color(
-            (color.red * 0.7).toInt().coerceIn(0, 255),
-            (color.green * 0.7).toInt().coerceIn(0, 255),
-            (color.blue * 0.7).toInt().coerceIn(0, 255)
-        )
+        val darkColor: Color = color.darker()
     }
 
     /**
@@ -284,8 +280,8 @@ class Raycaster(private val screenWidth: Int, private val screenHeight: Int) {
             else -> Double.MAX_VALUE
         }
 
-        val maxCrossings = 2 * (maze.columns + maze.rows) + 8
-        repeat(maxCrossings) {
+        // each crossing advances t by a positive delta, so the distance check alone ends the walk
+        while (true) {
             if (nextX < nextY) {
                 val t = nextX
                 if (t > maxDistance) return null
@@ -308,18 +304,6 @@ class Raycaster(private val screenWidth: Int, private val screenHeight: Int) {
                 nextY += deltaY
             }
         }
-        return null
-    }
-
-    /**
-     * Whether the edge leaving ([column], [row]) in [direction] is walled, seen from whichever side of the edge
-     * lies inside the maze. Rays that start outside the maze still stop at its border this way.
-     */
-    private fun Maze.hasEdgeWall(column: Int, row: Int, direction: GridDirection): Boolean {
-        if (isInside(column, row)) return hasWall(column, row, direction)
-        val nextColumn = column + direction.dx
-        val nextRow = row + direction.dy
-        return isInside(nextColumn, nextRow) && hasWall(nextColumn, nextRow, direction.opposite)
     }
 
     private fun renderSprites(

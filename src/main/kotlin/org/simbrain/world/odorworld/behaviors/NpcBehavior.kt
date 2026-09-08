@@ -237,14 +237,5 @@ object Steering {
      * into the debug snapshot for the overlay text. When debug is on, replaces any prior rays
      * with an empty snapshot so the overlay shows just the status text.
      */
-    fun stop(entity: OdorWorldEntity, reason: String) {
-        entity.pendingGridStep = null
-        entity.movement.speed = 0.0
-        entity.movement.dtheta = 0.0
-        if (entity.showSteeringDebug) {
-            entity.steeringDebug = SteeringDebugInfo(
-                DoubleArray(0), DoubleArray(0), DoubleArray(0), entity.heading, 0.0
-            ).also { it.behaviorNotes = reason }
-        }
-    }
+    fun stop(entity: OdorWorldEntity, reason: String) = commitGridStep(entity, null, 0.0, reason)
 }

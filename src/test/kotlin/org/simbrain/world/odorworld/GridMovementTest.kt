@@ -258,4 +258,105 @@ class GridMovementTest {
         assertEquals(15, world.maze!!.reachableCellCount())
         assertTrue(world.collidableObjects.size >= world.maze!!.wallCount)
     }
+
+    @Test
+    fun `grid entities survive a save and reload`() = runBlocking {
+        val component = OdorWorldComponent("Test")
+        val world = component.world.apply {
+            tileMap = TileMap(8, 8)
+            gridCellSizeInTiles = 2
+        }
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        mouse.location = world.cellCenter(1, 2)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = 16.0
+        val reopened = OdorWorldComponent.open(component.xml.byteInputStream(), "reopened", "xml").world
+        val loadedMouse = reopened.entityList.single { it.entityType == EntityType.Mouse }
+        assertEquals(MovementMode.GRID, loadedMouse.movementMode)
+        assertEquals(world.cellCenter(1, 2), loadedMouse.location)
+        assertEquals(16.0, loadedMouse.gridSpeed)
+        assertFalse(loadedMouse.isInTransit)
+    }
+
+    @Test
+    fun `worlds saved before grid movement existed load with the default cell size`() = runBlocking {
+        val component = OdorWorldComponent("Test")
+        val xml = component.xml
+        assertTrue(xml.contains("<gridCellSizeInTiles>"))
+        val legacy = xml.replace(Regex("<gridCellSizeInTiles>\\d+</gridCellSizeInTiles>"), "")
+        val reopened = OdorWorldComponent.open(legacy.byteInputStream(), "legacy", "xml").world
+        assertEquals(2, reopened.gridCellSizeInTiles)
+        assertTrue(reopened.gridColumns > 0)
+        assertEquals(0 to 0, reopened.cellAt(point(10.0, 10.0)))
+    }
+
+    @Test
+    fun `a cell larger than the map counts as one cell`() {
+        val world = OdorWorld().apply {
+            tileMap = TileMap(8, 8)
+            wrapAround = true
+            gridCellSizeInTiles = 10
+        }
+        assertEquals(1, world.gridColumns)
+        assertEquals(1, world.gridRows)
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        mouse.movementMode = MovementMode.GRID
+        assertEquals(0 to 0, mouse.cell)
+        mouse.stepOneCell(GridDirection.EAST)
+        assertEquals(0 to 0, mouse.cell)
+    }
+
+    @Test
+    fun `a step from outside a smaller maze is blocked by its border from both sides`() {
+        val world = OdorWorld().apply {
+            tileMap = TileMap(10, 10)
+            gridCellSizeInTiles = 2
+            wrapAround = false
+            isObjectsBlockMovement = false
+        }
+        world.maze = Maze.openGrid(3, 3)
+        val outside = OdorWorldEntity(world, EntityType.Mouse)
+        outside.location = world.cellCenter(3, 1)
+        outside.movementMode = MovementMode.GRID
+        assertFalse(outside.stepOneCell(GridDirection.WEST))
+        assertEquals(3 to 1, outside.cell)
+        assertTrue(outside.stepOneCell(GridDirection.NORTH))
+        val inside = OdorWorldEntity(world, EntityType.Mouse)
+        inside.location = world.cellCenter(2, 1)
+        inside.movementMode = MovementMode.GRID
+        assertFalse(inside.stepOneCell(GridDirection.EAST))
+    }
+
+    @Test
+    fun `continuous movement is stopped by a maze wall at any speed`() {
+        for (speed in listOf(10.0, 25.0, 40.0, 60.0)) {
+            val world = gridWorld()
+            world.maze = Maze(4, 4)
+            val mouse = OdorWorldEntity(world, EntityType.Mouse)
+            mouse.location = world.cellCenter(0, 0)
+            mouse.heading = 0.0
+            mouse.movement.speed = speed
+            repeat(10) { mouse.applyMovement() }
+            assertTrue(mouse.x + mouse.width / 2 <= 64.0 + 1e-9, "speed $speed pushed through the wall to x=${mouse.x}")
+            assertEquals(0 to 0, mouse.cell, "speed $speed")
+        }
+    }
+
+    @Test
+    fun `a continuous mover slides along a wall it is pressed against`() {
+        val world = gridWorld()
+        world.maze = Maze.openGrid(4, 4).apply {
+            for (row in 0 until 4) setWall(0, row, GridDirection.EAST, true)
+        }
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        mouse.location = world.cellCenter(0, 2)
+        mouse.heading = 45.0
+        mouse.movement.speed = 20.0
+        val startY = mouse.y
+        repeat(3) { mouse.applyMovement() }
+        assertTrue(mouse.x + mouse.width / 2 <= 64.0 + 1e-9)
+        assertTrue(mouse.y < startY - 30.0, "should keep moving north along the wall, y=${mouse.y}")
+        assertFalse(mouse.wasStuckLastTick)
+    }
 }

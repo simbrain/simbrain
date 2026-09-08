@@ -137,4 +137,13 @@ class RaycasterTest {
         assertEquals(1, flat.distinct().size)
         assertTrue(textured.distinct().size > 1)
     }
+
+    @Test
+    fun `walls far from the camera but within view distance are still found`() {
+        val maze = Maze(3, 3)
+        val cell = 32.0
+        val hit = Raycaster(4, 4).castMazeRay(maze, cell, 14.5 * cell, 14.5 * cell, -1.0, -1.0, 5000.0)
+        assertNotNull(hit)
+        assertEquals(11.5 * cell, hit!!.distance, 1e-9)
+    }
 }

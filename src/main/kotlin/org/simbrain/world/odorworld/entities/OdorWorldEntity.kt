@@ -1,3 +1,10 @@
+/**
+ * An object in an [OdorWorld]: position, heading and sprite type, the sensors and effectors attached to it, and its
+ * movement. Continuous movement uses speed and turn rate with a swept box collision against tiles, maze walls,
+ * other entities and the map edge; grid movement travels cell to cell with new steps accepted only at cell
+ * centers. Movement requests arrive through three channels with fixed priority: manual keys, an [NpcBehavior],
+ * then the coupled [movement] speed and turn rate. The world owns cell geometry and blocking rules.
+ */
 package org.simbrain.world.odorworld.entities
 
 import kotlinx.coroutines.CompletableDeferred
@@ -117,7 +124,12 @@ class OdorWorldEntity @JvmOverloads constructor(
         order = 5,
         setter = {
             field = it
-            if (it == MovementMode.GRID) snapToCellCenter() else cancelTransit()
+            // during deserialization the world has no tile map yet, and the saved location must be kept as is
+            if (it == MovementMode.GRID) {
+                if (world.tileMap != null) snapToCellCenter()
+            } else {
+                cancelTransit()
+            }
         }
     )
 
@@ -130,11 +142,11 @@ class OdorWorldEntity @JvmOverloads constructor(
         initValue = 8.0,
         label = "Grid speed",
         description = "Pixels per update while moving between cells in grid mode. At or above the cell size a " +
-                "step takes a single update.",
+                "step takes a single update. An NPC behavior uses its own max speed instead.",
         min = 0.01,
         order = 6,
         onUpdate = {
-            showWidget(widgetValue(::movementMode) == MovementMode.GRID)
+            showWidget(widgetValue(::movementMode) == MovementMode.GRID && widgetValue(::behavior) is NoOpBehavior)
         }
     )
 
@@ -447,27 +459,10 @@ class OdorWorldEntity @JvmOverloads constructor(
 
         val bounds = world.collidableObjects.filter { it !== this }
 
-        val directionX = if (dx > 0) 1 else -1
-        val directionY = if (dy > 0) 1 else -1
-
-        val moveInX = Bound(x + dx, y, width, height)
-
-        val distanceXShortenBy = bounds
-            .associateWith { moveInX.intersect(it) }
-            .filter { it.value.intersect }
-            .minByOrNull { it.value.dx }
-            ?.apply { events.collided.fire(key) }?.value?.dx ?: 0.0
-
-        val moveInY = Bound(x + (dx - distanceXShortenBy * directionX), y + dy, width, height)
-
-        val distanceYShortenBy = bounds
-            .associateWith { moveInY.intersect(it) }
-            .filter { it.value.intersect }
-            .minByOrNull { it.value.dy }
-            ?.apply { events.collided.fire(key) }?.value?.dy ?: 0.0
-
-        val effectiveDx = dx - distanceXShortenBy * directionX
-        val effectiveDy = dy - distanceYShortenBy * directionY
+        val (effectiveDx, hitInX) = sweep(bounds, dx, 0.0)
+        val (effectiveDy, hitInY) = sweep(bounds, 0.0, dy, xOffset = effectiveDx)
+        hitInX?.let { events.collided.fire(it) }
+        hitInY?.let { events.collided.fire(it) }
         val newX = x + effectiveDx
         val newY = y + effectiveDy
 
@@ -480,12 +475,68 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
 
         val effectiveSpeed = kotlin.math.sqrt(effectiveDx * effectiveDx + effectiveDy * effectiveDy)
-        wasStuckLastTick = effectiveSpeed < speed * 0.1
+        wasStuckLastTick = effectiveSpeed < kotlin.math.abs(speed) * 0.1
         steeringDebug?.let {
             it.actualDx = effectiveDx
             it.actualDy = effectiveDy
-            it.collided = distanceXShortenBy > 0.0 || distanceYShortenBy > 0.0
+            it.collided = hitInX != null || hitInY != null
         }
+    }
+
+    /**
+     * Sweeps this entity's box along one axis of travel (exactly one of [dx], [dy] is nonzero) from its current
+     * location shifted by [xOffset], and returns the travel allowed before the nearest obstacle face together with
+     * that obstacle, or the full travel and null. Only faces ahead of the box count, so an obstacle already
+     * overlapping the box never blocks, and a box flush against a face can still slide along it. This is what
+     * keeps zero-thickness maze walls and fast movers from tunneling. The world edge is the exception: the box is
+     * clamped to stay inside it.
+     */
+    private fun sweep(bounds: List<Bounded>, dx: Double, dy: Double, xOffset: Double = 0.0): Pair<Double, Bounded?> {
+        if (dx == 0.0 && dy == 0.0) return 0.0 to null
+        val left = x + xOffset - width / 2
+        val right = x + xOffset + width / 2
+        val top = y - height / 2
+        val bottom = y + height / 2
+        var allowed = if (dx != 0.0) dx else dy
+        var hit: Bounded? = null
+        val epsilon = 1e-9
+        for (obstacle in bounds) {
+            if (obstacle is OdorWorld) {
+                // the world contains rather than obstructs: clamp so the box ends inside it, which also nudges a
+                // box that already pokes past the edge back in
+                val contained = when {
+                    dx > 0 -> minOf(allowed, obstacle.width - right)
+                    dx < 0 -> maxOf(allowed, -left)
+                    dy > 0 -> minOf(allowed, obstacle.height - bottom)
+                    else -> maxOf(allowed, -top)
+                }
+                if (contained != allowed) {
+                    allowed = contained
+                    hit = obstacle
+                }
+                continue
+            }
+            val obstacleTopLeft = obstacle.topLeftLocation
+            val oLeft = obstacleTopLeft.x
+            val oRight = oLeft + obstacle.width
+            val oTop = obstacleTopLeft.y
+            val oBottom = oTop + obstacle.height
+            val faceDistance: Double
+            if (dx != 0.0) {
+                if (oTop >= bottom || oBottom <= top) continue
+                faceDistance = if (dx > 0) oLeft - right else left - oRight
+            } else {
+                if (oLeft >= right || oRight <= left) continue
+                faceDistance = if (dy > 0) oTop - bottom else top - oBottom
+            }
+            if (faceDistance < -epsilon) continue
+            val travel = if (dx > 0 || dy > 0) faceDistance else -faceDistance
+            if (kotlin.math.abs(travel) < kotlin.math.abs(allowed)) {
+                allowed = travel
+                hit = obstacle
+            }
+        }
+        return allowed to hit
     }
 
     /**

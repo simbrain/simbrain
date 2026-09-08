@@ -87,6 +87,34 @@ class Maze(val columns: Int, val rows: Int) {
             GridDirection.NORTH -> horizontalWalls[column][row] = present
             GridDirection.SOUTH -> horizontalWalls[column][row + 1] = present
         }
+        segmentCache = null
+    }
+
+    /**
+     * Whether the edge leaving ([column], [row]) in [direction] is walled, seen from whichever side of the edge
+     * lies inside the maze. Works for cells outside the maze too, so a step or ray from outside stops at the
+     * border just as one from inside does.
+     */
+    fun hasEdgeWall(column: Int, row: Int, direction: GridDirection): Boolean {
+        if (isInside(column, row)) return hasWall(column, row, direction)
+        val nextColumn = column + direction.dx
+        val nextRow = row + direction.dy
+        return isInside(nextColumn, nextRow) && hasWall(nextColumn, nextRow, direction.opposite)
+    }
+
+    /**
+     * The edge leaving ([column], [row]) in [direction] as a collision bound, whether or not it is walled.
+     */
+    fun edgeWall(column: Int, row: Int, direction: GridDirection, cellSize: Double): Bounded {
+        val x = column * cellSize
+        val y = row * cellSize
+        val segment = when (direction) {
+            GridDirection.WEST -> WallSegment(x, y, x, y + cellSize)
+            GridDirection.EAST -> WallSegment(x + cellSize, y, x + cellSize, y + cellSize)
+            GridDirection.NORTH -> WallSegment(x, y, x + cellSize, y)
+            GridDirection.SOUTH -> WallSegment(x, y + cellSize, x + cellSize, y + cellSize)
+        }
+        return segment.toBound()
     }
 
     /**
@@ -102,10 +130,24 @@ class Maze(val columns: Int, val rows: Int) {
     val wallCount: Int
         get() = verticalWalls.sumOf { col -> col.count { it } } + horizontalWalls.sumOf { col -> col.count { it } }
 
+    @Transient
+    private var segmentCache: SegmentCache? = null
+
+    private class SegmentCache(val cellSize: Double, val segments: List<WallSegment>, val bounds: List<Bounded>)
+
+    private fun cacheFor(cellSize: Double): SegmentCache {
+        segmentCache?.takeIf { it.cellSize == cellSize }?.let { return it }
+        val segments = buildSegments(cellSize)
+        return SegmentCache(cellSize, segments, segments.map { it.toBound() }).also { segmentCache = it }
+    }
+
     /**
-     * Every present wall as a pixel-space segment, given the pixel size of one cell.
+     * Every present wall as a pixel-space segment, given the pixel size of one cell. The list is cached until a
+     * wall changes, so callers may compare it by identity to detect changes.
      */
-    fun wallSegments(cellSize: Double): List<WallSegment> = buildList {
+    fun wallSegments(cellSize: Double): List<WallSegment> = cacheFor(cellSize).segments
+
+    private fun buildSegments(cellSize: Double): List<WallSegment> = buildList {
         for (c in 0..columns) {
             for (r in 0 until rows) {
                 if (verticalWalls[c][r]) {
@@ -122,24 +164,14 @@ class Maze(val columns: Int, val rows: Int) {
         }
     }
 
-    fun collisionBounds(cellSize: Double): List<Bounded> = wallSegments(cellSize).map { it.toBound() }
+    fun collisionBounds(cellSize: Double): List<Bounded> = cacheFor(cellSize).bounds
 
     /**
      * The wall crossed when stepping from ([column], [row]) in [direction], as a collision bound, or null if the
      * step is open.
      */
-    fun blockingWall(column: Int, row: Int, direction: GridDirection, cellSize: Double): Bounded? {
-        if (isOpen(column, row, direction)) return null
-        val x = column * cellSize
-        val y = row * cellSize
-        val segment = when (direction) {
-            GridDirection.WEST -> WallSegment(x, y, x, y + cellSize)
-            GridDirection.EAST -> WallSegment(x + cellSize, y, x + cellSize, y + cellSize)
-            GridDirection.NORTH -> WallSegment(x, y, x + cellSize, y)
-            GridDirection.SOUTH -> WallSegment(x, y + cellSize, x + cellSize, y + cellSize)
-        }
-        return segment.toBound()
-    }
+    fun blockingWall(column: Int, row: Int, direction: GridDirection, cellSize: Double): Bounded? =
+        if (hasEdgeWall(column, row, direction)) edgeWall(column, row, direction, cellSize) else null
 
     /**
      * Cells reachable from (0, 0), used to check that a maze is fully connected.

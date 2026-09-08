@@ -395,4 +395,18 @@ class BehaviorsTest {
         Steering.stop(agent, "done")
         assertNull(agent.pendingGridStep)
     }
+
+    @Test
+    fun `Evade in grid mode off the grid holds still without throwing`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(1, 1)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        agent.x = world.width
+        assertFalse(world.isCellOnGrid(agent.cell))
+        world.update()
+        assertNull(agent.pendingGridStep)
+    }
 }

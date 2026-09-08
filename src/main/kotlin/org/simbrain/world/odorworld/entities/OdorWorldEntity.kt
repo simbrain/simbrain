@@ -132,7 +132,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         description = "Pixels per update while moving between cells in grid mode. At or above the cell size a " +
                 "step takes a single update.",
         min = 0.01,
-        order = 6
+        order = 6,
+        onUpdate = {
+            showWidget(widgetValue(::movementMode) == MovementMode.GRID)
+        }
     )
 
     /**

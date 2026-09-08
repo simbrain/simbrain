@@ -2,6 +2,7 @@ package org.simbrain.world.odorworld.behaviors
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.shortestAngleDelta
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.abs
 import kotlin.random.Random
@@ -9,6 +10,9 @@ import kotlin.random.Random
 /**
  * Coherent random motion: an internal "desired heading" drifts by a small random
  * amount each tick, and the agent steers toward it while avoiding walls.
+ *
+ * In grid movement mode this becomes a corridor walk: keep going straight, turn into another open direction
+ * with probability [gridTurnChance] when one exists, and turn back only at a dead end.
  */
 class Wander : NpcBehavior() {
 
@@ -50,10 +54,23 @@ class Wander : NpcBehavior() {
     )
     var numRays: Int = 24
 
+    @UserParameter(
+        label = "Grid Turn Chance",
+        description = "In grid movement mode, the chance per cell of turning into another open direction instead of continuing straight",
+        minimumValue = 0.0,
+        maximumValue = 1.0,
+        order = 70
+    )
+    var gridTurnChance: Double = 0.3
+
     @Transient
     private var desiredHeading: Double = Double.NaN
 
     override fun update(entity: OdorWorldEntity) {
+        if (entity.movementMode == MovementMode.GRID) {
+            updateGrid(entity)
+            return
+        }
         if (desiredHeading.isNaN()) desiredHeading = entity.heading
         desiredHeading += (Random.nextDouble() - 0.5) * 2.0 * driftDegreesPerTick
 
@@ -77,6 +94,23 @@ class Wander : NpcBehavior() {
         }
     }
 
+    private fun updateGrid(entity: OdorWorldEntity) {
+        val world = entity.world
+        val open = world.openGridDirections(entity.cell)
+        if (open.isEmpty()) {
+            commitGridStep(entity, null, "Wander: boxed in")
+            return
+        }
+        val facing = entity.facingDirection
+        val sideways = open.filter { it != facing && it != facing.opposite }
+        val step = when {
+            facing in open && (sideways.isEmpty() || Random.nextDouble() >= gridTurnChance) -> facing
+            sideways.isNotEmpty() -> sideways.random()
+            else -> open.random()
+        }
+        commitGridStep(entity, step, if (step == facing) "Wander: straight" else "Wander: turning $step")
+    }
+
     override fun copy(): Wander = Wander().also {
         it.maxSpeed = maxSpeed
         it.maxTurn = maxTurn
@@ -84,6 +118,7 @@ class Wander : NpcBehavior() {
         it.wallWeight = wallWeight
         it.driftDegreesPerTick = driftDegreesPerTick
         it.numRays = numRays
+        it.gridTurnChance = gridTurnChance
     }
 
     override val name = "Wander"

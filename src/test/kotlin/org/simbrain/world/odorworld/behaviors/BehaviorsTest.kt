@@ -219,8 +219,10 @@ class BehaviorsTest {
             wallWeight = 1.5
             driftDegreesPerTick = 9.0
             numRays = 32
+            gridTurnChance = 0.6
         }
         val copy = original.copy()
+        assertEquals(0.6, copy.gridTurnChance)
         assertEquals(2.5, copy.maxSpeed)
         assertEquals(7.0, copy.maxTurn)
         assertEquals(50.0, copy.feelerLength)
@@ -262,29 +264,107 @@ class BehaviorsTest {
     }
 
     @Test
-    fun `Pursue in grid mode goes around a maze wall instead of into it`() = runBlocking {
+    fun `Pursue in grid mode follows the shortest path through a maze to the target`() = runBlocking {
         val world = gridWorld()
-        world.maze = Maze.openGrid(4, 4).apply { setWall(0, 0, GridDirection.SOUTH, true) }
+        world.maze = Maze.recursiveBacktracker(4, 4, seed = 11L)
         val agent = gridAgent(world, 0, 0)
         val target = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(target)
-        target.location = world.cellCenter(0, 3)
+        target.location = world.cellCenter(3, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 1000.0 }
+        val pathLength = world.gridDistancesFrom(0 to 0).distanceAt(3 to 3)
+        assertTrue(pathLength > 0)
+        repeat(pathLength) {
+            world.update()
+            assertFalse(agent.wasStuckLastTick, "every step along the path should be open")
+        }
+        assertEquals(3 to 3, agent.cell)
+        world.update()
+        assertEquals(3 to 3, agent.cell)
+        assertNull(agent.pendingGridStep)
+    }
+
+    @Test
+    fun `Pursue in grid mode stops next to a target that blocks movement`() = runBlocking {
+        val world = gridWorld().apply { isObjectsBlockMovement = true }
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(2, 0)
         agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0 }
         world.update()
         assertEquals(1 to 0, agent.cell)
+        world.update()
+        assertEquals(1 to 0, agent.cell)
+        assertEquals(GridDirection.EAST, agent.facingDirection)
         assertFalse(agent.wasStuckLastTick)
     }
 
     @Test
-    fun `Wander in grid mode keeps the entity on cell centers with a cardinal heading`() = runBlocking {
+    fun `Evade in grid mode steps to the cell furthest from the threat by path`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.openGrid(4, 1)
+        val agent = gridAgent(world, 1, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(0, 0)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        world.update()
+        assertEquals(2 to 0, agent.cell)
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        assertNull(agent.pendingGridStep)
+    }
+
+    @Test
+    fun `Evade in grid mode prefers a long corridor over a nearby dead end`() = runBlocking {
+        val world = gridWorld()
+        // Row 0 is a corridor; cell (1, 1) is a dead end hanging off (1, 0)
+        world.maze = Maze(4, 4).apply {
+            for (c in 0 until 3) setWall(c, 0, GridDirection.EAST, false)
+            setWall(1, 0, GridDirection.SOUTH, false)
+        }
+        val agent = gridAgent(world, 1, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(0, 0)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        world.update()
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+    }
+
+    @Test
+    fun `Wander in grid mode walks corridors and turns at walls without leaving cell centers`() = runBlocking {
         val world = gridWorld()
         world.maze = Maze.recursiveBacktracker(4, 4, seed = 3L)
         val agent = gridAgent(world, 1, 1)
         agent.behavior = Wander()
-        repeat(12) { world.update() }
-        val (column, row) = agent.cell
-        assertEquals(world.cellCenter(column, row), agent.location)
-        assertTrue(agent.heading % 90.0 == 0.0, "heading should be cardinal, got ${agent.heading}")
+        val visited = mutableSetOf<Pair<Int, Int>>()
+        repeat(60) {
+            world.update()
+            visited += agent.cell
+            val (column, row) = agent.cell
+            assertEquals(world.cellCenter(column, row), agent.location)
+            assertEquals(0.0, agent.heading % 90.0)
+        }
+        assertTrue(visited.size >= 4, "should have explored several cells, visited $visited")
+    }
+
+    @Test
+    fun `Wander in grid mode with no turn chance goes straight until a wall`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.openGrid(4, 4)
+        val agent = gridAgent(world, 0, 0)
+        agent.behavior = Wander().also { it.gridTurnChance = 0.0 }
+        world.update()
+        world.update()
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        world.update()
+        assertNotEquals(3 to 0, agent.cell)
     }
 
     @Test

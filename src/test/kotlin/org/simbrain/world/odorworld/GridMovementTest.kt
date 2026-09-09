@@ -1,5 +1,7 @@
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -356,5 +358,91 @@ class GridMovementTest {
         assertTrue(mouse.x + mouse.width / 2 <= 64.0 + 1e-9)
         assertTrue(mouse.y < startY - 30.0, "should keep moving north along the wall, y=${mouse.y}")
         assertFalse(mouse.wasStuckLastTick)
+    }
+
+    private suspend fun gridMouse(world: OdorWorld, column: Int, row: Int, speed: Double = world.gridCellPixelSize): OdorWorldEntity {
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        mouse.location = world.cellCenter(column, row)
+        mouse.movementMode = MovementMode.GRID
+        mouse.gridSpeed = speed
+        return mouse
+    }
+
+    @Test
+    fun `queued steps walk one cell per update and complete when the last one arrives`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 2)
+        val plan = mouse.queueGridSteps { north(2); east() }
+        world.update()
+        world.update()
+        assertEquals(1 to 0, mouse.cell)
+        assertFalse(plan.isCompleted)
+        world.update()
+        assertEquals(2 to 0, mouse.cell)
+        assertTrue(plan.isCompleted)
+        assertTrue(plan.await())
+        assertFalse(mouse.hasQueuedGridSteps)
+        world.update()
+        assertEquals(2 to 0, mouse.cell)
+    }
+
+    @Test
+    fun `a blocked queued step fails the plan and drops the rest of it`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze(4, 4)
+        val mouse = gridMouse(world, 1, 1)
+        val plan = mouse.queueGridSteps { east(); north() }
+        world.update()
+        assertEquals(1 to 1, mouse.cell)
+        assertFalse(plan.await())
+        assertFalse(mouse.hasQueuedGridSteps)
+        assertTrue(mouse.wasStuckLastTick)
+        world.update()
+        assertEquals(1 to 1, mouse.cell)
+    }
+
+    @Test
+    fun `until blocked walks to the wall and then the plan continues`() = runBlocking {
+        val world = gridWorld()
+        world.maze = openMaze(4, 4)
+        val mouse = gridMouse(world, 0, 1)
+        val plan = mouse.queueGridSteps { untilBlocked(GridDirection.EAST); north() }
+        repeat(3) { world.update() }
+        assertEquals(3 to 1, mouse.cell)
+        assertFalse(plan.isCompleted)
+        world.update()
+        assertEquals(3 to 0, mouse.cell)
+        assertTrue(plan.await())
+    }
+
+    @Test
+    fun `walking suspends until a gliding plan finishes`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 1, speed = 32.0)
+        val walk = async(start = CoroutineStart.UNDISPATCHED) { mouse.walkGridSteps { east() } }
+        assertFalse(walk.isCompleted)
+        world.update()
+        assertFalse(walk.isCompleted)
+        world.update()
+        assertTrue(walk.await())
+        assertEquals(2 to 1, mouse.cell)
+    }
+
+    @Test
+    fun `manual keys take priority over a queued plan and a new plan replaces the old one`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 1)
+        val first = mouse.queueGridSteps { north() }
+        mouse.manualGridDirection = GridDirection.SOUTH
+        world.update()
+        assertEquals(1 to 2, mouse.cell)
+        assertTrue(mouse.hasQueuedGridSteps)
+        mouse.manualGridDirection = null
+        val second = mouse.queueGridSteps { west() }
+        assertFalse(first.await())
+        world.update()
+        assertEquals(0 to 2, mouse.cell)
+        assertTrue(second.await())
     }
 }

@@ -2,11 +2,14 @@
  * An object in an [OdorWorld]: position, heading and sprite type, the sensors and effectors attached to it, and its
  * movement. Continuous movement uses speed and turn rate with a swept box collision against tiles, maze walls,
  * other entities and the map edge; grid movement travels cell to cell with new steps accepted only at cell
- * centers. Movement requests arrive through three channels with fixed priority: manual keys, an [NpcBehavior],
- * then the coupled [movement] speed and turn rate. The world owns cell geometry and blocking rules.
+ * centers. Movement requests arrive through four channels with fixed priority: manual keys, a queued
+ * [GridStepPlan], an [NpcBehavior], then the coupled [movement] speed and turn rate. The world owns cell geometry
+ * and blocking rules.
  */
 package org.simbrain.world.odorworld.entities
 
+import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.Deferred
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
@@ -172,6 +175,52 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     @Transient
     var manualGridDirection: GridDirection? = null
+
+    @Transient
+    private var gridStepQueueField: ArrayDeque<QueuedGridStep>? = null
+
+    private val gridStepQueue: ArrayDeque<QueuedGridStep>
+        get() = gridStepQueueField ?: ArrayDeque<QueuedGridStep>().also { gridStepQueueField = it }
+
+    @Transient
+    private var gridPlanCompletion: CompletableDeferred<Boolean>? = null
+
+    val hasQueuedGridSteps: Boolean
+        get() = gridStepQueue.isNotEmpty()
+
+    /**
+     * Replace any queued plan with the steps described in [block], walked one per cell center after manual keys
+     * and before behaviors. The result completes with true once the last step arrives, or with false as soon as a
+     * plain step is blocked, which also drops the rest of the plan. Arrival is produced by world updates, so only
+     * await the result from code that is not itself a workspace update action.
+     */
+    fun queueGridSteps(block: GridStepPlan.() -> Unit): Deferred<Boolean> {
+        clearGridSteps()
+        gridStepQueue.addAll(GridStepPlan().apply(block).steps)
+        val completion = CompletableDeferred<Boolean>()
+        gridPlanCompletion = completion
+        if (gridStepQueue.isEmpty()) completion.complete(true)
+        return completion
+    }
+
+    /**
+     * [queueGridSteps] followed by waiting for the plan to finish. Never call this from a workspace update action,
+     * since the world updates that carry the steps would be waiting on this call.
+     */
+    suspend fun walkGridSteps(block: GridStepPlan.() -> Unit): Boolean = queueGridSteps(block).await()
+
+    /**
+     * Drop any queued plan; a pending result completes with false.
+     */
+    fun clearGridSteps() {
+        gridStepQueue.clear()
+        finishGridPlan(false)
+    }
+
+    private fun finishGridPlan(success: Boolean) {
+        gridPlanCompletion?.complete(success)
+        gridPlanCompletion = null
+    }
 
     @UserParameter(label = "Enable Sensors", order = 6)
     var isSensorsEnabled: Boolean = true
@@ -359,6 +408,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         recordTravelDistance(location.distance(target))
         location = target
         cancelTransit()
+        if (gridStepQueue.isEmpty()) finishGridPlan(true)
     }
 
     /**
@@ -379,15 +429,52 @@ class OdorWorldEntity @JvmOverloads constructor(
     private fun takePendingGridStep(): GridDirection? = pendingGridStep.also { pendingGridStep = null }
 
     /**
-     * The next grid step to begin, with whether to face it: manual keys first, then a behavior's request, then the
-     * coupled movement channels. Requests lower in the order are discarded, as manual movement overrides the rest
-     * in continuous mode.
+     * At a cell center, begin the next grid step from the command channels in priority order: manual keys, a
+     * queued plan, a behavior's request, then the coupled movement channels. Requests lower in the order are
+     * discarded, as manual movement overrides the rest in continuous mode.
      */
-    private fun chooseGridStep(): Pair<GridDirection, Boolean>? {
+    private fun beginNextGridStep(instant: Boolean = gridSpeed >= world.gridCellPixelSize) {
         val behaviorStep = takePendingGridStep()
-        manualGridDirection?.let { return it to true }
-        behaviorStep?.let { return it to true }
-        return consumeGridCommand()?.let { it to false }
+        manualGridDirection?.let {
+            wasStuckLastTick = !requestGridStep(it, face = true, instant = instant)
+            return
+        }
+        if (gridStepQueue.isNotEmpty()) {
+            beginQueuedStep(instant)
+            return
+        }
+        behaviorStep?.let {
+            wasStuckLastTick = !requestGridStep(it, face = true, instant = instant)
+            return
+        }
+        consumeGridCommand()?.let { wasStuckLastTick = !requestGridStep(it, face = false, instant = instant) }
+    }
+
+    /**
+     * Begin the first queued step that is not blocked. A blocked plain step fails the plan; a blocked
+     * [GridStepPlan.untilBlocked] entry is simply finished and the next entry tried in the same call.
+     */
+    private fun beginQueuedStep(instant: Boolean) {
+        while (true) {
+            val entry = gridStepQueue.firstOrNull()
+            if (entry == null) {
+                finishGridPlan(true)
+                return
+            }
+            if (requestGridStep(entry.direction, face = true, instant = instant)) {
+                if (!entry.untilBlocked) gridStepQueue.removeFirst()
+                wasStuckLastTick = false
+                if (gridStepQueue.isEmpty() && !isInTransit) finishGridPlan(true)
+                return
+            }
+            gridStepQueue.removeFirst()
+            if (!entry.untilBlocked) {
+                gridStepQueue.clear()
+                wasStuckLastTick = true
+                finishGridPlan(false)
+                return
+            }
+        }
     }
 
     /**
@@ -415,11 +502,7 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     fun applyMovement() {
         if (movementMode == MovementMode.GRID) {
-            if (!isInTransit) {
-                chooseGridStep()?.let { (direction, face) ->
-                    wasStuckLastTick = !requestGridStep(direction, face, instant = false)
-                }
-            }
+            if (!isInTransit) beginNextGridStep(instant = false)
             advanceTransit(manualMovement.manualStraightMovementIncrement)
             return
         }
@@ -531,9 +614,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (movementMode == MovementMode.GRID) {
             if (!isInTransit) {
                 behavior.update(this)
-                chooseGridStep()?.let { (direction, face) ->
-                    wasStuckLastTick = !requestGridStep(direction, face)
-                }
+                beginNextGridStep()
             }
             advanceTransit(gridSpeed)
         } else {

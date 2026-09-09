@@ -2,13 +2,13 @@
  * An object in an [OdorWorld]: position, heading and sprite type, the sensors and effectors attached to it, and its
  * movement. Continuous movement uses speed and turn rate with a swept box collision against tiles, maze walls,
  * other entities and the map edge; grid movement travels cell to cell with new steps accepted only at cell
- * centers. Movement requests arrive through four channels with fixed priority: manual keys, a queued
- * [GridStepPlan], an [NpcBehavior], then the coupled [movement] speed and turn rate. The world owns cell geometry
- * and blocking rules.
+ * centers. Movement requests arrive through four channels with fixed priority: manual keys, a running grid plan
+ * (see [GridStepScope]), an [NpcBehavior], then the coupled [movement] speed and turn rate. The world owns cell
+ * geometry and blocking rules.
  */
 package org.simbrain.world.odorworld.entities
 
-import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Deferred
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
@@ -30,6 +30,11 @@ import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.*
 import java.awt.geom.Point2D
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.coroutines.Continuation
+import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.startCoroutine
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -177,49 +182,54 @@ class OdorWorldEntity @JvmOverloads constructor(
     var manualGridDirection: GridDirection? = null
 
     @Transient
-    private var gridStepQueueField: ArrayDeque<QueuedGridStep>? = null
+    private var gridPlan: GridPlanRun? = null
 
-    private val gridStepQueue: ArrayDeque<QueuedGridStep>
-        get() = gridStepQueueField ?: ArrayDeque<QueuedGridStep>().also { gridStepQueueField = it }
-
-    @Transient
-    private var gridPlanCompletion: CompletableDeferred<Boolean>? = null
-
-    val hasQueuedGridSteps: Boolean
-        get() = gridStepQueue.isNotEmpty()
+    val isFollowingGridPlan: Boolean
+        get() = gridPlan != null
 
     /**
-     * Replace any queued plan with the steps described in [block], walked one per cell center after manual keys
-     * and before behaviors. The result completes with true once the last step arrives, or with false as soon as a
-     * plain step is blocked, which also drops the rest of the plan. Arrival is produced by world updates, so only
+     * Replace any running plan with [block], a script whose step calls (see [GridStepScope]) each suspend until
+     * that step arrives or is blocked. Steps are taken one per cell center, after manual keys and before the
+     * behavior. The result completes with true when the block finishes, with false if the plan is replaced or
+     * cleared first, and with the block's exception if it throws. Arrival is produced by world updates, so only
      * await the result from code that is not itself a workspace update action.
      */
-    fun queueGridSteps(block: GridStepPlan.() -> Unit): Deferred<Boolean> {
+    fun queueGridSteps(block: suspend GridStepScope.() -> Unit): Deferred<Boolean> {
         clearGridSteps()
-        gridStepQueue.addAll(GridStepPlan().apply(block).steps)
-        val completion = CompletableDeferred<Boolean>()
-        gridPlanCompletion = completion
-        if (gridStepQueue.isEmpty()) completion.complete(true)
-        return completion
+        val run = GridPlanRun()
+        gridPlan = run
+        block.startCoroutine(GridStepScope(this, run), object : Continuation<Unit> {
+            override val context = EmptyCoroutineContext
+            override fun resumeWith(result: Result<Unit>) {
+                if (gridPlan === run) gridPlan = null
+                result.fold(
+                    onSuccess = { run.completion.complete(true) },
+                    onFailure = { e ->
+                        if (e is CancellationException) run.completion.complete(false) else run.completion.completeExceptionally(e)
+                    }
+                )
+            }
+        })
+        return run.completion
     }
 
     /**
      * [queueGridSteps] followed by waiting for the plan to finish. Never call this from a workspace update action,
      * since the world updates that carry the steps would be waiting on this call.
      */
-    suspend fun walkGridSteps(block: GridStepPlan.() -> Unit): Boolean = queueGridSteps(block).await()
+    suspend fun walkGridSteps(block: suspend GridStepScope.() -> Unit): Boolean = queueGridSteps(block).await()
 
     /**
-     * Drop any queued plan; a pending result completes with false.
+     * Stop any running plan; its block unwinds with a cancellation and its result completes with false.
      */
     fun clearGridSteps() {
-        gridStepQueue.clear()
-        finishGridPlan(false)
-    }
-
-    private fun finishGridPlan(success: Boolean) {
-        gridPlanCompletion?.complete(success)
-        gridPlanCompletion = null
+        val run = gridPlan ?: return
+        gridPlan = null
+        val waiting = run.pending?.continuation ?: run.awaitingArrival
+        run.pending = null
+        run.awaitingArrival = null
+        waiting?.resumeWithException(CancellationException("Grid plan cleared"))
+        if (!run.completion.isCompleted) run.completion.complete(false)
     }
 
     @UserParameter(label = "Enable Sensors", order = 6)
@@ -408,7 +418,11 @@ class OdorWorldEntity @JvmOverloads constructor(
         recordTravelDistance(location.distance(target))
         location = target
         cancelTransit()
-        if (gridStepQueue.isEmpty()) finishGridPlan(true)
+        gridPlan?.let { run ->
+            val continuation = run.awaitingArrival ?: return
+            run.awaitingArrival = null
+            continuation.resume(true)
+        }
     }
 
     /**
@@ -439,8 +453,8 @@ class OdorWorldEntity @JvmOverloads constructor(
             wasStuckLastTick = !requestGridStep(it, face = true, instant = instant)
             return
         }
-        if (gridStepQueue.isNotEmpty()) {
-            beginQueuedStep(instant)
+        gridPlan?.takeIf { it.pending != null }?.let {
+            beginPlanStep(it, instant)
             return
         }
         behaviorStep?.let {
@@ -451,29 +465,23 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     /**
-     * Begin the first queued step that is not blocked. A blocked plain step fails the plan; a blocked
-     * [GridStepPlan.untilBlocked] entry is simply finished and the next entry tried in the same call.
+     * Begin the step the plan's block is waiting on. A blocked step resumes the block with false right away, and
+     * if the block then asks for another step it is tried in the same call, so a plan never loses an update to a
+     * wall. An accepted step ends the call: the block resumes with true on arrival, which for an instant step has
+     * already happened inside the request.
      */
-    private fun beginQueuedStep(instant: Boolean) {
-        while (true) {
-            val entry = gridStepQueue.firstOrNull()
-            if (entry == null) {
-                finishGridPlan(true)
-                return
-            }
-            if (requestGridStep(entry.direction, face = true, instant = instant)) {
-                if (!entry.untilBlocked) gridStepQueue.removeFirst()
+    private fun beginPlanStep(run: GridPlanRun, instant: Boolean) {
+        while (gridPlan === run) {
+            val pending = run.pending ?: return
+            run.pending = null
+            run.awaitingArrival = pending.continuation
+            if (requestGridStep(pending.direction, face = true, instant = instant)) {
                 wasStuckLastTick = false
-                if (gridStepQueue.isEmpty() && !isInTransit) finishGridPlan(true)
                 return
             }
-            gridStepQueue.removeFirst()
-            if (!entry.untilBlocked) {
-                gridStepQueue.clear()
-                wasStuckLastTick = true
-                finishGridPlan(false)
-                return
-            }
+            run.awaitingArrival = null
+            wasStuckLastTick = true
+            pending.continuation.resume(false)
         }
     }
 

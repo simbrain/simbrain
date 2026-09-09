@@ -5,6 +5,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.util.piccolo.TileMap
@@ -382,37 +383,56 @@ class GridMovementTest {
         assertEquals(2 to 0, mouse.cell)
         assertTrue(plan.isCompleted)
         assertTrue(plan.await())
-        assertFalse(mouse.hasQueuedGridSteps)
+        assertFalse(mouse.isFollowingGridPlan)
         world.update()
         assertEquals(2 to 0, mouse.cell)
     }
 
     @Test
-    fun `a blocked queued step fails the plan and drops the rest of it`() = runBlocking {
+    fun `a blocked step returns false so the block can react in the same update`() = runBlocking {
         val world = gridWorld()
-        world.maze = Maze(4, 4)
+        world.maze = Maze(4, 4).apply { setWall(1, 1, GridDirection.NORTH, false) }
         val mouse = gridMouse(world, 1, 1)
-        val plan = mouse.queueGridSteps { east(); north() }
+        val outcomes = mutableListOf<Boolean>()
+        val plan = mouse.queueGridSteps {
+            outcomes += east()
+            if (!outcomes.last()) outcomes += north()
+        }
         world.update()
-        assertEquals(1 to 1, mouse.cell)
-        assertFalse(plan.await())
-        assertFalse(mouse.hasQueuedGridSteps)
-        assertTrue(mouse.wasStuckLastTick)
-        world.update()
-        assertEquals(1 to 1, mouse.cell)
+        assertEquals(1 to 0, mouse.cell)
+        assertEquals(listOf(false, true), outcomes)
+        assertTrue(plan.await())
     }
 
     @Test
-    fun `until blocked walks to the wall and then the plan continues`() = runBlocking {
+    fun `a while loop on a step walks to the wall and the block continues`() = runBlocking {
         val world = gridWorld()
         world.maze = openMaze(4, 4)
         val mouse = gridMouse(world, 0, 1)
-        val plan = mouse.queueGridSteps { untilBlocked(GridDirection.EAST); north() }
+        val plan = mouse.queueGridSteps {
+            while (east()) { }
+            north()
+        }
         repeat(3) { world.update() }
         assertEquals(3 to 1, mouse.cell)
         assertFalse(plan.isCompleted)
         world.update()
         assertEquals(3 to 0, mouse.cell)
+        assertTrue(plan.await())
+    }
+
+    @Test
+    fun `the block can look before it steps`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze(4, 4).apply { setWall(1, 1, GridDirection.SOUTH, false) }
+        val mouse = gridMouse(world, 1, 1)
+        val plan = mouse.queueGridSteps {
+            val open = GridDirection.entries.filter { canStep(it) }
+            assertEquals(listOf(GridDirection.SOUTH), open)
+            step(open.single())
+        }
+        world.update()
+        assertEquals(1 to 2, mouse.cell)
         assertTrue(plan.await())
     }
 
@@ -430,19 +450,34 @@ class GridMovementTest {
     }
 
     @Test
-    fun `manual keys take priority over a queued plan and a new plan replaces the old one`() = runBlocking {
+    fun `manual keys take priority over a plan and a new plan replaces the old one`() = runBlocking {
         val world = gridWorld()
         val mouse = gridMouse(world, 1, 1)
         val first = mouse.queueGridSteps { north() }
         mouse.manualGridDirection = GridDirection.SOUTH
         world.update()
         assertEquals(1 to 2, mouse.cell)
-        assertTrue(mouse.hasQueuedGridSteps)
+        assertTrue(mouse.isFollowingGridPlan)
         mouse.manualGridDirection = null
         val second = mouse.queueGridSteps { west() }
         assertFalse(first.await())
         world.update()
         assertEquals(0 to 2, mouse.cell)
         assertTrue(second.await())
+    }
+
+    @Test
+    fun `an exception in the block fails the plan result`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 1)
+        val plan = mouse.queueGridSteps {
+            east()
+            error("boom")
+        }
+        world.update()
+        assertEquals(2 to 1, mouse.cell)
+        assertTrue(plan.isCompleted)
+        assertThrows(IllegalStateException::class.java) { runBlocking { plan.await() } }
+        assertFalse(mouse.isFollowingGridPlan)
     }
 }

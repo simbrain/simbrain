@@ -116,13 +116,10 @@ class Workspace: CoroutineScope {
     lateinit var idManager: SimpleIdManager
 
     /**
-     * Pause in milliseconds after every update cycle, so a running simulation can be watched at a comfortable
-     * pace. Applies to every way of iterating; zero runs flat out.
+     * Delay in milliseconds between update cycles. Used to artificially slow
+     * down simulation (sometimes useful in teaching).
      */
     var updateDelay = 0
-        set(value) {
-            field = value.coerceAtLeast(0)
-        }
 
     @Transient
     val couplingManager = CouplingManager(this)
@@ -315,7 +312,6 @@ class Workspace: CoroutineScope {
         setWorkspaceChanged(false)
         currentFile = null
         simulationId = ""
-        updateDelay = 0
         exposedTypeNames = LinkedHashSet()
         couplingManager.clear()
         events.workspaceCleared.fire()

@@ -7,7 +7,6 @@
  */
 package org.simbrain.world.odorworld.entities
 
-import kotlinx.coroutines.CompletableDeferred
 import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.DecayFunction
 import org.simbrain.util.propertyeditor.EditableObject
@@ -159,9 +158,6 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     val isInTransit: Boolean
         get() = transitTarget != null
-
-    @Transient
-    private var arrival: CompletableDeferred<Unit>? = null
 
     /**
      * One-shot cardinal step requested by an [NpcBehavior] for the next update in [MovementMode.GRID]. Takes
@@ -322,7 +318,8 @@ class OdorWorldEntity @JvmOverloads constructor(
     /**
      * Begin a grid step in [direction]. When [instant], the entity lands on the target cell now; otherwise it enters
      * transit and later calls to [advanceTransit] carry it there. Returns false without moving when the step is
-     * blocked or one is already in transit.
+     * blocked, which also fires [EntityEvents.collided], or when one is already in transit; check [isInTransit]
+     * first to tell the two apart. Never waits, so it is safe to call from a workspace update action.
      */
     fun requestGridStep(
         direction: GridDirection,
@@ -335,18 +332,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             arriveAt(target)
         } else {
             transitTarget = target
-            arrival = CompletableDeferred()
         }
-        return true
-    }
-
-    /**
-     * [requestGridStep] followed by suspending until the entity arrives. Arrival is driven by the world's
-     * updates, so do not await this from inside a workspace update action unless the step is instant.
-     */
-    suspend fun moveOneCell(direction: GridDirection, face: Boolean = true): Boolean {
-        if (!requestGridStep(direction, face)) return false
-        arrival?.await()
         return true
     }
 
@@ -367,8 +353,6 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     private fun cancelTransit() {
         transitTarget = null
-        arrival?.complete(Unit)
-        arrival = null
     }
 
     private fun arriveAt(target: Point2D) {

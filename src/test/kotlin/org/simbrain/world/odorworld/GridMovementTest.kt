@@ -1,7 +1,5 @@
 package org.simbrain.world.odorworld
 
-import kotlinx.coroutines.CoroutineStart
-import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
@@ -126,20 +124,20 @@ class GridMovementTest {
     }
 
     @Test
-    fun `moveOneCell suspends until world updates carry the entity to the next cell`() = runBlocking {
+    fun `world updates carry a requested step to the next cell over several iterations`() = runBlocking {
         val world = gridWorld()
         val mouse = OdorWorldEntity(world, EntityType.Mouse)
         world.addEntity(mouse)
         mouse.location = world.cellCenter(1, 1)
         mouse.movementMode = MovementMode.GRID
         mouse.gridSpeed = 32.0
-        val move = async(start = CoroutineStart.UNDISPATCHED) { mouse.moveOneCell(GridDirection.EAST) }
-        assertFalse(move.isCompleted)
+        assertTrue(mouse.requestGridStep(GridDirection.EAST))
         assertTrue(mouse.isInTransit)
         world.update()
-        assertFalse(move.isCompleted)
+        assertTrue(mouse.isInTransit)
+        assertEquals(point(128.0, 96.0), mouse.location)
         world.update()
-        assertTrue(move.await())
+        assertFalse(mouse.isInTransit)
         assertEquals(2 to 1, mouse.cell)
         assertEquals(world.cellCenter(2, 1), mouse.location)
     }
@@ -152,7 +150,7 @@ class GridMovementTest {
         mouse.location = world.cellCenter(1, 1)
         mouse.movementMode = MovementMode.GRID
         mouse.gridSpeed = world.gridCellPixelSize
-        assertTrue(mouse.moveOneCell(GridDirection.SOUTH))
+        assertTrue(mouse.requestGridStep(GridDirection.SOUTH))
         assertEquals(1 to 2, mouse.cell)
         assertFalse(mouse.isInTransit)
     }
@@ -315,7 +313,7 @@ class GridMovementTest {
             wrapAround = false
             isObjectsBlockMovement = false
         }
-        world.maze = Maze.openGrid(3, 3)
+        world.maze = openMaze(3, 3)
         val outside = OdorWorldEntity(world, EntityType.Mouse)
         outside.location = world.cellCenter(3, 1)
         outside.movementMode = MovementMode.GRID
@@ -346,7 +344,7 @@ class GridMovementTest {
     @Test
     fun `a continuous mover slides along a wall it is pressed against`() {
         val world = gridWorld()
-        world.maze = Maze.openGrid(4, 4).apply {
+        world.maze = openMaze(4, 4).apply {
             for (row in 0 until 4) setWall(0, row, GridDirection.EAST, true)
         }
         val mouse = OdorWorldEntity(world, EntityType.Mouse)

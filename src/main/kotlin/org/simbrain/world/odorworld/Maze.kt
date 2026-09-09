@@ -47,7 +47,6 @@ enum class GridDirection(val dx: Int, val dy: Int, val heading: Double) {
  * A single zero-thickness wall in pixel space. [x1], [y1] to [x2], [y2] is axis aligned.
  */
 data class WallSegment(val x1: Double, val y1: Double, val x2: Double, val y2: Double) {
-    val isVertical get() = x1 == x2
     fun toBound(): Bounded = Bound((x1 + x2) / 2, (y1 + y2) / 2, x2 - x1, y2 - y1)
 }
 
@@ -127,9 +126,6 @@ class Maze(val columns: Int, val rows: Int) {
         return !hasWall(column, row, direction)
     }
 
-    val wallCount: Int
-        get() = verticalWalls.sumOf { col -> col.count { it } } + horizontalWalls.sumOf { col -> col.count { it } }
-
     @Transient
     private var segmentCache: SegmentCache? = null
 
@@ -166,51 +162,7 @@ class Maze(val columns: Int, val rows: Int) {
 
     fun collisionBounds(cellSize: Double): List<Bounded> = cacheFor(cellSize).bounds
 
-    /**
-     * The wall crossed when stepping from ([column], [row]) in [direction], as a collision bound, or null if the
-     * step is open.
-     */
-    fun blockingWall(column: Int, row: Int, direction: GridDirection, cellSize: Double): Bounded? =
-        if (hasEdgeWall(column, row, direction)) edgeWall(column, row, direction, cellSize) else null
-
-    /**
-     * Cells reachable from (0, 0), used to check that a maze is fully connected.
-     */
-    fun reachableCellCount(): Int {
-        val visited = Array(columns) { BooleanArray(rows) }
-        val stack = ArrayDeque<Pair<Int, Int>>()
-        stack.addLast(0 to 0)
-        visited[0][0] = true
-        var count = 0
-        while (stack.isNotEmpty()) {
-            val (c, r) = stack.removeLast()
-            count++
-            for (direction in GridDirection.entries) {
-                if (!isOpen(c, r, direction)) continue
-                val nc = c + direction.dx
-                val nr = r + direction.dy
-                if (!visited[nc][nr]) {
-                    visited[nc][nr] = true
-                    stack.addLast(nc to nr)
-                }
-            }
-        }
-        return count
-    }
-
     companion object {
-
-        /**
-         * A maze whose interior walls are all open, leaving only the border.
-         */
-        fun openGrid(columns: Int, rows: Int) = Maze(columns, rows).apply {
-            for (c in 0 until columns) {
-                for (r in 0 until rows) {
-                    if (c + 1 < columns) setWall(c, r, GridDirection.EAST, false)
-                    if (r + 1 < rows) setWall(c, r, GridDirection.SOUTH, false)
-                }
-            }
-        }
 
         /**
          * A perfect maze (a spanning tree over the cells, so there is exactly one path between any two cells)

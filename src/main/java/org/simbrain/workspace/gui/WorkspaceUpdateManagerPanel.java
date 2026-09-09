@@ -193,12 +193,6 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         downFullButton.addActionListener(evt -> moveSelectedUpdateAction(currentActionListModel.getSize() - 1 - currentActionJList.getSelectedIndex()));
         buttonPanel.add(downFullButton);
 
-        JSpinner updateDelaySpinner = new JSpinner(new SpinnerNumberModel(workspace.getUpdateDelay(), 0, 60000, 10));
-        updateDelaySpinner.setToolTipText("Pause in milliseconds after every update, to watch a simulation at a comfortable pace");
-        updateDelaySpinner.addChangeListener(evt -> workspace.setUpdateDelay((Integer) updateDelaySpinner.getValue()));
-        buttonPanel.add(new JLabel("Update delay (ms)"));
-        buttonPanel.add(updateDelaySpinner);
-
         add(buttonPanel, BorderLayout.SOUTH);
 
         // // Help button

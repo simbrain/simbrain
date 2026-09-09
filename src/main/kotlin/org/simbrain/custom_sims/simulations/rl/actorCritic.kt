@@ -361,7 +361,7 @@ val actorCritic = newSim {
     
     ## Mazes
     
-    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials. `Update Delay` pauses the workspace after each step so you can watch the agent move; set it to `0` for the fastest possible training.
+    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
     
     You can also study the time series plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place. 
     
@@ -471,10 +471,6 @@ val actorCritic = newSim {
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
             val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
-            val tfUpdateDelay = addTextField(
-                "Update Delay (ms)", "" + workspace.updateDelay,
-                toolTip = "Pause after each step so the agent can be watched. 0 trains as fast as possible."
-            )
             val tfMazeSeed = addTextField(
                 "Maze Seed", "",
                 toolTip = "Whole number that picks a fixed maze layout. Leave blank for a random maze each time."
@@ -510,7 +506,6 @@ val actorCritic = newSim {
 
                     this@addButton.isEnabled = false
                     try {
-                        workspace.updateDelay = tfUpdateDelay.text.trim().toIntOrNull() ?: 0
 
                         stop = false
 

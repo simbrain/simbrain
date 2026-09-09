@@ -6,7 +6,6 @@ import org.simbrain.util.rayVsAabb
 import org.simbrain.util.shortestAngleDelta
 import org.simbrain.util.toRadian
 import org.simbrain.util.wrapAroundVectorTo
-import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.cos
@@ -16,11 +15,9 @@ import kotlin.math.sin
 /**
  * Programmatic NPC behavior that drives an entity's movement each tick by writing
  * to its [OdorWorldEntity.movement] (speed and dtheta). Attach to an entity via
- * [OdorWorldEntity.behavior]; it is invoked at the start of [OdorWorldEntity.update].
- *
- * Behaviors built on [Steering] work unchanged in [MovementMode.GRID]: only the four cardinal headings are
- * scored, and the winner becomes a one-cell step through [OdorWorldEntity.pendingGridStep] instead of a
- * speed and turn rate.
+ * [OdorWorldEntity.behavior]; it is invoked at the start of [OdorWorldEntity.update]. In
+ * [MovementMode.GRID] a behavior instead queues one cardinal step per cell center through
+ * [commitGridStep]; the helpers in GridNavigation.kt search the cell graph for it.
  */
 abstract class NpcBehavior : CopyableObject {
 
@@ -96,9 +93,6 @@ object Steering {
      * the sample positions between ticks (e.g. while stuck) so directions missed last tick get
      * a chance. When [OdorWorldEntity.showSteeringDebug] is on, per-candidate scores and feeler
      * hits are captured into [OdorWorldEntity.steeringDebug] for the GUI overlay.
-     *
-     * In [MovementMode.GRID] the candidate set is always the four cardinal headings, since those are the only
-     * moves available, and [numCandidates] and [angularOffset] are ignored.
      */
     fun pickBestHeading(
         entity: OdorWorldEntity,
@@ -108,13 +102,10 @@ object Steering {
         isObstacle: (OdorWorldEntity) -> Boolean = { it !== entity },
         score: (heading: Double, dirX: Double, dirY: Double, obstacleDistance: Double) -> Double
     ): Double {
-        val grid = entity.movementMode == MovementMode.GRID
-        val candidateCount = if (grid) GridDirection.entries.size else numCandidates
-        val offset = if (grid) 0.0 else angularOffset
         val capture = entity.showSteeringDebug
-        val headings = if (capture) DoubleArray(candidateCount) else null
-        val scores = if (capture) DoubleArray(candidateCount) else null
-        val obstacles = if (capture) DoubleArray(candidateCount) else null
+        val headings = if (capture) DoubleArray(numCandidates) else null
+        val scores = if (capture) DoubleArray(numCandidates) else null
+        val obstacles = if (capture) DoubleArray(numCandidates) else null
         val world = entity.world
         val tileMap = world.tileMap
         val wrap = world.wrapAround
@@ -174,11 +165,11 @@ object Steering {
             }
         }
 
-        val baseHeading = if (grid) entity.facingDirection.heading else entity.heading
+        val baseHeading = entity.heading
         var bestScore = Double.NEGATIVE_INFINITY
         var bestHeading = baseHeading
-        for (k in 0 until candidateCount) {
-            val heading = ((baseHeading + offset + k * (360.0 / candidateCount)) % 360.0 + 360.0) % 360.0
+        for (k in 0 until numCandidates) {
+            val heading = ((baseHeading + angularOffset + k * (360.0 / numCandidates)) % 360.0 + 360.0) % 360.0
             val rad = heading.toRadian()
             val dirX = cos(rad)
             val dirY = -sin(rad)
@@ -205,23 +196,9 @@ object Steering {
     }
 
     /**
-     * Steers toward [targetHeading], turning at most [maxTurn] degrees this tick at [speed]. In
-     * [MovementMode.GRID] this instead queues a one-cell step in the cardinal direction nearest
-     * [targetHeading] travelling at [speed] pixels per update when [speed] is positive; [maxTurn] does not apply
-     * since grid entities face each step.
+     * Steers toward [targetHeading], turning at most [maxTurn] degrees this tick at [speed].
      */
     fun applyHeading(entity: OdorWorldEntity, targetHeading: Double, speed: Double, maxTurn: Double) {
-        if (entity.movementMode == MovementMode.GRID) {
-            entity.pendingGridStep = if (speed > 0) GridDirection.fromHeading(targetHeading) else null
-            if (speed > 0) entity.gridSpeed = speed
-            entity.movement.dtheta = 0.0
-            entity.movement.speed = 0.0
-            entity.steeringDebug?.let {
-                it.intendedSpeed = speed
-                it.intendedDtheta = shortestAngleDelta(entity.heading, targetHeading)
-            }
-            return
-        }
         val delta = shortestAngleDelta(entity.heading, targetHeading)
         val dtheta = delta.coerceIn(-maxTurn, maxTurn)
         entity.movement.dtheta = dtheta

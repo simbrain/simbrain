@@ -33,7 +33,7 @@ class MazeTest {
 
     @Test
     fun `stepping off the edge is never open`() {
-        val maze = Maze.openGrid(2, 2)
+        val maze = openMaze(2, 2)
         assertFalse(maze.isOpen(0, 0, GridDirection.WEST))
         assertFalse(maze.isOpen(1, 1, GridDirection.SOUTH))
         assertTrue(maze.isOpen(0, 0, GridDirection.EAST))
@@ -72,9 +72,9 @@ class MazeTest {
     @Test
     fun `blocking wall is returned only for closed edges`() {
         val maze = Maze(2, 1)
-        assertNotNull(maze.blockingWall(0, 0, GridDirection.EAST, 64.0))
+        assertTrue(maze.hasEdgeWall(0, 0, GridDirection.EAST))
         maze.setWall(0, 0, GridDirection.EAST, false)
-        assertNull(maze.blockingWall(0, 0, GridDirection.EAST, 64.0))
+        assertFalse(maze.hasEdgeWall(0, 0, GridDirection.EAST))
     }
 
     @Test

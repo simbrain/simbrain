@@ -38,7 +38,7 @@ class RaycasterTest {
 
     @Test
     fun `diagonal ray reports the position along a horizontal wall`() {
-        val maze = Maze.openGrid(3, 3)
+        val maze = openMaze(3, 3)
         // Heads east and slightly north from the center of the top left cell, so the border above is hit first
         val hit = Raycaster(4, 4).castMazeRay(maze, cellSize, 32.0, 32.0, 1.0, -0.5, 1000.0)
         assertNotNull(hit)
@@ -49,7 +49,7 @@ class RaycasterTest {
 
     @Test
     fun `rays starting outside the maze stop at its border`() {
-        val maze = Maze.openGrid(2, 2)
+        val maze = openMaze(2, 2)
         val hit = Raycaster(4, 4).castMazeRay(maze, cellSize, -40.0, 32.0, 1.0, 0.0, 1000.0)
         assertNotNull(hit)
         assertEquals(40.0, hit!!.distance, 1e-9)
@@ -118,7 +118,7 @@ class RaycasterTest {
     @Test
     fun `a closed maze wall fills the view and hides the entity behind it`() {
         val closed = render(scene(Maze(3, 1)), textureWalls = false)
-        val open = render(scene(Maze.openGrid(3, 1)), textureWalls = false)
+        val open = render(scene(openMaze(3, 1)), textureWalls = false)
 
         val closedColumn = closed.column(16)
         assertEquals(1, closedColumn.distinct().size, "flat wall at half a cell should cover the whole column")

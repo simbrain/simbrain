@@ -7,6 +7,7 @@ import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.Maze
+import org.simbrain.world.odorworld.openMaze
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.MovementMode
@@ -321,7 +322,7 @@ class BehaviorsTest {
     @Test
     fun `Evade in grid mode steps to the cell furthest from the threat by path`() = runBlocking {
         val world = gridWorld()
-        world.maze = Maze.openGrid(4, 1)
+        world.maze = openMaze(4, 1)
         val agent = gridAgent(world, 1, 0)
         val threat = OdorWorldEntity(world, EntityType.Swiss)
         world.addEntity(threat)
@@ -374,7 +375,7 @@ class BehaviorsTest {
     @Test
     fun `Wander in grid mode with no turn chance goes straight until a wall`() = runBlocking {
         val world = gridWorld()
-        world.maze = Maze.openGrid(4, 4)
+        world.maze = openMaze(4, 4)
         val agent = gridAgent(world, 0, 0)
         agent.behavior = Wander().also { it.gridTurnChance = 0.0; it.maxSpeed = wholeCell }
         world.update()
@@ -390,8 +391,9 @@ class BehaviorsTest {
         val world = gridWorld()
         val agent = OdorWorldEntity(world, EntityType.Mouse)
         agent.movementMode = MovementMode.GRID
-        Steering.applyHeading(agent, 270.0, 2.0, 10.0)
+        commitGridStep(agent, GridDirection.SOUTH, 2.0, "go")
         assertEquals(GridDirection.SOUTH, agent.pendingGridStep)
+        assertEquals(2.0, agent.gridSpeed)
         Steering.stop(agent, "done")
         assertNull(agent.pendingGridStep)
     }

@@ -2,6 +2,11 @@ package org.simbrain.network.gui
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.nodes.ScreenElement
 import org.junit.jupiter.api.Test
 import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
@@ -84,5 +89,26 @@ class NetworkPanelTest {
                 validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
             }
         }
+    }
+
+    @Test
+    fun `a weight matrix added before its arrays gets its node without freezing the panel`() = runBlocking {
+        val net = Network()
+        val nc = NetworkComponent("Test", net)
+        val np = NetworkPanel(nc)
+        val source = NeuronArray(3)
+        val target = NeuronArray(2)
+        val weightMatrix = WeightMatrix(source, target)
+
+        val start = System.nanoTime()
+        // the matrix's node creation starts first and must wait for the array nodes rather than block on them
+        val matrixAdded = net.addNetworkModelAsync(weightMatrix)
+        net.addNetworkModels(source, target)
+        matrixAdded?.await()
+        val elapsedMs = (System.nanoTime() - start) / 1_000_000
+
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(source))
+        assertTrue(elapsedMs < 5000, "node creation should not wait out the blocking lookup's timeout, took $elapsedMs ms")
     }
 }

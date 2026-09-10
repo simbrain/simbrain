@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.swing.Swing
@@ -179,10 +180,9 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 // Re-create the node if its asynchronous, debounced removal already landed (getImmediately
                 // returns null once it has), then attach it to the right container node. Without this a
                 // restored internal model (e.g. a neuron array in a feedforward) comes back as a model but
-                // stays invisible on the canvas. createNode for these layer/connector/neuron types does not
-                // await any other node, so re-creating them here cannot deadlock; for any other type fall
-                // back to re-attaching an already-live node, never blocking on an endpoint that is only
-                // re-created later in this same restore.
+                // stays invisible on the canvas. A connector's createNode waits for its endpoints' nodes,
+                // which is why restore re-adds connectors only after every other model; for any other type
+                // fall back to re-attaching an already-live node.
                 if (collection != null) {
                     modelNodeMap.getImmediately<NeuronCollectionNode>(collection)?.let { collectionNode ->
                         val neuronNode = modelNodeMap.getImmediately<NeuronNode>(model) ?: createNode(model as Neuron)
@@ -213,7 +213,11 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             }
 
             is SupervisedModel -> {
-                network.addNetworkModel(model, usePlacementManager = false, useAutoAssignedId = false)
+                // Not awaited here: a connector's node creation waits for its endpoint layers' nodes, and
+                // the layers may come later in this same loop, so all the children's adds are awaited
+                // together in restore once every one of them has been issued.
+                network.addNetworkModelAsync(model, usePlacementManager = false, useAutoAssignedId = false)
+                    ?.let { pendingChildAdds += it }
                 // Non-blocking: the overlay's own node is (re)built later in this restore via
                 // createNode(SupervisedModel), which re-attaches its layer/matrix nodes; this best-effort
                 // attach only matters when that node already exists, so peek-and-skip is correct.
@@ -225,6 +229,8 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             }
         }
     }
+
+    private val pendingChildAdds = mutableListOf<Deferred<Unit>>()
 
     private fun hasNoParent(model: NetworkModel): Boolean {
         return childToParentMaps.none { it.containsKey(model) }
@@ -248,14 +254,18 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
             staleNodes.forEach { (model, node) -> modelNodeMap.removeIfValue(model) { it === node } }
         }
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
-        // Adds models back to parent groups.
-        modelsToReAdd.forEach { reAddToGroup(it) }
+        // Adds models back to parent groups. Connectors go last: their node creation waits for their
+        // endpoints' nodes, and the endpoints may be among the models restored here.
+        val (connectors, others) = modelsToReAdd.partition { it is Connector || it is SynapseGroup }
+        (others + connectors).forEach { reAddToGroup(it) }
         // Add all models without parents back
         network.addNetworkModelsAsync(
             modelsToReAdd.filter { hasNoParent(it) },
             usePlacementManager = false,
             useAutoAssignedId = false
         ).awaitAll()
+        pendingChildAdds.awaitAll()
+        pendingChildAdds.clear()
         // Finalize recreation. afterRestore re-establishes a model's external links (a Connector
         // re-registers with its endpoint layers, a Synapse with its neurons' fan-in/out, a SynapseGroup
         // with its layers, etc.). Call it on every restored model whose parent is NOT itself being

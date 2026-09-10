@@ -353,9 +353,26 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(tensorLayer: TensorLayer) = addScreenElement { TensorNode(this, tensorLayer) }
 
-    suspend fun createNode(tensorConnector: TensorConnector) = addScreenElement { TensorConnectorNode(this, tensorConnector) }
+    /**
+     * Waits for the nodes of a connector's endpoints before the connector's own node is created. A connector's
+     * arrow resolves its endpoint nodes with a blocking lookup during layout on the EDT, so adding the connector
+     * to the canvas first would block the EDT on node creation that itself needs the EDT, a deadlock that only
+     * the lookup's timeout ends. Suspending here on the Swing dispatcher lets that creation run instead. Inside a
+     * subnetwork's own creation sequence the endpoints already have nodes, so this returns at once.
+     */
+    private suspend fun awaitEndpointNodes(vararg endpoints: NetworkModel) {
+        endpoints.forEach { modelNodeMap.get<ScreenElement>(it) }
+    }
 
-    suspend fun createNode(flattenConnector: FlattenConnector) = addScreenElement { FlattenConnectorNode(this, flattenConnector) }
+    suspend fun createNode(tensorConnector: TensorConnector): ScreenElement {
+        awaitEndpointNodes(tensorConnector.source, tensorConnector.target)
+        return addScreenElement { TensorConnectorNode(this, tensorConnector) }
+    }
+
+    suspend fun createNode(flattenConnector: FlattenConnector): ScreenElement {
+        awaitEndpointNodes(flattenConnector.source, flattenConnector.target)
+        return addScreenElement { FlattenConnectorNode(this, flattenConnector) }
+    }
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
 
@@ -379,7 +396,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
+    suspend fun createNode(synapseGroup: SynapseGroup): ScreenElement {
+        awaitEndpointNodes(synapseGroup.source, synapseGroup.target)
+        return createSynapseGroupNode(synapseGroup)
+    }
+
+    private suspend fun createSynapseGroupNode(synapseGroup: SynapseGroup) = addScreenElement {
         // Loose individual synapse nodes and the collapsed arrow are mutually exclusive, both driven by
         // synapseGroup.displaySynapses (the single source of truth, kept in sync with the visibility
         // threshold by SynapseGroup.refreshVisibility). Expanded -> every group synapse has a node;
@@ -416,8 +438,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         SynapseGroupNode(this, synapseGroup)
     }
 
-    suspend fun createNode(weightMatrix: Connector) = addScreenElement {
-        WeightMatrixNode(this, weightMatrix)
+    suspend fun createNode(weightMatrix: Connector): ScreenElement {
+        awaitEndpointNodes(weightMatrix.source, weightMatrix.target)
+        return addScreenElement { WeightMatrixNode(this, weightMatrix) }
     }
 
     suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {

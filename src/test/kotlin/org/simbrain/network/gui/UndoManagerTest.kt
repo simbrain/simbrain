@@ -1,7 +1,6 @@
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
@@ -78,13 +77,13 @@ class UndoManagerTest {
 
         val stubButton = JButton(newNeuronAction)
 
+        // the action adds its model and then registers the undo entry, so wait for both
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        awaitUntil { network.flatNeuronList.size == initialNeuronCount + 1 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that a neuron was added
         assertEquals(initialNeuronCount + 1, network.flatNeuronList.size, "A neuron should be added to the network")
@@ -131,22 +130,22 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2)) }
 
         // Get the action for this test
         val neuronCollectionAction = networkPanel.networkActions.neuronCollectionAction
 
         val stubButton = JButton(neuronCollectionAction)
 
+        awaitUntil { neuronCollectionAction.isEnabled }
+
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        awaitUntil { network.getModels<NeuronCollection>().size == initialCollectionCount + 1 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that a neuron collection was added
         assertEquals(initialCollectionCount + 1, network.getModels<NeuronCollection>().size, "A neuron collection should be added to the network")
@@ -261,9 +260,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2)) }
 
         // Get the actions for this test
         val copyAction = networkPanel.networkActions.copyAction
@@ -275,19 +273,16 @@ class UndoManagerTest {
             copyButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        awaitUntil { pasteAction.isEnabled }
 
         // Execute the paste action
         val pasteButton = JButton(pasteAction)
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             pasteButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        awaitUntil { network.flatNeuronList.size == initialNeuronCount + 2 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that neurons were added
         assertEquals(initialNeuronCount + 2, network.flatNeuronList.size, "Two neurons should be added to the network")
@@ -346,9 +341,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2)) }
 
         // Store the neuron IDs for later verification
         val neuronIds = listOf(neuron1.id, neuron2.id)
@@ -358,13 +352,12 @@ class UndoManagerTest {
 
         // Execute the cut action
         val cutButton = JButton(cutAction)
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             cutButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        awaitUntil { network.flatNeuronList.size == initialNeuronCount - 2 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that neurons were removed
         assertEquals(initialNeuronCount - 2, network.flatNeuronList.size, "Two neurons should be removed from the network")
@@ -427,9 +420,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2, neuron3)) }
 
         // Record the original Y positions
         val originalY1 = neuron1.y
@@ -489,9 +481,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2, neuron3)) }
 
         // Record the original X positions
         val originalX1 = neuron1.x
@@ -551,9 +542,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2, neuron3)) }
 
         // Record the original X positions
         val originalX1 = neuron1.x
@@ -616,9 +606,8 @@ class UndoManagerTest {
         // Select the neurons
         network.selectModels(listOf(neuron1, neuron2, neuron3))
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // selection reaches the panel through asynchronous events
+        awaitUntil { networkPanel.selectionManager.selectedModels.containsAll(listOf(neuron1, neuron2, neuron3)) }
 
         // Record the original Y positions
         val originalY1 = neuron1.y
@@ -700,12 +689,13 @@ class UndoManagerTest {
 
         // the action's enabled state follows selection events; a click on a disabled button does nothing
         awaitUntil { createSupervisedModelAction.isEnabled }
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }
 
         // the action adds the model asynchronously
-        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 }
+        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that a supervised model was added
         assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
@@ -792,12 +782,13 @@ class UndoManagerTest {
         // Action 1: Create a supervised model. The action's enabled state follows selection events, and a
         // click on a disabled button does nothing.
         awaitUntil { createSupervisedModelAction.isEnabled }
+        val undoDepth = networkPanel.undoManager.undoStack.size
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }
 
         // the action adds the model asynchronously
-        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 }
+        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 && networkPanel.undoManager.undoStack.size == undoDepth + 1 }
 
         // Verify that a supervised model was added
         assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,

@@ -27,6 +27,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.events.OdorWorldEvents
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
+import kotlin.math.floor
 import java.util.concurrent.CopyOnWriteArrayList
 
 /**
@@ -116,13 +117,17 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      */
     @UserParameter(
         label = "Grid cell size (tiles)",
-        description = "Side length in tiles of one cell for grid movement and maze walls",
+        description = "Side length in tiles of one cell for grid movement and maze walls. Cells should be at " +
+                "least as large as the entities that move through them. Changing this removes any maze.",
         minimumValue = 1.0,
         order = 30
     )
     var gridCellSizeInTiles: Int = DEFAULT_GRID_CELL_SIZE_IN_TILES
         set(value) {
-            field = value.coerceAtLeast(1)
+            val coerced = value.coerceAtLeast(1)
+            // a maze's walls are laid out for the cell size it was generated with
+            if (coerced != field) maze = null
+            field = coerced
             events.mazeChanged.fire()
         }
 
@@ -145,8 +150,7 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
      * Grid cell containing a pixel location, as (column, row). Not clamped to the map.
      */
     fun cellAt(location: Point2D): Pair<Int, Int> =
-        Math.floorDiv(location.x.toInt(), gridCellPixelSize.toInt()) to
-                Math.floorDiv(location.y.toInt(), gridCellPixelSize.toInt())
+        floor(location.x / gridCellPixelSize).toInt() to floor(location.y / gridCellPixelSize).toInt()
 
     /**
      * Replace the maze with a perfect maze of the given size, resizing the tile map when it does not already

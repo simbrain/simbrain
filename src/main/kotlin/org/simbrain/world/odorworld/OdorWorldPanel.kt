@@ -1,3 +1,9 @@
+/**
+ * Piccolo canvas for an [OdorWorld]: draws tile layers, the maze overlay and entity nodes, keeps the camera on the
+ * selected agent, and turns manual key driving into entity movement. While the world is stopped a movement timer
+ * carries continuous movement and grid steps; while it runs, world updates do. The panel never decides what a
+ * move means; it only feeds the entity's manual channels.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
@@ -474,18 +480,30 @@ class OdorWorldPanel(
      */
     fun pressGridDirection(direction: GridDirection) {
         heldGridDirections = heldGridDirections - direction + direction
-        firstSelectedRotatingEntity?.manualGridDirection = direction
+        val entity = firstSelectedRotatingEntity ?: return
+        if (gridDrivenEntity !== entity) gridDrivenEntity?.manualGridDirection = null
+        gridDrivenEntity = entity
+        entity.manualGridDirection = direction
     }
 
-    fun releaseGridDirection(direction: GridDirection) {
+    /**
+     * Stop holding [direction]. Returns whether it was held, so a key release can tell a grid-driven press from a
+     * continuous one.
+     */
+    fun releaseGridDirection(direction: GridDirection): Boolean {
+        if (direction !in heldGridDirections) return false
         heldGridDirections = heldGridDirections - direction
         val remaining = heldGridDirections.lastOrNull()
         if (remaining == null) {
-            world.entityList.forEach { it.manualGridDirection = null }
+            gridDrivenEntity?.manualGridDirection = null
+            gridDrivenEntity = null
         } else {
-            firstSelectedRotatingEntity?.manualGridDirection = remaining
+            gridDrivenEntity?.manualGridDirection = remaining
         }
+        return true
     }
+
+    private var gridDrivenEntity: OdorWorldEntity? = null
 
     /**
      * Movement timer tick while the world is stopped: applies held keys, and keeps carrying a grid step that is

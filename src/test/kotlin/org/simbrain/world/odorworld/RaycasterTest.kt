@@ -1,3 +1,7 @@
+/**
+ * Maze walls in the 3D view: the cell walk that finds the first closed edge along a ray, and rendering checks that
+ * walls occlude entities and textures vary along a column.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.runBlocking

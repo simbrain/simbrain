@@ -29,10 +29,7 @@ fun OdorWorldPanel.addKeyBindings() {
             return true
         }
 
-        fun releaseGrid(direction: GridDirection): Boolean {
-            releaseGridDirection(direction)
-            return firstSelectedRotatingEntity?.isGrid() == true
-        }
+        fun releaseGrid(direction: GridDirection): Boolean = releaseGridDirection(direction)
 
         // Manual Forward Motion
         bind("pressed W", "pressed UP") {

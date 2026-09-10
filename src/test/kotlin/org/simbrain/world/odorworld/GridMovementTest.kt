@@ -1,3 +1,8 @@
+/**
+ * Grid movement mode on an entity: cell snapping, instant and gliding steps, blocking by walls, tiles and edges,
+ * the manual, plan and coupled command channels, save and reload, and the swept continuous collision that keeps
+ * fast movers out of maze walls.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineStart
@@ -5,6 +10,8 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -204,17 +211,21 @@ class GridMovementTest {
     }
 
     @Test
-    fun `grid turn is always a quarter turn`() {
+    fun `grid turns accumulate into quarter turns`() {
         val world = gridWorld()
         val mouse = OdorWorldEntity(world, EntityType.Mouse)
         mouse.movementMode = MovementMode.GRID
         mouse.heading = 0.0
-        mouse.turn(1.0)
+        repeat(4) { mouse.turn(10.0) }
+        assertEquals(0.0, mouse.heading)
+        mouse.turn(10.0)
         assertEquals(90.0, mouse.heading)
         mouse.turn(-30.0)
+        assertEquals(90.0, mouse.heading)
+        mouse.turn(-15.0)
         assertEquals(0.0, mouse.heading)
-        mouse.turn(0.0)
-        assertEquals(0.0, mouse.heading)
+        mouse.turn(90.0)
+        assertEquals(90.0, mouse.heading)
     }
 
     @Test
@@ -479,5 +490,84 @@ class GridMovementTest {
         assertTrue(plan.isCompleted)
         assertThrows(IllegalStateException::class.java) { runBlocking { plan.await() } }
         assertFalse(mouse.isFollowingGridPlan)
+    }
+
+    @Test
+    fun `a gliding step that wraps around the map lands instantly on the far side`() = runBlocking {
+        val world = gridWorld().apply { wrapAround = true }
+        val mouse = gridMouse(world, 0, 1, speed = 8.0)
+        assertTrue(mouse.requestGridStep(GridDirection.WEST))
+        assertFalse(mouse.isInTransit)
+        assertEquals(3 to 1, mouse.cell)
+        assertTrue(mouse.requestGridStep(GridDirection.WEST))
+        assertTrue(mouse.isInTransit)
+    }
+
+    @Test
+    fun `leaving grid mode cancels a running plan`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 1, speed = 8.0)
+        val plan = mouse.queueGridSteps { east(3) }
+        world.update()
+        assertTrue(mouse.isInTransit)
+        mouse.movementMode = MovementMode.CONTINUOUS
+        assertFalse(plan.await())
+        assertFalse(mouse.isFollowingGridPlan)
+        assertFalse(mouse.isInTransit)
+    }
+
+    @Test
+    fun `deleting an entity cancels its plan`() = runBlocking {
+        val world = gridWorld()
+        val mouse = gridMouse(world, 1, 1)
+        val plan = mouse.queueGridSteps { east(3) }
+        mouse.delete()
+        assertFalse(plan.await())
+    }
+
+    @Test
+    fun `a plan on a continuous entity fails right away`() = runBlocking {
+        val world = gridWorld()
+        val mouse = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(mouse)
+        val plan = mouse.queueGridSteps { east() }
+        assertTrue(plan.isCompleted)
+        assertThrows(IllegalStateException::class.java) { runBlocking { plan.await() } }
+    }
+
+    @Test
+    fun `a block that keeps retrying a wall yields after a few attempts instead of stalling the update`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze(4, 4)
+        val mouse = gridMouse(world, 1, 1)
+        var attempts = 0
+        val plan = mouse.queueGridSteps {
+            while (!east()) { attempts++ }
+        }
+        world.update()
+        assertEquals(4, attempts)
+        assertFalse(plan.isCompleted)
+        assertEquals(1 to 1, mouse.cell)
+        world.update()
+        assertEquals(8, attempts)
+    }
+
+    @Test
+    fun `cells are found by flooring so points just past a negative grid line are outside`() {
+        val world = gridWorld()
+        assertEquals(-1 to 0, world.cellAt(point(-0.5, 10.0)))
+        assertEquals(0 to -1, world.cellAt(point(10.0, -0.5)))
+        assertEquals(0 to 0, world.cellAt(point(0.0, 0.0)))
+    }
+
+    @Test
+    fun `changing the cell size removes a maze laid out for the old size`() {
+        val world = gridWorld()
+        world.generateMaze(4, 4, cellSizeInTiles = 2, seed = 5L)
+        assertNotNull(world.maze)
+        world.gridCellSizeInTiles = 2
+        assertNotNull(world.maze)
+        world.gridCellSizeInTiles = 4
+        assertNull(world.maze)
     }
 }

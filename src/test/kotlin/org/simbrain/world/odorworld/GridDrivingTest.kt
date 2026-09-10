@@ -1,3 +1,6 @@
+/**
+ * Manual key driving of a grid-mode entity through the odor world panel while the world is stopped.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.runBlocking

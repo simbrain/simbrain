@@ -136,6 +136,7 @@ class OdorWorldEntity @JvmOverloads constructor(
                 if (world.tileMap != null) snapToCellCenter()
             } else {
                 cancelTransit()
+                clearGridSteps()
             }
         }
     )
@@ -184,6 +185,15 @@ class OdorWorldEntity @JvmOverloads constructor(
     @Transient
     private var gridPlan: GridPlanRun? = null
 
+    /**
+     * Guards grid stepping, which the panel's movement timer and a world update can both drive.
+     */
+    @Transient
+    private var gridStepLockField: Any? = null
+
+    private val gridStepLock: Any
+        get() = gridStepLockField ?: Any().also { gridStepLockField = it }
+
     val isFollowingGridPlan: Boolean
         get() = gridPlan != null
 
@@ -197,6 +207,10 @@ class OdorWorldEntity @JvmOverloads constructor(
     fun queueGridSteps(block: suspend GridStepScope.() -> Unit): Deferred<Boolean> {
         clearGridSteps()
         val run = GridPlanRun()
+        if (movementMode != MovementMode.GRID) {
+            run.completion.completeExceptionally(IllegalStateException("$name is not in grid movement mode"))
+            return run.completion
+        }
         gridPlan = run
         block.startCoroutine(GridStepScope(this, run), object : Continuation<Unit> {
             override val context = EmptyCoroutineContext
@@ -355,14 +369,22 @@ class OdorWorldEntity @JvmOverloads constructor(
         heading = facingDirection.heading
     }
 
+    @Transient
+    private var accumulatedGridTurn = 0.0
+
     /**
-     * Rotate by [delta] degrees. In grid mode any nonzero turn is a quarter turn in that direction.
+     * Rotate by [delta] degrees. In grid mode turns accumulate and become a quarter turn once 45 degrees has built
+     * up in one direction, so a coupled turn rate turns the entity at a proportional pace rather than every tick.
      */
     fun turn(delta: Double) {
-        heading = if (movementMode == MovementMode.GRID) {
-            if (delta == 0.0) heading else facingDirection.heading + 90.0 * sign(delta)
-        } else {
-            heading + delta
+        if (movementMode != MovementMode.GRID) {
+            heading += delta
+            return
+        }
+        accumulatedGridTurn += delta
+        if (kotlin.math.abs(accumulatedGridTurn) >= GRID_TURN_THRESHOLD) {
+            heading = facingDirection.heading + 90.0 * sign(accumulatedGridTurn)
+            accumulatedGridTurn = 0.0
         }
     }
 
@@ -387,7 +409,9 @@ class OdorWorldEntity @JvmOverloads constructor(
     ): Boolean {
         if (isInTransit) return false
         val target = beginGridStep(direction, face) ?: return false
-        if (instant) {
+        // a step that wrapped around the map targets the far side, which is not a place to glide to
+        val wrapped = location.distance(target) > world.gridCellPixelSize * 1.5
+        if (instant || wrapped) {
             arriveAt(target)
         } else {
             transitTarget = target
@@ -467,11 +491,13 @@ class OdorWorldEntity @JvmOverloads constructor(
     /**
      * Begin the step the plan's block is waiting on. A blocked step resumes the block with false right away, and
      * if the block then asks for another step it is tried in the same call, so a plan never loses an update to a
-     * wall. An accepted step ends the call: the block resumes with true on arrival, which for an instant step has
-     * already happened inside the request.
+     * wall; after four blocked attempts the rest waits for the next update, so a block that keeps retrying a wall
+     * cannot stall the world. An accepted step ends the call: the block resumes with true on arrival, which for
+     * an instant step has already happened inside the request.
      */
     private fun beginPlanStep(run: GridPlanRun, instant: Boolean) {
-        while (gridPlan === run) {
+        var blockedAttempts = 0
+        while (gridPlan === run && blockedAttempts < GridDirection.entries.size) {
             val pending = run.pending ?: return
             run.pending = null
             run.awaitingArrival = pending.continuation
@@ -481,6 +507,7 @@ class OdorWorldEntity @JvmOverloads constructor(
             }
             run.awaitingArrival = null
             wasStuckLastTick = true
+            blockedAttempts++
             pending.continuation.resume(false)
         }
     }
@@ -510,8 +537,10 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     fun applyMovement() {
         if (movementMode == MovementMode.GRID) {
-            if (!isInTransit) beginNextGridStep(instant = false)
-            advanceTransit(manualMovement.manualStraightMovementIncrement)
+            synchronized(gridStepLock) {
+                if (!isInTransit) beginNextGridStep(instant = false)
+                advanceTransit(manualMovement.manualStraightMovementIncrement)
+            }
             return
         }
         if (dtheta != 0.0) {
@@ -620,11 +649,13 @@ class OdorWorldEntity @JvmOverloads constructor(
      */
     suspend fun update() {
         if (movementMode == MovementMode.GRID) {
-            if (!isInTransit) {
-                behavior.update(this)
-                beginNextGridStep()
+            synchronized(gridStepLock) {
+                if (!isInTransit) {
+                    behavior.update(this)
+                    beginNextGridStep()
+                }
+                advanceTransit(gridSpeed)
             }
-            advanceTransit(gridSpeed)
         } else {
             behavior.update(this)
             applyMovement()
@@ -707,6 +738,7 @@ class OdorWorldEntity @JvmOverloads constructor(
     }
 
     fun delete() {
+        clearGridSteps()
         events.deleted.fire(this)
     }
 
@@ -892,3 +924,8 @@ fun OdorWorldEntity.vectorTo(other: Point2D): Point2D {
 private fun EntityType.hasMultipleAnimationFrames(): Boolean {
     return (imageBasePaths.firstOrNull()?.size ?: 1) > 1
 }
+
+/**
+ * Accumulated coupled turn, in degrees, at which a grid-mode entity makes its quarter turn.
+ */
+private const val GRID_TURN_THRESHOLD = 45.0

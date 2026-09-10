@@ -1,3 +1,7 @@
+/**
+ * The maze model: wall bookkeeping on cell edges, perfect maze generation with seeds, edge-wall checks from either
+ * side of the border, and serialization.
+ */
 package org.simbrain.world.odorworld
 
 import org.junit.jupiter.api.Assertions.assertEquals

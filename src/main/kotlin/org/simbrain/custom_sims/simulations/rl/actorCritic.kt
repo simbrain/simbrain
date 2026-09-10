@@ -1,3 +1,8 @@
+/**
+ * Actor-critic reinforcement learning on a grid world: a mouse learns state values and a policy from cheese and
+ * poison rewards, with an optional maze. The simulation owns the update sequence (world, coupling, reward,
+ * network, movement) and drives the mouse with instant grid steps so one workspace iteration is one decision.
+ */
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.Dispatchers

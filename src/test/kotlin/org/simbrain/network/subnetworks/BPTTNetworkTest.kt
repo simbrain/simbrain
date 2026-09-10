@@ -180,7 +180,7 @@ class BPTTNetworkTest {
         BPTTTrainer(net, bptt).trainOnce()
 
         assertEquals(5, bptt.trainingSet.size)
-        assertEquals(4, bptt.unrolledActivations.size) {
+        assertEquals(5, bptt.unrolledActivations.size) {
             "Expected the complete five-step sequence"
         }
     }
@@ -190,7 +190,7 @@ class BPTTNetworkTest {
         val net = Network()
         val bptt = BPTTNetwork(5, 4, 5)
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.sequenceLength = 4
+        bptt.trainerConfig.sequenceLength = 5
         bptt.unrolledView = true
 
         BPTTTrainer(net, bptt).trainOnce()
@@ -358,7 +358,8 @@ class BPTTNetworkTest {
         val net = Network()
         val bptt = BPTTNetwork(6, 4, 6).apply { label = "BPTT" }
         net.addNetworkModelsAsync(bptt)
-        bptt.trainerConfig.sequenceLength = 7
+        // the default diagonal data has six rows, so three-step sequences divide it evenly
+        bptt.trainerConfig.sequenceLength = 3
         bptt.unrolledView = true
 
         val fromXml = getNetworkXStream().fromXML(getNetworkXStream().toXML(net)) as Network
@@ -366,7 +367,7 @@ class BPTTNetworkTest {
         assertNotNull(restored)
         requireNotNull(restored)
 
-        assertEquals(7, restored.trainerConfig.sequenceLength)
+        assertEquals(3, restored.trainerConfig.sequenceLength)
         assertTrue(restored.unrolledView) { "The unrolled view toggle should survive a round trip" }
         assertEquals(4, restored.hiddenLayer.size)
 

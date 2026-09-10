@@ -383,23 +383,31 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         // Loose individual synapse nodes and the collapsed arrow are mutually exclusive, both driven by
         // synapseGroup.displaySynapses (the single source of truth, kept in sync with the visibility
         // threshold by SynapseGroup.refreshVisibility). Expanded -> every group synapse has a node;
-        // collapsed -> the arrow stands in, so its loose nodes are removed.
+        // collapsed -> the arrow stands in, so its loose nodes are removed. The nodes this group created are
+        // tracked here, because a synapse deleted while a reconcile is still creating nodes would otherwise
+        // get a node after its deletion event has already passed, and nothing would ever remove it.
+        val looseNodes = HashMap<Synapse, SynapseNode>()
+        fun dropLooseNode(synapse: Synapse) {
+            looseNodes.remove(synapse)?.let { node ->
+                canvas.layer.removeChild(node)
+                modelNodeMap.removeIfValue(synapse) { it === node }
+            }
+        }
         suspend fun reconcileLooseSynapseNodes() {
             val groupSynapses = synapseGroup.synapses.toSet()
-            val groupSynapseNodes = filterScreenElements<SynapseNode>().filter { it.synapse in groupSynapses }
+            looseNodes.keys.filter { it !in groupSynapses }.forEach { dropLooseNode(it) }
             if (synapseGroup.displaySynapses) {
-                val withNodes = groupSynapseNodes.map { it.synapse }.toSet()
-                groupSynapses.filter { it !in withNodes }.forEach { synapse ->
-                    createNode(synapse)
+                groupSynapses.filter { it !in looseNodes }.forEach { synapse ->
+                    // membership can change across the suspension points of the previous creations
+                    if (synapse !in synapseGroup.synapses) return@forEach
+                    looseNodes[synapse] = createNode(synapse)
                     // Group synapses follow displaySynapses, not the free-weight visibility that
                     // createNode(synapse) applies.
                     synapse.isVisible = synapseGroup.displaySynapses
                 }
+                looseNodes.keys.filter { it !in synapseGroup.synapses }.forEach { dropLooseNode(it) }
             } else {
-                groupSynapseNodes.forEach {
-                    canvas.layer.removeChild(it)
-                    modelNodeMap.remove(it.model)
-                }
+                looseNodes.keys.toList().forEach { dropLooseNode(it) }
             }
         }
         reconcileLooseSynapseNodes()

@@ -3,6 +3,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
@@ -64,17 +65,11 @@ class NetworkPanelTest {
             // Should now have 1 synapse in the model
             assertEquals(1, synapseGroup.size())
             
-            // The bug: NetworkPanel should only have SynapseNodes for actual synapses in the network
-            val actualSynapseNodes = np.filterScreenElements<SynapseNode>()
-            val synapseNodesWithValidModels = actualSynapseNodes.filter { synapseNode ->
-                // Check if this SynapseNode's synapse is actually in the current synapseGroup
-                synapseGroup.synapses.contains(synapseNode.synapse)
+            // Node creation and removal both arrive through asynchronous events, so wait for the canvas to settle
+            fun validSynapseNodes() = np.filterScreenElements<SynapseNode>().filter { it.synapse in synapseGroup.synapses }
+            awaitUntil(message = "one node for the surviving synapse and none for deleted ones") {
+                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
             }
-            
-            // This should pass but currently fails due to the bug
-            assertEquals(1, synapseNodesWithValidModels.size, 
-                "Expected 1 SynapseNode with valid model, but found ${synapseNodesWithValidModels.size}. " +
-                "Total SynapseNodes: ${actualSynapseNodes.size}")
             
             // Repeat the cycle to show the bug gets worse
             sparse.connectionDensity = 1.0
@@ -85,15 +80,9 @@ class NetworkPanelTest {
             // Should still have 1 synapse in the model
             assertEquals(1, synapseGroup.size())
             
-            // But now we should have even more fake SynapseNodes
-            val finalSynapseNodes = np.filterScreenElements<SynapseNode>()
-            val finalValidSynapseNodes = finalSynapseNodes.filter { synapseNode ->
-                synapseGroup.synapses.contains(synapseNode.synapse)
+            awaitUntil(message = "after the second cycle, still one node for the surviving synapse") {
+                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
             }
-            
-            assertEquals(1, finalValidSynapseNodes.size,
-                "After second cycle: Expected 1 SynapseNode with valid model, but found ${finalValidSynapseNodes.size}. " +
-                "Total SynapseNodes: ${finalSynapseNodes.size}")
         }
     }
 }

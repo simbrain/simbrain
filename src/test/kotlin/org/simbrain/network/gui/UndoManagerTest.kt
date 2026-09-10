@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
@@ -681,6 +682,8 @@ class UndoManagerTest {
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
 
         // Select the input layer as source and output layer as target.
+        // nodes are created from asynchronous model-added events
+        awaitUntil { listOf("Input Layer", "Output Layer").all { label -> networkPanel.screenElements.any { it.model.label == label } } }
         val screenElements = networkPanel.screenElements.associateBy { it.model.label }
 
         networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
@@ -697,9 +700,8 @@ class UndoManagerTest {
             stubButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // the action adds the model asynchronously
+        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 }
 
         // Verify that a supervised model was added
         assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,
@@ -766,6 +768,8 @@ class UndoManagerTest {
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
 
         // Select the input layer as source and output layer as target.
+        // nodes are created from asynchronous model-added events
+        awaitUntil { listOf("Input Layer", "Output Layer").all { label -> networkPanel.screenElements.any { it.model.label == label } } }
         val screenElements = networkPanel.screenElements.associateBy { it.model.label }
 
         networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
@@ -785,9 +789,8 @@ class UndoManagerTest {
             stubButton.doClick()
         }
 
-        withContext(Dispatchers.Swing) {
-            delay(10)
-        }
+        // the action adds the model asynchronously
+        awaitUntil { network.getModels(SupervisedModel::class.java).size == initialSupervisedModelCount + 1 }
 
         // Verify that a supervised model was added
         assertEquals(initialSupervisedModelCount + 1, network.getModels(SupervisedModel::class.java).size,

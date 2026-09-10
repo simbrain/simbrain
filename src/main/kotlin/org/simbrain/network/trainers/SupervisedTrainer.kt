@@ -185,21 +185,30 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     val processorChannel = Channel<Pair<TrainerTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
 
     init {
-        // Wait for incoming tasks and ensures each one is completed before the next one begins
+        // Wait for incoming tasks and ensures each one is completed before the next one begins. A failing task
+        // must fail its own signal and leave the loop running; otherwise every later caller waits forever.
         launch(coroutineContext) {
             for (event in processorChannel) {
                 val (task, signal) = event
-                when (task) {
-                    TrainerTask.Start -> startTrainingHandler()
-                    TrainerTask.Train -> trainOnceHandler()
-                    TrainerTask.Stop -> stopTrainingHandler()
-                    TrainerTask.Randomize -> {
-                        supervisedNetwork.initWeights()
-                        supervisedNetwork.initBiases()
-                        supervisedNetwork.trainerConfig.optimizer.reset()
+                try {
+                    when (task) {
+                        TrainerTask.Start -> startTrainingHandler()
+                        TrainerTask.Train -> trainOnceHandler()
+                        TrainerTask.Stop -> stopTrainingHandler()
+                        TrainerTask.Randomize -> {
+                            supervisedNetwork.initWeights()
+                            supervisedNetwork.initBiases()
+                            supervisedNetwork.trainerConfig.optimizer.reset()
+                        }
                     }
+                    signal.complete(Unit)
+                } catch (e: CancellationException) {
+                    signal.completeExceptionally(e)
+                    throw e
+                } catch (e: Exception) {
+                    isRunning = false
+                    signal.completeExceptionally(e)
                 }
-                signal.complete(Unit)
             }
         }
     }

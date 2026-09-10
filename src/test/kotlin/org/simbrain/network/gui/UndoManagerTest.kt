@@ -8,6 +8,7 @@ import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
@@ -681,21 +682,24 @@ class UndoManagerTest {
         // Get the initial number of supervised models in the network
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
 
-        // Select the input layer as source and output layer as target.
-        // nodes are created from asynchronous model-added events
-        awaitUntil { listOf("Input Layer", "Output Layer").all { label -> networkPanel.screenElements.any { it.model.label == label } } }
-        val screenElements = networkPanel.screenElements.associateBy { it.model.label }
+        // Select the input layer as source and output layer as target. Nodes are created from asynchronous
+        // model-added events, and a layer node's child elements share its model, so pick the layer nodes by type.
+        fun layerNode(layer: NeuronArray) =
+            networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer }
+        awaitUntil { layerNode(inputLayer) != null && layerNode(outputLayer) != null }
 
-        networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
+        networkPanel.selectionManager.add(layerNode(inputLayer)!!)
         networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
         networkPanel.selectionManager.clear()
-        networkPanel.selectionManager.add(screenElements["Output Layer"]!!)
+        networkPanel.selectionManager.add(layerNode(outputLayer)!!)
 
         // Get the action for this test
         val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
 
         val stubButton = JButton(createSupervisedModelAction)
 
+        // the action's enabled state follows selection events; a click on a disabled button does nothing
+        awaitUntil { createSupervisedModelAction.isEnabled }
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }
@@ -767,15 +771,16 @@ class UndoManagerTest {
         // Get the initial number of supervised models in the network
         val initialSupervisedModelCount = network.getModels(SupervisedModel::class.java).size
 
-        // Select the input layer as source and output layer as target.
-        // nodes are created from asynchronous model-added events
-        awaitUntil { listOf("Input Layer", "Output Layer").all { label -> networkPanel.screenElements.any { it.model.label == label } } }
-        val screenElements = networkPanel.screenElements.associateBy { it.model.label }
+        // Select the input layer as source and output layer as target. Nodes are created from asynchronous
+        // model-added events, and a layer node's child elements share its model, so pick the layer nodes by type.
+        fun layerNode(layer: NeuronArray) =
+            networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer }
+        awaitUntil { layerNode(inputLayer) != null && layerNode(outputLayer) != null }
 
-        networkPanel.selectionManager.add(screenElements["Input Layer"]!!)
+        networkPanel.selectionManager.add(layerNode(inputLayer)!!)
         networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
         networkPanel.selectionManager.clear()
-        networkPanel.selectionManager.add(screenElements["Output Layer"]!!)
+        networkPanel.selectionManager.add(layerNode(outputLayer)!!)
 
         // Get the action for this test
         val createSupervisedModelAction = networkPanel.networkActions.createSupervisedModelAction
@@ -784,7 +789,9 @@ class UndoManagerTest {
 
         // Perform multiple actions that can be undone/redone
 
-        // Action 1: Create a supervised model
+        // Action 1: Create a supervised model. The action's enabled state follows selection events, and a
+        // click on a disabled button does nothing.
+        awaitUntil { createSupervisedModelAction.isEnabled }
         withContext(Dispatchers.Swing) {
             stubButton.doClick()
         }

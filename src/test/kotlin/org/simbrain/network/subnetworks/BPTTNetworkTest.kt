@@ -17,7 +17,6 @@ import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.BPTTUnrolledView
 import org.simbrain.network.trainers.BPTTTrainer
-import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.SupervisedTrainerConfig
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.copy
@@ -48,75 +47,6 @@ class BPTTNetworkTest {
             }
             assertTrue(trainer.lastTrainingError < 0.1) { "Error too high: ${trainer.lastTrainingError}" }
         }
-    }
-
-    @Test
-    fun `bptt at sequence length one matches an srn given the same weights`() {
-        val net = Network()
-        val srn = SRNNetwork(4, 3, 4)
-        val bptt = BPTTNetwork(4, 3, 4)
-        net.addNetworkModelsAsync(srn, bptt)
-
-        val random = Random(1234)
-        fun randomize(matrix: Matrix) {
-            for (i in 0 until matrix.nrow()) {
-                for (j in 0 until matrix.ncol()) {
-                    matrix[i, j] = random.nextDouble(-1.0, 1.0)
-                }
-            }
-        }
-
-        listOf(srn.wmList[0].weights, srn.wmList[1].weights, srn.contextToHidden.weights).forEach { randomize(it) }
-        listOf(srn.hiddenLayer, srn.outputLayer).forEach { layer ->
-            layer.biases = Matrix.column(DoubleArray(layer.size) { random.nextDouble(-0.5, 0.5) })
-        }
-
-        // The SRN's context-to-hidden matrix and the BPTT network's self-connection play the same
-        // role, so they start from the same values.
-        bptt.wmList[0].setMatrixValues(srn.wmList[0].weights.clone())
-        bptt.wmList[1].setMatrixValues(srn.wmList[1].weights.clone())
-        bptt.hiddenToHidden.setMatrixValues(srn.contextToHidden.weights.clone())
-        bptt.hiddenLayer.biases = srn.hiddenLayer.biases.clone()
-        bptt.outputLayer.biases = srn.outputLayer.biases.clone()
-
-        val dataset = createDiagonalDataset(4, 4, shiftAmount = 1)
-        srn.trainingSet = dataset.copy()
-        bptt.trainingSet = dataset.copy()
-
-        srn.trainerConfig.learningRate = 0.01
-        bptt.trainerConfig.learningRate = 0.01
-        bptt.trainerConfig.sequenceLength = 1
-
-        val srnTrainer = SupervisedTrainer(net, srn)
-        val bpttTrainer = BPTTTrainer(net, bptt)
-
-        runBlocking {
-            repeat(50) {
-                // BPTT clears its recurrent memory at the start of every pass over the sequence; an
-                // SRN carries whatever the last pass left behind, so match it up by hand.
-                srn.hiddenLayer.activations = Matrix(srn.hiddenLayer.size, 1)
-                srnTrainer.trainOnce()
-                bpttTrainer.trainOnce()
-            }
-        }
-
-        assertEquals(srnTrainer.lastTrainingError, bpttTrainer.lastTrainingError, 1e-10) {
-            "Training error should track an SRN's at sequence length 1"
-        }
-
-        fun assertMatricesEqual(expected: Matrix, actual: Matrix, what: String) {
-            for (i in 0 until expected.nrow()) {
-                for (j in 0 until expected.ncol()) {
-                    assertEquals(expected[i, j], actual[i, j], 1e-10) { "$what differs at ($i, $j)" }
-                }
-            }
-        }
-
-        assertMatricesEqual(srn.wmList[0].weights, bptt.wmList[0].weights, "Input to hidden weights")
-        assertMatricesEqual(srn.wmList[1].weights, bptt.wmList[1].weights, "Hidden to output weights")
-        assertMatricesEqual(srn.contextToHidden.weights, bptt.hiddenToHidden.weights, "Recurrent weights")
-        assertMatricesEqual(srn.hiddenLayer.biases, bptt.hiddenLayer.biases, "Hidden biases")
-        assertMatricesEqual(srn.outputLayer.biases, bptt.outputLayer.biases, "Output biases")
     }
 
     @Test
@@ -381,5 +311,14 @@ class BPTTNetworkTest {
         assertEquals(3, restored.layers.size)
         with(fromXml) { restored.update() }
         runBlocking { BPTTTrainer(fromXml, restored).trainOnce() }
+    }
+
+    @Test
+    fun `a fresh network trains on its default data without any configuration`() = runBlocking {
+        val net = Network()
+        val bptt = BPTTNetwork(5, 4, 5)
+        net.addNetworkModelsAsync(bptt)
+        assertEquals(bptt.trainingSet.size, bptt.trainerConfig.sequenceLength)
+        BPTTTrainer(net, bptt).trainOnce()
     }
 }

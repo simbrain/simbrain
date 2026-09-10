@@ -87,6 +87,8 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
 
         trainingSet = createDiagonalDataset(numInputNodes, numOutputNodes, shiftAmount = 1)
         testingSet = TrainingDataset(mutableListOf(), mutableListOf(), numInputNodes, numOutputNodes)
+        // the default data is one sequence, so a fresh network trains without any configuration
+        trainerConfig.sequenceLength = trainingSet.size
 
         customInfo = InfoText(stateInfoText)
 

@@ -1,3 +1,9 @@
+/**
+ * Piccolo canvas for an [OdorWorld]: draws tile layers, the maze overlay and entity nodes, keeps the camera on the
+ * selected agent, and turns manual key driving into entity movement. While the world is stopped a movement timer
+ * carries continuous movement and grid steps; while it runs, world updates do. The panel never decides what a
+ * move means; it only feeds the entity's manual channels.
+ */
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
@@ -17,6 +23,7 @@ import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
@@ -83,6 +90,11 @@ class OdorWorldPanel(
      * List corresponding to the layers of a tmx file.
      */
     private var layerImageList: List<PImage?>
+
+    /**
+     * Draws maze walls above the tile layers and below entities.
+     */
+    val mazeNode = MazeNode(world)
 
     /**
      * Set to true while the user is dragging an entity, to suppress camera centering.
@@ -261,6 +273,7 @@ class OdorWorldPanel(
         // Add tile map
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
+        canvas.layer.addChild(mazeNode)
 
         // Remove default event handlers
         val panEventHandler: PInputEventListener = canvas.panEventHandler
@@ -416,6 +429,7 @@ class OdorWorldPanel(
         canvas.layer.removeAllChildren()
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
+        canvas.layer.addChild(mazeNode)
         for (oe in world.entityList) {
             val node = EntityNode(oe)
             canvas.layer.addChild(node)
@@ -457,10 +471,48 @@ class OdorWorldPanel(
         }
     }
 
+    private var heldGridDirections: List<GridDirection> = emptyList()
+
+    /**
+     * Hold [direction] on the selected grid-mode entity so it steps that way at every cell center until
+     * [releaseGridDirection]. The most recently pressed direction wins while several are held. With the world
+     * stopped the movement timer carries the steps; while it runs, the world's updates do.
+     */
+    fun pressGridDirection(direction: GridDirection) {
+        heldGridDirections = heldGridDirections - direction + direction
+        val entity = firstSelectedRotatingEntity ?: return
+        if (gridDrivenEntity !== entity) gridDrivenEntity?.manualGridDirection = null
+        gridDrivenEntity = entity
+        entity.manualGridDirection = direction
+    }
+
+    /**
+     * Stop holding [direction]. Returns whether it was held, so a key release can tell a grid-driven press from a
+     * continuous one.
+     */
+    fun releaseGridDirection(direction: GridDirection): Boolean {
+        if (direction !in heldGridDirections) return false
+        heldGridDirections = heldGridDirections - direction
+        val remaining = heldGridDirections.lastOrNull()
+        if (remaining == null) {
+            gridDrivenEntity?.manualGridDirection = null
+            gridDrivenEntity = null
+        } else {
+            gridDrivenEntity?.manualGridDirection = remaining
+        }
+        return true
+    }
+
+    private var gridDrivenEntity: OdorWorldEntity? = null
+
+    /**
+     * Movement timer tick while the world is stopped: applies held keys, and keeps carrying a grid step that is
+     * already in transit after the keys are released so the entity settles on a cell center.
+     */
     fun manualMovementUpdate() {
-        val entityNode = firstSelectedEntityNode
-        if (entityNode != null && isManualMovementMode) {
-            val entity = entityNode.entity
+        val entityNode = firstSelectedEntityNode ?: return
+        val entity = entityNode.entity
+        if (isManualMovementMode || entity.isInTransit) {
             entity.applyMovement()
             entityNode.advance()
             centerCameraToSelectedEntity()
@@ -604,7 +656,7 @@ class OdorWorldPanel(
     }
 
     private val isManualMovementMode: Boolean
-        get() = manualMovementKeyState > 0
+        get() = manualMovementKeyState > 0 || heldGridDirections.isNotEmpty()
 
     private fun createMainToolBar() = JToolBar().apply {
         with(odorWorldActions) {

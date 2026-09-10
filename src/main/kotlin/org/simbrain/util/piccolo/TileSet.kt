@@ -4,6 +4,7 @@ import com.thoughtworks.xstream.annotations.XStreamAlias
 import com.thoughtworks.xstream.annotations.XStreamAsAttribute
 import com.thoughtworks.xstream.annotations.XStreamImplicit
 import java.awt.Image
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * A set of tiles based on an underlying image, e.g. . See https://en.wikipedia.org/wiki/Tile-based_video_game
@@ -125,16 +126,23 @@ class TileSet(
      * @param gid index of the tile
      * @return the image of the tile
      */
+    @Transient
+    private var tileImageCache: ConcurrentHashMap<Int, Image>? = null
+
+    /**
+     * The image for [gid]. Sub-images share the tileset's pixels, so they are cached per gid; the floor caster
+     * asks for one per rendered pixel from the update thread while the panel renders layers on the EDT.
+     */
     fun getTileImage(gid: Int): Image {
         val index = gid - firstgid
-        return if (index !in 0..tilecount) {
-            transparentTexture(tilewidth, tileheight)
-        } else {
+        if (index !in 0..tilecount) return transparentTexture(tilewidth, tileheight)
+        val cache = tileImageCache ?: ConcurrentHashMap<Int, Image>().also { tileImageCache = it }
+        return cache.getOrPut(gid) {
             image.image!!.getSubimage(
-                    index % columns * (tilewidth + spacing),
-                    index / columns * (tileheight + spacing),
-                    tilewidth,
-                    tileheight
+                index % columns * (tilewidth + spacing),
+                index / columns * (tileheight + spacing),
+                tilewidth,
+                tileheight
             )
         }
     }

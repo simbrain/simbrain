@@ -3,6 +3,7 @@ package org.simbrain.world.odorworld
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Assertions.assertSame
 import org.simbrain.util.piccolo.*
 
 class TileMapTest {
@@ -71,4 +72,9 @@ class TileMapTest {
 
     }
 
+    @Test
+    fun `tile images are cached per gid`() {
+        val tileMap = TileMap(4, 4)
+        assertSame(tileMap.tileImage(1), tileMap.tileImage(1))
+    }
 }

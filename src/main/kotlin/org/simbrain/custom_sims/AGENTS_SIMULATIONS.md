@@ -106,6 +106,23 @@ val sensor = agent.addObjectSensor(EntityType.Swiss, 10.0, 0.0, 45.0)
 // Couple sensor to network neurons
 ```
 
+**Grid movement and mazes:**
+```kotlin
+odorWorld.world.generateMaze(5, 5, cellSizeInTiles = 2, seed = 42L)
+agent.movementMode = MovementMode.GRID
+agent.gridSpeed = 8.0                        // pixels per update; at or above the cell size a step is instant
+agent.stepOneCell(GridDirection.NORTH)       // instant, returns false if blocked
+agent.queueGridSteps {                       // one cell per update; each step returns false when blocked
+    north(2)
+    while (east()) { }                       // walk to the wall
+    if (canStep(GridDirection.SOUTH)) south() else west()
+}
+agent.walkGridSteps { east() }               // suspending form; not from inside an update action
+```
+The block is resumed by the entity's own updates, so only its step calls should suspend inside it. Plans run
+while the workspace iterates, after manual keys and before the entity's NPC behavior. Behaviors (`Pursue`,
+`Evade`, `Wander`) path-find over the cell graph in grid mode and set `gridSpeed` from their max speed.
+
 **Custom Updates:**
 ```kotlin
 network.updateManager.addAction(updateAction("Custom Learning") {

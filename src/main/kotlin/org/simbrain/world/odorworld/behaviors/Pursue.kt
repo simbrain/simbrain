@@ -4,7 +4,9 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.magnitude
 import org.simbrain.util.point
 import org.simbrain.util.wrapAroundDistanceTo
+import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.vectorTo
 import kotlin.math.max
@@ -15,6 +17,9 @@ import kotlin.random.Random
  * (current position + velocity * [leadTicks]). Multi-target attraction is summed and
  * weighted by proximity, so the geometry decides which one wins. Wall-aware via a
  * forward feeler ray.
+ *
+ * In grid movement mode the chase is a shortest path over open cells to the nearest reachable target, one cell
+ * per tick, so mazes are solved rather than felt out.
  */
 class Pursue : NpcBehavior() {
 
@@ -82,6 +87,11 @@ class Pursue : NpcBehavior() {
             return
         }
 
+        if (entity.movementMode == MovementMode.GRID) {
+            updateGrid(entity, targets)
+            return
+        }
+
         val predicted = targets.map { t ->
             val v = t.velocity
             point(t.location.x + v.x * leadTicks, t.location.y + v.y * leadTicks)
@@ -116,6 +126,44 @@ class Pursue : NpcBehavior() {
             val stuckSuffix = if (stuck) " — escape mode" else ""
             entity.steeringDebug?.behaviorNotes = "Pursue: ${targets.size} ${targetType} in range$stuckSuffix"
         }
+    }
+
+    private fun updateGrid(entity: OdorWorldEntity, targets: List<OdorWorldEntity>) {
+        val world = entity.world
+        val here = entity.cell
+        val fromHere = world.gridDistancesFrom(here)
+        val targetCells = targets.map { world.cellAt(it.location) }.filter { world.isCellOnGrid(it) }
+        val goal = targetCells
+            .filter { fromHere.distanceAt(it) != UNREACHABLE }
+            .minByOrNull { fromHere.distanceAt(it) }
+        if (goal == null) {
+            commitGridStep(entity, null, maxSpeed, "Pursue: no path to any $targetType")
+            return
+        }
+        if (goal == here) {
+            commitGridStep(entity, null, maxSpeed, "Pursue: reached $targetType")
+            return
+        }
+        val toGoal = world.gridDistancesFrom(goal)
+        val facing = entity.facingDirection
+        val step = world.openGridDirections(here)
+            .mapNotNull { direction ->
+                world.gridStepTarget(here.first, here.second, direction)?.let { direction to toGoal.distanceAt(it) }
+            }
+            .filter { it.second != UNREACHABLE }
+            .minWithOrNull(compareBy<Pair<GridDirection, Int>> { it.second }.thenBy { if (it.first == facing) 0 else 1 })
+            ?.first
+        if (step == null) {
+            commitGridStep(entity, null, maxSpeed, "Pursue: no path to $targetType")
+            return
+        }
+        val nextCell = world.gridStepTarget(here.first, here.second, step)
+        if (nextCell == goal && world.isObjectsBlockMovement) {
+            entity.heading = step.heading
+            commitGridStep(entity, null, maxSpeed, "Pursue: next to $targetType")
+            return
+        }
+        commitGridStep(entity, step, maxSpeed, "Pursue: ${toGoal.distanceAt(here)} steps to $targetType")
     }
 
     override fun copy(): Pursue = Pursue().also {

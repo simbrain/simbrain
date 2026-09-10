@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage
 
 /**
  * A sensor that renders a pseudo-3D first-person view from the entity's perspective.
- * Uses raycasting to project the tilemap floor, world boundary walls, and entity sprites.
+ * Uses raycasting to project the tilemap floor, maze and world boundary walls, and entity sprites.
  *
  * The output is a raster array that can be coupled to neural networks or other components.
  */
@@ -62,10 +62,17 @@ class View3DSensor @JvmOverloads constructor(
 
     @UserParameter(
         label = "Wall Height",
-        description = "Height of boundary walls relative to camera height (1.0 = horizon level, 2.0 = extends above horizon)",
+        description = "Height of maze and boundary walls relative to camera height (1.0 = horizon level, 2.0 = extends above horizon)",
         order = 16
     )
     var wallHeight: Double = 2.0
+
+    @UserParameter(
+        label = "Textured Walls",
+        description = "Draw a brick pattern and a seam at every grid cell boundary on walls, so distance along a wall is visible",
+        order = 18
+    )
+    var textureWalls: Boolean = true
 
     @UserParameter(
         label = "Billboard Sprites",
@@ -83,7 +90,7 @@ class View3DSensor @JvmOverloads constructor(
 
     @UserParameter(
         label = "Wall Color",
-        description = "Base color of boundary walls (darker shade used for N/S walls)",
+        description = "Base color of maze and boundary walls (darker shade used for N/S walls)",
         order = 21
     )
     var wallColor: Color = Color(180, 140, 100)  // Sandy brown
@@ -186,7 +193,8 @@ class View3DSensor @JvmOverloads constructor(
             billboardSprites = billboardSprites,
             skyColor = skyColor,
             wallColor = wallColor,
-            outputBuffer = backBuffer!!
+            outputBuffer = backBuffer!!,
+            textureWalls = textureWalls
         )
 
         // Swap buffers - display buffer now has the completed frame
@@ -243,6 +251,7 @@ class View3DSensor @JvmOverloads constructor(
             billboardSprites = this@View3DSensor.billboardSprites
             skyColor = this@View3DSensor.skyColor
             wallColor = this@View3DSensor.wallColor
+            textureWalls = this@View3DSensor.textureWalls
         }
     }
 

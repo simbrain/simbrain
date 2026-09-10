@@ -4,7 +4,9 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.magnitude
 import org.simbrain.util.point
 import org.simbrain.util.wrapAroundDistanceTo
+import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.vectorTo
 import kotlin.math.max
@@ -13,6 +15,10 @@ import kotlin.random.Random
 /**
  * Flee visible entities of [threatType], avoiding both threats (predicted ahead by
  * [leadTicks]) and walls. Stops when no threats are within [visionRange].
+ *
+ * In grid movement mode each tick steps to whichever neighboring cell is furthest from the nearest threat by
+ * path length, or stays put when no neighbor is better, so a dead end is only entered when it really is the
+ * furthest place to be.
  */
 class Evade : NpcBehavior() {
 
@@ -83,6 +89,11 @@ class Evade : NpcBehavior() {
             return
         }
 
+        if (entity.movementMode == MovementMode.GRID) {
+            updateGrid(entity, threats)
+            return
+        }
+
         val predicted = threats.map { t ->
             val v = t.velocity
             point(t.location.x + v.x * leadTicks, t.location.y + v.y * leadTicks)
@@ -117,6 +128,39 @@ class Evade : NpcBehavior() {
             val stuckSuffix = if (stuck) " — escape mode" else ""
             entity.steeringDebug?.behaviorNotes = "Evade: ${threats.size} ${threatType} in range$stuckSuffix"
         }
+    }
+
+    private fun updateGrid(entity: OdorWorldEntity, threats: List<OdorWorldEntity>) {
+        val world = entity.world
+        val here = entity.cell
+        if (!world.isCellOnGrid(here)) {
+            commitGridStep(entity, null, maxSpeed, "Evade: off the grid")
+            return
+        }
+        val threatMaps = threats
+            .map { world.cellAt(it.location) }
+            .filter { world.isCellOnGrid(it) }
+            .map { world.gridDistancesFrom(it) }
+        fun threatDistance(cell: GridCell): Int {
+            val reachable = threatMaps.map { it.distanceAt(cell) }.filter { it != UNREACHABLE }
+            return reachable.minOrNull() ?: Int.MAX_VALUE
+        }
+        val current = threatDistance(here)
+        if (current == Int.MAX_VALUE) {
+            commitGridStep(entity, null, maxSpeed, "Evade: no $threatType can reach this cell")
+            return
+        }
+        val facing = entity.facingDirection
+        val best = world.openGridDirections(here)
+            .mapNotNull { direction ->
+                world.gridStepTarget(here.first, here.second, direction)?.let { direction to threatDistance(it) }
+            }
+            .maxWithOrNull(compareBy<Pair<GridDirection, Int>> { it.second }.thenBy { if (it.first == facing) 1 else 0 })
+        if (best == null || best.second <= current) {
+            commitGridStep(entity, null, maxSpeed, "Evade: holding, $current steps from $threatType")
+            return
+        }
+        commitGridStep(entity, best.first, maxSpeed, "Evade: ${best.second} steps from $threatType")
     }
 
     override fun copy(): Evade = Evade().also {

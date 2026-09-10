@@ -3,9 +3,14 @@ package org.simbrain.world.odorworld.behaviors
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.GridDirection
+import org.simbrain.world.odorworld.Maze
+import org.simbrain.world.odorworld.openMaze
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.abs
 
@@ -215,8 +220,10 @@ class BehaviorsTest {
             wallWeight = 1.5
             driftDegreesPerTick = 9.0
             numRays = 32
+            gridTurnChance = 0.6
         }
         val copy = original.copy()
+        assertEquals(0.6, copy.gridTurnChance)
         assertEquals(2.5, copy.maxSpeed)
         assertEquals(7.0, copy.maxTurn)
         assertEquals(50.0, copy.feelerLength)
@@ -224,5 +231,184 @@ class BehaviorsTest {
         assertEquals(9.0, copy.driftDegreesPerTick)
         assertEquals(32, copy.numRays)
         assertTrue(copy !== original)
+    }
+
+    private fun gridWorld() = OdorWorld().apply {
+        tileMap = TileMap(8, 8)
+        gridCellSizeInTiles = 2
+        wrapAround = false
+        isObjectsBlockMovement = false
+    }
+
+    private suspend fun gridAgent(world: OdorWorld, column: Int, row: Int): OdorWorldEntity {
+        val agent = OdorWorldEntity(world, EntityType.Mouse)
+        world.addEntity(agent)
+        agent.location = world.cellCenter(column, row)
+        agent.heading = 0.0
+        agent.movementMode = MovementMode.GRID
+        return agent
+    }
+
+    private val wholeCell = 64.0
+
+    @Test
+    fun `Pursue in grid mode steps one cell toward the target along a cardinal direction`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(0, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = wholeCell }
+        world.update()
+        assertEquals(0 to 1, agent.cell)
+        assertEquals(GridDirection.SOUTH, agent.facingDirection)
+        assertEquals(0.0, agent.movement.speed, 0.001)
+    }
+
+    @Test
+    fun `a behavior's max speed sets the grid transit speed`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(0, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = 16.0 }
+        world.update()
+        assertEquals(16.0, agent.gridSpeed)
+        assertTrue(agent.isInTransit)
+        assertEquals(0 to 0, agent.cell)
+        repeat(3) { world.update() }
+        assertFalse(agent.isInTransit)
+        assertEquals(0 to 1, agent.cell)
+    }
+
+    @Test
+    fun `Pursue in grid mode follows the shortest path through a maze to the target`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.recursiveBacktracker(4, 4, seed = 11L)
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(3, 3)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
+        val pathLength = world.gridDistancesFrom(0 to 0).distanceAt(3 to 3)
+        assertTrue(pathLength > 0)
+        repeat(pathLength) {
+            world.update()
+            assertFalse(agent.wasStuckLastTick, "every step along the path should be open")
+        }
+        assertEquals(3 to 3, agent.cell)
+        world.update()
+        assertEquals(3 to 3, agent.cell)
+        assertNull(agent.pendingGridStep)
+    }
+
+    @Test
+    fun `Pursue in grid mode stops next to a target that blocks movement`() = runBlocking {
+        val world = gridWorld().apply { isObjectsBlockMovement = true }
+        val agent = gridAgent(world, 0, 0)
+        val target = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(target)
+        target.location = world.cellCenter(2, 0)
+        agent.behavior = Pursue().also { it.targetType = EntityType.Swiss; it.visionRange = 400.0; it.maxSpeed = wholeCell }
+        world.update()
+        assertEquals(1 to 0, agent.cell)
+        world.update()
+        assertEquals(1 to 0, agent.cell)
+        assertEquals(GridDirection.EAST, agent.facingDirection)
+        assertFalse(agent.wasStuckLastTick)
+    }
+
+    @Test
+    fun `Evade in grid mode steps to the cell furthest from the threat by path`() = runBlocking {
+        val world = gridWorld()
+        world.maze = openMaze(4, 1)
+        val agent = gridAgent(world, 1, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(0, 0)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
+        world.update()
+        assertEquals(2 to 0, agent.cell)
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        assertNull(agent.pendingGridStep)
+    }
+
+    @Test
+    fun `Evade in grid mode prefers a long corridor over a nearby dead end`() = runBlocking {
+        val world = gridWorld()
+        // Row 0 is a corridor; cell (1, 1) is a dead end hanging off (1, 0)
+        world.maze = Maze(4, 4).apply {
+            for (c in 0 until 3) setWall(c, 0, GridDirection.EAST, false)
+            setWall(1, 0, GridDirection.SOUTH, false)
+        }
+        val agent = gridAgent(world, 1, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(0, 0)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0; it.maxSpeed = wholeCell }
+        world.update()
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+    }
+
+    @Test
+    fun `Wander in grid mode walks corridors and turns at walls without leaving cell centers`() = runBlocking {
+        val world = gridWorld()
+        world.maze = Maze.recursiveBacktracker(4, 4, seed = 3L)
+        val agent = gridAgent(world, 1, 1)
+        agent.behavior = Wander().also { it.maxSpeed = wholeCell }
+        val visited = mutableSetOf<Pair<Int, Int>>()
+        repeat(60) {
+            world.update()
+            visited += agent.cell
+            val (column, row) = agent.cell
+            assertEquals(world.cellCenter(column, row), agent.location)
+            assertEquals(0.0, agent.heading % 90.0)
+        }
+        assertTrue(visited.size >= 4, "should have explored several cells, visited $visited")
+    }
+
+    @Test
+    fun `Wander in grid mode with no turn chance goes straight until a wall`() = runBlocking {
+        val world = gridWorld()
+        world.maze = openMaze(4, 4)
+        val agent = gridAgent(world, 0, 0)
+        agent.behavior = Wander().also { it.gridTurnChance = 0.0; it.maxSpeed = wholeCell }
+        world.update()
+        world.update()
+        world.update()
+        assertEquals(3 to 0, agent.cell)
+        world.update()
+        assertNotEquals(3 to 0, agent.cell)
+    }
+
+    @Test
+    fun `stop in grid mode clears a pending step`() {
+        val world = gridWorld()
+        val agent = OdorWorldEntity(world, EntityType.Mouse)
+        agent.movementMode = MovementMode.GRID
+        commitGridStep(agent, GridDirection.SOUTH, 2.0, "go")
+        assertEquals(GridDirection.SOUTH, agent.pendingGridStep)
+        assertEquals(2.0, agent.gridSpeed)
+        Steering.stop(agent, "done")
+        assertNull(agent.pendingGridStep)
+    }
+
+    @Test
+    fun `Evade in grid mode off the grid holds still without throwing`() = runBlocking {
+        val world = gridWorld()
+        val agent = gridAgent(world, 0, 0)
+        val threat = OdorWorldEntity(world, EntityType.Swiss)
+        world.addEntity(threat)
+        threat.location = world.cellCenter(1, 1)
+        agent.behavior = Evade().also { it.threatType = EntityType.Swiss; it.visionRange = 1000.0 }
+        agent.x = world.width
+        assertFalse(world.isCellOnGrid(agent.cell))
+        world.update()
+        assertNull(agent.pendingGridStep)
     }
 }

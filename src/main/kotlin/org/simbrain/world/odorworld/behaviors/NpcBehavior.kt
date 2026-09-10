@@ -6,6 +6,7 @@ import org.simbrain.util.rayVsAabb
 import org.simbrain.util.shortestAngleDelta
 import org.simbrain.util.toRadian
 import org.simbrain.util.wrapAroundVectorTo
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import kotlin.math.cos
 import kotlin.math.max
@@ -14,7 +15,9 @@ import kotlin.math.sin
 /**
  * Programmatic NPC behavior that drives an entity's movement each tick by writing
  * to its [OdorWorldEntity.movement] (speed and dtheta). Attach to an entity via
- * [OdorWorldEntity.behavior]; it is invoked at the start of [OdorWorldEntity.update].
+ * [OdorWorldEntity.behavior]; it is invoked at the start of [OdorWorldEntity.update]. In
+ * [MovementMode.GRID] a behavior instead queues one cardinal step per cell center through
+ * [commitGridStep]; the helpers in GridNavigation.kt search the cell graph for it.
  */
 abstract class NpcBehavior : CopyableObject {
 
@@ -143,6 +146,25 @@ object Steering {
             }
         }
 
+        world.maze?.let { maze ->
+            val reach = feelerLength + max(entity.width, entity.height)
+            for (wall in maze.wallSegments(world.gridCellPixelSize)) {
+                val nearX = entity.x.coerceIn(wall.x1, wall.x2)
+                val nearY = entity.y.coerceIn(wall.y1, wall.y2)
+                val dx = nearX - entity.x
+                val dy = nearY - entity.y
+                if (dx * dx + dy * dy > reach * reach) continue
+                obsBoxes.add(
+                    doubleArrayOf(
+                        wall.x1 - agentHalfW,
+                        wall.y1 - agentHalfH,
+                        (wall.x2 - wall.x1) + entity.width,
+                        (wall.y2 - wall.y1) + entity.height
+                    )
+                )
+            }
+        }
+
         val baseHeading = entity.heading
         var bestScore = Double.NEGATIVE_INFINITY
         var bestHeading = baseHeading
@@ -173,6 +195,9 @@ object Steering {
         return bestHeading
     }
 
+    /**
+     * Steers toward [targetHeading], turning at most [maxTurn] degrees this tick at [speed].
+     */
     fun applyHeading(entity: OdorWorldEntity, targetHeading: Double, speed: Double, maxTurn: Double) {
         val delta = shortestAngleDelta(entity.heading, targetHeading)
         val dtheta = delta.coerceIn(-maxTurn, maxTurn)
@@ -189,13 +214,5 @@ object Steering {
      * into the debug snapshot for the overlay text. When debug is on, replaces any prior rays
      * with an empty snapshot so the overlay shows just the status text.
      */
-    fun stop(entity: OdorWorldEntity, reason: String) {
-        entity.movement.speed = 0.0
-        entity.movement.dtheta = 0.0
-        if (entity.showSteeringDebug) {
-            entity.steeringDebug = SteeringDebugInfo(
-                DoubleArray(0), DoubleArray(0), DoubleArray(0), entity.heading, 0.0
-            ).also { it.behaviorNotes = reason }
-        }
-    }
+    fun stop(entity: OdorWorldEntity, reason: String) = commitGridStep(entity, null, 0.0, reason)
 }

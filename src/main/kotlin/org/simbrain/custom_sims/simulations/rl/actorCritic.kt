@@ -1,3 +1,8 @@
+/**
+ * Actor-critic reinforcement learning on a grid world: a mouse learns state values and a policy from cheese and
+ * poison rewards, with an optional maze. The simulation owns the update sequence (world, coupling, reward,
+ * network, movement) and drives the mouse with instant grid steps so one workspace iteration is one decision.
+ */
 package org.simbrain.custom_sims.simulations
 
 import kotlinx.coroutines.Dispatchers
@@ -17,9 +22,10 @@ import org.simbrain.util.piccolo.TileMap
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
+import org.simbrain.world.odorworld.GridDirection
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.entities.EntityType
-import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.sensors.GridSensor
 import org.simbrain.world.odorworld.sensors.ObjectSensor
 import java.awt.BasicStroke
@@ -28,9 +34,7 @@ import java.awt.Graphics2D
 import java.util.function.Consumer
 import javax.swing.JInternalFrame
 import javax.swing.JLabel
-import kotlin.math.cos
 import kotlin.math.max
-import kotlin.math.sin
 
 val actorCritic = newSim {
 
@@ -70,6 +74,7 @@ val actorCritic = newSim {
         tileMap = TileMap(numTilesInADimension * tileGridRatio, numTilesInADimension * tileGridRatio)
         isObjectsBlockMovement = false
         wrapAround = false
+        gridCellSizeInTiles = tileGridRatio
         lockAspectRatio = true
     }
 
@@ -80,6 +85,8 @@ val actorCritic = newSim {
     val mouse = world.addEntity(mouseHomeLocation, mouseHomeLocation, EntityType.Mouse).apply {
         heading = 90.0
         isShowSensorsAndEffectors = false
+        movementMode = MovementMode.GRID
+        gridSpeed = gridSize.toDouble()
     }
     val cheese = world.addEntity(gridSize / 2, gridSize / 2, EntityType.Swiss)
     val poison = world.addEntity(gridSize / 2, mouseHomeLocation, EntityType.Poison)
@@ -274,37 +281,14 @@ val actorCritic = newSim {
     workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
     workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
         outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
-
-            fun OdorWorldEntity.applyGridMovement() {
-                val dx = cos(heading.toRadian()) * gridSize
-                val dy = -sin(heading.toRadian()) * gridSize
-
-                val newX = x + dx
-                val newY = y + dy
-
-                location = if (world.wrapAround) {
-                    val maxXLocation = world.width
-                    val maxYLocation = world.height
-                    point((newX + maxXLocation) % maxXLocation, (newY + maxYLocation) % maxYLocation)
-                } else {
-                    val newLocation = point(newX, newY)
-                    if (world.contains(newLocation)) {
-                        newLocation
-                    } else {
-                        point(x, y)
-                    }
-                }
+            val direction = when (it.label) {
+                "North" -> GridDirection.NORTH
+                "South" -> GridDirection.SOUTH
+                "East" -> GridDirection.EAST
+                "West" -> GridDirection.WEST
+                else -> return@let
             }
-
-            when (it.label) {
-                "North" -> mouse.heading = 90.0
-                "South" -> mouse.heading = -90.0
-                "East" -> mouse.heading = 0.0
-                "West" -> mouse.heading = 180.0
-                else -> {}
-            }
-
-            mouse.applyGridMovement()
+            mouse.stepOneCell(direction)
         }
     })
     // Doc viewer
@@ -379,6 +363,10 @@ val actorCritic = newSim {
     You can move the cheese or poison around as you run trials, and see how it will follow old "trails" and build new ones. For example, after it learns to find the cheese in the upper left, you can pull the cheese down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. You can make it learn to follow an arbitrary pattern to find the cheese.
     
     It's easy to delete, move, or add additional cheese and poison entities to create customized environments (right click in odor world and select `add entity`). Watch how the world gets populated with "good" (green) and "bad" (red) regions or trails as the agent learns. You can also easily delete cheeses or poisons. 
+    
+    ## Mazes
+    
+    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
     
     You can also study the time series plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place. 
     
@@ -488,6 +476,10 @@ val actorCritic = newSim {
             val tfEpsilon = addTextField("Epsilon", "" + epsilon)
             val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
             val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
+            val tfMazeSeed = addTextField(
+                "Maze Seed", "",
+                toolTip = "Whole number that picks a fixed maze layout. Leave blank for a random maze each time."
+            )
             addCheckBox("Show Grid", showGrid) {
                 showGrid = it
                 refreshValueOverlay()
@@ -496,6 +488,14 @@ val actorCritic = newSim {
                 showValues = it
                 refreshValueOverlay()
             }
+            addButton("Generate Maze") {
+                val seed = tfMazeSeed.text.trim().toLongOrNull()
+                world.generateMaze(numTilesInADimension, numTilesInADimension, tileGridRatio, seed)
+                resetMouse()
+            }.apply { toolTipText = "Lay a new perfect maze over the grid and return the mouse to its start" }
+            addButton("Clear Maze") {
+                world.clearMaze()
+            }.apply { toolTipText = "Remove the maze walls" }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)

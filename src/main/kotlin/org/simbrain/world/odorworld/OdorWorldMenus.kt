@@ -47,6 +47,7 @@ val OdorWorldPanel.editMenu
             add(createChooseLayerMenu())
             add(editLayersAction)
             add(clearTileMapAction)
+            add(clearMazeAction)
             addSeparator()
             add(clearAllTrailsAction)
         }
@@ -57,6 +58,8 @@ val OdorWorldPanel.insertMenu
         with(odorWorldActions) {
             add(addAgentAction)
             add(addEntityAction)
+            addSeparator()
+            add(addMazeAction)
         }
     }
 

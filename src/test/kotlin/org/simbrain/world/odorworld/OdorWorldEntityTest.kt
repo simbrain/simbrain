@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.simbrain.util.point
+import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.entities.vectorTo
 import org.simbrain.world.odorworld.sensors.SmellSensor
@@ -149,4 +150,14 @@ class OdorWorldEntityTest {
         assertEquals(-20.0, v.y, 0.001)
     }
 
+    @Test
+    fun `changing the entity type changes the collision size`() {
+        val world = OdorWorld()
+        val entity = OdorWorldEntity(world, EntityType.Amy)
+        assertEquals(96.0, entity.width)
+        assertEquals(96.0, entity.height)
+        entity.entityType = EntityType.Mouse
+        assertEquals(40.0, entity.width)
+        assertEquals(40.0, entity.height)
+    }
 }

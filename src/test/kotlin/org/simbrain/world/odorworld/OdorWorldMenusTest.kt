@@ -50,14 +50,14 @@ class OdorWorldMenusTest {
 
     @Test
     fun `insert menu holds the actions that add objects to the world`() {
-        assertEquals(listOf("Add agent", "Add entity"), panel.insertMenu.itemLabels())
+        assertEquals(listOf("Add agent", "Add entity", "Add maze..."), panel.insertMenu.itemLabels())
     }
 
     @Test
     fun `edit menu groups selection and tile map editing`() {
         val labels = panel.editMenu.itemLabels()
         assertTrue(labels.containsAll(listOf("Select all", "Delete selected entities", "Edit entity...")))
-        assertTrue(labels.containsAll(listOf("Add tile...", "Fill layer...", "Choose layer", "Edit layers...", "Clear tile map...")))
+        assertTrue(labels.containsAll(listOf("Add tile...", "Fill layer...", "Choose layer", "Edit layers...", "Clear tile map...", "Clear maze")))
         assertFalse(labels.contains("Add entity"))
     }
 
@@ -87,8 +87,8 @@ class OdorWorldMenusTest {
         val toolbarActions = panel.mainToolBar.components.filterIsInstance<javax.swing.AbstractButton>().map { it.action }
         assertTrue(toolbarActions.contains(actions.addAgentAction))
         assertTrue(toolbarActions.contains(actions.deleteSelectedAction))
-        val insertActions = (0 until panel.insertMenu.itemCount).map { panel.insertMenu.getItem(it).action }
-        assertEquals(listOf(actions.addAgentAction, actions.addEntityAction), insertActions)
+        val insertActions = (0 until panel.insertMenu.itemCount).mapNotNull { panel.insertMenu.getItem(it)?.action }
+        assertEquals(listOf(actions.addAgentAction, actions.addEntityAction, actions.addMazeAction), insertActions)
         val popupActions = panel.getContextMenu().components.filterIsInstance<javax.swing.JMenuItem>().map { it.action }
         assertTrue(popupActions.contains(actions.addEntityAction))
     }
@@ -104,6 +104,18 @@ class OdorWorldMenusTest {
 
         SwingUtilities.invokeAndWait { panel.selectionManager.add(panel.getEntityNode(entity)) }
         awaitOnEdt { actions.deleteSelectedAction.isEnabled && actions.editEntityAction.isEnabled }
+    }
+
+    @Test
+    fun `clear maze is enabled only while the world has a maze`() {
+        val actions = panel.odorWorldActions
+        awaitOnEdt { !actions.clearMazeAction.isEnabled }
+
+        world.generateMaze(3, 3, seed = 7L)
+        awaitOnEdt { actions.clearMazeAction.isEnabled }
+
+        SwingUtilities.invokeAndWait { actions.clearMazeAction.actionPerformed(ActionEvent(panel, ActionEvent.ACTION_PERFORMED, null)) }
+        awaitOnEdt { world.maze == null && !actions.clearMazeAction.isEnabled }
     }
 
     @Test

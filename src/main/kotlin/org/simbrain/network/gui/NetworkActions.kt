@@ -1278,7 +1278,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     val flattenTarget = pipelineModels.last() as Layer
                     var currentLayer: Layer = flattenTarget
                     var denseLayerCount = 0
-                    while (currentLayer != target) {
+                    // a self-loop or cycle of matrices must not spin this recompute forever, least of all on the EDT
+                    val visited = HashSet<Layer>()
+                    while (currentLayer != target && visited.add(currentLayer)) {
                         val wm = currentLayer.outgoingConnectors
                             .filterIsInstance<WeightMatrix>().firstOrNull() ?: break
                         pipelineModels.add(wm)

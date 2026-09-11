@@ -1,3 +1,7 @@
+/**
+ * Canvas node lifecycle in the network panel: nodes for group synapses track the model, and connector nodes are
+ * created only once their endpoints have nodes, whatever order the models arrive in.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.runBlocking
@@ -11,6 +15,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
@@ -110,5 +115,24 @@ class NetworkPanelTest {
         assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
         assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(source))
         assertTrue(elapsedMs < 5000, "node creation should not wait out the blocking lookup's timeout, took $elapsedMs ms")
+    }
+
+    @Test
+    fun `a panel built over an existing network creates connector nodes after their endpoints`() = runBlocking {
+        val net = Network()
+        // an activation sequence sorts after connectors in updating order, so this matrix's endpoint would
+        // otherwise be reached only after the matrix during reconstruction
+        val sequence = ActivationSequence(3, 4)
+        val array = NeuronArray(2)
+        val weightMatrix = WeightMatrix(sequence, array)
+        net.addNetworkModels(sequence, array, weightMatrix)
+
+        val start = System.nanoTime()
+        val np = NetworkPanel(NetworkComponent("Test", net))
+        val elapsedMs = (System.nanoTime() - start) / 1_000_000
+
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(sequence))
+        assertTrue(elapsedMs < 5000, "reconstruction should not wait out the endpoint lookup's timeout, took $elapsedMs ms")
     }
 }

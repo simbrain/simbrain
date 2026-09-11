@@ -1,3 +1,9 @@
+/**
+ * Undo and redo for the network panel. [UndoManager] keeps the action stacks; [UndeleteContext] snapshots the
+ * parent relationships of models about to be deleted and restores them afterwards, re-creating canvas nodes in
+ * an order the panel can honor: connectors after every other model, since their node creation waits for their
+ * endpoints' nodes.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Deferred
@@ -218,19 +224,16 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
                 // together in restore once every one of them has been issued.
                 network.addNetworkModelAsync(model, usePlacementManager = false, useAutoAssignedId = false)
                     ?.let { pendingChildAdds += it }
-                // Non-blocking: the overlay's own node is (re)built later in this restore via
-                // createNode(SupervisedModel), which re-attaches its layer/matrix nodes; this best-effort
-                // attach only matters when that node already exists, so peek-and-skip is correct.
-                (modelNodeMap.peek(parent) as? SupervisedModelNode)?.let { supervisedModelNode ->
-                    modelNodeMap.peek(model)?.let { screenElement ->
-                        supervisedModelNode.addNode(screenElement)
-                    }
-                }
+                // A surviving overlay node re-attaches the child once its node exists; a rebuilt overlay
+                // node re-attaches everything itself through createNode(SupervisedModel).
+                (modelNodeMap.peek(parent) as? SupervisedModelNode)?.let { pendingChildAttaches += it to model }
             }
         }
     }
 
     private val pendingChildAdds = mutableListOf<Deferred<Unit>>()
+
+    private val pendingChildAttaches = mutableListOf<Pair<SupervisedModelNode, NetworkModel>>()
 
     private fun hasNoParent(model: NetworkModel): Boolean {
         return childToParentMaps.none { it.containsKey(model) }
@@ -256,16 +259,23 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
         // Adds models back to parent groups. Connectors go last: their node creation waits for their
         // endpoints' nodes, and the endpoints may be among the models restored here.
-        val (connectors, others) = modelsToReAdd.partition { it is Connector || it is SynapseGroup }
-        (others + connectors).forEach { reAddToGroup(it) }
-        // Add all models without parents back
-        network.addNetworkModelsAsync(
-            modelsToReAdd.filter { hasNoParent(it) },
-            usePlacementManager = false,
-            useAutoAssignedId = false
-        ).awaitAll()
-        pendingChildAdds.awaitAll()
-        pendingChildAdds.clear()
+        val (connectors, others) = modelsToReAdd.partition { it.waitsForEndpointNodes() }
+        try {
+            (others + connectors).forEach { reAddToGroup(it) }
+            // Add all models without parents back
+            network.addNetworkModelsAsync(
+                modelsToReAdd.filter { hasNoParent(it) },
+                usePlacementManager = false,
+                useAutoAssignedId = false
+            ).awaitAll()
+            pendingChildAdds.awaitAll()
+            pendingChildAttaches.forEach { (overlayNode, model) ->
+                modelNodeMap.peek(model)?.let { overlayNode.addNode(it) }
+            }
+        } finally {
+            pendingChildAdds.clear()
+            pendingChildAttaches.clear()
+        }
         // Finalize recreation. afterRestore re-establishes a model's external links (a Connector
         // re-registers with its endpoint layers, a Synapse with its neurons' fan-in/out, a SynapseGroup
         // with its layers, etc.). Call it on every restored model whose parent is NOT itself being

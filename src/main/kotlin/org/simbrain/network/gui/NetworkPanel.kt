@@ -1,3 +1,10 @@
+/**
+ * Piccolo canvas for a [org.simbrain.network.core.Network]: creates and removes a screen element for every network
+ * model from the model's events, keeps the model-to-node map that connectors and containers resolve their parts
+ * through, and hosts selection, key handling and the actions. Node creation order matters: a connector's node is
+ * created only after its endpoints' nodes exist, because its arrow resolves them with a blocking lookup during
+ * layout on the EDT; the constructor and undo restore both order their work to honor that.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.*
@@ -42,6 +49,13 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
+/**
+ * Models whose node draws an arrow between two endpoint nodes and therefore must not exist on the canvas before
+ * those nodes do; see [NetworkPanel.awaitEndpointNodes].
+ */
+internal fun NetworkModel.waitsForEndpointNodes() =
+    this is Connector || this is TensorConnector || this is FlattenConnector || this is SynapseGroup
+
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -230,9 +244,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         })
 
-        // Add all network elements (important for de-serializing)
+        // Add all network elements (important for de-serializing). Connector nodes wait for their endpoint
+        // nodes, and updating order does not place every endpoint type before connectors, so they go last.
         runBlocking {
-            network.modelsInReconstructionOrder.forEach { createNode(it) }
+            val (connectors, others) = network.modelsInReconstructionOrder.partition { it.waitsForEndpointNodes() }
+            (others + connectors).forEach { createNode(it) }
         }
 
         initEventHandlers()
@@ -401,13 +417,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         return createSynapseGroupNode(synapseGroup)
     }
 
-    private suspend fun createSynapseGroupNode(synapseGroup: SynapseGroup) = addScreenElement {
+    private suspend fun createSynapseGroupNode(synapseGroup: SynapseGroup): ScreenElement {
         // Loose individual synapse nodes and the collapsed arrow are mutually exclusive, both driven by
         // synapseGroup.displaySynapses (the single source of truth, kept in sync with the visibility
         // threshold by SynapseGroup.refreshVisibility). Expanded -> every group synapse has a node;
-        // collapsed -> the arrow stands in, so its loose nodes are removed. The nodes this group created are
-        // tracked here, because a synapse deleted while a reconcile is still creating nodes would otherwise
-        // get a node after its deletion event has already passed, and nothing would ever remove it.
+        // collapsed -> the arrow stands in, so its loose nodes are removed. The group's loose nodes are
+        // tracked here rather than found by scanning the canvas, because a synapse deleted while a
+        // reconcile is still creating nodes would otherwise get a node after its deletion event has
+        // already passed, and nothing would ever remove it. Nodes made by other paths, such as undo, are
+        // adopted from the model map at each reconcile so they are never duplicated.
         val looseNodes = HashMap<Synapse, SynapseNode>()
         fun dropLooseNode(synapse: Synapse) {
             looseNodes.remove(synapse)?.let { node ->
@@ -417,6 +435,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         suspend fun reconcileLooseSynapseNodes() {
             val groupSynapses = synapseGroup.synapses.toSet()
+            groupSynapses.filter { it !in looseNodes }.forEach { synapse ->
+                (modelNodeMap.peek(synapse) as? SynapseNode)?.let { looseNodes[synapse] = it }
+            }
             looseNodes.keys.filter { it !in groupSynapses }.forEach { dropLooseNode(it) }
             if (synapseGroup.displaySynapses) {
                 groupSynapses.filter { it !in looseNodes }.forEach { synapse ->
@@ -433,9 +454,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         }
         reconcileLooseSynapseNodes()
-        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
-        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
-        SynapseGroupNode(this, synapseGroup)
+        val groupNode = addScreenElement { SynapseGroupNode(this, synapseGroup) }
+        // A group deleted and restored gets a new node while these handlers stay subscribed, so each pair
+        // only acts while its own node is still the group's node
+        fun isCurrent() = modelNodeMap.peek(synapseGroup) === groupNode
+        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        return groupNode
     }
 
     suspend fun createNode(weightMatrix: Connector): ScreenElement {

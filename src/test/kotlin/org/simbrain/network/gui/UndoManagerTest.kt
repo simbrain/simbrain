@@ -1,3 +1,7 @@
+/**
+ * Undo and redo of the network panel's actions through the same buttons a user clicks, with every asynchronous
+ * effect awaited rather than slept on.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers

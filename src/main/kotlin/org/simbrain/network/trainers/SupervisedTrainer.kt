@@ -1,3 +1,9 @@
+/**
+ * Drives supervised training for a [SupervisedNetwork]: one task loop processes start, train, stop and randomize
+ * requests in order so a training step never overlaps another, computing gradients through the network's layers
+ * and applying the configured optimizer. A failing task fails only its own request and ends any run in progress;
+ * the loop itself always survives. Subclasses such as the BPTT trainer override the batch step.
+ */
 package org.simbrain.network.trainers
 
 import kotlinx.coroutines.*
@@ -205,8 +211,12 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                 } catch (e: CancellationException) {
                     signal.completeExceptionally(e)
                     throw e
-                } catch (e: Exception) {
-                    isRunning = false
+                } catch (e: Throwable) {
+                    // Throwable, not Exception: an error such as running out of memory must not kill the
+                    // loop either. A run in progress is ended so the dialog leaves its running state.
+                    System.err.println("Trainer task $task failed: $e")
+                    e.printStackTrace()
+                    if (isRunning) stopTrainingHandler()
                     signal.completeExceptionally(e)
                 }
             }

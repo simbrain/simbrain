@@ -1,3 +1,10 @@
+/**
+ * Piccolo canvas for a [org.simbrain.network.core.Network]: creates and removes a screen element for every network
+ * model from the model's events, keeps the model-to-node map that connectors and containers resolve their parts
+ * through, and hosts selection, key handling and the actions. Node creation order matters: a connector's node is
+ * created only after its endpoints' nodes exist, because its arrow resolves them with a blocking lookup during
+ * layout on the EDT; the constructor and undo restore both order their work to honor that.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.*
@@ -42,6 +49,13 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
+/**
+ * Models whose node draws an arrow between two endpoint nodes and therefore must not exist on the canvas before
+ * those nodes do; see [NetworkPanel.awaitEndpointNodes].
+ */
+internal fun NetworkModel.waitsForEndpointNodes() =
+    this is Connector || this is TensorConnector || this is FlattenConnector || this is SynapseGroup
+
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -230,9 +244,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         })
 
-        // Add all network elements (important for de-serializing)
+        // Add all network elements (important for de-serializing). Connector nodes wait for their endpoint
+        // nodes, and updating order does not place every endpoint type before connectors, so they go last.
         runBlocking {
-            network.modelsInReconstructionOrder.forEach { createNode(it) }
+            val (connectors, others) = network.modelsInReconstructionOrder.partition { it.waitsForEndpointNodes() }
+            (others + connectors).forEach { createNode(it) }
         }
 
         initEventHandlers()
@@ -353,9 +369,26 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     suspend fun createNode(tensorLayer: TensorLayer) = addScreenElement { TensorNode(this, tensorLayer) }
 
-    suspend fun createNode(tensorConnector: TensorConnector) = addScreenElement { TensorConnectorNode(this, tensorConnector) }
+    /**
+     * Waits for the nodes of a connector's endpoints before the connector's own node is created. A connector's
+     * arrow resolves its endpoint nodes with a blocking lookup during layout on the EDT, so adding the connector
+     * to the canvas first would block the EDT on node creation that itself needs the EDT, a deadlock that only
+     * the lookup's timeout ends. Suspending here on the Swing dispatcher lets that creation run instead. Inside a
+     * subnetwork's own creation sequence the endpoints already have nodes, so this returns at once.
+     */
+    private suspend fun awaitEndpointNodes(vararg endpoints: NetworkModel) {
+        endpoints.forEach { modelNodeMap.get<ScreenElement>(it) }
+    }
 
-    suspend fun createNode(flattenConnector: FlattenConnector) = addScreenElement { FlattenConnectorNode(this, flattenConnector) }
+    suspend fun createNode(tensorConnector: TensorConnector): ScreenElement {
+        awaitEndpointNodes(tensorConnector.source, tensorConnector.target)
+        return addScreenElement { TensorConnectorNode(this, tensorConnector) }
+    }
+
+    suspend fun createNode(flattenConnector: FlattenConnector): ScreenElement {
+        awaitEndpointNodes(flattenConnector.source, flattenConnector.target)
+        return addScreenElement { FlattenConnectorNode(this, flattenConnector) }
+    }
 
     suspend fun createNode(activationSequence: ActivationSequence) = addScreenElement { ActivationSequenceNode(this, activationSequence) }
 
@@ -379,37 +412,60 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    suspend fun createNode(synapseGroup: SynapseGroup) = addScreenElement {
+    suspend fun createNode(synapseGroup: SynapseGroup): ScreenElement {
+        awaitEndpointNodes(synapseGroup.source, synapseGroup.target)
+        return createSynapseGroupNode(synapseGroup)
+    }
+
+    private suspend fun createSynapseGroupNode(synapseGroup: SynapseGroup): ScreenElement {
         // Loose individual synapse nodes and the collapsed arrow are mutually exclusive, both driven by
         // synapseGroup.displaySynapses (the single source of truth, kept in sync with the visibility
         // threshold by SynapseGroup.refreshVisibility). Expanded -> every group synapse has a node;
-        // collapsed -> the arrow stands in, so its loose nodes are removed.
+        // collapsed -> the arrow stands in, so its loose nodes are removed. The group's loose nodes are
+        // tracked here rather than found by scanning the canvas, because a synapse deleted while a
+        // reconcile is still creating nodes would otherwise get a node after its deletion event has
+        // already passed, and nothing would ever remove it. Nodes made by other paths, such as undo, are
+        // adopted from the model map at each reconcile so they are never duplicated.
+        val looseNodes = HashMap<Synapse, SynapseNode>()
+        fun dropLooseNode(synapse: Synapse) {
+            looseNodes.remove(synapse)?.let { node ->
+                canvas.layer.removeChild(node)
+                modelNodeMap.removeIfValue(synapse) { it === node }
+            }
+        }
         suspend fun reconcileLooseSynapseNodes() {
             val groupSynapses = synapseGroup.synapses.toSet()
-            val groupSynapseNodes = filterScreenElements<SynapseNode>().filter { it.synapse in groupSynapses }
+            groupSynapses.filter { it !in looseNodes }.forEach { synapse ->
+                (modelNodeMap.peek(synapse) as? SynapseNode)?.let { looseNodes[synapse] = it }
+            }
+            looseNodes.keys.filter { it !in groupSynapses }.forEach { dropLooseNode(it) }
             if (synapseGroup.displaySynapses) {
-                val withNodes = groupSynapseNodes.map { it.synapse }.toSet()
-                groupSynapses.filter { it !in withNodes }.forEach { synapse ->
-                    createNode(synapse)
+                groupSynapses.filter { it !in looseNodes }.forEach { synapse ->
+                    // membership can change across the suspension points of the previous creations
+                    if (synapse !in synapseGroup.synapses) return@forEach
+                    looseNodes[synapse] = createNode(synapse)
                     // Group synapses follow displaySynapses, not the free-weight visibility that
                     // createNode(synapse) applies.
                     synapse.isVisible = synapseGroup.displaySynapses
                 }
+                looseNodes.keys.filter { it !in synapseGroup.synapses }.forEach { dropLooseNode(it) }
             } else {
-                groupSynapseNodes.forEach {
-                    canvas.layer.removeChild(it)
-                    modelNodeMap.remove(it.model)
-                }
+                looseNodes.keys.toList().forEach { dropLooseNode(it) }
             }
         }
         reconcileLooseSynapseNodes()
-        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
-        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { reconcileLooseSynapseNodes() }
-        SynapseGroupNode(this, synapseGroup)
+        val groupNode = addScreenElement { SynapseGroupNode(this, synapseGroup) }
+        // A group deleted and restored gets a new node while these handlers stay subscribed, so each pair
+        // only acts while its own node is still the group's node
+        fun isCurrent() = modelNodeMap.peek(synapseGroup) === groupNode
+        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        return groupNode
     }
 
-    suspend fun createNode(weightMatrix: Connector) = addScreenElement {
-        WeightMatrixNode(this, weightMatrix)
+    suspend fun createNode(weightMatrix: Connector): ScreenElement {
+        awaitEndpointNodes(weightMatrix.source, weightMatrix.target)
+        return addScreenElement { WeightMatrixNode(this, weightMatrix) }
     }
 
     suspend fun createNode(supervisedModel: SupervisedModel) = addScreenElement {

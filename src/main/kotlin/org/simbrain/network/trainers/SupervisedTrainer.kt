@@ -1,3 +1,9 @@
+/**
+ * Drives supervised training for a [SupervisedNetwork]: one task loop processes start, train, stop and randomize
+ * requests in order so a training step never overlaps another, computing gradients through the network's layers
+ * and applying the configured optimizer. A failing task fails only its own request and ends any run in progress;
+ * the loop itself always survives. Subclasses such as the BPTT trainer override the batch step.
+ */
 package org.simbrain.network.trainers
 
 import kotlinx.coroutines.*
@@ -185,21 +191,34 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     val processorChannel = Channel<Pair<TrainerTask, CompletableDeferred<Unit>>>(capacity = Channel.UNLIMITED)
 
     init {
-        // Wait for incoming tasks and ensures each one is completed before the next one begins
+        // Wait for incoming tasks and ensures each one is completed before the next one begins. A failing task
+        // must fail its own signal and leave the loop running; otherwise every later caller waits forever.
         launch(coroutineContext) {
             for (event in processorChannel) {
                 val (task, signal) = event
-                when (task) {
-                    TrainerTask.Start -> startTrainingHandler()
-                    TrainerTask.Train -> trainOnceHandler()
-                    TrainerTask.Stop -> stopTrainingHandler()
-                    TrainerTask.Randomize -> {
-                        supervisedNetwork.initWeights()
-                        supervisedNetwork.initBiases()
-                        supervisedNetwork.trainerConfig.optimizer.reset()
+                try {
+                    when (task) {
+                        TrainerTask.Start -> startTrainingHandler()
+                        TrainerTask.Train -> trainOnceHandler()
+                        TrainerTask.Stop -> stopTrainingHandler()
+                        TrainerTask.Randomize -> {
+                            supervisedNetwork.initWeights()
+                            supervisedNetwork.initBiases()
+                            supervisedNetwork.trainerConfig.optimizer.reset()
+                        }
                     }
+                    signal.complete(Unit)
+                } catch (e: CancellationException) {
+                    signal.completeExceptionally(e)
+                    throw e
+                } catch (e: Throwable) {
+                    // Throwable, not Exception: an error such as running out of memory must not kill the
+                    // loop either. A run in progress is ended so the dialog leaves its running state.
+                    System.err.println("Trainer task $task failed: $e")
+                    e.printStackTrace()
+                    if (isRunning) stopTrainingHandler()
+                    signal.completeExceptionally(e)
                 }
-                signal.complete(Unit)
             }
         }
     }

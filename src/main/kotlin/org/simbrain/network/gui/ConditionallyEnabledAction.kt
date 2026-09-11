@@ -1,6 +1,7 @@
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
@@ -15,8 +16,8 @@ abstract class ConditionallyEnabledAction(
 
     init {
         updateAction()
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Default) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Default) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
         // Also listen to clipboard changes for conditions that depend on clipboard state
         Clipboard.addClipboardListener { updateAction() }
     }

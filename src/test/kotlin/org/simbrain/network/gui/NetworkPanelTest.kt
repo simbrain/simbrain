@@ -1,10 +1,21 @@
+/**
+ * Canvas node lifecycle in the network panel: nodes for group synapses track the model, and connector nodes are
+ * created only once their endpoints have nodes, whatever order the models arrive in.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotNull
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.nodes.ScreenElement
 import org.junit.jupiter.api.Test
+import org.simbrain.plot.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
@@ -64,17 +75,11 @@ class NetworkPanelTest {
             // Should now have 1 synapse in the model
             assertEquals(1, synapseGroup.size())
             
-            // The bug: NetworkPanel should only have SynapseNodes for actual synapses in the network
-            val actualSynapseNodes = np.filterScreenElements<SynapseNode>()
-            val synapseNodesWithValidModels = actualSynapseNodes.filter { synapseNode ->
-                // Check if this SynapseNode's synapse is actually in the current synapseGroup
-                synapseGroup.synapses.contains(synapseNode.synapse)
+            // Node creation and removal both arrive through asynchronous events, so wait for the canvas to settle
+            fun validSynapseNodes() = np.filterScreenElements<SynapseNode>().filter { it.synapse in synapseGroup.synapses }
+            awaitUntil(message = "one node for the surviving synapse and none for deleted ones") {
+                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
             }
-            
-            // This should pass but currently fails due to the bug
-            assertEquals(1, synapseNodesWithValidModels.size, 
-                "Expected 1 SynapseNode with valid model, but found ${synapseNodesWithValidModels.size}. " +
-                "Total SynapseNodes: ${actualSynapseNodes.size}")
             
             // Repeat the cycle to show the bug gets worse
             sparse.connectionDensity = 1.0
@@ -85,15 +90,49 @@ class NetworkPanelTest {
             // Should still have 1 synapse in the model
             assertEquals(1, synapseGroup.size())
             
-            // But now we should have even more fake SynapseNodes
-            val finalSynapseNodes = np.filterScreenElements<SynapseNode>()
-            val finalValidSynapseNodes = finalSynapseNodes.filter { synapseNode ->
-                synapseGroup.synapses.contains(synapseNode.synapse)
+            awaitUntil(message = "after the second cycle, still one node for the surviving synapse") {
+                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
             }
-            
-            assertEquals(1, finalValidSynapseNodes.size,
-                "After second cycle: Expected 1 SynapseNode with valid model, but found ${finalValidSynapseNodes.size}. " +
-                "Total SynapseNodes: ${finalSynapseNodes.size}")
         }
+    }
+
+    @Test
+    fun `a weight matrix added before its arrays gets its node without freezing the panel`() = runBlocking {
+        val net = Network()
+        val nc = NetworkComponent("Test", net)
+        val np = NetworkPanel(nc)
+        val source = NeuronArray(3)
+        val target = NeuronArray(2)
+        val weightMatrix = WeightMatrix(source, target)
+
+        val start = System.nanoTime()
+        // the matrix's node creation starts first and must wait for the array nodes rather than block on them
+        val matrixAdded = net.addNetworkModelAsync(weightMatrix)
+        net.addNetworkModels(source, target)
+        matrixAdded?.await()
+        val elapsedMs = (System.nanoTime() - start) / 1_000_000
+
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(source))
+        assertTrue(elapsedMs < 5000, "node creation should not wait out the blocking lookup's timeout, took $elapsedMs ms")
+    }
+
+    @Test
+    fun `a panel built over an existing network creates connector nodes after their endpoints`() = runBlocking {
+        val net = Network()
+        // an activation sequence sorts after connectors in updating order, so this matrix's endpoint would
+        // otherwise be reached only after the matrix during reconstruction
+        val sequence = ActivationSequence(3, 4)
+        val array = NeuronArray(2)
+        val weightMatrix = WeightMatrix(sequence, array)
+        net.addNetworkModels(sequence, array, weightMatrix)
+
+        val start = System.nanoTime()
+        val np = NetworkPanel(NetworkComponent("Test", net))
+        val elapsedMs = (System.nanoTime() - start) / 1_000_000
+
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
+        assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(sequence))
+        assertTrue(elapsedMs < 5000, "reconstruction should not wait out the endpoint lookup's timeout, took $elapsedMs ms")
     }
 }

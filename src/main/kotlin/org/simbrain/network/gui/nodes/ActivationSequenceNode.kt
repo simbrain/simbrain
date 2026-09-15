@@ -38,6 +38,10 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
         mainNode.addChild(this)
         pickable = true
         addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseEntered(event: PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+                event.isHandled = true
+            }
             override fun mouseMoved(event: PInputEvent) {
                 val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
                 networkPanel.updateActivationSequenceTrace(activationSequence, row, col)
@@ -68,8 +72,12 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     var pixelSelection: Set<Pair<Int, Int>> = emptySet()
         set(value) {
             field = value
+            if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
+
+    override val toolTipText: String?
+        get() = if (pixelSelection.isNotEmpty()) null else super.toolTipText
 
     /** Map a pixel within [activationImage] to a `(position row, feature col)` cell. */
     private fun pixelToCell(localPt: Point2D): Pair<Int, Int>? {

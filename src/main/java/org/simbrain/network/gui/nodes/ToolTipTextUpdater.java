@@ -49,9 +49,8 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
     public final void mouseEntered(final PInputEvent event) {
 
         event.setHandled(true);
-        // if (!networkPanel.isThreadRunning()) {
-        networkPanel.getCanvas().setToolTipText(getToolTipText());
-        // }
+        // Alt is the pixel-edit modifier; entering with it held means the user is aiming at cells.
+        networkPanel.getCanvas().setToolTipText(event.isAltDown() ? null : getToolTipText());
     }
 
     /**
@@ -61,8 +60,6 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
     public final void mouseExited(final PInputEvent event) {
 
         event.setHandled(true);
-        // if (!networkPanel.isThreadRunning()) {
         networkPanel.getCanvas().setToolTipText(null);
-        // }
     }
 }

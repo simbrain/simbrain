@@ -14,6 +14,7 @@ import org.simbrain.util.createEditorDialog
 import org.simbrain.util.propertyeditor.EditableObject
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
+import javax.swing.ToolTipManager
 
 /**
  * Helpers for the per-pixel quick-edit feature on neuron arrays and weight matrices.
@@ -78,6 +79,21 @@ fun NetworkPanel.hasAnyPixelSelection(): Boolean =
     filterScreenElements<NeuronArrayNode>().any { it.pixelSelection.isNotEmpty() } ||
     filterScreenElements<WeightMatrixNode>().any { it.pixelSelection.isNotEmpty() } ||
     filterScreenElements<ActivationSequenceNode>().any { it.pixelSelection.isNotEmpty() }
+
+/**
+ * Hide any visible canvas tooltip right away and keep it hidden until the mouse next enters a node.
+ * Called when the mouse enters a pixel surface and when a pixel selection begins, so the node-level
+ * summary box does not sit over the cells being traced or edited. Clearing the text alone leaves an
+ * already-open tooltip up until Swing's dismiss delay, so the shared manager is toggled to force the
+ * popup closed.
+ */
+fun NetworkPanel.hideCanvasTooltip() {
+    canvas.toolTipText = null
+    ToolTipManager.sharedInstance().apply {
+        isEnabled = false
+        isEnabled = true
+    }
+}
 
 /** Drop all pixel selections (e.g. on Escape). */
 fun NetworkPanel.clearAllPixelSelections() {

@@ -59,7 +59,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 circle.drawActivation(activation, neuronArray.updateRule.graphicalBounds)
                 circle.addInputEventListener(object : PBasicInputEventHandler() {
                     override fun mouseEntered(event: PInputEvent) {
+                        networkPanel.hideCanvasTooltip()
                         networkPanel.updateNeuronArrayTrace(neuronArray, i)
+                        event.isHandled = true
                     }
                     override fun mouseExited(event: PInputEvent) {
                         networkPanel.clearNeuronArrayTrace()
@@ -99,6 +101,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         imageNodeGroup.addChild(this)
         pickable = true
         addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseEntered(event: PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+                event.isHandled = true
+            }
             override fun mouseMoved(event: PInputEvent) {
                 val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
                 networkPanel.updateNeuronArrayTrace(neuronArray, idx)
@@ -172,8 +178,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     var pixelSelection: Set<Int> = emptySet()
         set(value) {
             field = value
+            if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
+
+    override val toolTipText: String?
+        get() = if (pixelSelection.isNotEmpty()) null else super.toolTipText
 
     /** Pick or toggle a pixel as part of the per-pixel selection. */
     private fun selectPixel(idx: Int, addToSelection: Boolean) {

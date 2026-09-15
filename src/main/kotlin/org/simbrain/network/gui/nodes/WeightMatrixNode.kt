@@ -102,6 +102,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     var pixelSelection: Set<Pair<Int, Int>> = emptySet()
         set(value) {
             field = value
+            if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
 
@@ -130,6 +131,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         addChild(imageBox)
         imageBox.pickable = true
         imageBox.addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseEntered(event: PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+                event.isHandled = true
+            }
             override fun mouseMoved(event: PInputEvent) {
                 val wm = weightMatrix as? WeightMatrix ?: return
                 val localPt = event.getPositionRelativeTo(imageBox)
@@ -365,8 +370,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override val isDraggable: Boolean = false
 
-    override val toolTipText: String
-        get() = createTooltipText(weightMatrix)
+    override val toolTipText: String?
+        get() = if (pixelSelection.isNotEmpty()) null else createTooltipText(weightMatrix)
 
     override val contextMenu: JPopupMenu
         get() {

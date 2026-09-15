@@ -9,6 +9,8 @@ import org.simbrain.util.allPropertiesToString
 import org.simbrain.util.displayInDialog
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
+import java.awt.Color
 
 @APETabOder( "Main", "Test Tab")
 class APETestObjectKotlin: EditableObject {
@@ -95,6 +97,29 @@ class APETestObjectKotlin: EditableObject {
         initValue = intArrayOf(1, -1),
         columnMode = false,
         order = 67
+    )
+
+    var testBooleanArray by GuiEditable(
+        initValue = booleanArrayOf(true, false),
+        columnMode = false,
+        order = 68
+    )
+
+    var testStringArray by GuiEditable(
+        initValue = arrayOf("a", "b"),
+        columnMode = false,
+        order = 69
+    )
+
+    var testMatrix by GuiEditable(
+        initValue = Matrix.column(doubleArrayOf(1.0, 2.0)),
+        columnMode = true,
+        order = 69
+    )
+
+    var testColor by GuiEditable(
+        initValue = Color.BLACK,
+        order = 69
     )
 
     var neuronUpdateRule: NeuronUpdateRule<*, *> by GuiEditable(

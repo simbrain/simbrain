@@ -18,6 +18,7 @@ import smile.math.matrix.Matrix
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.FlowLayout
 import java.awt.event.ActionEvent
 import java.awt.event.FocusAdapter
 import java.awt.event.FocusEvent
@@ -758,6 +759,12 @@ class ColorWidget<O : EditableObject>(
         ColorSelector().also {
             if (isConsistent) {
                 it.value = parameter.value
+            } else {
+                it.setNull()
+            }
+            it.addChangeListener { _ ->
+                this@ColorWidget.isConsistent = true
+                events.valueChanged.fire(parameter.property)
             }
         }
     }
@@ -790,6 +797,12 @@ class ThemeColorWidget<O : EditableObject>(
         ThemeColorSelector().also {
             if (isConsistent) {
                 it.value = parameter.value
+            } else {
+                it.setNull()
+            }
+            it.onChanged = {
+                this@ThemeColorWidget.isConsistent = true
+                events.valueChanged.fire(parameter.property)
             }
         }
     }
@@ -812,39 +825,74 @@ class ThemeColorWidget<O : EditableObject>(
     }
 }
 
-class DoubleArrayWidget<O : EditableObject>(
+/**
+ * Base for widgets that edit a value through a table. When the edited objects hold different values, an "Edit"
+ * button stands in for the table. Clicking it shows the table seeded from the first object and marks the widget
+ * consistent, so the table's value is committed to every object. The button is disabled when the values have
+ * different shapes, since one table cannot be written to all of them.
+ */
+abstract class TableParameterWidget<O : EditableObject, T>(
     val editor: AnnotatedPropertyEditor<O>,
-    parameter: GuiEditable<O, DoubleArray>,
+    parameter: GuiEditable<O, T>,
     isConsistent: Boolean
-) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
+) : ParameterWidget<O, T>(parameter, isConsistent) {
 
-    private var model = if (parameter.columnMode) {
-        createBasicDataFrameFromColumn(parameter.value)
-    } else {
-        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
+    protected abstract fun createTablePanel(): JComponent
+
+    protected abstract fun shapeOf(value: T): List<Int>
+
+    val tablePanel: JComponent by lazy { createTablePanel() }
+
+    /**
+     * True when every edited object's value has the same shape, so one table can be written to all of them.
+     */
+    val canEditInconsistentValues: Boolean by lazy {
+        editor.editingObjects.map { shapeOf(parameter.property.get(it)) }.distinct().size == 1
     }
 
-    override val widget by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                usePadding = false
-            ).also {
-                it.table.tableHeader = null
-                add(it)
-                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+    val isShowingTable: Boolean
+        get() = isConsistent
+
+    /**
+     * Stands in for the table while the objects have different values; clicking it reveals the table so the value
+     * can be edited for all objects at once.
+     */
+    private val editButton: JButton by lazy {
+        JButton("Edit").apply {
+            toolTipText = if (canEditInconsistentValues) {
+                "Selected objects have different values. Click to edit them all at once."
+            } else {
+                "Selected objects have different values and different sizes, so they cannot be edited together."
             }
+            isEnabled = canEditInconsistentValues
+            addActionListener { editInconsistentValues() }
         }
     }
 
-    override val value: DoubleArray
-        get() = if (parameter.columnMode) {
-            model.getDoubleColumn(0)
-        } else {
-            model.getRow<Double>(0).toDoubleArray()
+    private val placeholderPanel: JComponent by lazy {
+        JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
+            add(editButton)
         }
+    }
+
+    override val widget: JComponent by lazy {
+        JPanel(BorderLayout()).apply {
+            add(if (isConsistent) tablePanel else placeholderPanel)
+        }
+    }
+
+    /**
+     * Replaces the "..." placeholder with the table so that the value can be edited for all objects at once.
+     */
+    fun editInconsistentValues() {
+        if (isConsistent || !canEditInconsistentValues) return
+        isConsistent = true
+        widget.removeAll()
+        widget.add(tablePanel)
+        widget.revalidate()
+        widget.repaint()
+        events.valueChanged.fire(parameter.property)
+    }
 
     override fun refresh(property: KProperty<*>) {
         parameter.update(UpdateFunctionContext(
@@ -853,20 +901,58 @@ class DoubleArrayWidget<O : EditableObject>(
             property,
             enableWidgetProvider = { enabled ->
                 widget.isEnabled = enabled
+                editButton.isEnabled = enabled && canEditInconsistentValues
             },
             widgetVisibilityProvider = { visible ->
                 widget.isVisible = visible
             }
         ))
     }
+
+    protected fun createHeaderlessTablePanel(model: SimbrainDataFrame): JComponent = JPanel().apply {
+        layout = BorderLayout()
+        SimbrainTablePanel(
+            model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
+            usePadding = false
+        ).also {
+            it.table.tableHeader = null
+            add(it)
+            minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+            preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
+        }
+    }
+}
+
+class DoubleArrayWidget<O : EditableObject>(
+    editor: AnnotatedPropertyEditor<O>,
+    parameter: GuiEditable<O, DoubleArray>,
+    isConsistent: Boolean
+) : TableParameterWidget<O, DoubleArray>(editor, parameter, isConsistent) {
+
+    private var model = if (parameter.columnMode) {
+        createBasicDataFrameFromColumn(parameter.value)
+    } else {
+        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
+    }
+
+    override fun createTablePanel() = createHeaderlessTablePanel(model)
+
+    override fun shapeOf(value: DoubleArray) = listOf(value.size)
+
+    override val value: DoubleArray
+        get() = if (parameter.columnMode) {
+            model.getDoubleColumn(0)
+        } else {
+            model.getRow<Double>(0).toDoubleArray()
+        }
 }
 
 class TensorWidget<O : EditableObject>(
-    val editor: AnnotatedPropertyEditor<O>,
+    editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, DoubleArray>,
     isConsistent: Boolean,
     private val descriptor: TensorDescriptor
-) : ParameterWidget<O, DoubleArray>(parameter, isConsistent) {
+) : TableParameterWidget<O, DoubleArray>(editor, parameter, isConsistent) {
 
     /** One BasicDataFrame per slice (tab). */
     private val sliceModels: List<BasicDataFrame> = (0 until descriptor.numSlices).map { sliceIdx ->
@@ -890,64 +976,66 @@ class TensorWidget<O : EditableObject>(
         addAction(table.createShowMatrixPlotAction())
     }
 
-    override val widget: JComponent by lazy {
+    override fun createTablePanel(): JComponent {
         // header ~25px, each data row ~20px, plus border/insets ~6px, cap at 300
         val tableHeight = min(50 + descriptor.numRows * 20 + 6, 300)
         val tableWidth = min(descriptor.numCols * 55 + 30, 500).coerceAtLeast(200)
 
         if (descriptor.numSlices == 1) {
             // Single slice: no tabs needed
-            object : JPanel(BorderLayout()) {
+            return object : JPanel(BorderLayout()) {
                 init {
                     createTensorTablePanel(sliceModels[0]).also { add(it) }
                 }
                 override fun getPreferredSize() = Dimension(tableWidth, tableHeight)
                 override fun getMinimumSize() = preferredSize
             }
-        } else {
-            // Multiple tab axes → nested tab panes; single tab axis → flat tabs
-            val tabDepth = descriptor.tabAxes.size
-            val totalTabOverhead = tabDepth * 35
+        }
 
-            fun buildTablePanel(sliceIdx: Int) = JPanel(BorderLayout()).apply {
-                createTensorTablePanel(sliceModels[sliceIdx]).also { add(it) }
-            }
+        // Multiple tab axes → nested tab panes; single tab axis → flat tabs
+        val tabDepth = descriptor.tabAxes.size
+        val totalTabOverhead = tabDepth * 35
 
-            /**
-             * Recursively build nested JTabbedPanes.
-             * [tabAxisLevel] is the index into descriptor.tabAxes we're nesting at.
-             * [baseSlice] is the accumulated slice offset from outer tab selections.
-             * [sliceStride] is how many slices each tab at this level spans.
-             */
-            fun buildTabs(tabAxisLevel: Int, baseSlice: Int, sliceStride: Int): JComponent {
-                val axis = descriptor.tabAxes[tabAxisLevel]
-                val axisSize = descriptor.dimensions[axis]
-                val tabbedPane = JTabbedPane()
-                val childStride = sliceStride / axisSize
+        fun buildTablePanel(sliceIdx: Int) = JPanel(BorderLayout()).apply {
+            createTensorTablePanel(sliceModels[sliceIdx]).also { add(it) }
+        }
 
-                for (i in 0 until axisSize) {
-                    val childBase = baseSlice + i * childStride
-                    val label = descriptor.axisLabel(tabAxisLevel, i)
-                    if (tabAxisLevel == tabDepth - 1) {
-                        // Leaf level: add table directly
-                        tabbedPane.addTab(label, buildTablePanel(childBase))
-                    } else {
-                        // Intermediate level: recurse
-                        tabbedPane.addTab(label, buildTabs(tabAxisLevel + 1, childBase, childStride))
-                    }
+        /**
+         * Recursively build nested JTabbedPanes.
+         * [tabAxisLevel] is the index into descriptor.tabAxes we're nesting at.
+         * [baseSlice] is the accumulated slice offset from outer tab selections.
+         * [sliceStride] is how many slices each tab at this level spans.
+         */
+        fun buildTabs(tabAxisLevel: Int, baseSlice: Int, sliceStride: Int): JComponent {
+            val axis = descriptor.tabAxes[tabAxisLevel]
+            val axisSize = descriptor.dimensions[axis]
+            val tabbedPane = JTabbedPane()
+            val childStride = sliceStride / axisSize
+
+            for (i in 0 until axisSize) {
+                val childBase = baseSlice + i * childStride
+                val label = descriptor.axisLabel(tabAxisLevel, i)
+                if (tabAxisLevel == tabDepth - 1) {
+                    // Leaf level: add table directly
+                    tabbedPane.addTab(label, buildTablePanel(childBase))
+                } else {
+                    // Intermediate level: recurse
+                    tabbedPane.addTab(label, buildTabs(tabAxisLevel + 1, childBase, childStride))
                 }
-                return tabbedPane
             }
+            return tabbedPane
+        }
 
-            object : JPanel(BorderLayout()) {
-                init {
-                    add(buildTabs(0, 0, descriptor.numSlices))
-                }
-                override fun getPreferredSize() = Dimension(tableWidth, tableHeight + totalTabOverhead)
-                override fun getMinimumSize() = preferredSize
+        return object : JPanel(BorderLayout()) {
+            init {
+                add(buildTabs(0, 0, descriptor.numSlices))
             }
+            override fun getPreferredSize() = Dimension(tableWidth, tableHeight + totalTabOverhead)
+            override fun getMinimumSize() = preferredSize
         }
     }
+
+    override fun shapeOf(value: DoubleArray) = listOf(value.size)
 
     override val value: DoubleArray
         get() {
@@ -958,27 +1046,13 @@ class TensorWidget<O : EditableObject>(
             }
             return result
         }
-
-    override fun refresh(property: KProperty<*>) {
-        parameter.update(UpdateFunctionContext(
-            editor,
-            parameter,
-            property,
-            enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
-            },
-            widgetVisibilityProvider = { visible ->
-                widget.isVisible = visible
-            }
-        ))
-    }
 }
 
 class IntArrayWidget<O : EditableObject>(
-    val editor: AnnotatedPropertyEditor<O>,
+    editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, IntArray>,
     isConsistent: Boolean
-) : ParameterWidget<O, IntArray>(parameter, isConsistent) {
+) : TableParameterWidget<O, IntArray>(editor, parameter, isConsistent) {
 
     private var model = if (parameter.columnMode) {
         createBasicDataFrameFromColumn(parameter.value)
@@ -986,20 +1060,9 @@ class IntArrayWidget<O : EditableObject>(
         createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
     }
 
-    override val widget by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                usePadding = false
-            ).also {
-                it.table.tableHeader = null
-                add(it)
-                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            }
-        }
-    }
+    override fun createTablePanel() = createHeaderlessTablePanel(model)
+
+    override fun shapeOf(value: IntArray) = listOf(value.size)
 
     override val value: IntArray
         get() = if (parameter.columnMode) {
@@ -1007,27 +1070,13 @@ class IntArrayWidget<O : EditableObject>(
         } else {
             model.getRow<Int>(0).toIntArray()
         }
-
-    override fun refresh(property: KProperty<*>) {
-        parameter.update(UpdateFunctionContext(
-            editor,
-            parameter,
-            property,
-            enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
-            },
-            widgetVisibilityProvider = { visible ->
-                widget.isVisible = visible
-            }
-        ))
-    }
 }
 
 class BooleanArrayWidget<O : EditableObject>(
-    val editor: AnnotatedPropertyEditor<O>,
+    editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, BooleanArray>,
     isConsistent: Boolean
-) : ParameterWidget<O, BooleanArray>(parameter, isConsistent) {
+) : TableParameterWidget<O, BooleanArray>(editor, parameter, isConsistent) {
 
     private var model = if (parameter.columnMode) {
         createBasicDataFrameFromColumn(parameter.value.map { if (it) 1 else 0 }.toIntArray())
@@ -1035,20 +1084,9 @@ class BooleanArrayWidget<O : EditableObject>(
         createFrom2DArray(arrayOf(parameter.value.map { if (it) 1 else 0 }.toTypedArray()))
     }
 
-    override val widget by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                usePadding = false
-            ).also {
-                it.table.tableHeader = null
-                add(it)
-                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            }
-        }
-    }
+    override fun createTablePanel() = createHeaderlessTablePanel(model)
+
+    override fun shapeOf(value: BooleanArray) = listOf(value.size)
 
     override val value: BooleanArray
         get() = if (parameter.columnMode) {
@@ -1056,27 +1094,13 @@ class BooleanArrayWidget<O : EditableObject>(
         } else {
             model.getRow<Boolean>(0).toBooleanArray()
         }
-
-    override fun refresh(property: KProperty<*>) {
-        parameter.update(UpdateFunctionContext(
-            editor,
-            parameter,
-            property,
-            enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
-            },
-            widgetVisibilityProvider = { visible ->
-                widget.isVisible = visible
-            }
-        ))
-    }
 }
 
 class StringArrayWidget<O : EditableObject>(
-    val editor: AnnotatedPropertyEditor<O>,
+    editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Array<String>>,
     isConsistent: Boolean
-) : ParameterWidget<O, Array<String>>(parameter, isConsistent) {
+) : TableParameterWidget<O, Array<String>>(editor, parameter, isConsistent) {
 
     private var model = if (parameter.columnMode) {
         parameter.value.let { data ->
@@ -1094,20 +1118,9 @@ class StringArrayWidget<O : EditableObject>(
         }
     }
 
-    override val widget by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                usePadding = false
-            ).also {
-                it.table.tableHeader = null
-                add(it)
-                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            }
-        }
-    }
+    override fun createTablePanel() = createHeaderlessTablePanel(model)
+
+    override fun shapeOf(value: Array<String>) = listOf(value.size)
 
     override val value: Array<String>
         get() = if (parameter.columnMode) {
@@ -1115,27 +1128,13 @@ class StringArrayWidget<O : EditableObject>(
         } else {
             model.getRow<String>(0).toTypedArray()
         }
-
-    override fun refresh(property: KProperty<*>) {
-        parameter.update(UpdateFunctionContext(
-            editor,
-            parameter,
-            property,
-            enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
-            },
-            widgetVisibilityProvider = { visible ->
-                widget.isVisible = visible
-            }
-        ))
-    }
 }
 
 class MatrixWidget<O : EditableObject>(
-    val editor: AnnotatedPropertyEditor<O>,
+    editor: AnnotatedPropertyEditor<O>,
     parameter: GuiEditable<O, Matrix>,
     isConsistent: Boolean
-) : ParameterWidget<O, Matrix>(parameter, isConsistent) {
+) : TableParameterWidget<O, Matrix>(editor, parameter, isConsistent) {
 
     private var model = MatrixDataFrame(
 
@@ -1151,20 +1150,9 @@ class MatrixWidget<O : EditableObject>(
         }
     )
 
-    override val widget by lazy {
-        JPanel().apply {
-            layout = BorderLayout()
-            SimbrainTablePanel(
-                model, useDefaultToolbarAndMenu = false, useRowHeaders = false,
-                usePadding = false
-            ).also {
-                it.table.tableHeader = null
-                add(it)
-                minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-                preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
-            }
-        }
-    }
+    override fun createTablePanel() = createHeaderlessTablePanel(model)
+
+    override fun shapeOf(value: Matrix) = listOf(value.nrow(), value.ncol())
 
     override val value: Matrix
         get() = if (parameter.columnMode && parameter.value.ncol() == 1) {
@@ -1172,20 +1160,6 @@ class MatrixWidget<O : EditableObject>(
         } else {
             model.data.transpose()
         }
-
-    override fun refresh(property: KProperty<*>) {
-        parameter.update(UpdateFunctionContext(
-            editor,
-            parameter,
-            property,
-            enableWidgetProvider = { enabled ->
-                widget.isEnabled = enabled
-            },
-            widgetVisibilityProvider = { visible ->
-                widget.isVisible = visible
-            }
-        ))
-    }
 }
 
 /**

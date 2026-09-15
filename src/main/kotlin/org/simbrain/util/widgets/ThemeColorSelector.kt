@@ -1,5 +1,6 @@
 package org.simbrain.util.widgets
 
+import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.Theme
 import org.simbrain.util.ThemeColor
 import org.simbrain.util.inferDark
@@ -11,6 +12,7 @@ import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.BorderFactory
 import javax.swing.JCheckBox
+import javax.swing.JComponent
 import javax.swing.JColorChooser
 import javax.swing.JLabel
 import javax.swing.JPanel
@@ -18,13 +20,29 @@ import javax.swing.JPanel
 /**
  * Compact editor for a [ThemeColor]: a light swatch, a dark swatch, and an "auto" checkbox that derives
  * the dark color from the light one. While auto is on, the dark swatch is disabled and previews the
- * inferred color; turning auto off lets the dark color be picked directly.
+ * inferred color; turning auto off lets the dark color be picked directly. A null state, shown as "...", stands in
+ * for the swatches when several edited objects have different colors; any edit clears it.
  */
 class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
 
     private var lightColor: Color = Color.GRAY
     private var manualDarkColor: Color = Color.DARK_GRAY
     private var useManualDark: Boolean = false
+
+    /**
+     * True while no single color is being shown.
+     */
+    var isNull: Boolean = false
+        private set
+
+    /**
+     * Called whenever the value is edited, whether by a swatch, the auto checkbox, or the [value] setter.
+     */
+    var onChanged: (() -> Unit)? = null
+
+    private val nullLabel = JLabel(NULL_STRING).apply { isVisible = false }
+    private val lightLabel = JLabel("Light")
+    private val darkLabel = JLabel("Dark")
 
     private val lightSwatch = swatch { chooseColor("Choose Light Color", lightColor) { lightColor = it } }
     private val darkSwatch = swatch { chooseColor("Choose Dark Color", effectiveDark()) { manualDarkColor = it } }
@@ -33,17 +51,38 @@ class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
         toolTipText = "Derive the dark-mode color from the light color"
         addActionListener {
             useManualDark = !isSelected
+            leaveNullState()
             refreshSwatches()
+            onChanged?.invoke()
         }
     }
 
+    private val swatchComponents: List<JComponent> = listOf(lightLabel, lightSwatch, darkLabel, darkSwatch, autoCheckBox)
+
     init {
-        add(JLabel("Light"))
+        add(lightLabel)
         add(lightSwatch)
-        add(JLabel("Dark"))
+        add(darkLabel)
         add(darkSwatch)
         add(autoCheckBox)
+        add(nullLabel)
         refreshSwatches()
+    }
+
+    /**
+     * Show "..." instead of the swatches, until the color is edited.
+     */
+    fun setNull() {
+        isNull = true
+        swatchComponents.forEach { it.isVisible = false }
+        nullLabel.isVisible = true
+    }
+
+    private fun leaveNullState() {
+        if (!isNull) return
+        isNull = false
+        swatchComponents.forEach { it.isVisible = true }
+        nullLabel.isVisible = false
     }
 
     private fun swatch(onClick: () -> Unit) = JPanel().apply {
@@ -60,7 +99,9 @@ class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
     private fun chooseColor(title: String, initial: Color, onChosen: (Color) -> Unit) {
         JColorChooser.showDialog(this, title, initial)?.let {
             onChosen(it)
+            leaveNullState()
             refreshSwatches()
+            onChanged?.invoke()
         }
     }
 
@@ -82,6 +123,8 @@ class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
             lightColor = themeColor.light
             manualDarkColor = themeColor.dark
             useManualDark = themeColor.useManualDark
+            leaveNullState()
             refreshSwatches()
+            onChanged?.invoke()
         }
 }

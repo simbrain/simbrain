@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -12,7 +13,11 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
 import org.simbrain.util.SimbrainConstants.NULL_STRING
 import org.simbrain.util.propertyeditor.*
+import smile.math.matrix.Matrix
+import java.awt.Color
 import javax.swing.JComboBox
+import javax.swing.JButton
+import javax.swing.JComponent
 import javax.swing.JSpinner
 import kotlin.reflect.full.declaredMemberProperties
 
@@ -123,6 +128,83 @@ class AnnotatedPropertyEditorTest {
         assertEquals(1, selectedObjects.size)
         assertEquals(NULL_STRING, selectedObjects.first())
     }
+
+    @Test
+    fun `equal array and matrix contents across objects are consistent`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin()
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        listOf("testDoubleArray", "testIntArray", "testBooleanArray", "testStringArray", "testMatrix", "testColor").forEach {
+            assertTrue(ape.propertyNameWidgetMap[it]!!.isConsistent, "$it should be consistent")
+        }
+    }
+
+    @Test
+    fun `differing matrix contents show the placeholder and are not committed`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin().apply { testMatrix = Matrix.column(doubleArrayOf(5.0, 6.0)) }
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        val widget = ape.propertyNameWidgetMap["testMatrix"] as MatrixWidget
+        assertFalse(widget.isConsistent)
+        assertFalse(widget.isShowingTable)
+        assertTrue(widget.canEditInconsistentValues)
+        assertEquals("Edit", widget.widget.findButton()?.text)
+        assertTrue(widget.widget.findButton()!!.isEnabled)
+        ape.commitChanges()
+        assertEquals(1.0, o1.testMatrix[0, 0])
+        assertEquals(5.0, o2.testMatrix[0, 0])
+    }
+
+    @Test
+    fun `choosing to edit inconsistent arrays commits the table to every object`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin().apply { testDoubleArray = doubleArrayOf(5.0, 6.0) }
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        val widget = ape.propertyNameWidgetMap["testDoubleArray"] as DoubleArrayWidget
+        widget.editInconsistentValues()
+        assertTrue(widget.isConsistent)
+        assertTrue(widget.isShowingTable)
+        ape.commitChanges()
+        assertArrayEquals(doubleArrayOf(1.0, -1.0), o1.testDoubleArray)
+        assertArrayEquals(doubleArrayOf(1.0, -1.0), o2.testDoubleArray)
+    }
+
+    @Test
+    fun `inconsistent arrays of different sizes cannot be edited together`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin().apply { testStringArray = arrayOf("a", "b", "c") }
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        val widget = ape.propertyNameWidgetMap["testStringArray"] as StringArrayWidget
+        assertFalse(widget.canEditInconsistentValues)
+        assertFalse(widget.widget.findButton()!!.isEnabled)
+        widget.editInconsistentValues()
+        assertFalse(widget.isConsistent)
+        ape.commitChanges()
+        assertEquals(3, o2.testStringArray.size)
+    }
+
+    @Test
+    fun `inconsistent colors show the null state until a color is chosen`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin().apply { testColor = Color.RED }
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        val widget = ape.propertyNameWidgetMap["testColor"] as ColorWidget
+        assertFalse(widget.isConsistent)
+        assertTrue(widget.widget.isNull)
+        ape.commitChanges()
+        assertEquals(Color.RED, o2.testColor)
+        widget.widget.value = Color.BLUE
+        assertTrue(widget.isConsistent)
+        assertFalse(widget.widget.isNull)
+        ape.commitChanges()
+        assertEquals(Color.BLUE, o1.testColor)
+        assertEquals(Color.BLUE, o2.testColor)
+    }
+
+    private fun JComponent.findButton(): JButton? =
+        components.filterIsInstance<JComponent>().firstNotNullOfOrNull { c ->
+            c as? JButton ?: c.findButton()
+        }
 
     @Test
     fun `test behavior with inconsistent values`() {

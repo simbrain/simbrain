@@ -97,15 +97,8 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                     isConsistent = if (parameter.value is CopyableObject) {
                         editingObjects.map { eo -> parameter.property.getter.call(eo)!!::class }.toSet().size == 1
                     } else {
-                        editingObjects
-                            .map { eo -> parameter.property.getter.call(eo) }
-                            .map { value ->
-                                when (value) {
-                                    is IntArray -> value.contentHashCode()
-                                    is DoubleArray -> value.contentHashCode()
-                                    else -> value.hashCode()
-                                }
-                            }.toSet().size == 1
+                        val values = editingObjects.map { eo -> parameter.property.getter.call(eo) }
+                        values.all { valuesContentEqual(values.first(), it) }
                     }
                 )
             }
@@ -324,6 +317,19 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                 }
             }
         }
+    }
+
+    /**
+     * Content-based equality for the values a widget can edit. Arrays and matrices compare by contents, so that
+     * objects holding equal but distinct arrays count as consistent.
+     */
+    private fun valuesContentEqual(a: Any?, b: Any?): Boolean = when {
+        a is DoubleArray && b is DoubleArray -> a.contentEquals(b)
+        a is IntArray && b is IntArray -> a.contentEquals(b)
+        a is BooleanArray && b is BooleanArray -> a.contentEquals(b)
+        a is Array<*> && b is Array<*> -> a.contentDeepEquals(b)
+        a is Matrix && b is Matrix -> a.nrow() == b.nrow() && a.ncol() == b.ncol() && a == b
+        else -> a == b
     }
 
     fun refreshValues() {

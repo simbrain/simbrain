@@ -1,0 +1,33 @@
+word	pronunciation	frequency	regularity
+cat	K AE T	150	regular
+bed	B EH D	120	regular
+dog	D AO G	110	regular
+fish	F IH SH	100	regular
+hand	HH AE N D	90	regular
+mint	M IH N T	85	regular
+save	S EY V	85	regular
+light	L AY T	80	regular
+have	HH AE V	200	exception
+give	G IH V	180	exception
+said	S EH D	170	exception
+was	W AA Z	170	exception
+one	W AH N	150	exception
+gone	G AO N	100	exception
+love	L AH V	95	exception
+move	M UW V	90	exception
+hint	HH IH N T	8	regular
+sand	S AE N D	8	regular
+lamp	L AE M P	7	regular
+best	B EH S T	7	regular
+fast	F AE S T	6	regular
+hill	HH IH L	6	regular
+pack	P AE K	5	regular
+wish	W IH SH	5	regular
+pint	P AY N T	8	exception
+comb	K OW M	7	exception
+yacht	Y AA T	6	exception
+shoe	SH UW	6	exception
+blood	B L AH D	5	exception
+broad	B R AO D	5	exception
+dove	D AH V	4	exception
+soul	S OW L	4	exception

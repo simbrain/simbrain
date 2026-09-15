@@ -1,3 +1,4 @@
+/** Registers the simulations exposed through the simulation menu and command-line runner. */
 package org.simbrain.custom_sims
 
 import org.simbrain.custom_sims.simulations.*
@@ -11,8 +12,10 @@ import org.simbrain.custom_sims.simulations.braitenberg.braitenbergSim
 import org.simbrain.custom_sims.simulations.braitenberg.pursuer
 import org.simbrain.custom_sims.simulations.cogsci.landmarkCognitiveMap
 import org.simbrain.custom_sims.simulations.demos.*
+import org.simbrain.custom_sims.simulations.dynamical_systems.logisticMap
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystem
 import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbrain
+import org.simbrain.custom_sims.simulations.dynamical_systems.twoNeuronDynamics
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
@@ -28,6 +31,7 @@ import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
 import org.simbrain.custom_sims.simulations.psychology.*
+import org.simbrain.custom_sims.simulations.reading.triangleReadingSim
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
 import org.simbrain.custom_sims.simulations.tutorials.localistAndDistributedRepresentations
@@ -121,6 +125,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Basic word embeddings") { nlpSimBasic }
         item("Synthesizer demo") { synthesizerDemo }
         item("NETtalk") { nettalkComponentSim }
+        item("Triangle model of reading", beta = true) { triangleReadingSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
         item("Tiny Language Model") { tinyLanguageModelSim }
@@ -165,6 +170,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Dynamical systems") {
+        item("Logistic map") { logisticMap }
+        item("Two-neuron dynamics") { twoNeuronDynamics }
         item("Lorenz attractor") { lorenzSystem }
         item("Lorenz attractor (Pure Simbrain)") { lorenzSystemSimbrain }
     }

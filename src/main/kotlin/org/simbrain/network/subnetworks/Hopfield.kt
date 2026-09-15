@@ -3,7 +3,7 @@ package org.simbrain.network.subnetworks
 import org.simbrain.network.core.*
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.network.trainers.UnsupervisedTrainer
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -48,7 +48,7 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
         this.trainingData = mutableListOf()
 
         // Create main neuron collection
-        val binary = BinaryRule().apply {
+        val binary = ThresholdRule().apply {
             threshold = 0.0
             setCeiling(1.0)
             setFloor(0.0)

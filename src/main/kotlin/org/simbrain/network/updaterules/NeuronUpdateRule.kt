@@ -239,7 +239,6 @@ val scalarUpdateRules = listOf(
     AdExIFRule::class.java,
     AfdThermoreceptorRule::class.java,
     AllostaticUpdateRule::class.java,
-    BinaryRule::class.java,
     ContinuousSigmoidalRule::class.java,
     DecayRule::class.java,
     FitzhughNagumo::class.java,
@@ -259,12 +258,12 @@ val scalarUpdateRules = listOf(
     SinusoidalRule::class.java,
     SpikingThresholdRule::class.java,
     StochasticRule::class.java,
-    ThreeValueRule::class.java
+    ThreeValueRule::class.java,
+    ThresholdRule::class.java
 )
 
 val neuronArrayUpdateRules = listOf(
     AdExIFRule::class.java,
-    BinaryRule::class.java,
     DecayRule::class.java,
     FitzhughNagumo::class.java,
     GELU::class.java,
@@ -274,5 +273,6 @@ val neuronArrayUpdateRules = listOf(
     NakaRushtonRule::class.java,
     SigmoidalRule::class.java,
     SoftmaxRule::class.java,
+    ThresholdRule::class.java,
     WinnerTakeAllRule::class.java,
 )

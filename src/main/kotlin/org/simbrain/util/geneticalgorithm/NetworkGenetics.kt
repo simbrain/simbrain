@@ -265,7 +265,7 @@ fun NeuronRuleGene.mutateParam(
             is LinearRule -> {
                 changeParam{clippingType = LinearRule.ClippingType.entries.sampleOne()}
             }
-            is BinaryRule -> {
+            is ThresholdRule -> {
                 changeParam { threshold += random.nextDouble(-1.0, 1.0) }
             }
             is DecayRule -> {
@@ -300,7 +300,7 @@ fun NeuronRuleGene.mutateType(
 
 context(Genotype)
 fun NeuronRuleGene.mutateStandardTypes() = mutateType(
-    allowedTypes = listOf(1 to LinearRule::class, 1 to SigmoidalRule::class, 1 to BinaryRule::class, 1 to SigmoidalRule::class),
+    allowedTypes = listOf(1 to LinearRule::class, 1 to SigmoidalRule::class, 1 to ThresholdRule::class, 1 to SigmoidalRule::class),
 )
 
 context(Genotype)

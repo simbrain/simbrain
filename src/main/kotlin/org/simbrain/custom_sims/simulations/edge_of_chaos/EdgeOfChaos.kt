@@ -5,7 +5,7 @@ import org.simbrain.network.connections.Direction
 import org.simbrain.network.connections.FixedDegree
 import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.decayfunctions.StepDecayFunction
 import org.simbrain.util.place
 import org.simbrain.util.projection.DecayColoringManager
@@ -253,7 +253,7 @@ const val GRID_SPACE: Int = 25
 
 suspend fun createReservoir(parentNet: Network, x: Int, y: Int, numNeurons: Int): NeuronCollection {
     val layout = GridLayout(GRID_SPACE.toDouble(), GRID_SPACE.toDouble(), sqrt(numNeurons.toDouble()).toInt())
-    val thresholdUnit = BinaryRule()
+    val thresholdUnit = ThresholdRule()
     val nc = parentNet.addNeuronCollection(numNeurons) { updateRule = thresholdUnit.copy() }
 
     nc.layout = layout

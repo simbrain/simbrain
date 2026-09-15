@@ -7,7 +7,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.getModelById
 import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.desktop.NetworkDesktopComponent
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.place
 import org.simbrain.util.updateAction
 import org.simbrain.workspace.Workspace
@@ -39,7 +39,7 @@ val classicalConditioning = newSim("classical conditioning") {
     cheeseDetectorNeuron.setLocation(160.0, 194.0)
     cheeseDetectorNeuron.label = "Cheese detector"
 
-    val responseRule = BinaryRule()
+    val responseRule = ThresholdRule()
     responseRule.threshold = .5
     responseRule.lowerBound = 0.0
     val salivationResponse = Neuron()

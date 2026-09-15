@@ -4,7 +4,7 @@ import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addNeuronCollection
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.place
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -53,7 +53,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     suspend fun buildBitStream(reservoir: NeuronCollection): NeuronCollection {
         // Offset in pixels of input nodes to right of reservoir
         val offset = 200
-        val b = BinaryRule(0.0, u_bar, 0.49)
+        val b = ThresholdRule(0.0, u_bar, 0.49)
         val bitStreamInputs = net.addNeuronCollection(1) { updateRule = b.copy() }.apply {
             val bitStream = arrayOf(
                 doubleArrayOf(u_bar), doubleArrayOf(0.0), doubleArrayOf(0.0), doubleArrayOf(0.0), doubleArrayOf(0.0),

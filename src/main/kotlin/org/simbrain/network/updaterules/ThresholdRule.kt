@@ -1,3 +1,6 @@
+/**
+ * Selects one of two output values using a strict input threshold for neurons and layers.
+ */
 package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.Layer
@@ -10,12 +13,9 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
 
-/**
- * BinaryNeuron takes one of two values based on a threshold.
- */
-class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUpdateRule {
+class ThresholdRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUpdateRule {
 
-    @UserParameter(label = "Threshold", description = "Threshold for binary neurons.", increment = .1, order = 1)
+    @UserParameter(label = "Threshold", description = "Input must exceed this threshold to produce the upper value.", increment = .1, order = 1)
     var threshold: Double = .5
 
     override var upperBound: Double = 1.0
@@ -30,8 +30,8 @@ class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUp
         this.threshold = threshold
     }
 
-    override fun copy(): BinaryRule {
-        val bn = BinaryRule()
+    override fun copy(): ThresholdRule {
+        val bn = ThresholdRule()
         bn.threshold = threshold
         bn.setCeiling(upperBound)
         bn.setFloor(lowerBound)
@@ -41,16 +41,16 @@ class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUp
     context(Network)
     override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         for (i in 0 until layer.activations.nrow()) {
-            layer.activations[i, 0] = binaryRule(layer.inputs[i, 0])
+            layer.activations[i, 0] = thresholdRule(layer.inputs[i, 0])
         }
     }
 
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
-        neuron.activation = binaryRule(neuron.input)
+        neuron.activation = thresholdRule(neuron.input)
     }
 
-    fun binaryRule(inputVal: Double): Double {
+    fun thresholdRule(inputVal: Double): Double {
         return if (inputVal > threshold) {
             upperBound
         } else {
@@ -72,7 +72,7 @@ class BinaryRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, BoundedUp
     }
 
     override val name: String
-        get() = "Binary"
+        get() = "Threshold"
 
     fun setCeiling(ceiling: Double) {
         this.upperBound = ceiling

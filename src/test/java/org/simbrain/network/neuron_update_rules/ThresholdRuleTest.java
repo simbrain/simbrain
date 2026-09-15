@@ -4,19 +4,19 @@ package org.simbrain.network.neuron_update_rules;
 import org.junit.jupiter.api.Test;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.updaterules.BinaryRule;
+import org.simbrain.network.updaterules.ThresholdRule;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class BinaryRuleTest {
+public class ThresholdRuleTest {
 
     @Test
     public void testUpdate() {
 
         Network net = new Network();
-        Neuron n = new Neuron(new BinaryRule());
+        Neuron n = new Neuron(new ThresholdRule());
         net.addNetworkModelAsync(n);
-        BinaryRule br = (BinaryRule) n.getUpdateRule();
+        ThresholdRule br = (ThresholdRule) n.getUpdateRule();
 
         // Set up rule
         br.setThreshold(.5);

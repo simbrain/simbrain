@@ -6,7 +6,7 @@ import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.core.addNeuron
 import org.simbrain.network.core.addSynapseAsync
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.place
 import org.simbrain.util.point
 
@@ -27,7 +27,7 @@ val heatColdSim = newSim {
     val heatReceptor = network.addNeuron {
         label = "Heat Receptor"
         location = point(18.5, -73.3)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 0.5
             increment = 1.0
         }
@@ -38,7 +38,7 @@ val heatColdSim = newSim {
     val coldReceptor = network.addNeuron {
         label = "Cold Receptor"  
         location = point(17.3, 70.5)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 0.5
             increment = 1.0
         }
@@ -49,7 +49,7 @@ val heatColdSim = newSim {
     val heatSensation = network.addNeuron {
         label = "Heat Sensation"
         location = point(154.5, -74.0)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 1.0
             increment = 0.1
         }
@@ -58,7 +58,7 @@ val heatColdSim = newSim {
     val coldSensation = network.addNeuron {
         label = "Cold Sensation"
         location = point(149.1, 70.3)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 1.0
             increment = 0.1
         }
@@ -68,7 +68,7 @@ val heatColdSim = newSim {
     val neuronA = network.addNeuron {
         label = "A"
         location = point(82.9, -33.6)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 1.0
             increment = 0.1
         }
@@ -77,7 +77,7 @@ val heatColdSim = newSim {
     val neuronB = network.addNeuron {
         label = "B"
         location = point(83.1, 26.4)
-        updateRule = BinaryRule().apply {
+        updateRule = ThresholdRule().apply {
             threshold = 1.0
             increment = 0.1
         }

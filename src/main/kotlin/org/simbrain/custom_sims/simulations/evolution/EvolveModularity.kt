@@ -11,7 +11,7 @@ package org.simbrain.custom_sims.simulations
 // import org.simbrain.network.core.Neuron
 // import org.simbrain.network.core.Synapse
 // import org.simbrain.network.core.activations
-// import org.simbrain.network.updaterules.BinaryRule
+// import org.simbrain.network.updaterules.ThresholdRule
 // import org.simbrain.util.geneticalgorithms.*
 // import org.simbrain.util.point
 // import org.simbrain.workspace.Workspace
@@ -39,7 +39,7 @@ package org.simbrain.custom_sims.simulations
 //          */
 //         val leftRetina = chromosome(4) {
 //             nodeGene() {
-//                 updateRule = BinaryRule()
+//                 updateRule = ThresholdRule()
 //                 location = point(it * 30, -50)
 //                 isClamped = true
 //                 applyDefaultParams()
@@ -48,7 +48,7 @@ package org.simbrain.custom_sims.simulations
 //
 //         val rightRetina = chromosome(4) {
 //             nodeGene() {
-//                 updateRule = BinaryRule()
+//                 updateRule = ThresholdRule()
 //                 location = point(150 + (it * 30), -50)
 //                 isClamped = true
 //                 applyDefaultParams()
@@ -123,7 +123,7 @@ package org.simbrain.custom_sims.simulations
 //             // Local extension function for mutating biases
 //             // fun NodeGene.mutateThreshold() = mutate {
 //             //     updateRule.let {
-//             //         if (it is BinaryRule) it.threshold = thresholds.shuffled().first()
+//             //         if (it is ThresholdRule) it.threshold = thresholds.shuffled().first()
 //             //     }
 //             // }
 //

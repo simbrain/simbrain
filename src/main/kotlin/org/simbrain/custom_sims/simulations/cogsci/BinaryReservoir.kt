@@ -9,7 +9,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.addToNetwork
 import org.simbrain.network.layouts.GridLayout
-import org.simbrain.network.updaterules.BinaryRule
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.*
 import org.simbrain.util.Utils.FS
 import org.simbrain.util.stats.distributions.NormalDistribution
@@ -69,7 +69,7 @@ val binaryReservoir = newSim {
 
     // Add a self-connected neuron array to the network
     val resNeurons = List(numNeurons) {
-        val rule = BinaryRule()
+        val rule = ThresholdRule()
         rule.threshold = .5
         Neuron(rule)
     }

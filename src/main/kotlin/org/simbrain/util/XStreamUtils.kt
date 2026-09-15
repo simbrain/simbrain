@@ -1,3 +1,6 @@
+/**
+ * Shared XML serialization settings and converters, including compatibility with saved Simbrain models.
+ */
 @file:JvmName("XStreamUtils")
 
 package org.simbrain.util
@@ -15,6 +18,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.trainers.TrainingDataset
+import org.simbrain.network.updaterules.ThresholdRule
 import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.TileMapLayer
 import org.simbrain.util.projection.Projector
@@ -39,6 +43,9 @@ import kotlin.reflect.jvm.javaField
  */
 fun getSimbrainXStream(): XStream {
     return XStream(DomDriver("UTF-8")).apply {
+        // Accept the former rule name while writing the current class name.
+        alias("org.simbrain.network.updaterules.BinaryRule", ThresholdRule::class.java)
+        alias(ThresholdRule::class.java.name, ThresholdRule::class.java)
         ignoreUnknownElements()
         allowTypesByWildcard(
             // be sure to sync these with the build.gradle simbrainJvmArgs --add-opens items
@@ -153,16 +160,18 @@ fun createConstructorCallingConverter(
             }
         }
 
+        private fun resolveClass(name: String): Class<*> = try {
+            Class.forName(name)
+        } catch (e: ClassNotFoundException) {
+            // Renamed types can still be loaded through their registered XML aliases.
+            mapper.realClass(name)
+        }
+
         @OptIn(ExperimentalStdlibApi::class)
         override fun unmarshal(reader: HierarchicalStreamReader, context: UnmarshallingContext): Any {
 
             // Get a class from an xml node
-            @Suppress("UNCHECKED_CAST")
-            val cls: KClass<*> = (try {
-                Class.forName(reader.nodeName).kotlin
-            } catch (e: ClassNotFoundException) {
-                Class.forName(reader.getAttribute("class")).kotlin
-            })
+            val cls: KClass<*> = resolveClass(reader.getAttribute("class") ?: reader.nodeName).kotlin
 
             if (cls.objectInstance != null) {
                 return cls.objectInstance!!
@@ -201,7 +210,7 @@ fun createConstructorCallingConverter(
                 propertyMap[nodeName]?.let {
                     if (customUnmarshaller?.invoke(reader, context) == true) return
                     propertyNameToDeserializedValueMap[nodeName] = if (reader.getAttribute("class") != null) {
-                        context.convertAnother(reader.value, Class.forName(reader.getAttribute("class")))
+                        context.convertAnother(reader.value, resolveClass(reader.getAttribute("class")))
                     } else {
                         // For parameterized property types (e.g. `List<String>?`) the javaType is a
                         // ParameterizedType, not a Class. Unwrap to the raw class — XStream's

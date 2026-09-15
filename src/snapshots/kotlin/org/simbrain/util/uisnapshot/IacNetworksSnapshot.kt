@@ -6,13 +6,7 @@ package org.simbrain.util.uisnapshot
 
 import kotlinx.coroutines.runBlocking
 import org.simbrain.custom_sims.SimulationScope
-import org.simbrain.custom_sims.simulations.iac.iacGames
-import org.simbrain.custom_sims.simulations.iac.iacJetsSharks5People
-import org.simbrain.custom_sims.simulations.iac.iacJetsSharksFull
-import org.simbrain.custom_sims.simulations.iac.iacLanguages
-import org.simbrain.custom_sims.simulations.iac.iacMovies
-import org.simbrain.custom_sims.simulations.iac.iacNovels
-import org.simbrain.custom_sims.simulations.iac.iacSpongeBob
+import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.NetworkPanel
 import java.awt.Component
@@ -42,7 +36,8 @@ class IacNetworksSnapshot : UiSnapshotDef {
             runBlocking { sim.task.invoke(scope, null) }
             val component = scope.workspace.getComponent(componentName) as NetworkComponent
             NetworkPanel(component).apply {
-                preferredSize = Dimension(1000, 650)
+                freeWeightsVisible = componentName == "Jets and Sharks (5 people)"
+                preferredSize = Dimension(1400, 900)
                 border = BorderFactory.createTitledBorder(componentName)
             }
         }

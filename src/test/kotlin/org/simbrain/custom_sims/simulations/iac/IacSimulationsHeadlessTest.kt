@@ -26,7 +26,7 @@ class IacSimulationsHeadlessTest {
             val scope = SimulationScope()
             sim.task.invoke(scope, null)
             val network = (scope.workspace.getComponent(componentName) as NetworkComponent).network
-            assertTrue(network.freeNeurons.size > 20, "$componentName neurons")
+            assertTrue(network.freeNeurons.size >= 18, "$componentName neurons")
             assertTrue(network.freeSynapses.size > 100, "$componentName synapses")
         }
     }
@@ -46,6 +46,26 @@ class IacSimulationsHeadlessTest {
         assertTrue(strongly in 2..12, "expected sparse retrieval, but $strongly nodes are above 0.5")
         assertTrue(network.freeNeurons.first { it.label == "Bikini Bottom" }.activation > 0.5)
         assertTrue(network.freeNeurons.first { it.label == "Protagonist" }.activation > 0.5)
+    }
+
+    @Test
+    fun `directly named movie and language nodes retrieve their properties`() = runBlocking {
+        for ((sim, componentName, retrieval) in listOf(
+            Triple(iacMovies, "Movies", "Star Wars" to listOf("Sci-Fi", "Exciting")),
+            Triple(iacLanguages, "Language Classifier", "Arabic" to listOf("Semitic", "Arabic / Abjad", "Fusional", "2"))
+        )) {
+            val (cue, expected) = retrieval
+            val scope = SimulationScope()
+            sim.task.invoke(scope, null)
+            val network = (scope.workspace.getComponent(componentName) as NetworkComponent).network
+            val node = network.freeNeurons.single { it.label == cue }
+            node.clamped = true
+            node.activation = 1.0
+            repeat(100) { network.update() }
+            for (label in expected) {
+                assertTrue(network.freeNeurons.single { it.label == label }.activation > 0.5, "$cue retrieves $label")
+            }
+        }
     }
 
     @Test

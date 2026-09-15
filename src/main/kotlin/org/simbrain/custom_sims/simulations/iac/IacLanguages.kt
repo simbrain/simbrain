@@ -1,11 +1,12 @@
 package org.simbrain.custom_sims.simulations.iac
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
+import javax.swing.JInternalFrame
 
 /**
  * Student-built IAC network classifying twenty languages by family, script, typology, and noun genders, ported
@@ -17,15 +18,10 @@ val iacLanguages = newSim {
 
     val networkComponent = addNetworkComponent("Language Classifier")
     networkComponent.network.iacNetwork {
-        val languages = pool(
-            "Languages",
-            "Afrikaans", "Arabic", "Armenian", "Basque", "Chinese", "Czech", "Dutch", "English", "French", "German", "Greek", "Hebrew", "Japanese", "Latin", "Macedonian", "Maltese", "Persian", "Serbian", "Spanish", "Turkish",
-            at = point(0, -160), columns = 10, hSpacing = 100.0
-        )
         val family = pool(
             "Family",
             "Indo-European - Romance", "Indo-European - Germanic", "Indo-European - Slavic", "Indo-European - Others", "Semitic", "Other",
-            at = point(-850, -40), columns = 1
+            at = point(-550, -40), columns = 1
         )
         val typology = pool(
             "Typology",
@@ -35,45 +31,56 @@ val iacLanguages = newSim {
         val genders = pool(
             "Noun Genders",
             "1", "2", "3",
-            at = point(700, 30), columns = 1
+            at = point(700, 120), columns = 1
         )
         val script = pool(
             "Script",
             "Latin", "Cyrillic", "Arabic / Abjad", "Logographic / Syllabic", "Own",
-            at = point(0, 220), columns = 5, hSpacing = 180.0
+            at = point(0, 290), columns = 5, hSpacing = 180.0
         )
-        instances("Language Codes", at = point(0, 20), columns = 10, hSpacing = 100.0) {
-            instance("af", languages["Afrikaans"], family["Indo-European - Germanic"], script["Latin"], typology["Analytic"], genders["1"])
-            instance("ar", languages["Arabic"], family["Semitic"], script["Arabic / Abjad"], typology["Fusional"], genders["2"])
-            instance("hy", languages["Armenian"], family["Indo-European - Others"], script["Own"], typology["Agglutinative"], genders["1"])
-            instance("eu", languages["Basque"], family["Other"], script["Latin"], typology["Agglutinative"], genders["2"])
-            instance("zh", languages["Chinese"], family["Other"], script["Logographic / Syllabic"], typology["Analytic"], genders["1"])
-            instance("cs", languages["Czech"], family["Indo-European - Slavic"], script["Latin"], typology["Fusional"], genders["3"])
-            instance("nl", languages["Dutch"], family["Indo-European - Germanic"], script["Latin"], typology["Fusional"], genders["2"])
-            instance("en", languages["English"], family["Indo-European - Germanic"], script["Latin"], typology["Analytic"], genders["1"])
-            instance("fr", languages["French"], family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["2"])
-            instance("de", languages["German"], family["Indo-European - Germanic"], script["Latin"], typology["Fusional"], genders["3"])
-            instance("el", languages["Greek"], family["Indo-European - Others"], script["Own"], typology["Fusional"], genders["3"])
-            instance("he", languages["Hebrew"], family["Semitic"], script["Arabic / Abjad"], typology["Fusional"], genders["2"])
-            instance("ja", languages["Japanese"], family["Other"], script["Logographic / Syllabic"], typology["Agglutinative"], genders["1"])
-            instance("la", languages["Latin"], family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["3"])
-            instance("mk", languages["Macedonian"], family["Indo-European - Slavic"], script["Cyrillic"], typology["Analytic"], genders["3"])
-            instance("mt", languages["Maltese"], family["Semitic"], script["Latin"], typology["Fusional"], genders["2"])
-            instance("fa", languages["Persian"], family["Indo-European - Others"], script["Arabic / Abjad"], typology["Agglutinative"], genders["1"])
-            instance("sr", languages["Serbian"], family["Indo-European - Slavic"], script["Latin"], script["Cyrillic"], typology["Fusional"], genders["3"])
-            instance("es", languages["Spanish"], family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["2"])
-            instance("tr", languages["Turkish"], family["Other"], script["Latin"], typology["Agglutinative"], genders["1"])
+        instances("Languages", at = point(0, 0), columns = 5, hSpacing = 130.0, vSpacing = 75.0) {
+            instance("Afrikaans", family["Indo-European - Germanic"], script["Latin"], typology["Analytic"], genders["1"])
+            instance("Arabic", family["Semitic"], script["Arabic / Abjad"], typology["Fusional"], genders["2"])
+            instance("Armenian", family["Indo-European - Others"], script["Own"], typology["Agglutinative"], genders["1"])
+            instance("Basque", family["Other"], script["Latin"], typology["Agglutinative"], genders["2"])
+            instance("Chinese", family["Other"], script["Logographic / Syllabic"], typology["Analytic"], genders["1"])
+            instance("Czech", family["Indo-European - Slavic"], script["Latin"], typology["Fusional"], genders["3"])
+            instance("Dutch", family["Indo-European - Germanic"], script["Latin"], typology["Fusional"], genders["2"])
+            instance("English", family["Indo-European - Germanic"], script["Latin"], typology["Analytic"], genders["1"])
+            instance("French", family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["2"])
+            instance("German", family["Indo-European - Germanic"], script["Latin"], typology["Fusional"], genders["3"])
+            instance("Greek", family["Indo-European - Others"], script["Own"], typology["Fusional"], genders["3"])
+            instance("Hebrew", family["Semitic"], script["Arabic / Abjad"], typology["Fusional"], genders["2"])
+            instance("Japanese", family["Other"], script["Logographic / Syllabic"], typology["Agglutinative"], genders["1"])
+            instance("Latin", family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["3"])
+            instance("Macedonian", family["Indo-European - Slavic"], script["Cyrillic"], typology["Analytic"], genders["3"])
+            instance("Maltese", family["Semitic"], script["Latin"], typology["Fusional"], genders["2"])
+            instance("Persian", family["Indo-European - Others"], script["Arabic / Abjad"], typology["Agglutinative"], genders["1"])
+            instance("Serbian", family["Indo-European - Slavic"], script["Latin"], script["Cyrillic"], typology["Fusional"], genders["3"])
+            instance("Spanish", family["Indo-European - Romance"], script["Latin"], typology["Fusional"], genders["2"])
+            instance("Turkish", family["Other"], script["Latin"], typology["Agglutinative"], genders["1"])
         }
+
+        typology["Fusional"].location = point(650, -180)
+        typology["Agglutinative"].location = point(790, -160)
+        typology["Analytic"].location = point(720, -70)
+        genders["1"].location = point(650, 125)
+        genders["2"].location = point(760, 110)
+        genders["3"].location = point(700, 205)
     }
 
     withGui {
+        getNetworkPanel(networkComponent).freeWeightsVisible = false
         place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 800, 550)
+        withContext(Dispatchers.Swing) {
+            (getDesktopComponent(networkComponent).parentFrame as JInternalFrame).isMaximum = true
+        }
         addSidebarInfo(
             iacSidebarText(
                 title = "Language Classifier",
                 body = """
-                    An IAC network modeling the categorization of 20 languages. Each language has an instance node (labelled
-                    with its two-letter code) linked to its name and to four property pools:
+                    An IAC network modeling the categorization of 20 languages. Each language has a central instance node labelled
+                    with its full name and linked directly to four property pools:
 
                     - [Language family](https://en.wikipedia.org/wiki/Language_family). Indo-European is split into
                     Romance, Germanic, Slavic, and Others; then Semitic and Other.

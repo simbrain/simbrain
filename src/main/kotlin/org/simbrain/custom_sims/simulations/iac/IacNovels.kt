@@ -1,11 +1,12 @@
 package org.simbrain.custom_sims.simulations.iac
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
+import javax.swing.JInternalFrame
 
 /**
  * Student-built IAC network of novel characters, ported from the Simbrain 3 workspace Novels_2015.
@@ -16,11 +17,6 @@ val iacNovels = newSim {
 
     val networkComponent = addNetworkComponent("Novels")
     networkComponent.network.iacNetwork {
-        val characters = pool(
-            "Characters",
-            "Frankenstein", "Phantom", "Dracula", "Don Quixote", "Raoul, Vicomte de Chagny", "Jane Eyre", "Dorothy", "Jo March", "Atticus Finch",
-            at = point(0, -160), columns = 5, hSpacing = 160.0
-        )
         val roles = pool(
             "Roles",
             "Monster", "Hero", "Heroine",
@@ -34,29 +30,40 @@ val iacNovels = newSim {
         val genres = pool(
             "Genres",
             "Fiction/Gothic", "Fiction/Classic", "Fiction/Drama",
-            at = point(0, 180), columns = 3, hSpacing = 150.0
+            at = point(0, 290), columns = 3, hSpacing = 150.0
         )
-        instances("Novels", at = point(0, 20), columns = 5, hSpacing = 160.0) {
-            instance(characters["Frankenstein"], roles["Monster"], centuries["19th c"], genres["Fiction/Gothic"])
-            instance(characters["Phantom"], roles["Monster"], centuries["20th c"], genres["Fiction/Gothic"])
-            instance(characters["Dracula"], roles["Monster"], centuries["19th c"], genres["Fiction/Gothic"])
-            instance(characters["Don Quixote"], roles["Hero"], centuries["17th c"], genres["Fiction/Drama"])
-            instance(characters["Raoul, Vicomte de Chagny"], roles["Hero"], centuries["20th c"], genres["Fiction/Gothic"])
-            instance(characters["Jane Eyre"], roles["Heroine"], centuries["19th c"], genres["Fiction/Classic"])
-            instance(characters["Dorothy"], roles["Heroine"], centuries["20th c"], genres["Fiction/Classic"])
-            instance(characters["Jo March"], roles["Heroine"], centuries["19th c"], genres["Fiction/Drama"])
-            instance(characters["Atticus Finch"], roles["Hero"], centuries["20th c"], genres["Fiction/Drama"])
+        instances("Characters", at = point(0, 0), columns = 3, hSpacing = 240.0, vSpacing = 85.0) {
+            instance("Frankenstein", roles["Monster"], centuries["19th c"], genres["Fiction/Gothic"])
+            instance("Phantom", roles["Monster"], centuries["20th c"], genres["Fiction/Gothic"])
+            instance("Dracula", roles["Monster"], centuries["19th c"], genres["Fiction/Gothic"])
+            instance("Don Quixote", roles["Hero"], centuries["17th c"], genres["Fiction/Drama"])
+            instance("Raoul, Vicomte de Chagny", roles["Hero"], centuries["20th c"], genres["Fiction/Gothic"])
+            instance("Jane Eyre", roles["Heroine"], centuries["19th c"], genres["Fiction/Classic"])
+            instance("Dorothy", roles["Heroine"], centuries["20th c"], genres["Fiction/Classic"])
+            instance("Jo March", roles["Heroine"], centuries["19th c"], genres["Fiction/Drama"])
+            instance("Atticus Finch", roles["Hero"], centuries["20th c"], genres["Fiction/Drama"])
         }
+
+        roles["Monster"].location = point(-590, -100)
+        roles["Hero"].location = point(-490, -80)
+        roles["Heroine"].location = point(-535, 10)
+        centuries["17th c"].location = point(510, -90)
+        centuries["20th c"].location = point(610, -110)
+        centuries["19th c"].location = point(555, 5)
     }
 
     withGui {
+        getNetworkPanel(networkComponent).freeWeightsVisible = false
         place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 800, 550)
+        withContext(Dispatchers.Swing) {
+            (getDesktopComponent(networkComponent).parentFrame as JInternalFrame).isMaximum = true
+        }
         addSidebarInfo(
             iacSidebarText(
                 title = "Novels",
                 body = """
                     A small IAC network of characters from well-known novels, from Frankenstein's monster and Dracula to Jane
-                    Eyre, Jo March, and Atticus Finch. Each character is linked through an instance node to a role
+                    Eyre, Jo March, and Atticus Finch. Each central instance node is labelled with a character's name and linked to a role
                     (Monster, Hero, Heroine), a century (17th, 19th, or 20th), and a genre (Gothic, Classic, or Drama
                     fiction).
 

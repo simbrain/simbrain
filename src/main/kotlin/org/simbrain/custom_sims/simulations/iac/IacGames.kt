@@ -1,11 +1,12 @@
 package org.simbrain.custom_sims.simulations.iac
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
+import org.simbrain.custom_sims.*
 import org.simbrain.util.place
 import org.simbrain.util.point
+import javax.swing.JInternalFrame
 
 /**
  * Student-built IAC network of board and card games in a household, ported from the Simbrain 3 workspace
@@ -20,24 +21,24 @@ val iacGames = newSim {
         val owner = pool(
             "Owner",
             "Alivia", "Blake", "Keddoe",
-            at = point(-250, -180), columns = 3
+            at = point(-430, -400), columns = 3
         )
         val type = pool(
             "Type of Game",
             "Cooperative Deck Builder", "Cooperative Strategy", "Deck Builder", "Living Card Game", "Party", "Strategy",
-            at = point(350, -180), columns = 3, hSpacing = 200.0
+            at = point(350, -400), columns = 3, hSpacing = 260.0
         )
         val players = pool(
             "Number of Players",
             "1-4", "1-5", "2-4", "2-5", "2-6", "2-7", "2-8", "3-5", "3-6", "3-10", "4-8", "4-10", "4-30", "5-6", "2+",
-            at = point(800, 150), columns = 3, hSpacing = 70.0
+            at = point(930, 150), columns = 3, hSpacing = 70.0
         )
         val time = pool(
             "Time to Play in Minutes",
             ">5", ">15", ">30", "15+", "30+", "45+", "60+", "90+", "120+",
-            at = point(-800, 150), columns = 3, hSpacing = 70.0
+            at = point(-930, 150), columns = 3, hSpacing = 70.0
         )
-        instances("Games", at = point(0, 150), columns = 10) {
+        instances("Games", at = point(0, 180), columns = 5, hSpacing = 290.0, vSpacing = 85.0) {
             instance("Ascension", owner["Alivia"], type["Deck Builder"], players["1-4"], time["30+"])
             instance("Exploding Kittens: NSFW", owner["Alivia"], type["Party"], players["2-5"], time[">15"])
             instance("Game of Thrones The Board Game", owner["Alivia"], type["Strategy"], players["3-6"], time["120+"])
@@ -89,10 +90,18 @@ val iacGames = newSim {
             instance("Wrath of Ashardalon", owner["Keddoe"], type["Cooperative Strategy"], players["1-5"], time["60+"])
             instance("XenoShyft Onslaught", owner["Keddoe"], type["Cooperative Deck Builder"], players["1-4"], time["30+"])
         }
+
+        owner["Alivia"].location = point(-510, -420)
+        owner["Blake"].location = point(-380, -435)
+        owner["Keddoe"].location = point(-440, -340)
     }
 
     withGui {
-        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 1000, 500)
+        getNetworkPanel(networkComponent).freeWeightsVisible = false
+        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 1200, 850)
+        withContext(Dispatchers.Swing) {
+            (getDesktopComponent(networkComponent).parentFrame as JInternalFrame).isMaximum = true
+        }
         addSidebarInfo(
             iacSidebarText(
                 title = "Games at Alivia's",

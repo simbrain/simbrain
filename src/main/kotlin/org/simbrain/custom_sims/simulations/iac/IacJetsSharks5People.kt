@@ -1,11 +1,15 @@
 package org.simbrain.custom_sims.simulations.iac
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.addNetworkComponent
 import org.simbrain.custom_sims.addSidebarInfo
 import org.simbrain.custom_sims.newSim
 import org.simbrain.util.place
 import org.simbrain.util.point
+import javax.swing.JInternalFrame
 
 /**
  * Reduced five-person fragment of the Jets and Sharks IAC network, ported from the Simbrain 3 workspace
@@ -16,7 +20,7 @@ val iacJetsSharks5People = newSim {
     workspace.clearWorkspace()
 
     val networkComponent = addNetworkComponent("Jets and Sharks (5 people)")
-    networkComponent.network.iacNetwork(excitatory = 0.05, inhibitory = -0.03) {
+    val iac = networkComponent.network.iacNetwork(excitatory = 0.05, inhibitory = -0.03) {
         val names = pool(
             "Names",
             "Ralph", "Sam", "Lance", "Ned", "Rick",
@@ -56,8 +60,25 @@ val iacJetsSharks5People = newSim {
         }
     }
 
+    // Original hand-placed arrangement, enlarged to leave room for pool titles and labels.
+    val positions = listOf(
+        point(0, 0), point(39, -34), point(97, -29), point(58, 27), point(112, 19),
+        point(219, 163), point(214, 109),
+        point(-119, 43), point(-162, 78), point(-104, 90),
+        point(-163, 194), point(-202, 250), point(-148, 260),
+        point(10, 341), point(67, 345), point(25, 388),
+        point(223, 256), point(193, 313), point(266, 308),
+        point(10, 143), point(49, 110), point(107, 122), point(67, 169), point(131, 180)
+    )
+    iac.neurons.zip(positions).forEach { (neuron, position) ->
+        neuron.location = point(position.x * 2, position.y * 2)
+    }
+
     withGui {
         place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 600)
+        withContext(Dispatchers.Swing) {
+            (getDesktopComponent(networkComponent).parentFrame as JInternalFrame).isMaximum = true
+        }
         addSidebarInfo(
             iacSidebarText(
                 title = "Jets and Sharks (5 People)",
@@ -67,6 +88,9 @@ val iacJetsSharks5People = newSim {
                     follow what happens on each step. Add activation to a person, or to any property, run the network, and
                     see what pattern it settles into. This models human associative memory. For more background see the
                     full Jets and Sharks simulation.
+
+                    Separate name nodes are probably unnecessary: we usually label the central object (instance) nodes
+                    directly. We retain the separate name pool here because it was part of the original model.
                 """,
                 credits = "[Jeff Yoshimi](https://jeffyoshimi.net/index.html)"
             )

@@ -74,12 +74,16 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
 
         // Notation and algorithm from McClelland 1981, Proceedings of the third
-        // annual cog-sci meeting
+        // annual cog-sci meeting. Only sources with positive activation send input; a unit
+        // below zero is inactive rather than a negative signal, so an inhibitory weight from it
+        // must not excite its target.
+        val activeInputs = neuron.fanIn.sumOf { if (it.source.activation > 0) it.psr else 0.0 }
+        val netInput = neuron.input - neuron.weightedInputs + activeInputs
 
-        val effect = if (neuron.input >= 0) {
-            (upperBound - neuron.activation) * neuron.input
+        val effect = if (netInput >= 0) {
+            (upperBound - neuron.activation) * netInput
         } else {
-            (neuron.activation - lowerBound) * neuron.input
+            (neuron.activation - lowerBound) * netInput
         }
 
         // Update activation using Euler integration of main ODE

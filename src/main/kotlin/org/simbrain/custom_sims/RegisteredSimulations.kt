@@ -16,6 +16,7 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbra
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
+import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
@@ -26,7 +27,6 @@ import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulatio
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
-import org.simbrain.custom_sims.simulations.patterns_of_activity.iacJetsSharks5People
 import org.simbrain.custom_sims.simulations.psychology.*
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
@@ -87,11 +87,20 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Psychology") {
         item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
-        item("IAC Jets Sharks 5 people") { iacJetsSharks5People }
         item("Mouse and eye tracking") { spiveyNet }
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
         item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
+    }
+
+    dir("IAC networks") {
+        item("Jets and Sharks") { iacJetsSharksFull }
+        item("Jets and Sharks (5 people)") { iacJetsSharks5People }
+        item("Games") { iacGames }
+        item("Languages") { iacLanguages }
+        item("Movies") { iacMovies }
+        item("Novels") { iacNovels }
+        item("SpongeBob") { iacSpongeBob }
     }
 
     dir("Behaviorism") {

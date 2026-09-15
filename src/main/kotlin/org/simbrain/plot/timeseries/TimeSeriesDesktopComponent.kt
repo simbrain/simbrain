@@ -31,20 +31,7 @@ import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.text.NumberFormat
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.ButtonGroup
-import javax.swing.JComboBox
-import javax.swing.JDesktopPane
-import javax.swing.JMenu
-import javax.swing.JMenuBar
-import javax.swing.JMenuItem
-import javax.swing.JPanel
-import javax.swing.JRadioButtonMenuItem
-import javax.swing.JSpinner
-import javax.swing.JSplitPane
-import javax.swing.JTabbedPane
-import javax.swing.JToolBar
-import javax.swing.SpinnerNumberModel
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotComponent) :
     DesktopComponent<TimeSeriesPlotComponent>(frame, component) {
@@ -334,6 +321,8 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
             modeCombo.selectedItem = plotModel.recurrenceMode
             thresholdSpinner.value = plotModel.recurrenceThreshold
             modeCombo.isEnabled = recurrenceVisible()
+            modeCombo.isVisible = recurrenceVisible()
+            thresholdSpinner.isVisible = recurrenceVisible()
             thresholdSpinner.isEnabled = recurrenceVisible() && plotModel.recurrenceMode == RecurrenceMode.THRESHOLD
         } finally {
             syncingControls = false

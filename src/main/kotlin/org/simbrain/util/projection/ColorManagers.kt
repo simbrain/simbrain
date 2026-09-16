@@ -1,3 +1,7 @@
+/**
+ * Strategies for coloring projection plot points. Each manager blends between the owning [Projector]'s
+ * theme-aware [Projector.baseColor] (resolved for the active light/dark mode at query time) and an accent color.
+ */
 package org.simbrain.util.projection
 
 import org.simbrain.util.HSBInterpolate
@@ -91,7 +95,6 @@ class DecayColoringManager: ColoringManager() {
         set(value) {
             if (field != value) {
                 field = value
-                isValuesToColorsDirty = true
                 updateAllColors()
             }
         }
@@ -101,11 +104,12 @@ class DecayColoringManager: ColoringManager() {
      */
     lateinit var valuesToColors: List<Color>
 
-    private var isValuesToColorsDirty = true
+    /** The (base, hot, steps) inputs [valuesToColors] was built from; the gradient is rebuilt when any changes. */
+    private var valuesToColorsKey: Triple<Color, Color, Int>? = null
 
     context(Projector)
     fun initColors(): List<Color> {
-        return HSBInterpolate(baseColor.toHSB(), hotColor.toHSB(), stepsToBase)
+        return HSBInterpolate(baseColor.resolved.toHSB(), hotColor.toHSB(), stepsToBase)
     }
 
     private val pointsToValues: MutableMap<DataPoint, Int> = HashMap()
@@ -116,9 +120,10 @@ class DecayColoringManager: ColoringManager() {
 
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
-        if (isValuesToColorsDirty) {
+        val key = Triple(baseColor.resolved, hotColor, stepsToBase)
+        if (key != valuesToColorsKey) {
             valuesToColors = initColors()
-            isValuesToColorsDirty = false
+            valuesToColorsKey = key
         }
         val colorIndex = pointsToValues.getOrDefault(dataPoint, 0)
         return valuesToColors[colorIndex]
@@ -168,11 +173,10 @@ class FrequencyColoringManager: ColoringManager() {
         maxCount = max(maxCount, count + 1)
     }
 
-    // TODO: Cache hotcolor and bascolor
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
         val t = getActivation(dataPoint)
-        return HSBInterpolate(baseColor.toHSB(), highFrequencyColor.toHSB(), t)
+        return HSBInterpolate(baseColor.resolved.toHSB(), highFrequencyColor.toHSB(), t)
     }
 
     context(Projector)
@@ -219,7 +223,7 @@ class MarkovColoringManager: ColoringManager() {
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
         val t = getActivation(dataPoint)
-        return HSBInterpolate(baseColor.toHSB(), highProbabilityColor.toHSB(), t)
+        return HSBInterpolate(baseColor.resolved.toHSB(), highProbabilityColor.toHSB(), t)
     }
 
     context(Projector)
@@ -273,7 +277,7 @@ class HaloColoringManager: ColoringManager() {
     context(Projector)
     override fun getColor(dataPoint: DataPoint): Color {
         val t = getActivation(dataPoint)
-        return HSBInterpolate(hotColor.toHSB(), baseColor.toHSB(), t)
+        return HSBInterpolate(hotColor.toHSB(), baseColor.resolved.toHSB(), t)
     }
 
     context(Projector)

@@ -3,6 +3,7 @@ package org.simbrain.util.projection
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.simbrain.util.ThemeColor
 import java.awt.Color
 
 class ColoringManagerTest {
@@ -15,7 +16,7 @@ class ColoringManagerTest {
     @BeforeEach
     fun setUp() {
         projector = Projector(2)
-        projector.baseColor = Color.GRAY
+        projector.baseColor = ThemeColor(Color.GRAY)
         projector.hotColor = Color.RED
         
         point1 = DataPoint(doubleArrayOf(1.0, 0.0))

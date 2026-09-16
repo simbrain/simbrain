@@ -1,10 +1,18 @@
+/**
+ * Model side of the projection plot: owns the high-dimensional [Dataset], the active [ProjectionMethod], the
+ * [ColoringManager], and the user-facing point colors. [baseColor] is a [ThemeColor] so resting points read on
+ * both the light and dark plot wells; consumers resolve it at paint time via [ThemeColor.resolved].
+ */
 package org.simbrain.util.projection
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import org.simbrain.util.ThemeColor
 import org.simbrain.util.UserParameter
+import org.simbrain.util.WithXStreamPropertyConverter
 import org.simbrain.util.createEditorDialog
+import org.simbrain.util.createXStreamPropertyConverter
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -57,8 +65,8 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     @UserParameter(label = "Hot color", order = 20)
     var hotColor = Color.red
 
-    @UserParameter(label = "Base color", order = 30)
-    var baseColor = Color.DARK_GRAY
+    @UserParameter(label = "Base color", description = "Color of points that are not currently highlighted, per light/dark theme", order = 30)
+    var baseColor = ThemeColor(Color.DARK_GRAY)
 
     @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
     var showLabels = true
@@ -131,6 +139,27 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     }
 
     override val name = "Projector"
+
+    companion object : WithXStreamPropertyConverter {
+
+        /**
+         * [baseColor] was a plain [Color] before it became theme-aware; workspaces saved then are loaded by
+         * treating the stored color as the light-mode value.
+         */
+        override val xStreamPropertyConverter = createXStreamPropertyConverter<Projector>(
+            marshal = {},
+            unmarshal = {
+                on("baseColor") { reader, context ->
+                    val stored = if (reader.getAttribute("class") == Color::class.java.name) {
+                        ThemeColor(context.convertAnother(reader.value, Color::class.java) as Color)
+                    } else {
+                        context.convertAnother(reader.value, ThemeColor::class.java) as ThemeColor
+                    }
+                    withConstructedObject { baseColor = stored }
+                }
+            }
+        )
+    }
 }
 
 fun main() {

@@ -3,6 +3,8 @@ package org.simbrain.util.projection
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.plot.projection.ProjectionComponent
+import org.simbrain.util.ThemeColor
+import java.awt.Color
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 import java.nio.charset.StandardCharsets
@@ -56,6 +58,28 @@ class ProjectorTest {
         val pc2 = ProjectionComponent.open(stream, "test2", "xml")
         assertEquals(4,pc2.projector.dimension)
         assertEquals(5,pc2.projector.dataset.kdTree.size)
+    }
+
+    @Test
+    fun `theme-aware base color survives a save and load round trip`() {
+        val pc = ProjectionComponent("Test", Projector(2).apply {
+            baseColor = ThemeColor(Color(85, 85, 85), Color(200, 200, 200), useManualDark = true)
+        })
+        val stream: InputStream = ByteArrayInputStream(pc.xml.toByteArray(StandardCharsets.UTF_8))
+        val loaded = ProjectionComponent.open(stream, "test2", "xml").projector
+        assertEquals(ThemeColor(Color(85, 85, 85), Color(200, 200, 200), useManualDark = true), loaded.baseColor)
+    }
+
+    @Test
+    fun `base color saved as a plain color loads as the light-mode value`() {
+        val pc = ProjectionComponent("Test", Projector(2))
+        val legacyNode = "<baseColor class=\"java.awt.Color\"><red>85</red><green>85</green><blue>85</blue><alpha>255</alpha></baseColor>"
+        val xml = pc.xml.replace(Regex("<baseColor class=\"org.simbrain.util.ThemeColor\">.*?</baseColor>", RegexOption.DOT_MATCHES_ALL), legacyNode)
+        assert(xml.contains(legacyNode))
+        val stream: InputStream = ByteArrayInputStream(xml.toByteArray(StandardCharsets.UTF_8))
+        val loaded = ProjectionComponent.open(stream, "test2", "xml").projector
+        assertEquals(Color(85, 85, 85), loaded.baseColor.light)
+        assertEquals(false, loaded.baseColor.useManualDark)
     }
 
     @Test

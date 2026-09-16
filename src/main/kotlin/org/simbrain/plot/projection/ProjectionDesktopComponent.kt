@@ -228,7 +228,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         domainAxis.autoRangeStickyZero = false
         domainAxis.isAutoRange = true
         rangeAxis.isAutoRange = true
-        xyPlot.foregroundAlpha = .5f // TODO: Make this settable
+        xyPlot.foregroundAlpha = .7f // TODO: Make this settable
         xyPlot.renderer = renderer
     }
     val chartPanel = ChartPanel(chart).also {
@@ -370,7 +370,7 @@ private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndSh
     override fun getItemPaint(series: Int, index: Int): Paint {
         val projector = proj.projector
         return with(projector) {
-            projector.coloringManager.getColor(proj.pointList[index])?: projector.baseColor
+            projector.coloringManager.getColor(proj.pointList[index]) ?: projector.baseColor.resolved
         }
     }
 

@@ -18,6 +18,7 @@ import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.SmellSource
+import org.simbrain.util.ThemeColor
 import org.simbrain.util.decayfunctions.GaussianDecayFunction
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.piccolo.TileMap
@@ -177,7 +178,7 @@ val landmarkCognitiveMap = newSim {
         projector.tolerance = 0.1
         projector.showLabels = false
         projector.connectPoints = false
-        projector.baseColor = Color(85, 85, 85)
+        projector.baseColor = ThemeColor(Color(85, 85, 85))
         projector.coloringManager = AuxDataColoringManager()
     }
 

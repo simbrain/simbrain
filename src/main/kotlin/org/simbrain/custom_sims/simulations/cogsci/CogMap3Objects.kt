@@ -12,6 +12,7 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.projection.HaloColoringManager
 import org.simbrain.util.setSpectralRadius
+import org.simbrain.util.ThemeColor
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -120,7 +121,7 @@ val cogMap3Objects = newSim {
     val projectionPlot = addProjectionPlot("Cognitive Map")
     projectionPlot.projector.tolerance = .9
     projectionPlot.projector.connectPoints = false
-    projectionPlot.projector.baseColor = Color.GRAY.brighter()
+    projectionPlot.projector.baseColor = ThemeColor(Color.GRAY.brighter())
     projectionPlot.projector.coloringManager = HaloColoringManager().also{
         it.radius = 50.0
     }

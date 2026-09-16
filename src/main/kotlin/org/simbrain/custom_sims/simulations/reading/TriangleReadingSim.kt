@@ -14,6 +14,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.ControlPanelKt
@@ -120,7 +121,7 @@ private suspend fun SimulationScope.installReaderUi(
                         false,
                         true,
                         false
-                    )))
+                    ).apply { applySimbrainChartTheme() }))
                     setSize(850, 500)
                     setLocationRelativeTo(this@desktop.frame)
                     isVisible = true

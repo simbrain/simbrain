@@ -75,7 +75,7 @@ public class ImagePreviewPanel extends JPanel implements PropertyChangeListener 
     }
 
     public void paintComponent(Graphics g) {
-        g.setColor(bg);
+        g.setColor(getBackground());
 
         /*
          * If we don't do this, we will end up with garbage from previous images

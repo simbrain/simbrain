@@ -21,6 +21,7 @@ import org.jfree.chart.title.PaintScaleLegend
 import org.jfree.chart.ui.RectangleEdge
 import org.jfree.chart.ui.RectangleInsets
 import org.simbrain.plot.ChartColorMapPaintScale
+import org.simbrain.plot.applySimbrainAxisTheme
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
@@ -118,11 +119,13 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
         return ChartColorMapPaintScale(range.start, range.endInclusive) { heatMapModel.colorMap }
     }
 
+    /** Rebuilt on every refresh, after [applySimbrainChartTheme] has run, so it themes itself. */
     private fun createRowAxis() = SymbolAxis(
         "Row",
         Array(heatMapModel.rowCount.coerceAtLeast(1)) { row -> heatMapModel.componentNames.getOrNull(row) ?: row.toString() }
     ).apply {
         isInverted = true
+        applySimbrainAxisTheme()
     }
 
     private fun addClearButton() {

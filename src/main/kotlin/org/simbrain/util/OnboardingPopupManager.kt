@@ -321,10 +321,10 @@ private class OnboardingPopup(
         
         // Draw popup background
         val backgroundColor = when (config.style) {
-            PopupStyle.DEFAULT -> Color(248, 249, 250)
-            PopupStyle.INFO -> Color(240, 248, 255)
-            PopupStyle.WARNING -> Color(255, 248, 240)
-            PopupStyle.SUCCESS -> Color(240, 255, 240)
+            PopupStyle.DEFAULT -> Theme.cardBg
+            PopupStyle.INFO -> blend(Color(100, 150, 255), Theme.cardBg, 0.08)
+            PopupStyle.WARNING -> blend(Color(255, 150, 100), Theme.cardBg, 0.08)
+            PopupStyle.SUCCESS -> blend(Color(100, 255, 150), Theme.cardBg, 0.08)
         }
         
         g2.color = backgroundColor
@@ -332,7 +332,7 @@ private class OnboardingPopup(
         
         // Draw border
         val borderColor = when (config.style) {
-            PopupStyle.DEFAULT -> Color(200, 200, 200)
+            PopupStyle.DEFAULT -> Theme.divider
             PopupStyle.INFO -> Color(100, 150, 255)
             PopupStyle.WARNING -> Color(255, 150, 100)
             PopupStyle.SUCCESS -> Color(100, 255, 150)
@@ -404,7 +404,7 @@ private class OnboardingPopup(
         var y = bounds.y + padding
         
         // Draw title
-        g2.color = Color.BLACK
+        g2.color = Theme.foreground
         g2.font = Theme.heading
         g2.drawString(config.title, bounds.x + padding, y + g2.fontMetrics.ascent)
         y += g2.fontMetrics.height + 4
@@ -421,7 +421,7 @@ private class OnboardingPopup(
     }
     
     private fun drawCloseButton(g2: Graphics2D) {
-        g2.color = Color.GRAY
+        g2.color = Theme.mutedText
         g2.stroke = BasicStroke(2f)
         
         val x = closeButtonBounds.x
@@ -435,13 +435,13 @@ private class OnboardingPopup(
     
     private fun drawCheckbox(g2: Graphics2D) {
         // Draw checkbox
-        g2.color = Color.WHITE
+        g2.color = UIManager.getColor("CheckBox.background") ?: Theme.cardBg
         g2.fillRect(checkboxBounds.x, checkboxBounds.y, checkboxBounds.width, checkboxBounds.height)
-        g2.color = Color.GRAY
+        g2.color = Theme.divider
         g2.drawRect(checkboxBounds.x, checkboxBounds.y, checkboxBounds.width, checkboxBounds.height)
         
         if (doNotShowAgainChecked) {
-            g2.color = Color.BLACK
+            g2.color = Theme.foreground
             g2.stroke = BasicStroke(2f)
             // Draw checkmark
             g2.drawLine(checkboxBounds.x + 3, checkboxBounds.y + 8, checkboxBounds.x + 6, checkboxBounds.y + 11)
@@ -449,7 +449,7 @@ private class OnboardingPopup(
         }
         
         // Draw text
-        g2.color = Color.BLACK
+        g2.color = Theme.foreground
         g2.font = Theme.body
         g2.drawString("Do not show again", checkboxTextBounds.x, checkboxTextBounds.y + 12)
     }

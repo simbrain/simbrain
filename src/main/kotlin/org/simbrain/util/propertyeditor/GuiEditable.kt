@@ -566,7 +566,7 @@ class NumericWidget<O : EditableObject, T>(
                         ftf.border = defaultBorder
                         ftf.commitEdit()
                     } else {
-                        ftf.border = BorderFactory.createEtchedBorder(Color.WHITE, Color.RED)
+                        ftf.border = BorderFactory.createLineBorder(Theme.errorText)
                     }
                 }
 

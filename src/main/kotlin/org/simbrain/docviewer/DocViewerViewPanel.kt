@@ -14,6 +14,8 @@ import javax.swing.event.DocumentListener
 import javax.swing.event.HyperlinkEvent
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultHighlighter
+import javax.swing.text.html.HTMLDocument
+import org.simbrain.util.ThemeColor
 
 /**
  * Renders documentation as html and provides a browser style inline find bar (Cmd/Ctrl+F) over the rendered text,
@@ -36,6 +38,9 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
     val renderedTextPanel = JEditorPane().apply {
         contentType = "text/html"
         isEditable = false
+        // Swing's default HTML stylesheet paints links pure blue, which is muddy on the dark theme
+        val link = UIManager.getColor("Component.linkColor") ?: Color(0x2A, 0x9A, 0xB2)
+        (document as? HTMLDocument)?.styleSheet?.addRule("a { color: #%02x%02x%02x; }".format(link.red, link.green, link.blue))
         addHyperlinkListener { e ->
             if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
@@ -51,8 +56,8 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
 
     private val scrollPane = JScrollPane(renderedTextPanel)
 
-    private val allMatchPainter = DefaultHighlighter.DefaultHighlightPainter(Color(255, 230, 90))
-    private val currentMatchPainter = DefaultHighlighter.DefaultHighlightPainter(Color(255, 150, 50))
+    private val allMatchColor = ThemeColor(Color(255, 230, 90), Color(120, 100, 20), useManualDark = true)
+    private val currentMatchColor = ThemeColor(Color(255, 150, 50), Color(160, 80, 20), useManualDark = true)
 
     private var matches: List<IntRange> = emptyList()
     private var currentMatchIndex = -1
@@ -189,6 +194,9 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
     private fun applyHighlights() {
         val highlighter = renderedTextPanel.highlighter
         highlighter.removeAllHighlights()
+        // Painters are rebuilt per pass so the fill follows the theme active when the matches are shown
+        val allMatchPainter = DefaultHighlighter.DefaultHighlightPainter(allMatchColor.resolved)
+        val currentMatchPainter = DefaultHighlighter.DefaultHighlightPainter(currentMatchColor.resolved)
         matches.forEachIndexed { index, range ->
             val painter = if (index == currentMatchIndex) currentMatchPainter else allMatchPainter
             try {

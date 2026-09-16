@@ -2,6 +2,7 @@ package org.simbrain.plot
 
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.Axis
+import org.jfree.chart.axis.SymbolAxis
 import org.jfree.chart.plot.CategoryPlot
 import org.jfree.chart.plot.DefaultDrawingSupplier
 import org.jfree.chart.plot.PiePlot
@@ -138,10 +139,23 @@ fun JFreeChart.applySimbrainChartTheme() {
     }
 }
 
+/**
+ * Theme one axis from the active tokens. For an axis a panel rebuilds after [applySimbrainChartTheme]
+ * has run (a [SymbolAxis] relabeled as rows come and go), which would otherwise come up with
+ * JFreeChart's black text and opaque light grid bands under the dark theme.
+ */
+fun Axis.applySimbrainAxisTheme() = themeAxis(this, Theme.foreground, Theme.divider)
+
 private fun themeAxis(axis: Axis?, text: Color, line: Color) {
     axis ?: return
     axis.labelPaint = text
     axis.tickLabelPaint = text
     axis.axisLinePaint = line
     axis.tickMarkPaint = line
+    if (axis is SymbolAxis) {
+        axis.gridBandPaint = Color(line.red, line.green, line.blue, 60)
+        axis.gridBandAlternatePaint = TRANSPARENT
+    }
 }
+
+private val TRANSPARENT = Color(0, 0, 0, 0)

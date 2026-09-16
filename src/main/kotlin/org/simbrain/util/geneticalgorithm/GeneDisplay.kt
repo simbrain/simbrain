@@ -214,7 +214,6 @@ class GeneDisplayPanel(
 
     init {
         border = EmptyBorder(8, 12, 8, 12)
-        background = Color.WHITE
         renderSections(sections)
     }
 

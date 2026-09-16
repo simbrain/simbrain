@@ -183,13 +183,13 @@ class FitnessTimeSeries(runner: EvolutionRunner, evaluatorParams: EvaluatorParam
         graphPanel.addRangeMarker(targetMarker)
 
         val maxGenMarker = ValueMarker(evaluatorParams.maxGenerations.toDouble()).apply {
-            paint = Color.GRAY
+            paint = Theme.mutedText
             stroke = BasicStroke(
                 1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 1.0f,
                 floatArrayOf(6f, 6f), 0f
             )
             label = "Max gen"
-            labelPaint = Color.GRAY
+            labelPaint = Theme.mutedText
             labelAnchor = RectangleAnchor.TOP_LEFT
             labelTextAnchor = TextAnchor.TOP_RIGHT
         }

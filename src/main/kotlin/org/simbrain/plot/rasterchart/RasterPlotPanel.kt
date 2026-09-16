@@ -16,13 +16,13 @@ import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.renderer.AbstractRenderer
 import org.jfree.chart.renderer.xy.XYItemRenderer
 import org.simbrain.plot.ChartLegendPanel
+import org.simbrain.plot.applySimbrainAxisTheme
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.plot.raster.RasterModel
 import org.simbrain.util.Theme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import java.awt.BorderLayout
-import java.awt.Color
 import java.awt.Dimension
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
@@ -105,8 +105,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
     /**
      * Show the incoming array's component names down the row axis, e.g. neuron labels, falling back to the
      * row index for rows the producer did not name. The axis is rebuilt on every settings change, after
-     * [applySimbrainChartTheme] has run, so it must theme itself or it comes up with dark-on-dark text and
-     * opaque light grid bands under the dark theme.
+     * [applySimbrainChartTheme] has run, so it themes itself.
      */
     private fun applyRowAxis() {
         val rows = max(max(rasterModel.rowCount, rasterModel.componentNames.size), 1)
@@ -115,12 +114,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
         }
         val axis = SymbolAxis("Value(s)", labels)
         axis.setRange(-0.5, rows - 0.5)
-        axis.labelPaint = Theme.foreground
-        axis.tickLabelPaint = Theme.foreground
-        axis.axisLinePaint = Theme.divider
-        axis.tickMarkPaint = Theme.divider
-        axis.gridBandPaint = Theme.divider.let { Color(it.red, it.green, it.blue, 60) }
-        axis.gridBandAlternatePaint = TRANSPARENT
+        axis.applySimbrainAxisTheme()
         chart.xyPlot.rangeAxis = axis
     }
 
@@ -176,6 +170,5 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
 
     companion object {
         private val PREFERRED_SIZE = Dimension(500, 400)
-        private val TRANSPARENT = Color(0, 0, 0, 0)
     }
 }

@@ -65,6 +65,7 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
         }
 
         // Draw labels only if they intersect the clip region
+        g2.color = Theme.foreground
         for (i in labels.indices) {
             val topLabelX = cellSize + i * cellSize + 5
             if (topLabelX + cellSize >= clip.x && topLabelX <= clip.x + clip.width && clip.y < cellSize) {

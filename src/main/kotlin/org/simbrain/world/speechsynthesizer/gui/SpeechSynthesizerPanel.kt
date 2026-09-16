@@ -103,11 +103,11 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
                 val barW = (slotEnd - slotStart - barGap).coerceAtLeast(1)
                 g2.color = if (i < codec.featureNames.size) Color(80, 130, 200) else Color(200, 100, 80)
                 g2.fillRect(barX, barHeight - h, barW, h)
-                g2.color = Color(235, 235, 235)
+                g2.color = Theme.divider
                 g2.drawRect(barX, 0, barW, barHeight)
                 labels.getOrNull(i)?.let { label ->
                     val saved = g2.transform
-                    g2.color = Color.DARK_GRAY
+                    g2.color = Theme.foreground
                     g2.translate((barX + barW / 2.0) - 2, (barHeight + 4).toDouble())
                     g2.rotate(Math.PI / 4)
                     g2.drawString(label, 0, 0)

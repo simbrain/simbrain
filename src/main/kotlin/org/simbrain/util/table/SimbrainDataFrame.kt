@@ -94,7 +94,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     fun getBooleanColumn(col: Int): BooleanArray {
         if (columns[col].isNumeric()) {
             return (0 until rowCount)
-                .map { (getValueAt(it, col) as Number).toInt() == 0 }
+                .map { (getValueAt(it, col) as Number).toInt() != 0 }
                 .toBooleanArray()
         }
         throw Error("getIntColumn called on a non-numeric column")
@@ -245,7 +245,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
             Double::class -> getValueAt(index, it)?.let { (it as Number).toDouble() } ?: Double.NaN
             Float::class -> getValueAt(index, it)?.let { (it as Number).toFloat() } ?: Float.NaN
             Int::class -> (getValueAt(index, it) as Number).toInt()
-            Boolean::class -> (getValueAt(index, it) as Number).toInt() == 0
+            Boolean::class -> (getValueAt(index, it) as Number).toInt() != 0
             else -> throw IllegalArgumentException("Unsupported type ${T::class}")
         } as T
     }

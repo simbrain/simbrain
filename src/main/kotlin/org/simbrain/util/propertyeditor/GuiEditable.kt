@@ -28,6 +28,7 @@ import java.text.NumberFormat
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
+import javax.swing.table.TableCellRenderer
 import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.math.min
@@ -359,6 +360,12 @@ sealed class ParameterWidget<O : EditableObject, T>(val parameter: GuiEditable<O
     }
 
     abstract val value: T
+
+    /**
+     * The value to write to [editingObject] on commit. Widgets that can hold a partially edited value merge their
+     * edits into the object's current value; every other widget writes [value].
+     */
+    open fun valueFor(editingObject: O): T = value
 
     abstract fun refresh(property: KProperty<*>)
 
@@ -826,10 +833,11 @@ class ThemeColorWidget<O : EditableObject>(
 }
 
 /**
- * Base for widgets that edit a value through a table. When the edited objects hold different values, an "Edit"
- * button stands in for the table. Clicking it shows the table seeded from the first object and marks the widget
- * consistent, so the table's value is committed to every object. The button is disabled when the values have
- * different shapes, since one table cannot be written to all of them.
+ * Base for widgets that edit a value through a table. When the edited objects hold different values, the table
+ * shows "..." in each cell where they differ and the shared value everywhere else. Editing any cell marks the
+ * widget consistent; on commit each object receives the table's cells where they hold a value and keeps its own
+ * where they still show "...". When the values have different shapes a "..." label stands in for the table, since
+ * one table cannot be written to all of them.
  */
 abstract class TableParameterWidget<O : EditableObject, T>(
     val editor: AnnotatedPropertyEditor<O>,
@@ -841,57 +849,97 @@ abstract class TableParameterWidget<O : EditableObject, T>(
 
     protected abstract fun shapeOf(value: T): List<Int>
 
+    /**
+     * The table's cells written over [base]. Cells still showing "..." keep the value from [base].
+     */
+    protected abstract fun mergeInto(base: T): T
+
     val tablePanel: JComponent by lazy { createTablePanel() }
 
     /**
      * True when every edited object's value has the same shape, so one table can be written to all of them.
      */
     val canEditInconsistentValues: Boolean by lazy {
-        editor.editingObjects.map { shapeOf(parameter.property.get(it)) }.distinct().size == 1
+        editor.editingObjects.map { shapeOf(it) }.distinct().size == 1
     }
 
-    val isShowingTable: Boolean
-        get() = isConsistent
+    protected open fun shapeOf(editingObject: O): List<Int> = shapeOf(parameter.property.get(editingObject))
 
     /**
-     * Stands in for the table while the objects have different values; clicking it reveals the table so the value
-     * can be edited for all objects at once.
+     * The values the table is seeded from: every object's value when they differ but share a shape, otherwise
+     * just the first object's.
      */
-    private val editButton: JButton by lazy {
-        JButton("Edit").apply {
-            toolTipText = if (canEditInconsistentValues) {
-                "Selected objects have different values. Click to edit them all at once."
-            } else {
-                "Selected objects have different values and different sizes, so they cannot be edited together."
-            }
-            isEnabled = canEditInconsistentValues
-            addActionListener { editInconsistentValues() }
+    protected val seedValues: List<T> by lazy {
+        if (isConsistent || !canEditInconsistentValues) {
+            listOf(parameter.value)
+        } else {
+            editor.editingObjects.map { parameter.property.get(it) }
         }
     }
 
+    /**
+     * Seed cells for a table given each seed value laid out as a row-major grid: the value all objects share at a
+     * cell, or null where they differ.
+     */
+    protected fun seedCells(grids: List<List<List<Any?>>>): MutableList<MutableList<Any?>> {
+        val first = grids.first()
+        return first.indices.map { row ->
+            first[row].indices.map { col ->
+                val cells = grids.map { it[row][col] }
+                cells.first().takeIf { shared -> cells.all { it == shared } }
+            }.toMutableList()
+        }.toMutableList()
+    }
+
+    protected fun columnsOf(count: Int, type: Column.DataType) =
+        MutableList(count) { Column("Column ${it + 1}", type) }
+
+    /**
+     * Allows the "..." cells to be edited and marks the widget consistent on the first edit, so that the table is
+     * committed.
+     */
+    protected fun <M : SimbrainDataFrame> M.trackingEdits(): M = apply {
+        allowNullEditing = true
+        addTableModelListener {
+            if (!this@TableParameterWidget.isConsistent) {
+                this@TableParameterWidget.isConsistent = true
+                this@TableParameterWidget.events.valueChanged.fire(parameter.property)
+            }
+        }
+    }
+
+    /**
+     * Cells of a table holding a vector, read along the column or the row depending on [GuiEditable.columnMode].
+     */
+    protected fun vectorCells(model: SimbrainDataFrame): List<Any?> = if (parameter.columnMode) {
+        (0 until model.rowCount).map { model.getValueAt(it, 0) }
+    } else {
+        (0 until model.columnCount).map { model.getValueAt(0, it) }
+    }
+
+    protected fun vectorGrid(cells: List<Any?>): List<List<Any?>> = if (parameter.columnMode) {
+        cells.map { listOf(it) }
+    } else {
+        listOf(cells)
+    }
+
+    override val value: T
+        get() = mergeInto(parameter.value)
+
+    override fun valueFor(editingObject: O): T = mergeInto(parameter.property.get(editingObject))
+
     private val placeholderPanel: JComponent by lazy {
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
-            add(editButton)
+            add(JLabel(NULL_STRING).apply {
+                toolTipText = "Selected objects have different sizes, so they cannot be edited together."
+            })
         }
     }
 
     override val widget: JComponent by lazy {
         JPanel(BorderLayout()).apply {
-            add(if (isConsistent) tablePanel else placeholderPanel)
+            add(if (isConsistent || canEditInconsistentValues) tablePanel else placeholderPanel)
         }
-    }
-
-    /**
-     * Replaces the "..." placeholder with the table so that the value can be edited for all objects at once.
-     */
-    fun editInconsistentValues() {
-        if (isConsistent || !canEditInconsistentValues) return
-        isConsistent = true
-        widget.removeAll()
-        widget.add(tablePanel)
-        widget.revalidate()
-        widget.repaint()
-        events.valueChanged.fire(parameter.property)
     }
 
     override fun refresh(property: KProperty<*>) {
@@ -901,12 +949,28 @@ abstract class TableParameterWidget<O : EditableObject, T>(
             property,
             enableWidgetProvider = { enabled ->
                 widget.isEnabled = enabled
-                editButton.isEnabled = enabled && canEditInconsistentValues
             },
             widgetVisibilityProvider = { visible ->
                 widget.isVisible = visible
             }
         ))
+    }
+
+    /**
+     * Renders cells whose values differ across the edited objects as "...".
+     */
+    protected fun showPlaceholderForNullCells(table: JTable) {
+        val delegate = table.getDefaultRenderer(Any::class.java)
+        table.setDefaultRenderer(Any::class.java, TableCellRenderer { t, cellValue, isSelected, hasFocus, row, column ->
+            // The default renderer keeps an explicitly set foreground for later cells, so set it before delegating
+            // and let the renderer resolve it for every cell.
+            (delegate as? JComponent)?.foreground = if (cellValue == null) Theme.mutedText else null
+            delegate.getTableCellRendererComponent(t, cellValue, isSelected, hasFocus, row, column).also {
+                if (cellValue == null && it is JLabel) {
+                    it.text = NULL_STRING
+                }
+            }
+        })
     }
 
     protected fun createHeaderlessTablePanel(model: SimbrainDataFrame): JComponent = JPanel().apply {
@@ -916,6 +980,7 @@ abstract class TableParameterWidget<O : EditableObject, T>(
             usePadding = false
         ).also {
             it.table.tableHeader = null
+            showPlaceholderForNullCells(it.table)
             add(it)
             minimumSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
             preferredSize = Dimension(200, min((model.rowCount + 1) * 17 + 2, 100))
@@ -929,22 +994,19 @@ class DoubleArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : TableParameterWidget<O, DoubleArray>(editor, parameter, isConsistent) {
 
-    private var model = if (parameter.columnMode) {
-        createBasicDataFrameFromColumn(parameter.value)
-    } else {
-        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
-    }
+    val model = BasicDataFrame(
+        seedCells(seedValues.map { vectorGrid(it.toList()) }),
+        columns = columnsOf(if (parameter.columnMode) 1 else parameter.value.size, Column.DataType.DoubleType)
+    ).trackingEdits()
 
     override fun createTablePanel() = createHeaderlessTablePanel(model)
 
     override fun shapeOf(value: DoubleArray) = listOf(value.size)
 
-    override val value: DoubleArray
-        get() = if (parameter.columnMode) {
-            model.getDoubleColumn(0)
-        } else {
-            model.getRow<Double>(0).toDoubleArray()
-        }
+    override fun mergeInto(base: DoubleArray): DoubleArray {
+        val cells = vectorCells(model)
+        return DoubleArray(cells.size) { (cells[it] as? Number)?.toDouble() ?: base.getOrElse(it) { 0.0 } }
+    }
 }
 
 class TensorWidget<O : EditableObject>(
@@ -955,9 +1017,11 @@ class TensorWidget<O : EditableObject>(
 ) : TableParameterWidget<O, DoubleArray>(editor, parameter, isConsistent) {
 
     /** One BasicDataFrame per slice (tab). */
-    private val sliceModels: List<BasicDataFrame> = (0 until descriptor.numSlices).map { sliceIdx ->
-        val slice2D = descriptor.extractSlice(parameter.value, sliceIdx)
-        createFrom2DArray(slice2D.map { row -> row.toTypedArray() }.toTypedArray())
+    val sliceModels: List<BasicDataFrame> = (0 until descriptor.numSlices).map { sliceIdx ->
+        BasicDataFrame(
+            seedCells(seedValues.map { value -> descriptor.extractSlice(value, sliceIdx).map { row -> row.toList() } }),
+            columns = columnsOf(descriptor.numCols, Column.DataType.DoubleType)
+        ).trackingEdits()
     }
 
     private fun createTensorTablePanel(model: BasicDataFrame) = SimbrainTablePanel(
@@ -966,6 +1030,7 @@ class TensorWidget<O : EditableObject>(
         useRowHeaders = false,
         usePadding = false
     ).apply {
+        showPlaceholderForNullCells(table)
         addAction(table.fillAction)
         addAction(table.zeroFillAction)
         addAction(table.randomizeAction)
@@ -1037,15 +1102,26 @@ class TensorWidget<O : EditableObject>(
 
     override fun shapeOf(value: DoubleArray) = listOf(value.size)
 
-    override val value: DoubleArray
-        get() {
-            val result = parameter.value.copyOf()
-            for (sliceIdx in 0 until descriptor.numSlices) {
-                val slice = sliceModels[sliceIdx].get2DDoubleArray()
-                descriptor.writeSlice(result, sliceIdx, slice)
+    /**
+     * Tensors of equal length can still be laid out differently, so compare the descriptor's dimensions.
+     */
+    override fun shapeOf(editingObject: O): List<Int> =
+        parameter.tensorDescriptor!!.get(editingObject).dimensions.toList()
+
+    override fun mergeInto(base: DoubleArray): DoubleArray {
+        val result = base.copyOf()
+        for (sliceIdx in 0 until descriptor.numSlices) {
+            val slice = descriptor.extractSlice(base, sliceIdx)
+            val model = sliceModels[sliceIdx]
+            for (row in 0 until model.rowCount) {
+                for (col in 0 until model.columnCount) {
+                    (model.getValueAt(row, col) as? Number)?.let { slice[row][col] = it.toDouble() }
+                }
             }
-            return result
+            descriptor.writeSlice(result, sliceIdx, slice)
         }
+        return result
+    }
 }
 
 class IntArrayWidget<O : EditableObject>(
@@ -1054,22 +1130,19 @@ class IntArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : TableParameterWidget<O, IntArray>(editor, parameter, isConsistent) {
 
-    private var model = if (parameter.columnMode) {
-        createBasicDataFrameFromColumn(parameter.value)
-    } else {
-        createFrom2DArray(arrayOf(parameter.value.toTypedArray()))
-    }
+    val model = BasicDataFrame(
+        seedCells(seedValues.map { vectorGrid(it.toList()) }),
+        columns = columnsOf(if (parameter.columnMode) 1 else parameter.value.size, Column.DataType.IntType)
+    ).trackingEdits()
 
     override fun createTablePanel() = createHeaderlessTablePanel(model)
 
     override fun shapeOf(value: IntArray) = listOf(value.size)
 
-    override val value: IntArray
-        get() = if (parameter.columnMode) {
-            model.getIntColumn(0)
-        } else {
-            model.getRow<Int>(0).toIntArray()
-        }
+    override fun mergeInto(base: IntArray): IntArray {
+        val cells = vectorCells(model)
+        return IntArray(cells.size) { (cells[it] as? Number)?.toInt() ?: base.getOrElse(it) { 0 } }
+    }
 }
 
 class BooleanArrayWidget<O : EditableObject>(
@@ -1078,22 +1151,19 @@ class BooleanArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : TableParameterWidget<O, BooleanArray>(editor, parameter, isConsistent) {
 
-    private var model = if (parameter.columnMode) {
-        createBasicDataFrameFromColumn(parameter.value.map { if (it) 1 else 0 }.toIntArray())
-    } else {
-        createFrom2DArray(arrayOf(parameter.value.map { if (it) 1 else 0 }.toTypedArray()))
-    }
+    val model = BasicDataFrame(
+        seedCells(seedValues.map { value -> vectorGrid(value.map { if (it) 1 else 0 }) }),
+        columns = columnsOf(if (parameter.columnMode) 1 else parameter.value.size, Column.DataType.IntType)
+    ).trackingEdits()
 
     override fun createTablePanel() = createHeaderlessTablePanel(model)
 
     override fun shapeOf(value: BooleanArray) = listOf(value.size)
 
-    override val value: BooleanArray
-        get() = if (parameter.columnMode) {
-            model.getBooleanColumn(0)
-        } else {
-            model.getRow<Boolean>(0).toBooleanArray()
-        }
+    override fun mergeInto(base: BooleanArray): BooleanArray {
+        val cells = vectorCells(model)
+        return BooleanArray(cells.size) { (cells[it] as? Number)?.let { n -> n.toInt() != 0 } ?: base.getOrElse(it) { false } }
+    }
 }
 
 class StringArrayWidget<O : EditableObject>(
@@ -1102,32 +1172,19 @@ class StringArrayWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : TableParameterWidget<O, Array<String>>(editor, parameter, isConsistent) {
 
-    private var model = if (parameter.columnMode) {
-        parameter.value.let { data ->
-            BasicDataFrame(
-                data.map { mutableListOf(it as Any?) }.toMutableList(),
-                columns = mutableListOf(Column("Column 1", Column.DataType.StringType))
-            )
-        }
-    } else {
-        parameter.value.let { data ->
-            BasicDataFrame(
-                mutableListOf(data.toMutableList()),
-                columns = data.mapIndexed { index, s -> Column("Column ${index + 1}", Column.DataType.StringType) }.toMutableList()
-            )
-        }
-    }
+    val model = BasicDataFrame(
+        seedCells(seedValues.map { vectorGrid(it.toList()) }),
+        columns = columnsOf(if (parameter.columnMode) 1 else parameter.value.size, Column.DataType.StringType)
+    ).trackingEdits()
 
     override fun createTablePanel() = createHeaderlessTablePanel(model)
 
     override fun shapeOf(value: Array<String>) = listOf(value.size)
 
-    override val value: Array<String>
-        get() = if (parameter.columnMode) {
-            model.getStringColumn(0)
-        } else {
-            model.getRow<String>(0).toTypedArray()
-        }
+    override fun mergeInto(base: Array<String>): Array<String> {
+        val cells = vectorCells(model)
+        return Array(cells.size) { cells[it]?.toString() ?: base.getOrElse(it) { "" } }
+    }
 }
 
 class MatrixWidget<O : EditableObject>(
@@ -1136,30 +1193,36 @@ class MatrixWidget<O : EditableObject>(
     isConsistent: Boolean
 ) : TableParameterWidget<O, Matrix>(editor, parameter, isConsistent) {
 
-    private var model = MatrixDataFrame(
+    /**
+     * Vectors are shown as a row unless [GuiEditable.columnMode] asks for a column vector to stay a column.
+     * Matrices with more than one row and column are shown as they are.
+     */
+    private val transposeForDisplay = parameter.value.let {
+        !(it.nrow() > 1 && it.ncol() > 1) && !(parameter.columnMode && it.ncol() == 1)
+    }
 
-        if (parameter.value.nrow() > 1 && parameter.value.ncol() > 1) {
-            parameter.value // don't transpose matrices since they are already in the correct orientation
-        } else {
-            // Column display mode only applies to column vectors
-            if (parameter.columnMode && parameter.value.ncol() == 1) {
-                parameter.value
-            } else {
-                parameter.value.transpose()
-            }
-        }
-    )
+    private fun displayed(value: Matrix) = if (transposeForDisplay) value.transpose() else value
+
+    val model = BasicDataFrame(
+        seedCells(seedValues.map { displayed(it).toArray().map { row -> row.toList() } }),
+        columns = columnsOf(displayed(parameter.value).ncol(), Column.DataType.DoubleType)
+    ).trackingEdits()
 
     override fun createTablePanel() = createHeaderlessTablePanel(model)
 
     override fun shapeOf(value: Matrix) = listOf(value.nrow(), value.ncol())
 
-    override val value: Matrix
-        get() = if (parameter.columnMode && parameter.value.ncol() == 1) {
-            model.data
-        } else {
-            model.data.transpose()
+    override fun mergeInto(base: Matrix): Matrix {
+        val displayedBase = displayed(base)
+        val result = Matrix(model.rowCount, model.columnCount)
+        for (row in 0 until model.rowCount) {
+            for (col in 0 until model.columnCount) {
+                result[row, col] = (model.getValueAt(row, col) as? Number)?.toDouble()
+                    ?: if (row < displayedBase.nrow() && col < displayedBase.ncol()) displayedBase[row, col] else 0.0
+            }
         }
+        return if (transposeForDisplay) result.transpose() else result
+    }
 }
 
 /**

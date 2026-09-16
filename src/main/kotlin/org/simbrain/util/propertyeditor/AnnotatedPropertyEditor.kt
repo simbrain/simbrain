@@ -307,9 +307,9 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                             }
                         } else {
                             if (parameter.useLegacySetter) {
-                                property.invokeLegacySetter(eo, widget.value)
+                                property.invokeLegacySetter(eo, widget.valueFor(eo))
                             } else {
-                                property.setter.call(eo, widget.value)
+                                property.setter.call(eo, widget.valueFor(eo))
                             }
                         }
                         eo.onCommit()

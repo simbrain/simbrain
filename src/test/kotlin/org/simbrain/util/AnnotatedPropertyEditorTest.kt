@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.TensorLayer
+import org.simbrain.network.core.TensorShape
 import org.simbrain.network.updaterules.AfdThermoreceptorRule
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
@@ -16,7 +18,7 @@ import org.simbrain.util.propertyeditor.*
 import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.JComboBox
-import javax.swing.JButton
+import javax.swing.JLabel
 import javax.swing.JComponent
 import javax.swing.JSpinner
 import kotlin.reflect.full.declaredMemberProperties
@@ -140,47 +142,91 @@ class AnnotatedPropertyEditorTest {
     }
 
     @Test
-    fun `differing matrix contents show the placeholder and are not committed`() {
+    fun `differing matrix cells show as null and are not committed until edited`() {
         val o1 = APETestObjectKotlin()
-        val o2 = APETestObjectKotlin().apply { testMatrix = Matrix.column(doubleArrayOf(5.0, 6.0)) }
+        val o2 = APETestObjectKotlin().apply { testMatrix = Matrix.column(doubleArrayOf(1.0, 6.0)) }
         val ape = AnnotatedPropertyEditor(o1, o2)
         val widget = ape.propertyNameWidgetMap["testMatrix"] as MatrixWidget
         assertFalse(widget.isConsistent)
-        assertFalse(widget.isShowingTable)
         assertTrue(widget.canEditInconsistentValues)
-        assertEquals("Edit", widget.widget.findButton()?.text)
-        assertTrue(widget.widget.findButton()!!.isEnabled)
+        assertEquals(1.0, widget.model.getValueAt(0, 0))
+        assertEquals(null, widget.model.getValueAt(1, 0))
         ape.commitChanges()
-        assertEquals(1.0, o1.testMatrix[0, 0])
-        assertEquals(5.0, o2.testMatrix[0, 0])
+        assertEquals(2.0, o1.testMatrix[1, 0])
+        assertEquals(6.0, o2.testMatrix[1, 0])
+        widget.model.setValueAt(9.0, 1, 0)
+        assertTrue(widget.isConsistent)
+        ape.commitChanges()
+        assertEquals(9.0, o1.testMatrix[1, 0])
+        assertEquals(9.0, o2.testMatrix[1, 0])
+        assertEquals(1.0, o2.testMatrix[0, 0])
     }
 
     @Test
-    fun `choosing to edit inconsistent arrays commits the table to every object`() {
+    fun `editing one differing array cell commits it to every object and leaves the other cells alone`() {
         val o1 = APETestObjectKotlin()
         val o2 = APETestObjectKotlin().apply { testDoubleArray = doubleArrayOf(5.0, 6.0) }
         val ape = AnnotatedPropertyEditor(o1, o2)
         val widget = ape.propertyNameWidgetMap["testDoubleArray"] as DoubleArrayWidget
-        widget.editInconsistentValues()
+        assertEquals(null, widget.model.getValueAt(0, 0))
+        assertEquals(null, widget.model.getValueAt(0, 1))
+        widget.model.setValueAt(7.0, 0, 0)
         assertTrue(widget.isConsistent)
-        assertTrue(widget.isShowingTable)
         ape.commitChanges()
-        assertArrayEquals(doubleArrayOf(1.0, -1.0), o1.testDoubleArray)
-        assertArrayEquals(doubleArrayOf(1.0, -1.0), o2.testDoubleArray)
+        assertArrayEquals(doubleArrayOf(7.0, -1.0), o1.testDoubleArray)
+        assertArrayEquals(doubleArrayOf(7.0, 6.0), o2.testDoubleArray)
     }
 
     @Test
-    fun `inconsistent arrays of different sizes cannot be edited together`() {
+    fun `boolean array cells round trip through the table`() {
+        val o1 = APETestObjectKotlin()
+        val o2 = APETestObjectKotlin().apply { testBooleanArray = booleanArrayOf(false, false) }
+        val ape = AnnotatedPropertyEditor(o1, o2)
+        val widget = ape.propertyNameWidgetMap["testBooleanArray"] as BooleanArrayWidget
+        assertEquals(null, widget.model.getValueAt(0, 0))
+        assertEquals(0, widget.model.getValueAt(0, 1))
+        widget.model.setValueAt(1, 0, 1)
+        ape.commitChanges()
+        assertArrayEquals(booleanArrayOf(true, true), o1.testBooleanArray)
+        assertArrayEquals(booleanArrayOf(false, true), o2.testBooleanArray)
+    }
+
+    @Test
+    fun `inconsistent arrays of different sizes show a placeholder and cannot be edited together`() {
         val o1 = APETestObjectKotlin()
         val o2 = APETestObjectKotlin().apply { testStringArray = arrayOf("a", "b", "c") }
         val ape = AnnotatedPropertyEditor(o1, o2)
         val widget = ape.propertyNameWidgetMap["testStringArray"] as StringArrayWidget
         assertFalse(widget.canEditInconsistentValues)
-        assertFalse(widget.widget.findButton()!!.isEnabled)
-        widget.editInconsistentValues()
-        assertFalse(widget.isConsistent)
+        assertEquals(NULL_STRING, widget.widget.findLabel()?.text)
         ape.commitChanges()
         assertEquals(3, o2.testStringArray.size)
+        assertEquals(2, o1.testStringArray.size)
+    }
+
+    @Test
+    fun `tensor cells that differ show as null and merge per object on commit`() {
+        val l1 = TensorLayer(TensorShape(2, 2))
+        val l2 = TensorLayer(TensorShape(2, 2)).apply { biases[3] = 1.0 }
+        val ape = AnnotatedPropertyEditor(l1, l2)
+        val widget = ape.propertyNameWidgetMap["biases"] as TensorWidget
+        assertTrue(widget.canEditInconsistentValues)
+        assertEquals(0.0, widget.sliceModels[0].getValueAt(0, 0))
+        assertEquals(null, widget.sliceModels[0].getValueAt(1, 1))
+        widget.sliceModels[0].setValueAt(5.0, 0, 0)
+        ape.commitChanges()
+        assertArrayEquals(doubleArrayOf(5.0, 0.0, 0.0, 0.0), l1.biases)
+        assertArrayEquals(doubleArrayOf(5.0, 0.0, 0.0, 1.0), l2.biases)
+    }
+
+    @Test
+    fun `tensors of equal length but different shape cannot be edited together`() {
+        val l1 = TensorLayer(TensorShape(2, 2))
+        val l2 = TensorLayer(TensorShape(4, 1)).apply { biases[0] = 1.0 }
+        val ape = AnnotatedPropertyEditor(l1, l2)
+        val widget = ape.propertyNameWidgetMap["biases"] as TensorWidget
+        assertFalse(widget.canEditInconsistentValues)
+        assertEquals(NULL_STRING, widget.widget.findLabel()?.text)
     }
 
     @Test
@@ -201,9 +247,9 @@ class AnnotatedPropertyEditorTest {
         assertEquals(Color.BLUE, o2.testColor)
     }
 
-    private fun JComponent.findButton(): JButton? =
+    private fun JComponent.findLabel(): JLabel? =
         components.filterIsInstance<JComponent>().firstNotNullOfOrNull { c ->
-            c as? JButton ?: c.findButton()
+            c as? JLabel ?: c.findLabel()
         }
 
     @Test

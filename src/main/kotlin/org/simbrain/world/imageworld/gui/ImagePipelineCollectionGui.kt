@@ -1,8 +1,10 @@
 package org.simbrain.world.imageworld.gui
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import org.simbrain.util.*
+import org.simbrain.util.widgets.ModelBackedComboBoxModel
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.dialogs.ImageProcessingPipelineDialog
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
@@ -21,17 +23,22 @@ class ImagePipelineCollectionGui(
 ) {
     private val imageWorld = imageWorldDesktopComponent.workspaceComponent.world
 
-    private val pipelineComboBox = JComboBox<ImageProcessingPipeline>().apply {
+    /**
+     * One lane for user pipeline picks, so rapid picks apply in click order and the last one wins.
+     */
+    @OptIn(ExperimentalCoroutinesApi::class)
+    private val selectionLane = Dispatchers.Default.limitedParallelism(1)
+
+    private val pipelineComboBoxModel = ModelBackedComboBoxModel<ImageProcessingPipeline> { pipeline ->
+        if (pipeline === imagePipelineCollection.currentPipeline) return@ModelBackedComboBoxModel
+        imageWorld.launch(selectionLane) {
+            imagePipelineCollection.setCurrentPipeline(pipeline)
+        }
+    }
+
+    private val pipelineComboBox = JComboBox(pipelineComboBoxModel).apply {
         toolTipText = "Which pipeline to view"
         maximumSize = Dimension(200, 100)
-        addActionListener { evt ->
-            imageWorldDesktopComponent.workspaceComponent.world.launch(Dispatchers.Default) {
-                val selectedPipeline = selectedItem as? ImageProcessingPipeline
-                if (selectedPipeline != null) {
-                    imagePipelineCollection.setCurrentPipeline(selectedPipeline)
-                }
-            }
-        }
     }
 
     private val addPipelineButton = JButton(imageWorldDesktopComponent.createAction(
@@ -41,7 +48,6 @@ class ImagePipelineCollectionGui(
         if (pipelineName != null && pipelineName.isNotBlank()) {
             val newPipeline = ImageProcessingPipeline(pipelineName, imagePipelineCollection.imageSource)
             imagePipelineCollection.addPipeline(newPipeline)
-            pipelineComboBox.selectedItem = newPipeline
             imagePipelineCollection.setCurrentPipeline(newPipeline)
         }
     }).apply { toolTipText = "Add pipeline" }
@@ -60,7 +66,6 @@ class ImagePipelineCollectionGui(
         val dialogResult = showWarningConfirmDialog("Are you sure you want to delete pipeline \"${currentPipeline.name}\"?")
         if (dialogResult == JOptionPane.YES_OPTION) {
             imagePipelineCollection.removePipeline(currentPipeline)
-            updateComboBox()
             // Set to first pipeline after deletion
             if (imagePipelineCollection.pipelines.isNotEmpty()) {
                 imagePipelineCollection.setCurrentPipeline(imagePipelineCollection.pipelines[0])
@@ -141,21 +146,14 @@ class ImagePipelineCollectionGui(
     }
 
     private fun setComboBoxSelection(pipeline: ImageProcessingPipeline?) {
-        pipelineComboBox.selectedItem = pipeline
+        pipelineComboBoxModel.sync(imagePipelineCollection.pipelines, pipeline)
     }
 
     /**
-     * Reset the combo box for the pipeline panels.
+     * Mirror the collection's pipelines and current pipeline into the combo box.
      */
     private fun updateComboBox() {
-        pipelineComboBox.removeAllItems()
-        val selectedPipeline = imagePipelineCollection.currentPipeline
-        for (pipeline in imagePipelineCollection.pipelines) {
-            pipelineComboBox.addItem(pipeline)
-            if (pipeline == selectedPipeline) {
-                pipelineComboBox.selectedItem = pipeline
-            }
-        }
+        pipelineComboBoxModel.sync(imagePipelineCollection.pipelines, imagePipelineCollection.currentPipeline)
         updateButtonStates()
     }
 }

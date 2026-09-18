@@ -23,13 +23,12 @@ import org.simbrain.util.piccolo.Tile
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
-import org.simbrain.world.odorworld.entities.MovementMode
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
 import java.awt.Color
-import java.awt.Rectangle
 import java.awt.Dimension
+import java.awt.Rectangle
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
@@ -37,9 +36,10 @@ import java.awt.event.MouseWheelEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.*
-import java.util.Timer
-import javax.swing.*
-import kotlin.math.abs
+import javax.swing.JPanel
+import javax.swing.JPopupMenu
+import javax.swing.JToolBar
+import javax.swing.ToolTipManager
 import kotlin.math.min
 import kotlin.math.pow
 
@@ -375,7 +375,7 @@ class OdorWorldPanel(
             override fun mouseWheelRotated(event: PInputEvent) {
                 val swingEvent = (event.sourceSwingEvent as MouseWheelEvent)
                 val newScale = 1.1.pow(swingEvent.preciseWheelRotation)
-                if (abs(swingEvent.preciseWheelRotation) > 2) {
+                if (swingEvent.preciseWheelRotation != 0.0 && autoZoom) {
                     autoZoom = false
                 }
                 canvas.scale(1 / newScale)
@@ -691,4 +691,3 @@ class OdorWorldPanel(
         return canvas.layer.allNodes.filterIsInstance<EntityNode>().first { it.entity == entity }
     }
 }
-

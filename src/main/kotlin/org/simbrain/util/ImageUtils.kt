@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import org.simbrain.network.gui.dialogs.NetworkPreferences.outlineValueText
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightMatrixImageMaxSize
 import org.simbrain.util.math.SimbrainMath
 import smile.math.matrix.Matrix
@@ -427,9 +428,9 @@ fun computeCellFont(targetWidth: Double, targetHeight: Double, refString: String
 }
 
 /**
- * Draw [text] centered at ([centerX], [centerY]) in the themed value color with a halo in the themed
- * canvas color for readability on any background. Sets antialiasing hints and modifies stroke/color on
- * the receiver.
+ * Draw [text] centered at ([centerX], [centerY]) in the themed value color. When the
+ * [outlineValueText] preference is on, a halo in the themed canvas color is drawn behind the glyphs for
+ * readability on any background. Sets antialiasing hints and modifies stroke/color on the receiver.
  */
 fun Graphics2D.drawCenteredOutlinedLabel(text: String, font: Font, centerX: Double, centerY: Double) {
     if (text.isEmpty()) return
@@ -442,17 +443,19 @@ fun Graphics2D.drawCenteredOutlinedLabel(text: String, font: Font, centerX: Doub
     setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
     setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
-    stroke = BasicStroke(font.size2D * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-    color = NetworkTheme.current.canvasBackground
-    draw(outline)
+    if (outlineValueText) {
+        stroke = BasicStroke(font.size2D * 0.15f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+        color = NetworkTheme.current.canvasBackground
+        draw(outline)
+    }
     color = NetworkTheme.current.valueText
     fill(outline)
 }
 
 /**
  * Draw numeric value labels over a grid of cells. Only cells visible in the current clip are drawn.
- * Text is rendered in the themed value color with a halo in the themed canvas color for readability
- * over any background color.
+ * Text is rendered in the themed value color, with a halo in the themed canvas color when the
+ * [outlineValueText] preference is on.
  * Font size is computed once from a worst-case reference string so that all cells use the same size.
  */
 fun Graphics2D.drawNumericOverlay(

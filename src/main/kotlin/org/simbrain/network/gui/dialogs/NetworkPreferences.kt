@@ -191,6 +191,16 @@ object NetworkPreferences: PreferenceHolder() {
     var showSynapseStrengthLabels by BooleanPreference(true)
 
     @UserParameter(
+        label = "Outline value text",
+        description = "Draw a background-colored halo around numeric labels on synapses, weight matrices, and other " +
+                "overlays so they stay readable over any color. Turn off if the halo makes text look blurry, " +
+                "for example on low-resolution displays.",
+        tab = "GUI",
+        order = 29
+    )
+    var outlineValueText by BooleanPreference(true)
+
+    @UserParameter(
         label = "Synapse strength decimal places",
         description = "Number of decimal places to display in synapse strength labels",
         minimumValue = 0.0,

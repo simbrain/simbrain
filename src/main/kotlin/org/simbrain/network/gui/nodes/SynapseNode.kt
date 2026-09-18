@@ -368,7 +368,6 @@ class SynapseNode(
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
         if (!NetworkPreferences.showSynapseStrengthLabels) return
-        if (isSelfConnection) return
 
         val diameter = circle?.width ?: return
         if (diameter * networkPanel.scalingFactor < NetworkPreferences.synapseStrengthLabelMinScreenSize) return
@@ -380,9 +379,11 @@ class SynapseNode(
 
         // The synapse circle sits on the target neuron's perimeter, so the half toward the target is
         // covered. Offset the label toward the source (visible half). Direction is preserved under
-        // translation, so we can compute it directly from the global neuron locations.
-        val dx = source.neuron.x - target.neuron.x
-        val dy = source.neuron.y - target.neuron.y
+        // translation, so we can compute it directly from the global neuron locations. A self
+        // connection's circle sits diagonally below and to the right of its neuron, so its visible
+        // half faces that way.
+        val dx = if (isSelfConnection) 1.0 else source.neuron.x - target.neuron.x
+        val dy = if (isSelfConnection) 1.0 else source.neuron.y - target.neuron.y
         val mag = sqrt(dx * dx + dy * dy)
         if (mag < 1e-6) return
         val labelX = circleCx + (dx / mag) * (diameter / 4)

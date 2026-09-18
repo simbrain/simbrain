@@ -100,10 +100,22 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * create a new matrix and copy its value to this one.
      */
     @get:Producible
-    val weights: Matrix
+    val weights: Matrix = Matrix(target.size, source.size)
 
+    /**
+     * Must stay the same shape as [weights]. A matrix of another shape, such as the transposed one older builds
+     * saved after the weight matrix dialog was committed, is replaced by a zero matrix of the right shape rather
+     * than left to fail on the next update.
+     */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
-    override var psrMatrix: Matrix
+    override var psrMatrix: Matrix = Matrix(target.size, source.size)
+        set(value) {
+            field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
+                value
+            } else {
+                Matrix(weights.nrow(), weights.ncol())
+            }
+        }
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -129,16 +141,11 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         source.addOutgoingConnector(this)
         target.addIncomingConnector(this)
 
-        weights = Matrix(target.size, source.size)
-
         excitatoryMask = Matrix(target.size, source.size)
         inhibitoryMask = Matrix(target.size, source.size)
 
         diagonalize()
         updateMasks()
-
-        psrMatrix = Matrix(target.size, source.size)
-
     }
 
     @get:Producible

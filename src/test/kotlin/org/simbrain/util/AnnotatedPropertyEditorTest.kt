@@ -163,6 +163,16 @@ class AnnotatedPropertyEditorTest {
     }
 
     @Test
+    fun `committing a non-square matrix keeps its orientation`() {
+        val o1 = APETestObjectKotlin().apply { testMatrix = Matrix.of(arrayOf(doubleArrayOf(0.0, 1.0, 2.0), doubleArrayOf(10.0, 11.0, 12.0))) }
+        val ape = AnnotatedPropertyEditor(o1)
+        ape.commitChanges()
+        assertEquals(2, o1.testMatrix.nrow())
+        assertEquals(3, o1.testMatrix.ncol())
+        assertEquals(12.0, o1.testMatrix[1, 2])
+    }
+
+    @Test
     fun `editing one differing array cell commits it to every object and leaves the other cells alone`() {
         val o1 = APETestObjectKotlin()
         val o2 = APETestObjectKotlin().apply { testDoubleArray = doubleArrayOf(5.0, 6.0) }

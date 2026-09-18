@@ -98,6 +98,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
             networkPanel.autoZoom = false
+            // A plain press on a node outside its pixels selects the whole node, so pixel selections go
+            if (!event.isShiftDown && !pickedNode.isPixelTarget) {
+                networkPanel.clearAllPixelSelections()
+            }
             // Toggle selection
             if (event.isShiftDown) {
                 networkPanel.selectionManager.toggle(pickedScreenElement)

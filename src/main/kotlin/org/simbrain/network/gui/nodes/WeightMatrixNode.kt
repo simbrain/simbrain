@@ -130,6 +130,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         addChild(arrow)
         addChild(imageBox)
         imageBox.pickable = true
+        imageBox.markAsPixelTarget()
         imageBox.addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseEntered(event: PInputEvent) {
                 networkPanel.hideCanvasTooltip()
@@ -145,14 +146,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 networkPanel.clearNeuronArrayTrace()
             }
             override fun mousePressed(event: PInputEvent) {
-                if (!event.isAltDown) return
                 val wm = weightMatrix as? WeightMatrix ?: return
                 val ij = pixelToWeightCell(wm, event.getPositionRelativeTo(imageBox)) ?: return
-                selectCell(ij.first, ij.second, addToSelection = event.isShiftDown)
-                if (this@WeightMatrixNode !in networkPanel.selectionManager) {
-                    networkPanel.selectionManager.add(this@WeightMatrixNode)
-                }
-                event.isHandled = true
+                networkPanel.pressPixel(event, this@WeightMatrixNode) { selectCell(ij.first, ij.second, addToSelection = it) }
             }
         })
         

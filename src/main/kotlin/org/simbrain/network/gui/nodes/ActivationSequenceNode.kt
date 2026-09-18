@@ -37,6 +37,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     protected val activationImage = SimbrainImage().apply {
         mainNode.addChild(this)
         pickable = true
+        markAsPixelTarget()
         addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseEntered(event: PInputEvent) {
                 networkPanel.hideCanvasTooltip()
@@ -50,13 +51,8 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
                 networkPanel.clearNeuronArrayTrace()
             }
             override fun mousePressed(event: PInputEvent) {
-                if (!event.isAltDown) return
                 val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
-                selectCell(row, col, addToSelection = event.isShiftDown)
-                if (this@ActivationSequenceNode !in networkPanel.selectionManager) {
-                    networkPanel.selectionManager.add(this@ActivationSequenceNode)
-                }
-                event.isHandled = true
+                networkPanel.pressPixel(event, this@ActivationSequenceNode) { selectCell(row, col, addToSelection = it) }
             }
         })
     }

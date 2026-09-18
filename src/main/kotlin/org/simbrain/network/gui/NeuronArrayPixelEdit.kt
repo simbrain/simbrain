@@ -1,17 +1,20 @@
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
+import org.piccolo2d.event.PInputEvent
 import org.simbrain.network.core.ActivationSequence
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.ActivationSequenceNode
 import org.simbrain.network.gui.nodes.NeuronArrayNode
+import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.UserParameter
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.event.MouseEvent
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Rectangle2D
 import javax.swing.ToolTipManager
@@ -19,10 +22,42 @@ import javax.swing.ToolTipManager
 /**
  * Helpers for the per-pixel quick-edit feature on neuron arrays and weight matrices.
  *
- * Pixel selections live on the visual nodes ([NeuronArrayNode.pixelSelection],
- * [WeightMatrixNode.pixelSelection]); these utilities aggregate them across the panel and
- * route increment / decrement / clear / randomize requests to the underlying model.
+ * Pixels behave like small selectable models inside their node: a plain click on one selects it (and the
+ * node), shift-click extends the pixel selection, and a plain click on the node outside its pixels selects
+ * the whole node and drops the pixel selection. Pixel selections live on the visual nodes
+ * ([NeuronArrayNode.pixelSelection], [WeightMatrixNode.pixelSelection]); these utilities aggregate them
+ * across the panel and route increment / decrement / clear / randomize requests to the underlying model.
  */
+
+private const val PIXEL_TARGET_ATTRIBUTE = "pixelTarget"
+
+/** Tag a node whose cells are pixels, so the canvas handler can tell a pixel press from a whole-node press. */
+fun PNode.markAsPixelTarget() {
+    addAttribute(PIXEL_TARGET_ATTRIBUTE, true)
+}
+
+/** True if this node or any ancestor is a pixel target, since picks land on the innermost child of a composite. */
+val PNode?.isPixelTarget: Boolean
+    get() = generateSequence(this) { it.parent }.any { it.getAttribute(PIXEL_TARGET_ATTRIBUTE) == true }
+
+/**
+ * Handle a press on a pixel of [node]. A plain left press selects just that pixel and is left unhandled so the
+ * canvas handler goes on to select the node, and drag it where it is draggable, as for any screen element. A
+ * shift press toggles the pixel in the node's pixel selection, keeps the node selected, and is marked handled so
+ * the canvas handler does not toggle the node off. Other buttons, popup triggers, the pan key, and cursor modes
+ * other than selection are ignored.
+ */
+fun NetworkPanel.pressPixel(event: PInputEvent, node: ScreenElement, select: (addToSelection: Boolean) -> Unit) {
+    if (event.button != MouseEvent.BUTTON1 || event.isPopupTrigger || event.isPanKeyDown) return
+    if (mouseCursor != MouseEventHandler.MouseCursor.Selection) return
+    if (event.isShiftDown) {
+        select(true)
+        if (node !in selectionManager) selectionManager.add(node)
+        event.isHandled = true
+    } else {
+        select(false)
+    }
+}
 
 /**
  * Shared cell-hit logic for the nodes' `collectCellsInGlobalEllipse`. Converts [ellipse] (global

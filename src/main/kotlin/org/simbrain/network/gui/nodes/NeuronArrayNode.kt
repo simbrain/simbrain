@@ -56,6 +56,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     val neuronCircles by lazy {
         neuronArray.activationArray.mapIndexed { i, activation ->
             NeuronCircleNode(networkPanel).also { circle ->
+                circle.markAsPixelTarget()
                 circle.drawActivation(activation, neuronArray.updateRule.graphicalBounds)
                 circle.addInputEventListener(object : PBasicInputEventHandler() {
                     override fun mouseEntered(event: PInputEvent) {
@@ -67,12 +68,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                         networkPanel.clearNeuronArrayTrace()
                     }
                     override fun mousePressed(event: PInputEvent) {
-                        if (!event.isAltDown) return
-                        selectPixel(i, addToSelection = event.isShiftDown)
-                        if (this@NeuronArrayNode !in networkPanel.selectionManager) {
-                            networkPanel.selectionManager.add(this@NeuronArrayNode)
-                        }
-                        event.isHandled = true
+                        networkPanel.pressPixel(event, this@NeuronArrayNode) { selectPixel(i, addToSelection = it) }
                     }
                 })
             }
@@ -100,6 +96,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     protected val activationImage = SimbrainImage().apply {
         imageNodeGroup.addChild(this)
         pickable = true
+        markAsPixelTarget()
         addInputEventListener(object : PBasicInputEventHandler() {
             override fun mouseEntered(event: PInputEvent) {
                 networkPanel.hideCanvasTooltip()
@@ -113,13 +110,8 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 networkPanel.clearNeuronArrayTrace()
             }
             override fun mousePressed(event: PInputEvent) {
-                if (!event.isAltDown) return
                 val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
-                selectPixel(idx, addToSelection = event.isShiftDown)
-                if (this@NeuronArrayNode !in networkPanel.selectionManager) {
-                    networkPanel.selectionManager.add(this@NeuronArrayNode)
-                }
-                event.isHandled = true
+                networkPanel.pressPixel(event, this@NeuronArrayNode) { selectPixel(idx, addToSelection = it) }
             }
         })
     }

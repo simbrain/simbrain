@@ -1,8 +1,10 @@
 package org.simbrain.util.projection
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.feature.extraction.PCA
 
+@CustomTypeName("PCA projection")
 class PCAProjection: ProjectionMethod() {
 
     @UserParameter(label = "Freeze space", description = "If true, project to existing components each update. If " +

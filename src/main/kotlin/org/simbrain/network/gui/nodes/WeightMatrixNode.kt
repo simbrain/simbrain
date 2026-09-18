@@ -21,7 +21,6 @@ import org.simbrain.util.table.createShowEigenValuesAction
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
-import java.awt.Color
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
@@ -502,15 +501,25 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 contentPane = JTabbedPane()
                 contentPane.addTab("Properties", ape)
 
-                val wm = MatrixDataFrame(editingObject.weights)
+                val targetSourceFormat = NetworkPreferences.weightMatrixTargetSource
+                val wm = MatrixDataFrame(
+                    if (targetSourceFormat) editingObject.weights else editingObject.weights.transpose()
+                )
                 val wmViewer = SimbrainTablePanel(wm, false)
                 wmViewer.addSimpleDefaults()
                 wmViewer.addSeparator()
                 wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
                 contentPane.addTab("Weight Matrix", wmViewer)
-                editingObject.events.updated.on(Dispatchers.Swing) { wmViewer.model.fireTableDataChanged() }
+                editingObject.events.updated.on(Dispatchers.Swing) {
+                    if (!targetSourceFormat) {
+                        wm.data = editingObject.weights.transpose()
+                    }
+                    wmViewer.model.fireTableDataChanged()
+                }
                 dialog.addCommitTask {
-                    editingObject.setWeights(wm.get2DDoubleArray())
+                    editingObject.setWeights(
+                        if (targetSourceFormat) wm.get2DDoubleArray() else wm.data.transpose().toArray()
+                    )
                     editingObject.events.updated.fire()
                 }
             } else {

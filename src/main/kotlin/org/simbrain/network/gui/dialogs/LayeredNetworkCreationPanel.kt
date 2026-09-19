@@ -108,9 +108,9 @@ class LayeredNetworkCreationPanel(
 
         // Create network
         val net = when (type) {
-            "Backprop" -> BackpropNetwork(topology, panel.network.placementManager.lastClickedLocation)
-            "FeedForward" -> FeedForward(topology, panel.network.placementManager.lastClickedLocation)
-            else -> FeedForward(topology, panel.network.placementManager.lastClickedLocation)
+            "Backprop" -> BackpropNetwork(topology, panel.network.placementManager.insertionLocation)
+            "FeedForward" -> FeedForward(topology, panel.network.placementManager.insertionLocation)
+            else -> FeedForward(topology, panel.network.placementManager.insertionLocation)
         }
 
         // Set neuron types

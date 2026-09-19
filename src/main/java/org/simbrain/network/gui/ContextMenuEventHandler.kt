@@ -18,7 +18,7 @@ class ContextMenuEventHandler(private val networkPanel: NetworkPanel) : PBasicIn
             contextMenu.show(networkPanel.canvas, canvasPosition.x.toInt(), canvasPosition.y.toInt())
             networkPanel.canvas.camera.localToView(canvasPosition)
             // Set this position so that new objects are added here
-            networkPanel.network.placementManager.lastClickedLocation = canvasPosition
+            networkPanel.network.placementManager.insertionPoint = canvasPosition
         }
     }
 

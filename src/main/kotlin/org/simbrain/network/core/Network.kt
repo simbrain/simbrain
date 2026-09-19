@@ -118,7 +118,7 @@ class Network: CoroutineScope, EditableObject {
      * Manages placement of new nodes, groups, etc.
      */
     @Transient
-    var placementManager = PlacementManager()
+    var placementManager = PlacementManager(this)
 
     /**
      * Returns a linked hash set of models of the specified type.
@@ -441,7 +441,7 @@ class Network: CoroutineScope, EditableObject {
 
         updateManager = NetworkUpdateManager(this)
 
-        placementManager = PlacementManager()
+        placementManager = PlacementManager(this)
 
         updateCompleted = AtomicBoolean(false)
 

@@ -1911,5 +1911,34 @@ class ClipboardTest {
             "Pasted neuron 2 should receive input from pasted neuron 1")
     }
 
+    @Test
+    fun `duplicating the first of three added neurons does not land on another neuron`() = runBlocking {
+        val row = List(3) { Neuron().also { network.addNetworkModel(it) } }
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        networkPanel.selectionManager.set(networkPanel.screenElements.filter { it.model == row[0] })
+        networkPanel.duplicate()
+        // Duplicating again duplicates the fresh copy, which is what is selected after a duplicate
+        networkPanel.duplicate()
+
+        val locations = network.getModels<Neuron>().map { it.location }
+        assertEquals(5, locations.size)
+        assertEquals(5, locations.distinct().size, "Neurons share a location: $locations")
+    }
+
+    @Test
+    fun `duplicating in place puts the selected copy on top of its source and leaves the source alone`() = runBlocking {
+        val source = Neuron().also { network.addNetworkModel(it) }
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+        val sourceLocation = source.location
+
+        networkPanel.selectionManager.set(networkPanel.screenElements.filter { it.model == source })
+        networkPanel.duplicateInPlace()
+
+        val copy = network.getModels<Neuron>().single { it != source }
+        assertEquals(sourceLocation, source.location)
+        assertEquals(sourceLocation, copy.location)
+        assertEquals(listOf<NetworkModel>(copy), networkPanel.selectionManager.selectedModels.toList())
+    }
 
 }

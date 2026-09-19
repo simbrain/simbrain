@@ -402,7 +402,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Build the pipeline
         val network = networkPanel.network
-        val location = network.placementManager.lastClickedLocation
+        val location = network.placementManager.insertionLocation
 
         val inputLayer = TensorLayer(inputShape).apply {
             label = "Input ($inputShape)"

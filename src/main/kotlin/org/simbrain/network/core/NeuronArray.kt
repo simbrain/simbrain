@@ -21,6 +21,8 @@ import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import smile.math.matrix.Matrix
 import kotlin.math.ceil
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.sqrt
 
 /**
@@ -133,12 +135,52 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Circle Mode",
-        description = "If true, show activations as neuron circles",
+        label = "Grid Columns",
+        description = "Number of cells per grid line in grid mode. 0 picks a square grid. With a vertical layout " +
+                "the grid is transposed, so this counts rows.",
+        minimumValue = 0.0,
         tab = "GUI",
         order = 11
     )
+    var gridColumns = 0
+        set(value) {
+            field = value.coerceAtLeast(0)
+            events.visualPropertiesChanged.fire()
+        }
+
+    @UserParameter(
+        label = "Circle Mode",
+        description = "If true, show activations as neuron circles",
+        tab = "GUI",
+        order = 12
+    )
     var circleMode = false
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
+    @UserParameter(
+        label = "Circle Spacing X",
+        description = "Horizontal centre-to-centre distance between neuron circles in circle mode",
+        minimumValue = 1.0,
+        tab = "GUI",
+        order = 13
+    )
+    var circleSpacingX = DEFAULT_CIRCLE_SPACING
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
+    @UserParameter(
+        label = "Circle Spacing Y",
+        description = "Vertical centre-to-centre distance between neuron circles in circle mode",
+        minimumValue = 1.0,
+        tab = "GUI",
+        order = 14
+    )
+    var circleSpacingY = DEFAULT_CIRCLE_SPACING
         set(value) {
             field = value
             events.visualPropertiesChanged.fire()
@@ -168,26 +210,73 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     /**
-     * The grid the activations are laid out in when drawn: a square for grid mode, a single column for a
-     * vertical array, a single row otherwise. A grid is square rather than exactly [size] cells, so the
-     * last row may be partly empty.
+     * The grid the activations are laid out in when drawn: a single column for a vertical array, a single row
+     * for a horizontal one, and in grid mode either a square or lines of [gridColumns] cells. A grid need not
+     * have exactly [size] cells, so the last line may be partly empty.
      *
      * Lives here rather than in the node because the modes it reads do, and because anything mimicking
      * this array's appearance needs the same answer.
      */
     val displayColumns: Int
         get() = when {
-            gridMode -> ceil(sqrt(size.toDouble())).toInt()
+            gridMode -> if (isGridTransposed) gridLineCount else gridLineLength
             verticalLayout -> 1
             else -> size
         }
 
     val displayRows: Int
         get() = when {
-            gridMode -> ceil(sqrt(size.toDouble())).toInt()
+            gridMode -> if (isGridTransposed) gridLineLength else gridLineCount
             verticalLayout -> size
             else -> 1
         }
+
+    private val gridLineLength: Int
+        get() = if (gridColumns > 0) min(gridColumns, max(size, 1)) else ceil(sqrt(size.toDouble())).toInt()
+
+    private val gridLineCount: Int
+        get() = ceil(size.toDouble() / max(gridLineLength, 1)).toInt()
+
+    /**
+     * A grid with an explicit [gridColumns] follows [verticalLayout] by filling columns top to bottom rather
+     * than rows left to right. The automatic square grid ignores orientation, as it always has, so saved
+     * image-like arrays do not flip.
+     */
+    val isGridTransposed: Boolean
+        get() = gridMode && verticalLayout && gridColumns > 0
+
+    /** The row and column at which the neuron with the given index is drawn. */
+    fun displayCellOf(index: Int): Pair<Int, Int> = when {
+        isGridTransposed -> (index % displayRows) to (index / displayRows)
+        else -> (index / displayColumns) to (index % displayColumns)
+    }
+
+    /** The index of the neuron drawn at the given cell, or null for an empty cell of a partly filled grid. */
+    fun indexAtDisplayCell(row: Int, col: Int): Int? {
+        if (row !in 0 until displayRows || col !in 0 until displayColumns) return null
+        val index = if (isGridTransposed) col * displayRows + row else row * displayColumns + col
+        return index.takeIf { it < size }
+    }
+
+    /**
+     * Per-neuron values rearranged into the row-major order an image of [displayColumns] by [displayRows]
+     * expects, with [empty] in cells that hold no neuron. Returns [values] itself unless the grid is transposed.
+     */
+    fun toDisplayOrder(values: DoubleArray, empty: Double = 0.0): DoubleArray {
+        if (!isGridTransposed) return values
+        val cols = displayColumns
+        return DoubleArray(displayRows * cols) { cell ->
+            indexAtDisplayCell(cell / cols, cell % cols)?.let { values.getOrNull(it) } ?: empty
+        }
+    }
+
+    fun toDisplayOrder(values: BooleanArray): BooleanArray {
+        if (!isGridTransposed) return values
+        val cols = displayColumns
+        return BooleanArray(displayRows * cols) { cell ->
+            indexAtDisplayCell(cell / cols, cell % cols)?.let { values.getOrNull(it) } ?: false
+        }
+    }
 
     @Transient
     override var events: NeuronArrayEvents = NeuronArrayEvents()
@@ -227,6 +316,9 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         this.labelArray = other.labelArray.copyOf()
         this.location = other.location
         this.gridMode = other.gridMode
+        this.gridColumns = other.gridColumns
+        this.circleSpacingX = other.circleSpacingX
+        this.circleSpacingY = other.circleSpacingY
         this.circleMode = other.circleMode
         this.verticalLayout = other.verticalLayout
         this.activations.copyFrom(other.activations)
@@ -393,6 +485,9 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
      */
     override fun readResolve(): Any {
         events = NeuronArrayEvents()
+        // Arrays saved before circle spacing existed deserialize it as zero
+        if (circleSpacingX <= 0.0) circleSpacingX = DEFAULT_CIRCLE_SPACING
+        if (circleSpacingY <= 0.0) circleSpacingY = DEFAULT_CIRCLE_SPACING
         return this
     }
 
@@ -418,4 +513,8 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             .reduceOrNull { base, add -> SimbrainMath.addVector(base, add) }
             ?: DoubleArray(size)
 
+    companion object {
+        /** Centre-to-centre spacing of the circles drawn in circle mode, unless overridden per array. */
+        const val DEFAULT_CIRCLE_SPACING = 50.0
+    }
 }

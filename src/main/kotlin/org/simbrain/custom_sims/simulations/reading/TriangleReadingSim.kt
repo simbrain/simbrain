@@ -52,9 +52,13 @@ val triangleReadingSim = newSim("triangle_reading") { optionString ->
             it.circleMode = true
             it.gridMode = true
         }
-        inputLayer.location = point(-483, 448)
+        // One row per letter or phoneme slot
+        inputLayer.gridColumns = orthography.symbolsPerSlot
+        outputLayer.gridColumns = phonology.featureNames.size
+        outputLayer.circleSpacingX = 75.0
+        inputLayer.location = point(0, 550)
         hiddenLayers().first().location = point(0, 0)
-        outputLayer.location = point(-442, -372)
+        outputLayer.location = point(0, -520)
         initWeights()
         initBiases()
     }
@@ -316,7 +320,7 @@ private suspend fun SimulationScope.installReaderUi(
             }
             addComponent(feedback)
         }.awaitLayout()
-        place(networkComponent, controls.rightEdgeWithGap(), SIM_WINDOW_GAP, 700, 680)
+        place(networkComponent, controls.rightEdgeWithGap(), SIM_WINDOW_GAP, 1000, 680)
     }
     addSidebarInfo(
         """

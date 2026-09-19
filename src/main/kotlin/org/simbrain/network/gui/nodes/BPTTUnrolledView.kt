@@ -37,7 +37,6 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.Rectangle2D
-import kotlin.math.ceil
 import kotlin.math.max
 import kotlin.math.round
 
@@ -56,7 +55,7 @@ class BPTTUnrolledView(
 
     /**
      * A layer drawn without a model behind it, following however the real layer is set to draw itself:
-     * as a horizontal strip, a vertical one, a square grid, or neuron circles, with a bias image beside
+     * as a horizontal strip, a vertical one, a grid, or neuron circles, with a bias image beside
      * the activations if that layer shows one. Reads the layer's own [NeuronArray.displayColumns] and
      * modes, so a column cannot end up depicting the layer differently from the layer itself.
      *
@@ -125,7 +124,7 @@ class BPTTUnrolledView(
                 show(DoubleArray(layer.size))
             }
             biasImage?.let {
-                it.image = layer.biases.toDoubleArray()
+                it.image = layer.toDisplayOrder(layer.biases.toDoubleArray())
                     .toSimbrainColorImage(layer.displayColumns, layer.displayRows)
                 it.setBounds(biasRect!!.x, biasRect.y, biasRect.width, biasRect.height)
                 parent.addChild(it.addBorder())
@@ -141,14 +140,13 @@ class BPTTUnrolledView(
          * that space was measured from the real node laying out the same number of circles.
          */
         private fun layoutCircles() {
-            val cols = layer.displayColumns
-            val rows = ceil(layer.size.toDouble() / cols).toInt()
-            val originX = content.centerX - (cols - 1) * NeuronArrayNode.CIRCLE_SPACING / 2
-            val originY = content.centerY - (rows - 1) * NeuronArrayNode.CIRCLE_SPACING / 2
+            val originX = content.centerX - (layer.displayColumns - 1) * layer.circleSpacingX / 2
+            val originY = content.centerY - (layer.displayRows - 1) * layer.circleSpacingY / 2
             circles?.forEachIndexed { i, circle ->
+                val (row, col) = layer.displayCellOf(i)
                 circle.setOffset(
-                    originX + (i % cols) * NeuronArrayNode.CIRCLE_SPACING,
-                    originY + (i / cols) * NeuronArrayNode.CIRCLE_SPACING
+                    originX + col * layer.circleSpacingX,
+                    originY + row * layer.circleSpacingY
                 )
             }
         }
@@ -160,7 +158,7 @@ class BPTTUnrolledView(
                 circle.setLabel(layer.labelArray.getOrNull(i))
             }
             activationImage?.let {
-                it.image = values.toSimbrainColorImage(layer.displayColumns, layer.displayRows)
+                it.image = layer.toDisplayOrder(values).toSimbrainColorImage(layer.displayColumns, layer.displayRows)
                 it.setBounds(activationRect.x, activationRect.y, activationRect.width, activationRect.height)
             }
         }
@@ -234,7 +232,8 @@ class BPTTUnrolledView(
         .flatMap {
             listOf(
                 it.width, it.height, it.size,
-                it.gridMode, it.circleMode, it.verticalLayout, it.isShowBias
+                it.gridMode, it.gridColumns, it.circleMode, it.circleSpacingX, it.circleSpacingY,
+                it.verticalLayout, it.isShowBias
             )
         // The rolled network's own drawn extent, which the columns are placed against. Included because it
         // moves for reasons the layers alone do not predict: a wider hidden layer pushes the recurrent

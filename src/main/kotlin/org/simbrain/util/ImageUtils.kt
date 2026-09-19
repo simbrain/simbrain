@@ -497,7 +497,7 @@ fun Graphics2D.drawNumericOverlay(
     for (row in startRow..endRow) {
         for (col in startCol..endCol) {
             val idx = row * cols + col
-            if (idx >= data.size) continue
+            if (idx >= data.size || data[idx].isNaN()) continue
             val text = data[idx].format(decimalPlaces)
             val cx = offsetX + col * cellWidth + cellWidth / 2
             val cy = offsetY + row * cellHeight + cellHeight / 2

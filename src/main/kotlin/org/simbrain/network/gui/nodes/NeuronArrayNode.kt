@@ -79,13 +79,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     private fun layoutNeuronCircles() {
         if (!neuronArray.circleMode) return
-        val ncol = neuronArray.displayColumns
         neuronCircles.forEachIndexed { i, circle ->
-            val row = i / ncol
-            val col = i % ncol
+            val (row, col) = neuronArray.displayCellOf(i)
             circle.setOffset(
-                col * CIRCLE_SPACING,
-                row * CIRCLE_SPACING
+                col * neuronArray.circleSpacingX,
+                row * neuronArray.circleSpacingY
             )
         }
     }
@@ -121,10 +119,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val size = neuronArray.size
         if (size <= 0) return null
         return if (gridMode) {
-            val len = ceil(sqrt(size.toDouble())).toInt()
-            val row = ((localPt.y / imageSize) * len).toInt().coerceIn(0, len - 1)
-            val col = ((localPt.x / imageSize) * len).toInt().coerceIn(0, len - 1)
-            (row * len + col).takeIf { it < size }
+            val rows = neuronArray.displayRows
+            val cols = neuronArray.displayColumns
+            val row = ((localPt.y / gridImageHeight) * rows).toInt().coerceIn(0, rows - 1)
+            val col = ((localPt.x / gridImageWidth) * cols).toInt().coerceIn(0, cols - 1)
+            neuronArray.indexAtDisplayCell(row, col)
         } else if (neuronArray.verticalLayout) {
             ((localPt.y / imageSize) * size).toInt().coerceIn(0, size - 1)
         } else {
@@ -143,11 +142,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             neuronArray.circleMode ->
                 neuronCircles.indices.filter { i -> ellipse.intersects(neuronCircles[i].globalBounds) }
             gridMode -> {
-                val len = ceil(sqrt(size.toDouble())).toInt()
-                val cell = imageSize / len
-                activationImage.cellsIntersectingGlobalEllipse(ellipse, len, len, cell, cell) { row, col ->
-                    (row * len + col).takeIf { it < size }
-                }
+                activationImage.cellsIntersectingGlobalEllipse(
+                    ellipse, neuronArray.displayRows, neuronArray.displayColumns, gridCellSize, gridCellSize
+                ) { row, col -> neuronArray.indexAtDisplayCell(row, col) }
             }
             neuronArray.verticalLayout ->
                 activationImage.cellsIntersectingGlobalEllipse(
@@ -202,6 +199,19 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     private val labelBackground = PNode()
 
     private val imageSize = 100.0
+
+    /**
+     * Side of one grid cell. Sized so the automatic square grid fills [imageSize]; a grid with explicit
+     * columns keeps the same cells and grows or shrinks around them, so its pixels stay square.
+     */
+    private val gridCellSize: kotlin.Double
+        get() = imageSize / ceil(sqrt(neuronArray.size.toDouble())).coerceAtLeast(1.0)
+
+    private val gridImageWidth: kotlin.Double
+        get() = neuronArray.displayColumns * gridCellSize
+
+    private val gridImageHeight: kotlin.Double
+        get() = neuronArray.displayRows * gridCellSize
 
     /**
      * If true, show the image array as a grid; if false show it as a horizontal line.
@@ -303,28 +313,31 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val activations = neuronArray.activations.toDoubleArray()
 
         fun renderGridImages() {
-            val len = ceil(sqrt(activations.size.toDouble())).toInt()
-            val img = activations.toSimbrainColorImage(len, len)
+            val cols = neuronArray.displayColumns
+            val rows = neuronArray.displayRows
+            val img = neuronArray.toDisplayOrder(activations).toSimbrainColorImage(cols, rows)
             activationImage.image = img
             activationImage.setBounds(
                 0.0, 0.0,
-                imageSize, imageSize
+                gridImageWidth, gridImageHeight
             )
             activationImage.addBorder()
             if (neuronArray.updateRule.isSpikingRule) {
                 val spikes = (neuronArray.dataHolder as SpikingMatrixData).spikes
-                spikeImage.image = spikes.toOverlay(len, len, NetworkPreferences.spikingColor)
+                spikeImage.image = neuronArray.toDisplayOrder(spikes)
+                    .toOverlay(cols, rows, NetworkPreferences.spikingColor)
                 spikeImage.setBounds(
                     0.0, 0.0,
-                    imageSize, imageSize
+                    gridImageWidth, gridImageHeight
                 )
                 spikeImage.addBorder()
             }
             if (showBias) {
-                biasImage.image = neuronArray.biases.toDoubleArray().toSimbrainColorImage(len, len)
+                biasImage.image = neuronArray.toDisplayOrder(neuronArray.biases.toDoubleArray())
+                    .toSimbrainColorImage(cols, rows)
                 biasImage.setBounds(
-                    0.0, imageSize + margin,
-                    imageSize, imageSize
+                    0.0, gridImageHeight + margin,
+                    gridImageWidth, gridImageHeight
                 )
                 biasImage.addBorder()
             }
@@ -398,11 +411,10 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
 
         if (gridMode) {
-            val len = ceil(sqrt(activations.size.toDouble())).toInt()
             g2.drawNumericOverlay(
-                data = activations,
-                rows = len, cols = len,
-                imageWidth = imageSize, imageHeight = imageSize,
+                data = neuronArray.toDisplayOrder(activations, empty = kotlin.Double.NaN),
+                rows = neuronArray.displayRows, cols = neuronArray.displayColumns,
+                imageWidth = gridImageWidth, imageHeight = gridImageHeight,
                 scalingFactor = networkPanel.scalingFactor,
                 decimalPlaces = decimalPlaces,
                 offsetX = activationImage.xOffset,
@@ -456,13 +468,11 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         val xOff = activationImage.xOffset
         val yOff = activationImage.yOffset
         if (gridMode) {
-            val len = ceil(sqrt(size.toDouble())).toInt()
-            val cellW = imageSize / len
-            val cellH = imageSize / len
+            val cellW = gridCellSize
+            val cellH = gridCellSize
             for (i in indices) {
                 if (i !in 0 until size) continue
-                val row = i / len
-                val col = i % len
+                val (row, col) = neuronArray.displayCellOf(i)
                 g2.drawRect(
                     (xOff + col * cellW).toInt(),
                     (yOff + row * cellH).toInt(),
@@ -491,9 +501,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     companion object {
         /** Outline color used to mark pixels in the per-pixel selection. */
         val PIXEL_SELECTION_COLOR: Color = Color(255, 200, 0)
-
-        /** Centre-to-centre spacing of the circles drawn in circle mode. */
-        const val CIRCLE_SPACING = 50.0
     }
 
     override val contextMenu: JPopupMenu

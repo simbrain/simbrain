@@ -18,6 +18,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.util.*
 import java.awt.Color
+import java.awt.Font
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
 import java.awt.geom.Line2D
@@ -138,9 +139,7 @@ class SynapseNode(
 
         // Update the line (unless it's a self connection)
         if (!isSelfConnection) {
-            line!!.reset()
-            line!!.append(Line2D.Double(globalToLocal(source.neuron.location), synapseCenter), false)
-            lineBound.setLine(source.neuron.location, localToGlobal(synapseCenter))
+            updateLineGeometry()
         } else {
             arcBound =
                 Arc2D.Float(
@@ -289,6 +288,31 @@ class SynapseNode(
         // offset properly moves circle, but this is not reflected in bounds
         circle!!.offset(delta, delta)
         setBounds(circle!!.fullBounds)
+        if (!isSelfConnection) {
+            updatePosition()
+        }
+    }
+
+    /**
+     * Stop the connection at the source-facing edge of the synapse circle instead of drawing
+     * through the circle's center.
+     */
+    private fun updateLineGeometry() {
+        val circleCenter = circle!!.fullBoundsReference.let { Point2D.Double(it.centerX, it.centerY) }
+        val sourcePoint = globalToLocal(source.neuron.location)
+        val dx = sourcePoint.x - circleCenter.x
+        val dy = sourcePoint.y - circleCenter.y
+        val distance = hypot(dx, dy)
+        if (distance < 1e-6) return
+
+        val radius = circle!!.width / 2
+        val lineEnd = Point2D.Double(
+            circleCenter.x + dx / distance * radius,
+            circleCenter.y + dy / distance * radius
+        )
+        line!!.reset()
+        line!!.append(Line2D.Double(sourcePoint, lineEnd), false)
+        lineBound.setLine(source.neuron.location, localToGlobal(lineEnd))
     }
 
     /**
@@ -316,7 +340,8 @@ class SynapseNode(
         var weightX = 0.0
         var weightY = 0.0
 
-        val neuronOffset = NEURON_DIAMETER / 2
+        val synapseRadius = (circle?.width ?: offset * 2) / 2
+        val neuronOffset = NEURON_DIAMETER / 2 + synapseRadius - SYNAPSE_NEURON_OVERLAP
 
         weightX = if (sourceX < targetX) {
             targetX - (neuronOffset * cos(alpha))
@@ -377,24 +402,12 @@ class SynapseNode(
         val circleCx = centerRef.centerX
         val circleCy = centerRef.centerY
 
-        // The synapse circle sits on the target neuron's perimeter, so the half toward the target is
-        // covered. Offset the label toward the source (visible half). Direction is preserved under
-        // translation, so we can compute it directly from the global neuron locations. A self
-        // connection's circle sits diagonally below and to the right of its neuron, so its visible
-        // half faces that way.
-        val dx = if (isSelfConnection) 1.0 else source.neuron.x - target.neuron.x
-        val dy = if (isSelfConnection) 1.0 else source.neuron.y - target.neuron.y
-        val mag = sqrt(dx * dx + dy * dy)
-        if (mag < 1e-6) return
-        val labelX = circleCx + (dx / mag) * (diameter / 4)
-        val labelY = circleCy + (dy / mag) * (diameter / 4)
-
-        val decimals = NetworkPreferences.synapseStrengthDecimalPlaces
-        val text = synapse.strength.format(decimals)
-        val refString = "-9." + "9".repeat(decimals)
+        val text = synapse.strength.formatAdaptive(maxPrecision = 1, minPrecision = 0)
+        val refString = "-9.9"
         val g2 = paintContext.graphics
         val font = computeCellFont(diameter * 0.6, diameter * 0.3, refString, g2.fontRenderContext)
-        g2.drawCenteredOutlinedLabel(text, font, labelX, labelY)
+            .deriveFont(Font.BOLD)
+        g2.drawCenteredOutlinedLabel(text, font, circleCx, circleCy)
     }
 
     override fun isIntersecting(bound: PBounds?): Boolean {
@@ -412,6 +425,8 @@ class SynapseNode(
          * Used to approximate zero to prevent divide-by-zero errors.
          */
         private const val ZERO_PROXY = .001
+
+        private const val SYNAPSE_NEURON_OVERLAP = 2.0
 
         var excitatoryColor: Color = excitatorySynapseColor
 

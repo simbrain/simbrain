@@ -8,6 +8,18 @@ import org.simbrain.util.geneticalgorithm.toProbabilityWeight
 class MathUtilsKtTest {
 
     @Test
+    fun `test adaptive decimal formatting`() {
+        assertEquals("1.0", 1.0.formatAdaptive(2))
+        assertEquals("-0.3", (-0.3).formatAdaptive(2))
+        assertEquals("0.06", 0.06.formatAdaptive(2))
+        assertEquals("-3.75", (-3.75).formatAdaptive(2))
+        assertEquals("1", 1.0.formatAdaptive(2, minPrecision = 0))
+        assertEquals("1", 1.2.formatAdaptive(0, minPrecision = 0))
+        assertEquals("0", (-0.01).formatAdaptive(1, minPrecision = 0))
+        assertEquals("-Infinity", Double.NEGATIVE_INFINITY.formatAdaptive(1, minPrecision = 0))
+    }
+
+    @Test
     fun `test one hot matrix`() {
         var oneHot = getOneHot(2, 10)
         assertEquals(0.0, oneHot[0,0])
@@ -70,4 +82,3 @@ class MathUtilsKtTest {
         assertEquals(1.0/3, .25.toProbabilityWeight(), .001)
     }
 }
-

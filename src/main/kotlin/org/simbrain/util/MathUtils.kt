@@ -30,6 +30,28 @@ fun <T : Comparable<T>> T.clip(range: ClosedRange<T>) =
 fun Double.format(precision: Int) = "%.${precision}f".format(this)
 fun Double.roundToString(precision: Int) = format(precision)
 
+/**
+ * Format with at most [maxPrecision] fractional digits, removing trailing zeroes while retaining
+ * [minPrecision] digits. This is useful for compact labels where fixed-width decimals add clutter.
+ */
+fun Double.formatAdaptive(maxPrecision: Int, minPrecision: Int = 1): String {
+    require(minPrecision >= 0) { "Minimum precision must be non-negative" }
+    require(maxPrecision >= minPrecision) { "Maximum precision must be at least the minimum precision" }
+
+    val formatted = format(maxPrecision)
+    val removableZeroes = (maxPrecision - minPrecision).coerceAtMost(formatted.takeLastWhile { it == '0' }.length)
+    val trimmed = formatted.dropLast(removableZeroes)
+    val endsInDecimalSeparator = trimmed.lastOrNull().let { it == '.' || it == ',' }
+    val withoutEmptyFraction = if (minPrecision == 0 && endsInDecimalSeparator) {
+        trimmed.dropLast(1)
+    } else {
+        trimmed
+    }
+    return withoutEmptyFraction.removePrefix("-").let { magnitude ->
+        if (magnitude.all { it == '0' || it == '.' || it == ',' }) magnitude else withoutEmptyFraction
+    }
+}
+
 fun Double.roundTo(precision: Int) = "%.${precision}f".format(this).toDouble()
 
 fun DoubleArray.summedSquares() =

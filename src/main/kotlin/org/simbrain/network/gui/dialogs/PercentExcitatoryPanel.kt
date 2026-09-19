@@ -1,10 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
-import org.simbrain.util.SwitchableChangeListener
-import org.simbrain.util.SwitchablePropertyChangeListener
-import org.simbrain.util.Theme
-import org.simbrain.util.Utils
-import org.simbrain.util.displayInDialog
+import org.simbrain.util.*
 import java.awt.*
 import java.beans.PropertyChangeEvent
 import java.util.*
@@ -13,7 +9,7 @@ import javax.swing.border.Border
 import javax.swing.event.ChangeEvent
 
 /**
- * Panel for setting inhibitory-excitatory ratio.
+ * Panel for setting the excitatory-inhibitory ratio.
  *
  * @author Zoë Tosi
  * @author Jeff Yoshimi
@@ -31,7 +27,7 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
     private val RATIO_MIN = 0
 
     /**
-     * A slider for setting the ratio of inhibitory to excitatory connections.
+     * A slider for setting the ratio of excitatory to inhibitory connections.
      */
     private val ratioSlider = JSlider(JSlider.HORIZONTAL, RATIO_MIN, RATIO_MAX, percentExcitatory.toInt())
 
@@ -108,13 +104,13 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         gbc.gridy = 1
         gbc.gridwidth = 1
         gbc.fill = GridBagConstraints.NONE
-        val inTfPanel = JPanel(FlowLayout())
-        val iRatioSize = iRatio.preferredSize
-        iRatioSize.width = 40
-        iRatio.preferredSize = iRatioSize
-        inTfPanel.add(JLabel("% Inhibitory"))
-        inTfPanel.add(iRatio)
-        sliderPanel.add(inTfPanel, gbc)
+        val exTfPanel = JPanel(FlowLayout())
+        val eRatioSize = eRatio.preferredSize
+        eRatioSize.width = 40
+        eRatio.preferredSize = eRatioSize
+        exTfPanel.add(JLabel("% Excitatory"))
+        exTfPanel.add(eRatio)
+        sliderPanel.add(exTfPanel, gbc)
 
         gbc.gridx = 2
         gbc.gridwidth = 1
@@ -127,13 +123,13 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         gbc.gridx = 3
         gbc.weightx = 0.0
         gbc.gridwidth = 1
-        val exTfPanel = JPanel(FlowLayout())
-        val eRatioSize = eRatio.preferredSize
-        eRatioSize.width = 40
-        eRatio.preferredSize = eRatioSize
-        exTfPanel.add(JLabel("% Excitatory"))
-        exTfPanel.add(eRatio)
-        sliderPanel.add(exTfPanel, gbc)
+        val inTfPanel = JPanel(FlowLayout())
+        val iRatioSize = iRatio.preferredSize
+        iRatioSize.width = 40
+        iRatio.preferredSize = iRatioSize
+        inTfPanel.add(JLabel("% Inhibitory"))
+        inTfPanel.add(iRatio)
+        sliderPanel.add(inTfPanel, gbc)
 
         gbc.gridx = 4
         gbc.gridwidth = 1
@@ -152,7 +148,7 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         //     sliderPanel.add(sliderApply, gbc)
         // }
 
-        val sliderBorder: Border = Theme.sectionBorder("Inhibitory/Excitatory Ratio")
+        val sliderBorder: Border = Theme.sectionBorder("Excitatory/Inhibitory Ratio")
         sliderPanel.border = sliderBorder
         layout = BorderLayout()
         add(sliderPanel, BorderLayout.NORTH)

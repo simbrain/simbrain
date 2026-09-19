@@ -134,6 +134,8 @@ val NetworkPanel.selectionMenu
         with(networkActions) {
             add(selectAllAction)
             add(selectAllWeightsAction)
+            add(selectAllExcitatorySynapsesAction)
+            add(selectAllInhibitorySynapsesAction)
             add(selectAllNeuronsAction)
             add(selectIncomingWeightsAction)
             add(selectOutgoingWeightsAction)

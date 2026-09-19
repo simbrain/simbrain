@@ -266,6 +266,24 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         selectionManager.add(filterScreenElements<WeightMatrixNode>())
     }
 
+    val selectAllExcitatorySynapsesAction = networkPanel.createAction(
+        name = "Select all excitatory synapses",
+        description = "Select all positive-strength synapses (Cmd/Ctrl-Shift-E)",
+        keyboardShortcut = CmdOrCtrl + Shift + 'E'
+    ) {
+        selectionManager.clear()
+        selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength > 0 })
+    }
+
+    val selectAllInhibitorySynapsesAction = networkPanel.createAction(
+        name = "Select all inhibitory synapses",
+        description = "Select all negative-strength synapses (Cmd/Ctrl-Shift-I)",
+        keyboardShortcut = CmdOrCtrl + Shift + 'I'
+    ) {
+        selectionManager.clear()
+        selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength < 0 })
+    }
+
     val selectIncomingWeightsAction = networkPanel.createAction(
         name = "Select incoming weights",
         description = "Select all incoming weights",

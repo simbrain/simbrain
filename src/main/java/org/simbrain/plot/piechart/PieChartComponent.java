@@ -1,5 +1,6 @@
 package org.simbrain.plot.piechart;
 
+import kotlin.Unit;
 import org.simbrain.util.XStreamUtils;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
@@ -9,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kotlin.Unit;
 
 /**
  * Pie chart component.
@@ -61,7 +61,6 @@ public class PieChartComponent extends WorkspaceComponent {
      *
      * @param input  stream
      * @param name   file name
-     * @param format format
      * @return component to be opened
      */
     public static PieChartComponent open(final InputStream input, final String name, final String format) {

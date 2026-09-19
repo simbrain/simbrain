@@ -604,7 +604,6 @@ class OdorWorldPanel(
     /**
      * Return true if the specified element is selected.
      *
-     * @param element element
      * @return true if the specified element is selected
      */
     fun isSelected(element: Any?): Boolean {
@@ -616,8 +615,6 @@ class OdorWorldPanel(
      * Toggle the selected state of the specified element; if it is selected,
      * remove it from the selection, if it is not selected, add it to the
      * selection.
-     *
-     * @param element element
      */
     fun toggleSelection(element: PNode) {
         if (isSelected(element)) {

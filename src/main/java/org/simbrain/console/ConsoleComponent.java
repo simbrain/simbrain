@@ -21,7 +21,6 @@ public class ConsoleComponent extends WorkspaceComponent {
      *
      * @param input  stream
      * @param name   name of file
-     * @param format format
      * @return component to be opened
      */
     public static ConsoleComponent open(InputStream input, final String name, final String format) {

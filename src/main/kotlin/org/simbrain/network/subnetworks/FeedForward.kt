@@ -35,7 +35,6 @@ open class FeedForward : Subnetwork {
     constructor(): super()
 
     /**
-     * @param parentNetwork Parent network
      * @param nodesPerLayer Integers 1...n correspond to number of nodes in layers 1..n
      * @param initialPosition Center location for network.
      */

@@ -62,9 +62,6 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
 
     /**
      * Adds an extension with the provided description to the filenamefilter.
-     *
-     * @param extension   the extension
-     * @param description the description
      */
     fun addExtension(description: String, extension: String) {
         exts.put(extension, description)
@@ -364,10 +361,6 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
 
         /**
          * Implements file name filter for native file dialog.
-         *
-         * @param dir
-         * @param name
-         * @return
          */
         override fun accept(dir: File?, name: String): Boolean {
             return extension.equals(getExtension(name), ignoreCase = true)
@@ -417,10 +410,6 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
 
         /**
          * Implements file name filter for native file dialog.
-         *
-         * @param dir
-         * @param name
-         * @return
          */
         override fun accept(dir: File?, name: String): Boolean {
             return extensions.contains(getExtension(name))

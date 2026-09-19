@@ -15,13 +15,12 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.world.textworld.gui.TextWorldPanel
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
-import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.ToggleButton
@@ -32,6 +31,7 @@ import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.gui.SimbrainDesktop.applyThemeIfChanged
 import org.simbrain.workspace.updater.PerformanceMonitor
+import org.simbrain.world.textworld.gui.TextWorldPanel
 import java.awt.*
 import java.awt.event.*
 import java.beans.PropertyVetoException
@@ -740,8 +740,6 @@ object SimbrainDesktop {
 
         /**
          * Construct an internal frame.
-         *
-         * @param workspaceComponent workspace component.
          */
         init {
             isResizable = true
@@ -1126,9 +1124,6 @@ object SimbrainDesktop {
         }
     }
 
-    /**
-     * Update time label.
-     */
     fun updateTimeLabel() {
         val timestep = workspace.time
         val updateTimeMs = System.currentTimeMillis()

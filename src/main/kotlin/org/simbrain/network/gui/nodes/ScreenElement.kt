@@ -80,9 +80,6 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * Screen element-specific context menu event handler.
      */
     private inner class ContextMenuEventHandler : PBasicInputEventHandler() {
-        /**
-         * Show the context menu.
-         */
         private fun showContextMenu(event: PInputEvent) {
             event.isHandled = true
             val (x, y) = event.canvasPosition.int

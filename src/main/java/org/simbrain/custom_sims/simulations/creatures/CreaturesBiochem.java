@@ -103,7 +103,6 @@ public class CreaturesBiochem {
      * @param id       An id for the chemical, to use as a sort of "key"
      * @param amount   An initial concentration of the chemical to start with
      * @param halfLife Determines how quickly the chemical concentration will decay
-     * @return
      */
     public CreaturesChem createNewChem(String name, String id, double amount, double halfLife) {
         CreaturesChem chem = new CreaturesChem(name, id, amount, halfLife);
@@ -139,8 +138,6 @@ public class CreaturesBiochem {
 
     /**
      * Returns the list of chemicals
-     *
-     * @return
      */
     public List<CreaturesChem> getChemList() {
         return chemList;
@@ -148,8 +145,6 @@ public class CreaturesBiochem {
 
     /**
      * Returns the list of chemical reactions
-     *
-     * @return
      */
     public List<CreaturesChemReaction> getReactionList() {
         return reactionList;
@@ -157,9 +152,6 @@ public class CreaturesBiochem {
 
     /**
      * Returns a chemical with that name.
-     *
-     * @param name
-     * @return
      */
     public CreaturesChem getChemByName(String name) {
         for (CreaturesChem chem : chemList) {
@@ -172,9 +164,6 @@ public class CreaturesBiochem {
 
     /**
      * Returns a chemical with that id.
-     *
-     * @param id
-     * @return
      */
     public CreaturesChem getChemById(String id) {
         for (CreaturesChem chem : chemList) {

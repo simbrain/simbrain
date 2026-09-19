@@ -86,8 +86,6 @@ public class LinkIcon extends JPanel implements MouseListener {
 
     /**
      * Sets the state of the link icon, linked or unlinked
-     *
-     * @param linked
      */
     public void setState(boolean linked) {
         this.linked = linked;

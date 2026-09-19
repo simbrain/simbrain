@@ -146,7 +146,6 @@ class WorldSelectionManager {
     /**
      * Return true if the specified element is selected.
      *
-     * @param element element
      * @return true if the specified element is selected
      */
     fun isSelected(element: Any?): Boolean {

@@ -311,8 +311,6 @@ class WorldMouseHandler(
         }
 
         /**
-         * @param node
-         * @return
          * @see PNodeFilter
          */
         override fun accept(node: PNode): Boolean {
@@ -326,8 +324,6 @@ class WorldMouseHandler(
         }
 
         /**
-         * @param node
-         * @return
          * @see PNodeFilter
          */
         override fun acceptChildrenOf(node: PNode): Boolean {

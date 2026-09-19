@@ -52,7 +52,6 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
      * Creates a new attribute list panel.
      *
      * @param workspace reference to workspace
-     * @param attributeType
      */
     public AttributePanel(Workspace workspace, ProducerOrConsumer attributeType) {
         super(new BorderLayout(0, Theme.componentGap));
@@ -250,9 +249,6 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
          */
         private final Workspace workspace;
 
-        /**
-         * @param workspace the workspace
-         */
         public ComponentDropDownBox(final Workspace workspace) {
             this.workspace = workspace;
             for (WorkspaceComponent component : workspace.getComponentList()) {

@@ -258,9 +258,6 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
     /**
      * Converts a voltage from the modern convention to the convention used by
      * the program.
-     *
-     * @param voltage
-     * @return
      */
     fun convertV(voltage: Float): Float {
         return (-1 * voltage - resting_v).toFloat()

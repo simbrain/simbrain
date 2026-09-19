@@ -28,9 +28,6 @@ public final class SelectionMarquee extends PPath.Float {
     /**
      * Create a new selection marquee at the specified point (<code>x</code>,
      * <code>y</code>).
-     *
-     * @param x x
-     * @param y y
      */
     public SelectionMarquee(final float x, final float y) {
         super();

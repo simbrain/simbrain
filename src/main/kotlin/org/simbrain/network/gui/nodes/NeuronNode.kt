@@ -85,9 +85,6 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         neuronCircleNode.isSpiking = with(networkPanel.network) { neuron.isSpike }
     }
 
-    /**
-     * Update the text label.
-     */
     fun updateTextLabel() {
         neuronCircleNode.setLabel(neuron.label)
     }

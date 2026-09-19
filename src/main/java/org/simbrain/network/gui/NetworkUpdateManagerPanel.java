@@ -162,9 +162,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
         return label;
     };
 
-    /**
-     * Configure the action list.
-     */
     private void configureActionList() {
         currentActionJList.setCellRenderer(listRenderer);
     }
@@ -260,8 +257,6 @@ public class NetworkUpdateManagerPanel extends JPanel {
 
     /**
      * Handle drag and drop events
-     *
-     * @return
      */
     private TransferHandler createTransferHandler() {
         return new TransferHandler() {

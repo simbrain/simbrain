@@ -61,9 +61,6 @@ class SoundWorldDesktopComponent(frame: GenericFrame, component: SoundWorldCompo
 
     /**
      * Creates a new frame of type SoundWorld.
-     *
-     * @param frame
-     * @param component
      */
     init {
         val openSaveToolBar = JToolBar()

@@ -742,9 +742,6 @@ public class SimbrainMath {
      * array has a sparsity of 0.4. Sparse matrix compression should usually be
      * used for very sparse matrices to see appreciable savings in memory,
      * definitely less than 0.2 and usually less than 0.05.
-     *
-     * @param wtMatrix
-     * @return
      */
     public static long[] getMatrixRowCompression(double[][] wtMatrix) {
         List<Long> wts = new ArrayList<Long>();
@@ -785,8 +782,6 @@ public class SimbrainMath {
      * @param <T> T has to be a number
      *
      * @param number the number to check
-     * @param lowerBound lower bound
-     * @param upperBound upper bound
      * @return the clipped value
      */
     public static <T extends Number & Comparable<T>> T clip(T number, T lowerBound, T upperBound) {
@@ -808,8 +803,6 @@ public class SimbrainMath {
 
     /**
      * Test randPermuteWithExclusion.
-     *
-     * @param yarhg
      */
     public static void main(String[] yarhg) {
         int[][] blarg = new int[10000][9999];

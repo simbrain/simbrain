@@ -49,8 +49,6 @@ public class AddEffectorDialog extends StandardDialog {
     
     /**
      * Effector Dialog add effector constructor (without parent).
-     *
-     * @param entity
      */
     public AddEffectorDialog(OdorWorldEntity entity) {
         super();

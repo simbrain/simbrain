@@ -128,9 +128,6 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
         return pipeline === defaultUnfilteredPipeline
     }
 
-    /**
-     * Set the current pipeline.
-     */
     suspend fun setCurrentPipeline(pipeline: ImageProcessingPipeline) {
         val oldPipeline = currentPipeline
         currentPipeline = pipeline

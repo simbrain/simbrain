@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
+import net.miginfocom.swing.MigLayout
 import org.simbrain.network.connections.polarizeSynapses
 import org.simbrain.network.connections.radialProbabilisticStyle
 import org.simbrain.network.core.Network
@@ -7,14 +8,8 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
-import net.miginfocom.swing.MigLayout
-import org.simbrain.util.LabelledItemPanel
-import org.simbrain.util.Theme
-import org.simbrain.util.complement
-import org.simbrain.util.createApplyPanel
-import org.simbrain.util.displayInDialog
+import org.simbrain.util.*
 import org.simbrain.util.math.SimbrainMath
-import org.simbrain.util.showWarningDialog
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -140,7 +135,7 @@ class SynapseAdjustmentPanel(
             add(perturberPanel, "growx, wrap")
             add(perturbButton, "align right, gapright 5")
         }
-        val prunerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
+        val prunerTab = JPanel(MigLayout("fsimbraillx, insets 5", "[grow]")).apply {
             add(PrunerPanel(), "growx, top")
         }
         val scalerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
@@ -357,9 +352,6 @@ class SynapseAdjustmentPanel(
         statsPanel.repaint()
     }
 
-    /**
-     * @author Zoë
-     */
     inner class StatisticsBlock {
         var mean = 0.0
             private set

@@ -1,11 +1,7 @@
 package org.simbrain.network
 
 import kotlinx.coroutines.Dispatchers
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.core.*
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.getSimbrainXStream
@@ -26,8 +22,6 @@ class NetworkComponent : WorkspaceComponent {
 
     /**
      * Create a new network component.
-     *
-     * @param name name
      */
     constructor(name: String?) : super(name!!) {
         init()

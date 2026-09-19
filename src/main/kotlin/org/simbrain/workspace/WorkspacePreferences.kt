@@ -91,9 +91,6 @@ object WorkspacePreferences: PreferenceHolder() {
         suppressedPopups = current.filter { it.isNotBlank() }.joinToString(",")
     }
     
-    /**
-     * Clear all popup suppressions
-     */
     fun clearAllPopupSuppressions() {
         suppressedPopups = ""
     }

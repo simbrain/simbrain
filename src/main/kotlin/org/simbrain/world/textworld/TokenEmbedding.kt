@@ -24,7 +24,6 @@ import java.io.File
  *
  * Cannot currently be mutated after creation.
  *
- * @param tokens
  * @param tokenVectorMatrix Matrix whose rows correspond to vector representations of corresponding tokens.
  * @param trainingDocument Document, if any, used to train this embedding.
  */

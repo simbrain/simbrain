@@ -1,5 +1,7 @@
 package org.simbrain.plot.rasterchart;
 
+import kotlin.Unit;
+import kotlinx.coroutines.Dispatchers;
 import org.simbrain.plot.raster.RasterModel;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
@@ -9,8 +11,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kotlinx.coroutines.Dispatchers;
-import kotlin.Unit;
 
 /**
  * Represents raster data.
@@ -79,7 +79,6 @@ public class RasterPlotComponent extends WorkspaceComponent {
      *
      * @param input  stream
      * @param name   name of file
-     * @param format format
      * @return bar chart component to be opened
      */
     public static RasterPlotComponent open(final InputStream input, final String name, final String format) {

@@ -43,7 +43,6 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
     protected abstract String getToolTipText();
 
     /**
-     * @param event
      * @see PBasicInputEventHandler
      */
     public final void mouseEntered(final PInputEvent event) {
@@ -54,7 +53,6 @@ abstract class ToolTipTextUpdater extends PBasicInputEventHandler {
     }
 
     /**
-     * @param event
      * @see PBasicInputEventHandler
      */
     public final void mouseExited(final PInputEvent event) {

@@ -27,8 +27,8 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.events.OdorWorldEvents
 import org.simbrain.world.odorworld.sensors.Sensor
 import java.awt.geom.Point2D
-import kotlin.math.floor
 import java.util.concurrent.CopyOnWriteArrayList
+import kotlin.math.floor
 
 /**
  * A 2d environment. Contains a list of [OdorWorldEntity]s, which can either be agents or static objects.
@@ -254,9 +254,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
         events.updated.fire()
     }
 
-    /**
-     * Stop animation.
-     */
     fun stopAnimation() {
         events.animationStopped.fire()
         events.worldStopped.fire()
@@ -407,8 +404,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     /**
      * Returns the sensor with the given id, or null if none is found.
      *
-     * @param entityId entity id
-     * @param sensorId sensor id
      * @return sensor if found
      */
     fun getSensor(entityId: String?, sensorId: String?): Sensor? {
@@ -424,7 +419,6 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     /**
      * Returns the effector with the given id, or null if none is found.
      *
-     * @param entityId   entity id
      * @param effectorId sensor id
      * @return effector if found
      */

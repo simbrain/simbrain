@@ -66,9 +66,6 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
 
     /**
      * Creates a new frame of type TextWorld.
-     *
-     * @param frame
-     * @param component
      */
     init {
         world = component.world

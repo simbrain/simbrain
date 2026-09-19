@@ -1,10 +1,6 @@
 package org.simbrain.world.odorworld.dialogs;
 
-import org.simbrain.util.CmdOrCtrl;
-import org.simbrain.util.ResourceManager;
-import org.simbrain.util.StandardDialog;
-import org.simbrain.util.SwingUtilsKt;
-import org.simbrain.util.Theme;
+import org.simbrain.util.*;
 import org.simbrain.world.odorworld.effectors.Effector;
 import org.simbrain.world.odorworld.entities.OdorWorldEntity;
 import org.simbrain.world.odorworld.entities.PeripheralAttribute;
@@ -226,9 +222,6 @@ public class SensorEffectorPanel extends JPanel {
     }
 
 
-    /**
-     * Edit an attribute.
-     */
     private void editAttribute(PeripheralAttribute attribute) {
         // Panel is null when no item is selected on opening.
         // TODO: Disable the edit button in this case.

@@ -2,11 +2,11 @@ package org.simbrain.workspace.updater
 
 import kotlinx.coroutines.*
 import org.pmw.tinylog.Logger
-import java.util.concurrent.ConcurrentHashMap
-import javax.swing.SwingUtilities
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.events.WorkspaceUpdaterEvents
+import java.util.concurrent.ConcurrentHashMap
+import javax.swing.SwingUtilities
 
 /**
  * This class manages workspace updates. "Running" and "Stepping" the simulation
@@ -43,9 +43,6 @@ class WorkspaceUpdater(val workspace: Workspace) {
      */
     var time = 0
 
-    /**
-     * The update Manager.
-     */
     val updateManager: UpdateActionManager = UpdateActionManager(this)
 
     /**

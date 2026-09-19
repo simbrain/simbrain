@@ -26,8 +26,6 @@ public class WorldSelectionEvent extends EventObject {
      * Create a new network selection event with the specified source.
      *
      * @param source       source of the event
-     * @param oldSelection old selection
-     * @param selection    selection
      */
     public WorldSelectionEvent(final OdorWorldPanel source, final Set<PNode> oldSelection, final Set<PNode> selection) {
         super(source);

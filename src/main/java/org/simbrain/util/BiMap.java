@@ -30,7 +30,6 @@ public class BiMap<K, V> extends AbstractMap<K, V> {
      * Standard put operation.
      *  @param k key
      * @param v value
-     * @return
      */
     public V put(K k, V v) {
         map.put(k, v);

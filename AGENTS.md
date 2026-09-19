@@ -62,6 +62,10 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 - If a needed dialog helper does not exist, add a reusable utility in `SwingUtils.kt` rather than duplicating dialog setup in feature code
 - Do not use code comment separators of any kind (for example `// ----- Section -----`, `// --- Section ---`, `// ========`, or `// ── Section ─────────────────`)
 - Use minimal plain comments only when they add clarity
+- Keep hand-written comments: explanations of intent, rationale, domain meaning, caveats, or decision history are valuable even if long or informal; never delete or rewrite them as part of a cleanup
+- Short `@param` / `@return` tags are fine (doc builders use them); trim one only when it is fully redundant with the summary sentence above it and adds no detail
+- When converting Java to Kotlin, prefer `?` over prose for nullability, but do not strip other Javadoc
+- Comment cleanups may auto-fix only exact-pattern redundancy (e.g. `@param foo the foo`); list anything judgment-based for the user instead of changing it. When in doubt, keep the comment
 - Test initialization in each test (not `@BeforeEach`)
 - Use backtick test names: `` `test that something works`() ``
 - Avoid class-level doc comments that frame ordinary unit tests as regressions or describe specific historical bugs; put scenario intent in the test name and only use local comments when they clarify a non-obvious setup or assertion.

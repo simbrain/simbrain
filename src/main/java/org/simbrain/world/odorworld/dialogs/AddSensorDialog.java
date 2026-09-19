@@ -49,8 +49,6 @@ public class AddSensorDialog extends StandardDialog {
     
     /**
      * Sensor Dialog add sensor constructor (without parent).
-     *
-     * @param entity
      */
     public AddSensorDialog(OdorWorldEntity entity) {
         super();

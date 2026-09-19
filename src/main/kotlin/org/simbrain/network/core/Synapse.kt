@@ -491,8 +491,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
 
     /**
      * Decay this synapse by the indicated percentage. E.g. .5 cuts the strength in half.
-     *
-     * @param decayPercent decay percent
      */
     fun decay(decayPercent: Double) {
         val decayAmount = decayPercent * strength

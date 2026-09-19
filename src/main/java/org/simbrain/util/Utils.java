@@ -240,9 +240,6 @@ public class Utils {
 
     /**
      * The same as {@link #parseInteger(JTextField)} except using a String directly as an input.
-     *
-     * @param text
-     * @return
      */
     public static Integer parseInteger(String text) {
         try {
@@ -779,7 +776,6 @@ public class Utils {
      * https://stackoverflow.com/questions/7324991/see-if-field-exists-in-class
      *
      * @param object    object class
-     * @param fieldName field name
      * @return true if the class contains the field, false otherwise
      */
     public static boolean containsField(Object object, String fieldName) {

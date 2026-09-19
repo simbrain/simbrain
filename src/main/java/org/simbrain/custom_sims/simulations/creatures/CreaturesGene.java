@@ -96,8 +96,6 @@ public class CreaturesGene {
     /**
      * Creates a copy of the gene. Used in creating child genomes and in duplication
      * mutations.
-     *
-     * @return
      */
     public CreaturesGene copy() {
         CreaturesGene copy = new CreaturesGene(this.desc, this.duplicatable, this.mutable, this.cuttable, this.gender, this.geneType, this.lifeStage, this.allele);

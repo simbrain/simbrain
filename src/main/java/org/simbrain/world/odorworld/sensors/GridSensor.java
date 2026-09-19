@@ -124,7 +124,6 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
      * @param x      upper left
      * @param y      upper right
      * @param width  width in pixels
-     * @param height height
      */
     public GridSensor(int x, int y, int width, int height) {
         super("Grid (" + x + "," + y + "):" + width + "x" + height);

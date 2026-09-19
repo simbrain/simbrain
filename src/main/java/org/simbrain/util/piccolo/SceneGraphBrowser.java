@@ -106,7 +106,6 @@ public class SceneGraphBrowser extends JPanel {
          *
          * @param sb     string buffer
          * @param label  bounds label
-         * @param bounds bounds
          */
         private void formatBounds(final StringBuffer sb, final String label, final PBounds bounds) {
             sb.append(" ");
@@ -123,14 +122,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param tree
-         * @param value
-         * @param isSelected
-         * @param isExpanded
-         * @param isLeaf
-         * @param row
-         * @param hasFocus
-         * @return
          * @see DefaultTreeCellRenderer
          */
         public Component getTreeCellRendererComponent(final JTree tree, final Object value, final boolean isSelected, final boolean isExpanded, final boolean isLeaf, final int row, final boolean hasFocus) {
@@ -171,9 +162,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param parent
-         * @param index
-         * @return
          * @see TreeModel
          */
         public Object getChild(final Object parent, final int index) {
@@ -181,8 +169,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param parent
-         * @return
          * @see TreeModel
          */
         public int getChildCount(final Object parent) {
@@ -190,9 +176,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param parent
-         * @param child
-         * @return
          * @see TreeModel
          */
         public int getIndexOfChild(final Object parent, final Object child) {
@@ -200,7 +183,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @return
          * @see TreeModel
          */
         public Object getRoot() {
@@ -208,8 +190,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param node
-         * @return
          * @see TreeModel
          */
         public boolean isLeaf(final Object node) {
@@ -217,7 +197,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param l
          * @see TreeModel
          */
         public void addTreeModelListener(final TreeModelListener l) {
@@ -225,7 +204,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param l
          * @see TreeModel
          */
         public void removeTreeModelListener(final TreeModelListener l) {
@@ -233,8 +211,6 @@ public class SceneGraphBrowser extends JPanel {
         }
 
         /**
-         * @param path
-         * @param newValue
          * @see TreeModel
          */
         public void valueForPathChanged(final TreePath path, final Object newValue) {

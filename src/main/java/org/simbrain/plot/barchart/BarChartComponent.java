@@ -1,5 +1,6 @@
 package org.simbrain.plot.barchart;
 
+import kotlin.Unit;
 import org.jetbrains.annotations.NotNull;
 import org.simbrain.workspace.AttributeContainer;
 import org.simbrain.workspace.Workspace;
@@ -9,7 +10,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import kotlin.Unit;
 
 /**
  * Data for a JFreeChart bar chart.
@@ -65,7 +65,6 @@ public class BarChartComponent extends WorkspaceComponent {
      *
      * @param input  stream
      * @param name   name of file
-     * @param format format
      * @return bar chart component to be opened
      */
     public static BarChartComponent open(InputStream input, String name, String format) {

@@ -32,7 +32,6 @@ public final class ArchivedAttribute {
      * Creates a new ArchivedAttribute.
      *
      * @param component The component which owns this attribute.
-     * @param attribute The attribute.
      */
     ArchivedAttribute(WorkspaceComponent component, Attribute attribute) {
         componentId = component.getName();

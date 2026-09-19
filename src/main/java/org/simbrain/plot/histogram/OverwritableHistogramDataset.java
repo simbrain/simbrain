@@ -10,8 +10,8 @@ import org.jfree.data.xy.IntervalXYDataset;
 
 import java.awt.*;
 import java.io.Serializable;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 import java.util.Map.Entry;
 
 // TODO: See if this code has been updated in the latest JFreechart
@@ -173,9 +173,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
 
     /**
      * Contingent on the histogram bins being sorted.
-     *
-     * @param histSet
-     * @return
      */
     private double getRange(HistogramBin[] histSet) {
         int cap1 = -1;
@@ -199,7 +196,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
      * Reset the data in the data map field.
      *
      * @param names List of data series names
-     * @param data  The data
      * @param bins  number of bins to use
      */
     public void resetData(List<String> names, List<double[]> data, int bins) {
@@ -402,7 +398,6 @@ public class OverwritableHistogramDataset extends AbstractIntervalXYDataset impl
     /**
      * Set the color of a data series.
      *
-     * @param seriesName the series name
      * @param color      the color to set
      */
     public void setSeriesColor(String seriesName, Color color) {

@@ -94,7 +94,6 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
          *
          * @param input  stream
          * @param name   name of file
-         * @param format format
          * @return bar chart component to be opened
          */
         fun open(input: InputStream, name: String, format: String?): TimeSeriesPlotComponent {

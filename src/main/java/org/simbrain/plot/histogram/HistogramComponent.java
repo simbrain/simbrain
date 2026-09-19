@@ -52,7 +52,6 @@ public class HistogramComponent extends WorkspaceComponent {
      *
      * @param input  stream
      * @param name   name of file
-     * @param format format
      * @return bar chart component to be opened
      */
     public static HistogramComponent open(final InputStream input, final String name, final String format) {

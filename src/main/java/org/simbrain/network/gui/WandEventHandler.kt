@@ -31,8 +31,6 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
 
     /**
      * Create a new selection event handler.
-     *
-     * @param networkPanel
      */
     init {
         eventFilter = WandEventFilter()
@@ -174,8 +172,6 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         }
 
         /**
-         * @param node
-         * @return
          * @see PNodeFilter
          */
         override fun accept(node: PNode): Boolean {

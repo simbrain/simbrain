@@ -32,9 +32,6 @@ public class LifeCycle {
      */
     OdorWorldEntity parent;
 
-    /**
-     * @param entity
-     */
     public LifeCycle(OdorWorldEntity entity) {
         this.parent = entity;
     }

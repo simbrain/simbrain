@@ -19,7 +19,6 @@ public abstract class EntityAttributeNode extends PNode {
 
     /**
      * Update the visual representation base on the attribute status.
-     * @param entity
      */
     public abstract void update(OdorWorldEntity entity);
 

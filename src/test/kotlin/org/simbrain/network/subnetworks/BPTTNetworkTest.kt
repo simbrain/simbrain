@@ -227,11 +227,11 @@ class BPTTNetworkTest {
         assertEquals(1, bptt.inputLayer.displayColumns) { "A vertical layer is a single column" }
         assertEquals(9, bptt.inputLayer.displayRows)
 
-        // A grid is square rather than exactly as many cells as there are neurons, so the last row is
-        // partly empty rather than the grid being ragged.
+        // A grid has as many rows as its neurons need rather than exactly as many cells as there are
+        // neurons, so the last row is partly empty rather than the grid being ragged.
         bptt.outputLayer.gridMode = true
         assertEquals(3, bptt.outputLayer.displayColumns)
-        assertEquals(3, bptt.outputLayer.displayRows) { "Five neurons still round up to a three by three" }
+        assertEquals(2, bptt.outputLayer.displayRows) { "Five neurons fill two rows of three" }
     }
 
     @Test

@@ -6,7 +6,8 @@ class OrthographyEncoder(private val slots: Int = 5) {
         require(slots > 0) { "There must be at least one orthographic slot" }
     }
 
-    val dimension = slots * SYMBOLS.size
+    val symbolsPerSlot = SYMBOLS.size
+    val dimension = slots * symbolsPerSlot
 
     val labels = (0 until slots).flatMap { slot -> SYMBOLS.map { symbol -> "${slot + 1}:$symbol" } }
 

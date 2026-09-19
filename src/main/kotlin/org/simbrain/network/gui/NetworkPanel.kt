@@ -221,6 +221,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         NetworkPreferences.registerChangeListener(preferenceLoader)
         preferenceLoader()
 
+        network.placementManager.visibleBounds = { canvas.camera.viewBounds }
+
         toolbars.apply {
             cursor = Cursor.getPredefinedCursor(Cursor.DEFAULT_CURSOR)
             val flowLayout = FlowLayout(FlowLayout.LEFT).apply { hgap = 0; vgap = 0 }
@@ -575,9 +577,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        selectionManager.filterSelectedModels<LocatableModel>().sortLeftRightTopBottom().firstOrNull()?.let {
-            network.placementManager.lastSelectedModel = it
-        }
+        network.placementManager.onCopy()
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }
@@ -595,8 +595,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         if (selectionManager.isNotEmpty) {
             copy()
         }
-        network.placementManager.useLastClickedLocation = false
-        paste()
+        Clipboard.paste(this, CopyPlacement.DUPLICATE)
+    }
+
+    /**
+     * Duplicate the selection on top of itself and select the copies, for callers that then move them (alt-drag).
+     */
+    suspend fun duplicateInPlace() {
+        if (selectionManager.isEmpty) return
+        copy()
+        Clipboard.paste(this, CopyPlacement.IN_PLACE)
     }
 
     private fun updateLocationsWithUndoableAction(

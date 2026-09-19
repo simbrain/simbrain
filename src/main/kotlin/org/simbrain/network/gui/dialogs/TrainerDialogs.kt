@@ -490,7 +490,7 @@ fun UnsupervisedNetwork.makeTrainerPanel(): StandardDialog = getUnsupervisedTrai
 fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 
     val creator = SRNNetwork.SRNCreator(
-        network.placementManager.lastClickedLocation
+        network.placementManager.insertionLocation
     )
     return creator.createEditorDialog {
         addSubnetworkAction(this@NetworkPanel) { creator.create() }
@@ -501,7 +501,7 @@ fun NetworkPanel.showSRNCreationDialog(): StandardDialog {
 fun NetworkPanel.showBPTTCreationDialog(): StandardDialog {
 
     val creator = BPTTNetwork.BPTTCreator(
-        network.placementManager.lastClickedLocation
+        network.placementManager.insertionLocation
     )
     return creator.createEditorDialog {
         addSubnetworkAction(this@NetworkPanel) { creator.create() }

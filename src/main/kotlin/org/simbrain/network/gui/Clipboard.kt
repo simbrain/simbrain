@@ -78,8 +78,9 @@ object Clipboard {
      * Paste objects into the netPanel.
      *
      * @param net the network to paste into
+     * @param placement where the copies go relative to their source
      */
-    suspend fun paste(net: NetworkPanel) {
+    suspend fun paste(net: NetworkPanel, placement: CopyPlacement = CopyPlacement.PASTE) {
         if (isEmpty) {
             return
         }
@@ -233,9 +234,10 @@ object Clipboard {
         net.selectionManager.clear()
 
         // Paste objects intelligently using placement manager
-        net.network.placementManager.placeObjects(
-            copy.filterIsInstance<LocatableModel>()
-                .onEach { it.shouldBePlaced = true }
+        net.network.placementManager.placeCopies(
+            copies = copy.filterIsInstance<LocatableModel>().onEach { it.shouldBePlaced = true },
+            source = copiedObjects.filterIsInstance<LocatableModel>(),
+            placement = placement
         )
 
         // Select copied objects after pasting them

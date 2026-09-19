@@ -1,16 +1,18 @@
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.piccolo2d.PCamera
 import org.piccolo2d.PLayer
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PDragSequenceEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
-import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.network.core.LocatableModel
-import org.simbrain.network.core.topLeftLocation
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.*
 import org.simbrain.util.ResourceManager.smallIconSize
@@ -18,6 +20,7 @@ import org.simbrain.util.piccolo.SelectionMarquee
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
 import java.awt.*
+import java.awt.dnd.DragSource
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BaseMultiResolutionImage
@@ -44,14 +47,22 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     private lateinit var startLocations: List<Point2D>
 
     /**
-     * Red line that shows what the delta for the [PlacementManager] will be.
-     */
-    private var placementManagerDelta: PPath? = null
-
-    /**
      * Stores the original autoZoom state to restore after dragging.
      */
     private var previousAutoZoomState: Boolean = true
+
+    /**
+     * True for an alt-drag, which drags out a duplicate of the selection rather than moving it.
+     */
+    private var isDuplicateDrag = false
+
+    private var duplicateStarted = false
+
+    /**
+     * True while the duplicate for an alt-drag is being created. Nothing is moved in the meantime; the copies catch
+     * up with the cursor once they exist.
+     */
+    private var awaitingDuplicate = false
 
     private val selectionMarquee by lazy {
         with(marqueeStartPosition) { SelectionMarquee(x.toFloat(), y.toFloat()) }.also {
@@ -80,7 +91,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         super.mouseClicked(event)
         event?.position?.let {
             if (event.pickedNode.firstScreenElement == null) {
-                networkPanel.network.placementManager.lastClickedLocation = it
+                networkPanel.network.placementManager.insertionPoint = it
             }
         }
     }
@@ -95,8 +106,11 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         previousAutoZoomState = networkPanel.autoZoom
 
         val pickedNode: PNode? = event.pickedNode
+        isDuplicateDrag = false
+        duplicateStarted = false
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
+            isDuplicateDrag = event.isAltDown
             networkPanel.autoZoom = false
             // A plain press on a node outside its pixels selects the whole node, so pixel selections go
             if (!event.isShiftDown && !pickedNode.isPixelTarget) {
@@ -154,7 +168,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 .filterSelectedModels<LocatableModel>()
             val startLocations = startLocations.toList()
             val endLocations = models.map { it.location }.toList()
-            networkPanel.undoManager.addUndoableAction(
+            if (isDuplicateDrag) networkPanel.cursor = networkPanel.mouseCursor.cursor
+            // Undoing a duplicate drag removes the copies (the paste's own undo entry), so there is no move to record
+            if (!isDuplicateDrag) networkPanel.undoManager.addUndoableAction(
                 description = "Move items",
                 undo = {
                     models.zip(startLocations).forEach { (m, l) -> m.location = l }
@@ -165,20 +181,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                     networkPanel.network.events.zoomToFitPage.fire()
                 }
             )
-            // Reset the anchor point in the placement manager
-            val topLeft = networkPanel.selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            val pm = networkPanel.network.placementManager
-
-            // Only reset the delta if alt/option key is down
-            if (event.pickedNode != null && event.isAltDown) {
-                event.pickedNode.firstScreenElement?.model.let {
-                    if (it is LocatableModel) {
-                        pm.customOffset = topLeft - (pm.customOffsetAnchor?.location ?: point(0, 0))
-                    }
-                }
-            }
         }
-        networkPanel.canvas.layer.removeChild(placementManagerDelta)
 
         networkPanel.autoZoom = previousAutoZoomState
     }
@@ -222,28 +225,40 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      * drag that. See [screenElements].
      */
     private fun dragItems(event: PInputEvent) {
+        if (awaitingDuplicate) return
+        val hasMoved = event.position.distance(marqueeStartPosition) > 0
+        if (isDuplicateDrag && mode == Mode.DRAG && !duplicateStarted && hasMoved) {
+            startDuplicateDrag()
+            return
+        }
         val delta = event.position - marqueeEndPosition
+        offsetSelection(delta.x, delta.y)
+    }
+
+    private fun offsetSelection(dx: Double, dy: Double) {
         val draggableElements = networkPanel.selectionManager.selection.map { it.screenElements.firstOrNull(ScreenElement::isDraggable) }
-        draggableElements.forEach { it?.offset(delta.x, delta.y) }
+        draggableElements.forEach { it?.offset(dx, dy) }
+    }
 
-        val placementManager = networkPanel.network.placementManager
-        val selectionManager = networkPanel.selectionManager
-        val customOffsetAnchor = placementManager.customOffsetAnchor
-
-        // Show placementManagerDelta for placement manager
-        if (event.isAltDown && customOffsetAnchor?.let { selectionManager.selectedModels.contains(it) } == false) {
-            val topLeft = selectionManager.filterSelectedModels<LocatableModel>().topLeftLocation
-            networkPanel.canvas.layer.removeChild(placementManagerDelta)
-            placementManagerDelta = PPath.createLine(
-                topLeft.x,
-                topLeft.y,
-                customOffsetAnchor.location.x,
-                customOffsetAnchor.location.y
-            ).apply {
-                this.stroke = PPath.DEFAULT_STROKE
-                this.strokePaint = NetworkTheme.current.sourceHandle
+    /**
+     * Duplicate the selection on top of itself, then move the copies (now selected) to where the cursor has got to.
+     * The originals never move.
+     */
+    private fun startDuplicateDrag() {
+        duplicateStarted = true
+        awaitingDuplicate = true
+        // The platform's copy-drag cursor (on macOS, the arrow with a green plus badge)
+        networkPanel.cursor = DragSource.DefaultCopyDrop
+        networkPanel.launch {
+            try {
+                networkPanel.duplicateInPlace()
+            } finally {
+                withContext(Dispatchers.Swing) {
+                    val dragged = marqueeEndPosition - marqueeStartPosition
+                    offsetSelection(dragged.x, dragged.y)
+                    awaitingDuplicate = false
+                }
             }
-            networkPanel.canvas.layer.addChild(placementManagerDelta)
         }
     }
 

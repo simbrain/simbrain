@@ -200,6 +200,7 @@ All classes live in `org.simbrain.util.uisnapshot`. Run any with `-PsnapshotDef=
 | `CnnTrainerDialogSnapshot` | `cnn_trainer_dialog.png` |
 | `ControlPanelRoundedSnapshot` | `rounded_control_panel.png` |
 | `GaborFilterEditorSnapshot` | `gabor_filter_editor.png` |
+| `BidirectionalSynapseSnapshot` | `bidirectional_synapse.png` |
 | `IconGallerySnapshot` | `icon_gallery.png` |
 | `ImagePipelineDialogSnapshot` | `image_pipeline_dialog.png` |
 | `IzhikevichRuleEditorSnapshot` | `izhikevich_rule_editor.png` |

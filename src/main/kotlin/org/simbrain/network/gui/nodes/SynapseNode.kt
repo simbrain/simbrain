@@ -63,7 +63,17 @@ class SynapseNode(
     var arcBound: Arc2D.Float = Arc2D.Float()
         private set
 
+    /**
+     * If this is one half of a bidirectional connection, the node for the synapse running the other way (target
+     * to source), else null. That node's circle sits at this synapse's source, so this node's line starts past it.
+     */
+    private var symmetricNode: SynapseNode? = null
+
     init {
+        if (!isSelfConnection) {
+            symmetricNode = synapse.symmetricSynapse?.let { networkPanel.modelNodeMap.peek(it) as? SynapseNode }
+            symmetricNode?.symmetricNode = this
+        }
         updatePosition()
         this.addChild(circle)
         this.addChild(line)
@@ -73,6 +83,7 @@ class SynapseNode(
 
         updateColor()
         updateDiameter()
+        symmetricNode?.updateLineGeometry()
 
         pickable = true
         circle!!.pickable = true
@@ -96,6 +107,14 @@ class SynapseNode(
         updateClampStatus()
 
         events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }
+
+        events.deleted.on(dispatcher = Dispatchers.Swing) {
+            symmetricNode?.let {
+                it.symmetricNode = null
+                it.updateLineGeometry()
+            }
+            symmetricNode = null
+        }
 
         // Respond to spiking events
         source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) {
@@ -290,6 +309,7 @@ class SynapseNode(
         setBounds(circle!!.fullBounds)
         if (!isSelfConnection) {
             updatePosition()
+            symmetricNode?.updateLineGeometry()
         }
     }
 
@@ -298,6 +318,7 @@ class SynapseNode(
      * through the circle's center.
      */
     private fun updateLineGeometry() {
+        if (circle == null || line == null) return
         val circleCenter = circle!!.fullBoundsReference.let { Point2D.Double(it.centerX, it.centerY) }
         val sourcePoint = globalToLocal(source.neuron.location)
         val dx = sourcePoint.x - circleCenter.x
@@ -310,9 +331,18 @@ class SynapseNode(
             circleCenter.x + dx / distance * radius,
             circleCenter.y + dy / distance * radius
         )
+
+        // Start past the symmetric synapse's circle, which sits at this synapse's source.
+        var lineStart: Point2D = sourcePoint
+        symmetricNode?.circle?.let { symmetricCircle ->
+            val trim = NEURON_DIAMETER / 2 + symmetricCircle.width - SYNAPSE_NEURON_OVERLAP
+            if (trim < distance - radius) {
+                lineStart = Point2D.Double(sourcePoint.x - dx / distance * trim, sourcePoint.y - dy / distance * trim)
+            }
+        }
         line!!.reset()
-        line!!.append(Line2D.Double(sourcePoint, lineEnd), false)
-        lineBound.setLine(source.neuron.location, localToGlobal(lineEnd))
+        line!!.append(Line2D.Double(lineStart, lineEnd), false)
+        lineBound.setLine(localToGlobal(lineStart), localToGlobal(lineEnd))
     }
 
     /**

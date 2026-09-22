@@ -190,7 +190,7 @@ dependencies {
     implementation(group = "org.piccolo2d", name = "piccolo2d-core", version = "3.0.1")
 
     // https://mvnrepository.com/artifact/org.jfree/jfreechart
-    implementation(group = "org.jfree", name = "jfreechart", version = "1.5.4")
+    implementation(group = "org.jfree", name = "jfreechart", version = "1.5.6")
 
     // https://mvnrepository.com/artifact/org.swinglabs/swingx-core
     implementation(group = "org.swinglabs", name = "swingx-core", version = "1.6.2-2")

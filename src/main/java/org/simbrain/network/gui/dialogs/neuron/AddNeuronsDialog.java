@@ -10,6 +10,8 @@ import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.Collections;
 
 /**
@@ -66,6 +68,14 @@ public class AddNeuronsDialog extends StandardDialog {
         JScrollPane scrollPane = new JScrollPane(mainPanel);
         scrollPane.setBorder(BorderFactory.createEmptyBorder());
         setContentPane(scrollPane);
+
+        addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowOpened(WindowEvent event) {
+                numNeurons.requestFocusInWindow();
+                numNeurons.selectAll();
+            }
+        });
     }
 
     @Override

@@ -75,6 +75,7 @@ public class NodeHandle extends PHandle {
         // Force handle to check its location and size
         updateBounds();
         relocateHandle();
+        invalidatePaint();
     }
 
     /**

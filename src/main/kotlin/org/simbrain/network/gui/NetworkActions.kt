@@ -250,9 +250,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Select all neurons (n)",
         keyboardShortcut = KeyCombination('N')
     ) {
-        selectionManager.clear()
-        selectionManager.set(filterScreenElements<NeuronNode>())
-        selectionManager.add(filterScreenElements<NeuronArrayNode>())
+        selectionManager.set(filterScreenElements<NeuronNode>() + filterScreenElements<NeuronArrayNode>())
     }
 
 

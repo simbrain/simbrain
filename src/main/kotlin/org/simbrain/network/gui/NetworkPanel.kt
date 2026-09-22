@@ -42,6 +42,7 @@ import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.util.prefs.PreferenceChangeListener
 import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
@@ -964,6 +965,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     }
 
+    /**
+     * Repaints now and again after pending EDT work, since a single repaint after adding many handles is
+     * sometimes not painted on recent macOS versions.
+     */
+    private fun repaintAfterSelectionChange() {
+        canvas.repaint()
+        SwingUtilities.invokeLater { canvas.repaint() }
+    }
+
     private fun NetworkSelectionManager.setUpSelectionEvents() {
         events.apply {
             selection.on(Dispatchers.Swing) { old, new ->
@@ -992,6 +1002,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                         else -> NodeHandle.addSelectionHandleTo(it)
                     }
                 }
+                repaintAfterSelectionChange()
             }
             sourceSelection.on(Dispatchers.Swing) { old, new ->
                 val (removed, added) = old complement new
@@ -1003,6 +1014,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                         NodeHandle.addSourceHandleTo(it)
                     }
                 }
+                repaintAfterSelectionChange()
             }
         }
     }

@@ -10,7 +10,6 @@ package org.simbrain.plot.heatmap
 
 import net.miginfocom.swing.MigLayout
 import org.jfree.chart.ChartPanel
-import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.NumberAxis
@@ -20,6 +19,7 @@ import org.jfree.chart.renderer.xy.XYBlockRenderer
 import org.jfree.chart.title.PaintScaleLegend
 import org.jfree.chart.ui.RectangleEdge
 import org.jfree.chart.ui.RectangleInsets
+import org.simbrain.plot.AdaptiveChartRepainter
 import org.simbrain.plot.ChartColorMapPaintScale
 import org.simbrain.plot.applySimbrainAxisTheme
 import org.simbrain.plot.applySimbrainChartTheme
@@ -38,7 +38,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
 
     private val renderer = XYBlockRenderer()
 
-    private val colorBarAxis = NumberAxis("Value")
+    private val colorBarAxis = NumberAxis()
 
     val chartPanel: ChartPanel = ChartPanel(null)
 
@@ -86,6 +86,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
     fun refresh() {
         val scale = currentPaintScale()
         renderer.paintScale = scale
+        colorBarAxis.label = heatMapModel.colorBarLabel.ifBlank { null }
         colorBarAxis.setRange(scale.lowerBound, scale.upperBound)
         chart.subtitles.filterIsInstance<PaintScaleLegend>().forEach { it.scale = scale }
         plot.dataset = heatMapModel.dataset()
@@ -121,7 +122,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
 
     /** Rebuilt on every refresh, after [applySimbrainChartTheme] has run, so it themes itself. */
     private fun createRowAxis() = SymbolAxis(
-        "Row",
+        heatMapModel.rowLabel.ifBlank { null },
         Array(heatMapModel.rowCount.coerceAtLeast(1)) { row -> heatMapModel.componentNames.getOrNull(row) ?: row.toString() }
     ).apply {
         isInverted = true

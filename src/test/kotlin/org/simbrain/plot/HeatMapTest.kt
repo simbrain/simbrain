@@ -1,8 +1,7 @@
 package org.simbrain.plot
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
@@ -247,6 +246,24 @@ class HeatMapTest {
         // Four columns five time units apart, each 5 wide, so the axis spans -2.5 to 17.5.
         assertEquals(-2.5, range.lowerBound, 1e-9)
         assertEquals(17.5, range.upperBound, 1e-9)
+    }
+
+    @Test
+    fun `axis labels are omitted by default and can be customized`() {
+        val model = HeatMapModel().apply {
+            timeSupplier = { 0 }
+        }
+        val panel = HeatMapPanel(model)
+
+        assertNull(panel.chartPanel.chart.xyPlot.rangeAxis.label)
+        assertNull(panel.chartPanel.chart.subtitles.filterIsInstance<org.jfree.chart.title.PaintScaleLegend>().single().axis.label)
+
+        model.rowLabel = "Neuron"
+        model.colorBarLabel = "Activation"
+        panel.refresh()
+
+        assertEquals("Neuron", panel.chartPanel.chart.xyPlot.rangeAxis.label)
+        assertEquals("Activation", panel.chartPanel.chart.subtitles.filterIsInstance<org.jfree.chart.title.PaintScaleLegend>().single().axis.label)
     }
 
     @Test

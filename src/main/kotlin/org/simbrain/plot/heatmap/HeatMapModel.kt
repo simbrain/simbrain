@@ -80,6 +80,20 @@ class HeatMapModel : AttributeContainer, EditableObject {
         order = 60
     )
 
+    var rowLabel by GuiEditable(
+        initValue = "",
+        label = "Row label",
+        description = "Optional label for the row axis",
+        order = 70
+    )
+
+    var colorBarLabel by GuiEditable(
+        initValue = "",
+        label = "Color scale label",
+        description = "Optional label for the color scale",
+        order = 80
+    )
+
     /**
      * Number of rows, taken from the widest retained column or the available row labels so a coupled
      * neuron collection is labelled before its first values arrive. Cells past a shorter column's end

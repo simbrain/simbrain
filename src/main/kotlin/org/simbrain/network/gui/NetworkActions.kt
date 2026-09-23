@@ -173,8 +173,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     }
 
     val neuronCollectionAction = networkPanel.createConditionallyEnabledAction(
-        name = "Add neurons to collection",
-        description = "Add selected neurons to a neuron collection (Cmd/Ctrl-G)",
+        name = "Create neuron collection from selection",
+        description = "Group the selected neurons into a new neuron collection (Cmd/Ctrl-G)",
         enablingCondition = EnablingConditions.NEURONS,
         keyboardShortcuts = CmdOrCtrl + 'G'
     ) {
@@ -185,7 +185,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                 network.addNetworkModelAsync(nc)
             }
             undoManager.addUndoableAction(
-                description = "Add neurons to collection",
+                description = "Create neuron collection from selection",
                 undo = { nc.delete() },
                 redo = {
                     nc.neuronList.clear()
@@ -808,7 +808,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val addGroupAction = addNeuronCollectionAction()
 
     val clipboardActions
-        get() = listOf(copyAction, cutAction, pasteAction, duplicateAction)
+        get() = listOf(cutAction, copyAction, pasteAction, duplicateAction)
 
     val networkEditingActions
         get() = listOf(newNeuronAction, deleteAction)

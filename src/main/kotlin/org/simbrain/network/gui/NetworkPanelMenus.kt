@@ -76,29 +76,6 @@ val NetworkPanel.editMenu
             addSeparator()
             add(deleteAction)
             addSeparator()
-            add(clearSourceNeurons)
-            add(setSourceNeurons)
-            addSeparator()
-            add(connectionMenu)
-            addSeparator()
-            add(randomizeObjectsAction)
-            add(showSynapseAdjustmentPanel)
-            addSeparator()
-            // TODO: Sync this with "2" and "3" ways of connecting both neuron groups and free neurons
-            add(connectWithWeightMatrix)
-            add(connectWithSynapseGroup)
-            add(connectWithGapJunction)
-            addSeparator()
-            add(showLayoutDialogAction)
-            addSeparator()
-            add(createSupervisedModelAction)
-            add(createConvolutionalNeuralNetworkAction)
-            addSeparator()
-            add(neuronCollectionAction)
-            addSeparator()
-            add(alignMenu)
-            add(spaceMenu)
-            addSeparator()
             add(createSelectionEditMenu())
             addSeparator()
             add(selectionMenu)
@@ -106,9 +83,8 @@ val NetworkPanel.editMenu
     }
 
 /**
- * Create and return a new Insert menu for this Network panel.
- *
- * @return a new Insert menu for this Network panel
+ * Create and return a new Insert menu for this Network panel. The last section holds models built from the
+ * current selection, which stay disabled until the needed source and target are selected.
  */
 val NetworkPanel.insertMenu
     get() = JMenu("Insert").apply {
@@ -127,6 +103,38 @@ val NetworkPanel.insertMenu
             add(newNetworkMenu)
             addSeparator()
             add(addTextAction)
+            addSeparator()
+            add(neuronCollectionAction)
+            add(createSupervisedModelAction)
+            add(createConvolutionalNeuralNetworkAction)
+        }
+    }
+
+/**
+ * Source-then-target connection workflow: mark source neurons, select targets, then pick how to connect them.
+ */
+val NetworkPanel.connectMenu
+    get() = JMenu("Connect").apply {
+        with(networkActions) {
+            add(setSourceNeurons)
+            add(clearSourceNeurons)
+            addSeparator()
+            add(connectionMenu)
+            addSeparator()
+            // TODO: Sync this with "2" and "3" ways of connecting both neuron groups and free neurons
+            add(connectWithWeightMatrix)
+            add(connectWithSynapseGroup)
+            add(connectWithGapJunction)
+        }
+    }
+
+val NetworkPanel.arrangeMenu
+    get() = JMenu("Arrange").apply {
+        with(networkActions) {
+            add(showLayoutDialogAction)
+            addSeparator()
+            add(alignMenu)
+            add(spaceMenu)
         }
     }
 
@@ -136,6 +144,9 @@ val NetworkPanel.insertMenu
 val NetworkPanel.actionMenu
     get() = JMenu("Actions").apply {
         with(networkActions) {
+            add(randomizeObjectsAction)
+            add(showSynapseAdjustmentPanel)
+            addSeparator()
             // Alphabetical by action name
             add(fast100)
             add(createLayeredFreeNeurons())
@@ -189,37 +200,16 @@ val NetworkPanel.helpMenu
         add(ShowHelpAction("https://docs.simbrain.net/docs/network/"))
     }
 
+/** Canvas popup; its insert section is taken from [insertMenu] so the two stay in sync. */
 fun NetworkPanel.creatContextMenu() = JPopupMenu().apply {
     with(networkActions) {
-
-        // Insert actions
-        add(newNeuronAction)
-        add(addNeuronsAction)
+        insertMenu.menuComponents.forEach { add(it) }
         addSeparator()
-        add(addGroupAction)
-        add(addNeuronArrayAction)
-        add(addTensorAction)
-        add(addClassifierAction)
-        add(addActivationSequenceAction)
-        add(addLanguageModelAction)
-        add(addTinyLanguageModelAction)
-        // add(addDeepNetAction)
-        add(newNetworkMenu)
-        addSeparator()
-        add(addTextAction)
-        addSeparator()
-
-        // Clipboard actions
         clipboardActions.forEach { add(it) }
-
-        // Connection actions
         addSeparator()
-        add(clearSourceNeurons)
-        add(setSourceNeurons)
-        add(connectWithGapJunction)
+        add(connectMenu)
+        add(arrangeMenu)
         addSeparator()
-
-        // Preferences
         add(showNetworkPropertiesAction)
     }
 }
@@ -290,37 +280,28 @@ fun NetworkPanel.createNeuronContextMenu(currentNeuron: Neuron? = null): JPopupM
                 panel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
             })
             addSeparator()
-        add(clearSourceNeurons)
-        add(setSourceNeurons)
-        add(connectionMenu)
-        addSeparator()
-        add(showLayoutDialogAction)
-        addSeparator()
-        add(neuronCollectionAction)
-        addSeparator()
-        add(showNetworkPropertiesAction)
-        addSeparator()
-        if (selectedNeuronList.size > 1) {
-            add(alignMenu)
-            add(spaceMenu)
+            add(connectMenu)
+            add(arrangeMenu)
+            add(neuronCollectionAction)
             addSeparator()
-        }
-        add(JMenu("Select").apply {
-            add(selectIncomingWeightsAction)
-            add(selectOutgoingWeightsAction)
-        })
-        if (selectedNeuronList.isNotEmpty()) {
+            add(JMenu("Select").apply {
+                add(selectIncomingWeightsAction)
+                add(selectOutgoingWeightsAction)
+            })
+            if (selectedNeuronList.isNotEmpty()) {
+                addSeparator()
+                add(selectedNeuronList.createCoupleActivationToTimeSeriesAction())
+            }
             addSeparator()
-            add(selectedNeuronList.createCoupleActivationToTimeSeriesAction())
-        }
-        addSeparator()
-        add(testInputAction)
-        add(showWeightMatrixAction)
-        if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
-            val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
+            add(testInputAction)
+            add(showWeightMatrixAction)
+            if (selectionManager.filterSelectedNodes<NeuronNode>().size == 1) {
+                val node = selectionManager.filterSelectedNodes<NeuronNode>()[0]
+                addSeparator()
+                add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
+            }
             addSeparator()
-            add(CouplingMenu(node.networkPanel.networkComponent, node.neuron))
-        }
+            add(showNetworkPropertiesAction)
         }
     }
 }

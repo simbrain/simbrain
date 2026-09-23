@@ -3,10 +3,7 @@ package org.simbrain.network.gui
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.network.core.LocatableModel
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.*
 import org.simbrain.util.point
 import java.awt.geom.Rectangle2D
 
@@ -64,6 +61,21 @@ class PlacementManagerTest {
         val n1 = net.addPlacedNeuron()
         assertEquals(1100.0, n1.x, .01)
         assertEquals(1050.0, n1.y, .01)
+    }
+
+    @Test
+    fun `test repeated adds are evenly spaced when the view re-centers after each add`() {
+        val net = Network()
+        // Auto zoom recenters the view on the contents after every add
+        net.placementManager.visibleBounds = {
+            val center = net.getModels<Neuron>().takeIf { it.isNotEmpty() }?.centerLocation ?: point(0.0, 0.0)
+            Rectangle2D.Double(center.x - 200.0, center.y - 100.0, 400.0, 200.0)
+        }
+        val row = List(4) { net.addPlacedNeuron() }
+        row.zipWithNext().forEach { (a, b) ->
+            assertEquals(a.x + NEURON_FOOTPRINT, b.x, .01)
+            assertEquals(a.y, b.y, .01)
+        }
     }
 
     @Test

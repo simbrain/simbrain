@@ -141,11 +141,25 @@ class PlacementManager(private val network: Network) {
         val movable = models.movable()
         if (movable.isEmpty()) return
 
-        movable.moveTopLeftTo(insertionLocation)
+        val start = insertionLocation
+        pinInsertionPoint(start)
+        movable.moveTopLeftTo(start)
         val footprint = models.footprint()
         val delta = firstFreeOffset(footprint, occupiedFootprints(models), marchRight(footprint, startStep = 0))
         movable.translate(delta)
         lastCopy = null
+    }
+
+    /**
+     * Keep adding from [start] even when it came from the center of the visible canvas. Auto zoom re-centers the view
+     * after each add, so without this every add would march right from a different point and the row would be
+     * unevenly spaced. Does not count as a click, so it does not redirect the next paste.
+     */
+    private fun pinInsertionPoint(start: Point2D) {
+        if (start == insertionPoint) return
+        val fresh = insertionPointIsFresh
+        insertionPoint = start
+        insertionPointIsFresh = fresh
     }
 
     /**

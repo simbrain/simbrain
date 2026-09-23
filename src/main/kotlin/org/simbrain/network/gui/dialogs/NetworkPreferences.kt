@@ -241,7 +241,7 @@ object NetworkPreferences: PreferenceHolder() {
         tab = "GUI",
         order = 50
     )
-    var maxWeightSize by IntegerPreference(20)
+    var maxWeightSize by IntegerPreference(10)
 
     @UserParameter(
         label = "Visibility threshold",

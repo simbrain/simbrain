@@ -335,7 +335,7 @@ class SynapseNode(
         // Start past the symmetric synapse's circle, which sits at this synapse's source.
         var lineStart: Point2D = sourcePoint
         symmetricNode?.circle?.let { symmetricCircle ->
-            val trim = NEURON_DIAMETER / 2 + symmetricCircle.width - SYNAPSE_NEURON_OVERLAP
+            val trim = centerDistanceFromNeuron(symmetricCircle.width / 2) + symmetricCircle.width / 2
             if (trim < distance - radius) {
                 lineStart = Point2D.Double(sourcePoint.x - dx / distance * trim, sourcePoint.y - dy / distance * trim)
             }
@@ -371,7 +371,7 @@ class SynapseNode(
         var weightY = 0.0
 
         val synapseRadius = (circle?.width ?: offset * 2) / 2
-        val neuronOffset = NEURON_DIAMETER / 2 + synapseRadius - SYNAPSE_NEURON_OVERLAP
+        val neuronOffset = centerDistanceFromNeuron(synapseRadius)
 
         weightX = if (sourceX < targetX) {
             targetX - (neuronOffset * cos(alpha))
@@ -457,6 +457,18 @@ class SynapseNode(
         private const val ZERO_PROXY = .001
 
         private const val SYNAPSE_NEURON_OVERLAP = 2.0
+
+        /**
+         * Cap on how far a growing synapse circle is pushed out from its target neuron. Beyond this radius larger
+         * circles grow back over the neuron, so strong weights don't crowd neighboring neurons and synapses.
+         */
+        private const val MAX_SYNAPSE_PUSH = 5.0
+
+        /**
+         * Distance from the target neuron's center to the center of a synapse circle with the given radius.
+         */
+        private fun centerDistanceFromNeuron(synapseRadius: kotlin.Double) =
+            NEURON_DIAMETER / 2 + minOf(synapseRadius, MAX_SYNAPSE_PUSH) - SYNAPSE_NEURON_OVERLAP
 
         var excitatoryColor: Color = excitatorySynapseColor
 

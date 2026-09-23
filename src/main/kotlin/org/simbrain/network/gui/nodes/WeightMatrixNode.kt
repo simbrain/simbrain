@@ -1,3 +1,4 @@
+/** Displays weight matrices and supplies property/data dialogs for explicit editing targets. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -486,7 +487,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     /**
      * Returns the dialog for editing this weight matrix
      */
-    private fun createEditDialog(editingObjects: List<WeightMatrix>): StandardDialog? {
+    internal fun createEditDialog(editingObjects: List<WeightMatrix>): StandardDialog? {
 
             if (editingObjects.isEmpty()) return null
 

@@ -1,3 +1,4 @@
+/** Displays a tiny language model with separate training and selection property editors. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.util.*
@@ -187,7 +189,7 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
     }
 
     override val propertyDialog: StandardDialog
-        get() = tinyLanguageModel.createEditorDialog("Edit ${tinyLanguageModel.displayName}")
+        get() = trainingDialog()
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
@@ -206,7 +208,7 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
             add(createAction(
                 name = "Edit ${tinyLanguageModel.displayName}...",
                 description = "Set the learning rate, sampling, and diagram scale",
-            ) { propertyDialog.display() })
+            ) { networkPanel.createSelectionEditDialog(tinyLanguageModel).display() })
             add(createAction(
                 name = "Train...",
                 description = "Open the trainer: run, stop, or step training and watch the loss curve",

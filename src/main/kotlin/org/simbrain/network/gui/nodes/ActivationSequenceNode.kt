@@ -1,3 +1,4 @@
+/** Displays activation sequences with selected-pixel editing and shared selection property editing. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -315,7 +316,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
     override fun createEditDialog(): StandardDialog? = createEditDialog(networkPanel.filterSelectedNodeByClass<ActivationSequenceNode>())
 
     override val propertyDialog: StandardDialog?
-        get() = if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else createEditDialog(listOf(this))
+        get() = if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else networkPanel.createSelectionEditDialog(model)
 
     override val model: ActivationSequence
         get() = activationSequence

@@ -1,3 +1,4 @@
+/** Displays workspace information text and creates a fresh content editor when requested. */
 package org.simbrain.network.gui.nodes
 
 import net.miginfocom.swing.MigLayout
@@ -13,7 +14,7 @@ class TextInfoNode(netPanel: NetworkPanel, text: InfoText) : TextNode(netPanel, 
 
     override val isDraggable = false
 
-    override val propertyDialog: StandardDialog? = createInfoTextEditor(text)
+    override val propertyDialog: StandardDialog get() = createInfoTextEditor(textObject as InfoText)
 
     override val contextMenu: JPopupMenu
         get() {

@@ -1,3 +1,4 @@
+/** Displays a neuron collection and routes collection property edits separately from its member neurons. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -153,7 +154,7 @@ class NeuronCollectionNode(
     // Property dialog
 
     override val propertyDialog: StandardDialog?
-        get() = networkPanel.createNeuronCollectionDialog(model)
+        get() = networkPanel.createSelectionEditDialog(model)
 
     // Context menu
 

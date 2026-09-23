@@ -1,3 +1,4 @@
+/** Builds network menus; type-specific context editors leave the shared selection-editing shortcut intact. */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -16,9 +17,50 @@ import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.gui.CouplingMenu
 import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JMenu
 import javax.swing.JPopupMenu
+import javax.swing.event.MenuEvent
+import javax.swing.event.MenuListener
+
+/** Lists the captured targets per model type while keeping Cmd-E on the shared all-types action. */
+fun NetworkPanel.createSelectionEditMenu(): JMenu {
+    val panel = this
+    val menu = JMenu("Edit selected models")
+    fun rebuild() {
+        val plan = SelectionEditPlan(selectionManager.selectedModels)
+        val (label, tooltip) = plan.description
+        menu.removeAll()
+        menu.text = label?.removeSuffix("...") ?: "Edit selected models"
+        menu.toolTipText = tooltip
+        menu.isEnabled = plan.groups.isNotEmpty()
+        if (!menu.isEnabled) return
+        menu.add(panel.createAction(name = "All...", description = tooltip) { event ->
+            networkActions.editSelectedModelsAction.actionPerformed(event)
+        }.apply {
+            putValue(Action.ACCELERATOR_KEY, networkActions.editSelectedModelsAction.getValue(Action.ACCELERATOR_KEY))
+        })
+        menu.addSeparator()
+        plan.groups.forEach { models ->
+            val groupPlan = SelectionEditPlan(models)
+            menu.add(panel.createAction(
+                name = "${models.size} ${modelTypeNoun(models.first(), models.size)}...",
+                description = groupPlan.description.second
+            ) {
+                groupPlan.createDialogs(panel).forEach { it.display() }
+            })
+        }
+    }
+    rebuild()
+    selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> rebuild() }
+    menu.addMenuListener(object : MenuListener {
+        override fun menuSelected(e: MenuEvent) = rebuild()
+        override fun menuDeselected(e: MenuEvent) {}
+        override fun menuCanceled(e: MenuEvent) {}
+    })
+    return menu
+}
 
 val NetworkPanel.editMenu
     get() = JMenu("Edit").apply {
@@ -57,7 +99,7 @@ val NetworkPanel.editMenu
             add(alignMenu)
             add(spaceMenu)
             addSeparator()
-            add(editSelectedModelsAction)
+            add(createSelectionEditMenu())
             addSeparator()
             add(selectionMenu)
         }
@@ -243,8 +285,7 @@ fun NetworkPanel.createNeuronContextMenu(currentNeuron: Neuron? = null): JPopupM
             addSeparator()
             add(panel.createAction(
                 name = "Edit $count ${if (count == 1) "neuron" else "neurons"}...",
-                description = "Set the properties of selected neurons (Cmd/Ctrl-E)",
-                keyboardShortcut = CmdOrCtrl + 'E',
+                description = "Set the properties of selected neurons",
             ) {
                 panel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
             })
@@ -298,8 +339,7 @@ fun NetworkPanel.createSynapseContextMenu(currentSynapse: Synapse? = null): JPop
             addSeparator()
             add(panel.createAction(
                 name = "Edit $count ${if (count == 1) "synapse" else "synapses"}...",
-                description = "Set the properties of selected synapses (Cmd/Ctrl-E)",
-                keyboardShortcut = CmdOrCtrl + 'E',
+                description = "Set the properties of selected synapses",
             ) {
                 panel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
             })

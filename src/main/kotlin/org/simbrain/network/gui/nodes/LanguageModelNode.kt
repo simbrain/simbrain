@@ -1,3 +1,4 @@
+/** Displays language-model generation and routes property edits through the selected model group. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -10,6 +11,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
+import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.Lfm2Weights
 import org.simbrain.network.llm.LlmPreferences
@@ -143,7 +145,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     }
 
     override val propertyDialog: StandardDialog
-        get() = languageModel.createEditorDialog("Edit ${languageModel.displayName}")
+        get() = networkPanel.createSelectionEditDialog(languageModel)
 
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {

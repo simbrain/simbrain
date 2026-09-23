@@ -1,3 +1,4 @@
+/** Exercises property widgets and per-object commits, including mixed values and incompatible data shapes. */
 package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -237,6 +238,24 @@ class AnnotatedPropertyEditorTest {
         val widget = ape.propertyNameWidgetMap["biases"] as TensorWidget
         assertFalse(widget.canEditInconsistentValues)
         assertEquals(NULL_STRING, widget.widget.findLabel()?.text)
+    }
+
+    @Test
+    fun `equal tensor values do not bypass incompatible shape protection`() {
+        val first = TensorLayer(TensorShape(2, 2))
+        val second = TensorLayer(TensorShape(4, 1))
+        val editor = AnnotatedPropertyEditor(first, second)
+        val widget = editor.propertyNameWidgetMap["biases"] as TensorWidget
+        assertTrue(widget.isConsistent)
+        assertFalse(widget.canEditInconsistentValues)
+        assertEquals(NULL_STRING, widget.widget.findLabel()?.text)
+        second.biases[0] = 7.0
+        (editor.propertyNameWidgetMap["priority"] as NumericWidget).widget.value = 3
+        editor.commitChanges()
+        assertEquals(3, first.priority)
+        assertEquals(3, second.priority)
+        assertEquals(7.0, second.biases[0])
+        assertEquals(0.0, first.biases[0])
     }
 
     @Test

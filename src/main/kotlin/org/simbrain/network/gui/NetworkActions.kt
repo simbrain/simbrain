@@ -1,3 +1,4 @@
+/** Network actions shared by menus and keyboard bindings, with selection-aware editing descriptions. */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -12,6 +13,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
+import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.llm.TinyLanguageModel
@@ -39,6 +41,7 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import javax.swing.AbstractAction
+import javax.swing.Action
 import javax.swing.Action.SHORT_DESCRIPTION
 import javax.swing.JCheckBoxMenuItem
 import javax.swing.JLabel
@@ -312,7 +315,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = CmdOrCtrl + 'E',
         initBlock = {
             fun updateAction() {
-                isEnabled = networkPanel.selectionManager.selection.isNotEmpty()
+                val (label, tooltip) = networkPanel.describeEditSelectedModels()
+                putValue(Action.NAME, label ?: "Edit selected models")
+                putValue(SHORT_DESCRIPTION, tooltip)
+                isEnabled = label != null
             }
             updateAction()
             networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
@@ -326,8 +332,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val count = selectedNeurons.size
         networkPanel.createAction(
             name = "Edit $count ${if (count == 1) "neuron" else "neurons"}...",
-            description = "Set the properties of selected neurons (Cmd/Ctrl-E)",
-            keyboardShortcut = CmdOrCtrl + 'E',
+            description = "Set the properties of selected neurons",
         ) {
             networkPanel.filterSelectedNodeByClass<NeuronNode>().firstOrNull()?.createEditDialog()?.display()
         }
@@ -345,8 +350,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val count = selectedSynapses.size
         networkPanel.createAction(
             name = "Edit $count ${if (count == 1) "synapse" else "synapses"}...",
-            description = "Set the properties of selected synapses (Cmd/Ctrl-E)",
-            keyboardShortcut = CmdOrCtrl + 'E',
+            description = "Set the properties of selected synapses",
         ) {
             networkPanel.filterSelectedNodeByClass<SynapseNode>().firstOrNull()?.createEditDialog()?.display()
         }
@@ -470,9 +474,9 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Text.png",
         keyboardShortcut = KeyCombination('T')
     ) {
-        textEntryDialog("", "Enter text to add to the network") {
-            if (it.isNotEmpty()) {
-                val textObject = NetworkTextObject(it)
+        val textObject = NetworkTextObject()
+        TextDialog(listOf(textObject), titleName = "Add Text") {
+            if (textObject.text.isNotEmpty()) {
                 undoManager.addUndoableAction(
                     description = "Add text object",
                     undo = { textObject.delete() },
@@ -1106,7 +1110,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     fun setTextPropertiesAction(textNodes: Collection<TextNode>) = networkPanel.createAction(
         name = "Text properties...",
-        description = "Set the properties of this text, e.g. font and size",
+        description = "Edit text content, font, and size",
         iconPath = "menu_icons/Properties.png"
     ) {
         networkPanel.showTextPropertyDialog(textNodes)

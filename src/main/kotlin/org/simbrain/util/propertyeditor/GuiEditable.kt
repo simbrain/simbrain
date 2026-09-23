@@ -76,6 +76,9 @@ class GuiEditable<O : EditableObject, T>(
     val useFileChooser: Boolean = false,
     val fileChooserInitialDirectory: String? = null,
     val tensorDescriptor: KProperty1<O, TensorDescriptor>? = null,
+    val multiline: Boolean = false,
+    val textAreaRows: Int = 5,
+    val textAreaColumns: Int = 32,
     private val onUpdate: (UpdateFunctionContext<O, T>).() -> Unit = { }
 ) {
 
@@ -244,6 +247,9 @@ fun <O : EditableObject> UserParameter.toGuiEditable(obj: O, property: KProperty
         useLegacySetter = useLegacySetter,
         columnMode = columnMode,
         useFileChooser = useFileChooser,
+        multiline = multiline,
+        textAreaRows = textAreaRows,
+        textAreaColumns = textAreaColumns,
         fileChooserInitialDirectory = fileChooserInitialDirectory.ifEmpty { null },
         tab = tab,
         typeMapProvider = if (typeMapProvider.isNotEmpty()) {
@@ -931,14 +937,14 @@ abstract class TableParameterWidget<O : EditableObject, T>(
     private val placeholderPanel: JComponent by lazy {
         JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
             add(JLabel(NULL_STRING).apply {
-                toolTipText = "Selected objects have different sizes, so they cannot be edited together."
+                toolTipText = "Selected objects have different shapes, so this data cannot be edited together."
             })
         }
     }
 
     override val widget: JComponent by lazy {
         JPanel(BorderLayout()).apply {
-            add(if (isConsistent || canEditInconsistentValues) tablePanel else placeholderPanel)
+            add(if (canEditInconsistentValues) tablePanel else placeholderPanel)
         }
     }
 

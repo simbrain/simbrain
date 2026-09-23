@@ -1,3 +1,4 @@
+/** Network keyboard bindings; selection editing shares the menu action and its captured model targets. */
 package org.simbrain.network.gui
 
 import org.simbrain.network.core.LocatableModel
@@ -31,13 +32,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Shift + 'C') { hardClearSelectedObjects() }
     bind(Alt + 'D') { println(network) } // Print debug information
     bind(Shift + 'F') { toggleClamping() }
-    bind(CmdOrCtrl + 'E') {
-        if (hasAnyPixelSelection()) {
-            createPixelEditDialog()?.display()
-        } else {
-            selectionManager.selection.firstNotNullOfOrNull { it.propertyDialog }?.display()
-        }
-    }
+    bindTo(CmdOrCtrl + 'E', networkActions.editSelectedModelsAction)
     bindTo("G", networkActions.addGroupAction)
     bindTo("S", networkActions.selectionEditModeAction)
     bind("D") {

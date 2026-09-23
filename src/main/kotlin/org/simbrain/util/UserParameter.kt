@@ -1,3 +1,4 @@
+/** Metadata for user-editable properties, including string editor layout and validation hints. */
 package org.simbrain.util
 
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -95,4 +96,9 @@ annotation class UserParameter(
     val useFileChooser: Boolean = false,
 
     val fileChooserInitialDirectory: String = "",
+
+    /** Display strings in a scrollable multiline editor instead of a single-line field. */
+    val multiline: Boolean = false,
+    val textAreaRows: Int = 5,
+    val textAreaColumns: Int = 32,
 )

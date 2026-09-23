@@ -1,3 +1,4 @@
+/** Builds shared property widgets and commits compatible edits to each target object. */
 package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
@@ -210,7 +211,17 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
 
         return when (userParameter.value) {
 
-            is String, is String? -> StringWidget(
+            is java.awt.Font -> FontWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, java.awt.Font>,
+                isConsistent
+            ) as ParameterWidget<O, T>
+
+            is String, is String? -> if (userParameter.multiline) MultilineStringWidget(
+                this@AnnotatedPropertyEditor,
+                userParameter as GuiEditable<O, String?>,
+                isConsistent
+            ) as ParameterWidget<O, T> else StringWidget(
                 this@AnnotatedPropertyEditor,
                 userParameter as GuiEditable<O, String?>,
                 isConsistent
@@ -289,7 +300,7 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
 
     fun commitChanges() {
         parameterWidgetMap.forEach { (parameter, widget) ->
-            if (widget.isConsistent) {
+            if (widget.isConsistent && (widget !is TableParameterWidget<*, *> || widget.canEditInconsistentValues)) {
                 val isObjectWidget = widget is ObjectWidget<*, *> && !widget.useEnumStyle
                 if (isObjectWidget) {
                     widget.objectTypeEditor.commitChanges()

@@ -1,3 +1,4 @@
+/** Displays a tensor's channels and delegates property editing to the selected model group. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -470,7 +471,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
 
     override fun createEditDialog(): StandardDialog {
-        return tensorLayer.createEditorDialog()
+        return networkPanel.createSelectionEditDialog(tensorLayer)
     }
 
     override val propertyDialog: StandardDialog

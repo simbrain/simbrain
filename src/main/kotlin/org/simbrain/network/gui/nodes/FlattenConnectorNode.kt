@@ -1,3 +1,4 @@
+/** Displays a tensor-to-array bridge and shares property editing between its arrow and interaction box. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -5,6 +6,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
@@ -94,7 +96,7 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         }
 
     override fun createEditDialog(): StandardDialog? {
-        return connector.createEditorDialog()
+        return networkPanel.createSelectionEditDialog(connector)
     }
 
     override val propertyDialog: StandardDialog? get() = createEditDialog()

@@ -1,3 +1,4 @@
+/** Displays tensor connections and edits selected connectors of the same underlying model type. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -520,7 +521,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }
 
     override fun createEditDialog(): StandardDialog? {
-        return connector.createEditorDialog()
+        return networkPanel.createSelectionEditDialog(connector)
     }
 
     override val propertyDialog: StandardDialog? get() = createEditDialog()

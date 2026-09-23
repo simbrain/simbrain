@@ -1,3 +1,4 @@
+/** Network dialog factories, including dispatch of property editors for a captured selection. */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -32,16 +33,20 @@ import javax.swing.event.ListSelectionListener
 import javax.swing.table.DefaultTableModel
 
 fun NetworkPanel.showTextPropertyDialog(textNodes: Collection<TextNode>) {
-    TextDialog(textNodes).apply {
+    TextDialog(textNodes.map { it.textObject }.distinct()).apply {
         setLocationRelativeTo(this@showTextPropertyDialog)
         isVisible = true
     }
 }
 
+/** Describes exactly the property dialogs opened by [showEditDialogsForSelectedModels]. */
+fun NetworkPanel.describeEditSelectedModels(): Pair<String?, String> =
+    SelectionEditPlan(selectionManager.selectedModels).description
+
 fun NetworkPanel.showEditDialogsForSelectedModels() {
-    selectionManager.selection.groupBy { it::class }.forEach { (_, nodes) ->
-        nodes.firstOrNull()?.createEditDialog()?.display()
-    }
+    val plan = SelectionEditPlan(selectionManager.selectedModels)
+    // Build every dialog before showing any modal window, preserving the original selection.
+    plan.createDialogs(this).forEach { it.display() }
 }
 
 fun NetworkPanel.showNeuronArrayCreationDialog() {

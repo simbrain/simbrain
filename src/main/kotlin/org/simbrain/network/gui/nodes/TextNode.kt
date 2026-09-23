@@ -1,11 +1,12 @@
+/** Displays model text and routes content and font editing through one selection-aware dialog. */
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.extras.nodes.PStyledText
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.util.*
-import java.util.stream.Collectors
 import javax.swing.JPopupMenu
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultStyledDocument
@@ -49,22 +50,9 @@ open class TextNode(
             contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
 
-            val textNodes = networkPanel.selectionManager.selection.stream()
-                .filter { obj: ScreenElement? -> TextNode::class.java.isInstance(obj) }
-                .map { obj: ScreenElement? -> TextNode::class.java.cast(obj) }
-                .collect(Collectors.toSet())
-            textNodes.add(this)
-
-            if (textNodes.size == 1) {
-                contextMenu.add(networkPanel.createAction(name = "Edit ${textObject.displayName}...") {
-                    textEntryDialog(textObject.text, "Edit Text", 20, 5) {
-                        textObject.text = it
-                        update()
-                    }.display()
-                })
-            }
-
-            contextMenu.add(networkPanel.networkActions.setTextPropertiesAction(textNodes))
+            contextMenu.add(networkPanel.createAction(name = "Edit text and font...") {
+                createEditDialog().display()
+            })
             contextMenu.addSeparator()
 
             return contextMenu
@@ -114,11 +102,14 @@ open class TextNode(
         pStyledText.offset = -pStyledText.bounds.center2D
     }
 
-    override val propertyDialog: StandardDialog?
-        get() = textEntryDialog(textObject.text, "Edit Text", 20, 5) { text ->
-            textObject.text = text
-            update()
-        }
+    override fun createEditDialog(): StandardDialog {
+        val selected = networkPanel.selectionManager.selectedModels
+        val targets = if (textObject in selected) selected.filterIsInstance<NetworkTextObject>()
+            .filter { it.javaClass == textObject.javaClass } else listOf(textObject)
+        return TextDialog(targets)
+    }
+
+    override val propertyDialog: StandardDialog get() = createEditDialog()
 }
 
 /**

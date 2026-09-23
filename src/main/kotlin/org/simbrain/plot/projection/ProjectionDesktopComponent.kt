@@ -6,8 +6,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
-import org.jfree.chart.ChartPanel
-import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
 import org.jfree.chart.labels.CustomXYToolTipGenerator
@@ -18,6 +16,9 @@ import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer
 import org.jfree.data.xy.XYDataset
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.plot.AdaptiveChartRepainter
+import org.simbrain.plot.SimbrainChartPanel
+import org.simbrain.plot.addChartNavigationControls
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
@@ -79,7 +80,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
 
     val prefsAction = createAction(
-        iconPath = "menu_icons/Tools.png",
+        iconPath = "menu_icons/Prefs.png",
         name = "Preferences...",
         description = "Set projection preferences"
     ) {
@@ -98,7 +99,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     val clearDataAction = createAction(
         name = "Clear",
         description = "Clear all points",
-        iconPath = "menu_icons/Eraser.png"
+        iconPath = "menu_icons/ClearChart.png"
     ) {
         clearData()
     }
@@ -123,7 +124,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         }
 
     private val freezingToggleButton = SimbrainToggleButton(
-        icon = ResourceManager.getSmallIcon("menu_icons/Clamp.png"),
+        icon = ResourceManager.getSmallIcon("menu_icons/ClampUnlocked.png"),
         stateGetter = { 
             val pcaProjection = projector.projectionMethod as? PCAProjection ?: return@SimbrainToggleButton false
             pcaProjection.freeze
@@ -134,10 +135,16 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             }
         },
         tooltipGenerator = { frozen ->
-            val frozenText = if (frozen) "on" else "off"
-            "PCA 'freezing' is $frozenText"
+            if (frozen) "PCA axes are fixed. New points use the current axes; click to unlock"
+            else "PCA axes update as new points are added; click to lock"
         }
-    )
+    ).apply {
+        selectedIcon = ResourceManager.getSmallIcon("menu_icons/Clamp.png")
+    }
+
+    private val freezingSpacer = Box.createHorizontalStrut(8)
+
+    private val freezingSeparator = JToolBar.Separator()
 
     private val projectionSelector: JComboBox<ProjectionMethod> = JComboBox<ProjectionMethod>().apply {
         maximumSize = Dimension(200, 100)
@@ -148,10 +155,18 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
                 swingInvokeLater {
                     projector.projectionMethod = (selectedItem as ProjectionMethod)
                     if (projector.projectionMethod is PCAProjection) {
-                        mainToolbar.add(freezingToggleButton)
+                        if (freezingToggleButton.parent != mainToolbar) {
+                            mainToolbar.add(freezingSpacer, 1)
+                            mainToolbar.add(freezingToggleButton, 2)
+                            mainToolbar.add(freezingSeparator, 3)
+                        }
                     } else {
                         mainToolbar.remove(freezingToggleButton)
+                        mainToolbar.remove(freezingSpacer)
+                        mainToolbar.remove(freezingSeparator)
                     }
+                    mainToolbar.revalidate()
+                    mainToolbar.repaint()
                 }
             }
         }
@@ -159,7 +174,6 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     }
     val mainToolbar = JToolBar().apply {
         add(projectionSelector)
-        addSeparator()
         add(prefsAction)
         add(randomizeAction)
         add(clearDataAction)
@@ -175,6 +189,10 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             }
         })
         add(iterateAction)
+    }
+
+    private val runToolbarSeparator = JSeparator(SwingConstants.VERTICAL).apply {
+        preferredSize = Dimension(8, 24)
     }
 
     val topPanel = JPanel(FlowLayout(FlowLayout.LEFT)).also {
@@ -215,7 +233,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
      */
     val chart: JFreeChart = ChartFactory.createScatterPlot(
         "", "Projection X", "Projection Y",
-        xyCollection, PlotOrientation.VERTICAL, true, true, false
+        xyCollection, PlotOrientation.VERTICAL, false, true, false
     ).apply {
         applySimbrainChartTheme()
         val rangeAxis = xyPlot.rangeAxis as NumberAxis
@@ -231,7 +249,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         xyPlot.foregroundAlpha = .7f // TODO: Make this settable
         xyPlot.renderer = renderer
     }
-    val chartPanel = ChartPanel(chart).also {
+    val chartPanel = SimbrainChartPanel(chart).also {
         add(it)
         // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
         AdaptiveChartRepainter(it).install()
@@ -275,6 +293,9 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     init {
         layout = BorderLayout()
 
+        mainToolbar.addSeparator()
+        addChartNavigationControls(mainToolbar, chartPanel)
+
         add("North", topPanel)
         add("Center", chartPanel)
         add("South", bottomPanel)
@@ -315,10 +336,14 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
             stopIterating()
             if (n is IterableProjectionMethod) {
-                topPanel.add(runToolbar)
+                if (runToolbar.parent != topPanel) {
+                    topPanel.add(runToolbarSeparator)
+                    topPanel.add(runToolbar)
+                }
                 bottomPanel.add(errorLabel)
             } else {
                 bottomPanel.remove(errorLabel)
+                topPanel.remove(runToolbarSeparator)
                 topPanel.remove(runToolbar)
             }
             topPanel.revalidate()

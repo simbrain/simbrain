@@ -22,7 +22,7 @@ public class TimeSeriesPlotActions {
         return new AbstractAction() {
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Tools.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Prefs.png"));
                 putValue(NAME, "Plot properties...");
                 putValue(SHORT_DESCRIPTION, "Show time series graph properties");
             }
@@ -43,7 +43,7 @@ public class TimeSeriesPlotActions {
         return new AbstractAction() {
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/ClearChart.png"));
                 putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 
@@ -63,6 +63,7 @@ public class TimeSeriesPlotActions {
         return new AbstractAction() {
             // Initialize
             {
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/plus.png"));
                 putValue(NAME, "Add");
                 putValue(SHORT_DESCRIPTION, "Add a data source");
             }

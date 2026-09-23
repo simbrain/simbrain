@@ -2,9 +2,11 @@ package org.simbrain.plot.piechart;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
+import org.simbrain.plot.AdaptiveChartRepainter;
+import org.simbrain.plot.ChartInteractionsKt;
 import org.simbrain.plot.ChartThemeKt;
+import org.simbrain.plot.SimbrainChartPanel;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -22,7 +24,7 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
 
     private final PlotActionManager actionManager;
 
-    private final ChartPanel chartPanel = new ChartPanel(null);
+    private final ChartPanel chartPanel = new SimbrainChartPanel(null);
 
     private static final Dimension PREFERRED_SIZE = new Dimension(500, 400);
 
@@ -41,6 +43,9 @@ public class PieChartDesktopComponent extends DesktopComponent<PieChartComponent
         chart = ChartFactory.createPieChart("", getWorkspaceComponent().getModel().getDataset(), true, true, false);
         ChartThemeKt.applySimbrainChartTheme(chart);
         chartPanel.setChart(chart);
+        JPanel navigationPanel = new JPanel();
+        ChartInteractionsKt.addChartNavigationControls(navigationPanel, chartPanel);
+        add("South", navigationPanel);
         // Per-notification repaints only mark the chart dirty; frames are self-clocked
         new AdaptiveChartRepainter(chartPanel).install();
     }

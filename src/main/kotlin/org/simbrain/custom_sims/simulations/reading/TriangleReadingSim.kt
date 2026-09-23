@@ -5,7 +5,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
-import org.jfree.chart.ChartPanel
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.data.category.DefaultCategoryDataset
 import org.simbrain.custom_sims.*
@@ -14,7 +13,10 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.AdamOptimizer
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.plot.SimbrainChartPanel
+import org.simbrain.plot.addChartNavigationControls
 import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.enableSimbrainChartNavigation
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.ControlPanelKt
@@ -116,7 +118,7 @@ private suspend fun SimulationScope.installReaderUi(
                 chartWindow?.dispose()
                 chartWindow = JFrame(title).apply {
                     defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
-                    add(ChartPanel(ChartFactory.createBarChart(
+                    val chartPanel = SimbrainChartPanel(ChartFactory.createBarChart(
                         title,
                         "Frequency",
                         yAxisLabel,
@@ -125,7 +127,9 @@ private suspend fun SimulationScope.installReaderUi(
                         false,
                         true,
                         false
-                    ).apply { applySimbrainChartTheme() }))
+                    ).apply { applySimbrainChartTheme() }).apply { enableSimbrainChartNavigation() }
+                    add(chartPanel, BorderLayout.CENTER)
+                    add(JPanel().apply { addChartNavigationControls(this, chartPanel) }, BorderLayout.SOUTH)
                     setSize(850, 500)
                     setLocationRelativeTo(this@desktop.frame)
                     isVisible = true

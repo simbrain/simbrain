@@ -58,6 +58,7 @@ class AdaptiveChartRepainter @JvmOverloads constructor(
     /** Take over the panel's repainting. Call once, after the panel's chart has been set. */
     fun install() {
         val chart = requireNotNull(chartPanel.chart) { "Install after the panel's chart is set" }
+        chartPanel.enableSimbrainChartNavigation()
         chart.removeChangeListener(chartPanel)
         chart.addChangeListener(this)
         chart.addProgressListener(this)

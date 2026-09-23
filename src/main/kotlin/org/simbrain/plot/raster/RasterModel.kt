@@ -1,6 +1,7 @@
 package org.simbrain.plot.raster
 
 import com.thoughtworks.xstream.XStream
+import kotlinx.coroutines.withContext
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.RasterPlotEvents
@@ -11,7 +12,6 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
-import kotlinx.coroutines.withContext
 import java.util.function.Supplier
 
 /**
@@ -69,6 +69,17 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         order = 40
     )
     var spikeThreshold: Double = 0.5
+
+    var rowLabel: String by GuiEditable(
+        initValue = "",
+        label = "Row label",
+        description = "Optional label for the row axis",
+        setter = {
+            field = it
+            events.propertyChanged.fire()
+        },
+        order = 45
+    )
 
     @Transient
     var events = RasterPlotEvents()

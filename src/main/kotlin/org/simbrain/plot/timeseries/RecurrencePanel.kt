@@ -15,7 +15,6 @@
 package org.simbrain.plot.timeseries
 
 import kotlinx.coroutines.Job
-import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.AxisSpace
@@ -62,7 +61,7 @@ class RecurrencePanel(
 
     private val chart: JFreeChart
 
-    val chartPanel: ChartPanel = ChartPanel(null)
+    val chartPanel: SimbrainChartPanel = SimbrainChartPanel(null)
 
     /** The rebuild throttle bounds matrix recomputes; this additionally self-clocks the paints. */
     private val repainter = AdaptiveChartRepainter(chartPanel)
@@ -115,6 +114,10 @@ class RecurrencePanel(
         plot = XYPlot(RecurrenceDataset(DoubleArray(0), emptyArray()), domainAxis, rangeAxis, renderer)
         chart = JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, false)
         chartPanel.chart = chart
+        JPanel().also { navigation ->
+            addChartNavigationControls(navigation, chartPanel)
+            add(navigation, BorderLayout.SOUTH)
+        }
         chart.applySimbrainChartTheme()
         repainter.install()
 

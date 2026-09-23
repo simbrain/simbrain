@@ -183,6 +183,7 @@ class WorkspaceActions {
 
 
     val showNetworkPreferencesAction = desktopPane.createAction(
+        iconPath = "menu_icons/Prefs.png",
         name = "Network preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
@@ -190,6 +191,7 @@ class WorkspaceActions {
     }
 
     val showOdorWorldPreferencesAction = desktopPane.createAction(
+        iconPath = "menu_icons/Prefs.png",
         name = "Odor world preferences...",
         description = "Set default properties that apply to all odor worlds in the Simbrain workspace.",
     ) {
@@ -197,6 +199,7 @@ class WorkspaceActions {
     }
 
     val showWorkspacePreferencesAction = createAction(
+        iconPath = "menu_icons/Prefs.png",
         name = "Workspace preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {

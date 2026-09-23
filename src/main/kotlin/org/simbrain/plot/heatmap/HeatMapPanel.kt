@@ -9,7 +9,6 @@
 package org.simbrain.plot.heatmap
 
 import net.miginfocom.swing.MigLayout
-import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.AxisLocation
 import org.jfree.chart.axis.NumberAxis
@@ -19,10 +18,8 @@ import org.jfree.chart.renderer.xy.XYBlockRenderer
 import org.jfree.chart.title.PaintScaleLegend
 import org.jfree.chart.ui.RectangleEdge
 import org.jfree.chart.ui.RectangleInsets
-import org.simbrain.plot.AdaptiveChartRepainter
-import org.simbrain.plot.ChartColorMapPaintScale
-import org.simbrain.plot.applySimbrainAxisTheme
-import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.*
+import org.simbrain.util.ResourceManager
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.swingDispatcher
@@ -40,7 +37,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
 
     private val colorBarAxis = NumberAxis()
 
-    val chartPanel: ChartPanel = ChartPanel(null)
+    val chartPanel: SimbrainChartPanel = SimbrainChartPanel(null)
 
     val buttonPanel: JPanel = JPanel()
 
@@ -62,6 +59,7 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
         plot = XYPlot(heatMapModel.dataset(), domainAxis, rangeAxis, renderer)
         chart = JFreeChart(null, JFreeChart.DEFAULT_TITLE_FONT, plot, false)
         chartPanel.chart = chart
+        addChartNavigationControls(buttonPanel, chartPanel)
 
         chart.addSubtitle(
             PaintScaleLegend(currentPaintScale(), colorBarAxis).apply {
@@ -130,11 +128,17 @@ class HeatMapPanel(val heatMapModel: HeatMapModel) : JPanel() {
     }
 
     private fun addClearButton() {
-        buttonPanel.add(JButton("Clear").apply { addActionListener { heatMapModel.clearData() } })
+        buttonPanel.add(JButton(ResourceManager.getSmallIcon("menu_icons/ClearChart.png")).apply {
+            toolTipText = "Clear data"
+            addActionListener { heatMapModel.clearData() }
+        })
     }
 
     private fun addPreferencesButton() {
-        buttonPanel.add(JButton("Prefs").apply { addActionListener { showPropertiesDialog() } })
+        buttonPanel.add(JButton(ResourceManager.getSmallIcon("menu_icons/Prefs.png")).apply {
+            toolTipText = "Plot properties"
+            addActionListener { showPropertiesDialog() }
+        })
     }
 
     fun showPropertiesDialog() {

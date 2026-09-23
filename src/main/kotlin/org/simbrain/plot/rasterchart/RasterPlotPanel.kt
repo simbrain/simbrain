@@ -8,18 +8,13 @@
 package org.simbrain.plot.rasterchart
 
 import org.jfree.chart.ChartFactory
-import org.jfree.chart.ChartPanel
-import org.simbrain.plot.AdaptiveChartRepainter
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.SymbolAxis
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.renderer.AbstractRenderer
 import org.jfree.chart.renderer.xy.XYItemRenderer
-import org.simbrain.plot.ChartLegendPanel
-import org.simbrain.plot.applySimbrainAxisTheme
-import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.*
 import org.simbrain.plot.raster.RasterModel
-import org.simbrain.util.Theme
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import java.awt.BorderLayout
@@ -34,7 +29,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
 
     private lateinit var chart: JFreeChart
 
-    val chartPanel: ChartPanel = ChartPanel(null)
+    val chartPanel: SimbrainChartPanel = SimbrainChartPanel(null)
 
     val buttonPanel: JPanel = JPanel()
 
@@ -67,7 +62,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
         chart = ChartFactory.createScatterPlot(
             "",
             "Iterations",
-            "Value(s)",
+            "",
             rasterModel.dataset,
             PlotOrientation.VERTICAL,
             false,
@@ -81,6 +76,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
         rasterModel.events.rasterConsumerAdded.on { rebuildLegend() }
         rasterModel.events.rasterConsumerRemoved.on { rebuildLegend() }
         chartPanel.chart = chart
+        addChartNavigationControls(buttonPanel, chartPanel)
         chart.applySimbrainChartTheme()
         // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
         AdaptiveChartRepainter(chartPanel).install()
@@ -112,7 +108,7 @@ class RasterPlotPanel(val rasterModel: RasterModel) : JPanel() {
         val labels = Array(rows) { row ->
             rasterModel.componentNames.getOrNull(row) ?: row.toString()
         }
-        val axis = SymbolAxis("Value(s)", labels)
+        val axis = SymbolAxis(rasterModel.rowLabel.ifBlank { null }, labels)
         axis.setRange(-0.5, rows - 0.5)
         axis.applySimbrainAxisTheme()
         chart.xyPlot.rangeAxis = axis

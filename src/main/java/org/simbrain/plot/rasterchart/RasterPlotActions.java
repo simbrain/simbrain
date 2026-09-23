@@ -21,7 +21,7 @@ public class RasterPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Tools.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Prefs.png"));
                 putValue(NAME, "Preferences...");
                 putValue(SHORT_DESCRIPTION, "Show raster chart properties");
             }
@@ -44,7 +44,7 @@ public class RasterPlotActions {
 
             // Initialize
             {
-                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/ClearChart.png"));
                 putValue(SHORT_DESCRIPTION, "Clear graph data");
             }
 
@@ -67,8 +67,7 @@ public class RasterPlotActions {
 
             // Initialize
             {
-                // putValue(SMALL_ICON,
-                // ResourceManager.getSmallIcon("Eraser.png"));
+                putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/plus.png"));
                 putValue(NAME, "Add");
                 putValue(SHORT_DESCRIPTION, "Add a data source");
             }

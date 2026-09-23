@@ -2,14 +2,16 @@ package org.simbrain.plot.histogram;
 
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-
+import org.simbrain.plot.AdaptiveChartRepainter;
+import org.simbrain.plot.ChartInteractionsKt;
 import org.simbrain.plot.ChartThemeKt;
+import org.simbrain.plot.SimbrainChartPanel;
+import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 
 import javax.swing.*;
@@ -172,13 +174,15 @@ public class HistogramPanel extends JPanel {
         createHistogram();
 
         JPanel buttonPanel = new JPanel();
-        JButton clearButton = new JButton("Clear");
+        JButton clearButton = new JButton(ResourceManager.getSmallIcon("menu_icons/ClearChart.png"));
+        clearButton.setToolTipText("Clear data");
         clearButton.addActionListener(e -> model.resetData());
         buttonPanel.add(clearButton);
         buttonPanel.add(binButton);
         buttonPanel.add(numBinLabel);
         numBins.setText("" + model.getBins());
         buttonPanel.add(numBins);
+        ChartInteractionsKt.addChartNavigationControls(buttonPanel, (ChartPanel) mainPanel);
 
         binButton.addActionListener(new ActionListener() {
 
@@ -246,7 +250,7 @@ public class HistogramPanel extends JPanel {
             isEx.printStackTrace();
             SwingUtilsKt.showErrorDialog(isEx.getMessage());
         }
-        mainPanel = new ChartPanel(mainChart);
+        mainPanel = new SimbrainChartPanel(mainChart);
         // Per-notification repaints only mark the chart dirty; frames are self-clocked
         new AdaptiveChartRepainter((ChartPanel) mainPanel).install();
 

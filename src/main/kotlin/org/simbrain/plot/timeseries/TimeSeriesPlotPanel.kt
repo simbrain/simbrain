@@ -9,15 +9,12 @@ package org.simbrain.plot.timeseries
 import kotlinx.coroutines.Job
 import net.miginfocom.swing.MigLayout
 import org.jfree.chart.ChartFactory
-import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.ValueAxis.*
 import org.jfree.chart.plot.PlotOrientation
 import org.jfree.chart.plot.ValueMarker
 import org.jfree.chart.renderer.AbstractRenderer
-import org.simbrain.plot.AdaptiveChartRepainter
-import org.simbrain.plot.ChartLegendPanel
-import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.*
 import org.simbrain.util.createEditorDialog
 import org.simbrain.util.display
 import org.simbrain.util.swingDispatcher
@@ -32,7 +29,7 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
 
     private val chart: JFreeChart
 
-    val chartPanel: ChartPanel = ChartPanel(null)
+    val chartPanel: SimbrainChartPanel = SimbrainChartPanel(null)
 
     val buttonPanel: JPanel = JPanel()
 
@@ -103,6 +100,7 @@ class TimeSeriesPlotPanel(val timeSeriesModel: TimeSeriesModel): JPanel() {
             false
         )
         chartPanel.chart = chart
+        addChartNavigationControls(buttonPanel, chartPanel)
         chart.applySimbrainChartTheme()
         // Per-point dataset notifications only mark the chart dirty; frames are self-clocked
         AdaptiveChartRepainter(chartPanel).install()

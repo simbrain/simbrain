@@ -9,9 +9,16 @@ import org.jfree.chart.ChartFactory
 import org.jfree.chart.ChartPanel
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.event.ChartProgressEvent
+import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
-import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.awt.event.InputEvent
+import java.awt.event.MouseEvent
+import java.awt.event.MouseWheelEvent
+import java.awt.image.BufferedImage
+import javax.swing.JButton
+import javax.swing.JPanel
 import javax.swing.SwingUtilities
 
 class AdaptiveChartRepaintTest {
@@ -26,8 +33,101 @@ class AdaptiveChartRepaintTest {
         override fun isShowing() = true
     }
 
-    private fun newChart(): JFreeChart =
-        ChartFactory.createXYLineChart("", "x", "y", XYSeriesCollection())
+    private fun newChart(): JFreeChart = ChartFactory.createXYLineChart(
+        "", "x", "y", XYSeriesCollection(XYSeries("series").apply {
+            add(0.0, 0.0)
+            add(10.0, 10.0)
+        })
+    )
+
+    @Test
+    fun `install enables smooth pointer anchored wheel zoom`() {
+        SwingUtilities.invokeAndWait {
+            val panel = CountingChartPanel(newChart())
+            AdaptiveChartRepainter(panel).install()
+
+            assertTrue(panel.isDomainZoomable)
+            assertTrue(panel.isRangeZoomable)
+            assertTrue(panel.zoomAroundAnchor)
+            assertTrue(panel.chart.xyPlot.isDomainPannable)
+            assertTrue(panel.chart.xyPlot.isRangePannable)
+
+            panel.setSize(400, 300)
+            panel.paint(BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB).graphics)
+            val originalRange = panel.chart.xyPlot.domainAxis.range.length
+            panel.dispatchEvent(MouseWheelEvent(
+                panel, MouseWheelEvent.MOUSE_WHEEL, 0, 0, 200, 150, 200, 150, 0, false,
+                MouseWheelEvent.WHEEL_UNIT_SCROLL, 1, -1, -0.5
+            ))
+            assertTrue(panel.chart.xyPlot.domainAxis.range.length < originalRange)
+        }
+    }
+
+    @Test
+    fun `command drag pans without starting a zoom rectangle`() {
+        SwingUtilities.invokeAndWait {
+            val panel = SimbrainChartPanel(newChart())
+            AdaptiveChartRepainter(panel).install()
+            panel.setSize(400, 300)
+            panel.paint(BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB).graphics)
+            panel.zoomInBoth(200.0, 150.0)
+            panel.constrainSimbrainChartView()
+            val originalLowerBound = panel.chart.xyPlot.domainAxis.range.lowerBound
+            val modifiers = InputEvent.META_DOWN_MASK or InputEvent.BUTTON1_DOWN_MASK
+
+            panel.mousePressed(MouseEvent(panel, MouseEvent.MOUSE_PRESSED, 0, modifiers, 200, 150, 1, false, MouseEvent.BUTTON1))
+            panel.mouseDragged(MouseEvent(panel, MouseEvent.MOUSE_DRAGGED, 0, modifiers, 160, 150, 0, false, MouseEvent.NOBUTTON))
+            panel.mouseReleased(MouseEvent(panel, MouseEvent.MOUSE_RELEASED, 0, InputEvent.META_DOWN_MASK, 160, 150, 1, false, MouseEvent.BUTTON1))
+
+            assertNotEquals(originalLowerBound, panel.chart.xyPlot.domainAxis.range.lowerBound)
+        }
+    }
+
+    @Test
+    fun `shared navigation controls zoom and reset the chart`() {
+        SwingUtilities.invokeAndWait {
+            val panel = SimbrainChartPanel(newChart())
+            AdaptiveChartRepainter(panel).install()
+            panel.setSize(400, 300)
+            panel.paint(BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB).graphics)
+            val originalRange = panel.chart.xyPlot.domainAxis.range.length
+            val controls = JPanel()
+            addChartNavigationControls(controls, panel)
+            val buttons = controls.components.filterIsInstance<JButton>()
+
+            assertEquals(3, buttons.size)
+            buttons[0].doClick()
+            assertTrue(panel.chart.xyPlot.domainAxis.range.length < originalRange)
+            buttons[2].doClick()
+            assertEquals(originalRange, panel.chart.xyPlot.domainAxis.range.length)
+        }
+    }
+
+    @Test
+    fun `manual navigation stays within useful data bounds`() {
+        SwingUtilities.invokeAndWait {
+            val panel = SimbrainChartPanel(newChart())
+            AdaptiveChartRepainter(panel).install()
+            panel.setSize(400, 300)
+            panel.paint(BufferedImage(400, 300, BufferedImage.TYPE_INT_ARGB).graphics)
+            val axis = panel.chart.xyPlot.domainAxis
+            val dataRange = panel.chart.xyPlot.getDataRange(axis)
+            val dataArea = panel.screenDataArea
+
+            repeat(20) {
+                panel.zoomOutBoth(dataArea.centerX, dataArea.centerY)
+                panel.constrainSimbrainChartView()
+            }
+            assertEquals(dataRange.length, axis.range.length)
+
+            repeat(20) {
+                panel.zoomInBoth(dataArea.centerX, dataArea.centerY)
+                panel.constrainSimbrainChartView()
+            }
+            val minimumLength = dataRange.length * MINIMUM_VISIBLE_DATA_PIXELS / dataArea.width
+            assertTrue(axis.range.length + 1e-12 >= minimumLength)
+        }
+    }
 
     @Test
     fun `a burst of chart changes requests a single frame`() {

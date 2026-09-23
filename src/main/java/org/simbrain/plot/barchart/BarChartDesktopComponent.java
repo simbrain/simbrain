@@ -3,10 +3,12 @@ package org.simbrain.plot.barchart;
 import kotlin.Unit;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
-import org.simbrain.plot.AdaptiveChartRepainter;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.PlotOrientation;
+import org.simbrain.plot.AdaptiveChartRepainter;
+import org.simbrain.plot.ChartInteractionsKt;
 import org.simbrain.plot.ChartThemeKt;
+import org.simbrain.plot.SimbrainChartPanel;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -32,7 +34,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
     /**
      * Panel for chart.
      */
-    private final ChartPanel chartPanel = new ChartPanel(null);
+    private final ChartPanel chartPanel = new SimbrainChartPanel(null);
 
     /**
      * Preferred frame size.
@@ -72,7 +74,7 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
         // add("South", buttonPanel);
 
         String title = "";
-        String xLabel = "Bar";
+        String xLabel = "";
         String yLabel = "Value";
         boolean legend = false;
         boolean tooltips = true;
@@ -82,6 +84,9 @@ public class BarChartDesktopComponent extends DesktopComponent<BarChartComponent
         ChartThemeKt.applySimbrainChartTheme(chart);
         chart.getCategoryPlot().getRenderer().setSeriesPaint(0, getWorkspaceComponent().getModel().getBarColor());
         chartPanel.setChart(chart);
+        JPanel navigationPanel = new JPanel();
+        ChartInteractionsKt.addChartNavigationControls(navigationPanel, chartPanel);
+        add("South", navigationPanel);
         chart.getCategoryPlot().getRangeAxis().setAutoRange(getWorkspaceComponent().getModel().isAutoRange());
         if (!getWorkspaceComponent().getModel().isAutoRange()) {
             chart.getCategoryPlot().getRangeAxis().setRange(getWorkspaceComponent().getModel().getLowerBound(), getWorkspaceComponent().getModel().getUpperBound());

@@ -391,6 +391,7 @@ class EntityNode(
             sourceName = "${entity.id ?: "Entity"} Location",
             numCols = 2
         ))
+        add(SimbrainDesktop.actionManager.createFirstPersonViewAction(entity))
         addSeparator()
         val couplingMenu = CouplingMenu(odorWorldPanel.odorWorldComponent, entity)
         couplingMenu.setCustomName("Create couplings")

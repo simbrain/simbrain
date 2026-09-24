@@ -29,9 +29,12 @@ import org.simbrain.workspace.gui.SimbrainDesktop.desktopPane
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import org.simbrain.world.dataworld.DataWorld
 import org.simbrain.world.dataworld.DataWorldComponent
+import org.simbrain.world.imageworld.ImageAlbum
 import org.simbrain.world.imageworld.ImageWorldComponent
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.odorworld.OdorWorldPreferences
+import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.View3DSensor
 import java.lang.Math.ceil
 import java.lang.Math.sqrt
 import javax.swing.Action
@@ -462,6 +465,29 @@ class WorkspaceActions {
         workspace.addWorkspaceComponent(component)
         with(workspace.couplingManager) {
             producer couple component.dataWorld.getConsumer(DataWorld::setCurrentNumericRow)
+        }
+    }
+
+    /**
+     * Create an image world showing what an odor world entity sees. Uses the entity's first [View3DSensor], adding
+     * one if needed, and couples its RGB output to the image world.
+     */
+    fun createFirstPersonViewAction(entity: OdorWorldEntity) = desktopPane.createAction(
+        name = "Show first person view",
+        iconPath = "menu_icons/camera.png",
+        description = "Show what this entity sees in an image world",
+        coroutineScope = workspace
+    ) {
+        val sensor = entity.sensors.filterIsInstance<View3DSensor>().firstOrNull()
+            ?: View3DSensor().also { entity.addSensor(it) }
+        sensor.update(entity)
+        val component = ImageWorldComponent("${entity.name} view")
+        workspace.addWorkspaceComponent(component)
+        val album = component.world.imageAlbum
+        album.reset(sensor.outputWidth, sensor.outputHeight)
+        album.setRgbActivations(sensor.rgbTensorLayer)
+        with(workspace.couplingManager) {
+            sensor.getProducer(View3DSensor::rgbTensorLayer) couple album.getConsumer(ImageAlbum::setRgbActivations)
         }
     }
 

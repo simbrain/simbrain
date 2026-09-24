@@ -17,7 +17,9 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
-import java.awt.*
+import java.awt.BasicStroke
+import java.awt.Graphics2D
+import java.awt.RenderingHints
 import java.awt.image.BufferedImage
 import javax.swing.JPopupMenu
 
@@ -41,6 +43,9 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         font = Theme.small
         textPaint = NetworkTheme.current.valueText
     }
+
+    /** Kernel shape caption (ConvolutionConnector only). */
+    private val shapeCaption = ShapeCaption((connector as? ConvolutionConnector)?.kernelShapeString ?: "")
 
     /** For ConvolutionConnector: delegates to model state. */
     private var currentFilter: Int
@@ -166,6 +171,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                     // Grid mode: center kernelGridGroup on midpoint
                     kernelGridGroup.centerFullBoundsOnPoint(px, py)
                     val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
+                    shapeCaption.centerFullBoundsOnPoint(px, py + gridHalfH + shapeCaption.height / 2.0 + 4.0)
                     interactionBox.centerFullBoundsOnPoint(
                         px, py - gridHalfH - interactionBox.fullBounds.height / 2.0 - 3.0
                     )
@@ -184,6 +190,9 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
                     val bottomEdge = py + hi + gap + bh
                     detailLabel.centerFullBoundsOnPoint(px, bottomEdge + 6.0)
+                    shapeCaption.centerFullBoundsOnPoint(
+                        px, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + 3.0
+                    )
                     interactionBox.centerFullBoundsOnPoint(
                         px, py - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - 1.0
                     )
@@ -204,6 +213,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             addChild(imageBox)
             addChild(detailLabel)
             addChild(kernelGridGroup)
+            addChild(shapeCaption)
             renderKernelImage()
             syncKernelDisplayMode()
             // Set kernelGridGroup's own bounds so NodeHandle selection handles work
@@ -278,6 +288,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         renderKernelGrid()
         updateArrowColorFromPreferences()
         updateDetailLabel()
+        shapeCaption.refresh()
         kernelGridGroup.allNodes.forEach { node ->
             when (node) {
                 is PText -> node.textPaint = NetworkTheme.current.valueText
@@ -478,19 +489,11 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     }
 
     /**
-     * Build the text shown on the interaction box, appending size info for convolution and pooling connectors.
-     * Uses the short [name] (e.g. "Pooling") instead of the full id when no custom label is set.
+     * Text shown on the interaction box: the custom label if set, otherwise the short [name] (e.g. "Pooling")
+     * instead of the full id.
      */
-    private fun connectorDisplayText(): String {
-        val hasCustomLabel = !connector.label.isNullOrEmpty()
-        val base = if (hasCustomLabel) connector.label!! else connector.name
-        val summary = when (connector) {
-            is ConvolutionConnector -> connector.summaryLabel
-            is PoolingConnector -> connector.summaryLabel
-            else -> null
-        }
-        return if (summary != null) "$base ($summary)" else base
-    }
+    private fun connectorDisplayText(): String =
+        connector.label?.takeIf { it.isNotEmpty() } ?: connector.name
 
     override val isDraggable: Boolean = false
 
@@ -528,6 +531,31 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     override val model: TensorConnector get() = connector
 
+    /** Tooltip giving the full input/output shapes and, for convolutions, the kernel shape with named axes. */
+    override val toolTipText: String
+        get() = createTooltipText(connector) {
+            val src = connector.source.shape.displayString
+            val tgt = connector.target.shape.displayString
+            when (connector) {
+                is ConvolutionConnector -> {
+                    val k = connector.kernelSize
+                    val inC = connector.source.shape.channels
+                    val weights = connector.numFilters * inC * k * k
+                    """
+                    ${connector.displayName}: $src → $tgt
+                    Kernels: ${connector.kernelShapeString} (${connector.numFilters} filters × $inC channels × ${k}×$k)
+                    Stride ${connector.stride}, ${connector.padding.name.lowercase()} padding
+                    Parameters: $weights weights + ${connector.numFilters} biases
+                    """.trimIndent()
+                }
+                is PoolingConnector -> """
+                    ${connector.displayName}: $src → $tgt
+                    ${connector.poolingType.name.lowercase().replaceFirstChar { it.uppercase() }} pool ${connector.poolSize}×${connector.poolSize}, stride ${connector.stride}
+                    """.trimIndent()
+                else -> "${connector.displayName}: $src → $tgt"
+            }
+        }
+
     override fun isIntersecting(bound: PBounds?): Boolean {
         if (bound == null) return false
         return imageBox.globalBounds.intersects(bound) ||
@@ -551,5 +579,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         override val isDraggable: Boolean get() = false
         override val model: TensorConnector
             get() = this@TensorConnectorNode.connector
+        override val toolTipText: String
+            get() = this@TensorConnectorNode.toolTipText
     }
 }

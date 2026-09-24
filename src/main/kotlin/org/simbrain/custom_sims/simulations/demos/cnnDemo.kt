@@ -63,7 +63,7 @@ val cnnDemo = newSim {
     // Input tensor: matches View3DSensor output
     val inputShape = TensorShape(64, 64, 3)
     val inputTensorLayer = TensorLayer(inputShape).apply {
-        label = "Input (64x64x3)"
+        label = "Input"
         isClamped = true
     }
     network.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
@@ -72,7 +72,7 @@ val cnnDemo = newSim {
     // Conv1: 3x3, 8 filters, SAME padding -> output 64x64x8
     val conv1OutputShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv1Output = TensorLayer(conv1OutputShape).apply {
-        label = "Conv1 (${conv1OutputShape})"
+        label = "Conv1"
         activationFunction = TensorActivation.RELU
     }
     network.addNetworkModelAsync(conv1Output, usePlacementManager = false)
@@ -83,7 +83,7 @@ val cnnDemo = newSim {
     // MaxPool1: 2x2 -> output 32x32x8
     val pool1OutputShape = conv1OutputShape.poolOutputShape(2, 2)
     val pool1Layer = TensorLayer(pool1OutputShape).apply {
-        label = "Pool1 (${pool1OutputShape})"
+        label = "Pool1"
     }
     network.addNetworkModelAsync(pool1Layer, usePlacementManager = false)
     pool1Layer.setLocation(0.0, 800.0)
@@ -93,7 +93,7 @@ val cnnDemo = newSim {
     // Conv2: 3x3, 16 filters, SAME padding -> output 32x32x16
     val conv2OutputShape = pool1OutputShape.convOutputShape(3, 1, Padding.SAME, 16)
     val conv2Layer = TensorLayer(conv2OutputShape).apply {
-        label = "Conv2 (${conv2OutputShape})"
+        label = "Conv2"
         activationFunction = TensorActivation.RELU
     }
     network.addNetworkModelAsync(conv2Layer, usePlacementManager = false)
@@ -104,7 +104,7 @@ val cnnDemo = newSim {
     // MaxPool2: 2x2 -> output 16x16x16
     val pool2OutputShape = conv2OutputShape.poolOutputShape(2, 2)
     val pool2Layer = TensorLayer(pool2OutputShape).apply {
-        label = "Pool2 (${pool2OutputShape})"
+        label = "Pool2"
     }
     network.addNetworkModelAsync(pool2Layer, usePlacementManager = false)
     pool2Layer.setLocation(0.0, 1600.0)
@@ -114,7 +114,7 @@ val cnnDemo = newSim {
     // Flatten: 16x16x16 = 4096 -> NeuronArray(4096)
     val flattenSize = pool2OutputShape.size
     val flattenArray = NeuronArray(flattenSize).apply {
-        label = "Flatten ($flattenSize)"
+        label = "Flatten"
     }
     network.addNetworkModelAsync(flattenArray, usePlacementManager = false)
     flattenArray.setLocation(0.0, 2000.0)
@@ -123,7 +123,7 @@ val cnnDemo = newSim {
 
     // Dense output: small output layer (e.g. 3 categories)
     val outputArray = NeuronArray(3).apply {
-        label = "Output (3)"
+        label = "Output"
     }
     network.addNetworkModelAsync(outputArray, usePlacementManager = false)
     outputArray.setLocation(0.0, 2400.0)

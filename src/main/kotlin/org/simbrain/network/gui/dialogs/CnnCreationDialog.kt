@@ -7,12 +7,7 @@ import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.PoolLayerTemplate
 import org.simbrain.network.gui.addSubnetworkAction
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Theme
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
-import org.simbrain.util.showErrorDialog
-import org.simbrain.util.toDisplayText
+import org.simbrain.util.*
 import javax.swing.*
 import javax.swing.event.DocumentEvent
 import javax.swing.event.DocumentListener
@@ -405,7 +400,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         val location = network.placementManager.insertionLocation
 
         val inputLayer = TensorLayer(inputShape).apply {
-            label = "Input ($inputShape)"
+            label = "Input"
             isClamped = true
         }
         inputLayer.setLocation(location.x, location.y)
@@ -422,7 +417,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
             when (spec) {
                 is LayerSpec.Conv -> {
                     targetTensor.activationFunction = spec.template.activation
-                    targetTensor.label = "Conv${i + 1} ($outShape)"
+                    targetTensor.label = "Conv${i + 1}"
                     val connector = ConvolutionConnector(
                         prevTensor, targetTensor,
                         spec.template.kernelSize, spec.template.numFilters,
@@ -432,7 +427,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
                     allModels.add(connector)
                 }
                 is LayerSpec.Pool -> {
-                    targetTensor.label = "Pool${i + 1} ($outShape)"
+                    targetTensor.label = "Pool${i + 1}"
                     val connector = PoolingConnector(
                         prevTensor, targetTensor,
                         spec.template.poolSize, spec.template.stride, spec.template.poolingType
@@ -450,7 +445,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         // Flatten
         val flatSize = prevTensor.shape.size
         val flatArray = NeuronArray(flatSize).apply {
-            label = "Flatten ($flatSize)"
+            label = "Flatten"
         }
         flatArray.setLocation(location.x, location.y + yOffset)
         yOffset -= 400.0
@@ -462,7 +457,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         var prevLayer: Layer = flatArray
         for ((i, spec) in denseLayers.withIndex()) {
             val denseArray = NeuronArray(spec.neurons).apply {
-                label = "Dense${i + 1} (${spec.neurons})"
+                label = "Dense${i + 1}"
             }
             denseArray.setLocation(location.x, location.y + yOffset)
             yOffset -= 400.0
@@ -474,7 +469,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Output
         val outputArray = NeuronArray(outputNeurons).apply {
-            label = "Output ($outputNeurons)"
+            label = "Output"
         }
         outputArray.setLocation(location.x, location.y + yOffset)
         val denseWeights = WeightMatrix(prevLayer, outputArray)

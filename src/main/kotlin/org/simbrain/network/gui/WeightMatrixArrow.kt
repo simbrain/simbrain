@@ -64,8 +64,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
             onUpdated { curve ->
                 val offset = if (isBidirectional()) 0.25 else 0.5
                 val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
-                weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
-                weightMatrixNode.interactionBox.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - weightMatrixNode.interactionBox.fullBounds.height / 2.0)
+                weightMatrixNode.placeAt(x, y)
             }
 
         }
@@ -82,8 +81,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     override fun layoutChildren() {
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) ->
-                weightMatrixNode.imageBox.centerFullBoundsOnPoint(x, y)
-                weightMatrixNode.interactionBox.centerFullBoundsOnPoint(x, y - weightMatrixNode.imageBox.height / 2.0 - weightMatrixNode.interactionBox.fullBounds.height / 2.0)
+                weightMatrixNode.placeAt(x, y)
             }
             is BezierArrow -> arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
         }

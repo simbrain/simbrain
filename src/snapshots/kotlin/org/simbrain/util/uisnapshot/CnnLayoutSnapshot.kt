@@ -35,7 +35,7 @@ class CnnLayoutSnapshot : UiSnapshotDef {
 
             val inputShape = TensorShape(20, 20, 1)
             val inputTensorLayer = TensorLayer(inputShape).apply {
-                label = "Input (20x20x1)"
+                label = "Input"
                 isClamped = true
                 activations = DoubleArray(inputShape.size) { Random.nextDouble() }
             }
@@ -43,7 +43,7 @@ class CnnLayoutSnapshot : UiSnapshotDef {
 
             val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 5)
             val conv1Out = TensorLayer(conv1OutShape).apply {
-                label = "Conv1 ($conv1OutShape)"
+                label = "Conv1"
                 activationFunction = TensorActivation.RELU
                 activations = DoubleArray(conv1OutShape.size) { Random.nextDouble() }
             }
@@ -52,7 +52,7 @@ class CnnLayoutSnapshot : UiSnapshotDef {
 
             val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
             val pool1Out = TensorLayer(pool1OutShape).apply {
-                label = "Pool1 ($pool1OutShape)"
+                label = "Pool1"
                 activations = DoubleArray(pool1OutShape.size) { Random.nextDouble() }
             }
             pool1Out.setLocation(leftX, pool1Y)
@@ -60,7 +60,7 @@ class CnnLayoutSnapshot : UiSnapshotDef {
 
             val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
             val conv2Out = TensorLayer(conv2OutShape).apply {
-                label = "Conv2 ($conv2OutShape)"
+                label = "Conv2"
                 activationFunction = TensorActivation.RELU
                 activations = DoubleArray(conv2OutShape.size) { Random.nextDouble() }
             }
@@ -69,21 +69,21 @@ class CnnLayoutSnapshot : UiSnapshotDef {
 
             val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
             val pool2Out = TensorLayer(pool2OutShape).apply {
-                label = "Pool2 ($pool2OutShape)"
+                label = "Pool2"
                 activations = DoubleArray(pool2OutShape.size) { Random.nextDouble() }
             }
             pool2Out.setLocation(rightX, pool2Y)
             PoolingConnector(conv2Out, pool2Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
             val flatArray = NeuronArray(pool2OutShape.size).apply {
-                label = "Flatten (${pool2OutShape.size})"
+                label = "Flatten"
                 activationArray = DoubleArray(pool2OutShape.size) { Random.nextDouble() }
             }
             flatArray.setLocation(rightX, flatY)
             FlattenConnector(pool2Out, flatArray)
 
             val outputArray = NeuronArray(10).apply {
-                label = "Output (10)"
+                label = "Output"
                 updateRule = SoftmaxRule()
                 circleMode = true
                 gridMode = true

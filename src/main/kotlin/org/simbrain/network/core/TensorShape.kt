@@ -50,6 +50,9 @@ data class TensorShape(val height: Int, val width: Int, val channels: Int = 1) {
         return TensorShape(outH, outW, channels)
     }
 
+    /** Shape formatted for on-screen labels, e.g. "32×32×3". */
+    val displayString: String get() = "${height}×${width}×${channels}"
+
     override fun toString(): String = "${height}x${width}x${channels}"
 }
 

@@ -69,6 +69,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     val interactionBox: WeightMatrixInteractionBox = WeightMatrixInteractionBox(networkPanel)
 
+    /** Rows × columns of the matrix as displayed, which depends on [NetworkPreferences.weightMatrixTargetSource]. */
+    private val shapeCaption = ShapeCaption()
+
     val sourceNode by lazy { networkPanel.getNode(weightMatrix.source) }
     val targetNode by lazy { networkPanel.getNode(weightMatrix.target) }
 
@@ -129,6 +132,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         addChild(interactionBox)
         addChild(arrow)
         addChild(imageBox)
+        addChild(shapeCaption)
+        updateShapeCaption()
         imageBox.pickable = true
         imageBox.markAsPixelTarget()
         imageBox.addInputEventListener(object : PBasicInputEventHandler() {
@@ -187,6 +192,25 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         renderMatrixToImage()
         updateArrowColorFromPreferences()
         setClamped((weightMatrix as WeightMatrix).clamped)
+        updateShapeCaption()
+    }
+
+    private fun updateShapeCaption() {
+        val weights = (weightMatrix as WeightMatrix).weights
+        val (rows, cols) = if (NetworkPreferences.weightMatrixTargetSource) {
+            weights.nrow() to weights.ncol()
+        } else {
+            weights.ncol() to weights.nrow()
+        }
+        shapeCaption.text = "${rows}×${cols}"
+        shapeCaption.refresh()
+    }
+
+    /** Center the image box on ([x], [y]) with the interaction box above it and the shape caption below. */
+    fun placeAt(x: kotlin.Double, y: kotlin.Double) {
+        imageBox.centerFullBoundsOnPoint(x, y)
+        interactionBox.centerFullBoundsOnPoint(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
+        shapeCaption.centerFullBoundsOnPoint(x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + 3.0)
     }
 
     /**

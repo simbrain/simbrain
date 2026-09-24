@@ -63,6 +63,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         mainNode.addChild(this)
     }
 
+    private val shapeCaption = ShapeCaption(tensorLayer.shape.displayString)
+
     private val prevChannelButton = createArrowButton(ArrowDirection.LEFT) { previousChannel() }
         .also { mainNode.addChild(it) }
     private val nextChannelButton = createArrowButton(ArrowDirection.RIGHT) { nextChannel() }
@@ -132,7 +134,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             layoutChildren()
         }
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
-            interactionBox.setText(tensorDisplayText())
+            interactionBox.setText(tensorLayer.displayName)
         }
         tensorEvents.updated.on(Dispatchers.Default) {
             tensorEvents.updateGraphics.fire()
@@ -142,15 +144,17 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
         tensorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             updateActivationImage()
+            updateShapeCaption()
             updateBorder()
         }
 
         addChild(interactionBox)
-        interactionBox.setText(tensorDisplayText())
+        interactionBox.setText(tensorLayer.displayName)
 
         pickable = true
         pullViewPositionFromModel()
         updateActivationImage()
+        updateShapeCaption()
         updateBorder()
         layoutChildren()
     }
@@ -169,6 +173,27 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     override fun refreshTheme() {
         borderBox.applyLayerBorderTheme()
         updateActivationImage()
+        shapeCaption.refresh()
+        if (updateShapeCaption()) updateBorder()
+    }
+
+    /**
+     * Show or hide the shape caption per preferences and place it below the channel row. The caption is
+     * removed from [mainNode] rather than hidden so the border shrinks with it.
+     *
+     * @return true if the caption was added or removed
+     */
+    private fun updateShapeCaption(): Boolean {
+        val show = NetworkPreferences.showShapeCaptions
+        val wasShown = shapeCaption.parent == mainNode
+        if (show) {
+            val rowHeight = if (tensorLayer.thumbnailStripMode) thumbSize else channelLabel.height
+            shapeCaption.setOffset((imageSize - shapeCaption.width) / 2, imageSize + 4 + rowHeight + 4)
+            if (!wasShown) mainNode.addChild(shapeCaption)
+        } else if (wasShown) {
+            mainNode.removeChild(shapeCaption)
+        }
+        return show != wasShown
     }
 
     private fun updateActivationImage() {
@@ -190,15 +215,6 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         activationImage.setBounds(0.0, 0.0, imageSize, imageSize)
         activationImage.addBorder()
         activationImage.visible = true
-    }
-
-    /**
-     * Build the text shown on the interaction box, appending shape info when it is not already present.
-     */
-    private fun tensorDisplayText(): String {
-        val base = tensorLayer.displayName
-        val shapeSummary = tensorLayer.shape.toString()
-        return if (base.contains(shapeSummary)) base else "$base ($shapeSummary)"
     }
 
     private fun renderSingleChannel() {
@@ -479,6 +495,11 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     override val model: TensorLayer get() = tensorLayer
 
+    override val toolTipText: String
+        get() = createTooltipTextWithLocation(tensorLayer) {
+            "${tensorLayer.displayName}\nShape: ${tensorLayer.shape.displayString} (height × width × channels)"
+        }
+
     inner class TensorInteractionBox(net: NetworkPanel) : InteractionBox(net) {
         override val contextMenu: JPopupMenu
             get() = this@TensorNode.contextMenu
@@ -486,5 +507,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             get() = this@TensorNode.propertyDialog
         override val model: TensorLayer
             get() = this@TensorNode.tensorLayer
+        override val toolTipText: String
+            get() = this@TensorNode.toolTipText
     }
 }

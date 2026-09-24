@@ -68,7 +68,7 @@ val cnnMNIST = newSim {
     // Input: 20x20x1
     val inputShape = TensorShape(20, 20, 1)
     val inputTensorLayer = TensorLayer(inputShape).apply {
-        label = "Input (20x20x1)"
+        label = "Input"
         isClamped = true
     }
     inputTensorLayer.setLocation(leftX, inputY)
@@ -76,7 +76,7 @@ val cnnMNIST = newSim {
     // Conv1: 3x3, 5 filters, SAME → 20x20x5
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 5)
     val conv1Out = TensorLayer(conv1OutShape).apply {
-        label = "Conv1 (${conv1OutShape})"
+        label = "Conv1"
         activationFunction = TensorActivation.RELU
     }
     conv1Out.setLocation(leftX, conv1Y)
@@ -85,7 +85,7 @@ val cnnMNIST = newSim {
     // Pool1: 2x2 → 10x10x5
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
     val poolLayer1 = TensorLayer(pool1OutShape).apply {
-        label = "Pool1 (${pool1OutShape})"
+        label = "Pool1"
     }
     poolLayer1.setLocation(leftX, pool1Y)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
@@ -93,7 +93,7 @@ val cnnMNIST = newSim {
     // Conv2: 3x3, 8 filters, SAME → 10x10x8
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
-        label = "Conv2 (${conv2OutShape})"
+        label = "Conv2"
         activationFunction = TensorActivation.RELU
     }
     conv2Out.setLocation(rightX, conv2Y)
@@ -102,7 +102,7 @@ val cnnMNIST = newSim {
     // Pool2: 2x2 → 5x5x8
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val poolLayer2 = TensorLayer(pool2OutShape).apply {
-        label = "Pool2 (${pool2OutShape})"
+        label = "Pool2"
     }
     poolLayer2.setLocation(rightX, pool2Y)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
@@ -110,14 +110,14 @@ val cnnMNIST = newSim {
     // Flatten: 5x5x8 = 200
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
-        label = "Flatten ($flatSize)"
+        label = "Flatten"
     }
     flatArray.setLocation(rightX, flatY)
     val flatten = FlattenConnector(poolLayer2, flatArray)
 
     // Dense output: 10 classes
     val outputArray = NeuronArray(10).apply {
-        label = "Output (10)"
+        label = "Output"
         updateRule = SoftmaxRule()
         circleMode = true
         gridMode = true

@@ -76,9 +76,6 @@ class PoolingConnector(
 
     override val name: String get() = "Pooling"
 
-    /** Short summary shown on the connector node in the GUI. */
-    val summaryLabel: String get() = "${poolSize}x${poolSize}"
-
     override fun toString(): String =
         "$displayName (${poolingType.name} Pool ${poolSize}x${poolSize})"
 

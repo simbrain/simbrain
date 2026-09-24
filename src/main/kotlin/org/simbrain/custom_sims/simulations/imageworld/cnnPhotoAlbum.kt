@@ -207,30 +207,30 @@ val cnnObjectDetector = newSim {
 
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
     val conv1Out = TensorLayer(conv1OutShape).apply {
-        label = "Conv1 ($conv1OutShape)"; activationFunction = TensorActivation.RELU
+        label = "Conv1"; activationFunction = TensorActivation.RELU
     }
     conv1Out.setLocation(leftX, conv1Y)
     val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 4, stride = 1, padding = Padding.SAME)
 
     val pool1OutShape = conv1OutShape.poolOutputShape(5, 5)
-    val poolLayer1 = TensorLayer(pool1OutShape).apply { label = "Pool1 ($pool1OutShape)" }
+    val poolLayer1 = TensorLayer(pool1OutShape).apply { label = "Pool1" }
     poolLayer1.setLocation(leftX, pool1Y)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 5, stride = 5, poolingType = PoolingType.MAX)
 
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
-        label = "Conv2 ($conv2OutShape)"; activationFunction = TensorActivation.RELU
+        label = "Conv2"; activationFunction = TensorActivation.RELU
     }
     conv2Out.setLocation(rightX, conv2Y)
     val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
     val pool2OutShape = conv2OutShape.poolOutputShape(4, 4)
-    val poolLayer2 = TensorLayer(pool2OutShape).apply { label = "Pool2 ($pool2OutShape)" }
+    val poolLayer2 = TensorLayer(pool2OutShape).apply { label = "Pool2" }
     poolLayer2.setLocation(rightX, pool2Y)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 4, stride = 4, poolingType = PoolingType.MAX)
 
     val flatSize = pool2OutShape.size
-    val flatArray = NeuronArray(flatSize).apply { label = "Flatten ($flatSize)" }
+    val flatArray = NeuronArray(flatSize).apply { label = "Flatten" }
     flatArray.setLocation(rightX, flatY)
     val flatten = FlattenConnector(poolLayer2, flatArray)
 
@@ -238,6 +238,7 @@ val cnnObjectDetector = newSim {
         label = "Output ($numClasses classes)"
         updateRule = SoftmaxRule()
         circleMode = true
+        circleSpacingX = 80.0
         labelArray = categoryNames.toTypedArray()
     }
     outputArray.setLocation(rightX, outputY)

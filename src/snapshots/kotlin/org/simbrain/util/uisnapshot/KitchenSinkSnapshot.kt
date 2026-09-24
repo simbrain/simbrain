@@ -4,24 +4,10 @@ import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLightLaf
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.ActivationSequence
-import org.simbrain.network.core.ConvolutionConnector
-import org.simbrain.network.core.FlattenConnector
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.Padding
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.TensorActivation
-import org.simbrain.network.core.TensorLayer
-import org.simbrain.network.core.TensorShape
-import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.*
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.llm.TinyLmConfig
-import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.subnetworks.Hopfield
@@ -263,7 +249,7 @@ class KitchenSinkSnapshot : UiSnapshotDef {
                 activations = spread(4 * 4 * 4)
             }
             val flat = NeuronArray(4 * 4 * 4).apply {
-                label = "Flattened (64)"
+                label = "Flattened"
                 gridMode = true
             }
             network.addNetworkModel(poolOut, usePlacementManager = false)

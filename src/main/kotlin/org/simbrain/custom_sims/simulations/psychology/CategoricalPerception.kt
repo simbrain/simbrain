@@ -145,14 +145,14 @@ val categoricalPerception = newSim {
     val inputShape = TensorShape(50, 50, 1)
 
     val inputLayer = TensorLayer(inputShape).apply {
-        label = "Input (50×50×1)"
+        label = "Input"
         isClamped = true
         setLocation(-586.0, 160.0)
     }
 
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 4)
     val conv1Out = TensorLayer(conv1OutShape).apply {
-        label = "Conv1 (${conv1OutShape})"
+        label = "Conv1"
         activationFunction = TensorActivation.RELU
         setLocation(107.0, -154.0)
     }
@@ -160,14 +160,14 @@ val categoricalPerception = newSim {
 
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
     val pool1Out = TensorLayer(pool1OutShape).apply {
-        label = "Pool1 (${pool1OutShape})"
+        label = "Pool1"
         setLocation(918.0, 160.0)
     }
     PoolingConnector(conv1Out, pool1Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
-        label = "Conv2 (${conv2OutShape})"
+        label = "Conv2"
         activationFunction = TensorActivation.RELU
         setLocation(918.0, -992.0)
     }
@@ -175,14 +175,14 @@ val categoricalPerception = newSim {
 
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val pool2Out = TensorLayer(pool2OutShape).apply {
-        label = "Pool2 (${pool2OutShape})"
+        label = "Pool2"
         setLocation(107.0, -992.0)
     }
     PoolingConnector(conv2Out, pool2Out, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
-        label = "Flatten ($flatSize)"
+        label = "Flatten"
         setLocation(107.0, -552.0)
     }
     FlattenConnector(pool2Out, flatArray)

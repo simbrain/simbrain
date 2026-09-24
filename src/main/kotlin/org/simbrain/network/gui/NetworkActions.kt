@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.simbrain.network.connections.*
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.*
@@ -40,12 +41,8 @@ import java.awt.geom.Rectangle2D
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import javax.swing.AbstractAction
-import javax.swing.Action
+import javax.swing.*
 import javax.swing.Action.SHORT_DESCRIPTION
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JLabel
-import javax.swing.JPanel
 
 class NetworkActions(val networkPanel: NetworkPanel) {
     // For testing purposes only
@@ -673,6 +670,21 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             } else {
                 !networkPanel.synapseSpikingOnlyVisible
             }
+        }
+    }
+
+    /**
+     * Toggle the global shape-caption preference and apply it to all open network panels.
+     */
+    val toggleShapeCaptions = networkPanel.createAction(
+        name = "Show shape captions",
+        description = "Show shapes under tensors, convolution kernels, and weight matrices"
+    ) { event ->
+        NetworkPreferences.showShapeCaptions =
+            (event?.source as? JCheckBoxMenuItem)?.state ?: !NetworkPreferences.showShapeCaptions
+        // Actions on the network panel run on the network's dispatcher, but the refresh edits Piccolo nodes
+        withContext(Dispatchers.Swing) {
+            NetworkPreferences.onCommit()
         }
     }
 

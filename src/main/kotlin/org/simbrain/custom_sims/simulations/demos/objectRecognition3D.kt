@@ -254,7 +254,7 @@ val objectRecognition3D = newSim {
 
         val inputShape = TensorShape(viewHeight, viewWidth, 3)
         val inputTensorLayer = TensorLayer(inputShape).apply {
-            label = "Input (${viewHeight}x${viewWidth}x3)"
+            label = "Input"
             isClamped = true
             rgbComposite = true
         }
@@ -262,7 +262,7 @@ val objectRecognition3D = newSim {
 
         val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
         val conv1Out = TensorLayer(conv1OutShape).apply {
-            label = "Conv1 ($conv1OutShape)"
+            label = "Conv1"
             activationFunction = TensorActivation.RELU
         }
         conv1Out.setLocation(leftX, conv1Y)
@@ -270,14 +270,14 @@ val objectRecognition3D = newSim {
 
         val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
         val pool1 = TensorLayer(pool1OutShape).apply {
-            label = "Pool1 ($pool1OutShape)"
+            label = "Pool1"
         }
         pool1.setLocation(leftX, pool1Y)
         PoolingConnector(conv1Out, pool1, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
         val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 16)
         val conv2Out = TensorLayer(conv2OutShape).apply {
-            label = "Conv2 ($conv2OutShape)"
+            label = "Conv2"
             activationFunction = TensorActivation.RELU
         }
         conv2Out.setLocation(rightX, conv2Y)
@@ -285,20 +285,20 @@ val objectRecognition3D = newSim {
 
         val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
         val pool2 = TensorLayer(pool2OutShape).apply {
-            label = "Pool2 ($pool2OutShape)"
+            label = "Pool2"
         }
         pool2.setLocation(rightX, pool2Y)
         PoolingConnector(conv2Out, pool2, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
         val flatSize = pool2OutShape.size
         val flatArray = NeuronArray(flatSize).apply {
-            label = "Flatten ($flatSize)"
+            label = "Flatten"
         }
         flatArray.setLocation(rightX, flatY)
         FlattenConnector(pool2, flatArray)
 
         val outputArray = NeuronArray(classes.size).apply {
-            label = "Output (${classes.size})"
+            label = "Output"
             updateRule = SoftmaxRule()
             circleMode = true
             gridMode = false

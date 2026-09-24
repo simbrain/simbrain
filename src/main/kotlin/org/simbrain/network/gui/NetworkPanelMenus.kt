@@ -7,20 +7,16 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
-import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.createAction
 import org.simbrain.util.display
 import org.simbrain.util.sizeIncluding
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.gui.CouplingMenu
-import javax.swing.AbstractAction
-import javax.swing.Action
-import javax.swing.JCheckBoxMenuItem
-import javax.swing.JMenu
-import javax.swing.JPopupMenu
+import javax.swing.*
 import javax.swing.event.MenuEvent
 import javax.swing.event.MenuListener
 
@@ -246,6 +242,16 @@ val NetworkPanel.viewMenu
                 networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(Dispatchers.Swing) {
                     this.state = it
                 }
+            })
+            val shapeCaptionsItem = JCheckBoxMenuItem(toggleShapeCaptions)
+            add(shapeCaptionsItem)
+            // The preference can also change from the preferences dialog, so sync when the menu opens
+            addMenuListener(object : MenuListener {
+                override fun menuSelected(e: MenuEvent?) {
+                    shapeCaptionsItem.state = NetworkPreferences.showShapeCaptions
+                }
+                override fun menuDeselected(e: MenuEvent?) {}
+                override fun menuCanceled(e: MenuEvent?) {}
             })
             addSeparator()
             add(showWeightMatrixAction)

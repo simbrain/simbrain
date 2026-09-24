@@ -183,6 +183,15 @@ object NetworkPreferences: PreferenceHolder() {
     var showNumericOverlays by BooleanPreference(true)
 
     @UserParameter(
+        label = "Show shape captions",
+        description = "Show shapes as captions under tensors (height × width × channels), convolution kernels " +
+                "(filters × channels × height × width), and weight matrices (rows × columns as displayed)",
+        tab = "GUI",
+        order = 24
+    )
+    var showShapeCaptions by BooleanPreference(true)
+
+    @UserParameter(
         label = "Show synapse strength labels",
         description = "Show numeric strength values on individual synapses when zoomed in",
         tab = "GUI",

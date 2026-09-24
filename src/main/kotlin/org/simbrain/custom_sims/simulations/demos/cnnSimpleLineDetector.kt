@@ -29,7 +29,7 @@ val cnnSimpleLineDetector = newSim {
     // Input: 16x16x1
     val inputShape = TensorShape(16, 16, 1)
     val inputLayer = TensorLayer(inputShape).apply {
-        label = "Input (16x16x1)"
+        label = "Input"
         isClamped = true
     }
     inputLayer.setLocation(-430.0, 373.0)
@@ -37,7 +37,7 @@ val cnnSimpleLineDetector = newSim {
     // Conv1: 3x3, 8 filters, SAME -> 16x16x8
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv1Layer = TensorLayer(conv1OutShape).apply {
-        label = "Conv1 (${conv1OutShape})"
+        label = "Conv1"
         activationFunction = TensorActivation.RELU
     }
     conv1Layer.setLocation(357.0, 375.0)
@@ -48,7 +48,7 @@ val cnnSimpleLineDetector = newSim {
     // Pool1: 2x2 -> 8x8x8
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
     val pool1Layer = TensorLayer(pool1OutShape).apply {
-        label = "Pool1 (${pool1OutShape})"
+        label = "Pool1"
     }
     pool1Layer.setLocation(-436.0, 127.0)
     val pool1 = PoolingConnector(conv1Layer, pool1Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
@@ -58,7 +58,7 @@ val cnnSimpleLineDetector = newSim {
     // Conv2: 3x3, 16 filters, SAME -> 8x8x16
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 16)
     val conv2Layer = TensorLayer(conv2OutShape).apply {
-        label = "Conv2 (${conv2OutShape})"
+        label = "Conv2"
         activationFunction = TensorActivation.RELU
     }
     conv2Layer.setLocation(391.0, 60.0)
@@ -69,7 +69,7 @@ val cnnSimpleLineDetector = newSim {
     // Pool2: 2x2 -> 4x4x16
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val pool2Layer = TensorLayer(pool2OutShape).apply {
-        label = "Pool2 (${pool2OutShape})"
+        label = "Pool2"
     }
     pool2Layer.setLocation(-408.0, -80.0)
     val pool2 = PoolingConnector(conv2Layer, pool2Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX).apply {
@@ -79,7 +79,7 @@ val cnnSimpleLineDetector = newSim {
     // Flatten: 4x4x16 = 256 -> NeuronArray(256)
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
-        label = "Flattened ($flatSize)"
+        label = "Flattened"
         gridMode = true
     }
     flatArray.setLocation(412.0, -294.0)

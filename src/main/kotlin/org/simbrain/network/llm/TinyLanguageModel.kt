@@ -1,3 +1,9 @@
+/**
+ * The tiny language model: [TinyLmConfig] and the headless [TinyLmModel] engine (one explicit op
+ * plan, trained in place by tape autodiff), plus the [TinyLanguageModel] network element that owns
+ * the engine, its trainer, and the compositor scene, and keeps the scene in step with generation,
+ * op-level walks, and clears.
+ */
 package org.simbrain.network.llm
 
 import org.simbrain.network.compositor.CompositorScene
@@ -474,6 +480,13 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
     @Transient
     private var windowCursor = 0
 
+    /**
+     * Whether the activation tensors hold a computed pass. False on a fresh or reloaded model and
+     * after [clearActivations], when the zeroed residuals would give the lens a meaningless reading.
+     */
+    @Transient
+    private var activationsLive = false
+
     /** Set while the scene shows a training window rather than the context; cleared by [forwardContext]. */
     @Transient
     private var sceneShowsTrainingWindow = false
@@ -540,6 +553,10 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
         }
         decks().forEach { it.selectedSlice = (deckSlices?.get(it.id) ?: selectedHead).coerceIn(0, it.slices - 1) }
         scene.setGradientView(gradientView)
+        // Tiles start blank until published, so publish now: weights show from the start, not
+        // only after the first forward pass.
+        if (!activationsLive) scene.lens?.clear()
+        scene.publish(currentSequenceRow())
         // A pager flip doesn't move any tile, so capture it directly rather than waiting for a layout change.
         scene.onHeadSelected = { _, _ -> captureViewState() }
     }
@@ -652,6 +669,26 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
 
     override fun onClear() {
         contextTokens = IntArray(0)
+        clearActivations()
+    }
+
+    /**
+     * Zeroes every computed tensor (weights are untouched) and blanks the lens and probability
+     * card, so the diagram stops showing a pass for a context that's gone. A walk in progress is
+     * finished first; a running trainer rewrites the activations anyway, so it's left alone.
+     */
+    fun clearActivations(): Unit = synchronized(model) {
+        if (trainer.isRunning) return
+        if (model.midWalk) finishStepWalk()
+        val params = model.params.values.mapTo(HashSet()) { it.tensor }
+        model.plan.ports.values.forEach { port -> if (port.tensor !in params) port.tensor.fill(0f) }
+        activationsLive = false
+        sceneShowsTrainingWindow = false
+        autoGradientView(false)
+        tokenProbabilitySnapshot = null
+        scene.lens?.clear()
+        scene.publish(-1)
+        events.updated.fire()
     }
 
     override fun hasContinuation(): Boolean = contextTokens.isNotEmpty() || sampledToken >= 0
@@ -746,6 +783,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
         autoGradientView(false)
         model.setSample(contextTokens)
         model.forward()
+        activationsLive = true
         scene.lens?.sourceRow = contextTokens.size - 1
         scene.publish(currentSequenceRow())
         events.updated.fire()
@@ -804,6 +842,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
             model.beginSteppedTrainStep(tokens, targets)
         }
         val op = model.stepOp()
+        activationsLive = true
         if (model.stepPhase == TinyLmModel.StepPhase.BACKWARD) autoGradientView(true)
         scene.lens?.sourceRow = config.contextSize - 1
         scene.publish(config.contextSize - 1)
@@ -832,6 +871,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
             scene.lens?.sourceRow = contextTokens.size - 1
         }
         val op = model.stepForwardOnly()
+        activationsLive = true
         scene.publish(currentSequenceRow())
         events.updated.fire()
         return op

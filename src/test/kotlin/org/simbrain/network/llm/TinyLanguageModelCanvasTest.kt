@@ -263,4 +263,41 @@ class TinyLanguageModelCanvasTest {
         assertEquals(5, teaching.scene.lens!!.sourceRow, "training walk reads the window's final row")
         teaching.finishStepWalk()
     }
+
+    @Test
+    fun `a new model publishes its weights before any forward pass`() {
+        val teaching = canvasModel()
+        assertTrue(teaching.scene.tile("layers.0.attn.wq").values.any { it != 0f }, "weights shown")
+        assertTrue(teaching.scene.tile("resid0").values.all { it == 0f }, "no activations yet")
+        assertTrue(teaching.scene.lens!!.readings.all { it.tokenId == -1 }, "lens blank until a pass")
+    }
+
+    @Test
+    fun `clearing the window blanks activations but keeps weights`() {
+        val net = Network()
+        val teaching = canvasModel()
+        runBlocking { net.addNetworkModel(teaching) }
+        teaching.setContext(intArrayOf(1, 2, 3))
+        net.update()
+        val weights = teaching.model.params.getValue("layers.0.attn.wq").tensor.toFloatArray()
+
+        teaching.clearWindow()
+
+        assertEquals(0, teaching.contextTokens.size)
+        assertTrue(teaching.model.plan.port("resid0").tensor.toFloatArray().all { it == 0f })
+        assertTrue(teaching.scene.tile("resid0").values.all { it == 0f }, "scene republished")
+        assertNull(teaching.tokenProbabilitySnapshot)
+        assertTrue(teaching.scene.lens!!.readings.all { it.tokenId == -1 })
+        assertArrayEquals(weights, teaching.model.params.getValue("layers.0.attn.wq").tensor.toFloatArray())
+        assertTrue(teaching.scene.tile("layers.0.attn.wq").values.any { it != 0f }, "weights still shown")
+    }
+
+    @Test
+    fun `weight satellites stay put under drag while activation tiles move`() {
+        val teaching = canvasModel()
+        val scene = teaching.scene
+        assertTrue(scene.satellites.isNotEmpty())
+        assertTrue(scene.satellites.none { scene.isMovable(it.tile) })
+        assertTrue(scene.isMovable(scene.tile("resid0")))
+    }
 }

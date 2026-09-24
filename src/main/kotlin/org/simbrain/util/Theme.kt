@@ -142,6 +142,8 @@ object Theme {
     @JvmStatic val foreground: Color get() = UIManager.getColor("Label.foreground") ?: Color.BLACK
     @JvmStatic val mutedText: Color get() = UIManager.getColor("Label.disabledForeground") ?: Color(100, 100, 100)
     @JvmStatic val errorText: Color get() = UIManager.getColor("Actions.Red") ?: Color(179, 38, 30)
+    /** Amber for "action needed" text; darker than FlatLaf's Actions.Yellow, which is too light to read on white. */
+    @JvmStatic val warningText: Color get() = if (isDark) Color(240, 176, 64) else Color(168, 92, 0)
     @JvmStatic val divider: Color get() = UIManager.getColor("Component.borderColor") ?: Color(200, 200, 200)
     @JvmStatic val cardBg: Color get() = UIManager.getColor("List.background") ?: Color(250, 250, 250)
     @JvmStatic val cardBorder: Color get() = UIManager.getColor("Component.borderColor") ?: Color(180, 180, 180)

@@ -35,6 +35,7 @@ import kotlin.math.atan2
 class CompositorNode(
     val scene: CompositorScene,
     private val canvas: PCanvas? = null,
+    /** Raw token text by id; the lens shows whitespace as symbols and the probability card quotes it. */
     private val tokenLabel: (Int) -> String = { "#$it" },
     private val probabilitySnapshot: () -> TokenProbabilitySnapshot? = { null },
     private val probabilityCardStyle: TokenProbabilityCardStyle = TokenProbabilityCardStyle(),
@@ -86,7 +87,7 @@ class CompositorNode(
     private val probabilityCardOverlay = scene.overlays.firstOrNull { it.id == PROBABILITY_CARD_ID }
         ?: InteriorOverlay(PROBABILITY_CARD_ID, probabilityCardStyle.width, probabilityCardStyle.height).also(scene::addOverlay)
 
-    private val probabilityCard = TokenProbabilityCardNode(tokenLabel, probabilityCardStyle, ::viewScale).also {
+    private val probabilityCard = TokenProbabilityCardNode({ "“${tokenLabel(it)}”" }, probabilityCardStyle, ::viewScale).also {
         it.onMoved = {
             probabilityCardOverlay.x = it.offset.x
             probabilityCardOverlay.y = it.offset.y
@@ -273,9 +274,13 @@ class CompositorNode(
             visible = false
         }.also { addChild(it) }
 
-        /** The activation op producing this tile, shown above the tile instead of on its edge. */
+        /**
+         * The nonlinearity producing this tile, shown as a badge above the tile instead of on its
+         * edge: a unary op whose output is itself a displayed tile reads as a property of that
+         * tile (ReLU makes `hidden`, the masked softmax makes the attention pattern).
+         */
         val activationOp: TensorOp? = scene.graph?.writer(tile.id)
-            ?.takeIf { it is ReLUOp }
+            ?.takeIf { it is ReLUOp || it is CausalMaskedRowSoftmaxOp }
 
         val badge: PPath? = activationOp?.let { op ->
             PPath.createEllipse(-BADGE_RADIUS, -BADGE_RADIUS, 2 * BADGE_RADIUS, 2 * BADGE_RADIUS).apply {
@@ -503,26 +508,60 @@ class CompositorNode(
 
     private fun viewScale() = canvas?.camera?.viewScale ?: 1.0
 
+    /**
+     * One lens readout: the circle sits at the row's origin, right beside its checkpoint tile, and
+     * the predicted token right-aligns against it on the left, truncated to the reserved strip.
+     */
     private inner class LensRowNode(val index: Int) : PNode() {
         val circle = NeuronCircleNode(::viewScale).apply {
             setOffset(LENS_CIRCLE_RADIUS, LENS_CIRCLE_RADIUS)
         }.also { addChild(it) }
         val text = PText().apply {
             font = Theme.small
-            setOffset(2 * LENS_CIRCLE_RADIUS + 6.0, LENS_CIRCLE_RADIUS - 7.0)
         }.also { addChild(it) }
 
         fun refresh() {
             val lens = scene.lens ?: return
             val reading = lens.readings[index]
+            // Before any pass the circle stays empty rather than claiming a zero probability.
+            val empty = reading.tokenId < 0
+            circle.activationTextHidden = empty
             circle.drawActivation(reading.prob.toDouble(), -1.0..1.0)
             text.textPaint = NetworkTheme.current.valueText
-            text.text = tokenLabel(reading.tokenId)
+            text.text = if (empty) "" else visibleToken(tokenLabel(reading.tokenId))
+            val maxWidth = lensSpace - 2 * LENS_CIRCLE_RADIUS - LENS_TILE_GAP - LENS_TEXT_GAP
+            if (text.width > maxWidth) {
+                val full = text.text
+                var keep = full.length
+                while (keep > 1 && text.width > maxWidth) text.text = full.take(--keep) + "…"
+            }
+            text.setOffset(-LENS_TEXT_GAP - text.width, LENS_CIRCLE_RADIUS - text.height / 2)
+        }
+
+        fun tooltip(): String {
+            val lens = scene.lens ?: return ""
+            val sourceTitle = tileNodesById[lens.sources[index].name]?.tile?.title ?: lens.sources[index].name
+            val reading = lens.readings[index]
+            val prediction = if (reading.tokenId >= 0) {
+                "Predicts ${visibleToken(tokenLabel(reading.tokenId))} with probability ${"%.2f".format(reading.prob)}"
+            } else "No reading yet: run the model forward"
+            return "Logit lens: $sourceTitle\n$prediction\n" +
+                "This checkpoint's residual stream, read through the final norm and unembedding:\n" +
+                "the next token the model would predict if it stopped here."
         }
     }
 
     private val lensRows = scene.lens?.sources?.indices?.map { LensRowNode(it).also { node -> addChild(node) } }
         ?: emptyList()
+
+    /** Names the lens column above its top row, so the circles read as readouts even when empty. */
+    private val lensHeading = PText("logit lens").apply {
+        font = Theme.small
+        pickable = false
+    }.also { if (lensRows.isNotEmpty()) addChild(it) }
+
+    private val lensHeadingTooltip = "Logit lens\nEach row reads the residual stream at the checkpoint beside it through the\n" +
+        "final norm and unembedding: what the model would predict if it stopped there."
 
     private fun lensShown() = lensRows.isNotEmpty() && scene.lens?.enabled != false
 
@@ -593,6 +632,9 @@ class CompositorNode(
             if (lensOn && it.parent == null) addChild(it)
             if (!lensOn) it.removeFromParent()
         }
+        lensHeading.textPaint = NetworkTheme.current.valueText
+        if (lensOn && lensHeading.parent == null) addChild(lensHeading)
+        if (!lensOn) lensHeading.removeFromParent()
         if (lensOn != lensRowsAttached) {
             lensRowsAttached = lensOn
             if (lensOn) probabilityCard.raiseToTop()
@@ -608,7 +650,17 @@ class CompositorNode(
         for (row in lensRows) {
             val sourceId = scene.lens?.sources?.get(row.index)?.name ?: continue
             val tile = tileNodesById[sourceId]?.tile ?: continue
-            row.setOffset(tile.x - lensSpace, tile.y + tile.height / 2 - LENS_CIRCLE_RADIUS)
+            row.setOffset(
+                tile.x - LENS_TILE_GAP - 2 * LENS_CIRCLE_RADIUS,
+                tile.y + tile.height / 2 - LENS_CIRCLE_RADIUS,
+            )
+        }
+        // Right-aligned with the circles, like the tokens beneath it.
+        lensRows.minByOrNull { it.offset.y }?.let { top ->
+            lensHeading.setOffset(
+                top.offset.x + 2 * LENS_CIRCLE_RADIUS - lensHeading.width,
+                top.offset.y - lensHeading.height - LENS_HEADING_GAP,
+            )
         }
         val bounds = scene.tiles.fold(null as Rectangle2D?) { acc, tile ->
             val r = Rectangle2D.Double(tile.x, tile.y, tile.width, tile.height + 34)
@@ -620,6 +672,11 @@ class CompositorNode(
             bounds.add(Rectangle2D.Double(edgeBounds.x, edgeBounds.y, edgeBounds.width, edgeBounds.height))
         }
         val lensStrip = if (lensShown()) lensSpace else 0.0
+        // The strip's width is reserved below; only the heading's height needs to fit the outline.
+        if (lensShown()) {
+            val heading = lensHeading.fullBoundsReference
+            bounds.add(Rectangle2D.Double(bounds.x, heading.y, 0.0, heading.height))
+        }
         if (probabilityCardOverlay.x.isNaN() || probabilityCardOverlay.y.isNaN()) {
             val cardPosition = probabilityCardPosition?.invoke(scene, bounds, probabilityCard)
                 ?: Point2D.Double(bounds.x - lensStrip + MARGIN, bounds.maxY + 18.0)
@@ -922,10 +979,13 @@ class CompositorNode(
         return bestT
     }
 
-    /** The box a satellite [tile] would claim centered at [at], with breathing room. */
+    /**
+     * The box a satellite [tile] would claim centered at [at]: the tile, its op glyph above, its
+     * label below, and breathing room — so a neighbor's glyph never lands on this label.
+     */
     private fun satelliteFootprint(tile: TensorTile, at: Point2D) = Rectangle2D.Double(
-        at.x - tile.width / 2 - 12, at.y - tile.height / 2 - 12,
-        tile.width + 24, tile.height + 24
+        at.x - tile.width / 2 - 12, at.y - tile.height / 2 - SATELLITE_GLYPH_BAND - 4,
+        tile.width + 24, tile.height + SATELLITE_GLYPH_BAND + TILE_LABEL_BAND + 8
     )
 
     /** The box [op]'s glyph would claim centered at [at]: the stage strip plus its card fan. */
@@ -940,16 +1000,41 @@ class CompositorNode(
         )
     }
 
+    /**
+     * Dashed accent curves from each depth-strip row to the block tile showing the same
+     * checkpoint, leaving and arriving horizontally. Added first, so real edges paint over them.
+     */
+    private fun addLeaderLines() {
+        val accent = NetworkTheme.current.sourceHandle
+        for ((from, to) in scene.leaderLinks) {
+            if (!scene.isShown(from) || !scene.isShown(to)) continue
+            val x0 = from.x + from.width
+            val y0 = from.y + from.height / 2
+            val x1 = to.x
+            val y1 = to.y + to.height / 2
+            val pull = (x1 - x0) / 2
+            edgeLayer.addChild(PPath.Double(CubicCurve2D.Double(x0, y0, x0 + pull, y0, x1 - pull, y1, x1, y1)).apply {
+                paint = null
+                strokePaint = accent
+                stroke = BasicStroke(1.5f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND, 10f, floatArrayOf(6f, 4f), 0f)
+                pickable = false
+            })
+        }
+    }
+
     private fun rebuildEdges() {
         val palette = NetworkTheme.current
         edgeLayer.removeAllChildren()
         glyphsByOp.clear()
         routesByEdge.clear()
+        addLeaderLines()
         placeLooseVertices()
         val satellitesByEdge = scene.satellites.groupBy { it.edge }
         val satelliteTiles = scene.satellites.map { it.tile }.toSet()
+        // Anchor tiles claim their label band too, so satellite glyphs stay off the titles.
         val placedObstacles = scene.tiles.filter { it !in satelliteTiles && scene.isShown(it) }
-            .map { it.bounds }.toMutableList()
+            .map { Rectangle2D.Double(it.x, it.y, it.width, it.height + TILE_LABEL_BAND) as Rectangle2D }
+            .toMutableList()
         val badgedOps = tileNodes.mapNotNull { it.activationOp }.toSet()
         for (vertex in scene.opVertices) {
             if (!scene.isShown(vertex)) continue
@@ -1106,7 +1191,7 @@ class CompositorNode(
                 if (satellite != null) {
                     satellite.tile.x = at.x - satellite.tile.width / 2
                     satellite.tile.y = at.y - satellite.tile.height / 2
-                    placedObstacles.add(satellite.tile.bounds)
+                    placedObstacles.add(satelliteFootprint(satellite.tile, at))
                     tileNodesById.getValue(satellite.tile.id).syncLayout()
                 }
                 if (makesGlyph) {
@@ -1245,7 +1330,7 @@ class CompositorNode(
             when (mode) {
                 Mode.MOVE -> {
                     val delta = event.getDeltaRelativeTo(this@CompositorNode)
-                    for (item in scene.selection.selected) {
+                    for (item in scene.selection.selected.filter(scene::isMovable)) {
                         when (item) {
                             is TensorTile -> {
                                 item.x += delta.width
@@ -1331,6 +1416,15 @@ class CompositorNode(
                 target.toolTipText = badged.activationOp?.let(::opTooltip)
                 return
             }
+            val lensRow = lensRows.firstOrNull { it.parent != null && it.fullBoundsReference.contains(point) }
+            if (lensRow != null) {
+                target.toolTipText = lensRow.tooltip()
+                return
+            }
+            if (lensHeading.parent != null && lensHeading.fullBoundsReference.contains(point)) {
+                target.toolTipText = lensHeadingTooltip
+                return
+            }
             val headSelector = tileNodes.firstOrNull { it.headSelectorContains(point.x, point.y) }
             if (headSelector != null) {
                 target.toolTipText = headSelector.headSelectorTooltip()
@@ -1358,6 +1452,13 @@ class CompositorNode(
     companion object {
         private const val PROBABILITY_CARD_ID = "probability-card"
         private const val MARGIN = 40.0
+        private const val LENS_HEADING_GAP = 6.0
+
+        /** Space between a lens circle and the checkpoint tile it reads. */
+        private const val LENS_TILE_GAP = 14.0
+
+        /** Space between a lens token and its circle. */
+        private const val LENS_TEXT_GAP = 6.0
         private const val DRAG_RELAYOUT_MS = 33L
         private const val LENS_CIRCLE_RADIUS = NEURON_DIAMETER / 2.0
         private const val DECK_STEP = 2.0

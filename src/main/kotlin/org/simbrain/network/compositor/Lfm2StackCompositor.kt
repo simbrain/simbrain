@@ -18,8 +18,8 @@ import kotlin.math.pow
  * pre-mixer norm feeds both limbs and both mixer outputs converge on one residual ⊕ junction.
  *
  * A depth strip — every residual checkpoint at mini scale, with the logit lens — sits to the
- * left as orientation and doubles as the layer selector; the rows the selected block spans
- * carry a standing highlight.
+ * left as orientation and doubles as the layer selector; the two rows the selected block reads
+ * and writes are highlighted, with dashed leader lines to the block's own input and output tiles.
  */
 object Lfm2StackCompositor {
 
@@ -422,6 +422,7 @@ object Lfm2StackCompositor {
                 edge.dimmed = keys.any(::inactive)
             }
             scene.highlightedTiles = setOf(stripTiles[layer], stripTiles[layer + 1])
+            scene.leaderLinks = listOf(stripTiles[layer] to blockInTile, stripTiles[layer + 1] to blockOutTile)
             // The tile flips and any replay run as one unit on the runner, so a superseded
             // flip can never stash half-derived history or interleave with another flip.
             scene.replayRunner {

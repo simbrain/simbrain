@@ -53,12 +53,10 @@ class TextWorldPanel(
 
     private val statusLabel = JLabel(" ").apply {
         font = Theme.label
-        foreground = Theme.mutedText
     }
 
     private val tokenCountLabel = JLabel().apply {
         font = Theme.label
-        foreground = Theme.mutedText
     }
 
     private var runLocked = false
@@ -71,9 +69,17 @@ class TextWorldPanel(
 
     private fun updateStatus() {
         val provided = world.statusMessageProvider?.invoke()
-        val message = provided ?: if (runLocked) "Read-only while running" else null
-        statusLabel.text = message ?: " "
-        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else provided
+        val warning = provided?.warning == true
+        val message = provided?.text ?: if (runLocked) "Read-only while running" else null
+        statusLabel.text = when {
+            message == null -> " "
+            warning -> "⚠ $message"
+            else -> message
+        }
+        // Colors are read per update rather than stored, so a theme switch picks them up.
+        statusLabel.foreground = if (warning) Theme.warningText else Theme.foreground
+        statusLabel.font = if (warning) Theme.label.deriveFont(Font.BOLD) else Theme.label
+        statusLabel.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else provided?.text
         textArea.toolTipText = if (runLocked) RUN_LOCK_EXPLANATION else null
     }
 

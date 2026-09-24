@@ -80,7 +80,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             compositorNode = CompositorNode(
                 state.scene,
                 networkPanel.canvas,
-                tokenLabel = { id -> "“${state.tokenizer.decode(intArrayOf(id))}”" },
+                tokenLabel = { id -> state.tokenizer.decode(intArrayOf(id)) },
                 probabilitySnapshot = { languageModel.tokenProbabilitySnapshot },
                 probabilityCardPosition = { scene, bounds, _ ->
                     languageModel.probabilityCardLayout?.let { Point2D.Double(it[0], it[1]) }

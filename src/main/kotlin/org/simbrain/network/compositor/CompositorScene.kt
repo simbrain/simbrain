@@ -1,3 +1,8 @@
+/**
+ * The renderer-independent state of a compositor interior: tiles, the flow edges and op vertices
+ * derived from the plan graph, weight satellites, selection, trace, and — on layer-stacked scenes —
+ * the layer selector and the depth-strip highlight and leader lines. [CompositorNode] renders it; compositors build it.
+ */
 package org.simbrain.network.compositor
 
 import org.simbrain.network.tensor.op.MergeHeadsOp
@@ -14,6 +19,12 @@ const val JUNCTION_SIZE = 24.0
 
 /** Vertical spacing between stacked return lanes. */
 const val LANE_GAP = 26.0
+
+/** Height a weight satellite's op glyph claims above the tile: the glyph plus its gap. */
+const val SATELLITE_GLYPH_BAND = 21.0
+
+/** Height a tile's title claims below the tile. */
+const val TILE_LABEL_BAND = 18.0
 
 /** The rect routing clears for an endpoint: a tile's rect, or the junction glyph's box. */
 val FlowEndpoint.routeRect: Rectangle2D
@@ -229,8 +240,15 @@ class CompositorScene(val graph: PlanGraph? = null) {
     /** Maps a tile to the model layer it selects when clicked or wheeled — the depth strip rows. */
     var layerOfTile: ((TensorTile) -> Int?)? = null
 
-    /** Tiles rendered with a standing accent border — the depth strip rows the block spans. */
+    /** Tiles rendered with a standing accent border — the depth strip rows the shown block spans. */
     var highlightedTiles: Set<TensorTile> = emptySet()
+
+    /**
+     * Dashed leader lines from depth-strip rows to the diagram tiles showing the same checkpoint
+     * (the shown block's input and output), so a layer flip visibly re-points the block at its
+     * place in the stack.
+     */
+    var leaderLinks: List<Pair<TensorTile, TensorTile>> = emptyList()
 
     /** Lane-routing intents for limb return edges, recorded by the layout pass. */
     var returnLanes: Map<FlowEdge, ReturnLaneRoute> = emptyMap()
@@ -323,6 +341,16 @@ class CompositorScene(val graph: PlanGraph? = null) {
 
     var satellites: List<TileSatellite> = emptyList()
         private set
+
+    /**
+     * Whether a drag may move [item]. Satellites are re-seated on their edge by every relayout
+     * and the depth strip is a fixed layer selector, so dragging either would only snap back
+     * (or knock the docked lens out of line); they stay selectable but don't move.
+     */
+    fun isMovable(item: FlowEndpoint) = when (item) {
+        is TensorTile -> satellites.none { it.tile == item } && layerOfTile?.invoke(item) == null
+        else -> true
+    }
 
     /**
      * Derives the display graph from op-graph reachability: edges between anchor tiles and

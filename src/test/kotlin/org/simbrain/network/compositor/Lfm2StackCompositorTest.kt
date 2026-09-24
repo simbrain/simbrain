@@ -456,6 +456,15 @@ class Lfm2StackCompositorTest {
             scene.highlightedTiles,
             "the strip highlights the block's input and output checkpoints"
         )
+        assertEquals(
+            listOf(
+                scene.tile("layers.1.resid") to scene.tile("block.in"),
+                scene.tile("layers.2.resid") to scene.tile("block.resid"),
+            ),
+            scene.leaderLinks,
+            "leader lines tie the highlighted rows to the block's own ends"
+        )
+        assertTrue(strip.none(scene::isMovable), "the depth strip is a fixed selector, not draggable")
         assertEquals(config.numLayers + 1, scene.lens?.sources?.size)
 
         val blockLeft = scene.tiles.filter { it.id.startsWith("block.") }.minOf { it.x }

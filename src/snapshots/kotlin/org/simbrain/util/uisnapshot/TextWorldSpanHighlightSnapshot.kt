@@ -2,6 +2,7 @@ package org.simbrain.util.uisnapshot
 
 import org.simbrain.world.textworld.DocumentStructureDisplay
 import org.simbrain.world.textworld.TextWorld
+import org.simbrain.world.textworld.TextWorldStatus
 import org.simbrain.world.textworld.gui.TextWorldPanel
 import java.awt.Component
 import java.awt.Dimension
@@ -22,7 +23,7 @@ class TextWorldSpanHighlightSnapshot : UiSnapshotDef {
         world.showTokenBoundaries = false
         world.text = "<|startoftext|>Here is a brief two-paragraph parable:\n\n" +
             "In a small village, there lived a wise old man named Elder."
-        world.statusMessageProvider = { "Finished — edit the text to continue" }
+        world.statusMessageProvider = { TextWorldStatus("Finished — edit the text to continue") }
         world.tokenCountLabelProvider = { "147 used / 365 remaining" }
         val start = world.text.indexOf("village")
         world.setHighlightSpan(intArrayOf(start, start + "village".length))

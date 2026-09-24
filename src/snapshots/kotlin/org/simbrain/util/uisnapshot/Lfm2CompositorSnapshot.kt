@@ -65,7 +65,7 @@ private fun buildLfm2StackCanvas(decorate: (CompositorScene) -> Unit): PCanvas {
         next = best
     }
 
-    val node = CompositorNode(scene, tokenLabel = { id -> "\"${tokenizer.decode(intArrayOf(id))}\"" })
+    val node = CompositorNode(scene, tokenLabel = { id -> tokenizer.decode(intArrayOf(id)) })
     val bounds = node.fullBoundsReference
     node.setOffset(-bounds.x, -bounds.y)
 

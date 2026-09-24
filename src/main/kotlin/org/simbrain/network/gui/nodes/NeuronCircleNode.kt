@@ -72,6 +72,14 @@ class NeuronCircleNode(private val scalingFactor: () -> kotlin.Double = { 1.0 })
     private var activation: kotlin.Double = 0.0
     private var graphicalBounds = -1.0..1.0
 
+    /** Hides the number, for a circle standing in for a value that doesn't exist yet. */
+    var activationTextHidden = false
+        set(value) {
+            if (field == value) return
+            field = value
+            updateActivationText()
+        }
+
     var isTextVisible = scalingFactor() > TEXT_VISIBILITY_THRESHOLD
         private set(value) {
             if (field != value) {
@@ -126,6 +134,10 @@ class NeuronCircleNode(private val scalingFactor: () -> kotlin.Double = { 1.0 })
 
     private fun updateActivationText() {
         if (isTextVisible) {
+            if (activationTextHidden) {
+                activationText.text = ""
+                return
+            }
             val decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces
             activationText.text = if (activation > -0.95 && activation < 0.95) {
                 // For small values, use the preference-based decimal places but apply special formatting

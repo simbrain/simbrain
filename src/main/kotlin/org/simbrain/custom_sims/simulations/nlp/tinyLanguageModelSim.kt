@@ -1,9 +1,16 @@
+/**
+ * The Tiny Language Model simulation: builds a [TinyLanguageModel] from a training text, couples its
+ * context window to a text world, and adds the control panel (train, reset, sampling) and sidebar.
+ */
 package org.simbrain.custom_sims.simulations.nlp
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.gui.nodes.createTrainingDialog
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.llm.TinyLmConfig
 import org.simbrain.network.trainers.SamplingStrategy
@@ -17,6 +24,7 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.EmbeddingType
 import org.simbrain.world.textworld.TextWorldComponent
+import org.simbrain.world.textworld.TextWorldStatus
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
 import java.awt.Dimension
 import java.io.File
@@ -350,14 +358,24 @@ fun SimulationScope.setupGeneration(workspace: Workspace) {
     textWorld.statusMessageProvider = {
         val typedTokens = textWorld.text.tokenize(languageModel.tokenizer).map { it.token }
         val unrecognized = typedTokens.filter { it.lowercase() !in vocabulary }.distinct()
+        // While running the document is read-only, so an unusable prompt can only be fixed by pausing.
+        val running = workspace.updater.isRunning
         when {
-            typedTokens.isEmpty() -> "Enter a vocabulary token to begin generation."
-            unrecognized.size == typedTokens.size ->
-                "No recognized tokens. Use a token from the vocabulary (see Show Vocabulary)."
-            unrecognized.isNotEmpty() ->
+            typedTokens.isEmpty() -> TextWorldStatus(
+                if (running) "No prompt — pause, then type a vocabulary token"
+                else "No prompt — type a vocabulary token to begin",
+                warning = true,
+            )
+            unrecognized.size == typedTokens.size -> TextWorldStatus(
+                if (running) "No known tokens — pause, then see Show Vocabulary"
+                else "No known tokens — see Show Vocabulary",
+                warning = true,
+            )
+            unrecognized.isNotEmpty() -> TextWorldStatus(
                 "Ignored token${if (unrecognized.size == 1) "" else "s"} not in the vocabulary: " +
                     unrecognized.take(3).joinToString(", ") +
                     if (unrecognized.size > 3) ", …" else ""
+            )
             else -> null
         }
     }
@@ -408,6 +426,22 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
         val textWorldWidth = 401
         val textWorldHeight = 372
         val controlPanel = createControlPanel("Language Model Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
+
+            addButton("Train...", Dispatchers.Swing) {
+                languageModel.createTrainingDialog(SimbrainDesktop.frame).display()
+            }.apply {
+                toolTipText = "Open the trainer: run, stop, or step training and watch the loss curve"
+            }
+
+            addButton("Reset") {
+                textWorldComponent.world.text = ""
+                languageModel.clearWindow()
+            }.apply {
+                toolTipText = "Clear the document, the context window, and the diagram's activations; " +
+                    "trained weights are kept"
+            }
+
+            addSeparator()
 
             addButton("Show Vocabulary") {
                 val labels = languageModel.tokenLabels ?: arrayListOf()
@@ -461,6 +495,8 @@ private val TINY_LM_SIDEBAR = """
 
         ## Control Panel Settings
 
+        - `Train...` opens the trainer (see "Train the model" below).
+        - `Reset` clears the text, the model's context window, and the activations shown in the diagram. Trained weights are kept.
         - `Show Vocabulary` displays the tokens the model recognizes.
         - `Show Training Text` displays the training corpus.
         - `Temperature` controls how varied the generated tokens are.
@@ -484,7 +520,7 @@ private val TINY_LM_SIDEBAR = """
 
         Tiles with heavy orange borders are weight matrices — the model's learned parameters. They ride directly on the line that uses them: Wq/Wk/Wv sit on the curves into q/k/v, W1 and W2 on the MLP path (each followed by its thin bias strip, showing the actual bias vector), Wo on the attention output, and the unembedding on the way into the logits. They only change during training.
 
-        The small circled icons on the connecting lines are operations: ⊕ addition, × matrix multiply, a bell curve for layer norm, σ for the masked softmax, and a target for the cross-entropy loss. The activation function appears as a corner badge on the tile it produces (the hockey-stick icon on `hidden` is the ReLU). Hover over any icon to see the operation's input and output tensors.
+        The small circled icons on the connecting lines are operations: ⊕ addition, × matrix multiply, a bell curve for layer norm, and a target for the cross-entropy loss. A nonlinearity appears as a badge on top of the tile it produces: the hockey-stick icon on `hidden` is the ReLU, and σ on the attention pattern is the masked softmax. Hover over any icon to see the operation's input and output tensors.
 
         The small readouts beside each spine tile are the logit lens: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read up the spine — the top reading is the model's actual prediction.
 
@@ -494,7 +530,7 @@ private val TINY_LM_SIDEBAR = """
 
         ## Train the model
 
-        The model starts untrained. Right-click the model's title tab and choose `Train...`, then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
+        The model starts untrained. Click `Train...` in the control panel (or right-click the model's title tab and choose `Train...`), then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
 
         ## Generate text
 
@@ -504,7 +540,7 @@ private val TINY_LM_SIDEBAR = """
 
         There is no start or stop mode: the model writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
-        Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
+        Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` turns amber when there is no usable prompt, explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
 
         ## Step through the computation, one operation at a time
 

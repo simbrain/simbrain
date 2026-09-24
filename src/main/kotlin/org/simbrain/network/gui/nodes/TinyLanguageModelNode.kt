@@ -1,4 +1,4 @@
-/** Displays a tiny language model with separate training and selection property editors. */
+/** Displays a tiny language model on the canvas, plus its trainer dialog, shared with the simulation's control panel. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +18,7 @@ import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.util.*
 import java.awt.Dialog
+import java.awt.Window
 import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.geom.Point2D
@@ -88,7 +89,7 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
         compositorNode = CompositorNode(
             tinyLanguageModel.scene,
             networkPanel.canvas,
-            tokenLabel = { id -> tinyLanguageModel.tokenLabels?.getOrNull(id)?.let { "“$it”" } ?: "#$id" },
+            tokenLabel = { id -> tinyLanguageModel.tokenLabels?.getOrNull(id) ?: "#$id" },
             probabilitySnapshot = {
                 tinyLanguageModel.tokenProbabilitySnapshot
                     ?: tinyLanguageModel.tokenLabels?.let { TokenProbabilitySnapshot.full(DoubleArray(it.size), -1) }
@@ -241,64 +242,8 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
             add(networkPanel.networkComponent.createCouplingMenu(tinyLanguageModel))
         }
 
-    private fun trainingDialog(): StandardDialog {
-        val trainer = tinyLanguageModel.trainer
-        val iterationsLabel = JLabel("Iterations: ${trainer.iteration}")
-        val lossLabel = JLabel("Loss: ${trainer.lastTrainingError.roundToString(4)}")
-        val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
-        val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
-
-        val trainButton = JButton("Train").apply { addActionListener { trainer.launch { trainer.startTraining() } } }
-        val stopButton = JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } }
-        val stepButton = JButton("Step").apply { addActionListener { trainer.launch { trainer.trainOnce() } } }
-        fun syncButtons(running: Boolean) {
-            trainButton.isEnabled = !running
-            stepButton.isEnabled = !running
-            stopButton.isEnabled = running
-        }
-        syncButtons(trainer.isRunning)
-
-        val errorTimeSeries = ErrorTimeSeries(trainer.events) { trainer.iteration }
-        val panel = JPanel(MigLayout("ins 10, wrap 4", "[][][][grow]"))
-        panel.add(trainButton)
-        panel.add(stopButton)
-        panel.add(stepButton)
-        panel.add(iterationsLabel)
-        panel.add(lossLabel)
-        panel.add(accuracyLabel)
-        panel.add(windowsLabel, "span 2")
-        panel.add(errorTimeSeries, "span 4, grow, push")
-
-        val beginRemover = trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }
-        val endJob = trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }
-        val statsRemover = trainer.events.errorUpdated.on(swingDispatcher) { stats ->
-            iterationsLabel.text = "Iterations: ${trainer.iteration}"
-            lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
-            accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
-        }
-        // The trainer outlives this dialog, so detach everything it registered; closing also
-        // stops a running training.
-        panel.onWindowClose {
-            beginRemover()
-            endJob.cancel()
-            statsRemover()
-            errorTimeSeries.dispose()
-            trainer.launch { trainer.stopTraining() }
-        }
-
-        val parentWindow = SwingUtilities.getWindowAncestor(networkPanel)
-        return StandardDialog(parentWindow as? JFrame, "Train ${tinyLanguageModel.displayName}").apply {
-            contentPane = panel
-            isModal = true
-            isAlwaysOnTop = false
-            modalityType = Dialog.ModalityType.APPLICATION_MODAL
-            addWindowFocusListener(object : WindowAdapter() {
-                override fun windowGainedFocus(e: WindowEvent?) {
-                    toFront()
-                }
-            })
-        }
-    }
+    private fun trainingDialog(): StandardDialog =
+        tinyLanguageModel.createTrainingDialog(SwingUtilities.getWindowAncestor(networkPanel))
 
     override fun refreshTheme() {
         interactionBox.refreshTheme()
@@ -312,5 +257,78 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
         override val propertyDialog: StandardDialog get() = trainingDialog()
 
         override val model: NetworkModel get() = this@TinyLanguageModelNode.tinyLanguageModel
+    }
+}
+
+/**
+ * The trainer for a [TinyLanguageModel]: run, stop, or step training and watch the loss curve.
+ * Shared by the canvas node's menu and the simulation's control panel.
+ */
+fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialog {
+    val iterationsLabel = JLabel("Iterations: ${trainer.iteration}")
+    val lossLabel = JLabel("Loss: ${trainer.lastTrainingError.roundToString(4)}")
+    val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
+    val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
+
+    val trainButton = JButton("Train").apply { addActionListener { trainer.launch { trainer.startTraining() } } }
+    val stopButton = JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } }
+    val stepButton = JButton("Step").apply { addActionListener { trainer.launch { trainer.trainOnce() } } }
+    fun syncButtons(running: Boolean) {
+        trainButton.isEnabled = !running
+        stepButton.isEnabled = !running
+        stopButton.isEnabled = running
+    }
+    syncButtons(trainer.isRunning)
+
+    val errorTimeSeries = ErrorTimeSeries(trainer.events) { trainer.iteration }
+    // Explicit minimum sizes: left to its preferred size the chart packs small, and the stat
+    // labels would reflow the row as their values change width.
+    val panel = JPanel(MigLayout("ins 12, fill, wrap 1", "[grow, fill]", "[][][grow, fill]"))
+    panel.add(JPanel(MigLayout("ins 0, gap 8")).apply {
+        add(trainButton)
+        add(stopButton)
+        add(stepButton)
+    })
+    panel.add(JPanel(MigLayout("ins 0, gap 16", "[110!][130!][140!][]")).apply {
+        add(iterationsLabel)
+        add(lossLabel)
+        add(accuracyLabel)
+        add(windowsLabel)
+    })
+    panel.add(errorTimeSeries, "w 560:640, h 280:340, grow, push")
+
+    val beginRemover = trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }
+    val endJob = trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }
+    val statsRemover = trainer.events.errorUpdated.on(swingDispatcher) { stats ->
+        iterationsLabel.text = "Iterations: ${trainer.iteration}"
+        lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
+        accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
+    }
+    // The trainer outlives this dialog, so detach everything it registered; closing also
+    // stops a running training.
+    panel.onWindowClose {
+        beginRemover()
+        endJob.cancel()
+        statsRemover()
+        errorTimeSeries.dispose()
+        trainer.launch { trainer.stopTraining() }
+    }
+
+    return StandardDialog(parentWindow as? JFrame, "Train $displayName").apply {
+        contentPane = panel
+        setAsDoneDialog()
+        // StandardDialog packs (and gets a native window) before the content arrives; on macOS
+        // the window occasionally opened at that empty first size despite the later pack.
+        // Pinning the minimum to the packed size rules that out.
+        pack()
+        minimumSize = size
+        isModal = true
+        isAlwaysOnTop = false
+        modalityType = Dialog.ModalityType.APPLICATION_MODAL
+        addWindowFocusListener(object : WindowAdapter() {
+            override fun windowGainedFocus(e: WindowEvent?) {
+                toFront()
+            }
+        })
     }
 }

@@ -120,7 +120,7 @@ class TextWorld : AttributeContainer, EditableObject {
 
     /** Optional contextual guidance displayed below the document by the desktop view. */
     @Transient
-    var statusMessageProvider: (() -> String?)? = null
+    var statusMessageProvider: (() -> TextWorldStatus?)? = null
         set(value) {
             field = value
             events.statusChanged.fire()
@@ -436,3 +436,10 @@ class TextWorld : AttributeContainer, EditableObject {
     override val id = "Text World"
 
 }
+
+/**
+ * A status-bar message for the text world. [warning] marks something the user must act on
+ * before the model can continue (no usable prompt, weights missing), drawn so it can't be
+ * mistaken for passive progress text.
+ */
+data class TextWorldStatus(val text: String, val warning: Boolean = false)

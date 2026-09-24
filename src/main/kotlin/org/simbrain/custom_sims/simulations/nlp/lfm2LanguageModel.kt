@@ -13,6 +13,7 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.DocumentStructureDisplay
 import org.simbrain.world.textworld.TextWorldComponent
+import org.simbrain.world.textworld.TextWorldStatus
 
 class Lfm2LanguageModelOptions : EditableObject {
 
@@ -244,16 +245,20 @@ private fun setupLfm2DocumentSync(workspace: Workspace) {
     }
     textWorld.statusMessageProvider = {
         when {
-            !languageModel.isLoaded ->
-                "Weights not loaded — right-click the model in the Network window to locate or download them"
-            languageModel.isPromptProcessing ->
+            !languageModel.isLoaded -> TextWorldStatus(
+                "Weights not loaded — right-click the model in the Network window to locate or download them",
+                warning = true,
+            )
+            languageModel.isPromptProcessing -> TextWorldStatus(
                 "Processing prompt — token ${languageModel.fedTokenCount} of ${languageModel.windowTokenCount}"
-            languageModel.isSealed -> if (languageModel.promptMode == PromptMode.CHAT)
-                "Reply finished — send the next message"
-            else "Finished — edit the text to continue"
-            languageModel.isWindowFull -> "Context window full — Reset to start over"
-            languageModel.budgetSpent -> "Token limit reached — edit the text to continue"
-            languageModel.canAdvance -> "Generating — ${languageModel.generatedCount} tokens so far"
+            )
+            languageModel.isSealed -> TextWorldStatus(
+                if (languageModel.promptMode == PromptMode.CHAT) "Reply finished — send the next message"
+                else "Finished — edit the text to continue"
+            )
+            languageModel.isWindowFull -> TextWorldStatus("Context window full — Reset to start over", warning = true)
+            languageModel.budgetSpent -> TextWorldStatus("Token limit reached — edit the text to continue")
+            languageModel.canAdvance -> TextWorldStatus("Generating — ${languageModel.generatedCount} tokens so far")
             else -> null
         }
     }

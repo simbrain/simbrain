@@ -33,8 +33,9 @@ class LogitLens(
 ) {
 
     class Reading {
+        /** The predicted token, or -1 before the lens has read a computed pass. */
         @Volatile
-        var tokenId = 0
+        var tokenId = -1
             internal set
 
         @Volatile
@@ -80,6 +81,19 @@ class LogitLens(
     fun reset() {
         lastVersions.fill(-1L)
         pending.set(null)
+    }
+
+    /**
+     * Blanks every reading and treats the sources' current contents as already read, so
+     * zeroed checkpoints aren't projected into a meaningless prediction on the next refresh.
+     */
+    fun clear() {
+        pending.set(null)
+        for ((i, source) in sources.withIndex()) lastVersions[i] = source.tensor.version
+        for (reading in readings) {
+            reading.tokenId = -1
+            reading.prob = 0f
+        }
     }
 
     fun refresh() {

@@ -48,7 +48,7 @@ fun main() {
 
     SwingUtilities.invokeLater {
         val canvas = PCanvas()
-        val node = CompositorNode(scene, canvas, tokenLabel = { id -> "“${tokenizer.decode(intArrayOf(id))}”" })
+        val node = CompositorNode(scene, canvas, tokenLabel = { id -> tokenizer.decode(intArrayOf(id)) })
         canvas.layer.addChild(node)
         canvas.addMouseWheelListener { e ->
             val factor = if (e.preciseWheelRotation < 0) 1.1 else 1 / 1.1

@@ -188,6 +188,19 @@ class CompositorLayout(
             is OpVertex -> graph.alias(e.op.name)
         }
 
+        // Satellites riding into stacked items sit partway along curves that fan out from one
+        // source, so they end up closer together than the items; size the stack so that even
+        // compressed, each satellite's glyph (above) and label (below) clear its neighbor.
+        val satelliteHeightInto = scene.satellites.groupBy { it.edge.to }
+            .mapValues { (_, riders) -> riders.maxOf { it.tile.height } }
+
+        fun satelliteStackGap(a: FlowEndpoint, b: FlowEndpoint): Double {
+            val sa = satelliteHeightInto[a] ?: return 0.0
+            val sb = satelliteHeightInto[b] ?: return 0.0
+            val centerDistance = (sa + sb) / 2 + SATELLITE_GLYPH_BAND + TILE_LABEL_BAND + SATELLITE_MARGIN
+            return centerDistance / FAN_COMPRESSION - (height(a) + height(b)) / 2
+        }
+
         class LimbPlan(val id: Int) {
             val template: LimbTemplate? = limbs[id].associateBy(::key).let { byKey ->
                 scene.limbTemplates.firstOrNull { it.keys == byKey.keys }
@@ -198,7 +211,12 @@ class CompositorLayout(
             val gridRowHeights = grid.map { row ->
                 row.maxOf { cell -> cell.maxOfOrNull { height(it) } ?: 0.0 }
             }
-            fun gridRowGap(boundary: Int) = template?.rowGaps?.get(boundary) ?: stackGap
+            fun gridRowGap(boundary: Int) = maxOf(
+                template?.rowGaps?.get(boundary) ?: stackGap,
+                grid[boundary].flatten().maxOfOrNull { a ->
+                    grid[boundary + 1].flatten().maxOfOrNull { b -> satelliteStackGap(a, b) } ?: 0.0
+                } ?: 0.0,
+            )
             val gridColWidths = (grid.firstOrNull()?.indices ?: IntRange.EMPTY).map { c ->
                 grid.maxOf { row ->
                     val cell = row[c]
@@ -213,8 +231,13 @@ class CompositorLayout(
                 .groupBy { localRank.getValue(it) }
                 .toSortedMap().values
                 .map { column -> column.sortedWith(compareBy({ rank.getValue(it) }, { scheduleIndex(it) })) }
-            val columnHeights = columns.map { column ->
-                column.sumOf { height(it) } + stackGap * (column.size - 1)
+            /** Uniform per column, so it holds whatever order the barycenter pass picks. */
+            val columnStackGaps = columns.map { column ->
+                column.maxOf { a -> column.maxOf { b -> if (a === b) 0.0 else satelliteStackGap(a, b) } }
+                    .coerceAtLeast(stackGap)
+            }
+            val columnHeights = columns.mapIndexed { c, column ->
+                column.sumOf { height(it) } + columnStackGaps[c] * (column.size - 1)
             }
             val stripHeight = if (template != null) {
                 gridRowHeights.sum() + (0 until grid.size - 1).sumOf { gridRowGap(it) }
@@ -280,8 +303,14 @@ class CompositorLayout(
             val from = spineIndex[satellite.edge.from] ?: continue
             val to = spineIndex[satellite.edge.to] ?: continue
             for (boundary in from until to) {
-                spineSatelliteNeed[boundary] =
-                    maxOf(spineSatelliteNeed[boundary] ?: 0.0, satellite.tile.height + spineSatelliteClearance)
+                // Beyond the tile: its glyph and label, the upper tile's label, and any bead
+                // glyphs sharing the edge.
+                val beads = (satellite.edge.ops.size - 1).coerceAtLeast(0)
+                val chrome = SATELLITE_GLYPH_BAND + 2 * TILE_LABEL_BAND + beads * BEAD_BAND + SATELLITE_MARGIN
+                spineSatelliteNeed[boundary] = maxOf(
+                    spineSatelliteNeed[boundary] ?: 0.0,
+                    satellite.tile.height + maxOf(spineSatelliteClearance, chrome),
+                )
             }
         }
         val gapNeed = DoubleArray((spine.size - 1).coerceAtLeast(0)) { i ->
@@ -349,7 +378,7 @@ class CompositorLayout(
                 var itemY = plan.top + (plan.stripHeight - plan.columnHeights[c]) / 2
                 for (item in ordered) {
                     place(item, x, itemY)
-                    itemY += height(item) + stackGap
+                    itemY += height(item) + plan.columnStackGaps[c]
                 }
                 x += (column.maxOf { width(it) }) + (plan.columnGaps.getOrNull(c) ?: 0.0)
             }
@@ -398,4 +427,14 @@ class CompositorLayout(
         if (verticalFlow == VerticalFlow.BOTTOM_TO_TOP) scene.flipVertically()
     }
 
+    private companion object {
+        /** Clear space kept between a satellite's chrome and its neighbor's. */
+        const val SATELLITE_MARGIN = 12.0
+
+        /** How close fanned-out satellites sit relative to the items they feed (1 = as far apart). */
+        const val FAN_COMPRESSION = 0.8
+
+        /** Along-edge room for one op glyph bead: its diameter plus clearance. */
+        const val BEAD_BAND = 26.0
+    }
 }

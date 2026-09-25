@@ -180,7 +180,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
     //    item("Point neuron") { pointNeuronSim }
     //}
 
-    dir("Hopfield and Boltzmann") {
+    dir("Associative Memory") {
+        item("Hebbian Associative Memory") { autoAssociator }
         item("Hopfield patterns") { hopfieldPatterns }
         item("Discrete Hopfield") { discreteHopfieldSim }
         item("Continuous Hopfield") { hopfieldSimContinuous }

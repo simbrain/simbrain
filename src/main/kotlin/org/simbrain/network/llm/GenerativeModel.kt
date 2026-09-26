@@ -1,10 +1,13 @@
 package org.simbrain.network.llm
 
+import org.simbrain.network.compositor.*
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.ProvidesDisplayTokenizer
 import org.simbrain.util.propertyeditor.EditableObject
+import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
@@ -33,6 +36,11 @@ import java.awt.geom.Point2D
  * discovery reads annotations off the most-derived declaration (an un-annotated override
  * silently drops the attribute), and the producer cache resolves [hiddenStateDescription] once
  * for the shared base method, so it too must stay on the base.
+ *
+ * Interior tiles: both families draw their internals as a compositor scene. The hand edits a
+ * weight tile offers ([editWeights], [replaceWeights]), user tile labels, per-tile increments, and
+ * the [TileProbe] coupling endpoints live here; each family supplies the scene, its lock, and what
+ * an edit means for its state (retraining state for the tiny model, stale caches for the LFM).
  */
 abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeContainer,
     ProvidesDisplayTokenizer {
@@ -82,6 +90,143 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
             field = value
             events.locationChanged.fire()
         }
+
+    var weightIncrement by GuiEditable(
+        initValue = 0.01,
+        label = "Weight increment",
+        description = "How far the up and down keys move every weight in a selected weight tile; " +
+            "a tile's own increment, set in its dialog, takes precedence",
+        min = 0.0,
+        increment = 0.001,
+        order = 50,
+    )
+
+    /** User names for interior tiles by tile id, shown in place of the compositor's titles. */
+    var tileLabels: HashMap<String, String> = HashMap()
+
+    /** Per-tile up/down steps by tile id, overriding [weightIncrement]. */
+    var tileIncrements: HashMap<String, Double> = HashMap()
+
+    /** Coupling endpoints made from tile menus, each pinned to a layer and head. */
+    var tileProbes: ArrayList<TileProbe> = ArrayList()
+
+    override val childrenContainers: List<AttributeContainer>
+        get() = tileProbes.onEach { it.host = this }
+
+    /** The interior compositor scene, or null while there is none (LFM weights not loaded). */
+    abstract val interiorScene: CompositorScene?
+
+    /** Sequence row of the last processed token, where tile readouts take the current value. */
+    protected abstract val readoutRow: Int
+
+    /** Runs [block] holding the lock the model's compute path holds. */
+    protected abstract fun <T> withModelLock(block: () -> T): T
+
+    /** Overwrites [tensor] with fresh random weights; each family picks its distribution. */
+    protected abstract fun randomizeWeights(tensor: FloatTensor)
+
+    /** Called under the model lock for each weight tensor a hand edit changed. */
+    protected open fun onWeightsEdited(tensor: FloatTensor) {}
+
+    /** Called under the model lock once a batch of weight edits is done, to bring activations up to date. */
+    protected abstract fun afterWeightEdits()
+
+    /** A token's text, for labels; null while the model cannot decode (weights not loaded). */
+    protected abstract fun tokenText(id: Int): String?
+
+    fun readProbe(probe: TileProbe): DoubleArray? = interiorScene?.tiles
+        ?.firstOrNull { it.id == probe.tileId }
+        ?.readCurrent(probe.pinnedLayer, probe.pinnedHead, readoutRow)
+
+    /** Index of the logit-lens source behind [tile] at [layer], or -1 when the lens doesn't read it. */
+    private fun lensSourceIndex(tile: TensorTile, layer: Int): Int {
+        val lens = interiorScene?.lens ?: return -1
+        val tensor = tile.sourceTensor(layer) ?: return -1
+        return lens.sources.indexOfFirst { it.tensor === tensor }
+    }
+
+    /** Whether the logit lens reads [tile] at the layer it shows now, so plots of it can carry lens labels. */
+    fun hasLensReading(tile: TensorTile): Boolean = lensSourceIndex(tile, tile.pinnableLayer) >= 0
+
+    /**
+     * The token the logit lens predicts from the probe's checkpoint for the last processed token,
+     * with whitespace made visible; null with the lens off or off the lens's checkpoints.
+     */
+    fun readLensToken(probe: TileProbe): String? {
+        val lens = interiorScene?.lens ?: return null
+        val tile = interiorScene?.tiles?.firstOrNull { it.id == probe.tileId } ?: return null
+        val index = lensSourceIndex(tile, probe.pinnedLayer).takeIf { it >= 0 } ?: return null
+        val reading = lens.currentReading(index) ?: return null
+        return tokenText(reading.tokenId)?.let(::visibleToken)
+    }
+
+    /** The name a probe shows: the tile's current label, so a rename carries into plot names. */
+    fun tileTitle(probe: TileProbe): String? = interiorScene?.tiles?.firstOrNull { it.id == probe.tileId }?.displayTitle
+
+    /**
+     * The probe reading [tile] at the layer and head it shows now. An existing probe with the
+     * same pins is reused, so two plots of the same view share one endpoint.
+     */
+    fun probeFor(tile: TensorTile): TileProbe {
+        val layer = tile.pinnableLayer
+        val head = tile.pinnableHead
+        val probe = tileProbes.firstOrNull { it.tileId == tile.id && it.pinnedLayer == layer && it.pinnedHead == head }
+            ?: TileProbe(tile.id, layer, head, tile.displayTitle).also { tileProbes.add(it) }
+        probe.host = this
+        return probe
+    }
+
+    fun incrementFor(tile: TensorTile): Double = tileIncrements[tile.id] ?: weightIncrement
+
+    fun setTileIncrement(tile: TensorTile, increment: Double?) {
+        if (increment == null) tileIncrements.remove(tile.id) else tileIncrements[tile.id] = increment
+    }
+
+    fun setTileLabel(tile: TensorTile, label: String?) {
+        val trimmed = label?.trim()?.takeIf { it.isNotEmpty() && it != tile.title }
+        if (trimmed == null) tileLabels.remove(tile.id) else tileLabels[tile.id] = trimmed
+        tile.label = trimmed
+    }
+
+    /** Puts saved user labels on a freshly built scene's tiles. */
+    protected fun applyTileLabels(scene: CompositorScene) {
+        scene.tiles.forEach { it.label = tileLabels[it.id] }
+    }
+
+    /** Applies [edit] to the matrix each weight tile in [tiles] shows; other tiles are ignored. */
+    fun editWeights(tiles: Collection<TensorTile>, edit: WeightEdit) {
+        applyToWeights(tiles.filterIsInstance<MatrixTile>().filter { it.kind == TileKind.WEIGHT }) { tile, tensor ->
+            when (edit) {
+                WeightEdit.CLEAR -> tensor.fill(0f)
+                WeightEdit.RANDOMIZE -> randomizeWeights(tensor)
+                WeightEdit.INCREMENT -> tensor.shiftBy(incrementFor(tile).toFloat())
+                WeightEdit.DECREMENT -> tensor.shiftBy(-incrementFor(tile).toFloat())
+            }
+        }
+    }
+
+    /** Overwrites the matrix a weight tile shows with [values], row-major in the tensor's own layout. */
+    fun replaceWeights(tile: MatrixTile, values: FloatArray) {
+        applyToWeights(listOf(tile)) { _, tensor -> tensor.copyFrom(values) }
+    }
+
+    private fun applyToWeights(tiles: List<MatrixTile>, edit: (MatrixTile, FloatTensor) -> Unit) {
+        if (tiles.isEmpty()) return
+        withModelLock {
+            for (tile in tiles) {
+                edit(tile, tile.tensor)
+                onWeightsEdited(tile.tensor)
+            }
+            afterWeightEdits()
+        }
+        tiles.forEach { it.refreshFromSource() }
+        events.updated.fire()
+    }
+
+    private fun FloatTensor.shiftBy(delta: Float) {
+        for (i in 0 until size) data.put(i, data.get(i) + delta)
+        markMutated()
+    }
 
     /**
      * Empties the window and run state; the model waits for new text. A coupled non-empty

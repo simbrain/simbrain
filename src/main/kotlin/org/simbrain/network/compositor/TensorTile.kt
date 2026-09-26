@@ -84,6 +84,18 @@ abstract class TensorTile(
     /** Learner-facing dimensions for hover text; specialized tiles add semantic axes such as heads. */
     open val tooltipShape: String get() = "$rows rows × $cols columns"
 
+    /**
+     * The model layer an unstacked tile belongs to, for scenes that draw every layer's tiles
+     * separately (the tiny model's); -1 for tiles outside any layer. Stacked tiles report their
+     * layer through [LayerStacked.shownLayer] instead.
+     */
+    var modelLayer = -1
+
+    /** A user-assigned name shown in place of [title]; the host persists it by tile [id]. */
+    var label: String? = null
+
+    val displayTitle: String get() = label ?: title
+
     var x = 0.0
     var y = 0.0
     var width = cols.toDouble()
@@ -633,6 +645,18 @@ class MatrixTile(
         lastVersion = -1L
     }
 
+    /**
+     * Re-copies the shown source with a fresh normalization scale. The scale otherwise only
+     * grows, so after a hand edit shrinks the values (a clear, a restore) the tile would stay
+     * shaded against the old range.
+     */
+    @Synchronized
+    fun refreshFromSource() {
+        lastVersion = -1L
+        resetScale()
+        publish(liveRow)
+    }
+
     @Synchronized
     override fun publish(tokenIndex: Int) {
         val source = if (showingGradient) gradientSource ?: return else tensor
@@ -682,7 +706,7 @@ class DeckTile(
     val slices: Int,
     kind: TileKind = TileKind.ATTENTION,
     signedNorm: Boolean = false,
-    private val columnSlices: Boolean = false,
+    val columnSlices: Boolean = false,
     override val stackLayers: List<Int> = emptyList(),
 ) : TensorTile(
     id, title,

@@ -31,11 +31,15 @@ import javax.swing.*
  * backward half filling gradient views.
  */
 class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: TinyLanguageModel) :
-    ScreenElement(networkPanel) {
+    ScreenElement(networkPanel), InteriorTileHost {
 
     private val interactionBox = TinyLanguageModelInteractionBox(networkPanel)
 
     private var compositorNode: CompositorNode? = null
+
+    override val generativeModel get() = tinyLanguageModel
+
+    override val interior get() = compositorNode
 
     init {
         addChild(interactionBox)
@@ -49,6 +53,9 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
             events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
             events.updateGraphics.on(swingDispatcher) { refreshView() },
             events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) },
+            networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
+                networkPanel.dropInteriorSelectionIfDeselected(this, selection)
+            },
             // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
             events.updated.on(swingDispatcher) {
                 if (stepNotice != null) {
@@ -118,6 +125,9 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
                 tinyLanguageModel.captureViewState()
                 positionInteractionBox()
             }
+            it.onTileContextMenu = { tile, event -> networkPanel.showTileMenu(this, tile, event) }
+            it.onTileDoubleClicked = { tile -> networkPanel.openTileDialog(this, tile) }
+            it.onSelectionChanged = { networkPanel.syncInteriorSelection(this) }
             addChild(it)
         }
         // The interior's background can grow over the interaction box; keep the box painting
@@ -226,6 +236,7 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
                 description = "Empty the window; a coupled non-empty document restores " +
                     "itself on the next play, so clear the document too for a full reset",
             ) { tinyLanguageModel.clearWindow() })
+            addClearTraceItem(this@TinyLanguageModelNode)
             addSeparator()
             add(JCheckBoxMenuItem("Show last training gradients", tinyLanguageModel.gradientView).apply {
                 isEnabled = tinyLanguageModel.hasGradients

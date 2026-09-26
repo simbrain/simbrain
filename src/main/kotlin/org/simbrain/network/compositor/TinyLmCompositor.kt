@@ -73,6 +73,7 @@ object TinyLmCompositor {
         spineTile("resid0", "residual in")
 
         for (l in 0 until config.numLayers) {
+            val firstTileOfLayer = scene.tiles.size
             val prefix = "layers.$l"
             weightTile("$prefix.attn.wq", "Wq")
             weightTile("$prefix.attn.wk", "Wk")
@@ -99,6 +100,7 @@ object TinyLmCompositor {
             biasTile("$prefix.mlp.b2", "b2")
             activationTile("$prefix.mlp.out", "mlp out")
             spineTile("$prefix.resid", "residual + mlp")
+            scene.tiles.drop(firstTileOfLayer).forEach { it.modelLayer = l }
         }
 
         weightTile("unembed.weight", "unembedding")

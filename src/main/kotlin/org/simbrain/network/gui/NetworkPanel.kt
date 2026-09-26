@@ -24,6 +24,7 @@ import org.simbrain.network.gui.nodes.subnetworkNodes.*
 import org.simbrain.network.layouts.Layout
 import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.TinyLanguageModel
+import org.simbrain.network.llm.WeightEdit
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
@@ -694,12 +695,20 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             incrementSelectedPixels()
             return
         }
+        if (hasAnyWeightTileSelection()) {
+            editSelectedWeightTiles(WeightEdit.INCREMENT)
+            return
+        }
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.increment() }
     }
 
     fun decrementSelectedObjects() {
         if (hasAnyPixelSelection()) {
             decrementSelectedPixels()
+            return
+        }
+        if (hasAnyWeightTileSelection()) {
+            editSelectedWeightTiles(WeightEdit.DECREMENT)
             return
         }
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.decrement() }
@@ -712,6 +721,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     fun hardClearSelectedObjects() {
         if (hasAnyPixelSelection()) {
             clearSelectedPixels()
+            return
+        }
+        if (hasAnyWeightTileSelection()) {
+            editSelectedWeightTiles(WeightEdit.CLEAR)
             return
         }
         clearSelectedObjects()

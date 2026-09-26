@@ -114,7 +114,7 @@ var function by GuiEditable(initValue = ActivationFunction.SIGMOID)
 ```bash
 ./gradlew build                              # Build project
 ./gradlew run                                # Run Simbrain
-./gradlew runSim -PsimName="Simulation Name" # Run simulation
+./gradlew runSim -PsimName="Simulation name" # Run simulation
 ./gradlew test                               # Run tests
 ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot # Render a UI snapshot
 ```

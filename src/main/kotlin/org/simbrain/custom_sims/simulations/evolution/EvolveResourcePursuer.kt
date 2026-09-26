@@ -46,7 +46,7 @@ import kotlin.random.nextInt
  *  in doing so
  *
  * Run headless using:
- *  `gradle runSim -PsimName="Evolve Resource Pursuer" -PoptionString='{"maxGenerations": 15, "targetValue": 5000, "useLayoutGene": false}'`
+ *  `gradle runSim -PsimName="Evolve resource pursuer" -PoptionString='{"maxGenerations": 15, "targetValue": 5000, "useLayoutGene": false}'`
  *
  *  for a full list of options, search for optionString in this file
  *

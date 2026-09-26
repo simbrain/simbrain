@@ -540,10 +540,10 @@ val braitenbergProgramLearning = newSim { optionString ->
      * SAMPLE TERMINAL COMMANDS:
      *
      * Basic run with 10000 iterations:
-     *   ./gradlew runSim -PsimName="Braitenberg Program Learning" -PoptionString='{"maxIterations": 10000, "csvOutput": {}}'
+     *   ./gradlew runSim -PsimName="Braitenberg program learning" -PoptionString='{"maxIterations": 10000, "csvOutput": {}}'
      *
      * Task switching mid-training:
-     *   ./gradlew runSim -PsimName="Braitenberg Program Learning" -PoptionString='{"taskIndex": 0, "maxIterations": 20000, "csvOutput": {}, "parameterSchedule": [{"atIteration": 5000, "set": {"taskIndex": 1}}]}'
+     *   ./gradlew runSim -PsimName="Braitenberg program learning" -PoptionString='{"taskIndex": 0, "maxIterations": 20000, "csvOutput": {}, "parameterSchedule": [{"atIteration": 5000, "set": {"taskIndex": 1}}]}'
      *
      * PARAMETERS:
      * - taskIndex: 0=Seek Cheese/Avoid Poison, 1=Seek Both, 2=Avoid Both, 3=Seek Poison/Avoid Cheese

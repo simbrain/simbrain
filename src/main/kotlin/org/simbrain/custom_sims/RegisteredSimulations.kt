@@ -60,9 +60,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Backprop") {
         item("XOR") { xorSim }
-        item("Three Object Detector") { threeObjectDetector }
+        item("Three object detector") { threeObjectDetector }
         item("Three layer auto-encoder") { backpropAutoEncoder }
-        item("Feed-Forward MNIST") { tinyMNIST }
+        item("Feed-forward MNIST") { tinyMNIST }
         item("CNN MNIST") { cnnMNIST }
         item("Remember one symbol (BPTT)", beta = true) { bpttRememberSymbol }
         item("Pattern generator (BPTT)", beta = true) { bpttPatternGenerator }
@@ -76,8 +76,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Isopod simulation") { isopodSim }
     }
 
-    dir("NPC Behaviors") {
-        item("NPC Basic Demo") { npcSteeringDemo }
+    dir("NPC behaviors") {
+        item("NPC basic demo") { npcSteeringDemo }
     }
 
     dir("Reservoir networks") {
@@ -128,10 +128,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Triangle model of reading", beta = true) { triangleReadingSim }
         item("Next-word prediction (SRN)") { srnElmanSentences }
         //item("Tiny language model") { tinyLanguageModelFF }
-        item("Tiny Language Model") { tinyLanguageModelSim }
+        item("Tiny language model") { tinyLanguageModelSim }
         // The "(Beta)" prefix is deliberate (per Jeff): discoverable without the beta opt-in,
         // while still flagged as beta.
-        item("(Beta) Pretrained Language Model (LFM2.5)") { lfm2LanguageModel }
+        item("(Beta) Pretrained language model (LFM2.5)") { lfm2LanguageModel }
     }
 
     dir("Neuroscience") {
@@ -140,8 +140,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Spike responders") { spikeResponderSim }
         item("Spike responders (array)") { spikeResponderSimArray }
         item("STDP") { stdpSim }
-        item("Spiking Network") { spikingNetworkSimulation }
-        item("E/I Balance") { excitatoryInhibitoryBalance }
+        item("Spiking network") { spikingNetworkSimulation }
+        item("E/I balance") { excitatoryInhibitoryBalance }
         item("Nematode simulation") { nematodeThermotaxis }
         item("Cortical layers", beta = true) { corticalLayers }
          //item("Cortical areas") { cortexKuramoto }
@@ -166,28 +166,28 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Competitive grid network") { competitiveGridSim }
         //item("Competitive image network") { competitiveImageSim }
         item("SOM network") { SOMSim }
-        item("SOM Network (Smell)") { somNetSmells }
+        item("SOM network (smell)") { somNetSmells }
     }
 
     dir("Dynamical systems") {
         item("Logistic map") { logisticMap }
         item("Two-neuron dynamics") { twoNeuronDynamics }
         item("Lorenz attractor") { lorenzSystem }
-        item("Lorenz attractor (Pure Simbrain)") { lorenzSystemSimbrain }
+        item("Lorenz attractor (pure Simbrain)") { lorenzSystemSimbrain }
     }
 
     //dir("Leabra") {
     //    item("Point neuron") { pointNeuronSim }
     //}
 
-    dir("Associative Memory") {
-        item("Hebbian Associative Memory") { autoAssociator }
+    dir("Associative memory") {
+        item("Hebbian associative memory") { autoAssociator }
         item("Hopfield patterns") { hopfieldPatterns }
         item("Discrete Hopfield") { discreteHopfieldSim }
         item("Continuous Hopfield") { hopfieldSimContinuous }
         item("Restricted Boltzmann machine") { rbmSim }
         item("Room schema") { roomSchemaSim }
-        item("Modern Hopfield Network (Beta)") { modernHopfieldSim }
+        item("Modern Hopfield network (Beta)") { modernHopfieldSim }
     }
 
     dir("Machine learning") {
@@ -202,7 +202,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Reinforcement learning") {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
-        item("Braitenberg Program Learning", beta = true) { braitenbergRLPrograms }
+        item("Braitenberg program learning", beta = true) { braitenbergRLPrograms }
     }
 
     dir("Tutorials") {
@@ -213,13 +213,13 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         //item("Photo album (100 x 100)") { photoAlbumExample }
         //item("3D View Example") { view3dDemo }
-        item("3D Navigation and Image World") { view3dNavigationPipelineDemo }
-        item("3D Object Recognition") { objectRecognition3D }
-        item("3D Navigation and Lateral Inhibition") { view3dNavigationLateralInhibitionDemo }
+        item("3D navigation and image world") { view3dNavigationPipelineDemo }
+        item("3D object recognition") { objectRecognition3D }
+        item("3D navigation and lateral inhibition") { view3dNavigationLateralInhibitionDemo }
         item("Attention as gain", beta = true) { attentionAsGain }
         //item("CNN Demo") { cnnDemo } // Develop into 3d demo
-        item("CNN Simple Demo") { cnnSimpleLineDetector }
-        item("CNN Object Recognition (100 x 100)") { cnnObjectDetector }
+        item("CNN simple demo") { cnnSimpleLineDetector }
+        item("CNN object recognition (100 x 100)") { cnnObjectDetector }
     }
 
 }

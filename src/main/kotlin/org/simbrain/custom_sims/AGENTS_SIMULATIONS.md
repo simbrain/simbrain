@@ -6,7 +6,7 @@ This guide helps AI coding assistants create and modify custom simulations in Si
 
 1. Create `.kt` file in `simulations/{category}/`
 2. Register in `RegisteredSimulations.kt`
-3. Test: `./gradlew runSim -PsimName="Your Sim Name"`
+3. Test: `./gradlew runSim -PsimName="Your sim name"`
 
 ## File Organization
 
@@ -48,8 +48,8 @@ In `RegisteredSimulations.kt`:
 
 ```kotlin
 val simulations = dir("Simulations", alphabetical = true) {
-    dir("Category Name") {
-        item("Menu Item Name") { mySimulation }
+    dir("Category name") {
+        item("Menu item name") { mySimulation }
     }
 }
 ```
@@ -58,6 +58,7 @@ val simulations = dir("Simulations", alphabetical = true) {
 - `item()` creates menu item
 - Labels used for menu and command-line
 - Avoid duplicate labels
+- Use sentence case for submenu and simulation labels. Keep proper names, acronyms, and the existing `(Beta)` status marker capitalized.
 
 ## Finding Templates
 

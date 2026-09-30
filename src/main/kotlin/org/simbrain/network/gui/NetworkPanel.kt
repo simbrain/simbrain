@@ -914,6 +914,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     private val repaintOnUpdate = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { repaint() }
 
+    private val updateRefreshPending = java.util.concurrent.atomic.AtomicBoolean(false)
+
     private fun initEventHandlers() {
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
@@ -936,9 +938,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
             }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-            updated.on(Dispatchers.Swing.immediate) {
-                repaintOnUpdate()
-                timeLabel.update()
+            // Posted, not awaited: updated is an awaitable barrier fired once per network iteration, and an EDT
+            // handler made every iteration wait in the EDT queue behind a full canvas repaint, pacing the
+            // simulation by the display. At most one refresh is pending; it reads the latest state when it runs.
+            updated.on(Dispatchers.Default) {
+                if (updateRefreshPending.compareAndSet(false, true)) {
+                    SwingUtilities.invokeLater {
+                        updateRefreshPending.set(false)
+                        repaintOnUpdate()
+                        timeLabel.update()
+                    }
+                }
             }
             zoomToFitPage.on(Dispatchers.Swing) {
                 if (autoZoom) {

@@ -1,18 +1,20 @@
 package org.simbrain.plot.raster
 
 import com.thoughtworks.xstream.XStream
-import kotlinx.coroutines.withContext
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.RasterPlotEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.runOnEventThread
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
+import java.util.concurrent.ConcurrentLinkedQueue
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.function.Supplier
+import javax.swing.SwingUtilities
 
 /**
  * Data model for a raster plot.
@@ -153,6 +155,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     }
 
     fun clearData() {
+        pendingColumns.clear()
         val seriesCount = dataset.seriesCount
         var i = 0
         while (seriesCount > i) {
@@ -166,7 +169,56 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
      */
     private fun readResolve(): Any {
         events = RasterPlotEvents()
+        pendingColumns = ConcurrentLinkedQueue()
+        drainScheduled = AtomicBoolean(false)
         return this
+    }
+
+    /** Lands any queued columns before XStream writes the dataset, so a save right after an iteration has them. */
+    private fun writeReplace(): Any {
+        runOnEventThread(::drainPending)
+        return this
+    }
+
+    /** One incoming array's spikes, captured on the updating thread and waiting to be added on the EDT. */
+    private class PendingColumn(val consumer: RasterConsumer, val time: Int, val size: Int, val spikeRows: IntArray)
+
+    @Transient
+    private var pendingColumns = ConcurrentLinkedQueue<PendingColumn>()
+
+    @Transient
+    private var drainScheduled = AtomicBoolean(false)
+
+    /**
+     * Queues a column for the chart without waiting on the EDT. The dataset is EDT-confined, but awaiting the
+     * EDT from the coupling made every workspace iteration wait behind whatever the EDT was painting, pacing
+     * the whole simulation by the slowest window on screen. At most one drain is pending at a time.
+     */
+    private fun enqueue(column: PendingColumn) {
+        pendingColumns.add(column)
+        if (drainScheduled.compareAndSet(false, true)) SwingUtilities.invokeLater(::drainPending)
+    }
+
+    /** Adds every queued column in one EDT pass, notifying each touched series once rather than per point. */
+    private fun drainPending() {
+        drainScheduled.set(false)
+        val touched = LinkedHashSet<XYSeries>()
+        while (true) {
+            val column = pendingColumns.poll() ?: break
+            if (column.consumer !in rasterConsumerList) continue
+            if (column.size > rowCount) {
+                rowCount = column.size
+                events.propertyChanged.fire()
+            }
+            val series = dataset.getSeries(column.consumer.index)
+            if (touched.add(series)) series.notify = false
+            if (column.spikeRows.isEmpty()) {
+                series.add(column.time, null, false)
+            } else {
+                column.spikeRows.forEach { series.add(column.time, it, false) }
+            }
+        }
+        touched.forEach { it.notify = true }
     }
 
 
@@ -193,24 +245,10 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
          * Example 2: [0.0, 0.6, -0.3, 0.0, 1.0] would show 2 dots vertically at the 2nd and 5th position at the current time
          */
         @Consumable
-        suspend fun setValues(values: DoubleArray) = withContext(swingDispatcher) {
-            var updated = false
-            var i = 0
-            val n = values.size
-            if (n > rowCount) {
-                rowCount = n
-                events.propertyChanged.fire()
-            }
-            while (i < n) {
-                if (values[i] >= spikeThreshold) {
-                    dataset.getSeries(index).add(timeSupplier.get(), i)
-                    updated = true
-                }
-                i++
-            }
-            if (!updated) {
-                dataset.getSeries(index).add(timeSupplier.get(), null)
-            }
+        fun setValues(values: DoubleArray) {
+            val threshold = spikeThreshold
+            val spikeRows = values.indices.filter { values[it] >= threshold }.toIntArray()
+            enqueue(PendingColumn(this, timeSupplier.get(), values.size, spikeRows))
         }
 
         override val id: String

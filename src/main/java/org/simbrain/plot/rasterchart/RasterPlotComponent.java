@@ -97,6 +97,12 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
+    public void close() {
+        model.close();
+        super.close();
+    }
+
+    @Override
     public String getXml() {
         return RasterModel.getXStream().toXML(model);
     }

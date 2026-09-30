@@ -49,6 +49,10 @@ import kotlin.reflect.KClass
 /**
  * Main GUI representation of a [Network].
  */
+
+/** Cap on how often the view refits to the network, matching the zoom event's own throttle. */
+private const val ZOOM_TO_FIT_INTERVAL_MS = 20L
+
 /**
  * Models whose node draws an arrow between two endpoint nodes and therefore must not exist on the canvas before
  * those nodes do; see [NetworkPanel.awaitEndpointNodes].
@@ -71,6 +75,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val network: Network = networkComponent.network
 
     override val coroutineContext get() = network.coroutineContext
+
+    /**
+     * Owns the panel's EDT updates, which the network posts to without waiting on the EDT. Cancelled when the
+     * panel's desktop component closes. The panel's own coroutine context is the network's, which outlives it.
+     */
+    val ui = UiScope()
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
@@ -98,7 +108,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             field = value
             network.events.zoomModeChanged.fire(value)
             if (value) {
-                network.events.zoomToFitPage.fire()
+                zoomToFit.request()
             }
         }
 
@@ -170,7 +180,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var guiOn = true
 
-    private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fire() }
+    private val forceZoomToFitPage = PreferenceChangeListener { zoomToFit.request() }
 
     /**
      * Called when preferences are updated. Ensures preference changes are applied immediately.
@@ -214,6 +224,48 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
 
     /**
+     * Full-canvas repaint after a network update, coalesced for high-rate model loops. This was
+     * introduced for language-model generation, where otherwise a full frame per token can make
+     * the post-update barrier pace the model. It also protects any future fast network simulation.
+     * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
+     * final state.
+     */
+    private val refreshAfterUpdate = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+        repaint()
+        timeLabel.update()
+    }
+
+    /**
+     * Fits the view to the network (when auto zoom is on) and repaints. Requests coalesce, and a run follows the
+     * EDT work queued before it was requested, so it reads bounds that node updates already applied.
+     */
+    private val zoomToFit = ui.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
+        if (autoZoom) {
+            val filtered = screenElements.unionOfGlobalFullBounds()
+            canvas.camera.setViewBounds(
+                PBounds(filtered.getX() - 10, filtered.getY() - 10, filtered.getWidth() + 20, filtered.getHeight() + 20)
+            )
+        }
+        canvas.repaint()
+    }
+
+    /**
+     * Nodes whose models were deleted, removed from the canvas in batches. Deletion never waits on the EDT, and
+     * the view refits once the batch is gone rather than while deleted nodes still count toward its bounds.
+     */
+    private val nodeRemovals = ui.uiInbox<ScreenElement> { nodes ->
+        val unique = nodes.toSet()
+        unique.forEach {
+            (it as? SynapseNode)?.detachSymmetric()
+            canvas.layer.removeChild(it)
+        }
+        // Removal can land after the model was re-added with a new node (undo then redo). Only clear the mapping
+        // if it still points at this node, so a stale removal never wipes a freshly recreated node.
+        unique.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
+        zoomToFit.request()
+    }
+
+    /**
      * Main initialization of the network panel.
      */
     init {
@@ -242,7 +294,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                network.events.zoomToFitPage.fire()
+                zoomToFit.request()
             }
         })
 
@@ -322,10 +374,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 selectionManager.add(node)
             }
         }
-        node.model.events.deleted.on(Dispatchers.Default) {
-            network.events.batchNodeRemoval.fire(node)
-        }
-        network.events.zoomToFitPage.fire()
+        node.model.events.deleted.on(Dispatchers.Unconfined) { nodeRemovals.post(node) }
+        zoomToFit.request()
     }
 
     private suspend fun createNode(model: NetworkModel): ScreenElement {
@@ -561,7 +611,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         )
 
-        network.events.zoomToFitPage.fire()
+        zoomToFit.request()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -905,70 +955,17 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    /**
-     * Full-canvas repaint after a network update, coalesced for high-rate model loops. This was
-     * introduced for language-model generation, where otherwise a full frame per token can make
-     * the post-update barrier pace the model. It also protects any future fast network simulation.
-     * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
-     * final state.
-     */
-    private val repaintOnUpdate = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { repaint() }
-
-    private val updateRefreshPending = java.util.concurrent.atomic.AtomicBoolean(false)
-
     private fun initEventHandlers() {
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
                 createNode(it)
             }
-            modelRemoved.on(Dispatchers.Default) {
-                zoomToFitPage.fire()
-            }
-            batchNodeRemoval.on(Dispatchers.Default) { nodes ->
-                val nodesUniq = nodes.toSet()
-                withContext(Swing) {
-                    nodesUniq.forEach {
-                        (it as? SynapseNode)?.detachSymmetric()
-                        canvas.layer.removeChild(it)
-                    }
-                }
-                // Removal is asynchronous (debounced) and can land after the model was re-added with a
-                // new node (undo then redo). Only clear the mapping if it still points at this node, so
-                // a stale removal never wipes a freshly recreated node.
-                nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
-            }
             updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-            // Posted, not awaited: updated is an awaitable barrier fired once per network iteration, and an EDT
-            // handler made every iteration wait in the EDT queue behind a full canvas repaint, pacing the
-            // simulation by the display. At most one refresh is pending; it reads the latest state when it runs.
-            updated.on(Dispatchers.Default) {
-                if (updateRefreshPending.compareAndSet(false, true)) {
-                    SwingUtilities.invokeLater {
-                        updateRefreshPending.set(false)
-                        repaintOnUpdate()
-                        timeLabel.update()
-                    }
-                }
-            }
-            zoomToFitPage.on(Dispatchers.Swing) {
-                if (autoZoom) {
-                    val filtered = screenElements.unionOfGlobalFullBounds()
-                    val adjustedFiltered = PBounds(
-                        filtered.getX() - 10, filtered.getY() - 10,
-                        filtered.getWidth() + 20, filtered.getHeight() + 20
-                    )
-                    launch(Dispatchers.Swing) {
-                        canvas.camera.setViewBounds(adjustedFiltered)
-                        repaint()
-                    }
-                }
-                launch(Dispatchers.Swing) {
-                    canvas.repaint()
-                }
-            }
-            boundsChanged.on(Dispatchers.Swing) {
-                zoomToFitPage.fire()
-            }
+            // Posted, not awaited: updated is a barrier fired once per network iteration, and an EDT handler made
+            // every iteration wait in the EDT queue behind a full canvas repaint, pacing the simulation by the display
+            updated.on(Dispatchers.Unconfined) { refreshAfterUpdate.request() }
+            zoomToFitPage.on(Dispatchers.Unconfined) { zoomToFit.request() }
+            boundsChanged.on(Dispatchers.Unconfined) { zoomToFit.request() }
             selected.on(Dispatchers.Default) { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
             }

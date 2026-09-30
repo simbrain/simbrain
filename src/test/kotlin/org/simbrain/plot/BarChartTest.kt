@@ -7,7 +7,11 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.barchart.BarChartComponent
+import org.simbrain.plot.barchart.BarChartModel
+import org.simbrain.util.UiWork
 import org.simbrain.workspace.Workspace
+import java.util.concurrent.CountDownLatch
+import javax.swing.SwingUtilities
 
 class BarChartTest {
 
@@ -102,6 +106,30 @@ class BarChartTest {
         }
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
         assertEquals(listOf("1", "2"), barChartComponent.model.getDataset().columnKeys)
+    }
+
+    @Test
+    fun `saving right after a value update includes that update`() {
+        val model = BarChartModel()
+        // Build and warm the serializer first, so the save below runs while the EDT is still held
+        val xstream = BarChartModel.getXStream()
+        xstream.toXML(BarChartModel())
+        val release = CountDownLatch(1)
+        val held = CountDownLatch(1)
+        SwingUtilities.invokeLater {
+            held.countDown()
+            release.await()
+        }
+        held.await()
+        model.setBarValues(doubleArrayOf(0.5, 1.5))
+        var xml = ""
+        val save = Thread { xml = xstream.toXML(model) }.apply { start() }
+        Thread.sleep(100)
+        release.countDown()
+        save.join(10_000)
+        val restored = xstream.fromXML(xml) as BarChartModel
+        assertEquals(1.5, restored.getDataset().getValue(0, 1))
     }
 }

@@ -1,5 +1,6 @@
 package org.simbrain.network.desktop
 
+import kotlinx.coroutines.cancel
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -37,6 +38,7 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
     override fun close() {
         super.close()
         NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
+        networkPanel.ui.cancel()
     }
 
     companion object {

@@ -7,12 +7,12 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
+import org.simbrain.util.UiWork
 import org.simbrain.util.setValuesInPlace
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import javax.swing.SwingUtilities
 
 class RasterPlotTest {
 
@@ -32,7 +32,7 @@ class RasterPlotTest {
     /** Iterates, then waits for the raster's queued points, which land on the EDT after the iteration returns. */
     private fun iterate() {
         workspace.simpleIterate()
-        SwingUtilities.invokeAndWait {}
+        UiWork.awaitIdle()
     }
 
     @Test

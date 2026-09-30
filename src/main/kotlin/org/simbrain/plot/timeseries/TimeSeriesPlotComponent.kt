@@ -77,6 +77,11 @@ class TimeSeriesPlotComponent @JvmOverloads constructor(name: String, val model:
         timeSeriesXStream.toXML(model, output)
     }
 
+    override fun close() {
+        model.close()
+        super.close()
+    }
+
     override fun hasChangedSinceLastSave(): Boolean {
         return false
     }

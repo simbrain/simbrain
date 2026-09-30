@@ -1,5 +1,6 @@
 package org.simbrain.world.textworld.gui
 
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.genericframe.GenericFrame
@@ -97,6 +98,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         super.close()
         runLockRemovers.forEach { it() }
         runLockRemovers = emptyList()
+        panel.ui.cancel()
     }
 
     /**

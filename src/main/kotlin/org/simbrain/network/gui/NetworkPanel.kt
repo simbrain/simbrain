@@ -926,6 +926,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 val nodesUniq = nodes.toSet()
                 withContext(Swing) {
                     nodesUniq.forEach {
+                        (it as? SynapseNode)?.detachSymmetric()
                         canvas.layer.removeChild(it)
                     }
                 }

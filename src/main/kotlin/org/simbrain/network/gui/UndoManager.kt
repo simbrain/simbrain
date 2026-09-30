@@ -137,18 +137,8 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     context(NetworkPanel)
     private suspend fun reAddToGroup(model: NetworkModel) {
         when (val parent = childToParentMaps.firstNotNullOfOrNull { it[model] }) {
-            is NeuronCollection -> {
-                (model as? Neuron)?.let { neuron ->
-                    network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
-                    parent.restoreNeuron(neuron)
-                    // The awaited addNetworkModel above already created the neuron's node, so a non-blocking
-                    // peek finds it; recreate only if it is somehow absent. Attach to the collection node.
-                    (modelNodeMap.peek(parent) as? NeuronCollectionNode)?.let { collectionNode ->
-                        val neuronNode = (modelNodeMap.peek(neuron) as? NeuronNode) ?: createNode(neuron)
-                        collectionNode.addNeuronNodes(listOf(neuronNode))
-                    }
-                }
-            }
+            // Its neurons are re-added as a batch by restoreCollectionNeurons before this loop runs.
+            is NeuronCollection -> {}
 
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
@@ -242,6 +232,24 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     private fun immediateParent(model: NetworkModel): NetworkModel? =
         childToParentMaps.firstNotNullOfOrNull { it[model] }
 
+    /**
+     * Re-adds neurons that belonged to a [NeuronCollection] as one concurrent batch, then restores their
+     * membership and node grouping per collection in their original order. Awaiting each add in turn (as
+     * [reAddToGroup] does for other models) made undoing a bulk delete wait on the EDT's node creation once
+     * per neuron.
+     */
+    context(NetworkPanel)
+    private suspend fun restoreCollectionNeurons(neurons: List<Neuron>) {
+        if (neurons.isEmpty()) return
+        network.addNetworkModelsAsync(neurons, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+        neurons.groupBy { immediateParent(it) as NeuronCollection }.forEach { (collection, members) ->
+            members.forEach { collection.restoreNeuron(it) }
+            (modelNodeMap.peek(collection) as? NeuronCollectionNode)?.let { collectionNode ->
+                collectionNode.addNeuronNodes(members.map { (modelNodeMap.peek(it) as? NeuronNode) ?: createNode(it) })
+            }
+        }
+    }
+
     context(NetworkPanel)
     suspend fun restore(deletedModels: List<NetworkModel>) {
         restoreMapSnapshot()
@@ -260,8 +268,10 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         // Adds models back to parent groups. Connectors go last: their node creation waits for their
         // endpoints' nodes, and the endpoints may be among the models restored here.
         val (connectors, others) = modelsToReAdd.partition { it.waitsForEndpointNodes() }
+        val collectionNeurons = others.filterIsInstance<Neuron>().filter { immediateParent(it) is NeuronCollection }
         try {
-            (others + connectors).forEach { reAddToGroup(it) }
+            restoreCollectionNeurons(collectionNeurons)
+            (others - collectionNeurons.toSet() + connectors).forEach { reAddToGroup(it) }
             // Add all models without parents back
             network.addNetworkModelsAsync(
                 modelsToReAdd.filter { hasNoParent(it) },

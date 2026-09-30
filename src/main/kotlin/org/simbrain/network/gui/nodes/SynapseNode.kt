@@ -69,6 +69,23 @@ class SynapseNode(
      */
     private var symmetricNode: SynapseNode? = null
 
+    /**
+     * Straightens the partner's line once this node leaves the canvas. Called from the panel's batched node
+     * removal on the EDT rather than from an EDT-dispatched `deleted` handler: the deleted event is awaited per
+     * synapse, so a Swing handler there made bulk deletes wait on the EDT (and its repaints) once per synapse.
+     * The partner is only unlinked if it still points here, since undo may already have paired it with a
+     * recreated node by the time a debounced removal lands.
+     */
+    fun detachSymmetric() {
+        symmetricNode?.let {
+            if (it.symmetricNode === this) {
+                it.symmetricNode = null
+                it.updateLineGeometry()
+            }
+        }
+        symmetricNode = null
+    }
+
     init {
         if (!isSelfConnection) {
             symmetricNode = synapse.symmetricSynapse?.let { networkPanel.modelNodeMap.peek(it) as? SynapseNode }
@@ -107,14 +124,6 @@ class SynapseNode(
         updateClampStatus()
 
         events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }
-
-        events.deleted.on(dispatcher = Dispatchers.Swing) {
-            symmetricNode?.let {
-                it.symmetricNode = null
-                it.updateLineGeometry()
-            }
-            symmetricNode = null
-        }
 
         // Respond to spiking events
         source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) {

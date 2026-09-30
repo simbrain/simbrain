@@ -45,6 +45,12 @@ import javax.swing.*
 import javax.swing.Action.SHORT_DESCRIPTION
 
 class NetworkActions(val networkPanel: NetworkPanel) {
+
+    /** Runs [refresh] on the EDT after models are added, coalesced so a bulk add costs a few refreshes, not one per model. */
+    private fun refreshOnModelAdded(refresh: () -> Unit) {
+        val limited = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS, refresh)
+        networkPanel.network.events.modelAdded.on(Dispatchers.Default) { SwingUtilities.invokeLater { limited() } }
+    }
     // For testing purposes only
     var fileChooserForTesting: SFileChooser? = null
     val addNeuronsAction = networkPanel.createAction(
@@ -1264,8 +1270,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         updateAction()
 
         // Enablement is recomputed on the EDT so recomputes run in event order; on a pool, a slow recompute
-        // from an earlier selection event could overwrite a later correct one and leave the action disabled
-        networkPanel.network.events.modelAdded.on(Dispatchers.Swing) { updateAction() }
+        // from an earlier selection event could overwrite a later correct one and leave the action disabled.
+        // Model additions only post a rate-limited recompute: modelAdded is awaited per model, so an EDT
+        // handler would make bulk adds (paste, undo of a delete) wait on the EDT once per model.
+        refreshOnModelAdded { updateAction() }
         networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
         networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
 
@@ -1376,7 +1384,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
         updateAction()
 
-        networkPanel.network.events.modelAdded.on(Dispatchers.Swing) { updateAction() }
+        refreshOnModelAdded { updateAction() }
         networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
         networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
     }

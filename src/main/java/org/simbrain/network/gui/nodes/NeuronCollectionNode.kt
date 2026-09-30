@@ -57,7 +57,9 @@ class NeuronCollectionNode(
         neuronNodes.addAll(nodes)
         for (node in nodes) {
             val events = node.neuron.events
-            events.deleted.on(swingDispatcher) { _ ->
+            // Off the EDT: deleted is awaited per neuron, so an EDT handler here would make a bulk delete wait on
+            // the EDT (and its repaints) once per neuron. The set is concurrent and the outline redraws on Swing.
+            events.deleted.on(Dispatchers.Default) { _ ->
                 neuronNodes.remove(node)
                 fireUpdateOutline()
             }

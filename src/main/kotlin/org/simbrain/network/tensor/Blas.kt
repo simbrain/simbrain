@@ -11,7 +11,10 @@ object Blas {
 
     var numThreads: Int
         get() = openblas_nolapack.blas_get_num_threads()
-        set(value) = openblas_nolapack.blas_set_num_threads(value)
+        // The native setter resolves its backend symbol on every call (~0.3 s on macOS), so skip no-op sets.
+        set(value) {
+            if (value != openblas_nolapack.blas_get_num_threads()) openblas_nolapack.blas_set_num_threads(value)
+        }
 
     inline fun <T> withThreads(n: Int, block: () -> T): T {
         val prev = numThreads

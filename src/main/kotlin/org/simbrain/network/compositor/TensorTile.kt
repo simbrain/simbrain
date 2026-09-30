@@ -1,3 +1,8 @@
+/**
+ * The compositor's retained heatmap tiles and the shared pieces they build on: layer stacking,
+ * history views, and the normalization scales that map published values onto the colormap.
+ * Tiles copy from model tensors on the compute thread and shade patches on the EDT.
+ */
 package org.simbrain.network.compositor
 
 import org.simbrain.network.compositor.HistoryView.*
@@ -35,6 +40,57 @@ const val HISTORY_GHOST = 0.15f
  * recording in every mode as the replay source.
  */
 enum class HistoryView { FULL, GHOSTED, OFF }
+
+/**
+ * The 99.5th-percentile entry of [magnitudes] (all non-negative), falling back to the max when
+ * that quantile is zero. Exactly what sorting and indexing would return, but by selection in
+ * O(n): weight tiles hold millions of entries and a full sort per publish dominated generation.
+ * Reorders [magnitudes] in place.
+ */
+internal fun magnitudeQuantileScale(magnitudes: FloatArray): Float {
+    val n = magnitudes.size
+    if (n == 0) return 0f
+    val quantile = selectNonNegative(magnitudes, (n.toLong() * 995 / 1000).toInt().coerceAtMost(n - 1))
+    if (quantile > 0f) return quantile
+    var max = magnitudes[0]
+    for (v in magnitudes) if (v.toRawBits() > max.toRawBits()) max = v
+    return max
+}
+
+/**
+ * The [k]th smallest entry of [a] in sorted order, by Hoare-partition quickselect. Non-negative
+ * floats (NaN included, since abs clears its sign) order exactly as their raw bits do, matching
+ * [FloatArray.sort]'s NaN-last placement.
+ */
+private fun selectNonNegative(a: FloatArray, k: Int): Float {
+    var lo = 0
+    var hi = a.size - 1
+    while (hi > lo) {
+        val x = a[lo].toRawBits()
+        val y = a[(lo + hi) ushr 1].toRawBits()
+        val z = a[hi].toRawBits()
+        val pivot = maxOf(minOf(x, y), minOf(maxOf(x, y), z))
+        var i = lo
+        var j = hi
+        while (i <= j) {
+            while (a[i].toRawBits() < pivot) i++
+            while (a[j].toRawBits() > pivot) j--
+            if (i <= j) {
+                val t = a[i]
+                a[i] = a[j]
+                a[j] = t
+                i++
+                j--
+            }
+        }
+        when {
+            k <= j -> hi = j
+            k >= i -> lo = i
+            else -> return a[k]
+        }
+    }
+    return a[k]
+}
 
 /**
  * A tile whose data source flips across model layers — the card stack behind a structure-first
@@ -531,9 +587,7 @@ class VectorHistoryTile(
     }
 
     private fun growScaleFromMagnitudes() {
-        magnitudes.sort()
-        val quantile = magnitudes[(cols.toLong() * 995 / 1000).toInt().coerceAtMost(cols - 1)]
-        growAbsMax(if (quantile > 0f) quantile else magnitudes[cols - 1])
+        growAbsMax(magnitudeQuantileScale(magnitudes))
     }
 }
 
@@ -647,10 +701,27 @@ class MatrixTile(
                 }
             }
         } else {
-            for (i in values.indices) values[i] = source.data.get(i)
+            source.data.get(0, values)
         }
-        growAbsMax(normalizationScale())
+        growAbsMax(if (gate) cachedScale(source.version) else normalizationScale())
         touch()
+    }
+
+    /**
+     * Scales of each stacked source at the version they were computed for, used only where
+     * versions are trusted (version-gated, non-gradient publishes). They outlive [reset] and
+     * layer flips, which re-copy unchanged weights but must not re-derive their quantile: the
+     * scale is a function of the source's contents alone.
+     */
+    private val scaleVersions = LongArray(tensors.size) { -1L }
+    private val scales = FloatArray(tensors.size)
+
+    private fun cachedScale(version: Long): Float {
+        if (scaleVersions[selected] != version) {
+            scales[selected] = normalizationScale()
+            scaleVersions[selected] = version
+        }
+        return scales[selected]
     }
 
     private fun normalizationScale(): Float {
@@ -659,10 +730,7 @@ class MatrixTile(
             for (v in values) max = maxOf(max, abs(v))
             return max
         }
-        val magnitudes = FloatArray(values.size) { abs(values[it]) }
-        magnitudes.sort()
-        val quantile = magnitudes[(magnitudes.size.toLong() * 995 / 1000).toInt().coerceAtMost(magnitudes.size - 1)]
-        return if (quantile > 0f) quantile else magnitudes[magnitudes.size - 1]
+        return magnitudeQuantileScale(FloatArray(values.size) { abs(values[it]) })
     }
 }
 

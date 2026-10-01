@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.jfree.chart.ChartPanel
@@ -317,6 +318,14 @@ object SimbrainDesktop {
             frame.title = workspace.currentFile!!.name
             lastTimestep = 0
             updateTimeLabel()
+        }
+        // Each iteration waits for the windows to draw it, unless the workspace runs as fast as possible: pending view
+        // updates run now rather than at their next rate-capped turn, then the dirty regions paint
+        workspace.displaySync = {
+            withContext(Dispatchers.Swing) {
+                UiWork.flushPending()
+                RepaintManager.currentManager(frame).paintDirtyRegions()
+            }
         }
         workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
         workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }

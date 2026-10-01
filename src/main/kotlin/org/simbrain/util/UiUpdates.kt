@@ -38,12 +38,26 @@ object UiWork {
 
     private val inFlight = AtomicInteger()
 
-    internal fun begin() {
+    /** Primitives with work scheduled but not yet finished, so a display sync can run it right away. */
+    private val active: MutableSet<UiPoster> = java.util.concurrent.ConcurrentHashMap.newKeySet()
+
+    internal fun begin(poster: UiPoster) {
         inFlight.incrementAndGet()
+        active += poster
     }
 
-    internal fun end() {
+    internal fun end(poster: UiPoster) {
+        active -= poster
         inFlight.decrementAndGet()
+    }
+
+    /**
+     * Runs every pending update now instead of when its rate cap next allows, so a caller about to paint (such as a
+     * per-iteration display sync) draws the latest state. Must be called on the EDT.
+     */
+    fun flushPending() {
+        check(SwingUtilities.isEventDispatchThread()) { "UiWork.flushPending must run on the EDT" }
+        active.toList().forEach { it.flush() }
     }
 
     val isIdle get() = inFlight.get() == 0
@@ -103,7 +117,7 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
             return
         }
         if (!running.compareAndSet(false, true)) return
-        UiWork.begin()
+        UiWork.begin(this)
         val job = scope.launch(Dispatchers.Swing) {
             while (true) {
                 val wait = lastRun + minIntervalMs - System.currentTimeMillis()
@@ -125,7 +139,7 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
         }
         job.invokeOnCompletion { cause ->
             running.set(false)
-            UiWork.end()
+            UiWork.end(this)
             if (cause != null) dropPending()
             // A post that saw the loop still running just before it exited would otherwise be stranded
             else if (hasPending()) schedule()

@@ -28,6 +28,7 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.BufferedPCanvas
 import org.simbrain.util.piccolo.Outline
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -231,7 +232,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * final state.
      */
     private val refreshAfterUpdate = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
-        repaint()
+        // The canvas, not the whole panel: toolbars and the status bar don't change with an update
+        canvas.repaint()
         timeLabel.update()
     }
 
@@ -1029,7 +1031,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     fun getNode(model: NetworkModel) = runBlocking { modelNodeMap.get<ScreenElement>(model) }
 
-    inner class NetworkCanvas : PCanvas() {
+    inner class NetworkCanvas : BufferedPCanvas() {
         init {
             // Always render in high quality
             setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)

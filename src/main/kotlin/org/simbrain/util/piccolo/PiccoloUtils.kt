@@ -75,6 +75,8 @@ fun PCamera.setViewBoundsNoOverflow(centerBounds: Rectangle2D): PTransformActivi
     if (s != Double.POSITIVE_INFINITY && s != 0.0) {
         newTransform.scaleAboutPoint(s, centerBounds.centerX, centerBounds.centerY)
     }
+    // Setting even an unchanged view repaints everything the camera shows
+    if (newTransform == viewTransform) return null
     return animateViewToTransform(newTransform, 0)
 }
 

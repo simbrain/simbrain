@@ -267,18 +267,18 @@ fun <T> FlowEvents.AwaitableEvent<T>.onUiBatch(scope: CoroutineScope, minInterva
 
 fun FlowEvents.NoArgEvent.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, block: () -> Unit): Job {
     val refresh = scope.uiRefresh(minIntervalMs, block)
-    val handler = on(Dispatchers.Unconfined) { refresh.request() }
+    val handler = onImmediate { refresh.request() }
     return subscribedUntil(scope) { handler.cancel() }
 }
 
 fun <T> FlowEvents.OneArgEvent<T>.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, apply: (T) -> Unit): Job {
     val latest = scope.uiLatest(minIntervalMs, apply)
-    val handler = on(Dispatchers.Unconfined) { latest.post(it) }
+    val handler = onImmediate { latest.post(it) }
     return subscribedUntil(scope) { handler.cancel() }
 }
 
 fun <T> FlowEvents.OneArgEvent<T>.onUiBatch(scope: CoroutineScope, minIntervalMs: Long = 0, drain: (List<T>) -> Unit): Job {
     val inbox = scope.uiInbox(minIntervalMs, drain)
-    val handler = on(Dispatchers.Unconfined) { inbox.post(it) }
+    val handler = onImmediate { inbox.post(it) }
     return subscribedUntil(scope) { handler.cancel() }
 }

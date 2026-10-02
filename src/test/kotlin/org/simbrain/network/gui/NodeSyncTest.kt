@@ -195,4 +195,24 @@ class NodeSyncTest {
         // Every synapse used to listen to its source's spike event, which fires every iteration: ~990 tasks each
         assertTrue(tasks < iterations / 5, "$iterations spiking iterations posted $tasks EDT tasks")
     }
+
+    @Test
+    fun `a strength change too small to see does not redraw the synapse`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val (a, b) = network.addNeurons(2)
+        val synapse = Synapse(a, b).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        synapse.strength = 0.5
+        UiWork.awaitIdle()
+        val drawn = node.drawnDiameter
+
+        synapse.strength = 0.5001
+        UiWork.awaitIdle()
+        assertEquals(drawn, node.drawnDiameter, "sub-pixel drift redrew the synapse")
+
+        synapse.strength = synapse.upperBound
+        UiWork.awaitIdle()
+        assertNotEquals(drawn, node.drawnDiameter, "a visible strength change did not redraw")
+    }
 }

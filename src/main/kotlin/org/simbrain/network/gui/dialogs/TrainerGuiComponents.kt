@@ -369,9 +369,7 @@ class ErrorTimeSeries(events: TrainerEvents, quantity: String = "Error", iterati
             updates.post(PlotUpdate.Point(iterationSupplier(), trainingStats))
         }
 
-        resetJob = events.iterationReset.on(Dispatchers.Unconfined) {
-            updates.post(PlotUpdate.Reset)
-        }
+        resetJob = events.iterationReset.onImmediate { updates.post(PlotUpdate.Reset) }
     }
 
     /** Detaches the plot from the trainer's events; for dialogs whose trainer outlives them. */

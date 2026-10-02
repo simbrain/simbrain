@@ -121,6 +121,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
         private val handlers = CopyOnWriteArrayList<Pair<CoroutineDispatcher, suspend (T) -> Unit>>()
 
+        /** Handlers run inline on the firing thread; see [onImmediateFlow]. */
+        private val immediateHandlers = CopyOnWriteArrayList<(T) -> Unit>()
+
         private val raw by lazy {
             // replay = 1: the shaping collector attaches asynchronously on the first subscription, and a
             // fire landing in that gap must not vanish — one-shot setup fires such as a neuron
@@ -159,8 +162,32 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
          * high rates and must not pay for per-emission debounce timer scheduling.
          */
         protected fun fireShaped(value: T) {
+            if (immediateHandlers.isNotEmpty()) runImmediate(value)
             if (handlers.isEmpty()) return
             if (interval == 0) dispatch(value) else raw.tryEmit(value)
+        }
+
+        private fun runImmediate(value: T) {
+            for (handler in immediateHandlers) {
+                try {
+                    handler(value)
+                } catch (e: Throwable) {
+                    System.err.println("Uncaught exception in ${this@FlowEvents::class.simpleName} immediate handler:")
+                    e.printStackTrace()
+                }
+            }
+        }
+
+        /**
+         * Subscribes [handler] to run synchronously inside every `fire()`, on the firing thread, before any shaping
+         * or dispatch: no coroutine is launched, so a model firing thousands of times a second pays only the call.
+         * The handler must be O(1) and must not block, suspend, or touch Swing; it is for recording that something
+         * changed (setting a dirty flag, requesting a [UiRefresh], posting to a [UiInbox]) and leaving the work to
+         * whoever drains it. Unshaped even on throttled or debounced events. Cancel the returned Job to unsubscribe.
+         */
+        protected fun onImmediateFlow(handler: (T) -> Unit): Job {
+            immediateHandlers.add(handler)
+            return Job().apply { invokeOnCompletion { immediateHandlers.remove(handler) } }
         }
 
         protected fun onFlow(dispatcher: CoroutineDispatcher, handler: suspend (T) -> Unit): Job {
@@ -179,6 +206,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend () -> Unit): Job =
             onFlow(dispatcher) { handler() }
 
+        /** Runs [handler] synchronously in every fire; see [onImmediateFlow] for the contract. */
+        fun onImmediate(handler: () -> Unit): Job = onImmediateFlow { handler() }
+
         @JvmOverloads
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: Runnable): Job =
             onFlow(dispatcher) { handler.run() }
@@ -192,6 +222,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (T) -> Unit): Job =
             onFlow(dispatcher, handler)
 
+        /** Runs [handler] synchronously in every fire; see [onImmediateFlow] for the contract. */
+        fun onImmediate(handler: (T) -> Unit): Job = onImmediateFlow(handler)
+
         @JvmOverloads
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: Consumer<T>): Job =
             onFlow(dispatcher) { handler.accept(it) }
@@ -204,6 +237,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
 
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: suspend (new: T, old: T) -> Unit): Job =
             onFlow(dispatcher) { (new, old) -> handler(new, old) }
+
+        /** Runs [handler] synchronously in every fire that changes the value; see [onImmediateFlow] for the contract. */
+        fun onImmediate(handler: (new: T, old: T) -> Unit): Job = onImmediateFlow { (new, old) -> handler(new, old) }
 
         @JvmOverloads
         fun on(dispatcher: CoroutineDispatcher = edtDispatcher, handler: BiConsumer<T, T>): Job =

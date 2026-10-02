@@ -41,8 +41,8 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         val events = neuron.events
         // Activation and spikes change every iteration: they only mark the node, and the panel's sync pass draws the
         // latest state once per frame
-        events.activationChanged.on(Dispatchers.Unconfined) { _, _ -> markDirty(ACTIVATION) }.untilDisposed()
-        events.spiked.on(Dispatchers.Unconfined) { spiking ->
+        events.activationChanged.onImmediate { _, _ -> markDirty(ACTIVATION) }.untilDisposed()
+        events.spiked.onImmediate { spiking ->
             // A spike can start and end between two frames; remember it so the next frame still shows it
             if (spiking) spikeSinceLastSync.set(true)
             markDirty(SPIKE)

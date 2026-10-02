@@ -57,8 +57,8 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 interactionBox.setText(languageModel.displayName)
                 rebuildInterior()
             },
-            events.updated.on(Dispatchers.Unconfined) { generationRefresh.request() },
-            events.updateGraphics.on(Dispatchers.Unconfined) { generationRefresh.request() },
+            events.updated.onImmediate { generationRefresh.request() },
+            events.updateGraphics.onImmediate { generationRefresh.request() },
         )
         // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
         events.deleted.on(Dispatchers.Default) {

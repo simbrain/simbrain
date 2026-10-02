@@ -118,7 +118,7 @@ class SynapseNode(
         val events = synapse.events
 
         // Learning rules can write strengths every iteration: mark, and let the per-frame sync redraw
-        events.strengthUpdated.on(Dispatchers.Unconfined) { markDirty(STRENGTH) }.untilDisposed()
+        events.strengthUpdated.onImmediate { markDirty(STRENGTH) }.untilDisposed()
         events.colorPreferencesChanged.on(dispatcher = Dispatchers.Swing) {
             updateColor()
             updateDiameter()
@@ -160,13 +160,17 @@ class SynapseNode(
 
     /** What the circle currently shows and whether the overlay highlights this synapse; both lag the model until the next sync. */
     internal val drawnCircleColor get() = circle!!.paint
+    internal val drawnDiameter get() = circle!!.width
     internal val drawnSourceSpiking get() = sourceSpiking
 
     override fun syncFromModel(bits: Int) {
         if (bits and STRENGTH != 0) {
             updateColor()
+            // Learning nudges strengths by tiny amounts every iteration; redrawing for a change no one can see would
+            // rebuild the geometry and throw away the cached connection tier each time. Drift is measured against
+            // what is drawn, so it still shows once it adds up.
             val diameter = computeDiameter()
-            if (diameter != circle!!.width) {
+            if (abs(diameter - circle!!.width) >= MIN_VISIBLE_DIAMETER_CHANGE) {
                 applyDiameter(diameter)
             }
         }
@@ -495,6 +499,9 @@ class SynapseNode(
 
     companion object {
         private const val STRENGTH = 1
+
+        /** Smallest change in circle diameter, in canvas units, worth redrawing for. */
+        private const val MIN_VISIBLE_DIAMETER_CHANGE = 0.25
 
         /**
          * Used to approximate zero to prevent divide-by-zero errors.

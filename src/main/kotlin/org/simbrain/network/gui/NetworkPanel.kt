@@ -981,8 +981,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             // Posted, not awaited: updated is a barrier fired once per network iteration, and an EDT handler made
             // every iteration wait in the EDT queue behind a full canvas repaint, pacing the simulation by the display
             updated.on(Dispatchers.Unconfined) { refreshAfterUpdate.request() }
-            zoomToFitPage.on(Dispatchers.Unconfined) { zoomToFit.request() }
-            boundsChanged.on(Dispatchers.Unconfined) { zoomToFit.request() }
+            zoomToFitPage.onImmediate { zoomToFit.request() }
+            boundsChanged.onImmediate { zoomToFit.request() }
             selected.on(Dispatchers.Default) { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
             }

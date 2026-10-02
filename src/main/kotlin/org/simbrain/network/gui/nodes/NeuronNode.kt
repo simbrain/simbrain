@@ -57,6 +57,18 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         events.updateRuleChanged.on(Dispatchers.Swing) { _, _ -> updateShape() }.untilDisposed()
     }
 
+    /**
+     * Outgoing synapse nodes draw their source's spike state; this neuron pushes it when it flips, so synapses don't
+     * each listen to a spike event that fires every iteration. The fan-out map is copied defensively because model
+     * edits on other threads can change it; an update lost to a concurrent edit is corrected by the next flip.
+     */
+    private fun showSpikingOnOutgoingSynapses(spiking: Boolean) {
+        val outgoing = runCatching { neuron.fanOutUnsafe.values.toList() }.getOrDefault(emptyList())
+        outgoing.forEach { synapse ->
+            (synapse?.let { networkPanel.modelNodeMap.peek(it) } as? SynapseNode)?.showSourceSpiking(spiking)
+        }
+    }
+
     /** The activation and spike state currently drawn, which lag the model until the next sync. */
     internal val drawnActivation get() = neuronCircleNode.activation
     internal val drawnSpiking get() = neuronCircleNode.isSpiking
@@ -66,6 +78,7 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
             val spiking = spikeSinceLastSync.getAndSet(false) || with(networkPanel.network) { neuron.isSpike }
             if (neuronCircleNode.isSpiking != spiking) {
                 neuronCircleNode.isSpiking = spiking
+                showSpikingOnOutgoingSynapses(spiking)
             }
         }
         if (bits and ACTIVATION != 0) {

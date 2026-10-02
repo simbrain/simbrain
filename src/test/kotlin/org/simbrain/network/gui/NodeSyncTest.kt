@@ -1,7 +1,7 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
- * visuals still follow the model, bursts of changes coalesce, a spike shorter than a frame is still drawn, and a node
- * that leaves the canvas stops listening to its model.
+ * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
+ * frame) reach neurons and their outgoing synapses, and a node that leaves the canvas stops listening to its model.
  */
 package org.simbrain.network.gui
 
@@ -12,8 +12,11 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeurons
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
@@ -131,5 +134,66 @@ class NodeSyncTest {
 
         // Before mark/sync every changed neuron posted its own task: ~75 per iteration here
         assertTrue(tasks < iterations / 5, "$iterations iterations posted $tasks EDT tasks")
+    }
+
+    @Test
+    fun `a synapse redraws its strength after the sync pass`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val (a, b) = network.addNeurons(2)
+        val synapse = Synapse(a, b).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        UiWork.awaitIdle()
+
+        synapse.strength = -0.5
+        UiWork.awaitIdle()
+        assertEquals(NetworkPreferences.inhibitorySynapseColor, node.drawnCircleColor)
+
+        synapse.strength = 0.5
+        UiWork.awaitIdle()
+        assertEquals(NetworkPreferences.excitatorySynapseColor, node.drawnCircleColor)
+    }
+
+    @Test
+    fun `a neuron's spike shows on its outgoing synapse and clears`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val source = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it) }
+        val target = Neuron().also { network.addNetworkModel(it) }
+        val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        UiWork.awaitIdle()
+        val idleColor = node.drawnLineColor
+
+        with(network) { source.isSpike = true }
+        UiWork.awaitIdle()
+        assertEquals(NetworkPreferences.spikingColor, node.drawnLineColor)
+
+        with(network) { source.isSpike = false }
+        UiWork.awaitIdle()
+        assertEquals(idleColor, node.drawnLineColor)
+    }
+
+    @Test
+    fun `an unpaced spiking run posts edt work per frame, not per spike event`() = runBlocking {
+        val workspace = Workspace()
+        val component = NetworkComponent("test")
+        workspace.addWorkspaceComponent(component)
+        val network = component.network
+        NetworkPanel(component)
+        val neurons = network.addNeurons(100) {
+            updateRule = IntegrateAndFireRule().apply { backgroundCurrent = 20.0 }
+        }
+        network.addNetworkModels(Sparse(0.1).connectNeurons(neurons, neurons))
+        UiWork.awaitIdle()
+
+        val iterations = 3000
+        val tasks = countEdtTasks {
+            runBlocking { workspace.iterateSuspend(iterations) }
+            Thread.sleep(200)
+        }
+
+        // Every synapse used to listen to its source's spike event, which fires every iteration: ~990 tasks each
+        assertTrue(tasks < iterations / 5, "$iterations spiking iterations posted $tasks EDT tasks")
     }
 }

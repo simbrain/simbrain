@@ -2,6 +2,7 @@ package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
@@ -317,6 +318,9 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         // Track the training job so we can cancel it when dialog closes
         var trainingJob: Job? = null
 
+        /** Scope of this dialog's view refreshes, cancelled when it closes. */
+        val ui = UiScope()
+
         val runControls = JPanel().apply { layout = MigLayout("nogrid") }
 
         val stepAction = createAction(
@@ -399,7 +403,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(labelPanel, "wrap")
 
-        trainer.events.progressUpdated.on(Dispatchers.Swing) {
+        // Fired every training iteration; awaiting the EDT here would pace training by the display
+        trainer.events.progressUpdated.onUi(ui) {
             iterationsLabel.text = "" + trainer.iteration
         }
 
@@ -475,6 +480,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         addCommitTask { syncDataSet() }
         addCloseTask {
             trainingJob?.cancel()
+            ui.cancel()
         }
 
         contentPane = mainPanel

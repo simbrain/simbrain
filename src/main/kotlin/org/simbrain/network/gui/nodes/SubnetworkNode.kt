@@ -249,9 +249,14 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val outlinedObjectBounds: PBounds
         get() = PBounds().apply { outlinedObjects.forEach { add(it.fullBounds) } }
 
+    override fun syncFromModel(bits: Int) {
+        if (bits and INFO != 0) layoutChildren()
+    }
+
     fun setInfoTextNode(infoTextNode: ScreenElement) {
         this.infoTextNode = infoTextNode
-        subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.layoutChildren() }
+        // Fired every iteration by networks that report training state, so laid out once per frame
+        subnetwork.events.customInfoUpdated.onImmediate { markDirty(INFO) }.untilDisposed()
         layoutChildren() // Trigger initial positioning
     }
 
@@ -294,6 +299,10 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
      * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
+    companion object {
+        private const val INFO = 1
+    }
+
     inner class SubnetworkNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
         override val contextMenu: JPopupMenu?

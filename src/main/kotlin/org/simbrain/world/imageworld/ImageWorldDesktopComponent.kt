@@ -1,8 +1,11 @@
 package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
 import org.simbrain.util.SFileChooser
+import org.simbrain.util.UiScope
 import org.simbrain.util.createAction
+import org.simbrain.util.onUi
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.swingDispatcher
 import org.simbrain.util.widgets.ShowHelpAction
@@ -21,6 +24,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     DesktopComponent<ImageWorldComponent>(frame, component), CoroutineScope by component.world {
 
     private val imageToolbar = JToolBar()
+
+    /** Scope of this view's refreshes; cancelled when the component closes. */
+    private val ui = UiScope()
 
     private val imageWorld: ImageWorld = component.world
 
@@ -130,7 +136,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         // Main image
         add(ImageWorldPanel(component), BorderLayout.CENTER)
-        imageWorld.imageAlbum.events.imageUpdate.on(swingDispatcher) {
+        // Sources such as a 3D view render a new image every iteration; awaiting the EDT here paced them by the display
+        imageWorld.imageAlbum.events.imageUpdate.onUi(ui) {
             updateToolbar()
             repaint()
         }
@@ -202,5 +209,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
     override fun getPreferredSize(): Dimension {
         return Dimension(800, 600)
+    }
+
+    override fun onClosed() {
+        ui.cancel()
     }
 }

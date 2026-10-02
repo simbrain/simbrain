@@ -1,7 +1,8 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
  * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
- * frame) reach neurons and their outgoing synapses, and a node that leaves the canvas stops listening to its model.
+ * frame) reach neurons and their outgoing synapses, text labels rewritten every iteration coalesce too, and a node that
+ * leaves the canvas stops listening to its model.
  */
 package org.simbrain.network.gui
 
@@ -11,12 +12,14 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
@@ -194,6 +197,28 @@ class NodeSyncTest {
 
         // Every synapse used to listen to its source's spike event, which fires every iteration: ~990 tasks each
         assertTrue(tasks < iterations / 5, "$iterations spiking iterations posted $tasks EDT tasks")
+    }
+
+    @Test
+    fun `a burst of text updates costs a few edt tasks and shows the last text`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val text = NetworkTextObject("start").also { network.addNetworkModel(it) }
+        val node = panel.getNode(text) as TextNode
+        UiWork.awaitIdle()
+
+        val tasks = countEdtTasks {
+            val release = holdEdt()
+            repeat(1000) { text.text = "update $it" }
+            release.countDown()
+            // Sleep rather than poll, so only the work the updates caused is counted
+            Thread.sleep(200)
+        }
+        UiWork.awaitIdle()
+
+        assertTrue(tasks < 10, "1000 text updates posted $tasks EDT tasks")
+        val document = node.pStyledText.document
+        assertEquals("update 999", document.getText(0, document.length))
     }
 
     @Test

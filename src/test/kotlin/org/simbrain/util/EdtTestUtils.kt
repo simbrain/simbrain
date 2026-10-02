@@ -1,6 +1,6 @@
 /**
- * Test support for EDT behavior: run code while the EDT is held and check it finishes anyway, and count how many tasks
- * code posts to the EDT.
+ * Test support for EDT behavior: run code while the EDT is held and check it finishes anyway, count how many tasks
+ * code posts to the EDT, and read the scene on the EDT.
  */
 package org.simbrain.util
 
@@ -44,6 +44,17 @@ suspend fun finishesWhileEdtIsBlocked(timeoutMs: Long = 10_000, block: suspend (
         release.countDown()
         watchdog.interrupt()
     }
+}
+
+/**
+ * Runs [block] on the EDT and returns its result, for tests that read the Piccolo scene: the EDT mutates it, so a read
+ * from the test thread can race those changes (and throw from inside Piccolo's child lists).
+ */
+fun <T> onEdt(block: () -> T): T {
+    if (SwingUtilities.isEventDispatchThread()) return block()
+    var result: Result<T>? = null
+    SwingUtilities.invokeAndWait { result = runCatching(block) }
+    return result!!.getOrThrow()
 }
 
 /** An event queue that counts the invocation events (posted tasks) it dispatches until it is removed. */

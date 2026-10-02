@@ -10,6 +10,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
+import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
@@ -30,6 +31,7 @@ import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.BufferedPCanvas
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.piccolo.RasterCachedNode
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -71,6 +73,23 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val canvas = NetworkCanvas()
 
     /**
+     * Bottom tier of the canvas: connections (weight matrices, synapses, gap junctions, synapse groups, connectors).
+     * They change only on edits, not every iteration, so the tier is drawn from a cached image that any change to a
+     * connection invalidates; neurons changing above it don't touch it.
+     */
+    internal val edgeTier = RasterCachedNode().also {
+        // Nothing but the canvas background lies under the bottom tier, so the cache can blend over it exactly
+        it.background = { canvas.background }
+        canvas.layer.addChild(it)
+    }
+
+    /** Spike highlights for synapses, drawn over the cached connections so spikes don't invalidate the cache. */
+    val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
+
+    /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
+    private val nodeTier = PNode().also { canvas.layer.addChild(it) }
+
+    /**
      * Reference to the model network
      */
     val network: Network = networkComponent.network
@@ -93,7 +112,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
     fun detachNode(node: ScreenElement) {
         node.dispose()
-        canvas.layer.removeChild(node)
+        node.removeFromParent()
     }
 
     /**
@@ -342,39 +361,22 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Calls to lowerToBottom and raiseToTop should be avoided for top level screen elements in favor of using this function.
      */
     private fun addNodeOrdered(node: ScreenElement) {
-        fun findIndexOfType(type: KClass<out ScreenElement>): Int {
-            return canvas.layer.childrenIterator.toSequence().indexOfLast { it != null && it::class == type }
-        }
+        // Within the edge tier, weight matrices sit lowest, then synapses, gap junctions, synapse groups, and
+        // connectors; each kind goes after the last node of the kind below it
+        fun after(type: KClass<out ScreenElement>) =
+            edgeTier.childrenIterator.toSequence().indexOfLast { type.isInstance(it) } + 1
 
         when (node) {
-            is WeightMatrixNode -> {
-                canvas.layer.addChild(0, node)
-            }
-            is SynapseNode -> {
-                val index = findIndexOfType(WeightMatrixNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is GapJunctionNode -> {
-                val index = findIndexOfType(SynapseNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is SynapseGroupNode -> {
-                val index = findIndexOfType(SynapseNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is TensorConnectorNode -> {
-                val index = findIndexOfType(SynapseGroupNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is FlattenConnectorNode -> {
-                val index = findIndexOfType(TensorConnectorNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            else -> {
-                canvas.layer.addChild(node)
-            }
+            is WeightMatrixNode -> edgeTier.addChild(0, node)
+            is SynapseNode -> edgeTier.addChild(after(WeightMatrixNode::class), node)
+            is GapJunctionNode -> edgeTier.addChild(after(SynapseNode::class), node)
+            is SynapseGroupNode -> edgeTier.addChild(after(SynapseNode::class), node)
+            is TensorConnectorNode -> edgeTier.addChild(after(SynapseGroupNode::class), node)
+            is FlattenConnectorNode -> edgeTier.addChild(after(TensorConnectorNode::class), node)
+            else -> nodeTier.addChild(node)
         }
     }
+
 
     /**
      * Add a screen element to the network panel and rezoom the page.

@@ -163,15 +163,14 @@ class NodeSyncTest {
         val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
         val node = panel.getNode(synapse) as SynapseNode
         UiWork.awaitIdle()
-        val idleColor = node.drawnLineColor
 
         with(network) { source.isSpike = true }
         UiWork.awaitIdle()
-        assertEquals(NetworkPreferences.spikingColor, node.drawnLineColor)
+        assertTrue(node.drawnSourceSpiking)
 
         with(network) { source.isSpike = false }
         UiWork.awaitIdle()
-        assertEquals(idleColor, node.drawnLineColor)
+        assertFalse(node.drawnSourceSpiking)
     }
 
     @Test

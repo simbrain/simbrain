@@ -1,8 +1,9 @@
 /**
- * The canvas node for a [Synapse]: a strength-sized circle near the target and a line from the source. Strength
- * changes, which learning rules can make every iteration, only mark the node; the panel's per-frame sync redraws the
- * circle when its color or size actually changes. The source neuron's node pushes its drawn spike state here rather
- * than every synapse listening to its source's per-iteration spike event.
+ * The canvas node for a [Synapse]: a strength-sized circle near the target and a line from the source, living in the
+ * panel's cached connection tier. Strength changes, which learning rules can make every iteration, only mark the node;
+ * the panel's per-frame sync redraws the circle when its color or size actually changes. The source neuron's node
+ * pushes its drawn spike state here, and the panel's spike overlay draws the highlight, so spikes never invalidate the
+ * cached tier.
  */
 package org.simbrain.network.gui.nodes
 
@@ -20,7 +21,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColo
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
-import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.util.*
 import java.awt.Color
@@ -126,9 +126,9 @@ class SynapseNode(
         }.untilDisposed()
         events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility ->
             updateVisibility(newVisibility) }.untilDisposed()
-        sourceSpiking = source.drawnSpiking
         updateVisibility(synapse.isVisible)
         updateSpikeColor()
+        showSourceSpiking(source.drawnSpiking)
         events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }.untilDisposed()
         updateClampStatus()
 
@@ -140,19 +140,27 @@ class SynapseNode(
         }.untilDisposed()
     }
 
-    /** Shows the source neuron's spike state on the line, and in spiking-only mode on visibility. */
+    /**
+     * Shows the source neuron's spike state. The highlight is drawn by the panel's spike overlay, not by recoloring
+     * this node, so spikes never invalidate the cached connection tier.
+     */
     fun showSourceSpiking(spiking: Boolean) {
         if (sourceSpiking == spiking) return
         sourceSpiking = spiking
-        updateSpikeColor()
-        if (networkPanel.synapseSpikingOnlyVisible) {
-            applySpikingOnlyVisibility()
-        }
+        networkPanel.spikeOverlay.setSpiking(this, spiking)
     }
 
-    /** What the circle and line currently show, which lag the model until the next sync. */
+    override fun dispose() {
+        networkPanel.spikeOverlay.remove(this)
+        super.dispose()
+    }
+
+    /** The strength circle, for the spike overlay to draw back over a highlighted line. */
+    internal val circleNode get() = circle
+
+    /** What the circle currently shows and whether the overlay highlights this synapse; both lag the model until the next sync. */
     internal val drawnCircleColor get() = circle!!.paint
-    internal val drawnLineColor get() = line!!.strokePaint
+    internal val drawnSourceSpiking get() = sourceSpiking
 
     override fun syncFromModel(bits: Int) {
         if (bits and STRENGTH != 0) {
@@ -250,15 +258,9 @@ class SynapseNode(
         }
     }
 
-    /**
-     * When spiking change the color of the line.
-     */
+    /** The line keeps its base color; spikes are highlighted by the panel's spike overlay. */
     private fun updateSpikeColor() {
-        if (sourceSpiking) {
-            line!!.strokePaint = spikingColor
-        } else {
-            line!!.strokePaint = lineColor
-        }
+        line!!.strokePaint = lineColor
     }
 
     /**
@@ -274,7 +276,8 @@ class SynapseNode(
             return
         }
         if (networkPanel.synapseSpikingOnlyVisible) {
-            super.setVisible(sourceSpiking)
+            // Only spiking synapses show, and the spike overlay draws those
+            super.setVisible(false)
         } else {
             super.setVisible(true)
         }

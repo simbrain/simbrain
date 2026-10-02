@@ -123,15 +123,24 @@ class SimbrainImage : PImage {
                 || imgScreenX != prevImgScreenX || imgScreenY != prevImgScreenY
                 || imgScreenW != prevImgScreenW || imgScreenH != prevImgScreenH
 
-        if (contentDirty || regionChanged || scaledCache == null) {
+        // Keep the source's transparency: an opaque cache would paint a transparent overlay (such as a spiking
+        // array's spike image) black. Source ints are copied as-is only when their layout matches the cache's;
+        // anything else goes through getRGB, which returns non-premultiplied ARGB.
+        val cacheType = when (img.type) {
+            BufferedImage.TYPE_INT_RGB, BufferedImage.TYPE_INT_ARGB, BufferedImage.TYPE_INT_ARGB_PRE -> img.type
+            else -> if (img.colorModel.hasAlpha()) BufferedImage.TYPE_INT_ARGB else BufferedImage.TYPE_INT_RGB
+        }
+        val copiesInts = cacheType == img.type
+
+        if (contentDirty || regionChanged || scaledCache == null || scaledCache?.type != cacheType) {
             var cache = scaledCache
-            if (cache == null || cache.width < cacheW || cache.height < cacheH) {
-                cache = BufferedImage(cacheW, cacheH, BufferedImage.TYPE_INT_RGB)
+            if (cache == null || cache.type != cacheType || cache.width < cacheW || cache.height < cacheH) {
+                cache = BufferedImage(cacheW, cacheH, cacheType)
                 scaledCache = cache
             }
 
             // Nearest-neighbor scale: map each cache pixel back to source pixel
-            val srcPixels = (img.raster.dataBuffer as? DataBufferInt)?.data
+            val srcPixels = if (copiesInts) (img.raster.dataBuffer as? DataBufferInt)?.data else null
             val dstPixels = (cache.raster.dataBuffer as DataBufferInt).data
 
             for (y in 0 until cacheH) {

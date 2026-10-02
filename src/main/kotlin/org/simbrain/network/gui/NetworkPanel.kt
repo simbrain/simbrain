@@ -84,6 +84,19 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val ui = UiScope()
 
     /**
+     * Per-frame sync pass for node visuals: model events only mark a node dirty and queue it here once, and each pass
+     * pulls the current model state into every queued node. Paced runs drain it every iteration through the
+     * workspace's display sync; unpaced runs sample it at frame rate, so the EDT never sees a task per model event.
+     */
+    val nodeSync = ui.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+
+    /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
+    fun detachNode(node: ScreenElement) {
+        node.dispose()
+        canvas.layer.removeChild(node)
+    }
+
+    /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
      * when the lasso is pulled over them.  Also keeps track of source nodes (but those events are
      * handled by keybindings).
@@ -259,7 +272,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val unique = nodes.toSet()
         unique.forEach {
             (it as? SynapseNode)?.detachSymmetric()
-            canvas.layer.removeChild(it)
+            detachNode(it)
         }
         // Removal can land after the model was re-added with a new node (undo then redo). Only clear the mapping
         // if it still points at this node, so a stale removal never wipes a freshly recreated node.
@@ -483,7 +496,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val looseNodes = HashMap<Synapse, SynapseNode>()
         fun dropLooseNode(synapse: Synapse) {
             looseNodes.remove(synapse)?.let { node ->
-                canvas.layer.removeChild(node)
+                detachNode(node)
                 modelNodeMap.removeIfValue(synapse) { it === node }
             }
         }

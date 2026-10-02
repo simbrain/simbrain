@@ -88,6 +88,9 @@ object SimbrainDesktop {
     /**
      * The frame that will hold the workspace.
      */
+    /** Owns the desktop's own EDT updates, which live as long as the application. */
+    private val desktopUi = UiScope()
+
     val frame: JFrame = JFrame(FRAME_TITLE)
 
     /**
@@ -327,7 +330,8 @@ object SimbrainDesktop {
                 RepaintManager.currentManager(frame).paintDirtyRegions()
             }
         }
-        workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
+        // Sampled at frame rate: a fast run updates thousands of times a second, and a task per update would bury the EDT
+        workspace.updater.events.workspaceUpdated.onUi(desktopUi, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { updateTimeLabel() }
         workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }
         workspace.updater.events.runFinished.on { StandardDialog.setSimulationRunning(false) }
         workspaceBounds = Rectangle(

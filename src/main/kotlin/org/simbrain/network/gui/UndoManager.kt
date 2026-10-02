@@ -261,7 +261,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         // removal then resolves to an identity-safe no-op.
         val staleNodes = deletedModels.mapNotNull { model -> modelNodeMap.peek(model)?.let { model to it } }
         if (staleNodes.isNotEmpty()) {
-            withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> canvas.layer.removeChild(node) } }
+            withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> networkPanel.detachNode(node) } }
             staleNodes.forEach { (model, node) -> modelNodeMap.removeIfValue(model) { it === node } }
         }
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())

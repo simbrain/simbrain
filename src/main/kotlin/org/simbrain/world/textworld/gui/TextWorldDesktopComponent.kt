@@ -94,8 +94,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
         parentFrame.pack()
     }
 
-    override fun close() {
-        super.close()
+    override fun onClosed() {
         runLockRemovers.forEach { it() }
         runLockRemovers = emptyList()
         panel.ui.cancel()

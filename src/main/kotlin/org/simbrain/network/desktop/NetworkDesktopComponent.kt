@@ -35,8 +35,7 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         return fileMenu
     }
 
-    override fun close() {
-        super.close()
+    override fun onClosed() {
         NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
         networkPanel.ui.cancel()
     }

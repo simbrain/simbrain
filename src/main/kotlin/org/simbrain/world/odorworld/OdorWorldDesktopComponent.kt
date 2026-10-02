@@ -5,6 +5,7 @@
  */
 package org.simbrain.world.odorworld
 
+import kotlinx.coroutines.cancel
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.gui.AspectRatioLockedContent
 import org.simbrain.workspace.gui.DesktopComponent
@@ -37,6 +38,10 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
         world.events.tileMapChanged.on { fitFrameToWorldSize() }
         world.events.propertiesChanged.on { applyAspectLock() }
         SwingUtilities.invokeLater { fitFrameToWorldSize() }
+    }
+
+    override fun onClosed() {
+        worldPanel.ui.cancel()
     }
 
     /**

@@ -96,7 +96,14 @@ var parentFrame: GenericFrame, workspaceComponent: E
             }
         }
         workspaceComponent.close()
+        onClosed()
     }
+
+    /**
+     * Releases this view's subscriptions and other resources once [close] has really closed the component; not
+     * called when the user cancels at the unsaved-changes prompt, since the view then stays open.
+     */
+    protected open fun onClosed() {}
 
     /**
      * Dialog for importing a workspace component.

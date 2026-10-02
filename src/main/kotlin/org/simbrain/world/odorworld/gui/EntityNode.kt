@@ -1,6 +1,14 @@
+/**
+ * Piccolo view of one [OdorWorldEntity]: its sprite, sensor and effector glyphs, steering debug overlay, and trail.
+ * Movement reaches the node through a dirty mark set inline when the entity moves and one per-frame sync pass run by
+ * [OdorWorldPanel.entitySync], so a running world costs the EDT one task per frame rather than one per move. Trail
+ * points are sampled on the model thread after each world update, so a fast run still draws the whole path rather
+ * than one segment per frame. The node's subscriptions live in [nodeScope], a child of the panel's UI scope, and end
+ * when it is disposed.
+ */
 package org.simbrain.world.odorworld.gui
 
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
@@ -25,6 +33,7 @@ import java.awt.Color
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.stream.Collectors
 import javax.swing.JPopupMenu
 import kotlin.math.abs
@@ -32,12 +41,20 @@ import kotlin.math.cos
 import kotlin.math.sin
 import kotlin.math.sqrt
 
-/**
- * Piccolo representation of an [OdorWorldEntity].
- */
 class EntityNode(
-    val entity: OdorWorldEntity
+    val entity: OdorWorldEntity,
+    private val panel: OdorWorldPanel
 ) : PNode(), NodeWithDispersion by DispersionNode(entity) {
+
+    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(panel.ui.coroutineContext.job))
+
+    private val dirty = AtomicBoolean()
+
+    /** A trail point waiting to be drawn; a [jump] starts a new stroke there instead of connecting to it. */
+    private class TrailPoint(val x: Double, val y: Double, val jump: Boolean)
+
+    /** Trail points recorded since the last sync, written by the model thread and drained on the EDT. */
+    private val pendingTrail = ArrayList<TrailPoint>()
 
     /**
      * Simple sprite node that renders the entity's current image.
@@ -195,12 +212,16 @@ class EntityNode(
         addChild(steeringDebugNode)
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
-        entity.events.deleted.on(dispatcher = Dispatchers.Swing) { removeFromParent() }
-        entity.events.moved.on(dispatcher = Dispatchers.Swing) { update() }
+        entity.events.deleted.on(dispatcher = Dispatchers.Swing) {
+            dispose()
+            removeFromParent()
+        }.untilDisposed()
+        entity.events.moved.onImmediate { markDirty() }.untilDisposed()
+        entity.world.events.updated.on(Dispatchers.Unconfined) { recordTrailPoint() }.untilDisposed()
         entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             sprite.updateBounds()
             sprite.repaint()
-        }
+        }.untilDisposed()
         entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->
             if (new) {
                 trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
@@ -210,14 +231,16 @@ class EntityNode(
             } else {
                 removeChild(trail)
             }
-        }
+            synchronized(pendingTrail) { pendingTrail.clear() }
+        }.untilDisposed()
         entity.events.trailCleared.on(dispatcher = Dispatchers.Swing) {
             removeChild(trail)
             trail = PPath.createPolyline(arrayOf(Point2D.Float(entity.x.toFloat(),entity.y.toFloat()))).apply {
                 paint = null
             }
             addChild(trail)
-        }
+            synchronized(pendingTrail) { pendingTrail.clear() }
+        }.untilDisposed()
 
         fun updateSensorsEffectorsVisibility() {
             visualizableAttributeMap.values.forEach { it?.visible = entity.isShowSensorsAndEffectors }
@@ -227,46 +250,89 @@ class EntityNode(
         entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
             updateSensorsEffectorsVisibility()
             sprite.repaint()
-        }
+        }.untilDisposed()
 
-        entity.events.updated.on(dispatcher = Dispatchers.Swing) { update() }
         entity.events.sensorAdded.on(dispatcher = Dispatchers.Swing) { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toAdd = s as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
-        }
+        }.untilDisposed()
         entity.events.effectorAdded.on(dispatcher = Dispatchers.Swing) { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toAdd = e as VisualizableEntityAttribute
                 addAttribute(toAdd)
             }
-        }
+        }.untilDisposed()
         entity.events.sensorRemoved.on(dispatcher = Dispatchers.Swing) { s: Sensor? ->
             if (s is VisualizableEntityAttribute) {
                 val toRemove = s as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
-        }
+        }.untilDisposed()
         entity.events.effectorRemoved.on(dispatcher = Dispatchers.Swing) { e: Effector? ->
             if (e is VisualizableEntityAttribute) {
                 val toRemove = e as VisualizableEntityAttribute
                 removeAttribute(toRemove)
             }
-        }
-        entity.world.events.worldStarted.on(dispatcher = Dispatchers.Swing) {
+        }.untilDisposed()
+        entity.world.events.worldStarted.onImmediate {
             if (entity.isShowTrail && !entity.drawTrailWithoutRunningWorkspace) {
-                trail.moveTo(entity.x, entity.y)
+                startTrailAtCurrentLocation()
             }
-        }
+        }.untilDisposed()
         drawDispersionCircleAround(this)
         entity.events.propertyChanged.on(dispatcher = Dispatchers.Swing) {
             drawDispersionCircleAround(this)
-        }
+        }.untilDisposed()
 
         if (entity.isShowTrail) {
             addChild(trail)
         }
+    }
+
+    /** Ends this node's subscriptions and drops its pending updates; called when it leaves the canvas. */
+    fun dispose() {
+        nodeScope.cancel()
+    }
+
+    private fun Job.untilDisposed(): Job = also { subscription ->
+        nodeScope.coroutineContext.job.invokeOnCompletion { subscription.cancel() }
+    }
+
+    private fun (() -> Unit).untilDisposed() {
+        nodeScope.coroutineContext.job.invokeOnCompletion { this() }
+    }
+
+    /** Schedules a sync on the next frame; cheap and safe to call from any thread. */
+    private fun markDirty() {
+        if (dirty.compareAndSet(false, true)) panel.entitySync.post(this)
+    }
+
+    /** Applies the entity's current state, if it changed since the last sync. Runs on the EDT. */
+    internal fun syncPending() {
+        if (dirty.getAndSet(false) && parent != null && nodeScope.isActive) update()
+    }
+
+    private val isDrawingTrail
+        get() = entity.isShowTrail && (entity.drawTrailWithoutRunningWorkspace || isWorkspaceRunning)
+
+    private val isWorkspaceRunning get() = panel.odorWorldComponent.isRunning
+
+    /**
+     * Records the entity's position as a trail point after a world update. Runs inline on the model thread, so it
+     * must stay cheap. The world update, not each move, is the sampling point: a move sets x and then y, and a point
+     * taken between the two would put a corner in the trail.
+     */
+    private fun recordTrailPoint() {
+        if (!isDrawingTrail) return
+        val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)
+        addTrailPoint(TrailPoint(entity.x, entity.y, jump = isCrossingBorder))
+    }
+
+    private fun addTrailPoint(point: TrailPoint) {
+        synchronized(pendingTrail) { pendingTrail.add(point) }
+        markDirty()
     }
 
     /**
@@ -301,8 +367,9 @@ class EntityNode(
         entity.y = p.y
     }
 
+    /** Starts a new trail stroke at the entity's current location; safe to call from any thread. */
     fun startTrailAtCurrentLocation() {
-        trail.moveTo(entity.x, entity.y)
+        addTrailPoint(TrailPoint(entity.x, entity.y, jump = true))
     }
 
     /**
@@ -341,23 +408,40 @@ class EntityNode(
 
     private fun update() {
         updateAttributesNodes()
-        val isCrossingBorder = !entity.world.contains(entity.location - entity.velocity)
         setOffset(entity.x, entity.y)
         // Repaint sprite to show updated heading/animation frame
         sprite.repaint()
         steeringDebugNode.repaint()
-        if (entity.isShowTrail && (SimbrainDesktop.workspace.updater.isRunning || entity.drawTrailWithoutRunningWorkspace)) {
-            if (isCrossingBorder) {
-                trail.moveTo(entity.x, entity.y)
-            }
-            if (entity.location distanceTo trail.path.currentPoint > 0.25) { // don't add points too close to each other
-                trail.lineTo(entity.x, entity.y)
-            }
-        }
+        drawPendingTrail()
         if (entity.isShowTrail) {
             trail.setOffset(-entity.x, -entity.y)
         }
+    }
 
+    /**
+     * Adds the trail points recorded since the last sync. A move made outside a world update, such as manual
+     * driving while the world is stopped, has no recorded point, so the current position is added as well.
+     */
+    private fun drawPendingTrail() {
+        val points = synchronized(pendingTrail) {
+            if (pendingTrail.isEmpty()) emptyList() else ArrayList(pendingTrail).also { pendingTrail.clear() }
+        }
+        for (point in points) {
+            addToTrail(point)
+        }
+        // While running the model thread may be partway through a move, so only the recorded points are drawn
+        if (isDrawingTrail && !isWorkspaceRunning) {
+            addToTrail(TrailPoint(entity.x, entity.y, jump = false))
+        }
+    }
+
+    private fun addToTrail(point: TrailPoint) {
+        val location = Point2D.Double(point.x, point.y)
+        if (point.jump) {
+            trail.moveTo(point.x, point.y)
+        } else if (location distanceTo trail.path.currentPoint > 0.25) { // don't add points too close to each other
+            trail.lineTo(point.x, point.y)
+        }
     }
 
     /**

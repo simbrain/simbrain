@@ -100,8 +100,7 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
         }
     }
 
-    override fun close() {
-        super.close()
+    override fun onClosed() {
         modelSubscriptions.forEach { it.cancel() }
         modelSubscriptions.clear()
         plotModel.dataset.removeChangeListener(titleSyncListener)

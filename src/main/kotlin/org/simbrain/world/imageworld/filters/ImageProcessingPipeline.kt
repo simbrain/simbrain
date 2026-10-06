@@ -133,6 +133,13 @@ class ImageProcessingPipeline(
     }
 
     /**
+     * Marks the processed image out of date, so it is recomputed the next time something reads it.
+     */
+    fun invalidate() {
+        processedImageCache.invalidate()
+    }
+
+    /**
      * Apply the pipeline and refresh the processed image
      */
     fun applyPipeline() {

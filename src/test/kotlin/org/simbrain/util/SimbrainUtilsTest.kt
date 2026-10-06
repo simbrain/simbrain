@@ -105,4 +105,19 @@ class SimbrainUtilsTest {
         assertEquals(1, callCounter)
     }
 
+
+    @Test
+    fun `an invalidation during a computation is not lost`() {
+        var calls = 0
+        lateinit var cached: CachedObject<Int>
+        cached = CachedObject {
+            calls++
+            // Another thread invalidates while this computation is still running
+            if (calls == 1) cached.invalidate()
+            calls
+        }
+
+        assertEquals(1, cached.value)
+        assertEquals(2, cached.value, "a value computed before the invalidation was kept as current")
+    }
 }

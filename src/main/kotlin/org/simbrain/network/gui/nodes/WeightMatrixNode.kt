@@ -14,6 +14,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
+import org.simbrain.util.onUi
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
@@ -535,7 +536,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 wmViewer.addSeparator()
                 wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
                 contentPane.addTab("Weight Matrix", wmViewer)
-                editingObject.events.updated.on(Dispatchers.Swing) {
+                // A learning matrix reports an update every iteration, so the table refreshes at most once per frame
+                editingObject.events.updated.onUi(dialog.viewScope) {
                     if (!targetSourceFormat) {
                         wm.data = editingObject.weights.transpose()
                     }

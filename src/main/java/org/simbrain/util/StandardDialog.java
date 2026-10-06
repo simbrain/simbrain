@@ -1,5 +1,7 @@
 package org.simbrain.util;
 
+import kotlinx.coroutines.CoroutineScope;
+import kotlinx.coroutines.CoroutineScopeKt;
 import net.miginfocom.swing.MigLayout;
 import org.simbrain.util.genericframe.GenericJDialog;
 
@@ -44,13 +46,31 @@ public class StandardDialog extends GenericJDialog {
     private final JPanel customButtonPanel = new JPanel();
 
     /**
-     * Action listener.
+     * Escape and Cmd-W close the dialog the way its window close button does, so close tasks run and its view scope
+     * ends; only hiding it left its subscriptions updating a dialog nobody could see.
      */
     ActionListener actionListener = new ActionListener() {
         public void actionPerformed(final ActionEvent actionEvent) {
-            setVisible(false);
+            myIsDialogCancelled = true;
+            closeDialogCancel();
         }
     };
+
+    /**
+     * Scope of this dialog's view updates: bind event subscriptions with {@code cancelWith(viewScope)} and create
+     * view refreshes in it, and they end when the dialog is disposed, which every way of closing it does.
+     */
+    private final CoroutineScope viewScope = UiUpdatesKt.UiScope();
+
+    public CoroutineScope getViewScope() {
+        return viewScope;
+    }
+
+    @Override
+    public void dispose() {
+        CoroutineScopeKt.cancel(viewScope, null);
+        super.dispose();
+    }
 
     /**
      * A global okay button for accessibility.

@@ -236,6 +236,25 @@ fun <T> CoroutineScope.uiInbox(minIntervalMs: Long = 0, drain: (List<T>) -> Unit
  */
 fun UiScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 
+/**
+ * Ends this event subscription when [scope] ends, so a view's subscriptions go with the view. The tie is a child of
+ * [scope] that detaches once the subscription ends on its own, so a long-lived scope does not accumulate handlers.
+ * Returns the subscription, which can still be cancelled earlier.
+ */
+fun Job.cancelWith(scope: CoroutineScope): Job = also { subscription ->
+    val tie = Job(scope.coroutineContext.job)
+    tie.invokeOnCompletion { subscription.cancel() }
+    subscription.invokeOnCompletion { tie.cancel() }
+}
+
+/** [cancelWith] for an awaitable-event subscription, which returns a remover instead of a Job. */
+fun (() -> Unit).cancelWith(scope: CoroutineScope) {
+    Job(scope.coroutineContext.job).invokeOnCompletion { this() }
+}
+
+/** Cancels this scope (such as a panel's view scope) when [scope] (such as its window's) ends. */
+fun CoroutineScope.cancelWith(scope: CoroutineScope): CoroutineScope = also { coroutineContext.job.cancelWith(scope) }
+
 /** Ties an event subscription's removal to [scope]'s lifetime and returns a Job that also removes it. */
 private fun subscribedUntil(scope: CoroutineScope, unsubscribe: () -> Unit): Job {
     val subscription = Job(scope.coroutineContext[Job])

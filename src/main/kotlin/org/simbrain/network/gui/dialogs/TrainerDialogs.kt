@@ -319,7 +319,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         var trainingJob: Job? = null
 
         /** Scope of this dialog's view refreshes, cancelled when it closes. */
-        val ui = UiScope()
+        val viewScope = UiScope()
 
         val runControls = JPanel().apply { layout = MigLayout("nogrid") }
 
@@ -404,7 +404,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         runControls.add(labelPanel, "wrap")
 
         // Fired every training iteration; awaiting the EDT here would pace training by the display
-        trainer.events.progressUpdated.onUi(ui) {
+        trainer.events.progressUpdated.onUi(viewScope) {
             iterationsLabel.text = "" + trainer.iteration
         }
 
@@ -480,7 +480,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         addCommitTask { syncDataSet() }
         addCloseTask {
             trainingJob?.cancel()
-            ui.cancel()
+            viewScope.cancel()
         }
 
         contentPane = mainPanel

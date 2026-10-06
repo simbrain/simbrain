@@ -107,7 +107,7 @@ class TextWorldPanel(
      * @param theWorld the reader world to display
      */
     /** Owns the panel's EDT updates; cancelled when the panel's desktop component closes. */
-    val ui = UiScope()
+    val viewScope = UiScope()
 
     init {
 
@@ -198,7 +198,7 @@ class TextWorldPanel(
         // cursor moves arrive once per iteration from coupled simulations, which would otherwise wait on the EDT
         // (and a full restyle) every time. Each refresh shows the world as it is when it runs, so a burst of
         // changes collapses into one refresh that is still in sync.
-        world.events.textChanged.onUi(ui, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+        world.events.textChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             if (textArea.text != world.text) {
                 updatingTextArea = true
                 try {
@@ -214,11 +214,11 @@ class TextWorldPanel(
             updateStatus()
         }
 
-        world.events.cursorPositionChanged.onUi(ui, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+        world.events.cursorPositionChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
         }
 
-        world.events.currentTokenChanged.onUi(ui, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+        world.events.currentTokenChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             updateHighlights()
         }
 

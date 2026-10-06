@@ -9,6 +9,7 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
 import org.simbrain.util.UiWork
+import org.simbrain.util.onEdt
 import org.simbrain.workspace.Workspace
 import java.util.concurrent.CountDownLatch
 import javax.swing.SwingUtilities
@@ -35,13 +36,13 @@ class BarChartTest {
         collection.activationArray = doubleArrayOf(0.25, 0.75)
         workspace.simpleIterate()
         awaitUntil(message = "Bars were not named after neuron labels") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Left", "Right")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Left", "Right") }
         }
         assertEquals(0.75, barChartComponent.model.getDataset().getValue(0, 1))
 
         neurons[0].label = "West"
         awaitUntil(message = "Bar name did not follow the neuron rename without an iteration") {
-            barChartComponent.model.getDataset().columnKeys == listOf("West", "Right")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("West", "Right") }
         }
         assertEquals(0.25, barChartComponent.model.getDataset().getValue(0, 0))
     }
@@ -66,14 +67,14 @@ class BarChartTest {
 
         collection.activationArray = doubleArrayOf(1.0, 2.0, 3.0)
         workspace.simpleIterate()
-        awaitUntil { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Beta", "Gamma") }
+        awaitUntil { onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Beta", "Gamma") } }
 
         runBlocking { neurons[1].delete() }
 
         // Without waiting for another update: the deleted neuron's bar goes, rather than staying behind
         // under the stand-in number it would get once it no longer has a name
         awaitUntil(message = "The deleted neuron's bar was not removed") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma") }
         }
 
         // Undoing a deletion restores collection membership through restoreNeuron
@@ -81,7 +82,7 @@ class BarChartTest {
         collection.restoreNeuron(neurons[1])
 
         awaitUntil(message = "The restored neuron's bar did not come back") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma", "Beta")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma", "Beta") }
         }
     }
 

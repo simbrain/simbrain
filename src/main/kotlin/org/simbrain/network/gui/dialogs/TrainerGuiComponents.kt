@@ -309,7 +309,7 @@ class ErrorTimeSeries(events: TrainerEvents, quantity: String = "Error", iterati
         object Reset : PlotUpdate
     }
 
-    private val ui = UiScope()
+    private val viewScope = UiScope()
 
     constructor(trainer: SupervisedTrainer) : this(trainer.events, iterationSupplier = { trainer.iteration })
 
@@ -347,7 +347,7 @@ class ErrorTimeSeries(events: TrainerEvents, quantity: String = "Error", iterati
 
         // Each report is bound to the iteration it came from and applied on the EDT in order with resets, so
         // training never waits on the EDT and a reset can't be overtaken by points from before it
-        val updates = ui.uiInbox<PlotUpdate> { batch ->
+        val updates = viewScope.uiInbox<PlotUpdate> { batch ->
             batch.forEach { update ->
                 when (update) {
                     is PlotUpdate.Point -> {
@@ -376,7 +376,7 @@ class ErrorTimeSeries(events: TrainerEvents, quantity: String = "Error", iterati
     fun dispose() {
         errorRemover()
         resetJob.cancel()
-        ui.cancel()
+        viewScope.cancel()
     }
 }
 

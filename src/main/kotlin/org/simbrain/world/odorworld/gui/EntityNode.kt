@@ -15,6 +15,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.Theme
+import org.simbrain.util.cancelWith
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
 import org.simbrain.util.toRadian
@@ -46,7 +47,7 @@ class EntityNode(
     private val panel: OdorWorldPanel
 ) : PNode(), NodeWithDispersion by DispersionNode(entity) {
 
-    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(panel.ui.coroutineContext.job))
+    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(panel.viewScope.coroutineContext.job))
 
     private val dirty = AtomicBoolean()
 
@@ -296,13 +297,9 @@ class EntityNode(
         nodeScope.cancel()
     }
 
-    private fun Job.untilDisposed(): Job = also { subscription ->
-        nodeScope.coroutineContext.job.invokeOnCompletion { subscription.cancel() }
-    }
+    private fun Job.untilDisposed(): Job = cancelWith(nodeScope)
 
-    private fun (() -> Unit).untilDisposed() {
-        nodeScope.coroutineContext.job.invokeOnCompletion { this() }
-    }
+    private fun (() -> Unit).untilDisposed() = cancelWith(nodeScope)
 
     /** Schedules a sync on the next frame; cheap and safe to call from any thread. */
     private fun markDirty() {

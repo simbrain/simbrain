@@ -100,14 +100,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Owns the panel's EDT updates, which the network posts to without waiting on the EDT. Cancelled when the
      * panel's desktop component closes. The panel's own coroutine context is the network's, which outlives it.
      */
-    val ui = UiScope()
+    val viewScope = UiScope()
 
     /**
      * Per-frame sync pass for node visuals: model events only mark a node dirty and queue it here once, and each pass
      * pulls the current model state into every queued node. Paced runs drain it every iteration through the
      * workspace's display sync; unpaced runs sample it at frame rate, so the EDT never sees a task per model event.
      */
-    val nodeSync = ui.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+    val nodeSync = viewScope.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
 
     /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
     fun detachNode(node: ScreenElement) {
@@ -263,7 +263,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
      * final state.
      */
-    private val refreshAfterUpdate = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+    private val refreshAfterUpdate = viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
         // The canvas, not the whole panel: toolbars and the status bar don't change with an update
         canvas.repaint()
         timeLabel.update()
@@ -273,7 +273,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Fits the view to the network (when auto zoom is on) and repaints. Requests coalesce, and a run follows the
      * EDT work queued before it was requested, so it reads bounds that node updates already applied.
      */
-    private val zoomToFit = ui.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
+    private val zoomToFit = viewScope.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
         if (autoZoom) {
             val filtered = screenElements.unionOfGlobalFullBounds()
             canvas.camera.setViewBounds(
@@ -287,7 +287,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Nodes whose models were deleted, removed from the canvas in batches. Deletion never waits on the EDT, and
      * the view refits once the batch is gone rather than while deleted nodes still count toward its bounds.
      */
-    private val nodeRemovals = ui.uiInbox<ScreenElement> { nodes ->
+    private val nodeRemovals = viewScope.uiInbox<ScreenElement> { nodes ->
         val unique = nodes.toSet()
         unique.forEach {
             (it as? SynapseNode)?.detachSymmetric()

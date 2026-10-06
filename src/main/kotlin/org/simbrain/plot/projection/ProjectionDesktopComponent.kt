@@ -1,13 +1,12 @@
 /**
  * Desktop view of a [ProjectionComponent]: a scatter chart of the projected points with controls for the projection
- * method, its settings, and iterating it. Projector events reach the chart through per-frame refreshes on [ui], so a
- * run that adds a point (or iterates the projection) every step costs the EDT about one redraw per frame rather than
- * one per point.
+ * method, its settings, and iterating it. Projector events reach the chart through per-frame refreshes on
+ * [viewScope], so a run that adds a point (or iterates the projection) every step costs the EDT about one redraw per
+ * frame rather than one per point.
  */
 package org.simbrain.plot.projection
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
@@ -44,11 +43,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
 
     private var running = false
 
-    /** Scope of this view's chart refreshes; cancelled when the component closes. */
-    private val ui = UiScope()
-
     /** Rebuilds the chart from the dataset, at most once per frame. */
-    private val redraw = ui.uiRefresh { redrawAllPoints() }
+    private val redraw = viewScope.uiRefresh { redrawAllPoints() }
 
     /**
      * Ordered list of [DataPoint] points so that the renderer can access points by index.
@@ -193,10 +189,10 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             setAction("Run")
             projector.events.startIterating.on {
                 setAction("Stop")
-            }
+            }.cancelWith(viewScope)
             projector.events.stopIterating.on {
                 setAction("Run")
-            }
+            }.cancelWith(viewScope)
         })
         add(iterateAction)
     }
@@ -298,10 +294,6 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         dimensionsLabel.text = "Dimensions: ${projector.dimension}"
     }
 
-    override fun onClosed() {
-        ui.cancel()
-    }
-
     init {
         layout = BorderLayout()
 
@@ -331,14 +323,14 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             })
         }
 
-        projector.events.datasetChanged.onImmediate { redraw.request() }
-        projector.events.pointUpdated.onUi(ui) { chart.fireChartChanged() }
+        projector.events.datasetChanged.onImmediate { redraw.request() }.cancelWith(viewScope)
+        projector.events.pointUpdated.onUi(viewScope) { chart.fireChartChanged() }
         projector.events.datasetCleared.on {
             projector.coloringManager.reset()
-        }
+        }.cancelWith(viewScope)
         projector.events.settingsChanged.on {
             renderer.setSeriesLinesVisible(0, projector.connectPoints)
-        }
+        }.cancelWith(viewScope)
         renderer.setSeriesLinesVisible(0, projector.connectPoints)
         projector.events.methodChanged.on { o, n ->
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
@@ -359,8 +351,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             bottomPanel.revalidate()
             bottomPanel.repaint()
             redraw.request()
-        }
-        projector.events.iterated.onUi(ui) { error ->
+        }.cancelWith(viewScope)
+        projector.events.iterated.onUi(viewScope) { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
         redraw.request()

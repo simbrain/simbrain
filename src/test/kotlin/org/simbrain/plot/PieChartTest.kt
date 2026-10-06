@@ -10,6 +10,7 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.piechart.PieChartComponent
 import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.util.UiWork
+import org.simbrain.util.onEdt
 import org.simbrain.workspace.Workspace
 
 class PieChartTest {
@@ -73,12 +74,12 @@ class PieChartTest {
         ng.activationArray = doubleArrayOf(.5, .5)
         iterate()
         awaitUntil(message = "Slices were not named after the neurons") {
-            pieChart.dataset.keys == listOf(ng.getNeuron(0).displayName, ng.getNeuron(1).displayName)
+            onEdt { pieChart.dataset.keys == listOf(ng.getNeuron(0).displayName, ng.getNeuron(1).displayName) }
         }
 
         ng.getNeuron(0).label = "Renamed"
         awaitUntil(message = "Slice name did not follow the neuron rename without an iteration") {
-            pieChart.dataset.keys.firstOrNull() == "Renamed"
+            onEdt { pieChart.dataset.keys.firstOrNull() == "Renamed" }
         }
         assertEquals(.5, pieChart.dataset.getValue(0).toDouble(), .01)
     }

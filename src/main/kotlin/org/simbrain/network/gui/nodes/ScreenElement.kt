@@ -20,6 +20,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.cancelWith
 import org.simbrain.util.display
 import org.simbrain.util.int
 import org.simbrain.util.piccolo.firstScreenElement
@@ -52,7 +53,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * node replaced by undo stops reacting to the model it used to show. The model's own event scope is never closed:
      * undo reuses model instances.
      */
-    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(networkPanel.ui.coroutineContext.job))
+    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(networkPanel.viewScope.coroutineContext.job))
 
     /** Ends this node's subscriptions; called when it is removed from the canvas for good. */
     open fun dispose() {
@@ -60,14 +61,10 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     }
 
     /** Keeps a subscription only for as long as this node is on the canvas. */
-    protected fun Job.untilDisposed(): Job = also { subscription ->
-        nodeScope.coroutineContext.job.invokeOnCompletion { subscription.cancel() }
-    }
+    protected fun Job.untilDisposed(): Job = cancelWith(nodeScope)
 
     /** [untilDisposed] for awaitable-event subscriptions, which return a remover. */
-    protected fun (() -> Unit).untilDisposed() {
-        nodeScope.coroutineContext.job.invokeOnCompletion { this() }
-    }
+    protected fun (() -> Unit).untilDisposed() = cancelWith(nodeScope)
 
     /**
      * Aspects of the model that changed since this node last synced, as subclass-defined bits. Model events only set

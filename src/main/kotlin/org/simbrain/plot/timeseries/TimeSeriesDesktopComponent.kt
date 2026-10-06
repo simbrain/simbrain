@@ -14,10 +14,10 @@
  */
 package org.simbrain.plot.timeseries
 
-import kotlinx.coroutines.Job
 import org.jfree.chart.axis.AxisSpace
 import org.jfree.data.general.DatasetChangeListener
 import org.simbrain.plot.actions.PlotActionManager
+import org.simbrain.util.cancelWith
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.swingDispatcher
 import org.simbrain.util.widgets.ShowHelpAction
@@ -69,9 +69,6 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
 
     private val lineChartDomainAxis get() = timeSeriesPanel.chartPanel.chart.xyPlot.domainAxis
 
-    /** Model-side registrations, undone in [close] because the model can outlive this window. */
-    private val modelSubscriptions = mutableListOf<Job>()
-
     private val titleSyncListener = DatasetChangeListener { scheduleTitleSync() }
 
     init {
@@ -84,13 +81,15 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
         rebuildLayout()
         syncControls()
 
-        modelSubscriptions += plotModel.events.propertyChanged.on(swingDispatcher) {
+        // The model can outlive this window, so its subscriptions end with the view
+        plotModel.events.propertyChanged.on(swingDispatcher) {
             rebuildLayout()
             syncControls()
-        }
-        modelSubscriptions += plotModel.events.timeSeriesAdded.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
-        modelSubscriptions += plotModel.events.timeSeriesRemoved.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
-        modelSubscriptions += plotModel.events.timeSeriesVisibilityChanged.on(swingDispatcher) { if (recurrenceVisible()) rebuildTabs() }
+        }.cancelWith(viewScope)
+        val rebuildIfShown: suspend () -> Unit = { if (recurrenceVisible()) rebuildTabs() }
+        plotModel.events.timeSeriesAdded.on(swingDispatcher) { rebuildIfShown() }.cancelWith(viewScope)
+        plotModel.events.timeSeriesRemoved.on(swingDispatcher) { rebuildIfShown() }.cancelWith(viewScope)
+        plotModel.events.timeSeriesVisibilityChanged.on(swingDispatcher) { rebuildIfShown() }.cancelWith(viewScope)
         // Renames happen in place without an add/remove event; catch them as data flows
         plotModel.dataset.addChangeListener(titleSyncListener)
         // Aligned panels pull the line chart's range on their own refreshes, which auto-range keeps
@@ -101,8 +100,6 @@ class TimeSeriesDesktopComponent(frame: GenericFrame, component: TimeSeriesPlotC
     }
 
     override fun onClosed() {
-        modelSubscriptions.forEach { it.cancel() }
-        modelSubscriptions.clear()
         plotModel.dataset.removeChangeListener(titleSyncListener)
         recurrencePanels.values.forEach { it.dispose() }
         recurrencePanels.clear()

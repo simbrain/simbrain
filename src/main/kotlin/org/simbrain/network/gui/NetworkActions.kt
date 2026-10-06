@@ -48,7 +48,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
 
     /** Runs [refresh] on the EDT after models are added, coalesced so a bulk add costs a few refreshes, not one per model. */
     private fun refreshOnModelAdded(refresh: () -> Unit) {
-        val limited = networkPanel.ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS, refresh)
+        val limited = networkPanel.viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS, refresh)
         networkPanel.network.events.modelAdded.on(Dispatchers.Unconfined) { limited.request() }
     }
     // For testing purposes only

@@ -181,6 +181,7 @@ class UiUpdatesTest {
     private class TestEvents : FlowEvents() {
         val barrier = NoArgAwaitableEvent()
         val valued = AwaitableEvent<Int>()
+        val ping = NoArgEvent()
     }
 
     @Test
@@ -220,5 +221,53 @@ class UiUpdatesTest {
         events.barrier.fire()
         withContext(Dispatchers.IO) { UiWork.awaitIdle() }
         assertEquals(0, runs.get())
+    }
+
+    @Test
+    fun `a subscription bound to a scope ends when the scope ends`() {
+        val scope = UiScope()
+        val events = TestEvents()
+        var runs = 0
+        events.ping.onImmediate { runs++ }.cancelWith(scope)
+
+        events.ping.fire()
+        scope.cancel()
+        events.ping.fire()
+
+        assertEquals(1, runs)
+    }
+
+    @Test
+    fun `an awaitable subscription bound to a scope ends when the scope ends`() = runBlocking {
+        val scope = UiScope()
+        val events = TestEvents()
+        var runs = 0
+        events.barrier.on(Dispatchers.Unconfined) { runs++ }.cancelWith(scope)
+
+        events.barrier.fire()
+        scope.cancel()
+        events.barrier.fire()
+
+        assertEquals(1, runs)
+    }
+
+    @Test
+    fun `subscriptions ended early do not pile up on a long-lived scope`() {
+        val scope = UiScope()
+        val events = TestEvents()
+
+        repeat(1000) { events.ping.onImmediate { }.cancelWith(scope).cancel() }
+
+        assertEquals(0, scope.coroutineContext.job.children.count())
+    }
+
+    @Test
+    fun `a panel scope bound to its window's scope ends with it`() {
+        val window = UiScope()
+        val panel = UiScope().cancelWith(window)
+
+        window.cancel()
+
+        assertFalse(panel.isActive)
     }
 }

@@ -54,13 +54,13 @@ class OdorWorldPanel(
     override val coroutineContext get() = world.coroutineContext
 
     /** Scope of this panel's view updates; cancelled when its desktop component closes. */
-    val ui = UiScope()
+    val viewScope = UiScope()
 
     /** Entity nodes with model changes to draw, synced once per frame. */
-    internal val entitySync = ui.uiInbox<EntityNode>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+    internal val entitySync = viewScope.uiInbox<EntityNode>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
 
     /** Keeps the camera on the selected entity, once per frame, after the world or a manual move changes it. */
-    private val cameraSync = ui.uiRefresh { centerCameraToSelectedEntity() }
+    private val cameraSync = viewScope.uiRefresh { centerCameraToSelectedEntity() }
 
     /**
      * The Piccolo PCanvas.

@@ -5,7 +5,7 @@
  */
 package org.simbrain.world.odorworld
 
-import kotlinx.coroutines.cancel
+import org.simbrain.util.cancelWith
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.gui.AspectRatioLockedContent
 import org.simbrain.workspace.gui.DesktopComponent
@@ -22,6 +22,7 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
     DesktopComponent<OdorWorldComponent>(frame, component), AspectRatioLockedContent {
 
     val worldPanel: OdorWorldPanel = OdorWorldPanel(component, component.world)
+        .also { it.viewScope.cancelWith(viewScope) }
 
     private val world get() = worldPanel.world
 
@@ -35,13 +36,9 @@ class OdorWorldDesktopComponent(frame: GenericFrame, component: OdorWorldCompone
         add("Center", worldPanel)
         parentFrame.jMenuBar = createMenuBar()
 
-        world.events.tileMapChanged.on { fitFrameToWorldSize() }
-        world.events.propertiesChanged.on { applyAspectLock() }
+        world.events.tileMapChanged.on { fitFrameToWorldSize() }.cancelWith(viewScope)
+        world.events.propertiesChanged.on { applyAspectLock() }.cancelWith(viewScope)
         SwingUtilities.invokeLater { fitFrameToWorldSize() }
-    }
-
-    override fun onClosed() {
-        worldPanel.ui.cancel()
     }
 
     /**

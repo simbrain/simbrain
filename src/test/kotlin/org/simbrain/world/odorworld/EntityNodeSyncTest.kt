@@ -50,7 +50,7 @@ class EntityNodeSyncTest {
         val world = component.world.apply { tileMap = TileMap(20, 20) }
         val panel = panelFor(world, component)
         val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
-        val node = panel.getEntityNode(mouse)
+        val node = onEdt { panel.getEntityNode(mouse) }
 
         mouse.location = point(150.0, 120.0)
         UiWork.awaitIdle()
@@ -65,7 +65,7 @@ class EntityNodeSyncTest {
         val world = component.world.apply { tileMap = TileMap(20, 20) }
         val panel = panelFor(world, component)
         val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
-        val node = panel.getEntityNode(mouse)
+        val node = onEdt { panel.getEntityNode(mouse) }
         UiWork.awaitIdle()
 
         val tasks = countEdtTasks {
@@ -100,7 +100,7 @@ class EntityNodeSyncTest {
             drawTrailWithoutRunningWorkspace = true
             isShowTrail = true
         }
-        val node = panel.getEntityNode(mouse)
+        val node = onEdt { panel.getEntityNode(mouse) }
         UiWork.awaitIdle()
 
         val updates = 60
@@ -130,7 +130,7 @@ class EntityNodeSyncTest {
         val world = component.world.apply { tileMap = TileMap(20, 20) }
         val panel = panelFor(world, component)
         val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
-        val node = panel.getEntityNode(mouse)
+        val node = onEdt { panel.getEntityNode(mouse) }
 
         mouse.delete()
 
@@ -144,15 +144,15 @@ class EntityNodeSyncTest {
         val world = component.world.apply { tileMap = TileMap(20, 20) }
         val panel = panelFor(world, component)
         val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
-        val original = panel.getEntityNode(mouse)
+        val original = onEdt { panel.getEntityNode(mouse) }
 
         world.events.tileMapChanged.fire()
 
-        awaitUntil { panel.getEntityNode(mouse) !== original }
+        awaitUntil { onEdt { panel.getEntityNode(mouse) } !== original }
         assertFalse(original.nodeScope.isActive, "a replaced node still listens to its entity")
         mouse.location = point(130.0, 110.0)
         UiWork.awaitIdle()
-        assertEquals(130.0, panel.getEntityNode(mouse).offset.x)
+        assertEquals(130.0, onEdt { panel.getEntityNode(mouse) }.offset.x)
     }
 
     @Test
@@ -161,14 +161,14 @@ class EntityNodeSyncTest {
         val world = component.world.apply { tileMap = TileMap(20, 20) }
         val panel = panelFor(world, component)
         val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
-        val original = panel.getEntityNode(mouse)
+        val original = onEdt { panel.getEntityNode(mouse) }
         world.events.tileMapChanged.fire()
-        awaitUntil { panel.getEntityNode(mouse) !== original }
+        awaitUntil { onEdt { panel.getEntityNode(mouse) } !== original }
         SwingUtilities.invokeAndWait { panel.selectionManager.clear() }
 
         mouse.select()
 
-        assertEquals(listOf(panel.getEntityNode(mouse)), panel.selectedEntityNodes)
+        assertEquals(listOf(onEdt { panel.getEntityNode(mouse) }), onEdt { panel.selectedEntityNodes })
     }
 
     @Test
@@ -182,6 +182,6 @@ class EntityNodeSyncTest {
 
         mouse.select()
 
-        assertEquals(listOf(panel.getEntityNode(mouse)), panel.selectedEntityNodes)
+        assertEquals(listOf(onEdt { panel.getEntityNode(mouse) }), onEdt { panel.selectedEntityNodes })
     }
 }

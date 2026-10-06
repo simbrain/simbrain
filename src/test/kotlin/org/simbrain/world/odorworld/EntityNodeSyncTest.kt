@@ -1,8 +1,8 @@
 /**
  * Entity movement reaches odor world nodes through dirty marks and one per-frame sync pass rather than an EDT task
  * per move: nodes still follow their entities, bursts of moves coalesce, a world update never waits on the EDT,
- * trails keep every world update's position even when frames are skipped, and nodes that leave the canvas stop
- * listening.
+ * trails keep every world update's position even when frames are skipped, nodes that leave the canvas stop
+ * listening, and selecting an entity selects whichever node currently draws it.
  */
 package org.simbrain.world.odorworld
 
@@ -14,9 +14,11 @@ import org.simbrain.plot.awaitUntil
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.util.finishesWhileEdtIsBlocked
+import org.simbrain.util.onEdt
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
 import org.simbrain.world.odorworld.entities.EntityType
+import org.simbrain.world.odorworld.gui.EntityNode
 import java.awt.geom.PathIterator
 import java.util.concurrent.CountDownLatch
 import javax.swing.SwingUtilities
@@ -133,7 +135,7 @@ class EntityNodeSyncTest {
         mouse.delete()
 
         awaitUntil { !node.nodeScope.isActive }
-        assertNull(node.parent)
+        assertNull(onEdt { node.parent })
     }
 
     @Test
@@ -151,5 +153,35 @@ class EntityNodeSyncTest {
         mouse.location = point(130.0, 110.0)
         UiWork.awaitIdle()
         assertEquals(130.0, panel.getEntityNode(mouse).offset.x)
+    }
+
+    @Test
+    fun `selecting an entity selects its live node after the tile map rebuilds the nodes`() = runBlocking {
+        val component = OdorWorldComponent("World")
+        val world = component.world.apply { tileMap = TileMap(20, 20) }
+        val panel = panelFor(world, component)
+        val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
+        val original = panel.getEntityNode(mouse)
+        world.events.tileMapChanged.fire()
+        awaitUntil { panel.getEntityNode(mouse) !== original }
+        SwingUtilities.invokeAndWait { panel.selectionManager.clear() }
+
+        mouse.select()
+
+        assertEquals(listOf(panel.getEntityNode(mouse)), panel.selectedEntityNodes)
+    }
+
+    @Test
+    fun `selecting an entity that existed before its panel selects its node`() = runBlocking {
+        val component = OdorWorldComponent("World")
+        val world = component.world.apply { tileMap = TileMap(20, 20) }
+        val mouse = world.addEntity(100.0, 100.0, EntityType.Mouse)
+        val panel = panelFor(world, component)
+        // Existing entities get their nodes from the panel's first tile map render, on a later EDT turn
+        awaitUntil { onEdt { panel.canvas.layer.allNodes.any { it is EntityNode && it.entity === mouse } } }
+
+        mouse.select()
+
+        assertEquals(listOf(panel.getEntityNode(mouse)), panel.selectedEntityNodes)
     }
 }

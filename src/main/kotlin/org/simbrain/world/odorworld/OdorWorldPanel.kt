@@ -301,14 +301,6 @@ class OdorWorldPanel(
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
-
-            world.events.cleanups[e] = e.events.selected.on(swingDispatcher) {
-                selectionManager.clear()
-                selectionManager.add(node)
-            }
-        }
-        world.events.entityRemoved.on(Dispatchers.Default) {
-            world.events.cleanups[it]?.invoke()
         }
         world.events.updated.on(Dispatchers.Unconfined) { cameraSync.request() }
         world.events.frameAdvanced.on(swingDispatcher) {

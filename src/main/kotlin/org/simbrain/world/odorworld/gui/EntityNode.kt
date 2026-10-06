@@ -214,10 +214,15 @@ class EntityNode(
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on(dispatcher = Dispatchers.Swing) {
-            dispose()
             removeFromParent()
+            dispose()
         }.untilDisposed()
         entity.events.moved.onImmediate { markDirty() }.untilDisposed()
+        // Owned by the node so it selects whichever node is live, including after a tile map rebuild
+        entity.events.selected.on(Dispatchers.Swing) {
+            panel.selectionManager.clear()
+            panel.selectionManager.add(this)
+        }.untilDisposed()
         entity.world.events.updated.on(Dispatchers.Unconfined) { recordTrailPoint() }.untilDisposed()
         entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             sprite.updateBounds()

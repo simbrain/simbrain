@@ -493,14 +493,19 @@ class CnnTrainer(
             targetTensor.inputs.fill(0.0)
             connector.propagate()
 
-            // Apply activation function (simulating Tensor.update())
+            // Apply activation function (simulating Tensor.update()). Read the delegated arrays once: each read of
+            // activations or biases goes through a GuiEditable delegate
             val af = targetTensor.activationFunction
-            for (j in targetTensor.activations.indices) {
-                val pre = targetTensor.inputs[j] + targetTensor.biases[j]
-                targetTensor.preActivations[j] = pre
-                targetTensor.activations[j] = af.apply(pre)
+            val inputs = targetTensor.inputs
+            val biases = targetTensor.biases
+            val preActivations = targetTensor.preActivations
+            val activations = targetTensor.activations
+            for (j in activations.indices) {
+                val pre = inputs[j] + biases[j]
+                preActivations[j] = pre
+                activations[j] = af.apply(pre)
             }
-            targetTensor.inputs.fill(0.0)
+            inputs.fill(0.0)
         }
 
         // Flatten: copy last tensor activations into pre-allocated buffer

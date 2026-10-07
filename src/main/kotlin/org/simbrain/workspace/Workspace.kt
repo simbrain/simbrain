@@ -9,6 +9,7 @@ import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewer
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.update_actions.BufferedUpdate
 import org.simbrain.network.update_actions.PriorityUpdate
 import org.simbrain.network.update_actions.UpdateNetworkModel
@@ -158,6 +159,7 @@ class Workspace: CoroutineScope {
 
     init {
         initIdManager()
+        Blas.ensureDefaultThreadsInBackground()
     }
 
     fun addWorkspaceComponent(component: WorkspaceComponent) {

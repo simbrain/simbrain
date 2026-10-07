@@ -5,7 +5,6 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkDebugInfoProvider
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
-import org.simbrain.network.tensor.Blas
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.util.HuggingFaceFileTokenizer
@@ -253,7 +252,6 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         check(Lfm2Weights.isValidWeightsDirectory(dir)) {
             "No model.safetensors and tokenizer.json in $weightsDirectory"
         }
-        Blas.numThreads = 4
         val model = Lfm2Model(Lfm2Config(maxSeqLen = maxSeqLen), Safetensors.load(dir.resolve("model.safetensors")))
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))

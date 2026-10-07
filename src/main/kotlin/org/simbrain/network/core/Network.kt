@@ -5,6 +5,7 @@ import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -47,6 +48,10 @@ class Network: CoroutineScope, EditableObject {
 
     @Transient
     override var coroutineContext = Dispatchers.Default + job
+
+    init {
+        Blas.ensureDefaultThreads()
+    }
 
     /**
      * Two types of time used in simulations.

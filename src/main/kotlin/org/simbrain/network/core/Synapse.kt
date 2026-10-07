@@ -20,6 +20,7 @@ import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import java.util.*
+import java.util.concurrent.atomic.AtomicLong
 
 /**
  * Model synapses or weights.
@@ -87,6 +88,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         set(newLearningRule) {
             val oldRule = learningRule
             field = newLearningRule.copy()
+            learningRuleEpoch.incrementAndGet()
             // TODO: Needed for calls to SynapseGroup.postOpenInit, which calls
             // SynapseGroup.setAndComformToTemplate. Template synapses don't seem to have
             // change support initialized.
@@ -546,6 +548,12 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     }
 
     companion object {
+        /**
+         * Incremented whenever any synapse's learning rule is replaced, so cached update plans know when their list of
+         * learning (non-static) synapses must be rebuilt.
+         */
+        val learningRuleEpoch = AtomicLong()
+
         /**
          * A default update rule for the synapse.
          */

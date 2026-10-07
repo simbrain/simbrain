@@ -61,7 +61,8 @@ abstract class SpikeResponder : CopyableObject {
 
     context(Network)
     fun probabilisticSpikeCheck(): Boolean {
-        return !useSpikeProbability || random.nextDouble() < spikeProbability
+        // the network's generator is shared by synapses updating on different threads
+        return !useSpikeProbability || synchronized(random) { random.nextDouble() } < spikeProbability
     }
 
     /**

@@ -29,6 +29,7 @@ class NetworkModelList {
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -45,6 +46,7 @@ class NetworkModelList {
     fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -67,6 +69,7 @@ class NetworkModelList {
     fun add(model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             put(Subnetwork::class.java, model)
         } else {
@@ -126,9 +129,17 @@ class NetworkModelList {
 
     val allInPriorityOrder by allInPriorityOrderCache::value
 
+    private val updatePlanCache = CachedObject { NetworkUpdatePlan(allInUpdatingOrder) }
+
+    /**
+     * The cached iteration order used by [Network.bufferedUpdate].
+     */
+    val updatePlan by updatePlanCache::value
+
     fun remove(model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)

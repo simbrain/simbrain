@@ -36,6 +36,9 @@ import kotlin.random.Random
  *
  * Note that much of the logic of the updates happens in [Layer.accumulateInputs] or [Neuron.accumulateInputs], and in [Connector.updatePSR] or [Synapse.updatePSR]
  *
+ * The default buffered update ([bufferedUpdate]) follows a cached [NetworkUpdatePlan] and updates large sets of free
+ * neurons and learning synapses in parallel (see `ParallelUpdate.kt`).
+ *
  */
 class Network: CoroutineScope, EditableObject {
 
@@ -154,13 +157,11 @@ class Network: CoroutineScope, EditableObject {
 
     private var shouldUpdateTimeType = true
 
-    private fun updateInternal(name: String) {
+    private suspend fun updateInternal(name: String) {
         // Main update
         updateManager.actionList.forEach {
-            runBlocking {
-                PerformanceMonitor.record(it, "${name}:${it.description}") {
-                    it.run()
-                }
+            PerformanceMonitor.record(it, "${name}:${it.description}") {
+                it.run()
             }
         }
 
@@ -179,7 +180,7 @@ class Network: CoroutineScope, EditableObject {
      */
     @JvmOverloads
     fun update(name: String = "") {
-        updateInternal(name)
+        runBlocking { updateInternal(name) }
         events.updated.fireAndBlock()
     }
 
@@ -211,9 +212,13 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Default asynchronous update method called by [org.simbrain.network.update_actions.BufferedUpdate].
      */
-    suspend fun bufferedUpdate()  = coroutineScope {
-        networkModels.all.forEach { it.accumulateInputs() }
-        networkModels.all.forEach { it.update() }
+    suspend fun bufferedUpdate() {
+        val plan = networkModels.updatePlan
+        plan.neuronChunks.forEachInParallel { it.accumulateInputs() }
+        plan.otherModels.forEach { it.accumulateInputs() }
+        plan.neuronUpdateChunks.forEachInParallel { it.update() }
+        plan.otherModels.forEach { it.update() }
+        plan.learningSynapseChunks.forEachInParallel { it.update() }
     }
 
     /**

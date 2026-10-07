@@ -24,6 +24,11 @@ import java.lang.Double.max
 @HiddenTypeOption
 class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
 
+    // reads source spikes and activations while updating
+    override val isNeuronLocal: Boolean
+        get() = false
+
+
     @UserParameter(label = "leakRate")
     var leakRate = .75
 

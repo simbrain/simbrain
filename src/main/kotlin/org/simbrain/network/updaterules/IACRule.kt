@@ -14,6 +14,11 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * **IACNeuron** implements an Interactive Activation and Competition neuron.
  */
 class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
+
+    // reads source activations while updating
+    override val isNeuronLocal: Boolean
+        get() = false
+
     @UserParameter(
         label = "Decay rate",
         description = "The rate at which activation decays to its resting value.",

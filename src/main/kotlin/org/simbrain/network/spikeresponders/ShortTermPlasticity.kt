@@ -123,6 +123,7 @@ class ShortTermPlasticity : SpikeResponder() {
         val stpData = responderData as STPMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
+            val psrMatrix = wm.psrMatrix
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
                     val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
@@ -130,9 +131,9 @@ class ShortTermPlasticity : SpikeResponder() {
                         stpData.updateSingle(i, j, time, U, D, F)
                     }
                     val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
-                    wm.psrMatrix.set(
+                    psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {
-                            is JumpAndDecay -> sr.jumpAndDecay(spiked, wm.psrMatrix[i, j], jumpHeight, timeStep)
+                            is JumpAndDecay -> sr.jumpAndDecay(spiked, psrMatrix[i, j], jumpHeight, timeStep)
                             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
                         })
                 }

@@ -23,12 +23,15 @@ class StepResponder(
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
         val weightMatrix = connector as WeightMatrix
         val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
-        for (i in 0 until connector.psrMatrix.ncol()) {
-            for (j in 0 until connector.psrMatrix.nrow()) {
-                if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-                    connector.psrMatrix[j, i] = connector.weights[j, i]
+        val psrMatrix = connector.psrMatrix
+        val weights = connector.weights
+        for (i in 0 until psrMatrix.ncol()) {
+            val responding = lastSpikeTimes[i] + responseDuration * timeStep >= time
+            for (j in 0 until psrMatrix.nrow()) {
+                if (responding && probabilisticSpikeCheck()) {
+                    psrMatrix[j, i] = weights[j, i]
                 } else {
-                    connector.psrMatrix[j, i] = 0.0
+                    psrMatrix[j, i] = 0.0
                 }
             }
         }

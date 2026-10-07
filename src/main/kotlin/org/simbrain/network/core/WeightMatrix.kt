@@ -14,6 +14,7 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
+import smile.math.blas.Transpose
 import smile.math.matrix.Matrix
 import kotlin.math.min
 
@@ -109,13 +110,42 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix = Matrix(target.size, source.size)
+        get() {
+            // Whoever reads the matrix may also write it, so the directly computed sums no longer stand for it
+            if (summedInputs != null) summedInputs = null
+            pendingPsrSource?.let { x ->
+                pendingPsrSource = null
+                for (j in 0 until field.ncol()) {
+                    for (i in 0 until field.nrow()) {
+                        field[i, j] = weights[i, j] * x[j]
+                    }
+                }
+            }
+            return field
+        }
         set(value) {
+            pendingPsrSource = null
+            summedInputs = null
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
                 value
             } else {
                 Matrix(weights.nrow(), weights.ncol())
             }
         }
+
+    /**
+     * Summed inputs from the last connectionist (non-spiking) update, computed as one matrix-vector product rather
+     * than as row sums of a filled [psrMatrix]. Null after a spiking update or once [psrMatrix] has been read.
+     */
+    @Transient
+    private var summedInputs: DoubleArray? = null
+
+    /**
+     * Source activations from the last connectionist update whose per-weight responses have not been written to
+     * [psrMatrix] yet. Most targets only need the summed inputs, so [psrMatrix] is filled only when something reads it.
+     */
+    @Transient
+    private var pendingPsrSource: DoubleArray? = null
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -209,9 +239,11 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     /**
-     * Prepare the PSR Matrix for consumption by target layers.
+     * Prepare post-synaptic responses for consumption by target layers.
      *
-     * Most targets use the updated PSRMatrix by calling [getSummedPSRs].
+     * Most targets read them summed, by calling [getSummedPSRs]. Without a spike responder the sums are computed
+     * directly as a matrix-vector product, and [psrMatrix] is filled only if it is read. With a spike responder, the
+     * responder writes [psrMatrix] and its rows are summed.
      * Some targets like [ActivationSequence] bypass the PSRMatrix and compute a matrix product directly.
      */
     context(Network)
@@ -232,14 +264,23 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 ?: activations
             }
 
-            // One "half" of a matrix product ([getSummedPSRs] does the rest). Source activations are element-wise multiplied by rows of matrix
-            psrMatrix.copyFrom(weights.scaleColumns(sourceActivations))
+            // The summed inputs are the matrix-vector product; the per-weight responses (each weight times its source
+            // activation) are left for psrMatrix to fill if it is read
+            val x = sourceActivations.col(0)
+            val summed = DoubleArray(weights.nrow())
+            weights.mv(Transpose.NO_TRANSPOSE, 1.0, x, 0.0, summed)
+            pendingPsrSource = x
+            summedInputs = summed
 
         } else {
             // Spiking case
+            pendingPsrSource = null
+            summedInputs = null
             spikeResponder.apply(this, spikeResponseData)
         }
     }
+
+    override fun getSummedPSRs(): DoubleArray = summedInputs?.copyOf() ?: psrMatrix.rowSums()
 
     private fun updateExcitatoryMask() {
         for (i in 0 until weights.nrow()) {

@@ -91,13 +91,22 @@ class AdamOptimizer(
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
 
-        meanEstimate.mul(beta1).add(delta.clone().mul(1 - beta1))
-        varianceEstimate.mul(beta2).add(delta.clone().applyFunction { it * it }.mul(1 - beta2))
-
-        val meanCorrected = meanEstimate.clone().div(1 - beta1.pow(timeSinceLastReset))
-        val varianceCorrected = varianceEstimate.clone().div(1 - beta2.pow(timeSinceLastReset))
-
-        return meanCorrected.mul(learningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
+        val meanCorrection = 1 - beta1.pow(timeSinceLastReset)
+        val varianceCorrection = 1 - beta2.pow(timeSinceLastReset)
+        val update = Matrix(matrix.nrow(), matrix.ncol())
+        // One pass per element, with the same operations in the same order as the matrix form
+        // m = beta1 m + (1 - beta1) g, v = beta2 v + (1 - beta2) g^2, update = lr (m / c1) / (sqrt(v / c2) + eps)
+        for (j in 0 until matrix.ncol()) {
+            for (i in 0 until matrix.nrow()) {
+                val g = delta[i, j]
+                val m = meanEstimate[i, j] * beta1 + g * (1 - beta1)
+                val v = varianceEstimate[i, j] * beta2 + (g * g) * (1 - beta2)
+                meanEstimate[i, j] = m
+                varianceEstimate[i, j] = v
+                update[i, j] = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
+            }
+        }
+        return update
     }
 
     context(SupervisedTrainer)

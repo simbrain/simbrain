@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.util.applyFunction
 import org.simbrain.util.assertMatrixEquals
 import org.simbrain.util.assertMatrixNotEquals
 import org.simbrain.util.frobeniusNorm
@@ -162,6 +163,27 @@ class OptimizerTest {
                     assertNotEquals(0.0, value, 1e-10, "Adam result should be non-zero for non-zero delta")
                 }
             }
+        }
+    }
+
+    @Test
+    fun `Adam matches the reference matrix formulation exactly over several steps`() {
+        val (_, _, trainer) = createTestNetwork()
+        val optimizer = AdamOptimizer(beta1 = 0.85, beta2 = 0.995).apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        val parameters = Matrix(7, 5)
+        val rng = kotlin.random.Random(3)
+        val mean = Matrix(7, 5)
+        val variance = Matrix(7, 5)
+        for (step in 1..5) {
+            trainer.iteration = step
+            val delta = Matrix(7, 5).apply { for (i in 0 until 7) for (j in 0 until 5) this[i, j] = rng.nextDouble(-1.0, 1.0) }
+            mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
+            variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
+            val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(0.01)
+                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { kotlin.math.sqrt(it) + 1e-8 })
+            val actual = with(trainer) { optimizer.computeDelta(parameters, delta) }
+            assertArrayEquals(expected.toArray().flatMap { it.asList() }.toDoubleArray(), actual.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
         }
     }
 

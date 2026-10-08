@@ -1,6 +1,7 @@
 package org.simbrain.util
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
@@ -42,6 +43,9 @@ private fun <T> Flow<T>.throttleLatest(period: Duration): Flow<T> = conflate().t
     emit(value)
     delay(period)
 }
+
+/** Returned by [FlowEvents.AwaitableEvent.fireAsync] when there are no handlers to wait for. */
+private val completedFire: Deferred<Unit> = CompletableDeferred(Unit)
 
 /** Default dispatcher for pub/sub handlers: the Swing EDT (immediate), so "model changed -> repaint" is UI-safe. */
 private val edtDispatcher: CoroutineDispatcher get() = Dispatchers.Swing.immediate
@@ -376,7 +380,7 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
          * Await it for the barrier (e.g. wait until a model's node has been created); ignore it for
          * fire-and-forget. Unlike [fireAndBlock] it never blocks the calling thread, so it is safe on the EDT.
          */
-        fun fireAsync(value: T): Deferred<Unit> = async { fire(value) }
+        fun fireAsync(value: T): Deferred<Unit> = if (handlers.isNullOrEmpty()) completedFire else async { fire(value) }
     }
 
     /**

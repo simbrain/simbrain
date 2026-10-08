@@ -132,7 +132,11 @@ class SynapseNode(
         events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }.untilDisposed()
         updateClampStatus()
 
+        // A synapse moves with its neurons. Listening to them here rather than having every model synapse forward their
+        // moves keeps headless and hidden synapses free of per-synapse subscriptions on their neurons
         events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
+        source.neuron.events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
+        target.neuron.events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
 
         // Respond to global toggles for spiking-only visibility
         networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(dispatcher = Dispatchers.Swing) {

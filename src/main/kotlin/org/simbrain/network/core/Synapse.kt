@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.events.SynapseEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
@@ -261,8 +260,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             source.addToFanOut(this)
             target.addToFanIn(this)
         }
-        source.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
-        target.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
     }
 
     /**

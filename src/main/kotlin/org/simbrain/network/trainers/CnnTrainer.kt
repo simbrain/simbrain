@@ -192,16 +192,8 @@ private class DenseLayerSnapshot(
 
     context(Network)
     fun applyUpdateRule() {
-        if (targetLayer.updateRule is SoftmaxRule) {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = weightedInput[i]
-                evalLayer.biases[i, 0] = biases[i]
-            }
-        } else {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = ruleInput[i]
-                evalLayer.biases[i, 0] = 0.0
-            }
+        for (i in ruleInput.indices) {
+            evalLayer.inputs[i, 0] = ruleInput[i]
         }
         evalLayer.update()
         System.arraycopy(evalLayer.activationArray, 0, activations, 0, outputSize)
@@ -521,12 +513,8 @@ class CnnTrainer(
                 layer.weights, layer.outputSize, layer.inputSize,
                 currentInput, layer.zeroBiases, layer.weightedInput
             )
-            if (layer.targetLayer.updateRule is SoftmaxRule) {
-                System.arraycopy(layer.weightedInput, 0, layer.ruleInput, 0, layer.outputSize)
-            } else {
-                for (j in 0 until layer.outputSize) {
-                    layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
-                }
+            for (j in 0 until layer.outputSize) {
+                layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
             }
             with(network) { layer.applyUpdateRule() }
             currentInput = layer.activations

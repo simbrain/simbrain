@@ -131,15 +131,15 @@ class BatchedBackprop private constructor(
             } else z
             rule.type.valueOf(weighted, rule.upperBound, rule.lowerBound, rule.slope)
         }
-        is SoftmaxRule -> softmaxColumns(z, layer.biases, rule.temperature)
+        is SoftmaxRule -> softmaxColumns(z, rule.temperature)
         else -> error("Unsupported rule ${rule::class.simpleName}")
     }
 
     /**
-     * Matches [SoftmaxRule]'s layer update column by column, including that it adds the layer's biases to inputs
-     * that already contain them, and its uniform fallback when every exponential underflows.
+     * Matches [SoftmaxRule]'s layer update column by column, including its uniform fallback when every exponential
+     * underflows.
      */
-    private fun softmaxColumns(z: Matrix, biases: Matrix, temperature: Double): Matrix {
+    private fun softmaxColumns(z: Matrix, temperature: Double): Matrix {
         val result = Matrix(z.nrow(), z.ncol())
         val exponentials = DoubleArray(z.nrow())
         for (b in 0 until z.ncol()) {
@@ -147,7 +147,7 @@ class BatchedBackprop private constructor(
             for (i in 0 until z.nrow()) max = maxOf(max, z[i, b])
             var total = 0.0
             for (i in 0 until z.nrow()) {
-                exponentials[i] = exp(((z[i, b] + biases[i, 0]) - max) / temperature)
+                exponentials[i] = exp((z[i, b] - max) / temperature)
                 total += exponentials[i]
             }
             for (i in 0 until z.nrow()) {

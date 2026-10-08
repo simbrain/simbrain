@@ -41,6 +41,30 @@ class NodeSyncTest {
     }
 
     @Test
+    fun `a synapse node follows its neurons when they move`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val source = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
+        val target = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
+        source.location = java.awt.geom.Point2D.Double(0.0, 0.0)
+        target.location = java.awt.geom.Point2D.Double(100.0, 0.0)
+        val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        UiWork.awaitIdle()
+        SwingUtilities.invokeAndWait { }
+        val before = node.globalFullBounds.centerX
+
+        target.location = java.awt.geom.Point2D.Double(500.0, 0.0)
+        var after = before
+        val deadline = System.currentTimeMillis() + 3000
+        while (after == before && System.currentTimeMillis() < deadline) {
+            SwingUtilities.invokeAndWait { after = node.globalFullBounds.centerX }
+            Thread.sleep(10)
+        }
+        assertTrue(after > before + 100, "synapse node should move with its target neuron: $before -> $after")
+    }
+
+    @Test
     fun `a node draws the model's activation after the sync pass`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))

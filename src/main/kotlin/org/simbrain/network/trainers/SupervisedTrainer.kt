@@ -172,8 +172,8 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     private var stepParamCount = 0
 
     private fun recordOptimizerUpdate(update: Matrix) {
-        for (i in 0 until update.nrow()) {
-            for (j in 0 until update.ncol()) {
+        for (j in 0 until update.ncol()) {
+            for (i in 0 until update.nrow()) {
                 val v = update[i, j]
                 stepSquaredSum += v * v
             }
@@ -343,11 +343,35 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     /**
      * @return the mean error for the batch
      */
+    /**
+     * Whether eligible networks train a batch as matrix products ([BatchedBackprop]) rather than one example at a
+     * time. Both compute the same update; turned off to compare the two.
+     */
+    var batchedTrainingEnabled = true
+
     open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
+
+        // Probes record per-example intermediate values, which only the per-example path produces
+        val batched = if (probe == null && batchedTrainingEnabled) BatchedBackprop.createOrNull(supervisedNetwork) else null
+        if (batched != null && !rowRange.isEmpty()) {
+            val result = with(network) {
+                batched.run(
+                    supervisedNetwork.trainingSet, rowRange, config.lossFunction, config.computeAccuracy,
+                    weightAccumulator, biasesAccumulator
+                )
+            }
+            batchAccuracySum += result.accuracySum
+            batchSampleCount += result.accuracyCount
+            applyAccumulatedDeltas(
+                weightAccumulator, synapseGroupAccumulator, biasesAccumulator, rawMatrixAccumulator,
+                1.0 / rowRange.count()
+            )
+            return result.lossSum / rowRange.count()
+        }
 
         val probeContext = probe?.createMapProbe("trainBatch")
 

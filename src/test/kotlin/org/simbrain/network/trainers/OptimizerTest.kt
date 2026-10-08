@@ -176,7 +176,7 @@ class OptimizerTest {
         val mean = Matrix(7, 5)
         val variance = Matrix(7, 5)
         for (step in 1..5) {
-            trainer.iteration = step
+            optimizer.beginStep()
             val delta = Matrix(7, 5).apply { for (i in 0 until 7) for (j in 0 until 5) this[i, j] = rng.nextDouble(-1.0, 1.0) }
             mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
             variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
@@ -185,6 +185,46 @@ class OptimizerTest {
             val actual = with(trainer) { optimizer.computeDelta(parameters, delta) }
             assertArrayEquals(expected.toArray().flatMap { it.asList() }.toDoubleArray(), actual.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
         }
+    }
+
+    @Test
+    fun `Adam bias correction counts optimizer steps, not trainer iterations`() {
+        val (_, wm, trainer) = createTestNetwork()
+        val optimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999).apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        // As in an epoch or sequential update: many steps within one trainer iteration
+        trainer.iteration = 7
+        val delta = Matrix.of(arrayOf(doubleArrayOf(0.3, -0.2), doubleArrayOf(0.1, 0.4)))
+        with(trainer) {
+            optimizer.beginStep()
+            val first = optimizer.computeDelta(wm.weights, delta)
+            // At step 1 the bias-corrected moments equal the gradient and its square, so each update is lr * sign(g)
+            assertEquals(0.01, first[0, 0], 1e-9)
+            assertEquals(-0.01, first[0, 1], 1e-9)
+            optimizer.beginStep()
+            val second = optimizer.computeDelta(wm.weights, delta)
+            // A constant gradient keeps the corrected moments equal to it at step 2 as well
+            assertEquals(0.01, second[0, 0], 1e-9)
+        }
+    }
+
+    @Test
+    fun `each training batch is one optimizer step`() {
+        val (net, _, trainer) = createTestNetwork()
+        var steps = 0
+        trainer.config.optimizer = object : Optimizer() {
+            override fun beginStep() { steps++ }
+            context(SupervisedTrainer)
+            override fun computeDelta(matrix: Matrix, delta: Matrix) = Matrix(matrix.nrow(), matrix.ncol())
+            context(SupervisedTrainer)
+            override fun reset() {}
+            override fun copy() = this
+        }
+        trainer.supervisedNetwork.trainingSet = TrainingDataset(
+            MutableList(4) { mutableListOf(1.0, 0.0) }, MutableList(4) { mutableListOf(0.0, 1.0) }
+        )
+        repeat(3) { trainer.trainBatch(0 until 4) }
+        assertEquals(3, steps)
     }
 
     @Test
@@ -200,14 +240,14 @@ class OptimizerTest {
         ))
         
         with(trainer) {
-            // Test multiple iterations to verify bias correction changes
-            trainer.iteration = 1
+            // Test multiple steps to verify bias correction changes
+            optimizer.beginStep()
             val result1 = optimizer.computeDelta(wm.weights, delta)
             
-            trainer.iteration = 2
+            optimizer.beginStep()
             val result2 = optimizer.computeDelta(wm.weights, delta)
             
-            trainer.iteration = 10
+            repeat(8) { optimizer.beginStep() }
             val result10 = optimizer.computeDelta(wm.weights, delta)
             
             // Bias correction should make earlier iterations have larger updates
@@ -232,16 +272,16 @@ class OptimizerTest {
         ))
         
         with(trainer) {
-            trainer.iteration = 5
+            repeat(5) { optimizer.beginStep() }
             
             // First update to establish running estimates
             optimizer.computeDelta(wm.weights, delta)
-            trainer.iteration = 6
+            optimizer.beginStep()
             val result1 = optimizer.computeDelta(wm.weights, delta)
             
-            // Reset optimizer - this clears running estimates and resets initial iteration
+            // Reset optimizer - this clears running estimates and restarts the step count
             optimizer.reset()
-            trainer.iteration = 10  // Different iteration after reset
+            optimizer.beginStep()
             
             // Next update should behave like early iterations due to reset
             val result2 = optimizer.computeDelta(wm.weights, delta)
@@ -296,11 +336,11 @@ class OptimizerTest {
         ))
         
         with(trainer) {
-            // Test at different iterations to verify learning rate decay
-            trainer.iteration = 1
+            // Test at different steps to verify learning rate decay
+            optimizer.beginStep()
             val result1 = optimizer.computeDelta(wm.weights, delta)
             
-            trainer.iteration = 10
+            repeat(9) { optimizer.beginStep() }
             val result10 = optimizer.computeDelta(wm.weights, delta)
             
             // Later iterations should have smaller updates due to learning rate decay
@@ -476,10 +516,10 @@ class OptimizerTest {
         ))
         
         with(trainer) {
-            trainer.iteration = 1
+            optimizer.beginStep()
             val result1 = optimizer.computeDelta(wm.weights, delta)
             
-            trainer.iteration = 10  // Learning rate should have decayed
+            repeat(9) { optimizer.beginStep() }  // Learning rate should have decayed
             val result10 = optimizer.computeDelta(wm.weights, delta)
             
             // Weight decay should use current (decayed) learning rate

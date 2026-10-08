@@ -461,6 +461,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         batchScale: Double,
         probeContext: StructuredProbe.MapProbe? = null
     ) {
+        config.optimizer.beginStep()
         val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
 
         weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->

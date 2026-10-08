@@ -19,6 +19,11 @@ abstract class Optimizer: CopyableObject {
     )
     var learningRate = 0.01
 
+    /**
+     * Called once at the start of each optimizer step, before [computeDelta] is called for each parameter matrix.
+     */
+    open fun beginStep() {}
+
     context(SupervisedTrainer)
     abstract fun computeDelta(matrix: Matrix, delta: Matrix): Matrix
 
@@ -81,10 +86,17 @@ class AdamOptimizer(
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
     private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
 
-    private var initialIteration = 0
+    /**
+     * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
+     * or sequential update takes many steps in one iteration.
+     */
+    private var stepsSinceReset = 0
 
-    context(SupervisedTrainer)
-    private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
+    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+
+    override fun beginStep() {
+        stepsSinceReset++
+    }
 
     context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
@@ -113,7 +125,7 @@ class AdamOptimizer(
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()
-        initialIteration = iteration
+        stepsSinceReset = 0
     }
 
     override fun copy() = AdamOptimizer(beta1, beta2).also { it.learningRate = learningRate }
@@ -162,10 +174,17 @@ class AdamWOptimizer(
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
     private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
 
-    private var initialIteration = 0
+    /**
+     * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
+     * or sequential update takes many steps in one iteration.
+     */
+    private var stepsSinceReset = 0
 
-    context(SupervisedTrainer)
-    private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
+    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+
+    override fun beginStep() {
+        stepsSinceReset++
+    }
 
     context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
@@ -201,7 +220,7 @@ class AdamWOptimizer(
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()
-        initialIteration = iteration
+        stepsSinceReset = 0
     }
 
     override fun copy() = AdamWOptimizer(beta1, beta2, weightDecay, learningRateDecay).also { it.learningRate = learningRate }

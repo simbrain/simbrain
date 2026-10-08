@@ -207,10 +207,11 @@ class AdamWOptimizer(
 
         val adamUpdate = meanCorrected.mul(currentLearningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
 
-        // AdamW: Apply weight decay directly to weights (decoupled)
+        // AdamW: Apply weight decay directly to weights (decoupled). Updates are added to the weights, so decay
+        // toward zero is subtracted
         if (weightDecay > 0.0) {
             val weightDecayUpdate = matrix.clone().mul(currentLearningRate * weightDecay)
-            return adamUpdate.add(weightDecayUpdate)
+            return adamUpdate.sub(weightDecayUpdate)
         } else {
             return adamUpdate
         }

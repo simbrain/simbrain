@@ -312,7 +312,7 @@ class OptimizerTest {
             val result = optimizer.computeDelta(wm.weights, delta)
             
             // AdamW should include weight decay component
-            // Expected: adam_update + (learning_rate * weight_decay * weights)
+            // Expected: adam_update - (learning_rate * weight_decay * weights)
             assertNotNull(result)
             
             // Verify weight decay contribution exists (result should be different from pure Adam)
@@ -320,6 +320,21 @@ class OptimizerTest {
             val adamOnlyResult = adamOnlyOptimizer.computeDelta(wm.weights, delta)
             
             assertMatrixNotEquals(adamOnlyResult, result, "AdamW should differ from Adam due to weight decay")
+        }
+    }
+
+    @Test
+    fun `AdamW weight decay shrinks weights toward zero`() {
+        val (_, wm, trainer) = createTestNetwork()
+        val optimizer = AdamWOptimizer(beta1 = 0.9, beta2 = 0.999, weightDecay = 0.1).apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        wm.weights.setValuesInPlace { i, j -> if (i == j) 2.0 else -3.0 }
+        with(trainer) {
+            optimizer.beginStep()
+            // With no gradient the Adam term is zero, leaving only the decay: -lr * weightDecay * w
+            val update = optimizer.computeDelta(wm.weights, Matrix(2, 2))
+            assertEquals(-0.01 * 0.1 * 2.0, update[0, 0], 1e-15)
+            assertEquals(-0.01 * 0.1 * -3.0, update[0, 1], 1e-15)
         }
     }
 

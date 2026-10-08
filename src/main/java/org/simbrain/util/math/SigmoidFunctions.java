@@ -31,8 +31,10 @@ public class SigmoidFunctions {
     public static Matrix tanh(Matrix in, double ceil, double floor, double slope) {
         // Smile does not use BLAS for any of these operations so we are reusing the scalar function
         var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, tanh(in.get(i, 0), ceil, floor, slope));
+        for (int j = 0; j < output.ncol(); j++) {
+            for (int i = 0; i < output.nrow(); i++) {
+                output.set(i, j, tanh(in.get(i, j), ceil, floor, slope));
+            }
         }
         return output;
     }
@@ -74,8 +76,10 @@ public class SigmoidFunctions {
     public static Matrix logistic(Matrix in, double ceil, double floor, double slope) {
         // Smile does not use BLAS for any of these operations so we are reusing the scalar function
         var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, logistic(in.get(i, 0), ceil, floor, slope));
+        for (int j = 0; j < output.ncol(); j++) {
+            for (int i = 0; i < output.nrow(); i++) {
+                output.set(i, j, logistic(in.get(i, j), ceil, floor, slope));
+            }
         }
         return output;
     }
@@ -100,8 +104,10 @@ public class SigmoidFunctions {
     public static Matrix atan(Matrix in, double ceil, double floor, double slope) {
         // Smile does not use BLAS for any of these operations so we are reusing the scalar function
         var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, atan(in.get(i, 0), ceil, floor, slope));
+        for (int j = 0; j < output.ncol(); j++) {
+            for (int i = 0; i < output.nrow(); i++) {
+                output.set(i, j, atan(in.get(i, j), ceil, floor, slope));
+            }
         }
         return output;
     }

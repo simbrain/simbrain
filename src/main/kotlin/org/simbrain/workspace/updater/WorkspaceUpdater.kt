@@ -235,6 +235,13 @@ class WorkspaceUpdater(val workspace: Workspace) {
             }
         }
         events.workspaceUpdated.fire()
+        // Once per iteration, never per item: let the views draw this step before the next one starts
+        if (!workspace.runAsFastAsPossible) {
+            workspace.displaySync?.invoke()
+        }
+        if (workspace.updateDelay > 0) {
+            delay(workspace.updateDelay.toLong())
+        }
         Logger.trace("done: $time")
     }
 

@@ -2,6 +2,7 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.cancelWith
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.couplings.getProducer
@@ -61,25 +62,23 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
      */
     private val world: TextWorld
 
-    /** Unsubscribes the run-lock handlers from the workspace updater when this view closes. */
-    private var runLockRemovers: List<() -> Unit> = emptyList()
-
     /**
      * Creates a new frame of type TextWorld.
      */
     init {
         world = component.world
-        panel = TextWorldPanel(world)
+        panel = TextWorldPanel(world).also { it.viewScope.cancelWith(viewScope) }
         this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         addMenuBar()
         add(panel)
         frame.pack()
 
+        // The workspace updater outlives this view
         val updater = component.workspace.updater
-        runLockRemovers = listOf(
-            updater.events.runStarted.on(Dispatchers.Swing) { panel.setRunLock(world.lockWhileRunning) },
-            updater.events.runFinished.on(Dispatchers.Swing) { panel.setRunLock(false) },
-        )
+        updater.events.runStarted.on(Dispatchers.Swing) {
+            panel.setRunLock(world.lockWhileRunning)
+        }.cancelWith(viewScope)
+        updater.events.runFinished.on(Dispatchers.Swing) { panel.setRunLock(false) }.cancelWith(viewScope)
         panel.setRunLock(world.lockWhileRunning && updater.isRunning)
 
         // Force component to fill up parent panel
@@ -91,12 +90,6 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             }
         })
         parentFrame.pack()
-    }
-
-    override fun close() {
-        super.close()
-        runLockRemovers.forEach { it() }
-        runLockRemovers = emptyList()
     }
 
     /**

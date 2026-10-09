@@ -25,7 +25,7 @@ abstract class Connector(var source: Layer, var target: Layer) : NetworkModel(),
      * input vector and a weight matrix, and in the spiking case corresponds to the sum of post-synaptic responses along
      * the dendrite of each output neuron.
      */
-    fun getSummedPSRs(): DoubleArray {
+    open fun getSummedPSRs(): DoubleArray {
         return psrMatrix.rowSums()
     }
 

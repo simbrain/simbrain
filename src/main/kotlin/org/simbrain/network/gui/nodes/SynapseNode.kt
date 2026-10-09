@@ -1,3 +1,10 @@
+/**
+ * The canvas node for a [Synapse]: a strength-sized circle near the target and a line from the source, living in the
+ * panel's cached connection tier. Strength changes, which learning rules can make every iteration, only mark the node;
+ * the panel's per-frame sync redraws the circle when its color or size actually changes. The source neuron's node
+ * pushes its drawn spike state here, and the panel's spike overlay draws the highlight, so spikes never invalidate the
+ * cached tier.
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -14,7 +21,6 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatorySynapseColo
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitorySynapseColor
 import org.simbrain.network.gui.dialogs.NetworkPreferences.maxWeightSize
 import org.simbrain.network.gui.dialogs.NetworkPreferences.minWeightSize
-import org.simbrain.network.gui.dialogs.NetworkPreferences.spikingColor
 import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.util.*
 import java.awt.Color
@@ -26,9 +32,6 @@ import java.awt.geom.Point2D
 import javax.swing.JPopupMenu
 import kotlin.math.*
 
-/**
- *  Piccolo representation of [Synapse]
- */
 class SynapseNode(
     net: NetworkPanel?,
     var source: NeuronNode,
@@ -69,6 +72,29 @@ class SynapseNode(
      */
     private var symmetricNode: SynapseNode? = null
 
+    /**
+     * Straightens the partner's line once this node leaves the canvas. Called from the panel's batched node
+     * removal on the EDT rather than from an EDT-dispatched `deleted` handler: the deleted event is awaited per
+     * synapse, so a Swing handler there made bulk deletes wait on the EDT (and its repaints) once per synapse.
+     * The partner is only unlinked if it still points here, since undo may already have paired it with a
+     * recreated node by the time a debounced removal lands.
+     */
+    fun detachSymmetric() {
+        symmetricNode?.let {
+            if (it.symmetricNode === this) {
+                it.symmetricNode = null
+                it.updateLineGeometry()
+            }
+        }
+        symmetricNode = null
+    }
+
+    /**
+     * Whether the source neuron is drawn spiking. Pushed by the source's [NeuronNode] when its drawn spike state
+     * flips, rather than each synapse subscribing to its source's spike event, which fires every iteration.
+     */
+    private var sourceSpiking = false
+
     init {
         if (!isSelfConnection) {
             symmetricNode = synapse.symmetricSynapse?.let { networkPanel.modelNodeMap.peek(it) as? SynapseNode }
@@ -91,43 +117,66 @@ class SynapseNode(
 
         val events = synapse.events
 
-        events.strengthUpdated.on(dispatcher = Dispatchers.Swing) {
-            updateColor()
-            updateDiameter()
-        }
+        // Learning rules can write strengths every iteration: mark, and let the per-frame sync redraw
+        events.strengthUpdated.onImmediate { markDirty(STRENGTH) }.untilDisposed()
         events.colorPreferencesChanged.on(dispatcher = Dispatchers.Swing) {
             updateColor()
             updateDiameter()
             updateSpikeColor()
-        }
+        }.untilDisposed()
         events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility ->
-            updateVisibility(newVisibility) }
+            updateVisibility(newVisibility) }.untilDisposed()
         updateVisibility(synapse.isVisible)
-        events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }
+        updateSpikeColor()
+        showSourceSpiking(source.drawnSpiking)
+        events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }.untilDisposed()
         updateClampStatus()
 
-        events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }
-
-        events.deleted.on(dispatcher = Dispatchers.Swing) {
-            symmetricNode?.let {
-                it.symmetricNode = null
-                it.updateLineGeometry()
-            }
-            symmetricNode = null
-        }
-
-        // Respond to spiking events
-        source.neuron.events.spiked.on(dispatcher = Dispatchers.Swing) {
-            updateSpikeColor()
-            // If spiking-only mode is on, adjust visibility in response to spike changes
-            if (networkPanel.synapseSpikingOnlyVisible) {
-                applySpikingOnlyVisibility()
-            }
-        }
+        // A synapse moves with its neurons. Listening to them here rather than having every model synapse forward their
+        // moves keeps headless and hidden synapses free of per-synapse subscriptions on their neurons
+        events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
+        source.neuron.events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
+        target.neuron.events.locationChanged.on(dispatcher = Dispatchers.Swing) { this.updatePosition() }.untilDisposed()
 
         // Respond to global toggles for spiking-only visibility
         networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(dispatcher = Dispatchers.Swing) {
             applySpikingOnlyVisibility()
+        }.untilDisposed()
+    }
+
+    /**
+     * Shows the source neuron's spike state. The highlight is drawn by the panel's spike overlay, not by recoloring
+     * this node, so spikes never invalidate the cached connection tier.
+     */
+    fun showSourceSpiking(spiking: Boolean) {
+        if (sourceSpiking == spiking) return
+        sourceSpiking = spiking
+        networkPanel.spikeOverlay.setSpiking(this, spiking)
+    }
+
+    override fun dispose() {
+        networkPanel.spikeOverlay.remove(this)
+        super.dispose()
+    }
+
+    /** The strength circle, for the spike overlay to draw back over a highlighted line. */
+    internal val circleNode get() = circle
+
+    /** What the circle currently shows and whether the overlay highlights this synapse; both lag the model until the next sync. */
+    internal val drawnCircleColor get() = circle!!.paint
+    internal val drawnDiameter get() = circle!!.width
+    internal val drawnSourceSpiking get() = sourceSpiking
+
+    override fun syncFromModel(bits: Int) {
+        if (bits and STRENGTH != 0) {
+            updateColor()
+            // Learning nudges strengths by tiny amounts every iteration; redrawing for a change no one can see would
+            // rebuild the geometry and throw away the cached connection tier each time. Drift is measured against
+            // what is drawn, so it still shows once it adds up.
+            val diameter = computeDiameter()
+            if (abs(diameter - circle!!.width) >= MIN_VISIBLE_DIAMETER_CHANGE) {
+                applyDiameter(diameter)
+            }
         }
     }
 
@@ -217,15 +266,9 @@ class SynapseNode(
         }
     }
 
-    /**
-     * When spiking change the color of the line.
-     */
+    /** The line keeps its base color; spikes are highlighted by the panel's spike overlay. */
     private fun updateSpikeColor() {
-        if (with(networkPanel.network) { source.neuron.isSpike }) {
-            line!!.strokePaint = spikingColor
-        } else {
-            line!!.strokePaint = lineColor
-        }
+        line!!.strokePaint = lineColor
     }
 
     /**
@@ -241,8 +284,8 @@ class SynapseNode(
             return
         }
         if (networkPanel.synapseSpikingOnlyVisible) {
-            val show = with(networkPanel.network) { source.neuron.isSpike }
-            super.setVisible(show)
+            // Only spiking synapses show, and the spike overlay draws those
+            super.setVisible(false)
         } else {
             super.setVisible(true)
         }
@@ -265,6 +308,11 @@ class SynapseNode(
      * strength.
      */
     fun updateDiameter() {
+        applyDiameter(computeDiameter())
+    }
+
+    /** The circle diameter for the synapse's current strength, relative to its bounds. */
+    private fun computeDiameter(): kotlin.Double {
         val diameter: kotlin.Double
 
         var upperBound = synapse.upperBound
@@ -299,7 +347,10 @@ class SynapseNode(
                 strength / lowerBound
             ))) + minDiameter
         }
+        return diameter
+    }
 
+    private fun applyDiameter(diameter: kotlin.Double) {
         val delta = (circle!!.bounds.getWidth() - diameter) / 2
 
         circle!!.width = diameter
@@ -451,6 +502,11 @@ class SynapseNode(
     }
 
     companion object {
+        private const val STRENGTH = 1
+
+        /** Smallest change in circle diameter, in canvas units, worth redrawing for. */
+        private const val MIN_VISIBLE_DIAMETER_CHANGE = 0.25
+
         /**
          * Used to approximate zero to prevent divide-by-zero errors.
          */

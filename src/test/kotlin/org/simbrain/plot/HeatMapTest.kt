@@ -12,6 +12,7 @@ import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.plot.heatmap.HeatMapPanel
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
+import org.simbrain.util.UiWork
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 
@@ -43,6 +44,7 @@ class HeatMapTest {
 
         workspace.simpleIterate()
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         assertEquals(2, hmc.model.columnCount)
         assertEquals(4, hmc.model.rowCount)
@@ -58,6 +60,7 @@ class HeatMapTest {
         repeat(6) { step ->
             na.activationArray = doubleArrayOf(step.toDouble(), 0.0, 0.0, 0.0)
             workspace.simpleIterate()
+            UiWork.awaitIdle()
         }
 
         assertEquals(3, hmc.model.columnCount)
@@ -71,6 +74,7 @@ class HeatMapTest {
         na.activationArray = doubleArrayOf(-2.0, 0.0, 0.0, 7.0)
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         val range = hmc.model.colorRange()
         assertEquals(-7.0, range.start, 1e-12)
@@ -86,6 +90,7 @@ class HeatMapTest {
         na.activationArray = doubleArrayOf(-50.0, 0.0, 0.0, 50.0)
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         assertEquals(-1.0, hmc.model.colorRange().start, 1e-12)
         assertEquals(1.0, hmc.model.colorRange().endInclusive, 1e-12)
@@ -97,6 +102,7 @@ class HeatMapTest {
         na.activationArray = doubleArrayOf(3.0, 3.0, 3.0, 3.0)
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         assertTrue(hmc.model.colorRange().endInclusive > hmc.model.colorRange().start)
     }
@@ -106,8 +112,10 @@ class HeatMapTest {
         with(workspace.couplingManager) { na couple hmc.model }
         na.activationArray = doubleArrayOf(10.0, 20.0, 30.0, 40.0)
         workspace.simpleIterate()
+        UiWork.awaitIdle()
         na.activationArray = doubleArrayOf(50.0, 60.0, 70.0, 80.0)
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         val dataset = hmc.model.dataset()
         assertEquals(8, dataset.getItemCount(0))
@@ -143,6 +151,7 @@ class HeatMapTest {
         listOf(1.0, 16384.0, 1e5, -5e4, 1e9).forEach { constant ->
             model.clearData()
             model.setValues(DoubleArray(4) { constant })
+            UiWork.awaitIdle()
 
             val range = model.colorRange()
             assertTrue(
@@ -168,6 +177,7 @@ class HeatMapTest {
         val model = HeatMapModel()
         model.setValues(doubleArrayOf(1.0, 2.0, 3.0, 4.0))
         model.setValues(doubleArrayOf(5.0, 6.0))
+        UiWork.awaitIdle()
 
         assertEquals(4, model.rowCount)
         val dataset = model.dataset()
@@ -194,6 +204,7 @@ class HeatMapTest {
         na.activationArray = doubleArrayOf(1.0, 2.0, 3.0, 4.0)
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         assertEquals(1, workspace.couplingManager.couplings.size)
         assertEquals(listOf(1.0, 2.0, 3.0, 4.0), hmc.model.columns.last().toList())
@@ -223,8 +234,10 @@ class HeatMapTest {
         var now = 500
         model.timeSupplier = { now }
         model.setValues(doubleArrayOf(1.0, 2.0))
+        UiWork.awaitIdle()
         now = 0
         model.setValues(doubleArrayOf(3.0, 4.0))
+        UiWork.awaitIdle()
 
         val range = HeatMapPanel(model).chartPanel.chart.xyPlot.domainAxis.range
 
@@ -239,6 +252,7 @@ class HeatMapTest {
         listOf(0, 5, 10, 15).forEach { time ->
             now = time
             model.setValues(doubleArrayOf(1.0, 2.0))
+            UiWork.awaitIdle()
         }
 
         val range = HeatMapPanel(model).chartPanel.chart.xyPlot.domainAxis.range
@@ -281,6 +295,7 @@ class HeatMapTest {
         na.activationArray = doubleArrayOf(-1.0, 0.0, 1.0, 2.0)
         hmc.model.colorMap = ChartColorMap.HOT
         workspace.simpleIterate()
+        UiWork.awaitIdle()
 
         val serializer = WorkspaceSerializer(workspace)
         val bas = ByteArrayOutputStream()
@@ -299,6 +314,7 @@ class HeatMapTest {
         assertEquals(listOf(-1.0, 0.0, 1.0, 2.0), reopened.model.columns.last().toList())
 
         workspace.simpleIterate()
+        UiWork.awaitIdle()
         assertEquals(2, reopened.model.columnCount)
     }
 }

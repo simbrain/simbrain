@@ -178,6 +178,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
      */
     fun getChannel(c: Int): DoubleArray {
         val result = DoubleArray(shape.height * shape.width)
+        val activations = activations
         for (h in 0 until shape.height) {
             for (w in 0 until shape.width) {
                 result[h * shape.width + w] = activations[shape.index(h, w, c)]
@@ -190,6 +191,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
      * Fill [buffer] with the values of channel [c] from [activations].
      */
     fun getChannel(c: Int, buffer: DoubleArray) {
+        val activations = activations
         for (h in 0 until shape.height) {
             for (w in 0 until shape.width) {
                 buffer[h * shape.width + w] = activations[shape.index(h, w, c)]
@@ -203,6 +205,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
     fun setChannel(c: Int, source: DoubleArray) {
         val pixelCount = shape.height * shape.width
         val len = minOf(source.size, pixelCount)
+        val activations = activations
         for (i in 0 until len) {
             val h = i / shape.width
             val w = i % shape.width
@@ -277,6 +280,10 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
     context(Network)
     override fun update() {
         if (isClamped) return
+        // Read the delegated properties once rather than per element
+        val activations = activations
+        val biases = biases
+        val activationFunction = activationFunction
         for (i in activations.indices) {
             val pre = inputs[i] + biases[i]
             preActivations[i] = pre
@@ -288,6 +295,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
 
     override fun randomize(randomizer: ProbabilityDistribution?) {
         val rand = randomizer ?: NetworkPreferences.activationRandomizer
+        val activations = activations
         for (i in activations.indices) {
             activations[i] = rand.sampleDouble()
         }

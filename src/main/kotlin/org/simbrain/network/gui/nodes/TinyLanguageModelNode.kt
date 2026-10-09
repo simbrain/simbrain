@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.util.PBounds
@@ -14,7 +15,9 @@ import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.createSelectionEditDialog
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
+import org.simbrain.network.gui.dialogs.postReportsTo
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.util.*
 import java.awt.Dialog
@@ -37,6 +40,8 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
 
     private var compositorNode: CompositorNode? = null
 
+    private val ui = UiScope()
+
     init {
         addChild(interactionBox)
         interactionBox.setText(tinyLanguageModel.displayName)
@@ -58,11 +63,14 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
                 }
             },
         )
-        val errorRemover = tinyLanguageModel.trainer.events.errorUpdated.on(swingDispatcher) { refreshView() }
+        // Training reports every iteration; posting the refresh keeps training from waiting on the EDT
+        val trainingRefresh = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
+        val errorRemover = tinyLanguageModel.trainer.events.errorUpdated.on(Dispatchers.Unconfined) { trainingRefresh.request() }
         // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
         events.deleted.on(Dispatchers.Default) {
             subscriptions.forEach(Job::cancel)
             errorRemover()
+            ui.cancel()
         }
 
         rebuildInterior()
@@ -299,17 +307,21 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
 
     val beginRemover = trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }
     val endJob = trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }
-    val statsRemover = trainer.events.errorUpdated.on(swingDispatcher) { stats ->
+    // Labels show the latest report, posted rather than awaited so training never waits on the EDT
+    val dialogUi = UiScope()
+    val labels = dialogUi.uiLatest<TrainingStats>(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { stats ->
         iterationsLabel.text = "Iterations: ${trainer.iteration}"
         lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
         accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
     }
+    val statsRemover = trainer.events.postReportsTo(labels)
     // The trainer outlives this dialog, so detach everything it registered; closing also
     // stops a running training.
     panel.onWindowClose {
         beginRemover()
         endJob.cancel()
         statsRemover()
+        dialogUi.cancel()
         errorTimeSeries.dispose()
         trainer.launch { trainer.stopTraining() }
     }

@@ -2,7 +2,9 @@ package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
 import org.simbrain.util.SFileChooser
+import org.simbrain.util.cancelWith
 import org.simbrain.util.createAction
+import org.simbrain.util.onUi
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.swingDispatcher
 import org.simbrain.util.widgets.ShowHelpAction
@@ -130,18 +132,19 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         // Main image
         add(ImageWorldPanel(component), BorderLayout.CENTER)
-        imageWorld.imageAlbum.events.imageUpdate.on(swingDispatcher) {
+        // Sources such as a 3D view render a new image every iteration; awaiting the EDT here paced them by the display
+        imageWorld.imageAlbum.events.imageUpdate.onUi(viewScope) {
             updateToolbar()
             repaint()
         }
         imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { (_, _) ->
             updateToolbar()
             repaint()
-        }
+        }.cancelWith(viewScope)
         imageWorld.imagePipelineCollection.events.pipelineSelectionChanged.on(swingDispatcher) { _: ImageProcessingPipeline ->
             updateToolbar()
             repaint()
-        }
+        }.cancelWith(viewScope)
 
         // Toolbars
         val transformationGui = ImagePipelineCollectionGui(this, imageWorld.imagePipelineCollection)

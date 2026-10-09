@@ -192,16 +192,8 @@ private class DenseLayerSnapshot(
 
     context(Network)
     fun applyUpdateRule() {
-        if (targetLayer.updateRule is SoftmaxRule) {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = weightedInput[i]
-                evalLayer.biases[i, 0] = biases[i]
-            }
-        } else {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = ruleInput[i]
-                evalLayer.biases[i, 0] = 0.0
-            }
+        for (i in ruleInput.indices) {
+            evalLayer.inputs[i, 0] = ruleInput[i]
         }
         evalLayer.update()
         System.arraycopy(evalLayer.activationArray, 0, activations, 0, outputSize)
@@ -493,14 +485,19 @@ class CnnTrainer(
             targetTensor.inputs.fill(0.0)
             connector.propagate()
 
-            // Apply activation function (simulating Tensor.update())
+            // Apply activation function (simulating Tensor.update()). Read the delegated arrays once: each read of
+            // activations or biases goes through a GuiEditable delegate
             val af = targetTensor.activationFunction
-            for (j in targetTensor.activations.indices) {
-                val pre = targetTensor.inputs[j] + targetTensor.biases[j]
-                targetTensor.preActivations[j] = pre
-                targetTensor.activations[j] = af.apply(pre)
+            val inputs = targetTensor.inputs
+            val biases = targetTensor.biases
+            val preActivations = targetTensor.preActivations
+            val activations = targetTensor.activations
+            for (j in activations.indices) {
+                val pre = inputs[j] + biases[j]
+                preActivations[j] = pre
+                activations[j] = af.apply(pre)
             }
-            targetTensor.inputs.fill(0.0)
+            inputs.fill(0.0)
         }
 
         // Flatten: copy last tensor activations into pre-allocated buffer
@@ -516,12 +513,8 @@ class CnnTrainer(
                 layer.weights, layer.outputSize, layer.inputSize,
                 currentInput, layer.zeroBiases, layer.weightedInput
             )
-            if (layer.targetLayer.updateRule is SoftmaxRule) {
-                System.arraycopy(layer.weightedInput, 0, layer.ruleInput, 0, layer.outputSize)
-            } else {
-                for (j in 0 until layer.outputSize) {
-                    layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
-                }
+            for (j in 0 until layer.outputSize) {
+                layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
             }
             with(network) { layer.applyUpdateRule() }
             currentInput = layer.activations

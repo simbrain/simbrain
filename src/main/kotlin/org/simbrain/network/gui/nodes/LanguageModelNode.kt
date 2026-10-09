@@ -3,6 +3,7 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
@@ -33,6 +34,17 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private var compositorNode: CompositorNode? = null
 
+    /** Owns this node's EDT updates; cancelled when its model is deleted. */
+    private val ui = UiScope()
+
+    /**
+     * Generation-driven refreshes coalesce at [HIGH_RATE_GUI_REFRESH_INTERVAL_MS]: syncing dirty
+     * tiles invalidates most of the interior, so at full decode speed a refresh per token would
+     * queue a full repaint per token. User-initiated paths (flips, menu actions) call
+     * [refreshView] directly.
+     */
+    private val generationRefresh = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
+
     init {
         addChild(interactionBox)
         interactionBox.setText(languageModel.displayName)
@@ -45,11 +57,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                 interactionBox.setText(languageModel.displayName)
                 rebuildInterior()
             },
-            events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
-            events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() },
+            events.updated.onImmediate { generationRefresh.request() },
+            events.updateGraphics.onImmediate { generationRefresh.request() },
         )
         // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
-        events.deleted.on(Dispatchers.Default) { subscriptions.forEach(Job::cancel) }
+        events.deleted.on(Dispatchers.Default) {
+            subscriptions.forEach(Job::cancel)
+            ui.cancel()
+        }
 
         rebuildInterior()
         pullLocationFromModel()
@@ -125,14 +140,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             outlineBounds.y - interactionBox.fullBounds.height / 2 + 0.5,
         )
     }
-
-    /**
-     * Generation-driven refreshes coalesce at [HIGH_RATE_GUI_REFRESH_INTERVAL_MS]: syncing dirty
-     * tiles invalidates most of the interior, so at full decode speed a refresh per token would
-     * queue a full repaint per token. User-initiated paths (flips, menu actions) call
-     * [refreshView] directly.
-     */
-    private val refreshViewThrottled = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
 
     private fun refreshView() {
         val node = compositorNode ?: return

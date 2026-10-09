@@ -165,6 +165,20 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         updateCurrentActionsList();
         add(currentListScroll, BorderLayout.CENTER);
 
+        // How a run is paced against the display
+        JPanel pacingPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+        JCheckBox drawEachIteration = new JCheckBox("Draw each iteration", !workspace.getRunAsFastAsPossible());
+        drawEachIteration.setToolTipText("Wait for open windows to draw each iteration before running the next, so a "
+            + "run can be watched step by step. Off runs as fast as possible and shows it at the display's frame rate.");
+        drawEachIteration.addActionListener(evt -> workspace.setRunAsFastAsPossible(!drawEachIteration.isSelected()));
+        pacingPanel.add(drawEachIteration);
+        pacingPanel.add(new JLabel("Delay (ms):"));
+        JSpinner delaySpinner = new JSpinner(new SpinnerNumberModel(workspace.getUpdateDelay(), 0, 10_000, 10));
+        delaySpinner.setToolTipText("Pause between iterations, to slow a run down");
+        delaySpinner.addChangeListener(evt -> workspace.setUpdateDelay((Integer) delaySpinner.getValue()));
+        pacingPanel.add(delaySpinner);
+        add(pacingPanel, BorderLayout.NORTH);
+
         // Add buttons
         JPanel buttonPanel = new JPanel();
         JButton addActionsButton = new JButton(addPresetAction);

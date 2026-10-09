@@ -111,6 +111,20 @@ private fun invokeReadResolveIfPresent(obj: Any): Any {
 }
 
 /**
+ * If [obj]'s class declares a `writeReplace()` method, invoke it and return what it returns, else [obj]. The
+ * counterpart of [invokeReadResolveIfPresent] for saving; used e.g. to land data still queued for the EDT.
+ */
+private fun invokeWriteReplaceIfPresent(obj: Any): Any {
+    return try {
+        val method = obj::class.java.getDeclaredMethod("writeReplace")
+        method.isAccessible = true
+        method.invoke(obj) ?: obj
+    } catch (_: NoSuchMethodException) {
+        obj
+    }
+}
+
+/**
  * XStream support for Kotlin classes that require a constructor call. Which constructor to use can be specified by
  * [XStreamConstructor].
  *
@@ -127,7 +141,9 @@ fun createConstructorCallingConverter(
 ): ReflectionConverter {
     return object : ReflectionConverter(mapper, reflectionProvider) {
 
-        override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        override fun marshal(original: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+            // Overriding marshal bypasses the stock converter's writeReplace call, so honor it here
+            val source = invokeWriteReplaceIfPresent(original)
             val customMarshaller = (source::class.companionObjectInstance as? WithXStreamPropertyConverter)
                 ?.xStreamPropertyConverter
                 ?.createMarshaller()

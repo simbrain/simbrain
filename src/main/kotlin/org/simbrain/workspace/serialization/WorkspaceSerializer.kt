@@ -311,6 +311,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
     private fun deserializeWorkspaceParameters(archive: ArchivedWorkspace) {
         if (archive.workspaceParameters != null) {
             workspace.updateDelay = archive.workspaceParameters.updateDelay
+            workspace.runAsFastAsPossible = archive.workspaceParameters.runAsFastAsPossible
             workspace.updater.time = archive.workspaceParameters.savedTime
             workspace.simulationId = archive.workspaceParameters.simulationId
             workspace.exposeTypeNames(archive.workspaceParameters.exposedTypes)

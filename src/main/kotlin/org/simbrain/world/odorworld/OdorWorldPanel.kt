@@ -53,6 +53,15 @@ class OdorWorldPanel(
 
     override val coroutineContext get() = world.coroutineContext
 
+    /** Scope of this panel's view updates; cancelled when its desktop component closes. */
+    val viewScope = UiScope()
+
+    /** Entity nodes with model changes to draw, synced once per frame. */
+    internal val entitySync = viewScope.uiInbox<EntityNode>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+
+    /** Keeps the camera on the selected entity, once per frame, after the world or a manual move changes it. */
+    private val cameraSync = viewScope.uiRefresh { centerCameraToSelectedEntity() }
+
     /**
      * The Piccolo PCanvas.
      */
@@ -288,20 +297,12 @@ class OdorWorldPanel(
         canvas.addInputEventListener(WorldContextMenuEventHandler(this, world))
 
         world.events.entityAdded.on(swingDispatcher) { e ->
-            val node = EntityNode(e)
+            val node = EntityNode(e, this)
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
-
-            world.events.cleanups[e] = e.events.selected.on(swingDispatcher) {
-                selectionManager.clear()
-                selectionManager.add(node)
-            }
         }
-        world.events.entityRemoved.on(Dispatchers.Default) {
-            world.events.cleanups[it]?.invoke()
-        }
-        world.events.updated.on(swingDispatcher) { this.centerCameraToSelectedEntity() }
+        world.events.updated.on(Dispatchers.Unconfined) { cameraSync.request() }
         world.events.frameAdvanced.on(swingDispatcher) {
             canvas.layer.childrenReference
                 .filterIsInstance<EntityNode>()
@@ -426,20 +427,24 @@ class OdorWorldPanel(
     }
 
     private fun renderAllLayers(world: OdorWorld) {
+        canvas.layer.childrenReference.filterIsInstance<EntityNode>().forEach { it.dispose() }
         canvas.layer.removeAllChildren()
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
         canvas.layer.addChild(mazeNode)
         for (oe in world.entityList) {
-            val node = EntityNode(oe)
+            val node = EntityNode(oe, this)
             canvas.layer.addChild(node)
         }
         repaint()
     }
 
+    /**
+     * Runs on the EDT, where Piccolo repaints what moved by itself; the camera only moves, and so only repaints the
+     * whole view, when the entity drifts off center.
+     */
     private fun centerCameraToSelectedEntity() {
         if (!world.isUseCameraCentering || isDraggingEntity) {
-            repaint()
             return
         }
 
@@ -452,7 +457,6 @@ class OdorWorldPanel(
                     canvas.camera.viewBounds.height
                 )
             )
-            repaint()
         }
     }
 
@@ -515,7 +519,7 @@ class OdorWorldPanel(
         if (isManualMovementMode || entity.isInTransit) {
             entity.applyMovement()
             entityNode.advance()
-            centerCameraToSelectedEntity()
+            cameraSync.request()
         }
     }
 

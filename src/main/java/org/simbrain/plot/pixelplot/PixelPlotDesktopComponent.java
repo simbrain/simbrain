@@ -1,5 +1,6 @@
 package org.simbrain.plot.pixelplot;
 
+import org.simbrain.util.UiUpdatesKt;
 import org.simbrain.plot.actions.PlotActionManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.genericframe.GenericFrame;
@@ -35,7 +36,8 @@ public class PixelPlotDesktopComponent extends DesktopComponent<PixelPlotCompone
         super(frame, component);
         setLayout(new BorderLayout());
         add(BorderLayout.CENTER, pixelPlotPanel);
-        getWorkspaceComponent().pixelPlot.getEvents().getImageUpdate().on(this::repaint);
+        var imageUpdates = getWorkspaceComponent().pixelPlot.getEvents().getImageUpdate().on(this::repaint);
+        UiUpdatesKt.cancelWith(imageUpdates, getViewScope());
 
         actionManager = new PlotActionManager(this);
 

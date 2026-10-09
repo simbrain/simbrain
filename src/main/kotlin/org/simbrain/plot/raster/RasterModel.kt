@@ -1,7 +1,6 @@
 package org.simbrain.plot.raster
 
 import com.thoughtworks.xstream.XStream
-import kotlinx.coroutines.withContext
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.RasterPlotEvents
@@ -9,9 +8,11 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.swingDispatcher
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
+import kotlinx.coroutines.cancel
+import org.simbrain.util.UiScope
+import org.simbrain.util.uiInbox
 import java.util.function.Supplier
 
 /**
@@ -153,6 +154,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
     }
 
     fun clearData() {
+        columns.clear()
         val seriesCount = dataset.seriesCount
         var i = 0
         while (seriesCount > i) {
@@ -169,6 +171,48 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         return this
     }
 
+    /** Lands any queued columns before XStream writes the dataset, so a save right after an iteration has them. */
+    private fun writeReplace(): Any {
+        columns.flush()
+        return this
+    }
+
+    /** Stops applying queued columns; called when the owning component closes. */
+    fun close() = ui.cancel()
+
+    /** One incoming array's spikes, captured on the updating thread and waiting to be added on the EDT. */
+    private class PendingColumn(val consumer: RasterConsumer, val time: Int, val size: Int, val spikeRows: IntArray)
+
+    @Transient
+    private val ui = UiScope()
+
+    /**
+     * Columns for the chart, added on the EDT without the updating thread waiting for it: the dataset is
+     * EDT-confined, and awaiting the EDT from the coupling made every workspace iteration wait behind whatever the
+     * EDT was painting.
+     */
+    @Transient
+    private val columns = ui.uiInbox<PendingColumn> { addColumns(it) }
+
+    /** Adds a batch of columns, notifying each touched series once rather than per point. */
+    private fun addColumns(batch: List<PendingColumn>) {
+        val touched = LinkedHashSet<XYSeries>()
+        for (column in batch) {
+            if (column.consumer !in rasterConsumerList) continue
+            if (column.size > rowCount) {
+                rowCount = column.size
+                events.propertyChanged.fire()
+            }
+            val series = dataset.getSeries(column.consumer.index)
+            if (touched.add(series)) series.notify = false
+            if (column.spikeRows.isEmpty()) {
+                series.add(column.time, null, false)
+            } else {
+                column.spikeRows.forEach { series.add(column.time, it, false) }
+            }
+        }
+        touched.forEach { it.notify = true }
+    }
 
     /**
      * Objects that represent separate sets of raster points, shown in a different color in the
@@ -193,24 +237,10 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
          * Example 2: [0.0, 0.6, -0.3, 0.0, 1.0] would show 2 dots vertically at the 2nd and 5th position at the current time
          */
         @Consumable
-        suspend fun setValues(values: DoubleArray) = withContext(swingDispatcher) {
-            var updated = false
-            var i = 0
-            val n = values.size
-            if (n > rowCount) {
-                rowCount = n
-                events.propertyChanged.fire()
-            }
-            while (i < n) {
-                if (values[i] >= spikeThreshold) {
-                    dataset.getSeries(index).add(timeSupplier.get(), i)
-                    updated = true
-                }
-                i++
-            }
-            if (!updated) {
-                dataset.getSeries(index).add(timeSupplier.get(), null)
-            }
+        fun setValues(values: DoubleArray) {
+            val threshold = spikeThreshold
+            val spikeRows = values.indices.filter { values[it] >= threshold }.toIntArray()
+            columns.post(PendingColumn(this, timeSupplier.get(), values.size, spikeRows))
         }
 
         override val id: String

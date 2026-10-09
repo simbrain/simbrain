@@ -271,8 +271,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     context(Network)
     override fun accumulateInputs() {
-        fanIn.forEach { it.updatePSR() }
-        addInputValue(weightedInputs)
+        addInputValue(updateFanInPSRs())
         accumulateGapJunctionCurrents()
         addInputValue(bias)
     }
@@ -283,9 +282,24 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     context(Network)
     fun accumulateFanInInputs() {
-        fanIn.forEach { it.updatePSR() }
-        addInputValue(weightedInputs)
+        addInputValue(updateFanInPSRs())
         accumulateGapJunctionCurrents()
+    }
+
+    /**
+     * Updates each incoming synapse's post-synaptic response and returns their sum ([weightedInputs]) in the same
+     * pass, so each synapse is visited once per update.
+     */
+    context(Network)
+    private fun updateFanInPSRs(): Double {
+        val synapses = fanIn
+        var sum = 0.0
+        for (i in 0 until synapses.size) {
+            val synapse = synapses[i]
+            synapse.updatePSR()
+            sum += synapse.psr
+        }
+        return sum
     }
 
     private fun accumulateGapJunctionCurrents() {

@@ -2,10 +2,14 @@ package org.simbrain.workspace.gui
 
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
 import org.simbrain.util.SFileChooser
+import org.simbrain.util.UiScope
+import org.simbrain.util.cancelWith
 import org.simbrain.util.createAction
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.showWarningDialog
@@ -45,6 +49,13 @@ var parentFrame: GenericFrame, workspaceComponent: E
     var workspaceComponent: E
         private set
 
+    /**
+     * Scope of this view: bind subscriptions with `cancelWith(viewScope)` and create view refreshes in it, and they end
+     * when the component really closes (not when the user cancels at the unsaved-changes prompt). Panels with their own
+     * scope tie it here the same way. Not named `ui`, which inside Swing code is a component's look-and-feel delegate.
+     */
+    val viewScope: CoroutineScope = UiScope()
+
     val exportAction = createAction(
         iconPath = "menu_icons/Save.png",
         name = "Export to xml...",
@@ -76,15 +87,15 @@ var parentFrame: GenericFrame, workspaceComponent: E
 
         // Add a default update listener
         val events = workspaceComponent.events
-        events.guiToggled.on { parentFrame.setVisible(workspaceComponent.isGuiOn) }
-        events.componentClosing.on { close() }
+        events.guiToggled.on { parentFrame.setVisible(workspaceComponent.isGuiOn) }.cancelWith(viewScope)
+        events.componentClosing.on { close() }.cancelWith(viewScope)
         events.componentMinimized.on { minimized ->
             try {
                 parentFrame.setIcon(minimized)
             } catch (e: PropertyVetoException) {
                 throw RuntimeException(e)
             }
-        }
+        }.cancelWith(viewScope)
         Logger.trace(this.javaClass.canonicalName + " created")
     }
 
@@ -96,7 +107,15 @@ var parentFrame: GenericFrame, workspaceComponent: E
             }
         }
         workspaceComponent.close()
+        onClosed()
+        viewScope.cancel()
     }
+
+    /**
+     * Releases resources [viewScope] does not cover (listeners registered outside the event system) once [close] has
+     * really closed the component; not called when the user cancels at the unsaved-changes prompt.
+     */
+    protected open fun onClosed() {}
 
     /**
      * Dialog for importing a workspace component.

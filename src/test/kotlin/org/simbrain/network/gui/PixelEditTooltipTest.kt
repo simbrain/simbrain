@@ -10,6 +10,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
+import org.simbrain.util.UiWork
 
 class PixelEditTooltipTest {
 
@@ -50,6 +51,8 @@ class PixelEditTooltipTest {
         val array = NeuronArray(4)
         network.addNetworkModelsAsync(array)
         val node = panel.getNode(array) as NeuronArrayNode
+        // Let the post-add zoom land first: a camera change re-picks the node under the mouse and can set a tooltip
+        UiWork.awaitIdle()
 
         panel.canvas.toolTipText = "stale summary"
         node.pixelSelection = setOf(0)

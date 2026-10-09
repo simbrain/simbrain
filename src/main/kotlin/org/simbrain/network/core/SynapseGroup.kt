@@ -112,12 +112,26 @@ class SynapseGroup @JvmOverloads constructor(
         }.also { synapses.clear() }
     }
 
+    /**
+     * True while [delete] tears the group down synapse by synapse. The per-synapse listeners then leave the list
+     * to be cleared at the end: shrinking it one by one would cross the visibility threshold partway through and
+     * have the GUI build loose nodes for synapses about to go, and emptying it would re-enter [delete].
+     */
+    @Transient
+    @Volatile
+    private var deleting = false
+
     override suspend fun delete(): List<NetworkModel> {
-        val removedSynapses = removeAllSynapses()
-        target.removeIncomingSg(this)
-        source.removeOutgoingSg(this)
-        events.deleted.fire(this)
-        return listOf(this) + removedSynapses
+        deleting = true
+        try {
+            val removedSynapses = removeAllSynapses()
+            target.removeIncomingSg(this)
+            source.removeOutgoingSg(this)
+            events.deleted.fire(this)
+            return listOf(this) + removedSynapses
+        } finally {
+            deleting = false
+        }
     }
 
     override suspend fun afterRestore(context: Any?) {
@@ -258,6 +272,7 @@ class SynapseGroup @JvmOverloads constructor(
 
     fun addSynapseListener(synapse: Synapse) {
         synapse.events.deleted.on(Dispatchers.Default) {
+            if (deleting) return@on
             this.synapses.remove(it)
             if (this.synapses.isEmpty()) {
                 this.delete()

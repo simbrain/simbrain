@@ -19,6 +19,11 @@ abstract class Optimizer: CopyableObject {
     )
     var learningRate = 0.01
 
+    /**
+     * Called once at the start of each optimizer step, before [computeDelta] is called for each parameter matrix.
+     */
+    open fun beginStep() {}
+
     context(SupervisedTrainer)
     abstract fun computeDelta(matrix: Matrix, delta: Matrix): Matrix
 
@@ -81,30 +86,46 @@ class AdamOptimizer(
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
     private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
 
-    private var initialIteration = 0
+    /**
+     * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
+     * or sequential update takes many steps in one iteration.
+     */
+    private var stepsSinceReset = 0
 
-    context(SupervisedTrainer)
-    private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
+    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+
+    override fun beginStep() {
+        stepsSinceReset++
+    }
 
     context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
 
-        meanEstimate.mul(beta1).add(delta.clone().mul(1 - beta1))
-        varianceEstimate.mul(beta2).add(delta.clone().applyFunction { it * it }.mul(1 - beta2))
-
-        val meanCorrected = meanEstimate.clone().div(1 - beta1.pow(timeSinceLastReset))
-        val varianceCorrected = varianceEstimate.clone().div(1 - beta2.pow(timeSinceLastReset))
-
-        return meanCorrected.mul(learningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
+        val meanCorrection = 1 - beta1.pow(timeSinceLastReset)
+        val varianceCorrection = 1 - beta2.pow(timeSinceLastReset)
+        val update = Matrix(matrix.nrow(), matrix.ncol())
+        // One pass per element, with the same operations in the same order as the matrix form
+        // m = beta1 m + (1 - beta1) g, v = beta2 v + (1 - beta2) g^2, update = lr (m / c1) / (sqrt(v / c2) + eps)
+        for (j in 0 until matrix.ncol()) {
+            for (i in 0 until matrix.nrow()) {
+                val g = delta[i, j]
+                val m = meanEstimate[i, j] * beta1 + g * (1 - beta1)
+                val v = varianceEstimate[i, j] * beta2 + (g * g) * (1 - beta2)
+                meanEstimate[i, j] = m
+                varianceEstimate[i, j] = v
+                update[i, j] = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
+            }
+        }
+        return update
     }
 
     context(SupervisedTrainer)
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()
-        initialIteration = iteration
+        stepsSinceReset = 0
     }
 
     override fun copy() = AdamOptimizer(beta1, beta2).also { it.learningRate = learningRate }
@@ -153,10 +174,17 @@ class AdamWOptimizer(
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
     private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
 
-    private var initialIteration = 0
+    /**
+     * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
+     * or sequential update takes many steps in one iteration.
+     */
+    private var stepsSinceReset = 0
 
-    context(SupervisedTrainer)
-    private val timeSinceLastReset get() = (iteration - initialIteration).coerceAtLeast(1)
+    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+
+    override fun beginStep() {
+        stepsSinceReset++
+    }
 
     context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
@@ -179,10 +207,11 @@ class AdamWOptimizer(
 
         val adamUpdate = meanCorrected.mul(currentLearningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
 
-        // AdamW: Apply weight decay directly to weights (decoupled)
+        // AdamW: Apply weight decay directly to weights (decoupled). Updates are added to the weights, so decay
+        // toward zero is subtracted
         if (weightDecay > 0.0) {
             val weightDecayUpdate = matrix.clone().mul(currentLearningRate * weightDecay)
-            return adamUpdate.add(weightDecayUpdate)
+            return adamUpdate.sub(weightDecayUpdate)
         } else {
             return adamUpdate
         }
@@ -192,7 +221,7 @@ class AdamWOptimizer(
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()
-        initialIteration = iteration
+        stepsSinceReset = 0
     }
 
     override fun copy() = AdamWOptimizer(beta1, beta2, weightDecay, learningRateDecay).also { it.learningRate = learningRate }

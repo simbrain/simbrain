@@ -141,7 +141,7 @@ class SubnetworkClipboardTest {
         duplicate(comp)
         panel.undoManager.undo()
         // Back-to-back with no settle: exercises the model->node map race directly (see CollectionUtils
-        // CompletableDeferredHashMap.set / removeIfValue and NetworkPanel.batchNodeRemoval).
+        // CompletableDeferredHashMap.set / removeIfValue and NetworkPanel's batched node removal).
         panel.undoManager.redo()
 
         assertEquals(2, subnetCount())

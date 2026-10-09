@@ -27,6 +27,11 @@ import kotlin.math.sin
  */
 class KuramotoRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule,
     ClippedUpdateRule, NoisyUpdateRule {
+
+    // reads source phases while updating
+    override val isNeuronLocal: Boolean
+        get() = false
+
     /**
      * Natural Frequency.
      */

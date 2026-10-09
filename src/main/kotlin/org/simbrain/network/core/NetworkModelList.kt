@@ -9,32 +9,32 @@ import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.CopyOnWriteArraySet
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
- * Backed by a linked hash set. Hash set deals with duplication; linked provides an iterator.
+ * Backed by insertion-ordered [ModelSet]s. The set deals with duplication; insertion order provides the iteration order.
  *
  * Used both by [Network] and by [Subnetwork].
  */
 class NetworkModelList {
 
     /**
-     * Backing for the collection: a map from model types to linked hash sets.
+     * Backing for the collection: a map from model types to insertion-ordered model sets.
      */
     @XStreamImplicit
-    private val networkModels: MutableMap<Class<out NetworkModel>, CopyOnWriteArraySet<NetworkModel>?> = ConcurrentHashMap()
+    private val networkModels: MutableMap<Class<out NetworkModel>, ModelSet<NetworkModel>?> = ConcurrentHashMap()
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = CopyOnWriteArraySet<T>()
+            val newSet = ModelSet<T>()
             newSet.add(model)
-            networkModels[modelClass] = newSet as CopyOnWriteArraySet<NetworkModel>
+            networkModels[modelClass] = newSet as ModelSet<NetworkModel>
         }
     }
 
@@ -45,10 +45,11 @@ class NetworkModelList {
     fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = CopyOnWriteArraySet<NetworkModel>()
+            val newSet = ModelSet<NetworkModel>()
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
@@ -67,6 +68,7 @@ class NetworkModelList {
     fun add(model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             put(Subnetwork::class.java, model)
         } else {
@@ -78,11 +80,11 @@ class NetworkModelList {
      * Returns an ordered set of network models of a specific type.
      */
     @Suppress("UNCHECKED_CAST")
-    operator fun <T : NetworkModel> get(modelClass: Class<T>): CopyOnWriteArraySet<T> {
+    operator fun <T : NetworkModel> get(modelClass: Class<T>): Set<T> {
         return if (networkModels.containsKey(modelClass)) {
-            networkModels[modelClass] as CopyOnWriteArraySet<T>
+            networkModels[modelClass] as Set<T>
         } else {
-            CopyOnWriteArraySet()
+            emptySet()
         }
     }
 
@@ -93,11 +95,11 @@ class NetworkModelList {
      * Returns a set corresponding to the provided network model type.
      * Does not guarantee that the returned set contains models of that type.
      */
-    fun getRawModelSet(modelClass: Class<*>?): CopyOnWriteArraySet<*> {
+    fun getRawModelSet(modelClass: Class<*>?): Set<*> {
         return if (networkModels.containsKey(modelClass)) {
             networkModels[modelClass]!!
         } else {
-            CopyOnWriteArraySet<NetworkModel>()
+            emptySet<NetworkModel>()
         }
     }
 
@@ -126,9 +128,17 @@ class NetworkModelList {
 
     val allInPriorityOrder by allInPriorityOrderCache::value
 
+    private val updatePlanCache = CachedObject { NetworkUpdatePlan(allInUpdatingOrder) }
+
+    /**
+     * The cached iteration order used by [Network.bufferedUpdate].
+     */
+    val updatePlan by updatePlanCache::value
+
     fun remove(model: NetworkModel) {
         allInUpdatingOrderCache.invalidate()
         allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)

@@ -58,15 +58,26 @@ val hopfieldSimContinuous = newSim {
 
             Unlike the discrete Hopfield simulation, this model uses continuous activation values and Euclidean distance when comparing recalled patterns.
 
+            ## Control Panel Settings
+
+            - `Clear pattern`: Sets every neuron to `-1`, giving a blank canvas to draw on with the wand tool.
+            - `Random pattern`: Sets each neuron randomly to `-1` or `1`. Useful as a starting point for testing recall.
+            - `Randomize weights`: Replaces the weights with symmetric random values, erasing anything the network has learned.
+            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the network.
+            - `Learning rate`: The Hebbian learning rate used when training. Larger values store a pattern in fewer presses.
+            - `Train once on current pattern`: Applies one Hebbian learning step, storing whatever pattern is currently on the neurons in the weights. The anti-pattern is stored along with it. Press it repeatedly to strengthen the memory.
+            - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
+            - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings, then runs the test and plots the results. The settings are described in the `Discrete Hopfield` simulation's documentation.
+
             # What to Do
 
             ## Learning a Memory
 
-            1. Click the `Randomize Weights` button to get a fresh random weight matrix.
+            1. Click the `Randomize weights` button to get a fresh random weight matrix.
 
-            2. `Train` the model on one object multiple times (e.g., `Circle`, `Square`, `Diagonal Line`, `Cross`).
+            2. Load a pattern (e.g., `Circle`, `Square`, `Diagonal Line`, `Cross`) and press `Train once on current pattern` several times.
 
-            3. Click `Random Pattern` or the `-1 Canvas` button and iterate the model repeatedly to see the change in real-time.
+            3. Click `Random pattern` or the `Clear pattern` button and iterate the model repeatedly to see the change in real-time.
 
             4. See how well the network has remembered the pattern by looking if the network can reproduce the same pattern or its anti-pattern. Do this
             multiple times by repeating step 3.
@@ -75,11 +86,11 @@ val hopfieldSimContinuous = newSim {
 
             You can also create one of your own images for the network to be trained on.
 
-            1. Start by clicking the `-1 Canvas` button to get a fresh canvas.
+            1. Start by clicking the `Clear pattern` button to get a fresh canvas.
 
             2. Now, click on the `Wand tool` or press `d` and then draw your image in the network.
 
-            3. After that, click the `Train` button and repeat the steps above in the `Learning a Memory` section.
+            3. After that, press `Train once on current pattern` and repeat the steps above in the `Learning a Memory` section.
 
             ## Memory Capacity Testing
 
@@ -113,7 +124,6 @@ val hopfieldSimContinuous = newSim {
         """.trimIndent()
     )
 
-    var numTrainIterations = 1
     var learningRate = .1
     var forgettingRate = .1
 
@@ -138,27 +148,28 @@ val hopfieldSimContinuous = newSim {
             //    }
             //    initForgettingRate()
             //}
-            addTextField("Training iterations", "" + numTrainIterations) {
-                it.toIntOrNull()?.let { num ->
-                    numTrainIterations = num
-                }
-            }
-            addTextField("Learning rate", "" + learningRate) {
+            addTextField(
+                "Learning rate",
+                "" + learningRate,
+                toolTip = "Hebbian learning rate used by Train once on current pattern."
+            ) {
                 it.toDoubleOrNull()?.let { num ->
                     learningRate = num
                 }
                 initLearningRate()
             }
-            addButton("Train") {
+            addButton("Train once on current pattern") {
                 // Forces into training mode
                 hopfield.isAllClamped = true
                 wm.clamped = false
                 // Now train
-                workspace.simpleIterate(numTrainIterations)
+                workspace.simpleIterate()
                 // Go to retrieval mode so user can test
                 hopfield.isAllClamped = false
                 wm.clamped = true
 
+            }.apply {
+                toolTipText = "Applies one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
             }
             //addSeparator()
             //addButton("Training Mode") {
@@ -177,7 +188,7 @@ val hopfieldSimContinuous = newSim {
                     // Training mode
                     hopfield.isAllClamped = true
                     wm.clamped = false
-                    workspace.iterateSuspend(numTrainIterations)
+                    workspace.iterateSuspend(1)
                     // Testing mode
                     hopfield.isAllClamped = false
                     wm.clamped = true

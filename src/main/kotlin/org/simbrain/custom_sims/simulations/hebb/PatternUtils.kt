@@ -86,33 +86,42 @@ suspend fun SimulationScope.createPatternControlPanel(
 ): ControlPanelKt? {
     return withGui {
         createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            val offValue = if (isContinuous) -1.0 else 0.0
+            addButton("Clear pattern") {
+                layer.setActivations(DoubleArray(layer.size) { offValue })
+            }.apply {
+                toolTipText = "Sets every neuron to $offValue, giving a blank canvas."
+            }
             addButton("Random pattern") {
-                if (isContinuous) {
-                    layer.randomize(TwoValued(-1.0, 1.0))
-                } else {
-                    layer.randomize(TwoValued(0.0, 1.0))
-                }
+                layer.randomize(TwoValued(offValue, 1.0))
+            }.apply {
+                toolTipText = "Sets each neuron randomly to $offValue or 1.0."
             }
             addButton("Randomize weights") {
                 randomizeWeights()
-            }
-            if (isContinuous) {
-                addButton("-1 Canvas") {
-                    layer.setActivations(DoubleArray(layer.size) { -1.0 })
-                }
+            }.apply {
+                toolTipText = "Randomizes the weights, erasing any stored patterns."
             }
             addSeparator()
             addButton("Circle") {
                 applyCirclePattern(layer, isContinuous)
+            }.apply {
+                toolTipText = "Sets the neurons to a ring pattern."
             }
             addButton("Square") {
                 applySquarePattern(layer, isContinuous)
+            }.apply {
+                toolTipText = "Sets the neurons to a square outline pattern."
             }
             addButton("Diagonal Line") {
                 applyLinePattern(layer, "diagonal", isContinuous)
+            }.apply {
+                toolTipText = "Sets the neurons to a diagonal line pattern."
             }
             addButton("Cross") {
                 applyCrossPattern(layer, isContinuous)
+            }.apply {
+                toolTipText = "Sets the neurons to a cross pattern."
             }
             addSeparator()
         }

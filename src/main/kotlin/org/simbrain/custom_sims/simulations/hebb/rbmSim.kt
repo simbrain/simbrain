@@ -39,6 +39,17 @@ val rbmSim = newSim {
             The visible layer is arranged in a 10x10 grid, making it easy to visualize patterns. The hidden layer learns feature representations of these patterns through 
             contrastive divergence learning.
 
+            ## Control Panel Settings
+
+            - `Clear pattern`: Sets every visible neuron to `0`, giving a blank canvas to draw on with the wand tool.
+            - `Random pattern`: Sets each visible neuron randomly to `0` or `1`. Useful as a starting point for testing reconstruction.
+            - `Randomize weights`: Replaces the weights with random values, erasing anything the network has learned.
+            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the visible layer.
+            - `Training iterations`: How many training passes each press of `Train On All Patterns` or `Train on current pattern` applies.
+            - `Train On All Patterns`: Trains on all four built-in patterns in turn, repeated once per training iteration.
+            - `Train on current pattern`: Trains on whatever pattern is currently on the visible layer, once per training iteration.
+            - `Add noise`: Adds Gaussian noise to the visible layer so you can watch the network clean it up.
+
             # What to Do
 
             Click `Train On All Patterns` to train the RBM on all four built-in patterns. The network will iterate through each pattern multiple times based on the `Training 
@@ -81,7 +92,11 @@ val rbmSim = newSim {
             rbm.visibleLayer,
             false
         ) { rbm.randomizeWeights() }?.apply {
-            addTextField("Training iterations", "" + numTrainIterations) {
+            addTextField(
+                "Training iterations",
+                "" + numTrainIterations,
+                toolTip = "Number of training passes applied by each press of a train button."
+            ) {
                 it.toIntOrNull()?.let { num ->
                     numTrainIterations = num
                 }
@@ -99,6 +114,8 @@ val rbmSim = newSim {
                         rbm.trainOnCurrentPattern()
                     }
                 }
+            }.apply {
+                toolTipText = "Trains on all four built-in patterns in turn, repeated once per training iteration."
             }
             addSeparator()
             addButton("Train on current pattern") {
@@ -107,12 +124,18 @@ val rbmSim = newSim {
                         rbm.trainOnCurrentPattern()
                     }
                 }
+            }.apply {
+                toolTipText = "Trains on the pattern currently on the visible layer, once per training iteration."
+            }.apply {
+                toolTipText = "Trains on all four built-in patterns in turn, repeated once per training iteration."
             }
             addSeparator()
             addButton("Add noise") {
                 rbm.visibleLayer.activations += NormalDistribution(standardDeviation = .1)
                     .sampleDouble(rbm.visibleLayer.size)
                     .toColumnVector()
+            }.apply {
+                toolTipText = "Adds Gaussian noise to the visible layer to test pattern completion."
             }
         }?.awaitLayout()
         place(networkComponent, controlPanel?.rightEdgeWithGap() ?: SIM_WINDOW_GAP, SIM_WINDOW_GAP, 815, 619)

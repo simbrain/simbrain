@@ -164,6 +164,7 @@ fun ControlPanelKt.createHopfieldTestPane(
         setLabelTable(labelTable)
     }
     slider.init()
+    slider.toolTipText = "Loads one of the randomly generated test patterns into the network."
 
     addButton("Capacity Test", tab = "Capacity") {
         patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
@@ -185,6 +186,8 @@ fun ControlPanelKt.createHopfieldTestPane(
         plot.model.clearData()
         runCapacityTests(config, patternTestConfig, allPatterns, numTestPatterns(), plot)
 
+    }.apply {
+        toolTipText = "Opens test settings, then plots how many patterns are recalled as more are stored."
     }
 
     val patternNum = JLabel("   Pattern number: ")

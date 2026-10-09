@@ -362,13 +362,21 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     private fun addNodeOrdered(node: ScreenElement) {
         // Within the edge tier, weight matrices sit lowest, then synapses, gap junctions, synapse groups, and
-        // connectors; each kind goes after the last node of the kind below it
-        fun after(type: KClass<out ScreenElement>) =
-            edgeTier.childrenIterator.toSequence().indexOfLast { type.isInstance(it) } + 1
+        // connectors; each kind goes after the last node of the kind below it. The search runs from the end of the
+        // tier, where the few nodes above the synapses sit, so it stops quickly even with many synapses
+        fun after(vararg types: KClass<out ScreenElement>): Int {
+            val children = edgeTier.childrenReference
+            for (i in children.indices.reversed()) {
+                if (types.any { it.isInstance(children[i]) }) return i + 1
+            }
+            return 0
+        }
 
         when (node) {
             is WeightMatrixNode -> edgeTier.addChild(0, node)
-            is SynapseNode -> edgeTier.addChild(after(WeightMatrixNode::class), node)
+            // After the last synapse rather than the first, so a large network appends instead of shifting every
+            // synapse already in the tier
+            is SynapseNode -> edgeTier.addChild(after(SynapseNode::class, WeightMatrixNode::class), node)
             is GapJunctionNode -> edgeTier.addChild(after(SynapseNode::class), node)
             is SynapseGroupNode -> edgeTier.addChild(after(SynapseNode::class), node)
             is TensorConnectorNode -> edgeTier.addChild(after(SynapseGroupNode::class), node)

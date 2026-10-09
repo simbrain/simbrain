@@ -223,7 +223,9 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
      */
     inner class ChannelContainer(val channelIndex: Int) : AttributeContainer {
 
-        override val id: String get() = "Channel $channelIndex"
+        override val id: String get() = "${this@TensorLayer.id}/Channel $channelIndex"
+
+        override val attributeName: String get() = "Channel $channelIndex"
 
         private val buffer = DoubleArray(shape.height * shape.width)
 

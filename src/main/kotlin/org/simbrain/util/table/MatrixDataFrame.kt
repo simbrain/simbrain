@@ -10,10 +10,9 @@ class MatrixDataFrame @JvmOverloads constructor(
     var data: Matrix,
     override var columns: MutableList<Column> = List(data.ncol()) { colNum ->
         Column("Column ${colNum + 1}", Column.DataType.DoubleType)
-    }.toMutableList()
+    }.toMutableList(),
+    override val isMutable: Boolean = true,
 ) : SimbrainDataFrame() {
-
-    override val isMutable = true
 
     override fun getRowCount(): Int {
         return data.nrow()

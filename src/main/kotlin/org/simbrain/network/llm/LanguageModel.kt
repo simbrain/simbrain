@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkDebugInfoProvider
 import org.simbrain.network.core.XStreamConstructor
 import org.simbrain.network.events.LocationEvents
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.tensor.Blas
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.trainers.SamplingStrategy
@@ -258,6 +259,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         val tokenizer = LlmTokenizer(dir.resolve("tokenizer.json"))
         loaded = LoadedState(model, tokenizer, buildScene(model))
         loadedFromDirectory = weightsDirectory
+        editedParameters = HashSet()
         initialText?.takeIf { it.isNotBlank() }?.let { seedWindow(it) }
         initialText = null
         events.weightsLoaded.fire()
@@ -265,6 +267,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
 
     private fun buildScene(model: Lfm2Model): CompositorScene {
         val scene = Lfm2StackCompositor.buildScene(model)
+        applyTileLabels(scene)
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
                 it.x = xy[0]
@@ -364,6 +367,9 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         copy.showLayerCards = showLayerCards
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.probabilityCardLayout = probabilityCardLayout?.copyOf()
+        copy.weightIncrement = weightIncrement
+        copy.tileIncrements = HashMap(tileIncrements)
+        copy.tileLabels = HashMap(tileLabels)
         copy.initialText = windowText()?.takeIf { it.isNotBlank() } ?: initialText
     }
 
@@ -584,6 +590,73 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         toolCallBuffer = null
         pendingToolCalls = null
         text = state.tokenizer.decode(ids, skipSpecials = true)
+    }
+
+    /**
+     * Parameters changed by hand since the weights loaded, by file name. Edits live only in
+     * memory: saving keeps the weights path, not the weights, so a reload starts from the file.
+     */
+    @Transient
+    private var editedParameters = HashSet<String>()
+
+    val hasEditedWeights: Boolean
+        get() = editedParameters.isNotEmpty()
+
+    override val interiorScene: CompositorScene?
+        get() = loaded?.scene
+
+    override val readoutRow: Int
+        get() = ((loaded?.model?.position ?: 0) - 1).coerceAtLeast(0)
+
+    override fun <T> withModelLock(block: () -> T): T = synchronized(this) { block() }
+
+    override fun randomizeWeights(tensor: FloatTensor) {
+        val randomizer = NetworkPreferences.weightRandomizer
+        for (i in 0 until tensor.size) tensor.data.put(i, randomizer.sampleDouble().toFloat())
+        tensor.markMutated()
+    }
+
+    override fun tokenText(id: Int): String? = loaded?.tokenizer?.decode(intArrayOf(id))
+
+    override fun onWeightsEdited(tensor: FloatTensor) {
+        loaded?.model?.parameterName(tensor)?.let(editedParameters::add)
+    }
+
+    override fun afterWeightEdits() = refeedWindow()
+
+    /** Re-reads every hand-edited parameter from the weights file and re-runs the window. */
+    @Synchronized
+    fun restoreWeights() {
+        val state = loaded ?: return
+        if (editedParameters.isEmpty()) return
+        val file = Path.of(weightsDirectory).resolve("model.safetensors")
+        editedParameters.forEach { name -> Safetensors.loadInto(file, name, state.model.plan.port(name).tensor) }
+        editedParameters.clear()
+        refeedWindow()
+        state.scene.tiles
+            .filterIsInstance<MatrixTile>()
+            .filter { it.kind == TileKind.WEIGHT }
+            .forEach { it.refreshFromSource() }
+        events.updated.fire()
+    }
+
+    /**
+     * Every cache, checkpoint, and recorded row was computed with the old weights, so after an
+     * edit the whole window is queued again from its first token, one per iteration like any
+     * prefill. The text and the committed stream are unchanged; only its computation reruns.
+     */
+    private fun refeedWindow() {
+        val state = loaded ?: return
+        state.model.reset()
+        state.scene.reset()
+        checkpoints = ArrayList()
+        pending = ArrayDeque(windowIds)
+        sampledToken = -1
+        lastGenerated = ""
+        currentSpan = IntArray(0)
+        generatedCount = 0
+        toolCallBuffer = null
+        pendingToolCalls = null
     }
 
     /**

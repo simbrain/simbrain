@@ -554,7 +554,8 @@ private val TINY_LM_SIDEBAR = """
 
         ## Explore
 
-        - Double-click a tile to trace its data-flow paths through the diagram; double-click again to clear.
+        - Right-click a tile to trace its data-flow paths through the diagram, plot its values, or clear, randomize, and nudge a weight matrix.
+        - Double-click a tile to open its dialog: rename it, read its values, or edit a weight matrix cell by cell.
         - Hover over any cell to read its exact value; drag tiles to rearrange the diagram.
         - Adjust `Temperature` and the sampling strategy in the control panel and compare generated text.
         - Try more heads or layers in the startup dialog. With two layers you can watch the logit lens improve across both.

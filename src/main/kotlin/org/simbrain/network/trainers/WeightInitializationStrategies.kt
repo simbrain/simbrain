@@ -1,6 +1,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
@@ -16,6 +17,14 @@ sealed class WeightInitializationStrategy(val seed: Long? = null): CopyableObjec
     abstract fun initializeWeights(weightMatrix: WeightMatrix)
 
     abstract fun initializeWeights(matrix: Matrix)
+
+    /** Initializes a rows (outputs) x cols (inputs) parameter tensor, the transformer weight layout. */
+    abstract fun initializeWeights(tensor: FloatTensor)
+
+    protected fun FloatTensor.fillWith(sample: () -> Double) {
+        for (i in 0 until size) data.put(i, sample().toFloat())
+        markMutated()
+    }
 
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
         Randomize::class.java,
@@ -49,6 +58,11 @@ class Xavier(seed: Long? = null): WeightInitializationStrategy(seed) {
     override fun initializeWeights(matrix: Matrix) {
         val randomizer = createRandomizer(matrix.ncol(), matrix.nrow())
         matrix.setValuesInPlace { _, _ -> randomizer.sampleDouble() }
+    }
+
+    override fun initializeWeights(tensor: FloatTensor) {
+        val randomizer = createRandomizer(tensor.cols, tensor.rows)
+        tensor.fillWith(randomizer::sampleDouble)
     }
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {
@@ -87,6 +101,11 @@ class He(seed: Long? = null): WeightInitializationStrategy(seed) {
         matrix.setValuesInPlace { _, _ -> randomizer.sampleDouble() }
     }
 
+    override fun initializeWeights(tensor: FloatTensor) {
+        val randomizer = createRandomizer(tensor.cols)
+        tensor.fillWith(randomizer::sampleDouble)
+    }
+
     override fun initializeWeights(weightMatrix: WeightMatrix) {
         val randomizer = createRandomizer(weightMatrix.source.size)
         weightMatrix.randomize(randomizer)
@@ -123,6 +142,11 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
         matrix.setValuesInPlace { _, _ -> randomizer.sampleDouble() }
     }
 
+    override fun initializeWeights(tensor: FloatTensor) {
+        val randomizer = createRandomizer(tensor.cols)
+        tensor.fillWith(randomizer::sampleDouble)
+    }
+
     override fun initializeWeights(weightMatrix: WeightMatrix) {
         val randomizer = createRandomizer(weightMatrix.source.size)
         weightMatrix.randomize(randomizer)
@@ -147,6 +171,10 @@ class Randomize(seed: Long? = null): WeightInitializationStrategy(seed) {
 
     override fun initializeWeights(matrix: Matrix) {
         matrix.setValuesInPlace { _, _ -> distribution.sampleDouble() }
+    }
+
+    override fun initializeWeights(tensor: FloatTensor) {
+        tensor.fillWith(distribution::sampleDouble)
     }
 
     override fun initializeWeights(weightMatrix: WeightMatrix) {

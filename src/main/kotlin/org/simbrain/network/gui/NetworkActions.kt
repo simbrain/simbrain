@@ -18,6 +18,7 @@ import org.simbrain.network.gui.dialogs.text.TextDialog
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.llm.TinyLanguageModel
+import org.simbrain.network.llm.WeightEdit
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.network.subnetworks.Subnetwork
@@ -216,6 +217,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     ) {
         if (networkPanel.hasAnyPixelSelection()) {
             networkPanel.randomizeSelectedPixels()
+            return@createConditionallyEnabledAction
+        }
+        if (networkPanel.hasAnyWeightTileSelection()) {
+            networkPanel.editSelectedWeightTiles(WeightEdit.RANDOMIZE)
             return@createConditionallyEnabledAction
         }
         with(network) {

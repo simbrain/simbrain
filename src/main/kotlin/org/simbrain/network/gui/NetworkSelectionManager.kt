@@ -3,7 +3,7 @@ package org.simbrain.network.gui
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.NetworkSelectionEvent
 import org.simbrain.network.gui.nodes.ScreenElement
-import java.util.concurrent.CopyOnWriteArraySet
+import org.simbrain.util.SnapshotSet
 
 /**
  * Manges network selection. E.g. when you select a group of nodes it tracks which nodes were selected.
@@ -25,12 +25,12 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * "Green" selection from lasso.
      */
-    val selection: Set<ScreenElement> = CopyOnWriteArraySet()
+    val selection: Set<ScreenElement> = SnapshotSet()
 
     /**
      * "Red" source selection.
      */
-    val sourceSelection: Set<ScreenElement> = CopyOnWriteArraySet()
+    val sourceSelection: Set<ScreenElement> = SnapshotSet()
 
     /**
      * Filter selected network models using a generic type.  With a helper for java code (which requires a class
@@ -57,10 +57,24 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     inline fun <reified T: ScreenElement> filterSelectedSourceNodes() = sourceSelection.filterIsInstance<T>()
     fun <T: ScreenElement> filterSelectedSourceNodes(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
 
+    private class SelectedModels(val selectionVersion: Long, val models: List<NetworkModel>)
+
+    @Volatile
+    private var selectionVersion = 0L
+
+    @Volatile
+    private var selectedModelsCache: SelectedModels? = null
+
     /**
-     * Getter for selected models.
+     * Getter for selected models. Every conditionally enabled action reads this on each selection change, so it is
+     * computed once per change rather than once per read.
      */
-    val selectedModels get() = selection.map { it.model }.toSet().toList()
+    val selectedModels: List<NetworkModel>
+        get() {
+            val version = selectionVersion
+            selectedModelsCache?.let { if (it.selectionVersion == version) return it.models }
+            return selection.map { it.model }.toSet().toList().also { selectedModelsCache = SelectedModels(version, it) }
+        }
 
     /**
      * Getter for source models.
@@ -177,19 +191,20 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * Core function which tells the Network Panel to updated provided ScreenElements. Modifies the [selection].
      */
-    private fun modifySourceSelection(block: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
+    private fun modifySourceSelection(block: SnapshotSet<ScreenElement>.() -> Unit) {
         val old = HashSet(sourceSelection)
-        (sourceSelection as CopyOnWriteArraySet).block()
+        (sourceSelection as SnapshotSet).block()
         events.sourceSelection.fire(old, sourceSelection)
     }
 
     /**
      * Core function which tells the Network Panel to updated provided ScreenElements. Modifies the [selection].
      */
-    private fun modifySelection(action: CopyOnWriteArraySet<ScreenElement>.() -> Unit) {
+    private fun modifySelection(action: SnapshotSet<ScreenElement>.() -> Unit) {
         val old = HashSet(selection)
         // Invoke provided action
-        (selection as CopyOnWriteArraySet).action()
+        (selection as SnapshotSet).action()
+        selectionVersion++
         events.selection.fire(old, selection)
     }
 

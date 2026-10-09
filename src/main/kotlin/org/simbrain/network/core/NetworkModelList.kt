@@ -7,12 +7,13 @@ import com.thoughtworks.xstream.converters.UnmarshallingContext
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.io.HierarchicalStreamWriter
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.SnapshotSet
 import org.simbrain.util.CachedObject
 import java.util.concurrent.ConcurrentHashMap
 
 /**
  * The main data structure for [NetworkModel]s. Wraps a map from classes to ordered sets of those objects.
- * Backed by insertion-ordered [ModelSet]s. The set deals with duplication; insertion order provides the iteration order.
+ * Backed by insertion-ordered [SnapshotSet]s. The set deals with duplication; insertion order provides the iteration order.
  *
  * Used both by [Network] and by [Subnetwork].
  */
@@ -22,7 +23,7 @@ class NetworkModelList {
      * Backing for the collection: a map from model types to insertion-ordered model sets.
      */
     @XStreamImplicit
-    private val networkModels: MutableMap<Class<out NetworkModel>, ModelSet<NetworkModel>?> = ConcurrentHashMap()
+    private val networkModels: MutableMap<Class<out NetworkModel>, SnapshotSet<NetworkModel>?> = ConcurrentHashMap()
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
@@ -32,9 +33,9 @@ class NetworkModelList {
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = ModelSet<T>()
+            val newSet = SnapshotSet<T>()
             newSet.add(model)
-            networkModels[modelClass] = newSet as ModelSet<NetworkModel>
+            networkModels[modelClass] = newSet as SnapshotSet<NetworkModel>
         }
     }
 
@@ -49,7 +50,7 @@ class NetworkModelList {
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
-            val newSet = ModelSet<NetworkModel>()
+            val newSet = SnapshotSet<NetworkModel>()
             newSet.add(model)
             networkModels[modelClass] = newSet
         }

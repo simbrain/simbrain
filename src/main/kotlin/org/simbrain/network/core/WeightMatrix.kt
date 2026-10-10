@@ -116,8 +116,9 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             pendingPsrSource?.let { x ->
                 pendingPsrSource = null
                 for (j in 0 until field.ncol()) {
+                    val factor = x[j]
                     for (i in 0 until field.nrow()) {
-                        field[i, j] = weights[i, j] * x[j]
+                        field[i, j] = if (factor == 0.0) 0.0 else weights[i, j] * factor
                     }
                 }
             }
@@ -134,14 +135,16 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
 
     /**
-     * Summed inputs from the last connectionist (non-spiking) update, computed as one matrix-vector product rather
-     * than as row sums of a filled [psrMatrix]. Null after a spiking update or once [psrMatrix] has been read.
+     * Summed inputs from the last update when they were computed from the weights directly (a matrix-vector product
+     * for connectionist updates, the responding sources' weights for [SpikeResponder.sourceFactors]) rather than as
+     * row sums of a filled [psrMatrix]. Null after a spike responder writes [psrMatrix], or once [psrMatrix] is read.
      */
     @Transient
     private var summedInputs: DoubleArray? = null
 
     /**
-     * Source activations from the last connectionist update whose per-weight responses have not been written to
+     * Per-source factors from the last update, either source activations (connectionist) or a spike responder's
+     * [SpikeResponder.sourceFactors], whose per-weight responses (weight times factor) have not been written to
      * [psrMatrix] yet. Most targets only need the summed inputs, so [psrMatrix] is filled only when something reads it.
      */
     @Transient
@@ -274,9 +277,25 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
 
         } else {
             // Spiking case
-            pendingPsrSource = null
-            summedInputs = null
-            spikeResponder.apply(this, spikeResponseData)
+            val factors = spikeResponder.sourceFactors(this)
+            if (factors != null) {
+                // Only sources with a nonzero factor contribute, so a step of a sparsely firing network visits a few
+                // columns of the weights rather than all of them
+                val summed = DoubleArray(weights.nrow())
+                for (i in factors.indices) {
+                    val factor = factors[i]
+                    if (factor == 0.0) continue
+                    for (j in summed.indices) {
+                        summed[j] += weights[j, i] * factor
+                    }
+                }
+                pendingPsrSource = factors
+                summedInputs = summed
+            } else {
+                pendingPsrSource = null
+                summedInputs = null
+                spikeResponder.apply(this, spikeResponseData)
+            }
         }
     }
 

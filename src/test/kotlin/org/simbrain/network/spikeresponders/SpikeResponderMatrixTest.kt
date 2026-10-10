@@ -132,4 +132,41 @@ class SpikeResponderMatrixTest {
     }
 
 
+
+    private fun recurrentIzhikevichArray(forceFullPsrMatrix: Boolean): Pair<Network, Pair<NeuronArray, WeightMatrix>> {
+        val rng = kotlin.random.Random(5)
+        val network = Network().apply { timeStep = 0.5 }
+        val array = NeuronArray(60).apply {
+            updateRule = org.simbrain.network.updaterules.IzhikevichRule().apply { backgroundCurrent = 6.0 }
+            for (i in 0 until size) activations[i, 0] = rng.nextDouble(-70.0, 30.0)
+        }
+        val recurrent = WeightMatrix(array, array).apply {
+            for (i in 0 until weights.nrow()) for (j in 0 until weights.ncol()) {
+                weights[i, j] = if (rng.nextDouble() < 0.2) rng.nextDouble(-4.0, 8.0) else 0.0
+            }
+            spikeResponder = StepResponder(2).apply {
+                // At probability one the probabilistic path behaves identically but writes the whole PSR matrix
+                if (forceFullPsrMatrix) useSpikeProbability = true
+            }
+        }
+        network.addNetworkModelsAsync(array, recurrent)
+        return network to (array to recurrent)
+    }
+
+    @Test
+    fun `summing a step response from the responding sources matches writing the whole psr matrix`() {
+        val (fastNetwork, fast) = recurrentIzhikevichArray(forceFullPsrMatrix = false)
+        val (fullNetwork, full) = recurrentIzhikevichArray(forceFullPsrMatrix = true)
+        var spikes = 0
+        repeat(400) { step ->
+            fastNetwork.update()
+            fullNetwork.update()
+            assertArrayEquals(full.first.activations.toArray().flatMap { it.asList() }.toDoubleArray(),
+                fast.first.activations.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0, "step $step")
+            spikes += (fast.first.dataHolder as SpikingMatrixData).spikes.count { it }
+        }
+        assertTrue(spikes > 100, "the network should spike, spiked $spikes times")
+        assertArrayEquals(full.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(),
+            fast.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
+    }
 }

@@ -19,6 +19,19 @@ class StepResponder(
 
 ) : SpikeResponder() {
 
+    /**
+     * A step response is the weight while the source is within its response window and zero otherwise, so a weight
+     * matrix can sum it from the weights of the responding sources. Spike probabilities draw per synapse, so they
+     * take the full [apply].
+     */
+    context(Network)
+    override fun sourceFactors(connector: WeightMatrix): DoubleArray? {
+        if (useSpikeProbability) return null
+        val lastSpikeTimes = ((connector.source as? NeuronArray)?.dataHolder as? SpikingMatrixData)?.lastSpikeTimes
+            ?: return null
+        return DoubleArray(lastSpikeTimes.size) { if (lastSpikeTimes[it] + responseDuration * timeStep >= time) 1.0 else 0.0 }
+    }
+
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
         val weightMatrix = connector as WeightMatrix

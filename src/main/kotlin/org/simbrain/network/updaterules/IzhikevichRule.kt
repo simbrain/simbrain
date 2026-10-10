@@ -124,21 +124,20 @@ class IzhikevichRule : SpikingNeuronUpdateRule<IzhikevichScalarData, IzhikevichM
 
             inputs.add(backgroundCurrent)
 
-            val result = buildList {
-                for (i in 0 until layer.size) {
-                    val activation = layer.activations.get(i, 0)
-                    val input = layer.inputs.get(i, 0)
-                    add(izhikevichRule(timeStep, input, activation, dataHolder.recoveryMatrix[i, 0]))
-                }
+            // Written straight into arrays: this runs every step for every neuron in the array
+            val oldActivations = layer.activations
+            val recoveryMatrix = dataHolder.recoveryMatrix
+            val activations = DoubleArray(layer.size)
+            val spikes = BooleanArray(layer.size)
+            for (i in 0 until layer.size) {
+                val state = izhikevichRule(timeStep, inputs[i, 0], oldActivations[i, 0], recoveryMatrix[i, 0])
+                activations[i] = state.activation
+                spikes[i] = state.isSpiked
+                recoveryMatrix[i, 0] = state.recovery
             }
 
-            val activations = Matrix.column(result.map { it.activation }.toDoubleArray())
-            val spikes = result.map { it.isSpiked }.toBooleanArray()
-            val recovery = Matrix.column(result.map { it.recovery }.toDoubleArray())
-
-            layer.activations = activations
+            layer.activations = Matrix.column(activations)
             dataHolder.setHasSpiked(spikes)
-            dataHolder.recoveryMatrix.copyFrom(recovery)
         }
     }
 

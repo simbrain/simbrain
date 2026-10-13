@@ -12,6 +12,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
+import org.simbrain.util.columnMajorArrayOrNull
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -172,12 +173,17 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     private var stepParamCount = 0
 
     private fun recordOptimizerUpdate(update: Matrix) {
+        val values = update.columnMajorArrayOrNull()
+        var sum = 0.0
         for (j in 0 until update.ncol()) {
-            for (i in 0 until update.nrow()) {
-                val v = update[i, j]
-                stepSquaredSum += v * v
+            if (values != null) {
+                val start = j * update.ld()
+                for (k in start until start + update.nrow()) sum += values[k] * values[k]
+            } else {
+                for (i in 0 until update.nrow()) sum += update[i, j] * update[i, j]
             }
         }
+        stepSquaredSum += sum
         stepParamCount += update.nrow() * update.ncol()
     }
 

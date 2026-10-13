@@ -1,6 +1,7 @@
 package org.simbrain.network.trainers
 
 import org.simbrain.util.UserParameter
+import org.simbrain.util.alignedColumnMajorArrays
 import org.simbrain.util.applyFunction
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
@@ -108,6 +109,23 @@ class AdamOptimizer(
         val update = Matrix(matrix.nrow(), matrix.ncol())
         // One pass per element, with the same operations in the same order as the matrix form
         // m = beta1 m + (1 - beta1) g, v = beta2 v + (1 - beta2) g^2, update = lr (m / c1) / (sqrt(v / c2) + eps)
+        val arrays = alignedColumnMajorArrays(delta, meanEstimate, varianceEstimate, update)
+        if (arrays != null) {
+            // Over the backing arrays, so the JIT can vectorize the loop
+            val (g, means, variances, out) = arrays
+            val ld = update.ld()
+            for (j in 0 until matrix.ncol()) {
+                val start = j * ld
+                for (k in start until start + matrix.nrow()) {
+                    val m = means[k] * beta1 + g[k] * (1 - beta1)
+                    val v = variances[k] * beta2 + (g[k] * g[k]) * (1 - beta2)
+                    means[k] = m
+                    variances[k] = v
+                    out[k] = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
+                }
+            }
+            return update
+        }
         for (j in 0 until matrix.ncol()) {
             for (i in 0 until matrix.nrow()) {
                 val g = delta[i, j]

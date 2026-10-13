@@ -168,16 +168,28 @@ class OptimizerTest {
 
     @Test
     fun `Adam matches the reference matrix formulation exactly over several steps`() {
+        // 7 x 5 is unpadded; 150 rows are stored with padded columns; a transposed delta takes the element-wise path
+        assertAdamMatchesReference(7, 5, transposedDelta = false)
+        assertAdamMatchesReference(150, 40, transposedDelta = false)
+        assertAdamMatchesReference(150, 40, transposedDelta = true)
+    }
+
+    private fun assertAdamMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
         val (_, _, trainer) = createTestNetwork()
         val optimizer = AdamOptimizer(beta1 = 0.85, beta2 = 0.995).apply { learningRate = 0.01 }
         trainer.config.optimizer = optimizer
-        val parameters = Matrix(7, 5)
+        val parameters = Matrix(rows, cols)
         val rng = kotlin.random.Random(3)
-        val mean = Matrix(7, 5)
-        val variance = Matrix(7, 5)
+        val mean = Matrix(rows, cols)
+        val variance = Matrix(rows, cols)
         for (step in 1..5) {
             optimizer.beginStep()
-            val delta = Matrix(7, 5).apply { for (i in 0 until 7) for (j in 0 until 5) this[i, j] = rng.nextDouble(-1.0, 1.0) }
+            val values = Array(rows) { DoubleArray(cols) { rng.nextDouble(-1.0, 1.0) } }
+            val delta = if (transposedDelta) {
+                Matrix(cols, rows).apply { for (i in 0 until rows) for (j in 0 until cols) this[j, i] = values[i][j] }.transpose()
+            } else {
+                Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = values[i][j] }
+            }
             mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
             variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
             val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(0.01)

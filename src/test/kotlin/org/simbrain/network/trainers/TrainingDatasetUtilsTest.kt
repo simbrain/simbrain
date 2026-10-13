@@ -74,14 +74,14 @@ class TrainingDatasetUtilsTest {
         val ds = createShapeDataset(samplesPerClass = 5, rngSeed = 0L)
         val n = 5
         val firstTarget = ds.targets[0]
-        for (i in 1 until n) assertEquals(firstTarget, ds.targets[i])
-        assertNotEquals(firstTarget, ds.targets[n])
+        for (i in 1 until n) assertArrayEquals(firstTarget, ds.targets[i])
+        assertFalse(firstTarget.contentEquals(ds.targets[n]))
     }
 
     @Test
     fun `inputs for same class differ from each other`() {
         val ds = createShapeDataset(samplesPerClass = 5, rngSeed = 0L)
-        assertNotEquals(ds.inputs[0], ds.inputs[1])
+        assertFalse(ds.inputs[0].contentEquals(ds.inputs[1]))
     }
 
     @Test
@@ -124,8 +124,8 @@ class TrainingDatasetUtilsTest {
         val first = createSimpleTensorClassificationDataset(shape, nOutputs = 4, samplesPerClass = 3, rngSeed = 123L)
         val second = createSimpleTensorClassificationDataset(shape, nOutputs = 4, samplesPerClass = 3, rngSeed = 123L)
 
-        assertEquals(first.inputs, second.inputs)
-        assertEquals(first.targets, second.targets)
+        assertEquals(first.inputs.map { it.toList() }, second.inputs.map { it.toList() })
+        assertEquals(first.targets.map { it.toList() }, second.targets.map { it.toList() })
     }
 
     @Test
@@ -138,7 +138,7 @@ class TrainingDatasetUtilsTest {
             rngSeed = 42L
         )
 
-        fun maxByChannel(sample: List<Double>): List<Double> =
+        fun maxByChannel(sample: DoubleArray): List<Double> =
             (0 until shape.channels).map { channel ->
                 (0 until shape.height).maxOf { row ->
                     (0 until shape.width).maxOf { col ->
@@ -165,7 +165,7 @@ class TrainingDatasetUtilsTest {
             rngSeed = 42L
         )
 
-        fun strongShapePixels(sample: List<Double>, channel: Int): Set<Pair<Int, Int>> =
+        fun strongShapePixels(sample: DoubleArray, channel: Int): Set<Pair<Int, Int>> =
             buildSet {
                 for (row in 0 until shape.height) {
                     for (col in 0 until shape.width) {

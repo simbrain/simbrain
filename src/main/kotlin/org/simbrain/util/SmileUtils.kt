@@ -138,9 +138,14 @@ fun List<List<Double>>.toMutableListOfLists(): MutableList<MutableList<Double>> 
 fun MutableList<MutableList<Double>>.copy(): MutableList<MutableList<Double>> =
     map { it.toMutableList() }.toMutableList()
 
+/**
+ * Copies of every row, so the copy shares no arrays with the original.
+ */
+fun List<DoubleArray>.copyRows(): MutableList<DoubleArray> = mapTo(ArrayList(size)) { it.copyOf() }
+
 fun TrainingDataset.copy(): TrainingDataset = TrainingDataset(
-    inputs = inputs.copy(),
-    targets = targets.copy(),
+    inputs = inputs.copyRows(),
+    targets = targets.copyRows(),
     inputSize = inputSize,
     targetSize = targetSize,
     inputRowNames = inputRowNames?.toMutableList(),

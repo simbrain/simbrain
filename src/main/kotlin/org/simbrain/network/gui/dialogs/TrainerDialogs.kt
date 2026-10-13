@@ -38,7 +38,7 @@ fun TrainingDataset.createDataSetPanel(
 ): DataSetPanel {
 
     fun createDataFrame(
-        data: MutableList<MutableList<Double>>,
+        data: List<DoubleArray>,
         rowNames: List<String>?,
         columnNames: List<String>?,
         expectedColumnCount: Int

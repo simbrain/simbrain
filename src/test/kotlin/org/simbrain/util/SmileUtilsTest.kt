@@ -987,8 +987,8 @@ class SmileUtilsTest {
         val copy = original.copy()
 
         // Verify content is the same
-        assertEquals(original.inputs, copy.inputs)
-        assertEquals(original.targets, copy.targets)
+        assertEquals(original.inputs.map { it.toList() }, copy.inputs.map { it.toList() })
+        assertEquals(original.targets.map { it.toList() }, copy.targets.map { it.toList() })
         assertEquals(original.inputRowNames, copy.inputRowNames)
         assertEquals(original.targetRowNames, copy.targetRowNames)
 

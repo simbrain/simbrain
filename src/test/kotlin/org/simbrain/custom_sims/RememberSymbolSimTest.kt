@@ -16,7 +16,7 @@ class RememberSymbolSimTest {
         val dataset = buildVariableDelayRecallDataset(2, Random(1))
         assertEquals(2 * symbols * (sequenceLength - 1) * sequenceLength, dataset.size)
         dataset.inputs.chunked(sequenceLength).zip(dataset.targets.chunked(sequenceLength)).forEach { (inputs, targets) ->
-            val symbol = inputs.first().indexOf(1.0)
+            val symbol = inputs.first().indexOfFirst { it == 1.0 }
             assertTrue(symbol in 0 until symbols)
             assertEquals(1.0, inputs.first().sum())
             val recallSteps = inputs.indices.filter { inputs[it].last() == 1.0 }

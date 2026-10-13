@@ -619,8 +619,8 @@ class CnnTrainer(
 
         for (row in rowRange) {
             if (row >= data.size) break
-            val input = data.inputs[row].toDoubleArray()
-            val target = data.targets[row].toDoubleArray()
+            val input = data.inputs[row]
+            val target = data.targets[row]
 
             // Clear tensor gradients for each sample
             tensorLayerStages.forEach { it.clearGradients() }
@@ -719,8 +719,8 @@ class CnnTrainer(
         if (data.size == 0) return 0.0
         var sum = 0.0
         for (i in 0 until data.size) {
-            val output = forwardPass(data.inputs[i].toDoubleArray())
-            sum += config.lossFunction.loss(output, data.targets[i].toDoubleArray())
+            val output = forwardPass(data.inputs[i])
+            sum += config.lossFunction.loss(output, data.targets[i])
         }
         return sum / data.size
     }
@@ -731,8 +731,8 @@ class CnnTrainer(
         var sum = 0.0
         var count = 0
         for (i in 0 until data.size) {
-            val output = forwardPass(data.inputs[i].toDoubleArray())
-            computeClassificationAccuracy(output, data.targets[i].toDoubleArray())?.let {
+            val output = forwardPass(data.inputs[i])
+            computeClassificationAccuracy(output, data.targets[i])?.let {
                 sum += it
                 count++
             }

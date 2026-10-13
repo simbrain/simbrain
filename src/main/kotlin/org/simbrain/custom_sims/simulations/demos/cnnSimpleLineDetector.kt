@@ -125,7 +125,7 @@ val cnnSimpleLineDetector = newSim {
     // Pre-load input with a sample from the third class.
     val thirdClassIndex = dataset.targets.indexOfFirst { it.getOrNull(2) == 1.0 }.takeIf { it >= 0 } ?: 0
     val thirdClassSample = dataset.inputs[thirdClassIndex]
-    inputLayer.activations = thirdClassSample.toDoubleArray()
+    inputLayer.activations = thirdClassSample
 
     place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 850, 730)
     workspace.simpleIterate() // So some activations are shown

@@ -23,6 +23,7 @@ import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.util.applyFunction
+import org.simbrain.util.columnMajorArrayOrNull
 import org.simbrain.util.copyFrom
 import smile.math.blas.Transpose
 import smile.math.matrix.Matrix
@@ -159,11 +160,12 @@ class BatchedBackprop private constructor(
 
     private fun Matrix.column(b: Int): Matrix = Matrix.column(DoubleArray(nrow()) { this[it, b] })
 
-    private fun columnsOf(rowsOfData: List<List<Double>>, rows: IntRange, size: Int): Matrix {
+    private fun columnsOf(rowsOfData: List<DoubleArray>, rows: IntRange, size: Int): Matrix {
         val m = Matrix(size, rows.count())
+        val columns = m.columnMajorArrayOrNull()
         rows.forEachIndexed { b, row ->
             val values = rowsOfData[row]
-            for (i in 0 until size) m[i, b] = values[i]
+            if (columns != null) values.copyInto(columns, b * m.ld(), 0, size) else for (i in 0 until size) m[i, b] = values[i]
         }
         return m
     }

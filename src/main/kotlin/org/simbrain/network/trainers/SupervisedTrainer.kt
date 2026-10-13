@@ -384,12 +384,12 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         val error = with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
-                inputLayer.setActivations(trainingSet.inputs[rowNum].toDoubleArray())
+                inputLayer.setActivations(trainingSet.inputs[rowNum])
                 
                 // Handle target reshaping for ActivationSequence outputs
                 val targetVec = if (outputLayer is ActivationSequence) {
                     // Reshape flattened target back to sequence format
-                    val flatTarget = trainingSet.targets[rowNum].toDoubleArray()
+                    val flatTarget = trainingSet.targets[rowNum]
                     val sequenceLayer = outputLayer as ActivationSequence
                     val sequenceSize = sequenceLayer.sequenceSize
                     val vocabSize = sequenceLayer.size
@@ -404,7 +404,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                     }
                     reshapedTarget
                 } else {
-                    trainingSet.targets[rowNum].toDoubleArray().toColumnVector()
+                    trainingSet.targets[rowNum].toColumnVector()
                 }
                 
                 with(network) {
@@ -538,9 +538,9 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
-                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+                supervisedNetwork.inputLayer.setActivations(input)
             } else {
-                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+                supervisedNetwork.inputLayer.activations = input.toColumnVector()
             }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
@@ -562,7 +562,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                 }
                 reshapedTarget
             } else {
-                target.toDoubleArray().toColumnVector()
+                target.toColumnVector()
             }
             
             config.lossFunction.scalarLoss(output, reshapedTarget)
@@ -576,9 +576,9 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
-                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+                supervisedNetwork.inputLayer.setActivations(input)
             } else {
-                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+                supervisedNetwork.inputLayer.activations = input.toColumnVector()
             }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
@@ -600,7 +600,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                 }
                 reshapedTarget
             } else {
-                target.toDoubleArray().toColumnVector()
+                target.toColumnVector()
             }
             
             classificationAccuracy(output, reshapedTarget)

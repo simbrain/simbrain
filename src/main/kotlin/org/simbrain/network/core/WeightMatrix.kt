@@ -113,15 +113,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         get() {
             // Whoever reads the matrix may also write it, so the directly computed sums no longer stand for it
             if (summedInputs != null) summedInputs = null
-            pendingPsrSource?.let { x ->
-                pendingPsrSource = null
-                for (j in 0 until field.ncol()) {
-                    val factor = x[j]
-                    for (i in 0 until field.nrow()) {
-                        field[i, j] = if (factor == 0.0) 0.0 else weights[i, j] * factor
-                    }
-                }
-            }
+            writePendingPsrs(field)
             return field
         }
         set(value) {
@@ -149,6 +141,17 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     @Transient
     private var pendingPsrSource: DoubleArray? = null
+
+    private fun writePendingPsrs(psrs: Matrix) {
+        val factors = pendingPsrSource ?: return
+        pendingPsrSource = null
+        for (j in 0 until psrs.ncol()) {
+            val factor = factors[j]
+            for (i in 0 until psrs.nrow()) {
+                psrs[i, j] = if (factor == 0.0) 0.0 else weights[i, j] * factor
+            }
+        }
+    }
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -282,18 +285,24 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 // Only sources with a nonzero factor contribute, so a step of a sparsely firing network visits a few
                 // columns of the weights rather than all of them
                 val summed = DoubleArray(weights.nrow())
+                val columns = weights.columnMajorArrayOrNull()
+                val ld = weights.ld()
                 for (i in factors.indices) {
                     val factor = factors[i]
                     if (factor == 0.0) continue
-                    for (j in summed.indices) {
-                        summed[j] += weights[j, i] * factor
+                    if (columns != null) {
+                        val start = i * ld
+                        for (j in summed.indices) summed[j] += columns[start + j] * factor
+                    } else {
+                        for (j in summed.indices) summed[j] += weights[j, i] * factor
                     }
                 }
                 pendingPsrSource = factors
                 summedInputs = summed
             } else {
-                pendingPsrSource = null
+                // A responder that just stopped using factors continues from the responses they stood for
                 summedInputs = null
+                writePendingPsrs(psrMatrix)
                 spikeResponder.apply(this, spikeResponseData)
             }
         }

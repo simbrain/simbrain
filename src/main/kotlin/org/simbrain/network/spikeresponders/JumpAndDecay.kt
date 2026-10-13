@@ -1,6 +1,7 @@
 package org.simbrain.network.spikeresponders
 
 import org.simbrain.network.core.*
+import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -52,8 +53,44 @@ class JumpAndDecay : SpikeResponder() {
         return jad
     }
 
+    override fun createMatrixData(rows: Int, cols: Int): MatrixDataHolder = JumpAndDecayMatrixData(cols)
+
+    /**
+     * With a zero baseline, fixed weights, and no spike probability, every synapse's response is its weight times a
+     * trace kept per source neuron: the trace jumps to one on a spike (or by one, with [useConvolution]) and decays
+     * toward zero otherwise. The weight matrix then sums responses from the spiking sources' weights. The trace
+     * stands for the PSR matrix only once it has been started from an all-zero PSR matrix; after the full [apply]
+     * runs, the PSR matrix is authoritative again.
+     */
+    context(Network)
+    override fun sourceFactors(connector: WeightMatrix): DoubleArray? {
+        if (useSpikeProbability || baseLine != 0.0 || connector.learningRule !is StaticSynapseRule) return null
+        val data = connector.spikeResponseData as? JumpAndDecayMatrixData ?: return null
+        val source = connector.source as? NeuronArray ?: return null
+        val spikes = (source.dataHolder as? SpikingMatrixData)?.spikes ?: return null
+        val trace = data.trace
+        if (trace.size != spikes.size) return null
+        if (!data.traceValid) {
+            val psrMatrix = connector.psrMatrix
+            for (j in 0 until psrMatrix.ncol()) for (i in 0 until psrMatrix.nrow()) if (psrMatrix[i, j] != 0.0) return null
+            trace.fill(0.0)
+            data.traceValid = true
+        }
+        if (source.updateRule.isSpikingRule) {
+            for (i in trace.indices) {
+                trace[i] = if (spikes[i]) {
+                    1.0 + (if (useConvolution) trace[i] else 0.0)
+                } else {
+                    trace[i] + timeStep * ((0.0 - trace[i]) / timeConstant)
+                }
+            }
+        }
+        return trace.copyOf()
+    }
+
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
+        (responderData as? JumpAndDecayMatrixData)?.traceValid = false
         val wm = connector.let { if (it is WeightMatrix) it else return }
         val na = connector.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
@@ -97,4 +134,27 @@ class JumpAndDecay : SpikeResponder() {
 
     override val name: String
         get() = "Jump and Decay"
+}
+
+/**
+ * Per-source traces for a [JumpAndDecay] responder on a weight matrix; see [JumpAndDecay.sourceFactors].
+ */
+class JumpAndDecayMatrixData(val sources: Int) : MatrixDataHolder {
+
+    val trace = DoubleArray(sources)
+
+    /**
+     * Whether [trace] currently stands for the weight matrix's PSR matrix.
+     */
+    var traceValid = false
+
+    override fun copy() = JumpAndDecayMatrixData(sources).also {
+        trace.copyInto(it.trace)
+        it.traceValid = traceValid
+    }
+
+    override fun clear() {
+        trace.fill(0.0)
+        traceValid = false
+    }
 }

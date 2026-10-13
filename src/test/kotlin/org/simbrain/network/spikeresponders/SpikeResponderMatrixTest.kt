@@ -133,7 +133,10 @@ class SpikeResponderMatrixTest {
 
 
 
-    private fun recurrentIzhikevichArray(forceFullPsrMatrix: Boolean): Pair<Network, Pair<NeuronArray, WeightMatrix>> {
+    private fun recurrentIzhikevichArray(
+        forceFullPsrMatrix: Boolean,
+        responder: () -> SpikeResponder = { StepResponder(2) },
+    ): Pair<Network, Pair<NeuronArray, WeightMatrix>> {
         val rng = kotlin.random.Random(5)
         val network = Network().apply { timeStep = 0.5 }
         val array = NeuronArray(60).apply {
@@ -144,7 +147,7 @@ class SpikeResponderMatrixTest {
             for (i in 0 until weights.nrow()) for (j in 0 until weights.ncol()) {
                 weights[i, j] = if (rng.nextDouble() < 0.2) rng.nextDouble(-4.0, 8.0) else 0.0
             }
-            spikeResponder = StepResponder(2).apply {
+            spikeResponder = responder().apply {
                 // At probability one the probabilistic path behaves identically but writes the whole PSR matrix
                 if (forceFullPsrMatrix) useSpikeProbability = true
             }
@@ -168,5 +171,44 @@ class SpikeResponderMatrixTest {
         assertTrue(spikes > 100, "the network should spike, spiked $spikes times")
         assertArrayEquals(full.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(),
             fast.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
+    }
+
+    private fun assertSameSpiking(responder: () -> SpikeResponder, switchToLearningAt: Int? = null) {
+        val (fastNetwork, fast) = recurrentIzhikevichArray(forceFullPsrMatrix = false, responder)
+        val (fullNetwork, full) = recurrentIzhikevichArray(forceFullPsrMatrix = true, responder)
+        var spikes = 0
+        repeat(300) { step ->
+            if (step == switchToLearningAt) {
+                // A learning rule hands the response back to the full PSR matrix, continuing from the trace
+                listOf(fast.second, full.second).forEach { it.learningRule = org.simbrain.network.learningrules.HebbianRule().apply { learningRate = 0.0 } }
+            }
+            fastNetwork.update()
+            fullNetwork.update()
+            val fastSpikes = (fast.first.dataHolder as SpikingMatrixData).spikes
+            assertArrayEquals((full.first.dataHolder as SpikingMatrixData).spikes, fastSpikes, "spikes at step $step")
+            spikes += fastSpikes.count { it }
+            val expected = full.first.activations.toArray().flatMap { it.asList() }
+            val actual = fast.first.activations.toArray().flatMap { it.asList() }
+            expected.zip(actual).forEach { (e, a) -> assertEquals(e, a, 1e-9 * maxOf(1.0, kotlin.math.abs(e)), "step $step") }
+        }
+        assertTrue(spikes > 100, "the network should spike, spiked $spikes times")
+        val expectedPsr = full.second.psrMatrix.toArray().flatMap { it.asList() }
+        val actualPsr = fast.second.psrMatrix.toArray().flatMap { it.asList() }
+        expectedPsr.zip(actualPsr).forEach { (e, a) -> assertEquals(e, a, 1e-9 * maxOf(1.0, kotlin.math.abs(e))) }
+    }
+
+    @Test
+    fun `a jump and decay trace per source matches the full psr matrix`() {
+        assertSameSpiking({ JumpAndDecay().apply { timeConstant = 4.0 } })
+    }
+
+    @Test
+    fun `a convolved jump and decay trace matches the full psr matrix`() {
+        assertSameSpiking({ JumpAndDecay().apply { timeConstant = 4.0; useConvolution = true } })
+    }
+
+    @Test
+    fun `switching to a learning rule continues jump and decay from the trace`() {
+        assertSameSpiking({ JumpAndDecay().apply { timeConstant = 4.0 } }, switchToLearningAt = 150)
     }
 }

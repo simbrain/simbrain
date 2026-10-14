@@ -200,6 +200,42 @@ class OptimizerTest {
     }
 
     @Test
+    fun `AdamW matches the reference matrix formulation exactly over several steps`() {
+        assertAdamWMatchesReference(7, 5, transposedDelta = false)
+        assertAdamWMatchesReference(150, 40, transposedDelta = false)
+        assertAdamWMatchesReference(150, 40, transposedDelta = true)
+    }
+
+    private fun assertAdamWMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
+        val (_, _, trainer) = createTestNetwork()
+        val optimizer = AdamWOptimizer(beta1 = 0.85, beta2 = 0.995, weightDecay = 0.05, learningRateDecay = 0.02)
+            .apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        val rng = kotlin.random.Random(5)
+        val parameters = Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = rng.nextDouble(-1.0, 1.0) }
+        val mean = Matrix(rows, cols)
+        val variance = Matrix(rows, cols)
+        for (step in 1..5) {
+            optimizer.beginStep()
+            val values = Array(rows) { DoubleArray(cols) { rng.nextDouble(-1.0, 1.0) } }
+            val delta = if (transposedDelta) {
+                Matrix(cols, rows).apply { for (i in 0 until rows) for (j in 0 until cols) this[j, i] = values[i][j] }.transpose()
+            } else {
+                Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = values[i][j] }
+            }
+            val lr = 0.01 * Math.pow(1 - 0.02, step.toDouble())
+            mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
+            variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
+            val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(lr)
+                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { kotlin.math.sqrt(it) + 1e-8 })
+                .sub(parameters.clone().mul(lr * 0.05))
+            val actual = with(trainer) { optimizer.computeDelta(parameters, delta) }
+            assertArrayEquals(expected.toArray().flatMap { it.asList() }.toDoubleArray(), actual.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
+            parameters.add(actual)
+        }
+    }
+
+    @Test
     fun `Adam bias correction counts optimizer steps, not trainer iterations`() {
         val (_, wm, trainer) = createTestNetwork()
         val optimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999).apply { learningRate = 0.01 }

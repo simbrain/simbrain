@@ -2,7 +2,6 @@ package org.simbrain.network.trainers
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.alignedColumnMajorArrays
-import org.simbrain.util.applyFunction
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.math.matrix.Matrix
@@ -103,40 +102,7 @@ class AdamOptimizer(
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-
-        val meanCorrection = 1 - beta1.pow(timeSinceLastReset)
-        val varianceCorrection = 1 - beta2.pow(timeSinceLastReset)
-        val update = Matrix(matrix.nrow(), matrix.ncol())
-        // One pass per element, with the same operations in the same order as the matrix form
-        // m = beta1 m + (1 - beta1) g, v = beta2 v + (1 - beta2) g^2, update = lr (m / c1) / (sqrt(v / c2) + eps)
-        val arrays = alignedColumnMajorArrays(delta, meanEstimate, varianceEstimate, update)
-        if (arrays != null) {
-            // Over the backing arrays, so the JIT can vectorize the loop
-            val (g, means, variances, out) = arrays
-            val ld = update.ld()
-            for (j in 0 until matrix.ncol()) {
-                val start = j * ld
-                for (k in start until start + matrix.nrow()) {
-                    val m = means[k] * beta1 + g[k] * (1 - beta1)
-                    val v = variances[k] * beta2 + (g[k] * g[k]) * (1 - beta2)
-                    means[k] = m
-                    variances[k] = v
-                    out[k] = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
-                }
-            }
-            return update
-        }
-        for (j in 0 until matrix.ncol()) {
-            for (i in 0 until matrix.nrow()) {
-                val g = delta[i, j]
-                val m = meanEstimate[i, j] * beta1 + g * (1 - beta1)
-                val v = varianceEstimate[i, j] * beta2 + (g * g) * (1 - beta2)
-                meanEstimate[i, j] = m
-                varianceEstimate[i, j] = v
-                update[i, j] = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
-            }
-        }
-        return update
+        return adamStep(matrix, delta, meanEstimate, varianceEstimate, beta1, beta2, timeSinceLastReset, learningRate, 0.0)
     }
 
     context(SupervisedTrainer)
@@ -209,13 +175,6 @@ class AdamWOptimizer(
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
 
-        // AdamW: Use original gradients (no weight decay mixed in)
-        meanEstimate.mul(beta1).add(delta.clone().mul(1 - beta1))
-        varianceEstimate.mul(beta2).add(delta.clone().applyFunction { it * it }.mul(1 - beta2))
-
-        val meanCorrected = meanEstimate.clone().div(1 - beta1.pow(timeSinceLastReset))
-        val varianceCorrected = varianceEstimate.clone().div(1 - beta2.pow(timeSinceLastReset))
-
         // Apply learning rate decay
         val currentLearningRate = if (learningRateDecay > 0.0) {
             learningRate * (1.0 - learningRateDecay).pow(timeSinceLastReset)
@@ -223,16 +182,12 @@ class AdamWOptimizer(
             learningRate
         }
 
-        val adamUpdate = meanCorrected.mul(currentLearningRate).div(varianceCorrected.applyFunction { sqrt(it) + 1e-8 })
-
-        // AdamW: Apply weight decay directly to weights (decoupled). Updates are added to the weights, so decay
-        // toward zero is subtracted
-        if (weightDecay > 0.0) {
-            val weightDecayUpdate = matrix.clone().mul(currentLearningRate * weightDecay)
-            return adamUpdate.sub(weightDecayUpdate)
-        } else {
-            return adamUpdate
-        }
+        // AdamW: the moments use the original gradients (no weight decay mixed in), and decay is applied directly to
+        // the weights (decoupled)
+        return adamStep(
+            matrix, delta, meanEstimate, varianceEstimate, beta1, beta2, timeSinceLastReset, currentLearningRate,
+            weightDecay
+        )
     }
 
     context(SupervisedTrainer)
@@ -243,4 +198,58 @@ class AdamWOptimizer(
     }
 
     override fun copy() = AdamWOptimizer(beta1, beta2, weightDecay, learningRateDecay).also { it.learningRate = learningRate }
+}
+
+/**
+ * One Adam step for one parameter matrix, in a single pass per element: updates the running [mean] and [variance] in
+ * place and returns the update, lr (m / c1) / (sqrt(v / c2) + eps), minus lr * [weightDecay] * w when [weightDecay] is
+ * positive (AdamW). Updates are added to the weights, so decay toward zero is subtracted. The operations are the
+ * same, in the same order, as the matrix formulation, so the results are identical.
+ */
+private fun adamStep(
+    weights: Matrix,
+    delta: Matrix,
+    mean: Matrix,
+    variance: Matrix,
+    beta1: Double,
+    beta2: Double,
+    step: Int,
+    learningRate: Double,
+    weightDecay: Double
+): Matrix {
+    val meanCorrection = 1 - beta1.pow(step)
+    val varianceCorrection = 1 - beta2.pow(step)
+    val decayRate = learningRate * weightDecay
+    val decay = weightDecay > 0.0
+    val update = Matrix(weights.nrow(), weights.ncol())
+    val arrays = alignedColumnMajorArrays(delta, mean, variance, update, weights)
+    if (arrays != null) {
+        // Over the backing arrays, so the JIT can vectorize the loop
+        val (g, means, variances, out, w) = arrays
+        val ld = update.ld()
+        for (j in 0 until weights.ncol()) {
+            val start = j * ld
+            for (k in start until start + weights.nrow()) {
+                val m = means[k] * beta1 + g[k] * (1 - beta1)
+                val v = variances[k] * beta2 + (g[k] * g[k]) * (1 - beta2)
+                means[k] = m
+                variances[k] = v
+                val adam = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
+                out[k] = if (decay) adam - w[k] * decayRate else adam
+            }
+        }
+        return update
+    }
+    for (j in 0 until weights.ncol()) {
+        for (i in 0 until weights.nrow()) {
+            val g = delta[i, j]
+            val m = mean[i, j] * beta1 + g * (1 - beta1)
+            val v = variance[i, j] * beta2 + (g * g) * (1 - beta2)
+            mean[i, j] = m
+            variance[i, j] = v
+            val adam = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
+            update[i, j] = if (decay) adam - weights[i, j] * decayRate else adam
+        }
+    }
+    return update
 }

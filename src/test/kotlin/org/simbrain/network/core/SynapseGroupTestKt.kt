@@ -494,4 +494,45 @@ class SynapseGroupTestKt {
         assertTrue(sg.displaySynapses, "with autoVisibility, a below-threshold group auto-expands")
     }
 
+    private fun clampedPair(network: Network): Pair<NeuronCollection, NeuronCollection> {
+        val pre = Neuron().apply { activation = 1.0; clamped = true }
+        val posts = List(2) { Neuron().apply { activation = 1.0; clamped = true } }
+        network.addNetworkModelsAsync(listOf(pre) + posts)
+        val source = NeuronCollection(listOf(pre)).apply { network.addNetworkModelAsync(this) }
+        val target = NeuronCollection(posts).apply { network.addNetworkModelAsync(this) }
+        return source to target
+    }
+
+    @Test
+    fun `a synapse group starts updating a synapse whose rule becomes a learning rule mid-run`() {
+        val network = Network()
+        val (source, target) = clampedPair(network)
+        val synapse = Synapse(source.neuronList[0], target.neuronList[0]).apply { forceSetStrength(0.5) }
+        val group = SynapseGroup(source, target, AllToAll(), mutableListOf(synapse))
+        network.addNetworkModelAsync(group)
+        repeat(2) { network.update() }
+        assertEquals(0.5, synapse.strength, 1e-12)
+        synapse.learningRule = HebbianRule().apply { learningRate = 0.1 }
+        network.update()
+        assertEquals(0.6, synapse.strength, 1e-9)
+    }
+
+    @Test
+    fun `a synapse group updates learning synapses swapped into its list in place`() {
+        val network = Network()
+        val (source, target) = clampedPair(network)
+        val static = Synapse(source.neuronList[0], target.neuronList[0]).apply { forceSetStrength(0.5) }
+        val learning = Synapse(source.neuronList[0], target.neuronList[1]).apply {
+            forceSetStrength(0.5)
+            learningRule = HebbianRule().apply { learningRate = 0.1 }
+        }
+        val group = SynapseGroup(source, target, AllToAll(), mutableListOf(static))
+        network.addNetworkModelAsync(group)
+        network.update()
+        // As reconnecting does: same list, same size, no learning rule change
+        group.synapses.clear()
+        group.synapses.add(learning)
+        network.update()
+        assertEquals(0.6, learning.strength, 1e-9)
+    }
 }

@@ -3,6 +3,7 @@ package org.simbrain.network.core
 import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
+import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.SimbrainConstants
@@ -161,8 +162,39 @@ class SynapseGroup @JvmOverloads constructor(
 
     context(Network)
     override fun update() {
-        this.synapses.forEach { it.update() }
+        learningSynapses().forEach { it.update() }
         events.updated.fire()
+    }
+
+    private class LearningSynapses(
+        val epoch: Long,
+        val list: List<Synapse>,
+        val size: Int,
+        val first: Synapse?,
+        val last: Synapse?,
+        val learning: List<Synapse>
+    )
+
+    @Transient
+    private var learningSynapses: LearningSynapses? = null
+
+    /**
+     * The synapses with a non-static learning rule, the only ones [update] has work for; a large group of static
+     * synapses would otherwise be walked serially on every update. Rebuilt when any learning rule is replaced
+     * ([Synapse.learningRuleEpoch]) or when [synapses] looks different, since other code edits it in place
+     * (reconnecting, undo): its identity, size, and first and last elements are compared.
+     */
+    private fun learningSynapses(): List<Synapse> {
+        val epoch = Synapse.learningRuleEpoch.get()
+        val list = synapses
+        learningSynapses?.let {
+            if (it.epoch == epoch && it.list === list && it.size == list.size && it.first === list.firstOrNull() &&
+                it.last === list.lastOrNull()
+            ) return it.learning
+        }
+        val learning = list.filter { it.learningRule !is StaticSynapseRule }
+        learningSynapses = LearningSynapses(epoch, list, list.size, list.firstOrNull(), list.lastOrNull(), learning)
+        return learning
     }
 
     fun size(): Int = this.synapses.size

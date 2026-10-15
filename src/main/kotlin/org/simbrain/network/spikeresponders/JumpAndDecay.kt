@@ -60,7 +60,8 @@ class JumpAndDecay : SpikeResponder() {
      * trace kept per source neuron: the trace jumps to one on a spike (or by one, with [useConvolution]) and decays
      * toward zero otherwise. The weight matrix then sums responses from the spiking sources' weights. The trace
      * stands for the PSR matrix only once it has been started from an all-zero PSR matrix; after the full [apply]
-     * runs, the PSR matrix is authoritative again.
+     * runs, the PSR matrix is authoritative again. Editing a weight while its response decays rescales that response
+     * at once, where the full PSR matrix keeps decaying from the old weight; the source's next spike makes them agree.
      */
     context(Network)
     override fun sourceFactors(connector: WeightMatrix): DoubleArray? {

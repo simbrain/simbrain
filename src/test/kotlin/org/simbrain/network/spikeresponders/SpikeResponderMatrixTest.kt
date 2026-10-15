@@ -211,4 +211,47 @@ class SpikeResponderMatrixTest {
     fun `switching to a learning rule continues jump and decay from the trace`() {
         assertSameSpiking({ JumpAndDecay().apply { timeConstant = 4.0 } }, switchToLearningAt = 150)
     }
+
+    @Test
+    fun `editing weights mid-response rescales a jump and decay trace but not the full psr matrix`() {
+        fun chain(forceFullPsrMatrix: Boolean): Triple<Network, NeuronArray, WeightMatrix> {
+            val network = Network()
+            val input = NeuronArray(2)
+            val spiking = NeuronArray(2).apply { updateRule = SpikingThresholdRule() }
+            val output = NeuronArray(3)
+            val responding = WeightMatrix(spiking, output).apply {
+                setWeights(arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, -1.0), doubleArrayOf(.5, .5)))
+                spikeResponder = JumpAndDecay().apply {
+                    timeConstant = 4.0
+                    if (forceFullPsrMatrix) useSpikeProbability = true
+                }
+            }
+            listOf(input, spiking, output).forEach { it.clear() }
+            network.addNetworkModelsAsync(input, spiking, output, WeightMatrix(input, spiking), responding)
+            return Triple(network, input, responding)
+        }
+        val fast = chain(forceFullPsrMatrix = false)
+        val full = chain(forceFullPsrMatrix = true)
+        fun spikeFirstSource() = listOf(fast, full).forEach { (network, input, _) ->
+            input.activations = Matrix.column(doubleArrayOf(1.0, 0.0))
+            network.update()
+            network.update()
+        }
+        fun step() = listOf(fast, full).forEach { it.first.update() }
+
+        spikeFirstSource()
+        repeat(3) { step() }
+        assertArrayEquals(full.third.getSummedPSRs(), fast.third.getSummedPSRs(), 1e-12)
+        assertTrue(full.third.getSummedPSRs()[0] in 0.1..0.99, "the response should be partly decayed")
+        listOf(fast, full).forEach { it.third.weights.mul(2.0) }
+        step()
+        // The trace path computes each response as weight times trace, so the decaying response follows the edit at
+        // once; the full PSR matrix keeps decaying from the response made with the old weights
+        val doubled = full.third.getSummedPSRs().map { it * 2 }.toDoubleArray()
+        assertArrayEquals(doubled, fast.third.getSummedPSRs(), 1e-12)
+        // The next spike jumps both to the new weights, so they agree again
+        spikeFirstSource()
+        assertArrayEquals(full.third.getSummedPSRs(), fast.third.getSummedPSRs(), 1e-12)
+        assertEquals(2.0, fast.third.getSummedPSRs()[0], 1e-12)
+    }
 }

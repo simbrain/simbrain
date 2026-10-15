@@ -25,6 +25,8 @@ import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
 import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
 import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
+import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetwork
+import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetworkArray
 import org.simbrain.custom_sims.simulations.neuroscience.nematodeThermotaxis
 import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
@@ -142,6 +144,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("STDP") { stdpSim }
         item("Spiking Network") { spikingNetworkSimulation }
         item("E/I Balance") { excitatoryInhibitoryBalance }
+        item("Izhikevich network (1000 neurons)") { izhikevichNetwork }
+        item("Izhikevich network (array)") { izhikevichNetworkArray }
         item("Nematode simulation") { nematodeThermotaxis }
         item("Cortical layers", beta = true) { corticalLayers }
          //item("Cortical areas") { cortexKuramoto }

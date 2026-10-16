@@ -14,7 +14,6 @@ import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
-import smile.math.blas.Transpose
 import smile.math.matrix.Matrix
 import kotlin.math.min
 
@@ -274,7 +273,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
             // activation) are left for psrMatrix to fill if it is read
             val x = sourceActivations.col(0)
             val summed = DoubleArray(weights.nrow())
-            weights.mv(Transpose.NO_TRANSPOSE, 1.0, x, 0.0, summed)
+            weights.timesVectorInto(x, summed)
             pendingPsrSource = x
             summedInputs = summed
 

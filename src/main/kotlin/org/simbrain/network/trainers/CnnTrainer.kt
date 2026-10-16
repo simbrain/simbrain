@@ -592,7 +592,8 @@ class CnnTrainer(
 
             // Backward through the connector
             when (connector) {
-                is ConvolutionConnector -> connector.backward()
+                // The input layer has no parameters, so nothing reads the gradient with respect to the input image
+                is ConvolutionConnector -> connector.backward(propagateToSource = connector.source !== inputTensorLayer)
                 is PoolingConnector -> connector.backward()
             }
         }

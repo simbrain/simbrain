@@ -18,6 +18,7 @@ import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.Container
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
 import java.awt.geom.Rectangle2D
@@ -28,6 +29,22 @@ import kotlin.math.max
 
 val PNode.parents
     get() = generateSequence(parent) { it.parent }
+
+/**
+ * Has every showing Piccolo canvas under this container apply its scene changes now, turning them into Swing repaint
+ * regions. Piccolo otherwise does that in a task of its own on a later EDT turn, so a paint that runs first misses the
+ * changes and a second paint follows.
+ */
+fun Container.processPiccoloChanges() {
+    for (child in components) {
+        if (!child.isShowing) continue
+        if (child is PCanvas) {
+            child.root.processInputs()
+        } else if (child is Container) {
+            child.processPiccoloChanges()
+        }
+    }
+}
 
 val PNode.screenElements
     get() = generateSequence(this) { it.parent }.filterIsInstance<ScreenElement>()

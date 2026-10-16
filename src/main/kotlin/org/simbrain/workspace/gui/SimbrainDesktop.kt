@@ -21,6 +21,7 @@ import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.piccolo.processPiccoloChanges
 import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
@@ -323,10 +324,12 @@ object SimbrainDesktop {
             updateTimeLabel()
         }
         // Each iteration waits for the windows to draw it, unless the workspace runs as fast as possible: pending view
-        // updates run now rather than at their next rate-capped turn, then the dirty regions paint
+        // updates run now rather than at their next rate-capped turn, canvases turn the changes into repaint regions,
+        // then the dirty regions paint, once
         workspace.displaySync = {
             withContext(Dispatchers.Swing) {
                 UiWork.flushPending()
+                frame.processPiccoloChanges()
                 RepaintManager.currentManager(frame).paintDirtyRegions()
             }
         }

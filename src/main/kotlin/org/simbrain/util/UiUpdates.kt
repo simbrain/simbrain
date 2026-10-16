@@ -138,8 +138,11 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
             }
         }
         job.invokeOnCompletion { cause ->
-            running.set(false)
+            // Leave the active set before allowing a new loop: the other order lets a post start one, register it,
+            // and then lose the registration here, so display syncs would skip this primitive for as long as posts
+            // keep that loop alive. A post that arrives between the two is picked up by the schedule below
             UiWork.end(this)
+            running.set(false)
             if (cause != null) dropPending()
             // A post that saw the loop still running just before it exited would otherwise be stranded
             else if (hasPending()) schedule()

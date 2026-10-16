@@ -178,6 +178,35 @@ class UiUpdatesTest {
         scope.cancel()
     }
 
+    @Test
+    fun `flushing pending work runs requests made while the run loop is ending`() {
+        val scope = UiScope()
+        val requested = AtomicInteger()
+        // The request count each run has accounted for
+        val covered = AtomicInteger()
+        val refresh = scope.uiRefresh(minIntervalMs = 0) { covered.set(requested.get()) }
+        val missed = AtomicInteger()
+        val flushes = AtomicInteger()
+        val deadline = System.currentTimeMillis() + 3000
+        var iterations = 0
+        while (System.currentTimeMillis() < deadline && missed.get() == 0) {
+            requested.incrementAndGet()
+            refresh.request()
+            val target = flushes.get() + 1
+            SwingUtilities.invokeLater {
+                val before = requested.get()
+                UiWork.flushPending()
+                if (covered.get() < before) missed.incrementAndGet()
+                flushes.incrementAndGet()
+            }
+            // Spin rather than block, so the next request lands while the EDT runs the loop's closing turn
+            while (flushes.get() < target) Thread.onSpinWait()
+            iterations++
+        }
+        assertEquals(0, missed.get(), "a flush skipped a request made before it, after $iterations iterations")
+        scope.cancel()
+    }
+
     private class TestEvents : FlowEvents() {
         val barrier = NoArgAwaitableEvent()
         val valued = AwaitableEvent<Int>()

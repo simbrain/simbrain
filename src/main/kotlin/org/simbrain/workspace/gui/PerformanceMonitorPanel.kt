@@ -1,3 +1,9 @@
+/**
+ * The desktop's Performance tab: per-update-action timings and what each thread last ran, collected from
+ * [PerformanceMonitor]. It observes the update loop without taking part in it: measurements accumulate as they arrive
+ * and the lists refresh a few times a second, only while the tab is showing, so the panel adds no work to an iteration
+ * and a paced run does not wait for it to draw.
+ */
 package org.simbrain.workspace.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -5,15 +11,18 @@ import kotlinx.coroutines.launch
 import org.simbrain.util.Theme
 import org.simbrain.util.format
 import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.updater.*
+import org.simbrain.workspace.updater.PerformanceMonitor
 import java.awt.BorderLayout
 import java.awt.Font
-import java.awt.event.FocusEvent
-import java.awt.event.FocusListener
-import java.lang.Long.max
-import java.lang.Long.min
-import java.util.*
-import javax.swing.*
+import java.awt.event.HierarchyEvent
+import java.util.TreeMap
+import javax.swing.BoxLayout
+import javax.swing.JList
+import javax.swing.JPanel
+import javax.swing.JScrollPane
+import javax.swing.Timer
+import kotlin.math.max
+import kotlin.math.min
 import kotlin.math.roundToLong
 
 /**
@@ -23,74 +32,88 @@ import kotlin.math.roundToLong
  */
 class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderLayout()) {
 
-    private val contentPanel = JPanel()
+    private data class TimerStats(val name: String, val min: Long, val avg: Long, val max: Long, val lastSeen: Long)
 
-    data class TimerProperties(val identifier: String, val min: Long, val avg: Long, val max: Long, var markForDeletion: Boolean = true)
-    data class ThreadAction(val threadName: String, val actionName: String, var markForDeletion: Boolean = true)
+    private data class ThreadActivity(val actionName: String, val lastSeen: Long)
 
-    private val timers: MutableMap<Any, TimerProperties> = LinkedHashMap()
+    /** Guards the maps below, which the collector writes as measurements arrive and the refresh reads on the EDT. */
+    private val lock = Any()
 
-    private val threadActions: MutableMap<String, ThreadAction> = TreeMap()
+    private val timers = LinkedHashMap<Any, TimerStats>()
+
+    private val threadActions = TreeMap<String, ThreadActivity>()
+
+    private var changed = false
+
+    private val timersList = JList<String>().apply { font = Font("Monospaced", Font.PLAIN, 11) }
+
+    private val threadsList = JList<String>()
+
+    private val refreshTimer = Timer(REFRESH_INTERVAL_MS) { refresh() }
 
     init {
+        val contentPanel = JPanel()
         contentPanel.layout = BoxLayout(contentPanel, BoxLayout.X_AXIS)
-        val timersList = JList<String>()
-        val updateActionPane = JScrollPane(timersList)
-        updateActionPane.border = Theme.sectionBorder("Update Actions")
-        timersList.font = Font("Monospaced", Font.PLAIN, 11)
-        contentPanel.add(updateActionPane)
-        val threadsList = JList<String>()
-        val threadPane = JScrollPane(threadsList)
-        threadPane.border = Theme.sectionBorder("Threads")
-        contentPanel.add(threadPane)
-
-        this.add("Center", contentPanel)
+        contentPanel.add(JScrollPane(timersList).apply { border = Theme.sectionBorder("Update Actions") })
+        contentPanel.add(JScrollPane(threadsList).apply { border = Theme.sectionBorder("Threads") })
+        add(contentPanel, BorderLayout.CENTER)
 
         workspace.launch(Dispatchers.Default) {
             PerformanceMonitor.flow.collect { (identifier, name, threadName, nanoTime) ->
-                val properties = timers.getOrPut(identifier) { TimerProperties(name, nanoTime, nanoTime, nanoTime) }
-                val (_, min, avg, max) = properties
-                timers[identifier] = properties.copy(
-                    min = min(min, nanoTime),
-                    avg = (0.99 * avg + 0.01 * nanoTime).roundToLong(),
-                    max = max(max, nanoTime),
-                    markForDeletion = false
-                )
-                threadActions[threadName] = ThreadAction(threadName, name, markForDeletion = false)
+                record(identifier, name, threadName, nanoTime)
             }
         }
 
-        workspace.addNonRemovableAction("performance monitor") {
-            timers.entries.filter { (_, record) ->
-                record.markForDeletion
-            }.forEach { (key) -> timers.remove(key) }
-
-            threadActions.entries.filter { (_, record) ->
-                record.markForDeletion
-            }.forEach { (key) -> threadActions.remove(key) }
-
-            timersList.model = DefaultListModel<String>().apply { addAll(timers.values.map { record ->
-                record.markForDeletion = true
-                val (recordName, min, avg, max) = record
-                fun Long.toSecondString()  = (this / 1e9).format(5)
-                val minSeconds = min.toSecondString()
-                val avgSeconds = avg.toSecondString()
-                val maxSeconds = max.toSecondString()
-                val maxLabelLength = 50
-                val formattedRecordName = if (recordName.length > maxLabelLength - 3) {
-                    recordName.substring(0, maxLabelLength - 3) + "..."
-                } else {
-                    recordName
-                }
-                "%-${maxLabelLength}s min:%s avg:%s max:%s".format(formattedRecordName, minSeconds, avgSeconds, maxSeconds)
-            }) }
-            timersList.repaint()
-            threadsList.model = DefaultListModel<String>().apply { addAll(threadActions.values.map { record ->
-                record.markForDeletion = true
-                val (threadName, name) = record
-                "$threadName: $name"
-            }) }
+        addHierarchyListener { e ->
+            if (e.changeFlags and HierarchyEvent.SHOWING_CHANGED.toLong() != 0L) {
+                if (isShowing) refreshTimer.start() else refreshTimer.stop()
+            }
         }
+    }
 
+    private fun record(identifier: Any, name: String, threadName: String, nanoTime: Long) {
+        val now = System.nanoTime()
+        synchronized(lock) {
+            val previous = timers[identifier]
+            timers[identifier] = previous?.copy(
+                min = min(previous.min, nanoTime),
+                avg = (0.99 * previous.avg + 0.01 * nanoTime).roundToLong(),
+                max = max(previous.max, nanoTime),
+                lastSeen = now
+            ) ?: TimerStats(name, nanoTime, nanoTime, nanoTime, now)
+            threadActions[threadName] = ThreadActivity(name, now)
+            changed = true
+        }
+    }
+
+    /**
+     * Shows the latest statistics. Actions and threads that have stopped reporting while others still do are dropped;
+     * when nothing reports, as when the simulation is stopped, the lists keep their last contents.
+     */
+    private fun refresh() {
+        val (timerLines, threadLines) = synchronized(lock) {
+            if (!changed) return
+            changed = false
+            val newest = timers.values.maxOf { it.lastSeen }
+            timers.values.removeIf { newest - it.lastSeen > STALE_NANOS }
+            threadActions.values.removeIf { newest - it.lastSeen > STALE_NANOS }
+            timers.values.map { it.describe() } to threadActions.map { (thread, activity) -> "$thread: ${activity.actionName}" }
+        }
+        timersList.setListData(timerLines.toTypedArray())
+        threadsList.setListData(threadLines.toTypedArray())
+    }
+
+    private fun TimerStats.describe(): String {
+        fun Long.toSecondString() = (this / 1e9).format(5)
+        val label = if (name.length > MAX_LABEL_LENGTH - 3) name.substring(0, MAX_LABEL_LENGTH - 3) + "..." else name
+        return "%-${MAX_LABEL_LENGTH}s min:%s avg:%s max:%s".format(
+            label, min.toSecondString(), avg.toSecondString(), max.toSecondString()
+        )
+    }
+
+    companion object {
+        private const val REFRESH_INTERVAL_MS = 250
+        private const val STALE_NANOS = 2_000_000_000L
+        private const val MAX_LABEL_LENGTH = 50
     }
 }

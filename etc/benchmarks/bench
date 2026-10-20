@@ -1,0 +1,4 @@
+#!/bin/sh
+# Runs bench.py in this directory's uv environment (see README.md).
+here=$(cd "$(dirname "$0")" && pwd)
+exec uv run --project "$here" python "$here/bench.py" "$@"

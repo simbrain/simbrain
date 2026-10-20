@@ -68,7 +68,6 @@ etc/benchmarks/bench summarize                               # medians of everyt
 - For `headed`, keep the screen on and unlocked for the whole run (macOS: `caffeinate -d`; KDE:
   `kde-inhibit --power --screenSaver`), because a locked or sleeping display throttles drawing. The published Linux
   runs used a 4K display with `GDK_SCALE=2`.
-- Stop leftover Gradle and Kotlin daemons after setup (`./gradlew --stop`). They are idle but hold memory.
 
 ## Files
 

@@ -35,7 +35,7 @@ def say(message):
 def sh(cmd, cwd=None, env=None, capture=False):
     say(" ".join(str(c) for c in cmd))
     result = subprocess.run([str(c) for c in cmd], cwd=cwd, env={**os.environ, **(env or {})}, text=True,
-                            capture_output=capture)
+                            capture_output=capture, stdin=subprocess.DEVNULL)
     if result.returncode != 0:
         if capture:
             sys.stderr.write(result.stdout + result.stderr)
@@ -79,10 +79,12 @@ def simbrain_cache_dir():
 
 
 def setup_simbrain4(java21, work):
-    # Gradle runs on Java 21; the init script adds a task that writes the test runtime classpath to a file
+    # Gradle runs on Java 21; the init script adds a task that writes the test runtime classpath to a file. No Gradle
+    # daemon is left running, since an idle one holds memory through the benchmarks; the Kotlin daemon it starts exits
+    # with it.
     java_home = java21.parent.parent
     classpath = work / "s4cp.txt"
-    sh([REPO / "gradlew", "-q", "--init-script", HERE / "cp.init.gradle", "printTestClasspath"], cwd=REPO,
+    sh([REPO / "gradlew", "-q", "--no-daemon", "--init-script", HERE / "cp.init.gradle", "printTestClasspath"], cwd=REPO,
        env={"JAVA_HOME": str(java_home), "CP_OUT": str(classpath)})
     say(f"Simbrain 4 classpath written to {classpath}")
 
@@ -90,7 +92,8 @@ def setup_simbrain4(java21, work):
 def setup_simbrain3(java25, work, commit):
     tree = work / "simbrain3"
     if not tree.exists():
-        known = subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=REPO).returncode == 0
+        known = subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=REPO,
+                               stderr=subprocess.DEVNULL).returncode == 0
         if not known:
             sh(["git", "fetch", "origin", SIMBRAIN3_BRANCH], cwd=REPO)
         sh(["git", "worktree", "add", "--detach", tree, commit], cwd=REPO)

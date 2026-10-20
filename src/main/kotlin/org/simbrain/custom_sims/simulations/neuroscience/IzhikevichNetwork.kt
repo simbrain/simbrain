@@ -1,7 +1,8 @@
 /**
  * The 1000-neuron Izhikevich (2003) network as two demos: free neurons in a neuron collection with a recurrent synapse
  * group, and a neuron array with a recurrent weight matrix. Both drive a spike raster. The builders below are also used
- * by the performance benchmarks, so the demo is the same network that is timed.
+ * by the performance benchmarks, so the demo is the same network that is timed; the benchmarks also build it at other
+ * sizes through [izhikevichNetworkSim] and [izhikevichNetworkArraySim].
  */
 package org.simbrain.custom_sims.simulations.neuroscience
 
@@ -21,24 +22,42 @@ import org.simbrain.network.updaterules.IzhikevichScalarData
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.stats.distributions.NormalDistribution
+import kotlin.math.ceil
+import kotlin.math.floor
+import kotlin.math.log10
+import kotlin.math.pow
+import kotlin.math.roundToLong
+import kotlin.math.sqrt
 import kotlin.random.Random
 
-val izhikevichNetwork = newSim {
+val izhikevichNetwork = izhikevichNetworkSim()
+
+val izhikevichNetworkArray = izhikevichNetworkArraySim()
+
+/**
+ * The free-neuron demo with [n] neurons connected with probability [p], every weight multiplied by [weightScale].
+ * A grid of about square shape keeps the network window filled at any size.
+ */
+fun izhikevichNetworkSim(
+    n: Int = IZHIKEVICH_NEURONS,
+    p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
+    weightScale: Double = 1.0
+) = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Izhikevich Network")
     val network = networkComponent.network
     network.timeStep = IZHIKEVICH_TIME_STEP
 
-    val neurons = izhikevichNeurons(IZHIKEVICH_NEURONS, Random.Default)
-    GridLayout(IZHIKEVICH_GRID_SPACING, IZHIKEVICH_GRID_SPACING, IZHIKEVICH_GRID_COLUMNS).layoutNeurons(neurons)
+    val neurons = izhikevichNeurons(n, Random.Default)
+    GridLayout(IZHIKEVICH_GRID_SPACING, IZHIKEVICH_GRID_SPACING, gridColumns(n)).layoutNeurons(neurons)
     network.addNetworkModels(neurons, usePlacementManager = false)
     val collection = NeuronCollection(neurons).apply { label = "Izhikevich neurons" }
     network.addNetworkModel(collection)
     val synapseGroup = SynapseGroup(
         collection,
         collection,
-        Sparse(IZHIKEVICH_CONNECTION_PROBABILITY),
-        izhikevichSynapses(neurons, IZHIKEVICH_CONNECTION_PROBABILITY, Random.Default).toMutableList()
+        Sparse(p),
+        izhikevichSynapses(neurons, p, Random.Default, weightScale).toMutableList()
     )
     network.addNetworkModel(synapseGroup)
 
@@ -52,16 +71,23 @@ val izhikevichNetwork = newSim {
         place(raster, SIM_WINDOW_GAP + 800 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 500)
     }
 
-    addSidebarInfo(izhikevichSidebar(arrays = false))
+    addSidebarInfo(izhikevichSidebar(arrays = false, n, p))
 }
 
-val izhikevichNetworkArray = newSim {
+/**
+ * The neuron-array demo with [n] neurons connected with probability [p], every weight multiplied by [weightScale].
+ */
+fun izhikevichNetworkArraySim(
+    n: Int = IZHIKEVICH_NEURONS,
+    p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
+    weightScale: Double = 1.0
+) = newSim {
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Izhikevich Network (Array)")
     val network = networkComponent.network
     network.timeStep = IZHIKEVICH_TIME_STEP
 
-    val (array, weights) = izhikevichArray(IZHIKEVICH_NEURONS, IZHIKEVICH_CONNECTION_PROBABILITY, Random.Default)
+    val (array, weights) = izhikevichArray(n, p, Random.Default, weightScale)
     array.location = point(0, 0)
     network.addNetworkModels(array, weights, usePlacementManager = false)
 
@@ -75,15 +101,17 @@ val izhikevichNetworkArray = newSim {
         place(raster, SIM_WINDOW_GAP + 800 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 500)
     }
 
-    addSidebarInfo(izhikevichSidebar(arrays = true))
+    addSidebarInfo(izhikevichSidebar(arrays = true, n, p))
 }
 
 const val IZHIKEVICH_NEURONS = 1000
 const val IZHIKEVICH_CONNECTION_PROBABILITY = 0.1
 const val IZHIKEVICH_TIME_STEP = 0.5
-private const val IZHIKEVICH_GRID_COLUMNS = 32
 private const val IZHIKEVICH_GRID_SPACING = 25.0
 private const val EXCITATORY_FRACTION = 0.8
+
+// 32 columns for the 1000-neuron demo
+private fun gridColumns(n: Int) = ceil(sqrt(n.toDouble())).toInt()
 
 /**
  * Izhikevich (2003) neurons: the first 80% excitatory regular-spiking to chattering cells, the rest inhibitory
@@ -167,12 +195,12 @@ fun izhikevichArray(n: Int, p: Double, rng: Random, weightScale: Double = 1.0): 
     return array to weights
 }
 
-private fun izhikevichSidebar(arrays: Boolean) = """
+private fun izhikevichSidebar(arrays: Boolean, n: Int, p: Double) = """
     # Izhikevich Network
 
-    A recurrent network of ${IZHIKEVICH_NEURONS} spiking neurons using the simple model of Izhikevich (2003): 80%
+    A recurrent network of $n spiking neurons using the simple model of Izhikevich (2003): 80%
     excitatory and 20% inhibitory, each neuron driven by its own Gaussian noise current. Each pair of neurons is
-    connected with probability ${IZHIKEVICH_CONNECTION_PROBABILITY}, giving about 100,000 synapses; excitatory
+    connected with probability $p, giving about ${"%,d".format(roundToTwoDigits(n * (n - 1) * p))} synapses; excitatory
     weights are positive and inhibitory weights negative, and each spike delivers a one-step current pulse.
 
     The raster plot shows one row per neuron and a dot for each spike. Activity is low (about 1.4 spikes per second
@@ -194,3 +222,9 @@ private fun izhikevichSidebar(arrays: Boolean) = """
     Reference: Izhikevich, E. M. (2003). Simple model of spiking neurons. IEEE Transactions on Neural Networks,
     14(6), 1569-1572.
 """.trimIndent()
+
+private fun roundToTwoDigits(x: Double): Long {
+    if (x < 1) return 0
+    val unit = 10.0.pow(floor(log10(x)) - 1)
+    return ((x / unit).roundToLong() * unit).roundToLong()
+}

@@ -451,10 +451,12 @@ val braitenbergProgramLearning = newSim { optionString ->
 
             addSeparator()
 
-            val learningCheckbox = addCheckBox("Learning Enabled", learningEnabled) { enabled ->
+            addCheckBox(
+                "Learning Enabled", learningEnabled,
+                toolTip = "Enable/disable learning on program biases"
+            ) { enabled ->
                 learningEnabled = enabled
             }
-            learningCheckbox.toolTipText = "Enable/disable learning on program biases"
 
             addSeparator()
 

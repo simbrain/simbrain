@@ -14,7 +14,6 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.UnsupervisedNetwork
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
-import org.simbrain.util.showInputDialog
 import javax.swing.JComponent
 import javax.swing.JPopupMenu
 
@@ -128,8 +127,15 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     }
 
     context(NetworkPanel)
-    protected fun JPopupMenu.applyUnsupervisedActions(net: UnsupervisedNetwork) = apply {
+    /**
+     * @param patternActions network-specific actions added just above "Add Current Pattern to Training Data"
+     */
+    protected fun JPopupMenu.applyUnsupervisedActions(
+        net: UnsupervisedNetwork,
+        patternActions: JPopupMenu.() -> Unit = {}
+    ) = apply {
         applyBasicActions()
+        patternActions()
         add(createAction("Add Current Pattern to Training Data") {
             net.trainingData.add(net.inputLayer.activationArray.toMutableList())
         })

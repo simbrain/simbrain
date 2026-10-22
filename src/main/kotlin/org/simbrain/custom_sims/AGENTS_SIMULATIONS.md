@@ -264,7 +264,7 @@ with(couplingManager) {
 ```kotlin
 withGui {
     createControlPanel("Control Panel", x, y) {
-        addCheckBox("Label", initialValue) { checked -> /* handler */ }
+        addCheckBox("Label", initialValue, toolTip = "...") { checked -> /* handler */ }
         addFormattedNumericTextField("Label", initValue) { value -> /* handler */ }
         addSlider("Label", min, max, initial, tickSpacing) { value -> /* handler */ }
         addButton("Label") { /* handler */ }
@@ -284,7 +284,10 @@ placing another component relative to it with `rightEdgeWithGap()` or `bottomEdg
 
 Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 
-Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled fields, apply an explanatory tooltip to both the field and its label; use `toolTip = "..."` with `addTextField(...)` and `labelToolTip = "..."` when a distinct label tooltip is needed. Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
+Put reset controls (`Reset`, `Reset Network`, and the like) last in the panel, below their own `addSeparator()`,
+so they are not pressed by accident in the middle of a workflow.
+
+Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled fields, apply an explanatory tooltip to both the field and its label; use `toolTip = "..."` with `addTextField(...)` and `labelToolTip = "..."` when a distinct label tooltip is needed. For `addCheckBox(...)`, pass `toolTip = "..."`, which sets it on both the check box and its label; setting `.toolTipText` on the returned check box covers only the small box. When a control only takes effect while the simulation runs, say so in the tooltip, for example "Check this and press Run to ...". Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
 
 ## Documentation
 
@@ -378,6 +381,41 @@ addSidebarInfo("""
 Use HTML `<img>` tags with `width` attribute to control display size without modifying the original image files.
 
 See `irisSim.kt` or `CorticalLayers.kt` for complete examples.
+
+### Interactive Web Supplements
+
+Some simulations depend on dynamics that are hard to see in the workspace, such as weight vectors moving in a high-dimensional space. For these, a short interactive web page can supplement the sidebar. The model example is the tutorial for `demos/competitiveSim.kt` and `demos/competitiveGridSim.kt`, published at [simbrain.net/misc/competitive_game](https://simbrain.net/misc/competitive_game/).
+
+#### Where it lives
+
+Put the page in the `www.simbrain.net` repository as `misc/<name>/index.html`. It should be one self-contained HTML file with inline CSS and JavaScript and no build step. Jekyll copies `misc` folders without front matter as is, and `README.md` files there are excluded from the site. Pushing to `main` deploys, so do not commit or push without the user's approval. Add a `README.md` beside the page that says what the page is and where its numbers came from. Material cut during revision can go in an `archive.html` in the same folder.
+
+#### Match the simulation exactly
+
+Reimplement the simulation's actual update rule in JavaScript, with the same parameters, after reading the Kotlin source. Use the simulation's names and visual vocabulary: the same pattern names, the same button names (`Train`, `Reset`), and circles for nodes. Any success rate or number quoted on the page or in the sidebar should be measured with the real Simbrain classes, for example in a temporary JUnit test that runs many random starts. Delete that test afterward. When a view projects a high-dimensional space to 2D, use a fixed linear projection, compute everything in the full space, and say so in a caption.
+
+#### Writing style
+
+Keep the page spare. Include only what a student needs to play and understand the simulation, and add more only when the user asks for it. Write in narrative paragraphs. Avoid bullet lists and bold text; use a list only for a few truly parallel items, such as settings to try. Refer to simulations by their italicized menu path, for example *Simulations › Competitive › Competitive network (simple)*.
+
+#### Structure
+
+A structure that works:
+
+1. Title and a lede that opens with "Supplemental material for the Simbrain simulation …", gives the menu path, and names related simulations the page also applies to.
+2. Background: what the model does and the dynamics that drive it, in a paragraph or two.
+3. The setup: the patterns and the update rule, specific to this simulation.
+4. The interactive bench: the same controls as the simulation's control panel, a clear goal, and simple feedback such as a score and a win message. Put detail views, such as a table of net inputs, in a collapsed `<details>` block.
+5. How to play: what fails and why, what works and why, and which settings in Simbrain's property editor reveal the dynamics (for example, what happens when normalization is turned off).
+6. Discussion: a few general lessons.
+
+#### Link both ways
+
+The sidebar's intro paragraph should link to the page early, and the page should name the simulation and its menu path at the top. Keep the two consistent: when the patterns, rates, or workflow change in one, update the other.
+
+#### Review before publishing
+
+Iterate on a private preview with the user before writing to the site repository. The page is for students, so get the goal, the labels, and the explanations right before polishing the visuals.
 
 ## Testing
 

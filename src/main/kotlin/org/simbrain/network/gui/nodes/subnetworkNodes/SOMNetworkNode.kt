@@ -1,5 +1,6 @@
 package org.simbrain.network.gui.nodes.subnetworkNodes
 
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.makeTrainerPanel
 import org.simbrain.network.gui.nodes.SubnetworkNode
@@ -17,10 +18,16 @@ class SOMNetworkNode(networkPanel: NetworkPanel, val somNet: SOMNetwork):
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             with(networkPanel) {
-                applyUnsupervisedActions(somNet)
+                applyUnsupervisedActions(somNet) {
+                    add(createAction(
+                        name = "Recall SOM memory",
+                        description = "Put the weights of the selected SOM neuron, or of the winner if none is selected, on the input layer"
+                    ) {
+                        somNet.recall(selectionManager.filterSelectedModels<Neuron>().firstOrNull { it in somNet.som.neuronList })
+                    })
+                }
                 addSeparator()
                 add(createAction(name = "Reset SOM network") { somNet.reset() })
-                add(createAction(name = "Recall SOM memory") { somNet.recall() })
             }
         }
 

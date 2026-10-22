@@ -196,28 +196,34 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
         return ret
     }
 
+    /**
+     * The SOM neuron whose weight vector is closest to [input], found without changing any activations or weights.
+     * Entries of [input] correspond to the neurons of [inputLayer]; synapses from any other source are ignored.
+     * Ties go to the earlier neuron, as in [update].
+     */
+    fun winnerFor(input: DoubleArray): Neuron? {
+        val inputIndex = inputLayer.neuronList.withIndex().associate { (i, n) -> n to i }
+        return som.neuronList.minByOrNull { n ->
+            n.fanIn.sumOf { s -> inputIndex[s.source]?.let { i -> (s.strength - input[i]).pow(2.0) } ?: 0.0 }
+        }
+    }
+
+    // The learning rate decays geometrically and never reaches zero, so show enough digits that a small but
+    // still-active rate is not displayed as 0.
     val stateInfoText: String
         get() = """
-            Learning rate (${Utils.round(somLearningRate, 2)})
+            Learning rate (${Utils.round(somLearningRate, 4)})
             N-size (${Utils.round(neighborhoodSize, 2)})
         """.trimIndent()
 
     /**
-     * Pushes the weight values of the most active SOM neuron onto the input neurons.
+     * Pushes the weight values of [neuron], or of the most active SOM neuron if [neuron] is null, onto the input
+     * neurons.
      */
-    fun recall() {
-        var maxActivation = Double.MIN_VALUE
-        var mostActivatedNeuron: Neuron? = null
-        for (neuron in som.neuronList) {
-            if (neuron.activation > maxActivation) {
-                maxActivation = neuron.activation
-                mostActivatedNeuron = neuron
-            }
-        }
-        if (mostActivatedNeuron != null) {
-            for (incoming in mostActivatedNeuron.fanIn) {
-                incoming.source.activation = incoming.strength
-            }
+    fun recall(neuron: Neuron? = null) {
+        val source = neuron ?: som.neuronList.maxByOrNull { it.activation }?.takeIf { it.activation > 0 } ?: return
+        for (incoming in source.fanIn) {
+            incoming.source.activation = incoming.strength
         }
     }
 

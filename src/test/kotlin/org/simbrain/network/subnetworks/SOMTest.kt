@@ -8,6 +8,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.Workspace
 
 class SOMTest {
@@ -88,4 +89,29 @@ class SOMTest {
         Assertions.assertNotNull(fromXml.getModelByLabel(SOMNetwork::class.java, "SOM"))
     }
 
+    @Test
+    fun `winnerFor matches the winner chosen by update and changes no weights`() {
+        val network = Network()
+        val somNet = SOMNetwork(3, 4)
+        network.addNetworkModelAsync(somNet)
+        somNet.randomize(UniformRealDistribution(0.0, 1.0))
+        val input = doubleArrayOf(0.2, 0.9, 0.4)
+        val weightsBefore = somNet.som.neuronList.flatMap { n -> n.fanIn.map { it.strength } }
+        val predicted = somNet.winnerFor(input)
+        assertEquals(weightsBefore, somNet.som.neuronList.flatMap { n -> n.fanIn.map { it.strength } })
+        somNet.inputLayer.activationArray = input
+        with(network) { somNet.update() }
+        assertEquals(somNet.winner, predicted)
+    }
+
+    @Test
+    fun `recall puts the given neuron's weights on the input layer`() {
+        val network = Network()
+        val somNet = SOMNetwork(3, 4)
+        network.addNetworkModelAsync(somNet)
+        somNet.randomize(UniformRealDistribution(0.0, 1.0))
+        val neuron = somNet.som.neuronList[2]
+        somNet.recall(neuron)
+        assertEquals(neuron.fanIn.map { it.strength }, somNet.inputLayer.neuronList.map { it.activation })
+    }
 }

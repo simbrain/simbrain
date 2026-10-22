@@ -126,10 +126,10 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         addSeparator()
     }
 
-    context(NetworkPanel)
     /**
      * @param patternActions network-specific actions added just above "Add Current Pattern to Training Data"
      */
+    context(NetworkPanel)
     protected fun JPopupMenu.applyUnsupervisedActions(
         net: UnsupervisedNetwork,
         patternActions: JPopupMenu.() -> Unit = {}

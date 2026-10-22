@@ -379,3 +379,59 @@ class WinnerLabeler {
         labelToNodeMap.clear()
     }
 }
+
+/**
+ * Labels the neurons of a competitive or SOM layer with the inputs they currently win.
+ *
+ * Each label keeps a prototype input, the mean of the samples recorded for it. [refresh] asks the network which
+ * neuron wins each prototype under the current weights and labels that neuron, so labels always agree with the
+ * network's own winner function. Unlike [WinnerLabeler], a label does not stay on a neuron that won it in the past
+ * but no longer does.
+ *
+ * @param neurons the neurons to label
+ * @param winnerFor the network's winner for an input, computed without changing activations or weights
+ */
+class PrototypeLabeler(
+    private val neurons: List<org.simbrain.network.core.Neuron>,
+    private val winnerFor: (DoubleArray) -> org.simbrain.network.core.Neuron?
+) {
+    private val sums = linkedMapOf<String, DoubleArray>()
+    private val counts = mutableMapOf<String, Int>()
+
+    /**
+     * Add [input] to the running mean that forms the prototype for [label].
+     */
+    fun addSample(label: String, input: DoubleArray) {
+        val sum = sums.getOrPut(label) { DoubleArray(input.size) }
+        input.forEachIndexed { i, x -> sum[i] += x }
+        counts[label] = (counts[label] ?: 0) + 1
+    }
+
+    /**
+     * Relabel every neuron with the labels whose prototypes it currently wins, overwriting any other labels on
+     * [neurons].
+     */
+    fun refresh() {
+        val labelsByWinner = sums.entries
+            .mapNotNull { (label, sum) ->
+                val count = counts.getValue(label)
+                winnerFor(DoubleArray(sum.size) { sum[it] / count })?.let { it to label }
+            }
+            .groupBy({ it.first }, { it.second })
+        neurons.forEach { neuron ->
+            val newLabel = labelsByWinner[neuron]?.joinToString(", ")
+            if (neuron.label != newLabel) {
+                neuron.label = newLabel
+            }
+        }
+    }
+
+    /**
+     * Forget all prototypes and remove the labels.
+     */
+    fun clear() {
+        sums.clear()
+        counts.clear()
+        neurons.forEach { it.label = null }
+    }
+}

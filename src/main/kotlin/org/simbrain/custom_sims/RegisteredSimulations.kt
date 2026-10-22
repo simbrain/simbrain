@@ -18,8 +18,8 @@ import org.simbrain.custom_sims.simulations.dynamical_systems.lorenzSystemSimbra
 import org.simbrain.custom_sims.simulations.dynamical_systems.twoNeuronDynamics
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaos
 import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
-import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.iac.*
+import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
@@ -163,9 +163,9 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Competitive") {
         item("Competitive network (simple)") { competitiveSim }
-        item("Competitive grid network") { competitiveGridSim }
+        item("Competitive network (shapes)") { competitiveGridSim }
         //item("Competitive image network") { competitiveImageSim }
-        item("SOM network") { SOMSim }
+        item("SOM network (animals)") { SOMSim }
         item("SOM network (smell)") { somNetSmells }
     }
 

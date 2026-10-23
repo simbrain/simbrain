@@ -4,6 +4,7 @@
  */
 package org.simbrain.network.trainers
 
+import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
@@ -31,9 +32,16 @@ class BatchedBackpropTest {
     private class Built(val network: Network, val model: SupervisedModel, val parameters: List<Matrix>)
 
     /**
-     * A layered network with seeded weights, biases, and data. [skip] adds a connection from the input to the output.
+     * A layered network with seeded weights, biases, and data. [skip] adds a connection from the input to the output;
+     * [extra] adds connections between layers by index.
      */
-    private fun build(sizes: List<Int>, rules: List<() -> NeuronUpdateRule<*, *>>, oneHotTargets: Boolean, skip: Boolean): Built {
+    private fun build(
+        sizes: List<Int>,
+        rules: List<() -> NeuronUpdateRule<*, *>>,
+        oneHotTargets: Boolean,
+        skip: Boolean,
+        extra: List<Pair<Int, Int>> = emptyList(),
+    ): Built {
         val rng = Random(11)
         val net = Network()
         val layers = sizes.mapIndexed { i, size ->
@@ -43,7 +51,8 @@ class BatchedBackpropTest {
             }
         }
         val connections = layers.zipWithNext().map { (a, b) -> WeightMatrix(a, b) } +
-                if (skip) listOf(WeightMatrix(layers.first(), layers.last())) else emptyList()
+                (if (skip) listOf(WeightMatrix(layers.first(), layers.last())) else emptyList()) +
+                extra.map { (from, to) -> WeightMatrix(layers[from], layers[to]) }
         connections.forEach { wm ->
             for (i in 0 until wm.weights.nrow()) for (j in 0 until wm.weights.ncol()) wm.weights[i, j] = rng.nextDouble(-1.0, 1.0)
         }
@@ -128,5 +137,37 @@ class BatchedBackpropTest {
         val built = build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false)
         built.model.inputLayer.isClamped = false
         assertNull(BatchedBackprop.createOrNull(built.model))
+    }
+
+    /**
+     * Graphs that cannot be put in a feedforward order train one example at a time even with batching on, rather than
+     * failing in the batched pass. Per-example training of these graphs is not reproducible from run to run, so the
+     * result is not compared with a second run.
+     */
+    private fun assertFallsBackToPerExample(build: () -> Built) {
+        assertNull(BatchedBackprop.createOrNull(build().model))
+        assertDoesNotThrow { train(build, BackpropLossFunction.MSE, batched = true) }
+    }
+
+    @Test
+    fun `skip connection out of a hidden layer falls back to per example training`() {
+        assertFallsBackToPerExample {
+            build(listOf(4, 5, 5, 5, 3), listOf(::relu, ::relu, ::relu, ::linear), oneHotTargets = false, skip = false,
+                extra = listOf(1 to 4))
+        }
+    }
+
+    @Test
+    fun `self connected hidden layer falls back to per example training`() {
+        assertFallsBackToPerExample {
+            build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false, extra = listOf(1 to 1))
+        }
+    }
+
+    @Test
+    fun `recurrent connection from the output falls back to per example training`() {
+        assertFallsBackToPerExample {
+            build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false, extra = listOf(2 to 1))
+        }
     }
 }

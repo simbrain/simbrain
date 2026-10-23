@@ -182,7 +182,9 @@ class BatchedBackprop private constructor(
          * A batched plan for [network], or null if it needs per-example training. Supported: a [BackpropNetwork] or
          * [SupervisedModel] whose layers are plain [NeuronArray]s with a clamped input, no layer norm, and linear,
          * sigmoidal, GELU, or softmax rules, joined only by [WeightMatrix]es without spike responders between layers
-         * of the network.
+         * of the network, each running from an earlier layer to a later one in the network's layer order. That order
+         * comes from a breadth-first search back from the output, so recurrent and self connections, and some skip
+         * connections between hidden layers, are left to per-example training.
          */
         fun createOrNull(network: SupervisedNetwork): BatchedBackprop? {
             if (network !is BackpropNetwork && network !is SupervisedModel) return null
@@ -191,7 +193,7 @@ class BatchedBackprop private constructor(
             val inputLayer = network.inputLayer as? NeuronArray ?: return null
             val outputLayer = network.outputLayer as? NeuronArray ?: return null
             if (!inputLayer.isClamped || inputLayer.incomingConnectors.isNotEmpty()) return null
-            val layerSet = layers.toSet()
+            val position = layers.withIndex().associate { (index, layer) -> layer to index }
             for (layer in layers) {
                 if (layer !== inputLayer) {
                     if (layer.isClamped) return null
@@ -204,7 +206,8 @@ class BatchedBackprop private constructor(
                 for (connector in layer.incomingConnectors) {
                     if (connector.javaClass != WeightMatrix::class.java) return null
                     if ((connector as WeightMatrix).spikeResponder !is NonResponder) return null
-                    if (connector.source !in layerSet) return null
+                    val sourcePosition = position[connector.source] ?: return null
+                    if (sourcePosition >= position.getValue(layer)) return null
                 }
             }
             return BatchedBackprop(layers, inputLayer, outputLayer)

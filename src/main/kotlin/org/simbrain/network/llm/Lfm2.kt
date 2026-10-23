@@ -57,6 +57,9 @@ class Lfm2Model(val config: Lfm2Config, private val params: Map<String, FloatTen
 
     val position get() = state.position
 
+    /** The file name of a parameter tensor, or null for workspaces and caches. */
+    fun parameterName(tensor: FloatTensor): String? = params.entries.firstOrNull { it.value === tensor }?.key
+
     private fun buildPlan(): OpPlan {
         val c = config
         val ops = ArrayList<TensorOp>()

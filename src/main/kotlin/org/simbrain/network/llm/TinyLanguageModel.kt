@@ -17,8 +17,10 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.tensor.FloatTensor
 import org.simbrain.network.tensor.TensorRole
 import org.simbrain.network.tensor.op.*
+import org.simbrain.network.trainers.LeCun
 import org.simbrain.network.trainers.SamplingStrategy
 import org.simbrain.network.trainers.TapeTrainer
+import org.simbrain.network.trainers.WeightInitializationStrategy
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -392,6 +394,15 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
         order = 3,
     )
 
+    var weightInitialization: WeightInitializationStrategy by GuiEditable(
+        initValue = LeCun(),
+        label = "Weight initialization",
+        description = "How Randomize on a weight tile redraws its weights. LeCun uniform is closest to " +
+            "the scale the model starts with",
+        showDetails = false,
+        order = 4,
+    )
+
     override var samplingStrategy: SamplingStrategy by GuiEditable(
         initValue = SamplingStrategy.Greedy,
         label = "Sampling strategy",
@@ -538,6 +549,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
     private fun rebuildScene() {
         scene = TinyLmCompositor.buildScene(model, scale = diagramScale)
         appliedDiagramScale = diagramScale
+        applyTileLabels(scene)
         tileLayout?.forEach { (id, xy) ->
             scene.tiles.firstOrNull { it.id == id }?.let {
                 it.x = xy[0]
@@ -609,6 +621,10 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
         copy.samplingTemperature = samplingTemperature
         copy.diagramScale = diagramScale
         copy.samplingStrategy = samplingStrategy.copy() as SamplingStrategy
+        copy.weightInitialization = weightInitialization.copy()
+        copy.weightIncrement = weightIncrement
+        copy.tileIncrements = HashMap(tileIncrements)
+        copy.tileLabels = HashMap(tileLabels)
         copy.deckSlices = decks().associateTo(HashMap()) { it.id to it.selectedSlice }
         copy.tileLayout = tileLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
         copy.junctionLayout = junctionLayout?.mapValuesTo(HashMap()) { it.value.copyOf() }
@@ -932,6 +948,33 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
 
     private fun currentSequenceRow() = (contextTokens.size - 1)
         .takeIf { it >= 0 } ?: config.contextSize - 1
+
+    override val interiorScene: CompositorScene
+        get() = scene
+
+    override val readoutRow: Int
+        get() = if (sceneShowsTrainingWindow) config.contextSize - 1 else currentSequenceRow()
+
+    /** A walk in progress is finished first: its backward pass would reject weights changed under its tape. */
+    override fun <T> withModelLock(block: () -> T): T = synchronized(model) {
+        if (model.midWalk) finishStepWalk()
+        block()
+    }
+
+    override fun randomizeWeights(tensor: FloatTensor) {
+        weightInitialization.initializeWeights(tensor)
+    }
+
+    override fun tokenText(id: Int): String = tokenLabels?.getOrNull(id) ?: "#$id"
+
+    /** Adam's moments describe the old weights; an edited parameter starts its momentum fresh. */
+    override fun onWeightsEdited(tensor: FloatTensor) {
+        model.params.entries.firstOrNull { it.value.tensor === tensor }?.key?.let(model.adam::reset)
+    }
+
+    override fun afterWeightEdits() {
+        if (activationsLive && contextTokens.isNotEmpty()) forwardContext()
+    }
 
     override suspend fun onDelete() {
         trainer.stopTraining()

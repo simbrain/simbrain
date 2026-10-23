@@ -18,7 +18,7 @@ class AutoAssociatorLessonsTest {
     fun `binary lesson learns only positive connections among active items`() = runBlocking {
         val scope = SimulationScope()
         autoAssociator.task.invoke(scope, null)
-        val network = (scope.workspace.getComponent("Hebbian Associative Memory") as NetworkComponent).network
+        val network = (scope.workspace.getComponent("Hebbian associative memory") as NetworkComponent).network
         val neurons = network.getModels(NeuronCollection::class.java).first()
         val synapses = network.freeSynapses.toList()
         assertEquals(72, synapses.size)
@@ -34,7 +34,7 @@ class AutoAssociatorLessonsTest {
     fun `bipolar lesson also learns inhibitory connections`() = runBlocking {
         val scope = SimulationScope()
         autoAssociator.task.invoke(scope, null)
-        val network = (scope.workspace.getComponent("Hebbian Associative Memory") as NetworkComponent).network
+        val network = (scope.workspace.getComponent("Hebbian associative memory") as NetworkComponent).network
         val neurons = network.getModels(NeuronCollection::class.java).first()
         val synapses = network.freeSynapses.toList()
         val state = AutoAssociatorState(neurons, synapses)
@@ -50,7 +50,7 @@ class AutoAssociatorLessonsTest {
     fun `switching encoding clears learning and restoring workspace keeps selection`() = runBlocking {
         val scope = SimulationScope()
         autoAssociator.task.invoke(scope, null)
-        val network = (scope.workspace.getComponent("Hebbian Associative Memory") as NetworkComponent).network
+        val network = (scope.workspace.getComponent("Hebbian associative memory") as NetworkComponent).network
         val neurons = network.getModels(NeuronCollection::class.java).first()
         val synapses = network.freeSynapses.toList()
         val state = AutoAssociatorState(neurons, synapses)
@@ -68,7 +68,7 @@ class AutoAssociatorLessonsTest {
         val restored = SimulationScope()
         WorkspaceSerializer(restored.workspace).deserialize(ByteArrayInputStream(bytes))
         autoAssociator.reopen(restored.workspace)
-        val restoredNetwork = (restored.workspace.getComponent("Hebbian Associative Memory") as NetworkComponent).network
+        val restoredNetwork = (restored.workspace.getComponent("Hebbian associative memory") as NetworkComponent).network
         val restoredNeurons = restoredNetwork.getModels(NeuronCollection::class.java).first()
         val restoredState = AutoAssociatorState(restoredNeurons, restoredNetwork.freeSynapses.toList())
         assertEquals(PatternEncoding.Bipolar, restoredState.encoding)
@@ -80,7 +80,7 @@ class AutoAssociatorLessonsTest {
     fun `loading a cue freezes weights and loading a pattern enables learning`() = runBlocking {
         val scope = SimulationScope()
         autoAssociator.task.invoke(scope, null)
-        val network = (scope.workspace.getComponent("Hebbian Associative Memory") as NetworkComponent).network
+        val network = (scope.workspace.getComponent("Hebbian associative memory") as NetworkComponent).network
         val neurons = network.getModels(NeuronCollection::class.java).first()
         val synapses = network.freeSynapses.toList()
         val state = AutoAssociatorState(neurons, synapses)

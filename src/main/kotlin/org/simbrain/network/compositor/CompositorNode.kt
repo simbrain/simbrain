@@ -26,8 +26,8 @@ import kotlin.math.atan2
 /**
  * Renders a [CompositorScene] as one Piccolo node: tile rasters ([TilePatchNode] children that
  * shade values straight to screen resolution at paint time), data-flow edges, the logit-lens
- * strip, and the interior interactions — click and marquee selection, drag-move, double-click
- * trace, and hover value tooltips.
+ * strip, and the interior interactions — click and marquee selection, drag-move, hover value
+ * tooltips, and handing tile double-clicks and right-clicks to the host's dialog and menu.
  *
  * Call [refreshDirtyTiles] on the EDT after the compute thread publishes a token; [relayout]
  * after geometry changes; [refreshTheme] on palette/theme switches.
@@ -66,7 +66,7 @@ class CompositorNode(
 
     private fun dataTooltipTitle(tile: TensorTile) = when (tile) {
         is AttentionTile -> "Data: attention weights"
-        else -> "Data: ${tile.title}" + if (tile.kind == TileKind.WEIGHT) " matrix" else ""
+        else -> "Data: ${tile.displayTitle}" + if (tile.kind == TileKind.WEIGHT) " matrix" else ""
     }
 
     private val background = PPath.createRectangle(0.0, 0.0, 1.0, 1.0).apply {
@@ -222,7 +222,7 @@ class CompositorNode(
         }
 
         /** Caption line one: what the tile is, centered under it. */
-        val label = PText(tile.title).apply {
+        val label = PText(tile.displayTitle).apply {
             font = Theme.small
         }.also { addChild(it) }
 
@@ -360,7 +360,7 @@ class CompositorNode(
         }
 
         fun syncLabel() {
-            label.text = tile.title
+            label.text = tile.displayTitle
             label.setOffset((tile.width - label.width) / 2, tile.height + 3.0)
             val muted = blend(NetworkTheme.current.valueText, NetworkTheme.current.canvasBackground, 0.65)
             layerText?.let {
@@ -540,7 +540,7 @@ class CompositorNode(
 
         fun tooltip(): String {
             val lens = scene.lens ?: return ""
-            val sourceTitle = tileNodesById[lens.sources[index].name]?.tile?.title ?: lens.sources[index].name
+            val sourceTitle = tileNodesById[lens.sources[index].name]?.tile?.displayTitle ?: lens.sources[index].name
             val reading = lens.readings[index]
             val prediction = if (reading.tokenId >= 0) {
                 "Predicts ${visibleToken(tokenLabel(reading.tokenId))} with probability ${"%.2f".format(reading.prob)}"
@@ -599,6 +599,45 @@ class CompositorNode(
 
     /** Invoked as the pointer moves across tiles (null between tiles); hosts hang previews on it. */
     var onTileHover: ((TensorTile?) -> Unit)? = null
+
+    /**
+     * Invoked on a popup trigger over a tile, after the tile joins the selection; the host shows
+     * its tile menu. Popups off the tiles are left unhandled for the host's whole-node menu.
+     */
+    var onTileContextMenu: ((TensorTile, PInputEvent) -> Unit)? = null
+
+    /**
+     * Invoked on a double-click over a tile; the host opens the tile's dialog. Double-clicks off
+     * the tiles are left unhandled for the host's whole-node dialog.
+     */
+    var onTileDoubleClicked: ((TensorTile) -> Unit)? = null
+
+    /** Invoked after a click or marquee changes the interior selection. */
+    var onSelectionChanged: (() -> Unit)? = null
+
+    val selectedTiles: List<TensorTile>
+        get() = scene.selection.selected.filterIsInstance<TensorTile>()
+
+    fun clearSelection() {
+        if (scene.selection.selected.isEmpty()) return
+        scene.selection.clear()
+        syncSelection()
+    }
+
+    /** The tile whose data-flow paths are highlighted, or null when nothing is traced. */
+    val traceFocus: TensorTile?
+        get() = scene.traceFocus
+
+    /** Highlights every data-flow path into and out of [tile]; null clears the trace. */
+    fun setTrace(tile: TensorTile?) {
+        scene.setTrace(tile)
+        syncHighlights()
+    }
+
+    /** Re-reads every tile's label, after a rename. */
+    fun refreshLabels() {
+        tileNodes.forEach { it.syncLabel() }
+    }
 
     init {
         rebuildEdges()
@@ -728,6 +767,7 @@ class CompositorNode(
     private fun syncSelection() {
         tileNodes.forEach { it.syncHighlight() }
         syncOpSelectionOverlay()
+        onSelectionChanged?.invoke()
     }
 
     private fun syncOpSelectionOverlay() {
@@ -1284,7 +1324,20 @@ class CompositorNode(
         private var pressPoint: Point2D? = null
         private var marqueeAdditive = false
 
+        /** Right-click (or control-click) on a tile: select it like a click, then hand off to the host. */
+        private fun showTileMenu(event: PInputEvent): Boolean {
+            val handler = onTileContextMenu ?: return false
+            val point = event.getPositionRelativeTo(this@CompositorNode)
+            val tile = scene.tileAt(point.x, point.y) ?: return false
+            if (tile !in scene.selection) scene.selection.set(listOf(tile))
+            syncSelection()
+            event.isHandled = true
+            handler(tile, event)
+            return true
+        }
+
         override fun mousePressed(event: PInputEvent) {
+            if (event.isPopupTrigger && showTileMenu(event)) return
             if (!event.isLeftMouseButton) return
             // With the pan key held or the hand tool active the canvas handler owns the
             // gesture; leave it unhandled.
@@ -1297,12 +1350,6 @@ class CompositorNode(
             }
             val point = event.getPositionRelativeTo(this@CompositorNode)
             val tile = scene.tileAt(point.x, point.y)
-            if (event.clickCount == 2) {
-                scene.setTrace(if (tile == null || scene.traceFocus == tile) null else tile)
-                syncHighlights()
-                event.isHandled = true
-                return
-            }
             val vertex = scene.opVertices.firstOrNull {
                 glyphsByOp[it.op]?.containsScenePoint(point.x, point.y) == true
             }
@@ -1323,6 +1370,15 @@ class CompositorNode(
             pressPoint = point
             syncSelection()
             event.isHandled = true
+        }
+
+        override fun mouseClicked(event: PInputEvent) {
+            if (event.clickCount != 2 || !event.isLeftMouseButton || event.isPanKeyDown || isPanMode()) return
+            val handler = onTileDoubleClicked ?: return
+            val point = event.getPositionRelativeTo(this@CompositorNode)
+            val tile = scene.tileAt(point.x, point.y) ?: return
+            event.isHandled = true
+            handler(tile)
         }
 
         override fun mouseDragged(event: PInputEvent) {
@@ -1366,6 +1422,7 @@ class CompositorNode(
         }
 
         override fun mouseReleased(event: PInputEvent) {
+            if (event.isPopupTrigger && mode == Mode.NONE && showTileMenu(event)) return
             if (mode == Mode.MARQUEE) {
                 val start = pressPoint
                 marquee?.removeFromParent()

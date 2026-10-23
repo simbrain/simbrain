@@ -28,7 +28,8 @@ import javax.swing.*
  * stepping the network generates one token per iteration whenever the model can advance;
  * the context menu reseeds the context window from the prompt.
  */
-class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageModel) : ScreenElement(networkPanel) {
+class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageModel) :
+    ScreenElement(networkPanel), InteriorTileHost {
 
     private val interactionBox = LanguageModelInteractionBox(networkPanel)
 
@@ -45,6 +46,10 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
      */
     private val generationRefresh = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
 
+    override val generativeModel get() = languageModel
+
+    override val interior get() = compositorNode
+
     init {
         addChild(interactionBox)
         interactionBox.setText(languageModel.displayName)
@@ -59,6 +64,9 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             },
             events.updated.onImmediate { generationRefresh.request() },
             events.updateGraphics.onImmediate { generationRefresh.request() },
+            networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
+                networkPanel.dropInteriorSelectionIfDeselected(this, selection)
+            },
         )
         // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
         events.deleted.on(Dispatchers.Default) {
@@ -108,6 +116,9 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     languageModel.captureViewState()
                     positionInteractionBox()
                 }
+                it.onTileContextMenu = { tile, event -> networkPanel.showTileMenu(this, tile, event) }
+                it.onTileDoubleClicked = { tile -> networkPanel.openTileDialog(this, tile) }
+                it.onSelectionChanged = { networkPanel.syncInteriorSelection(this) }
                 addChild(it)
             }
         }
@@ -183,6 +194,13 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
                     languageModel.clearWindow()
                     refreshView()
                 })
+                if (languageModel.hasEditedWeights) {
+                    add(createAction(
+                        name = "Restore original weights",
+                        description = "Re-read every edited weight matrix from the weights file",
+                    ) { networkPanel.network.launch(Dispatchers.Default) { languageModel.restoreWeights() } })
+                }
+                addClearTraceItem(this@LanguageModelNode)
                 addSeparator()
                 add(JCheckBoxMenuItem("Logit lens", languageModel.lensEnabled).apply {
                     toolTipText = "Decode the residual stream at each depth into the token it implies " +

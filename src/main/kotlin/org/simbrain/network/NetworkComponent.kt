@@ -71,6 +71,7 @@ class NetworkComponent : WorkspaceComponent {
             setChangedSinceLastSave(true)
             if (m is AttributeContainer) {
                 fireAttributeContainerRemoved(m)
+                m.childrenContainers?.forEach(::fireAttributeContainerRemoved)
             }
             if (m is NeuronCollection) {
                 m.neuronList.forEach { removedContainer ->
@@ -119,7 +120,10 @@ class NetworkComponent : WorkspaceComponent {
             val result = mutableListOf<AttributeContainer>()
             fun collect(models: Iterable<NetworkModel>) {
                 for (model in models) {
-                    if (model is AttributeContainer) result.add(model)
+                    if (model is AttributeContainer) {
+                        result.add(model)
+                        model.childrenContainers?.let(result::addAll)
+                    }
                     if (model is Subnetwork) collect(model.modelList.deepAll)
                 }
             }

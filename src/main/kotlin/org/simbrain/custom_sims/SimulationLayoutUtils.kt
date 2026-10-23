@@ -3,7 +3,6 @@ package org.simbrain.custom_sims
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.simbrain.network.core.Network
 import org.simbrain.network.layouts.HexagonalGridLayout
 import org.simbrain.network.subnetworks.CompetitiveNetwork
 import org.simbrain.network.subnetworks.SOMNetwork
@@ -21,7 +20,9 @@ const val SIM_WINDOW_GAP = 10
 
 const val COMPETITIVE_LAYER_GAP = 140.0
 
-const val SOM_SIM_SOM_INTERVAL = 34
+const val SOM_SIM_INPUT_INTERVAL = 45
+
+const val SOM_SIM_SOM_INTERVAL = 60
 
 const val SOM_SMELLS_SOM_INTERVAL = 38
 
@@ -37,14 +38,6 @@ suspend fun ControlPanelKt.awaitLayout() = apply {
     withContext(Dispatchers.Swing) {
         pack()
     }
-}
-
-fun CompetitiveNetwork.showInputPattern(network: Network, pattern: List<Double>) {
-    inputLayer.setActivations(pattern.toDoubleArray())
-    val savedLearningRate = learningRate
-    learningRate = 0.0
-    with(network) { update() }
-    learningRate = savedLearningRate
 }
 
 fun CompetitiveNetwork.applySimulationLayout(

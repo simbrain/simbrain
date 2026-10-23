@@ -415,8 +415,18 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
     }
 
-    fun addCheckBox(label: String, checked: Boolean, tab: String? = null, onChange: suspend (Boolean) -> Unit = {}) =
+    /**
+     * @param toolTip shown on both the check box and its label
+     */
+    fun addCheckBox(
+        label: String,
+        checked: Boolean,
+        tab: String? = null,
+        toolTip: String? = null,
+        onChange: suspend (Boolean) -> Unit = {}
+    ) =
         JCheckBox().also { checkBox ->
+            checkBox.toolTipText = toolTip
             checkBox.addActionListener {
                 launch(buttonTaskContext) {
                     onChange(checkBox.isSelected)
@@ -424,7 +434,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             }
             launch(Dispatchers.Swing) {
                 checkBox.isSelected = checked
-                getTab(tab).addItem(label, checkBox)
+                getTab(tab).addItem(label, checkBox).toolTipText = toolTip
                 pack()
             }
         }

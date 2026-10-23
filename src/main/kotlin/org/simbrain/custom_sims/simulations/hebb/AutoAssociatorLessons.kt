@@ -23,7 +23,7 @@ val autoAssociator = newSim("auto_associator") {
 
 private suspend fun SimulationScope.buildAutoAssociatorLesson() {
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Hebbian Associative Memory")
+    val networkComponent = addNetworkComponent("Hebbian associative memory")
     val network = networkComponent.network
     val neurons = network.addNeuronCollection(9).apply {
         label = AutoAssociatorState.labelFor(PatternEncoding.Binary)
@@ -43,7 +43,7 @@ private suspend fun SimulationScope.buildAutoAssociatorLesson() {
         }
     }
     addSidebarInfo("""
-        # Hebbian Associative Memory: Binary and Bipolar Patterns
+        # Hebbian associative memory: binary and bipolar patterns
 
         This nine-neuron network represents items on a grocery list. Every neuron connects to every other neuron, with no self-connections. All 72 weights start at zero and use the Hebbian rule, Δw = source activation × target activation.
 
@@ -71,7 +71,7 @@ private suspend fun SimulationScope.addAutoAssociatorControls(
     state: AutoAssociatorState
 ) {
     withGui {
-        val controls = createControlPanel("Hebbian Associative Memory", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controls = createControlPanel("Hebbian associative memory", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComboBox("Pattern encoding", PatternEncoding.entries, state.encoding) { state.selectEncoding(it) }.apply {
                 toolTipText = "Switch between 0/1 and −1/+1 patterns. Changing encoding resets weights and activations."
             }
@@ -123,10 +123,11 @@ internal class AutoAssociatorState(
     companion object {
         private val patterns = listOf(setOf(0, 3, 4, 7, 8), setOf(2, 4, 5, 6))
 
-        fun labelFor(encoding: PatternEncoding) = "Hebbian Associative Memory (${encoding.name})"
+        fun labelFor(encoding: PatternEncoding) = "Hebbian associative memory (${encoding.name})"
     }
 
     var encoding = if (neurons.label == labelFor(PatternEncoding.Bipolar) ||
+        neurons.label == "Hebbian Associative Memory (Bipolar)" ||
         neurons.label == "Hebbian Auto Associator (Bipolar)"
     ) PatternEncoding.Bipolar else PatternEncoding.Binary
         private set

@@ -41,6 +41,11 @@ class LogitLens(
         @Volatile
         var prob = 0f
             internal set
+
+        /** The source tensor version this reading was computed from; -1 before any. */
+        @Volatile
+        var sourceVersion = -1L
+            internal set
     }
 
     val readings = List(sources.size) { Reading() }
@@ -73,7 +78,11 @@ class LogitLens(
     private val logits = FloatTensor(sources.size, embedWeight.rows)
     private val lastVersions = LongArray(sources.size) { -1L }
 
-    private class Snapshot(val dirty: IntArray, val rows: FloatArray)
+    private class Snapshot(val dirty: IntArray, val versions: LongArray, val rows: FloatArray)
+
+    /** Buffers for [currentReading]'s one-source pass, apart from the batch the worker owns. */
+    private val singleBatch by lazy { FloatTensor(1, hidden) }
+    private val singleLogits by lazy { FloatTensor(1, embedWeight.rows) }
 
     private val pending = AtomicReference<Snapshot?>(null)
     private val draining = AtomicBoolean(false)
@@ -90,9 +99,10 @@ class LogitLens(
     fun clear() {
         pending.set(null)
         for ((i, source) in sources.withIndex()) lastVersions[i] = source.tensor.version
-        for (reading in readings) {
+        for ((i, reading) in readings.withIndex()) {
             reading.tokenId = -1
             reading.prob = 0f
+            reading.sourceVersion = lastVersions[i]
         }
     }
 
@@ -107,7 +117,8 @@ class LogitLens(
             dirty[dirtyCount++] = i
         }
         if (dirtyCount == 0) return
-        val snapshot = Snapshot(dirty.copyOf(dirtyCount), snapshotRows(dirty, dirtyCount))
+        val versions = LongArray(dirtyCount) { lastVersions[dirty[it]] }
+        val snapshot = Snapshot(dirty.copyOf(dirtyCount), versions, snapshotRows(dirty, dirtyCount))
         if (async) {
             pending.set(snapshot)
             if (draining.compareAndSet(false, true)) worker.execute(::drain)
@@ -119,14 +130,39 @@ class LogitLens(
     /** Copies the read row of each dirty source — the model mutates these tensors in place. */
     private fun snapshotRows(dirty: IntArray, dirtyCount: Int): FloatArray {
         val rows = FloatArray(dirtyCount * hidden)
-        for (d in 0 until dirtyCount) {
-            val tensor = sources[dirty[d]].tensor
-            val base = sourceRow.coerceIn(0, tensor.rows - 1) * tensor.cols
-            for (j in 0 until hidden) {
-                rows[d * hidden + j] = tensor.data.get(base + j)
+        for (d in 0 until dirtyCount) copyRow(sources[dirty[d]].tensor, rows, d * hidden)
+        return rows
+    }
+
+    private fun copyRow(tensor: FloatTensor, dst: FloatArray, dstBase: Int) {
+        val base = sourceRow.coerceIn(0, tensor.rows - 1) * tensor.cols
+        for (j in 0 until hidden) {
+            dst[dstBase + j] = tensor.data.get(base + j)
+        }
+    }
+
+    /**
+     * The reading for source [index] as of that source's current contents, or null with the lens
+     * off or nothing computed yet. An async pass can trail the model by a token, so a coupling
+     * that reads the lens right after a step would pair the new state with the old prediction; a
+     * stale reading is recomputed here, synchronously, for that one source.
+     */
+    fun currentReading(index: Int): Reading? {
+        if (!enabled) return null
+        val source = sources[index].tensor
+        val stored = readings[index]
+        val reading = if (stored.sourceVersion == source.version) stored else synchronized(singleBatch) {
+            val version = source.version
+            val row = FloatArray(hidden).also { copyRow(source, it, 0) }
+            norm(row, 0, singleBatch, 0)
+            singleBatch.markMutated()
+            matmul(singleBatch, embedWeight, singleLogits, transposeB = true, rowCount = 1)
+            Reading().also {
+                readOff(it, singleLogits, 0)
+                it.sourceVersion = version
             }
         }
-        return rows
+        return reading.takeIf { it.tokenId >= 0 }
     }
 
     private fun drain() {
@@ -142,16 +178,18 @@ class LogitLens(
     private fun compute(snapshot: Snapshot) {
         val count = snapshot.dirty.size
         for (d in 0 until count) {
-            norm(snapshot.rows, d * hidden, d)
+            norm(snapshot.rows, d * hidden, batch, d)
         }
         batch.markMutated()
         matmul(batch, embedWeight, logits, transposeB = true, rowCount = count)
         for (d in 0 until count) {
-            readOff(readings[snapshot.dirty[d]], d * logits.cols)
+            val reading = readings[snapshot.dirty[d]]
+            readOff(reading, logits, d * logits.cols)
+            reading.sourceVersion = snapshot.versions[d]
         }
     }
 
-    private fun norm(src: FloatArray, srcBase: Int, batchRow: Int) {
+    private fun norm(src: FloatArray, srcBase: Int, dst: FloatTensor, dstRow: Int) {
         var mean = 0f
         if (meanCenter) {
             for (j in 0 until hidden) mean += src[srcBase + j]
@@ -163,14 +201,14 @@ class LogitLens(
             sumSquares += v * v
         }
         val inv = 1f / sqrt(sumSquares / hidden + eps)
-        val dstBase = batchRow * hidden
+        val dstBase = dstRow * hidden
         for (j in 0 until hidden) {
             val bias = normBias?.data?.get(j) ?: 0f
-            batch.data.put(dstBase + j, (src[srcBase + j] - mean) * inv * normWeight.data.get(j) + bias)
+            dst.data.put(dstBase + j, (src[srcBase + j] - mean) * inv * normWeight.data.get(j) + bias)
         }
     }
 
-    private fun readOff(reading: Reading, base: Int) {
+    private fun readOff(reading: Reading, logits: FloatTensor, base: Int) {
         val vocab = logits.cols
         var best = 0
         var bestLogit = logits.data.get(base)

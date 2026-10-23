@@ -457,7 +457,9 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
 
             addSeparator()
 
-            addSliderWithTextField("Temperature", 0.01, 2.0, languageModel.samplingTemperature, 0.01) { temp ->
+            addSliderWithTextField(
+                "Temperature", 0.01, 2.0, languageModel.samplingTemperature, 0.01, showValueField = true
+            ) { temp ->
                 languageModel.samplingTemperature = temp
             }
 
@@ -526,7 +528,7 @@ private val TINY_LM_SIDEBAR = """
 
         The small readouts beside each spine tile are the logit lens: each one pushes that residual state through the model's own output head and shows the token it would predict from there. Watch the prediction sharpen as you read up the spine — the top reading is the model's actual prediction.
 
-        The `current position token probabilities` display at the top shows a circle for each token in the vocabulary and the probability associated with each. A red circle is draw around the token that will be selected on the next iteration, which is generally one of the more probable ones (see "sampling strategy" in docs for more information on how this selection is made).
+        The `current position token probabilities` display at the top shows a circle for each token in the vocabulary and the probability associated with each. A red circle is drawn around the token the model just sampled, which is added to the text on the next iteration. It is generally one of the more probable ones (see "sampling strategy" in docs for more information on how this selection is made).
 
         # What to Do
 
@@ -548,15 +550,16 @@ private val TINY_LM_SIDEBAR = """
 
         Right-click the model:
 
-        - `Step forward pass one op` runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings down to the probabilities.
+        - `Step forward pass one op` runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings up to the probabilities.
         - `Step training one op` walks an entire training step: the forward pass op by op, then the loss, then every gradient in reverse order back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on `Gradient view` to see the gradient values themselves flowing backward through the tiles.
         - `Finish current step walk` completes a walk you started.
 
-        The keyboard shortcuts F and B are useful to do this quickly.
+        With the model selected, the keyboard shortcuts F and B do this quickly.
 
         ## Explore
 
-        - Double-click a tile to trace its data-flow paths through the diagram; double-click again to clear.
+        - Right-click a tile to trace its data-flow paths through the diagram, plot its values, or clear, randomize, and nudge a weight matrix.
+        - Double-click a tile to open its dialog: rename it, read its values, or edit a weight matrix cell by cell.
         - Hover over any cell to read its exact value; drag tiles to rearrange the diagram.
         - Adjust `Temperature` and the sampling strategy in the control panel and compare generated text.
         - Try more heads or layers in the startup dialog. With two layers you can watch the logit lens improve across both.

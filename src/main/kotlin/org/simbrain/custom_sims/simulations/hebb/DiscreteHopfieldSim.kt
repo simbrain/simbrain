@@ -47,23 +47,31 @@ val discreteHopfieldSim = newSim {
             # Simulation Details
 
             The network stores patterns as attractor states. After training, partial or noisy versions of a stored pattern should settle back toward the learned memory.
-            
-            # What to Do         
-            
-            Select one of the input patterns from the button panel (`Circle`, `Square`, `Diagonal Line`, `Cross`, `Vertical Line`, or `Horizontal Line`) and press `Train on current pattern` to train the network on that pattern. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
-            
-            To confirm the pattern is remembered, randomize the network by pressing `N -> R` and then iterate by pressing `Space` to see if the pattern is recreated. You can also manually create part of a pattern using the wand tool (press `D` to activate) and see if the network completes it. The `Random Pattern` button generates a new random activation pattern, and `-1 Canvas` sets all neurons to `-1`.
-            
-            The `Training iterations` field controls how many learning steps occur when you press `Train on current pattern`. Increasing this value strengthens the memory trace more quickly.
-            
+
+            ## Control Panel Settings
+
+            - `Clear pattern`: Sets every neuron to `0`, giving a blank canvas to draw on with the wand tool.
+            - `Random pattern`: Sets each neuron randomly to `0` or `1`. Useful as a starting point for testing recall.
+            - `Randomize weights`: Replaces the weights with small symmetric random values, erasing anything the network has learned.
+            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the network.
+            - `Train once on current pattern`: Applies one Hebbian learning step, storing whatever pattern is currently on the neurons in the weights. The anti-pattern (all activations flipped) is stored along with it. Press it repeatedly to strengthen the memory.
+            - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
+            - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings (described in _How the Capacity Test Works_ below), then runs the test and plots the results.
+
+            # What to Do
+
+            Load one of the four patterns (`Circle`, `Square`, `Diagonal Line`, or `Cross`) and press `Train once on current pattern` to train the network on it. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
+
+            To confirm the pattern is remembered, press `Random pattern` (or press `N -> R`) and then iterate by pressing `Space` to see if the pattern is recreated. You can also press `Clear pattern`, draw part of a pattern using the wand tool (press `D` to activate), and see if the network completes it.
+
             ## Training on Multiple Patterns
-            
-            Hopfield networks have a memory capacity of about 14% of the number of nodes. In this case, about 8 memory states. However, those memories need to be sufficiently distinct. The network should be able to learn all 6 provided patterns, but you must carefully train it on them by selecting each pattern and pressing `Train on current pattern` multiple times. If patterns are too similar or you store too many, the network may converge to spurious states or fail to recall correctly.
-            
+
+            Hopfield networks have a memory capacity of about 14% of the number of nodes, so about 14 memory states for the default 100 neurons. However, those memories need to be sufficiently distinct. The network should be able to learn all 4 provided patterns, but you must carefully train it on them by selecting each pattern and pressing `Train once on current pattern` multiple times. If patterns are too similar or you store too many, the network may converge to spurious states or fail to recall correctly.
+
             ## Other things to observe
-            
+
             When you iterate the network it tends to go to lower energy states.
-            
+
             ## Memory Capacity Testing
             
             The Capacity tab provides tools to systematically test how many patterns the network can reliably store and retrieve. You can run automated tests that measure recall success rates across different numbers of stored patterns, with or without forgetting dynamics. A slider lets you explore individual test patterns, and the Capacity Test button launches the full analysis.
@@ -99,7 +107,11 @@ val discreteHopfieldSim = newSim {
                - `Percent to test`: What percentage of the network size to use as the number of test patterns
                - `Cue distance`: How much to perturb the pattern when testing retrieval (Hamming distance for discrete Hopfield)
                - `Test iterations`: How many iterations to run when testing pattern recall
-               - `Forgetting options`: Enable forgetting with decay rates, perturbation, and forgetting iterations
+               - `Forgetting`: Also run each test with forgetting applied after training, plotted as a second line
+               - `Forgetting iterations`: How many times the forgetting process is applied
+               - `Decay rate`: Fraction by which each weight shrinks on each forgetting iteration (`0` disables decay)
+               - `Perturb weights`: Add random noise to the weights on each forgetting iteration
+               - `Perturb function`: The probability distribution the weight noise is drawn from
             
             3. **Test Process**: For each number of patterns from 1 to the specified maximum:
                - Reset the network and weights
@@ -146,18 +158,13 @@ val discreteHopfieldSim = newSim {
     )
 
     withGui {
-        var numTrainIterations = 1
-
         val controlPanel = createPatternControlPanel(hopfield.neuronGroup, false) {
             hopfield.randomize()
         }?.apply {
-            addTextField("Training iterations", "" + numTrainIterations) {
-                it.toIntOrNull()?.let { num ->
-                    numTrainIterations = num
-                }
-            }
-            addButton("Train on current pattern") {
+            addButton("Train once on current pattern") {
                 with(network) { hopfield.trainOnCurrentPattern() }
+            }.apply {
+                toolTipText = "Applies one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
             }
             val config = HopfieldTestConfig(
                 workspace = workspace,

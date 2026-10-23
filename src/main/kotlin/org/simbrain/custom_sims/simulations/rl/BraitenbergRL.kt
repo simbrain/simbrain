@@ -752,7 +752,10 @@ val braitenbergRL = newSim { optionString ->
             }
             speedBiasField.toolTipText = "Base forward speed (higher = faster default movement)"
 
-            val learningCheckbox = addCheckBox("Learning Enabled", learningEnabled) { enabled ->
+            addCheckBox(
+                "Learning Enabled", learningEnabled,
+                toolTip = "Enable/disable weight updates (unchecking freezes all weights)"
+            ) { enabled ->
                 learningEnabled = enabled
                 // Clamp/unclamp trainable weights
                 val allTrainableWeights = actorSynapses + valueNeuron.fanIn
@@ -760,16 +763,17 @@ val braitenbergRL = newSim { optionString ->
                     syn.clamped = !enabled
                 }
             }
-            learningCheckbox.toolTipText = "Enable/disable weight updates (unchecking freezes all weights)"
 
-            val trainSpeedCheckbox = addCheckBox("Train Speed Connections", trainSpeedConnections) { enabled ->
+            addCheckBox(
+                "Train Speed Connections", trainSpeedConnections,
+                toolTip = "Include sensor-to-speed connections in learning"
+            ) { enabled ->
                 trainSpeedConnections = enabled
                 speedSynapses.forEach { syn ->
                     syn.clamped = !enabled
                 }
                 setSpeedSynapsesEnabled(enabled)
             }
-            trainSpeedCheckbox.toolTipText = "Include sensor-to-speed connections in learning"
 
             addSeparator()
 

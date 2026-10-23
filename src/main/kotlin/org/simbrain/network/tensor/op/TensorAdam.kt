@@ -61,6 +61,12 @@ class TensorAdam(
         params.markMutated()
     }
 
+    /** Drops [key]'s moments, so a parameter overwritten by hand starts fresh instead of carrying old momentum. */
+    fun reset(key: String) {
+        m.remove(key)
+        v.remove(key)
+    }
+
     fun reset() {
         m.clear()
         v.clear()

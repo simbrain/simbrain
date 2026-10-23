@@ -1,8 +1,8 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
  * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
- * frame) reach neurons and their outgoing synapses, text labels rewritten every iteration coalesce too, and a node that
- * leaves the canvas stops listening to its model.
+ * frame) reach neurons and their outgoing synapses, text labels rewritten every iteration coalesce too, a node that
+ * leaves the canvas stops listening to its model, and one node whose sync throws does not stop the others syncing.
  */
 package org.simbrain.network.gui
 
@@ -12,12 +12,14 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
+import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.updaterules.IntegrateAndFireRule
@@ -25,9 +27,25 @@ import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.workspace.Workspace
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.SwingUtilities
 
 class NodeSyncTest {
+
+    private class ProbeNode(panel: NetworkPanel, override val model: NetworkModel, val failFirstSync: Boolean) :
+        ScreenElement(panel) {
+        val syncs = AtomicInteger()
+        private var failed = false
+        override val isDraggable = false
+        fun mark() = markDirty(1)
+        override fun syncFromModel(bits: Int) {
+            if (failFirstSync && !failed) {
+                failed = true
+                error("sync failure")
+            }
+            syncs.incrementAndGet()
+        }
+    }
 
     private fun holdEdt(): CountDownLatch {
         val release = CountDownLatch(1)
@@ -263,5 +281,29 @@ class NodeSyncTest {
         synapse.strength = synapse.upperBound
         UiWork.awaitIdle()
         assertNotEquals(drawn, node.drawnDiameter, "a visible strength change did not redraw")
+    }
+
+    @Test
+    fun `a node queued behind one whose sync throws keeps syncing`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val failing = ProbeNode(panel, Neuron(), failFirstSync = true)
+        val other = ProbeNode(panel, Neuron(), failFirstSync = false)
+        SwingUtilities.invokeAndWait {
+            panel.canvas.layer.addChild(failing)
+            panel.canvas.layer.addChild(other)
+        }
+        UiWork.awaitIdle()
+
+        // Both marks land in one sync pass, with the failing node first
+        val release = holdEdt()
+        failing.mark()
+        other.mark()
+        release.countDown()
+        UiWork.awaitIdle()
+
+        other.mark()
+        UiWork.awaitIdle()
+        assertEquals(2, other.syncs.get())
     }
 }

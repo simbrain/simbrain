@@ -56,8 +56,19 @@ class OdorWorldPanel(
     /** Scope of this panel's view updates; cancelled when its desktop component closes. */
     val viewScope = UiScope()
 
-    /** Entity nodes with model changes to draw, synced once per frame. */
-    internal val entitySync = viewScope.uiInbox<EntityNode>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+    /**
+     * Entity nodes with model changes to draw, synced once per frame. A node whose sync throws is logged and skipped,
+     * since the rest of the batch would otherwise keep their pending marks and never be queued again.
+     */
+    internal val entitySync = viewScope.uiInbox<EntityNode>(UI_FRAME_MS) { nodes ->
+        nodes.forEach {
+            try {
+                it.syncPending()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     /** Keeps the camera on the selected entity, once per frame, after the world or a manual move changes it. */
     private val cameraSync = viewScope.uiRefresh { centerCameraToSelectedEntity() }

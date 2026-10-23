@@ -107,8 +107,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Per-frame sync pass for node visuals: model events only mark a node dirty and queue it here once, and each pass
      * pulls the current model state into every queued node. Paced runs drain it every iteration through the
      * workspace's display sync; unpaced runs sample it at frame rate, so the EDT never sees a task per model event.
+     * A node whose sync throws is logged and skipped: the rest of the batch already has its dirty bits set, so if
+     * the pass stopped there those nodes would never be queued again.
      */
-    val nodeSync = viewScope.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes -> nodes.forEach { it.syncPending() } }
+    val nodeSync = viewScope.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes ->
+        nodes.forEach {
+            try {
+                it.syncPending()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
 
     /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
     fun detachNode(node: ScreenElement) {

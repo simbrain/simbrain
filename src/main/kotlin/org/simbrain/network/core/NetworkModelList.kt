@@ -27,9 +27,6 @@ class NetworkModelList {
 
     @Suppress("UNCHECKED_CAST")
     fun <T : NetworkModel> put(modelClass: Class<T>, model: T) {
-        allInUpdatingOrderCache.invalidate()
-        allInPriorityOrderCache.invalidate()
-        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -37,6 +34,7 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet as SnapshotSet<NetworkModel>
         }
+        invalidateCaches()
     }
 
     /**
@@ -44,9 +42,6 @@ class NetworkModelList {
      * use with caution.
      */
     fun putUnsafe(modelClass: Class<out NetworkModel>, model: NetworkModel) {
-        allInUpdatingOrderCache.invalidate()
-        allInPriorityOrderCache.invalidate()
-        updatePlanCache.invalidate()
         if (modelClass in networkModels) {
             networkModels[modelClass]!!.add(model)
         } else {
@@ -54,6 +49,7 @@ class NetworkModelList {
             newSet.add(model)
             networkModels[modelClass] = newSet
         }
+        invalidateCaches()
     }
 
     /**
@@ -67,9 +63,6 @@ class NetworkModelList {
      * Add a network model to the map.
      */
     fun add(model: NetworkModel) {
-        allInUpdatingOrderCache.invalidate()
-        allInPriorityOrderCache.invalidate()
-        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             put(Subnetwork::class.java, model)
         } else {
@@ -137,15 +130,25 @@ class NetworkModelList {
     val updatePlan by updatePlanCache::value
 
     fun remove(model: NetworkModel) {
-        allInUpdatingOrderCache.invalidate()
-        allInPriorityOrderCache.invalidate()
-        updatePlanCache.invalidate()
         if (model is Subnetwork) {
             // Forces all subclasses of subnetwork to be grouped with the subnetwork class
             networkModels[Subnetwork::class.java]?.remove(model)
         } else {
             networkModels[model.javaClass]?.remove(model)
         }
+        invalidateCaches()
+    }
+
+    /**
+     * Called after every mutation, never before. A reader that starts between an early invalidation and the mutation
+     * would cache a list or plan built from the old models under the new generation, and keep it until the next
+     * edit; the update thread reads the plan while the GUI or a coroutine edits the network. The order follows the
+     * dependencies: the update plan is built from [allInUpdatingOrder].
+     */
+    private fun invalidateCaches() {
+        allInUpdatingOrderCache.invalidate()
+        allInPriorityOrderCache.invalidate()
+        updatePlanCache.invalidate()
     }
 
     fun updatePriorityList() {

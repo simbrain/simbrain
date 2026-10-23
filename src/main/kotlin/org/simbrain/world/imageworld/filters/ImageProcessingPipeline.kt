@@ -35,7 +35,15 @@ class ImageProcessingPipeline(
         createProcessedImage()
     }
 
-    var processedImage by processedImageCache::value
+    /**
+     * Reads through [processedImageCache] on every access. A delegate bound to `processedImageCache::value` would
+     * keep the cache that existed at construction, and [readResolve] replaces it.
+     */
+    var processedImage: BufferedImage
+        get() = processedImageCache.value
+        set(value) {
+            processedImageCache.value = value
+        }
 
     /**
      * Events fired when the pipeline changes

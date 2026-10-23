@@ -109,7 +109,21 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
      * Applies anything pending right now, blocking until it has run on the EDT. For saves and other callers that
      * must see every post land; runs directly when called on the EDT.
      */
-    fun flush() = blockOnEdt { runPending() }
+    fun flush() = blockOnEdt { runPendingLogged() }
+
+    /**
+     * [runPending], logging a failure instead of throwing it, so a broken view block neither ends a paced run (whose
+     * display sync flushes every primitive) nor stops the run loop. Returns true after a failure, since work ran.
+     */
+    private fun runPendingLogged(): Boolean = try {
+        runPending()
+    } catch (e: CancellationException) {
+        throw e
+    } catch (e: Throwable) {
+        System.err.println("Uncaught exception in ${this::class.simpleName} block:")
+        e.printStackTrace()
+        true
+    }
 
     protected fun schedule() {
         if (!scope.isActive) {
@@ -124,15 +138,7 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
                 if (wait > 0) delay(wait)
                 // Go to the back of the EDT queue so this run follows the tasks queued before it was requested
                 yield()
-                val ran = try {
-                    runPending()
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Throwable) {
-                    System.err.println("Uncaught exception in ${this@UiPoster::class.simpleName} block:")
-                    e.printStackTrace()
-                    true
-                }
+                val ran = runPendingLogged()
                 if (!ran) break
                 lastRun = System.currentTimeMillis()
             }

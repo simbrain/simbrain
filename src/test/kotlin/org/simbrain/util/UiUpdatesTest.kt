@@ -161,6 +161,22 @@ class UiUpdatesTest {
     }
 
     @Test
+    fun `a throwing block during a display flush is logged and the other primitives still flush`() {
+        val scope = UiScope()
+        val failing = scope.uiRefresh(minIntervalMs = 0) { throw IllegalStateException("expected by the test") }
+        val drained = Collections.synchronizedList(mutableListOf<Int>())
+        val inbox = scope.uiInbox<Int> { drained += it }
+        SwingUtilities.invokeAndWait {
+            failing.request()
+            inbox.post(1)
+            UiWork.flushPending()
+        }
+        assertEquals(listOf(1), drained.toList())
+        UiWork.awaitIdle()
+        scope.cancel()
+    }
+
+    @Test
     fun `flush applies queued items before returning`() {
         val scope = UiScope()
         val drained = Collections.synchronizedList(mutableListOf<Int>())

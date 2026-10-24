@@ -1,8 +1,9 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
  * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
- * frame) reach neurons and their outgoing synapses, text labels rewritten every iteration coalesce too, a node that
- * leaves the canvas stops listening to its model, and one node whose sync throws does not stop the others syncing.
+ * frame, which show for one frame) reach neurons and their outgoing synapses, text labels rewritten every iteration
+ * coalesce too, a node that leaves the canvas stops listening to its model, and one node whose sync throws does not stop
+ * the others syncing.
  */
 package org.simbrain.network.gui
 
@@ -117,25 +118,27 @@ class NodeSyncTest {
     }
 
     @Test
-    fun `a spike that ends before the next frame is still drawn`() = runBlocking {
+    fun `a spike that ends before the next frame is drawn for that frame and cleared on the next`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))
         val neuron = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it) }
         val node = panel.getNode(neuron) as NeuronNode
         UiWork.awaitIdle()
 
-        val release = holdEdt()
-        with(network) {
-            neuron.isSpike = true
-            neuron.isSpike = false
+        // The spike starts and ends, then that frame's sync runs, all in one EDT task so no other sync slips between
+        var drawnOnSpikeFrame = false
+        SwingUtilities.invokeAndWait {
+            with(network) {
+                neuron.isSpike = true
+                neuron.isSpike = false
+            }
+            node.syncPending()
+            drawnOnSpikeFrame = node.drawnSpiking
         }
-        release.countDown()
         UiWork.awaitIdle()
-        assertTrue(node.drawnSpiking, "a spike between frames was never drawn")
 
-        with(network) { neuron.isSpike = false }
-        UiWork.awaitIdle()
-        assertFalse(node.drawnSpiking)
+        assertTrue(drawnOnSpikeFrame, "a spike between frames was never drawn")
+        assertFalse(node.drawnSpiking, "a spike that had already ended stayed drawn")
     }
 
     @Test

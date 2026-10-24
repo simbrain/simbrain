@@ -75,11 +75,16 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     override fun syncFromModel(bits: Int) {
         if (bits and SPIKE != 0) {
-            val spiking = spikeSinceLastSync.getAndSet(false) || with(networkPanel.network) { neuron.isSpike }
+            val latched = spikeSinceLastSync.getAndSet(false)
+            val current = with(networkPanel.network) { neuron.isSpike }
+            val spiking = latched || current
             if (neuronCircleNode.isSpiking != spiking) {
                 neuronCircleNode.isSpiking = spiking
                 showSpikingOnOutgoingSynapses(spiking)
             }
+            // A latched spike that has already ended shows for this frame only. Nothing else may mark the node again
+            // (the run may have stopped), so mark it here to draw the current state next frame
+            if (latched && !current) markDirty(SPIKE)
         }
         if (bits and ACTIVATION != 0) {
             val bounds = neuron.updateRule.graphicalBounds

@@ -79,7 +79,7 @@ etc/benchmarks/bench summarize                               # medians of everyt
 | `bench`, `bench.py` | setup and entry point; `bench` runs `bench.py` in this folder's uv environment |
 | `pyproject.toml`, `uv.lock` | Python environment: Python 3.12, PyTorch 2.14.1 (CPU), Brian2 2.10.1, NumPy 2.5.3 |
 | `run_benchmarks.py`, `run_headed.py`, `torch_threads.py` | suite runners; each run is one process, appending one JSON line |
-| `summarize.py`, `summarize_headed.py`, `summarize_torch_threads.py` | medians over repeats; later files supersede earlier ones for the same machine, suite and simulator |
+| `summarize.py`, `summarize_headed.py`, `summarize_torch_threads.py` | medians over repeats; later files supersede earlier ones for the same measurement (machine, suite and simulator for the headless suites; machine, network or demo, and mode for the headed ones; machine, model, task, precision and thread count for PyTorch's threads). `bench summarize` leaves out files named `*.discarded.jsonl` |
 | `izh_brian2.py` | the Izhikevich network in Brian2 |
 | `mnist_torch.py`, `cnn_torch.py`, `tinylm_torch.py`, `mnist_infer_torch.py` | the PyTorch replicas of the MLP, the CNN, the tiny language model and test-set inference |
 | `simbrain3/*.java` | Simbrain 3 harnesses (headless network; network with the GUI open) |

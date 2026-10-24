@@ -3,9 +3,25 @@ simulator, representation, variant and mode) and of the machine learning demos (
 inference and text generation."""
 import collections, json, statistics as st, sys
 
-rows = [json.loads(l) for f in sys.argv[1:] for l in open(f)]
-errors = [r for r in rows if "error" in r]
-rows = [r for r in rows if "error" not in r]
+
+def measurement(r):
+    """What a row measures, without its repeat: rows of one measurement are summarized together."""
+    if "neurons" in r:
+        return r["machine"], r["neurons"], r["simulator"], r.get("representation", "objects"), r["variant"], r["mode"]
+    return r["machine"], r.get("benchmark"), r.get("size", ""), r.get("mode")
+
+
+# Later files supersede earlier ones for the same measurement, as in summarize.py, so a rerun replaces its old rows
+# rather than pooling with them
+by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
+errors = [r for file_rows in by_file for r in file_rows if "error" in r]
+latest = {}
+for index, file_rows in enumerate(by_file):
+    for r in file_rows:
+        if "error" not in r:
+            latest[measurement(r)] = index
+rows = [r for index, file_rows in enumerate(by_file) for r in file_rows
+        if "error" not in r and latest[measurement(r)] == index]
 
 
 def med(values):

@@ -5,18 +5,34 @@ Usage: summarize_torch_threads.py results.jsonl [...]
 """
 import collections, json, statistics as st, sys
 
-rows = [json.loads(l) for f in sys.argv[1:] for l in open(f)]
-errors = [r for r in rows if "error" in r]
-g = collections.defaultdict(list)
-for r in rows:
-    if "error" in r:
-        continue
+
+
+def measurement(r):
+    """What a row measures, without its repeat: rows of one measurement are summarized together."""
     dtype = r.get("dtype") or ("float32" if r["model"].startswith("tinylm") else r["framework"].rsplit("-", 1)[-1])
-    if r["task"] == "train":
-        epochs = r.get("epoch_s") or r.get("epochs_s")
-        g[(r["machine"], r["model"], "train", dtype, r["threads"])].append(st.median(epochs[1:]))
-    else:
-        g[(r["machine"], r["model"], "infer-" + r["mode"], dtype, r["threads"])].append(r["us_per_example"])
+    task = "train" if r["task"] == "train" else "infer-" + r["mode"]
+    return r["machine"], r["model"], task, dtype, r["threads"]
+
+
+# Later files supersede earlier ones for the same measurement, as in summarize.py, so a rerun replaces its old rows
+# rather than pooling with them
+by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
+errors = [r for file_rows in by_file for r in file_rows if "error" in r]
+latest = {}
+for index, file_rows in enumerate(by_file):
+    for r in file_rows:
+        if "error" not in r:
+            latest[measurement(r)] = index
+g = collections.defaultdict(list)
+for index, file_rows in enumerate(by_file):
+    for r in file_rows:
+        if "error" in r or latest[measurement(r)] != index:
+            continue
+        if r["task"] == "train":
+            epochs = r.get("epoch_s") or r.get("epochs_s")
+            g[measurement(r)].append(st.median(epochs[1:]))
+        else:
+            g[measurement(r)].append(r["us_per_example"])
 
 series = collections.defaultdict(dict)
 for (machine, model, task, dtype, threads), values in g.items():

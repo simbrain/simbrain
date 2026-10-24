@@ -198,7 +198,9 @@ def torch_threads(args):
 
 
 def summarize(args):
-    files = [Path(f) for f in args.files] or list((args.work / "results").glob("*.jsonl"))
+    # Files renamed to *.discarded.jsonl hold runs kept for the record but left out of the results
+    files = [Path(f) for f in args.files] or [f for f in (args.work / "results").glob("*.jsonl")
+                                             if not f.name.endswith(".discarded.jsonl")]
     # Ordered by when each file's runs started, which file times do not keep through a git checkout
     files.sort(key=lambda f: min((json.loads(l).get("timestamp", "") for l in f.read_text().splitlines() if l.strip()),
                                  default=""))

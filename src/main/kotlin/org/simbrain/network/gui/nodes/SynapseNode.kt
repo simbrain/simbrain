@@ -167,6 +167,16 @@ class SynapseNode(
     internal val drawnDiameter get() = circle!!.width
     internal val drawnSourceSpiking get() = sourceSpiking
 
+    /**
+     * The strength label last painted, or null when the last paint drew none (labels off, or too small at the current
+     * zoom). The label is painted into the cached connection tier, so a strength change too small to resize the circle
+     * must repaint when it changes the label's text.
+     */
+    private var paintedLabel: String? = null
+    internal val drawnStrengthLabel get() = paintedLabel
+
+    private val strengthLabel get() = synapse.strength.formatAdaptive(maxPrecision = 1, minPrecision = 0)
+
     override fun syncFromModel(bits: Int) {
         if (bits and STRENGTH != 0) {
             updateColor()
@@ -176,6 +186,8 @@ class SynapseNode(
             val diameter = computeDiameter()
             if (abs(diameter - circle!!.width) >= MIN_VISIBLE_DIAMETER_CHANGE) {
                 applyDiameter(diameter)
+            } else if (paintedLabel != null && paintedLabel != strengthLabel) {
+                repaint()
             }
         }
     }
@@ -473,6 +485,7 @@ class SynapseNode(
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
+        paintedLabel = null
         if (!NetworkPreferences.showSynapseStrengthLabels) return
 
         val diameter = circle?.width ?: return
@@ -483,7 +496,8 @@ class SynapseNode(
         val circleCx = centerRef.centerX
         val circleCy = centerRef.centerY
 
-        val text = synapse.strength.formatAdaptive(maxPrecision = 1, minPrecision = 0)
+        val text = strengthLabel
+        paintedLabel = text
         val refString = "-9.9"
         val g2 = paintContext.graphics
         val font = computeCellFont(diameter * 0.6, diameter * 0.3, refString, g2.fontRenderContext)

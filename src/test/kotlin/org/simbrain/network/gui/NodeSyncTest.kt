@@ -1,15 +1,17 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
  * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
- * frame, which show for one frame) reach neurons and their outgoing synapses, text labels rewritten every iteration
- * coalesce too, a node that leaves the canvas stops listening to its model, and one node whose sync throws does not stop
- * the others syncing.
+ * frame, which show for one frame) reach neurons and their outgoing synapses, strength labels follow changes too small
+ * to resize a synapse, text labels rewritten every iteration coalesce too, a node that leaves the canvas stops
+ * listening to its model, and one node whose sync throws does not stop the others syncing.
  */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
@@ -27,9 +29,12 @@ import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.workspace.Workspace
+import java.awt.Rectangle
+import java.awt.image.BufferedImage
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.SwingUtilities
+import kotlin.math.ceil
 
 class NodeSyncTest {
 
@@ -284,6 +289,49 @@ class NodeSyncTest {
         synapse.strength = synapse.upperBound
         UiWork.awaitIdle()
         assertNotEquals(drawn, node.drawnDiameter, "a visible strength change did not redraw")
+    }
+
+    @Test
+    fun `a strength label follows a change too small to resize the circle`() = runBlocking {
+        assumeTrue(NetworkPreferences.showSynapseStrengthLabels, "strength labels are turned off in the preferences")
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val (a, b) = network.addNeurons(2)
+        // A wide strength range makes the change below far too small to resize the circle
+        val synapse = Synapse(a, b).apply { upperBound = 1000.0 }.also { network.addNetworkModel(it) }
+        synapse.strength = 1.0
+        val node = panel.getNode(synapse) as SynapseNode
+        UiWork.awaitIdle()
+        // Zoomed in far enough to show labels, and painted twice so the connection tier holds a cached image
+        SwingUtilities.invokeAndWait { panel.canvas.camera.setViewScale(5.0) }
+        repeat(2) { paintConnectionTier(panel) }
+        val before = node.drawnStrengthLabel
+        assertNotNull(before)
+
+        synapse.strength = 5.0
+        UiWork.awaitIdle()
+        paintConnectionTier(panel)
+        assertNotNull(node.drawnStrengthLabel)
+        assertNotEquals(before, node.drawnStrengthLabel, "the cached tier kept the old strength label")
+    }
+
+    /** Paints the connection tier as the canvas would at the panel's zoom, so its raster cache is used or rebuilt. */
+    private fun paintConnectionTier(panel: NetworkPanel) = SwingUtilities.invokeAndWait {
+        val tier = panel.edgeTier
+        // What the canvas does before each paint: brings bounds up to date and turns invalidations into repaints
+        panel.canvas.root.processInputs()
+        val scale = panel.scalingFactor
+        val bounds = tier.fullBounds
+        val image = BufferedImage(
+            ceil((bounds.width + 10) * scale).toInt(), ceil((bounds.height + 10) * scale).toInt(),
+            BufferedImage.TYPE_INT_RGB
+        )
+        val g = image.createGraphics()
+        g.clip = Rectangle(0, 0, image.width, image.height)
+        g.scale(scale, scale)
+        g.translate(5 - bounds.x, 5 - bounds.y)
+        tier.fullPaint(PPaintContext(g))
+        g.dispose()
     }
 
     @Test

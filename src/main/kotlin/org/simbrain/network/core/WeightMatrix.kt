@@ -109,13 +109,13 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix = Matrix(target.size, source.size)
-        get() {
+        get() = synchronized(psrLock) {
             // Whoever reads the matrix may also write it, so the directly computed sums no longer stand for it
             if (summedInputs != null) summedInputs = null
             writePendingPsrs(field)
-            return field
+            field
         }
-        set(value) {
+        set(value) = synchronized(psrLock) {
             pendingPsrSource = null
             summedInputs = null
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
@@ -124,6 +124,14 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 Matrix(weights.nrow(), weights.ncol())
             }
         }
+
+    /**
+     * Guards the hand-off from [updatePSR] to [getSummedPSRs]. Reading [psrMatrix] changes that state (it fills the
+     * matrix and drops [summedInputs]), and the property editor, copying and saving read it off the update thread, so
+     * a read landing between the two would otherwise leave the update summing a half-filled matrix.
+     */
+    @Transient
+    private val psrLock = Any()
 
     /**
      * Summed inputs from the last update when they were computed from the weights directly (a matrix-vector product
@@ -252,7 +260,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * Some targets like [ActivationSequence] bypass the PSRMatrix and compute a matrix product directly.
      */
     context(Network)
-    override fun updatePSR() {
+    override fun updatePSR(): Unit = synchronized(psrLock) {
         if (spikeResponder is NonResponder) {
 
             val sourceActivations = if (source is ActivationSequenceProcessor) {
@@ -307,7 +315,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
     }
 
-    override fun getSummedPSRs(): DoubleArray = summedInputs?.copyOf() ?: psrMatrix.rowSums()
+    override fun getSummedPSRs(): DoubleArray = synchronized(psrLock) { summedInputs?.copyOf() ?: psrMatrix.rowSums() }
 
     private fun updateExcitatoryMask() {
         for (i in 0 until weights.nrow()) {

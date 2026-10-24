@@ -18,8 +18,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.piccolo2d.PNode
-import org.piccolo2d.util.PPaintContext
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.simulations.neuroscience.IZHIKEVICH_CONNECTION_PROBABILITY
 import org.simbrain.custom_sims.simulations.neuroscience.IZHIKEVICH_NEURONS
@@ -56,19 +54,6 @@ private class DirtyCountingRepaintManager : javax.swing.RepaintManager() {
             Throwable().stackTrace.take(25).forEach { System.err.println("    at $it") }
         }
         super.addDirtyRegion(c, x, y, w, h)
-    }
-}
-
-private class FrameCounter : PNode() {
-    val frames = AtomicLong()
-
-    init {
-        pickable = false
-        setBounds(-1e7, -1e7, 2e7, 2e7)
-    }
-
-    override fun paint(paintContext: PPaintContext) {
-        frames.incrementAndGet()
     }
 }
 

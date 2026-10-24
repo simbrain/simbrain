@@ -44,11 +44,10 @@ import org.simbrain.workspace.updater.InterceptingEventQueue;
  * iterated through the workspace.
  *
  * Usage: IzhikevichHeadedBenchmark headless|paced|guioff network|raster seed [simMs=2000] [warmupMs=500]
+ *   [neurons=1000] [p=0.1] [weightScale=1]
  */
 public class IzhikevichHeadedBenchmark {
 
-    static final int N = 1000;
-    static final double P = 0.1;
     static final double DT = 0.5;
 
     /** Counts paints of the network canvas: a camera child covering everything that draws nothing. */
@@ -115,6 +114,9 @@ public class IzhikevichHeadedBenchmark {
         Random rng = new Random(Long.parseLong(args[2]));
         double simMs = args.length > 3 ? Double.parseDouble(args[3]) : 2000;
         double warmupMs = args.length > 4 ? Double.parseDouble(args[4]) : 500;
+        final int N = args.length > 5 ? Integer.parseInt(args[5]) : 1000;
+        final double P = args.length > 6 ? Double.parseDouble(args[6]) : 0.1;
+        double scale = args.length > 7 ? Double.parseDouble(args[7]) : 1.0;
         if (!mode.equals("headless") && !mode.equals("paced") && !mode.equals("guioff")) {
             throw new IllegalArgumentException("mode must be headless|paced|guioff");
         }
@@ -155,11 +157,12 @@ public class IzhikevichHeadedBenchmark {
             rule.setNoiseGenerator(noise);
             Neuron neuron = new Neuron(net, rule);
             neuron.forceSetActivation(-65);
+            IzhikevichBenchmark.startRecovery(neuron);
             neurons.add(neuron);
         }
         NeuronGroup ng = new NeuronGroup(net, neurons);
         ng.setLabel("Izhikevich");
-        ng.setLayout(new GridLayout(20, 20, 32));
+        ng.setLayout(new GridLayout(20, 20, (int) Math.ceil(Math.sqrt(N))));
         ng.applyLayout(new java.awt.geom.Point2D.Double(0, 0));
         net.addGroup(ng);
 
@@ -174,7 +177,7 @@ public class IzhikevichHeadedBenchmark {
                 if (src == tgt || rng.nextDouble() >= P) {
                     continue;
                 }
-                double w = src < numExc ? 0.5 * rng.nextDouble() : -rng.nextDouble();
+                double w = scale * (src < numExc ? 0.5 * rng.nextDouble() : -rng.nextDouble());
                 Synapse s = new Synapse(neurons.get(src), neurons.get(tgt));
                 s.forceSetStrength(w);
                 Step step = new Step();
@@ -256,10 +259,10 @@ public class IzhikevichHeadedBenchmark {
 
         double simS = simMs / 1000.0;
         System.out.println(String.format(
-            "{\"simulator\":\"simbrain3-gui\",\"variant\":\"%s\",\"mode\":\"%s\",\"neurons\":%d,\"synapses\":%d,"
+            "{\"simulator\":\"simbrain3-gui\",\"variant\":\"%s\",\"mode\":\"%s\",\"neurons\":%d,\"p\":%s,\"weight_scale\":%s,\"synapses\":%d,"
                 + "\"dt_ms\":%s,\"sim_ms\":%s,\"build_s\":%.4f,\"warmup_s\":%.4f,\"run_s\":%.4f,\"rt_factor\":%.4f,"
                 + "\"iterations_per_s\":%.2f,\"frames\":%d,\"frames_per_s\":%.2f,\"rate_hz\":%.3f}",
-            variant, mode, N, synapses, DT, simMs, buildS, warmupS, runS, runS / simS, steps / runS, frames,
+            variant, mode, N, P, scale, synapses, DT, simMs, buildS, warmupS, runS, runS / simS, steps / runS, frames,
             frames / runS, spikeCounter.spikes / (double) N / simS));
         System.out.flush();
         System.exit(0);

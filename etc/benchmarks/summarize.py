@@ -24,7 +24,9 @@ def steady(epochs):
 for machine in sorted({r["machine"] for r in rows}):
     print(f"\n=== {machine}")
     meta = next(r for r in rows if r["machine"] == machine and r.get("suite") == "meta")
-    print(meta["platform"], meta["cores"], "logical cores |", meta["java21"], "|", meta["java25"])
+    # Results before 2026-10-22 ran Simbrain 3 on a separate Java 25
+    print(meta["platform"], meta["cores"], "logical cores |", meta["java21"],
+          *(["| Simbrain 3:", meta["java25"]] if "java25" in meta else []))
 
     print("\n-- headline (1000 neurons, p=0.1, 10 s simulated): wall s per simulated s")
     g = collections.defaultdict(list)

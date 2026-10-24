@@ -15,6 +15,10 @@ GUI-open numbers, so these are new measurements of late Simbrain 3, not a reprod
 - Random connections, p=0.1, no self-connections; weight 0.5*U(0,1) from excitatory sources, -U(0,1) from
   inhibitory sources (weight scale 1). Step spike responders lasting one time step. Synapses frozen/static.
 - dt = 0.5 ms. Firing rate should come out ~1.35 Hz (check it: same dynamics in every mode).
+- Larger networks (both harnesses take [neurons] [p] [weightScale] after the timing arguments): the size sweep's, at
+  p=0.1 with every weight scaled by 100 / in-degree so firing rates stay comparable; grid columns ceil(sqrt(neurons)).
+  Drawing every step of free neurons runs 50 simulated ms after 10 above 1000 neurons, and free neurons simulate
+  1000 ms after 250 at 8000 neurons.
 
 ## Representation (the GUI-relevant part)
 
@@ -48,3 +52,28 @@ GUI-open numbers, so these are new measurements of late Simbrain 3, not a reprod
 - Print one JSON line: simulator ("simbrain3-gui" / "simbrain-gui"), variant ("network" | "raster"), mode, neurons,
   synapses, dt_ms, sim_ms, build_s, warmup_s, run_s, rt_factor (run_s per simulated s), iterations_per_s,
   frames, frames_per_s, rate_hz. Then exit.
+
+## Machine learning demos (Simbrain 4 only)
+
+Each run opens the registered demo itself, with its own windows, layout and training settings, so the numbers are what a
+user sees. The headless mode is the same demo without a desktop and is the baseline for the GUI's cost; the tuned
+headless comparisons with PyTorch are separate (MnistBenchmark, CnnBenchmark, TinyLmBenchmark, MnistInferenceBenchmark).
+
+- Training (TrainingHeadedBenchmark): the Feed-Forward MNIST demo (batches of 35), the CNN MNIST demo (batches of 32)
+  and the Tiny Language Model demo (24,20,4,30,1 and 64,128,4,512,2, trained on `casual_texting.txt` like
+  TinyLmBenchmark; one iteration is one pass over the text). Each demo's trainer tests every 10 iterations, as in the
+  demo. Modes: `headless`, `network` (the network window open) and `dialog` (the demo's training dialog open too, as
+  its menu opens it, with training started through the dialog's own trainer). Timed after a warm-up: 2000 iterations
+  (MNIST demos), 100 and 10 (tiny language model).
+- Inference (InferenceHeadedBenchmark): the two MNIST demos, briefly trained, classify their test set one example per
+  workspace step, the example clamped on the input layer, as the input table's "Apply inputs" does. Modes: `headless`,
+  `fast` (display decoupled) and `paced` (every example drawn). Timed: 10000 examples after 5000 (headless, fast), 1000
+  after 200 (paced).
+- Generation (GenerationHeadedBenchmark): the Tiny Language Model demo, briefly trained, generates text after a prompt
+  typed into its text world (the first 8 words of the training text), one token per workspace step as Play does; timing
+  starts once the context window is full. Modes: `headless`, `fast` (display decoupled, the demo's own setting) and
+  `paced` (every token drawn). Timed: 5000 tokens after 500 at 24,20,4,30,1 and 1000 after 100 at 64,128,4,512,2
+  (paced: 1000 after 200, 300 after 100).
+- Output: one JSON line with the demo (`benchmark`), mode, iterations, examples or tokens, run_s, iterations_per_s and
+  epoch_equivalent_s (training), us_per_example (inference) or ms_per_token (generation), frames and frames_per_s of
+  the network canvas, and the test accuracy or training loss.

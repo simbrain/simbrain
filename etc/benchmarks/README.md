@@ -8,8 +8,7 @@ Simbrain 3.
 
 - macOS or Linux (the Simbrain 3 classpath uses `:` separators)
 - git, with this repository's history (the Simbrain 3 runs use the `Simbrain3` branch)
-- JDK 21, for building and running Simbrain 4
-- JDK 25, for building and running Simbrain 3 (any JDK from 21 on compiles it; the published runs used 25)
+- JDK 21, for building and running both Simbrain 4 and Simbrain 3
 - [uv](https://docs.astral.sh/uv/), which installs Python 3.12, PyTorch and Brian2 from `uv.lock`
 - A C++ compiler (Xcode command line tools, or gcc/clang) for Brian2's compiled modes
 - A display, only for `bench headed`
@@ -19,7 +18,7 @@ Simbrain 3.
 From the repository root:
 
 ```sh
-etc/benchmarks/bench setup --java21 /path/to/jdk-21 --java25 /path/to/jdk-25
+etc/benchmarks/bench setup --java21 /path/to/jdk-21
 ```
 
 This puts everything under `build/benchmarks/`:
@@ -54,8 +53,12 @@ etc/benchmarks/bench summarize                               # medians of everyt
 | | `training` | MLP and CNN on Tiny MNIST and the tiny language model, Simbrain against PyTorch (1 thread and all, float32 and float64) | 4 / 4 min |
 | | `inference` | MLP and CNN test set one example at a time; PyTorch also as one batch | 1 / 2 min |
 | | `sweep` | 500 to 8000 neurons at connection probability 0.01, 0.05 and 0.1, every simulator but Simbrain 3 serial | 33 / 75 min |
-| `headed` | `s4`, `mnist`, `s3` | the 1000-neuron network with the GUI open (no GUI, display decoupled, every step drawn; with and without a raster plot), and the MNIST demo training with its windows open | 30 / 25 min |
-| | `large` | Simbrain 4 at 8000 neurons and 6.4 million synapses, without and with the GUI (display decoupled); `--suites large --heap 24g` (12g on a 16 GB laptop) | 15 / 35 min |
+| `headed` | `s4`, `s3` | the 1000-neuron network with the GUI open (no GUI, display decoupled, every step drawn; with and without a raster plot) | 25 / 20 min |
+| | `training` | the MLP, CNN and tiny language model demos training as a user runs them: no GUI, network window open, training dialog open too | 15 / 25 min |
+| | `inference` | the MLP and CNN demos classifying their test set one example per step: no GUI, display decoupled, every example drawn | 3 / 4 min |
+| | `generation` | the tiny language model demo generating text one token per step, at both sizes: no GUI, display decoupled, every token drawn | 5 / 5 min |
+| | `large` | Simbrain 4 at 8000 neurons and 6.4 million synapses, without and with the GUI (display decoupled); `--suites large --heap 24g` (12g on a 16 GB laptop); `--sizes 2000,4000,8000` adds the sweep's other sizes at p = 0.1 | 15 / 35 min at 8000 |
+| | `large_paced`, `large_s3` | Simbrain 4 drawing every step, and Simbrain 3 (no GUI, every step drawn, GUI off), at the `--sizes` | |
 | `torch-threads` | | every PyTorch comparison at 1, 2, 4, 8, 16 and all threads | 30 / 30 min |
 
 `bench run --suites smoke` is a quick check that every simulator starts. `--heap` sets the Java heap; the default,
@@ -83,18 +86,27 @@ etc/benchmarks/bench summarize                               # medians of everyt
 | `cp.init.gradle` | Gradle init script that prints Simbrain 4's test classpath |
 | `HEADED_SPEC.md` | what the GUI-open runs measure, shared by the Simbrain 3 and 4 harnesses |
 
-The Simbrain 4 harnesses are in `src/test/kotlin/org/simbrain/benchmarks/`: `IzhikevichBenchmark`,
-`IzhikevichHeadedBenchmark`, `MnistBenchmark`, `CnnBenchmark`, `TinyLmBenchmark`, `MnistInferenceBenchmark` and
-`MnistHeadedBenchmark`. Each takes its parameters on the command line (see its header) and prints one JSON line, so it
-can also be run on its own with the classpath from `build/benchmarks/s4cp.txt`.
+The Simbrain 4 harnesses are in `src/test/kotlin/org/simbrain/benchmarks/`: `IzhikevichBenchmark`, `MnistBenchmark`,
+`CnnBenchmark`, `TinyLmBenchmark` and `MnistInferenceBenchmark` without the GUI, and `IzhikevichHeadedBenchmark`,
+`TrainingHeadedBenchmark`, `InferenceHeadedBenchmark` and `GenerationHeadedBenchmark` with it (sharing `HeadedSupport`).
+Each takes its parameters on the command line (see its header) and prints one JSON line, so it can also be run on its
+own with the classpath from `build/benchmarks/s4cp.txt`.
 
 ## Notes on the comparison
 
 - Every simulator runs the same Izhikevich (2003) network: forward Euler at dt = 0.5 ms, Gaussian noise current, a
   spike delivering a one-step current pulse. Each run records its mean firing rate (about 1.35 Hz), which should agree
   across simulators. Simbrain 4's neuron arrays use the excitatory parameters for every neuron, since an array has a
-  single update rule.
+  single update rule. Every simulator starts at v = -65 mV and u = b * v; Simbrain 3's rule has no setter for u, so its
+  harnesses set it by reflection.
+- Each run times only the simulation after an untimed warm-up in the same process: JIT compilation for the Simbrains,
+  first-run setup (code object loading) for Brian2. In Brian2's C++ standalone mode the binary's own timing of the last
+  run is used, so code generation and compilation are excluded.
+- Both Simbrains run on the same JDK, so neither gets a newer JIT. Result files from before 2026-10-22 ran Simbrain 3
+  on Java 25, which made it about 10% faster; rerun `bench setup` after updating to rebuild Simbrain 3 with JDK 21.
 - Simbrain computes in double precision, so PyTorch's float64 runs are the like-for-like comparison.
+- PyTorch inference times the forward pass plus the output softmax, which the Simbrain networks compute in their output
+  layer; inputs and labels are prepared before the timed loop, as Simbrain's are.
 - Simbrain runs with its defaults: OpenBLAS limited to 4 threads for matrix-matrix products, and a network-update
   pool of one worker per core minus one. Brian2 runs single-threaded, its default.
 - The PyTorch runs pin their thread count with `torch.set_num_threads`. For these small models, PyTorch is often fastest

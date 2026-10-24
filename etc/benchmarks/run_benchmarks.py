@@ -6,13 +6,13 @@ tiny language model vs PyTorch), inference (MLP and CNN test-set inference vs Py
 
 Usage:
   run_benchmarks.py --machine NAME --out results.jsonl --suites headline,sweep,threads,training \
-    --java21 PATH --java25 PATH --s4cp CLASSPATH_FILE --s4repo DIR --s3dir DIR --python PATH --bench DIR --data DIR \
+    --java21 PATH --s4cp CLASSPATH_FILE --s4repo DIR --s3dir DIR --python PATH --bench DIR --data DIR \
     --heap 24g [--s4-only]
 """
 import argparse, json, os, platform, subprocess, sys, time
 
 p = argparse.ArgumentParser()
-for a in ["machine", "out", "suites", "java21", "java25", "s4cp", "s4repo", "s3dir", "python", "bench", "data", "heap"]:
+for a in ["machine", "out", "suites", "java21", "s4cp", "s4repo", "s3dir", "python", "bench", "data", "heap"]:
     p.add_argument("--" + a, required=True)
 p.add_argument("--timeout", type=int, default=900)
 # Only the Simbrain 4 runs, for refreshing its rows after code changes; summarize.py lets them supersede older rows
@@ -63,19 +63,20 @@ def s4_izh(variant, n, p_, sim, warm, seed, scale, workers=None):
 
 
 def s3_izh(mode, n, p_, sim, warm, seed, scale):
-    return [args.java25, f"-Xmx{args.heap}", "-cp", "bin:lib/*", "org.simbrain.benchmarks.IzhikevichBenchmark",
+    # Same JDK as Simbrain 4: a newer JIT alone made Simbrain 3 about 10% faster
+    return [args.java21, f"-Xmx{args.heap}", "-cp", "bin:lib/*", "org.simbrain.benchmarks.IzhikevichBenchmark",
             mode, str(n), str(p_), DT, str(sim), str(warm), str(seed), str(scale)]
 
 
-def brian(target, n, p_, sim, seed, scale):
+def brian(target, n, p_, sim, warm, seed, scale):
     return [args.python, os.path.join(args.bench, "izh_brian2.py"), target, str(n), str(p_), DT, str(sim), str(seed),
-            str(scale)]
+            str(scale), str(warm)]
 
 
 def headline():
     n, p_, sim, warm = 1000, 0.1, 10000, 1000
     # Brian2's runtime mode compiles Cython on first use; one discarded run fills its cache
-    run(brian("runtime", n, p_, 200, 0, 1.0), {"suite": "warmup"})
+    run(brian("runtime", n, p_, 200, 0, 0, 1.0), {"suite": "warmup"})
     for rep in range(5):
         base = {"suite": "headline", "repeat": rep}
         run(s3_izh("serial", n, p_, sim, warm, rep + 1, 1.0), base, cwd=args.s3dir)
@@ -83,13 +84,13 @@ def headline():
         run(s4_izh("objects", n, p_, sim, warm, rep + 1, 1.0), base)
         run(s4_izh("objects", n, p_, sim, warm, rep + 1, 1.0, workers=1), base)
         run(s4_izh("arrays", n, p_, sim, warm, rep + 1, 1.0), base)
-        run(brian("runtime", n, p_, sim, rep + 1, 1.0), base)
-        run(brian("cpp_standalone", n, p_, sim, rep + 1, 1.0), base)
+        run(brian("runtime", n, p_, sim, warm, rep + 1, 1.0), base)
+        run(brian("cpp_standalone", n, p_, sim, warm, rep + 1, 1.0), base)
 
 
 def sweep():
     sim, warm = 2000, 500
-    run(brian("runtime", 1000, 0.1, 200, 0, 1.0), {"suite": "warmup"})
+    run(brian("runtime", 1000, 0.1, 200, 0, 0, 1.0), {"suite": "warmup"})
     for n in [500, 1000, 2000, 4000, 8000]:
         for p_ in [0.01, 0.05, 0.1]:
             scale = round(100.0 / ((n - 1) * p_), 6)
@@ -98,8 +99,8 @@ def sweep():
                 run(s3_izh("concurrent", n, p_, sim, warm, rep + 1, scale), base, cwd=args.s3dir)
                 run(s4_izh("objects", n, p_, sim, warm, rep + 1, scale), base)
                 run(s4_izh("arrays", n, p_, sim, warm, rep + 1, scale), base)
-                run(brian("runtime", n, p_, sim, rep + 1, scale), base)
-                run(brian("cpp_standalone", n, p_, sim, rep + 1, scale), base)
+                run(brian("runtime", n, p_, sim, warm, rep + 1, scale), base)
+                run(brian("cpp_standalone", n, p_, sim, warm, rep + 1, scale), base)
 
 
 def threads():
@@ -164,16 +165,15 @@ def smoke():
     run(s3_izh("concurrent", 200, 0.1, 100, 50, 1, 5.0), base, cwd=args.s3dir)
     run(s4_izh("objects", 200, 0.1, 100, 50, 1, 5.0, workers=2), base)
     run(s4_izh("arrays", 200, 0.1, 100, 50, 1, 5.0), base)
-    run(brian("runtime", 200, 0.1, 100, 1, 5.0), base)
-    run(brian("cpp_standalone", 200, 0.1, 100, 1, 5.0), base)
+    run(brian("runtime", 200, 0.1, 100, 50, 1, 5.0), base)
+    run(brian("cpp_standalone", 200, 0.1, 100, 50, 1, 5.0), base)
     run([args.java21, f"-Xmx{args.heap}", "-cp", s4cp, "org.simbrain.benchmarks.MnistBenchmarkKt", args.data, "1", "1"], base)
     run([args.python, os.path.join(args.bench, "cnn_torch.py"), args.data, "1", "1", "1", "float32"], base)
 
 
 record({"suite": "meta", "platform": platform.platform(), "processor": platform.processor(), "cores": cores,
         "python": sys.version.split()[0],
-        "java21": subprocess.run([args.java21, "-version"], capture_output=True, text=True).stderr.splitlines()[0],
-        "java25": subprocess.run([args.java25, "-version"], capture_output=True, text=True).stderr.splitlines()[0]},
+        "java21": subprocess.run([args.java21, "-version"], capture_output=True, text=True).stderr.splitlines()[0]},
        json.dumps({}))
 for suite in args.suites.split(","):
     {"smoke": smoke, "arrays": arrays, "headline": headline, "sweep": sweep, "threads": threads, "training": training,

@@ -2,13 +2,16 @@
 
 Forward Euler at dt; Gaussian noise current redrawn each step (sigma 5 exc / 2 inh);
 a presynaptic spike adds w*dt to v_post (equivalent to a one-step current pulse of height w).
-Usage: izh_brian2.py <runtime|cpp_standalone> N p dt_ms sim_ms seed [weight_scale]
+Like the Simbrain harnesses, an untimed warm-up run precedes the timed run, so per-process setup that Brian2 does on
+the first run (code object loading, before_run) is excluded and the rate covers the timed run only.
+Usage: izh_brian2.py <runtime|cpp_standalone> N p dt_ms sim_ms seed [weight_scale] [warmup_ms]
 """
 import json, sys, time, os, shutil, tempfile
 import numpy as np
 
 target, N, p, dt_ms, sim_ms, seed_value = sys.argv[1], int(sys.argv[2]), float(sys.argv[3]), float(sys.argv[4]), float(sys.argv[5]), int(sys.argv[6])
 weight_scale = float(sys.argv[7]) if len(sys.argv) > 7 else 1.0
+warmup_ms = float(sys.argv[8]) if len(sys.argv) > 8 else 0.0
 
 t_import = time.perf_counter()
 from brian2 import *
@@ -58,6 +61,12 @@ mon = SpikeMonitor(G, record=False)
 net = Network(G, S, mon)
 build_s = time.perf_counter() - t0
 
+if warmup_ms > 0:
+    mon.active = False
+    net.run(warmup_ms * ms, report=None)
+    mon.active = True
+
+# In standalone mode both runs execute inside the binary and device._last_run_time is the last (timed) run's
 t1 = time.perf_counter()
 net.run(sim_ms * ms, report=None)
 if target == "cpp_standalone":
@@ -68,6 +77,7 @@ result = {
     "simulator": f"brian2-{target}",
     "version": brian2.__version__,
     "neurons": N, "p": p, "weight_scale": weight_scale, "synapses": int(len(S)), "dt_ms": dt_ms, "sim_ms": sim_ms,
+    "warmup_ms": warmup_ms,
     "build_s": round(build_s, 4),
     "rate_hz": round(mon.num_spikes / N / (sim_ms / 1000), 3),
 }

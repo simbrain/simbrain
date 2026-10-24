@@ -5,6 +5,8 @@ over the test set in eval mode under torch.inference_mode:
 - batch1: one example per call, as Simbrain runs these networks
 - full: the whole test set in one call
 
+Both include the output softmax, which the Simbrain networks compute in their output layer.
+
 Usage: mnist_infer_torch.py <mlp|cnn> dataDir trainEpochs passes seed threads dtype[float32|float64]
 """
 import json, os, sys, time
@@ -55,8 +57,10 @@ for _ in range(train_epochs):
         opt.step()
 model.eval()
 
-# The single-example inputs are prepared up front, as Simbrain's are, so the loop times only the forward pass
+# The single-example inputs and the labels are prepared up front, as Simbrain's are, so the loop times only the
+# forward pass rather than per-example tensor indexing
 singles = [Xte[i:i + 1].contiguous() for i in range(len(Xte))]
+labels = Yte.tolist()
 
 
 def batch1_pass():
@@ -64,14 +68,14 @@ def batch1_pass():
     t0 = time.perf_counter()
     with torch.inference_mode():
         for i, x in enumerate(singles):
-            correct += int(model(x).argmax(1).item() == Yte[i].item())
+            correct += int(torch.softmax(model(x), 1).argmax(1).item() == labels[i])
     return time.perf_counter() - t0, correct
 
 
 def full_pass():
     t0 = time.perf_counter()
     with torch.inference_mode():
-        correct = int((model(Xte).argmax(1) == Yte).sum().item())
+        correct = int((torch.softmax(model(Xte), 1).argmax(1) == Yte).sum().item())
     return time.perf_counter() - t0, correct
 
 

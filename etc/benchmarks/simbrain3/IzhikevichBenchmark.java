@@ -1,5 +1,6 @@
 package org.simbrain.benchmarks;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -20,6 +21,21 @@ import org.simbrain.util.randomizer.Randomizer;
  * Usage: IzhikevichBenchmark <serial|concurrent> neurons p dtMs simMs warmupMs seed [weightScale]
  */
 public class IzhikevichBenchmark {
+
+    /**
+     * Starts the recovery variable at u = b * v, as Simbrain 4 and Brian2 do. Simbrain 3's rule has no setter for it
+     * and starts it at 0, which hyperpolarises the first ~50 ms of a run.
+     */
+    static void startRecovery(Neuron neuron) {
+        IzhikevichRule rule = (IzhikevichRule) neuron.getUpdateRule();
+        try {
+            Field recovery = IzhikevichRule.class.getDeclaredField("recovery");
+            recovery.setAccessible(true);
+            recovery.setDouble(rule, rule.getB() * neuron.getActivation());
+        } catch (ReflectiveOperationException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 
     public static void main(String[] args) {
         String mode = args[0];
@@ -56,6 +72,7 @@ public class IzhikevichBenchmark {
             rule.setNoiseGenerator(noise);
             Neuron neuron = new Neuron(net, rule);
             neuron.forceSetActivation(-65);
+            startRecovery(neuron);
             neurons.add(neuron);
             net.addNeuron(neuron);
         }

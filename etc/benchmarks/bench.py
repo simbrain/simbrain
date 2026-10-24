@@ -1,7 +1,7 @@
 """Sets up and runs the Simbrain 4 performance benchmarks. Run it through the `bench` wrapper next to it, which runs it
 in this directory's uv environment, so PyTorch and Brian2 come from uv.lock.
 
-  bench setup --java21 JDK --java25 JDK   build Simbrain 4, check out and build Simbrain 3, download the MNIST data
+  bench setup --java21 JDK               build Simbrain 4, check out and build Simbrain 3, download the MNIST data
   bench run --machine NAME [--suites ...] headless suites (run_benchmarks.py)
   bench headed --machine NAME             suites with the GUI open; needs a display (run_headed.py)
   bench torch-threads --machine NAME      PyTorch at several thread counts (torch_threads.py); run after training
@@ -89,7 +89,7 @@ def setup_simbrain4(java21, work):
     say(f"Simbrain 4 classpath written to {classpath}")
 
 
-def setup_simbrain3(java25, work, commit):
+def setup_simbrain3(java21, work, commit):
     tree = work / "simbrain3"
     if not tree.exists():
         known = subprocess.run(["git", "cat-file", "-e", f"{commit}^{{commit}}"], cwd=REPO,
@@ -103,7 +103,8 @@ def setup_simbrain3(java25, work, commit):
     for harness in sorted((HERE / "simbrain3").glob("*.java")):
         shutil.copy2(harness, target / harness.name)
     # Equivalent of Simbrain 3's `ant compile`: compile every source and copy the resources beside the classes
-    javac = java25.parent / "javac"
+    # Built and run with the same JDK as Simbrain 4, so both get the same JIT
+    javac = java21.parent / "javac"
     sources = sorted(str(p.relative_to(tree)) for p in (tree / "src").rglob("*.java"))
     (work / "simbrain3-sources.txt").write_text("\n".join(sources) + "\n")
     bin_dir = tree / "bin"
@@ -143,16 +144,14 @@ def setup_data(work):
 def setup(args):
     work = args.work
     work.mkdir(parents=True, exist_ok=True)
-    java21, java25 = java_binary(args.java21), java_binary(args.java25)
+    java21 = java_binary(args.java21)
     if java_major(java21) != 21:
         sys.exit(f"[bench] --java21 is Java {java_major(java21)}; Simbrain 4 builds with Java 21")
-    if java_major(java25) < 21:
-        sys.exit(f"[bench] --java25 is Java {java_major(java25)}; the Simbrain 3 runs used Java 25")
-    config = {"java21": str(java21), "java25": str(java25), "simbrain3_commit": args.simbrain3_commit}
+    config = {"java21": str(java21), "simbrain3_commit": args.simbrain3_commit}
     if not args.skip_simbrain4:
         setup_simbrain4(java21, work)
     if not args.skip_simbrain3:
-        setup_simbrain3(java25, work, args.simbrain3_commit)
+        setup_simbrain3(java21, work, args.simbrain3_commit)
     setup_data(work)
     config_path(work).write_text(json.dumps(config, indent=2) + "\n")
     say(f"set up in {work}")
@@ -169,7 +168,7 @@ def run(args):
     config = load_config(args.work)
     out = output_file(args, "headless")
     sh([sys.executable, HERE / "run_benchmarks.py", "--machine", args.machine, "--out", out, "--suites", args.suites,
-        "--java21", config["java21"], "--java25", config["java25"], "--s4cp", args.work / "s4cp.txt",
+        "--java21", config["java21"], "--s4cp", args.work / "s4cp.txt",
         "--s4repo", REPO, "--s3dir", args.work / "simbrain3", "--python", sys.executable, "--bench", HERE,
         "--data", args.work / "data", "--heap", args.heap, *(["--s4-only"] if args.s4_only else [])])
     say(f"results in {out}")
@@ -179,8 +178,8 @@ def headed(args):
     config = load_config(args.work)
     out = output_file(args, "headed")
     sh([sys.executable, HERE / "run_headed.py", "--machine", args.machine, "--out", out, "--suites", args.suites,
-        "--repeats", str(args.repeats), "--heap", args.heap, "--java21", config["java21"], "--java25", config["java25"],
-        "--s4cp", args.work / "s4cp.txt", "--s3dir", args.work / "simbrain3"])
+        "--repeats", str(args.repeats), "--heap", args.heap, "--java21", config["java21"],
+        "--s4cp", args.work / "s4cp.txt", "--s3dir", args.work / "simbrain3", "--s4repo", REPO, "--sizes", args.sizes])
     say(f"results in {out}")
 
 
@@ -222,8 +221,7 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
 
     p = commands.add_parser("setup", help="build both Simbrains and fetch the data")
-    p.add_argument("--java21", required=True, help="Java 21 (JDK home or java executable), for Simbrain 4")
-    p.add_argument("--java25", required=True, help="Java 25 (JDK home or java executable), for Simbrain 3")
+    p.add_argument("--java21", required=True, help="Java 21 (JDK home or java executable), for both Simbrains")
     p.add_argument("--simbrain3-commit", default=SIMBRAIN3_COMMIT)
     p.add_argument("--skip-simbrain3", action="store_true")
     p.add_argument("--skip-simbrain4", action="store_true")
@@ -240,8 +238,10 @@ def main():
 
     p = commands.add_parser("headed", help="suites with the GUI open")
     p.add_argument("--machine", required=True)
-    p.add_argument("--suites", default="s4,mnist,s3", help="comma-separated: s4, mnist, s3, large")
+    p.add_argument("--suites", default="s4,training,inference,s3",
+                   help="comma-separated: s4, training, inference, generation, s3, large, large_paced, large_s3")
     p.add_argument("--heap", default="8g", help="Java heap; the large suite needs about 24g for free neurons")
+    p.add_argument("--sizes", default="8000", help="network sizes for the large suites, comma separated")
     p.add_argument("--repeats", type=int, default=3)
     p.add_argument("--out", type=Path)
     p.set_defaults(func=headed)

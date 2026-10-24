@@ -25,6 +25,7 @@ import org.simbrain.network.gui.dialogs.synapse.SynapseDialog
 import org.simbrain.util.*
 import java.awt.Color
 import java.awt.Font
+import java.awt.Graphics2D
 import java.awt.geom.Arc2D
 import java.awt.geom.Area
 import java.awt.geom.Line2D
@@ -232,6 +233,7 @@ class SynapseNode(
                     Arc2D.OPEN
                 )
         }
+        networkPanel.spikeOverlay.moved(this)
     }
 
 
@@ -485,11 +487,19 @@ class SynapseNode(
 
     override fun paintAfterChildren(paintContext: PPaintContext) {
         super.paintAfterChildren(paintContext)
-        paintedLabel = null
-        if (!NetworkPreferences.showSynapseStrengthLabels) return
+        paintedLabel = paintStrengthLabel(paintContext.graphics)
+    }
 
-        val diameter = circle?.width ?: return
-        if (diameter * networkPanel.scalingFactor < NetworkPreferences.synapseStrengthLabelMinScreenSize) return
+    /**
+     * Draws the strength label over the circle in this node's local coordinates, when labels are on and large enough
+     * at the current zoom; also called by the spike overlay, which draws the circle over the cached one. Returns the
+     * label drawn, or null if none was.
+     */
+    internal fun paintStrengthLabel(g2: Graphics2D): String? {
+        if (!NetworkPreferences.showSynapseStrengthLabels) return null
+
+        val diameter = circle?.width ?: return null
+        if (diameter * networkPanel.scalingFactor < NetworkPreferences.synapseStrengthLabelMinScreenSize) return null
 
         // Visible center of the circle in this node's local coords (fullBounds includes circle.offset).
         val centerRef = circle!!.fullBoundsReference
@@ -497,12 +507,11 @@ class SynapseNode(
         val circleCy = centerRef.centerY
 
         val text = strengthLabel
-        paintedLabel = text
         val refString = "-9.9"
-        val g2 = paintContext.graphics
         val font = computeCellFont(diameter * 0.6, diameter * 0.3, refString, g2.fontRenderContext)
             .deriveFont(Font.BOLD)
         g2.drawCenteredOutlinedLabel(text, font, circleCx, circleCy)
+        return text
     }
 
     override fun isIntersecting(bound: PBounds?): Boolean {

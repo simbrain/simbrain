@@ -1,9 +1,10 @@
 /**
  * Model changes reach node visuals through dirty marks and one per-frame sync pass rather than an EDT task per event:
  * neuron and synapse visuals still follow the model, bursts of changes coalesce, spikes (including ones shorter than a
- * frame, which show for one frame) reach neurons and their outgoing synapses, strength labels follow changes too small
- * to resize a synapse, text labels rewritten every iteration coalesce too, a node that leaves the canvas stops
- * listening to its model, and one node whose sync throws does not stop the others syncing.
+ * frame, which show for one frame) reach neurons and their outgoing synapses, the spike overlay follows highlighted
+ * synapses and keeps their strength labels, strength labels follow changes too small to resize a synapse, text labels
+ * rewritten every iteration coalesce too, a node that leaves the canvas stops listening to its model, and one node
+ * whose sync throws does not stop the others syncing.
  */
 package org.simbrain.network.gui
 
@@ -11,6 +12,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
 import org.junit.jupiter.api.Test
+import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
@@ -304,20 +306,28 @@ class NodeSyncTest {
         UiWork.awaitIdle()
         // Zoomed in far enough to show labels, and painted twice so the connection tier holds a cached image
         SwingUtilities.invokeAndWait { panel.canvas.camera.setViewScale(5.0) }
-        repeat(2) { paintConnectionTier(panel) }
+        repeat(2) { paintTier(panel, panel.edgeTier) }
         val before = node.drawnStrengthLabel
         assertNotNull(before)
 
         synapse.strength = 5.0
         UiWork.awaitIdle()
-        paintConnectionTier(panel)
+        paintTier(panel, panel.edgeTier)
         assertNotNull(node.drawnStrengthLabel)
         assertNotEquals(before, node.drawnStrengthLabel, "the cached tier kept the old strength label")
     }
 
-    /** Paints the connection tier as the canvas would at the panel's zoom, so its raster cache is used or rebuilt. */
-    private fun paintConnectionTier(panel: NetworkPanel) = SwingUtilities.invokeAndWait {
-        val tier = panel.edgeTier
+    /**
+     * Paints one tier of the canvas as the canvas would at the panel's zoom (so the connection tier's raster cache is
+     * used or rebuilt), into an image with a 5-unit margin around the tier's bounds.
+     */
+    private fun paintTier(panel: NetworkPanel, tier: PNode): BufferedImage {
+        lateinit var image: BufferedImage
+        SwingUtilities.invokeAndWait { image = paintTierOnEdt(panel, tier) }
+        return image
+    }
+
+    private fun paintTierOnEdt(panel: NetworkPanel, tier: PNode): BufferedImage {
         // What the canvas does before each paint: brings bounds up to date and turns invalidations into repaints
         panel.canvas.root.processInputs()
         val scale = panel.scalingFactor
@@ -332,6 +342,67 @@ class NodeSyncTest {
         g.translate(5 - bounds.x, 5 - bounds.y)
         tier.fullPaint(PPaintContext(g))
         g.dispose()
+        return image
+    }
+
+    @Test
+    fun `a highlighted synapse stays inside the spike overlay's bounds when its neuron moves`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val source = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it, usePlacementManager = false) }
+        val target = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
+        source.location = java.awt.geom.Point2D.Double(0.0, 0.0)
+        target.location = java.awt.geom.Point2D.Double(100.0, 0.0)
+        val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        with(network) { source.isSpike = true }
+        UiWork.awaitIdle()
+        assertTrue(node.drawnSourceSpiking)
+
+        target.location = java.awt.geom.Point2D.Double(500.0, 0.0)
+        var moved = false
+        val deadline = System.currentTimeMillis() + 3000
+        while (!moved && System.currentTimeMillis() < deadline) {
+            SwingUtilities.invokeAndWait { moved = node.circleNode!!.globalFullBounds.centerX > 400 }
+            Thread.sleep(10)
+        }
+        assertTrue(moved, "the synapse node never followed its target")
+
+        var covered = false
+        SwingUtilities.invokeAndWait { covered = panel.spikeOverlay.globalFullBounds.contains(node.globalFullBounds) }
+        assertTrue(covered, "the overlay would be culled where the highlighted synapse now is")
+    }
+
+    @Test
+    fun `a highlighted synapse keeps its strength label`() = runBlocking {
+        assumeTrue(NetworkPreferences.showSynapseStrengthLabels, "strength labels are turned off in the preferences")
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val source = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it) }
+        val target = Neuron().also { network.addNetworkModel(it) }
+        val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
+        synapse.strength = 1.0
+        val node = panel.getNode(synapse) as SynapseNode
+        with(network) { source.isSpike = true }
+        UiWork.awaitIdle()
+        assertTrue(node.drawnSourceSpiking)
+        SwingUtilities.invokeAndWait { panel.canvas.camera.setViewScale(5.0) }
+
+        // The overlay draws the circle back over the cached one; the middle of the circle must show the label's
+        // pixels, not only the circle's fill
+        val image = paintTier(panel, panel.spikeOverlay)
+        var labelDrawn = false
+        SwingUtilities.invokeAndWait {
+            val scale = panel.scalingFactor
+            val overlay = panel.spikeOverlay.globalFullBounds
+            val circle = node.circleNode!!.globalFullBounds
+            val cx = ((circle.centerX - overlay.x + 5) * scale).toInt()
+            val cy = ((circle.centerY - overlay.y + 5) * scale).toInt()
+            val half = (circle.width / 2 * scale * 0.3).toInt()
+            val fill = (node.drawnCircleColor as java.awt.Color).rgb
+            labelDrawn = (cx - half..cx + half).any { x -> (cy - half..cy + half).any { y -> image.getRGB(x, y) != fill } }
+        }
+        assertTrue(labelDrawn, "the spike overlay covered the strength label")
     }
 
     @Test

@@ -175,6 +175,14 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     open val isSpikingRule: Boolean
         get() = false
 
+    /**
+     * Whether [apply] reads and writes only its own neuron's state (and its own incoming synapses). Rules that read
+     * other neurons' activations while updating, or keep per-neuron state on the rule object, return false, and
+     * networks containing them update their neurons serially.
+     */
+    open val isNeuronLocal: Boolean
+        get() = true
+
     open fun getGraphicalValue(n: Neuron): Double {
         return n.activation
     }

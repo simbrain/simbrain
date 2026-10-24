@@ -18,9 +18,9 @@ import java.awt.image.BufferedImage;
  * overlapping frame behind it — shows through them with a smooth edge (true transparency, not a
  * fill matched to the background).
  *
- * <p>Soft-clipping the corners needs an offscreen buffer, but only corner-touching repaints take
- * that path: a repaint whose dirty region does not reach a corner paints straight to the screen,
- * so a running sim repainting the canvas interior stays at full speed. The corner buffer is sized
+ * <p>Soft-clipping the corners needs an offscreen buffer, but only the corner squares of a repaint
+ * take that path: everything else paints straight to the screen, so a running sim repainting its
+ * canvas, even all of it, stays at full speed. The corner buffer is sized
  * to device pixels and blitted back 1:1, so corners stay crisp on HiDPI displays. While maximized
  * the frame renders square and full-bleed.
  */
@@ -114,15 +114,64 @@ public class GenericJInternalFrame extends JInternalFrame implements GenericFram
             paintOutline(g);
             return;
         }
+        int w = getWidth();
+        int h = getHeight();
+        int a = (int) Math.ceil(ARC);
+        if (w < 2 * a || h < 2 * a) {
+            paintSoftClipped(g2, clip);
+            paintOutline(g);
+            return;
+        }
+        // Even then only the corner squares need the offscreen buffer. The rest of the region, such as a
+        // full repaint of a canvas that fills the bottom of the frame, goes straight to the screen as up
+        // to three rectangles (a non-rectangular clip would be slow on the GPU pipelines itself), which
+        // avoids rendering it all in software and copying it back every frame.
+        Rectangle[] direct = {
+            new Rectangle(a, 0, w - 2 * a, a),
+            new Rectangle(0, a, w, h - 2 * a),
+            new Rectangle(a, h - a, w - 2 * a, a)
+        };
+        for (Rectangle band : direct) {
+            Rectangle region = band.intersection(clip);
+            if (!region.isEmpty()) {
+                Graphics2D gd = (Graphics2D) g.create();
+                try {
+                    gd.clipRect(region.x, region.y, region.width, region.height);
+                    super.paint(gd);
+                } finally {
+                    gd.dispose();
+                }
+            }
+        }
+        Rectangle[] corners = {
+            new Rectangle(0, 0, a, a),
+            new Rectangle(w - a, 0, a, a),
+            new Rectangle(0, h - a, a, a),
+            new Rectangle(w - a, h - a, a, a)
+        };
+        for (Rectangle corner : corners) {
+            Rectangle region = corner.intersection(clip);
+            if (!region.isEmpty()) {
+                paintSoftClipped(g2, region);
+            }
+        }
+        paintOutline(g);
+    }
+
+    /**
+     * Paints {@code region} into a device-resolution offscreen buffer, knocks the rounded-away corners out of
+     * it, and copies it to the screen.
+     */
+    private void paintSoftClipped(Graphics2D g2, Rectangle region) {
         AffineTransform at = g2.getTransform();
         double scale = at.getScaleX() > 0 ? at.getScaleX() : 1;
-        int bufW = Math.max(1, (int) Math.ceil(clip.width * scale));
-        int bufH = Math.max(1, (int) Math.ceil(clip.height * scale));
+        int bufW = Math.max(1, (int) Math.ceil(region.width * scale));
+        int bufH = Math.max(1, (int) Math.ceil(region.height * scale));
         BufferedImage buf = new BufferedImage(bufW, bufH, BufferedImage.TYPE_INT_ARGB);
         Graphics2D bg = buf.createGraphics();
         bg.scale(scale, scale);
-        bg.translate(-clip.x, -clip.y);
-        bg.setClip(clip);
+        bg.translate(-region.x, -region.y);
+        bg.setClip(region);
         boolean wasDoubleBuffered = isDoubleBuffered();
         setDoubleBuffered(false);
         try {
@@ -137,13 +186,12 @@ public class GenericJInternalFrame extends JInternalFrame implements GenericFram
         bg.fill(cornerCutouts());
         bg.dispose();
         // Blit the device-resolution buffer back 1:1 (no upscaling, so corners stay crisp on HiDPI).
-        Graphics2D gd = (Graphics2D) g.create();
+        Graphics2D gd = (Graphics2D) g2.create();
         gd.setTransform(new AffineTransform());
-        int devX = (int) Math.round(at.getTranslateX() + clip.x * scale);
-        int devY = (int) Math.round(at.getTranslateY() + clip.y * scale);
+        int devX = (int) Math.round(at.getTranslateX() + region.x * scale);
+        int devY = (int) Math.round(at.getTranslateY() + region.y * scale);
         gd.drawImage(buf, devX, devY, null);
         gd.dispose();
-        paintOutline(g);
     }
 
     private void paintOutline(Graphics g) {

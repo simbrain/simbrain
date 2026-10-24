@@ -1,10 +1,13 @@
+/**
+ * Desktop view of a [ProjectionComponent]: a scatter chart of the projected points with controls for the projection
+ * method, its settings, and iterating it. Projector events reach the chart through per-frame refreshes on
+ * [viewScope], so a run that adds a point (or iterates the projection) every step costs the EDT about one redraw per
+ * frame rather than one per point.
+ */
 package org.simbrain.plot.projection
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
 import org.jfree.chart.ChartFactory
 import org.jfree.chart.JFreeChart
 import org.jfree.chart.axis.NumberAxis
@@ -39,6 +42,9 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     override var coroutineContext = projector.coroutineContext
 
     private var running = false
+
+    /** Rebuilds the chart from the dataset, at most once per frame. */
+    private val redraw = viewScope.uiRefresh { redrawAllPoints() }
 
     /**
      * Ordered list of [DataPoint] points so that the renderer can access points by index.
@@ -183,10 +189,10 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             setAction("Run")
             projector.events.startIterating.on {
                 setAction("Stop")
-            }
+            }.cancelWith(viewScope)
             projector.events.stopIterating.on {
                 setAction("Run")
-            }
+            }.cancelWith(viewScope)
         })
         add(iterateAction)
     }
@@ -270,24 +276,22 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
     fun showPrefDialog() {
         projector.createEditorDialog {
             it.initProjector()
-            launch {
-                redrawAllPoints()
-            }
+            redraw.request()
         }.display()
     }
 
-    private suspend fun redrawAllPoints() {
-        withContext(Dispatchers.Swing) {
-            xyCollection.getSeries(0).clear()
-            pointList.clear()
-            projector.dataset.pointsInInsertionOrder().forEach {
-                pointList.add(it)
-                val (x, y) = it.downstairsPoint
-                xyCollection.getSeries(0).add(x, y)
-            }
-            pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
-            dimensionsLabel.text = "Dimensions: ${projector.dimension}"
+    private fun redrawAllPoints() {
+        val series = xyCollection.getSeries(0)
+        series.clear()
+        pointList.clear()
+        projector.dataset.pointsInInsertionOrder().forEach {
+            pointList.add(it)
+            val (x, y) = it.downstairsPoint
+            series.add(x, y, false)
         }
+        series.fireSeriesChanged()
+        pointsLabel.text = "Datapoints: ${projector.dataset.kdTree.size}"
+        dimensionsLabel.text = "Dimensions: ${projector.dimension}"
     }
 
     init {
@@ -319,18 +323,14 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             })
         }
 
-        projector.events.datasetChanged.on {
-            redrawAllPoints()
-        }
-        projector.events.pointUpdated.on {
-            chart.fireChartChanged()
-        }
+        projector.events.datasetChanged.onImmediate { redraw.request() }.cancelWith(viewScope)
+        projector.events.pointUpdated.onUi(viewScope) { chart.fireChartChanged() }
         projector.events.datasetCleared.on {
             projector.coloringManager.reset()
-        }
+        }.cancelWith(viewScope)
         projector.events.settingsChanged.on {
             renderer.setSeriesLinesVisible(0, projector.connectPoints)
-        }
+        }.cancelWith(viewScope)
         renderer.setSeriesLinesVisible(0, projector.connectPoints)
         projector.events.methodChanged.on { o, n ->
             projectionSelector.selectedItem = projectionMethods[n.javaClass]
@@ -350,14 +350,12 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
             topPanel.repaint()
             bottomPanel.revalidate()
             bottomPanel.repaint()
-            launch { redrawAllPoints() }
-        }
-        projector.events.iterated.on(Dispatchers.Swing) { error ->
+            redraw.request()
+        }.cancelWith(viewScope)
+        projector.events.iterated.onUi(viewScope) { error ->
             errorLabel.text = "Error: ${error.format(2)}"
         }
-        launch {
-            redrawAllPoints()
-        }
+        redraw.request()
     }
 
     private fun stopIterating() {

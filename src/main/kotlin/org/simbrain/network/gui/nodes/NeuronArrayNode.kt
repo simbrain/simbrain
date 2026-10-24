@@ -271,9 +271,9 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
         addChild(labelBackground)
 
-        events.updated.on(Dispatchers.Default) {
-            events.updateGraphics.fire()
-        }
+        // Marked, not throttled: the panel's sync pass redraws once per frame, and a paced run's display sync draws
+        // every iteration
+        events.updated.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
 
         events.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
@@ -518,7 +518,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
+    override fun syncFromModel(bits: Int) {
+        if (bits and ACTIVATIONS != 0) {
+            updateActivationImage()
+        }
+    }
+
     companion object {
+        private const val ACTIVATIONS = 1
+
         /** Outline color used to mark pixels in the per-pixel selection. */
         val PIXEL_SELECTION_COLOR: Color = Color(255, 200, 0)
     }

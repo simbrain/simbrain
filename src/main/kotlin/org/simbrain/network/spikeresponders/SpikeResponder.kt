@@ -2,6 +2,7 @@ package org.simbrain.network.spikeresponders
 
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.spikeresponders.*
 import org.simbrain.network.util.EmptyMatrixData
@@ -59,9 +60,20 @@ abstract class SpikeResponder : CopyableObject {
     context(Network)
     open fun apply(connector: Connector, responderData: MatrixDataHolder) {}
 
+    /**
+     * For a responder whose response at each synapse of a weight matrix is that synapse's weight times a factor that
+     * depends only on the source neuron, returns those per-source factors. The weight matrix then sums responses from
+     * its weights directly, visiting only sources with a nonzero factor, instead of having [apply] write every entry
+     * of its PSR matrix. Called once per update of the weight matrix, so a responder may advance per-source state
+     * here. Null, the default, means [apply] writes the PSR matrix.
+     */
+    context(Network)
+    open fun sourceFactors(connector: WeightMatrix): DoubleArray? = null
+
     context(Network)
     fun probabilisticSpikeCheck(): Boolean {
-        return !useSpikeProbability || random.nextDouble() < spikeProbability
+        // the network's generator is shared by synapses updating on different threads
+        return !useSpikeProbability || synchronized(random) { random.nextDouble() } < spikeProbability
     }
 
     /**

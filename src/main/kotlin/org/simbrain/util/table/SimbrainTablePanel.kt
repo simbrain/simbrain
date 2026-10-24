@@ -3,12 +3,15 @@ package org.simbrain.util.table
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
+import org.simbrain.util.UiScope
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
+import org.simbrain.util.onUi
 import org.simbrain.util.widgets.RowNumberTable
 import java.awt.*
 import java.awt.event.*
@@ -53,42 +56,61 @@ open class SimbrainTablePanel @JvmOverloads constructor(
             }
         }
 
-    init {
+    /**
+     * Scope of the current-row highlight, alive while the panel is on screen. Many panels live in dialogs nobody
+     * disposes, so the subscription follows the panel's place in the component hierarchy instead.
+     */
+    private var ui: CoroutineScope? = null
 
-        fun scrollToVisible(row: Int) {
-            val cellRect = table.getCellRect(row, 0, true)
-            val viewRect = scrollPane.viewport.viewRect
+    override fun addNotify() {
+        super.addNotify()
+        ui?.cancel()
+        ui = UiScope().also { scope ->
+            model.events.currentRowChanged.onUi(scope) { showCurrentRow() }
+        }
+    }
 
-            // Determine if the cell is not visible within the viewport.
-            if (!viewRect.contains(cellRect)) {
-                // Determine the scroll direction and distance.
-                val toScroll = when {
-                    // Scroll up if the cell is above the viewport
-                    cellRect.y < viewRect.y -> cellRect.y - viewRect.y
-                    // Scroll down if the cell is below the viewport
-                    cellRect.y + cellRect.height > viewRect.y + viewRect.height -> cellRect.y + cellRect.height - viewRect.y - viewRect.height
-                    // No scrolling necessary if the cell is already visible
-                    else -> 0
-                }
+    override fun removeNotify() {
+        ui?.cancel()
+        ui = null
+        super.removeNotify()
+    }
 
-                // If scrolling is needed, calculate the new view position.
-                if (toScroll != 0) {
-                    val newViewPosY = viewRect.y + toScroll
-                    val newPoint = Point(viewRect.x, max(0, newViewPosY))
-                    scrollPane.viewport.viewPosition = newPoint
-                }
+    private fun showCurrentRow() {
+        table.selectedRow = model.currentRowIndex
+        scrollToVisible(table.selectedRow)
+    }
 
-                // Revalidate and repaint the scroll pane to reflect changes.
-                scrollPane.revalidate()
-                scrollPane.repaint()
+    private fun scrollToVisible(row: Int) {
+        val cellRect = table.getCellRect(row, 0, true)
+        val viewRect = scrollPane.viewport.viewRect
+
+        // Determine if the cell is not visible within the viewport.
+        if (!viewRect.contains(cellRect)) {
+            // Determine the scroll direction and distance.
+            val toScroll = when {
+                // Scroll up if the cell is above the viewport
+                cellRect.y < viewRect.y -> cellRect.y - viewRect.y
+                // Scroll down if the cell is below the viewport
+                cellRect.y + cellRect.height > viewRect.y + viewRect.height -> cellRect.y + cellRect.height - viewRect.y - viewRect.height
+                // No scrolling necessary if the cell is already visible
+                else -> 0
             }
-        }
 
+            // If scrolling is needed, calculate the new view position.
+            if (toScroll != 0) {
+                val newViewPosY = viewRect.y + toScroll
+                val newPoint = Point(viewRect.x, max(0, newViewPosY))
+                scrollPane.viewport.viewPosition = newPoint
+            }
 
-        model.events.currentRowChanged.on(Dispatchers.Swing) {
-            table.selectedRow = model.currentRowIndex
-            scrollToVisible(table.selectedRow)
+            // Revalidate and repaint the scroll pane to reflect changes.
+            scrollPane.revalidate()
+            scrollPane.repaint()
         }
+    }
+
+    init {
         model.events.rowNameChanged.on(Dispatchers.Swing) {
             scrollPane.rowNames = model.getAllRowNames()
         }

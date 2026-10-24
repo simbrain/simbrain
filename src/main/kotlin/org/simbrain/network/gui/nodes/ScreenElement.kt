@@ -1,5 +1,15 @@
+/**
+ * Base class for nodes on the network canvas: shared interactions (context menu, property dialog, tooltip), the node's
+ * lifetime ([nodeScope], [dispose]) and the dirty-mark contract by which model changes reach its visuals once per
+ * frame instead of once per event.
+ */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
@@ -10,10 +20,12 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.cancelWith
 import org.simbrain.util.display
 import org.simbrain.util.int
 import org.simbrain.util.piccolo.firstScreenElement
 import java.awt.event.InputEvent
+import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
@@ -35,6 +47,52 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
             }
         })
     }
+
+    /**
+     * Lifetime of this node's subscriptions to its model, cancelled by [dispose] when the node leaves the canvas, so a
+     * node replaced by undo stops reacting to the model it used to show. The model's own event scope is never closed:
+     * undo reuses model instances.
+     */
+    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(networkPanel.viewScope.coroutineContext.job))
+
+    /** Ends this node's subscriptions; called when it is removed from the canvas for good. */
+    open fun dispose() {
+        nodeScope.cancel()
+    }
+
+    /** Keeps a subscription only for as long as this node is on the canvas. */
+    protected fun Job.untilDisposed(): Job = cancelWith(nodeScope)
+
+    /** [untilDisposed] for awaitable-event subscriptions, which return a remover. */
+    protected fun (() -> Unit).untilDisposed() = cancelWith(nodeScope)
+
+    /**
+     * Aspects of the model that changed since this node last synced, as subclass-defined bits. Model events only set
+     * bits here; the panel's per-frame sync pass then calls [syncFromModel] once with everything accumulated, so a
+     * model firing thousands of changes a second costs the EDT one update per frame rather than one task per change.
+     */
+    private val dirty = AtomicInteger()
+
+    /** Records changed aspects and queues this node for the next sync pass, once however many marks arrive. */
+    protected fun markDirty(bits: Int) {
+        if (dirty.getAndUpdate { it or bits } == 0) {
+            networkPanel.nodeSync.post(this)
+        }
+    }
+
+    /** Runs a pending sync now; called on the EDT by the panel's sync pass. */
+    internal fun syncPending() {
+        val bits = dirty.getAndSet(0)
+        if (bits != 0 && parent != null) {
+            syncFromModel(bits)
+        }
+    }
+
+    /**
+     * Updates visuals from the model's current state for the aspects in [bits]. Runs on the EDT, at most once per
+     * frame, and should only touch visuals whose drawn value actually differs.
+     */
+    protected open fun syncFromModel(bits: Int) {}
 
     /**
      * Returns a reference to the model object this node represents.

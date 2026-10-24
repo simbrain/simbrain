@@ -109,13 +109,48 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix = Matrix(target.size, source.size)
+        get() {
+            // Whoever reads the matrix may also write it, so the directly computed sums no longer stand for it
+            if (summedInputs != null) summedInputs = null
+            writePendingPsrs(field)
+            return field
+        }
         set(value) {
+            pendingPsrSource = null
+            summedInputs = null
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
                 value
             } else {
                 Matrix(weights.nrow(), weights.ncol())
             }
         }
+
+    /**
+     * Summed inputs from the last update when they were computed from the weights directly (a matrix-vector product
+     * for connectionist updates, the responding sources' weights for [SpikeResponder.sourceFactors]) rather than as
+     * row sums of a filled [psrMatrix]. Null after a spike responder writes [psrMatrix], or once [psrMatrix] is read.
+     */
+    @Transient
+    private var summedInputs: DoubleArray? = null
+
+    /**
+     * Per-source factors from the last update, either source activations (connectionist) or a spike responder's
+     * [SpikeResponder.sourceFactors], whose per-weight responses (weight times factor) have not been written to
+     * [psrMatrix] yet. Most targets only need the summed inputs, so [psrMatrix] is filled only when something reads it.
+     */
+    @Transient
+    private var pendingPsrSource: DoubleArray? = null
+
+    private fun writePendingPsrs(psrs: Matrix) {
+        val factors = pendingPsrSource ?: return
+        pendingPsrSource = null
+        for (j in 0 until psrs.ncol()) {
+            val factor = factors[j]
+            for (i in 0 until psrs.nrow()) {
+                psrs[i, j] = if (factor == 0.0) 0.0 else weights[i, j] * factor
+            }
+        }
+    }
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -209,9 +244,11 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     /**
-     * Prepare the PSR Matrix for consumption by target layers.
+     * Prepare post-synaptic responses for consumption by target layers.
      *
-     * Most targets use the updated PSRMatrix by calling [getSummedPSRs].
+     * Most targets read them summed, by calling [getSummedPSRs]. Without a spike responder the sums are computed
+     * directly as a matrix-vector product, and [psrMatrix] is filled only if it is read. With a spike responder, the
+     * responder writes [psrMatrix] and its rows are summed.
      * Some targets like [ActivationSequence] bypass the PSRMatrix and compute a matrix product directly.
      */
     context(Network)
@@ -232,14 +269,45 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 ?: activations
             }
 
-            // One "half" of a matrix product ([getSummedPSRs] does the rest). Source activations are element-wise multiplied by rows of matrix
-            psrMatrix.copyFrom(weights.scaleColumns(sourceActivations))
+            // The summed inputs are the matrix-vector product; the per-weight responses (each weight times its source
+            // activation) are left for psrMatrix to fill if it is read
+            val x = sourceActivations.col(0)
+            val summed = DoubleArray(weights.nrow())
+            weights.timesVectorInto(x, summed)
+            pendingPsrSource = x
+            summedInputs = summed
 
         } else {
             // Spiking case
-            spikeResponder.apply(this, spikeResponseData)
+            val factors = spikeResponder.sourceFactors(this)
+            if (factors != null) {
+                // Only sources with a nonzero factor contribute, so a step of a sparsely firing network visits a few
+                // columns of the weights rather than all of them
+                val summed = DoubleArray(weights.nrow())
+                val columns = weights.columnMajorArrayOrNull()
+                val ld = weights.ld()
+                for (i in factors.indices) {
+                    val factor = factors[i]
+                    if (factor == 0.0) continue
+                    if (columns != null) {
+                        val start = i * ld
+                        for (j in summed.indices) summed[j] += columns[start + j] * factor
+                    } else {
+                        for (j in summed.indices) summed[j] += weights[j, i] * factor
+                    }
+                }
+                pendingPsrSource = factors
+                summedInputs = summed
+            } else {
+                // A responder that just stopped using factors continues from the responses they stood for
+                summedInputs = null
+                writePendingPsrs(psrMatrix)
+                spikeResponder.apply(this, spikeResponseData)
+            }
         }
     }
+
+    override fun getSummedPSRs(): DoubleArray = summedInputs?.copyOf() ?: psrMatrix.rowSums()
 
     private fun updateExcitatoryMask() {
         for (i in 0 until weights.nrow()) {

@@ -19,16 +19,32 @@ class StepResponder(
 
 ) : SpikeResponder() {
 
+    /**
+     * A step response is the weight while the source is within its response window and zero otherwise, so a weight
+     * matrix can sum it from the weights of the responding sources. Spike probabilities draw per synapse, so they
+     * take the full [apply].
+     */
+    context(Network)
+    override fun sourceFactors(connector: WeightMatrix): DoubleArray? {
+        if (useSpikeProbability) return null
+        val lastSpikeTimes = ((connector.source as? NeuronArray)?.dataHolder as? SpikingMatrixData)?.lastSpikeTimes
+            ?: return null
+        return DoubleArray(lastSpikeTimes.size) { if (lastSpikeTimes[it] + responseDuration * timeStep >= time) 1.0 else 0.0 }
+    }
+
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
         val weightMatrix = connector as WeightMatrix
         val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
-        for (i in 0 until connector.psrMatrix.ncol()) {
-            for (j in 0 until connector.psrMatrix.nrow()) {
-                if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-                    connector.psrMatrix[j, i] = connector.weights[j, i]
+        val psrMatrix = connector.psrMatrix
+        val weights = connector.weights
+        for (i in 0 until psrMatrix.ncol()) {
+            val responding = lastSpikeTimes[i] + responseDuration * timeStep >= time
+            for (j in 0 until psrMatrix.nrow()) {
+                if (responding && probabilisticSpikeCheck()) {
+                    psrMatrix[j, i] = weights[j, i]
                 } else {
-                    connector.psrMatrix[j, i] = 0.0
+                    psrMatrix[j, i] = 0.0
                 }
             }
         }

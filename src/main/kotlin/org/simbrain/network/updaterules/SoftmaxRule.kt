@@ -50,8 +50,10 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
         val biases = layer.biases
         
         if (layer is NeuronArray) {
-            layer.setActivations(softmax(inputs, temperature, biases))
+            // A neuron array's inputs already include its biases (see ArrayLayer.accumulateInputs)
+            layer.setActivations(softmax(inputs, temperature))
         } else if (layer is ActivationSequenceProcessor){
+            // Activation sequences do not add biases to their inputs, so they are added here
             // Multiple rows case: apply softmax row-wise
             layer.activations = softmaxRowWise(inputs, temperature, biases)
         }

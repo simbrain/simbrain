@@ -169,6 +169,8 @@ val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
     }
 
     workspace.clearWorkspace()
+    // Token generation shouldn't wait for each step to be drawn; the views sample it at their own frame rate
+    workspace.runAsFastAsPossible = true
 
     val contextSize = options.contextSize
     // The embedding dimension must split evenly across heads

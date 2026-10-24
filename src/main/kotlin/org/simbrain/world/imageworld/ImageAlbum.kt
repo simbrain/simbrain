@@ -173,6 +173,8 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     }
 
     fun saveCurrentFrame() {
+        // Usually the current image is this frame itself, and copying it onto itself changes nothing
+        if (currentImage === _frames[frameIndex]) return
         val snapshot = currentImage.copy()
         _frames[frameIndex].data = snapshot.data
     }

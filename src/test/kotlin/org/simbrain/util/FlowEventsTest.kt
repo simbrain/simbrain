@@ -474,4 +474,62 @@ class FlowEventsTest {
         withTimeout(2000) { laterRan.await() }
         events.close()
     }
+
+    @Test
+    fun `an immediate handler runs on the firing thread before fire returns`() {
+        val events = FlowEvents()
+        val event = events.OneArgEvent<Int>()
+        val seen = mutableListOf<Pair<Int, Thread>>()
+        event.onImmediate { seen += it to Thread.currentThread() }
+
+        event.fire(1)
+        event.fire(2)
+
+        assertEquals(listOf(1, 2), seen.map { it.first })
+        assertTrue(seen.all { it.second === Thread.currentThread() })
+        events.close()
+    }
+
+    @Test
+    fun `an immediate handler on a changed event sees only real changes`() {
+        val events = FlowEvents()
+        val event = events.ChangedEvent<String>()
+        val seen = mutableListOf<Pair<String, String>>()
+        event.onImmediate { new, old -> seen += new to old }
+
+        event.fire("b", "a")
+        event.fire("b", "b")
+
+        assertEquals(listOf("b" to "a"), seen)
+        events.close()
+    }
+
+    @Test
+    fun `a throwing immediate handler neither breaks the firer nor skips other handlers`() {
+        val events = FlowEvents()
+        val event = events.NoArgEvent()
+        val ran = AtomicInteger()
+        event.onImmediate { throw IllegalStateException("expected by the test") }
+        event.onImmediate { ran.incrementAndGet() }
+
+        event.fire()
+
+        assertEquals(1, ran.get())
+        events.close()
+    }
+
+    @Test
+    fun `cancelling an immediate subscription stops it`() {
+        val events = FlowEvents()
+        val event = events.NoArgEvent()
+        val ran = AtomicInteger()
+        val subscription = event.onImmediate { ran.incrementAndGet() }
+
+        event.fire()
+        subscription.cancel()
+        event.fire()
+
+        assertEquals(1, ran.get())
+        events.close()
+    }
 }

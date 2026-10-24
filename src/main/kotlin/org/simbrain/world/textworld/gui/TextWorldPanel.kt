@@ -10,8 +10,11 @@ package org.simbrain.world.textworld.gui
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
+import org.simbrain.util.HIGH_RATE_GUI_REFRESH_INTERVAL_MS
 import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
+import org.simbrain.util.UiScope
+import org.simbrain.util.onUi
 import org.simbrain.util.widgets.SimbrainTextPane
 import org.simbrain.world.textworld.TextWorld
 import org.simbrain.world.textworld.extractEmbeddingFromCurrentText
@@ -103,6 +106,9 @@ class TextWorldPanel(
      *
      * @param theWorld the reader world to display
      */
+    /** Owns the panel's EDT updates; cancelled when the panel's desktop component closes. */
+    val viewScope = UiScope()
+
     init {
 
         this.layout = BorderLayout()
@@ -188,7 +194,11 @@ class TextWorldPanel(
                     )
             }
         })
-        world.events.textChanged.on(Dispatchers.Swing.immediate) {
+        // The view follows the world by re-reading its current state, posted rather than awaited: appends and
+        // cursor moves arrive once per iteration from coupled simulations, which would otherwise wait on the EDT
+        // (and a full restyle) every time. Each refresh shows the world as it is when it runs, so a burst of
+        // changes collapses into one refresh that is still in sync.
+        world.events.textChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             if (textArea.text != world.text) {
                 updatingTextArea = true
                 try {
@@ -204,11 +214,11 @@ class TextWorldPanel(
             updateStatus()
         }
 
-        world.events.cursorPositionChanged.on(Dispatchers.Swing) {
+        world.events.cursorPositionChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             textArea.caretPosition = world.position.coerceIn(0, textArea.document.length)
         }
 
-        world.events.currentTokenChanged.on(Dispatchers.Swing) {
+        world.events.currentTokenChanged.onUi(viewScope, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
             updateHighlights()
         }
 

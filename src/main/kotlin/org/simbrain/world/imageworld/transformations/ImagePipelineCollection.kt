@@ -39,8 +39,16 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
 
     init {
         initializeDefaultPipelines()
-        imageSource.events.imageUpdate.on(Dispatchers.Default) {
-            pipelinesList.toList().forEach { it.applyPipeline() }
+        subscribeToImageUpdates()
+    }
+
+    /**
+     * A new source image only marks the pipelines out of date. Each is computed when something reads it (the display
+     * or a coupling), so an update no longer pays for every pipeline, including ones nothing uses.
+     */
+    private fun subscribeToImageUpdates() {
+        imageSource.events.imageUpdate.on(Dispatchers.Unconfined) {
+            pipelinesList.toList().forEach { it.invalidate() }
         }
     }
 
@@ -49,9 +57,7 @@ class ImagePipelineCollection(val imageSource: ImageSource): AttributeContainer 
      */
     fun readResolve(): Any {
         events = ImagePipelineCollectionEvents()
-        imageSource.events.imageUpdate.on(Dispatchers.Default) {
-            pipelinesList.toList().forEach { it.applyPipeline() }
-        }
+        subscribeToImageUpdates()
         // Reinitialize the default unfiltered pipeline reference
         if (pipelinesList.isNotEmpty()) {
             defaultUnfilteredPipeline = pipelinesList[0]

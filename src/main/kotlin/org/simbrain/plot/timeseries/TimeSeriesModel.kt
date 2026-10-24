@@ -1,6 +1,6 @@
 package org.simbrain.plot.timeseries
 
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.cancel
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.ChartColorMap
@@ -190,6 +190,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     fun clearData() {
+        points.clear()
         val seriesCount = dataset.seriesCount
         var i = 0
         while (seriesCount > i) {
@@ -244,19 +245,48 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     }
 
     @Consumable
-    suspend fun setValues(array: DoubleArray) {
+    fun setValues(array: DoubleArray) {
         if (timeSeriesList.isEmpty()) {
             addTimeSeries(array.size)
         }
-        // One hop to the event thread for the whole tick, not one per series, so frames can never
-        // catch a half-updated tick
-        withContext(swingDispatcher) {
-            var i = 0
-            while (i < array.size && i < timeSeriesList.size) {
-                timeSeriesList[i].addValueOnEventThread(array[i])
-                i++
-            }
+        val time = timeSupplier()
+        val count = minOf(array.size, timeSeriesList.size)
+        for (i in 0 until count) {
+            points.post(Point(timeSeriesList[i].series, time, array[i]))
         }
+    }
+
+    /**
+     * A value bound to its series and time when it was sent, so a series reordered or removed before the point
+     * lands can't receive another series' data, and the x value is the time it was recorded rather than the time
+     * the EDT got to it.
+     */
+    private class Point(val series: XYSeries, val time: Int, val value: Double)
+
+    @Transient
+    private val ui = UiScope()
+
+    /**
+     * Points for the EDT-painted dataset, added without the updating thread waiting on the EDT. A whole batch lands
+     * in one EDT task, so frames never catch a half-updated tick, and each series notifies its listeners once.
+     */
+    @Transient
+    private val points = ui.uiInbox<Point> { batch ->
+        val touched = LinkedHashSet<XYSeries>()
+        for (point in batch) {
+            if (touched.add(point.series)) point.series.notify = false
+            point.series.add(point.time as Number, point.value as Number, false)
+        }
+        touched.forEach { it.notify = true }
+    }
+
+    /** Stops applying queued points; called when the owning component closes. */
+    fun close() = ui.cancel()
+
+    /** Lands queued points before XStream writes the series. */
+    private fun writeReplace(): Any {
+        points.flush()
+        return this
     }
 
     /**
@@ -466,17 +496,8 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
             }
 
         @Consumable
-        suspend fun setValue(value: Double) {
-            withContext(swingDispatcher) {
-                addValueOnEventThread(value)
-            }
-        }
-
-        /**
-         * Adds a point directly; only call on the event thread, where the dataset is painted.
-         */
-        internal fun addValueOnEventThread(value: Double) {
-            series.add(timeSupplier(), value as Number)
+        fun setValue(value: Double) {
+            points.post(Point(series, timeSupplier(), value))
         }
 
         override val id: String

@@ -1,7 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.NetworkComponent
@@ -13,6 +12,7 @@ import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
+import org.simbrain.util.onUi
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.stats.distributions.TwoValued
@@ -43,7 +43,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
             testingStatsLabel.text = classifier.testingStats
         }
         updateStatsLabel()
-        events.updated.on(Dispatchers.Swing) {
+        events.updated.onUi(viewScope) {
             updateStatsLabel()
         }
 

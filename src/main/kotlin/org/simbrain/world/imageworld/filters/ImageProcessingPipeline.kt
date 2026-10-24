@@ -35,7 +35,15 @@ class ImageProcessingPipeline(
         createProcessedImage()
     }
 
-    var processedImage by processedImageCache::value
+    /**
+     * Reads through [processedImageCache] on every access. A delegate bound to `processedImageCache::value` would
+     * keep the cache that existed at construction, and [readResolve] replaces it.
+     */
+    var processedImage: BufferedImage
+        get() = processedImageCache.value
+        set(value) {
+            processedImageCache.value = value
+        }
 
     /**
      * Events fired when the pipeline changes
@@ -130,6 +138,13 @@ class ImageProcessingPipeline(
         operations.clear()
         processedImageCache.invalidate()
         removedOps.forEach { events.operationRemoved.fire(it) }
+    }
+
+    /**
+     * Marks the processed image out of date, so it is recomputed the next time something reads it.
+     */
+    fun invalidate() {
+        processedImageCache.invalidate()
     }
 
     /**

@@ -12,6 +12,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
+import org.simbrain.util.columnMajorArrayOrNull
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -172,12 +173,17 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     private var stepParamCount = 0
 
     private fun recordOptimizerUpdate(update: Matrix) {
-        for (i in 0 until update.nrow()) {
-            for (j in 0 until update.ncol()) {
-                val v = update[i, j]
-                stepSquaredSum += v * v
+        val values = update.columnMajorArrayOrNull()
+        var sum = 0.0
+        for (j in 0 until update.ncol()) {
+            if (values != null) {
+                val start = j * update.ld()
+                for (k in start until start + update.nrow()) sum += values[k] * values[k]
+            } else {
+                for (i in 0 until update.nrow()) sum += update[i, j] * update[i, j]
             }
         }
+        stepSquaredSum += sum
         stepParamCount += update.nrow() * update.ncol()
     }
 
@@ -343,23 +349,47 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     /**
      * @return the mean error for the batch
      */
+    /**
+     * Whether eligible networks train a batch as matrix products ([BatchedBackprop]) rather than one example at a
+     * time. Both compute the same update; turned off to compare the two.
+     */
+    var batchedTrainingEnabled = true
+
     open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()
         val rawMatrixAccumulator: HashMap<Matrix, Matrix> = HashMap()
 
+        // Probes record per-example intermediate values, which only the per-example path produces
+        val batched = if (probe == null && batchedTrainingEnabled) BatchedBackprop.createOrNull(supervisedNetwork) else null
+        if (batched != null && !rowRange.isEmpty()) {
+            val result = with(network) {
+                batched.run(
+                    supervisedNetwork.trainingSet, rowRange, config.lossFunction, config.computeAccuracy,
+                    weightAccumulator, biasesAccumulator
+                )
+            }
+            batchAccuracySum += result.accuracySum
+            batchSampleCount += result.accuracyCount
+            applyAccumulatedDeltas(
+                weightAccumulator, synapseGroupAccumulator, biasesAccumulator, rawMatrixAccumulator,
+                1.0 / rowRange.count()
+            )
+            return result.lossSum / rowRange.count()
+        }
+
         val probeContext = probe?.createMapProbe("trainBatch")
 
         val error = with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
-                inputLayer.setActivations(trainingSet.inputs[rowNum].toDoubleArray())
+                inputLayer.setActivations(trainingSet.inputs[rowNum])
                 
                 // Handle target reshaping for ActivationSequence outputs
                 val targetVec = if (outputLayer is ActivationSequence) {
                     // Reshape flattened target back to sequence format
-                    val flatTarget = trainingSet.targets[rowNum].toDoubleArray()
+                    val flatTarget = trainingSet.targets[rowNum]
                     val sequenceLayer = outputLayer as ActivationSequence
                     val sequenceSize = sequenceLayer.sequenceSize
                     val vocabSize = sequenceLayer.size
@@ -374,7 +404,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                     }
                     reshapedTarget
                 } else {
-                    trainingSet.targets[rowNum].toDoubleArray().toColumnVector()
+                    trainingSet.targets[rowNum].toColumnVector()
                 }
                 
                 with(network) {
@@ -437,6 +467,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         batchScale: Double,
         probeContext: StructuredProbe.MapProbe? = null
     ) {
+        config.optimizer.beginStep()
         val weightAccumulatorContext = probeContext?.createMapProbe("weightAccumulators")
 
         weightAccumulatorContext?.writeAll(weightAccumulator) { wm, delta ->
@@ -507,9 +538,9 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         return supervisedNetwork.testingSet.sumOf { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
-                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+                supervisedNetwork.inputLayer.setActivations(input)
             } else {
-                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+                supervisedNetwork.inputLayer.activations = input.toColumnVector()
             }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
@@ -531,7 +562,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                 }
                 reshapedTarget
             } else {
-                target.toDoubleArray().toColumnVector()
+                target.toColumnVector()
             }
             
             config.lossFunction.scalarLoss(output, reshapedTarget)
@@ -545,9 +576,9 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         return supervisedNetwork.testingSet.mapNotNull { (input, target) ->
             // Handle input reshaping for ActivationSequence inputs
             if (supervisedNetwork.inputLayer is ActivationSequence) {
-                supervisedNetwork.inputLayer.setActivations(input.toDoubleArray())
+                supervisedNetwork.inputLayer.setActivations(input)
             } else {
-                supervisedNetwork.inputLayer.activations = input.toDoubleArray().toColumnVector()
+                supervisedNetwork.inputLayer.activations = input.toColumnVector()
             }
             with(network) { supervisedNetwork.forwardPass() }
             val output = supervisedNetwork.outputLayer.activations
@@ -569,7 +600,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
                 }
                 reshapedTarget
             } else {
-                target.toDoubleArray().toColumnVector()
+                target.toColumnVector()
             }
             
             classificationAccuracy(output, reshapedTarget)

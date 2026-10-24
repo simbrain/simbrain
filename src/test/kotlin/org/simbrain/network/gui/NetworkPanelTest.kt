@@ -21,6 +21,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.nodes.SynapseNode
+import javax.swing.SwingUtilities
 
 class NetworkPanelTest {
     @Test
@@ -59,7 +60,6 @@ class NetworkPanelTest {
             
             // Initial state: 10% of 10x10 = 10 synapses
             assertEquals(10, synapseGroup.size())
-            val initialSynapseNodes = np.filterScreenElements<SynapseNode>().size
             
             // Change density to 100% and apply connection strategy
             sparse.connectionDensity = 1.0
@@ -75,10 +75,16 @@ class NetworkPanelTest {
             // Should now have 1 synapse in the model
             assertEquals(1, synapseGroup.size())
             
-            // Node creation and removal both arrive through asynchronous events, so wait for the canvas to settle
-            fun validSynapseNodes() = np.filterScreenElements<SynapseNode>().filter { it.synapse in synapseGroup.synapses }
+            // Node creation and removal both arrive through asynchronous events, so wait for the canvas to settle.
+            // The scene is read on the EDT, which is where those events add and remove nodes.
+            fun synapseNodesOnCanvas(): List<SynapseNode> {
+                var nodes = emptyList<SynapseNode>()
+                SwingUtilities.invokeAndWait { nodes = np.filterScreenElements<SynapseNode>() }
+                return nodes
+            }
+            fun validSynapseNodes() = synapseNodesOnCanvas().filter { it.synapse in synapseGroup.synapses }
             awaitUntil(message = "one node for the surviving synapse and none for deleted ones") {
-                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
+                validSynapseNodes().size == 1 && synapseNodesOnCanvas().size == 1
             }
             
             // Repeat the cycle to show the bug gets worse
@@ -91,7 +97,7 @@ class NetworkPanelTest {
             assertEquals(1, synapseGroup.size())
             
             awaitUntil(message = "after the second cycle, still one node for the surviving synapse") {
-                validSynapseNodes().size == 1 && np.filterScreenElements<SynapseNode>().size == 1
+                validSynapseNodes().size == 1 && synapseNodesOnCanvas().size == 1
             }
         }
     }

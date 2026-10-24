@@ -98,6 +98,10 @@ class FloatTensor private constructor(
     override fun toString() = "FloatTensor(${rows}x$cols, role=$role, version=$version)"
 
     companion object {
+        init {
+            Blas.ensureDefaultThreads()
+        }
+
         fun vector(n: Int, role: TensorRole = TensorRole.WORKSPACE) = FloatTensor(n, 1, role)
 
         fun of(rows: Int, cols: Int, values: FloatArray, role: TensorRole = TensorRole.WORKSPACE) =

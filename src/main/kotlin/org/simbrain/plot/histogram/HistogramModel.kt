@@ -2,8 +2,11 @@ package org.simbrain.plot.histogram
 
 import org.jfree.data.xy.IntervalXYDataset
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries
-import kotlinx.coroutines.withContext
-import org.simbrain.util.swingDispatcher
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import org.simbrain.util.UiLatest
+import org.simbrain.util.UiScope
+import org.simbrain.util.uiLatest
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
@@ -73,8 +76,34 @@ class HistogramModel(
      * @param histData the array of histogram data
      */
     @Consumable
-    suspend fun addData(histData: DoubleArray) {
-        withContext(swingDispatcher) { addDataToDataSeries(histData, 0) }
+    fun addData(histData: DoubleArray) = incoming().post(histData)
+
+    /**
+     * Data for the EDT-painted dataset, applied without the updating thread waiting on the EDT; only the newest
+     * array matters, since each replaces the last. Created on first use rather than in a field initializer
+     * because this class is deserialized without running its constructor.
+     */
+    @Transient
+    private var incomingData: UiLatest<DoubleArray>? = null
+
+    @Transient
+    private var ui: CoroutineScope? = null
+
+    @Synchronized
+    private fun incoming(): UiLatest<DoubleArray> = incomingData ?: UiScope().let { scope ->
+        ui = scope
+        scope.uiLatest<DoubleArray> { addDataToDataSeries(it, 0) }.also { incomingData = it }
+    }
+
+    /** Stops applying queued data; called when the owning component closes. */
+    fun close() {
+        ui?.cancel()
+    }
+
+    /** Lands queued data before XStream writes the series. */
+    private fun writeReplace(): Any {
+        incomingData?.flush()
+        return this
     }
 
     fun applyCurrentData() {

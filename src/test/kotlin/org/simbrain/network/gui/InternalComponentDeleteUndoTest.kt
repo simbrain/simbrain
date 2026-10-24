@@ -9,6 +9,7 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.util.onEdt
 
 /**
  * Deleting a single INTERNAL component of a composite model (a subnetwork or a supervised model) through
@@ -98,7 +99,7 @@ class InternalComponentDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         val ff = FeedForward(intArrayOf(2, 2, 2), null)
         network.addNetworkModel(ff)
         val hidden = ff.layerList[1]
-        fun hiddenNodePresent() = panel.filterScreenElements<NeuronArrayNode>().any { it.neuronArray === hidden }
+        fun hiddenNodePresent() = onEdt { panel.filterScreenElements<NeuronArrayNode>().any { it.neuronArray === hidden } }
         awaitUntil { hiddenNodePresent() }
         assertTrue(hiddenNodePresent(), "precondition: the hidden array's node should exist on the canvas")
 
@@ -317,7 +318,7 @@ class InternalComponentDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         val comp = CompetitiveNetwork(20, 12) // 20x12 = 240 > 200 threshold -> starts collapsed
         network.addNetworkModel(comp)
         val sg = comp.weights
-        fun visibleLoose() = panel.filterScreenElements<SynapseNode>().count { it.synapse in sg.synapses && it.visible }
+        fun visibleLoose() = onEdt { panel.filterScreenElements<SynapseNode>().count { it.synapse in sg.synapses && it.visible } }
 
         awaitUntil { !sg.displaySynapses && visibleLoose() == 0 }
         assertFalse(sg.displaySynapses, "240 synapses should start collapsed")
@@ -350,7 +351,7 @@ class InternalComponentDeleteUndoTest : NetworkPanelDeleteUndoTestBase() {
         val comp = CompetitiveNetwork(5, 4)
         network.addNetworkModel(comp)
         val sg = comp.weights
-        fun sgNodePresent() = panel.filterScreenElements<SynapseGroupNode>().any { it.synapseGroup === sg }
+        fun sgNodePresent() = onEdt { panel.filterScreenElements<SynapseGroupNode>().any { it.synapseGroup === sg } }
         awaitUntil { sgNodePresent() }
         assertTrue(sgNodePresent(), "precondition: the synapse group node exists on the canvas")
 

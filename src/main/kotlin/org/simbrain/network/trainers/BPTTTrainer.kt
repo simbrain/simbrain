@@ -71,8 +71,8 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
             val synapseGroupAccumulator = HashMap<SynapseGroup, Matrix>()
             val biasesAccumulator = HashMap<Layer, Matrix>()
             val rawMatrixAccumulator = HashMap<Matrix, Matrix>()
-            val inputs = sequence.map { bpttNetwork.trainingSet.inputs[it].toDoubleArray().toColumnVector() }
-            val targets = sequence.map { bpttNetwork.trainingSet.targets[it].toDoubleArray().toColumnVector() }
+            val inputs = sequence.map { bpttNetwork.trainingSet.inputs[it].toColumnVector() }
+            val targets = sequence.map { bpttNetwork.trainingSet.targets[it].toColumnVector() }
             val activationTrace = if (drawingUnrolledView) mutableListOf<Map<Layer, Matrix>>() else null
 
             summedError += with(network) {

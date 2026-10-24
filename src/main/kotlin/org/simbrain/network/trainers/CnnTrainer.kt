@@ -192,16 +192,8 @@ private class DenseLayerSnapshot(
 
     context(Network)
     fun applyUpdateRule() {
-        if (targetLayer.updateRule is SoftmaxRule) {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = weightedInput[i]
-                evalLayer.biases[i, 0] = biases[i]
-            }
-        } else {
-            for (i in ruleInput.indices) {
-                evalLayer.inputs[i, 0] = ruleInput[i]
-                evalLayer.biases[i, 0] = 0.0
-            }
+        for (i in ruleInput.indices) {
+            evalLayer.inputs[i, 0] = ruleInput[i]
         }
         evalLayer.update()
         System.arraycopy(evalLayer.activationArray, 0, activations, 0, outputSize)
@@ -493,14 +485,19 @@ class CnnTrainer(
             targetTensor.inputs.fill(0.0)
             connector.propagate()
 
-            // Apply activation function (simulating Tensor.update())
+            // Apply activation function (simulating Tensor.update()). Read the delegated arrays once: each read of
+            // activations or biases goes through a GuiEditable delegate
             val af = targetTensor.activationFunction
-            for (j in targetTensor.activations.indices) {
-                val pre = targetTensor.inputs[j] + targetTensor.biases[j]
-                targetTensor.preActivations[j] = pre
-                targetTensor.activations[j] = af.apply(pre)
+            val inputs = targetTensor.inputs
+            val biases = targetTensor.biases
+            val preActivations = targetTensor.preActivations
+            val activations = targetTensor.activations
+            for (j in activations.indices) {
+                val pre = inputs[j] + biases[j]
+                preActivations[j] = pre
+                activations[j] = af.apply(pre)
             }
-            targetTensor.inputs.fill(0.0)
+            inputs.fill(0.0)
         }
 
         // Flatten: copy last tensor activations into pre-allocated buffer
@@ -516,12 +513,8 @@ class CnnTrainer(
                 layer.weights, layer.outputSize, layer.inputSize,
                 currentInput, layer.zeroBiases, layer.weightedInput
             )
-            if (layer.targetLayer.updateRule is SoftmaxRule) {
-                System.arraycopy(layer.weightedInput, 0, layer.ruleInput, 0, layer.outputSize)
-            } else {
-                for (j in 0 until layer.outputSize) {
-                    layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
-                }
+            for (j in 0 until layer.outputSize) {
+                layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
             }
             with(network) { layer.applyUpdateRule() }
             currentInput = layer.activations
@@ -599,7 +592,8 @@ class CnnTrainer(
 
             // Backward through the connector
             when (connector) {
-                is ConvolutionConnector -> connector.backward()
+                // The input layer has no parameters, so nothing reads the gradient with respect to the input image
+                is ConvolutionConnector -> connector.backward(propagateToSource = connector.source !== inputTensorLayer)
                 is PoolingConnector -> connector.backward()
             }
         }
@@ -626,8 +620,8 @@ class CnnTrainer(
 
         for (row in rowRange) {
             if (row >= data.size) break
-            val input = data.inputs[row].toDoubleArray()
-            val target = data.targets[row].toDoubleArray()
+            val input = data.inputs[row]
+            val target = data.targets[row]
 
             // Clear tensor gradients for each sample
             tensorLayerStages.forEach { it.clearGradients() }
@@ -726,8 +720,8 @@ class CnnTrainer(
         if (data.size == 0) return 0.0
         var sum = 0.0
         for (i in 0 until data.size) {
-            val output = forwardPass(data.inputs[i].toDoubleArray())
-            sum += config.lossFunction.loss(output, data.targets[i].toDoubleArray())
+            val output = forwardPass(data.inputs[i])
+            sum += config.lossFunction.loss(output, data.targets[i])
         }
         return sum / data.size
     }
@@ -738,8 +732,8 @@ class CnnTrainer(
         var sum = 0.0
         var count = 0
         for (i in 0 until data.size) {
-            val output = forwardPass(data.inputs[i].toDoubleArray())
-            computeClassificationAccuracy(output, data.targets[i].toDoubleArray())?.let {
+            val output = forwardPass(data.inputs[i])
+            computeClassificationAccuracy(output, data.targets[i])?.let {
                 sum += it
                 count++
             }

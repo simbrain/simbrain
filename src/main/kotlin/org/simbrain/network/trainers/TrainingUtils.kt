@@ -857,6 +857,26 @@ fun splitDataSet(
 }
 
 /**
+ * Split dataset rows into training and testing subsets, copying each row.
+ */
+@JvmName("splitDataSetRows")
+fun splitDataSet(
+    inputs: List<DoubleArray>,
+    targets: List<DoubleArray>,
+    splitRatio: Double,
+    random: Random = Random(42L)
+): Pair<Pair<MutableList<DoubleArray>, MutableList<DoubleArray>>, Pair<MutableList<DoubleArray>, MutableList<DoubleArray>>> {
+    require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets size (${targets.size})" }
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+    val rowIndices = (0 until inputs.size).shuffled(random)
+    val trainRowCount = (inputs.size * splitRatio).toInt()
+    val trainRowIndices = rowIndices.take(trainRowCount)
+    val testRowIndices = rowIndices.takeLast(inputs.size - trainRowCount)
+    return (trainRowIndices.mapTo(mutableListOf()) { inputs[it].copyOf() } to trainRowIndices.mapTo(mutableListOf()) { targets[it].copyOf() }) to
+            (testRowIndices.mapTo(mutableListOf()) { inputs[it].copyOf() } to testRowIndices.mapTo(mutableListOf()) { targets[it].copyOf() })
+}
+
+/**
  * Split a TrainingDataset into training and testing TrainingDatasets.
  * Preserves input and target dimensions, allowing for empty datasets when splitRatio is 0.0 or 1.0.
  */

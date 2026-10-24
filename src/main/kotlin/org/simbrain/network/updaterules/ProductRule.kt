@@ -10,6 +10,11 @@ import org.simbrain.util.UserParameter
  * units.  Used in "Long Short Term Memory" and "Sigma-Pi" networks.
  */
 class ProductRule : LinearRule() {
+
+    // without weights, the product is over source activations, read while they are being updated
+    override val isNeuronLocal: Boolean
+        get() = useWeights
+
     /**
      * Whether to use weights or not.
      */

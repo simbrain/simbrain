@@ -83,6 +83,12 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
+    public void close() {
+        model.close();
+        super.close();
+    }
+
+    @Override
     public String getXml() {
         return BarChartModel.getXStream().toXML(model);
     }

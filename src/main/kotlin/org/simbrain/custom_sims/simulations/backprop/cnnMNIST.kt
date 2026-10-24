@@ -144,7 +144,7 @@ val cnnMNIST = newSim {
 
     // Pre-load input with a random training image
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
-    inputTensorLayer.activations = trainingSet.inputs[randomSampleIndex].toDoubleArray()
+    inputTensorLayer.activations = trainingSet.inputs[randomSampleIndex]
     
     // GUI
 

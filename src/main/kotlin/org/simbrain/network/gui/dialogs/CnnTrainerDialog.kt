@@ -7,11 +7,10 @@ import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.CnnTrainer
 import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
-import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.*
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
@@ -143,14 +142,16 @@ class CnnTrainerControls(
 
     init {
         // Cancel coroutine scopes when this component is disposed
+        val errorPlot = ErrorTimeSeries(trainer.events, quantity = "Loss") { trainer.iteration }
+
         onWindowClose {
             trainer.job.cancel()
             controlsJob.cancel()
+            errorPlot.dispose()
         }
 
         val errorPlotPanel = JPanel().apply {
             layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")
-            val errorPlot = CnnErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
             val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
@@ -275,7 +276,8 @@ class CnnTrainerControls(
 
         runTools.add(labelPanel)
 
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
+        // Labels show the latest report, posted rather than awaited so training never waits on the EDT
+        val labels = uiLatest<TrainingStats>(minIntervalMs = HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { trainingStats ->
             iterationsLabel.text = "" + trainer.iteration
             trainingLossValue.text = "" + trainingStats.trainingError.format(4)
             trainingLossLabel.text = "Training ${lossDescriptionString()}"
@@ -292,6 +294,7 @@ class CnnTrainerControls(
 
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
+        trainer.events.postReportsTo(labels)
 
         layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
@@ -330,53 +333,5 @@ class CnnTrainerControls(
             else -> "Cannot train: Testing input and target row counts must match."
         }
         runActionRef.putValue(Action.SHORT_DESCRIPTION, runValidationMessage)
-    }
-}
-
-/**
- * Error time series plot for CNN training.
- */
-class CnnErrorTimeSeries(trainer: CnnTrainer) : JPanel() {
-
-    val graphPanel: TimeSeriesPlotPanel
-
-    init {
-        layout = MigLayout("ins 0, gap 0px 0px")
-
-        val model = TimeSeriesModel()
-        model.timeSupplier = { trainer.iteration }
-        model.rangeLowerBound = 0.0
-        model.rangeUpperBound = 5.0
-        model.fixedWidth = true
-        model.windowSize = 1000
-        model.isAutoRange = true
-        model.useAutoRangeMinimumUpperBound = true
-        model.autoRangeMinimumUpperBound = 1.0
-        graphPanel = TimeSeriesPlotPanel(model)
-        graphPanel.chartPanel.chart.setTitle("")
-        graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
-        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Loss"
-        graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
-
-        graphPanel.removeAllButtonsFromToolBar()
-        graphPanel.seriesRemovalEnabled = false
-
-        add(graphPanel, "growx, growy, push")
-
-        model.addTimeSeries("Training Loss")
-
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            model.addData(0, trainer.iteration.toDouble(), trainingStats.trainingError)
-            trainingStats.testingError?.let {
-                if (model.timeSeriesList.size == 1) {
-                    model.addTimeSeries("Testing Loss")
-                }
-                model.addData(1, trainer.iteration.toDouble(), it)
-            }
-        }
-
-        trainer.events.iterationReset.on(Dispatchers.Swing) {
-            model.clearData()
-        }
     }
 }

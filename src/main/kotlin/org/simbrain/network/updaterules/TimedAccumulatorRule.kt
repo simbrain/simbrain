@@ -21,6 +21,11 @@ import kotlin.math.exp
  * fire spontaneously with some probability.
  */
 class TimedAccumulatorRule : SpikingThresholdRule() {
+
+    // accumulator state lives on the rule object, not a data holder
+    override val isNeuronLocal: Boolean
+        get() = false
+
     /**
      * Refractory period
      */

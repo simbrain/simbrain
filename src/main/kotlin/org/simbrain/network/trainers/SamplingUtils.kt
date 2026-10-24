@@ -32,14 +32,28 @@ sealed class SamplingStrategy: CopyableObject {
         override fun sample(probabilities: DoubleArray, random: Random): Int {
             require(k > 0) { "k must be positive" }
             
-            // Get top-k indices and probabilities
-            val indexedProbs = probabilities.mapIndexed { index, prob -> index to prob }
-                .sortedByDescending { it.second }
-                .take(k)
-            
+            // Get top-k indices and probabilities. A running insertion keeps this O(n·k) over
+            // LLM vocabularies instead of boxing and sorting every entry; ties keep the lower
+            // index first, as the stable descending sort it replaces did.
+            val limit = minOf(k, probabilities.size)
+            val topKIndices = IntArray(limit)
+            val topKProbs = DoubleArray(limit)
+            var filled = 0
+            for (index in probabilities.indices) {
+                val prob = probabilities[index]
+                if (filled == limit && prob.compareTo(topKProbs[limit - 1]) <= 0) continue
+                var slot = minOf(filled, limit - 1)
+                while (slot > 0 && prob.compareTo(topKProbs[slot - 1]) > 0) {
+                    topKProbs[slot] = topKProbs[slot - 1]
+                    topKIndices[slot] = topKIndices[slot - 1]
+                    slot--
+                }
+                topKProbs[slot] = prob
+                topKIndices[slot] = index
+                if (filled < limit) filled++
+            }
+
             // Renormalize top-k probabilities
-            val topKProbs = indexedProbs.map { it.second }
-            val topKIndices = indexedProbs.map { it.first }
             val sumTopK = topKProbs.sum()
             val normalizedTopKProbs = topKProbs.map { it / sumTopK }
             

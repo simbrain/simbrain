@@ -28,8 +28,8 @@ class TrainingDatasetConverterTest {
         assertEquals(ds.targetSize, restored.targetSize)
         assertEquals(ds.inputs.size, restored.inputs.size)
         for (i in 0 until ds.inputs.size) {
-            assertEquals(ds.inputs[i], restored.inputs[i], "input row $i")
-            assertEquals(ds.targets[i], restored.targets[i], "target row $i")
+            assertArrayEquals(ds.inputs[i], restored.inputs[i], "input row $i")
+            assertArrayEquals(ds.targets[i], restored.targets[i], "target row $i")
         }
         assertEquals(ds.inputRowNames, restored.inputRowNames)
         assertEquals(ds.targetRowNames, restored.targetRowNames)
@@ -99,10 +99,10 @@ class TrainingDatasetConverterTest {
         val restored = getSimbrainXStream().fromXML(legacy) as TrainingDataset
         assertEquals(2, restored.inputSize)
         assertEquals(1, restored.targetSize)
-        assertEquals(listOf(1.0, 0.5), restored.inputs[0])
-        assertEquals(listOf(0.0, -0.25), restored.inputs[1])
-        assertEquals(listOf(0.1), restored.targets[0])
-        assertEquals(listOf(0.9), restored.targets[1])
+        assertEquals(listOf(1.0, 0.5), restored.inputs[0].toList())
+        assertEquals(listOf(0.0, -0.25), restored.inputs[1].toList())
+        assertEquals(listOf(0.1), restored.targets[0].toList())
+        assertEquals(listOf(0.9), restored.targets[1].toList())
         assertEquals(listOf("a", "b"), restored.inputColumnNames)
         assertNotNull(restored)
     }

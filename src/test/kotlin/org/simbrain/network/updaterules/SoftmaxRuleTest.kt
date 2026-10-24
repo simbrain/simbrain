@@ -20,6 +20,16 @@ class SoftmaxRuleTest {
     }
 
     @Test
+    fun `a neuron array's bias counts once`() {
+        na.biases = smile.math.matrix.Matrix.column(doubleArrayOf(1.0, -1.0))
+        na.addInputs(doubleArrayOf(0.5, 0.5))
+        net.update()
+        // Net inputs are 1.5 and -0.5, so softmax gives e^1.5 / (e^1.5 + e^-0.5)
+        val expected = kotlin.math.exp(1.5) / (kotlin.math.exp(1.5) + kotlin.math.exp(-0.5))
+        assertEquals(expected, na.activationArray[0], 1e-12)
+    }
+
+    @Test
     fun `Values should sum to 1`() {
         na.addInputs(doubleArrayOf(.5, .7))
         net.update()

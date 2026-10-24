@@ -21,6 +21,11 @@ import kotlin.math.exp
 class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule,
     MembranePotentialProvider {
 
+    // gating variables live on the rule object, not a data holder
+    override val isNeuronLocal: Boolean
+        get() = false
+
+
     override fun membranePotential(neuron: Neuron): Double = neuron.activation
     /**
      * Sodium Channels

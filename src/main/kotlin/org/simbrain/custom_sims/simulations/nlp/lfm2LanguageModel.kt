@@ -42,6 +42,8 @@ val lfm2LanguageModel = newSim("lfm2_language_model") {
         ?: return@newSim
 
     workspace.clearWorkspace()
+    // Token generation shouldn't wait for each step to be drawn; the views sample it at their own frame rate
+    workspace.runAsFastAsPossible = true
 
     val networkComponent = addNetworkComponent("Network")
     val network = networkComponent.network

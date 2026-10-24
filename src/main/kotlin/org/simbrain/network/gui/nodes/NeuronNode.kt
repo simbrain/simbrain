@@ -1,3 +1,8 @@
+/**
+ * The canvas node for a [Neuron]. Activation and spike changes, which arrive every iteration, only mark the node
+ * dirty; the panel's per-frame sync pass draws the latest state. Rarer changes (label, clamp, location, rule, color)
+ * update directly on the EDT.
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -14,14 +19,15 @@ import org.simbrain.util.StandardDialog
 import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JPopupMenu
 
-/**
- * A Piccolo PNode representation of a [Neuron]
- */
 class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     private val neuronCircleNode = NeuronCircleNode(net).also { addChild(it) }
+
+    /** Set when a spike fires, consumed by the next sync, so a spike shorter than a frame is still drawn. */
+    private val spikeSinceLastSync = AtomicBoolean(false)
 
     init {
         updateShape()
@@ -33,19 +39,55 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
         pickable = true
 
         val events = neuron.events
-        events.activationChanged.on(Dispatchers.Swing) { _, _ ->
-            updateActivation()
-            updatePolarity()
-        }
-        events.spiked.on(Dispatchers.Swing) { updateSpikeColor() }
-        events.colorChanged.on(Dispatchers.Swing) { updatePolarity() }
+        // Activation and spikes change every iteration: they only mark the node, and the panel's sync pass draws the
+        // latest state once per frame
+        events.activationChanged.onImmediate { _, _ -> markDirty(ACTIVATION) }.untilDisposed()
+        events.spiked.onImmediate { spiking ->
+            // A spike can start and end between two frames; remember it so the next frame still shows it
+            if (spiking) spikeSinceLastSync.set(true)
+            markDirty(SPIKE)
+        }.untilDisposed()
+        events.colorChanged.on(Dispatchers.Swing) { updatePolarity() }.untilDisposed()
         events.labelChanged.on(Dispatchers.Swing) { _, _ ->
             updateTextLabel()
             networkPanel.network.events.zoomToFitPage.fire()
+        }.untilDisposed()
+        events.clampChanged.on(Dispatchers.Swing)  { updateClampStatus() }.untilDisposed()
+        events.locationChanged.on(Dispatchers.Swing) { pullViewPositionFromModel() }.untilDisposed()
+        events.updateRuleChanged.on(Dispatchers.Swing) { _, _ -> updateShape() }.untilDisposed()
+    }
+
+    /**
+     * Outgoing synapse nodes draw their source's spike state; this neuron pushes it when it flips, so synapses don't
+     * each listen to a spike event that fires every iteration. The fan-out map is copied defensively because model
+     * edits on other threads can change it; an update lost to a concurrent edit is corrected by the next flip.
+     */
+    private fun showSpikingOnOutgoingSynapses(spiking: Boolean) {
+        val outgoing = runCatching { neuron.fanOutUnsafe.values.toList() }.getOrDefault(emptyList())
+        outgoing.forEach { synapse ->
+            (synapse?.let { networkPanel.modelNodeMap.peek(it) } as? SynapseNode)?.showSourceSpiking(spiking)
         }
-        events.clampChanged.on(Dispatchers.Swing)  { updateClampStatus() }
-        events.locationChanged.on(Dispatchers.Swing) { pullViewPositionFromModel() }
-        events.updateRuleChanged.on(Dispatchers.Swing) { _, _ -> updateShape() }
+    }
+
+    /** The activation and spike state currently drawn, which lag the model until the next sync. */
+    internal val drawnActivation get() = neuronCircleNode.activation
+    internal val drawnSpiking get() = neuronCircleNode.isSpiking
+
+    override fun syncFromModel(bits: Int) {
+        if (bits and SPIKE != 0) {
+            val spiking = spikeSinceLastSync.getAndSet(false) || with(networkPanel.network) { neuron.isSpike }
+            if (neuronCircleNode.isSpiking != spiking) {
+                neuronCircleNode.isSpiking = spiking
+                showSpikingOnOutgoingSynapses(spiking)
+            }
+        }
+        if (bits and ACTIVATION != 0) {
+            val bounds = neuron.updateRule.graphicalBounds
+            if (neuron.activation != neuronCircleNode.activation || bounds != neuronCircleNode.graphicalBounds) {
+                updateActivation()
+            }
+            updatePolarity()
+        }
     }
 
     /**
@@ -76,13 +118,6 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
             SimbrainConstants.Polarity.INHIBITORY -> NetworkPreferences.coolNodeColor
             else -> null
         }
-    }
-
-    /**
-     * When spiking change the color of the line around the node.
-     */
-    private fun updateSpikeColor() {
-        neuronCircleNode.isSpiking = with(networkPanel.network) { neuron.isSpike }
     }
 
     fun updateTextLabel() {
@@ -155,6 +190,11 @@ class NeuronNode(net: NetworkPanel, val neuron: Neuron) : ScreenElement(net) {
 
     override fun acceptsSourceHandle(): Boolean {
         return true
+    }
+
+    companion object {
+        private const val ACTIVATION = 1
+        private const val SPIKE = 2
     }
 
     override fun refreshTheme() {

@@ -6,6 +6,8 @@ import org.simbrain.network.tensor.TensorRole
 import java.io.RandomAccessFile
 import java.nio.ByteBuffer
 import java.nio.ByteOrder
+import java.nio.FloatBuffer
+import java.nio.ShortBuffer
 import java.nio.channels.FileChannel
 import java.nio.file.Path
 
@@ -68,9 +70,7 @@ object Safetensors {
                 require(end - begin == count * 2L) { "$name: byte span ${end - begin} != ${count * 2}" }
                 val src = data.slice(begin.toInt(), (end - begin).toInt())
                     .order(ByteOrder.LITTLE_ENDIAN).asShortBuffer()
-                for (i in 0 until count) {
-                    dst.put(i, Float.fromBits(src.get(i).toInt() shl 16))
-                }
+                decodeBf16(src, dst, count)
             }
             "F32" -> {
                 require(end - begin == count * 4L) { "$name: byte span ${end - begin} != ${count * 4}" }
@@ -81,6 +81,22 @@ object Safetensors {
             else -> throw IllegalArgumentException("$name: unsupported dtype $dtype")
         }
         tensor.markMutated()
+    }
+
+    private const val DECODE_CHUNK = 1 shl 16
+
+    /** Widens [count] bf16 values in chunks, so the copies are bulk rather than per-element bounds-checked. */
+    private fun decodeBf16(src: ShortBuffer, dst: FloatBuffer, count: Int) {
+        val shorts = ShortArray(minOf(DECODE_CHUNK, count))
+        val floats = FloatArray(shorts.size)
+        var offset = 0
+        while (offset < count) {
+            val n = minOf(shorts.size, count - offset)
+            src.get(offset, shorts, 0, n)
+            for (i in 0 until n) floats[i] = Float.fromBits(shorts[i].toInt() shl 16)
+            dst.put(offset, floats, 0, n)
+            offset += n
+        }
     }
 
     private fun to2d(name: String, shape: IntArray): Pair<Int, Int> {

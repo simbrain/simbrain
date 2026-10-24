@@ -8,13 +8,15 @@
  */
 package org.simbrain.plot.heatmap
 
+import kotlinx.coroutines.cancel
 import org.jfree.data.xy.AbstractXYZDataset
 import org.jfree.data.xy.XYZDataset
 import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.HeatMapEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.runOnEventThread
+import org.simbrain.util.UiScope
+import org.simbrain.util.uiInbox
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
@@ -107,29 +109,56 @@ class HeatMapModel : AttributeContainer, EditableObject {
     var componentNames: List<String> = emptyList()
         private set
 
+    /** A change to apply to the EDT-confined columns. */
+    private sealed interface Update {
+        class Column(val values: DoubleArray, val time: Int?) : Update
+        object Clear : Update
+        class Names(val names: List<String>) : Update
+    }
+
+    @Transient
+    private val ui = UiScope()
+
+    /**
+     * Changes applied on the EDT in the order they were made, without the caller waiting on the EDT. Every
+     * column is kept; listeners hear about a whole batch once.
+     */
+    @Transient
+    private val updates = ui.uiInbox<Update> { batch ->
+        batch.forEach { update ->
+            when (update) {
+                is Update.Column -> {
+                    columns.add(update.values)
+                    times.add(update.time ?: times.size)
+                }
+                Update.Clear -> {
+                    columns.clear()
+                    times.clear()
+                }
+                is Update.Names -> componentNames = update.names
+            }
+        }
+        trimToWindow()
+        events.propertyChanged.fire()
+    }
+
     @Consumable(description = "Append a column of values")
     fun setValues(values: DoubleArray) {
-        runOnEventThread {
-            columns.add(values.copyOf())
-            times.add(if (::timeSupplier.isInitialized) timeSupplier() else times.size)
-            trimToWindow()
-            events.propertyChanged.fire()
-        }
+        val time = if (::timeSupplier.isInitialized) timeSupplier() else null
+        updates.post(Update.Column(values.copyOf(), time))
     }
 
-    fun clearData() {
-        runOnEventThread {
-            columns.clear()
-            times.clear()
-            events.propertyChanged.fire()
-        }
-    }
+    fun clearData() = updates.post(Update.Clear)
 
-    fun setComponentNames(names: List<String>) {
-        runOnEventThread {
-            componentNames = names
-            events.propertyChanged.fire()
-        }
+    fun setComponentNames(names: List<String>) = updates.post(Update.Names(names))
+
+    /** Stops applying updates; called when the owning component closes. */
+    fun close() = ui.cancel()
+
+    /** Lands pending updates before XStream writes the columns. */
+    private fun writeReplace(): Any {
+        updates.flush()
+        return this
     }
 
     /**

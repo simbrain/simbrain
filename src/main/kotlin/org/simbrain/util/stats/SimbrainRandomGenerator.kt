@@ -1,5 +1,6 @@
 /**
- * The random source behind every [ProbabilityDistribution].
+ * The random source behind every [ProbabilityDistribution], and the SplitMix64 hashing it is built on, which keyed
+ * draws (such as a synapse's spike probability) use directly.
  */
 package org.simbrain.util.stats
 
@@ -22,12 +23,7 @@ class SimbrainRandomGenerator(seed: Long = ThreadLocalRandom.current().nextLong(
 
     private val state = AtomicLong(seed)
 
-    override fun nextLong(): Long {
-        var z = state.addAndGet(GOLDEN_GAMMA)
-        z = (z xor (z ushr 30)) * -0x40a7b892e31b1a47L
-        z = (z xor (z ushr 27)) * -0x6b2fb644ecceee15L
-        return z xor (z ushr 31)
-    }
+    override fun nextLong(): Long = mix64(state.addAndGet(GOLDEN_GAMMA))
 
     override fun setSeed(seed: Long) {
         state.set(seed)
@@ -51,7 +47,22 @@ class SimbrainRandomGenerator(seed: Long = ThreadLocalRandom.current().nextLong(
 
     override fun nextGaussian(): Double = super<JavaRandomGenerator>.nextGaussian()
 
-    private companion object {
+    companion object {
         const val GOLDEN_GAMMA = -0x61c8864680b583ebL
     }
 }
+
+/**
+ * SplitMix64's output function: scrambles [z] so that nearby inputs give unrelated outputs. Hashing a key with it
+ * gives a draw that depends only on the key, for randomness that must not depend on the order of the draws.
+ */
+fun mix64(z: Long): Long {
+    var x = (z xor (z ushr 30)) * -0x40a7b892e31b1a47L
+    x = (x xor (x ushr 27)) * -0x6b2fb644ecceee15L
+    return x xor (x ushr 31)
+}
+
+/**
+ * A double in [0, 1) from the top 53 bits of [bits], as [JavaRandomGenerator.nextDouble] makes one.
+ */
+fun unitDouble(bits: Long): Double = (bits ushr 11) * (1.0 / (1L shl 53))

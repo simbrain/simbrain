@@ -114,7 +114,7 @@ class JumpAndDecay : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         synapse.rawPSR = jumpAndDecay(
-            synapse.source.isSpike, synapse.rawPSR, synapse.strength, timeStep
+            synapse.source.isSpike, synapse.rawPSR, synapse.strength, timeStep, synapse
         )
     }
 
@@ -123,8 +123,9 @@ class JumpAndDecay : SpikeResponder() {
         spiked: Boolean,
         psr: Double,
         jumpHeight: Double,
-        timeStep: Double): Double {
-        return if (spiked && probabilisticSpikeCheck()) {
+        timeStep: Double,
+        synapse: Synapse? = null): Double {
+        return if (spiked && probabilisticSpikeCheck(synapse)) {
             jumpHeight + (if (useConvolution) psr else 0.0)
         } else {
             psr + timeStep * ((baseLine - psr) / timeConstant)

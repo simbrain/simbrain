@@ -1,11 +1,12 @@
 /**
  * Tests for the parallel buffered network update: chunking, equivalence with a serial update, and the serial
- * fallback for update rules that are not neuron-local.
+ * fallback for update rules that are not neuron-local or that share seeded noise.
  */
 package org.simbrain.network.core
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.learningrules.STDPRule
@@ -17,10 +18,11 @@ import kotlin.random.Random
 
 class ParallelUpdateTest {
 
-    private fun buildSpikingNetwork(seed: Int): Pair<Network, List<Synapse>> {
+    private fun buildSpikingNetwork(seed: Int, spikeProbability: Double = 1.0): Pair<Network, List<Synapse>> {
         val rng = Random(seed)
         val net = Network()
         net.timeStep = 0.5
+        net.randomSeed = seed.toLong()
         val neurons = List(300) { i ->
             Neuron(IzhikevichRule().apply {
                 backgroundCurrent = 2.0 + 10.0 * (i % 7) / 7.0
@@ -32,7 +34,7 @@ class ParallelUpdateTest {
                 if (src == tgt || rng.nextDouble() >= 0.2) continue
                 add(Synapse(neurons[src], neurons[tgt]).apply {
                     forceSetStrength(if (src < 240) 2.0 * rng.nextDouble() else -4.0 * rng.nextDouble())
-                    spikeResponder = StepResponder(1)
+                    spikeResponder = StepResponder(1).also { it.spikeProbability = spikeProbability }
                     if (src % 3 == 0) learningRule = STDPRule()
                 })
             }
@@ -42,10 +44,10 @@ class ParallelUpdateTest {
         return net to synapses
     }
 
-    private fun runAndRecord(parallel: Boolean): Pair<DoubleArray, DoubleArray> {
+    private fun runAndRecord(parallel: Boolean, spikeProbability: Double = 1.0): Pair<DoubleArray, DoubleArray> {
         parallelUpdateOverride = parallel
         try {
-            val (net, synapses) = buildSpikingNetwork(7)
+            val (net, synapses) = buildSpikingNetwork(7, spikeProbability)
             repeat(400) { net.update() }
             return net.flatNeuronList.map { it.activation }.toDoubleArray() to
                     synapses.map { it.strength }.toDoubleArray()
@@ -66,6 +68,16 @@ class ParallelUpdateTest {
     }
 
     @Test
+    fun `parallel update with spike probability matches serial update exactly`() {
+        val (serialActivations, serialStrengths) = runAndRecord(parallel = false, spikeProbability = 0.5)
+        val (parallelActivations, parallelStrengths) = runAndRecord(parallel = true, spikeProbability = 0.5)
+        assertArrayEquals(serialActivations, parallelActivations)
+        assertArrayEquals(serialStrengths, parallelStrengths)
+        val (allSpikesActivations, _) = runAndRecord(parallel = false)
+        assertFalse(serialActivations contentEquals allSpikesActivations, "Dropping spikes should change the run")
+    }
+
+    @Test
     fun `large network is split into several neuron chunks`() {
         val (net, _) = buildSpikingNetwork(7)
         val plan = NetworkUpdatePlan(net.flatNeuronList + net.freeSynapses)
@@ -81,6 +93,19 @@ class ParallelUpdateTest {
         assertTrue(plan.neuronUpdateChunks.size > 1)
         neurons[17].updateRule = IACRule()
         assertEquals(listOf(neurons), plan.neuronUpdateChunks)
+    }
+
+    @Test
+    fun `neurons sharing a rule with seeded noise update serially`() {
+        val rule = LinearRule().apply { addNoise = true }
+        val neurons = List(200) { Neuron(rule) }
+        val synapses = neurons.flatMap { src -> neurons.filter { it !== src }.map { Synapse(src, it) } }
+        val plan = NetworkUpdatePlan(neurons + synapses)
+        assertTrue(plan.neuronUpdateChunks.size > 1, "Unseeded noise is not reproducible anyway")
+        rule.noiseGenerator.randomSeed = 42
+        assertEquals(listOf(neurons), plan.neuronUpdateChunks)
+        neurons.forEach { it.updateRule = rule.copy() }
+        assertTrue(plan.neuronUpdateChunks.size > 1, "Neurons with their own rules each draw their own noise")
     }
 
     @Test

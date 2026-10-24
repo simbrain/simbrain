@@ -67,7 +67,8 @@ class RiseAndDecay : SpikeResponder() {
             synapse.rawPSR,
             data.recovery,
             synapse.strength,
-            timeStep
+            timeStep,
+            synapse
         )
         synapse.rawPSR = psr
         data.recovery = recovery
@@ -78,10 +79,11 @@ class RiseAndDecay : SpikeResponder() {
                              psr: Double,
                              recovery: Double,
                              jumpHeight: Double,
-                             timeStep: Double): Pair<Double, Double> {
+                             timeStep: Double,
+                             synapse: Synapse? = null): Pair<Double, Double> {
         return Pair(
             (psr + ((timeStep / timeConstant) * (Math.E * jumpHeight * recovery * (1 - psr) - psr))),
-            if (spiked && probabilisticSpikeCheck()) {
+            if (spiked && probabilisticSpikeCheck(synapse)) {
                 1.0
             } else {
                 recovery + timeStep / timeConstant * -recovery

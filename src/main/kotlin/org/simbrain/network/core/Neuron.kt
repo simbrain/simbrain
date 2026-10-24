@@ -28,6 +28,7 @@ import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
 import org.simbrain.workspace.couplings.HIGH_PRIORITY
 import org.simbrain.workspace.couplings.LOW_PRIORITY
+import java.util.concurrent.atomic.AtomicLong
 import java.awt.geom.Point2D
 
 /**
@@ -80,6 +81,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
             if (oldRule::class != value::class) {
                 dataHolder = value.createScalarData()
             }
+            updateRuleEpoch.incrementAndGet()
             events.updateRuleChanged.fire(oldRule, value)
         }
 
@@ -771,6 +773,14 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
         } else {
             LOW_PRIORITY
         }
+    }
+
+    companion object {
+        /**
+         * Incremented whenever any neuron's update rule is replaced, so cached update plans know when to recheck
+         * which rule objects are shared by several neurons.
+         */
+        val updateRuleEpoch = AtomicLong()
     }
 
 }

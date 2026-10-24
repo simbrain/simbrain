@@ -104,13 +104,13 @@ class ShortTermPlasticity : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val udfData = responderData as STPScalarData
-        val spiked = synapse.source.isSpike && probabilisticSpikeCheck()
+        val spiked = synapse.source.isSpike && probabilisticSpikeCheck(synapse)
         if (spiked) {
             udfData.update(time, U, D, F)
         }
         val jumpHeight = udfData.R * synapse.strength * udfData.u
         synapse.rawPSR = when (val sr = spikeResponderLocal) {
-            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.rawPSR, jumpHeight, timeStep)
+            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.rawPSR, jumpHeight, timeStep, synapse)
             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
         }
 

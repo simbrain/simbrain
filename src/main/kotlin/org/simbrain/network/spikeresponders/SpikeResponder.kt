@@ -11,6 +11,9 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.SimbrainRandomGenerator
+import org.simbrain.util.stats.mix64
+import org.simbrain.util.stats.unitDouble
 import java.util.*
 
 /**
@@ -70,10 +73,21 @@ abstract class SpikeResponder : CopyableObject {
     context(Network)
     open fun sourceFactors(connector: WeightMatrix): DoubleArray? = null
 
+    /**
+     * Whether a spike gets through, given [spikeProbability]. For a [synapse], the draw is a hash of the network's
+     * seed, the synapse's id, this responder's type and the iteration, so free synapses, which update in parallel,
+     * get the same draws whatever order they update in. Weight matrices update serially and draw from the network's
+     * generator.
+     */
     context(Network)
-    fun probabilisticSpikeCheck(): Boolean {
-        // the network's generator is shared by synapses updating on different threads
-        return !useSpikeProbability || synchronized(random) { random.nextDouble() } < spikeProbability
+    fun probabilisticSpikeCheck(synapse: Synapse? = null): Boolean {
+        if (!useSpikeProbability) return true
+        if (synapse == null) return synchronized(random) { random.nextDouble() } < spikeProbability
+        // Rounded, since time accumulates floating point error
+        val iteration = Math.round(time / timeStep)
+        var key = mix64(randomSeed + SimbrainRandomGenerator.GOLDEN_GAMMA * (synapse.id?.hashCode() ?: 0))
+        key = mix64(key + SimbrainRandomGenerator.GOLDEN_GAMMA * javaClass.name.hashCode())
+        return unitDouble(mix64(key + SimbrainRandomGenerator.GOLDEN_GAMMA * iteration)) < spikeProbability
     }
 
     /**

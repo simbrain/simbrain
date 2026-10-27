@@ -212,31 +212,39 @@ class SpikeResponderMatrixTest {
         assertSameSpiking({ JumpAndDecay().apply { timeConstant = 4.0 } }, switchToLearningAt = 150)
     }
 
-    @Test
-    fun `editing weights mid-response rescales a jump and decay trace but not the full psr matrix`() {
-        fun chain(forceFullPsrMatrix: Boolean): Triple<Network, NeuronArray, WeightMatrix> {
-            val network = Network()
-            val input = NeuronArray(2)
-            val spiking = NeuronArray(2).apply { updateRule = SpikingThresholdRule() }
-            val output = NeuronArray(3)
-            val responding = WeightMatrix(spiking, output).apply {
-                setWeights(arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, -1.0), doubleArrayOf(.5, .5)))
-                spikeResponder = JumpAndDecay().apply {
-                    timeConstant = 4.0
-                    if (forceFullPsrMatrix) useSpikeProbability = true
-                }
+    /**
+     * Input array -> spiking array -> output array, with a jump and decay responder on the second weight matrix.
+     * Spike probability is on (but 1) for [forceFullPsrMatrix], which keeps the responder off the trace path.
+     */
+    private fun jumpAndDecayChain(forceFullPsrMatrix: Boolean): Triple<Network, NeuronArray, WeightMatrix> {
+        val network = Network()
+        val input = NeuronArray(2)
+        val spiking = NeuronArray(2).apply { updateRule = SpikingThresholdRule() }
+        val output = NeuronArray(3)
+        val responding = WeightMatrix(spiking, output).apply {
+            setWeights(arrayOf(doubleArrayOf(1.0, 0.0), doubleArrayOf(0.0, -1.0), doubleArrayOf(.5, .5)))
+            spikeResponder = JumpAndDecay().apply {
+                timeConstant = 4.0
+                if (forceFullPsrMatrix) useSpikeProbability = true
             }
-            listOf(input, spiking, output).forEach { it.clear() }
-            network.addNetworkModelsAsync(input, spiking, output, WeightMatrix(input, spiking), responding)
-            return Triple(network, input, responding)
         }
-        val fast = chain(forceFullPsrMatrix = false)
-        val full = chain(forceFullPsrMatrix = true)
-        fun spikeFirstSource() = listOf(fast, full).forEach { (network, input, _) ->
+        listOf(input, spiking, output).forEach { it.clear() }
+        network.addNetworkModelsAsync(input, spiking, output, WeightMatrix(input, spiking), responding)
+        return Triple(network, input, responding)
+    }
+
+    private fun spikeFirstSource(vararg chains: Triple<Network, NeuronArray, WeightMatrix>) =
+        chains.forEach { (network, input, _) ->
             input.activations = Matrix.column(doubleArrayOf(1.0, 0.0))
             network.update()
             network.update()
         }
+
+    @Test
+    fun `editing weights mid-response rescales a jump and decay trace but not the full psr matrix`() {
+        val fast = jumpAndDecayChain(forceFullPsrMatrix = false)
+        val full = jumpAndDecayChain(forceFullPsrMatrix = true)
+        fun spikeFirstSource() = spikeFirstSource(fast, full)
         fun step() = listOf(fast, full).forEach { it.first.update() }
 
         spikeFirstSource()
@@ -253,5 +261,18 @@ class SpikeResponderMatrixTest {
         spikeFirstSource()
         assertArrayEquals(full.third.getSummedPSRs(), fast.third.getSummedPSRs(), 1e-12)
         assertEquals(2.0, fast.third.getSummedPSRs()[0], 1e-12)
+    }
+
+    @Test
+    fun `an edited psr matrix replaces a jump and decay trace`() {
+        val fast = jumpAndDecayChain(forceFullPsrMatrix = false)
+        val full = jumpAndDecayChain(forceFullPsrMatrix = true)
+        spikeFirstSource(fast, full)
+        repeat(2) { listOf(fast, full).forEach { it.first.update() } }
+        assertTrue(fast.third.getSummedPSRs()[0] > 0.1, "the response should still be decaying")
+        listOf(fast, full).forEach { it.third.psrMatrix = Matrix(3, 2) }
+        listOf(fast, full).forEach { it.first.update() }
+        assertArrayEquals(DoubleArray(3), full.third.getSummedPSRs(), 0.0)
+        assertArrayEquals(DoubleArray(3), fast.third.getSummedPSRs(), 0.0)
     }
 }

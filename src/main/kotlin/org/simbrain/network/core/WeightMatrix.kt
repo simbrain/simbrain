@@ -118,6 +118,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         set(value) = synchronized(psrLock) {
             pendingPsrSource = null
             summedInputs = null
+            spikeResponseData.psrMatrixReplaced()
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
                 value
             } else {

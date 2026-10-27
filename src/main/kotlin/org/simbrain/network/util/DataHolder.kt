@@ -10,6 +10,12 @@ import org.simbrain.util.propertyeditor.CopyableObject
 interface MatrixDataHolder : CopyableObject {
     override fun copy(): MatrixDataHolder
     fun clear() {}
+
+    /**
+     * Called when the PSR matrix of the weight matrix holding this data is replaced, for example from the property
+     * editor, so that state standing for the old matrix is dropped.
+     */
+    fun psrMatrixReplaced() {}
 }
 
 object EmptyMatrixData : MatrixDataHolder {

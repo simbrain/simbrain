@@ -1,16 +1,18 @@
 package org.simbrain.custom_sims.simulations.backprop
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.dialogs.getCnnTrainingDialog
 import org.simbrain.network.trainers.CnnLossFunction
+import org.simbrain.network.trainers.CnnTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.util.csvToDouble2DArray
-import org.simbrain.util.fetchDataWithCache
 import org.simbrain.util.place
+import org.simbrain.util.placeBeside
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.world.imageworld.ImageWorldComponent
+import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
+import javax.swing.SwingUtilities
 
 /**
  * CNN version of the Tiny MNIST simulation.
@@ -29,27 +31,9 @@ val cnnMNIST = newSim {
 
     // Load data
 
-    val trainInputsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv") ?: return@newSim
-    val trainLabelsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv") ?: return@newSim
-    val testInputsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_inputs.csv") ?: return@newSim
-    val testLabelsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_labels.csv") ?: return@newSim
-
-    val trainingSet = TrainingDataset(
-        inputs = csvToDouble2DArray(trainInputsCSV).map { it.toMutableList() }.toMutableList(),
-        targets = csvToDouble2DArray(trainLabelsCSV).map { it.toMutableList() }.toMutableList(),
-        inputSize = 400,
-        targetSize = 10,
-    )
-    val testingSet = TrainingDataset(
-        inputs = csvToDouble2DArray(testInputsCSV).map { it.toMutableList() }.toMutableList(),
-        targets = csvToDouble2DArray(testLabelsCSV).map { it.toMutableList() }.toMutableList(),
-        inputSize = 400,
-        targetSize = 10,
-    )
+    val data = loadTinyMnist() ?: return@newSim
+    val trainingSet = data.trainingSet
+    val testingSet = data.testingSet
 
     // Build CNN Pipeline
 
@@ -142,13 +126,80 @@ val cnnMNIST = newSim {
         testConfiguration.testFrequency = 10
     }
 
+    // Used only for its forward pass, so stop the task processor every trainer starts
+    val evaluationTrainer = CnnTrainer(network, inputTensorLayer, outputArray, cnnModel.trainerConfig)
+        .apply { job.cancel() }
+
     // Pre-load input with a random training image
     val randomSampleIndex = kotlin.random.Random.nextInt(trainingSet.inputs.size)
     inputTensorLayer.activations = trainingSet.inputs[randomSampleIndex].toDoubleArray()
     
     // GUI
 
-    place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 800)
+    withGui {
+        val networkPanel = getNetworkPanel(networkComponent)
+        var drawingWorld: ImageWorldComponent? = null
+        val model = object : TinyMnistModel {
+            override var trainingSet: TrainingDataset
+                get() = cnnModel.trainingSet
+                set(value) {
+                    cnnModel.trainingSet = value
+                }
+            override var testingSet: TrainingDataset
+                get() = cnnModel.testingSet
+                set(value) {
+                    cnnModel.testingSet = value
+                }
+
+            override suspend fun show(image: DoubleArray): DoubleArray {
+                beginEvaluation()
+                val output = predict(image)
+                // The trainer's forward pass writes the tensor stages directly, so copy its results into the
+                // remaining layers and fire update events so the GUI repaints, as the training dialog does
+                outputArray.setActivations(output)
+                flatArray.setActivations(evaluationTrainer.tensorLayerStages.last().activations.copyOf())
+                inputTensorLayer.events.updated.fire()
+                evaluationTrainer.tensorLayerStages.forEach { it.events.updated.fire() }
+                flatArray.events.updated.fire()
+                outputArray.events.updated.fire()
+                return output
+            }
+
+            override suspend fun predict(image: DoubleArray) = evaluationTrainer.forwardPass(image)
+
+            override suspend fun beginEvaluation() {
+                // Copy the latest trained weights into the trainer
+                evaluationTrainer.syncFromNetwork()
+            }
+
+            override suspend fun openTrainingDialog() {
+                SwingUtilities.invokeLater {
+                    with(networkPanel) { cnnModel.getCnnTrainingDialog() }.run {
+                        pack()
+                        setLocationRelativeTo(null)
+                        isVisible = true
+                    }
+                }
+            }
+
+            override suspend fun addDrawingWorld() {
+                if (drawingWorld?.let { it in workspace.componentList } == true) return
+                val imageWorld = ImageWorldComponent("Draw a digit")
+                workspace.addWorkspaceComponent(imageWorld)
+                imageWorld.world.resetImageAlbum(inputShape.width, inputShape.height)
+                with(workspace.couplingManager) {
+                    imageWorld.world.imagePipelineCollection.currentPipeline
+                        .getProducer(ImageProcessingPipeline::brightness) couple
+                        inputTensorLayer.channelContainers[0].getConsumer(TensorLayer.ChannelContainer::setValues)
+                }
+                inputTensorLayer.isClamped = true
+                placeBeside(imageWorld, networkComponent)
+                drawingWorld = imageWorld
+            }
+        }
+        val controlPanel = createTinyMnistControlPanel(data, model).awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 800)
+    }
     workspace.simpleIterate()
 
     addSidebarInfo(
@@ -165,12 +216,27 @@ val cnnMNIST = newSim {
         - **Training**: 10,000 images of handwritten digits
         - **Testing**: 1,000 images
 
+        # Control Panel
+
+        - `Train network...`: Opens the training dialog. This is a convenience; right-clicking the `CNN MNIST` outline and choosing `Train...` opens the same dialog.
+
+        - `Training examples`: Train on the first `10,000`, `1,000`, or `300` training images. With fewer examples the network memorizes the training set, so training error falls well below testing error (overfitting).
+
+        - `Testing set`: Test on the original images, or on copies shifted `1` or `2` pixels, rotated `20` degrees, or with added noise. This sets the testing set used during training and shown in the `Testing data` tab.
+
+        - `Random training image` and `Random test image`: Run a randomly chosen training or test image through the network so you can see how it classifies it.
+
+        - `Draw your own digit`: Opens an image world coupled to the input layer. Draw a digit, then press `Run` or `Step` to see the network's answer.
+
+        - `Test generalization`: Reports accuracy on the training set and on every testing set. The progress bar below it shows how far along it is. Stop the simulation first if it is running.
+
         # What to Do
-        1. Right-click the `CNN MNIST` outline and select `Train...`
+        1. Press `Train network...` in the control panel, or right-click the `CNN MNIST` outline and select `Train...`
         2. Click `Run` to start training, `Stop` to pause
         3. Watch the loss plot decrease
-        4. Use the `Training data` / `Testing data` tabs to browse examples
-        5. Click `Apply inputs` on a row to see the network's prediction
+        4. Close the dialog and use `Random training image` and `Random test image` to see how the network classifies individual images
+        5. In the training dialog, use the `Training data` / `Testing data` tabs to browse examples, and click `Apply inputs` on a row to see the network's prediction
+        6. Press `Test generalization`. Compare the results with the `Feed-forward MNIST` simulation: the CNN usually keeps more of its accuracy on digits shifted a pixel or two, because max pooling lets a feature move slightly without changing the pooled output. Both networks fail once digits move several pixels, since the final dense layer still depends on where the pooled features are.
         """.trimIndent()
     )
 }

@@ -247,12 +247,15 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
     @Consumable
     fun setValues(array: DoubleArray) {
         if (timeSeriesList.isEmpty()) {
-            addTimeSeries(array.size)
+            // Checked again on the event thread, where syncTimeSeries refills the list, so a sync caught between its
+            // clear and refill doesn't get a second set of series
+            runOnEventThread { if (timeSeriesList.isEmpty()) addTimeSeries(array.size) }
         }
         val time = timeSupplier()
-        val count = minOf(array.size, timeSeriesList.size)
-        for (i in 0 until count) {
-            points.post(Point(timeSeriesList[i].series, time, array[i]))
+        // One snapshot per tick: syncTimeSeries clears and refills the list on the event thread meanwhile
+        val series = timeSeriesList.toList()
+        for (i in 0 until minOf(array.size, series.size)) {
+            points.post(Point(series[i].series, time, array[i]))
         }
     }
 

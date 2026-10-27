@@ -2,14 +2,17 @@
 import collections, json, statistics as st, sys
 
 # Later files supersede earlier ones for the same (machine, suite, simulator), so a rerun of one simulator replaces
-# its old rows without discarding the raw data
+# its old rows without discarding the raw data. Rows recording an error (a crash or timeout) are listed at the end
+# instead, as in summarize_headed.py
 by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
+errors = [r for file_rows in by_file for r in file_rows if "error" in r]
 latest = {}
 for index, file_rows in enumerate(by_file):
     for r in file_rows:
-        latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] = index
+        if "error" not in r:
+            latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] = index
 rows = [r for index, file_rows in enumerate(by_file) for r in file_rows
-        if latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] == index]
+        if "error" not in r and latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] == index]
 
 
 def med(values):
@@ -83,3 +86,8 @@ for machine in sorted({r["machine"] for r in rows}):
         for (f, fw, mode), v in sorted((kv for kv in g.items() if kv[0][0] == flavor), key=lambda kv: kv[0][1:]):
             print(f"  {flavor:4s} {fw:36s} {mode:8s} {med([x['us_per_example'] for x in v]):8.2f} us/example"
                   f"  {med([x['examples_per_s'] for x in v]):9.0f} examples/s  acc {med([x['test_acc'] for x in v]):.3f}")
+
+if errors:
+    print(f"\n{len(errors)} errors")
+    for r in errors:
+        print("  ", {k: r.get(k) for k in ["machine", "suite", "simulator", "framework", "neurons", "p"]}, r["error"][-200:])

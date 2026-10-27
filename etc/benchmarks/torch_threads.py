@@ -15,9 +15,13 @@ tiny_configs = [("24", "20", "4", "30", "1"), ("64", "128", "4", "512", "2")]
 
 
 def run(cmd, extra):
-    out = subprocess.run(cmd, capture_output=True, text=True, timeout=1200, stdin=subprocess.DEVNULL)
-    lines = [l for l in out.stdout.splitlines() if l.startswith("{")]
-    rows = [json.loads(l) for l in lines] or [{"error": (out.stdout + out.stderr)[-800:]}]
+    try:
+        out = subprocess.run(cmd, capture_output=True, text=True, timeout=1200, stdin=subprocess.DEVNULL)
+        lines = [l for l in out.stdout.splitlines() if l.startswith("{")]
+        rows = [json.loads(l) for l in lines] or [{"error": (out.stdout + out.stderr)[-800:]}]
+    except subprocess.TimeoutExpired:
+        # One hung run is recorded and the sweep goes on, as in run_benchmarks.py
+        rows = [{"error": "timeout after 1200 s"}]
     with open(args.out, "a") as f:
         for r in rows:
             r.update(extra)

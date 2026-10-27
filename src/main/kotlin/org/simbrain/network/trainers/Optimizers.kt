@@ -148,7 +148,8 @@ class AdamWOptimizer(
     ) var weightDecay: Double = 0.01,
     @UserParameter(
         label = "Learning Rate Decay", 
-        description = "Exponential decay rate for learning rate over time. 0.0 means no decay. Higher values decay faster",
+        description = "Fraction by which the learning rate shrinks at each optimizer step: each batch, or each example " +
+                "when training one example at a time. 0.0 means no decay. Higher values decay faster",
         minimumValue = 0.0, 
         maximumValue = 1.0, 
         order = 4

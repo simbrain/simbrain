@@ -30,8 +30,10 @@ import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
+import org.simbrain.util.point
 import org.simbrain.workspace.Workspace
 import java.awt.Rectangle
+import java.awt.geom.Point2D
 import java.awt.image.BufferedImage
 import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
@@ -403,6 +405,38 @@ class NodeSyncTest {
             labelDrawn = (cx - half..cx + half).any { x -> (cy - half..cy + half).any { y -> image.getRGB(x, y) != fill } }
         }
         assertTrue(labelDrawn, "the spike overlay covered the strength label")
+    }
+
+    @Test
+    fun `in spiking only mode a synapse can be clicked while its source spikes`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val source = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it) }
+        val target = Neuron().also { network.addNetworkModel(it) }
+        target.location = point(200.0, 0.0)
+        val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
+        val node = panel.getNode(synapse) as SynapseNode
+        panel.synapseSpikingOnlyVisible = true
+        UiWork.awaitIdle()
+
+        fun pickedAtCircle(): Boolean {
+            var picked = false
+            SwingUtilities.invokeAndWait {
+                val camera = panel.canvas.camera
+                camera.setBounds(0.0, 0.0, 800.0, 800.0)
+                panel.canvas.root.processInputs()
+                val center = node.circleNode!!.globalFullBounds.center2D
+                val local = camera.viewToLocal(Point2D.Double(center.x, center.y))
+                picked = camera.pick(local.x, local.y, 1.0).nodeStackReference.contains(node)
+            }
+            return picked
+        }
+
+        assertFalse(pickedAtCircle(), "a hidden synapse should not take clicks")
+        with(network) { source.isSpike = true }
+        UiWork.awaitIdle()
+        assertTrue(node.drawnSourceSpiking)
+        assertTrue(pickedAtCircle(), "the spiking synapse the overlay shows should take clicks")
     }
 
     @Test

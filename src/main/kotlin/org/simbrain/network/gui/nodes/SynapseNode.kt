@@ -12,6 +12,7 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.piccolo2d.util.PPickPath
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSynapseContextMenu
@@ -286,36 +287,25 @@ class SynapseNode(
     }
 
     /**
-     * Apply combined logic for visibility:
-     * - If the model's own visibility is false, this node must remain hidden.
-     * - If spiking-only mode is enabled, only show while the source neuron is spiking.
-     * - Otherwise reflect the model's own visibility.
+     * The node follows the model's own visibility. In spiking-only mode it also stays visible to Piccolo but draws
+     * nothing and takes picks only while its source spikes (see [fullPaint] and [fullPick]): the spike overlay draws
+     * the spiking synapses, and showing or hiding the node on every spike would throw away the cached connection tier.
      */
     private fun applySpikingOnlyVisibility() {
-        // Old synapse visibility has higher priority
-        if (!synapse.isVisible) {
-            super.setVisible(false)
-            return
-        }
-        if (networkPanel.synapseSpikingOnlyVisible) {
-            // Only spiking synapses show, and the spike overlay draws those
-            super.setVisible(false)
-        } else {
-            super.setVisible(true)
-        }
+        super.setVisible(synapse.isVisible)
+        repaint()
     }
 
     private fun updateVisibility(modelVisibility: Boolean) {
-        if (!modelVisibility) {
-            super.setVisible(false)
-            return
-        }
-        if (networkPanel.synapseSpikingOnlyVisible) {
-            applySpikingOnlyVisibility()
-        } else {
-            super.setVisible(true)
-        }
+        super.setVisible(modelVisibility)
     }
+
+    override fun fullPaint(paintContext: PPaintContext) {
+        if (!networkPanel.synapseSpikingOnlyVisible) super.fullPaint(paintContext)
+    }
+
+    override fun fullPick(pickPath: PPickPath): Boolean =
+        (!networkPanel.synapseSpikingOnlyVisible || sourceSpiking) && super.fullPick(pickPath)
 
     /**
      * Update the diameter of the drawn weight based on the logical weight's

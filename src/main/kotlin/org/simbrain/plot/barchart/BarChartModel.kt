@@ -100,10 +100,11 @@ class BarChartModel : AttributeContainer, EditableObject {
     }
 
     /**
-     * Called by coupling producers via reflection.
+     * Called by coupling producers via reflection. The values are copied, since a producer may hand over a buffer it
+     * keeps writing to before the update lands on the event thread.
      */
     @Consumable
-    fun setBarValues(newPoint: DoubleArray) = updates.post(Update.Values(newPoint))
+    fun setBarValues(newPoint: DoubleArray) = updates.post(Update.Values(newPoint.copyOf()))
 
     /**
      * Set the component names and rename any bars already in the dataset, so a label change shows without

@@ -133,4 +133,24 @@ class BarChartTest {
         val restored = xstream.fromXML(xml) as BarChartModel
         assertEquals(1.5, restored.getDataset().getValue(0, 1))
     }
+
+    @Test
+    fun `a value array changed after it is sent does not change the bars`() {
+        val model = BarChartModel()
+        val release = CountDownLatch(1)
+        val held = CountDownLatch(1)
+        SwingUtilities.invokeLater {
+            held.countDown()
+            release.await()
+        }
+        held.await()
+        // A producer such as a tensor layer hands over its live buffer and keeps writing to it
+        val values = doubleArrayOf(0.5, 1.5)
+        model.setBarValues(values)
+        values[1] = 9.0
+        release.countDown()
+        UiWork.awaitIdle()
+        assertEquals(1.5, onEdt { model.getDataset().getValue(0, 1) })
+    }
 }
+

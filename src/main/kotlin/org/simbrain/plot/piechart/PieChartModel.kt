@@ -96,14 +96,15 @@ class PieChartModel : AttributeContainer, EditableObject {
     }
 
     /**
-     * Called by coupling producers via reflection.
+     * Called by coupling producers via reflection. The values are copied, since a producer may hand over a buffer it
+     * keeps writing to before the update lands on the event thread.
      */
     @Consumable
     fun setValues(vector: DoubleArray) {
         if (vector.isEmpty()) {
             throw IllegalArgumentException("Pie chart supplied with empty array")
         }
-        updates.post(Update.Values(vector))
+        updates.post(Update.Values(vector.copyOf()))
     }
 
     /** Stops applying updates; called when the owning component closes. */

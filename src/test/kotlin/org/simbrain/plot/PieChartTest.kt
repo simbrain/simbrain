@@ -12,6 +12,8 @@ import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.util.UiWork
 import org.simbrain.util.onEdt
 import org.simbrain.workspace.Workspace
+import java.util.concurrent.CountDownLatch
+import javax.swing.SwingUtilities
 
 class PieChartTest {
 
@@ -135,4 +137,24 @@ class PieChartTest {
 
 
 
+
+    @Test
+    fun `a value array changed after it is sent does not change the slices`() {
+        val model = PieChartModel()
+        val release = CountDownLatch(1)
+        val held = CountDownLatch(1)
+        SwingUtilities.invokeLater {
+            held.countDown()
+            release.await()
+        }
+        held.await()
+        // A producer such as a tensor layer hands over its live buffer and keeps writing to it
+        val values = doubleArrayOf(1.0, 3.0)
+        model.setValues(values)
+        values[1] = 1.0
+        release.countDown()
+        UiWork.awaitIdle()
+        assertEquals(0.75, onEdt { model.dataset.getValue(1).toDouble() }, 1e-12)
+    }
 }
+

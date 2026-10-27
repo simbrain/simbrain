@@ -10,7 +10,7 @@ import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.util.format
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.showMessageDialog
+import org.simbrain.util.showResultsDialog
 import kotlin.math.cos
 import kotlin.math.ln
 import kotlin.math.sqrt
@@ -188,7 +188,11 @@ val serialOrderContextMemory = newSim {
         }
     }
 
-    fun benchmarkCondition(label: String, trials: Int, setup: () -> Unit): String {
+    /**
+     * Run [trials] trials after [setup] and return the condition's label followed by its accuracy, mean
+     * transposition distance, and intrusion rate.
+     */
+    fun benchmarkCondition(label: String, trials: Int, setup: () -> Unit): List<String> {
         setup()
         var accuracy = 0.0
         var errorDistance = 0.0
@@ -202,36 +206,44 @@ val serialOrderContextMemory = newSim {
             transpositionCount += distances.size
             intrusionCount += recalledList.count { it !in targetList }
         }
-        val distance = if (transpositionCount == 0) "no in-list transpositions" else
-            "mean transposition distance ${(errorDistance / transpositionCount).format(2)}"
+        val distance = if (transpositionCount == 0) "none" else (errorDistance / transpositionCount).format(2)
         val intrusionRate = 100.0 * intrusionCount / (trials * listLength)
-        return "$label: ${(100.0 * accuracy / trials).format(1)}% accuracy, $distance, " +
-            "${intrusionRate.format(1)}% intrusions"
+        return listOf(label, "${(100.0 * accuracy / trials).format(1)}%", distance, "${intrusionRate.format(1)}%")
     }
 
-    fun runBenchmark(): String {
+    fun runBenchmark() {
         val trials = 200
+        val benchmarkListLength = listLength
         val savedNoise = outputNoise
         val savedDecayMultiplier = weightDecay
-        return try {
-            buildString {
-                appendLine("Burgess-Hitch positional-context core over $trials trials per condition")
-                appendLine("List length $listLength")
-                appendLine()
-                appendLine("Letter-selection noise sweep (retention per step ${savedDecayMultiplier.format(2)})")
-                listOf(0.00, 0.04, 0.08, 0.16).forEach { noise ->
-                    appendLine(benchmarkCondition("Noise ${noise.format(2)}", trials) { outputNoise = noise })
-                }
-                appendLine()
-                appendLine("Retention-per-step sweep (letter-selection noise ${savedNoise.format(2)})")
-                listOf(1.00, 0.98, 0.94, 0.86).forEach { multiplier ->
-                    appendLine(benchmarkCondition("Multiplier ${multiplier.format(2)}", trials) { weightDecay = multiplier })
+        val (noiseRows, retentionRows) = try {
+            val noiseRows = listOf(0.00, 0.04, 0.08, 0.16).map { noise ->
+                benchmarkCondition("Noise ${noise.format(2)}", trials) { outputNoise = noise }
+            }
+            // Restore the selected noise, which the noise sweep changed, so it is held fixed here
+            val retentionRows = listOf(1.00, 0.98, 0.94, 0.86).map { multiplier ->
+                benchmarkCondition("Multiplier ${multiplier.format(2)}", trials) {
+                    outputNoise = savedNoise
+                    weightDecay = multiplier
                 }
             }
+            noiseRows to retentionRows
         } finally {
             outputNoise = savedNoise
             weightDecay = savedDecayMultiplier
             resetTrial()
+        }
+        val columns = listOf("Accuracy", "Mean transposition distance", "Intrusions")
+        showResultsDialog("Positional Context Benchmark") {
+            note("Burgess-Hitch positional-context core, $trials trials per condition, list length $benchmarkListLength")
+            section("Letter-selection noise sweep", columns) {
+                note("Retention per step held at ${savedDecayMultiplier.format(2)}")
+                noiseRows.forEach { row(it.first(), *it.drop(1).toTypedArray()) }
+            }
+            section("Retention-per-step sweep", columns) {
+                note("Letter-selection noise held at ${savedNoise.format(2)}")
+                retentionRows.forEach { row(it.first(), *it.drop(1).toTypedArray()) }
+            }
         }
     }
 
@@ -277,7 +289,7 @@ val serialOrderContextMemory = newSim {
             addSeparator()
             addButton("Run Trial") { runTrial(); refreshLabels() }
             addButton("Run Benchmark") {
-                showMessageDialog(runBenchmark(), "Positional Context Benchmark")
+                runBenchmark()
                 refreshLabels()
             }
         }.awaitLayout()

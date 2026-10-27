@@ -441,7 +441,7 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 - Always call `workspace.clearWorkspace()` at start
 - Test save/reopen if using custom updates or control panels
 - Control panels should not include a title label or top separator — the panel title is set via `createControlPanel("Title", ...)` and shown in the window frame
-- Use `showMessageDialog(text, title)` from `org.simbrain.util` to display analysis results rather than printing to console or embedding text in the control panel
+- Use `showResultsDialog(title) { section(...) { row(label, value) } }` from `org.simbrain.util` to display analysis results that fit a label and value layout (accuracies, distances, benchmark sweeps), and `showMessageDialog(text, title)` for free-form text. Do not print results to the console or embed them in the control panel
 
 ## Custom Overlays
 

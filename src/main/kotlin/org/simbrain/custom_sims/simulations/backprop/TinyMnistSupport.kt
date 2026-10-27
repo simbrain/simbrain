@@ -10,7 +10,6 @@ package org.simbrain.custom_sims.simulations.backprop
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import net.miginfocom.swing.MigLayout
 import org.simbrain.custom_sims.SIM_WINDOW_GAP
 import org.simbrain.custom_sims.createControlPanel
 import org.simbrain.network.trainers.TrainingDataset
@@ -18,9 +17,6 @@ import org.simbrain.util.*
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.awt.Dimension
-import java.awt.Font
-import javax.swing.JLabel
-import javax.swing.JPanel
 import javax.swing.JProgressBar
 import kotlin.math.cos
 import kotlin.math.roundToInt
@@ -262,7 +258,14 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
             withContext(Dispatchers.Swing) {
                 progressBar.value = 100
                 progressBar.string = "Done"
-                showGeneralizationResults(trainingSet.size, trainingAccuracy, testingAccuracies)
+            }
+            showResultsDialog("Generalization accuracy") {
+                section("Training set") {
+                    row("${"%,d".format(trainingSet.size)} training images", formatPercent(trainingAccuracy))
+                }
+                section("Testing sets") {
+                    testingAccuracies.forEach { (label, accuracy) -> row(label, formatPercent(accuracy)) }
+                }
             }
         } finally {
             withContext(Dispatchers.Swing) { isEnabled = true }
@@ -271,29 +274,6 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
         toolTipText = "Reports accuracy on the training set and on every testing set. Stop the simulation first if it is running."
     }
     addComponent(progressBar)
-}
-
-private fun generalizationResultsPanel(trainingSize: Int, trainingAccuracy: Double, testingAccuracies: List<Pair<String, Double>>) =
-    JPanel(MigLayout("insets 20 24 12 24, wrap 2", "[left]40[right]", "[]4[]")).apply {
-        fun heading(text: String) = JLabel(text).apply { font = font.deriveFont(Font.BOLD, 16f) }
-        fun row(label: String, accuracy: Double) {
-            add(JLabel(label).apply { font = font.deriveFont(15f) })
-            add(JLabel(formatPercent(accuracy)).apply { font = font.deriveFont(Font.BOLD, 15f) })
-        }
-        add(heading("Training set"), "span, wrap")
-        row("${"%,d".format(trainingSize)} training images", trainingAccuracy)
-        add(heading("Testing sets"), "span, gaptop 16, wrap")
-        testingAccuracies.forEach { (label, accuracy) -> row(label, accuracy) }
-    }
-
-private fun showGeneralizationResults(trainingSize: Int, trainingAccuracy: Double, testingAccuracies: List<Pair<String, Double>>) {
-    StandardDialog().apply {
-        title = "Generalization accuracy"
-        contentPane = generalizationResultsPanel(trainingSize, trainingAccuracy, testingAccuracies)
-        isModal = false
-        setAsDoneDialog()
-        makeVisible()
-    }
 }
 
 private fun formatPercent(value: Double) = "${(value * 1000).roundToInt() / 10.0}%"

@@ -515,7 +515,10 @@ object SimbrainDesktop {
                 scriptMenu.removeAll()
                 simulations.addToMenu(scriptMenu) { sim ->
                     workspace.launch {
-                        sim.run(this@SimbrainDesktop)
+                        workspace.stop()
+                        if (confirmDiscardChanges()) {
+                            sim.run(this@SimbrainDesktop)
+                        }
                     }
                 }
             }
@@ -861,6 +864,9 @@ object SimbrainDesktop {
      */
     suspend fun openWorkspace() {
         workspace.stop()
+        if (!confirmDiscardChanges()) {
+            return
+        }
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
@@ -1028,23 +1034,29 @@ object SimbrainDesktop {
      * Clear desktop of all components. Show a save-as dialog if there have been changes.
      */
     suspend fun clearDesktop() {
-
         workspace.stop()
-
-        // If there have been changes, show a save-as dialog
-        if (workspace.changesExist()) {
-            val s = showHasChangedDialog()
-            if (s == JOptionPane.OK_OPTION) {
-                save()
-                clearComponents()
-            } else if (s == JOptionPane.NO_OPTION) {
-                clearComponents()
-            } else if (s == JOptionPane.CANCEL_OPTION) {
-                return
-            }
-        } else {
-            // If there have been no changes, just clear away!
+        if (confirmDiscardChanges()) {
             clearComponents()
+        }
+    }
+
+    /**
+     * If the workspace has unsaved changes, offer to save them before they are discarded.
+     *
+     * @return false if the user cancelled (including cancelling the save itself), in which case the workspace
+     * should be left alone
+     */
+    private fun confirmDiscardChanges(): Boolean {
+        if (!workspace.changesExist()) {
+            return true
+        }
+        return when (showHasChangedDialog()) {
+            JOptionPane.OK_OPTION -> {
+                save()
+                !workspace.changesExist()
+            }
+            JOptionPane.NO_OPTION -> true
+            else -> false
         }
     }
 

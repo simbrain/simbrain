@@ -2,6 +2,7 @@ package org.simbrain.util
 
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
+import net.miginfocom.swing.MigLayout
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
@@ -483,13 +484,120 @@ fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: I
     }
     val scrollPane = JScrollPane(textArea)
     SwingUtilities.invokeLater {
-        StandardDialog().apply {
-            this.title = title
-            contentPane = scrollPane
-            isModal = false
-            setAsDoneDialog()
-            makeVisible()
+        showDoneDialog(title, scrollPane)
+    }
+}
+
+/**
+ * Builds the content of [showResultsDialog]: section headings, short notes, and rows of a label followed by
+ * one or more right-aligned values.
+ */
+class ResultsBuilder {
+
+    internal sealed class Item {
+        class Heading(val text: String, val columns: List<String>) : Item()
+        class Note(val text: String) : Item()
+        class Row(val label: String, val values: List<String>) : Item()
+    }
+
+    internal val items = mutableListOf<Item>()
+
+    /**
+     * Start a section. [columns], when given, label the value columns of the rows that follow.
+     */
+    fun section(heading: String, columns: List<String> = listOf(), block: ResultsBuilder.() -> Unit = {}) {
+        items.add(Item.Heading(heading, columns))
+        block()
+    }
+
+    fun note(text: String) {
+        items.add(Item.Note(text))
+    }
+
+    fun row(label: String, vararg values: String) {
+        items.add(Item.Row(label, values.toList()))
+    }
+}
+
+/**
+ * The panel shown by [showResultsDialog].
+ */
+fun createResultsPanel(build: ResultsBuilder.() -> Unit): JPanel {
+    val items = ResultsBuilder().apply(build).items
+    val valueColumns = items.maxOfOrNull {
+        when (it) {
+            is ResultsBuilder.Item.Row -> it.values.size
+            is ResultsBuilder.Item.Heading -> it.columns.size
+            is ResultsBuilder.Item.Note -> 0
         }
+    } ?: 0
+    val columnConstraints = "[left]" + "40[right]" + "24[right]".repeat((valueColumns - 1).coerceAtLeast(0))
+    val baseFont = UIManager.getFont("Label.font")
+    fun label(text: String, style: Int, size: Float) = JLabel(text).apply { font = baseFont.deriveFont(style, size) }
+    return JPanel(MigLayout("insets 20 24 12 24, wrap ${valueColumns + 1}", columnConstraints, "[]4[]")).apply {
+        items.forEachIndexed { index, item ->
+            when (item) {
+                is ResultsBuilder.Item.Heading -> {
+                    // Space each section after the first from the one above it
+                    val gap = if (index == 0) "" else "gaptop 16"
+                    if (item.columns.isEmpty()) {
+                        add(label(item.text, Font.BOLD, 16f), "span, $gap")
+                    } else {
+                        add(label(item.text, Font.BOLD, 16f), gap)
+                        item.columns.forEach { add(label(it, Font.PLAIN, 13f), "aligny bottom, $gap") }
+                        repeat(valueColumns - item.columns.size) { add(JLabel()) }
+                    }
+                }
+                is ResultsBuilder.Item.Note -> add(label(item.text, Font.PLAIN, 13f).apply {
+                    UIManager.getColor("Label.disabledForeground")?.let { foreground = it }
+                }, "span")
+                is ResultsBuilder.Item.Row -> {
+                    add(label(item.label, Font.PLAIN, 15f))
+                    item.values.forEach { add(label(it, Font.BOLD, 15f)) }
+                    repeat(valueColumns - item.values.size) { add(JLabel()) }
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Show labelled results, such as accuracies or distances, in a non-modal dialog that sizes itself to fit. Prefer
+ * this to [showMessageDialog] when results fit a label and value layout. Safe to call from any thread, but [build]
+ * runs later on the event dispatch thread, so compute results first and only format them inside [build].
+ *
+ * ```
+ * showResultsDialog("Generalization accuracy") {
+ *     section("Training set") {
+ *         row("10,000 training images", "99.4%")
+ *     }
+ *     section("Testing sets") {
+ *         row("Original", "94.6%")
+ *         row("Shifted 2 pixels right", "56.4%")
+ *     }
+ * }
+ * ```
+ */
+fun showResultsDialog(title: String, build: ResultsBuilder.() -> Unit) {
+    SwingUtilities.invokeLater {
+        showDoneDialog(title, createResultsPanel(build))
+    }
+}
+
+/**
+ * Show [content] in a non-modal dialog with a Done button. The dialog is owned by and centered on the active
+ * window, so on a multi-monitor setup it opens on the same screen as Simbrain rather than the primary screen.
+ */
+private fun showDoneDialog(title: String, content: Container) {
+    val owner = KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow
+        ?: Frame.getFrames().firstOrNull { it.isVisible }
+    StandardDialog(owner, title).apply {
+        contentPane = content
+        isModal = false
+        setAsDoneDialog()
+        pack()
+        setLocationRelativeTo(owner)
+        isVisible = true
     }
 }
 

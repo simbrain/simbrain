@@ -34,23 +34,32 @@ sealed class SamplingStrategy: CopyableObject {
             
             // Get top-k indices and probabilities. A running insertion keeps this O(n·k) over
             // LLM vocabularies instead of boxing and sorting every entry; ties keep the lower
-            // index first, as the stable descending sort it replaces did.
+            // index first, as a stable descending sort does. Insertion grows quadratic as k
+            // approaches the vocabulary size, so a k beyond a sixteenth of it sorts instead.
             val limit = minOf(k, probabilities.size)
             val topKIndices = IntArray(limit)
             val topKProbs = DoubleArray(limit)
-            var filled = 0
-            for (index in probabilities.indices) {
-                val prob = probabilities[index]
-                if (filled == limit && prob.compareTo(topKProbs[limit - 1]) <= 0) continue
-                var slot = minOf(filled, limit - 1)
-                while (slot > 0 && prob.compareTo(topKProbs[slot - 1]) > 0) {
-                    topKProbs[slot] = topKProbs[slot - 1]
-                    topKIndices[slot] = topKIndices[slot - 1]
-                    slot--
+            if (limit > probabilities.size / 16) {
+                val order = probabilities.indices.sortedByDescending { probabilities[it] }
+                for (slot in 0 until limit) {
+                    topKIndices[slot] = order[slot]
+                    topKProbs[slot] = probabilities[order[slot]]
                 }
-                topKProbs[slot] = prob
-                topKIndices[slot] = index
-                if (filled < limit) filled++
+            } else {
+                var filled = 0
+                for (index in probabilities.indices) {
+                    val prob = probabilities[index]
+                    if (filled == limit && prob.compareTo(topKProbs[limit - 1]) <= 0) continue
+                    var slot = minOf(filled, limit - 1)
+                    while (slot > 0 && prob.compareTo(topKProbs[slot - 1]) > 0) {
+                        topKProbs[slot] = topKProbs[slot - 1]
+                        topKIndices[slot] = topKIndices[slot - 1]
+                        slot--
+                    }
+                    topKProbs[slot] = prob
+                    topKIndices[slot] = index
+                    if (filled < limit) filled++
+                }
             }
 
             // Renormalize top-k probabilities

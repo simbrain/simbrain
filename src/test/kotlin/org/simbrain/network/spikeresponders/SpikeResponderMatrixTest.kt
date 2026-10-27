@@ -275,4 +275,24 @@ class SpikeResponderMatrixTest {
         assertArrayEquals(DoubleArray(3), full.third.getSummedPSRs(), 0.0)
         assertArrayEquals(DoubleArray(3), fast.third.getSummedPSRs(), 0.0)
     }
+
+    @Test
+    fun `a jump and decay trace restarts from a decaying psr matrix`() {
+        val fast = jumpAndDecayChain(forceFullPsrMatrix = false)
+        val full = jumpAndDecayChain(forceFullPsrMatrix = true)
+        fun step() = listOf(fast, full).forEach { it.first.update() }
+        spikeFirstSource(fast, full)
+        // A learning rule hands the response to the full PSR matrix while it is still decaying
+        fast.third.learningRule = org.simbrain.network.learningrules.HebbianRule().apply { learningRate = 0.0 }
+        step()
+        assertFalse((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
+        fast.third.learningRule = org.simbrain.network.learningrules.StaticSynapseRule()
+        step()
+        assertTrue((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
+        repeat(5) {
+            step()
+            assertArrayEquals(full.third.getSummedPSRs(), fast.third.getSummedPSRs(), 1e-12)
+        }
+        assertTrue(full.third.getSummedPSRs()[0] in 0.01..0.99, "the response should be partly decayed")
+    }
 }

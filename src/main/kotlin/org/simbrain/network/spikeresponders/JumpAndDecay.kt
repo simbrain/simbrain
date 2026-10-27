@@ -6,6 +6,8 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.util.UserParameter
+import smile.math.matrix.Matrix
+import kotlin.math.abs
 
 /**
  * When a spike occurs the jump to a max value (the synaptic strength) and then decay to baseline value..
@@ -58,9 +60,9 @@ class JumpAndDecay : SpikeResponder() {
     /**
      * With a zero baseline, fixed weights, and no spike probability, every synapse's response is its weight times a
      * trace kept per source neuron: the trace jumps to one on a spike (or by one, with [useConvolution]) and decays
-     * toward zero otherwise. The weight matrix then sums responses from the spiking sources' weights. The trace
-     * stands for the PSR matrix only once it has been started from an all-zero PSR matrix; after the full [apply]
-     * runs, or the PSR matrix is replaced (as when it is edited), the PSR matrix is authoritative again. Editing a weight while its response decays rescales that response
+     * toward zero otherwise. The weight matrix then sums responses from the spiking sources' weights. After the full
+     * [apply] runs, or the PSR matrix is replaced (as when it is edited), the PSR matrix is authoritative again until
+     * the trace can be restarted from it (see [startTrace]). Editing a weight while its response decays rescales that response
      * at once, where the full PSR matrix keeps decaying from the old weight; the source's next spike makes them agree.
      */
     context(Network)
@@ -72,9 +74,7 @@ class JumpAndDecay : SpikeResponder() {
         val trace = data.trace
         if (trace.size != spikes.size) return null
         if (!data.traceValid) {
-            val psrMatrix = connector.psrMatrix
-            for (j in 0 until psrMatrix.ncol()) for (i in 0 until psrMatrix.nrow()) if (psrMatrix[i, j] != 0.0) return null
-            trace.fill(0.0)
+            if (!startTrace(connector.weights, connector.psrMatrix, trace)) return null
             data.traceValid = true
         }
         if (source.updateRule.isSpikingRule) {
@@ -87,6 +87,32 @@ class JumpAndDecay : SpikeResponder() {
             }
         }
         return trace.copyOf()
+    }
+
+    /**
+     * Starts [trace] from [psrMatrix] if each column is its weights times one factor, the source's trace, and returns
+     * whether it could. The full update leaves the PSR matrix that way after each source's spikes, and the decay keeps
+     * it so, so the trace restarts on the step after the full update stops being needed. Differences within 1e-12 of
+     * the largest weight are dropped, so that an edited response decaying toward zero, which it never quite
+     * reaches, does not keep the full update running.
+     */
+    private fun startTrace(weights: Matrix, psrMatrix: Matrix, trace: DoubleArray): Boolean {
+        var largestWeight = 0.0
+        for (j in 0 until weights.ncol()) for (i in 0 until weights.nrow()) largestWeight = maxOf(largestWeight, abs(weights[i, j]))
+        val tolerance = maxOf(1e-12 * largestWeight, java.lang.Double.MIN_NORMAL)
+        for (j in 0 until weights.ncol()) {
+            var reference = -1
+            for (i in 0 until weights.nrow()) {
+                if (abs(weights[i, j]) > (if (reference < 0) 0.0 else abs(weights[reference, j]))) reference = i
+            }
+            val factor = if (reference < 0) 0.0 else psrMatrix[reference, j] / weights[reference, j]
+            for (i in 0 until weights.nrow()) {
+                val expected = weights[i, j] * factor
+                if (abs(psrMatrix[i, j] - expected) > tolerance + 1e-9 * abs(expected)) return false
+            }
+            trace[j] = factor
+        }
+        return true
     }
 
     context(Network)

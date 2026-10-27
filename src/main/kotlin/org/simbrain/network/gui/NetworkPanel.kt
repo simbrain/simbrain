@@ -403,14 +403,15 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
         modelNodeMap[node.model] = node
         addNodeOrdered(node)
+        // Tied to the node, since undo gives the same model a new node and the old one must stop answering for it
         node.model.events.selected.on(Dispatchers.Default) {
             if (node is NeuronCollectionNode) {
                 selectionManager.add(node.getInteractionBox())
             } else {
                 selectionManager.add(node)
             }
-        }
-        node.model.events.deleted.on(Dispatchers.Unconfined) { nodeRemovals.post(node) }
+        }.cancelWith(node.nodeScope)
+        node.model.events.deleted.on(Dispatchers.Unconfined) { nodeRemovals.post(node) }.cancelWith(node.nodeScope)
         zoomToFit.request()
     }
 

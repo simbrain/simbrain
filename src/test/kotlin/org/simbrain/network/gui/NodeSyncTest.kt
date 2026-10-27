@@ -440,6 +440,27 @@ class NodeSyncTest {
     }
 
     @Test
+    fun `a node removed from the canvas no longer joins the selection`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val neuron = Neuron().also { network.addNetworkModel(it) }
+        val removed = panel.getNode(neuron)
+        neuron.delete()
+        UiWork.awaitIdle()
+        // Undo puts the same model back, and it gets a new node
+        network.addNetworkModel(neuron)
+        val current = panel.getNode(neuron)
+        assertNotSame(removed, current)
+
+        neuron.select()
+        val deadline = System.currentTimeMillis() + 5000
+        while (current !in panel.selectionManager.selection && System.currentTimeMillis() < deadline) Thread.sleep(10)
+        // The selected event reaches every subscriber at about the same time; give a stale one the same chance
+        Thread.sleep(200)
+        assertEquals(setOf(current), panel.selectionManager.selection.toSet())
+    }
+
+    @Test
     fun `a node queued behind one whose sync throws keeps syncing`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))

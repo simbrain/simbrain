@@ -165,6 +165,7 @@ class BatchedBackprop private constructor(
         val columns = m.columnMajorArrayOrNull()
         rows.forEachIndexed { b, row ->
             val values = rowsOfData[row]
+            require(values.size == size) { "Row $row has ${values.size} values, but its layer has $size neurons" }
             if (columns != null) values.copyInto(columns, b * m.ld(), 0, size) else for (i in 0 until size) m[i, b] = values[i]
         }
         return m

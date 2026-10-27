@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
@@ -169,5 +170,18 @@ class BatchedBackpropTest {
         assertFallsBackToPerExample {
             build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false, extra = listOf(2 to 1))
         }
+    }
+
+    @Test
+    fun `rows wider than the input layer are rejected as in per example training`() {
+        fun wideRows(): Built = build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false).also {
+            it.model.trainingSet = TrainingDataset(
+                inputs = MutableList(23) { MutableList(5) { 0.5 } },
+                targets = MutableList(23) { MutableList(3) { 0.5 } },
+            )
+        }
+        assertNotNull(BatchedBackprop.createOrNull(wideRows().model))
+        assertThrows(IllegalArgumentException::class.java) { train(::wideRows, BackpropLossFunction.MSE, batched = false) }
+        assertThrows(IllegalArgumentException::class.java) { train(::wideRows, BackpropLossFunction.MSE, batched = true) }
     }
 }

@@ -312,6 +312,7 @@ object SimbrainDesktop {
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on
             workspaceComponentDesktopComponentMap.remove(wc)
+            component.disposeView()
             component.parentFrame.dispose()
             if (!lastFocusedStack.isEmpty()) {
                 lastFocusedStack.remove(component)

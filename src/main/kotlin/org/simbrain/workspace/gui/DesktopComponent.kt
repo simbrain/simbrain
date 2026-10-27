@@ -25,6 +25,7 @@ import java.awt.Dimension
 import java.awt.Rectangle
 import java.beans.PropertyVetoException
 import java.io.*
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JOptionPane
 import javax.swing.JPanel
 
@@ -107,13 +108,25 @@ var parentFrame: GenericFrame, workspaceComponent: E
             }
         }
         workspaceComponent.close()
+        disposeView()
+    }
+
+    private val viewDisposed = AtomicBoolean(false)
+
+    /**
+     * Ends this view once its component is gone, whether it was closed from its window ([close]) or removed with the
+     * rest of the workspace when it was cleared or another was opened: calls [onClosed] and cancels [viewScope]. Runs
+     * only the first time.
+     */
+    fun disposeView() {
+        if (!viewDisposed.compareAndSet(false, true)) return
         onClosed()
         viewScope.cancel()
     }
 
     /**
-     * Releases resources [viewScope] does not cover (listeners registered outside the event system) once [close] has
-     * really closed the component; not called when the user cancels at the unsaved-changes prompt.
+     * Releases resources [viewScope] does not cover (listeners registered outside the event system) once the component
+     * is really gone (see [disposeView]); not called when the user cancels at the unsaved-changes prompt.
      */
     protected open fun onClosed() {}
 

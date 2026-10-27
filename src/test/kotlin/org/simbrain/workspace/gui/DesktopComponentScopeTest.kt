@@ -1,10 +1,11 @@
 /**
- * A desktop component's view scope, and the scope of a panel tied to it, end when the component closes, taking the
- * view's event subscriptions with them.
+ * A desktop component's view scope, and the scope of a panel tied to it, end when the component closes or is removed
+ * with the rest of the workspace, taking the view's event subscriptions with them.
  */
 package org.simbrain.workspace.gui
 
 import kotlinx.coroutines.isActive
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -32,4 +33,25 @@ class DesktopComponentScopeTest {
         assertFalse(desktop.viewScope.isActive, "the view scope outlived its component")
         assertFalse(desktop.worldPanel.viewScope.isActive, "the panel's scope outlived its window")
     }
+
+    @Test
+    fun `clearing the workspace ends a component's view scope and its panel's`() = runBlocking {
+        val workspace = SimbrainDesktop.workspace
+        workspace.clearWorkspace()
+        val component = OdorWorldComponent("Odor world")
+        workspace.addWorkspaceComponent(component)
+        val desktop = SimbrainDesktop.getDesktopComponent(component) as OdorWorldDesktopComponent
+        assertTrue(desktop.viewScope.isActive)
+
+        // Opening a workspace clears the current one this way too, without closing each component's window
+        workspace.clearWorkspace()
+
+        val deadline = System.currentTimeMillis() + 5000
+        while (desktop.viewScope.isActive && System.currentTimeMillis() < deadline) {
+            SwingUtilities.invokeAndWait {}
+        }
+        assertFalse(desktop.viewScope.isActive, "the view scope outlived its component")
+        assertFalse(desktop.worldPanel.viewScope.isActive, "the panel's scope outlived its window")
+    }
 }
+

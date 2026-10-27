@@ -22,6 +22,7 @@ import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
+import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.util.applyFunction
 import org.simbrain.util.columnMajorArrayOrNull
 import org.simbrain.util.copyFrom
@@ -126,12 +127,7 @@ class BatchedBackprop private constructor(
     private fun activate(layer: NeuronArray, z: Matrix): Matrix = when (val rule = layer.updateRule) {
         is LinearRule -> z.applyFunction(rule::linearRule)
         is GELU -> z.applyFunction(rule::gelu)
-        is SigmoidalRule -> {
-            val weighted = if (rule.addNoise) z.clone().also { m ->
-                for (j in 0 until m.ncol()) for (i in 0 until m.nrow()) m.add(i, j, rule.noiseGenerator.sampleDouble())
-            } else z
-            rule.type.valueOf(weighted, rule.upperBound, rule.lowerBound, rule.slope)
-        }
+        is SigmoidalRule -> rule.type.valueOf(z, rule.upperBound, rule.lowerBound, rule.slope)
         is SoftmaxRule -> softmaxColumns(z, rule.temperature)
         else -> error("Unsupported rule ${rule::class.simpleName}")
     }
@@ -182,10 +178,10 @@ class BatchedBackprop private constructor(
         /**
          * A batched plan for [network], or null if it needs per-example training. Supported: a [BackpropNetwork] or
          * [SupervisedModel] whose layers are plain [NeuronArray]s with a clamped input, no layer norm, and linear,
-         * sigmoidal, GELU, or softmax rules, joined only by [WeightMatrix]es without spike responders between layers
-         * of the network, each running from an earlier layer to a later one in the network's layer order. That order
-         * comes from a breadth-first search back from the output, so recurrent and self connections, and some skip
-         * connections between hidden layers, are left to per-example training.
+         * sigmoidal, GELU, or softmax rules without noise, joined only by [WeightMatrix]es without spike responders
+         * between layers of the network, each running from an earlier layer to a later one in the network's layer
+         * order. That order comes from a breadth-first search back from the output, so recurrent and self connections,
+         * and some skip connections between hidden layers, are left to per-example training.
          */
         fun createOrNull(network: SupervisedNetwork): BatchedBackprop? {
             if (network !is BackpropNetwork && network !is SupervisedModel) return null
@@ -202,6 +198,9 @@ class BatchedBackprop private constructor(
                     val supported = rule.javaClass == LinearRule::class.java || rule.javaClass == SigmoidalRule::class.java ||
                             rule.javaClass == GELU::class.java || rule.javaClass == SoftmaxRule::class.java
                     if (!supported) return null
+                    // Per-example training draws noise example by example through every layer, which a batched pass,
+                    // going layer by layer over the batch, cannot reproduce
+                    if (rule is NoisyUpdateRule && rule.addNoise) return null
                 }
                 if (layer.incomingFlattenConnectors.isNotEmpty()) return null
                 for (connector in layer.incomingConnectors) {

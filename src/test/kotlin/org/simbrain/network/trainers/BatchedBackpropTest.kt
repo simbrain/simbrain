@@ -4,6 +4,7 @@
  */
 package org.simbrain.network.trainers
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertDoesNotThrow
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -183,5 +184,18 @@ class BatchedBackpropTest {
         assertNotNull(BatchedBackprop.createOrNull(wideRows().model))
         assertThrows(IllegalArgumentException::class.java) { train(::wideRows, BackpropLossFunction.MSE, batched = false) }
         assertThrows(IllegalArgumentException::class.java) { train(::wideRows, BackpropLossFunction.MSE, batched = true) }
+    }
+
+    @Test
+    fun `noisy layers train per example so seeded noise is drawn in the same order`() {
+        fun noisyRelu() = relu().apply { addNoise = true; noiseGenerator.randomSeed = 5 }
+        fun noisyLogistic() = sigmoid(SigmoidFunctionEnum.LOGISTIC).apply { addNoise = true; noiseGenerator.randomSeed = 6 }
+        val build = {
+            build(listOf(4, 5, 5, 3), listOf(::noisyRelu, ::noisyLogistic, ::linear), oneHotTargets = false, skip = false)
+        }
+        assertNull(BatchedBackprop.createOrNull(build().model))
+        val (batchedParameters, _) = train(build, BackpropLossFunction.MSE, batched = true)
+        val (exampleParameters, _) = train(build, BackpropLossFunction.MSE, batched = false)
+        batchedParameters.zip(exampleParameters).forEach { (a, b) -> assertArrayEquals(b, a, 0.0) }
     }
 }

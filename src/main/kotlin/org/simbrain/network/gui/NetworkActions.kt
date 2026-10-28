@@ -245,7 +245,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllAction = networkPanel.createAction(
         name = "Select all",
         description = "Select all network items (a or Cmd/Ctrl-A)",
-        keyboardShortcuts = listOf(KeyCombination('A'), CmdOrCtrl + 'A')
+        keyboardShortcuts = listOf(KeyCombination('A'), CmdOrCtrl + 'A'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.selectAll()
     }
@@ -253,7 +254,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllNeuronsAction = networkPanel.createAction(
         name = "Select all neurons",
         description = "Select all neurons (n)",
-        keyboardShortcut = KeyCombination('N')
+        keyboardShortcut = KeyCombination('N'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.set(filterScreenElements<NeuronNode>() + filterScreenElements<NeuronArrayNode>())
     }
@@ -262,7 +264,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllWeightsAction = networkPanel.createAction(
         name = "Select all weights",
         description = "Select all weights (w)",
-        keyboardShortcut = KeyCombination('W')
+        keyboardShortcut = KeyCombination('W'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>())
@@ -272,7 +275,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllExcitatorySynapsesAction = networkPanel.createAction(
         name = "Select all excitatory synapses",
         description = "Select all positive-strength synapses (Cmd/Ctrl-Shift-E)",
-        keyboardShortcut = CmdOrCtrl + Shift + 'E'
+        keyboardShortcut = CmdOrCtrl + Shift + 'E',
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength > 0 })
@@ -281,7 +285,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllInhibitorySynapsesAction = networkPanel.createAction(
         name = "Select all inhibitory synapses",
         description = "Select all negative-strength synapses (Cmd/Ctrl-Shift-I)",
-        keyboardShortcut = CmdOrCtrl + Shift + 'I'
+        keyboardShortcut = CmdOrCtrl + Shift + 'I',
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength < 0 })

@@ -23,7 +23,6 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import java.util.concurrent.ConcurrentLinkedQueue
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import javax.swing.SwingUtilities
 
@@ -31,25 +30,35 @@ import javax.swing.SwingUtilities
 const val UI_FRAME_MS = 16L
 
 /**
- * Counts EDT work that has been posted but not yet run, across every primitive in this file, so tests and saves
+ * Default cadence for coalescing GUI refreshes caused by very fast model updates.
+ *
+ * This was introduced to prevent language-model token generation from being paced by the display.
+ * It is kept generic because other high-rate simulations can use the same protection.
+ *
+ * Use [UI_FRAME_MS] for views that should keep up with the display, and this for views whose source fires far faster
+ * than anyone can read (per-token text, per-iteration labels) and whose block is costly.
+ */
+const val HIGH_RATE_GUI_REFRESH_INTERVAL_MS = 33L
+
+/**
+ * Tracks the primitives in this file that have EDT work scheduled, so a display sync can run it right away and tests
  * can wait for posted updates to land.
  */
 object UiWork {
-
-    private val inFlight = AtomicInteger()
 
     /** Primitives with work scheduled but not yet finished, so a display sync can run it right away. */
     private val active: MutableSet<UiPoster> = java.util.concurrent.ConcurrentHashMap.newKeySet()
 
     internal fun begin(poster: UiPoster) {
-        inFlight.incrementAndGet()
         active += poster
     }
 
     internal fun end(poster: UiPoster) {
         active -= poster
-        inFlight.decrementAndGet()
     }
+
+    /** The primitives with work scheduled, for diagnostics. */
+    internal fun activePosters(): List<UiPoster> = active.toList()
 
     /**
      * Runs every pending update now instead of when its rate cap next allows, so a caller about to paint (such as a
@@ -60,56 +69,61 @@ object UiWork {
         active.toList().forEach { it.flush() }
     }
 
-    val isIdle get() = inFlight.get() == 0
-
     /**
-     * Blocks until every posted update has run, or [timeoutMs] passes. Must not be called on the EDT, which is
-     * what runs the work.
+     * For tests: blocks until every posted update has run and every run loop has ended. Pending work is run now
+     * rather than when its rate cap next allows, so the wait is at most the trailing check each loop makes one
+     * interval after its last run. Throws, naming the primitives still scheduled, if work keeps arriving for
+     * [timeoutMs]. Must not be called on the EDT, which is what runs the work.
      */
     fun awaitIdle(timeoutMs: Long = 10_000) {
         check(!SwingUtilities.isEventDispatchThread()) { "UiWork.awaitIdle would block the EDT it waits for" }
         val deadline = System.currentTimeMillis() + timeoutMs
-        do {
-            SwingUtilities.invokeAndWait {}
-            if (isIdle) return
+        while (true) {
+            // Checked on the EDT, where a run loop ending and rescheduling for a late post happens in one step
+            var scheduled = emptyList<UiPoster>()
+            SwingUtilities.invokeAndWait {
+                flushPending()
+                scheduled = active.toList()
+            }
+            if (scheduled.isEmpty()) return
+            check(System.currentTimeMillis() < deadline) {
+                "UI updates still scheduled after $timeoutMs ms: ${scheduled.joinToString()}"
+            }
             Thread.sleep(1)
-        } while (System.currentTimeMillis() < deadline)
+        }
     }
-}
-
-/**
- * Runs [block] on the EDT, blocking the caller until it finishes. Only for the rare caller that genuinely needs the
- * result applied before it continues (saving, one-off setup); per-item or per-iteration code should post to a
- * [UiRefresh], [UiLatest] or [UiInbox] instead.
- */
-fun blockOnEdt(block: () -> Unit) {
-    if (SwingUtilities.isEventDispatchThread()) block() else SwingUtilities.invokeAndWait(block)
 }
 
 /**
  * The shared run loop: at most one drain coroutine per primitive, started on demand and ending when nothing is
  * left to do, so an idle primitive holds no coroutine.
  */
-abstract class UiPoster internal constructor(private val scope: CoroutineScope, private val minIntervalMs: Long) {
+sealed class UiPoster(private val scope: CoroutineScope, private val minIntervalMs: Long) {
 
     private val running = AtomicBoolean(false)
 
     @Volatile
     private var lastRun = 0L
 
+    /** The block this primitive runs, named in diagnostics by its class. */
+    protected abstract val work: Any
+
     /** Runs the pending work on the EDT; returns false when there was none. */
     protected abstract fun runPending(): Boolean
 
-    protected abstract fun hasPending(): Boolean
+    internal abstract fun hasPending(): Boolean
 
     /** Drops pending work without running it. */
     protected abstract fun dropPending()
+
+    /** Whether a run loop is scheduled or running. */
+    internal val isRunning get() = running.get()
 
     /**
      * Applies anything pending right now, blocking until it has run on the EDT. For saves and other callers that
      * must see every post land; runs directly when called on the EDT.
      */
-    fun flush() = blockOnEdt { runPendingLogged() }
+    fun flush() = runOnEventThread { runPendingLogged() }
 
     /**
      * [runPending], logging a failure instead of throwing it, so a broken view block neither ends a paced run (whose
@@ -120,10 +134,11 @@ abstract class UiPoster internal constructor(private val scope: CoroutineScope, 
     } catch (e: CancellationException) {
         throw e
     } catch (e: Throwable) {
-        System.err.println("Uncaught exception in ${this::class.simpleName} block:")
-        e.printStackTrace()
+        logHandlerFailure("${this::class.simpleName} block", e)
         true
     }
+
+    override fun toString() = "${this::class.simpleName}(${work.javaClass.name})"
 
     protected fun schedule() {
         if (!scope.isActive) {
@@ -161,6 +176,8 @@ class UiRefresh internal constructor(scope: CoroutineScope, minIntervalMs: Long,
 
     private val dirty = AtomicBoolean(false)
 
+    override val work get() = block
+
     /** Asks for one run of the block; requests made before it runs collapse into that run. Never blocks. */
     fun request() {
         dirty.set(true)
@@ -184,6 +201,8 @@ class UiLatest<T> internal constructor(scope: CoroutineScope, minIntervalMs: Lon
     private object None
 
     private val latest = AtomicReference<Any?>(None)
+
+    override val work get() = apply
 
     /** Replaces whatever value is waiting to be applied. Never blocks. */
     fun post(value: T) {
@@ -209,6 +228,8 @@ class UiInbox<T> internal constructor(scope: CoroutineScope, minIntervalMs: Long
 
     private val queue = ConcurrentLinkedQueue<T>()
 
+    override val work get() = drain
+
     /** Queues [item] for the next drain. Never blocks. */
     fun post(item: T) {
         queue.add(item)
@@ -216,7 +237,7 @@ class UiInbox<T> internal constructor(scope: CoroutineScope, minIntervalMs: Long
     }
 
     /** Discards queued items without draining them, e.g. when the data they would be added to is cleared. */
-    fun clear() = queue.clear()
+    fun clear() = dropPending()
 
     override fun runPending(): Boolean {
         val batch = buildList { while (true) add(queue.poll() ?: break) }
@@ -246,30 +267,30 @@ fun <T> CoroutineScope.uiInbox(minIntervalMs: Long = 0, drain: (List<T>) -> Unit
 fun UiScope(): CoroutineScope = CoroutineScope(SupervisorJob())
 
 /**
- * Ends this event subscription when [scope] ends, so a view's subscriptions go with the view. The tie is a child of
- * [scope] that detaches once the subscription ends on its own, so a long-lived scope does not accumulate handlers.
- * Returns the subscription, which can still be cancelled earlier.
+ * Runs [unsubscribe] when [scope] ends, or when the returned Job is cancelled first. The Job is a child of [scope],
+ * so cancelling it early also detaches it and a long-lived scope does not accumulate ended subscriptions. Every
+ * scope-bound subscription in this file goes through here.
+ */
+private fun subscribedUntil(scope: CoroutineScope, unsubscribe: () -> Unit): Job =
+    Job(scope.coroutineContext.job).apply { invokeOnCompletion { unsubscribe() } }
+
+/**
+ * Ends this event subscription when [scope] ends, so a view's subscriptions go with the view. The tie detaches from
+ * [scope] once the subscription ends on its own. Returns the subscription, which can still be cancelled earlier.
  */
 fun Job.cancelWith(scope: CoroutineScope): Job = also { subscription ->
-    val tie = Job(scope.coroutineContext.job)
-    tie.invokeOnCompletion { subscription.cancel() }
+    val tie = subscribedUntil(scope) { subscription.cancel() }
     subscription.invokeOnCompletion { tie.cancel() }
 }
 
-/** [cancelWith] for an awaitable-event subscription, which returns a remover instead of a Job. */
-fun (() -> Unit).cancelWith(scope: CoroutineScope) {
-    Job(scope.coroutineContext.job).invokeOnCompletion { this() }
-}
+/**
+ * [cancelWith] for an awaitable-event subscription, which returns a remover instead of a Job. Returns a Job that
+ * removes the subscription when cancelled; use it, not the remover, to unsubscribe early.
+ */
+fun (() -> Unit).cancelWith(scope: CoroutineScope): Job = subscribedUntil(scope, this)
 
 /** Cancels this scope (such as a panel's view scope) when [scope] (such as its window's) ends. */
 fun CoroutineScope.cancelWith(scope: CoroutineScope): CoroutineScope = also { coroutineContext.job.cancelWith(scope) }
-
-/** Ties an event subscription's removal to [scope]'s lifetime and returns a Job that also removes it. */
-private fun subscribedUntil(scope: CoroutineScope, unsubscribe: () -> Unit): Job {
-    val subscription = Job(scope.coroutineContext[Job])
-    subscription.invokeOnCompletion { unsubscribe() }
-    return subscription
-}
 
 /**
  * Redraws on the EDT after this event, coalescing fires into at most one run per [minIntervalMs]. The event's
@@ -278,35 +299,32 @@ private fun subscribedUntil(scope: CoroutineScope, unsubscribe: () -> Unit): Job
  */
 fun FlowEvents.NoArgAwaitableEvent.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, block: () -> Unit): Job {
     val refresh = scope.uiRefresh(minIntervalMs, block)
-    return subscribedUntil(scope, on(Dispatchers.Unconfined) { refresh.request() })
+    return on(Dispatchers.Unconfined) { refresh.request() }.cancelWith(scope)
 }
 
 /** [onUi] for a valued awaitable event: only the newest value since the last run is applied. */
 fun <T> FlowEvents.AwaitableEvent<T>.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, apply: (T) -> Unit): Job {
     val latest = scope.uiLatest(minIntervalMs, apply)
-    return subscribedUntil(scope, on(Dispatchers.Unconfined) { latest.post(it) })
+    return on(Dispatchers.Unconfined) { latest.post(it) }.cancelWith(scope)
 }
 
 /** Every value fired, in order, handed to [drain] in batches on the EDT. The event's fire never waits on the EDT. */
 fun <T> FlowEvents.AwaitableEvent<T>.onUiBatch(scope: CoroutineScope, minIntervalMs: Long = 0, drain: (List<T>) -> Unit): Job {
     val inbox = scope.uiInbox(minIntervalMs, drain)
-    return subscribedUntil(scope, on(Dispatchers.Unconfined) { inbox.post(it) })
+    return on(Dispatchers.Unconfined) { inbox.post(it) }.cancelWith(scope)
 }
 
 fun FlowEvents.NoArgEvent.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, block: () -> Unit): Job {
     val refresh = scope.uiRefresh(minIntervalMs, block)
-    val handler = onImmediate { refresh.request() }
-    return subscribedUntil(scope) { handler.cancel() }
+    return onImmediate { refresh.request() }.cancelWith(scope)
 }
 
 fun <T> FlowEvents.OneArgEvent<T>.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, apply: (T) -> Unit): Job {
     val latest = scope.uiLatest(minIntervalMs, apply)
-    val handler = onImmediate { latest.post(it) }
-    return subscribedUntil(scope) { handler.cancel() }
+    return onImmediate { latest.post(it) }.cancelWith(scope)
 }
 
 fun <T> FlowEvents.OneArgEvent<T>.onUiBatch(scope: CoroutineScope, minIntervalMs: Long = 0, drain: (List<T>) -> Unit): Job {
     val inbox = scope.uiInbox(minIntervalMs, drain)
-    val handler = onImmediate { inbox.post(it) }
-    return subscribedUntil(scope) { handler.cancel() }
+    return onImmediate { inbox.post(it) }.cancelWith(scope)
 }

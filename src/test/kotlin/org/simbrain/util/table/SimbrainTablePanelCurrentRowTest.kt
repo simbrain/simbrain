@@ -1,7 +1,7 @@
 /**
  * A table panel highlights its data frame's current row through a per-frame refresh while it is on screen: the
  * highlight follows the row, a data world update never waits on the EDT, and a panel taken off screen stops
- * listening.
+ * listening. Row names likewise follow the data frame while the panel is shown.
  */
 package org.simbrain.util.table
 
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test
 import org.simbrain.util.UiWork
 import org.simbrain.util.finishesWhileEdtIsBlocked
 import org.simbrain.util.onEdt
+import org.simbrain.util.subscriberTotal
 import org.simbrain.world.dataworld.DataWorld
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -71,5 +72,33 @@ class SimbrainTablePanelCurrentRowTest {
         UiWork.awaitIdle()
 
         assertEquals(shown, onEdt { panel.table.selectedRow })
+    }
+
+    @Test
+    fun `a panel taken off screen leaves no subscriptions on its data frame`() = runBlocking {
+        val world = DataWorld(rows = 10, cols = 2)
+        val withoutPanel = world.dataModel.events.subscriberTotal()
+        val (frame, _) = showPanel(world)
+        assertTrue(world.dataModel.events.subscriberTotal() > withoutPanel)
+
+        SwingUtilities.invokeAndWait { frame.dispose() }
+
+        assertEquals(withoutPanel, world.dataModel.events.subscriberTotal())
+    }
+
+    @Test
+    fun `row names renamed while the panel is off screen show once it is back`() = runBlocking {
+        val world = DataWorld(rows = 3, cols = 2)
+        val (frame, panel) = showPanel(world)
+        SwingUtilities.invokeAndWait { frame.dispose() }
+
+        world.dataModel.rowNames = listOf("a", "b", "c")
+        SwingUtilities.invokeAndWait { frame.isVisible = true }
+
+        try {
+            assertEquals(listOf("a", "b", "c"), onEdt { panel.scrollPane.rowNames })
+        } finally {
+            SwingUtilities.invokeAndWait { frame.dispose() }
+        }
     }
 }

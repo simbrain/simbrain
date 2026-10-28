@@ -706,11 +706,3 @@ fun buttonRow(vararg components: Component, align: Int = FlowLayout.LEFT, gap: I
     for (c in components) panel.add(c)
     return panel
 }
-
-/**
- * Default cadence for coalescing GUI refreshes caused by very fast model updates.
- *
- * This was introduced to prevent language-model token generation from being paced by the display.
- * It is kept generic because other high-rate simulations can use the same protection.
- */
-const val HIGH_RATE_GUI_REFRESH_INTERVAL_MS = 33L

@@ -31,6 +31,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.updaterules.IzhikevichMatrixData
 import org.simbrain.plot.rasterchart.RasterPlotComponent
+import org.simbrain.util.UiRefresh
 import org.simbrain.util.UiWork
 import org.simbrain.util.updateAction
 import org.simbrain.workspace.Workspace
@@ -149,26 +150,18 @@ private suspend fun run(
     // With -Dbench.syncLog=true, records which UI primitives are pending when each step's display sync flushes
     val syncLog = java.util.concurrent.ConcurrentHashMap<String, AtomicLong>()
     if (headed && System.getProperty("bench.syncLog") == "true") {
-        val activeField = UiWork::class.java.getDeclaredField("active").apply { isAccessible = true }
         val original = workspace.displaySync!!
         val panel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
-        val refresh = panel.javaClass.getDeclaredField("refreshAfterUpdate").apply { isAccessible = true }.get(panel)
-        val running = org.simbrain.util.UiPoster::class.java.getDeclaredField("running").apply { isAccessible = true }.get(refresh) as java.util.concurrent.atomic.AtomicBoolean
-        val dirty = refresh.javaClass.getDeclaredField("dirty").apply { isAccessible = true }.get(refresh) as java.util.concurrent.atomic.AtomicBoolean
+        val refresh = panel.javaClass.getDeclaredField("refreshAfterUpdate").apply { isAccessible = true }.get(panel) as UiRefresh
         workspace.displaySync = {
             withContext(Dispatchers.Swing) {
-                @Suppress("UNCHECKED_CAST")
-                val active = (activeField.get(UiWork) as Set<Any>).toList()
+                val active = UiWork.activePosters()
                 syncLog.computeIfAbsent("syncs") { AtomicLong() }.incrementAndGet()
                 syncLog.computeIfAbsent("active=${active.size}") { AtomicLong() }.incrementAndGet()
-                val state = "panel refresh running=${running.get()} active=${refresh in active} dirty=${dirty.get()}"
+                val state = "panel refresh running=${refresh.isRunning} active=${refresh in active} dirty=${refresh.hasPending()}"
                 syncLog.computeIfAbsent(state) { AtomicLong() }.incrementAndGet()
                 active.forEach { poster ->
-                    val work = listOf("block", "apply", "drain").firstNotNullOfOrNull { name ->
-                        runCatching { poster.javaClass.getDeclaredField(name).apply { isAccessible = true }.get(poster) }.getOrNull()
-                    }
-                    val key = "${poster.javaClass.simpleName} ${work?.javaClass?.name} #${System.identityHashCode(poster)}"
-                    syncLog.computeIfAbsent(key) { AtomicLong() }.incrementAndGet()
+                    syncLog.computeIfAbsent("$poster #${System.identityHashCode(poster)}") { AtomicLong() }.incrementAndGet()
                 }
             }
             original()

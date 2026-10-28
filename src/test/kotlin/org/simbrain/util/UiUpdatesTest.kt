@@ -207,6 +207,19 @@ class UiUpdatesTest {
         scope.cancel()
     }
 
+    @Test
+    fun `awaiting idle throws, naming the work, when work keeps arriving`() {
+        val scope = UiScope()
+        lateinit var refresh: UiRefresh
+        refresh = scope.uiRefresh(minIntervalMs = 0) { refresh.request() }
+        refresh.request()
+
+        val error = assertThrows(IllegalStateException::class.java) { UiWork.awaitIdle(timeoutMs = 200) }
+
+        assertTrue("UiRefresh" in error.message!!, error.message)
+        scope.cancel()
+    }
+
     private class TestEvents : FlowEvents() {
         val barrier = NoArgAwaitableEvent()
         val valued = AwaitableEvent<Int>()
@@ -286,6 +299,17 @@ class UiUpdatesTest {
         repeat(1000) { events.ping.onImmediate { }.cancelWith(scope).cancel() }
 
         assertEquals(0, scope.coroutineContext.job.children.count())
+    }
+
+    @Test
+    fun `awaitable subscriptions ended early leave nothing behind`() {
+        val scope = UiScope()
+        val events = TestEvents()
+
+        repeat(1000) { events.barrier.on(Dispatchers.Unconfined) { }.cancelWith(scope).cancel() }
+
+        assertEquals(0, scope.coroutineContext.job.children.count())
+        assertEquals(0, events.subscriberTotal())
     }
 
     @Test

@@ -1,3 +1,8 @@
+/**
+ * The table view of a [SimbrainDataFrame]: the panel with its toolbar and row headers, the JTable itself, and the
+ * row banding shared by tables whose rows are consumed in groups. The panel follows the data frame only while it is
+ * on screen.
+ */
 package org.simbrain.util.table
 
 import kotlinx.coroutines.CoroutineScope
@@ -8,6 +13,7 @@ import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
 import org.simbrain.util.UiScope
+import org.simbrain.util.cancelWith
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
@@ -57,22 +63,28 @@ open class SimbrainTablePanel @JvmOverloads constructor(
         }
 
     /**
-     * Scope of the current-row highlight, alive while the panel is on screen. Many panels live in dialogs nobody
-     * disposes, so the subscription follows the panel's place in the component hierarchy instead.
+     * Scope of the model subscriptions (current-row highlight, row names), alive while the panel is on screen. Many
+     * panels live in dialogs nobody disposes, so the subscriptions follow the panel's place in the component
+     * hierarchy instead.
      */
-    private var ui: CoroutineScope? = null
+    private var viewScope: CoroutineScope? = null
 
     override fun addNotify() {
         super.addNotify()
-        ui?.cancel()
-        ui = UiScope().also { scope ->
+        viewScope?.cancel()
+        viewScope = UiScope().also { scope ->
             model.events.currentRowChanged.onUi(scope) { showCurrentRow() }
+            // Names may have changed while the panel was off screen
+            scrollPane.rowNames = model.getAllRowNames()
+            model.events.rowNameChanged.on(Dispatchers.Swing) {
+                scrollPane.rowNames = model.getAllRowNames()
+            }.cancelWith(scope)
         }
     }
 
     override fun removeNotify() {
-        ui?.cancel()
-        ui = null
+        viewScope?.cancel()
+        viewScope = null
         super.removeNotify()
     }
 
@@ -111,10 +123,6 @@ open class SimbrainTablePanel @JvmOverloads constructor(
     }
 
     init {
-        model.events.rowNameChanged.on(Dispatchers.Swing) {
-            scrollPane.rowNames = model.getAllRowNames()
-        }
-
         // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
         // main panel
         layout = BorderLayout()

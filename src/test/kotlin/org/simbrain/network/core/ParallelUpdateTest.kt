@@ -4,16 +4,19 @@
  */
 package org.simbrain.network.core
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.network.learningrules.HebbianRule
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IACRule
 import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.util.awaitUntil
 import kotlin.random.Random
 
 class ParallelUpdateTest {
@@ -45,15 +48,11 @@ class ParallelUpdateTest {
     }
 
     private fun runAndRecord(parallel: Boolean, spikeProbability: Double = 1.0): Pair<DoubleArray, DoubleArray> {
-        parallelUpdateOverride = parallel
-        try {
-            val (net, synapses) = buildSpikingNetwork(7, spikeProbability)
-            repeat(400) { net.update() }
-            return net.flatNeuronList.map { it.activation }.toDoubleArray() to
-                    synapses.map { it.strength }.toDoubleArray()
-        } finally {
-            parallelUpdateOverride = null
-        }
+        val (net, synapses) = buildSpikingNetwork(7, spikeProbability)
+        net.parallelUpdate = parallel
+        repeat(400) { net.update() }
+        return net.flatNeuronList.map { it.activation }.toDoubleArray() to
+                synapses.map { it.strength }.toDoubleArray()
     }
 
     @Test
@@ -100,12 +99,43 @@ class ParallelUpdateTest {
         val rule = LinearRule().apply { addNoise = true }
         val neurons = List(200) { Neuron(rule) }
         val synapses = neurons.flatMap { src -> neurons.filter { it !== src }.map { Synapse(src, it) } }
-        val plan = NetworkUpdatePlan(neurons + synapses)
-        assertTrue(plan.neuronUpdateChunks.size > 1, "Unseeded noise is not reproducible anyway")
+        val network = Network()
+        network.addNetworkModelsAsync(neurons + synapses, usePlacementManager = false)
+        assertTrue(network.updatePlan.neuronUpdateChunks.size > 1, "Unseeded noise is not reproducible anyway")
         rule.noiseGenerator.randomSeed = 42
-        assertEquals(listOf(neurons), plan.neuronUpdateChunks)
+        assertEquals(listOf(neurons), network.updatePlan.neuronUpdateChunks)
         neurons.forEach { it.updateRule = rule.copy() }
-        assertTrue(plan.neuronUpdateChunks.size > 1, "Neurons with their own rules each draw their own noise")
+        assertTrue(
+            network.updatePlan.neuronUpdateChunks.size > 1,
+            "Neurons with their own rules each draw their own noise"
+        )
+    }
+
+    @Test
+    fun `a synapse given a learning rule after the plan is built learns`() {
+        val network = Network()
+        val source = Neuron().apply { activation = 1.0; clamped = true }
+        val target = Neuron().apply { activation = 1.0; clamped = true }
+        val synapse = Synapse(source, target).apply { forceSetStrength(0.5) }
+        network.addNetworkModelsAsync(listOf(source, target, synapse), usePlacementManager = false)
+        network.update()
+
+        synapse.learningRule = HebbianRule().apply { learningRate = 0.1 }
+        network.update()
+
+        assertEquals(0.6, synapse.strength, 1e-9)
+    }
+
+    @Test
+    fun `a deleted synapse keeps no network listener on its learning rule`() = runBlocking {
+        val network = Network()
+        val (source, target) = List(2) { Neuron() }
+        val synapse = Synapse(source, target)
+        network.addNetworkModels(listOf(source, target, synapse), usePlacementManager = false)
+        assertEquals(1, synapse.events.learningRuleUpdated.subscriberCount)
+
+        synapse.delete()
+        awaitUntil { synapse.events.learningRuleUpdated.subscriberCount == 0 }
     }
 
     @Test

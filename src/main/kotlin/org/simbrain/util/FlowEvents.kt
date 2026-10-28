@@ -227,6 +227,20 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             return Job().apply { invokeOnCompletion { list.remove(handler) } }
         }
 
+        /**
+         * [onImmediateFlow] without the Job: [handler] stays subscribed until [removeImmediate] is called with the same
+         * instance, and adding an instance already subscribed does nothing. For a subscription held on every model of
+         * a large network, where a Job per model is a measurable share of the heap; share one handler instance across
+         * the models so each pays only a slot in its handler list.
+         */
+        fun addImmediate(handler: (T) -> Unit) {
+            immediateHandlerList().addIfAbsent(handler)
+        }
+
+        fun removeImmediate(handler: (T) -> Unit) {
+            immediateHandlers?.remove(handler)
+        }
+
         /** How many handlers are subscribed, immediate or dispatched; for checking that a view's subscriptions ended. */
         internal val subscriberCount get() = (handlers?.size ?: 0) + (immediateHandlers?.size ?: 0)
 

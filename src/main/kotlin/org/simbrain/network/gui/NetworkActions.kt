@@ -1456,8 +1456,7 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
             }
 
             synapseGroupSynapsesMap.forEach { (group, synapses) ->
-                group.synapses.clear()
-                group.synapses.addAll(synapses)
+                group.restoreSynapses(synapses)
             }
 
             subnetwork.modelList.addAll(models)

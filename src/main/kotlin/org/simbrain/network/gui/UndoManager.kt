@@ -142,7 +142,7 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
 
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
-                    parent.synapses.add(synapse)
+                    parent.restoreSynapse(synapse)
                     // Restoring synapses changes the group's size; recompute its expanded/collapsed state.
                     // A flip to collapsed fires visibilityChanged, whose reconcile removes any loose nodes.
                     parent.refreshVisibility()

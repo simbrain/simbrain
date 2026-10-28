@@ -954,8 +954,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 redo = {
                     synapseGroupSynapses.entries.map { (sg, synapses) ->
                         launch {
-                            sg.synapses.clear()
-                            sg.synapses.addAll(synapses)
+                            sg.restoreSynapses(synapses)
                             network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)
                             sg.afterRestore()
                         }

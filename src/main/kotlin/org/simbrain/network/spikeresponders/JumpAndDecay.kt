@@ -1,7 +1,6 @@
 package org.simbrain.network.spikeresponders
 
 import org.simbrain.network.core.*
-import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.network.util.SpikingMatrixData
@@ -67,7 +66,7 @@ class JumpAndDecay : SpikeResponder() {
      */
     context(Network)
     override fun sourceFactors(connector: WeightMatrix): DoubleArray? {
-        if (useSpikeProbability || baseLine != 0.0 || connector.learningRule !is StaticSynapseRule) return null
+        if (useSpikeProbability || baseLine != 0.0 || connector.isLearning) return null
         val data = connector.spikeResponseData as? JumpAndDecayMatrixData ?: return null
         val source = connector.source as? NeuronArray ?: return null
         val spikes = (source.dataHolder as? SpikingMatrixData)?.spikes ?: return null

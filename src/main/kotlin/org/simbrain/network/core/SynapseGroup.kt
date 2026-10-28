@@ -3,9 +3,9 @@ package org.simbrain.network.core
 import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
-import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.util.CachedObject
 import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.showWarningDialog
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -37,9 +37,37 @@ class SynapseGroup @JvmOverloads constructor(
     @Transient
     override var events = SynapseGroupEvents()
 
-    var synapses: MutableList<Synapse> = synapses.onEach { synapse ->
+    /**
+     * The synapses with a non-static learning rule, the only ones [update] has work for; a large group of static
+     * synapses would otherwise be walked serially on every update. Dropped when the list changes or a synapse's
+     * learning rule is replaced.
+     */
+    // `this.`: in an initializer, a bare `synapses` is the constructor parameter, not the group's current list
+    @Transient
+    private val learningSynapses = CachedObject { this.synapses.filter { it.isLearning } }
+
+    /** One instance shared by every synapse in the group, so each pays only a slot in its event's handler list. */
+    @Transient
+    private val learningRuleChanged: (Any?) -> Unit = { learningSynapses.invalidate() }
+
+    /**
+     * The group's synapses. Change them through [addSynapse], [restoreSynapse] and [restoreSynapses], which keep
+     * [learningSynapses] current.
+     */
+    val synapses: List<Synapse> = ArrayList(synapses).onEach { synapse ->
         synapse.isVisible = false
         addSynapseListener(synapse)
+    }
+
+    /**
+     * [synapses] for editing. The field is declared as a read-only list so other code cannot edit it in place, and
+     * keeps its name because saved workspaces store it under that name.
+     */
+    private val synapseList get() = synapses as MutableList<Synapse>
+
+    private inline fun editSynapses(edit: MutableList<Synapse>.() -> Unit) {
+        synapseList.edit()
+        learningSynapses.invalidate()
     }
 
     /**
@@ -110,7 +138,7 @@ class SynapseGroup @JvmOverloads constructor(
                 val deletedBySynapse = synapse.delete()
                 addAll(deletedBySynapse)
             }
-        }.also { synapses.clear() }
+        }.also { editSynapses { clear() } }
     }
 
     /**
@@ -152,8 +180,17 @@ class SynapseGroup @JvmOverloads constructor(
         
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
-        this.synapses.add(syn)
+        editSynapses { add(syn) }
         refreshVisibility()
+    }
+
+    /** Puts back a synapse of this group whose deletion is being undone. */
+    fun restoreSynapse(synapse: Synapse) = editSynapses { add(synapse) }
+
+    /** Puts back the group's synapses as they were when an addition being redone was first made. */
+    fun restoreSynapses(synapses: List<Synapse>) = editSynapses {
+        clear()
+        addAll(synapses)
     }
 
     fun isRecurrent(): Boolean {
@@ -162,39 +199,8 @@ class SynapseGroup @JvmOverloads constructor(
 
     context(Network)
     override fun update() {
-        learningSynapses().forEach { it.update() }
+        learningSynapses.value.forEach { it.update() }
         events.updated.fire()
-    }
-
-    private class LearningSynapses(
-        val epoch: Long,
-        val list: List<Synapse>,
-        val size: Int,
-        val first: Synapse?,
-        val last: Synapse?,
-        val learning: List<Synapse>
-    )
-
-    @Transient
-    private var learningSynapses: LearningSynapses? = null
-
-    /**
-     * The synapses with a non-static learning rule, the only ones [update] has work for; a large group of static
-     * synapses would otherwise be walked serially on every update. Rebuilt when any learning rule is replaced
-     * ([Synapse.learningRuleEpoch]) or when [synapses] looks different, since other code edits it in place
-     * (reconnecting, undo): its identity, size, and first and last elements are compared.
-     */
-    private fun learningSynapses(): List<Synapse> {
-        val epoch = Synapse.learningRuleEpoch.get()
-        val list = synapses
-        learningSynapses?.let {
-            if (it.epoch == epoch && it.list === list && it.size == list.size && it.first === list.firstOrNull() &&
-                it.last === list.lastOrNull()
-            ) return it.learning
-        }
-        val learning = list.filter { it.learningRule !is StaticSynapseRule }
-        learningSynapses = LearningSynapses(epoch, list, list.size, list.firstOrNull(), list.lastOrNull(), learning)
-        return learning
     }
 
     fun size(): Int = this.synapses.size
@@ -303,9 +309,10 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun addSynapseListener(synapse: Synapse) {
+        synapse.events.learningRuleUpdated.addImmediate(learningRuleChanged)
         synapse.events.deleted.on(Dispatchers.Default) {
             if (deleting) return@on
-            this.synapses.remove(it)
+            editSynapses { remove(it) }
             if (this.synapses.isEmpty()) {
                 this.delete()
             } else {

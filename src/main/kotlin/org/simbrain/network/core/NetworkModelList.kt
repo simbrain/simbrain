@@ -151,6 +151,11 @@ class NetworkModelList {
         updatePlanCache.invalidate()
     }
 
+    /** Drops the update plan after a change it depends on that the model list does not see, such as a replaced rule. */
+    fun invalidateUpdatePlan() {
+        updatePlanCache.invalidate()
+    }
+
     fun updatePriorityList() {
         allInPriorityOrderCache.invalidate()
     }

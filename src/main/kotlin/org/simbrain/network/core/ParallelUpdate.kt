@@ -13,18 +13,17 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.launch
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 
 /**
  * Number of chunks that may run at once. One core is left for the Swing event thread so the interface stays
  * responsive while a large network runs.
  */
-val modelUpdateParallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
+internal val modelUpdateParallelism = (Runtime.getRuntime().availableProcessors() - 1).coerceAtLeast(1)
 
 /**
  * Dispatcher shared by every network's parallel update phases.
  */
-val modelUpdateDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(modelUpdateParallelism)
+internal val modelUpdateDispatcher: CoroutineDispatcher = Dispatchers.Default.limitedParallelism(modelUpdateParallelism)
 
 /**
  * Minimum estimated cost of a chunk (roughly, synapse visits). Below this, launching a coroutine costs more than it
@@ -37,7 +36,7 @@ private const val MIN_CHUNK_COST = 4096L
  * which are usually allocated together, on the same thread. Returns a single chunk when the total cost is too small
  * to be worth splitting.
  */
-fun <T> chunkByCost(items: List<T>, cost: (T) -> Int): List<List<T>> {
+internal fun <T> chunkByCost(items: List<T>, cost: (T) -> Int): List<List<T>> {
     if (items.isEmpty()) return emptyList()
     val costs = LongArray(items.size) { cost(items[it]).toLong().coerceAtLeast(1) }
     val total = costs.sum()
@@ -59,22 +58,12 @@ fun <T> chunkByCost(items: List<T>, cost: (T) -> Int): List<List<T>> {
 }
 
 /**
- * Replaces [NetworkPreferences.parallelUpdate] without persisting a preference, so tests can compare a parallel
- * update with a serial reference. Null defers to the preference.
- */
-@Volatile
-internal var parallelUpdateOverride: Boolean? = null
-
-@PublishedApi
-internal val parallelUpdateEnabled: Boolean get() = parallelUpdateOverride ?: NetworkPreferences.parallelUpdate
-
-/**
  * Runs [action] on every item of every chunk and returns once all have finished. Chunks run concurrently on
- * [modelUpdateDispatcher] unless there is only one chunk or parallel updating is turned off in [NetworkPreferences].
- * [action] must only touch state owned by its item, since items in different chunks run at the same time.
+ * [modelUpdateDispatcher] when [parallel] is set and there is more than one chunk. [action] must only touch state
+ * owned by its item, since items in different chunks run at the same time.
  */
-suspend inline fun <T> List<List<T>>.forEachInParallel(crossinline action: (T) -> Unit) {
-    if (size <= 1 || !parallelUpdateEnabled) {
+internal suspend inline fun <T> List<List<T>>.forEachInParallel(parallel: Boolean, crossinline action: (T) -> Unit) {
+    if (size <= 1 || !parallel) {
         for (chunk in this) chunk.forEach(action)
         return
     }

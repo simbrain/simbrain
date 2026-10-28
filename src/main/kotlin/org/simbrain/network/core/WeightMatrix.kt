@@ -59,6 +59,9 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @UserParameter(label = "Learning rule", description = "Learning rule for updating weights.", order = 100)
     var learningRule: SynapseUpdateRule<*, *> = StaticSynapseRule()
 
+    /** Whether [learningRule] changes the weights; a static rule leaves nothing to update. */
+    val isLearning: Boolean get() = learningRule !is StaticSynapseRule
+
     /**
      * Only used if source connector's rule is spiking.
      */
@@ -240,7 +243,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         if (clamped) {
             return
         }
-        if (learningRule !is StaticSynapseRule) {
+        if (isLearning) {
             learningRule.apply(this, learningRuleData)
             updateMasks()
             events.updated.fire()

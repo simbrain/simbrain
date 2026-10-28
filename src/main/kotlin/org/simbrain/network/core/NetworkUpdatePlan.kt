@@ -13,12 +13,12 @@
  * of model order.
  *
  * The plan also skips work that is known to be empty: synapses have no input accumulation of their own, and synapses
- * with a static learning rule have nothing to update. Which synapses learn is tracked against
- * [Synapse.learningRuleEpoch], since learning rules can change without the model list changing.
+ * with a static learning rule have nothing to update. Which rules are shared and which synapses learn can change
+ * without the model list changing, so [Network] also drops the plan when a neuron's update rule or a synapse's
+ * learning rule is replaced.
  */
 package org.simbrain.network.core
 
-import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import java.util.*
@@ -41,23 +41,12 @@ class NetworkUpdatePlan(ordered: List<NetworkModel>) {
         get() = if (neuronChunks.size > 1 && (neurons.any { !it.updateRule.isNeuronLocal } ||
                     sharedUpdateRules.any { it.addsSeededNoise })) listOf(neurons) else neuronChunks
 
-    private class SharedRules(val epoch: Long, val rules: List<NeuronUpdateRule<*, *>>)
-
-    @Volatile
-    private var sharedRules: SharedRules? = null
-
     /**
-     * Rule objects used by more than one neuron. Tracked against [Neuron.updateRuleEpoch].
+     * Rule objects used by more than one neuron.
      */
-    private val sharedUpdateRules: List<NeuronUpdateRule<*, *>>
-        get() {
-            val epoch = Neuron.updateRuleEpoch.get()
-            sharedRules?.let { if (it.epoch == epoch) return it.rules }
-            val counts = IdentityHashMap<NeuronUpdateRule<*, *>, Int>()
-            neurons.forEach { counts.merge(it.updateRule, 1, Int::plus) }
-            val shared = counts.filterValues { it > 1 }.keys.toList()
-            return shared.also { sharedRules = SharedRules(epoch, it) }
-        }
+    private val sharedUpdateRules: List<NeuronUpdateRule<*, *>> = IdentityHashMap<NeuronUpdateRule<*, *>, Int>()
+        .also { counts -> neurons.forEach { counts.merge(it.updateRule, 1, Int::plus) } }
+        .filterValues { it > 1 }.keys.toList()
 
     private val NeuronUpdateRule<*, *>.addsSeededNoise: Boolean
         get() = this is NoisyUpdateRule && addNoise && noiseGenerator.randomSeed != null
@@ -68,21 +57,9 @@ class NetworkUpdatePlan(ordered: List<NetworkModel>) {
      */
     val otherModels: List<NetworkModel> = ordered.filter { it !is Neuron && it !is Synapse }
 
-    private val synapses: List<Synapse> = ordered.filterIsInstance<Synapse>()
-
-    private class LearningSynapses(val epoch: Long, val chunks: List<List<Synapse>>)
-
-    @Volatile
-    private var learningSynapses: LearningSynapses? = null
-
     /**
      * Free synapses with a non-static learning rule, in chunks.
      */
-    val learningSynapseChunks: List<List<Synapse>>
-        get() {
-            val epoch = Synapse.learningRuleEpoch.get()
-            learningSynapses?.let { if (it.epoch == epoch) return it.chunks }
-            val learning = synapses.filter { it.learningRule !is StaticSynapseRule }
-            return chunkByCost(learning) { 1 }.also { learningSynapses = LearningSynapses(epoch, it) }
-        }
+    val learningSynapseChunks: List<List<Synapse>> =
+        chunkByCost(ordered.filterIsInstance<Synapse>().filter { it.isLearning }) { 1 }
 }

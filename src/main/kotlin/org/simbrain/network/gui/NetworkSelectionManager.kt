@@ -1,5 +1,6 @@
 package org.simbrain.network.gui
 
+import org.simbrain.util.CachedObject
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.events.NetworkSelectionEvent
 import org.simbrain.network.gui.nodes.ScreenElement
@@ -57,24 +58,13 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     inline fun <reified T: ScreenElement> filterSelectedSourceNodes() = sourceSelection.filterIsInstance<T>()
     fun <T: ScreenElement> filterSelectedSourceNodes(clazz: Class<T>) = sourceSelection.filterIsInstance(clazz)
 
-    private class SelectedModels(val selectionVersion: Long, val models: List<NetworkModel>)
-
-    @Volatile
-    private var selectionVersion = 0L
-
-    @Volatile
-    private var selectedModelsCache: SelectedModels? = null
+    private val selectedModelsCache = CachedObject { selection.map { it.model }.toSet().toList() }
 
     /**
      * Getter for selected models. Every conditionally enabled action reads this on each selection change, so it is
      * computed once per change rather than once per read.
      */
-    val selectedModels: List<NetworkModel>
-        get() {
-            val version = selectionVersion
-            selectedModelsCache?.let { if (it.selectionVersion == version) return it.models }
-            return selection.map { it.model }.toSet().toList().also { selectedModelsCache = SelectedModels(version, it) }
-        }
+    val selectedModels: List<NetworkModel> by selectedModelsCache::value
 
     /**
      * Getter for source models.
@@ -204,7 +194,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
         val old = HashSet(selection)
         // Invoke provided action
         (selection as SnapshotSet).action()
-        selectionVersion++
+        selectedModelsCache.invalidate()
         events.selection.fire(old, selection)
     }
 

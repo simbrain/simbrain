@@ -36,9 +36,18 @@ class UnsupervisedTrainer: EditableObject {
 
     var isRunning = false
 
-    var maxIterations by GuiEditable(
-        initValue = 1000
+    var useMaxIterations by GuiEditable(
+        initValue = false,
+        description = "Stop training after a fixed number of iterations. Otherwise training runs until stopped"
     )
+
+    var maxIterations by GuiEditable(
+        initValue = 1000,
+        description = "Training stops after this many iterations",
+        conditionallyEnabledBy = UnsupervisedTrainer::useMaxIterations
+    )
+
+    private val maxIterationsReached get() = useMaxIterations && iteration >= maxIterations
 
     @UserParameter(
         label = "Learning Rate",
@@ -51,7 +60,7 @@ class UnsupervisedTrainer: EditableObject {
 
     context(Network)
     suspend fun startTraining(network: UnsupervisedNetwork) {
-        if (iteration >= maxIterations) {
+        if (maxIterationsReached) {
             events.iterationReset.fire()
         }
         isRunning = true
@@ -59,7 +68,7 @@ class UnsupervisedTrainer: EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce(network)
-                if (iteration >= maxIterations) {
+                if (maxIterationsReached) {
                     stopTraining()
                 }
             }
@@ -81,6 +90,7 @@ class UnsupervisedTrainer: EditableObject {
     }
 
     fun copyFrom(other: UnsupervisedTrainer) {
+        this.useMaxIterations = other.useMaxIterations
         this.maxIterations = other.maxIterations
         this.learningRate = other.learningRate
     }

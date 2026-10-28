@@ -179,6 +179,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
         add(clearDataAction)
     }
     private val runToolbar = JToolBar().apply {
+        add(iterateAction)
         add(ToggleButton(listOf(stopAction, runAction)).apply {
             setAction("Run")
             projector.events.startIterating.on {
@@ -188,7 +189,6 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
                 setAction("Run")
             }
         })
-        add(iterateAction)
     }
 
     private val runToolbarSeparator = JSeparator(SwingConstants.VERTICAL).apply {

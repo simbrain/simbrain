@@ -36,7 +36,12 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
 
     override val coroutineContext = Dispatchers.Swing + job
 
-    val iterationsLabel = JLabel(trainer.iteration.toString())
+    private fun currentStats() = TrainingStats(
+        trainingError = trainer.lastTrainingError,
+        trainingAccuracy = trainer.lastTrainingAccuracy,
+        testingAccuracy = trainer.lastTestingAccuracy,
+        effectiveStepSize = trainer.lastEffectiveStepSize
+    )
 
     // Validation state for row count matching
     private var isValidationEnabled = true
@@ -92,7 +97,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
                     showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
                 }
             }
-            trainer.events.errorUpdated.fireAsync(TrainingStats(trainer.lastTrainingError, null, trainer.lastTrainingAccuracy, trainer.lastTestingAccuracy))
+            trainer.events.errorUpdated.fireAsync(currentStats())
             supervisedNetwork.onTrainerConfigChanged()
             onTrainerConfigEdited?.invoke()
         }.display()
@@ -192,81 +197,27 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         initParamsButton.hideActionText = true
         runTools.add(initParamsButton)
         runTools.add(JButton(trainerPropsAction), "wrap")
-        val labelPanel = LabelledItemPanel()
-        labelPanel.addItem("Iterations:", iterationsLabel)
-        labelPanel.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 2) {
-                    trainer.iteration = 0
-                    trainer.events.iterationReset.fire()
-                    iterationsLabel.text = trainer.iteration.toString()
-                }
+        val statsPanel = TrainingStatsPanel(
+            events = trainer.events,
+            iteration = { trainer.iteration },
+            resetIteration = {
+                trainer.iteration = 0
+                trainer.events.iterationReset.fire()
+            },
+            initialStats = currentStats()
+        ) {
+            with(supervisedNetwork.trainerConfig) {
+                TrainingStatsSettings(
+                    lossName = lossFunction.shortName,
+                    updateMethod = updateType.toString(),
+                    testingEnabled = testConfiguration.enabled,
+                    computeAccuracy = computeAccuracy,
+                    showStepSize = showEffectiveStepSize,
+                    stoppingCondition = stoppingCondition
+                )
             }
-        })
-        val trainingErrorValue = JLabel(trainer.lastTrainingError.roundToString(4))
-        fun errorDescriptionString() = "Mean Error (${supervisedNetwork.trainerConfig.updateType}; ${supervisedNetwork.trainerConfig.lossFunction.shortName})"
-        val trainingErrorLabel = labelPanel.addItem("Training ${errorDescriptionString()}", trainingErrorValue)
-
-        // Effective Step Size is always shown, so keep it grouped with the other always-visible
-        // rows (Iterations, Training Error) instead of after the conditional testing/accuracy rows,
-        // which would leave it detached from the text above when those are hidden.
-        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
-        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
-            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
-                "For Adam in steady state ≈ learning rate; for SGD ≈ lr·||g||. " +
-                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
         }
-        labelPanel.addItem("Effective Step Size:", stepSizeValue)
-
-        val testingErrorValue = JLabel("N/A")
-        val testingErrorLabel = labelPanel.addItem("Testing ${errorDescriptionString()}", testingErrorValue)
-
-        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
-
-        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
-
-        fun updateLabelVisibility() {
-            val showTestingLoss = supervisedNetwork.trainerConfig.testConfiguration.enabled
-            val showTrainingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy
-            val showTestingAccuracy = supervisedNetwork.trainerConfig.computeAccuracy && 
-                                           supervisedNetwork.trainerConfig.testConfiguration.enabled
-            
-            testingErrorLabel.isVisible = showTestingLoss
-            testingErrorValue.isVisible = showTestingLoss
-            trainingAccuracyLabel.isVisible = showTrainingAccuracy
-            trainingAccuracyValue.isVisible = showTrainingAccuracy
-            testingAccuracyLabel.isVisible = showTestingAccuracy
-            testingAccuracyValue.isVisible = showTestingAccuracy
-        }
-        
-        updateLabelVisibility()
-        
-        runTools.add(labelPanel)
-
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            iterationsLabel.text = "" + trainer.iteration
-            trainingErrorValue.text = "" + trainingStats.trainingError.format(4)
-            trainingErrorLabel.text = "Training ${errorDescriptionString()}"
-            
-            trainingStats.testingError?.let { testingError ->
-                testingErrorValue.text = "" + testingError.format(4)
-                testingErrorLabel.text = "Testing ${errorDescriptionString()}"
-            }
-            
-            updateLabelVisibility()
-            
-            trainingStats.trainingAccuracy?.let { accuracy ->
-                trainingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
-            }
-            
-            trainingStats.testingAccuracy?.let { accuracy ->
-                testingAccuracyValue.text = "${(accuracy * 100).format(1)}%"
-            }
-
-            stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
-        }
+        runTools.add(statsPanel)
 
         layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
@@ -275,6 +226,113 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
 
 }
 
+/**
+ * What [TrainingStatsPanel] needs from a trainer's configuration, read again on every refresh so edits to the
+ * trainer properties show up without rebuilding the panel.
+ */
+data class TrainingStatsSettings(
+    val lossName: String,
+    val updateMethod: String? = null,
+    val testingEnabled: Boolean,
+    val computeAccuracy: Boolean,
+    val showStepSize: Boolean,
+    val stoppingCondition: SupervisedTrainer.StoppingCondition
+)
+
+/**
+ * The iteration count and training statistics shown beside the run controls of the supervised and CNN trainers.
+ * Rows tied to a trainer setting are left out while that setting is off. Double-clicking resets the iteration count.
+ */
+class TrainingStatsPanel(
+    events: TrainerEvents,
+    private val iteration: () -> Int,
+    resetIteration: () -> Unit,
+    initialStats: TrainingStats,
+    private val settings: () -> TrainingStatsSettings
+) : LabelledItemPanel() {
+
+    private data class Row(val label: String, val value: JLabel, val tooltip: String? = null)
+
+    private val iterationsValue = JLabel(iteration().toString())
+    private val trainingErrorValue = JLabel(initialStats.trainingError.format(4))
+    private val testingErrorValue = JLabel(initialStats.testingError?.format(4) ?: "N/A")
+    private val trainingAccuracyValue = JLabel(formatAccuracy(initialStats.trainingAccuracy))
+    private val testingAccuracyValue = JLabel(formatAccuracy(initialStats.testingAccuracy))
+    private val stepSizeValue = JLabel(formatStepSize(initialStats.effectiveStepSize)).apply {
+        toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
+            "For Adam in steady state ≈ learning rate; for SGD ≈ lr·||g||. " +
+            "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
+    }
+    private val earlyStoppingValue = JLabel()
+
+    private var shownRows = emptyList<Row>()
+
+    init {
+        addMouseListener(object : MouseAdapter() {
+            override fun mouseClicked(e: MouseEvent) {
+                if (e.clickCount == 2) {
+                    resetIteration()
+                    iterationsValue.text = iteration().toString()
+                }
+            }
+        })
+
+        events.errorUpdated.on(Dispatchers.Swing) { stats ->
+            trainingErrorValue.text = stats.trainingError.format(4)
+            stats.testingError?.let { testingErrorValue.text = it.format(4) }
+            stats.trainingAccuracy?.let { trainingAccuracyValue.text = formatAccuracy(it) }
+            stats.testingAccuracy?.let { testingAccuracyValue.text = formatAccuracy(it) }
+            stepSizeValue.text = formatStepSize(stats.effectiveStepSize)
+            refresh()
+        }
+        // The stopping condition is checked after the stats for an iteration go out, so the early stopping row
+        // is refreshed again once a run ends to show the state that stopped it.
+        events.endTraining.on(Dispatchers.Swing) { refresh() }
+
+        refresh()
+    }
+
+    /**
+     * Update the iteration count and early stopping status, and rebuild the rows if the trainer's settings now call
+     * for different ones.
+     */
+    fun refresh() {
+        val current = settings()
+        iterationsValue.text = iteration().toString()
+        earlyStoppingValue.text = current.stoppingCondition.getEarlyStoppingStatus() ?: ""
+
+        // Rows are rebuilt rather than hidden because the layout keeps the gap of a hidden row, which leaves a
+        // visible hole when several hidden rows fall between shown ones.
+        val rows = buildList {
+            add(Row("Iterations:", iterationsValue))
+            add(Row(
+                "Training Error (${current.lossName}):",
+                trainingErrorValue,
+                "Mean ${current.lossName} over the examples in the last ${current.updateMethod?.let { "$it " } ?: ""}update"
+            ))
+            if (current.testingEnabled) {
+                add(Row("Testing Error (${current.lossName}):", testingErrorValue, "Mean ${current.lossName} over the testing data"))
+            }
+            if (current.computeAccuracy) add(Row("Training Accuracy:", trainingAccuracyValue))
+            if (current.computeAccuracy && current.testingEnabled) add(Row("Testing Accuracy:", testingAccuracyValue))
+            if (current.showStepSize) add(Row("Effective Step Size:", stepSizeValue))
+            if (current.stoppingCondition.useEarlyStopping && current.testingEnabled) {
+                add(Row("Early Stopping:", earlyStoppingValue))
+            }
+        }
+        if (rows != shownRows) {
+            clearItems()
+            rows.forEach { row -> addItem(row.label, row.value).toolTipText = row.tooltip }
+            shownRows = rows
+            revalidate()
+            repaint()
+        }
+    }
+
+    private fun formatAccuracy(value: Double?) = value?.let { "${(it * 100).format(1)}%" } ?: "N/A"
+
+    private fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
+}
 
 class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPanel() {
 

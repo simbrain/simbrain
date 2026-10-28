@@ -3,12 +3,7 @@ package org.simbrain.network.llm
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import org.junit.jupiter.api.Assertions.assertArrayEquals
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.compositor.DeckTile
 import org.simbrain.network.core.Network
@@ -232,7 +227,6 @@ class TinyLanguageModelCanvasTest {
         val teaching = canvasModel()
         teaching.setCorpus(IntArray(20) { it % 5 })
         teaching.setContext(intArrayOf(1, 2, 3))
-        teaching.trainer.stoppingCondition.maxIterations = 100_000
         val refusals = mutableListOf<TinyLanguageModel.StepRefusal>()
         teaching.events.stepRefused.on(Dispatchers.Unconfined) { refusals.add(it) }
 

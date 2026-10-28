@@ -5,20 +5,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
 import org.simbrain.network.trainers.CnnTrainer
 import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotActions
-import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.util.*
 import org.simbrain.util.widgets.ToggleButton
 import java.awt.Cursor
 import java.awt.Dialog
-import java.awt.Dimension
-import java.awt.event.MouseAdapter
-import java.awt.event.MouseEvent
 import javax.swing.*
 
 /**
@@ -141,6 +137,31 @@ class CnnTrainerControls(
     private val runActionRef: Action
     private val stepActionRef: Action
 
+    private val statsPanel = TrainingStatsPanel(
+        events = trainer.events,
+        iteration = { trainer.iteration },
+        resetIteration = {
+            trainer.iteration = 0
+            trainer.events.iterationReset.fire()
+        },
+        initialStats = TrainingStats(
+            trainingError = trainer.lastTrainingError,
+            trainingAccuracy = trainer.lastTrainingAccuracy,
+            testingAccuracy = trainer.lastTestingAccuracy,
+            effectiveStepSize = trainer.lastEffectiveStepSize
+        )
+    ) {
+        with(trainer.config) {
+            TrainingStatsSettings(
+                lossName = lossFunction.shortName,
+                testingEnabled = testConfiguration.enabled,
+                computeAccuracy = computeAccuracy,
+                showStepSize = showEffectiveStepSize,
+                stoppingCondition = stoppingCondition
+            )
+        }
+    }
+
     init {
         // Cancel coroutine scopes when this component is disposed
         onWindowClose {
@@ -150,7 +171,7 @@ class CnnTrainerControls(
 
         val errorPlotPanel = JPanel().apply {
             layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")
-            val errorPlot = CnnErrorTimeSeries(trainer)
+            val errorPlot = ErrorTimeSeries(trainer.events) { trainer.iteration }
             add(errorPlot, "growx, wrap")
 
             val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
@@ -202,7 +223,7 @@ class CnnTrainerControls(
             description = "Edit CNN trainer properties",
             iconPath = "menu_icons/Tools.png",
         ) {
-            trainer.config.createEditorDialog().display()
+            trainer.config.createEditorDialog { statsPanel.refresh() }.display()
         }
 
         val runTools = JPanel().apply { layout = MigLayout("nogrid, ins 4, gap 8px") }
@@ -223,75 +244,7 @@ class CnnTrainerControls(
         runTools.add(initParamsButton)
         runTools.add(JButton(trainerPropsAction), "wrap")
 
-        val labelPanel = LabelledItemPanel()
-        val iterationsLabel = JLabel(trainer.iteration.toString())
-        labelPanel.addItem("Iterations:", iterationsLabel)
-        labelPanel.addMouseListener(object : MouseAdapter() {
-            override fun mouseClicked(e: MouseEvent) {
-                if (e.clickCount == 2) {
-                    trainer.iteration = 0
-                    trainer.events.iterationReset.fire()
-                    iterationsLabel.text = trainer.iteration.toString()
-                }
-            }
-        })
-        val trainingLossValue = JLabel(trainer.lastTrainingError.roundToString(4))
-        fun lossDescriptionString() = "Loss (${trainer.config.lossFunction.shortName})"
-        val trainingLossLabel = labelPanel.addItem("Training ${lossDescriptionString()}", trainingLossValue)
-
-        // Effective Step Size is always shown, so keep it grouped with the other always-visible
-        // rows (Iterations, Training Loss) instead of after the conditional testing/accuracy rows,
-        // which would leave it detached from the text above when those are hidden.
-        fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
-        val stepSizeValue = JLabel(formatStepSize(trainer.lastEffectiveStepSize)).apply {
-            toolTipText = "RMS of the optimizer's per-parameter update last iteration. " +
-                "For Adam in steady state ≈ learning rate. " +
-                "Near 0 ⇒ optimizer is flat-lining; very large ⇒ updates may be diverging."
-        }
-        labelPanel.addItem("Effective Step Size:", stepSizeValue)
-
-        val testingLossValue = JLabel("N/A")
-        val testingLossLabel = labelPanel.addItem("Testing ${lossDescriptionString()}", testingLossValue)
-
-        val trainingAccuracyValue = JLabel(trainer.lastTrainingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val trainingAccuracyLabel = labelPanel.addItem("Training Accuracy:", trainingAccuracyValue)
-
-        val testingAccuracyValue = JLabel(trainer.lastTestingAccuracy?.let { "${(it * 100).format(1)}%" } ?: "N/A")
-        val testingAccuracyLabel = labelPanel.addItem("Testing Accuracy:", testingAccuracyValue)
-
-        fun updateLabelVisibility() {
-            val showTestingLoss = trainer.config.testConfiguration.enabled
-            val showTrainingAccuracy = trainer.config.computeAccuracy
-            val showTestingAccuracy = trainer.config.computeAccuracy && trainer.config.testConfiguration.enabled
-            
-            testingLossLabel.isVisible = showTestingLoss
-            testingLossValue.isVisible = showTestingLoss
-            trainingAccuracyLabel.isVisible = showTrainingAccuracy
-            trainingAccuracyValue.isVisible = showTrainingAccuracy
-            testingAccuracyLabel.isVisible = showTestingAccuracy
-            testingAccuracyValue.isVisible = showTestingAccuracy
-        }
-        updateLabelVisibility()
-
-        runTools.add(labelPanel)
-
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            iterationsLabel.text = "" + trainer.iteration
-            trainingLossValue.text = "" + trainingStats.trainingError.format(4)
-            trainingLossLabel.text = "Training ${lossDescriptionString()}"
-            
-            trainingStats.testingError?.let { testingError ->
-                testingLossValue.text = "" + testingError.format(4)
-                testingLossLabel.text = "Testing ${lossDescriptionString()}"
-            }
-            
-            updateLabelVisibility()
-            
-            trainingStats.trainingAccuracy?.let { trainingAccuracyValue.text = "${(it * 100).format(1)}%" }
-            trainingStats.testingAccuracy?.let { testingAccuracyValue.text = "${(it * 100).format(1)}%" }
-
-            stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
-        }
+        runTools.add(statsPanel)
 
         layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
@@ -333,50 +286,3 @@ class CnnTrainerControls(
     }
 }
 
-/**
- * Error time series plot for CNN training.
- */
-class CnnErrorTimeSeries(trainer: CnnTrainer) : JPanel() {
-
-    val graphPanel: TimeSeriesPlotPanel
-
-    init {
-        layout = MigLayout("ins 0, gap 0px 0px")
-
-        val model = TimeSeriesModel()
-        model.timeSupplier = { trainer.iteration }
-        model.rangeLowerBound = 0.0
-        model.rangeUpperBound = 5.0
-        model.fixedWidth = true
-        model.windowSize = 1000
-        model.isAutoRange = true
-        model.useAutoRangeMinimumUpperBound = true
-        model.autoRangeMinimumUpperBound = 1.0
-        graphPanel = TimeSeriesPlotPanel(model)
-        graphPanel.chartPanel.chart.setTitle("")
-        graphPanel.chartPanel.chart.xyPlot.domainAxis.label = "Iterations"
-        graphPanel.chartPanel.chart.xyPlot.rangeAxis.label = "Loss"
-        graphPanel.preferredSize = Dimension(graphPanel.preferredSize.width, 200)
-
-        graphPanel.removeAllButtonsFromToolBar()
-        graphPanel.seriesRemovalEnabled = false
-
-        add(graphPanel, "growx, growy, push")
-
-        model.addTimeSeries("Training Loss")
-
-        trainer.events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            model.addData(0, trainer.iteration.toDouble(), trainingStats.trainingError)
-            trainingStats.testingError?.let {
-                if (model.timeSeriesList.size == 1) {
-                    model.addTimeSeries("Testing Loss")
-                }
-                model.addData(1, trainer.iteration.toDouble(), it)
-            }
-        }
-
-        trainer.events.iterationReset.on(Dispatchers.Swing) {
-            model.clearData()
-        }
-    }
-}

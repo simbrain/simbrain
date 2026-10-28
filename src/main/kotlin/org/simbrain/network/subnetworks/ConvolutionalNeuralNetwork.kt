@@ -231,6 +231,7 @@ class ConvolutionalNeuralNetwork(
             trainerConfig.batchSize = this@ConvolutionalNeuralNetwork.trainerConfig.batchSize
             trainerConfig.lossFunction = this@ConvolutionalNeuralNetwork.trainerConfig.lossFunction
             trainerConfig.computeAccuracy = this@ConvolutionalNeuralNetwork.trainerConfig.computeAccuracy
+            trainerConfig.showEffectiveStepSize = this@ConvolutionalNeuralNetwork.trainerConfig.showEffectiveStepSize
             trainerConfig.weightInitializationStrategy = this@ConvolutionalNeuralNetwork.trainerConfig.weightInitializationStrategy.copy()
             trainerConfig.testConfiguration = this@ConvolutionalNeuralNetwork.trainerConfig.testConfiguration.copy()
             trainerConfig.stoppingCondition = this@ConvolutionalNeuralNetwork.trainerConfig.stoppingCondition.copy()

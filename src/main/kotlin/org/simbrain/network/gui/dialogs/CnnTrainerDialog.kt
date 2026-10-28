@@ -69,7 +69,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
             // Compute and display per-row loss
             val target = targetDataFrame.getRow<Double>(selectedRow).toDoubleArray()
             val loss = trainer.config.lossFunction.loss(output, target)
-            rowErrorJLabel.text = "${trainer.config.lossFunction.shortName}: ${loss.format(4)}"
+            showRowError(selectedRow, trainer.config.lossFunction.shortName, loss)
         }
 
         val trainingDataSetPanel = createDataSetPanel(cnnNetwork.trainingSet)

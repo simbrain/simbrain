@@ -73,6 +73,12 @@ fun TrainingDataset.createDataSetPanel(
     )
 }
 
+/** Checkbox controlling whether "Apply inputs" steps the selection to the next row. */
+fun autoAdvanceCheckbox() = JCheckBox("Auto advance").apply {
+    isSelected = true
+    toolTipText = "After applying a row's inputs, move the selection to the next row, so repeated clicks step through the data"
+}
+
 fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog? = null) {
     addAction(table.importCSVAction(parentComponent = parentDialog))
     addAction(table.exportCsv(parentComponent = parentDialog))
@@ -94,6 +100,16 @@ class DataSetPanel(
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
+
+    /**
+     * Show the loss for [row], naming the row since auto advance will already have moved the selection past it.
+     * The label is kept short; the tooltip says which loss function produced the number.
+     */
+    fun showRowError(row: Int, lossName: String, loss: Double) {
+        rowErrorJLabel.text = "Row ${inputDataFrame.getRowName(row)} error: ${loss.format(4)}"
+        rowErrorJLabel.toolTipText = "<html>$lossName error for the most recently applied row: the network's output<br>" +
+            "compared with that row's target. This is not the dataset-wide training error.</html>"
+    }
     
     // Callback for when row counts change
     var onRowCountChanged: ((inputRowCount: Int, targetRowCount: Int) -> Unit)? = null
@@ -101,7 +117,7 @@ class DataSetPanel(
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
         applyCommonTrainerAttributes(parentDialog)
         toolbar.addSeparator()
-        val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+        val advanceRowCheckbox = autoAdvanceCheckbox()
         toolbar.add(
             table.createApplyAction("Apply inputs") {
                 applyAction(it)
@@ -213,7 +229,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
                     targetDataFrame.getRow<Double>(selectedRow).toDoubleArray().toColumnVector()
-                ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
+                ).also { showRowError(selectedRow, trainerConfig.lossFunction.shortName, it) }
             }
         }
 
@@ -433,7 +449,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             val tablePanel = SimbrainTablePanel(dataFrame, false).apply {
                 applyCommonTrainerAttributes(this@dialog)
                 toolbar.addSeparator()
-                val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+                val advanceRowCheckbox = autoAdvanceCheckbox()
                 toolbar.add(
                     table.createApplyAction("Apply inputs") {
                         unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(it).toDoubleArray())

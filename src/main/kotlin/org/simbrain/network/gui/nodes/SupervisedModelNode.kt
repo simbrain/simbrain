@@ -47,12 +47,12 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         node.model.events.deleted.on(swingDispatcher) {
             outlinedObjects.remove(node)
             outline.resetOutlinedNodes(outlinedObjects)
-        }
+        }.untilDisposed()
         node.model.events
         (node.model as? LocatableModel)?.let { locatableModel ->
             locatableModel.events.locationChanged.on(swingDispatcher) {
                 updateOutline()
-            }
+            }.untilDisposed()
             locatableModel.events.locationChanged.fire()
         }
 
@@ -143,8 +143,8 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         addChild(interactionBox)
 
         val events: LocationEvents = supervisedModel.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
-        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
+        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }.untilDisposed()
 
         createApplyImmediateLearningAction()
     }

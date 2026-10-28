@@ -32,6 +32,7 @@ import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.BufferedPCanvas
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.piccolo.nodeSyncPass
 import org.simbrain.util.piccolo.RasterCachedNode
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
@@ -110,15 +111,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * A node whose sync throws is logged and skipped: the rest of the batch already has its dirty bits set, so if
      * the pass stopped there those nodes would never be queued again.
      */
-    val nodeSync = viewScope.uiInbox<ScreenElement>(UI_FRAME_MS) { nodes ->
-        nodes.forEach {
-            try {
-                it.syncPending()
-            } catch (e: Exception) {
-                e.printStackTrace()
-            }
-        }
-    }
+    val nodeSync = viewScope.nodeSyncPass()
 
     /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
     fun detachNode(node: ScreenElement) {
@@ -300,10 +293,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     private val nodeRemovals = viewScope.uiInbox<ScreenElement> { nodes ->
         val unique = nodes.toSet()
-        unique.forEach {
-            (it as? SynapseNode)?.detachSymmetric()
-            detachNode(it)
-        }
+        unique.forEach { detachNode(it) }
         // Removal can land after the model was re-added with a new node (undo then redo). Only clear the mapping
         // if it still points at this node, so a stale removal never wipes a freshly recreated node.
         unique.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
@@ -544,11 +534,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         reconcileLooseSynapseNodes()
         val groupNode = addScreenElement { SynapseGroupNode(this, synapseGroup) }
-        // A group deleted and restored gets a new node while these handlers stay subscribed, so each pair
-        // only acts while its own node is still the group's node
+        // These handlers end with the group's node, but a group deleted and restored gets its new node before the
+        // old one's removal lands, so each pair only acts while its own node is still the group's node
         fun isCurrent() = modelNodeMap.peek(synapseGroup) === groupNode
-        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
-        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }.cancelWith(groupNode.nodeScope)
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }.cancelWith(groupNode.nodeScope)
         return groupNode
     }
 
@@ -999,25 +989,26 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             ).apply {
                 network.events.zoomModeChanged.on(Dispatchers.Swing) {
                     updateFromExternalState()
-                }
+                }.cancelWith(viewScope)
             })
         }
     }
 
     private fun initEventHandlers() {
+        // The network outlives this panel, so its subscriptions end with the panel's view scope
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
                 createNode(it)
-            }
-            updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
+            }.cancelWith(viewScope)
+            updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }.cancelWith(viewScope)
             // Posted, not awaited: updated is a barrier fired once per network iteration, and an EDT handler made
             // every iteration wait in the EDT queue behind a full canvas repaint, pacing the simulation by the display
-            updated.on(Dispatchers.Unconfined) { refreshAfterUpdate.request() }
-            zoomToFitPage.onImmediate { zoomToFit.request() }
-            boundsChanged.onImmediate { zoomToFit.request() }
+            updated.on(Dispatchers.Unconfined) { refreshAfterUpdate.request() }.cancelWith(viewScope)
+            zoomToFitPage.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
+            boundsChanged.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             selected.on(Dispatchers.Default) { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
-            }
+            }.cancelWith(viewScope)
         }
 
     }

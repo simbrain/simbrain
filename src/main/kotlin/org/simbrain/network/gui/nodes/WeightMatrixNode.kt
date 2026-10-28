@@ -27,6 +27,7 @@ import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.Ellipse2D
+import java.beans.PropertyChangeListener
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -121,15 +122,19 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
     }
 
+    /** Keeps the arrow attached while the view pans and zooms; removed when the node leaves the canvas. */
+    private val cameraListener: PropertyChangeListener
+
     init {
         pickable = true
         val events = weightMatrix.events
-        events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() }
-        events.clampChanged.on(Dispatchers.Swing) { setClamped((weightMatrix as WeightMatrix).clamped) }
-        events.updateGraphics.on(Dispatchers.Swing) { renderMatrixToImage() }
+        // Marked, not relayed through updateGraphics: the panel's sync pass redraws the matrix once per frame
+        events.updated.onImmediate { markDirty(WEIGHTS) }.untilDisposed()
+        events.updateGraphics.onImmediate { markDirty(WEIGHTS) }.untilDisposed()
+        events.clampChanged.on(Dispatchers.Swing) { setClamped((weightMatrix as WeightMatrix).clamped) }.untilDisposed()
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel ->
             interactionBox.setText(weightMatrix.displayName)
-        }
+        }.untilDisposed()
         addChild(interactionBox)
         addChild(arrow)
         addChild(imageBox)
@@ -163,25 +168,35 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
-        }
+        }.untilDisposed()
         weightMatrix.target.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
-        }
+        }.untilDisposed()
         (weightMatrix.source as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
-        }
+        }?.untilDisposed()
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
-        }
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
-            updateLocations()
-        }
+        }?.untilDisposed()
+        cameraListener = PropertyChangeListener { updateLocations() }
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
         networkPanel
         invalidateFullBounds()
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()
         renderMatrixToImage()
+    }
+
+    override fun dispose() {
+        super.dispose()
+        networkPanel.canvas.camera.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
+    }
+
+    override fun syncFromModel(bits: Int) {
+        if (bits and WEIGHTS != 0) {
+            renderMatrixToImage()
+        }
     }
 
     fun updateArrowColorFromPreferences() {
@@ -611,5 +626,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
         override val toolTipText: String?
             get() = this@WeightMatrixNode.toolTipText
+    }
+
+    companion object {
+        private const val WEIGHTS = 1
     }
 }

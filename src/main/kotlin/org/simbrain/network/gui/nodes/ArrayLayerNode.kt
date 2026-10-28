@@ -71,16 +71,16 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     init {
         layer.events.apply {
-            clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
+            clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }.untilDisposed()
             locationChanged.on(dispatcher = Dispatchers.Swing) { 
                 pullViewPositionFromModel()
                 layoutChildren()
-            }
+            }.untilDisposed()
             labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
                 interactionBox.setText(layer.displayName)
-            }
+            }.untilDisposed()
         }
-        (layer as? NeuronArray)?.events?.visualPropertiesChanged?.on(dispatcher = Dispatchers.Swing) { rotateNode() }
+        (layer as? NeuronArray)?.events?.visualPropertiesChanged?.on(dispatcher = Dispatchers.Swing) { rotateNode() }?.untilDisposed()
         rotateNode()
 
         addChild(interactionBox)

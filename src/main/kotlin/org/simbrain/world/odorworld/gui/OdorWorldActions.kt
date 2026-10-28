@@ -316,9 +316,10 @@ private fun OdorWorldPanel.createConditionallyEnabledAction(
         }
         updateEnabled()
         selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateEnabled() }
-        world.events.entityAdded.on(Dispatchers.Swing) { updateEnabled() }
-        world.events.entityRemoved.on(Dispatchers.Swing) { updateEnabled() }
-        world.events.mazeChanged.on(Dispatchers.Swing) { updateEnabled() }
+        // The world outlives the panel, so these end with the panel's view scope
+        world.events.entityAdded.on(Dispatchers.Swing) { updateEnabled() }.cancelWith(viewScope)
+        world.events.entityRemoved.on(Dispatchers.Swing) { updateEnabled() }.cancelWith(viewScope)
+        world.events.mazeChanged.on(Dispatchers.Swing) { updateEnabled() }.cancelWith(viewScope)
     },
     block = block
 )

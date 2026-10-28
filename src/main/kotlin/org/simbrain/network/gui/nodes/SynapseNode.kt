@@ -75,13 +75,13 @@ class SynapseNode(
     private var symmetricNode: SynapseNode? = null
 
     /**
-     * Straightens the partner's line once this node leaves the canvas. Called from the panel's batched node
-     * removal on the EDT rather than from an EDT-dispatched `deleted` handler: the deleted event is awaited per
-     * synapse, so a Swing handler there made bulk deletes wait on the EDT (and its repaints) once per synapse.
-     * The partner is only unlinked if it still points here, since undo may already have paired it with a
+     * Straightens the partner's line once this node leaves the canvas. Called from [dispose], which the panel runs on
+     * the EDT when it detaches the node, rather than from an EDT-dispatched `deleted` handler: the deleted event is
+     * awaited per synapse, so a Swing handler there made bulk deletes wait on the EDT (and its repaints) once per
+     * synapse. The partner is only unlinked if it still points here, since undo may already have paired it with a
      * recreated node by the time a debounced removal lands.
      */
-    fun detachSymmetric() {
+    private fun detachSymmetric() {
         symmetricNode?.let {
             if (it.symmetricNode === this) {
                 it.symmetricNode = null
@@ -158,6 +158,7 @@ class SynapseNode(
 
     override fun dispose() {
         networkPanel.spikeOverlay.remove(this)
+        detachSymmetric()
         super.dispose()
     }
 

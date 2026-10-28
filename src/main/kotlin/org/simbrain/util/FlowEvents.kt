@@ -214,6 +214,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
             return Job().apply { invokeOnCompletion { list.remove(handler) } }
         }
 
+        /** How many handlers are subscribed, immediate or dispatched; for checking that a view's subscriptions ended. */
+        internal val subscriberCount get() = (handlers?.size ?: 0) + (immediateHandlers?.size ?: 0)
+
         protected fun onFlow(dispatcher: CoroutineDispatcher, handler: suspend (T) -> Unit): Job {
             ensureShapingCollector()
             val entry = dispatcher to handler
@@ -381,6 +384,9 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
          * fire-and-forget. Unlike [fireAndBlock] it never blocks the calling thread, so it is safe on the EDT.
          */
         fun fireAsync(value: T): Deferred<Unit> = if (handlers.isNullOrEmpty()) completedFire else async { fire(value) }
+
+        /** How many handlers are subscribed; for checking that a view's subscriptions ended. */
+        internal val subscriberCount get() = handlers?.size ?: 0
     }
 
     /**
@@ -403,5 +409,7 @@ open class FlowEvents : CoroutineScope, AutoCloseable {
         fun fireAndBlock() = delegate.fireAndBlock(Unit)
 
         fun fireAsync(): Deferred<Unit> = delegate.fireAsync(Unit)
+
+        internal val subscriberCount get() = delegate.subscriberCount
     }
 }

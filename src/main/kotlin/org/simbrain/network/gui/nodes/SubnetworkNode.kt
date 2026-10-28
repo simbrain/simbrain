@@ -66,7 +66,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         node.model.events.deleted.on(swingDispatcher) {
             outlinedObjects.remove(node)
             outline.resetOutlinedNodes(outlinedObjects)
-        }
+        }.untilDisposed()
         (node.model as? LocatableModel)?.events?.locationChanged?.fire()
 
         updateOutline()
@@ -209,8 +209,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         addChild(interactionBox)
 
         val events: LocationEvents = subnetwork.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
-        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
+        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }.untilDisposed()
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {

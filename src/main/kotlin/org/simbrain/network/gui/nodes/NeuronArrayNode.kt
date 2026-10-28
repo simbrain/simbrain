@@ -265,7 +265,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             layoutNeuronCircles()
             updateShapeCaption()
             networkPanel.network.events.zoomToFitPage.fire()
-        }
+        }.untilDisposed()
         gridMode = neuronArray.gridMode
         showBias = neuronArray.isShowBias
 
@@ -274,18 +274,13 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         // Marked, not throttled: the panel's sync pass redraws once per frame, and a paced run's display sync draws
         // every iteration
         events.updated.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
-
-        events.updateGraphics.on(Dispatchers.Swing) {
-            updateActivationImage()
-        }
+        events.updateGraphics.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
         events.updateRuleChanged.on(Dispatchers.Swing) {
             if (!neuronArray.updateRule.isSpikingRule) {
                 mainNode.removeChild(spikeImage)
             }
-        }
-        events.clampChanged.on(Dispatchers.Swing) {
-            updateActivationImage()
-        }
+        }.untilDisposed()
+        events.clampChanged.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
 
         updateActivationImage()
         neuronCircleGroup.setOffset(NEURON_DIAMETER / 2.0, NEURON_DIAMETER / 2.0 + 20.0)

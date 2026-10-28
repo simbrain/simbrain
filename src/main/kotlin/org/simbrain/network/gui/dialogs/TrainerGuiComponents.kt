@@ -271,7 +271,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
 
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
-        trainer.events.postReportsTo(labels)
+        trainer.events.postReportsTo(this, labels)
 
         layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)
@@ -282,13 +282,13 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
 
 
 /**
- * Posts each training report to [target] without the trainer waiting on the EDT. Testing values and accuracies
- * arrive only every few iterations, so they carry forward from earlier reports instead of being lost when a later
- * report supersedes theirs before it is shown.
+ * Posts each training report to [target] without the trainer waiting on the EDT, until [scope] (the view's) ends; the
+ * trainer outlives its views. Testing values and accuracies arrive only every few iterations, so they carry forward
+ * from earlier reports instead of being lost when a later report supersedes theirs before it is shown.
  */
-fun TrainerEvents.postReportsTo(target: UiLatest<TrainingStats>): () -> Unit {
+fun TrainerEvents.postReportsTo(scope: CoroutineScope, target: UiLatest<TrainingStats>) {
     var reported: TrainingStats? = null
-    return errorUpdated.on(Dispatchers.Unconfined) { stats ->
+    errorUpdated.on(Dispatchers.Unconfined) { stats ->
         val merged = reported?.let { previous ->
             stats.copy(
                 testingError = stats.testingError ?: previous.testingError,
@@ -298,7 +298,7 @@ fun TrainerEvents.postReportsTo(target: UiLatest<TrainingStats>): () -> Unit {
         } ?: stats
         reported = merged
         target.post(merged)
-    }
+    }.cancelWith(scope)
 }
 
 /** Plots a trainer's training and testing [quantity] (error or loss) against iteration. */

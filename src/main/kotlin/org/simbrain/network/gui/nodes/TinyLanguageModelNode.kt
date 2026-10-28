@@ -2,8 +2,6 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import net.miginfocom.swing.MigLayout
 import org.piccolo2d.util.PBounds
@@ -40,8 +38,6 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
 
     private var compositorNode: CompositorNode? = null
 
-    private val ui = UiScope()
-
     override val generativeModel get() = tinyLanguageModel
 
     override val interior get() = compositorNode
@@ -51,34 +47,27 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
         interactionBox.setText(tinyLanguageModel.displayName)
 
         val events = tinyLanguageModel.events
-        val subscriptions = listOf(
-            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(tinyLanguageModel.displayName) },
-            events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
-            events.modelRebuilt.on(swingDispatcher) { rebuildInterior() },
-            events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
-            events.updateGraphics.on(swingDispatcher) { refreshView() },
-            events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) },
-            networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
-                networkPanel.dropInteriorSelectionIfDeselected(this, selection)
-            },
-            // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
-            events.updated.on(swingDispatcher) {
-                if (stepNotice != null) {
-                    stepNotice = null
-                    stepNoticeTimer.stop()
-                    refreshView()
-                }
-            },
-        )
-        // Training reports every iteration; posting the refresh keeps training from waiting on the EDT
-        val trainingRefresh = ui.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
-        val errorRemover = tinyLanguageModel.trainer.events.errorUpdated.on(Dispatchers.Unconfined) { trainingRefresh.request() }
-        // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
-        events.deleted.on(Dispatchers.Default) {
-            subscriptions.forEach(Job::cancel)
-            errorRemover()
-            ui.cancel()
-        }
+        events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(tinyLanguageModel.displayName) }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { pullLocationFromModel() }.untilDisposed()
+        events.modelRebuilt.on(swingDispatcher) { rebuildInterior() }.untilDisposed()
+        // Updates, graphics requests and training reports all arrive up to every iteration; one posted refresh
+        // coalesces them, so neither a run nor training waits on the EDT
+        val viewRefresh = nodeScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
+        events.updated.onImmediate { viewRefresh.request() }.untilDisposed()
+        events.updateGraphics.onImmediate { viewRefresh.request() }.untilDisposed()
+        tinyLanguageModel.trainer.events.errorUpdated.on(Dispatchers.Unconfined) { viewRefresh.request() }.untilDisposed()
+        events.stepRefused.on(swingDispatcher) { reason -> flashStepNotice(reason) }.untilDisposed()
+        networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
+            networkPanel.dropInteriorSelectionIfDeselected(this, selection)
+        }.untilDisposed()
+        // A successful step outdates any refusal notice; drop it rather than letting the timer run out.
+        events.updated.on(swingDispatcher) {
+            if (stepNotice != null) {
+                stepNotice = null
+                stepNoticeTimer.stop()
+                refreshView()
+            }
+        }.untilDisposed()
 
         rebuildInterior()
         pullLocationFromModel()
@@ -316,28 +305,23 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
     })
     panel.add(errorTimeSeries, "w 560:640, h 280:340, grow, push")
 
-    val beginRemover = trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }
-    val endJob = trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }
-    // Labels show the latest report, posted rather than awaited so training never waits on the EDT
-    val dialogUi = UiScope()
-    val labels = dialogUi.uiLatest<TrainingStats>(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { stats ->
-        iterationsLabel.text = "Iterations: ${trainer.iteration}"
-        lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
-        accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
-    }
-    val statsRemover = trainer.events.postReportsTo(labels)
-    // The trainer outlives this dialog, so detach everything it registered; closing also
-    // stops a running training.
+    // Closing the dialog also stops a running training
     panel.onWindowClose {
-        beginRemover()
-        endJob.cancel()
-        statsRemover()
-        dialogUi.cancel()
         errorTimeSeries.dispose()
         trainer.launch { trainer.stopTraining() }
     }
 
     return StandardDialog(parentWindow as? JFrame, "Train $displayName").apply {
+        // The trainer outlives this dialog, so everything registered on it ends with the dialog's view scope
+        trainer.events.beginTraining.on(swingDispatcher) { syncButtons(true) }.cancelWith(viewScope)
+        trainer.events.endTraining.on(swingDispatcher) { syncButtons(false) }.cancelWith(viewScope)
+        // Labels show the latest report, posted rather than awaited so training never waits on the EDT
+        val labels = viewScope.uiLatest<TrainingStats>(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { stats ->
+            iterationsLabel.text = "Iterations: ${trainer.iteration}"
+            lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
+            accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
+        }
+        trainer.events.postReportsTo(viewScope, labels)
         contentPane = panel
         setAsDoneDialog()
         // StandardDialog packs (and gets a native window) before the content arrives; on macOS

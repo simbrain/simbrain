@@ -15,9 +15,11 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.Theme
-import org.simbrain.util.cancelWith
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
+import org.simbrain.util.piccolo.NodeSync
+import org.simbrain.util.piccolo.ScopedNode
+import org.simbrain.util.piccolo.nodeScopeIn
 import org.simbrain.util.toRadian
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
@@ -34,7 +36,6 @@ import java.awt.Color
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
-import java.util.concurrent.atomic.AtomicBoolean
 import java.util.stream.Collectors
 import javax.swing.JPopupMenu
 import kotlin.math.abs
@@ -45,11 +46,11 @@ import kotlin.math.sqrt
 class EntityNode(
     val entity: OdorWorldEntity,
     private val panel: OdorWorldPanel
-) : PNode(), NodeWithDispersion by DispersionNode(entity) {
+) : PNode(), NodeWithDispersion by DispersionNode(entity), ScopedNode {
 
-    val nodeScope: CoroutineScope = CoroutineScope(SupervisorJob(panel.viewScope.coroutineContext.job))
+    override val nodeScope: CoroutineScope = nodeScopeIn(panel.viewScope)
 
-    private val dirty = AtomicBoolean()
+    private val sync = NodeSync(this, nodeScope, panel.entitySync) { update() }
 
     /** A trail point waiting to be drawn; a [jump] starts a new stroke there instead of connecting to it. */
     private class TrailPoint(val x: Double, val y: Double, val jump: Boolean)
@@ -297,24 +298,11 @@ class EntityNode(
         }
     }
 
-    /** Ends this node's subscriptions and drops its pending updates; called when it leaves the canvas. */
-    fun dispose() {
-        nodeScope.cancel()
-    }
-
-    private fun Job.untilDisposed(): Job = cancelWith(nodeScope)
-
-    private fun (() -> Unit).untilDisposed() = cancelWith(nodeScope)
-
     /** Schedules a sync on the next frame; cheap and safe to call from any thread. */
-    private fun markDirty() {
-        if (dirty.compareAndSet(false, true)) panel.entitySync.post(this)
-    }
+    private fun markDirty() = sync.mark(1)
 
     /** Applies the entity's current state, if it changed since the last sync. Runs on the EDT. */
-    internal fun syncPending() {
-        if (dirty.getAndSet(false) && parent != null && nodeScope.isActive) update()
-    }
+    internal fun syncPending() = sync.runPending()
 
     private val isDrawingTrail
         get() = entity.isShowTrail && (entity.drawTrailWithoutRunningWorkspace || isWorkspaceRunning)
@@ -462,8 +450,8 @@ class EntityNode(
         sprite.repaint()
     }
 
-    fun createContextMenu(odorWorldPanel: OdorWorldPanel) = JPopupMenu().apply {
-        with(odorWorldPanel.odorWorldActions) {
+    fun createContextMenu() = JPopupMenu().apply {
+        with(panel.odorWorldActions) {
             add(editEntityAction)
             add(deleteSelectedAction)
             addSeparator()
@@ -479,7 +467,7 @@ class EntityNode(
         ))
         add(SimbrainDesktop.actionManager.createFirstPersonViewAction(entity))
         addSeparator()
-        val couplingMenu = CouplingMenu(odorWorldPanel.odorWorldComponent, entity)
+        val couplingMenu = CouplingMenu(panel.odorWorldComponent, entity)
         couplingMenu.setCustomName("Create couplings")
         add(couplingMenu)
     }

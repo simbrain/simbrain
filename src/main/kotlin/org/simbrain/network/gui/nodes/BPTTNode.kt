@@ -34,7 +34,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
         events.displayModeChanged.on(swingDispatcher) {
             syncUnrolledView()
             if (bptt.unrolledView) attachSharedWeightHighlighting()
-        }
+        }.untilDisposed()
         // Truncation depth changes the number of columns, and it is what the info text reports.
         events.customInfoUpdated.on(swingDispatcher) {
             unrolledViewNode?.rebuild()
@@ -44,18 +44,18 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             // A different truncation depth is a different number of columns, so the network is now a
             // different width.
             if (unrolledViewNode != null) requestZoomToFit()
-        }
-        events.locationChanged.on(swingDispatcher) { positionUnrolledView() }
+        }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { positionUnrolledView() }.untilDisposed()
         events.displayDataUpdated.on(swingDispatcher) {
             refreshUnrolledActivations()
             // Training moves the weights, and the drawn copies of the matrices have to follow.
             unrolledViewNode?.refreshMatrices()
-        }
-        events.deleted.on(swingDispatcher) { detachUnrolledView() }
+        }.untilDisposed()
+        events.deleted.on(swingDispatcher) { detachUnrolledView() }.untilDisposed()
         // A layer changing how it draws itself changes what the columns should look like and how big they
         // are. Only nudges the layout, since the new size is not known until that layer's node lays out.
         listOf(bptt.inputLayer, bptt.hiddenLayer, bptt.outputLayer).forEach { layer ->
-            layer.events.visualPropertiesChanged.on(swingDispatcher) { invalidateLayout() }
+            layer.events.visualPropertiesChanged.on(swingDispatcher) { invalidateLayout() }.untilDisposed()
         }
         syncUnrolledView()
         if (bptt.unrolledView) {

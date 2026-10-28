@@ -294,7 +294,7 @@ class CnnTrainerControls(
 
             stepSizeValue.text = formatStepSize(trainingStats.effectiveStepSize)
         }
-        trainer.events.postReportsTo(labels)
+        trainer.events.postReportsTo(this, labels)
 
         layout = MigLayout("ins 0, gap 12px 0px")
         add(runTools)

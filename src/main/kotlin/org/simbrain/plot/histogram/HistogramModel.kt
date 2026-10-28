@@ -1,12 +1,12 @@
+/**
+ * The histogram's data and JFreeChart dataset. Coupled arrays are posted from the updating thread and binned on the
+ * EDT, where the dataset is painted.
+ */
 package org.simbrain.plot.histogram
 
 import org.jfree.data.xy.IntervalXYDataset
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.cancel
-import org.simbrain.util.UiLatest
-import org.simbrain.util.UiScope
-import org.simbrain.util.uiLatest
+import org.simbrain.util.EdtUpdates
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
@@ -41,7 +41,7 @@ class HistogramModel(
     xAxisName: String = "",
     yAxisName: String = "Count",
     colorPallet: Array<Color>? = null
-) : AttributeContainer {
+) : AttributeContainer, AutoCloseable {
 
     /**
      * The data set used to generate the histogram.
@@ -76,33 +76,29 @@ class HistogramModel(
      * @param histData the array of histogram data
      */
     @Consumable
-    fun addData(histData: DoubleArray) = incoming().post(histData)
+    fun addData(histData: DoubleArray) = incoming.post(histData)
 
     /**
      * Data for the EDT-painted dataset, applied without the updating thread waiting on the EDT; only the newest
-     * array matters, since each replaces the last. Created on first use rather than in a field initializer
-     * because this class is deserialized without running its constructor.
+     * array matters, since each replaces the last. Recreated in [readResolve] because this class is deserialized
+     * without running its constructor or field initializers.
      */
     @Transient
-    private var incomingData: UiLatest<DoubleArray>? = null
+    private var incoming = newIncoming()
 
-    @Transient
-    private var ui: CoroutineScope? = null
+    private fun newIncoming() = EdtUpdates<DoubleArray> { batch -> addDataToDataSeries(batch.last(), 0) }
 
-    @Synchronized
-    private fun incoming(): UiLatest<DoubleArray> = incomingData ?: UiScope().let { scope ->
-        ui = scope
-        scope.uiLatest<DoubleArray> { addDataToDataSeries(it, 0) }.also { incomingData = it }
-    }
-
-    /** Stops applying queued data; called when the owning component closes. */
-    fun close() {
-        ui?.cancel()
-    }
+    /** Stops applying queued data; called when the owning component leaves the workspace. */
+    override fun close() = incoming.close()
 
     /** Lands queued data before XStream writes the series. */
     private fun writeReplace(): Any {
-        incomingData?.flush()
+        incoming.flush()
+        return this
+    }
+
+    private fun readResolve(): Any {
+        incoming = newIncoming()
         return this
     }
 

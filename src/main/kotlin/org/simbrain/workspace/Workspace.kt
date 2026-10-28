@@ -191,6 +191,7 @@ class Workspace: CoroutineScope {
         // Remove all couplings associated with this component
         // this.getCouplingManager().removeCouplings(component);
         _componentList.remove(component)
+        component.closeOwnedModels()
         setWorkspaceChanged(true)
         events.componentRemoved.fire(component)
     }

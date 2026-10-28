@@ -1,3 +1,7 @@
+/**
+ * The raster plot's data: a dot per spike, one row per component of each coupled array. Couplings post columns from
+ * the updating thread; the series are EDT-confined and change only when those land on the EDT.
+ */
 package org.simbrain.plot.raster
 
 import com.thoughtworks.xstream.XStream
@@ -10,15 +14,13 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
-import kotlinx.coroutines.cancel
-import org.simbrain.util.UiScope
-import org.simbrain.util.uiInbox
+import org.simbrain.util.EdtUpdates
 import java.util.function.Supplier
 
 /**
  * Data model for a raster plot.
  */
-class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
+class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoCloseable {
 
     /**
      * Lambda to supply time to the time series model.
@@ -153,15 +155,8 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         rasterConsumerList.add(rc)
     }
 
-    fun clearData() {
-        columns.clear()
-        val seriesCount = dataset.seriesCount
-        var i = 0
-        while (seriesCount > i) {
-            dataset.getSeries(i).clear()
-            ++i
-        }
-    }
+    /** Clears every series, after the columns already sent have landed. */
+    fun clearData() = updates.post(Clear)
 
     /**
      * See [org.simbrain.workspace.serialization.WorkspaceComponentDeserializer]
@@ -173,18 +168,21 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
 
     /** Lands any queued columns before XStream writes the dataset, so a save right after an iteration has them. */
     private fun writeReplace(): Any {
-        columns.flush()
+        updates.flush()
         return this
     }
 
-    /** Stops applying queued columns; called when the owning component closes. */
-    fun close() = ui.cancel()
+    /** Stops applying queued columns; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
+
+    /** A change to apply to the EDT-confined dataset. */
+    private sealed interface Update
 
     /** One incoming array's spikes, captured on the updating thread and waiting to be added on the EDT. */
-    private class PendingColumn(val consumer: RasterConsumer, val time: Int, val size: Int, val spikeRows: IntArray)
+    private class PendingColumn(val consumer: RasterConsumer, val time: Int, val size: Int, val spikeRows: IntArray) :
+        Update
 
-    @Transient
-    private val ui = UiScope()
+    private object Clear : Update
 
     /**
      * Columns for the chart, added on the EDT without the updating thread waiting for it: the dataset is
@@ -192,23 +190,28 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
      * EDT was painting.
      */
     @Transient
-    private val columns = ui.uiInbox<PendingColumn> { addColumns(it) }
+    private val updates = EdtUpdates<Update> { applyUpdates(it) }
 
-    /** Adds a batch of columns, notifying each touched series once rather than per point. */
-    private fun addColumns(batch: List<PendingColumn>) {
+    /** Applies a batch of columns and clears, notifying each touched series once rather than per point. */
+    private fun applyUpdates(batch: List<Update>) {
         val touched = LinkedHashSet<XYSeries>()
-        for (column in batch) {
-            if (column.consumer !in rasterConsumerList) continue
-            if (column.size > rowCount) {
-                rowCount = column.size
-                events.propertyChanged.fire()
-            }
-            val series = dataset.getSeries(column.consumer.index)
-            if (touched.add(series)) series.notify = false
-            if (column.spikeRows.isEmpty()) {
-                series.add(column.time, null, false)
-            } else {
-                column.spikeRows.forEach { series.add(column.time, it, false) }
+        fun quiet(series: XYSeries) = series.also { if (touched.add(it)) it.notify = false }
+        for (update in batch) {
+            when (update) {
+                is PendingColumn -> {
+                    if (update.consumer !in rasterConsumerList) continue
+                    if (update.size > rowCount) {
+                        rowCount = update.size
+                        events.propertyChanged.fire()
+                    }
+                    val series = quiet(dataset.getSeries(update.consumer.index))
+                    if (update.spikeRows.isEmpty()) {
+                        series.add(update.time, null, false)
+                    } else {
+                        update.spikeRows.forEach { series.add(update.time, it, false) }
+                    }
+                }
+                Clear -> for (i in 0 until dataset.seriesCount) quiet(dataset.getSeries(i)).clear()
             }
         }
         touched.forEach { it.notify = true }
@@ -240,7 +243,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject {
         fun setValues(values: DoubleArray) {
             val threshold = spikeThreshold
             val spikeRows = values.indices.filter { values[it] >= threshold }.toIntArray()
-            columns.post(PendingColumn(this, timeSupplier.get(), values.size, spikeRows))
+            updates.post(PendingColumn(this, timeSupplier.get(), values.size, spikeRows))
         }
 
         override val id: String

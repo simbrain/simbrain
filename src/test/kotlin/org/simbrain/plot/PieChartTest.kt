@@ -145,5 +145,14 @@ class PieChartTest {
         UiWork.awaitIdle()
         assertEquals(0.75, onEdt { model.dataset.getValue(1).toDouble() }, 1e-12)
     }
-}
 
+    @Test
+    fun `slices without names are numbered from one`() {
+        val model = PieChartModel()
+
+        model.setValues(doubleArrayOf(1.0, 3.0))
+        UiWork.awaitIdle()
+
+        assertEquals(listOf("1", "2"), onEdt { model.dataset.keys })
+    }
+}

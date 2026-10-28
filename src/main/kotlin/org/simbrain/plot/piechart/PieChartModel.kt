@@ -1,13 +1,19 @@
+/**
+ * The pie chart's data: one slice per component of the coupled array, sized by its share of the total. Couplings
+ * post values and names from the updating thread; the JFreeChart dataset is EDT-confined and changes only when those
+ * land on the EDT.
+ */
 package org.simbrain.plot.piechart
 
 import com.thoughtworks.xstream.XStream
-import kotlinx.coroutines.cancel
 import org.jfree.data.general.DefaultPieDataset
+import org.simbrain.plot.ChartUpdate
+import org.simbrain.plot.applyChartUpdates
+import org.simbrain.plot.componentLabel
+import org.simbrain.util.EdtUpdates
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.UiScope
-import org.simbrain.util.uiInbox
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import kotlin.math.abs
@@ -15,7 +21,7 @@ import kotlin.math.abs
 /**
  * Model data for pie charts.
  */
-class PieChartModel : AttributeContainer, EditableObject {
+class PieChartModel : AttributeContainer, EditableObject, AutoCloseable {
 
     override val id: String
         get() = "Pie Chart"
@@ -36,11 +42,11 @@ class PieChartModel : AttributeContainer, EditableObject {
     /**
      * Names of the incoming array's components, one per slice. Set via coupling events in
      * [PieChartComponent]. Setting new names renames any slices already in the dataset, so a label change
-     * shows without waiting for the next value update.
+     * shows without waiting for the next value update. Reads return the names applied so far.
      */
     var componentNames: List<String>
         get() = names
-        set(value) = updates.post(Update.Names(value))
+        set(value) = updates.post(ChartUpdate.Names(value))
 
     /** The names currently applied to the dataset. Workspaces saved before this field load through [componentNames]. */
     private var names = listOf<String>()
@@ -71,29 +77,9 @@ class PieChartModel : AttributeContainer, EditableObject {
         dataset.setValue("Empty pie", 1.0)
     }
 
-    /** A change to apply to [dataset] on the EDT. */
-    private sealed interface Update {
-        class Values(val values: DoubleArray) : Update
-        class Names(val names: List<String>) : Update
-    }
-
+    /** Changes to the EDT-confined dataset. */
     @Transient
-    private val ui = UiScope()
-
-    /**
-     * Changes to the EDT-confined dataset, applied in the order they were made without the caller waiting on the
-     * EDT. Values sent each iteration are latest-wins: one superseded by a later one in the same batch is skipped.
-     */
-    @Transient
-    private val updates = ui.uiInbox<Update> { batch ->
-        val lastValues = batch.indexOfLast { it is Update.Values }
-        batch.forEachIndexed { i, update ->
-            when (update) {
-                is Update.Values -> if (i == lastValues) applyValues(update.values)
-                is Update.Names -> applyNames(update.names)
-            }
-        }
-    }
+    private val updates = EdtUpdates<ChartUpdate> { applyChartUpdates(it, ::applyValues, ::applyNames) }
 
     /**
      * Called by coupling producers via reflection. The values are copied, since a producer may hand over a buffer it
@@ -104,11 +90,11 @@ class PieChartModel : AttributeContainer, EditableObject {
         if (vector.isEmpty()) {
             throw IllegalArgumentException("Pie chart supplied with empty array")
         }
-        updates.post(Update.Values(vector.copyOf()))
+        updates.post(ChartUpdate.Values(vector.copyOf()))
     }
 
-    /** Stops applying updates; called when the owning component closes. */
-    fun close() = ui.cancel()
+    /** Stops applying updates; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
 
     /** Lands pending updates before XStream writes the dataset. */
     private fun writeReplace(): Any {
@@ -152,7 +138,7 @@ class PieChartModel : AttributeContainer, EditableObject {
         }
     }
 
-    private fun componentName(i: Int) = names.getOrElse(i) { "$i" }
+    private fun componentName(i: Int) = componentLabel(names, i)
 
     override val name: String
         get() = "Pie chart"

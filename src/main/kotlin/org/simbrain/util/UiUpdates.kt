@@ -11,7 +11,8 @@
  *
  * Each is created from a [CoroutineScope] (like `launch`), and its lifetime is that scope's: once the scope is
  * cancelled, pending work is dropped and posting does nothing. Nothing runs, and no coroutine exists, until the
- * first post, so headless workspaces pay nothing. [onUi] and [onUiBatch] subscribe an event straight into one.
+ * first post, so headless workspaces pay nothing. [onUi] and [onUiBatch] subscribe an event straight into one, and
+ * [EdtUpdates] is the [UiInbox] a model keeps for its own dataset.
  *
  * Every run happens on a later EDT turn, never inline (even when posted from the EDT), and after the EDT tasks
  * already queued when it was posted, so a refresh sees state updates those tasks apply. [minIntervalMs] caps how
@@ -236,9 +237,6 @@ class UiInbox<T> internal constructor(scope: CoroutineScope, minIntervalMs: Long
         schedule()
     }
 
-    /** Discards queued items without draining them, e.g. when the data they would be added to is cleared. */
-    fun clear() = dropPending()
-
     override fun runPending(): Boolean {
         val batch = buildList { while (true) add(queue.poll() ?: break) }
         if (batch.isEmpty()) return false
@@ -259,6 +257,30 @@ fun <T> CoroutineScope.uiLatest(minIntervalMs: Long = UI_FRAME_MS, apply: (T) ->
 
 fun <T> CoroutineScope.uiInbox(minIntervalMs: Long = 0, drain: (List<T>) -> Unit) =
     UiInbox(this, minIntervalMs, drain)
+
+/**
+ * A model's changes to an EDT-confined dataset, such as a chart's, applied on the EDT in the order they were made
+ * without the caller waiting. Each model holds one in a `@Transient` field: [flush] lands what is still queued
+ * before a save, [awaitUpdates] lets a script read the dataset after its own changes, and [close], called when the
+ * model's component leaves the workspace, drops what is pending and stops later posts.
+ */
+class EdtUpdates<T>(drain: (List<T>) -> Unit) : AutoCloseable {
+
+    private val scope = UiScope()
+
+    private val inbox = scope.uiInbox(drain = drain)
+
+    /** Queues [update] for the EDT. Never blocks. */
+    fun post(update: T) = inbox.post(update)
+
+    /** Applies everything queued, blocking until it has run on the EDT; runs directly when called on the EDT. */
+    fun flush() = inbox.flush()
+
+    /** Suspends until everything queued so far has been applied. */
+    suspend fun awaitUpdates() = withContext(Dispatchers.Swing) { inbox.flush() }
+
+    override fun close() = scope.cancel()
+}
 
 /**
  * A scope for view-owned [UiRefresh]/[UiLatest]/[UiInbox] instances, to be cancelled when the view goes away.

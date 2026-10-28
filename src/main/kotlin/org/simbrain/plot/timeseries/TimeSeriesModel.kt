@@ -1,6 +1,10 @@
+/**
+ * The time series plot's data: one series per component of the coupled array, or per scalar coupling. Data is posted
+ * from the updating thread and lands on the EDT, where the series are painted; adding, removing and renaming series
+ * runs on the EDT while the caller waits.
+ */
 package org.simbrain.plot.timeseries
 
-import kotlinx.coroutines.cancel
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.ChartColorMap
@@ -22,7 +26,7 @@ import java.util.concurrent.CopyOnWriteArrayList
  *
  * There is no support for representing separate scalar values in a single time series.
  */
-class TimeSeriesModel : AttributeContainer, EditableObject {
+class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
 
     @Transient
     lateinit var timeSupplier: () -> Int
@@ -189,18 +193,12 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         }
     }
 
-    fun clearData() {
-        points.clear()
-        val seriesCount = dataset.seriesCount
-        var i = 0
-        while (seriesCount > i) {
-            dataset.getSeries(i).clear()
-            ++i
-        }
-    }
+    /** Clears every series, after the points already sent have landed. */
+    fun clearData() = updates.post(Clear)
 
     /**
-     * Add scalar data to a specified time series. Called by scripts.
+     * Add scalar data to a specified time series. Called by scripts. The point lands on the EDT after this returns;
+     * a script that reads the series right after should call [awaitUpdates] first.
      *
      * @param seriesIndex index of data source to use
      * @param time        data for x axis
@@ -208,11 +206,11 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
      * the specified description.
      */
     fun addData(seriesIndex: Int, time: Double, value: Double) {
-        if (seriesIndex < dataset.seriesCount) {
-            val currentSeries = dataset.getSeries(seriesIndex)
-            currentSeries.add(time, value)
-        }
+        timeSeriesList.getOrNull(seriesIndex)?.let { updates.post(Point(it.series, time, value)) }
     }
+
+    /** Suspends until every point and clear sent so far has been applied to the series. */
+    suspend fun awaitUpdates() = updates.awaitUpdates()
 
     /**
      * Adds a [TimeSeries] with a default description, skipping numbers still in use so that removing a series
@@ -255,40 +253,47 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
         // One snapshot per tick: syncTimeSeries clears and refills the list on the event thread meanwhile
         val series = timeSeriesList.toList()
         for (i in 0 until minOf(array.size, series.size)) {
-            points.post(Point(series[i].series, time, array[i]))
+            updates.post(Point(series[i].series, time, array[i]))
         }
     }
+
+    /** A change to apply to the EDT-painted dataset. */
+    private sealed interface Update
 
     /**
      * A value bound to its series and time when it was sent, so a series reordered or removed before the point
      * lands can't receive another series' data, and the x value is the time it was recorded rather than the time
      * the EDT got to it.
      */
-    private class Point(val series: XYSeries, val time: Int, val value: Double)
+    private class Point(val series: XYSeries, val time: Number, val value: Double) : Update
 
-    @Transient
-    private val ui = UiScope()
+    private object Clear : Update
 
     /**
-     * Points for the EDT-painted dataset, added without the updating thread waiting on the EDT. A whole batch lands
-     * in one EDT task, so frames never catch a half-updated tick, and each series notifies its listeners once.
+     * Points and clears for the EDT-painted dataset, applied without the updating thread waiting on the EDT. A whole
+     * batch lands in one EDT task, so frames never catch a half-updated tick, and each series notifies its listeners
+     * once. Data goes through here; structural changes (adding, removing, renaming and syncing series) run on the
+     * EDT while the caller waits, since callers go on to use the series they changed.
      */
     @Transient
-    private val points = ui.uiInbox<Point> { batch ->
+    private val updates = EdtUpdates<Update> { batch ->
         val touched = LinkedHashSet<XYSeries>()
-        for (point in batch) {
-            if (touched.add(point.series)) point.series.notify = false
-            point.series.add(point.time as Number, point.value as Number, false)
+        fun quiet(series: XYSeries) = series.also { if (touched.add(it)) it.notify = false }
+        for (update in batch) {
+            when (update) {
+                is Point -> quiet(update.series).add(update.time, update.value as Number, false)
+                Clear -> for (i in 0 until dataset.seriesCount) quiet(dataset.getSeries(i)).clear()
+            }
         }
         touched.forEach { it.notify = true }
     }
 
-    /** Stops applying queued points; called when the owning component closes. */
-    fun close() = ui.cancel()
+    /** Stops applying queued points; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
 
     /** Lands queued points before XStream writes the series. */
     private fun writeReplace(): Any {
-        points.flush()
+        updates.flush()
         return this
     }
 
@@ -500,7 +505,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject {
 
         @Consumable
         fun setValue(value: Double) {
-            points.post(Point(series, timeSupplier(), value))
+            updates.post(Point(series, timeSupplier(), value))
         }
 
         override val id: String

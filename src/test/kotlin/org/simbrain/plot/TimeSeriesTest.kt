@@ -1,5 +1,7 @@
 package org.simbrain.plot
 
+import org.simbrain.util.withEdtHeld
+import org.simbrain.util.onEdt
 import kotlinx.coroutines.runBlocking
 import org.jfree.chart.renderer.AbstractRenderer
 import org.junit.jupiter.api.Assertions.*
@@ -512,7 +514,8 @@ class TimeSeriesTest {
         
         // Clear all data
         timeSeriesModel.clearData()
-        
+        UiWork.awaitIdle()
+
         assertEquals(0, series1.series.itemCount)
         assertEquals(0, series2.series.itemCount)
         
@@ -520,4 +523,18 @@ class TimeSeriesTest {
         assertEquals(2, timeSeriesModel.timeSeriesList.size)
     }
 
+    @Test
+    fun `added data reaches the series on the edt and can be awaited`() = runBlocking {
+        val model = TimeSeriesModel()
+        val series = model.addTimeSeries("Series").series
+
+        val countWhileEdtBusy = withEdtHeld {
+            model.addData(0, 1.0, 2.0)
+            series.itemCount
+        }
+        model.awaitUpdates()
+
+        assertEquals(0, countWhileEdtBusy)
+        assertEquals(1, onEdt { series.itemCount })
+    }
 }

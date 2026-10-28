@@ -1,5 +1,10 @@
 package org.simbrain.plot
 
+import java.util.function.Supplier
+import org.simbrain.util.withEdtHeld
+import org.simbrain.util.onEdt
+import org.simbrain.util.UiWork
+import org.simbrain.plot.raster.RasterModel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -126,4 +131,19 @@ class RasterPlotTest {
         assertEquals(3.0, rpc.model.dataset.getSeries(0).getDataItem(3).yValue)
     }
 
+    @Test
+    fun `clearing changes the dataset on the edt, not on the caller's thread`() {
+        val model = RasterModel(Supplier { 0 })
+        model.rasterConsumerList[0].setValues(doubleArrayOf(1.0))
+        UiWork.awaitIdle()
+
+        val countWhileEdtBusy = withEdtHeld {
+            model.clearData()
+            model.dataset.getSeries(0).itemCount
+        }
+        UiWork.awaitIdle()
+
+        assertEquals(1, countWhileEdtBusy)
+        assertEquals(0, onEdt { model.dataset.getSeries(0).itemCount })
+    }
 }

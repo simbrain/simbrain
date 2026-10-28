@@ -83,9 +83,8 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
-    public void close() {
-        model.close();
-        super.close();
+    protected List<AutoCloseable> getCloseables() {
+        return List.of(model);
     }
 
     @Override

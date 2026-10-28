@@ -8,21 +8,19 @@
  */
 package org.simbrain.plot.heatmap
 
-import kotlinx.coroutines.cancel
 import org.jfree.data.xy.AbstractXYZDataset
 import org.jfree.data.xy.XYZDataset
 import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.HeatMapEvents
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.util.UiScope
-import org.simbrain.util.uiInbox
+import org.simbrain.util.EdtUpdates
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Workspace
 import kotlin.math.abs
 
-class HeatMapModel : AttributeContainer, EditableObject {
+class HeatMapModel : AttributeContainer, EditableObject, AutoCloseable {
 
     @Transient
     lateinit var timeSupplier: () -> Int
@@ -116,15 +114,9 @@ class HeatMapModel : AttributeContainer, EditableObject {
         class Names(val names: List<String>) : Update
     }
 
+    /** Changes to the EDT-confined columns. Every column is kept; listeners hear about a whole batch once. */
     @Transient
-    private val ui = UiScope()
-
-    /**
-     * Changes applied on the EDT in the order they were made, without the caller waiting on the EDT. Every
-     * column is kept; listeners hear about a whole batch once.
-     */
-    @Transient
-    private val updates = ui.uiInbox<Update> { batch ->
+    private val updates = EdtUpdates<Update> { batch ->
         batch.forEach { update ->
             when (update) {
                 is Update.Column -> {
@@ -152,8 +144,8 @@ class HeatMapModel : AttributeContainer, EditableObject {
 
     fun setComponentNames(names: List<String>) = updates.post(Update.Names(names))
 
-    /** Stops applying updates; called when the owning component closes. */
-    fun close() = ui.cancel()
+    /** Stops applying updates; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
 
     /** Lands pending updates before XStream writes the columns. */
     private fun writeReplace(): Any {

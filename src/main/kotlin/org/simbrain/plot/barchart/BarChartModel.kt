@@ -1,14 +1,19 @@
+/**
+ * The bar chart's data: one bar per component of the coupled array. Couplings post values and names from the
+ * updating thread; the JFreeChart dataset is EDT-confined and changes only when those land on the EDT.
+ */
 package org.simbrain.plot.barchart
 
 import com.thoughtworks.xstream.XStream
-import kotlinx.coroutines.cancel
 import org.jfree.data.category.DefaultCategoryDataset
+import org.simbrain.plot.ChartUpdate
+import org.simbrain.plot.applyChartUpdates
 import org.simbrain.plot.chartSeriesColor
+import org.simbrain.plot.componentLabel
+import org.simbrain.util.EdtUpdates
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.UiScope
-import org.simbrain.util.uiInbox
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
@@ -16,7 +21,7 @@ import java.awt.Color
 /**
  * Data for a JFreeChart bar chart.
  */
-class BarChartModel : AttributeContainer, EditableObject {
+class BarChartModel : AttributeContainer, EditableObject, AutoCloseable {
 
     override val id: String
         get() = "Bar Chart"
@@ -54,8 +59,15 @@ class BarChartModel : AttributeContainer, EditableObject {
 
     /**
      * Names of the incoming array's components, one per bar. Set via coupling events in [BarChartComponent].
+     * Setting new names renames any bars already in the dataset, so a label change shows without waiting for the
+     * next value update. Reads return the names applied so far.
      */
-    private var componentNames = listOf<String>()
+    var componentNames: List<String>
+        get() = names
+        set(value) = updates.post(ChartUpdate.Names(value))
+
+    /** The names currently applied to the dataset. Workspaces saved before this field load through [componentNames]. */
+    private var names = listOf<String>()
 
     /**
      * Track how many bars there are. If an array with a different number of
@@ -75,45 +87,19 @@ class BarChartModel : AttributeContainer, EditableObject {
         this.upperBound = upperBound
     }
 
-    /** A change to apply to [dataset] on the EDT. */
-    private sealed interface Update {
-        class Values(val values: DoubleArray) : Update
-        class Names(val names: List<String>) : Update
-    }
-
+    /** Changes to the EDT-confined dataset. */
     @Transient
-    private val ui = UiScope()
-
-    /**
-     * Changes to the EDT-confined dataset, applied in the order they were made without the caller waiting on the
-     * EDT. Values sent each iteration are latest-wins: one superseded by a later one in the same batch is skipped.
-     */
-    @Transient
-    private val updates = ui.uiInbox<Update> { batch ->
-        val lastValues = batch.indexOfLast { it is Update.Values }
-        batch.forEachIndexed { i, update ->
-            when (update) {
-                is Update.Values -> if (i == lastValues) applyValues(update.values)
-                is Update.Names -> applyNames(update.names)
-            }
-        }
-    }
+    private val updates = EdtUpdates<ChartUpdate> { applyChartUpdates(it, ::applyValues, ::applyNames) }
 
     /**
      * Called by coupling producers via reflection. The values are copied, since a producer may hand over a buffer it
      * keeps writing to before the update lands on the event thread.
      */
     @Consumable
-    fun setBarValues(newPoint: DoubleArray) = updates.post(Update.Values(newPoint.copyOf()))
+    fun setBarValues(newPoint: DoubleArray) = updates.post(ChartUpdate.Values(newPoint.copyOf()))
 
-    /**
-     * Set the component names and rename any bars already in the dataset, so a label change shows without
-     * waiting for the next value update.
-     */
-    fun setComponentNames(names: List<String>) = updates.post(Update.Names(names))
-
-    /** Stops applying updates; called when the owning component closes. */
-    fun close() = ui.cancel()
+    /** Stops applying updates; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
 
     /** Lands pending updates before XStream writes the dataset. */
     private fun writeReplace(): Any {
@@ -135,7 +121,7 @@ class BarChartModel : AttributeContainer, EditableObject {
     }
 
     private fun applyNames(names: List<String>) {
-        componentNames = names
+        this.names = names
         if (dataset.columnCount > 0) {
             // The producer now sends one value per name, so the bars are rebuilt to match: one whose
             // neuron was deleted goes rather than lingering under a stand-in number, and one whose
@@ -149,7 +135,7 @@ class BarChartModel : AttributeContainer, EditableObject {
         }
     }
 
-    private fun componentName(i: Int) = componentNames.getOrElse(i) { "${i + 1}" }
+    private fun componentName(i: Int) = componentLabel(names, i)
 
     override val name: String
         get() = "Bar chart"

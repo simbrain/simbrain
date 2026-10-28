@@ -39,6 +39,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.*
 import javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY
 import javax.swing.event.*
@@ -226,6 +227,12 @@ object SimbrainDesktop {
      */
     private var lastTimestep = 0
 
+    /**
+     * Set while a quit is prompting, so a second quit request (e.g. one Cmd-Q reaching both the macOS quit
+     * handler and the File menu key binding) does not open a second prompt.
+     */
+    private val quitInProgress = AtomicBoolean(false)
+
     private val mouseListener: MouseListener = object : MouseAdapter() {
         override fun mousePressed(mouseEvent: MouseEvent) {
             val lastClickedPoint = mouseEvent.point
@@ -272,10 +279,16 @@ object SimbrainDesktop {
         )
         createAndAttachMenus()
         
-        // Add macOS About menu handler
+        // Add macOS About and Quit menu handlers. With the screen menu bar, Cmd-Q belongs to the application
+        // menu's Quit item rather than to the File menu action, so route it through quit() to get the save prompt.
         if (Utils.isMacOSX()) {
             Desktop.getDesktop().setAboutHandler {
                 showAboutDialog()
+            }
+            Desktop.getDesktop().setQuitHandler { _, response ->
+                // Answer AppKit right away and prompt afterwards; quit() exits the process unless the user cancels
+                response.cancelQuit()
+                SwingUtilities.invokeLater { quit(false) }
             }
         }
         
@@ -544,8 +557,11 @@ object SimbrainDesktop {
         fileMenu.add(actionManager.showOdorWorldPreferencesAction)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.resetOnboardingWindows)
-        fileMenu.addSeparator()
-        fileMenu.add(actionManager.quitWorkspaceAction)
+        // On macOS, Quit (with its Cmd-Q shortcut) lives in the application menu; see the quit handler
+        if (!Utils.isMacOSX()) {
+            fileMenu.addSeparator()
+            fileMenu.add(actionManager.quitWorkspaceAction)
+        }
         return fileMenu
     }
 
@@ -1047,7 +1063,7 @@ object SimbrainDesktop {
      * should be left alone
      */
     private fun confirmDiscardChanges(): Boolean {
-        if (!workspace.changesExist()) {
+        if (workspace.componentList.isEmpty() || !workspace.changesExist()) {
             return true
         }
         return when (showHasChangedDialog()) {
@@ -1120,19 +1136,14 @@ object SimbrainDesktop {
      * @param forceQuit should quit be forced.
      */
     fun quit(forceQuit: Boolean) {
-        if (workspace.changesExist() && !forceQuit && workspace.componentList.size > 0) {
-            val s = showHasChangedDialog()
-            if (s == JOptionPane.OK_OPTION) {
-                save()
-                quit(true)
-            } else if (s == JOptionPane.NO_OPTION) {
-                quit(true)
-            } else if (s == JOptionPane.CANCEL_OPTION) {
-                return
+        if (!quitInProgress.compareAndSet(false, true)) return
+        try {
+            if (forceQuit || confirmDiscardChanges()) {
+                workspace.removeAllComponents()
+                System.exit(0)
             }
-        } else {
-            workspace.removeAllComponents()
-            System.exit(0)
+        } finally {
+            quitInProgress.set(false)
         }
     }
 

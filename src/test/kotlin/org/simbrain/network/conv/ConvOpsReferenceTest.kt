@@ -1,3 +1,7 @@
+/**
+ * Checks the convolution routines against direct implementations of the definitions, which loop over every filter,
+ * output position, channel and kernel entry in turn.
+ */
 package org.simbrain.network.conv
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals
@@ -5,10 +9,6 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.TensorShape
 import kotlin.random.Random
 
-/**
- * Checks the convolution routines against direct implementations of the definitions, which loop over every filter,
- * output position, channel and kernel entry in turn.
- */
 class ConvOpsReferenceTest {
 
     private class Case(val inH: Int, val inW: Int, val inC: Int, val filters: Int, val k: Int, val stride: Int, val pad: Int) {

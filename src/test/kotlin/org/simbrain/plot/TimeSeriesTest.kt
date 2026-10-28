@@ -17,6 +17,8 @@ import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.plot.timeseries.createTimeSeriesModel
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.workspace.Workspace
 import org.simbrain.util.UiWork
 
@@ -83,8 +85,7 @@ class TimeSeriesTest {
             timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
         }
 
-        workspace.simpleIterate()
-        UiWork.awaitIdle()
+        workspace.iterateAndSettle()
         assertEquals(1, timeSeriesComponent.model.timeSeriesList[1].series.itemCount)
 
         neurons[1].label = "Delta"
@@ -117,8 +118,7 @@ class TimeSeriesTest {
         awaitUntil(message = "Series were not named after neuron labels") {
             timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
         }
-        repeat(3) { workspace.simpleIterate() }
-        UiWork.awaitIdle()
+        workspace.iterateAndSettle(3)
         assertEquals(listOf(3, 3, 3), timeSeriesComponent.model.timeSeriesList.map { it.series.itemCount })
 
         runBlocking { neurons[1].delete() }
@@ -149,8 +149,7 @@ class TimeSeriesTest {
         workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
 
         awaitUntil { timeSeriesComponent.model.timeSeriesList.size == 2 }
-        repeat(3) { workspace.simpleIterate() }
-        UiWork.awaitIdle()
+        workspace.iterateAndSettle(3)
 
         val added = Neuron().apply { label = "Gamma" }
         network.addNetworkModelAsync(added)
@@ -189,8 +188,7 @@ class TimeSeriesTest {
                     listOf("Alpha", "Beta", neurons[2].id)
         }
 
-        workspace.simpleIterate()
-        UiWork.awaitIdle()
+        workspace.iterateAndSettle()
         neurons[1].label = "Delta"
         awaitUntil(message = "Series name did not follow the neuron rename") {
             timeSeriesComponent.model.timeSeriesList.map { it.description } ==
@@ -255,7 +253,7 @@ class TimeSeriesTest {
         val populated = model.addTimeSeries("Alpha")
         repeat(3) {
             time = it
-            runBlocking { populated.setValue(it.toDouble() + 1) }
+            populated.setValue(it.toDouble() + 1)
         }
         UiWork.awaitIdle()
         // Stands in for the series added when a deleted neuron is restored: it has no values until the
@@ -277,11 +275,9 @@ class TimeSeriesTest {
         val large = model.addTimeSeries("Large")
         repeat(3) {
             time = it
-            runBlocking {
-                small.setValue(it.toDouble())
-                large.setValue(it * 100.0)
-                UiWork.awaitIdle()
-            }
+            small.setValue(it.toDouble())
+            large.setValue(it * 100.0)
+            UiWork.awaitIdle()
         }
         UiWork.awaitIdle()
         val panel = TimeSeriesPlotPanel(model)

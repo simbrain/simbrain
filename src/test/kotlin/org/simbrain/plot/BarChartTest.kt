@@ -2,6 +2,7 @@ package org.simbrain.plot
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
@@ -9,10 +10,11 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
 import org.simbrain.util.UiWork
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.util.onEdt
+import org.simbrain.util.withEdtHeld
 import org.simbrain.workspace.Workspace
-import java.util.concurrent.CountDownLatch
-import javax.swing.SwingUtilities
 
 class BarChartTest {
 
@@ -106,8 +108,7 @@ class BarChartTest {
             collection.getProducer("getInputArray") couple barChartComponent.model.getConsumer("setBarValues")
         }
 
-        workspace.simpleIterate()
-        UiWork.awaitIdle()
+        workspace.iterateAndSettle()
         assertEquals(listOf("1", "2"), barChartComponent.model.getDataset().columnKeys)
     }
 
@@ -117,19 +118,17 @@ class BarChartTest {
         // Build and warm the serializer first, so the save below runs while the EDT is still held
         val xstream = BarChartModel.getXStream()
         xstream.toXML(BarChartModel())
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
-        }
-        held.await()
-        model.setBarValues(doubleArrayOf(0.5, 1.5))
         var xml = ""
-        val save = Thread { xml = xstream.toXML(model) }.apply { start() }
-        Thread.sleep(100)
-        release.countDown()
+        val save = withEdtHeld {
+            model.setBarValues(doubleArrayOf(0.5, 1.5))
+            Thread { xml = xstream.toXML(model) }.apply {
+                start()
+                // The save flushes the queued update on the EDT, so it waits there until the EDT is released
+                awaitUntil(message = "the save never waited for the EDT") { state == Thread.State.WAITING }
+            }
+        }
         save.join(10_000)
+        assertFalse(save.isAlive, "the save did not finish once the EDT was released")
         val restored = xstream.fromXML(xml) as BarChartModel
         assertEquals(1.5, restored.getDataset().getValue(0, 1))
     }
@@ -137,18 +136,12 @@ class BarChartTest {
     @Test
     fun `a value array changed after it is sent does not change the bars`() {
         val model = BarChartModel()
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
+        withEdtHeld {
+            // A producer such as a tensor layer hands over its live buffer and keeps writing to it
+            val values = doubleArrayOf(0.5, 1.5)
+            model.setBarValues(values)
+            values[1] = 9.0
         }
-        held.await()
-        // A producer such as a tensor layer hands over its live buffer and keeps writing to it
-        val values = doubleArrayOf(0.5, 1.5)
-        model.setBarValues(values)
-        values[1] = 9.0
-        release.countDown()
         UiWork.awaitIdle()
         assertEquals(1.5, onEdt { model.getDataset().getValue(0, 1) })
     }

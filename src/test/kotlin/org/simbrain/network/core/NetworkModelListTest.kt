@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.updaterules.LinearRule
+import java.util.concurrent.atomic.AtomicBoolean
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.concurrent.atomic.AtomicReference
 import kotlin.concurrent.thread
@@ -31,7 +32,7 @@ class NetworkModelListTest {
     fun `update plan includes a model added while another thread reads the plan`() {
         val current = AtomicReference<NetworkModelList?>()
         val readerPasses = AtomicInteger()
-        val stop = AtomicReference(false)
+        val stop = AtomicBoolean(false)
         val reader = thread(isDaemon = true) {
             while (!stop.get()) {
                 current.get()?.updatePlan
@@ -47,7 +48,11 @@ class NetworkModelListTest {
                 current.set(null)
                 // Let the reader finish any plan it started from this list before checking it
                 val passes = readerPasses.get()
-                while (readerPasses.get() < passes + 2) Thread.onSpinWait()
+                val deadline = System.nanoTime() + 10_000_000_000L
+                while (readerPasses.get() < passes + 2) {
+                    check(System.nanoTime() < deadline) { "trial $trial: the reader thread made no progress within 10 seconds" }
+                    Thread.onSpinWait()
+                }
                 assertTrue(added in list.updatePlan.neuronChunks.flatten(), "trial $trial: plan misses the added neuron")
             }
         } finally {

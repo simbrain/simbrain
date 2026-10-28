@@ -10,17 +10,17 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
-import org.simbrain.plot.awaitUntil
+import org.simbrain.util.awaitUntil
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.util.finishesWhileEdtIsBlocked
 import org.simbrain.util.onEdt
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.util.point
+import org.simbrain.util.withEdtHeld
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.gui.EntityNode
 import java.awt.geom.PathIterator
-import java.util.concurrent.CountDownLatch
 import javax.swing.SwingUtilities
 import kotlin.math.cos
 import kotlin.math.sin
@@ -31,17 +31,6 @@ class EntityNodeSyncTest {
         lateinit var panel: OdorWorldPanel
         SwingUtilities.invokeAndWait { panel = OdorWorldPanel(component, world) }
         return panel
-    }
-
-    private fun holdEdt(): CountDownLatch {
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
-        }
-        held.await()
-        return release
     }
 
     @Test
@@ -55,8 +44,7 @@ class EntityNodeSyncTest {
         mouse.location = point(150.0, 120.0)
         UiWork.awaitIdle()
 
-        assertEquals(150.0, node.offset.x)
-        assertEquals(120.0, node.offset.y)
+        assertEquals(point(150.0, 120.0), onEdt { node.offset })
     }
 
     @Test
@@ -68,17 +56,13 @@ class EntityNodeSyncTest {
         val node = onEdt { panel.getEntityNode(mouse) }
         UiWork.awaitIdle()
 
-        val tasks = countEdtTasks {
-            val release = holdEdt()
-            repeat(1000) { mouse.location = point(100.0 + it * 0.2, 100.0) }
-            release.countDown()
-            // Sleep rather than poll, so only the work the moves caused is counted
-            Thread.sleep(200)
+        val tasks = countEdtTasks(settleMs = 200) {
+            withEdtHeld { repeat(1000) { mouse.location = point(100.0 + it * 0.2, 100.0) } }
         }
         UiWork.awaitIdle()
 
         assertTrue(tasks < 10, "1000 moves posted $tasks EDT tasks")
-        assertEquals(mouse.x, node.offset.x)
+        assertEquals(mouse.x, onEdt { node.offset.x })
     }
 
     @Test
@@ -114,12 +98,15 @@ class EntityNodeSyncTest {
         UiWork.awaitIdle()
         assertTrue(finished, "world updates waited on the EDT")
 
-        val iterator = node.trail.pathReference.getPathIterator(null)
-        var lines = 0
-        val coords = DoubleArray(6)
-        while (!iterator.isDone) {
-            if (iterator.currentSegment(coords) == PathIterator.SEG_LINETO) lines++
-            iterator.next()
+        val lines = onEdt {
+            val iterator = node.trail.pathReference.getPathIterator(null)
+            var count = 0
+            val coords = DoubleArray(6)
+            while (!iterator.isDone) {
+                if (iterator.currentSegment(coords) == PathIterator.SEG_LINETO) count++
+                iterator.next()
+            }
+            count
         }
         assertTrue(lines >= updates - 1, "a circle of $updates world updates drew $lines trail segments")
     }

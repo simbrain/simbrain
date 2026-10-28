@@ -1,12 +1,12 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.awaitUntil
 import org.simbrain.workspace.gui.SimbrainDesktop
 
 /**
@@ -44,13 +44,5 @@ abstract class NetworkPanelDeleteUndoTestBase {
             }
         }
         panel.selectionManager.set(models.mapNotNull { panel.modelNodeMap.peek(it) })
-    }
-
-    /** Poll until [cond] holds or the timeout elapses (node creation/removal is async + debounced). */
-    protected suspend fun awaitUntil(timeoutMs: Int = 5000, cond: () -> Boolean) {
-        repeat(timeoutMs / 50) {
-            if (cond()) return
-            delay(50)
-        }
     }
 }

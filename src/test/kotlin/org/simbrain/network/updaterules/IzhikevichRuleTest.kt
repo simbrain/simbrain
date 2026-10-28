@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronArray
 import kotlin.math.abs
+import kotlin.random.Random
 
 /**
  * Test suite for IzhikevichRule implementation validation against the original paper:
@@ -398,11 +400,11 @@ class IzhikevichRuleTest {
 
     @Test
     fun `a neuron array matches individual neurons with the same rule`() {
-        val rng = kotlin.random.Random(9)
+        val rng = Random(9)
         val network = Network().apply { timeStep = 0.5 }
         val rule = IzhikevichRule().apply { backgroundCurrent = 3.0 }
         val initial = DoubleArray(8) { rng.nextDouble(-70.0, 20.0) }
-        val array = org.simbrain.network.core.NeuronArray(8).apply {
+        val array = NeuronArray(8).apply {
             updateRule = rule.copy()
             for (i in 0 until size) activations[i, 0] = initial[i]
         }

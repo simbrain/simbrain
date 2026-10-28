@@ -8,6 +8,7 @@
  */
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Assumptions.assumeTrue
@@ -29,13 +30,15 @@ import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.gui.nodes.TextNode
 import org.simbrain.network.updaterules.IntegrateAndFireRule
 import org.simbrain.util.UiWork
+import org.simbrain.util.awaitUntil
 import org.simbrain.util.countEdtTasks
+import org.simbrain.util.onEdt
 import org.simbrain.util.point
+import org.simbrain.util.withEdtHeld
 import org.simbrain.workspace.Workspace
+import java.awt.Color
 import java.awt.Rectangle
-import java.awt.geom.Point2D
 import java.awt.image.BufferedImage
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.SwingUtilities
 import kotlin.math.ceil
@@ -57,39 +60,23 @@ class NodeSyncTest {
         }
     }
 
-    private fun holdEdt(): CountDownLatch {
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
-        }
-        held.await()
-        return release
-    }
-
     @Test
     fun `a synapse node follows its neurons when they move`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))
         val source = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
         val target = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
-        source.location = java.awt.geom.Point2D.Double(0.0, 0.0)
-        target.location = java.awt.geom.Point2D.Double(100.0, 0.0)
+        source.location = point(0.0, 0.0)
+        target.location = point(100.0, 0.0)
         val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
         val node = panel.getNode(synapse) as SynapseNode
         UiWork.awaitIdle()
-        SwingUtilities.invokeAndWait { }
-        val before = node.globalFullBounds.centerX
+        val before = onEdt { node.globalFullBounds.centerX }
 
-        target.location = java.awt.geom.Point2D.Double(500.0, 0.0)
-        var after = before
-        val deadline = System.currentTimeMillis() + 3000
-        while (after == before && System.currentTimeMillis() < deadline) {
-            SwingUtilities.invokeAndWait { after = node.globalFullBounds.centerX }
-            Thread.sleep(10)
+        target.location = point(500.0, 0.0)
+        awaitUntil(3000, "synapse node should move with its target neuron") {
+            onEdt { node.globalFullBounds.centerX } > before + 100
         }
-        assertTrue(after > before + 100, "synapse node should move with its target neuron: $before -> $after")
     }
 
     @Test
@@ -102,7 +89,7 @@ class NodeSyncTest {
         neuron.activation = 0.7
         UiWork.awaitIdle()
 
-        assertEquals(0.7, node.drawnActivation)
+        assertEquals(0.7, onEdt { node.drawnActivation })
     }
 
     @Test
@@ -113,17 +100,13 @@ class NodeSyncTest {
         val node = panel.getNode(neuron) as NeuronNode
         UiWork.awaitIdle()
 
-        val tasks = countEdtTasks {
-            val release = holdEdt()
-            repeat(1000) { neuron.activation = it.toDouble() }
-            release.countDown()
-            // Sleep rather than poll, so only the work the changes caused is counted
-            Thread.sleep(200)
+        val tasks = countEdtTasks(settleMs = 200) {
+            withEdtHeld { repeat(1000) { neuron.activation = it.toDouble() } }
         }
         UiWork.awaitIdle()
 
         assertTrue(tasks < 10, "1000 activation changes posted $tasks EDT tasks")
-        assertEquals(999.0, node.drawnActivation)
+        assertEquals(999.0, onEdt { node.drawnActivation })
     }
 
     @Test
@@ -147,7 +130,7 @@ class NodeSyncTest {
         UiWork.awaitIdle()
 
         assertTrue(drawnOnSpikeFrame, "a spike between frames was never drawn")
-        assertFalse(node.drawnSpiking, "a spike that had already ended stayed drawn")
+        assertFalse(onEdt { node.drawnSpiking }, "a spike that had already ended stayed drawn")
     }
 
     @Test
@@ -160,15 +143,15 @@ class NodeSyncTest {
 
         panel.deleteSelectedObjects()
         UiWork.awaitIdle()
-        assertFalse(original.nodeScope.coroutineContext[kotlinx.coroutines.Job]!!.isActive, "deleted node still subscribed")
+        assertFalse(original.nodeScope.isActive, "deleted node still subscribed")
 
         panel.undoManager.undo()
         val restored = panel.getNode(neuron) as NeuronNode
         assertNotSame(original, restored)
         neuron.activation = 0.4
         UiWork.awaitIdle()
-        assertEquals(0.4, restored.drawnActivation)
-        assertNotEquals(0.4, original.drawnActivation)
+        assertEquals(0.4, onEdt { restored.drawnActivation })
+        assertNotEquals(0.4, onEdt { original.drawnActivation })
     }
 
     @Test
@@ -184,9 +167,8 @@ class NodeSyncTest {
         UiWork.awaitIdle()
 
         val iterations = 3000
-        val tasks = countEdtTasks {
+        val tasks = countEdtTasks(settleMs = 200) {
             runBlocking { workspace.iterateSuspend(iterations) }
-            Thread.sleep(200)
         }
 
         // Before mark/sync every changed neuron posted its own task: ~75 per iteration here
@@ -204,11 +186,11 @@ class NodeSyncTest {
 
         synapse.strength = -0.5
         UiWork.awaitIdle()
-        assertEquals(NetworkPreferences.inhibitorySynapseColor, node.drawnCircleColor)
+        assertEquals(NetworkPreferences.inhibitorySynapseColor, onEdt { node.drawnCircleColor })
 
         synapse.strength = 0.5
         UiWork.awaitIdle()
-        assertEquals(NetworkPreferences.excitatorySynapseColor, node.drawnCircleColor)
+        assertEquals(NetworkPreferences.excitatorySynapseColor, onEdt { node.drawnCircleColor })
     }
 
     @Test
@@ -223,11 +205,11 @@ class NodeSyncTest {
 
         with(network) { source.isSpike = true }
         UiWork.awaitIdle()
-        assertTrue(node.drawnSourceSpiking)
+        assertTrue(onEdt { node.drawnSourceSpiking })
 
         with(network) { source.isSpike = false }
         UiWork.awaitIdle()
-        assertFalse(node.drawnSourceSpiking)
+        assertFalse(onEdt { node.drawnSourceSpiking })
     }
 
     @Test
@@ -244,9 +226,8 @@ class NodeSyncTest {
         UiWork.awaitIdle()
 
         val iterations = 3000
-        val tasks = countEdtTasks {
+        val tasks = countEdtTasks(settleMs = 200) {
             runBlocking { workspace.iterateSuspend(iterations) }
-            Thread.sleep(200)
         }
 
         // Every synapse used to listen to its source's spike event, which fires every iteration: ~990 tasks each
@@ -261,18 +242,14 @@ class NodeSyncTest {
         val node = panel.getNode(text) as TextNode
         UiWork.awaitIdle()
 
-        val tasks = countEdtTasks {
-            val release = holdEdt()
-            repeat(1000) { text.text = "update $it" }
-            release.countDown()
-            // Sleep rather than poll, so only the work the updates caused is counted
-            Thread.sleep(200)
+        val tasks = countEdtTasks(settleMs = 200) {
+            withEdtHeld { repeat(1000) { text.text = "update $it" } }
         }
         UiWork.awaitIdle()
 
         assertTrue(tasks < 10, "1000 text updates posted $tasks EDT tasks")
-        val document = node.pStyledText.document
-        assertEquals("update 999", document.getText(0, document.length))
+        val shown = onEdt { node.pStyledText.document.let { it.getText(0, it.length) } }
+        assertEquals("update 999", shown)
     }
 
     @Test
@@ -284,15 +261,15 @@ class NodeSyncTest {
         val node = panel.getNode(synapse) as SynapseNode
         synapse.strength = 0.5
         UiWork.awaitIdle()
-        val drawn = node.drawnDiameter
+        val drawn = onEdt { node.drawnDiameter }
 
         synapse.strength = 0.5001
         UiWork.awaitIdle()
-        assertEquals(drawn, node.drawnDiameter, "sub-pixel drift redrew the synapse")
+        assertEquals(drawn, onEdt { node.drawnDiameter }, "sub-pixel drift redrew the synapse")
 
         synapse.strength = synapse.upperBound
         UiWork.awaitIdle()
-        assertNotEquals(drawn, node.drawnDiameter, "a visible strength change did not redraw")
+        assertNotEquals(drawn, onEdt { node.drawnDiameter }, "a visible strength change did not redraw")
     }
 
     @Test
@@ -309,27 +286,22 @@ class NodeSyncTest {
         // Zoomed in far enough to show labels, and painted twice so the connection tier holds a cached image
         SwingUtilities.invokeAndWait { panel.canvas.camera.setViewScale(5.0) }
         repeat(2) { paintTier(panel, panel.edgeTier) }
-        val before = node.drawnStrengthLabel
+        val before = onEdt { node.drawnStrengthLabel }
         assertNotNull(before)
 
         synapse.strength = 5.0
         UiWork.awaitIdle()
         paintTier(panel, panel.edgeTier)
-        assertNotNull(node.drawnStrengthLabel)
-        assertNotEquals(before, node.drawnStrengthLabel, "the cached tier kept the old strength label")
+        val after = onEdt { node.drawnStrengthLabel }
+        assertNotNull(after)
+        assertNotEquals(before, after, "the cached tier kept the old strength label")
     }
 
     /**
      * Paints one tier of the canvas as the canvas would at the panel's zoom (so the connection tier's raster cache is
      * used or rebuilt), into an image with a 5-unit margin around the tier's bounds.
      */
-    private fun paintTier(panel: NetworkPanel, tier: PNode): BufferedImage {
-        lateinit var image: BufferedImage
-        SwingUtilities.invokeAndWait { image = paintTierOnEdt(panel, tier) }
-        return image
-    }
-
-    private fun paintTierOnEdt(panel: NetworkPanel, tier: PNode): BufferedImage {
+    private fun paintTier(panel: NetworkPanel, tier: PNode): BufferedImage = onEdt {
         // What the canvas does before each paint: brings bounds up to date and turns invalidations into repaints
         panel.canvas.root.processInputs()
         val scale = panel.scalingFactor
@@ -344,7 +316,7 @@ class NodeSyncTest {
         g.translate(5 - bounds.x, 5 - bounds.y)
         tier.fullPaint(PPaintContext(g))
         g.dispose()
-        return image
+        image
     }
 
     @Test
@@ -353,25 +325,20 @@ class NodeSyncTest {
         val panel = NetworkPanel(NetworkComponent("test", network))
         val source = Neuron(IntegrateAndFireRule()).also { network.addNetworkModel(it, usePlacementManager = false) }
         val target = Neuron().also { network.addNetworkModel(it, usePlacementManager = false) }
-        source.location = java.awt.geom.Point2D.Double(0.0, 0.0)
-        target.location = java.awt.geom.Point2D.Double(100.0, 0.0)
+        source.location = point(0.0, 0.0)
+        target.location = point(100.0, 0.0)
         val synapse = Synapse(source, target).also { network.addNetworkModel(it) }
         val node = panel.getNode(synapse) as SynapseNode
         with(network) { source.isSpike = true }
         UiWork.awaitIdle()
-        assertTrue(node.drawnSourceSpiking)
+        assertTrue(onEdt { node.drawnSourceSpiking })
 
-        target.location = java.awt.geom.Point2D.Double(500.0, 0.0)
-        var moved = false
-        val deadline = System.currentTimeMillis() + 3000
-        while (!moved && System.currentTimeMillis() < deadline) {
-            SwingUtilities.invokeAndWait { moved = node.circleNode!!.globalFullBounds.centerX > 400 }
-            Thread.sleep(10)
+        target.location = point(500.0, 0.0)
+        awaitUntil(3000, "the synapse node never followed its target") {
+            onEdt { node.circleNode!!.globalFullBounds.centerX > 400 }
         }
-        assertTrue(moved, "the synapse node never followed its target")
 
-        var covered = false
-        SwingUtilities.invokeAndWait { covered = panel.spikeOverlay.globalFullBounds.contains(node.globalFullBounds) }
+        val covered = onEdt { panel.spikeOverlay.globalFullBounds.contains(node.globalFullBounds) }
         assertTrue(covered, "the overlay would be culled where the highlighted synapse now is")
     }
 
@@ -387,22 +354,21 @@ class NodeSyncTest {
         val node = panel.getNode(synapse) as SynapseNode
         with(network) { source.isSpike = true }
         UiWork.awaitIdle()
-        assertTrue(node.drawnSourceSpiking)
+        assertTrue(onEdt { node.drawnSourceSpiking })
         SwingUtilities.invokeAndWait { panel.canvas.camera.setViewScale(5.0) }
 
         // The overlay draws the circle back over the cached one; the middle of the circle must show the label's
         // pixels, not only the circle's fill
         val image = paintTier(panel, panel.spikeOverlay)
-        var labelDrawn = false
-        SwingUtilities.invokeAndWait {
+        val labelDrawn = onEdt {
             val scale = panel.scalingFactor
             val overlay = panel.spikeOverlay.globalFullBounds
             val circle = node.circleNode!!.globalFullBounds
             val cx = ((circle.centerX - overlay.x + 5) * scale).toInt()
             val cy = ((circle.centerY - overlay.y + 5) * scale).toInt()
             val half = (circle.width / 2 * scale * 0.3).toInt()
-            val fill = (node.drawnCircleColor as java.awt.Color).rgb
-            labelDrawn = (cx - half..cx + half).any { x -> (cy - half..cy + half).any { y -> image.getRGB(x, y) != fill } }
+            val fill = (node.drawnCircleColor as Color).rgb
+            (cx - half..cx + half).any { x -> (cy - half..cy + half).any { y -> image.getRGB(x, y) != fill } }
         }
         assertTrue(labelDrawn, "the spike overlay covered the strength label")
     }
@@ -419,23 +385,19 @@ class NodeSyncTest {
         panel.synapseSpikingOnlyVisible = true
         UiWork.awaitIdle()
 
-        fun pickedAtCircle(): Boolean {
-            var picked = false
-            SwingUtilities.invokeAndWait {
-                val camera = panel.canvas.camera
-                camera.setBounds(0.0, 0.0, 800.0, 800.0)
-                panel.canvas.root.processInputs()
-                val center = node.circleNode!!.globalFullBounds.center2D
-                val local = camera.viewToLocal(Point2D.Double(center.x, center.y))
-                picked = camera.pick(local.x, local.y, 1.0).nodeStackReference.contains(node)
-            }
-            return picked
+        fun pickedAtCircle(): Boolean = onEdt {
+            val camera = panel.canvas.camera
+            camera.setBounds(0.0, 0.0, 800.0, 800.0)
+            panel.canvas.root.processInputs()
+            val center = node.circleNode!!.globalFullBounds.center2D
+            val local = camera.viewToLocal(point(center.x, center.y))
+            camera.pick(local.x, local.y, 1.0).nodeStackReference.contains(node)
         }
 
         assertFalse(pickedAtCircle(), "a hidden synapse should not take clicks")
         with(network) { source.isSpike = true }
         UiWork.awaitIdle()
-        assertTrue(node.drawnSourceSpiking)
+        assertTrue(onEdt { node.drawnSourceSpiking })
         assertTrue(pickedAtCircle(), "the spiking synapse the overlay shows should take clicks")
     }
 
@@ -453,11 +415,13 @@ class NodeSyncTest {
         assertNotSame(removed, current)
 
         neuron.select()
-        val deadline = System.currentTimeMillis() + 5000
-        while (current !in panel.selectionManager.selection && System.currentTimeMillis() < deadline) Thread.sleep(10)
-        // The selected event reaches every subscriber at about the same time; give a stale one the same chance
+        awaitUntil(message = "the current node never joined the selection") {
+            onEdt { current in panel.selectionManager.selection }
+        }
+        // The selected event reaches every subscriber at about the same time; a stale one can only be caught joining
+        // late, so give it the same chance before checking it stayed out
         Thread.sleep(200)
-        assertEquals(setOf(current), panel.selectionManager.selection.toSet())
+        assertEquals(setOf(current), onEdt { panel.selectionManager.selection.toSet() })
     }
 
     @Test
@@ -473,10 +437,10 @@ class NodeSyncTest {
         UiWork.awaitIdle()
 
         // Both marks land in one sync pass, with the failing node first
-        val release = holdEdt()
-        failing.mark()
-        other.mark()
-        release.countDown()
+        withEdtHeld {
+            failing.mark()
+            other.mark()
+        }
         UiWork.awaitIdle()
 
         other.mark()

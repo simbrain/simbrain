@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.simbrain.util.awaitUntil
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.odorworld.OdorWorldComponent
@@ -46,11 +47,7 @@ class DesktopComponentScopeTest {
         // Opening a workspace clears the current one this way too, without closing each component's window
         workspace.clearWorkspace()
 
-        val deadline = System.currentTimeMillis() + 5000
-        while (desktop.viewScope.isActive && System.currentTimeMillis() < deadline) {
-            SwingUtilities.invokeAndWait {}
-        }
-        assertFalse(desktop.viewScope.isActive, "the view scope outlived its component")
+        awaitUntil(message = "the view scope outlived its component") { !desktop.viewScope.isActive }
         assertFalse(desktop.worldPanel.viewScope.isActive, "the panel's scope outlived its window")
     }
 }

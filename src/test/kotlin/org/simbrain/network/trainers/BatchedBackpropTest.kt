@@ -18,6 +18,7 @@ import org.simbrain.network.updaterules.GELU
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
 import org.simbrain.network.updaterules.SigmoidalRule
+import org.simbrain.util.flatten
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.util.math.SigmoidFunctionEnum
 import smile.math.matrix.Matrix
@@ -80,7 +81,7 @@ class BatchedBackpropTest {
         // Uneven batch sizes, including a single example
         val losses = listOf(0 until 10, 10 until 11, 11 until 23, 3 until 17).map { trainer.trainBatch(it) }
         val parameters = (built.network.getModels<WeightMatrix>().map { it.weights } +
-                built.network.getModels<NeuronArray>().map { it.biases }).map { it.toArray().flatMap { row -> row.asIterable() }.toDoubleArray() }
+                built.network.getModels<NeuronArray>().map { it.biases }).map { it.flatten() }
         return parameters to losses
     }
 

@@ -10,10 +10,11 @@ import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.piechart.PieChartComponent
 import org.simbrain.plot.piechart.PieChartModel
 import org.simbrain.util.UiWork
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.util.onEdt
+import org.simbrain.util.withEdtHeld
 import org.simbrain.workspace.Workspace
-import java.util.concurrent.CountDownLatch
-import javax.swing.SwingUtilities
 
 class PieChartTest {
 
@@ -34,11 +35,6 @@ class PieChartTest {
         workspace.couplingManager.createCoupling(ng, pieChart)
     }
 
-    /** Iterates, then waits for the chart's queued update, which lands on the EDT after the iteration returns. */
-    private fun iterate() {
-        workspace.simpleIterate()
-        UiWork.awaitIdle()
-    }
 
     @Test
     fun `pie is empty with no input or low input`() {
@@ -49,12 +45,12 @@ class PieChartTest {
         // With input below threshold it remains empty
         pieChart.emptyPieThreshold = .2
         ng.activationArray = doubleArrayOf(.1, .0)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(1,pieChart.dataset.itemCount)
 
         // With input above threshold it is no longer empty
         ng.activationArray = doubleArrayOf(.1, .3)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(2,pieChart.dataset.itemCount)
 
     }
@@ -62,7 +58,7 @@ class PieChartTest {
     @Test
     fun `pie chart is initialized correctly`() {
         ng.activationArray = doubleArrayOf(.5, .5)
-        iterate()
+        workspace.iterateAndSettle()
         // There should be two "slices" of the pie
         assertEquals(2,pieChart.dataset.itemCount)
         // Keys should be "Neuron 1" and "Neuron 2"
@@ -74,7 +70,7 @@ class PieChartTest {
     @Test
     fun `slice names follow neuron renames without an iteration`() {
         ng.activationArray = doubleArrayOf(.5, .5)
-        iterate()
+        workspace.iterateAndSettle()
         awaitUntil(message = "Slices were not named after the neurons") {
             onEdt { pieChart.dataset.keys == listOf(ng.getNeuron(0).displayName, ng.getNeuron(1).displayName) }
         }
@@ -89,14 +85,14 @@ class PieChartTest {
     @Test
     fun `equal values should lead to equal pie slices`() {
         ng.activationArray = doubleArrayOf(1.5, 1.5)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(pieChart.dataset.getValue(0).toDouble(), pieChart.dataset.getValue(1).toDouble())
     }
 
     @Test
     fun `pie slices have correct proportions`() {
         ng.activationArray = doubleArrayOf(.5, 1.0)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(.33, pieChart.dataset.getValue(0).toDouble(), .01)
         assertEquals(.66, pieChart.dataset.getValue(1).toDouble(), .01)
     }
@@ -104,7 +100,7 @@ class PieChartTest {
     @Test
     fun `test xml rep`() {
         ng.activationArray = doubleArrayOf(.5, 1.0)
-        iterate()
+        workspace.iterateAndSettle()
         val xml = pcc.xml
         val deserializedPieChart = PieChartModel.getXStream().fromXML(xml) as PieChartModel
         assertEquals(2,deserializedPieChart.dataset.itemCount)
@@ -118,7 +114,7 @@ class PieChartTest {
     fun `test workspace couplings`() {
         // Put pie chat in 50/50 state
         ng.activationArray = doubleArrayOf(1.5, 1.5)
-        iterate()
+        workspace.iterateAndSettle()
 
         // Zip and create a new workspace
         val zip = workspace.zipDataHeadless
@@ -129,8 +125,7 @@ class PieChartTest {
         val savedNg = (workspace2.getComponent("Net") as NetworkComponent).network.getModels<NeuronCollection>().first()
         savedNg.activationArray = doubleArrayOf(1.5, .5)
         val savedPie = (workspace2.getComponent("Pie") as PieChartComponent).model as PieChartModel
-        workspace2.simpleIterate()
-        UiWork.awaitIdle()
+        workspace2.iterateAndSettle()
         assertEquals(.75, savedPie.dataset.getValue(0).toDouble())
         assertEquals(.25, savedPie.dataset.getValue(1).toDouble())
     }
@@ -141,18 +136,12 @@ class PieChartTest {
     @Test
     fun `a value array changed after it is sent does not change the slices`() {
         val model = PieChartModel()
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
+        withEdtHeld {
+            // A producer such as a tensor layer hands over its live buffer and keeps writing to it
+            val values = doubleArrayOf(1.0, 3.0)
+            model.setValues(values)
+            values[1] = 1.0
         }
-        held.await()
-        // A producer such as a tensor layer hands over its live buffer and keeps writing to it
-        val values = doubleArrayOf(1.0, 3.0)
-        model.setValues(values)
-        values[1] = 1.0
-        release.countDown()
         UiWork.awaitIdle()
         assertEquals(0.75, onEdt { model.dataset.getValue(1).toDouble() }, 1e-12)
     }

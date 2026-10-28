@@ -12,7 +12,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.junit.jupiter.api.Test
-import org.simbrain.plot.awaitUntil
+import org.simbrain.util.awaitUntil
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.ActivationSequence

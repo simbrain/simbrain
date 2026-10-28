@@ -5,10 +5,16 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.learningrules.HebbianRule
+import org.simbrain.network.learningrules.StaticSynapseRule
 import org.simbrain.network.updaterules.IntegrateAndFireRule
+import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.util.flatten
 import smile.math.matrix.Matrix
+import kotlin.math.abs
+import kotlin.random.Random
 
 /**
  * This will hold all matrix based spike responder tests since they all require the same setup.
@@ -137,10 +143,10 @@ class SpikeResponderMatrixTest {
         forceFullPsrMatrix: Boolean,
         responder: () -> SpikeResponder = { StepResponder(2) },
     ): Pair<Network, Pair<NeuronArray, WeightMatrix>> {
-        val rng = kotlin.random.Random(5)
+        val rng = Random(5)
         val network = Network().apply { timeStep = 0.5 }
         val array = NeuronArray(60).apply {
-            updateRule = org.simbrain.network.updaterules.IzhikevichRule().apply { backgroundCurrent = 6.0 }
+            updateRule = IzhikevichRule().apply { backgroundCurrent = 6.0 }
             for (i in 0 until size) activations[i, 0] = rng.nextDouble(-70.0, 30.0)
         }
         val recurrent = WeightMatrix(array, array).apply {
@@ -164,13 +170,11 @@ class SpikeResponderMatrixTest {
         repeat(400) { step ->
             fastNetwork.update()
             fullNetwork.update()
-            assertArrayEquals(full.first.activations.toArray().flatMap { it.asList() }.toDoubleArray(),
-                fast.first.activations.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0, "step $step")
+            assertArrayEquals(full.first.activations.flatten(), fast.first.activations.flatten(), 0.0, "step $step")
             spikes += (fast.first.dataHolder as SpikingMatrixData).spikes.count { it }
         }
         assertTrue(spikes > 100, "the network should spike, spiked $spikes times")
-        assertArrayEquals(full.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(),
-            fast.second.psrMatrix.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
+        assertArrayEquals(full.second.psrMatrix.flatten(), fast.second.psrMatrix.flatten(), 0.0)
     }
 
     private fun assertSameSpiking(responder: () -> SpikeResponder, switchToLearningAt: Int? = null) {
@@ -180,21 +184,21 @@ class SpikeResponderMatrixTest {
         repeat(300) { step ->
             if (step == switchToLearningAt) {
                 // A learning rule hands the response back to the full PSR matrix, continuing from the trace
-                listOf(fast.second, full.second).forEach { it.learningRule = org.simbrain.network.learningrules.HebbianRule().apply { learningRate = 0.0 } }
+                listOf(fast.second, full.second).forEach { it.learningRule = HebbianRule().apply { learningRate = 0.0 } }
             }
             fastNetwork.update()
             fullNetwork.update()
             val fastSpikes = (fast.first.dataHolder as SpikingMatrixData).spikes
             assertArrayEquals((full.first.dataHolder as SpikingMatrixData).spikes, fastSpikes, "spikes at step $step")
             spikes += fastSpikes.count { it }
-            val expected = full.first.activations.toArray().flatMap { it.asList() }
-            val actual = fast.first.activations.toArray().flatMap { it.asList() }
-            expected.zip(actual).forEach { (e, a) -> assertEquals(e, a, 1e-9 * maxOf(1.0, kotlin.math.abs(e)), "step $step") }
+            assertClose(full.first.activations.flatten(), fast.first.activations.flatten(), "step $step")
         }
         assertTrue(spikes > 100, "the network should spike, spiked $spikes times")
-        val expectedPsr = full.second.psrMatrix.toArray().flatMap { it.asList() }
-        val actualPsr = fast.second.psrMatrix.toArray().flatMap { it.asList() }
-        expectedPsr.zip(actualPsr).forEach { (e, a) -> assertEquals(e, a, 1e-9 * maxOf(1.0, kotlin.math.abs(e))) }
+        assertClose(full.second.psrMatrix.flatten(), fast.second.psrMatrix.flatten())
+    }
+
+    private fun assertClose(expected: DoubleArray, actual: DoubleArray, message: String = "") {
+        expected.zip(actual).forEach { (e, a) -> assertEquals(e, a, 1e-9 * maxOf(1.0, abs(e)), message) }
     }
 
     @Test
@@ -283,10 +287,10 @@ class SpikeResponderMatrixTest {
         fun step() = listOf(fast, full).forEach { it.first.update() }
         spikeFirstSource(fast, full)
         // A learning rule hands the response to the full PSR matrix while it is still decaying
-        fast.third.learningRule = org.simbrain.network.learningrules.HebbianRule().apply { learningRate = 0.0 }
+        fast.third.learningRule = HebbianRule().apply { learningRate = 0.0 }
         step()
         assertFalse((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
-        fast.third.learningRule = org.simbrain.network.learningrules.StaticSynapseRule()
+        fast.third.learningRule = StaticSynapseRule()
         step()
         assertTrue((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
         repeat(5) {

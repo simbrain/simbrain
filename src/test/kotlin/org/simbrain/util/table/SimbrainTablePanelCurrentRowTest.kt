@@ -11,6 +11,7 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.util.UiWork
 import org.simbrain.util.finishesWhileEdtIsBlocked
+import org.simbrain.util.onEdt
 import org.simbrain.world.dataworld.DataWorld
 import javax.swing.JFrame
 import javax.swing.SwingUtilities
@@ -38,8 +39,11 @@ class SimbrainTablePanelCurrentRowTest {
         repeat(3) { world.update() }
         UiWork.awaitIdle()
 
-        assertEquals(world.dataModel.currentRowIndex, panel.table.selectedRow)
-        SwingUtilities.invokeAndWait { frame.dispose() }
+        try {
+            assertEquals(world.dataModel.currentRowIndex, onEdt { panel.table.selectedRow })
+        } finally {
+            SwingUtilities.invokeAndWait { frame.dispose() }
+        }
     }
 
     @Test
@@ -47,8 +51,11 @@ class SimbrainTablePanelCurrentRowTest {
         val world = DataWorld(rows = 10, cols = 2)
         val (frame, _) = showPanel(world)
 
-        assertTrue(finishesWhileEdtIsBlocked { repeat(20) { world.update() } })
-        SwingUtilities.invokeAndWait { frame.dispose() }
+        try {
+            assertTrue(finishesWhileEdtIsBlocked { repeat(20) { world.update() } })
+        } finally {
+            SwingUtilities.invokeAndWait { frame.dispose() }
+        }
     }
 
     @Test
@@ -57,12 +64,12 @@ class SimbrainTablePanelCurrentRowTest {
         val (frame, panel) = showPanel(world)
         world.update()
         UiWork.awaitIdle()
-        val shown = panel.table.selectedRow
+        val shown = onEdt { panel.table.selectedRow }
 
         SwingUtilities.invokeAndWait { frame.dispose() }
         repeat(3) { world.update() }
         UiWork.awaitIdle()
 
-        assertEquals(shown, panel.table.selectedRow)
+        assertEquals(shown, onEdt { panel.table.selectedRow })
     }
 }

@@ -9,6 +9,7 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.util.awaitUntil
 import org.simbrain.util.onEdt
 
 /**

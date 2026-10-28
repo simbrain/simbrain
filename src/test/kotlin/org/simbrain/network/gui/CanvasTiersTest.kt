@@ -18,6 +18,7 @@ import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.UiWork
+import org.simbrain.util.onEdt
 
 class CanvasTiersTest {
 
@@ -32,19 +33,21 @@ class CanvasTiersTest {
         network.addNetworkModel(SynapseGroup(source, target))
         UiWork.awaitIdle()
 
-        val layer = panel.canvas.layer
-        val edgeIndex = layer.indexOfChild(panel.edgeTier)
-        val overlayIndex = layer.indexOfChild(panel.spikeOverlay)
-        val nodes = panel.screenElements
-        val connections = nodes.filter { it is SynapseNode || it is SynapseGroupNode }
-        val others = nodes.filter { it is NeuronNode || it is NeuronCollectionNode }
+        onEdt {
+            val layer = panel.canvas.layer
+            val edgeIndex = layer.indexOfChild(panel.edgeTier)
+            val overlayIndex = layer.indexOfChild(panel.spikeOverlay)
+            val nodes = panel.screenElements
+            val connections = nodes.filter { it is SynapseNode || it is SynapseGroupNode }
+            val others = nodes.filter { it is NeuronNode || it is NeuronCollectionNode }
 
-        assertTrue(connections.any { it is SynapseGroupNode } && connections.any { it is SynapseNode })
-        connections.forEach { assertEquals(panel.edgeTier, it.parent, "${it::class.simpleName} is not in the connection tier") }
-        others.forEach { node ->
-            assertTrue(layer.indexOfChild(node.parent) > overlayIndex, "${node::class.simpleName} is not above the connections")
+            assertTrue(connections.any { it is SynapseGroupNode } && connections.any { it is SynapseNode })
+            connections.forEach { assertEquals(panel.edgeTier, it.parent, "${it::class.simpleName} is not in the connection tier") }
+            others.forEach { node ->
+                assertTrue(layer.indexOfChild(node.parent) > overlayIndex, "${node::class.simpleName} is not above the connections")
+            }
+            assertTrue(edgeIndex < overlayIndex)
         }
-        assertTrue(edgeIndex < overlayIndex)
     }
 
     @Test
@@ -63,7 +66,7 @@ class CanvasTiersTest {
         network.addNetworkModel(Synapse(c, a))
         UiWork.awaitIdle()
 
-        val band = panel.edgeTier.childrenReference.map {
+        val band = onEdt { panel.edgeTier.childrenReference.toList() }.map {
             when (it) {
                 is WeightMatrixNode -> 0
                 is SynapseNode -> 1

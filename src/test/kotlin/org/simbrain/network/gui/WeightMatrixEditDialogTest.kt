@@ -15,21 +15,10 @@ import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
-import java.util.concurrent.CountDownLatch
+import org.simbrain.util.withEdtHeld
 import javax.swing.SwingUtilities
 
 class WeightMatrixEditDialogTest {
-
-    private fun holdEdt(): CountDownLatch {
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
-        }
-        held.await()
-        return release
-    }
 
     @Test
     fun `an open editor refreshes once per frame, not once per update, and stops when disposed`() = runBlocking {
@@ -42,21 +31,16 @@ class WeightMatrixEditDialogTest {
         SwingUtilities.invokeAndWait { dialog = node.createEditDialog(listOf(wm))!! }
         UiWork.awaitIdle()
 
-        val whileOpen = countEdtTasks {
-            val release = holdEdt()
-            repeat(1000) { wm.events.updated.fire() }
-            release.countDown()
-            // Sleep rather than poll, so only the work the updates caused is counted
-            Thread.sleep(200)
+        val whileOpen = countEdtTasks(settleMs = 200) {
+            withEdtHeld { repeat(1000) { wm.events.updated.fire() } }
         }
         // The matrix node's own throttled refresh accounts for a few; a per-update editor would add about 1000
         assertTrue(whileOpen < 50, "1000 updates posted $whileOpen EDT tasks")
 
         SwingUtilities.invokeAndWait { dialog.dispose() }
         UiWork.awaitIdle()
-        val afterClose = countEdtTasks {
+        val afterClose = countEdtTasks(settleMs = 200) {
             repeat(100) { wm.events.updated.fire() }
-            Thread.sleep(200)
         }
         assertTrue(afterClose < 10, "a disposed editor still refreshed: 100 updates posted $afterClose EDT tasks")
     }

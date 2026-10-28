@@ -9,9 +9,12 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.util.applyFunction
 import org.simbrain.util.assertMatrixEquals
 import org.simbrain.util.assertMatrixNotEquals
+import org.simbrain.util.flatten
 import org.simbrain.util.frobeniusNorm
 import org.simbrain.util.setValuesInPlace
 import smile.math.matrix.Matrix
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 class OptimizerTest {
 
@@ -175,28 +178,8 @@ class OptimizerTest {
     }
 
     private fun assertAdamMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
-        val (_, _, trainer) = createTestNetwork()
         val optimizer = AdamOptimizer(beta1 = 0.85, beta2 = 0.995).apply { learningRate = 0.01 }
-        trainer.config.optimizer = optimizer
-        val parameters = Matrix(rows, cols)
-        val rng = kotlin.random.Random(3)
-        val mean = Matrix(rows, cols)
-        val variance = Matrix(rows, cols)
-        for (step in 1..5) {
-            optimizer.beginStep()
-            val values = Array(rows) { DoubleArray(cols) { rng.nextDouble(-1.0, 1.0) } }
-            val delta = if (transposedDelta) {
-                Matrix(cols, rows).apply { for (i in 0 until rows) for (j in 0 until cols) this[j, i] = values[i][j] }.transpose()
-            } else {
-                Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = values[i][j] }
-            }
-            mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
-            variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
-            val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(0.01)
-                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { kotlin.math.sqrt(it) + 1e-8 })
-            val actual = with(trainer) { optimizer.computeDelta(parameters, delta) }
-            assertArrayEquals(expected.toArray().flatMap { it.asList() }.toDoubleArray(), actual.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
-        }
+        assertAdaptiveMatchesReference(optimizer, seed = 3, rows, cols, transposedDelta)
     }
 
     @Test
@@ -207,12 +190,32 @@ class OptimizerTest {
     }
 
     private fun assertAdamWMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
-        val (_, _, trainer) = createTestNetwork()
         val optimizer = AdamWOptimizer(beta1 = 0.85, beta2 = 0.995, weightDecay = 0.05, learningRateDecay = 0.02)
             .apply { learningRate = 0.01 }
+        assertAdaptiveMatchesReference(optimizer, seed = 5, rows, cols, transposedDelta, learningRateDecay = 0.02, weightDecay = 0.05)
+    }
+
+    /**
+     * Compares [optimizer] with a reference matrix formulation of Adam (beta1 0.85, beta2 0.995, learning rate 0.01).
+     * Passing [weightDecay] makes the reference AdamW: random starting parameters that follow the computed deltas, and a
+     * decoupled decay term.
+     */
+    private fun assertAdaptiveMatchesReference(
+        optimizer: Optimizer,
+        seed: Int,
+        rows: Int,
+        cols: Int,
+        transposedDelta: Boolean,
+        learningRateDecay: Double = 0.0,
+        weightDecay: Double? = null,
+    ) {
+        val (_, _, trainer) = createTestNetwork()
         trainer.config.optimizer = optimizer
-        val rng = kotlin.random.Random(5)
-        val parameters = Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = rng.nextDouble(-1.0, 1.0) }
+        val rng = Random(seed)
+        val parameters = Matrix(rows, cols)
+        if (weightDecay != null) {
+            for (i in 0 until rows) for (j in 0 until cols) parameters[i, j] = rng.nextDouble(-1.0, 1.0)
+        }
         val mean = Matrix(rows, cols)
         val variance = Matrix(rows, cols)
         for (step in 1..5) {
@@ -223,15 +226,15 @@ class OptimizerTest {
             } else {
                 Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = values[i][j] }
             }
-            val lr = 0.01 * Math.pow(1 - 0.02, step.toDouble())
+            val lr = 0.01 * Math.pow(1 - learningRateDecay, step.toDouble())
             mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
             variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
             val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(lr)
-                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { kotlin.math.sqrt(it) + 1e-8 })
-                .sub(parameters.clone().mul(lr * 0.05))
+                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { sqrt(it) + 1e-8 })
+            if (weightDecay != null) expected.sub(parameters.clone().mul(lr * weightDecay))
             val actual = with(trainer) { optimizer.computeDelta(parameters, delta) }
-            assertArrayEquals(expected.toArray().flatMap { it.asList() }.toDoubleArray(), actual.toArray().flatMap { it.asList() }.toDoubleArray(), 0.0)
-            parameters.add(actual)
+            assertArrayEquals(expected.flatten(), actual.flatten(), 0.0)
+            if (weightDecay != null) parameters.add(actual)
         }
     }
 

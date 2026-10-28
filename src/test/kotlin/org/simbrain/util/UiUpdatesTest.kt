@@ -8,23 +8,11 @@ import kotlinx.coroutines.*
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.util.Collections
-import java.util.concurrent.CountDownLatch
 import java.util.concurrent.atomic.AtomicInteger
 import javax.swing.SwingUtilities
 
 class UiUpdatesTest {
 
-    /** Holds the EDT until the returned latch is counted down. */
-    private fun holdEdt(): CountDownLatch {
-        val release = CountDownLatch(1)
-        val held = CountDownLatch(1)
-        SwingUtilities.invokeLater {
-            held.countDown()
-            release.await()
-        }
-        held.await()
-        return release
-    }
 
     @Test
     fun `requests made while a refresh is pending collapse into one run on the edt`() {
@@ -35,9 +23,7 @@ class UiUpdatesTest {
             onEdt = onEdt && SwingUtilities.isEventDispatchThread()
             runs.incrementAndGet()
         }
-        val release = holdEdt()
-        repeat(1000) { refresh.request() }
-        release.countDown()
+        withEdtHeld { repeat(1000) { refresh.request() } }
         UiWork.awaitIdle()
         assertEquals(1, runs.get())
         assertTrue(onEdt)
@@ -50,11 +36,11 @@ class UiUpdatesTest {
         val seen = Collections.synchronizedList(mutableListOf<String>())
         var state = "old"
         val refresh = scope.uiRefresh(minIntervalMs = 0) { seen += state }
-        val release = holdEdt()
-        refresh.request()
-        SwingUtilities.invokeLater { state = "new" }
-        refresh.request()
-        release.countDown()
+        withEdtHeld {
+            refresh.request()
+            SwingUtilities.invokeLater { state = "new" }
+            refresh.request()
+        }
         UiWork.awaitIdle()
         assertEquals(listOf("new"), seen.toList())
         scope.cancel()
@@ -106,11 +92,11 @@ class UiUpdatesTest {
             batches.incrementAndGet()
             drained += it
         }
-        val release = holdEdt()
-        val start = System.nanoTime()
-        repeat(10_000) { inbox.post(it) }
-        val postMs = (System.nanoTime() - start) / 1_000_000
-        release.countDown()
+        val postMs = withEdtHeld {
+            val start = System.nanoTime()
+            repeat(10_000) { inbox.post(it) }
+            (System.nanoTime() - start) / 1_000_000
+        }
         UiWork.awaitIdle()
         assertTrue(postMs < 1000, "posting took $postMs ms")
         assertEquals((0 until 10_000).toList(), drained.toList())
@@ -123,9 +109,7 @@ class UiUpdatesTest {
         val scope = UiScope()
         val applied = Collections.synchronizedList(mutableListOf<Int>())
         val latest = scope.uiLatest<Int>(minIntervalMs = 0) { applied += it }
-        val release = holdEdt()
-        repeat(100) { latest.post(it) }
-        release.countDown()
+        withEdtHeld { repeat(100) { latest.post(it) } }
         UiWork.awaitIdle()
         assertEquals(listOf(99), applied.toList())
         scope.cancel()
@@ -136,11 +120,11 @@ class UiUpdatesTest {
         val scope = UiScope()
         val drained = AtomicInteger()
         val inbox = scope.uiInbox<Int> { drained.addAndGet(it.size) }
-        val release = holdEdt()
-        repeat(10) { inbox.post(it) }
-        scope.cancel()
-        inbox.post(99)
-        release.countDown()
+        withEdtHeld {
+            repeat(10) { inbox.post(it) }
+            scope.cancel()
+            inbox.post(99)
+        }
         UiWork.awaitIdle()
         assertEquals(0, drained.get())
     }
@@ -235,9 +219,7 @@ class UiUpdatesTest {
         val events = TestEvents()
         val runs = AtomicInteger()
         events.barrier.onUi(scope, minIntervalMs = 0) { runs.incrementAndGet() }
-        val release = holdEdt()
-        val fired = withTimeoutOrNull(2000) { repeat(100) { events.barrier.fire() } }
-        release.countDown()
+        val fired = withEdtHeld { withTimeoutOrNull(2000) { repeat(100) { events.barrier.fire() } } }
         withContext(Dispatchers.IO) { UiWork.awaitIdle() }
         assertNotNull(fired, "fire waited on the held EDT")
         assertEquals(1, runs.get())

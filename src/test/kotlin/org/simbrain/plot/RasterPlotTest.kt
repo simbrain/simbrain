@@ -7,7 +7,8 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
-import org.simbrain.util.UiWork
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.util.setValuesInPlace
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -29,11 +30,6 @@ class RasterPlotTest {
         workspace.addWorkspaceComponent(rpc)
     }
 
-    /** Iterates, then waits for the raster's queued points, which land on the EDT after the iteration returns. */
-    private fun iterate() {
-        workspace.simpleIterate()
-        UiWork.awaitIdle()
-    }
 
     @Test
     fun `rows are named from the coupled producer and follow label changes`() {
@@ -59,13 +55,13 @@ class RasterPlotTest {
         }
         // Should produce (1,2) and (1,4) since after 1 iteration, since second and fourth components are above threshld
         na.activationArray = doubleArrayOf(-1.0, 0.0, 1.0, 0.0, 2.0)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(0).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(0).yValue)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(4.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         na.activationArray = doubleArrayOf(0.0, 0.0, 1.0, 2.0, -1.0)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(3).xValue)
@@ -80,8 +76,8 @@ class RasterPlotTest {
         na.isClamped = false
         na.updateRule = SpikingThresholdRule()
         na.inputs.setValuesInPlace { i, j -> if ((i + j) % 2 == 1 ) 100.0 else -100.0 }
-        iterate()
-        iterate()
+        workspace.iterateAndSettle()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
@@ -123,7 +119,7 @@ class RasterPlotTest {
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(4.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         na.activationArray = doubleArrayOf(0.0, 0.0, 1.0, 2.0, -1.0)
-        iterate()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(3).xValue)

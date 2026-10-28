@@ -13,7 +13,7 @@ import org.simbrain.plot.projection.ProjectionDesktopComponent
 import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.util.genericframe.GenericJInternalFrame
-import java.util.concurrent.CountDownLatch
+import org.simbrain.util.withEdtHeld
 import javax.swing.SwingUtilities
 import kotlin.random.Random
 
@@ -46,18 +46,8 @@ class ProjectionDesktopComponentTest {
         UiWork.awaitIdle()
         val random = Random(2)
 
-        val tasks = countEdtTasks {
-            val release = CountDownLatch(1)
-            val held = CountDownLatch(1)
-            SwingUtilities.invokeLater {
-                held.countDown()
-                release.await()
-            }
-            held.await()
-            repeat(300) { component.addPoint(DoubleArray(4) { random.nextDouble() }) }
-            release.countDown()
-            // Sleep rather than poll, so only the work the points caused is counted
-            Thread.sleep(200)
+        val tasks = countEdtTasks(settleMs = 200) {
+            withEdtHeld { repeat(300) { component.addPoint(DoubleArray(4) { random.nextDouble() }) } }
         }
         UiWork.awaitIdle()
 

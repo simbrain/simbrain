@@ -24,6 +24,9 @@ val xorSim = newSim { optionString ->
 
     val inputLayer = net.addNeuronCollection(2).apply {
         isClamped = true
+        setLowerBound(0.0)
+        setUpperBound(1.0)
+        setIncrement(1.0)
     }
     val hiddenLayer = net.addNeuronCollection(2) { updateRule = SigmoidalRule() }
     val outputLayer = net.addNeuronCollection(1) { updateRule = SigmoidalRule() }

@@ -81,6 +81,11 @@ public class ChoicesWithNull extends JComboBox {
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected,
                     cellHasFocus);
+            // Items that format themselves as HTML (e.g. with color swatches) are shown as is
+            if (value.toString().startsWith("<html>")) {
+                setText(value.toString());
+                return this;
+            }
             // Title case with underscores converted to spaces
             String itemText = value.toString().toLowerCase();
             itemText = itemText.replaceAll("_", " ");

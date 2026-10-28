@@ -15,6 +15,7 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
@@ -71,6 +72,7 @@ object SimbrainDesktop {
         // Apply theme changes committed in the Workspace Preferences dialog, and follow the OS
         // appearance live while in System mode (macOS fires this when system dark mode is toggled).
         WorkspacePreferences.registerChangeListener { applyThemeIfChanged() }
+        PlotPreferences.registerChangeListener { refreshCharts() }
         Toolkit.getDefaultToolkit().addPropertyChangeListener("apple.awt.application.appearance") {
             applyThemeIfChanged()
         }
@@ -552,9 +554,10 @@ object SimbrainDesktop {
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.showWorkspacePreferencesAction)
         fileMenu.add(actionManager.showNetworkPreferencesAction)
         fileMenu.add(actionManager.showOdorWorldPreferencesAction)
+        fileMenu.add(actionManager.showPlotPreferencesAction)
+        fileMenu.add(actionManager.showWorkspacePreferencesAction)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.resetOnboardingWindows)
         // On macOS, Quit (with its Cmd-Q shortcut) lives in the application menu; see the quit handler
@@ -620,6 +623,21 @@ object SimbrainDesktop {
             } finally {
                 applyingTheme = false
             }
+        }
+    }
+
+    /**
+     * Re-theme every open chart so it re-reads the [PlotPreferences] series palette and line width, then
+     * repaint so legend swatches follow.
+     */
+    private fun refreshCharts() {
+        fun walk(c: Component) {
+            if (c is ChartPanel) c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
+            if (c is Container) c.components.forEach(::walk)
+        }
+        Window.getWindows().forEach {
+            walk(it)
+            it.repaint()
         }
     }
 

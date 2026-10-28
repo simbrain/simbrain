@@ -16,7 +16,7 @@ class WorkspacePreferencesDialogSnapshot : UiSnapshotDef {
     override fun build(): Component {
         lateinit var dialog: Component
         SwingUtilities.invokeAndWait {
-            dialog = getPreferenceDialog(WorkspacePreferences)
+            dialog = getPreferenceDialog(WorkspacePreferences, "Workspace Preferences")
         }
         return dialog
     }

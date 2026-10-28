@@ -8,12 +8,8 @@ package org.simbrain.util.projection
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import org.simbrain.util.ThemeColor
-import org.simbrain.util.UserParameter
-import org.simbrain.util.WithXStreamPropertyConverter
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.createXStreamPropertyConverter
-import org.simbrain.util.display
+import org.simbrain.plot.PlotPreferences
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import java.awt.Color
@@ -63,23 +59,23 @@ class Projector(initialDimension: Int = 25) : EditableObject, CoroutineScope {
     var tolerance: Double = 0.1
 
     @UserParameter(label = "Hot color", order = 20)
-    var hotColor = Color.red
+    var hotColor: Color = PlotPreferences.projectionHotColor
 
     @UserParameter(label = "Base color", description = "Color of points that are not currently highlighted, per light/dark theme", order = 30)
-    var baseColor = ThemeColor(Color.DARK_GRAY)
+    var baseColor = PlotPreferences.projectionBaseColor
 
     @UserParameter(label = "Show labels", description = "Show text labels sometimes associated with points", order = 40)
-    var showLabels = true
+    var showLabels = PlotPreferences.projectionShowLabels
 
     @UserParameter(label = "Connect points", description = "Draw lines between points in plot", order = 45)
-    var connectPoints = false
+    var connectPoints = PlotPreferences.projectionConnectPoints
         set(value) {
             field = value
             events.settingsChanged.fire()
         }
 
     @UserParameter(label = "Use hot point", description = "If true, current point is rendered using the hotpoint color", order = 50)
-    var useHotPoint = true
+    var useHotPoint = PlotPreferences.projectionUseHotPoint
 
     @UserParameter(label = "Extreme value threshold", description = "Data points with absolute values >= this threshold (or infinite/NaN values) will be filtered out to prevent projection issues.", minimumValue = 1.0, order = 60)
     var extremeValueThreshold: Double = 1e50

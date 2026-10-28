@@ -1,5 +1,6 @@
 package org.simbrain.plot.pixelplot;
 
+import org.simbrain.plot.PlotPreferences;
 import org.simbrain.util.UserParameter;
 import org.simbrain.util.propertyeditor.EditableObject;
 import org.simbrain.workspace.AttributeContainer;
@@ -30,7 +31,7 @@ public class PixelPlot implements AttributeContainer, EditableObject {
     private BufferedImage image;
 
     @UserParameter(label = "Invert brightness", description = "If true, 0 is mapped to white and 1 to white.", useLegacySetter = true)
-    private boolean invertBrightness = true;
+    private boolean invertBrightness = PlotPreferences.INSTANCE.getPixelPlotInvertBrightness();
 
     /**
      * The values this matrix produces for floating point channel couplings.

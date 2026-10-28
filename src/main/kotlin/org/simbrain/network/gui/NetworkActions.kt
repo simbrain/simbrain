@@ -572,7 +572,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Set default properties that apply to all networks in the Simbrain workspace (Cmd/Ctrl-,)",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        getPreferenceDialog(NetworkPreferences).display()
+        getPreferenceDialog(NetworkPreferences, "Network Preferences").display()
     }
 
     val showNetworkPropertiesAction = networkPanel.createAction(

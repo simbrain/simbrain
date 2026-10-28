@@ -1,3 +1,7 @@
+/**
+ * Shared look of Simbrain's JFreeChart plots: the selectable series palettes and the theming pass that
+ * styles a chart's chrome and data from the active light/dark tokens and [PlotPreferences].
+ */
 package org.simbrain.plot
 
 import org.jfree.chart.JFreeChart
@@ -20,16 +24,41 @@ import java.awt.Paint
 import javax.swing.UIManager
 
 /**
- * The cohesive categorical palette (Tableau 10) used for every chart's series. Reads cleanly on both
- * the light (white) and dark plot wells, unlike JFreeChart's saturated primary defaults. Exposed so
+ * Categorical palettes for chart series. Each reads cleanly on both the light (white) and dark plot
+ * wells, unlike JFreeChart's saturated primary defaults, which is why none includes black or white.
+ */
+enum class ChartSeriesPalette(private val label: String, vararg rgb: Int) {
+
+    TABLEAU_10(
+        "Tableau 10",
+        0x4E79A7, 0xF28E2B, 0xE15759, 0x59A14F, 0xEDC948, 0xB07AA1, 0x76B7B2, 0xFF9DA7, 0x9C755F, 0xBAB0AC
+    ),
+
+    /** Okabe-Ito, distinguishable under common color vision deficiencies; its black is swapped for gray. */
+    OKABE_ITO(
+        "Okabe-Ito (colorblind safe)",
+        0xE69F00, 0x56B4E9, 0x009E73, 0xF0E442, 0x0072B2, 0xD55E00, 0xCC79A7, 0x999999
+    ),
+
+    DARK_2(
+        "Dark 2",
+        0x1B9E77, 0xD95F02, 0x7570B3, 0xE7298A, 0x66A61E, 0xE6AB02, 0xA6761D, 0x666666
+    );
+
+    val colors: List<Color> = rgb.map { Color(it) }
+
+    /** The name followed by a swatch of each color, so a dropdown previews the palette. */
+    override fun toString() = colors.joinToString("", "<html>$label&nbsp;&nbsp;", "</html>") {
+        "<font size='+1' color='#%06X'>&#9632;</font>".format(it.rgb and 0xFFFFFF)
+    }
+}
+
+/**
+ * The categorical palette used for every chart's series, chosen in [PlotPreferences]. Exposed so
  * charts that assign their own series colors (the histogram, the bar chart) draw from the same set
  * rather than re-introducing the old red/blue/green/yellow.
  */
-val CHART_SERIES_PALETTE: List<Color> = listOf(
-    Color(0x4E, 0x79, 0xA7), Color(0xF2, 0x8E, 0x2B), Color(0xE1, 0x57, 0x59), Color(0x59, 0xA1, 0x4F),
-    Color(0xED, 0xC9, 0x48), Color(0xB0, 0x7A, 0xA1), Color(0x76, 0xB7, 0xB2), Color(0xFF, 0x9D, 0xA7),
-    Color(0x9C, 0x75, 0x5F), Color(0xBA, 0xB0, 0xAC)
-)
+val CHART_SERIES_PALETTE: List<Color> get() = PlotPreferences.seriesPalette.colors
 
 /**
  * Palette entry [index] (wrapping around the palette) at the given [alpha] (0–255, default opaque).
@@ -37,24 +66,30 @@ val CHART_SERIES_PALETTE: List<Color> = listOf(
  */
 @JvmOverloads
 fun chartSeriesColor(index: Int, alpha: Int = 255): Color {
-    val base = CHART_SERIES_PALETTE[index.mod(CHART_SERIES_PALETTE.size)]
+    val palette = CHART_SERIES_PALETTE
+    val base = palette[index.mod(palette.size)]
     return if (alpha >= 255) base else Color(base.red, base.green, base.blue, alpha)
 }
 
-private val SERIES_PALETTE: Array<Paint> = Array(CHART_SERIES_PALETTE.size) { CHART_SERIES_PALETTE[it] }
-
-/** Line/series stroke, a touch heavier than JFreeChart's 1px default so lines read as deliberate. */
-private val SERIES_STROKE = BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+/**
+ * Line/series stroke from [PlotPreferences.lineWidth], by default a touch heavier than JFreeChart's
+ * 1px so lines read as deliberate.
+ */
+private fun seriesStroke() =
+    BasicStroke(PlotPreferences.lineWidth.toFloat(), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
 
 /** A fresh supplier per plot — [DefaultDrawingSupplier] is stateful (tracks the next-series index). */
-private fun modernDrawingSupplier() = DefaultDrawingSupplier(
-    SERIES_PALETTE,
-    SERIES_PALETTE,
-    DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
-    arrayOf<java.awt.Stroke>(SERIES_STROKE),
-    DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
-    DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE
-)
+private fun modernDrawingSupplier(): DefaultDrawingSupplier {
+    val palette: Array<Paint> = CHART_SERIES_PALETTE.toTypedArray()
+    return DefaultDrawingSupplier(
+        palette,
+        palette,
+        DefaultDrawingSupplier.DEFAULT_OUTLINE_PAINT_SEQUENCE,
+        arrayOf<java.awt.Stroke>(seriesStroke()),
+        DefaultDrawingSupplier.DEFAULT_OUTLINE_STROKE_SEQUENCE,
+        DefaultDrawingSupplier.DEFAULT_SHAPE_SEQUENCE
+    )
+}
 
 /**
  * Theme a [JFreeChart]'s chrome AND modernize how its data is drawn, from the active FlatLaf /
@@ -63,14 +98,16 @@ private fun modernDrawingSupplier() = DefaultDrawingSupplier(
  *
  * Chrome: chart/plot backgrounds, gridlines, axis lines, tick/label/title/legend text.
  * Data styling: flat bars (no gradient sheen, no drop shadow), heavier antialiased lines, flat pie
- * slices (no shadow/outline), and a cohesive [SERIES_PALETTE] for auto-assigned series.
+ * slices (no shadow/outline), and the [CHART_SERIES_PALETTE] for auto-assigned series.
  *
  * The palette is applied via the plot's drawing supplier, so any chart that sets explicit series
  * colors AFTER calling this (the histogram's per-series loop, the bar chart's model color, the
- * projection plot's custom renderer) still wins — those are domain colors owned by the model.
+ * projection plot's custom renderer) still wins — those are domain colors owned by the model. The
+ * exception is a line/scatter renderer's series paints, which are reset and re-pinned in series order
+ * on every call so a changed palette reaches open time series and raster plots.
  *
- * Call once after the chart is built. Tokens resolve at call time, matching the rest of the app's
- * resolve-on-build convention.
+ * Call after the chart is built, and again to re-theme it (a light/dark switch or a [PlotPreferences]
+ * change). Tokens resolve at call time, matching the rest of the app's resolve-on-build convention.
  */
 fun JFreeChart.applySimbrainChartTheme() {
     val chartBg = UIManager.getColor("Panel.background") ?: Theme.cardBg
@@ -106,7 +143,11 @@ fun JFreeChart.applySimbrainChartTheme() {
                 }
                 is XYLineAndShapeRenderer -> {
                     r.setAutoPopulateSeriesStroke(false)
-                    r.defaultStroke = SERIES_STROKE
+                    r.defaultStroke = seriesStroke()
+                    // Drop paints cached from the previous supplier so a re-theme picks up a changed
+                    // palette, then re-pin them in series order as the panels' legends expect
+                    r.clearSeriesPaints(false)
+                    p.dataset?.let { ds -> repeat(ds.seriesCount) { r.lookupSeriesPaint(it) } }
                 }
             }
         }

@@ -7,10 +7,7 @@ import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
-import org.simbrain.plot.AdaptiveChartRepainter;
-import org.simbrain.plot.ChartInteractionsKt;
-import org.simbrain.plot.ChartThemeKt;
-import org.simbrain.plot.SimbrainChartPanel;
+import org.simbrain.plot.*;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 
@@ -18,7 +15,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.Arrays;
 import java.util.Iterator;
 
 /**
@@ -63,17 +59,6 @@ public class HistogramPanel extends JPanel {
     public static final int GRID_HEIGHT = 3;
 
     /**
-     * Constant Alpha value governing transparency of histogram colors.
-     */
-    public static final byte DEFAULT_ALPHA = -0x50;
-
-    /**
-     * Alpha (0–255) applied to series colors so overlapping histogram bars blend; the unsigned value
-     * of the legacy {@link #DEFAULT_ALPHA} byte.
-     */
-    private static final int SERIES_ALPHA = DEFAULT_ALPHA & 0xFF;
-
-    /**
      * The default (and maximum, unless otherwise changed) number of colors
      * available to different data sets. Implicitly this is the default maximum
      * number of supported data sets.
@@ -81,40 +66,22 @@ public class HistogramPanel extends JPanel {
     private static final int DEFAULT_NUM_DATASETS = 4;
 
     /**
-     * The color pallete, initialized to the default number of data sets.
+     * The first {@link #DEFAULT_NUM_DATASETS} series colors from the plot preferences palette, at the
+     * preferred histogram alpha so overlapping bars blend.
      */
-    private static final Color[] DEFAULT_PALLET = new Color[DEFAULT_NUM_DATASETS];
-
     public static Color[] getDefault_Pallet() {
-        Color[] pallet = new Color[DEFAULT_PALLET.length];
-        System.arraycopy(DEFAULT_PALLET, 0, pallet, 0, DEFAULT_PALLET.length);
-        return pallet;
-    }
-
-    /**
-     * The standard color pallete, Red, Blue, Green, Yellow. Colors are
-     * represented as a single integer where bits 0-7 consist of the blue
-     * component, bits 8-15 consist of the green component, bits 16-23 consist
-     * of the red component, and bits 24-31 consist of the alpha component. Here
-     * bits are shifted to remove the default alpha value, then shifted back and
-     * replaced with ALPHA.
-     */
-    static {
+        Color[] pallet = new Color[DEFAULT_NUM_DATASETS];
         for (int i = 0; i < DEFAULT_NUM_DATASETS; i++) {
-            DEFAULT_PALLET[i] = ChartThemeKt.chartSeriesColor(i, SERIES_ALPHA);
+            pallet[i] = ChartThemeKt.chartSeriesColor(i, PlotPreferences.INSTANCE.getHistogramAlpha());
         }
+        return pallet;
     }
 
     private int index = 0;
 
     private Color assignColor() {
-        return ChartThemeKt.chartSeriesColor(index++, SERIES_ALPHA);
+        return ChartThemeKt.chartSeriesColor(index++, PlotPreferences.INSTANCE.getHistogramAlpha());
     }
-
-    /**
-     * The color pallet, initialized to the default number of data sets.
-     */
-    private final Color[] colorPallet = Arrays.copyOf(DEFAULT_PALLET, DEFAULT_NUM_DATASETS);
 
     /**
      * The main panel supporting the histogram chart.
@@ -225,7 +192,7 @@ public class HistogramPanel extends JPanel {
 
                 Iterator<OverwritableHistogramDataset.ColoredDataSeries> series = model.getSeriesData().iterator();
                 for (int i = 0; i < model.getData().size(); i++) {
-                    if (i < colorPallet.length) {
+                    if (i < DEFAULT_NUM_DATASETS) {
                         OverwritableHistogramDataset.ColoredDataSeries s = series.next();
                         Color c = s.color;
                         if (c == null) {
@@ -282,7 +249,7 @@ public class HistogramPanel extends JPanel {
         Iterator<OverwritableHistogramDataset.ColoredDataSeries> series = model.getSeriesData().iterator();
         int i = 0;
         while (series.hasNext()) {
-            if (i < colorPallet.length) {
+            if (i < DEFAULT_NUM_DATASETS) {
                 OverwritableHistogramDataset.ColoredDataSeries s = series.next();
                 Color c = s.color;
                 if (c == null) {

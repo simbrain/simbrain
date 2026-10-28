@@ -2,7 +2,7 @@ package org.simbrain.plot.barchart
 
 import com.thoughtworks.xstream.XStream
 import org.jfree.data.category.DefaultCategoryDataset
-import org.simbrain.plot.chartSeriesColor
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
@@ -28,7 +28,7 @@ class BarChartModel : AttributeContainer, EditableObject {
      * Color of bars in barchart.
      */
     @UserParameter(label = "Bar Color", order = 4)
-    var barColor: Color = chartSeriesColor(0)
+    var barColor: Color = PlotPreferences.barColor
 
     /**
      * Auto range bar chart.

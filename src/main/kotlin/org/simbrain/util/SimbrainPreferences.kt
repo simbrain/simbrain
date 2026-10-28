@@ -61,7 +61,11 @@ open class PreferenceHolder: EditableObject {
         events.remove(preferenceLoader)
     }
 
-    override fun onCommit() {
+    /**
+     * Notify listeners that preferences changed. Called once per dialog commit or revert rather than from
+     * [onCommit], which the property editor calls once per committed property.
+     */
+    fun fireChanged() {
         events.forEach { it() }
     }
 }
@@ -251,9 +255,10 @@ object WandPaletteStorage {
     }
 }
 
-fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
+fun getPreferenceDialog(prefHolder: PreferenceHolder, title: String): StandardDialog {
     val ape = AnnotatedPropertyEditor(prefHolder)
     return StandardDialog().apply {
+        this.title = title
         contentPane = ape
         addButton(JButton("Revert to Default").apply {
             addActionListener {
@@ -262,11 +267,12 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
                     prefHolder.revertToDefault()
                 }
                 closeDialogCancel()
-                prefHolder.events.forEach { it.invoke() }
+                prefHolder.fireChanged()
             }
         })
         addCommitTask {
             ape.commitChanges()
+            prefHolder.fireChanged()
         }
     }
 }
@@ -287,4 +293,4 @@ object TestPrefs: PreferenceHolder() {
 
 }
 
-fun main() = getPreferenceDialog(TestPrefs).display()
+fun main() = getPreferenceDialog(TestPrefs, "Test Preferences").display()

@@ -2,6 +2,7 @@ package org.simbrain.workspace.gui
 
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.barchart.BarChartComponent
 import org.simbrain.plot.barchart.BarChartModel
 import org.simbrain.plot.heatmap.HeatMapComponent
@@ -190,7 +191,7 @@ class WorkspaceActions {
         name = "Network preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(NetworkPreferences).display()
+        getPreferenceDialog(NetworkPreferences, "Network Preferences").display()
     }
 
     val showOdorWorldPreferencesAction = desktopPane.createAction(
@@ -198,7 +199,15 @@ class WorkspaceActions {
         name = "Odor world preferences...",
         description = "Set default properties that apply to all odor worlds in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(OdorWorldPreferences).display()
+        getPreferenceDialog(OdorWorldPreferences, "Odor World Preferences").display()
+    }
+
+    val showPlotPreferencesAction = desktopPane.createAction(
+        iconPath = "menu_icons/Prefs.png",
+        name = "Plot preferences...",
+        description = "Set default properties that apply to all plots in the Simbrain workspace.",
+    ) {
+        getPreferenceDialog(PlotPreferences, "Plot Preferences").display()
     }
 
     val showWorkspacePreferencesAction = createAction(
@@ -206,7 +215,7 @@ class WorkspaceActions {
         name = "Workspace preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(WorkspacePreferences).display()
+        getPreferenceDialog(WorkspacePreferences, "Workspace Preferences").display()
     }
 
     val showUpdaterDialog = desktopPane.createAction(

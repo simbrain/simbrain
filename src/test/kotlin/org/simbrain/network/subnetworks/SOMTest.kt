@@ -1,5 +1,6 @@
 package org.simbrain.network.subnetworks
 
+import org.simbrain.util.onEdt
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -39,7 +40,7 @@ class SOMTest {
             val networkComponent = NetworkComponent("Test", net)
             workspace.addWorkspaceComponent(networkComponent)
             val np = NetworkPanel(networkComponent)
-            assertEquals(3, np.filterScreenElements<NeuronNode>().size)
+            assertEquals(3, onEdt { np.filterScreenElements<NeuronNode>().size })
         }
     }
 

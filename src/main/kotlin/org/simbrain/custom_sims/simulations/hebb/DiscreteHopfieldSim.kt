@@ -1,9 +1,7 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
-import org.simbrain.custom_sims.simulations.hebb.HopfieldTestConfig
-import org.simbrain.custom_sims.simulations.hebb.createHopfieldTestPane
-import org.simbrain.custom_sims.simulations.hebb.createPatternControlPanel
+import org.simbrain.custom_sims.simulations.hebb.*
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
 import org.simbrain.util.place
@@ -54,6 +52,8 @@ val discreteHopfieldSim = newSim {
             - `Random pattern`: Sets each neuron randomly to `0` or `1`. Useful as a starting point for testing recall.
             - `Randomize weights`: Replaces the weights with small symmetric random values, erasing anything the network has learned.
             - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the network.
+            - `Show correlations`: Opens a corr plot comparing the four built-in patterns. Patterns with high correlations overlap more and are harder to store together without interference.
+            - `Show trained correlations`: Opens a corr plot of the patterns trained with this panel's train buttons, each shown as a small picture. A pattern a few units away from a built-in one is labelled like `Circle ~3`, otherwise it is numbered, and `×2` means it was trained twice. `Randomize weights` clears the list.
             - `Train once on current pattern`: Applies one Hebbian learning step, storing whatever pattern is currently on the neurons in the weights. The anti-pattern (all activations flipped) is stored along with it. Press it repeatedly to strengthen the memory.
             - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
             - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings (described in _How the Capacity Test Works_ below), then runs the test and plots the results.
@@ -158,10 +158,12 @@ val discreteHopfieldSim = newSim {
     )
 
     withGui {
-        val controlPanel = createPatternControlPanel(hopfield.neuronGroup, false) {
+        val trainedPatterns = TrainedPatterns(builtInPatterns(hopfield.neuronGroup.size), 0.5, nameInverses = true)
+        val controlPanel = createPatternControlPanel(hopfield.neuronGroup, false, trainedPatterns) {
             hopfield.randomize()
         }?.apply {
             addButton("Train once on current pattern") {
+                trainedPatterns.record(hopfield.neuronGroup.activationArray)
                 with(network) { hopfield.trainOnCurrentPattern() }
             }.apply {
                 toolTipText = "Applies one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
@@ -175,6 +177,7 @@ val discreteHopfieldSim = newSim {
                 applyReset = {
                     hopfield.clear()
                     hopfield.weightMatrix.hardClear()
+                    trainedPatterns.clear()
                 }
             )
             createHopfieldTestPane(config, true)

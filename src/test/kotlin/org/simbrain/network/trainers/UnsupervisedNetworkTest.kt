@@ -170,7 +170,6 @@ class UnsupervisedNetworkTest {
         // Test trainer properties
         assertFalse(trainer.useMaxIterations)
         assertEquals(1000, trainer.maxIterations)
-        assertEquals(0.01, trainer.learningRate, 0.001)
         assertFalse(trainer.isRunning)
         assertEquals(0, trainer.iteration)
         

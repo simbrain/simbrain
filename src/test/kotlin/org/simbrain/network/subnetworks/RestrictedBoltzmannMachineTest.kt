@@ -22,7 +22,7 @@ class RestrictedBoltzmannMachineTest {
     @Test
     fun `test rbm network copy`() {
         // Set up original network
-        rbm.trainer.learningRate = 0.1
+        rbm.learningRate = 0.1
         val testInput = doubleArrayOf(0.5, 0.3, 0.8, 0.2)
         with(net) {
             rbm.visibleLayer.activationArray = testInput
@@ -37,7 +37,7 @@ class RestrictedBoltzmannMachineTest {
             "Should have same number of synapse groups")
             
         // Verify properties
-        assertEquals(rbm.trainer.learningRate, copy.trainer.learningRate, "Learning rate should be copied")
+        assertEquals(rbm.learningRate, copy.learningRate, "Learning rate should be copied")
     }
 
     @Test

@@ -1,13 +1,12 @@
 package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.simulations.hebb.TrainedPatterns
+import org.simbrain.custom_sims.simulations.hebb.showPatternCorrelations
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.subnetworks.Hopfield.HopfieldUpdate
-import org.simbrain.util.computeCorrelationMatrix
-import org.simbrain.util.displayInDialog
 import org.simbrain.util.perturbBinaryByHammingDistance
 import org.simbrain.util.place
-import org.simbrain.util.widgets.CorrPlotPanel
 
 /**
  * Demo for studying discrete Hopfield networks.
@@ -68,9 +67,10 @@ val hopfieldPatterns = newSim {
         ## Experiments
         
         - Train the network on the `E`, `F`, and `L` patterns, then randomize and iterate the network (`N -> R`). What do you notice?
-        - Click on `Show Correlations`. What do you notice about the above patterns?
+        - Click on `Show correlations`. What do you notice about the above patterns?
         - Now, reset the network try to train the network to try to remember as many patterns as possible. Recall that the theoretical limit is `15%` of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
         - Click on `Show correlations` again and note that some patterns are correlated, for example `L`, `E`, and `F`. The network should not do as well learning those patterns (they might interfere in different ways). 
+        - Click on `Show trained correlations` to compare only the patterns you have trained. Each row shows a picture of the pattern. A pattern that differs from a named one by a few units is labelled like `E ~3`, and `×2` means it was trained twice.
 
         # Credits
         
@@ -305,6 +305,8 @@ val hopfieldPatterns = newSim {
         "Stripe Pattern" to StripeShape,
         "Checker Pattern" to CheckerShape,
     )
+    val shortNames = patternMap.mapKeys { it.key.removeSuffix(" Pattern") }
+    val trainedPatterns = TrainedPatterns(shortNames, 0.5, nameInverses = true)
     withGui {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             for ((label, pattern) in patternMap) {
@@ -314,6 +316,7 @@ val hopfieldPatterns = newSim {
             }
             addSeparator()
             addButton("Train on current pattern") {
+                trainedPatterns.record(hopfield.neuronGroup.activationArray)
                 hopfield.weightMatrix.setMatrixValues(hopfield.weightMatrix.weights.mul(patternCnt / (patternCnt + 1)))
                 hopfield.learningRate = 1 / (patternCnt + 1)
                 with(network) { hopfield.trainOnCurrentPattern() }
@@ -327,49 +330,13 @@ val hopfieldPatterns = newSim {
                     )
                 )
             }
+            addSeparator()
             addButton("Show correlations") {
-                CorrPlotPanel(
-                    listOf(
-                        "D",
-                        "E",
-                        "F",
-                        "H",
-                        "L",
-                        "U",
-                        "V",
-                        "X",
-                        "Y",
-                        "Z",
-                        "zero",
-                        "eight",
-                        "Diamond",
-                        "Stripe",
-                        "Checker"
-                    ),
-                    computeCorrelationMatrix(
-                        arrayOf(
-                            DShape,
-                            EShape,
-                            FShape,
-                            HShape,
-                            LShape,
-                            UShape,
-                            VShape,
-                            XShape,
-                            YShape,
-                            ZShape,
-                            zeroShape,
-                            eightShape,
-                            DiamondShape,
-                            StripeShape,
-                            CheckerShape
-                        )
-                    )
-                ).displayInDialog().apply {
-                    title = "Inter-pattern correlations"
-                }
+                showPatternCorrelations(shortNames)
             }
-
+            addButton("Show trained correlations") {
+                trainedPatterns.showCorrelations()
+            }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 509, 619)
     }

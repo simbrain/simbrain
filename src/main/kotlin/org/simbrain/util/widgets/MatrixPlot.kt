@@ -5,6 +5,7 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import java.awt.*
+import java.awt.event.MouseEvent
 import javax.swing.*
 import kotlin.math.abs
 import kotlin.math.max
@@ -14,24 +15,78 @@ import kotlin.random.Random
 /**
  * Produce something like an R Corrplot.
  *
- * Paints directly without an off-screen buffer. When placed in a JScrollPane,
- * only the visible cells are drawn, so it scales to large matrices.
+ * Cells grow to fill the available space and shrink with it down to [minCellSize], below which the plot
+ * scrolls. Label margins are sized from the label text, and column labels turn vertical when they would
+ * not fit across a cell. Paints directly without an off-screen buffer, and only the visible cells are
+ * drawn, so it scales to large matrices. Hovering shows the row and column labels and the cell value.
  *
  * @param labels column and row headings
  * @param data the matrix data to represent
+ * @param thumbnails optional images drawn beside each heading, for example a picture of the pattern that row
+ * and column represent
  */
-class MatrixPlot(private val labels: List<String>, private val data: Array<DoubleArray>) : JPanel() {
+class MatrixPlot(
+    private val labels: List<String>,
+    private val data: Array<DoubleArray>,
+    private val thumbnails: List<Image>? = null,
+) : JPanel(), Scrollable {
 
-    private val cellSize = 50
+    private val thumbnailSize = 36
+
+    private val minCellSize = if (thumbnails != null) thumbnailSize + 4 else 28
+
+    private val comfortableCellSize = 50
+
+    private val labelGap = 6
 
     private val magnitude = data.flatten().maxOfOrNull { abs(it) }?.coerceAtLeast(1e-12) ?: 1.0
 
     var properties = MatrixPlotProperties()
 
+    // The widest value decides whether values fit in a cell, and its sign and integer digits depend only on magnitude
+    private val widestValueText = "%.2f".format(-magnitude)
+
+    private val labelMetrics get() = getFontMetrics(font)
+
+    private var measuredFont: Font? = null
+
+    private var measuredLabelWidth = 0
+
+    // Measured once per font rather than on every access, since layout math reads it many times per paint
+    private val maxLabelWidth: Int
+        get() {
+            if (font != measuredFont) {
+                measuredFont = font
+                measuredLabelWidth = labels.maxOfOrNull { labelMetrics.stringWidth(it) } ?: 0
+            }
+            return measuredLabelWidth
+        }
+
+    private val verticalColumnLabels get() = maxLabelWidth > minCellSize - labelGap
+
+    private val thumbnailBlock get() = if (thumbnails != null) thumbnailSize + labelGap else 0
+
+    private val leftMargin get() = maxLabelWidth + 2 * labelGap + thumbnailBlock
+
+    private val topMargin
+        get() = thumbnailBlock + if (verticalColumnLabels) {
+            maxLabelWidth + 2 * labelGap
+        } else {
+            labelMetrics.height + 2 * labelGap
+        }
+
+    private val cellSize: Int
+        get() {
+            val n = labels.size.coerceAtLeast(1)
+            return max(minCellSize, min((width - leftMargin) / n, (height - topMargin) / n))
+        }
+
     init {
-        val totalSize = (labels.size + 2) * cellSize
-        preferredSize = Dimension(totalSize, totalSize)
+        preferredSize = sizeForCell(minCellSize)
+        ToolTipManager.sharedInstance().registerComponent(this)
     }
+
+    private fun sizeForCell(cell: Int) = Dimension(leftMargin + labels.size * cell, topMargin + labels.size * cell)
 
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
@@ -39,12 +94,15 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
 
         val clip = g2.clipBounds ?: Rectangle(0, 0, width, height)
+        val cell = cellSize
+        val left = leftMargin
+        val top = topMargin
 
         // Determine visible cell range to avoid painting the entire matrix
-        val colStart = max(0, (clip.x - cellSize) / cellSize - 1)
-        val colEnd = min(labels.size - 1, (clip.x + clip.width) / cellSize)
-        val rowStart = max(0, (clip.y - cellSize) / cellSize - 1)
-        val rowEnd = min(labels.size - 1, (clip.y + clip.height) / cellSize)
+        val colStart = max(0, (clip.x - left) / cell)
+        val colEnd = min(labels.size - 1, (clip.x + clip.width - left) / cell)
+        val rowStart = max(0, (clip.y - top) / cell)
+        val rowEnd = min(labels.size - 1, (clip.y + clip.height - top) / cell)
 
         val colorRange = if (properties.fixedColorScale) {
             properties.minValue..properties.maxValue
@@ -52,31 +110,106 @@ class MatrixPlot(private val labels: List<String>, private val data: Array<Doubl
             -magnitude..magnitude
         }
 
+        val valueFont = font.deriveFont((cell * 0.28f).coerceIn(10f, 18f))
+        val valueMetrics = g2.getFontMetrics(valueFont)
+        val showValues = valueMetrics.stringWidth(widestValueText) + 4 <= cell
+        g2.font = valueFont
         for (i in rowStart..rowEnd) {
             for (j in colStart..colEnd) {
-                val cx = cellSize + j * cellSize
-                val cy = cellSize + i * cellSize
+                val cx = left + j * cell
+                val cy = top + i * cell
                 val value = data[i][j]
                 g2.color = Color(value.toSimbrainColor(colorRange))
-                g2.fillRect(cx, cy, cellSize, cellSize)
-                g2.color = Color.BLACK
-                g2.drawString("%.2f".format(value), cx + 5, cy + cellSize / 2 + 5)
+                g2.fillRect(cx, cy, cell, cell)
+                if (showValues) {
+                    val text = "%.2f".format(value)
+                    g2.color = Color.BLACK
+                    g2.drawString(
+                        text,
+                        cx + (cell - valueMetrics.stringWidth(text)) / 2,
+                        cy + (cell + valueMetrics.ascent - valueMetrics.descent) / 2
+                    )
+                }
             }
         }
 
-        // Draw labels only if they intersect the clip region
-        g2.color = Theme.foreground
-        for (i in labels.indices) {
-            val topLabelX = cellSize + i * cellSize + 5
-            if (topLabelX + cellSize >= clip.x && topLabelX <= clip.x + clip.width && clip.y < cellSize) {
-                g2.drawString(labels[i], topLabelX, cellSize - 10)
-            }
-            val leftLabelY = cellSize + i * cellSize + cellSize / 2 + 5
-            if (leftLabelY + 15 >= clip.y && leftLabelY - 15 <= clip.y + clip.height && clip.x < cellSize) {
-                g2.drawString(labels[i], 5, leftLabelY)
+        g2.font = font
+        val metrics = labelMetrics
+        val thumbBlock = thumbnailBlock
+        val vertical = verticalColumnLabels
+        for (i in rowStart..rowEnd) {
+            val label = labels[i]
+            g2.color = Theme.foreground
+            g2.drawString(
+                label,
+                left - thumbBlock - labelGap - metrics.stringWidth(label),
+                top + i * cell + (cell + metrics.ascent - metrics.descent) / 2
+            )
+            drawThumbnail(g2, i, left - thumbBlock, top + i * cell + (cell - thumbnailSize) / 2)
+        }
+        for (j in colStart..colEnd) {
+            val label = labels[j]
+            val centerX = left + j * cell + cell / 2
+            drawThumbnail(g2, j, centerX - thumbnailSize / 2, top - thumbBlock)
+            g2.color = Theme.foreground
+            if (vertical) {
+                val rotated = g2.create() as Graphics2D
+                rotated.translate(centerX + (metrics.ascent - metrics.descent) / 2, top - thumbBlock - labelGap)
+                rotated.rotate(-Math.PI / 2)
+                rotated.drawString(label, 0, 0)
+                rotated.dispose()
+            } else {
+                g2.drawString(
+                    label,
+                    centerX - metrics.stringWidth(label) / 2,
+                    top - thumbBlock - labelGap - metrics.descent
+                )
             }
         }
     }
+
+    private fun drawThumbnail(g2: Graphics2D, index: Int, x: Int, y: Int) {
+        val image = thumbnails?.getOrNull(index) ?: return
+        g2.drawImage(image, x, y, thumbnailSize, thumbnailSize, null)
+        g2.color = Color.GRAY
+        g2.drawRect(x, y, thumbnailSize, thumbnailSize)
+    }
+
+    override fun getToolTipText(event: MouseEvent): String? {
+        val cell = cellSize
+        val col = Math.floorDiv(event.x - leftMargin, cell)
+        val row = Math.floorDiv(event.y - topMargin, cell)
+        val colLabel = labels.getOrNull(col)
+        val rowLabel = labels.getOrNull(row)
+        return when {
+            rowLabel != null && colLabel != null -> "$rowLabel × $colLabel: ${"%.3f".format(data[row][col])}"
+            event.x < leftMargin && event.y >= topMargin -> rowLabel
+            event.y < topMargin && event.x >= leftMargin -> colLabel
+            else -> null
+        }
+    }
+
+    override fun getPreferredScrollableViewportSize(): Dimension = sizeForCell(comfortableCellSize).apply {
+        width = min(width, 700)
+        height = min(height, 700)
+    }
+
+    override fun getScrollableUnitIncrement(visibleRect: Rectangle, orientation: Int, direction: Int) = 10
+
+    override fun getScrollableBlockIncrement(visibleRect: Rectangle, orientation: Int, direction: Int) =
+        if (orientation == SwingConstants.VERTICAL) visibleRect.height else visibleRect.width
+
+    /**
+     * Fill the viewport while minimum-size cells fit in it; otherwise keep the minimum size and scroll.
+     */
+    private fun fitsViewport(): Boolean {
+        val viewport = parent as? JViewport ?: return false
+        return viewport.width >= preferredSize.width && viewport.height >= preferredSize.height
+    }
+
+    override fun getScrollableTracksViewportWidth() = fitsViewport()
+
+    override fun getScrollableTracksViewportHeight() = fitsViewport()
 
 }
 
@@ -99,7 +232,15 @@ class MatrixPlotProperties: EditableObject {
     )
 }
 
-class CorrPlotPanel(private val labels: List<String>, private val data: Array<DoubleArray>): JPanel(BorderLayout()) {
+/**
+ * A [MatrixPlot] of pairwise comparisons between the rows of [data], with a toolbar for choosing the comparison
+ * function. [thumbnails] are passed through to the plot.
+ */
+class CorrPlotPanel(
+    private val labels: List<String>,
+    private val data: Array<DoubleArray>,
+    private val thumbnails: List<Image>? = null,
+): JPanel(BorderLayout()) {
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     private var computeJob: Job? = null
@@ -181,7 +322,7 @@ class CorrPlotPanel(private val labels: List<String>, private val data: Array<Do
                     "Dot Product" -> computeDotProductMatrix(data, onProgress)
                     else -> computeCorrelationMatrix(data, onProgress)
                 }
-                matrixPlot = MatrixPlot(labels, result)
+                matrixPlot = MatrixPlot(labels, result, thumbnails)
                 matrixPlotPanel.viewport.view = matrixPlot
                 displayedFunction = functionName
                 revalidate()

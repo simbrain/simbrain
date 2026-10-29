@@ -32,6 +32,13 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     lateinit var visibleLayer: NeuronArray
 
     @UserParameter(
+        label = "Learning rate",
+        description = "Step size for contrastive divergence updates. Controls how quickly weights adapt to input patterns.",
+        order = 20,
+    )
+    var learningRate = .01
+
+    @UserParameter(
         label = "RBM Weight randomizer",
         showDetails = false,
         description = "Randomizer for RBM Weights.",
@@ -143,8 +150,6 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     context(Network)
     override fun trainOnCurrentPattern() {
 
-        val learningRate = trainer.learningRate
-
         // "Positive phase"
         hiddenLayer.accumulateInputs()
         hiddenLayer.update()
@@ -209,6 +214,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
         copy.testingData = testingData.copy()
         copy.customInfo = InfoText(copy.stateInfoText)
 
+        copy.learningRate = learningRate
         copy.trainer.copyFrom(trainer)
 
         return copy

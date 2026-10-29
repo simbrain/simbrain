@@ -353,7 +353,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         // Only add play/stop button for algorithms that benefit from repeated iteration
         // SOM and Competitive networks use iterative learning with decaying parameters
         // Hopfield and RBM typically use single-pass training
-        if (unsupervisedNetwork is SOMNetwork || unsupervisedNetwork is CompetitiveNetwork) {
+        val runsIteratively = unsupervisedNetwork is SOMNetwork || unsupervisedNetwork is CompetitiveNetwork
+        if (runsIteratively) {
             val runAction = createAction(
                 name = "Run",
                 description = "Run training algorithm",
@@ -421,14 +422,17 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
 
-        val preferencesButton = JButton(createAction(
-            name = "Trainer properties",
-            description = "Edit trainer preferences",
-            iconPath = "menu_icons/Tools.png",
-        ) {
-            trainer.createEditorDialog().display()
-        })
-        runControls.add(preferencesButton)
+        // The trainer's only settings limit how long Run continues, so they are moot without a Run button
+        if (runsIteratively) {
+            val preferencesButton = JButton(createAction(
+                name = "Trainer properties",
+                description = "Edit trainer preferences",
+                iconPath = "menu_icons/Tools.png",
+            ) {
+                trainer.createEditorDialog().display()
+            })
+            runControls.add(preferencesButton)
+        }
 
         // Create data frame for unsupervised data with explicit columns like DataSetPanel
         fun createUnsupervisedDataFrame(data: MutableList<MutableList<Double>>): BasicDataFrame {

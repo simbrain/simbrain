@@ -1,5 +1,7 @@
 package org.simbrain.custom_sims.simulations
 import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.simulations.hebb.TrainedPatterns
+import org.simbrain.custom_sims.simulations.hebb.showPatternCorrelations
 import org.simbrain.network.subnetworks.RestrictedBoltzmannMachine
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
@@ -48,41 +50,58 @@ val roomSchemaSim = newSim {
         rbm.visibleLayer.events.updated.fire()
     }
 
+    val rooms = mapOf(
+        "Kitchen" to listOf(
+            "oven", "coffeepot", "cupboard", "toaster", "refrigerator", "sink", "stove", "drapes",
+            "coffee-cup", "clock", "telephone", "small", "windows", "walls", "ceiling"
+        ),
+        "Office" to listOf(
+            "computer", "ashtray", "coffee-cup", "picture", "desk-chair", "books", "carpet",
+            "bookshelf", "typewriter", "telephone", "desk", "large", "door", "walls", "ceiling"
+        ),
+        "Bathroom" to listOf("scale", "toilet", "bathtub", "cupboard", "sink", "very-small", "door", "walls", "ceiling"),
+        "Living Room" to listOf(
+            "television", "drapes", "fireplace", "easy-chair", "sofa", "floor-lamp", "picture",
+            "clock", "books", "carpet", "bookshelf", "telephone", "very-large", "windows", "door",
+            "walls", "ceiling"
+        ),
+        "Bedroom" to listOf(
+            "clothes-hanger", "television", "dresser", "drapes", "picture", "clock", "books",
+            "carpet", "bookshelf", "bed", "medium", "windows", "door", "walls", "ceiling"
+        ),
+    )
+    // activateNode silently skips unknown labels, so catch misspelled room features here
+    rooms.values.flatten().forEach { require(it in labels) { "Unknown room feature: $it" } }
+    val roomPatterns = rooms.mapValues { (_, features) ->
+        DoubleArray(labels.size) { if (labels[it] in features) 1.0 else 0.0 }
+    }
+    val trainedPatterns = TrainedPatterns(roomPatterns, 0.5)
+
     fun flipBitWithChance(bit: Int, chance: Double): Int {
         return if (Random.nextDouble() < chance) 1 - bit else bit
     }
 
     withGui {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addButton("Kitchen") {
-                activateNodes(listOf(
-                    "oven", "coffee-pot", "cupboard", "toaster", "refrigerator", "sink", "stove", "drapes",
-                    "coffee-cup", "clock", "telephone", "small", "window", "walls", "ceiling"
-                ))
+            for ((room, features) in rooms) {
+                addButton(room) {
+                    activateNodes(features)
+                }
             }
-            addButton("Office") {
-                activateNodes(listOf(
-                    "computer", "ash-tray", "coffee-cup", "picture", "desk-chair", "books", "carpet",
-                    "bookshelf", "typewriter", "telephone", "desk", "large", "door", "walls", "ceiling"
-                ))
+            addSeparator()
+            addButton("Show correlations") {
+                showPatternCorrelations(roomPatterns)
+            }.apply {
+                toolTipText = "Shows how strongly each pair of room patterns overlaps."
             }
-            addButton("Bathroom") {
-                activateNodes(listOf("scale", "toilet", "bathtub", "cupboard", "sink", "very-small", "door", "walls", "ceiling"))
-            }
-            addButton("Living Room") {
-                activateNodes(listOf(
-                    "television", "drapes", "fire-place", "easy-chair", "sofa", "floor-lamp", "picture",
-                    "clock", "books", "carpet", "bookshelf", "telephone", "very-large", "window", "door",
-                    "walls", "ceiling"
-                ))
-            }
-            addButton("Bedroom") {
-                activateNodes(listOf("coat-hanger", "television", "dresser", "drapes", "picture", "clock", "books",
-                    "carpet", "bookshelf", "bed", "medium", "window", "door", "walls", "ceiling"
-                ))
+            addButton("Show trained correlations") {
+                trainedPatterns.showCorrelations()
+            }.apply {
+                toolTipText = "Shows how strongly each pair of patterns trained so far overlaps."
             }
             addSeparator()
             addButton("Train on Current Pattern") {
+                trainedPatterns.record(rbm.visibleLayer.activationArray)
                 with(network) {
                     runWithProgressWindow(20, batchSize = 10) {
                         rbm.trainOnCurrentPattern()
@@ -137,7 +156,7 @@ val roomSchemaSim = newSim {
 
         # What to Do
         
-        1. Explore room types: Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living Room`, `Bedroom`) to see the typical features of each room type
+        1. Explore room types: Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living Room`, `Bedroom`) to see the typical features of each room type. Click `Show correlations` to see how much the room patterns overlap. `Living Room` and `Bedroom` overlap the most, while the other rooms are nearly uncorrelated. `Show trained correlations` does the same for the patterns you have trained, labelling a permuted room like `Kitchen ~3`
         
         2. Train the network: After setting a room pattern, click `Train on Current Pattern` to strengthen the associations. The network learns by adjusting connection weights 
         based on which features tend to co-occur

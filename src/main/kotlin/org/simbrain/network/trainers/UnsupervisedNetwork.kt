@@ -5,7 +5,6 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
-import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -49,12 +48,6 @@ class UnsupervisedTrainer: EditableObject {
 
     private val maxIterationsReached get() = useMaxIterations && iteration >= maxIterations
 
-    @UserParameter(
-        label = "Learning Rate",
-        description = "Step size for unsupervised learning updates. Controls how quickly weights adapt to input patterns"
-    )
-    var learningRate = .01
-
     @Transient
     val events = TrainerEvents()
 
@@ -92,7 +85,6 @@ class UnsupervisedTrainer: EditableObject {
     fun copyFrom(other: UnsupervisedTrainer) {
         this.useMaxIterations = other.useMaxIterations
         this.maxIterations = other.maxIterations
-        this.learningRate = other.learningRate
     }
 
     override val name: String

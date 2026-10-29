@@ -94,14 +94,14 @@ open class TextNode(
     override val toolTipText: String?
         get() = "Location: (" + textObject.locationX.toInt() + "," + textObject.locationY.toInt() + ")"
 
-    /**
-     * Updates the position of the view text based on the position of the model
-     * text object.
-     */
     override fun syncFromModel(bits: Int) {
         if (bits and TEXT != 0) update() else if (bits and LOCATION != 0) recenterTextObject()
     }
 
+    /**
+     * Updates the position of the view text based on the position of the model
+     * text object.
+     */
     private fun recenterTextObject() {
         globalTranslation = textObject.location
         pStyledText.offset = -pStyledText.bounds.center2D
@@ -117,8 +117,9 @@ open class TextNode(
     override val propertyDialog: StandardDialog get() = createEditDialog()
 
     companion object {
-        private const val TEXT = 1
-        private const val LOCATION = 2
+        // Protected so a subclass numbers its own bits after these
+        protected const val TEXT = 1
+        protected const val LOCATION = 2
     }
 }
 

@@ -101,14 +101,14 @@ class TextWorldPanel(
         tokenCountLabel.toolTipText = "Tokens in this document, counted by the active tokenizer"
     }
 
+    /** Owns the panel's EDT updates; cancelled when the panel's desktop component closes. */
+    val viewScope = UiScope()
+
     /**
      * Initialize the panel with an open / close toolbar.
      *
      * @param theWorld the reader world to display
      */
-    /** Owns the panel's EDT updates; cancelled when the panel's desktop component closes. */
-    val viewScope = UiScope()
-
     init {
 
         this.layout = BorderLayout()

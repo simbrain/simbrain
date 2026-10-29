@@ -54,7 +54,11 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      */
     private val sync = NodeSync(this, nodeScope, networkPanel.nodeSync) { bits -> syncFromModel(bits) }
 
-    /** Records changed aspects and queues this node for the next sync pass, once however many marks arrive. */
+    /**
+     * Records changed aspects and queues this node for the next sync pass, once however many marks arrive. Bits are
+     * numbered per class hierarchy: an open node class keeps its bits protected, so a subclass numbers its own after
+     * them.
+     */
     protected fun markDirty(bits: Int) = sync.mark(bits)
 
     /** Runs a pending sync now; called on the EDT by the panel's sync pass. */

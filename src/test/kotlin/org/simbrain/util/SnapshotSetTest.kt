@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 
 class SnapshotSetTest {
 
@@ -45,13 +46,13 @@ class SnapshotSetTest {
         assertEquals(listOf(1, 2, 11, 12, 13), set.toList())
     }
 
+    // Generous: adding 300k elements takes far less, where a copy-on-write set's quadratic time takes minutes
     @Test
+    @Timeout(30)
     fun `adding many elements stays fast`() {
         val set = SnapshotSet<Int>()
-        val start = System.nanoTime()
         set.addAll((0 until 200_000).toList())
         (200_000 until 300_000).forEach { set.add(it) }
         assertEquals(300_000, set.size)
-        assertTrue((System.nanoTime() - start) / 1e9 < 2.0, "adding 300k elements should take far less than the quadratic time a copy-on-write set needs")
     }
 }

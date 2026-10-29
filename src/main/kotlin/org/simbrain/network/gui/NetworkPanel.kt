@@ -51,10 +51,6 @@ import javax.swing.SwingUtilities
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
-/**
- * Main GUI representation of a [Network].
- */
-
 /** Cap on how often the view refits to the network, matching the zoom event's own throttle. */
 private const val ZOOM_TO_FIT_INTERVAL_MS = 20L
 
@@ -65,6 +61,9 @@ private const val ZOOM_TO_FIT_INTERVAL_MS = 20L
 internal fun NetworkModel.waitsForEndpointNodes() =
     this is Connector || this is TensorConnector || this is FlattenConnector || this is SynapseGroup
 
+/**
+ * Main GUI representation of a [Network].
+ */
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -86,7 +85,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     /** Spike highlights for synapses, drawn over the cached connections so spikes don't invalidate the cache. */
-    val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
+    internal val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
 
     /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
     private val nodeTier = PNode().also { canvas.layer.addChild(it) }
@@ -111,10 +110,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * A node whose sync throws is logged and skipped: the rest of the batch already has its dirty bits set, so if
      * the pass stopped there those nodes would never be queued again.
      */
-    val nodeSync = viewScope.nodeSyncPass()
+    internal val nodeSync = viewScope.nodeSyncPass()
 
     /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
-    fun detachNode(node: ScreenElement) {
+    internal fun detachNode(node: ScreenElement) {
         node.dispose()
         node.removeFromParent()
     }
@@ -208,8 +207,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         set(value) {
             field = value
             network.events.synapseSpikingOnlyVisibilityChanged.fire(value)
-            // Trigger a redraw by nudging synapse graphics via the throttled update event
-            // Individual SynapseNodes will listen and adjust their own visibility accordingly
+            // Individual SynapseNodes listen and repaint; while it is set, each draws nothing and takes picks only
+            // while its source spikes (SynapseNode.fullPaint and fullPick), and the spike overlay draws the spiking
+            // synapses
         }
 
     /**

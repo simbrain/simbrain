@@ -63,7 +63,7 @@ class SpikeOverlayNode : PNode() {
         for (node in spiking) {
             if (node.parent == null || !node.synapse.isVisible) continue
             drawPath(g, node.line ?: continue, fill = false)
-            drawPath(g, node.circleNode ?: continue, fill = true)
+            drawPath(g, node.circle ?: continue, fill = true)
             val saved = g.transform
             g.transform(node.getLocalToGlobalTransform(null))
             node.paintStrengthLabel(g)

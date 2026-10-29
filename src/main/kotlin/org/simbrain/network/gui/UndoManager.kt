@@ -133,13 +133,11 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         }
     }
 
-    // When undoing deletion of a group, its children must be re-added
+    // When undoing deletion of a group, its children must be re-added. Neurons of a NeuronCollection are not passed
+    // here: restoreCollectionNeurons re-adds them as a batch first.
     context(NetworkPanel)
     private suspend fun reAddToGroup(model: NetworkModel) {
         when (val parent = childToParentMaps.firstNotNullOfOrNull { it[model] }) {
-            // Its neurons are re-added as a batch by restoreCollectionNeurons before this loop runs.
-            is NeuronCollection -> {}
-
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
                     parent.restoreSynapse(synapse)

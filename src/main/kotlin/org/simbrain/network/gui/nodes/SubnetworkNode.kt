@@ -301,14 +301,15 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     }
 
 
+    companion object {
+        // Protected so a subclass numbers its own bits after these
+        protected const val INFO = 1
+    }
+
     /**
      * Basic interaction box for subnetwork nodes. Ensures a property dialog
      * appears when the box is double-clicked.
      */
-    companion object {
-        private const val INFO = 1
-    }
-
     inner class SubnetworkNodeInteractionBox(net: NetworkPanel) : InteractionBox(net) {
 
         override val contextMenu: JPopupMenu?

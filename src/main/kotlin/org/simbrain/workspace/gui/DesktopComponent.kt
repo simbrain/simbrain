@@ -169,7 +169,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
             return
         }
         val bounds = parentFrame.bounds
-        val workspace = workspaceComponent.workspace
         workspace.removeWorkspaceComponent(workspaceComponent)
         workspaceComponent = newComponent
         workspace.addWorkspaceComponent(workspaceComponent)

@@ -49,7 +49,9 @@ class SynapseNode(
     /**
      * Main circle of the synapse.
      */
-    private var circle: PPath? = null
+    /** The strength circle, which the spike overlay also draws back over a highlighted line. */
+    internal var circle: PPath? = null
+        private set
 
     /**
      * Line connecting nodes. More of a loop for self connections.
@@ -124,12 +126,11 @@ class SynapseNode(
         events.colorPreferencesChanged.on(dispatcher = Dispatchers.Swing) {
             updateColor()
             updateDiameter()
-            updateSpikeColor()
+            applyLineColor()
         }.untilDisposed()
-        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, newVisibility ->
-            updateVisibility(newVisibility) }.untilDisposed()
-        updateVisibility(synapse.isVisible)
-        updateSpikeColor()
+        events.visbilityChanged.on(dispatcher = Dispatchers.Swing) { _, _ -> applyVisibility() }.untilDisposed()
+        applyVisibility()
+        applyLineColor()
         showSourceSpiking(source.drawnSpiking)
         events.clampChanged.on(dispatcher = Dispatchers.Swing) { this.updateClampStatus() }.untilDisposed()
         updateClampStatus()
@@ -142,7 +143,7 @@ class SynapseNode(
 
         // Respond to global toggles for spiking-only visibility
         networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(dispatcher = Dispatchers.Swing) {
-            applySpikingOnlyVisibility()
+            applyVisibility()
         }.untilDisposed()
     }
 
@@ -161,9 +162,6 @@ class SynapseNode(
         detachSymmetric()
         super.dispose()
     }
-
-    /** The strength circle, for the spike overlay to draw back over a highlighted line. */
-    internal val circleNode get() = circle
 
     /** What the circle currently shows and whether the overlay highlights this synapse; both lag the model until the next sync. */
     internal val drawnCircleColor get() = circle!!.paint
@@ -283,7 +281,7 @@ class SynapseNode(
     }
 
     /** The line keeps its base color; spikes are highlighted by the panel's spike overlay. */
-    private fun updateSpikeColor() {
+    private fun applyLineColor() {
         line!!.strokePaint = lineColor
     }
 
@@ -292,13 +290,9 @@ class SynapseNode(
      * nothing and takes picks only while its source spikes (see [fullPaint] and [fullPick]): the spike overlay draws
      * the spiking synapses, and showing or hiding the node on every spike would throw away the cached connection tier.
      */
-    private fun applySpikingOnlyVisibility() {
+    private fun applyVisibility() {
         super.setVisible(synapse.isVisible)
         repaint()
-    }
-
-    private fun updateVisibility(modelVisibility: Boolean) {
-        super.setVisible(modelVisibility)
     }
 
     override fun fullPaint(paintContext: PPaintContext) {

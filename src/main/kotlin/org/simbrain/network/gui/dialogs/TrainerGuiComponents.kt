@@ -156,10 +156,9 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
     }
 
     init {
-        
-        // Cancel the trainer's coroutine scope when this component is disposed
         val errorPlot = ErrorTimeSeries(trainer)
 
+        // Cancel the trainer's coroutine scope when this component is disposed
         onWindowClose {
             trainer.job.cancel()
             job.cancel()

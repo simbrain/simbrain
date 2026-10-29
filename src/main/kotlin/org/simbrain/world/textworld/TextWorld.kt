@@ -170,8 +170,9 @@ class TextWorld : AttributeContainer, EditableObject {
         }
 
     /**
-     * Suspend version of setting currentTokenIndex that awaits the event's handlers, for update actions. The
-     * display refreshes on its own schedule, so this does not pace a simulation to the screen.
+     * Suspend version of setting currentTokenIndex that awaits the event's handlers, for update actions. The text
+     * world panel refreshes on its own schedule, so it does not pace a simulation to the screen; a handler that runs
+     * on the EDT, as some simulations add, still does.
      */
     suspend fun setCurrentTokenIndexSuspend(value: Int) {
         val tokenList = tokens
@@ -246,8 +247,9 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Suspend version of setting text that awaits the textChanged event's handlers, for update actions. The
-     * display refreshes on its own schedule, so this does not pace a simulation to the screen.
+     * Suspend version of setting text that awaits the textChanged event's handlers, for update actions. The text
+     * world panel refreshes on its own schedule, so it does not pace a simulation to the screen; a handler that runs
+     * on the EDT, as some simulations add, still does.
      */
     suspend fun setTextSuspend(newText: String) {
         _text = newText
@@ -344,8 +346,8 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Add a text at the cursor position. The display catches up to the latest text on its own; a running
-     * simulation doesn't wait for it.
+     * Add a text at the cursor position. The text world panel catches up to the latest text on its own, so a running
+     * simulation doesn't wait for it, though it does wait for any textChanged handler that runs on the EDT.
      */
     @Consumable
     suspend fun addTextAtCursor(newText: String) {
@@ -355,9 +357,10 @@ class TextWorld : AttributeContainer, EditableObject {
     }
 
     /**
-     * Add a text to the end of the world text. The display catches up to the latest text on its own; a
-     * running simulation doesn't wait for it. Empty strings are ignored so per-iteration couplings from
-     * sources that only sometimes produce a token add no stray spacing.
+     * Add a text to the end of the world text. The text world panel catches up to the latest text on its own, so a
+     * running simulation doesn't wait for it, though it does wait for any textChanged handler that runs on the EDT.
+     * Empty strings are ignored so per-iteration couplings from sources that only sometimes produce a token add no
+     * stray spacing.
      */
     @Consumable
     suspend fun addTextAtEnd(newText: String) {

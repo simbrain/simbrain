@@ -26,12 +26,16 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     /**
      * "Green" selection from lasso.
      */
-    val selection: Set<ScreenElement> = SnapshotSet()
+    val selection: Set<ScreenElement> get() = selectionSet
+
+    private val selectionSet = SnapshotSet<ScreenElement>()
 
     /**
      * "Red" source selection.
      */
-    val sourceSelection: Set<ScreenElement> = SnapshotSet()
+    val sourceSelection: Set<ScreenElement> get() = sourceSelectionSet
+
+    private val sourceSelectionSet = SnapshotSet<ScreenElement>()
 
     /**
      * Filter selected network models using a generic type.  With a helper for java code (which requires a class
@@ -183,7 +187,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
      */
     private fun modifySourceSelection(block: SnapshotSet<ScreenElement>.() -> Unit) {
         val old = HashSet(sourceSelection)
-        (sourceSelection as SnapshotSet).block()
+        sourceSelectionSet.block()
         events.sourceSelection.fire(old, sourceSelection)
     }
 
@@ -193,7 +197,7 @@ class NetworkSelectionManager(val networkPanel: NetworkPanel) {
     private fun modifySelection(action: SnapshotSet<ScreenElement>.() -> Unit) {
         val old = HashSet(selection)
         // Invoke provided action
-        (selection as SnapshotSet).action()
+        selectionSet.action()
         selectedModelsCache.invalidate()
         events.selection.fire(old, selection)
     }

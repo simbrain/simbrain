@@ -141,9 +141,9 @@ class CnnTrainerControls(
     private val stepActionRef: Action
 
     init {
-        // Cancel coroutine scopes when this component is disposed
         val errorPlot = ErrorTimeSeries(trainer.events, quantity = "Loss") { trainer.iteration }
 
+        // Cancel coroutine scopes when this component is disposed
         onWindowClose {
             trainer.job.cancel()
             controlsJob.cancel()

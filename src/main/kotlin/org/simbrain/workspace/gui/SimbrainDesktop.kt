@@ -86,12 +86,12 @@ object SimbrainDesktop {
      */
     private val FRAME_TITLE = BuildInfo.applicationTitle
 
-    /**
-     * The frame that will hold the workspace.
-     */
     /** Owns the desktop's own EDT updates, which live as long as the application. */
     private val desktopUi = UiScope()
 
+    /**
+     * The frame that will hold the workspace.
+     */
     val frame: JFrame = JFrame(FRAME_TITLE)
 
     /**

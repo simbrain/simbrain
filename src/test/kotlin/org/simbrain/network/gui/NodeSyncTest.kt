@@ -335,7 +335,7 @@ class NodeSyncTest {
 
         target.location = point(500.0, 0.0)
         awaitUntil(3000, "the synapse node never followed its target") {
-            onEdt { node.circleNode!!.globalFullBounds.centerX > 400 }
+            onEdt { node.circle!!.globalFullBounds.centerX > 400 }
         }
 
         val covered = onEdt { panel.spikeOverlay.globalFullBounds.contains(node.globalFullBounds) }
@@ -363,7 +363,7 @@ class NodeSyncTest {
         val labelDrawn = onEdt {
             val scale = panel.scalingFactor
             val overlay = panel.spikeOverlay.globalFullBounds
-            val circle = node.circleNode!!.globalFullBounds
+            val circle = node.circle!!.globalFullBounds
             val cx = ((circle.centerX - overlay.x + 5) * scale).toInt()
             val cy = ((circle.centerY - overlay.y + 5) * scale).toInt()
             val half = (circle.width / 2 * scale * 0.3).toInt()
@@ -389,7 +389,7 @@ class NodeSyncTest {
             val camera = panel.canvas.camera
             camera.setBounds(0.0, 0.0, 800.0, 800.0)
             panel.canvas.root.processInputs()
-            val center = node.circleNode!!.globalFullBounds.center2D
+            val center = node.circle!!.globalFullBounds.center2D
             val local = camera.viewToLocal(point(center.x, center.y))
             camera.pick(local.x, local.y, 1.0).nodeStackReference.contains(node)
         }

@@ -271,8 +271,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
 
     context(Network)
     override fun accumulateInputs() {
-        addInputValue(updateFanInPSRs())
-        accumulateGapJunctionCurrents()
+        accumulateFanInInputs()
         addInputValue(bias)
     }
 
@@ -282,7 +281,7 @@ class Neuron : LocatableModel, EditableObject, AttributeContainer {
      */
     context(Network)
     fun accumulateFanInInputs() {
-        addInputValue(updateFanInPSRs())
+        addInputValue(updateRule.synapticInput(this, dataHolder, updateFanInPSRs()))
         accumulateGapJunctionCurrents()
     }
 

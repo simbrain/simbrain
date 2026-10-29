@@ -5,9 +5,10 @@
  *
  * Free neurons, the bulk of a large network, are split into chunks that update in parallel (see `ParallelUpdate.kt`):
  * accumulating a neuron's input writes only to that neuron and its own incoming synapses, and updating it writes only
- * to the neuron, unless its rule says otherwise ([NeuronUpdateRule.isNeuronLocal]), in which case neurons update
- * serially. Neurons also update serially when several of them share one rule object that adds seeded noise: they
- * would draw from one generator in thread order, so the run would not repeat for that seed. Everything else (arrays,
+ * to the neuron and its data holder. A rule that depends on other neurons reads them while inputs are accumulated
+ * ([NeuronUpdateRule.synapticInput]), when every neuron still holds the previous update's state, so the result does
+ * not depend on update order. Neurons update serially only when several of them share one rule object that adds
+ * seeded noise: they would draw from one generator in thread order, so the run would not repeat for that seed. Everything else (arrays,
  * collections, connectors, subnetworks) runs serially in [updatingOrder] after the neurons of each phase. Learning
  * synapses update last, in parallel, so learning rules always see the activations of the current update regardless
  * of model order.
@@ -33,13 +34,12 @@ class NetworkUpdatePlan(ordered: List<NetworkModel>) {
     val neuronChunks: List<List<Neuron>> = chunkByCost(neurons) { 1 + it.fanIn.size }
 
     /**
-     * Chunks for the neuron update phase: [neuronChunks], or a single chunk when some neuron's rule is not
-     * [NeuronUpdateRule.isNeuronLocal] or a shared rule adds seeded noise. Checked on every update since rules and
-     * their settings can change without the model list changing.
+     * Chunks for the neuron update phase: [neuronChunks], or a single chunk when a shared rule adds seeded noise.
+     * Checked on every update since noise settings can change without the model list or any rule changing.
      */
     val neuronUpdateChunks: List<List<Neuron>>
-        get() = if (neuronChunks.size > 1 && (neurons.any { !it.updateRule.isNeuronLocal } ||
-                    sharedUpdateRules.any { it.addsSeededNoise })) listOf(neurons) else neuronChunks
+        get() = if (neuronChunks.size > 1 && sharedUpdateRules.any { it.addsSeededNoise }) listOf(neurons)
+        else neuronChunks
 
     /**
      * Rule objects used by more than one neuron.

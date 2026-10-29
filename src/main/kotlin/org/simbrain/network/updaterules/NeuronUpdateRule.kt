@@ -42,6 +42,17 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
     abstract fun apply(neuron: Neuron, data: @UnsafeVariance DS)
 
     /**
+     * The input [neuron] receives from its incoming synapses, given [psrSum], the sum of their post-synaptic
+     * responses. Called while the network gathers inputs, before any neuron updates, so source neurons still hold
+     * their previous activations whatever order neurons update in. A rule that combines its inputs other than by
+     * summing responses (from active sources only, as a product, as phase differences) overrides this, rather than
+     * reading source neurons in [apply], where sources updated earlier in the same update already hold new values.
+     * The result reaches [apply] as part of [Neuron.input]; per-neuron facts [apply] needs besides go in [data].
+     */
+    context(Network)
+    open fun synapticInput(neuron: Neuron, data: @UnsafeVariance DS, psrSum: Double): Double = psrSum
+
+    /**
      * Override to return an appropriate data holder for a given rule.
      */
     open fun createScalarData(): DS {
@@ -174,14 +185,6 @@ abstract class NeuronUpdateRule<out DS : ScalarDataHolder, out DM : MatrixDataHo
 
     open val isSpikingRule: Boolean
         get() = false
-
-    /**
-     * Whether [apply] reads and writes only its own neuron's state (and its own incoming synapses). Rules that read
-     * other neurons' activations while updating, or keep per-neuron state on the rule object, return false, and
-     * networks containing them update their neurons serially.
-     */
-    open val isNeuronLocal: Boolean
-        get() = true
 
     open fun getGraphicalValue(n: Neuron): Double {
         return n.activation

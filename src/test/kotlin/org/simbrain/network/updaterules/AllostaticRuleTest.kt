@@ -116,6 +116,8 @@ class AllostaticRuleTest {
             reservoirInput.activation = 3.0
             reservoirInput.update()
             n.activation = 3.0
+            // As a network update does: the spike is read while inputs are gathered
+            n.accumulateInputs()
             n.update()
             assertTrue(resWeight.strength < 1.0)
         }
@@ -128,6 +130,7 @@ class AllostaticRuleTest {
             reservoirInput.activation = 3.0
             reservoirInput.update()
             n.activation = .5
+            n.accumulateInputs()
             n.update()
             assertTrue(resWeight.strength < 1.0)
         }
@@ -139,6 +142,8 @@ class AllostaticRuleTest {
             reservoirInput.activation = 3.0
             reservoirInput.update()
             n.activation = 3.0
+            // As a network update does: the spike is read while inputs are gathered
+            n.accumulateInputs()
             n.update()
             assertTrue(resWeight.strength < 1.0)
         }

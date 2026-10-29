@@ -22,10 +22,6 @@ import kotlin.math.exp
  */
 class TimedAccumulatorRule : SpikingThresholdRule() {
 
-    // accumulator state lives on the rule object, not a data holder
-    override val isNeuronLocal: Boolean
-        get() = false
-
     /**
      * Refractory period
      */
@@ -78,41 +74,35 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     var kappa: Double = defaultKappa
 
     /**
-     * Sum of all weights when exponentiated: exp(weights * b)
-     */
-    private var expSum = 0.0
-
-    /**
      * Number of incoming connections.
      */
     private val fanInSize = 0
 
-    /**
-     * A timing variable to keep track of refractory periods.
-     */
-    var currentState: Int = 0
-
     override val timeType: Network.TimeType
         get() = Network.TimeType.DISCRETE
 
+    override fun createScalarData() = TimedAccumulatorData()
+
     context(Network)
     override fun apply(neuron: Neuron, data: SpikingScalarData) {
-        if (currentState >= 1) {
-            currentState++
-            if (currentState > maxState) {
-                currentState = 0
+        val state = data as TimedAccumulatorData
+        if (state.currentState >= 1) {
+            state.currentState++
+            if (state.currentState > maxState) {
+                state.currentState = 0
             }
-            neuron.activation = currentState.toDouble()
+            neuron.activation = state.currentState.toDouble()
             neuron.isSpike = false
             return
         }
         if (ThreadLocalRandom.current().nextDouble() < baseProb) {
-            currentState++
+            state.currentState++
             neuron.activation = 1.0
             neuron.isSpike = true
             return
         }
-        expSum = 0.0
+        // Sum of all weights when exponentiated: exp(weights * b)
+        var expSum = 0.0
         for (ii in 0 until fanInSize) {
             if (!neuron.fanInUnsafe!![ii].clamped) expSum += exp(b * neuron.fanInUnsafe!![ii].strength)
         }
@@ -123,7 +113,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
                 // divide that by the exp sum to get the softmax value
                 // then set this to a 1 state from a 0 with that probability.
                 if (ThreadLocalRandom.current().nextDouble() < kappa * neuron.fanInUnsafe!![ii].rawPSR / expSum) {
-                    currentState++
+                    state.currentState++
                     neuron.activation = 1.0
                     neuron.isSpike = true
                     return
@@ -146,7 +136,6 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     override fun copy(): TimedAccumulatorRule {
         val tar = TimedAccumulatorRule()
         tar.baseProb = baseProb
-        tar.currentState = currentState
         tar.maxState = maxState
         tar.kappa = kappa
         return tar
@@ -161,4 +150,14 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
         const val DEFAULT_BASE_PROB: Double = 1E-5
         const val DEFAULT_REF: Int = 10
     }
+}
+
+/** One neuron's [TimedAccumulatorRule] state: where it is in its refractory period, counted in updates. */
+class TimedAccumulatorData(
+    spiked: Boolean = false,
+    lastSpikeTime: Double = Double.NEGATIVE_INFINITY,
+    @UserParameter(label = "Refractory state", order = 1)
+    var currentState: Int = 0
+) : SpikingScalarData(spiked, lastSpikeTime) {
+    override fun copy() = TimedAccumulatorData(spiked, lastSpikeTime, currentState)
 }

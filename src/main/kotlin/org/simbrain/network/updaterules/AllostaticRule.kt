@@ -24,11 +24,6 @@ import java.lang.Double.max
 @HiddenTypeOption
 class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, SpikingMatrixData>() {
 
-    // reads source spikes and activations while updating
-    override val isNeuronLocal: Boolean
-        get() = false
-
-
     @UserParameter(label = "leakRate")
     var leakRate = .75
 
@@ -37,11 +32,23 @@ class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, Spiki
 
     override fun createScalarData(): AllostaticDataHolder = AllostaticDataHolder()
 
+    /**
+     * The allostatic input, and the incoming synapses from spiking sources that fired, which [apply] trains. Both
+     * are read here, while sources still hold the previous update's spikes.
+     */
+    context(Network)
+    override fun synapticInput(neuron: Neuron, data: AllostaticDataHolder, psrSum: Double): Double {
+        data.spikedInputs = neuron.fanIn
+            .filter { it.source.updateRule is SpikingNeuronUpdateRule<*, *> }
+            .filter { it.source.isSpike }
+        return neuron.getAllostaticInput()
+    }
+
     context(Network)
     override fun apply(neuron: Neuron, data: AllostaticDataHolder) {
 
         // Equation 1
-        val newActivation = neuron.activation * leakRate + neuron.getAllostaticInput()
+        val newActivation = neuron.activation * leakRate + neuron.input
         neuron.activation = max(0.0, newActivation) // Prevent from going below 0
 
         // Only apply learning if neuron has just spiked
@@ -58,9 +65,7 @@ class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, Spiki
         val error = neuron.activation - data.target
 
         // Weights
-        val toTrain = neuron.fanIn
-            .filter { it.source.updateRule is SpikingNeuronUpdateRule<*, *> }
-            .filter { it.source.isSpike }
+        val toTrain = data.spikedInputs
 
         toTrain.forEach { s ->
             if (toTrain.isNotEmpty()) {

@@ -16,6 +16,9 @@ import org.simbrain.network.spikeresponders.StepResponder
 import org.simbrain.network.updaterules.IACRule
 import org.simbrain.network.updaterules.IzhikevichRule
 import org.simbrain.network.updaterules.LinearRule
+import org.simbrain.network.updaterules.ProductRule
+import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.KuramotoRule
 import org.simbrain.util.awaitUntil
 import kotlin.random.Random
 
@@ -84,14 +87,63 @@ class ParallelUpdateTest {
         assertEquals(net.flatNeuronList, plan.neuronChunks.flatten())
     }
 
+    /**
+     * Activations after [steps] updates of [count] neurons, each fed by [fanIn] randomly chosen others, with the
+     * neurons added to the network in [order]. The synapses are created in the same order either way, so each
+     * neuron sums its inputs in the same order; only the order neurons update in differs.
+     */
+    private fun activationsAddedInOrder(
+        rule: () -> NeuronUpdateRule<*, *>,
+        order: (List<Neuron>) -> List<Neuron>,
+        count: Int = 30,
+        fanIn: Int = 3,
+        steps: Int = 25
+    ): DoubleArray {
+        val rng = Random(11)
+        val neurons = List(count) { Neuron(rule()).apply { activation = rng.nextDouble(-0.2, 1.0) } }
+        val synapses = neurons.flatMap { target ->
+            neurons.filter { it !== target }.shuffled(rng).take(fanIn).map { source ->
+                Synapse(source, target).apply { forceSetStrength(rng.nextDouble(-1.0, 1.0)) }
+            }
+        }
+        neurons.take(3).forEach { it.addInputValue(0.5) }
+        val network = Network()
+        network.addNetworkModelsAsync(order(neurons) + synapses, usePlacementManager = false)
+        repeat(steps) { network.update() }
+        return neurons.map { it.activation }.toDoubleArray()
+    }
+
     @Test
-    fun `rule that is not neuron local forces a serial neuron update`() {
-        val neurons = List(200) { Neuron(LinearRule()) }
-        val synapses = neurons.flatMap { src -> neurons.filter { it !== src }.map { Synapse(src, it) } }
-        val plan = NetworkUpdatePlan(neurons + synapses)
-        assertTrue(plan.neuronUpdateChunks.size > 1)
-        neurons[17].updateRule = IACRule()
-        assertEquals(listOf(neurons), plan.neuronUpdateChunks)
+    fun `rules that read their source neurons give the same result in any update order`() {
+        val rules = mapOf<String, () -> NeuronUpdateRule<*, *>>(
+            "IAC" to { IACRule() },
+            "Kuramoto" to { KuramotoRule() },
+            "Product" to { ProductRule() }
+        )
+        rules.forEach { (name, rule) ->
+            assertArrayEquals(
+                activationsAddedInOrder(rule, { it }),
+                activationsAddedInOrder(rule, { it.reversed() }),
+                "$name depends on update order"
+            )
+        }
+    }
+
+    @Test
+    fun `an iac network updates the same in parallel as serially`() {
+        fun run(parallel: Boolean): DoubleArray {
+            val rng = Random(5)
+            val neurons = List(200) { Neuron(IACRule()).apply { activation = rng.nextDouble(-0.2, 1.0) } }
+            val synapses = neurons.flatMap { src ->
+                neurons.filter { it !== src }.map { Synapse(src, it).apply { forceSetStrength(rng.nextDouble(-0.1, 0.1)) } }
+            }
+            val network = Network().apply { parallelUpdate = parallel }
+            network.addNetworkModelsAsync(neurons + synapses, usePlacementManager = false)
+            assertTrue(network.updatePlan.neuronUpdateChunks.size > 1)
+            repeat(30) { network.update() }
+            return neurons.map { it.activation }.toDoubleArray()
+        }
+        assertArrayEquals(run(parallel = false), run(parallel = true))
     }
 
     @Test

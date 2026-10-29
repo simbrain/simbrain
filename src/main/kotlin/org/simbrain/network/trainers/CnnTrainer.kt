@@ -163,9 +163,7 @@ private class DenseLayerSnapshot(
     val biasGrads = DoubleArray(outputSize)
     val activations = DoubleArray(outputSize)
     val inputCache = DoubleArray(inputSize)
-    val weightedInput = DoubleArray(outputSize)
     val ruleInput = DoubleArray(outputSize)
-    val zeroBiases = DoubleArray(outputSize)
     private val evalLayer = NeuronArray(outputSize).apply { biases.fill(0.0) }
 
     fun syncFromNetwork() {
@@ -511,11 +509,8 @@ class CnnTrainer(
             System.arraycopy(currentInput, 0, layer.inputCache, 0, currentInput.size)
             DoubleArrayOps.matVecMultiply(
                 layer.weights, layer.outputSize, layer.inputSize,
-                currentInput, layer.zeroBiases, layer.weightedInput
+                currentInput, layer.biases, layer.ruleInput
             )
-            for (j in 0 until layer.outputSize) {
-                layer.ruleInput[j] = layer.weightedInput[j] + layer.biases[j]
-            }
             with(network) { layer.applyUpdateRule() }
             currentInput = layer.activations
         }

@@ -111,7 +111,21 @@ val tinyMNIST = newSim {
 
         - Press `Test generalization`. Accuracy on the original testing images is high, but it falls quickly when the same digits are shifted a pixel or two. The network has learned which pixels matter, not what shape a digit is, and has no notion that a shifted `7` is still a `7`. Set `Testing set` to a shifted set and press `Random test image` to see examples. Compare the `CNN MNIST` simulation, whose pooling layers tolerate small shifts better.
 
-        - Set `Training examples` to `300`, press `Init parameters` in the training dialog, and train again. Watch the red training curve drop well below the blue testing curve.
+        ## Overfitting and Early Stopping
+
+        This simulation is a good place to learn about overfitting and early stopping, so here is a short tutorial.
+
+        With only a few training examples, a network can memorize them instead of learning what digits look like. Training error keeps falling, but testing error, measured on images the network never trains on, stops improving and then rises. This is overfitting. Early stopping watches the testing error and ends training once it stops improving.
+
+        Here is what you will find. With `300` training examples the network starts overfitting within a couple of hundred iterations, and early stopping catches it there. With `10,000` examples the network keeps improving for much longer and ends up far better, but early stopping has to be made more patient so it does not quit too soon.
+
+        1. Set `Training examples` to `300`, press the dice button in the training dialog to re-initialize the weights, and run for about `2,000` iterations. The red training curve falls to nearly zero. The blue testing curve bottoms out within the first couple of hundred iterations and then climbs steadily. Everything after that low point made the network worse on new images.
+
+        2. Notice that `Testing Accuracy` barely changes while testing error climbs. The network is not getting more digits wrong. It is becoming more confident, including about the digits it gets wrong, and cross-entropy error punishes confident mistakes heavily.
+
+        3. Press the dice button again. In `Trainer properties`, open `Stopping Condition`, check `Use Early Stopping`, and run. Early stopping cannot quit the first time testing error fails to improve, because the testing curve wobbles and a single bad test is often followed by a new best. So it is given a certain amount of patience, like a teacher waiting for a student to improve. Each disappointing test uses up a little of that patience, and a new best restores it. When the patience runs out, early stopping gives up on further improvement and stops training. The `Early Stopping` row shows the best testing error so far and the patience count. Testing happens every `10` iterations, and each test that fails to beat the best adds one to the count, while a new best resets it to zero. When it reaches `5/5`, training stops on its own, usually around iteration `200`. The network keeps the weights it had when it stopped, a little past the best point.
+
+        4. Set `Training examples` back to `10,000`, press the dice button, and run with early stopping still on. It now stops after a few hundred iterations, too soon: the testing curve is still falling but is bumpy enough that five tests in a row can miss a new best by chance. Set `Early Stopping Patience` to `20` and try again. Training now runs to roughly `1,500` iterations and ends with testing error near `0.2` and about `94%` accuracy, compared with about `0.6` and `83%` with 300 examples. Early stopping keeps a network from overtraining, but more data is what makes it generalize better.
 
         # Credits
 

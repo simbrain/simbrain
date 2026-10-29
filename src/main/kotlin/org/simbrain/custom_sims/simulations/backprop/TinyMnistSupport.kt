@@ -186,7 +186,7 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
     }.apply {
         toolTipText = "Opens the training dialog. This is a convenience: right-clicking the network and choosing Train opens the same dialog."
     }
-    val trainingSizeToolTip = "Train on fewer images to make overfitting visible. Press Init parameters in the training dialog to start fresh."
+    val trainingSizeToolTip = "Train on fewer images to make overfitting visible. Press the dice button in the training dialog to start fresh."
     addComboBox(
         "Training examples",
         tinyMnistTrainingSizes,

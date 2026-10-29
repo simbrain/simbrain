@@ -72,18 +72,13 @@ class JumpAndDecay : SpikeResponder() {
         val spikes = (source.dataHolder as? SpikingMatrixData)?.spikes ?: return null
         val trace = data.trace
         if (trace.size != spikes.size) return null
-        if (!data.traceValid) {
+        if (!data.traceStandsFor(connector)) {
             if (!startTrace(connector.weights, connector.psrMatrix, trace)) return null
-            data.traceValid = true
+            data.traceNowStandsFor(connector)
         }
         if (source.updateRule.isSpikingRule) {
-            for (i in trace.indices) {
-                trace[i] = if (spikes[i]) {
-                    1.0 + (if (useConvolution) trace[i] else 0.0)
-                } else {
-                    trace[i] + timeStep * ((0.0 - trace[i]) / timeConstant)
-                }
-            }
+            // A unit jump height: each response is its weight times this trace
+            for (i in trace.indices) trace[i] = jumpAndDecay(spikes[i], trace[i], 1.0, timeStep)
         }
         return trace.copyOf()
     }
@@ -116,16 +111,15 @@ class JumpAndDecay : SpikeResponder() {
 
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
-        (responderData as? JumpAndDecayMatrixData)?.traceValid = false
         val wm = connector.let { if (it is WeightMatrix) it else return }
         val na = connector.source.let { if (it is NeuronArray) it else return }
         val spikeData = na.dataHolder.let { if (it is SpikingMatrixData) it else return }
         if (na.updateRule.isSpikingRule) {
-            val psrMatrix = wm.psrMatrix
+            val psrMatrix = wm.materializePsrMatrix()
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
                     val psr = jumpAndDecay(
-                            spikeData.spikes[j],
+                            spikeData.spikes[j] && spikeGetsThroughInOrder(),
                             psrMatrix[i, j],
                             wm.weights[i, j],
                             timeStep
@@ -139,18 +133,16 @@ class JumpAndDecay : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         synapse.rawPSR = jumpAndDecay(
-            synapse.source.isSpike, synapse.rawPSR, synapse.strength, timeStep, synapse
+            synapse.source.isSpike && spikeGetsThrough(synapse), synapse.rawPSR, synapse.strength, timeStep
         )
     }
 
-    context(Network)
-    fun jumpAndDecay(
-        spiked: Boolean,
-        psr: Double,
-        jumpHeight: Double,
-        timeStep: Double,
-        synapse: Synapse? = null): Double {
-        return if (spiked && probabilisticSpikeCheck(synapse)) {
+    /**
+     * The response after one step: [jumpHeight] (added to [psr] with [useConvolution]) if a spike [arrived], else
+     * [psr] decayed toward the baseline. [arrived] is after any [spikeProbability] check, which callers make.
+     */
+    fun jumpAndDecay(arrived: Boolean, psr: Double, jumpHeight: Double, timeStep: Double): Double {
+        return if (arrived) {
             jumpHeight + (if (useConvolution) psr else 0.0)
         } else {
             psr + timeStep * ((baseLine - psr) / timeConstant)
@@ -171,21 +163,23 @@ class JumpAndDecayMatrixData(val sources: Int) : MatrixDataHolder {
     val trace = DoubleArray(sources)
 
     /**
-     * Whether [trace] currently stands for the weight matrix's PSR matrix.
+     * The [WeightMatrix.psrGeneration] at which [trace] last stood for the weight matrix's PSR matrix, or -1. A copy,
+     * or a reloaded holder, starts over from the PSR matrix it is used with.
      */
-    var traceValid = false
+    @Transient
+    private var traceGeneration = -1L
 
-    override fun copy() = JumpAndDecayMatrixData(sources).also {
-        trace.copyInto(it.trace)
-        it.traceValid = traceValid
+    /** Whether [trace] stands for [weightMatrix]'s PSR matrix as it is now. */
+    fun traceStandsFor(weightMatrix: WeightMatrix) = traceGeneration == weightMatrix.psrGeneration
+
+    fun traceNowStandsFor(weightMatrix: WeightMatrix) {
+        traceGeneration = weightMatrix.psrGeneration
     }
+
+    override fun copy() = JumpAndDecayMatrixData(sources).also { trace.copyInto(it.trace) }
 
     override fun clear() {
         trace.fill(0.0)
-        traceValid = false
-    }
-
-    override fun psrMatrixReplaced() {
-        traceValid = false
+        traceGeneration = -1
     }
 }

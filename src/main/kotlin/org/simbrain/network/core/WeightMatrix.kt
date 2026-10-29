@@ -109,19 +109,20 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * Must stay the same shape as [weights]. A matrix of another shape, such as the transposed one older builds
      * saved after the weight matrix dialog was committed, is replaced by a zero matrix of the right shape rather
      * than left to fail on the next update.
+     *
+     * For reading: displaying, copying and saving it. Responses computed straight from the weights are written into
+     * it on the first read after an update ([pendingPsrSource]). A spike responder that writes its entries in place
+     * gets it from [materializePsrMatrix] instead, and anything else replaces it through this setter.
      */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix = Matrix(target.size, source.size)
         get() = synchronized(psrLock) {
-            // Whoever reads the matrix may also write it, so the directly computed sums no longer stand for it
-            if (summedInputs != null) summedInputs = null
             writePendingPsrs(field)
             field
         }
         set(value) = synchronized(psrLock) {
             pendingPsrSource = null
-            summedInputs = null
-            spikeResponseData.psrMatrixReplaced()
+            invalidateDerivedPsrState()
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
                 value
             } else {
@@ -130,9 +131,32 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         }
 
     /**
-     * Guards the hand-off from [updatePSR] to [getSummedPSRs]. Reading [psrMatrix] changes that state (it fills the
-     * matrix and drops [summedInputs]), and the property editor, copying and saving read it off the update thread, so
-     * a read landing between the two would otherwise leave the update summing a half-filled matrix.
+     * [psrMatrix], for a spike responder about to write its entries in place. The sums computed directly from the
+     * weights, and state derived from the matrix (see [psrGeneration]), stop standing for it.
+     */
+    fun materializePsrMatrix(): Matrix = synchronized(psrLock) {
+        psrMatrix.also { invalidateDerivedPsrState() }
+    }
+
+    /**
+     * Counts the changes to [psrMatrix] that responses computed from the weights do not account for: replacing it,
+     * or a spike responder writing its entries. State derived from the matrix, such as a [JumpAndDecay] trace,
+     * records the count it was derived at and is stale once the count moves on.
+     */
+    @Transient
+    @Volatile
+    var psrGeneration = 0L
+        private set
+
+    private fun invalidateDerivedPsrState() {
+        summedInputs = null
+        psrGeneration++
+    }
+
+    /**
+     * Guards the hand-off from [updatePSR] to [getSummedPSRs]. Reading [psrMatrix] fills it from [pendingPsrSource],
+     * and the property editor, copying and saving read it off the update thread, so a read landing between the two
+     * would otherwise leave the update summing a half-filled matrix.
      */
     @Transient
     private val psrLock = Any()
@@ -140,7 +164,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     /**
      * Summed inputs from the last update when they were computed from the weights directly (a matrix-vector product
      * for connectionist updates, the responding sources' weights for [SpikeResponder.sourceFactors]) rather than as
-     * row sums of a filled [psrMatrix]. Null after a spike responder writes [psrMatrix], or once [psrMatrix] is read.
+     * row sums of a filled [psrMatrix]. Null after a spike responder writes [psrMatrix] or it is replaced.
      */
     @Transient
     private var summedInputs: DoubleArray? = null
@@ -296,24 +320,12 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 // Only sources with a nonzero factor contribute, so a step of a sparsely firing network visits a few
                 // columns of the weights rather than all of them
                 val summed = DoubleArray(weights.nrow())
-                val columns = weights.columnMajorArrayOrNull()
-                val ld = weights.ld()
-                for (i in factors.indices) {
-                    val factor = factors[i]
-                    if (factor == 0.0) continue
-                    if (columns != null) {
-                        val start = i * ld
-                        for (j in summed.indices) summed[j] += columns[start + j] * factor
-                    } else {
-                        for (j in summed.indices) summed[j] += weights[j, i] * factor
-                    }
-                }
+                weights.timesSparseVectorInto(factors, summed)
                 pendingPsrSource = factors
                 summedInputs = summed
             } else {
                 // A responder that just stopped using factors continues from the responses they stood for
-                summedInputs = null
-                writePendingPsrs(psrMatrix)
+                materializePsrMatrix()
                 spikeResponder.apply(this, spikeResponseData)
             }
         }
@@ -391,7 +403,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         this.weights.copyFrom(other.weights)
         this.excitatoryMask.copyFrom(other.excitatoryMask)
         this.inhibitoryMask.copyFrom(other.inhibitoryMask)
-        this.psrMatrix.copyFrom(other.psrMatrix)
+        materializePsrMatrix().copyFrom(other.psrMatrix)
         this.learningRuleData = other.learningRuleData.copy()
         this.spikeResponseData = other.spikeResponseData.copy()
     }

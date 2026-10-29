@@ -289,10 +289,10 @@ class SpikeResponderMatrixTest {
         // A learning rule hands the response to the full PSR matrix while it is still decaying
         fast.third.learningRule = HebbianRule().apply { learningRate = 0.0 }
         step()
-        assertFalse((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
+        assertFalse((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceStandsFor(fast.third))
         fast.third.learningRule = StaticSynapseRule()
         step()
-        assertTrue((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceValid)
+        assertTrue((fast.third.spikeResponseData as JumpAndDecayMatrixData).traceStandsFor(fast.third))
         repeat(5) {
             step()
             assertArrayEquals(full.third.getSummedPSRs(), fast.third.getSummedPSRs(), 1e-12)

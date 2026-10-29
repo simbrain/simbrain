@@ -29,19 +29,23 @@ class StepResponder(
         if (useSpikeProbability) return null
         val lastSpikeTimes = ((connector.source as? NeuronArray)?.dataHolder as? SpikingMatrixData)?.lastSpikeTimes
             ?: return null
-        return DoubleArray(lastSpikeTimes.size) { if (lastSpikeTimes[it] + responseDuration * timeStep >= time) 1.0 else 0.0 }
+        return DoubleArray(lastSpikeTimes.size) { if (isResponding(lastSpikeTimes[it])) 1.0 else 0.0 }
     }
+
+    /** Whether a source that last spiked at [lastSpikeTime] is still within its response window. */
+    context(Network)
+    private fun isResponding(lastSpikeTime: Double) = lastSpikeTime + responseDuration * timeStep >= time
 
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
         val weightMatrix = connector as WeightMatrix
         val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
-        val psrMatrix = connector.psrMatrix
+        val psrMatrix = weightMatrix.materializePsrMatrix()
         val weights = connector.weights
         for (i in 0 until psrMatrix.ncol()) {
-            val responding = lastSpikeTimes[i] + responseDuration * timeStep >= time
+            val responding = isResponding(lastSpikeTimes[i])
             for (j in 0 until psrMatrix.nrow()) {
-                if (responding && probabilisticSpikeCheck()) {
+                if (responding && spikeGetsThroughInOrder()) {
                     psrMatrix[j, i] = weights[j, i]
                 } else {
                     psrMatrix[j, i] = 0.0
@@ -52,7 +56,7 @@ class StepResponder(
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time && probabilisticSpikeCheck(synapse)) {
+        if (isResponding(synapse.source.lastSpikeTime) && spikeGetsThrough(synapse)) {
             synapse.rawPSR = synapse.strength
         } else {
             synapse.rawPSR = 0.0

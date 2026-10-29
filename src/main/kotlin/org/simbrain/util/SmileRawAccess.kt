@@ -72,3 +72,23 @@ fun Matrix.timesVectorInto(x: DoubleArray, out: DoubleArray) {
         j++
     }
 }
+
+/**
+ * Adds this matrix times [x] into [out], visiting only the columns where [x] is nonzero, for a sparse [x] such as the
+ * sources that spiked in one update. Column by column, so on the column-major array each visited column is one
+ * contiguous run.
+ */
+fun Matrix.timesSparseVectorInto(x: DoubleArray, out: DoubleArray) {
+    val columns = columnMajorArrayOrNull()
+    val ld = ld()
+    for (i in x.indices) {
+        val factor = x[i]
+        if (factor == 0.0) continue
+        if (columns != null) {
+            val start = i * ld
+            for (j in out.indices) out[j] += columns[start + j] * factor
+        } else {
+            for (j in out.indices) out[j] += this[j, i] * factor
+        }
+    }
+}

@@ -4,6 +4,7 @@
  */
 package org.simbrain.network.gui
 
+import org.simbrain.util.UiWork
 import org.simbrain.util.countEdtTasks
 import org.simbrain.util.onEdt
 import kotlinx.coroutines.runBlocking
@@ -151,6 +152,8 @@ class NetworkPanelTest {
         val array = NeuronArray(4).also { net.addNetworkModel(it) }
         val np = NetworkPanel(NetworkComponent("Test", net))
         lateinit var node: NeuronArrayNode
+        // Count only the new node's work, not what the panel still has queued
+        UiWork.awaitIdle()
 
         // Work it posted would edit its children on the EDT while a constructor on this thread still adds them
         val tasks = countEdtTasks { node = NeuronArrayNode(np, array) }

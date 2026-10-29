@@ -6,6 +6,7 @@
  */
 package org.simbrain.network.trainers
 
+import org.simbrain.network.tensor.Blas
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.core.*
@@ -346,6 +347,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
      * @return the mean error for the batch
      */
     open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
+        Blas.ensureDefaultThreads()
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
         val biasesAccumulator: HashMap<Layer, Matrix> = HashMap()

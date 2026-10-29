@@ -1,6 +1,7 @@
 /** Trainer and fixed-sequence configuration for BPTT networks. */
 package org.simbrain.network.trainers
 
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.SynapseGroup
@@ -54,6 +55,7 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
     private val bpttConfig get() = bpttNetwork.trainerConfig
 
     override fun trainBatch(rowRange: IntRange, probe: StructuredProbe?): Double {
+        Blas.ensureDefaultThreads()
         val rows = rowRange.toList()
         if (rows.isEmpty()) return 0.0
 

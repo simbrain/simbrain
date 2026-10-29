@@ -49,10 +49,6 @@ class Network: CoroutineScope, EditableObject {
     @Transient
     override var coroutineContext = Dispatchers.Default + job
 
-    init {
-        Blas.ensureDefaultThreads()
-    }
-
     /**
      * Two types of time used in simulations.
      */
@@ -163,6 +159,7 @@ class Network: CoroutineScope, EditableObject {
     private var shouldUpdateTimeType = true
 
     private suspend fun updateInternal(name: String) {
+        Blas.ensureDefaultThreads()
         // Main update
         updateManager.actionList.forEach {
             PerformanceMonitor.record(it, "${name}:${it.description}") {

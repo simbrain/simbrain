@@ -13,6 +13,9 @@ import kotlin.concurrent.thread
  * small to repay the hand-off, hyperthreads and efficiency cores take an equal share of a statically split product,
  * and the slowest thread sets the pace. [ensureDefaultThreads] replaces that default with [defaultThreads] unless the
  * user chose a count with an OpenBLAS environment variable or code already set [numThreads] explicitly.
+ *
+ * It is called where matrix work starts (a network update, a training batch, a tensor product), not when models are
+ * built, plus once in the background at application startup so the first update does not wait for it.
  */
 object Blas {
 
@@ -25,13 +28,18 @@ object Blas {
 
     private val threadEnvironmentVariables = listOf("OPENBLAS_NUM_THREADS", "GOTO_NUM_THREADS", "OMP_NUM_THREADS")
 
+    /** Whether code has set [numThreads], which the default must not override. */
     @Volatile
-    private var configured = false
+    private var explicitlySet = false
+
+    /** Whether [ensureDefaultThreads] has run (whether or not it changed the count). */
+    @Volatile
+    private var defaultApplied = false
 
     var numThreads: Int
         get() = openblas_nolapack.blas_get_num_threads()
         set(value) = synchronized(this) {
-            configured = true
+            explicitlySet = true
             setNative(value)
         }
 
@@ -45,11 +53,11 @@ object Blas {
      * first call; a call that arrives while another thread is applying the default waits for it to finish.
      */
     fun ensureDefaultThreads() {
-        if (configured) return
+        if (defaultApplied) return
         synchronized(this) {
-            if (configured) return
-            if (threadEnvironmentVariables.none { System.getenv(it) != null }) setNative(defaultThreads)
-            configured = true
+            if (defaultApplied) return
+            if (!explicitlySet && threadEnvironmentVariables.none { System.getenv(it) != null }) setNative(defaultThreads)
+            defaultApplied = true
         }
     }
 
@@ -58,7 +66,7 @@ object Blas {
      * setter. Does nothing once the thread count is configured.
      */
     fun ensureDefaultThreadsInBackground() {
-        if (!configured) thread(isDaemon = true, name = "OpenBLAS thread setup") { ensureDefaultThreads() }
+        if (!defaultApplied) thread(isDaemon = true, name = "OpenBLAS thread setup") { ensureDefaultThreads() }
     }
 
     inline fun <T> withThreads(n: Int, block: () -> T): T {

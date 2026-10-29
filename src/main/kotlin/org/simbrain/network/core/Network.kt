@@ -514,9 +514,11 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Returns the current number of iterations.
      *
+     * Rounded, since time accumulates floating point error and can fall just short of a whole number of steps.
+     *
      * @return the number of update iterations which have been run since the network was created.
      */
-    val iterations: Long get() = (time / timeStep).toLong()
+    val iterations: Long get() = Math.round(time / timeStep)
 
     /**
      * string version of time, with units.

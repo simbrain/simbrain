@@ -393,4 +393,24 @@ class ShortTermPlasticityTest {
         
         assert(matrixData.u[0, 0] != 0.0 || matrixData.R[0, 0] != 0.0)
     }
-} 
+
+    @Test
+    fun `a spike that passes short term plasticity's probability is not checked again by its inner responder`() {
+        val network = Network()
+        val input = Neuron()
+        val spiking = Neuron(SpikingThresholdRule())
+        val output = Neuron().also { it.upperBound = 10.0 }
+        val drive = Synapse(input, spiking)
+        val response = Synapse(spiking, output).apply {
+            strength = 1.0
+            // The inner responder's own probability would block every spike
+            spikeResponder = ShortTermPlasticity().apply { (spikeResponderLocal as JumpAndDecay).spikeProbability = 0.0 }
+        }
+        network.addNetworkModelsAsync(input, spiking, output, drive, response)
+
+        input.activation = 1.0
+        repeat(3) { network.update() }
+
+        assert(output.activation > 0.0) { "the spike never reached the output" }
+    }
+}

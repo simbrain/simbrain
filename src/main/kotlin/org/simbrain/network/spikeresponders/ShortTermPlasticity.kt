@@ -110,7 +110,8 @@ class ShortTermPlasticity : SpikeResponder() {
         }
         val jumpHeight = udfData.R * synapse.strength * udfData.u
         synapse.rawPSR = when (val sr = spikeResponderLocal) {
-            is JumpAndDecay -> sr.jumpAndDecay(spiked && sr.spikeGetsThrough(synapse), synapse.rawPSR, jumpHeight, timeStep)
+            // The spike has passed this responder's probability; the inner responder only shapes the response
+            is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.rawPSR, jumpHeight, timeStep)
             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
         }
 
@@ -133,7 +134,7 @@ class ShortTermPlasticity : SpikeResponder() {
                     val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
                     psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {
-                            is JumpAndDecay -> sr.jumpAndDecay(spiked && sr.spikeGetsThroughInOrder(), psrMatrix[i, j], jumpHeight, timeStep)
+                            is JumpAndDecay -> sr.jumpAndDecay(spiked, psrMatrix[i, j], jumpHeight, timeStep)
                             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
                         })
                 }

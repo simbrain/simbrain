@@ -79,13 +79,11 @@ abstract class SpikeResponder : CopyableObject {
     context(Network)
     fun spikeGetsThrough(synapse: Synapse): Boolean {
         if (!useSpikeProbability) return true
-        // Rounded, since time accumulates floating point error
-        val iteration = Math.round(time / timeStep)
         val draw = keyedUnitDouble(
             randomSeed,
             (synapse.id?.hashCode() ?: 0).toLong(),
             javaClass.name.hashCode().toLong(),
-            iteration
+            iterations
         )
         return draw < spikeProbability
     }

@@ -62,8 +62,8 @@ class SpikeOverlayNode : PNode() {
         val g = paintContext.graphics
         for (node in spiking) {
             if (node.parent == null || !node.synapse.isVisible) continue
-            drawPath(g, node.line ?: continue, fill = false)
-            drawPath(g, node.circle ?: continue, fill = true)
+            drawSpikingLine(g, node.line ?: continue)
+            drawAsDrawn(g, node.circle ?: continue)
             val saved = g.transform
             g.transform(node.getLocalToGlobalTransform(null))
             node.paintStrengthLabel(g)
@@ -71,25 +71,30 @@ class SpikeOverlayNode : PNode() {
         }
     }
 
-    /** Draws one of a synapse's shapes in global coordinates: the line stroked in the spiking color, or the circle as drawn. */
-    private fun drawPath(g: Graphics2D, path: PPath, fill: Boolean) {
-        val saved = g.transform
-        g.transform(path.getLocalToGlobalTransform(null))
-        if (fill) {
-            path.paint?.let {
-                g.paint = it
-                g.fill(path.pathReference)
-            }
-            path.strokePaint?.let {
-                g.paint = it
-                g.stroke = path.stroke
-                g.draw(path.pathReference)
-            }
-        } else {
-            g.paint = NetworkPreferences.spikingColor
+    /** Strokes a synapse's line in global coordinates in the spiking color. */
+    private fun drawSpikingLine(g: Graphics2D, line: PPath) = inGlobalCoordinates(g, line) {
+        g.paint = NetworkPreferences.spikingColor
+        g.stroke = line.stroke
+        g.draw(line.pathReference)
+    }
+
+    /** Draws a synapse's circle in global coordinates as the node draws it, back over the highlighted line. */
+    private fun drawAsDrawn(g: Graphics2D, path: PPath) = inGlobalCoordinates(g, path) {
+        path.paint?.let {
+            g.paint = it
+            g.fill(path.pathReference)
+        }
+        path.strokePaint?.let {
+            g.paint = it
             g.stroke = path.stroke
             g.draw(path.pathReference)
         }
+    }
+
+    private inline fun inGlobalCoordinates(g: Graphics2D, path: PPath, draw: () -> Unit) {
+        val saved = g.transform
+        g.transform(path.getLocalToGlobalTransform(null))
+        draw()
         g.transform = saved
     }
 }

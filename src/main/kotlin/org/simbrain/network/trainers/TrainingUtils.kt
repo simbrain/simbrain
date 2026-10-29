@@ -828,6 +828,17 @@ fun crossEntropySequence(predictions: Matrix, targets: Matrix): Double {
 }
 
 /**
+ * Shuffled indices of [rows] rows, split into the first [splitRatio] of them, for training, and the rest, for
+ * testing. Every row-based split goes through here, so data and row names split by the same permutation.
+ */
+private fun splitRowIndices(rows: Int, splitRatio: Double, random: Random): Pair<List<Int>, List<Int>> {
+    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
+    val rowIndices = (0 until rows).shuffled(random)
+    val trainRowCount = (rows * splitRatio).toInt()
+    return rowIndices.take(trainRowCount) to rowIndices.takeLast(rows - trainRowCount)
+}
+
+/**
  * Split a dataset into training and testing subsets using MutableList format.
  */
 fun splitDataSet(
@@ -837,23 +848,10 @@ fun splitDataSet(
     random: Random = Random(42L)
 ): Pair<Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>, Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>>> {
     require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets size (${targets.size})" }
-    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
-
-    val nrows = inputs.size
-    val rowIndices = (0 until nrows).shuffled(random)
-    
-    val trainRowCount = (nrows * splitRatio).toInt()
-    val testRowCount = nrows - trainRowCount
-
-    val trainRowIndices = rowIndices.take(trainRowCount)
-    val testRowIndices = rowIndices.takeLast(testRowCount)
-
-    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
-    val trainingTargets = trainRowIndices.map { targets[it].toMutableList() }.toMutableList()
-    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
-    val testingTargets = testRowIndices.map { targets[it].toMutableList() }.toMutableList()
-
-    return (trainingInputs to trainingTargets) to (testingInputs to testingTargets)
+    val (trainRowIndices, testRowIndices) = splitRowIndices(inputs.size, splitRatio, random)
+    fun rows(indices: List<Int>, of: List<List<Double>>) = indices.mapTo(mutableListOf()) { of[it].toMutableList() }
+    return (rows(trainRowIndices, inputs) to rows(trainRowIndices, targets)) to
+            (rows(testRowIndices, inputs) to rows(testRowIndices, targets))
 }
 
 /**
@@ -867,13 +865,10 @@ fun splitDataSet(
     random: Random = Random(42L)
 ): Pair<Pair<MutableList<DoubleArray>, MutableList<DoubleArray>>, Pair<MutableList<DoubleArray>, MutableList<DoubleArray>>> {
     require(inputs.size == targets.size) { "inputs size (${inputs.size}) must equal targets size (${targets.size})" }
-    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
-    val rowIndices = (0 until inputs.size).shuffled(random)
-    val trainRowCount = (inputs.size * splitRatio).toInt()
-    val trainRowIndices = rowIndices.take(trainRowCount)
-    val testRowIndices = rowIndices.takeLast(inputs.size - trainRowCount)
-    return (trainRowIndices.mapTo(mutableListOf()) { inputs[it].copyOf() } to trainRowIndices.mapTo(mutableListOf()) { targets[it].copyOf() }) to
-            (testRowIndices.mapTo(mutableListOf()) { inputs[it].copyOf() } to testRowIndices.mapTo(mutableListOf()) { targets[it].copyOf() })
+    val (trainRowIndices, testRowIndices) = splitRowIndices(inputs.size, splitRatio, random)
+    fun rows(indices: List<Int>, of: List<DoubleArray>) = indices.mapTo(mutableListOf()) { of[it].copyOf() }
+    return (rows(trainRowIndices, inputs) to rows(trainRowIndices, targets)) to
+            (rows(testRowIndices, inputs) to rows(testRowIndices, targets))
 }
 
 /**
@@ -885,51 +880,18 @@ fun splitDataSet(
     splitRatio: Double,
     random: Random = Random(42L)
 ): Pair<TrainingDataset, TrainingDataset> {
-    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
-
-    // Generate the same row indices that will be used for data splitting
-    val nrows = dataset.inputs.size
-    val rowIndices = (0 until nrows).shuffled(random)
-    val trainRowCount = (nrows * splitRatio).toInt()
-    val trainRowIndices = rowIndices.take(trainRowCount)
-    val testRowIndices = rowIndices.drop(trainRowCount)
-
-    // Split the data using the existing function (but we already know the indices)
-    val (training, testing) = splitDataSet(dataset.inputs, dataset.targets, splitRatio, random)
-    val (trainingInputs, trainingTargets) = training
-    val (testingInputs, testingTargets) = testing
-
-    val trainingDataset = TrainingDataset(
-        inputs = trainingInputs,
-        targets = trainingTargets,
+    val (trainRowIndices, testRowIndices) = splitRowIndices(dataset.size, splitRatio, random)
+    fun subset(indices: List<Int>) = TrainingDataset(
+        inputs = indices.mapTo(mutableListOf()) { dataset.inputs[it].copyOf() },
+        targets = indices.mapTo(mutableListOf()) { dataset.targets[it].copyOf() },
         inputSize = dataset.inputSize,
         targetSize = dataset.targetSize,
-        inputRowNames = dataset.inputRowNames?.let { names ->
-            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
-        },
-        targetRowNames = dataset.targetRowNames?.let { names ->
-            trainRowIndices.map { names.getOrNull(it) ?: "Row $it" }
-        },
+        inputRowNames = dataset.inputRowNames?.let { names -> indices.map { names.getOrNull(it) ?: "Row $it" } },
+        targetRowNames = dataset.targetRowNames?.let { names -> indices.map { names.getOrNull(it) ?: "Row $it" } },
         inputColumnNames = dataset.inputColumnNames,
         targetColumnNames = dataset.targetColumnNames
     )
-
-    val testingDataset = TrainingDataset(
-        inputs = testingInputs,
-        targets = testingTargets,
-        inputSize = dataset.inputSize,
-        targetSize = dataset.targetSize,
-        inputRowNames = dataset.inputRowNames?.let { names ->
-            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
-        },
-        targetRowNames = dataset.targetRowNames?.let { names ->
-            testRowIndices.map { names.getOrNull(it) ?: "Row $it" }
-        },
-        inputColumnNames = dataset.inputColumnNames,
-        targetColumnNames = dataset.targetColumnNames
-    )
-
-    return trainingDataset to testingDataset
+    return subset(trainRowIndices) to subset(testRowIndices)
 }
 
 /**
@@ -958,21 +920,9 @@ fun splitDataSet(inputs: Matrix, splitRatio: Double, random: Random = Random(42L
  * Split a dataset (inputs only) into training and testing subsets for unsupervised learning using MutableList format.
  */
 fun splitDataSet(inputs: MutableList<MutableList<Double>>, splitRatio: Double, random: Random = Random(42L)): Pair<MutableList<MutableList<Double>>, MutableList<MutableList<Double>>> {
-    require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
-
-    val nrows = inputs.size
-    val rowIndices = (0 until nrows).shuffled(random)
-
-    val trainRowCount = (nrows * splitRatio).toInt()
-    val testRowCount = nrows - trainRowCount
-
-    val trainRowIndices = rowIndices.take(trainRowCount)
-    val testRowIndices = rowIndices.takeLast(testRowCount)
-
-    val trainingInputs = trainRowIndices.map { inputs[it].toMutableList() }.toMutableList()
-    val testingInputs = testRowIndices.map { inputs[it].toMutableList() }.toMutableList()
-
-    return trainingInputs to testingInputs
+    val (trainRowIndices, testRowIndices) = splitRowIndices(inputs.size, splitRatio, random)
+    return trainRowIndices.mapTo(mutableListOf()) { inputs[it].toMutableList() } to
+            testRowIndices.mapTo(mutableListOf()) { inputs[it].toMutableList() }
 }
 
 /**

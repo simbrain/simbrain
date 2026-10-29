@@ -3,6 +3,7 @@ package org.simbrain.network.trainers
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.TensorShape
+import kotlin.random.Random
 
 class TrainingDatasetUtilsTest {
 
@@ -208,4 +209,23 @@ class TrainingDatasetUtilsTest {
         }
     }
 
+    @Test
+    fun `splitting a dataset keeps each row with its name`() {
+        val dataset = TrainingDataset(
+            inputs = MutableList(10) { doubleArrayOf(it.toDouble()) },
+            targets = MutableList(10) { doubleArrayOf(it * 10.0) },
+            inputRowNames = List(10) { "row $it" },
+            targetRowNames = List(10) { "row $it" },
+        )
+
+        val (training, testing) = splitDataSet(dataset, 0.6, Random(7))
+
+        listOf(training, testing).forEach { part ->
+            part.inputs.forEachIndexed { i, row ->
+                assertEquals("row ${row[0].toInt()}", part.inputRowNames!![i])
+                assertEquals("row ${row[0].toInt()}", part.targetRowNames!![i])
+                assertEquals(row[0] * 10.0, part.targets[i][0])
+            }
+        }
+    }
 }

@@ -15,8 +15,8 @@ import java.util.*
 class TrainingDataset(
     val inputs: MutableList<DoubleArray> = mutableListOf(),
     val targets: MutableList<DoubleArray> = mutableListOf(),
-    val inputSize: Int = if (inputs.isNotEmpty()) inputs[0].size else throw IllegalArgumentException("Cannot infer input size from empty data. Use constructor with explicit sizes."),
-    val targetSize: Int = if (targets.isNotEmpty()) targets[0].size else throw IllegalArgumentException("Cannot infer target size from empty data. Use constructor with explicit sizes."),
+    val inputSize: Int = inferredWidth(inputs.firstOrNull()?.size, "input"),
+    val targetSize: Int = inferredWidth(targets.firstOrNull()?.size, "target"),
     val inputRowNames: List<String>? = null,
     val targetRowNames: List<String>? = null,
     val inputColumnNames: List<String>? = null,
@@ -80,8 +80,8 @@ class TrainingDataset(
         operator fun invoke(
             inputs: List<List<Double>>,
             targets: List<List<Double>>,
-            inputSize: Int = inputs.firstOrNull()?.size ?: throw IllegalArgumentException("Cannot infer input size from empty data. Use constructor with explicit sizes."),
-            targetSize: Int = targets.firstOrNull()?.size ?: throw IllegalArgumentException("Cannot infer target size from empty data. Use constructor with explicit sizes."),
+            inputSize: Int = inferredWidth(inputs.firstOrNull()?.size, "input"),
+            targetSize: Int = inferredWidth(targets.firstOrNull()?.size, "target"),
             inputRowNames: List<String>? = null,
             targetRowNames: List<String>? = null,
             inputColumnNames: List<String>? = null,
@@ -164,3 +164,7 @@ class TrainingDataset(
         }
     }
 }
+
+/** The width of the first row, [firstRowSize], for a dataset built without an explicit size. */
+private fun inferredWidth(firstRowSize: Int?, what: String): Int = firstRowSize
+    ?: throw IllegalArgumentException("Cannot infer $what size from empty data. Use constructor with explicit sizes.")

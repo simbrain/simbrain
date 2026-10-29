@@ -120,8 +120,29 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
         return newBorder
     }
 
+    /** Set while the node is off the canvas and its border needs rebuilding once it is attached. */
+    @Volatile
+    private var borderStale = false
+
+    /**
+     * Rebuilds [borderBox] on a later EDT turn, after the caller's other changes to the node's content. A node not
+     * yet on the canvas instead rebuilds it when attached ([setParent]): it may be under construction on another
+     * thread, and an EDT task replacing its border would edit its child list while the constructor adds children.
+     */
     fun updateBorder() {
+        if (parent == null) {
+            borderStale = true
+            return
+        }
         SwingUtilities.invokeLater {
+            borderBox = createBorder()
+        }
+    }
+
+    override fun setParent(newParent: PNode?) {
+        super.setParent(newParent)
+        if (newParent != null && borderStale) {
+            borderStale = false
             borderBox = createBorder()
         }
     }

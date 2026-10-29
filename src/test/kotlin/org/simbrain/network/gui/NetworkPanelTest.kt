@@ -4,6 +4,7 @@
  */
 package org.simbrain.network.gui
 
+import org.simbrain.util.countEdtTasks
 import org.simbrain.util.onEdt
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
@@ -11,6 +12,7 @@ import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.junit.jupiter.api.Test
 import org.simbrain.util.awaitUntil
@@ -141,5 +143,20 @@ class NetworkPanelTest {
         assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(weightMatrix))
         assertNotNull(np.modelNodeMap.getImmediately<ScreenElement>(sequence))
         assertTrue(elapsedMs < 5000, "reconstruction should not wait out the endpoint lookup's timeout, took $elapsedMs ms")
+    }
+
+    @Test
+    fun `building an array node off the canvas posts nothing to the edt`() = runBlocking {
+        val net = Network()
+        val array = NeuronArray(4).also { net.addNetworkModel(it) }
+        val np = NetworkPanel(NetworkComponent("Test", net))
+        lateinit var node: NeuronArrayNode
+
+        // Work it posted would edit its children on the EDT while a constructor on this thread still adds them
+        val tasks = countEdtTasks { node = NeuronArrayNode(np, array) }
+        onEdt { np.canvas.layer.addChild(node) }
+
+        assertEquals(0, tasks)
+        assertTrue(onEdt { node.borderBox.bounds.contains(node.mainNode.fullBounds) })
     }
 }

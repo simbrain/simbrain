@@ -1,3 +1,7 @@
+/**
+ * The raw-array matrix-vector product matches the naive product, on and off its eight-column stride and for matrices
+ * without a column-major array.
+ */
 package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals

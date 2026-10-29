@@ -69,16 +69,29 @@ object ConvOps {
      * channels at one position are contiguous, and so are the filters for one input value, so the convolution loops
      * run over contiguous memory with the padding checks hoisted out of them.
      */
-    private fun kernelsByPosition(kernels: DoubleArray, numFilters: Int, inC: Int, kernelSize: Int): DoubleArray {
+    private fun kernelsByPosition(kernels: DoubleArray, numFilters: Int, inC: Int, kernelSize: Int): DoubleArray =
+        rearrangeKernels(kernels, numFilters, inC, kernelSize) { k, c, f -> positionChannelFilter(k, c, f, inC, numFilters) }
+
+    /** Index of kernel position [k] (kh * kernelSize + kw), channel [c] and filter [f] in [kh][kw][channel][filter] order. */
+    private fun positionChannelFilter(k: Int, c: Int, f: Int, inC: Int, numFilters: Int) = (k * inC + c) * numFilters + f
+
+    /** Index of kernel position [k], channel [c] and filter [f] in [kh][kw][filter][channel] order. */
+    private fun positionFilterChannel(k: Int, c: Int, f: Int, inC: Int, numFilters: Int) = (k * numFilters + f) * inC + c
+
+    /** [kernels], stored [filter][channel][kh][kw], copied to the position [index] gives each weight. */
+    private inline fun rearrangeKernels(
+        kernels: DoubleArray, numFilters: Int, inC: Int, kernelSize: Int,
+        index: (k: Int, c: Int, f: Int) -> Int
+    ): DoubleArray {
         val area = kernelSize * kernelSize
-        val byPosition = DoubleArray(numFilters * inC * area)
+        val rearranged = DoubleArray(numFilters * inC * area)
         for (f in 0 until numFilters) {
             for (c in 0 until inC) {
                 val from = (f * inC + c) * area
-                for (k in 0 until area) byPosition[(k * inC + c) * numFilters + f] = kernels[from + k]
+                for (k in 0 until area) rearranged[index(k, c, f)] = kernels[from + k]
             }
         }
-        return byPosition
+        return rearranged
     }
 
     /** True when any of the [count] gradients from [start] is nonzero; ReLU zeroes many whole output positions. */
@@ -188,15 +201,10 @@ object ConvOps {
         val inC = inputShape.channels
         val inH = inputShape.height
         val inW = inputShape.width
-        val area = kernelSize * kernelSize
         // [kh][kw][filter][channel]: each output gradient scales a contiguous run of channel weights, so the inner loop
         // is independent multiply-adds rather than a sum whose every add waits on the last
-        val byPosition = DoubleArray(numFilters * inC * area)
-        for (f in 0 until numFilters) {
-            for (c in 0 until inC) {
-                val from = (f * inC + c) * area
-                for (k in 0 until area) byPosition[(k * numFilters + f) * inC + c] = kernels[from + k]
-            }
+        val byPosition = rearrangeKernels(kernels, numFilters, inC, kernelSize) { k, c, f ->
+            positionFilterChannel(k, c, f, inC, numFilters)
         }
 
         for (oh in 0 until outputShape.height) {
@@ -272,10 +280,11 @@ object ConvOps {
                 }
             }
         }
+        // The inverse of kernelsByPosition, accumulating
         for (f in 0 until numFilters) {
             for (c in 0 until inC) {
                 val to = (f * inC + c) * area
-                for (k in 0 until area) kernelGrad[to + k] += gradByPosition[(k * inC + c) * numFilters + f]
+                for (k in 0 until area) kernelGrad[to + k] += gradByPosition[positionChannelFilter(k, c, f, inC, numFilters)]
             }
         }
     }

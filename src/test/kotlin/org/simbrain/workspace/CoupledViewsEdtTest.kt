@@ -1,7 +1,7 @@
 /**
- * A running workspace must never wait on the EDT: plots, the network canvas and text views catch up on their own.
- * Waiting on the EDT once per iteration paced whole simulations by whatever the EDT was painting (the Cortical
- * Layers sim ran 7x slower with its windows up). These tests hold the EDT and require iterations to finish anyway.
+ * A running workspace never waits on the EDT: plots, the network canvas and text views catch up on their own, so a
+ * simulation is not paced by whatever the EDT is painting. These tests hold the EDT and require iterations to finish
+ * anyway.
  */
 package org.simbrain.workspace
 

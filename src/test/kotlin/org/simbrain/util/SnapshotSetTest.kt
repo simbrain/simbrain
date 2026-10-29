@@ -1,3 +1,7 @@
+/**
+ * SnapshotSet keeps insertion order without duplicates, lets an iteration in progress finish over the elements it
+ * started with, and adds many elements in linear time.
+ */
 package org.simbrain.util
 
 import org.junit.jupiter.api.Assertions.assertEquals

@@ -1,3 +1,7 @@
+/**
+ * SimbrainRandomGenerator reproduces SplitMix64, repeats for a seed, never hands two threads the same state, and
+ * gives uniform and Gaussian samples with the expected moments.
+ */
 package org.simbrain.util.stats
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals

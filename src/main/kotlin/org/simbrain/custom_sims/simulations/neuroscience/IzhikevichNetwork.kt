@@ -8,6 +8,7 @@ package org.simbrain.custom_sims.simulations.neuroscience
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
+import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
@@ -22,6 +23,7 @@ import org.simbrain.network.updaterules.IzhikevichScalarData
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.stats.distributions.NormalDistribution
+import org.simbrain.workspace.AttributeContainer
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.log10
@@ -29,6 +31,7 @@ import kotlin.math.pow
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
 import kotlin.random.Random
+import kotlin.reflect.KProperty0
 
 val izhikevichNetwork = izhikevichNetworkSim()
 
@@ -42,12 +45,7 @@ fun izhikevichNetworkSim(
     n: Int = IZHIKEVICH_NEURONS,
     p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
     weightScale: Double = 1.0
-) = newSim {
-    workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Izhikevich Network")
-    val network = networkComponent.network
-    network.timeStep = IZHIKEVICH_TIME_STEP
-
+) = izhikevichSim("Izhikevich Network", arrays = false, n, p) { network ->
     val neurons = izhikevichNeurons(n, Random.Default)
     GridLayout(IZHIKEVICH_GRID_SPACING, IZHIKEVICH_GRID_SPACING, gridColumns(n)).layoutNeurons(neurons)
     network.addNetworkModels(neurons, usePlacementManager = false)
@@ -60,18 +58,7 @@ fun izhikevichNetworkSim(
         izhikevichSynapses(neurons, p, Random.Default, weightScale).toMutableList()
     )
     network.addNetworkModel(synapseGroup)
-
-    val raster = addRasterPlot("Spikes")
-    with(couplingManager) {
-        collection.getProducer(collection::spikes) couple raster.model.rasterConsumerList[0].getConsumer("setValues")
-    }
-
-    withGui {
-        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 800, 800)
-        place(raster, SIM_WINDOW_GAP + 800 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 500)
-    }
-
-    addSidebarInfo(izhikevichSidebar(arrays = false, n, p))
+    collection to collection::spikes
 }
 
 /**
@@ -81,19 +68,34 @@ fun izhikevichNetworkArraySim(
     n: Int = IZHIKEVICH_NEURONS,
     p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
     weightScale: Double = 1.0
-) = newSim {
-    workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Izhikevich Network (Array)")
-    val network = networkComponent.network
-    network.timeStep = IZHIKEVICH_TIME_STEP
-
+) = izhikevichSim("Izhikevich Network (Array)", arrays = true, n, p) { network ->
     val (array, weights) = izhikevichArray(n, p, Random.Default, weightScale)
     array.location = point(0, 0)
     network.addNetworkModels(array, weights, usePlacementManager = false)
+    array to array::spikes
+}
+
+/**
+ * What both demos share: a network window whose network [addNetwork] builds, returning the model and property whose
+ * spikes drive the raster plot beside it.
+ */
+private fun izhikevichSim(
+    componentName: String,
+    arrays: Boolean,
+    n: Int,
+    p: Double,
+    addNetwork: suspend (Network) -> Pair<AttributeContainer, KProperty0<*>>
+) = newSim {
+    workspace.clearWorkspace()
+    val networkComponent = addNetworkComponent(componentName)
+    val network = networkComponent.network
+    network.timeStep = IZHIKEVICH_TIME_STEP
+
+    val (spikeSource, spikes) = addNetwork(network)
 
     val raster = addRasterPlot("Spikes")
     with(couplingManager) {
-        array.getProducer(array::spikes) couple raster.model.rasterConsumerList[0].getConsumer("setValues")
+        spikeSource.getProducer(spikes) couple raster.model.rasterConsumerList[0].getConsumer("setValues")
     }
 
     withGui {
@@ -101,7 +103,7 @@ fun izhikevichNetworkArraySim(
         place(raster, SIM_WINDOW_GAP + 800 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 500)
     }
 
-    addSidebarInfo(izhikevichSidebar(arrays = true, n, p))
+    addSidebarInfo(izhikevichSidebar(arrays, n, p))
 }
 
 const val IZHIKEVICH_NEURONS = 1000
@@ -121,18 +123,7 @@ fun izhikevichNeurons(n: Int, rng: Random): List<Neuron> {
     val numExcitatory = (n * EXCITATORY_FRACTION).toInt()
     return List(n) { i ->
         val r = rng.nextDouble()
-        val rule = IzhikevichRule().apply {
-            backgroundCurrent = 0.0
-            threshold = 30.0
-            addNoise = true
-            if (i < numExcitatory) {
-                a = 0.02; b = 0.2; c = -65.0 + 15 * r * r; d = 8.0 - 6 * r * r
-                noiseGenerator = NormalDistribution(0.0, 5.0)
-            } else {
-                a = 0.02 + 0.08 * r; b = 0.25 - 0.05 * r; c = -65.0; d = 2.0
-                noiseGenerator = NormalDistribution(0.0, 2.0)
-            }
-        }
+        val rule = if (i < numExcitatory) excitatoryIzhikevichRule(r) else inhibitoryIzhikevichRule(r)
         Neuron(rule).apply {
             activation = -65.0
             (dataHolder as IzhikevichScalarData).recovery = rule.b * -65.0
@@ -150,7 +141,7 @@ fun izhikevichSynapses(neurons: List<Neuron>, p: Double, rng: Random, weightScal
     for (src in neurons.indices) {
         for (tgt in neurons.indices) {
             if (src == tgt || rng.nextDouble() >= p) continue
-            val w = weightScale * if (src < numExcitatory) 0.5 * rng.nextDouble() else -rng.nextDouble()
+            val w = izhikevichWeight(src < numExcitatory, rng, weightScale)
             synapses += Synapse(neurons[src], neurons[tgt]).apply {
                 upperBound = 100.0
                 lowerBound = -100.0
@@ -168,19 +159,15 @@ fun izhikevichSynapses(neurons: List<Neuron>, p: Double, rng: Random, weightScal
  */
 fun izhikevichArray(n: Int, p: Double, rng: Random, weightScale: Double = 1.0): Pair<NeuronArray, WeightMatrix> {
     val numExcitatory = (n * EXCITATORY_FRACTION).toInt()
+    // r = 0: regular spiking
+    val rule = excitatoryIzhikevichRule(0.0)
     val array = NeuronArray(n).apply {
         label = "Izhikevich neurons"
-        updateRule = IzhikevichRule().apply {
-            backgroundCurrent = 0.0
-            threshold = 30.0
-            addNoise = true
-            a = 0.02; b = 0.2; c = -65.0; d = 8.0
-            noiseGenerator = NormalDistribution(0.0, 5.0)
-        }
+        updateRule = rule
     }
     for (i in 0 until n) {
         array.activations[i, 0] = -65.0
-        (array.dataHolder as IzhikevichMatrixData).recoveryMatrix[i, 0] = 0.2 * -65.0
+        (array.dataHolder as IzhikevichMatrixData).recoveryMatrix[i, 0] = rule.b * -65.0
     }
     val weights = WeightMatrix(array, array).apply { spikeResponder = StepResponder(1) }
     for (tgt in 0 until n) {
@@ -188,19 +175,46 @@ fun izhikevichArray(n: Int, p: Double, rng: Random, weightScale: Double = 1.0): 
             weights.weights[tgt, src] = if (src == tgt || rng.nextDouble() >= p) {
                 0.0
             } else {
-                weightScale * if (src < numExcitatory) 0.5 * rng.nextDouble() else -rng.nextDouble()
+                izhikevichWeight(src < numExcitatory, rng, weightScale)
             }
         }
     }
     return array to weights
 }
 
+/**
+ * An excitatory cell: regular spiking at [r] = 0, chattering at [r] = 1, with a Gaussian noise current of standard
+ * deviation 5.
+ */
+private fun excitatoryIzhikevichRule(r: Double) = izhikevichRule(5.0).apply {
+    a = 0.02; b = 0.2; c = -65.0 + 15 * r * r; d = 8.0 - 6 * r * r
+}
+
+/**
+ * An inhibitory cell: fast spiking at [r] = 0, low-threshold spiking at [r] = 1, with a Gaussian noise current of
+ * standard deviation 2.
+ */
+private fun inhibitoryIzhikevichRule(r: Double) = izhikevichRule(2.0).apply {
+    a = 0.02 + 0.08 * r; b = 0.25 - 0.05 * r; c = -65.0; d = 2.0
+}
+
+private fun izhikevichRule(noiseDeviation: Double) = IzhikevichRule().apply {
+    backgroundCurrent = 0.0
+    threshold = 30.0
+    addNoise = true
+    noiseGenerator = NormalDistribution(0.0, noiseDeviation)
+}
+
+/** 0.5 U(0, 1) from an excitatory source and -U(0, 1) from an inhibitory one, times [weightScale]. */
+private fun izhikevichWeight(excitatory: Boolean, rng: Random, weightScale: Double) =
+    weightScale * if (excitatory) 0.5 * rng.nextDouble() else -rng.nextDouble()
+
 private fun izhikevichSidebar(arrays: Boolean, n: Int, p: Double) = """
     # Izhikevich Network
 
     A recurrent network of $n spiking neurons using the simple model of Izhikevich (2003): 80%
     excitatory and 20% inhibitory, each neuron driven by its own Gaussian noise current. Each pair of neurons is
-    connected with probability $p, giving about ${"%,d".format(roundToTwoDigits(n * (n - 1) * p))} synapses; excitatory
+    connected with probability $p, giving about ${"%,d".format(roundToTwoDigits(n.toLong() * (n - 1) * p))} synapses; excitatory
     weights are positive and inhibitory weights negative, and each spike delivers a one-step current pulse.
 
     The raster plot shows one row per neuron and a dot for each spike. Activity is low (about 1.4 spikes per second

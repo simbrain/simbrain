@@ -1,6 +1,5 @@
 /**
- * Every way of closing a [StandardDialog] runs its close tasks and ends its view scope, including Escape, which used
- * to only hide the dialog and leave its subscriptions running.
+ * Every way of closing a [StandardDialog] runs its close tasks and ends its view scope, Escape included.
  */
 package org.simbrain.util
 

@@ -1,3 +1,6 @@
+/**
+ * The default OpenBLAS thread count stays small and never overrides a count set explicitly.
+ */
 package org.simbrain.network.tensor
 
 import org.junit.jupiter.api.Assertions.assertEquals

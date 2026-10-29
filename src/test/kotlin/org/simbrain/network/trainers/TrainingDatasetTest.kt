@@ -1,3 +1,6 @@
+/**
+ * Training datasets copy list rows into arrays, reject rows of the wrong width, and iterate inputs with their targets.
+ */
 package org.simbrain.network.trainers
 
 import org.junit.jupiter.api.Assertions.assertArrayEquals

@@ -31,8 +31,8 @@ class OdorWorldPanelLifetimeTest {
     fun `repeated tile map changes keep one set of handlers on the tile map`() {
         val component = OdorWorldComponent("World")
         val world = component.world.apply { tileMap = TileMap(20, 20) }
-        panelFor(world, component)
         val withoutPanelHandlers = world.tileMap.events.subscriberTotal()
+        panelFor(world, component)
         changeTileMap(world)
         val once = world.tileMap.events.subscriberTotal()
         assertTrue(once > withoutPanelHandlers)

@@ -1,7 +1,14 @@
+/**
+ * Optimizers that turn a parameter matrix's accumulated gradient into the update the trainer adds to it: plain
+ * gradient descent with momentum, Adam, and AdamW. The trainer calls [Optimizer.beginStep] once per step, then
+ * [Optimizer.computeDelta] for each parameter matrix.
+ */
 package org.simbrain.network.trainers
 
 import org.simbrain.util.UserParameter
 import org.simbrain.util.alignedColumnMajorArrays
+import org.simbrain.util.columnMajorCopy
+import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.math.matrix.Matrix
@@ -24,10 +31,8 @@ abstract class Optimizer: CopyableObject {
      */
     open fun beginStep() {}
 
-    context(SupervisedTrainer)
     abstract fun computeDelta(matrix: Matrix, delta: Matrix): Matrix
 
-    context(SupervisedTrainer)
     abstract fun reset()
 
     override fun getTypeList() = listOf(
@@ -51,14 +56,12 @@ class BasicOptimizer(
 ) : Optimizer() {
     private var matrixToVelocityMap: HashMap<Matrix, Matrix> = HashMap()
 
-    context(SupervisedTrainer)
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val velocity = matrixToVelocityMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         velocity.mul(momentum).add(delta)
         return velocity.clone().mul(learningRate)
     }
 
-    context(SupervisedTrainer)
     override fun reset() {
         matrixToVelocityMap.clear()
     }
@@ -66,21 +69,25 @@ class BasicOptimizer(
     override fun copy() = BasicOptimizer(momentum).also { it.learningRate = learningRate }
 }
 
-class AdamOptimizer(
+/**
+ * State and step shared by [AdamOptimizer] and [AdamWOptimizer]: running moments per parameter matrix and the step
+ * count that bias correction uses. Subclasses choose the learning rate for a step and the weight decay.
+ */
+abstract class AdamFamilyOptimizer(
     @UserParameter(
         label = "Beta1", 
         description = "Exponential decay rate for first moment estimates (momentum). Controls how much past gradients influence current update.",
         minimumValue = 0.0, 
         maximumValue = 1.0, 
         order = 1
-    ) var beta1: Double = 0.9,
+    ) var beta1: Double,
     @UserParameter(
         label = "Beta2", 
         description = "Exponential decay rate for second moment estimates (variance). Controls adaptive learning rate scaling.",
         minimumValue = 0.0, 
         maximumValue = 1.0, 
         order = 2
-    ) var beta2: Double = 0.999
+    ) var beta2: Double
 ) : Optimizer() {
 
     private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
@@ -92,25 +99,42 @@ class AdamOptimizer(
      */
     private var stepsSinceReset = 0
 
-    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+    protected val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
 
     override fun beginStep() {
         stepsSinceReset++
     }
 
-    context(SupervisedTrainer)
+    /** The learning rate for the current step. */
+    protected open val stepLearningRate: Double get() = learningRate
+
+    /** Decay applied directly to the weights, decoupled from the gradients; zero for plain Adam. */
+    protected open val decoupledWeightDecay: Double get() = 0.0
+
     override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
         val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
         val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-        return adamStep(matrix, delta, meanEstimate, varianceEstimate, beta1, beta2, timeSinceLastReset, learningRate, 0.0)
+        return adamStep(
+            weights = matrix,
+            delta = delta,
+            mean = meanEstimate,
+            variance = varianceEstimate,
+            beta1 = beta1,
+            beta2 = beta2,
+            step = timeSinceLastReset,
+            learningRate = stepLearningRate,
+            weightDecay = decoupledWeightDecay
+        )
     }
 
-    context(SupervisedTrainer)
     override fun reset() {
         matrixRunningMeanMap.clear()
         matrixRunningVarianceMap.clear()
         stepsSinceReset = 0
     }
+}
+
+class AdamOptimizer(beta1: Double = 0.9, beta2: Double = 0.999) : AdamFamilyOptimizer(beta1, beta2) {
 
     override fun copy() = AdamOptimizer(beta1, beta2).also { it.learningRate = learningRate }
 }
@@ -126,20 +150,8 @@ class AdamOptimizer(
  */
 @CustomTypeName("AdamW Optimizer")
 class AdamWOptimizer(
-    @UserParameter(
-        label = "Beta1", 
-        description = "Exponential decay rate for first moment estimates (momentum). Controls how much past gradients influence current update.",
-        minimumValue = 0.0, 
-        maximumValue = 1.0, 
-        order = 1
-    ) var beta1: Double = 0.9,
-    @UserParameter(
-        label = "Beta2", 
-        description = "Exponential decay rate for second moment estimates (variance). Controls adaptive learning rate scaling.",
-        minimumValue = 0.0, 
-        maximumValue = 1.0, 
-        order = 2
-    ) var beta2: Double = 0.999,
+    beta1: Double = 0.9,
+    beta2: Double = 0.999,
     @UserParameter(
         label = "Weight Decay", 
         description = "L2 regularization strength applied directly to weights (decoupled from gradients). Helps prevent overfitting.",
@@ -154,49 +166,19 @@ class AdamWOptimizer(
         maximumValue = 1.0, 
         order = 4
     ) var learningRateDecay: Double = 0.0
-) : Optimizer() {
+) : AdamFamilyOptimizer(beta1, beta2) {
 
-    private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
-    private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
-
-    /**
-     * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
-     * or sequential update takes many steps in one iteration.
-     */
-    private var stepsSinceReset = 0
-
-    private val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
-
-    override fun beginStep() {
-        stepsSinceReset++
-    }
-
-    context(SupervisedTrainer)
-    override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
-        val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-        val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-
-        // Apply learning rate decay
-        val currentLearningRate = if (learningRateDecay > 0.0) {
+    // Apply learning rate decay
+    override val stepLearningRate: Double
+        get() = if (learningRateDecay > 0.0) {
             learningRate * (1.0 - learningRateDecay).pow(timeSinceLastReset)
         } else {
             learningRate
         }
 
-        // AdamW: the moments use the original gradients (no weight decay mixed in), and decay is applied directly to
-        // the weights (decoupled)
-        return adamStep(
-            matrix, delta, meanEstimate, varianceEstimate, beta1, beta2, timeSinceLastReset, currentLearningRate,
-            weightDecay
-        )
-    }
-
-    context(SupervisedTrainer)
-    override fun reset() {
-        matrixRunningMeanMap.clear()
-        matrixRunningVarianceMap.clear()
-        stepsSinceReset = 0
-    }
+    // AdamW: the moments use the original gradients (no weight decay mixed in), and decay is applied directly to
+    // the weights (decoupled)
+    override val decoupledWeightDecay: Double get() = weightDecay
 
     override fun copy() = AdamWOptimizer(beta1, beta2, weightDecay, learningRateDecay).also { it.learningRate = learningRate }
 }
@@ -223,34 +205,30 @@ private fun adamStep(
     val decayRate = learningRate * weightDecay
     val decay = weightDecay > 0.0
     val update = Matrix(weights.nrow(), weights.ncol())
-    val arrays = alignedColumnMajorArrays(delta, mean, variance, update, weights)
-    if (arrays != null) {
-        // Over the backing arrays, so the JIT can vectorize the loop
-        val (g, means, variances, out, w) = arrays
-        val ld = update.ld()
-        for (j in 0 until weights.ncol()) {
-            val start = j * ld
-            for (k in start until start + weights.nrow()) {
-                val m = means[k] * beta1 + g[k] * (1 - beta1)
-                val v = variances[k] * beta2 + (g[k] * g[k]) * (1 - beta2)
-                means[k] = m
-                variances[k] = v
-                val adam = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
-                out[k] = if (decay) adam - w[k] * decayRate else adam
-            }
-        }
-        return update
-    }
+    // Over the backing arrays, so the JIT can vectorize the loop. Matrices not laid out alike, such as a transposed
+    // delta, are copied into ones that are, and the moments copied back.
+    val aligned = alignedColumnMajorArrays(delta, mean, variance, update, weights) != null
+    val g = if (aligned) delta else delta.columnMajorCopy()
+    val means = if (aligned) mean else mean.columnMajorCopy()
+    val variances = if (aligned) variance else variance.columnMajorCopy()
+    val out = update
+    val w = if (aligned) weights else weights.columnMajorCopy()
+    val (ga, ma, va, oa, wa) = alignedColumnMajorArrays(g, means, variances, out, w)!!
+    val ld = out.ld()
     for (j in 0 until weights.ncol()) {
-        for (i in 0 until weights.nrow()) {
-            val g = delta[i, j]
-            val m = mean[i, j] * beta1 + g * (1 - beta1)
-            val v = variance[i, j] * beta2 + (g * g) * (1 - beta2)
-            mean[i, j] = m
-            variance[i, j] = v
+        val start = j * ld
+        for (k in start until start + weights.nrow()) {
+            val m = ma[k] * beta1 + ga[k] * (1 - beta1)
+            val v = va[k] * beta2 + (ga[k] * ga[k]) * (1 - beta2)
+            ma[k] = m
+            va[k] = v
             val adam = (m / meanCorrection) * learningRate / (sqrt(v / varianceCorrection) + 1e-8)
-            update[i, j] = if (decay) adam - weights[i, j] * decayRate else adam
+            oa[k] = if (decay) adam - wa[k] * decayRate else adam
         }
     }
-    return update
+    if (!aligned) {
+        mean.copyFrom(means)
+        variance.copyFrom(variances)
+    }
+    return out
 }

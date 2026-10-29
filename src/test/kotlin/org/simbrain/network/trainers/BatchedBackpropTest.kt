@@ -17,6 +17,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.GELU
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.NeuronUpdateRule
+import org.simbrain.network.updaterules.ProductRule
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.flatten
 import org.simbrain.network.updaterules.SoftmaxRule
@@ -132,6 +133,12 @@ class BatchedBackpropTest {
     fun `layer norm falls back to per example training`() {
         val built = build(listOf(4, 5, 3), listOf(::relu, ::linear), oneHotTargets = false, skip = false)
         built.network.getModels<NeuronArray>().first { !it.isClamped }.useLayerNorm = true
+        assertNull(BatchedBackprop.createOrNull(built.model))
+    }
+
+    @Test
+    fun `a subclass of a batched rule that changes its layer update falls back to per example training`() {
+        val built = build(listOf(4, 5, 3), listOf(::ProductRule, ::linear), oneHotTargets = false, skip = false)
         assertNull(BatchedBackprop.createOrNull(built.model))
     }
 

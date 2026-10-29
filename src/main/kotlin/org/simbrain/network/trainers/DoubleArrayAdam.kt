@@ -6,6 +6,10 @@ import kotlin.math.sqrt
  * Adam optimizer operating on DoubleArrays, keyed by string identifiers.
  * Each parameter group (e.g., "conv1_kernels", "dense1_weights") has its own
  * first and second moment arrays.
+ *
+ * Uses the "efficient" form from the Adam paper (folding both bias corrections into the step size, with epsilon added
+ * to the uncorrected root variance), where the matrix optimizers in Optimizers.kt add epsilon to the corrected one, so
+ * the two give slightly different updates. Kept separate so CNN training results do not change.
  */
 class DoubleArrayAdam(
     var learningRate: Double = 0.001,
@@ -19,14 +23,6 @@ class DoubleArrayAdam(
         private set
 
     /**
-     * Apply one Adam update step to [params] using [grad].
-     * Both arrays are modified in-place (params updated, grad unchanged).
-     *
-     * @param key    unique identifier for this parameter group
-     * @param params the parameter array to update in-place
-     * @param grad   the gradient array (same length as params)
-     */
-    /**
      * Sum of squared per-parameter updates from the most recent [step] cycle, plus the count
      * of params updated. Cleared in [step]. Caller can read these to compute an RMS step size.
      */
@@ -35,6 +31,14 @@ class DoubleArrayAdam(
     var lastStepParamCount: Int = 0
         private set
 
+    /**
+     * Apply one Adam update step to [params] using [grad].
+     * Both arrays are modified in-place (params updated, grad unchanged).
+     *
+     * @param key    unique identifier for this parameter group
+     * @param params the parameter array to update in-place
+     * @param grad   the gradient array (same length as params)
+     */
     fun update(key: String, params: DoubleArray, grad: DoubleArray) {
         val size = params.size
         val mArr = m.getOrPut(key) { DoubleArray(size) }

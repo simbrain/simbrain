@@ -1,5 +1,7 @@
 package org.simbrain.network.updaterules
 
+import smile.math.matrix.Matrix
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -20,7 +22,7 @@ import kotlin.math.max
 /**
  * **LinearNeuron** is a standard linear neuron.
  */
-open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule,
+open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule, BatchActivation,
     NoisyUpdateRule, BoundedUpdateRule {
     override var upperBound by GuiEditable(
         initValue = DEFAULT_UPPER_BOUND,
@@ -90,6 +92,11 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
     override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         layer.activations.copyFrom(layer.inputs.applyFunction(::linearRule))
     }
+
+    // A subclass, such as ProductRule, may compute its layer update differently
+    override val activatesBatches get() = javaClass == LinearRule::class.java
+
+    override fun activateColumns(netInputs: Matrix): Matrix = netInputs.applyFunction(::linearRule)
 
     fun linearRule(input: Double): Double {
         var ret = input * slope

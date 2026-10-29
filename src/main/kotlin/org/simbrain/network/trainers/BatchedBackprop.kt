@@ -17,18 +17,13 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.spikeresponders.NonResponder
 import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.updaterules.GELU
-import org.simbrain.network.updaterules.LinearRule
-import org.simbrain.network.updaterules.SigmoidalRule
-import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.util.applyFunction
-import org.simbrain.util.columnMajorArrayOrNull
 import org.simbrain.util.copyFrom
+import org.simbrain.util.setColumn
 import smile.math.blas.Transpose
 import smile.math.matrix.Matrix
-import kotlin.math.exp
 
 class BatchedBackprop private constructor(
     private val layers: List<NeuronArray>,
@@ -71,7 +66,7 @@ class BatchedBackprop private constructor(
                 z.mm(Transpose.NO_TRANSPOSE, wm.weights, Transpose.NO_TRANSPOSE, activations.getValue(wm.source as NeuronArray), 1.0, 1.0)
             }
             netInputs[layer] = z
-            activations[layer] = if (layer === inputLayer) inputs else activate(layer, z)
+            activations[layer] = if (layer === inputLayer) inputs else (layer.updateRule as BatchActivation).activateColumns(z)
         }
 
         val output = activations.getValue(outputLayer)
@@ -80,8 +75,8 @@ class BatchedBackprop private constructor(
         var accuracyCount = 0
         val outputError = Matrix(outputLayer.size, batch)
         for (b in 0 until batch) {
-            val actual = output.column(b)
-            val target = targets.column(b)
+            val actual = output.columnVector(b)
+            val target = targets.columnVector(b)
             lossSum += lossFunction.scalarLoss(actual, target)
             if (computeAccuracy) {
                 classificationAccuracy(actual, target)?.let {
@@ -96,7 +91,8 @@ class BatchedBackprop private constructor(
         val errors = HashMap<NeuronArray, Matrix>()
         errors[outputLayer] = outputError
         for (layer in layers.asReversed()) {
-            val error = errors[layer] ?: outputError
+            // Every layer feeds a later one, which the reversed order has already visited
+            val error = errors.getValue(layer)
             (layer.updateRule as? DifferentiableUpdateRule)?.let { error.mul(it.getDerivative(netInputs.getValue(layer))) }
             biasesAccumulator.getOrPut(layer) { Matrix(layer.size, 1) }.add(Matrix.column(error.rowSums()))
             for (connector in layer.incomingConnectors) {
@@ -112,57 +108,24 @@ class BatchedBackprop private constructor(
 
         for (layer in layers) {
             if (layer === inputLayer) {
-                layer.activations = inputs.column(batch - 1)
+                layer.activations = inputs.columnVector(batch - 1)
             } else {
-                layer.inputs.copyFrom(netInputs.getValue(layer).column(batch - 1))
-                layer.activations = activations.getValue(layer).column(batch - 1)
+                layer.inputs.copyFrom(netInputs.getValue(layer).columnVector(batch - 1))
+                layer.activations = activations.getValue(layer).columnVector(batch - 1)
             }
         }
         return Result(lossSum, accuracySum, accuracyCount)
     }
 
-    /**
-     * Applies a layer's update rule to every column of [z], as the rule's own layer update does to a single column.
-     */
-    private fun activate(layer: NeuronArray, z: Matrix): Matrix = when (val rule = layer.updateRule) {
-        is LinearRule -> z.applyFunction(rule::linearRule)
-        is GELU -> z.applyFunction(rule::gelu)
-        is SigmoidalRule -> rule.type.valueOf(z, rule.upperBound, rule.lowerBound, rule.slope)
-        is SoftmaxRule -> softmaxColumns(z, rule.temperature)
-        else -> error("Unsupported rule ${rule::class.simpleName}")
-    }
-
-    /**
-     * Matches [SoftmaxRule]'s layer update column by column, including its uniform fallback when every exponential
-     * underflows.
-     */
-    private fun softmaxColumns(z: Matrix, temperature: Double): Matrix {
-        val result = Matrix(z.nrow(), z.ncol())
-        val exponentials = DoubleArray(z.nrow())
-        for (b in 0 until z.ncol()) {
-            var max = Double.NEGATIVE_INFINITY
-            for (i in 0 until z.nrow()) max = maxOf(max, z[i, b])
-            var total = 0.0
-            for (i in 0 until z.nrow()) {
-                exponentials[i] = exp((z[i, b] - max) / temperature)
-                total += exponentials[i]
-            }
-            for (i in 0 until z.nrow()) {
-                result[i, b] = if (total < 1e-6) 1.0 / z.nrow() else exponentials[i] / total
-            }
-        }
-        return result
-    }
-
-    private fun Matrix.column(b: Int): Matrix = Matrix.column(DoubleArray(nrow()) { this[it, b] })
+    /** Column [b] as a column vector. Not named `column`, which Smile's static Matrix.column(DoubleArray) would shadow. */
+    private fun Matrix.columnVector(b: Int): Matrix = Matrix.column(DoubleArray(nrow()) { this[it, b] })
 
     private fun columnsOf(rowsOfData: List<DoubleArray>, rows: IntRange, size: Int): Matrix {
         val m = Matrix(size, rows.count())
-        val columns = m.columnMajorArrayOrNull()
         rows.forEachIndexed { b, row ->
             val values = rowsOfData[row]
             require(values.size == size) { "Row $row has ${values.size} values, but its layer has $size neurons" }
-            if (columns != null) values.copyInto(columns, b * m.ld(), 0, size) else for (i in 0 until size) m[i, b] = values[i]
+            m.setColumn(b, values)
         }
         return m
     }
@@ -177,8 +140,9 @@ class BatchedBackprop private constructor(
 
         /**
          * A batched plan for [network], or null if it needs per-example training. Supported: a [BackpropNetwork] or
-         * [SupervisedModel] whose layers are plain [NeuronArray]s with a clamped input, no layer norm, and linear,
-         * sigmoidal, GELU, or softmax rules without noise, joined only by [WeightMatrix]es without spike responders
+         * [SupervisedModel] whose layers are plain [NeuronArray]s with a clamped input, no layer norm, and rules that
+         * activate batches ([BatchActivation]: linear, sigmoidal, GELU, softmax) without noise, joined only by
+         * [WeightMatrix]es without spike responders
          * between layers of the network, each running from an earlier layer to a later one in the network's layer
          * order. That order comes from a breadth-first search back from the output, so recurrent and self connections,
          * and some skip connections between hidden layers, are left to per-example training.
@@ -195,9 +159,7 @@ class BatchedBackprop private constructor(
                 if (layer !== inputLayer) {
                     if (layer.isClamped) return null
                     val rule = layer.updateRule
-                    val supported = rule.javaClass == LinearRule::class.java || rule.javaClass == SigmoidalRule::class.java ||
-                            rule.javaClass == GELU::class.java || rule.javaClass == SoftmaxRule::class.java
-                    if (!supported) return null
+                    if (rule !is BatchActivation || !rule.activatesBatches) return null
                     // Per-example training draws noise example by example through every layer, which a batched pass,
                     // going layer by layer over the batch, cannot reproduce
                     if (rule is NoisyUpdateRule && rule.addNoise) return null

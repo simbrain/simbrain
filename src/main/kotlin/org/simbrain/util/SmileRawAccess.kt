@@ -35,6 +35,30 @@ fun alignedColumnMajorArrays(vararg matrices: Matrix): List<DoubleArray>? {
     return matrices.map { it.columnMajorArrayOrNull() ?: return null }
 }
 
+/** Writes [values] into column [j]. */
+fun Matrix.setColumn(j: Int, values: DoubleArray) {
+    val columns = columnMajorArrayOrNull()
+    if (columns != null) values.copyInto(columns, j * ld(), 0, nrow()) else for (i in 0 until nrow()) this[i, j] = values[i]
+}
+
+/** The sum of the squares of all entries. */
+fun Matrix.sumOfSquares(): Double {
+    val values = columnMajorArrayOrNull()
+    var sum = 0.0
+    for (j in 0 until ncol()) {
+        if (values != null) {
+            val start = j * ld()
+            for (k in start until start + nrow()) sum += values[k] * values[k]
+        } else {
+            for (i in 0 until nrow()) sum += this[i, j] * this[i, j]
+        }
+    }
+    return sum
+}
+
+/** A copy of this matrix in the default column-major layout, which a new matrix of the same shape also has. */
+fun Matrix.columnMajorCopy(): Matrix = Matrix(nrow(), ncol()).also { it.copyFrom(this) }
+
 /**
  * Writes this matrix times [x] into [out]. On the column-major array it walks eight columns per pass, loading and
  * storing each output entry once per eight columns. That beat OpenBLAS's matrix-vector product at every size tried,

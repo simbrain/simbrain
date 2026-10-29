@@ -12,7 +12,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
-import org.simbrain.util.columnMajorArrayOrNull
+import org.simbrain.util.sumOfSquares
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -173,17 +173,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     private var stepParamCount = 0
 
     private fun recordOptimizerUpdate(update: Matrix) {
-        val values = update.columnMajorArrayOrNull()
-        var sum = 0.0
-        for (j in 0 until update.ncol()) {
-            if (values != null) {
-                val start = j * update.ld()
-                for (k in start until start + update.nrow()) sum += values[k] * values[k]
-            } else {
-                for (i in 0 until update.nrow()) sum += update[i, j] * update[i, j]
-            }
-        }
-        stepSquaredSum += sum
+        stepSquaredSum += update.sumOfSquares()
         stepParamCount += update.nrow() * update.ncol()
     }
 
@@ -347,14 +337,14 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     }
 
     /**
-     * @return the mean error for the batch
-     */
-    /**
      * Whether eligible networks train a batch as matrix products ([BatchedBackprop]) rather than one example at a
      * time. Both compute the same update; turned off to compare the two.
      */
-    var batchedTrainingEnabled = true
+    internal var batchedTrainingEnabled = true
 
+    /**
+     * @return the mean error for the batch
+     */
     open fun trainBatch(rowRange: IntRange, probe: StructuredProbe? = null): Double {
         val weightAccumulator: HashMap<WeightMatrix, Matrix> = HashMap()
         val synapseGroupAccumulator: HashMap<SynapseGroup, Matrix> = HashMap()
@@ -363,7 +353,9 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
 
         // Probes record per-example intermediate values, which only the per-example path produces
         val batched = if (probe == null && batchedTrainingEnabled) BatchedBackprop.createOrNull(supervisedNetwork) else null
-        if (batched != null && !rowRange.isEmpty()) {
+        val probeContext = probe?.createMapProbe("trainBatch")
+
+        val error = if (batched != null && !rowRange.isEmpty()) {
             val result = with(network) {
                 batched.run(
                     supervisedNetwork.trainingSet, rowRange, config.lossFunction, config.computeAccuracy,
@@ -372,16 +364,8 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
             }
             batchAccuracySum += result.accuracySum
             batchSampleCount += result.accuracyCount
-            applyAccumulatedDeltas(
-                weightAccumulator, synapseGroupAccumulator, biasesAccumulator, rawMatrixAccumulator,
-                1.0 / rowRange.count()
-            )
-            return result.lossSum / rowRange.count()
-        }
-
-        val probeContext = probe?.createMapProbe("trainBatch")
-
-        val error = with(supervisedNetwork) {
+            result.lossSum
+        } else with(supervisedNetwork) {
             rowRange.sumOf { rowNum ->
                 val rowProbeContext = probeContext?.createMapProbe("trainRow-$rowNum")
                 inputLayer.setActivations(trainingSet.inputs[rowNum])

@@ -3,12 +3,13 @@ thread count. Training is seconds per epoch (median of epochs after the first); 
 
 Usage: summarize_torch_threads.py results.jsonl [...]
 """
-import collections, json, statistics as st, sys
-
+import collections, sys
+from _common import load_latest, med, steady
 
 
 def measurement(r):
     """What a row measures, without its repeat: rows of one measurement are summarized together."""
+    # Rows from before the scripts recorded dtype carry it only in the framework label
     dtype = r.get("dtype") or ("float32" if r["model"].startswith("tinylm") else r["framework"].rsplit("-", 1)[-1])
     task = "train" if r["task"] == "train" else "infer-" + r["mode"]
     return r["machine"], r["model"], task, dtype, r["threads"]
@@ -16,27 +17,16 @@ def measurement(r):
 
 # Later files supersede earlier ones for the same measurement, as in summarize.py, so a rerun replaces its old rows
 # rather than pooling with them
-by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
-errors = [r for file_rows in by_file for r in file_rows if "error" in r]
-latest = {}
-for index, file_rows in enumerate(by_file):
-    for r in file_rows:
-        if "error" not in r:
-            latest[measurement(r)] = index
+rows, errors = load_latest(sys.argv[1:], measurement)
 g = collections.defaultdict(list)
-for index, file_rows in enumerate(by_file):
-    for r in file_rows:
-        if "error" in r or latest[measurement(r)] != index:
-            continue
-        if r["task"] == "train":
-            epochs = r.get("epoch_s") or r.get("epochs_s")
-            g[measurement(r)].append(st.median(epochs[1:]))
-        else:
-            g[measurement(r)].append(r["us_per_example"])
+for r in rows:
+    if r.get("suite") == "meta":
+        continue
+    g[measurement(r)].append(steady(r["epoch_s"]) if r["task"] == "train" else r["us_per_example"])
 
 series = collections.defaultdict(dict)
 for (machine, model, task, dtype, threads), values in g.items():
-    series[(machine, model, task, dtype)][threads] = st.median(values)
+    series[(machine, model, task, dtype)][threads] = med(values)
 for key in sorted(series):
     by_threads = series[key]
     best = min(by_threads, key=by_threads.get)

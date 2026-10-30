@@ -3,7 +3,9 @@ package org.simbrain.benchmarks;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
+import java.util.function.Consumer;
 
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.Neuron;
@@ -16,7 +18,8 @@ import org.simbrain.util.randomizer.Randomizer;
 
 /**
  * Headless Izhikevich (2003) benchmark matched to Simbrain 4's IzhikevichBenchmark.kt, for measuring Simbrain 3 on
- * the same hardware. Free neurons and synapses, Step responders lasting one time step.
+ * the same hardware. Free neurons and synapses, Step responders lasting one time step. The network is built by
+ * {@link #izhikevichNeurons} and {@link #forEachSynapse}, which IzhikevichHeadedBenchmark shares.
  *
  * Usage: IzhikevichBenchmark <serial|concurrent> neurons p dtMs simMs warmupMs seed [weightScale]
  */
@@ -37,20 +40,12 @@ public class IzhikevichBenchmark {
         }
     }
 
-    public static void main(String[] args) {
-        String mode = args[0];
-        int n = Integer.parseInt(args[1]);
-        double p = Double.parseDouble(args[2]);
-        double dt = Double.parseDouble(args[3]);
-        double simMs = Double.parseDouble(args[4]);
-        double warmupMs = Double.parseDouble(args[5]);
-        Random rng = new Random(Long.parseLong(args[6]));
-        double scale = args.length > 7 ? Double.parseDouble(args[7]) : 1.0;
-
-        long t0 = System.nanoTime();
-        Network net = new Network();
-        net.setFireUpdates(false);
-        net.setTimeStep(dt);
+    /**
+     * The network's neurons, not yet added to {@code net}: the first 80% excitatory regular-spiking to chattering
+     * cells, the rest inhibitory fast-spiking to low-threshold cells, each with its own random parameter r drawn from
+     * {@code rng} and a Gaussian noise current, starting at v = -65 and u = b * v.
+     */
+    static List<Neuron> izhikevichNeurons(Network net, int n, Random rng) {
         int numExc = (int) (n * 0.8);
         List<Neuron> neurons = new ArrayList<>();
         for (int i = 0; i < n; i++) {
@@ -74,8 +69,21 @@ public class IzhikevichBenchmark {
             neuron.forceSetActivation(-65);
             startRecovery(neuron);
             neurons.add(neuron);
-            net.addNeuron(neuron);
         }
+        return neurons;
+    }
+
+    /**
+     * Gives {@code add} each synapse of the random network over {@code neurons}: connection probability {@code p}, no
+     * self-connections, weights 0.5 U(0, 1) from excitatory sources and -U(0, 1) from inhibitory ones times
+     * {@code scale}, frozen, with Step responders lasting one time step of {@code dt}. Draws from {@code rng} in the
+     * order Simbrain 4's izhikevichSynapses does (Simbrain 4's generator differs, so the same seed gives a different
+     * network there). Returns the number of synapses.
+     */
+    static long forEachSynapse(List<Neuron> neurons, double p, double scale, double dt, Random rng,
+                               Consumer<Synapse> add) {
+        int n = neurons.size();
+        int numExc = (int) (n * 0.8);
         long synapses = 0;
         for (int src = 0; src < n; src++) {
             for (int tgt = 0; tgt < n; tgt++) {
@@ -89,10 +97,33 @@ public class IzhikevichBenchmark {
                 step.setResponseDuration(dt);
                 s.setSpikeResponder(step);
                 s.setFrozen(true);
-                net.addSynapse(s);
+                add.accept(s);
                 synapses++;
             }
         }
+        return synapses;
+    }
+
+    public static void main(String[] args) {
+        String mode = args[0];
+        int n = Integer.parseInt(args[1]);
+        double p = Double.parseDouble(args[2]);
+        double dt = Double.parseDouble(args[3]);
+        double simMs = Double.parseDouble(args[4]);
+        double warmupMs = Double.parseDouble(args[5]);
+        long seed = Long.parseLong(args[6]);
+        Random rng = new Random(seed);
+        double scale = args.length > 7 ? Double.parseDouble(args[7]) : 1.0;
+
+        long t0 = System.nanoTime();
+        Network net = new Network();
+        net.setFireUpdates(false);
+        net.setTimeStep(dt);
+        List<Neuron> neurons = izhikevichNeurons(net, n, rng);
+        for (Neuron neuron : neurons) {
+            net.addNeuron(neuron);
+        }
+        long synapses = forEachSynapse(neurons, p, scale, dt, rng, net::addSynapse);
         if (mode.equals("concurrent")) {
             net.getUpdateManager().clear();
             net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
@@ -118,11 +149,13 @@ public class IzhikevichBenchmark {
             }
         }
         double runS = (System.nanoTime() - t2) / 1e9;
-        System.out.println(String.format(
-            "{\"simulator\":\"simbrain3-%s\",\"neurons\":%d,\"p\":%s,\"weight_scale\":%s,\"workers\":%d,\"synapses\":%d,\"dt_ms\":%s,\"sim_ms\":%s,"
-                + "\"build_s\":%.4f,\"warmup_s\":%.4f,\"run_s\":%.4f,\"rt_factor\":%.4f,\"rate_hz\":%.3f}",
-            mode, n, p, scale, mode.equals("concurrent") ? Runtime.getRuntime().availableProcessors() : 1, synapses, dt, simMs, buildS, warmupS, runS, runS / (simMs / 1000.0),
-            spikes / (double) n / (simMs / 1000.0)));
+        // Locale.ROOT: a decimal comma would break the JSON
+        System.out.println(String.format(Locale.ROOT,
+            "{\"simulator\":\"simbrain3-%s\",\"neurons\":%d,\"p\":%s,\"weight_scale\":%s,\"seed\":%d,\"workers\":%d,\"synapses\":%d,"
+                + "\"dt_ms\":%s,\"sim_ms\":%s,\"warmup_ms\":%s,\"build_s\":%.4f,\"warmup_s\":%.4f,\"run_s\":%.4f,"
+                + "\"rt_factor\":%.4f,\"rate_hz\":%.3f}",
+            mode, n, p, scale, seed, mode.equals("concurrent") ? Runtime.getRuntime().availableProcessors() : 1, synapses,
+            dt, simMs, warmupMs, buildS, warmupS, runS, runS / (simMs / 1000.0), spikes / (double) n / (simMs / 1000.0)));
         System.exit(0);
     }
 }

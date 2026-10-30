@@ -1,7 +1,8 @@
 """Summarizes run_headed.py output: medians over repeats of the Izhikevich network (per machine, network size,
 simulator, representation, variant and mode) and of the machine learning demos (per machine, demo and mode): training,
 inference and text generation."""
-import collections, json, statistics as st, sys
+import collections, sys
+from _common import load_latest, med
 
 
 def measurement(r):
@@ -13,26 +14,14 @@ def measurement(r):
 
 # Later files supersede earlier ones for the same measurement, as in summarize.py, so a rerun replaces its old rows
 # rather than pooling with them
-by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
-errors = [r for file_rows in by_file for r in file_rows if "error" in r]
-latest = {}
-for index, file_rows in enumerate(by_file):
-    for r in file_rows:
-        if "error" not in r:
-            latest[measurement(r)] = index
-rows = [r for index, file_rows in enumerate(by_file) for r in file_rows
-        if "error" not in r and latest[measurement(r)] == index]
-
-
-def med(values):
-    return st.median(values) if values else float("nan")
+rows, errors = load_latest(sys.argv[1:], measurement)
 
 
 print("-- Izhikevich network: wall s per simulated s, steps/s, network canvas frames/s, firing rate")
 g = collections.defaultdict(list)
 for r in rows:
     if "neurons" in r:
-        g[(r["machine"], r["neurons"], r["simulator"], r.get("representation", "objects"), r["variant"], r["mode"])].append(r)
+        g[measurement(r)].append(r)
 order = {"headless": 0, "fast": 1, "guioff": 2, "paced": 3}
 heading = None
 for key in sorted(g, key=lambda k: (*k[:5], order[k[5]])):

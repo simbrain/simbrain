@@ -22,6 +22,9 @@ import java.awt.Container
 import java.util.concurrent.atomic.AtomicLong
 import javax.swing.SwingUtilities
 
+/** The tiny language model demo's default size: contextSize,embeddingDimension,numHeads,hiddenSize,numLayers. */
+internal const val DEMO_TINY_LM_SIZE = "24,20,4,30,1"
+
 /** Counts paints of the canvas whose camera it is added to; it covers the whole canvas and draws nothing. */
 internal class FrameCounter : PNode() {
     val frames = AtomicLong()
@@ -72,7 +75,3 @@ internal suspend fun settleDesktop() {
 internal fun <T> Container.findComponent(type: Class<T>): T? =
     if (type.isInstance(this)) type.cast(this)
     else components.filterIsInstance<Container>().firstNotNullOfOrNull { it.findComponent(type) }
-
-/** Reads a private field that [owner] declares; the dialogs keep their trainers in one. */
-internal fun Any.privateField(owner: Class<*>, name: String): Any? =
-    owner.getDeclaredField(name).apply { isAccessible = true }.get(this)

@@ -6,10 +6,17 @@
  * Modes: headless (no desktop), paced (each iteration drawn before the next, the default), fast (runAsFastAsPossible;
  * views refresh at frame rate). Frames are paints of the network canvas, counted by an invisible camera child.
  *
- * Usage: IzhikevichHeadedBenchmarkKt <headless|paced|fast> <network|raster> <objects|arrays> [simMs] [warmupMs]
- *   [neurons] [connectionProbability] [weightScale]
+ * Usage: IzhikevichHeadedBenchmarkKt <headless|paced|fast> <network|raster> <objects|arrays> <neurons>
+ *   <connectionProbability> <dtMs> <simMs> <warmupMs> <seed> [weightScale]
  *
- * The size arguments default to the 1000-neuron demo. The size sweep's networks scale weights by 100 / in-degree.
+ * The numeric arguments are in the order of the headless IzhikevichBenchmark, and a seed builds the same network as
+ * that harness does from it. The demo is 1000 neurons at p = 0.1 and dt = 0.5; the size sweep's networks scale weights
+ * by 100 / in-degree.
+ *
+ * Diagnostic switches, recorded in the output when set: -Dbench.dirtyLog=true counts dirty-region requests by
+ * component class; -Dbench.syncLog=true records which UI primitives are pending at each step's display sync;
+ * -Dbench.noCount=true leaves out the spike counting (and so the firing rate); -Dbench.direct=true updates the network
+ * directly instead of iterating the workspace.
  */
 package org.simbrain.benchmarks
 
@@ -18,9 +25,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
-import org.simbrain.custom_sims.SimulationScope
-import org.simbrain.custom_sims.simulations.neuroscience.IZHIKEVICH_CONNECTION_PROBABILITY
-import org.simbrain.custom_sims.simulations.neuroscience.IZHIKEVICH_NEURONS
+import kotlinx.coroutines.withTimeout
+import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetworkArraySim
 import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetworkSim
 import org.simbrain.network.NetworkComponent
@@ -28,87 +34,93 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
-import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.updaterules.IzhikevichMatrixData
 import org.simbrain.plot.rasterchart.RasterPlotComponent
-import org.simbrain.util.UiRefresh
 import org.simbrain.util.UiWork
 import org.simbrain.util.updateAction
-import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.gui.SimbrainDesktop
+import java.awt.Component
+import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicLong
+import javax.swing.JComponent
+import javax.swing.JLabel
+import javax.swing.JList
+import javax.swing.RepaintManager
 import javax.swing.SwingUtilities
 import kotlin.system.exitProcess
 
 /**
  * With -Dbench.dirtyLog=true, counts dirty-region requests by component class, to see what the GUI repaints per step.
  */
-private class DirtyCountingRepaintManager : javax.swing.RepaintManager() {
-    val counts = java.util.concurrent.ConcurrentHashMap<String, AtomicLong>()
-    private val reported = java.util.concurrent.ConcurrentHashMap.newKeySet<String>()
+private class DirtyCountingRepaintManager : RepaintManager() {
+    val counts = ConcurrentHashMap<String, AtomicLong>()
+    private val reported = ConcurrentHashMap.newKeySet<String>()
 
-    override fun addDirtyRegion(c: javax.swing.JComponent, x: Int, y: Int, w: Int, h: Int) {
+    override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
         counts.computeIfAbsent(c.javaClass.name) { AtomicLong() }.incrementAndGet()
-        if ((c is javax.swing.JList<*> || c.javaClass == javax.swing.JLabel::class.java) && reported.add(c.javaClass.name)) {
-            val path = generateSequence(c as java.awt.Component) { it.parent }.take(8).joinToString(" < ") { it.javaClass.simpleName.ifEmpty { it.javaClass.name } }
-            System.err.println("first dirty ${c.javaClass.name}: ${(c as? javax.swing.JLabel)?.text ?: ""} | $path")
+        if ((c is JList<*> || c.javaClass == JLabel::class.java) && reported.add(c.javaClass.name)) {
+            val path = generateSequence(c as Component) { it.parent }.take(8).joinToString(" < ") { it.javaClass.simpleName.ifEmpty { it.javaClass.name } }
+            System.err.println("first dirty ${c.javaClass.name}: ${(c as? JLabel)?.text ?: ""} | $path")
             Throwable().stackTrace.take(25).forEach { System.err.println("    at $it") }
         }
         super.addDirtyRegion(c, x, y, w, h)
     }
 }
 
+private class Settings(
+    val mode: String,
+    val variant: String,
+    val representation: String,
+    val neurons: Int,
+    val p: Double,
+    val dt: Double,
+    val simMs: Double,
+    val warmupMs: Double,
+    val seed: Long,
+    val weightScale: Double
+)
+
 fun main(args: Array<String>) {
-    val mode = args[0]
-    val variant = args[1]
-    val representation = args[2]
-    val simMs = args.getOrNull(3)?.toDouble() ?: 2000.0
-    val warmupMs = args.getOrNull(4)?.toDouble() ?: 500.0
-    val n = args.getOrNull(5)?.toInt() ?: IZHIKEVICH_NEURONS
-    val p = args.getOrNull(6)?.toDouble() ?: IZHIKEVICH_CONNECTION_PROBABILITY
-    val weightScale = args.getOrNull(7)?.toDouble() ?: 1.0
-    require(mode in listOf("headless", "paced", "fast")) { "mode: headless | paced | fast" }
-    require(variant in listOf("network", "raster")) { "variant: network | raster" }
-    val sim = when (representation) {
-        "objects" -> izhikevichNetworkSim(n, p, weightScale)
-        "arrays" -> izhikevichNetworkArraySim(n, p, weightScale)
-        else -> error("representation: objects | arrays")
+    if (args.size < 9) {
+        System.err.println("Usage: <headless|paced|fast> <network|raster> <objects|arrays> <neurons> <p> <dtMs> <simMs> <warmupMs> <seed> [weightScale]")
+        exitProcess(1)
     }
-    runBlocking { run(sim, mode, variant, representation, simMs, warmupMs, p, weightScale) }
+    val settings = Settings(
+        mode = args[0],
+        variant = args[1],
+        representation = args[2],
+        neurons = args[3].toInt(),
+        p = args[4].toDouble(),
+        dt = args[5].toDouble(),
+        simMs = args[6].toDouble(),
+        warmupMs = args[7].toDouble(),
+        seed = args[8].toLong(),
+        weightScale = args.getOrNull(9)?.toDouble() ?: 1.0
+    )
+    require(settings.mode in listOf("headless", "paced", "fast")) { "mode: headless | paced | fast" }
+    require(settings.variant in listOf("network", "raster")) { "variant: network | raster" }
+    val sim = with(settings) {
+        when (representation) {
+            "objects" -> izhikevichNetworkSim(neurons, p, weightScale, seed)
+            "arrays" -> izhikevichNetworkArraySim(neurons, p, weightScale, seed)
+            else -> error("representation: objects | arrays")
+        }
+    }
+    runBlocking { run(sim, settings) }
     exitProcess(0)
 }
 
-private suspend fun run(
-    sim: org.simbrain.custom_sims.NewSimulation,
-    mode: String,
-    variant: String,
-    representation: String,
-    simMs: Double,
-    warmupMs: Double,
-    p: Double,
-    weightScale: Double
-) {
-    val headed = mode != "headless"
+private suspend fun run(sim: NewSimulation, settings: Settings) {
+    val headed = settings.mode != "headless"
     val t0 = System.nanoTime()
-    val workspace: Workspace
     val dirtyLog = if (headed && System.getProperty("bench.dirtyLog") == "true") {
-        DirtyCountingRepaintManager().also { m -> SwingUtilities.invokeAndWait { javax.swing.RepaintManager.setCurrentManager(m) } }
+        DirtyCountingRepaintManager().also { m -> SwingUtilities.invokeAndWait { RepaintManager.setCurrentManager(m) } }
     } else null
-    if (headed) {
-        SimbrainDesktop.main(arrayOf())
-        withContext(Dispatchers.Swing) {
-            SimbrainDesktop.frame.setBounds(0, 0, 1600, 1000)
-        }
-        sim.run(SimbrainDesktop)
-        workspace = SimbrainDesktop.workspace
-    } else {
-        val scope = SimulationScope()
-        sim.task(scope, null)
-        workspace = scope.workspace
-    }
+    val workspace = openDemo(sim, headed)
     val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().single()
     val network = networkComponent.network
-    if (variant == "network") {
+    network.timeStep = settings.dt
+    if (settings.variant == "network") {
         val rasters = workspace.componentList.filterIsInstance<RasterPlotComponent>()
         rasters.forEach { it.setChangedSinceLastSave(false) }
         if (headed) {
@@ -117,9 +129,11 @@ private suspend fun run(
             rasters.forEach { it.close() }
         }
         // Closing removes the plot's couplings asynchronously
-        while (workspace.couplingManager.couplings.isNotEmpty()) delay(10)
+        withTimeout(30_000) {
+            while (workspace.couplingManager.couplings.isNotEmpty()) delay(10)
+        }
     }
-    workspace.runAsFastAsPossible = mode == "fast"
+    workspace.runAsFastAsPossible = settings.mode == "fast"
 
     val models = network.allModels
     val collection = models.filterIsInstance<NeuronCollection>().firstOrNull()
@@ -130,29 +144,19 @@ private suspend fun run(
     var counting = false
     var spikes = 0L
     val arraySpikes = (array?.dataHolder as? IzhikevichMatrixData)?.spikes
-    if (System.getProperty("bench.noCount") != "true") network.addUpdateAction(updateAction("Count spikes") {
+    val countSpikes = System.getProperty("bench.noCount") != "true"
+    if (countSpikes) network.addUpdateAction(updateAction("Count spikes") {
         if (counting) {
             spikes += if (collection != null) with(network) { collection.neuronList.count { it.isSpike } } else arraySpikes!!.count { it }
         }
     })
 
-    val counter = FrameCounter()
-    if (headed) {
-        val panel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
-        withContext(Dispatchers.Swing) { panel.canvas.camera.addChild(counter) }
-        // Let the windows open and settle before timing
-        delay(2000)
-        // First-run tips would otherwise cover part of the windows
-        SimbrainDesktop.onboardingManager.dismissAll()
-        UiWork.awaitIdle()
-        SwingUtilities.invokeAndWait { }
-    }
-    // With -Dbench.syncLog=true, records which UI primitives are pending when each step's display sync flushes
-    val syncLog = java.util.concurrent.ConcurrentHashMap<String, AtomicLong>()
+    val counter = if (headed) networkComponent.countFrames() else null
+    if (headed) settleDesktop()
+    val syncLog = ConcurrentHashMap<String, AtomicLong>()
     if (headed && System.getProperty("bench.syncLog") == "true") {
         val original = workspace.displaySync!!
-        val panel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
-        val refresh = panel.javaClass.getDeclaredField("refreshAfterUpdate").apply { isAccessible = true }.get(panel) as UiRefresh
+        val refresh = networkComponent.networkPanel().refreshAfterUpdate
         workspace.displaySync = {
             withContext(Dispatchers.Swing) {
                 val active = UiWork.activePosters()
@@ -171,31 +175,47 @@ private suspend fun run(
 
     val dt = network.timeStep
     val t1 = System.nanoTime()
-    workspace.iterateSuspend(Math.round(warmupMs / dt).toInt())
+    workspace.iterateSuspend(Math.round(settings.warmupMs / dt).toInt())
     val warmupS = (System.nanoTime() - t1) / 1e9
 
-    val steps = Math.round(simMs / dt).toInt()
+    val steps = Math.round(settings.simMs / dt).toInt()
     counting = true
     dirtyLog?.counts?.clear()
     syncLog.clear()
     dirtyLog?.let { System.err.println("=== timed run starts") }
-    val frames0 = counter.frames.get()
+    val frames0 = counter?.frames?.get() ?: 0
     val t2 = System.nanoTime()
     if (System.getProperty("bench.direct") == "true") repeat(steps) { network.update() } else workspace.iterateSuspend(steps)
     val runS = (System.nanoTime() - t2) / 1e9
-    val frames = counter.frames.get() - frames0
+    val frames = (counter?.frames?.get() ?: 0) - frames0
     counting = false
 
     dirtyLog?.counts?.entries?.sortedByDescending { it.value.get() }?.take(12)?.forEach { (name, n) ->
         System.err.println("dirty %8d %s".format(n.get(), name))
     }
     syncLog.entries.sortedByDescending { it.value.get() }.forEach { (name, n) -> System.err.println("sync %8d %s".format(n.get(), name)) }
-    val rateHz = spikes / neurons.toDouble() / (simMs / 1000.0)
-    println(
-        "{\"simulator\":\"simbrain-gui\",\"representation\":\"$representation\",\"variant\":\"$variant\",\"mode\":\"$mode\"," +
-                "\"neurons\":$neurons,\"p\":$p,\"weight_scale\":$weightScale,\"synapses\":$synapses,\"dt_ms\":$dt,\"sim_ms\":$simMs,\"build_s\":%.3f,\"warmup_s\":%.3f,".format(buildS, warmupS) +
-                "\"run_s\":%.4f,\"rt_factor\":%.4f,\"iterations_per_s\":%.1f,\"frames\":$frames,\"frames_per_s\":%.1f,\"rate_hz\":%.3f}".format(
-                    runS, runS / (simMs / 1000.0), steps / runS, frames / runS, rateHz
-                )
+    val simS = settings.simMs / 1000.0
+    emitResult(
+        "simulator" to "simbrain-gui",
+        "representation" to settings.representation,
+        "variant" to settings.variant,
+        "mode" to settings.mode,
+        "neurons" to neurons,
+        "p" to settings.p,
+        "weight_scale" to settings.weightScale,
+        "seed" to settings.seed,
+        "synapses" to synapses,
+        "dt_ms" to dt,
+        "sim_ms" to settings.simMs,
+        "warmup_ms" to settings.warmupMs,
+        "build_s" to fixed(buildS, 3),
+        "warmup_s" to fixed(warmupS, 3),
+        "run_s" to fixed(runS, 4),
+        "rt_factor" to fixed(runS / simS, 4),
+        "iterations_per_s" to fixed(steps / runS, 1),
+        "frames" to frames,
+        "frames_per_s" to fixed(frames / runS, 1),
+        // Without spike counting there is no rate to report
+        "rate_hz" to if (countSpikes) fixed(spikes / neurons.toDouble() / simS, 3) else null,
     )
 }

@@ -29,7 +29,7 @@ fun main(args: Array<String>) {
     val tokens = args.getOrNull(1)?.toInt() ?: 2000
     val warmup = args.getOrNull(2)?.toInt() ?: 200
     val trainIterations = args.getOrNull(3)?.toInt() ?: 20
-    val size = args.getOrNull(4) ?: "24,20,4,30,1"
+    val size = args.getOrNull(4) ?: DEMO_TINY_LM_SIZE
     runBlocking { run(mode, tokens, warmup, trainIterations, size) }
     exitProcess(0)
 }
@@ -76,13 +76,22 @@ private suspend fun run(mode: String, tokens: Int, warmup: Int, trainIterations:
     val frames = (counter?.frames?.get() ?: 0) - frames0
     val tokensGenerated = generated - generated0
 
-    println(
-        "{\"simulator\":\"simbrain-gui\",\"benchmark\":\"tiny-lm-demo-generation\",\"size\":\"$size\"," +
-                "\"mode\":\"$mode\",\"steps\":$tokens,\"tokens\":$tokensGenerated,\"train_iterations\":$trainIterations," +
-                "\"build_s\":%.3f,\"train_s\":%.3f,\"warmup_s\":%.3f,\"run_s\":%.4f,".format(buildS, trainS, warmupS, runS) +
-                "\"ms_per_token\":%.4f,\"tokens_per_s\":%.1f,\"frames\":$frames,\"frames_per_s\":%.1f,".format(
-                    runS / tokensGenerated * 1e3, tokensGenerated / runS, frames / runS
-                ) +
-                "\"train_loss\":%.4f}".format(model.trainer.lastTrainingError)
+    emitResult(
+        "simulator" to "simbrain-gui",
+        "benchmark" to "tiny-lm-demo-generation",
+        "size" to size,
+        "mode" to mode,
+        "steps" to tokens,
+        "tokens" to tokensGenerated,
+        "train_iterations" to trainIterations,
+        "build_s" to fixed(buildS, 3),
+        "train_s" to fixed(trainS, 3),
+        "warmup_s" to fixed(warmupS, 3),
+        "run_s" to fixed(runS, 4),
+        "ms_per_token" to fixed(runS / tokensGenerated * 1e3, 4),
+        "tokens_per_s" to fixed(tokensGenerated / runS, 1),
+        "frames" to frames,
+        "frames_per_s" to fixed(frames / runS, 1),
+        "train_loss" to fixed(model.trainer.lastTrainingError, 4),
     )
 }

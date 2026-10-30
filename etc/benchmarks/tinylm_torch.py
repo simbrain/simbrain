@@ -76,6 +76,7 @@ for _ in range(epochs):
         n += len(x)
     epoch_s.append(round(time.perf_counter() - t0, 3))
     last = total / n
-print(json.dumps({"framework": f"pytorch-tinylm-{threads}t-b{batch}", "vocab": vocab, "windows": len(inputs),
+print(json.dumps({"framework": f"pytorch-tinylm-{threads}t-b{batch}", "version": torch.__version__, "threads": threads,
+                  "dtype": "float32", "vocab": vocab, "windows": len(inputs),
                   "config": [ctx, dim, heads, hidden, layers], "epochs": epochs, "epoch_s": epoch_s,
                   "final_train_loss": round(last, 4)}))

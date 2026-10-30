@@ -129,7 +129,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
  * Controls for CNN training: Step/Run/Stop buttons, Randomize, iterations, error plot.
  */
 class CnnTrainerControls(
-    private val trainer: CnnTrainer
+    internal val trainer: CnnTrainer
 ) : JPanel(), CoroutineScope {
 
     private val controlsJob = SupervisorJob()

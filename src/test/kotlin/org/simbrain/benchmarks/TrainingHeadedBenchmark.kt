@@ -54,7 +54,7 @@ fun main(args: Array<String>) {
     val (defaultIterations, defaultWarmup) = if (demo == "tinylm") 100 to 10 else 2000 to 200
     val iterations = args.getOrNull(2)?.toInt() ?: defaultIterations
     val warmup = args.getOrNull(3)?.toInt() ?: defaultWarmup
-    val tinyLmSize = args.getOrNull(4) ?: "24,20,4,30,1"
+    val tinyLmSize = args.getOrNull(4) ?: DEMO_TINY_LM_SIZE
     runBlocking { run(demo, mode, iterations, warmup, tinyLmSize) }
     exitProcess(0)
 }
@@ -69,23 +69,26 @@ private class DemoTrainer(
     suspend fun trainFor(iterations: Int) {
         val done = CompletableDeferred<Unit>()
         val subscription = events.endTraining.on(Dispatchers.Default) { done.complete(Unit) }
-        stoppingCondition.maxIterations = iteration() + iterations
-        start()
-        done.await()
-        subscription.cancel()
+        try {
+            stoppingCondition.maxIterations = iteration() + iterations
+            start()
+            done.await()
+        } finally {
+            subscription.cancel()
+        }
     }
 }
 
 /**
  * A demo ready to train: its [name] in the output, its [batch] size, how many iterations make one pass over the
- * training data, and what to report once training is done.
+ * training data, and the fields to report once training is done.
  */
 private class Demo(
     val name: String,
     val trainer: DemoTrainer,
     val batch: Int,
     val iterationsPerEpoch: Double,
-    val result: suspend () -> String
+    val result: suspend () -> List<Pair<String, Any?>>
 )
 
 // As the demos open them: modal and centered
@@ -101,7 +104,7 @@ private suspend fun mlp(component: NetworkComponent, dialog: Boolean): Demo {
             showDialog(trainingDialog)
             val controls = trainingDialog.contentPane.findComponent(TrainerControls::class.java)
                 ?: error("no trainer controls in the dialog")
-            controls.privateField(TrainerControls::class.java, "trainer") as SupervisedTrainer
+            controls.trainer
         }
     } else {
         SupervisedTrainer(network, bp)
@@ -112,7 +115,7 @@ private suspend fun mlp(component: NetworkComponent, dialog: Boolean): Demo {
         DemoTrainer(trainer.events, trainer.config.stoppingCondition, { trainer.iteration }) { trainer.startTraining() },
         batch,
         bp.trainingSet.size / batch.toDouble()
-    ) { "\"test_acc\":%.4f".format(trainer.computeTestAccuracy()) }
+    ) { listOf("test_acc" to fixed(trainer.computeTestAccuracy(), 4)) }
 }
 
 private suspend fun cnn(component: NetworkComponent, dialog: Boolean): Demo {
@@ -125,7 +128,7 @@ private suspend fun cnn(component: NetworkComponent, dialog: Boolean): Demo {
             showDialog(trainingDialog)
             val controls = trainingDialog.contentPane.findComponent(CnnTrainerControls::class.java)
                 ?: error("no trainer controls in the dialog")
-            controls.privateField(CnnTrainerControls::class.java, "trainer") as CnnTrainer
+            controls.trainer
         }
     } else {
         // What the training dialog builds
@@ -140,16 +143,7 @@ private suspend fun cnn(component: NetworkComponent, dialog: Boolean): Demo {
         DemoTrainer(trainer.events, trainer.config.stoppingCondition, { trainer.iteration }) { trainer.startTraining() },
         batch,
         cnn.trainingSet.size / batch.toDouble()
-    ) {
-        val test = cnn.testingSet
-        var correct = 0
-        for (i in test.inputs.indices) {
-            val output = trainer.forwardPass(test.inputs[i])
-            val target = test.targets[i]
-            if (output.indices.maxBy { output[it] } == target.indices.maxBy { target[it] }) correct++
-        }
-        "\"test_acc\":%.4f".format(correct.toDouble() / test.inputs.size)
-    }
+    ) { listOf("test_acc" to fixed(trainer.testAccuracy(cnn.testingSet), 4)) }
 }
 
 private suspend fun tinyLm(component: NetworkComponent, dialog: Boolean): Demo {
@@ -163,7 +157,7 @@ private suspend fun tinyLm(component: NetworkComponent, dialog: Boolean): Demo {
         DemoTrainer(trainer.events, trainer.stoppingCondition, { trainer.iteration }) { trainer.startTraining() },
         1,
         1.0
-    ) { "\"train_loss\":%.4f,\"windows\":${trainer.trainingWindows.size}".format(trainer.lastTrainingError) }
+    ) { listOf("train_loss" to fixed(trainer.lastTrainingError, 4), "windows" to trainer.trainingWindows.size) }
 }
 
 private suspend fun run(demoName: String, mode: String, iterations: Int, warmup: Int, tinyLmSize: String) {
@@ -201,14 +195,21 @@ private suspend fun run(demoName: String, mode: String, iterations: Int, warmup:
     val runS = (System.nanoTime() - t2) / 1e9
     val frames = (counter?.frames?.get() ?: 0) - frames0
 
-    val size = if (demoName == "tinylm") ",\"size\":\"$tinyLmSize\"" else ""
-    println(
-        "{\"simulator\":\"simbrain-gui\",\"benchmark\":\"${demo.name}\"$size,\"mode\":\"$mode\",\"iterations\":$iterations," +
-                "\"batch\":${demo.batch},\"build_s\":%.3f,\"warmup_s\":%.3f,\"run_s\":%.4f,\"iterations_per_s\":%.1f,".format(
-                    buildS, warmupS, runS, iterations / runS
-                ) +
-                "\"epoch_equivalent_s\":%.3f,\"frames\":$frames,\"frames_per_s\":%.1f,".format(
-                    runS / iterations * demo.iterationsPerEpoch, frames / runS
-                ) + demo.result() + "}"
+    val size = if (demoName == "tinylm") listOf("size" to tinyLmSize) else emptyList()
+    emitResult(
+        "simulator" to "simbrain-gui",
+        "benchmark" to demo.name,
+        *size.toTypedArray(),
+        "mode" to mode,
+        "iterations" to iterations,
+        "batch" to demo.batch,
+        "build_s" to fixed(buildS, 3),
+        "warmup_s" to fixed(warmupS, 3),
+        "run_s" to fixed(runS, 4),
+        "iterations_per_s" to fixed(iterations / runS, 1),
+        "epoch_equivalent_s" to fixed(runS / iterations * demo.iterationsPerEpoch, 3),
+        "frames" to frames,
+        "frames_per_s" to fixed(frames / runS, 1),
+        *demo.result().toTypedArray(),
     )
 }

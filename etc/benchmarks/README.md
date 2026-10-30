@@ -44,12 +44,14 @@ etc/benchmarks/bench summarize                               # medians of everyt
 ```
 
 `--machine` is recorded in every result. Each command appends to a dated file in `build/benchmarks/results/`; pass
-`--out` to choose the file.
+`--out` to choose the file. Each file starts with a meta row recording the platform, the command line, the Simbrain 4
+commit (and whether tracked files had uncommitted changes) and the Simbrain 3 commit, and each result records its seed
+and any `-Dbench.*` diagnostic switch it ran with (see the harness headers; none is set by these commands).
 
 | Command | Suite | What it times | Time on a 16-core desktop / 10-core laptop |
 |---|---|---|---|
 | `run` | `headline` | 1000-neuron Izhikevich network, 10 s simulated: Simbrain 3 (serial, concurrent), Simbrain 4 (objects on all workers and on one, arrays), Brian2 (runtime, C++ standalone) | 13 / 20 min |
-| | `threads` | Simbrain 4 objects at 1, 2, 4, 8, 16 and all workers, 1000 and 4000 neurons | 32 / 40 min |
+| | `threads` | Simbrain 4 objects at 1, 2, 4, 8 and 16 workers, one per core but one (the default) and one per core, 1000 and 4000 neurons | 32 / 40 min |
 | | `training` | MLP and CNN on Tiny MNIST and the tiny language model, Simbrain against PyTorch (1 thread and all, float32 and float64) | 4 / 4 min |
 | | `inference` | MLP and CNN test set one example at a time; PyTorch also as one batch | 1 / 2 min |
 | | `sweep` | 500 to 8000 neurons at connection probability 0.01, 0.05 and 0.1, every simulator but Simbrain 3 serial | 33 / 75 min |
@@ -77,11 +79,13 @@ etc/benchmarks/bench summarize                               # medians of everyt
 | File | Role |
 |---|---|
 | `bench`, `bench.py` | setup and entry point; `bench` runs `bench.py` in this folder's uv environment |
+| `_common.py` | what the runners and summarizers share: running a harness and recording its rows, the meta row, the suites' shared parameters, reading results with later files superseding earlier ones |
 | `pyproject.toml`, `uv.lock` | Python environment: Python 3.12, PyTorch 2.14.1 (CPU), Brian2 2.10.1, NumPy 2.5.3 |
 | `run_benchmarks.py`, `run_headed.py`, `torch_threads.py` | suite runners; each run is one process, appending one JSON line |
 | `summarize.py`, `summarize_headed.py`, `summarize_torch_threads.py` | medians over repeats; later files supersede earlier ones for the same measurement (machine, suite and simulator for the headless suites; machine, network or demo, and mode for the headed ones; machine, model, task, precision and thread count for PyTorch's threads). `bench summarize` leaves out files named `*.discarded.jsonl` |
 | `izh_brian2.py` | the Izhikevich network in Brian2 |
 | `mnist_torch.py`, `cnn_torch.py`, `tinylm_torch.py`, `mnist_infer_torch.py` | the PyTorch replicas of the MLP, the CNN, the tiny language model and test-set inference |
+| `torch_models.py` | the data loading, MLP, CNN and training epoch the Tiny MNIST replicas share |
 | `simbrain3/*.java` | Simbrain 3 harnesses (headless network; network with the GUI open) |
 | `cp.init.gradle` | Gradle init script that prints Simbrain 4's test classpath |
 | `HEADED_SPEC.md` | what the GUI-open runs measure, shared by the Simbrain 3 and 4 harnesses |
@@ -90,7 +94,10 @@ The Simbrain 4 harnesses are in `src/test/kotlin/org/simbrain/benchmarks/`: `Izh
 `CnnBenchmark`, `TinyLmBenchmark` and `MnistInferenceBenchmark` without the GUI, and `IzhikevichHeadedBenchmark`,
 `TrainingHeadedBenchmark`, `InferenceHeadedBenchmark` and `GenerationHeadedBenchmark` with it (sharing `HeadedSupport`).
 Each takes its parameters on the command line (see its header) and prints one JSON line, so it can also be run on its
-own with the classpath from `build/benchmarks/s4cp.txt`.
+own with the classpath from `build/benchmarks/s4cp.txt`. The four Izhikevich harnesses (both Simbrains, with and
+without the GUI) and `izh_brian2.py` take their numeric arguments in one order: neurons, connection probability, dt,
+simulated ms, warm-up ms, seed, weight scale. The ML harnesses share their networks through `BenchmarkModels.kt` and
+their output through `BenchmarkOutput.kt`.
 
 ## Notes on the comparison
 

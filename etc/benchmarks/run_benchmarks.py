@@ -9,7 +9,8 @@ Usage:
     --java21 PATH --s4cp CLASSPATH_FILE --s4repo DIR --s3dir DIR --python PATH --bench DIR --data DIR \
     --heap 24g [--s4-only]
 """
-import argparse, json, os, platform, subprocess, sys, time
+import argparse, os, subprocess
+from _common import DT, TINY_LM_CONFIGS, record_meta, run_and_record, sweep_scale, tinylm_ids_path
 
 p = argparse.ArgumentParser()
 for a in ["machine", "out", "suites", "java21", "s4cp", "s4repo", "s3dir", "python", "bench", "data", "heap"]:
@@ -21,56 +22,45 @@ args = p.parse_args()
 
 s4cp = open(args.s4cp).read().strip()
 cores = os.cpu_count()
-DT = "0.5"
 
 
-def record(extra, line):
-    try:
-        result = json.loads(line)
-    except json.JSONDecodeError:
-        result = {"error": line[-500:]}
-    result.update(extra)
-    result["machine"] = args.machine
-    result["timestamp"] = time.strftime("%Y-%m-%dT%H:%M:%S")
-    with open(args.out, "a") as f:
-        f.write(json.dumps(result) + "\n")
-    print(json.dumps(result), flush=True)
-
-
-def run(cmd, extra, cwd=None, env=None):
-    if args.s4_only and cmd[0] != args.java21:
+def run(cmd, extra, cwd=None):
+    # A Simbrain 4 run is one on Simbrain 4's classpath; Simbrain 3 runs on the same JDK, so the executable won't tell
+    if args.s4_only and s4cp not in cmd:
         return
-    started = time.time()
-    try:
-        out = subprocess.run(cmd, cwd=cwd, env={**os.environ, **(env or {})}, capture_output=True, text=True,
-                             timeout=args.timeout, stdin=subprocess.DEVNULL)
-        # A harness may print one result line per mode
-        lines = [l for l in out.stdout.splitlines() if l.startswith("{")] or \
-            [json.dumps({"error": (out.stdout + out.stderr)[-800:]})]
-    except subprocess.TimeoutExpired:
-        lines = [json.dumps({"error": f"timeout after {args.timeout} s"})]
-    extra = {**extra, "wall_total_s": round(time.time() - started, 2)}
-    for line in lines:
-        record(extra, line)
+    run_and_record(cmd, extra, args.out, args.machine, args.timeout, cwd=cwd)
+
+
+def s4(main, *rest, headless=False, workers=None):
+    """A Simbrain 4 harness; workers limits the network update pool by the JVM's processor count."""
+    jvm = [args.java21, f"-Xmx{args.heap}"]
+    if headless:
+        jvm.append("-Djava.awt.headless=true")
+    if workers is not None:
+        jvm.append(f"-XX:ActiveProcessorCount={workers + 1}")
+    return jvm + ["-cp", s4cp, "org.simbrain.benchmarks." + main, *map(str, rest)]
+
+
+def s3(main, *rest):
+    """A Simbrain 3 harness, run from its worktree. Same JDK as Simbrain 4: a newer JIT alone made Simbrain 3 about 10%
+    faster."""
+    return [args.java21, f"-Xmx{args.heap}", "-cp", "bin:lib/*", "org.simbrain.benchmarks." + main, *map(str, rest)]
+
+
+def python(script, *rest):
+    return [args.python, os.path.join(args.bench, script), *map(str, rest)]
 
 
 def s4_izh(variant, n, p_, sim, warm, seed, scale, workers=None):
-    jvm = [args.java21, f"-Xmx{args.heap}"]
-    if workers is not None:
-        jvm.append(f"-XX:ActiveProcessorCount={workers + 1}")
-    return jvm + ["-cp", s4cp, "org.simbrain.benchmarks.IzhikevichBenchmarkKt", variant, str(n), str(p_), DT,
-                  str(sim), str(warm), str(seed), str(scale)]
+    return s4("IzhikevichBenchmarkKt", variant, n, p_, DT, sim, warm, seed, scale, workers=workers)
 
 
 def s3_izh(mode, n, p_, sim, warm, seed, scale):
-    # Same JDK as Simbrain 4: a newer JIT alone made Simbrain 3 about 10% faster
-    return [args.java21, f"-Xmx{args.heap}", "-cp", "bin:lib/*", "org.simbrain.benchmarks.IzhikevichBenchmark",
-            mode, str(n), str(p_), DT, str(sim), str(warm), str(seed), str(scale)]
+    return s3("IzhikevichBenchmark", mode, n, p_, DT, sim, warm, seed, scale)
 
 
 def brian(target, n, p_, sim, warm, seed, scale):
-    return [args.python, os.path.join(args.bench, "izh_brian2.py"), target, str(n), str(p_), DT, str(sim), str(seed),
-            str(scale), str(warm)]
+    return python("izh_brian2.py", target, n, p_, DT, sim, warm, seed, scale)
 
 
 def headline():
@@ -93,7 +83,7 @@ def sweep():
     run(brian("runtime", 1000, 0.1, 200, 0, 0, 1.0), {"suite": "warmup"})
     for n in [500, 1000, 2000, 4000, 8000]:
         for p_ in [0.01, 0.05, 0.1]:
-            scale = round(100.0 / ((n - 1) * p_), 6)
+            scale = sweep_scale(n, p_)
             for rep in range(3):
                 base = {"suite": "sweep", "repeat": rep}
                 run(s3_izh("concurrent", n, p_, sim, warm, rep + 1, scale), base, cwd=args.s3dir)
@@ -106,7 +96,7 @@ def sweep():
 def threads():
     counts = sorted(c for c in {1, 2, 4, 8, 16, cores - 1, cores} if 1 <= c <= cores)
     for n, p_ in [(1000, 0.1), (4000, 0.05)]:
-        scale = round(100.0 / ((n - 1) * p_), 6)
+        scale = sweep_scale(n, p_)
         for workers in counts:
             for rep in range(3):
                 run(s4_izh("objects", n, p_, 2000, 500, rep + 1, scale, workers=workers),
@@ -115,38 +105,31 @@ def threads():
 
 def training():
     text = os.path.join(args.s4repo, "simulations", "texts", "casual_texting.txt")
-    tiny_configs = [("24", "20", "4", "30", "1"), ("64", "128", "4", "512", "2")]
+    results_dir = os.path.dirname(os.path.abspath(args.out))
     for rep in range(3):
         base = {"suite": "training", "repeat": rep}
-        run([args.java21, f"-Xmx{args.heap}", "-cp", s4cp, "org.simbrain.benchmarks.MnistBenchmarkKt", args.data, "6",
-             str(rep + 1)], base)
-        run([args.java21, f"-Xmx{args.heap}", "-Djava.awt.headless=true", "-cp", s4cp,
-             "org.simbrain.benchmarks.CnnBenchmarkKt", "6", str(rep + 1)], base)
+        run(s4("MnistBenchmarkKt", args.data, 6, rep + 1), base)
+        run(s4("CnnBenchmarkKt", 6, rep + 1, headless=True), base)
         # Simbrain computes in double precision, so PyTorch runs in both
         for threads_ in [1, cores]:
             for dtype in ["float32", "float64"]:
-                run([args.python, os.path.join(args.bench, "mnist_torch.py"), args.data, "6", str(rep + 1),
-                     str(threads_), dtype], base)
-                run([args.python, os.path.join(args.bench, "cnn_torch.py"), args.data, "6", str(rep + 1),
-                     str(threads_), dtype], base)
-        for cfg in tiny_configs:
-            ids = os.path.join(os.path.dirname(os.path.abspath(args.out)), f"tinylm_ids_{'_'.join(cfg)}.txt")
-            run([args.java21, f"-Xmx{args.heap}", "-cp", s4cp, "org.simbrain.benchmarks.TinyLmBenchmarkKt", text, ids,
-                 "4", *cfg], base, cwd=args.s4repo)
+                run(python("mnist_torch.py", args.data, 6, rep + 1, threads_, dtype), base)
+                run(python("cnn_torch.py", args.data, 6, rep + 1, threads_, dtype), base)
+        for cfg in TINY_LM_CONFIGS:
+            ids = tinylm_ids_path(results_dir, cfg)
+            run(s4("TinyLmBenchmarkKt", text, ids, 4, *cfg), base, cwd=args.s4repo)
             for threads_ in [1, cores]:
-                run([args.python, os.path.join(args.bench, "tinylm_torch.py"), ids, "4", str(threads_), "1", *cfg], base)
+                run(python("tinylm_torch.py", ids, 4, threads_, 1, *cfg), base)
 
 
 def inference():
     for rep in range(3):
         base = {"suite": "inference", "repeat": rep}
         for flavor in ["mlp", "cnn"]:
-            run([args.java21, f"-Xmx{args.heap}", "-Djava.awt.headless=true", "-cp", s4cp,
-                 "org.simbrain.benchmarks.MnistInferenceBenchmarkKt", flavor, args.data, "2", "10", str(rep + 1)], base)
+            run(s4("MnistInferenceBenchmarkKt", flavor, args.data, 2, 10, rep + 1, headless=True), base)
             for threads_ in [1, cores]:
                 for dtype in ["float32", "float64"]:
-                    run([args.python, os.path.join(args.bench, "mnist_infer_torch.py"), flavor, args.data, "2", "10",
-                         str(rep + 1), str(threads_), dtype], base)
+                    run(python("mnist_infer_torch.py", flavor, args.data, 2, 10, rep + 1, threads_, dtype), base)
 
 
 def arrays():
@@ -155,7 +138,7 @@ def arrays():
         run(s4_izh("arrays", 1000, 0.1, 10000, 1000, rep + 1, 1.0), {"suite": "headline", "repeat": rep})
     for n in [500, 1000, 2000, 4000, 8000]:
         for p_ in [0.01, 0.05, 0.1]:
-            scale = round(100.0 / ((n - 1) * p_), 6)
+            scale = sweep_scale(n, p_)
             for rep in range(3):
                 run(s4_izh("arrays", n, p_, 2000, 500, rep + 1, scale), {"suite": "sweep", "repeat": rep})
 
@@ -167,14 +150,12 @@ def smoke():
     run(s4_izh("arrays", 200, 0.1, 100, 50, 1, 5.0), base)
     run(brian("runtime", 200, 0.1, 100, 50, 1, 5.0), base)
     run(brian("cpp_standalone", 200, 0.1, 100, 50, 1, 5.0), base)
-    run([args.java21, f"-Xmx{args.heap}", "-cp", s4cp, "org.simbrain.benchmarks.MnistBenchmarkKt", args.data, "1", "1"], base)
-    run([args.python, os.path.join(args.bench, "cnn_torch.py"), args.data, "1", "1", "1", "float32"], base)
+    run(s4("MnistBenchmarkKt", args.data, 1, 1), base)
+    run(python("cnn_torch.py", args.data, 1, 1, 1, "float32"), base)
 
 
-record({"suite": "meta", "platform": platform.platform(), "processor": platform.processor(), "cores": cores,
-        "python": sys.version.split()[0],
-        "java21": subprocess.run([args.java21, "-version"], capture_output=True, text=True).stderr.splitlines()[0]},
-       json.dumps({}))
+record_meta(args.out, args.machine, s3dir=args.s3dir,
+            java21=subprocess.run([args.java21, "-version"], capture_output=True, text=True).stderr.splitlines()[0])
 for suite in args.suites.split(","):
     {"smoke": smoke, "arrays": arrays, "headline": headline, "sweep": sweep, "threads": threads, "training": training,
      "inference": inference}[suite]()

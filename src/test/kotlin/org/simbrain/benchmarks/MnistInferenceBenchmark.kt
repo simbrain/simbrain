@@ -13,28 +13,9 @@
 package org.simbrain.benchmarks
 
 import kotlinx.coroutines.runBlocking
-import org.simbrain.custom_sims.SimulationScope
-import org.simbrain.custom_sims.simulations.backprop.cnnMNIST
-import org.simbrain.network.NetworkComponent
-import org.simbrain.network.core.Network
-import org.simbrain.network.subnetworks.BackpropNetwork
-import org.simbrain.network.subnetworks.ConvolutionalNeuralNetwork
-import org.simbrain.network.subnetworks.Subnetwork
-import org.simbrain.network.trainers.BackpropLossFunction
-import org.simbrain.network.trainers.CnnTrainer
-import org.simbrain.network.trainers.SupervisedTrainer
-import org.simbrain.network.trainers.TrainingDataset
-import org.simbrain.network.updaterules.LinearRule
-import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.util.csvToDouble2DArray
 import org.simbrain.util.toColumnVector
-import java.io.File
 import kotlin.random.Random
 import kotlin.system.exitProcess
-
-private fun load(dir: String, name: String) = csvToDouble2DArray(File(dir, name).readText())
-
-private fun DoubleArray.argmax() = indices.maxBy { this[it] }
 
 /** One timed pass: runs [infer] on every test example and returns the seconds taken and the number correct. */
 private class Inference(
@@ -58,9 +39,10 @@ fun main(args: Array<String>) {
     val dataDir = args[1]
     val trainEpochs = args[2].toInt()
     val passes = args[3].toInt()
-    val rng = Random(args[4].toLong())
+    val seed = args[4].toLong()
     require(flavor in listOf("mlp", "cnn")) { "flavor: mlp | cnn" }
 
+    val rng = Random(seed)
     val modes = runBlocking { if (flavor == "mlp") mlp(dataDir, trainEpochs, rng) else cnn(trainEpochs, rng) }
     for ((mode, inference) in modes) {
         inference.setup()
@@ -70,12 +52,18 @@ fun main(args: Array<String>) {
         }
         val n = inference.inputs.size
         val median = results.map { it.first }.sorted()[passes / 2]
-        println(
-            "{\"framework\":\"simbrain\",\"flavor\":\"$flavor\",\"mode\":\"$mode\",\"batch\":1,\"examples\":$n," +
-                    "\"passes\":$passes,\"pass_s\":[${results.joinToString(",") { "%.4f".format(it.first) }}]," +
-                    "\"us_per_example\":%.2f,\"examples_per_s\":%.0f,\"test_acc\":%.4f}".format(
-                        median / n * 1e6, n / median, results.last().second.toDouble() / n
-                    )
+        emitResult(
+            "framework" to "simbrain",
+            "flavor" to flavor,
+            "mode" to mode,
+            "batch" to 1,
+            "examples" to n,
+            "passes" to passes,
+            "seed" to seed,
+            "pass_s" to results.map { fixed(it.first, 4) },
+            "us_per_example" to fixed(median / n * 1e6, 2),
+            "examples_per_s" to fixed(n / median, 0),
+            "test_acc" to fixed(results.last().second.toDouble() / n, 4),
         )
     }
     exitProcess(0)
@@ -83,35 +71,15 @@ fun main(args: Array<String>) {
 
 private const val WARMUP_PASSES = 3
 
-private suspend fun mlp(dataDir: String, trainEpochs: Int, rng: Random): List<Pair<String, Inference>> {
-    val trainX = load(dataDir, "tiny_mnist_train_inputs.csv")
-    val trainY = load(dataDir, "tiny_mnist_train_labels.csv")
-    val testX = load(dataDir, "tiny_mnist_test_inputs.csv").toList()
-    val testY = load(dataDir, "tiny_mnist_test_labels.csv").map { it.argmax() }
+private fun mlp(dataDir: String, trainEpochs: Int, rng: Random): List<Pair<String, Inference>> {
+    val data = TinyMnistData(dataDir)
+    val model = MnistMlp(data)
+    repeat(trainEpochs) { model.trainEpoch(rng) }
+    val bp = model.bp
+    val net = model.network
 
-    val net = Network()
-    val bp = BackpropNetwork(intArrayOf(trainX[0].size, 150, 100, trainY[0].size))
-    bp.hiddenLayers().forEach { it.updateRule = LinearRule().apply { clippingType = LinearRule.ClippingType.Relu } }
-    bp.outputLayer.updateRule = SoftmaxRule()
-    bp.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
-    bp.trainerConfig.learningRate = .001
-    bp.trainerConfig.computeAccuracy = false
-    bp.initBiases()
-    bp.initWeights()
-    net.addNetworkModelsAsync(bp, usePlacementManager = false)
-    val trainer = SupervisedTrainer(net, bp)
-    repeat(trainEpochs) {
-        val order = trainX.indices.shuffled(rng)
-        bp.trainingSet = TrainingDataset(
-            inputs = order.map { trainX[it] }.toMutableList(),
-            targets = order.map { trainY[it] }.toMutableList(),
-        )
-        for (start in order.indices step 35) {
-            trainer.iteration++
-            trainer.trainBatch(start until minOf(start + 35, order.size))
-        }
-    }
-
+    val testX = data.testInputs.toList()
+    val testY = data.testTargets.map { it.argmax() }
     val forward = Inference(testX, testY) { x ->
         bp.inputLayer.activations = x.toColumnVector()
         with(net) { bp.forwardPass() }
@@ -126,28 +94,13 @@ private suspend fun mlp(dataDir: String, trainEpochs: Int, rng: Random): List<Pa
 }
 
 private suspend fun cnn(trainEpochs: Int, rng: Random): List<Pair<String, Inference>> {
-    val scope = SimulationScope()
-    cnnMNIST.task.invoke(scope, null)
-    val network = (scope.workspace.getComponent("CNN MNIST") as NetworkComponent).network
-    val cnn = network.getModels<Subnetwork>().filterIsInstance<ConvolutionalNeuralNetwork>().first()
-    val train = cnn.trainingSet
-    val test = cnn.testingSet
-    val trainer = CnnTrainer(network, cnn.inputTensorLayer, cnn.outputArray, cnn.trainerConfig)
-    trainer.config.computeAccuracy = false
-    trainer.initParameters()
-    repeat(trainEpochs) {
-        val order = train.inputs.indices.shuffled(rng)
-        trainer.trainingData = TrainingDataset(
-            inputs = order.map { train.inputs[it] }.toMutableList(),
-            targets = order.map { train.targets[it] }.toMutableList(),
-            inputSize = 400,
-            targetSize = 10,
-        )
-        for (start in order.indices step trainer.config.batchSize) {
-            trainer.trainBatch(start until minOf(start + trainer.config.batchSize, order.size))
-        }
-    }
+    val model = MnistCnn.create()
+    repeat(trainEpochs) { model.trainEpoch(rng) }
+    val cnn = model.cnn
+    val network = model.network
+    val trainer = model.trainer
 
+    val test = cnn.testingSet
     val labels = test.targets.map { it.argmax() }
     val forward = Inference(test.inputs, labels) { x -> trainer.forwardPass(x).argmax() }
     val input = cnn.inputTensorLayer

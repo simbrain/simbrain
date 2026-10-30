@@ -42,10 +42,14 @@ fun main(args: Array<String>) {
         epochTimes += (System.nanoTime() - t0) / 1e9
         lastLoss = total / windows.size
     }
-    println(
-        "{\"framework\":\"simbrain-tinylm\",\"vocab\":${vocab.size},\"windows\":${windows.size}," +
-                "\"config\":[$contextSize,$embedDim,$numHeads,$hiddenDim,$numLayers],\"epochs\":$epochs," +
-                "\"epoch_s\":[${epochTimes.joinToString(",") { "%.3f".format(it) }}],\"final_train_loss\":%.4f}".format(lastLoss)
+    emitResult(
+        "framework" to "simbrain-tinylm",
+        "vocab" to vocab.size,
+        "windows" to windows.size,
+        "config" to listOf(contextSize, embedDim, numHeads, hiddenDim, numLayers),
+        "epochs" to epochs,
+        "epoch_s" to epochTimes.map { fixed(it, 3) },
+        "final_train_loss" to fixed(lastLoss, 4),
     )
     exitProcess(0)
 }

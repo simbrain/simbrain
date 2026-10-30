@@ -49,8 +49,6 @@ private class Classifier(
     val apply: (DoubleArray) -> Unit
 )
 
-private fun DoubleArray.argmax() = indices.maxBy { this[it] }
-
 private suspend fun mlp(component: NetworkComponent, trainIterations: Int): Classifier {
     val network = component.network
     val bp = network.allModels.filterIsInstance<BackpropNetwork>().single()
@@ -116,13 +114,18 @@ private suspend fun run(demoName: String, mode: String, examples: Int, warmup: I
     val frames = (counter?.frames?.get() ?: 0) - frames0
     counting = false
 
-    println(
-        "{\"simulator\":\"simbrain-gui\",\"benchmark\":\"${classifier.name}-inference\",\"mode\":\"$mode\"," +
-                "\"examples\":$examples,\"build_s\":%.3f,\"warmup_s\":%.3f,\"run_s\":%.4f,\"us_per_example\":%.2f,".format(
-                    buildS, warmupS, runS, runS / examples * 1e6
-                ) +
-                "\"examples_per_s\":%.1f,\"frames\":$frames,\"frames_per_s\":%.1f,\"test_acc\":%.4f}".format(
-                    examples / runS, frames / runS, correct.toDouble() / examples
-                )
+    emitResult(
+        "simulator" to "simbrain-gui",
+        "benchmark" to "${classifier.name}-inference",
+        "mode" to mode,
+        "examples" to examples,
+        "build_s" to fixed(buildS, 3),
+        "warmup_s" to fixed(warmupS, 3),
+        "run_s" to fixed(runS, 4),
+        "us_per_example" to fixed(runS / examples * 1e6, 2),
+        "examples_per_s" to fixed(examples / runS, 1),
+        "frames" to frames,
+        "frames_per_s" to fixed(frames / runS, 1),
+        "test_acc" to fixed(correct.toDouble() / examples, 4),
     )
 }

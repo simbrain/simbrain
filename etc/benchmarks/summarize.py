@@ -1,27 +1,11 @@
 """Summarizes benchmark results (medians over repeats) from one or more run_benchmarks.py output files."""
-import collections, json, statistics as st, sys
+import collections, sys
+from _common import load_latest, med, steady
 
 # Later files supersede earlier ones for the same (machine, suite, simulator), so a rerun of one simulator replaces
 # its old rows without discarding the raw data. Rows recording an error (a crash or timeout) are listed at the end
 # instead, as in summarize_headed.py
-by_file = [[json.loads(l) for l in open(f)] for f in sys.argv[1:]]
-errors = [r for file_rows in by_file for r in file_rows if "error" in r]
-latest = {}
-for index, file_rows in enumerate(by_file):
-    for r in file_rows:
-        if "error" not in r:
-            latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] = index
-rows = [r for index, file_rows in enumerate(by_file) for r in file_rows
-        if "error" not in r and latest[(r["machine"], r.get("suite"), r.get("simulator") or r.get("framework"))] == index]
-
-
-def med(values):
-    return st.median(values) if values else float("nan")
-
-
-def steady(epochs):
-    # first epoch includes JIT warm-up (Simbrain) or allocator warm-up (PyTorch)
-    return med(epochs[1:] if len(epochs) > 1 else epochs)
+rows, errors = load_latest(sys.argv[1:], lambda r: (r["machine"], r.get("suite"), r.get("simulator") or r.get("framework")))
 
 
 for machine in sorted({r["machine"] for r in rows}):

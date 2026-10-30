@@ -15,15 +15,19 @@ GUI-open numbers, so these are new measurements of late Simbrain 3, not a reprod
 - Random connections, p=0.1, no self-connections; weight 0.5*U(0,1) from excitatory sources, -U(0,1) from
   inhibitory sources (weight scale 1). Step spike responders lasting one time step. Synapses frozen/static.
 - dt = 0.5 ms. Firing rate should come out ~1.35 Hz (check it: same dynamics in every mode).
-- Larger networks (both harnesses take [neurons] [p] [weightScale] after the timing arguments): the size sweep's, at
-  p=0.1 with every weight scaled by 100 / in-degree so firing rates stay comparable; grid columns ceil(sqrt(neurons)).
+- Both harnesses take `mode variant [representation] neurons p dtMs simMs warmupMs seed [weightScale]`, the numeric
+  arguments in the order of the headless harnesses. Repeat r uses seed r + 1, so each repeat is a different network
+  and a rerun times the same ones. Simbrain 4's headed and headless harnesses build the same network from a seed;
+  Simbrain 3 draws from Java's generator, so its networks differ from Simbrain 4's for the same seed.
+- Larger networks: the size sweep's, at p=0.1 with every weight scaled by 100 / in-degree so firing rates stay
+  comparable; grid columns ceil(sqrt(neurons)).
   Drawing every step of free neurons runs 50 simulated ms after 10 above 1000 neurons, and free neurons simulate
   1000 ms after 250 at 8000 neurons.
 
 ## Representation (the GUI-relevant part)
 
 - ONE neuron group holding all 1000 neurons (S3 `NeuronGroup`; S4 `NeuronCollection` of free neurons), grid layout,
-  32 columns, 20 px spacing in S4 terms (S3: whatever its GridLayout gives at comparable spacing).
+  32 columns, 25 px apart in S4 (the demo's spacing) and 20 px in S3.
 - ONE recurrent synapse group holding all ~100k synapses (S3 `SynapseGroup`; S4 `SynapseGroup`), synapses hidden
   (drawn as the group's arrow).
 - Simbrain 3 update: ConcurrentBufferedUpdate (its multithreaded mode). Simbrain 4: default update (parallel).
@@ -48,10 +52,10 @@ GUI-open numbers, so these are new measurements of late Simbrain 3, not a reprod
 - Build, show, let the GUI settle (wait for the event queue to drain).
 - Warm-up 500 simulated ms, then time 2000 simulated ms (4000 iterations), iterating through the workspace (not the
   network directly), so couplings and the plot update as in normal use.
-- Count frames: install a RepaintManager subclass that counts `paintDirtyRegions` calls that had dirty regions.
+- Count frames: an invisible node on the network canvas's camera, covering the whole view, counts the canvas's paints.
 - Print one JSON line: simulator ("simbrain3-gui" / "simbrain-gui"), variant ("network" | "raster"), mode, neurons,
-  synapses, dt_ms, sim_ms, build_s, warmup_s, run_s, rt_factor (run_s per simulated s), iterations_per_s,
-  frames, frames_per_s, rate_hz. Then exit.
+  p, weight_scale, seed, synapses, dt_ms, sim_ms, warmup_ms, build_s, warmup_s, run_s, rt_factor (run_s per simulated
+  s), iterations_per_s, frames, frames_per_s, rate_hz. Then exit.
 
 ## Machine learning demos (Simbrain 4 only)
 

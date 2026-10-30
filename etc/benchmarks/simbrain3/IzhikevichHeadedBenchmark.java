@@ -2,8 +2,8 @@ package org.simbrain.benchmarks;
 
 import java.awt.EventQueue;
 import java.awt.Toolkit;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Random;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.atomic.AtomicLong;
@@ -18,18 +18,13 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.core.Network;
 import org.simbrain.network.core.NetworkUpdateAction;
 import org.simbrain.network.core.Neuron;
-import org.simbrain.network.core.Synapse;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.network.groups.NeuronGroup;
 import org.simbrain.network.groups.SynapseGroup;
 import org.simbrain.network.gui.NetworkPanel;
 import org.simbrain.network.layouts.GridLayout;
-import org.simbrain.network.neuron_update_rules.IzhikevichRule;
-import org.simbrain.network.synapse_update_rules.spikeresponders.Step;
 import org.simbrain.network.update_actions.ConcurrentBufferedUpdate;
 import org.simbrain.plot.rasterchart.RasterPlotComponent;
-import org.simbrain.util.math.ProbDistribution;
-import org.simbrain.util.randomizer.Randomizer;
 import org.simbrain.workspace.Coupling;
 import org.simbrain.workspace.PotentialConsumer;
 import org.simbrain.workspace.PotentialProducer;
@@ -40,15 +35,16 @@ import org.simbrain.workspace.updater.InterceptingEventQueue;
 /**
  * GUI-open ("headed") Izhikevich (2003) benchmark for Simbrain 3, following
  * etc/benchmarks/HEADED_SPEC.md. Same network as the "concurrent" variant of
- * {@link IzhikevichBenchmark} (same RNG draw order), but held in one NeuronGroup and one recurrent SynapseGroup and
+ * {@link IzhikevichBenchmark}, built by the same code, but held in one NeuronGroup and one recurrent SynapseGroup and
  * iterated through the workspace.
  *
- * Usage: IzhikevichHeadedBenchmark headless|paced|guioff network|raster seed [simMs=2000] [warmupMs=500]
- *   [neurons=1000] [p=0.1] [weightScale=1]
+ * Usage: IzhikevichHeadedBenchmark headless|paced|guioff network|raster neurons p dtMs simMs warmupMs seed
+ *   [weightScale=1]
+ *
+ * The numeric arguments are in the order of the other Izhikevich harnesses. The headed runs use 1000 neurons at
+ * p = 0.1 and dt = 0.5.
  */
 public class IzhikevichHeadedBenchmark {
-
-    static final double DT = 0.5;
 
     /** Counts paints of the network canvas: a camera child covering everything that draws nothing. */
     static class FrameCounterNode extends PNode {
@@ -109,14 +105,20 @@ public class IzhikevichHeadedBenchmark {
     }
 
     static void run(String[] args) throws Exception {
+        if (args.length < 8) {
+            throw new IllegalArgumentException(
+                "usage: headless|paced|guioff network|raster neurons p dtMs simMs warmupMs seed [weightScale]");
+        }
         String mode = args[0];
         String variant = args[1];
-        Random rng = new Random(Long.parseLong(args[2]));
-        double simMs = args.length > 3 ? Double.parseDouble(args[3]) : 2000;
-        double warmupMs = args.length > 4 ? Double.parseDouble(args[4]) : 500;
-        final int N = args.length > 5 ? Integer.parseInt(args[5]) : 1000;
-        final double P = args.length > 6 ? Double.parseDouble(args[6]) : 0.1;
-        double scale = args.length > 7 ? Double.parseDouble(args[7]) : 1.0;
+        final int N = Integer.parseInt(args[2]);
+        final double P = Double.parseDouble(args[3]);
+        final double DT = Double.parseDouble(args[4]);
+        double simMs = Double.parseDouble(args[5]);
+        double warmupMs = Double.parseDouble(args[6]);
+        long seed = Long.parseLong(args[7]);
+        double scale = args.length > 8 ? Double.parseDouble(args[8]) : 1.0;
+        Random rng = new Random(seed);
         if (!mode.equals("headless") && !mode.equals("paced") && !mode.equals("guioff")) {
             throw new IllegalArgumentException("mode must be headless|paced|guioff");
         }
@@ -136,30 +138,7 @@ public class IzhikevichHeadedBenchmark {
 
         Network net = new Network();
         net.setTimeStep(DT);
-        int numExc = (int) (N * 0.8);
-        List<Neuron> neurons = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            boolean exc = i < numExc;
-            double r = rng.nextDouble();
-            IzhikevichRule rule = new IzhikevichRule();
-            rule.setiBg(0);
-            rule.setThreshold(30);
-            rule.setAddNoise(true);
-            Randomizer noise = new Randomizer(ProbDistribution.NORMAL);
-            noise.setParam1(0);
-            if (exc) {
-                rule.setA(0.02); rule.setB(0.2); rule.setC(-65 + 15 * r * r); rule.setD(8 - 6 * r * r);
-                noise.setParam2(5);
-            } else {
-                rule.setA(0.02 + 0.08 * r); rule.setB(0.25 - 0.05 * r); rule.setC(-65); rule.setD(2);
-                noise.setParam2(2);
-            }
-            rule.setNoiseGenerator(noise);
-            Neuron neuron = new Neuron(net, rule);
-            neuron.forceSetActivation(-65);
-            IzhikevichBenchmark.startRecovery(neuron);
-            neurons.add(neuron);
-        }
+        List<Neuron> neurons = IzhikevichBenchmark.izhikevichNeurons(net, N, rng);
         NeuronGroup ng = new NeuronGroup(net, neurons);
         ng.setLabel("Izhikevich");
         ng.setLayout(new GridLayout(20, 20, (int) Math.ceil(Math.sqrt(N))));
@@ -171,23 +150,7 @@ public class IzhikevichHeadedBenchmark {
         sg.setDisplaySynapses(false);
         ng.addOutgoingSg(sg);
         ng.addIncomingSg(sg);
-        long synapses = 0;
-        for (int src = 0; src < N; src++) {
-            for (int tgt = 0; tgt < N; tgt++) {
-                if (src == tgt || rng.nextDouble() >= P) {
-                    continue;
-                }
-                double w = scale * (src < numExc ? 0.5 * rng.nextDouble() : -rng.nextDouble());
-                Synapse s = new Synapse(neurons.get(src), neurons.get(tgt));
-                s.forceSetStrength(w);
-                Step step = new Step();
-                step.setResponseDuration(DT);
-                s.setSpikeResponder(step);
-                s.setFrozen(true);
-                sg.addSynapseUnsafe(s);
-                synapses++;
-            }
-        }
+        long synapses = IzhikevichBenchmark.forEachSynapse(neurons, P, scale, DT, rng, sg::addSynapseUnsafe);
         net.addGroup(sg);
         net.getUpdateManager().clear();
         net.getUpdateManager().addAction(ConcurrentBufferedUpdate.createConcurrentBufferedUpdate(net));
@@ -258,12 +221,14 @@ public class IzhikevichHeadedBenchmark {
         spikeCounter.counting = false;
 
         double simS = simMs / 1000.0;
-        System.out.println(String.format(
-            "{\"simulator\":\"simbrain3-gui\",\"variant\":\"%s\",\"mode\":\"%s\",\"neurons\":%d,\"p\":%s,\"weight_scale\":%s,\"synapses\":%d,"
-                + "\"dt_ms\":%s,\"sim_ms\":%s,\"build_s\":%.4f,\"warmup_s\":%.4f,\"run_s\":%.4f,\"rt_factor\":%.4f,"
-                + "\"iterations_per_s\":%.2f,\"frames\":%d,\"frames_per_s\":%.2f,\"rate_hz\":%.3f}",
-            variant, mode, N, P, scale, synapses, DT, simMs, buildS, warmupS, runS, runS / simS, steps / runS, frames,
-            frames / runS, spikeCounter.spikes / (double) N / simS));
+        // Locale.ROOT: a decimal comma would break the JSON
+        System.out.println(String.format(Locale.ROOT,
+            "{\"simulator\":\"simbrain3-gui\",\"variant\":\"%s\",\"mode\":\"%s\",\"neurons\":%d,\"p\":%s,\"weight_scale\":%s,\"seed\":%d,"
+                + "\"synapses\":%d,\"dt_ms\":%s,\"sim_ms\":%s,\"warmup_ms\":%s,\"build_s\":%.4f,\"warmup_s\":%.4f,"
+                + "\"run_s\":%.4f,\"rt_factor\":%.4f,\"iterations_per_s\":%.2f,\"frames\":%d,\"frames_per_s\":%.2f,"
+                + "\"rate_hz\":%.3f}",
+            variant, mode, N, P, scale, seed, synapses, DT, simMs, warmupMs, buildS, warmupS, runS, runS / simS,
+            steps / runS, frames, frames / runS, spikeCounter.spikes / (double) N / simS));
         System.out.flush();
         System.exit(0);
     }

@@ -31,7 +31,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
+class TrainerControls(internal val trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 

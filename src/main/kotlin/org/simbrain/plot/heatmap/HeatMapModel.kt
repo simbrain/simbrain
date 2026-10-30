@@ -10,8 +10,8 @@ package org.simbrain.plot.heatmap
 
 import org.jfree.data.xy.AbstractXYZDataset
 import org.jfree.data.xy.XYZDataset
-import org.simbrain.plot.ChartColorMap
 import org.simbrain.plot.HeatMapEvents
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.EdtUpdates
@@ -36,7 +36,7 @@ class HeatMapModel : AttributeContainer, EditableObject, AutoCloseable {
         private set
 
     var colorMap by GuiEditable(
-        initValue = ChartColorMap.COOL_TO_HOT,
+        initValue = PlotPreferences.heatMapColorMap,
         label = "Color map",
         description = "How values are mapped to colors",
         order = 10
@@ -66,14 +66,14 @@ class HeatMapModel : AttributeContainer, EditableObject, AutoCloseable {
     )
 
     var fixedWidth by GuiEditable(
-        initValue = true,
+        initValue = PlotPreferences.heatMapFixedWidth,
         label = "Fixed width",
         description = "If true, only the most recent time steps are kept",
         order = 50
     )
 
     var windowSize by GuiEditable(
-        initValue = 200,
+        initValue = PlotPreferences.heatMapWindowSize,
         label = "Window size",
         description = "Number of time steps retained when fixed width is used",
         conditionallyEnabledBy = HeatMapModel::fixedWidth,

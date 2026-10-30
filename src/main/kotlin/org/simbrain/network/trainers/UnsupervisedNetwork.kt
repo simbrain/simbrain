@@ -5,7 +5,6 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
-import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -36,22 +35,25 @@ class UnsupervisedTrainer: EditableObject {
 
     var isRunning = false
 
-    var maxIterations by GuiEditable(
-        initValue = 1000
+    var useMaxIterations by GuiEditable(
+        initValue = false,
+        description = "Stop training after a fixed number of iterations. Otherwise training runs until stopped"
     )
 
-    @UserParameter(
-        label = "Learning Rate",
-        description = "Step size for unsupervised learning updates. Controls how quickly weights adapt to input patterns"
+    var maxIterations by GuiEditable(
+        initValue = 1000,
+        description = "Training stops after this many iterations",
+        conditionallyEnabledBy = UnsupervisedTrainer::useMaxIterations
     )
-    var learningRate = .01
+
+    private val maxIterationsReached get() = useMaxIterations && iteration >= maxIterations
 
     @Transient
     val events = TrainerEvents()
 
     context(Network)
     suspend fun startTraining(network: UnsupervisedNetwork) {
-        if (iteration >= maxIterations) {
+        if (maxIterationsReached) {
             events.iterationReset.fire()
         }
         isRunning = true
@@ -59,7 +61,7 @@ class UnsupervisedTrainer: EditableObject {
         withContext(Dispatchers.Default) {
             while (isRunning) {
                 trainOnce(network)
-                if (iteration >= maxIterations) {
+                if (maxIterationsReached) {
                     stopTraining()
                 }
             }
@@ -81,8 +83,8 @@ class UnsupervisedTrainer: EditableObject {
     }
 
     fun copyFrom(other: UnsupervisedTrainer) {
+        this.useMaxIterations = other.useMaxIterations
         this.maxIterations = other.maxIterations
-        this.learningRate = other.learningRate
     }
 
     override val name: String

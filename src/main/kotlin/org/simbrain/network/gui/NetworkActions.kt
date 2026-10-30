@@ -266,7 +266,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllAction = networkPanel.createAction(
         name = "Select all",
         description = "Select all network items (a or Cmd/Ctrl-A)",
-        keyboardShortcuts = listOf(KeyCombination('A'), CmdOrCtrl + 'A')
+        keyboardShortcuts = listOf(KeyCombination('A'), CmdOrCtrl + 'A'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.selectAll()
     }
@@ -274,7 +275,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllNeuronsAction = networkPanel.createAction(
         name = "Select all neurons",
         description = "Select all neurons (n)",
-        keyboardShortcut = KeyCombination('N')
+        keyboardShortcut = KeyCombination('N'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.set(filterScreenElements<NeuronNode>() + filterScreenElements<NeuronArrayNode>())
     }
@@ -283,7 +285,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllWeightsAction = networkPanel.createAction(
         name = "Select all weights",
         description = "Select all weights (w)",
-        keyboardShortcut = KeyCombination('W')
+        keyboardShortcut = KeyCombination('W'),
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>())
@@ -293,7 +296,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllExcitatorySynapsesAction = networkPanel.createAction(
         name = "Select all excitatory synapses",
         description = "Select all positive-strength synapses (Cmd/Ctrl-Shift-E)",
-        keyboardShortcut = CmdOrCtrl + Shift + 'E'
+        keyboardShortcut = CmdOrCtrl + Shift + 'E',
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength > 0 })
@@ -302,7 +306,8 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val selectAllInhibitorySynapsesAction = networkPanel.createAction(
         name = "Select all inhibitory synapses",
         description = "Select all negative-strength synapses (Cmd/Ctrl-Shift-I)",
-        keyboardShortcut = CmdOrCtrl + Shift + 'I'
+        keyboardShortcut = CmdOrCtrl + Shift + 'I',
+        coroutineContext = Dispatchers.Swing
     ) {
         selectionManager.clear()
         selectionManager.set(filterScreenElements<SynapseNode>().filter { it.synapse.strength < 0 })
@@ -571,7 +576,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             } catch (e: IOException) {
                 println("[DEBUG_LOG] Error saving file: ${e.message}")
                 e.printStackTrace()
-                showErrorDialog("Error saving file: ${e.message}", "Save error")
+                showMessage("Error saving file: ${e.message}", MessageKind.ERROR, title = "Save error")
             }
         } else {
             println("[DEBUG_LOG] No file selected for save")
@@ -593,7 +598,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Set default properties that apply to all networks in the Simbrain workspace (Cmd/Ctrl-,)",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        getPreferenceDialog(NetworkPreferences).display()
+        getPreferenceDialog(NetworkPreferences, "Network Preferences").display()
     }
 
     val showNetworkPropertiesAction = networkPanel.createAction(
@@ -998,7 +1003,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
         }
         if (groupsAboveThreshold.isNotEmpty()) {
-            showWarningDialog("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}")
+            showMessage("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}", MessageKind.WARNING)
         }
         // A manual toggle pins visibility: stop auto-tracking the threshold so the user's choice sticks.
         groupsBelowThreshold.forEach {

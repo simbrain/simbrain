@@ -57,12 +57,8 @@ private fun showCategorySelectionDialog(
 
         val selected = checkboxes.filter { it.isSelected }.map { it.text }
         if (selected.size < 2) {
-            val confirm = showWarningConfirmDialog("Please select at least 2 categories.")
-            if (confirm == JOptionPane.YES_OPTION) {
-                continue
-            } else {
-                return null
-            }
+            runOnEventThread { showMessage("Please select at least 2 categories.", MessageKind.WARNING) }
+            continue
         }
         return CategorySelection(
             categories = selected,
@@ -105,11 +101,12 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
     val alreadyCached = extractDir.exists() && extractDir.listFiles()?.isNotEmpty() == true
 
     if (!alreadyCached) {
-        val confirm = showWarningConfirmDialog(
-            "The Caltech101 dataset (~137 MB) will be downloaded from data.caltech.edu\n" +
-            "and cached locally. This only happens once."
+        val confirmed = showConfirm(
+            "The Caltech101 dataset (~137 MB) will be downloaded from data.caltech.edu " +
+                "and cached locally. This only happens once.",
+            okLabel = "Download"
         )
-        if (confirm != JOptionPane.OK_OPTION && confirm != JOptionPane.YES_OPTION) return null
+        if (!confirmed) return null
     }
 
     val root = fetchZipWithCache(CALTECH101_URL, expectedChecksum = CALTECH101_MD5)

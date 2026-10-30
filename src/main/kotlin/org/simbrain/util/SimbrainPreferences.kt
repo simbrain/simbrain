@@ -9,7 +9,6 @@ import java.awt.Color
 import java.io.File
 import java.util.prefs.Preferences
 import javax.swing.JButton
-import javax.swing.JOptionPane
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
@@ -61,7 +60,11 @@ open class PreferenceHolder: EditableObject {
         events.remove(preferenceLoader)
     }
 
-    override fun onCommit() {
+    /**
+     * Notify listeners that preferences changed. Called once per dialog commit or revert rather than from
+     * [onCommit], which the property editor calls once per committed property.
+     */
+    fun fireChanged() {
         events.forEach { it() }
     }
 }
@@ -251,22 +254,28 @@ object WandPaletteStorage {
     }
 }
 
-fun getPreferenceDialog(prefHolder: PreferenceHolder): StandardDialog {
+fun getPreferenceDialog(prefHolder: PreferenceHolder, title: String): StandardDialog {
     val ape = AnnotatedPropertyEditor(prefHolder)
     return StandardDialog().apply {
+        this.title = title
         contentPane = ape
         addButton(JButton("Revert to Default").apply {
             addActionListener {
-                val result = showWarningConfirmDialog("Reverting to default preferences. This action cannot be undone.")
-                if (result == JOptionPane.YES_OPTION) {
+                if (showConfirm(
+                        "Reverting to default preferences. This action cannot be undone.",
+                        okLabel = "Revert",
+                        kind = MessageKind.WARNING
+                    )
+                ) {
                     prefHolder.revertToDefault()
                 }
                 closeDialogCancel()
-                prefHolder.events.forEach { it.invoke() }
+                prefHolder.fireChanged()
             }
         })
         addCommitTask {
             ape.commitChanges()
+            prefHolder.fireChanged()
         }
     }
 }
@@ -287,4 +296,4 @@ object TestPrefs: PreferenceHolder() {
 
 }
 
-fun main() = getPreferenceDialog(TestPrefs).display()
+fun main() = getPreferenceDialog(TestPrefs, "Test Preferences").display()

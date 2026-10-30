@@ -560,7 +560,7 @@ fun createSynapseAdjustmentPanel(
 ): SynapseAdjustmentPanel? {
     val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer)
     if (synapses.isEmpty()) {
-        showWarningDialog("No synapses to display")
+        showMessage("No synapses to display", MessageKind.WARNING)
         return null
     }
     return sap

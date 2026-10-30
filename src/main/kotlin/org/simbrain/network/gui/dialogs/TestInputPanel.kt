@@ -42,7 +42,7 @@ private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEd
     toolbar.add(table.insertRowAction)
     toolbar.add(table.deleteRowAction)
     toolbar.addSeparator()
-    val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+    val advanceRowCheckbox = autoAdvanceCheckbox()
     toolbar.add(table.createApplyAction("Apply inputs") {
         applyInputs(it)
         if (workspaceMode) {

@@ -27,3 +27,6 @@ out/*
 simulation_outputs/
 .cursor/
 .kotlin/
+
+# Claude Code worktrees
+.claude/worktrees/

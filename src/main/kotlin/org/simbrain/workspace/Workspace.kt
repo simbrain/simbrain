@@ -3,7 +3,6 @@ package org.simbrain.workspace
 import kotlinx.coroutines.*
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
-import javax.swing.SwingUtilities
 import org.pmw.tinylog.Logger
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.simulations
@@ -27,6 +26,7 @@ import org.simbrain.workspace.updater.UpdateCoupling
 import org.simbrain.workspace.updater.WorkspaceUpdater
 import java.io.*
 import java.util.*
+import javax.swing.SwingUtilities
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KClass
 
@@ -452,6 +452,8 @@ class Workspace: CoroutineScope {
                     val serializer = WorkspaceSerializer(this)
                     serializer.serialize(ostream, headless)
                     setWorkspaceChanged(false)
+                    // Components track their own edits, so clear those too or changesExist() stays true after a save
+                    componentList.forEach { it.setChangedSinceLastSave(false) }
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {

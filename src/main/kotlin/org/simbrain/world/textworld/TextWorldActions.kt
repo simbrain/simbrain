@@ -27,12 +27,12 @@ fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction
             editor.commitChanges()
             
             if (options.documentPath.isEmpty()) {
-                showWarningDialog("Please select a training document")
+                showMessage("Please select a training document", MessageKind.WARNING)
                 false
             } else {
                 val trainingDocument = File(options.documentPath)
                 if (!trainingDocument.exists()) {
-                    showWarningDialog("Selected file does not exist")
+                    showMessage("Selected file does not exist", MessageKind.WARNING)
                     false
                 } else {
                     true
@@ -59,7 +59,7 @@ val TextWorld.extractEmbeddingFromCurrentText
         iconPath = "menu_icons/Extract.png"
     ) {
         if (text.isEmpty()) {
-            showWarningDialog("No text in text world. Please load or enter some text first.")
+            showMessage("No text in text world. Please load or enter some text first.", MessageKind.WARNING)
             return@createAction
         }
         

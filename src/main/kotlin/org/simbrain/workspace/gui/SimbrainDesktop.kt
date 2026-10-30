@@ -16,6 +16,7 @@ import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
@@ -41,6 +42,7 @@ import java.io.File
 import java.io.PrintWriter
 import java.io.StringWriter
 import java.util.*
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.*
 import javax.swing.JSplitPane.DIVIDER_LOCATION_PROPERTY
 import javax.swing.event.*
@@ -72,6 +74,7 @@ object SimbrainDesktop {
         // Apply theme changes committed in the Workspace Preferences dialog, and follow the OS
         // appearance live while in System mode (macOS fires this when system dark mode is toggled).
         WorkspacePreferences.registerChangeListener { applyThemeIfChanged() }
+        PlotPreferences.registerChangeListener { refreshCharts() }
         Toolkit.getDefaultToolkit().addPropertyChangeListener("apple.awt.application.appearance") {
             applyThemeIfChanged()
         }
@@ -231,6 +234,12 @@ object SimbrainDesktop {
      */
     private var lastTimestep = 0
 
+    /**
+     * Set while a quit is prompting, so a second quit request (e.g. one Cmd-Q reaching both the macOS quit
+     * handler and the File menu key binding) does not open a second prompt.
+     */
+    private val quitInProgress = AtomicBoolean(false)
+
     private val mouseListener: MouseListener = object : MouseAdapter() {
         override fun mousePressed(mouseEvent: MouseEvent) {
             val lastClickedPoint = mouseEvent.point
@@ -277,10 +286,16 @@ object SimbrainDesktop {
         )
         createAndAttachMenus()
         
-        // Add macOS About menu handler
+        // Add macOS About and Quit menu handlers. With the screen menu bar, Cmd-Q belongs to the application
+        // menu's Quit item rather than to the File menu action, so route it through quit() to get the save prompt.
         if (Utils.isMacOSX()) {
             Desktop.getDesktop().setAboutHandler {
                 showAboutDialog()
+            }
+            Desktop.getDesktop().setQuitHandler { _, response ->
+                // Answer AppKit right away and prompt afterwards; quit() exits the process unless the user cancels
+                response.cancelQuit()
+                SwingUtilities.invokeLater { quit(false) }
             }
         }
         
@@ -299,10 +314,11 @@ object SimbrainDesktop {
         val warnedCouplings = mutableSetOf<Coupling>()
         workspace.couplingManager.events.couplingFailed.on(Dispatchers.Swing) { failure ->
             if (warnedCouplings.add(failure.coupling)) {
-                showWarningDialog(
+                showMessage(
                     "Coupling ${failure.coupling.description} failed to update and will keep failing " +
                             "silently until fixed:\n${failure.cause}",
-                    "Coupling Failed"
+                    MessageKind.WARNING,
+                    title = "Coupling Failed"
                 )
             }
         }
@@ -532,7 +548,10 @@ object SimbrainDesktop {
                 scriptMenu.removeAll()
                 simulations.addToMenu(scriptMenu) { sim ->
                     workspace.launch {
-                        sim.run(this@SimbrainDesktop)
+                        workspace.stop()
+                        if (confirmDiscardChanges()) {
+                            sim.run(this@SimbrainDesktop)
+                        }
                     }
                 }
             }
@@ -553,13 +572,17 @@ object SimbrainDesktop {
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.showWorkspacePreferencesAction)
         fileMenu.add(actionManager.showNetworkPreferencesAction)
         fileMenu.add(actionManager.showOdorWorldPreferencesAction)
+        fileMenu.add(actionManager.showPlotPreferencesAction)
+        fileMenu.add(actionManager.showWorkspacePreferencesAction)
         fileMenu.addSeparator()
         fileMenu.add(actionManager.resetOnboardingWindows)
-        fileMenu.addSeparator()
-        fileMenu.add(actionManager.quitWorkspaceAction)
+        // On macOS, Quit (with its Cmd-Q shortcut) lives in the application menu; see the quit handler
+        if (!Utils.isMacOSX()) {
+            fileMenu.addSeparator()
+            fileMenu.add(actionManager.quitWorkspaceAction)
+        }
         return fileMenu
     }
 
@@ -618,6 +641,21 @@ object SimbrainDesktop {
             } finally {
                 applyingTheme = false
             }
+        }
+    }
+
+    /**
+     * Re-theme every open chart so it re-reads the [PlotPreferences] series palette and line width, then
+     * repaint so legend swatches follow.
+     */
+    private fun refreshCharts() {
+        fun walk(c: Component) {
+            if (c is ChartPanel) c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
+            if (c is Container) c.components.forEach(::walk)
+        }
+        Window.getWindows().forEach {
+            walk(it)
+            it.repaint()
         }
     }
 
@@ -878,6 +916,9 @@ object SimbrainDesktop {
      */
     suspend fun openWorkspace() {
         workspace.stop()
+        if (!confirmDiscardChanges()) {
+            return
+        }
         val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
@@ -1045,23 +1086,29 @@ object SimbrainDesktop {
      * Clear desktop of all components. Show a save-as dialog if there have been changes.
      */
     suspend fun clearDesktop() {
-
         workspace.stop()
-
-        // If there have been changes, show a save-as dialog
-        if (workspace.changesExist()) {
-            val s = showHasChangedDialog()
-            if (s == JOptionPane.OK_OPTION) {
-                save()
-                clearComponents()
-            } else if (s == JOptionPane.NO_OPTION) {
-                clearComponents()
-            } else if (s == JOptionPane.CANCEL_OPTION) {
-                return
-            }
-        } else {
-            // If there have been no changes, just clear away!
+        if (confirmDiscardChanges()) {
             clearComponents()
+        }
+    }
+
+    /**
+     * If the workspace has unsaved changes, offer to save them before they are discarded.
+     *
+     * @return false if the user cancelled (including cancelling the save itself), in which case the workspace
+     * should be left alone
+     */
+    private fun confirmDiscardChanges(): Boolean {
+        if (workspace.componentList.isEmpty() || !workspace.changesExist()) {
+            return true
+        }
+        return when (showHasChangedDialog()) {
+            0 -> {
+                save()
+                !workspace.changesExist()
+            }
+            1 -> true
+            else -> false
         }
     }
 
@@ -1085,7 +1132,7 @@ object SimbrainDesktop {
             e.printStackTrace(PrintWriter(sw))
             e.printStackTrace()
             val stackTrace = sw.toString()
-            showMessageDialog("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
+            showText("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
         }
 
         /*
@@ -1104,20 +1151,15 @@ object SimbrainDesktop {
     /**
      * Checks to see if anything has changed and then offers to save if true.
      *
-     * @return the JOptionPane pane result
+     * @return the index of the button clicked (Save, Don't Save, Cancel), or null if the dialog was closed
      */
-    private fun showHasChangedDialog(): Int {
-        val options = arrayOf("Save", "Don't Save", "Cancel")
-        return showOptionDialog(
-            """
-     The workspace has changed since last save,
-     Would you like to save these changes?
-     """.trimIndent(),
-            "Workspace Has Changed",
-            options,
-            0
-        )
-    }
+    private fun showHasChangedDialog(): Int? = showChoice(
+        "Would you like to save these changes?",
+        listOf("Save", "Don't Save", "Cancel"),
+        kind = MessageKind.WARNING,
+        heading = "The workspace has changed since it was last saved",
+        title = "Workspace Has Changed"
+    )
 
     /**
      * Quit application.
@@ -1125,19 +1167,14 @@ object SimbrainDesktop {
      * @param forceQuit should quit be forced.
      */
     fun quit(forceQuit: Boolean) {
-        if (workspace.changesExist() && !forceQuit && workspace.componentList.size > 0) {
-            val s = showHasChangedDialog()
-            if (s == JOptionPane.OK_OPTION) {
-                save()
-                quit(true)
-            } else if (s == JOptionPane.NO_OPTION) {
-                quit(true)
-            } else if (s == JOptionPane.CANCEL_OPTION) {
-                return
+        if (!quitInProgress.compareAndSet(false, true)) return
+        try {
+            if (forceQuit || confirmDiscardChanges()) {
+                workspace.removeAllComponents()
+                System.exit(0)
             }
-        } else {
-            workspace.removeAllComponents()
-            System.exit(0)
+        } finally {
+            quitInProgress.set(false)
         }
     }
 

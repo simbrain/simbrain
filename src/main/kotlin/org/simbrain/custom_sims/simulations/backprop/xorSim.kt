@@ -24,6 +24,9 @@ val xorSim = newSim { optionString ->
 
     val inputLayer = net.addNeuronCollection(2).apply {
         isClamped = true
+        setLowerBound(0.0)
+        setUpperBound(1.0)
+        setIncrement(1.0)
     }
     val hiddenLayer = net.addNeuronCollection(2) { updateRule = SigmoidalRule() }
     val outputLayer = net.addNeuronCollection(1) { updateRule = SigmoidalRule() }
@@ -103,7 +106,7 @@ val xorSim = newSim { optionString ->
 
         2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
 
-        3. Watch the `Sum Squared Error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Randomize` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
+        3. Watch the `Sum Squared Error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Init parameters` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
 
         4. Click `Apply current row as input and increment selected row` to check the network's performance.
 
@@ -112,6 +115,14 @@ val xorSim = newSim { optionString ->
         ## Experiments
 
         Try switching the optimizer to `Adam`, or build a similar network with three or four hidden units. More hidden units usually make XOR much easier to train, but the two-unit version better illustrates why linearly inseparable tasks were historically interesting and sometimes frustrating.
+
+        ### How to Make Things Harder
+
+        Making training harder is informative about gradient descent: it shows what can trap or stall it. Weight initialization is an especially direct way to do this. In the training window, click `Trainer properties`, set `Weight Initialization Strategy` to `Random Initialization`, and choose one of these distributions. Then press `Init parameters` so the new weights are used, and train:
+
+        - **Nearly identical weights**, for example `Uniform (Real)` with `Floor` `0.5` and `Ceiling` `0.501`. The two hidden units start out as near copies, so they tend to learn the same thing and behave like one hidden unit, which cannot solve XOR.
+        - **Very small weights**, for example `Normal` with `Std. Dev. (σ)` `0.01`. All outputs start near `0.5`, and the error can sit on a long, flat plateau.
+        - **Very large weights**, for example `Normal` with `Std. Dev. (σ)` `10`. The sigmoids saturate, the gradients become tiny, and the network barely moves.
 
         # Credits
 

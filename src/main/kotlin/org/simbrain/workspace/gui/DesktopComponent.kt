@@ -7,12 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
-import org.simbrain.util.SFileChooser
-import org.simbrain.util.UiScope
-import org.simbrain.util.cancelWith
-import org.simbrain.util.createAction
+import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.showWarningDialog
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -26,7 +22,6 @@ import java.awt.Rectangle
 import java.beans.PropertyVetoException
 import java.io.*
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.JOptionPane
 import javax.swing.JPanel
 
 /**
@@ -148,7 +143,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
                 FileInputStream(file)
             }
         } catch (ex: FileNotFoundException) {
-            showWarningDialog(String.format("File %s was not found.", file))
+            showMessage(String.format("File %s was not found.", file), MessageKind.WARNING)
             return
         }
         val newComponent: E = try {
@@ -164,7 +159,7 @@ var parentFrame: GenericFrame, workspaceComponent: E
                 name,
                 workspaceComponent.javaClass.simpleName
             )
-            showWarningDialog(message)
+            showMessage(message, MessageKind.WARNING)
             ex.printStackTrace()
             return
         }
@@ -245,34 +240,21 @@ var parentFrame: GenericFrame, workspaceComponent: E
     /**
      * Checks to see if anything has changed and then offers to save if true.
      *
-     * @return true if user cancels
+     * @return true if the user cancels or closes the dialog
      */
-    fun showHasChangedDialog(): Boolean {
-        val options = arrayOf<Any>("Save", "Don't Save", "Cancel")
-        val s = JOptionPane.showInternalOptionDialog(
-            this,
-            """
-     This component has changed since last save,
-     Would you like to save these changes?
-     """.trimIndent(),
-            "Component Has Changed",
-            JOptionPane.YES_NO_OPTION,
-            JOptionPane.WARNING_MESSAGE,
-            null,
-            options,
-            options[0]
-        )
-        if (s == JOptionPane.OK_OPTION) {
-            this.save()
-            workspaceComponent.close()
-            return false
-        } else if (s == JOptionPane.NO_OPTION) {
-            workspaceComponent.close()
-            return false
-        } else if (s == JOptionPane.CANCEL_OPTION) {
-            return true
+    fun showHasChangedDialog(): Boolean = when (showChoice(
+            "Would you like to save these changes?",
+            listOf("Save", "Don't Save", "Cancel"),
+            kind = MessageKind.WARNING,
+            heading = "This component has changed since it was last saved",
+            title = "Component Has Changed"
+        )) {
+        0 -> {
+            save()
+            false
         }
-        return false
+        1 -> false
+        else -> true
     }
 
     /**

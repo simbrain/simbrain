@@ -3,17 +3,9 @@ package org.simbrain.network.llm
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import org.simbrain.util.PreferenceHolder
-import org.simbrain.util.StringPreference
-import org.simbrain.util.fetchFileWithCache
-import org.simbrain.util.getSystemCacheDirectory
-import org.simbrain.util.showDirectorySelectionDialog
-import org.simbrain.util.showOptionDialog
-import org.simbrain.util.showWarningConfirmDialog
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.*
 import java.io.File
 import java.nio.file.Path
-import javax.swing.JOptionPane
 import kotlin.io.path.exists
 import kotlin.io.path.listDirectoryEntries
 
@@ -77,17 +69,22 @@ object Lfm2Weights {
         return safetensors.parentFile.toPath()
     }
 
-    val downloadNotice: String
-        get() = """
-            The weights for $MODEL_NAME by Liquid AI, Inc. (~460 MB) will be downloaded from
-            Hugging Face into ${File(getSystemCacheDirectory(), CACHE_SUBDIRECTORY)}.
-
-            They are licensed under the LFM Open License v1.0 ($LICENSE_URL),
-            whose terms bind you as the downloader. Commercial use is restricted for
-            organizations above ${'$'}10M annual revenue.
-
-            Download now?
-        """.trimIndent()
+    /**
+     * Asks the user to accept the download and its license terms.
+     */
+    fun confirmDownload(): Boolean = showConfirm(
+        "The weights by Liquid AI, Inc. (~460 MB) will be downloaded from Hugging Face.\n\n" +
+            "They are licensed under the LFM Open License v1.0, whose terms bind you as the downloader. " +
+            "Commercial use is restricted for organizations above ${'$'}10M annual revenue.",
+        okLabel = "Download",
+        kind = MessageKind.WARNING,
+        heading = "Download $MODEL_NAME weights?",
+        title = "Download Weights",
+        details = listOf(
+            "Destination" to File(getSystemCacheDirectory(), CACHE_SUBDIRECTORY).path,
+            "License" to LICENSE_URL,
+        )
+    )
 }
 
 /**
@@ -102,14 +99,13 @@ fun LanguageModel.obtainWeightsInteractive(scope: CoroutineScope): Boolean {
         weightsDirectory = it.toString()
         return true
     }
-    return when (showOptionDialog(
+    return when (showChoice(
         "No ${Lfm2Weights.MODEL_NAME} weights were found on this machine.",
-        "Language Model Weights",
-        arrayOf("Download…", "Locate folder…", "Cancel"),
-        defaultOption = 0,
+        listOf("Download…", "Locate folder…", "Cancel"),
+        title = "Language Model Weights",
     )) {
         0 -> {
-            if (showWarningConfirmDialog(Lfm2Weights.downloadNotice) != JOptionPane.OK_OPTION) return false
+            if (!Lfm2Weights.confirmDownload()) return false
             scope.launch(Dispatchers.Default) {
                 val dir = Lfm2Weights.download() ?: return@launch
                 LlmPreferences.weightsDirectory = dir.toString()
@@ -121,7 +117,7 @@ fun LanguageModel.obtainWeightsInteractive(scope: CoroutineScope): Boolean {
         1 -> {
             val dir = showDirectorySelectionDialog() ?: return false
             if (!Lfm2Weights.isValidWeightsDirectory(Path.of(dir))) {
-                showWarningDialog("No model.safetensors and tokenizer.json in $dir")
+                showMessage("No model.safetensors and tokenizer.json in $dir", MessageKind.WARNING)
                 return false
             }
             LlmPreferences.weightsDirectory = dir

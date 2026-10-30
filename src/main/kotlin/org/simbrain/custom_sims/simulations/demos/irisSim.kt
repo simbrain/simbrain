@@ -14,7 +14,7 @@ import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.showOptionDialog
+import org.simbrain.util.showChoice
 import org.simbrain.util.toMatrix
 import smile.io.Read
 
@@ -23,10 +23,10 @@ import smile.io.Read
  */
 val irisClassifier = newSim {
 
-    val option = showOptionDialog(
-        "Choose Classifier Type",
+    val option = showChoice(
         "Choose a classifier type to train on Iris data.",
-        arrayOf("KNN", "Logistic Regression")
+        listOf("KNN", "Logistic Regression"),
+        title = "Choose Classifier Type"
     )
 
     // Last column is target data

@@ -3,10 +3,7 @@ package org.simbrain.network.trainers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.llm.TinyLmConfig
@@ -54,6 +51,7 @@ class TapeTrainerTest {
     @Test
     fun `continuous training honors the stopping condition and fires lifecycle events`() {
         val trainer = trainer()
+        trainer.stoppingCondition.useMaxIterations = true
         trainer.stoppingCondition.maxIterations = 7
         var began = 0
         var ended = 0
@@ -73,8 +71,27 @@ class TapeTrainerTest {
     }
 
     @Test
+    fun `pressing play again after max iterations trains for another full run`() {
+        val trainer = trainer()
+        trainer.stoppingCondition.useMaxIterations = true
+        trainer.stoppingCondition.maxIterations = 5
+
+        runBlocking {
+            repeat(2) { run ->
+                trainer.startTraining()
+                withTimeout(30_000) {
+                    while (trainer.iteration < 5 * (run + 1) || trainer.isRunning) delay(20)
+                }
+            }
+        }
+        assertEquals(10, trainer.iteration)
+        assertFalse(trainer.isRunning)
+    }
+
+    @Test
     fun `error threshold stops a converging run before max iterations`() {
         val trainer = trainer()
+        trainer.stoppingCondition.useMaxIterations = true
         trainer.stoppingCondition.maxIterations = 500
         trainer.stoppingCondition.useErrorThreshold = true
         trainer.stoppingCondition.errorThreshold = 0.2

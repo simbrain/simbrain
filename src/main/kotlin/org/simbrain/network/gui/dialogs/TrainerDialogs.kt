@@ -73,6 +73,12 @@ fun TrainingDataset.createDataSetPanel(
     )
 }
 
+/** Checkbox controlling whether "Apply inputs" steps the selection to the next row. */
+fun autoAdvanceCheckbox() = JCheckBox("Auto advance").apply {
+    isSelected = true
+    toolTipText = "After applying a row's inputs, move the selection to the next row, so repeated clicks step through the data"
+}
+
 fun SimbrainTablePanel.applyCommonTrainerAttributes(parentDialog: StandardDialog? = null) {
     addAction(table.importCSVAction(parentComponent = parentDialog))
     addAction(table.exportCsv(parentComponent = parentDialog))
@@ -94,6 +100,16 @@ class DataSetPanel(
 ): JPanel() {
 
     val rowErrorJLabel = JLabel("")
+
+    /**
+     * Show the loss for [row], naming the row since auto advance will already have moved the selection past it.
+     * The label is kept short; the tooltip says which loss function produced the number.
+     */
+    fun showRowError(row: Int, lossName: String, loss: Double) {
+        rowErrorJLabel.text = "Row ${inputDataFrame.getRowName(row)} error: ${loss.format(4)}"
+        rowErrorJLabel.toolTipText = "<html>$lossName error for the most recently applied row: the network's output<br>" +
+            "compared with that row's target. This is not the dataset-wide training error.</html>"
+    }
     
     // Callback for when row counts change
     var onRowCountChanged: ((inputRowCount: Int, targetRowCount: Int) -> Unit)? = null
@@ -101,7 +117,7 @@ class DataSetPanel(
     val inputs = SimbrainTablePanel(inputDataFrame, false).apply {
         applyCommonTrainerAttributes(parentDialog)
         toolbar.addSeparator()
-        val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+        val advanceRowCheckbox = autoAdvanceCheckbox()
         toolbar.add(
             table.createApplyAction("Apply inputs") {
                 applyAction(it)
@@ -213,7 +229,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
                 trainerConfig.lossFunction.scalarLoss(
                     outputLayer.activations,
                     targetDataFrame.getRow<Double>(selectedRow).toDoubleArray().toColumnVector()
-                ).also { rowErrorJLabel.text = "${trainerConfig.lossFunction.shortName}: ${it.format(4)}" }
+                ).also { showRowError(selectedRow, trainerConfig.lossFunction.shortName, it) }
             }
         }
 
@@ -337,7 +353,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         // Only add play/stop button for algorithms that benefit from repeated iteration
         // SOM and Competitive networks use iterative learning with decaying parameters
         // Hopfield and RBM typically use single-pass training
-        if (unsupervisedNetwork is SOMNetwork || unsupervisedNetwork is CompetitiveNetwork) {
+        val runsIteratively = unsupervisedNetwork is SOMNetwork || unsupervisedNetwork is CompetitiveNetwork
+        if (runsIteratively) {
             val runAction = createAction(
                 name = "Run",
                 description = "Run training algorithm",
@@ -406,14 +423,17 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
 
         runControls.layout = MigLayout("gap 0px 0px, ins 0")
 
-        val preferencesButton = JButton(createAction(
-            name = "Trainer properties",
-            description = "Edit trainer preferences",
-            iconPath = "menu_icons/Tools.png",
-        ) {
-            trainer.createEditorDialog().display()
-        })
-        runControls.add(preferencesButton)
+        // The trainer's only settings limit how long Run continues, so they are moot without a Run button
+        if (runsIteratively) {
+            val preferencesButton = JButton(createAction(
+                name = "Trainer properties",
+                description = "Edit trainer preferences",
+                iconPath = "menu_icons/Tools.png",
+            ) {
+                trainer.createEditorDialog().display()
+            })
+            runControls.add(preferencesButton)
+        }
 
         // Create data frame for unsupervised data with explicit columns like DataSetPanel
         fun createUnsupervisedDataFrame(data: MutableList<MutableList<Double>>): BasicDataFrame {
@@ -434,7 +454,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             val tablePanel = SimbrainTablePanel(dataFrame, false).apply {
                 applyCommonTrainerAttributes(this@dialog)
                 toolbar.addSeparator()
-                val advanceRowCheckbox = JCheckBox("Auto advance").apply { isSelected = true }
+                val advanceRowCheckbox = autoAdvanceCheckbox()
                 toolbar.add(
                     table.createApplyAction("Apply inputs") {
                         unsupervisedNetwork.inputLayer.setActivations(dataFrame.getRow<Double>(it).toDoubleArray())

@@ -4,13 +4,15 @@ import com.formdev.flatlaf.FlatDarkLaf
 import com.formdev.flatlaf.FlatLaf
 import com.formdev.flatlaf.FlatLightLaf
 import com.formdev.flatlaf.extras.FlatSVGIcon
-import java.awt.Color
-import java.awt.Component
-import java.awt.Font
-import java.awt.Graphics
-import java.awt.Graphics2D
-import java.awt.Insets
-import java.awt.RenderingHints
+import org.simbrain.util.Theme.cardBg
+import org.simbrain.util.Theme.cardBorder
+import org.simbrain.util.Theme.divider
+import org.simbrain.util.Theme.font
+import org.simbrain.util.Theme.foreground
+import org.simbrain.util.Theme.section
+import org.simbrain.util.Theme.sectionBorder
+import org.simbrain.util.ThemeMode.SYSTEM
+import java.awt.*
 import java.awt.geom.RoundRectangle2D
 import javax.swing.JLabel
 import javax.swing.UIManager
@@ -129,6 +131,7 @@ object Theme {
 
     val title: Font     get() = font(baseSize + 5, Font.BOLD)
     val heading: Font   get() = font(baseSize + 3, Font.BOLD)
+    val large: Font     get() = font(baseSize + 2)
     val section: Font   get() = font(baseSize + 1, Font.BOLD)
     val bodyBold: Font  get() = font(baseSize, Font.BOLD)
     val body: Font      get() = font(baseSize)

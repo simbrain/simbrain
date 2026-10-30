@@ -7,8 +7,8 @@ package org.simbrain.plot.barchart
 import com.thoughtworks.xstream.XStream
 import org.jfree.data.category.DefaultCategoryDataset
 import org.simbrain.plot.ChartUpdate
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.applyChartUpdates
-import org.simbrain.plot.chartSeriesColor
 import org.simbrain.plot.componentLabel
 import org.simbrain.util.EdtUpdates
 import org.simbrain.util.UserParameter
@@ -35,7 +35,7 @@ class BarChartModel : AttributeContainer, EditableObject, AutoCloseable {
      * Color of bars in barchart.
      */
     @UserParameter(label = "Bar Color", order = 4)
-    var barColor: Color = chartSeriesColor(0)
+    var barColor: Color = PlotPreferences.barColor
 
     /**
      * Auto range bar chart.

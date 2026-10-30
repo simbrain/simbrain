@@ -1,16 +1,19 @@
-package org.simbrain.util
 
+package org.simbrain.util
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
+import net.miginfocom.swing.MigLayout
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.widgets.DropDownTriangle
 import org.simbrain.util.widgets.ProgressWindow
-import org.simbrain.util.widgets.SimbrainTextArea
 import java.awt.*
+import java.awt.datatransfer.StringSelection
 import java.awt.event.*
 import java.beans.PropertyChangeEvent
 import java.io.File
+import java.util.concurrent.ExecutionException
+import java.util.concurrent.FutureTask
 import javax.swing.*
 import javax.swing.border.CompoundBorder
 import javax.swing.event.MenuEvent
@@ -21,11 +24,18 @@ import kotlin.math.min
 
 
 /**
- * Run [block] on the event dispatch thread, directly if already on it, else blocking via
+ * Run [block] on the event dispatch thread and return its result, directly if already on it, else blocking via
  * [SwingUtilities.invokeAndWait]. Use for model mutations that Swing views observe (e.g. JFreeChart datasets).
  */
-fun runOnEventThread(block: () -> Unit) {
-    if (SwingUtilities.isEventDispatchThread()) block() else SwingUtilities.invokeAndWait(block)
+fun <T> runOnEventThread(block: () -> T): T {
+    if (SwingUtilities.isEventDispatchThread()) return block()
+    val task = FutureTask { block() }
+    SwingUtilities.invokeAndWait(task)
+    return try {
+        task.get()
+    } catch (e: ExecutionException) {
+        throw e.cause ?: e
+    }
 }
 
 inline fun StandardDialog.onClosed(crossinline block: (WindowEvent?) -> Unit) = apply {
@@ -359,173 +369,431 @@ suspend fun <T: EditableObject> T.showAPEOptionDialog(title: String) = let {
     deferred
 }.await()
 
-@JvmOverloads
-fun showWarningDialog(message: String?, title: String = "Warning!") {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.WARNING_MESSAGE)
+enum class MessageKind(val title: String, private val iconKey: String) {
+    INFO("Information", "OptionPane.informationIcon"),
+    WARNING("Warning", "OptionPane.warningIcon"),
+    ERROR("Error", "OptionPane.errorIcon"),
+    QUESTION("Question", "OptionPane.questionIcon");
+
+    val icon: Icon? get() = UIManager.getIcon(iconKey)
 }
 
-@JvmOverloads
-fun showErrorDialog(message: String?, title: String = "Error") {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.ERROR_MESSAGE)
-}
+private const val MESSAGE_WIDTH = 400
+private const val TEXT_WIDTH = 640
 
+/**
+ * Show a message with an OK button. [text] wraps to fit and can be selected and copied; separate paragraphs with a
+ * blank line. [heading] is an optional bold summary above the text, and [details] are optional label and value rows
+ * below it, such as a file path or checksum.
+ *
+ * On the event dispatch thread this waits until the user closes the message. From any other thread it returns
+ * immediately and the message appears on the event dispatch thread.
+ */
 @JvmOverloads
-fun showInfoDialog(message: String?, title: String = "Information") {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, message, title, JOptionPane.INFORMATION_MESSAGE)
+fun showMessage(
+    text: String,
+    kind: MessageKind = MessageKind.INFO,
+    heading: String? = null,
+    title: String = kind.title,
+    details: List<Pair<String, String>> = listOf()
+) {
+    val show = { createMessageDialog(text, listOf("OK"), kind, heading, title, details).isVisible = true }
+    if (SwingUtilities.isEventDispatchThread()) show() else SwingUtilities.invokeLater(show)
 }
 
 /**
- * Like [showWarningDialog], but renders the message in a non-editable [JTextArea] so the user
- * can select and copy the text (e.g. to copy a command embedded in the message).
+ * Ask the user to confirm an action and return true if they click [okLabel]. Prefer a label naming the action,
+ * such as "Download" or "Delete", to "OK".
  */
-fun showCopyableWarningDialog(message: String) {
-    val textArea = JTextArea(message).apply {
-        isEditable = false
-        isOpaque = false
-        font = UIManager.getFont("Label.font")
-        border = null
+@JvmOverloads
+fun showConfirm(
+    text: String,
+    okLabel: String = "OK",
+    kind: MessageKind = MessageKind.QUESTION,
+    heading: String? = null,
+    title: String = kind.title,
+    details: List<Pair<String, String>> = listOf()
+): Boolean = showChoice(text, listOf(okLabel, "Cancel"), kind, heading, title, details) == 0
+
+/**
+ * Show a message with one button per option and return the index of the button clicked, or null if the dialog is
+ * closed without choosing. The first option is the default button. Waits for the user from any thread.
+ */
+@JvmOverloads
+fun showChoice(
+    text: String,
+    options: List<String>,
+    kind: MessageKind = MessageKind.QUESTION,
+    heading: String? = null,
+    title: String = kind.title,
+    details: List<Pair<String, String>> = listOf()
+): Int? = runOnEventThread {
+    var choice: Int? = null
+    createMessageDialog(text, options, kind, heading, title, details) { choice = it }.isVisible = true
+    choice
+}
+
+/**
+ * The modal dialog shown by [showMessage], [showConfirm] and [showChoice], built but not yet visible. Clicking a
+ * button passes its index to [onClose] and closes the dialog; closing it any other way passes null.
+ */
+fun createMessageDialog(
+    text: String,
+    options: List<String> = listOf("OK"),
+    kind: MessageKind = MessageKind.INFO,
+    heading: String? = null,
+    title: String = kind.title,
+    details: List<Pair<String, String>> = listOf(),
+    onClose: (Int?) -> Unit = {}
+): JDialog {
+    val body = JPanel(MigLayout("insets 0, wrap 2, gapy 0", "[]16[]")).apply {
+        heading?.let {
+            val headingArea = wrappedText(it, Theme.heading)
+            add(headingArea, "span, width ${headingArea.width}!, gapbottom 8")
+        }
+        val textArea = wrappedText(text)
+        add(textArea, "span, width ${textArea.width}!")
+        details.forEachIndexed { i, (label, value) ->
+            val gap = if (i == 0) "gaptop 12" else "gaptop 4"
+            add(JLabel(label).apply {
+                font = Theme.body
+                // A plain Color, since a look and feel refresh resets a ColorUIResource to the default foreground
+                foreground = Color(Theme.mutedText.rgb)
+            }, gap)
+            add(JTextField(value).apply {
+                isEditable = false
+                isOpaque = false
+                border = BorderFactory.createEmptyBorder()
+                font = Font(Font.MONOSPACED, Font.PLAIN, Theme.body.size)
+            }, gap)
+        }
     }
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    JOptionPane.showMessageDialog(dialog, textArea, "Warning!", JOptionPane.WARNING_MESSAGE)
-}
-
-fun showWarningConfirmDialog(message: String): Int {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    return JOptionPane.showConfirmDialog(dialog, message, "Warning!", JOptionPane.WARNING_MESSAGE)
+    return dialogFrame(title, kind.icon, body, options) { dialog, choice ->
+        onClose(choice)
+        dialog.dispose()
+    }
 }
 
 /**
- * Create a dialog that takes an input in a text field and returns it as a string.
+ * Ask the user for a line of text and return it, or null if they cancel. [initValue] starts out selected.
+ * Waits for the user from any thread.
  */
-fun showInputDialog(message: String, initValue: String? = ""): String? {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    return JOptionPane.showInputDialog(dialog, message, initValue)
+@JvmOverloads
+fun showInputDialog(message: String, initValue: String? = "", title: String = "Input"): String? = runOnEventThread {
+    var result: String? = null
+    createInputDialog(message, initValue, title, parse = { it }) { result = it }.isVisible = true
+    result
 }
 
-fun showOptionDialog(
+/**
+ * Ask the user for a number and return it, or null if they cancel. The type of [initValue], Int or Double, is the
+ * type returned. Text that is not a number of that type shows an error under the field and keeps the dialog open.
+ */
+fun <T : Number> showNumericInputDialog(message: String, initValue: T, title: String = "Input"): T? {
+    @Suppress("UNCHECKED_CAST")
+    val parse: (String) -> T? = when (initValue) {
+        is Int -> { text -> text.trim().toIntOrNull() as T? }
+        is Double -> { text -> text.trim().toDoubleOrNull() as T? }
+        else -> throw IllegalArgumentException("Unsupported number type ${initValue::class.simpleName}")
+    }
+    val error = if (initValue is Int) "Enter a whole number." else "Enter a number."
+    return runOnEventThread {
+        var result: T? = null
+        createInputDialog(message, initValue.toString(), title, error, parse) { result = it }.isVisible = true
+        result
+    }
+}
+
+/**
+ * The modal dialog shown by [showInputDialog] and [showNumericInputDialog], built but not yet visible. OK passes the
+ * field's text to [parse]. If that returns null, [error] appears under the field and the dialog stays open;
+ * otherwise the parsed value goes to [onClose]. Cancelling passes null.
+ */
+fun <T> createInputDialog(
     message: String,
-    title: String,
-    options: Array<String>,
-    defaultOption: Int? = null
-): Int {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    return JOptionPane.showOptionDialog(
-        dialog,
-        message,
-        title,
-        JOptionPane.DEFAULT_OPTION,
-        JOptionPane.QUESTION_MESSAGE,
-        null,
-        options,
-        defaultOption?.let { options[it] }
-    )
+    initValue: String? = "",
+    title: String = "Input",
+    error: String = "",
+    parse: (String) -> T?,
+    onClose: (T?) -> Unit = {}
+): JDialog {
+    val field = JTextField(initValue).apply {
+        font = Theme.large
+        selectAll()
+    }
+    val errorLabel = JLabel(error).apply {
+        font = Theme.body
+        // A plain Color, since a look and feel refresh resets a ColorUIResource to the default foreground
+        foreground = Color(Theme.errorText.rgb)
+        isVisible = false
+    }
+    val body = JPanel(MigLayout("insets 0, wrap 1, gapy 0, hidemode 3")).apply {
+        val prompt = wrappedText(message)
+        add(prompt, "width ${prompt.width}!")
+        add(field, "growx, wmin 320, gaptop 8")
+        add(errorLabel, "gaptop 4")
+    }
+    return dialogFrame(title, null, body, listOf("OK", "Cancel"), focus = field) { dialog, choice ->
+        if (choice == 0) {
+            val value = parse(field.text)
+            if (value == null) {
+                errorLabel.isVisible = true
+                dialog.pack()
+                field.selectAll()
+                field.requestFocusInWindow()
+                return@dialogFrame
+            }
+            onClose(value)
+        } else {
+            onClose(null)
+        }
+        dialog.dispose()
+    }
 }
 
 /**
- * Shows a dialog with a scrollable grid of checkboxes and returns the labels of those
- * that are checked when the user clicks OK, or `null` if the user cancels.
- *
- * @param title           Dialog window title.
- * @param message         Optional explanatory label shown above the checkboxes.
- * @param items           Full list of item labels to display.
- * @param defaultSelected Items that should be pre-checked (defaults to all items).
- * @param columns         Number of columns in the checkbox grid (default 1).
+ * A modal dialog with [body] beside [icon] and one button per option below it, the first being the default.
+ * Clicking a button passes its index to [onButton]; Escape or closing the window passes null. [onButton] disposes
+ * the dialog when it should close. [focus] gets the keyboard focus when the dialog opens, or else the first button.
  */
-fun showCheckboxDialog(
+private fun dialogFrame(
     title: String,
-    message: String = "",
-    items: List<String>,
-    defaultSelected: List<String> = items,
-    columns: Int = 1
-): List<String>? {
-    val checkboxes = items.map { JCheckBox(it, it in defaultSelected) }
-
-    val numRows = (items.size + columns - 1) / columns
-    val grid = JPanel(GridLayout(numRows, columns, 8, 2))
-    checkboxes.forEach { grid.add(it) }
-    // Pad any empty cells in the last row
-    repeat(numRows * columns - items.size) { grid.add(JLabel()) }
-
-    val content = JPanel(BorderLayout(0, 8))
-    if (message.isNotEmpty()) {
-        content.add(JLabel("<html>$message</html>"), BorderLayout.NORTH)
+    icon: Icon?,
+    body: JComponent,
+    options: List<String>,
+    focus: JComponent? = null,
+    onButton: (JDialog, Int?) -> Unit
+): JDialog {
+    val owner = activeWindow()
+    val dialog = JDialog(owner, title, Dialog.ModalityType.APPLICATION_MODAL)
+    val buttons = options.mapIndexed { i, option ->
+        JButton(option).apply { addActionListener { onButton(dialog, i) } }
     }
-    content.add(JScrollPane(grid).apply {
-        preferredSize = Dimension(columns * 180, minOf(numRows * 26 + 20, 480))
-    }, BorderLayout.CENTER)
-
-    val result = JOptionPane.showConfirmDialog(
-        null, content, title,
-        JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
+    dialog.contentPane = JPanel(MigLayout("insets 20 20 16 20", if (icon == null) "[grow]" else "[]20[grow]")).apply {
+        icon?.let { add(JLabel(it), "aligny top") }
+        add(body, "wrap")
+        buttons.forEachIndexed { i, button ->
+            add(button, if (i == 0) "span, split ${buttons.size}, alignx right, gaptop 16" else "")
+        }
+    }
+    dialog.rootPane.defaultButton = buttons.firstOrNull()
+    dialog.rootPane.registerKeyboardAction(
+        { onButton(dialog, null) },
+        KeyStroke.getKeyStroke("ESCAPE"),
+        JComponent.WHEN_IN_FOCUSED_WINDOW
     )
-    return if (result == JOptionPane.OK_OPTION)
-        checkboxes.filter { it.isSelected }.map { it.text }
-    else
-        null
+    dialog.defaultCloseOperation = JDialog.DO_NOTHING_ON_CLOSE
+    dialog.addWindowListener(object : WindowAdapter() {
+        override fun windowOpened(e: WindowEvent?) {
+            (focus ?: buttons.firstOrNull())?.requestFocusInWindow()
+        }
+
+        override fun windowClosing(e: WindowEvent?) = onButton(dialog, null)
+    })
+    if (owner == null) {
+        dialog.isAlwaysOnTop = true
+    }
+    dialog.pack()
+    dialog.setLocationRelativeTo(owner)
+    return dialog
 }
 
-fun showMessageDialog(message: String, title: String, rows: Int = 10, columns: Int = 50) {
-    val textArea = SimbrainTextArea().apply {
-        text = message
-        isEditable = false
-        this.rows = rows
-        this.columns = columns
-    }
-    val scrollPane = JScrollPane(textArea)
+/**
+ * Read-only wrapping text, sized to its longest line up to [maxWidth]. Unlike a label it shows `<` and `&`
+ * literally and lets the user select and copy the text. Tab moves focus on rather than staying in the text.
+ */
+private fun wrappedText(
+    text: String,
+    textFont: Font = Theme.large,
+    maxWidth: Int = MESSAGE_WIDTH
+) = JTextArea(text).apply {
+    isEditable = false
+    isOpaque = false
+    lineWrap = true
+    wrapStyleWord = true
+    border = BorderFactory.createEmptyBorder()
+    margin = Insets(0, 0, 0, 0)
+    font = textFont
+    setFocusTraversalKeys(KeyboardFocusManager.FORWARD_TRAVERSAL_KEYS, null)
+    setFocusTraversalKeys(KeyboardFocusManager.BACKWARD_TRAVERSAL_KEYS, null)
+    val longestLine = text.lines().maxOf { getFontMetrics(font).stringWidth(it) }
+    setSize(min(longestLine + 1, maxWidth), Short.MAX_VALUE.toInt())
+}
+
+/**
+ * The window new dialogs should be owned by and centered on, so on a multi-monitor setup they open on the same
+ * screen as Simbrain rather than the primary screen.
+ */
+private fun activeWindow(): Window? = KeyboardFocusManager.getCurrentKeyboardFocusManager().activeWindow
+    ?: Frame.getFrames().firstOrNull { it.isVisible }
+
+/**
+ * Show long text, such as a stack trace or debug dump, in a non-modal dialog. The text wraps, can be selected, and
+ * scrolls when it is too tall for the screen; a Copy button copies all of it. Prefer [showMessage] for short prose and [showResults] for
+ * labelled values. Safe to call from any thread.
+ */
+fun showText(text: String, title: String) {
     SwingUtilities.invokeLater {
-        StandardDialog().apply {
-            this.title = title
-            contentPane = scrollPane
-            isModal = false
-            setAsDoneDialog()
-            makeVisible()
+        val textArea = wrappedText(text.replace("\t", "    "), Theme.body, TEXT_WIDTH)
+        val panel = JPanel(MigLayout("insets 16 20 16 20")).apply { add(textArea, "width ${textArea.width}!") }
+        createDoneDialog(title, scrollIfTall(panel), text).isVisible = true
+    }
+}
+
+/**
+ * The receiver of the block passed to [showResults]. Each call to [section], [row] or [note] adds a line to the
+ * dialog, in order: section headings, short notes, and rows of a label followed by one or more right-aligned values.
+ */
+class ResultsBuilder {
+
+    internal sealed class Item {
+        class Heading(val text: String, val columns: List<String>) : Item()
+        class Note(val text: String) : Item()
+        class Row(val label: String, val values: List<String>) : Item()
+    }
+
+    internal val items = mutableListOf<Item>()
+
+    /**
+     * The results as plain text, one line per heading, note or row, with values separated by tabs so they paste into
+     * a spreadsheet as columns.
+     */
+    internal fun toText(): String = buildString {
+        items.forEachIndexed { i, item ->
+            when (item) {
+                is Item.Heading -> {
+                    if (i > 0) appendLine()
+                    appendLine((listOf(item.text) + item.columns).joinToString("\t"))
+                }
+                is Item.Note -> appendLine(item.text)
+                is Item.Row -> appendLine((listOf(item.label) + item.values).joinToString("\t"))
+            }
+        }
+    }.trimEnd()
+
+    /**
+     * Start a section. [columns], when given, label the value columns of the rows that follow.
+     */
+    fun section(heading: String, columns: List<String> = listOf(), block: ResultsBuilder.() -> Unit = {}) {
+        items.add(Item.Heading(heading, columns))
+        block()
+    }
+
+    fun note(text: String) {
+        items.add(Item.Note(text))
+    }
+
+    fun row(label: String, vararg values: String) {
+        items.add(Item.Row(label, values.toList()))
+    }
+}
+
+private fun resultsPanel(items: List<ResultsBuilder.Item>): JPanel {
+    val valueColumns = items.maxOfOrNull {
+        when (it) {
+            is ResultsBuilder.Item.Row -> it.values.size
+            is ResultsBuilder.Item.Heading -> it.columns.size
+            is ResultsBuilder.Item.Note -> 0
+        }
+    } ?: 0
+    val columnConstraints = "[left]" + "40[right]" + "24[right]".repeat((valueColumns - 1).coerceAtLeast(0))
+    fun label(text: String, font: Font) = JLabel(text).apply { this.font = font }
+    return JPanel(MigLayout("insets 20 24 12 24, wrap ${valueColumns + 1}", columnConstraints, "[]4[]")).apply {
+        items.forEachIndexed { index, item ->
+            when (item) {
+                is ResultsBuilder.Item.Heading -> {
+                    // Space each section after the first from the one above it
+                    val gap = if (index == 0) "" else "gaptop 16"
+                    if (item.columns.isEmpty()) {
+                        add(label(item.text, Theme.heading), "span, $gap")
+                    } else {
+                        add(label(item.text, Theme.heading), gap)
+                        item.columns.forEach { add(label(it, Theme.body), "aligny bottom, $gap") }
+                        repeat(valueColumns - item.columns.size) { add(JLabel()) }
+                    }
+                }
+                is ResultsBuilder.Item.Note -> add(label(item.text, Theme.body).apply {
+                    foreground = Color(Theme.mutedText.rgb)
+                }, "span")
+                is ResultsBuilder.Item.Row -> {
+                    add(label(item.label, Theme.large))
+                    item.values.forEach { add(label(it, Theme.large.deriveFont(Font.BOLD))) }
+                    repeat(valueColumns - item.values.size) { add(JLabel()) }
+                }
+            }
         }
     }
 }
 
 /**
- * Create a dialog that takes an input in a text field and returns it as a number.
- * Returns null if user cancels the input.
+ * Show labelled results, such as accuracies or distances, in a non-modal dialog that sizes itself to fit. Safe to
+ * call from any thread, but [build] runs later on the event dispatch thread, so compute results first and only
+ * format them inside [build].
  *
- * Init value determines the type. Int and Double supported.
+ * ```
+ * showResults("Generalization accuracy") {
+ *     section("Training set") {
+ *         row("10,000 training images", "99.4%")
+ *     }
+ *     section("Testing sets") {
+ *         row("Original", "94.6%")
+ *         row("Shifted 2 pixels right", "56.4%")
+ *     }
+ * }
+ * ```
  */
-fun <T: Number> showNumericInputDialog(message: String, initValue: T): T? {
-    val dialog = JDialog()
-    dialog.isAlwaysOnTop = true
-    while (true) {
-        val result = JOptionPane.showInputDialog(dialog, message, initValue)
-        if (result == null) {
-            // User cancelled
-            return null
-        }
+fun showResults(title: String, build: ResultsBuilder.() -> Unit) {
+    SwingUtilities.invokeLater {
+        createResultsDialog(title, build).isVisible = true
+    }
+}
 
-        when (initValue) {
-            is Int -> {
-                try {
-                    return Integer.parseInt(result) as T
-                } catch (e: NumberFormatException) { /* continue below */ }
+/**
+ * The dialog shown by [showResults], built but not yet visible. Its Copy button copies the results via
+ * [ResultsBuilder.toText].
+ */
+fun createResultsDialog(title: String, build: ResultsBuilder.() -> Unit): StandardDialog {
+    val results = ResultsBuilder().apply(build)
+    return createDoneDialog(title, scrollIfTall(resultsPanel(results.items)), results.toText())
+}
+
+/**
+ * [content] as is, or in a scroll pane [maxHeight] tall if it is taller, so a long list keeps the dialog's buttons
+ * on screen. By default [maxHeight] is three quarters of the height of the screen Simbrain is on.
+ */
+private fun scrollIfTall(
+    content: JComponent,
+    maxHeight: Int = (activeWindow()?.graphicsConfiguration?.bounds?.height ?: 800) * 3 / 4
+): JComponent {
+    val size = content.preferredSize
+    if (size.height <= maxHeight) return content
+    return JScrollPane(content).apply {
+        border = BorderFactory.createEmptyBorder()
+        horizontalScrollBarPolicy = JScrollPane.HORIZONTAL_SCROLLBAR_NEVER
+        verticalScrollBar.unitIncrement = 16
+        preferredSize = Dimension(size.width + verticalScrollBar.preferredSize.width, maxHeight)
+    }
+}
+
+/**
+ * A non-modal dialog showing [content], centered on the [activeWindow], with a Done button and a Copy button that
+ * puts [copyText] on the clipboard.
+ */
+private fun createDoneDialog(title: String, content: Container, copyText: String): StandardDialog {
+    val owner = activeWindow()
+    return StandardDialog(owner, title).apply {
+        contentPane = content
+        isModal = false
+        setAsDoneDialog()
+        addButton(JButton("Copy").apply {
+            toolTipText = "Copy all of the text to the clipboard"
+            addActionListener {
+                Toolkit.getDefaultToolkit().systemClipboard.setContents(StringSelection(copyText), null)
+                text = "Copied"
             }
-            is Double -> {
-                try {
-                    return java.lang.Double.parseDouble(result) as T
-                } catch (e: NumberFormatException) { /* continue below */ }
-            }
-            else -> {
-                JOptionPane.showMessageDialog(dialog, "Unsupported number type!", "Error", JOptionPane.ERROR_MESSAGE)
-                return null
-            }
-        }
-        JOptionPane.showMessageDialog(dialog, "Please enter a valid number!", "Warning", JOptionPane.WARNING_MESSAGE)
+        })
+        pack()
+        setLocationRelativeTo(owner)
     }
 }
 

@@ -62,6 +62,15 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
+     * Remove every item so the panel can be filled again starting from the
+     * first row.
+     */
+    public void clearItems() {
+        removeAll();
+        myNextItemRow = 0;
+    }
+
+    /**
      * Add a labeled item to the panel. The item is added to the row below the
      * last item added.
      *

@@ -6,8 +6,9 @@ import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
 import org.simbrain.util.CachedObject
+import org.simbrain.util.MessageKind
 import org.simbrain.util.SimbrainConstants
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
 import org.simbrain.workspace.AttributeContainer
@@ -255,7 +256,7 @@ class SynapseGroup @JvmOverloads constructor(
                 with(strategy) {
                     val result = createSparseSynapses(source.neuronList, target.neuronList, connectionDensity, allowSelfConnection, equalizeEfferents, random)
                     if (result is ConnectionsResult.Remove && result.removedAll) {
-                        showWarningDialog("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.")
+                        showMessage("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.", MessageKind.WARNING)
                         return
                     }
                     when(result) {
@@ -281,7 +282,7 @@ class SynapseGroup @JvmOverloads constructor(
                     target.neuronList
                 )
                 if (newSynapses.isEmpty()) {
-                    showWarningDialog("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.")
+                    showMessage("Connection strategy not applied: The result is empty. Please check your connection strategy parameters.", MessageKind.WARNING)
                     return
                 }
                 // Can’t let number of synapses get to 0, because this triggers deletion of the synapse group.

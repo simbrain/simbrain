@@ -1,12 +1,7 @@
 package org.simbrain.network.trainers
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.launch
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.llm.TinyLmModel
@@ -112,7 +107,7 @@ class TapeTrainer(val model: TinyLmModel) : CoroutineScope {
     private suspend fun startHandler() {
         synchronized(model) {
             if (model.midWalk) return
-            stoppingCondition.resetEarlyStopping()
+            stoppingCondition.startRun(iteration)
             isRunning = true
         }
         events.beginTraining.fire()

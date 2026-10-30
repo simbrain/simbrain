@@ -7,6 +7,7 @@ package org.simbrain.plot.raster
 import com.thoughtworks.xstream.XStream
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.RasterPlotEvents
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
@@ -37,14 +38,14 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoClo
         label = "Dot Size",
         description = "Size of dots in chart",
         order = 5)
-    var dotSize: Int = 4
+    var dotSize: Int = PlotPreferences.rasterDotSize
         set(value) {
             field = value
             events.propertyChanged.fire()
         }
 
     var windowSize: Int by GuiEditable(
-        initValue = 100,
+        initValue = PlotPreferences.rasterWindowSize,
         label = "Window Size",
         setter = {
             field = it
@@ -60,7 +61,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoClo
         description = "If true, the raster window never extends beyond a fixed with",
         order = 30
     )
-    var isFixedWidth: Boolean = true
+    var isFixedWidth: Boolean = PlotPreferences.rasterFixedWidth
         set(value) {
             field = value
             events.propertyChanged.fire()

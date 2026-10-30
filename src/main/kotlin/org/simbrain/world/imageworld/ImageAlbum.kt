@@ -1,8 +1,9 @@
 package org.simbrain.world.imageworld
 
+import org.simbrain.util.MessageKind
 import org.simbrain.util.copy
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.image.BufferedImage
@@ -75,7 +76,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
                 if (read != null) {
                     list.add(read)
                 } else {
-                    showWarningDialog(String.format("Could not parse %s", file.name))
+                    showMessage(String.format("Could not parse %s", file.name), MessageKind.WARNING)
                     System.err.printf("Could not parse %s", file.name)
                 }
             } catch (e: IOException) {

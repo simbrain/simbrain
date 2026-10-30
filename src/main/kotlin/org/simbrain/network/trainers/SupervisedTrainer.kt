@@ -69,7 +69,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     var stoppingCondition by GuiEditable(
         initValue = StoppingCondition(),
-        description = "Conditions for automatically stopping training. Can stop after max iterations, error threshold, or early stopping",
+        description = "Conditions for automatically stopping training. By default training runs until stopped; optionally stop after max iterations, error threshold, or early stopping",
         showDetails = false,
         order = 50
     )
@@ -90,6 +90,12 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
         initValue = false,
         description = "Calculate and display classification accuracy for networks with one-hot encoded targets",
         order = 70
+    )
+
+    var showEffectiveStepSize by GuiEditable(
+        initValue = false,
+        description = "Display the average size of the optimizer's per-parameter updates, which helps diagnose training that stalls or diverges",
+        order = 80
     )
 
     /**
@@ -117,6 +123,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
         it.stoppingCondition = stoppingCondition.copy()
         it.testConfiguration = testConfiguration.copy()
         it.computeAccuracy = computeAccuracy
+        it.showEffectiveStepSize = showEffectiveStepSize
     }
 
     override fun copy() = copyCurrentInto(SupervisedTrainerConfig())
@@ -234,8 +241,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         // Clear stopping condition flag to allow continued training
         stoppingConditionReached = false
 
-        // Reset early stopping state when training starts
-        config.stoppingCondition.resetEarlyStopping()
+        config.stoppingCondition.startRun(iteration)
         isRunning = true
         events.beginTraining.fire()
         submitTask(TrainerTask.Train)
@@ -647,11 +653,23 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         abstract override fun copy(): UpdateMethod
     }
 
+    /**
+     * Every condition is off by default, so a run continues until the user stops it.
+     *
+     * Max iterations counts from the start of the current run rather than from iteration zero, so pressing play
+     * again after it fires trains for another [maxIterations] instead of stopping after a single iteration.
+     */
     class StoppingCondition: CopyableObject {
+        var useMaxIterations by GuiEditable(
+            initValue = false,
+            description = "Stop training after a fixed number of iterations, counted from when training starts",
+            order = 0
+        )
         var maxIterations by GuiEditable(
             initValue = 10_000,
-            description = "Maximum number of training iterations before stopping automatically",
-            order = 1
+            description = "Training stops after this many iterations of the current run",
+            order = 1,
+            conditionallyEnabledBy = StoppingCondition::useMaxIterations
         )
         var useErrorThreshold by GuiEditable(
             initValue = false,
@@ -688,9 +706,12 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         private var bestTestError = Double.MAX_VALUE
         @Transient
         private var patienceCounter = 0
+        @Transient
+        private var runStartIteration = 0
 
         override fun copy(): StoppingCondition {
             return StoppingCondition().also {
+                it.useMaxIterations = useMaxIterations
                 it.maxIterations = maxIterations
                 it.useErrorThreshold = useErrorThreshold
                 it.errorThreshold = errorThreshold
@@ -702,8 +723,12 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         }
 
         fun validate(iterations: Int, trainingError: Double, testError: Double? = null): Boolean {
+            // The iteration counter was reset mid-run, so count from the reset instead
+            if (iterations < runStartIteration) runStartIteration = 0
+            val iterationsThisRun = iterations - runStartIteration
+
             // Check standard stopping conditions
-            val standardStop = iterations >= maxIterations || (useErrorThreshold && trainingError < errorThreshold)
+            val standardStop = (useMaxIterations && iterationsThisRun >= maxIterations) || (useErrorThreshold && trainingError < errorThreshold)
             
             // Check early stopping if enabled and test error is available
             val earlyStop = if (useEarlyStopping && testError != null) {
@@ -731,7 +756,15 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         }
         
         /**
-         * Reset early stopping state (called when training starts)
+         * Call when training starts, with the trainer's iteration count at that moment.
+         */
+        fun startRun(currentIteration: Int) {
+            runStartIteration = currentIteration
+            resetEarlyStopping()
+        }
+
+        /**
+         * Reset early stopping state
          */
         fun resetEarlyStopping() {
             bestTestError = Double.MAX_VALUE

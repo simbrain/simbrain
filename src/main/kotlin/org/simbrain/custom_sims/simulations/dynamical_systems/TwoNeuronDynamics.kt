@@ -8,9 +8,10 @@ import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.plot.timeseries.RecurrenceView
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
+import org.simbrain.util.MessageKind
 import org.simbrain.util.math.SigmoidFunctionEnum
 import org.simbrain.util.place
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.workspace.Workspace
 
 val twoNeuronDynamics = newSim("two-neuron-dynamics") {
@@ -165,7 +166,7 @@ private suspend fun SimulationScope.setupTwoNeuronControls(workspace: Workspace)
             addButton("Apply gain") {
                 val gain = gainField.text.toDoubleOrNull()
                 if (gain == null || !gain.isFinite() || gain !in 0.0..1.3) {
-                    showWarningDialog("Enter a finite feedback gain between 0 and 1.3.")
+                    showMessage("Enter a finite feedback gain between 0 and 1.3.", MessageKind.WARNING)
                 } else {
                     applyGain(gain)
                 }

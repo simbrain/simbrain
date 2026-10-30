@@ -1,19 +1,25 @@
 package org.simbrain.custom_sims.simulations
 
-import org.simbrain.custom_sims.SIM_WINDOW_GAP
-import org.simbrain.custom_sims.addNetworkComponent
-import org.simbrain.custom_sims.addSidebarInfo
-import org.simbrain.custom_sims.newSim
+import org.simbrain.custom_sims.*
+import org.simbrain.custom_sims.simulations.backprop.TinyMnistModel
+import org.simbrain.custom_sims.simulations.backprop.createTinyMnistControlPanel
+import org.simbrain.custom_sims.simulations.backprop.loadTinyMnist
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.network.trainers.BackpropLossFunction
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.LinearRule
 import org.simbrain.network.updaterules.SoftmaxRule
-import org.simbrain.util.csvToDouble2DArray
-import org.simbrain.util.fetchDataWithCache
 import org.simbrain.util.place
+import org.simbrain.util.placeBeside
 import org.simbrain.util.toMatrix
+import org.simbrain.workspace.couplings.getConsumer
+import org.simbrain.workspace.couplings.getProducer
+import org.simbrain.world.imageworld.ImageWorldComponent
+import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
+import javax.swing.SwingUtilities
 
 /**
  * A small implementation of MNIst
@@ -33,23 +39,9 @@ val tinyMNIST = newSim {
     }
     bp.outputLayer.updateRule = SoftmaxRule()
 
-    val trainInputsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_inputs.csv") ?: return@newSim
-    val trainLabelsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_train_labels.csv") ?: return@newSim
-    val testInputsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_inputs.csv") ?: return@newSim
-    val testLabelsCSV =
-        fetchDataWithCache("https://downloads.simbrain.net/simbraindata/tiny_mnist_test_labels.csv") ?: return@newSim
-
-    bp.trainingSet = TrainingDataset(
-        inputs = csvToDouble2DArray(trainInputsCSV).map { it.toMutableList() }.toMutableList(),
-        targets = csvToDouble2DArray(trainLabelsCSV).map { it.toMutableList() }.toMutableList(),
-    )
-    bp.testingSet = TrainingDataset(
-        inputs = csvToDouble2DArray(testInputsCSV).map { it.toMutableList() }.toMutableList(),
-        targets = csvToDouble2DArray(testLabelsCSV).map { it.toMutableList() }.toMutableList(),
-    )
+    val data = loadTinyMnist() ?: return@newSim
+    bp.trainingSet = data.trainingSet
+    bp.testingSet = data.testingSet
     bp.trainerConfig.lossFunction = BackpropLossFunction.CrossEntropy
     bp.trainerConfig.learningRate = .001
     bp.trainerConfig.updateType = SupervisedTrainer.UpdateMethod.Batch(35)
@@ -59,7 +51,7 @@ val tinyMNIST = newSim {
 
     bp.inputLayer.gridMode = true
     bp.inputLayer.offset(-350.0, -225.0)
-    bp.inputLayer.inputData = csvToDouble2DArray(testInputsCSV).toMatrix()
+    bp.inputLayer.inputData = data.testingSet.inputs.toTypedArray().toMatrix()
     bp.outputLayer.offset(-350.0, 225.0)
     bp.outputLayer.circleMode = true
     bp.outputLayer.gridMode = true
@@ -83,23 +75,57 @@ val tinyMNIST = newSim {
 
         Training uses the smaller `20 x 20` images in the bundled Tiny MNIST dataset, with separate training and testing examples so you can compare learning and generalization.
 
+        # Control Panel
+
+        - `Train network...`: Opens the training dialog. This is a convenience; right-clicking the network and choosing `Train...` opens the same dialog.
+
+        - `Training examples`: Train on the first `10,000`, `1,000`, or `300` training images. With fewer examples the network memorizes the training set, so training error falls well below testing error (overfitting).
+
+        - `Testing set`: Test on the original images, or on copies shifted `1` or `2` pixels, rotated `20` degrees, or with added noise. This sets the blue test curve, the `Testing data` tab, and the `Inputs` table.
+
+        - `Random training image` and `Random test image`: Run a randomly chosen training or test image through the network so you can see how it classifies it.
+
+        - `Draw your own digit`: Opens an image world coupled to the input layer. Draw a digit, then press `Run` or `Step` to see the network's answer.
+
+        - `Test generalization`: Reports accuracy on the training set and on every testing set. The progress bar below it shows how far along it is. Stop the simulation first if it is running.
+
         # What to Do
 
-        1. Enter the `Train Network` dialog by right-clicking the `BackpropNetwork_1` network (under the `Tiny Mnist` window) and selecting `Edit/Train Backprop...`
+        1. Open the training dialog with `Train network...` in the control panel, or by right-clicking the `BackpropNetwork_1` network (under the `Tiny Mnist` window) and selecting `Train...`
 
         2. Train the simulation by clicking the `Iterate training until stop button is pressed` button
 
-        3. Train this simulation until the `Mean Error` reaches below `0.2` or `0.1`. With the default settings it will hover around there. At that point it achieves decent results. The blue line on the graph shows how well the model is generalizing to test data
+        3. Train this simulation until the `Training Error` reaches below `0.2` or `0.1`. With the default settings it will hover around there. At that point it achieves decent results. The blue line on the graph shows how well the model is generalizing to test data
 
         Notice that the training error (red line) appears jagged compared to the testing error (blue line). This is because training uses batches of 35 examples when updating, while testing (which happens every 10 iterations, and is thus not visible initially) evaluates the entire test set. See the [docs on supervised learning](https://docs.simbrain.net/docs/network/learning/supervisedLearning.html)
 
         ## Things You Can Do After Training
 
+        - Press `Random test image` a few times to see how the network classifies images it was not trained on.
+
         - Manually try specific training or testing images. To do this, under the `Inputs` toolbar, go to the table of interest and click the button with this tooltip: `Apply current row as
         input to network` when hovered. Then observe how it classifies written digits. The values of the output layer correspond to the probability it assigns the input to a digit `0-9`.
 
-        - Draw your own image. Right click on the image layer and select `Add image world` then draw your own image and see how the network does. It generally does poorly since it
+        - Draw your own image. Press `Draw your own digit` (or right click on the image layer and select `Add image world`), draw a digit, and see how the network does. It generally does poorly since it
         was trained on anti-aliased images.
+
+        - Press `Test generalization`. Accuracy on the original testing images is high, but it falls quickly when the same digits are shifted a pixel or two. The network has learned which pixels matter, not what shape a digit is, and has no notion that a shifted `7` is still a `7`. Set `Testing set` to a shifted set and press `Random test image` to see examples. Compare the `CNN MNIST` simulation, whose pooling layers tolerate small shifts better.
+
+        ## Overfitting and Early Stopping
+
+        This simulation is a good place to learn about overfitting and early stopping, so here is a short tutorial.
+
+        With only a few training examples, a network can memorize them instead of learning what digits look like. Training error keeps falling, but testing error, measured on images the network never trains on, stops improving and then rises. This is overfitting. Early stopping watches the testing error and ends training once it stops improving.
+
+        Here is what you will find. With `300` training examples the network starts overfitting within a couple of hundred iterations, and early stopping catches it there. With `10,000` examples the network keeps improving for much longer and ends up far better, but early stopping has to be made more patient so it does not quit too soon.
+
+        1. Set `Training examples` to `300`, press the dice button in the training dialog to re-initialize the weights, and run for about `2,000` iterations. The red training curve falls to nearly zero. The blue testing curve bottoms out within the first couple of hundred iterations and then climbs steadily. Everything after that low point made the network worse on new images.
+
+        2. Notice that `Testing Accuracy` barely changes while testing error climbs. The network is not getting more digits wrong. It is becoming more confident, including about the digits it gets wrong, and cross-entropy error punishes confident mistakes heavily.
+
+        3. Press the dice button again. In `Trainer properties`, open `Stopping Condition`, check `Use Early Stopping`, and run. Early stopping cannot quit the first time testing error fails to improve, because the testing curve wobbles and a single bad test is often followed by a new best. So it is given a certain amount of patience, like a teacher waiting for a student to improve. Each disappointing test uses up a little of that patience, and a new best restores it. When the patience runs out, early stopping gives up on further improvement and stops training. The `Early Stopping` row shows the best testing error so far and the patience count. Testing happens every `10` iterations, and each test that fails to beat the best adds one to the count, while a new best resets it to zero. When it reaches `5/5`, training stops on its own, usually around iteration `200`. The network keeps the weights it had when it stopped, a little past the best point.
+
+        4. Set `Training examples` back to `10,000`, press the dice button, and run with early stopping still on. It now stops after a few hundred iterations, too soon: the testing curve is still falling but is bumpy enough that five tests in a row can miss a new best by chance. Set `Early Stopping Patience` to `20` and try again. Training now runs to roughly `1,500` iterations and ends with testing error near `0.2` and about `94%` accuracy, compared with about `0.6` and `83%` with 300 examples. Early stopping keeps a network from overtraining, but more data is what makes it generalize better.
 
         # Credits
 
@@ -110,9 +136,55 @@ val tinyMNIST = newSim {
         """.trimIndent()
     )
 
-    // Location of the network in the desktop
     withGui {
-        place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 700, 700)
+        val networkPanel = getNetworkPanel(networkComponent)
+        var drawingWorld: ImageWorldComponent? = null
+        val model = object : TinyMnistModel {
+            override var trainingSet: TrainingDataset
+                get() = bp.trainingSet
+                set(value) {
+                    bp.trainingSet = value
+                }
+            override var testingSet: TrainingDataset
+                get() = bp.testingSet
+                set(value) {
+                    bp.testingSet = value
+                    bp.inputLayer.inputData = value.inputs.toTypedArray().toMatrix()
+                }
+
+            override suspend fun show(image: DoubleArray): DoubleArray {
+                bp.inputLayer.setActivations(image)
+                with(net) { bp.forwardPass() }
+                return bp.outputLayer.activationArray
+            }
+
+            override suspend fun openTrainingDialog() {
+                SwingUtilities.invokeLater {
+                    with(networkPanel) { bp.getSupervisedTrainingDialog() }.run {
+                        pack()
+                        setLocationRelativeTo(null)
+                        isVisible = true
+                    }
+                }
+            }
+
+            override suspend fun addDrawingWorld() {
+                if (drawingWorld?.let { it in workspace.componentList } == true) return
+                val imageWorld = ImageWorldComponent("Draw a digit")
+                workspace.addWorkspaceComponent(imageWorld)
+                imageWorld.world.resetImageAlbum(20, 20)
+                with(workspace.couplingManager) {
+                    imageWorld.world.imagePipelineCollection.currentPipeline
+                        .getProducer(ImageProcessingPipeline::brightness) couple
+                        bp.inputLayer.getConsumer(NeuronArray::activationArray)
+                }
+                bp.inputLayer.isClamped = true
+                placeBeside(imageWorld, networkComponent)
+                drawingWorld = imageWorld
+            }
+        }
+        val controlPanel = createTinyMnistControlPanel(data, model).awaitLayout()
+        place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 700, 700)
     }
 
     val trainer = SupervisedTrainer(net, bp)

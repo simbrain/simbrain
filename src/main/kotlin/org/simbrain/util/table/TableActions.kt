@@ -4,6 +4,7 @@ import com.Ostermiller.util.CSVPrinter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.miginfocom.swing.MigLayout
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.util.*
 import org.simbrain.util.projection.DataPoint
@@ -17,7 +18,6 @@ import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
-import net.miginfocom.swing.MigLayout
 import java.awt.Component
 import javax.swing.JLabel
 import javax.swing.JOptionPane
@@ -187,11 +187,11 @@ val SimbrainJTable.setRowsColumnsAction
                     if (newRows > 0 && newCols > 0) {
                         Pair(newRows, newCols)
                     } else {
-                        showErrorDialog("Rows and columns must be positive integers", "Invalid Input")
+                        showMessage("Rows and columns must be positive integers", MessageKind.ERROR, title = "Invalid Input")
                         null
                     }
                 } catch (e: NumberFormatException) {
-                    showErrorDialog("Please enter valid integer values", "Invalid Input")
+                    showMessage("Please enter valid integer values", MessageKind.ERROR, title = "Invalid Input")
                     null
                 }
             } else null
@@ -225,7 +225,7 @@ val SimbrainJTable.setRowsColumnsAction
                     tableModel.fireTableStructureChanged()
                 }
                 else -> {
-                    showWarningDialog("Reshaping not supported for this table type", "Warning")
+                    showMessage("Reshaping not supported for this table type", MessageKind.WARNING)
                 }
             }
         }
@@ -248,7 +248,7 @@ val SimbrainJTable.showHistogramAction
         // canvas.window() uses invokeAndWait, so this actually has to be invoked from a non-swing thread
         launch(Dispatchers.Default) {
             if (selectedColumn < 0) {
-                showWarningDialog("No column selected")
+                showMessage("No column selected", MessageKind.WARNING)
             } else {
                 val canvas = Histogram.of(model.getDoubleColumn(selectedColumn)).canvas()
                 canvas.window()
@@ -303,8 +303,7 @@ fun SimbrainJTable.createShowEigenValuesAction() = createAction(
         isEnabled = canShowEigenValues
     },
 ) {
-    val eigenValues = model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix().eigenValuesString()
-    showInfoDialog("[${eigenValues.joinToString(", ")}]", "Eigenvalues")
+    showEigenvalues(model.get2DDoubleArray(replaceInvalid = 0.0).toMatrix())
 }
 
 /**
@@ -383,7 +382,7 @@ fun SimbrainJTable.importCSVAction(
         val csvFile = chooser.showOpenDialog(parentComponent)
         fun checkColumns(numColumns: Int): Boolean {
             if (numColumns != model.columnCount) {
-                showWarningDialog("Trying to import a table with the wrong number of columns ", "Warning")
+                showMessage("Trying to import a table with the wrong number of columns ", MessageKind.WARNING)
                 return false
             }
             return true

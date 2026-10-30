@@ -65,6 +65,11 @@ class CnnTrainerConfig : EditableObject {
         description = "Compute classification accuracy when targets are one-hot encoded.",
         order = 90,
     )
+    var showEffectiveStepSize by GuiEditable(
+        initValue = false,
+        description = "Display the average size of the optimizer's per-parameter updates, which helps diagnose training that stalls or diverges.",
+        order = 100,
+    )
     override val name = "CNN Trainer Config"
 }
 
@@ -307,7 +312,7 @@ class CnnTrainer(
 
     private suspend fun startTrainingHandler() {
         stoppingConditionReached = false
-        config.stoppingCondition.resetEarlyStopping()
+        config.stoppingCondition.startRun(iteration)
         isRunning = true
         events.beginTraining.fire()
         submitTask(TrainerTask.Train)

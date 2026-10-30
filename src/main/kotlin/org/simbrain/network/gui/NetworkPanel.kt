@@ -607,11 +607,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         if (selectedModels.isEmpty()) {
             if (protected.isNotEmpty()) {
                 withContext(Dispatchers.Swing) {
-                    showWarningDialog(
+                    showMessage(
                         "These are structural parts of a subnetwork and cannot be deleted individually, " +
                             "as that would leave the subnetwork in a state the undo system cannot " +
                             "reconstruct. Delete the whole subnetwork instead (via its interaction box).",
-                        "Cannot delete subnetwork components"
+                        MessageKind.WARNING,
+                        title = "Cannot delete subnetwork components"
                     )
                 }
             }

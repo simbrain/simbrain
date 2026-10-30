@@ -268,7 +268,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     private fun locateWeights() {
         val dir = showDirectorySelectionDialog() ?: return
         if (!Lfm2Weights.isValidWeightsDirectory(Path.of(dir))) {
-            showWarningDialog("No model.safetensors and tokenizer.json in $dir")
+            showMessage("No model.safetensors and tokenizer.json in $dir", MessageKind.WARNING)
             return
         }
         LlmPreferences.weightsDirectory = dir
@@ -277,7 +277,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     }
 
     private fun downloadWeights() {
-        if (showWarningConfirmDialog(Lfm2Weights.downloadNotice) != JOptionPane.OK_OPTION) return
+        if (!Lfm2Weights.confirmDownload()) return
         networkPanel.network.launch(Dispatchers.Default) {
             val dir = Lfm2Weights.download() ?: return@launch
             LlmPreferences.weightsDirectory = dir.toString()
@@ -308,7 +308,7 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
     private fun reportLoadFailure(message: String) {
         SwingUtilities.invokeLater {
             interactionBox.setText("${languageModel.displayName} — weights failed to load")
-            showWarningDialog("Could not load weights for ${languageModel.displayName}:\n$message")
+            showMessage("Could not load weights for ${languageModel.displayName}:\n$message", MessageKind.WARNING)
         }
     }
 

@@ -26,8 +26,18 @@ class SupervisedTrainerTest {
     // StoppingCondition Tests
     
     @Test
+    fun `test default stopping condition never stops training`() {
+        val condition = SupervisedTrainer.StoppingCondition()
+
+        assertFalse(condition.useMaxIterations)
+        assertFalse(condition.validate(condition.maxIterations, 0.5))
+        assertFalse(condition.validate(Int.MAX_VALUE, 0.0, 1.0))
+    }
+
+    @Test
     fun `test maxIterations stops training`() {
         val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
             maxIterations = 100
         }
         
@@ -41,6 +51,32 @@ class SupervisedTrainerTest {
         assertTrue(condition.validate(101, 0.5))
     }
     
+    @Test
+    fun `test maxIterations counts from the start of the current run`() {
+        val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
+            maxIterations = 100
+        }
+
+        condition.startRun(100)
+        assertFalse(condition.validate(101, 0.5))
+        assertFalse(condition.validate(199, 0.5))
+        assertTrue(condition.validate(200, 0.5))
+    }
+
+    @Test
+    fun `test maxIterations counts from a mid run iteration reset`() {
+        val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
+            maxIterations = 100
+        }
+
+        condition.startRun(500)
+        assertFalse(condition.validate(1, 0.5))
+        assertFalse(condition.validate(99, 0.5))
+        assertTrue(condition.validate(100, 0.5))
+    }
+
     @Test
     fun `test errorThreshold stops training when enabled`() {
         val condition = SupervisedTrainer.StoppingCondition().apply {
@@ -62,6 +98,7 @@ class SupervisedTrainerTest {
     @Test
     fun `test errorThreshold disabled does not stop training`() {
         val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
             maxIterations = 1000
             useErrorThreshold = false
             errorThreshold = 0.1
@@ -175,6 +212,7 @@ class SupervisedTrainerTest {
     @Test
     fun `test multiple stopping conditions work independently`() {
         val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
             maxIterations = 100
             useErrorThreshold = true
             errorThreshold = 0.1
@@ -233,6 +271,7 @@ class SupervisedTrainerTest {
     @Test
     fun `test copy preserves settings but resets state`() {
         val original = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
             maxIterations = 500
             useErrorThreshold = true
             errorThreshold = 0.2
@@ -248,6 +287,7 @@ class SupervisedTrainerTest {
         val copy = original.copy()
         
         // Settings should be copied
+        assertTrue(copy.useMaxIterations)
         assertEquals(500, copy.maxIterations)
         assertTrue(copy.useErrorThreshold)
         assertEquals(0.2, copy.errorThreshold)
@@ -287,6 +327,7 @@ class SupervisedTrainerTest {
     @Test
     fun `test boundary condition - zero maxIterations`() {
         val condition = SupervisedTrainer.StoppingCondition().apply {
+            useMaxIterations = true
             maxIterations = 0
         }
         

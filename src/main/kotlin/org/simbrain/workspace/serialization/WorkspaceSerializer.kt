@@ -1,8 +1,9 @@
 package org.simbrain.workspace.serialization
 
 import kotlinx.coroutines.runBlocking
+import org.simbrain.util.MessageKind
 import org.simbrain.util.getSimbrainXStream
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.couplings.Coupling
@@ -277,7 +278,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
                 } catch (ex: Exception) {
                     ex.printStackTrace()
                     val message = String.format("Failed to deserialize component %s.", archivedComponent.name)
-                    showWarningDialog(message)
+                    showMessage(message, MessageKind.WARNING)
                 }
             }
         }

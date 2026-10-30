@@ -79,11 +79,11 @@ public class Utils {
             theParser = new CSVParser(new FileInputStream(theFile), "", "", "#");
             stringMatrix = theParser.getAllValues();
         } catch (java.io.FileNotFoundException e) {
-            SwingUtilsKt.showWarningDialog("Could not find the file \n" + theFile);
+            SwingUtilsKt.showMessage("Could not find the file:\n" + theFile, MessageKind.WARNING);
 
             return null;
         } catch (Exception e) {
-            SwingUtilsKt.showWarningDialog("There was a problem opening the file \n" + theFile);
+            SwingUtilsKt.showMessage("There was a problem opening the file:\n" + theFile, MessageKind.WARNING);
             e.printStackTrace();
 
             return null;

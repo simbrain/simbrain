@@ -6,7 +6,7 @@ import org.fife.ui.rtextarea.RTextArea;
 import org.fife.ui.rtextarea.SearchContext;
 import org.fife.ui.rtextarea.SearchEngine;
 import org.fife.ui.rtextarea.SearchResult;
-
+import org.simbrain.util.MessageKind;
 import org.simbrain.util.SwingUtilsKt;
 
 import javax.swing.*;
@@ -127,7 +127,7 @@ public class FindReplaceDialog extends JPanel {
                 SearchContext context = setUpContext();
                 if (context != null) {
                     SearchResult replacements = SearchEngine.replaceAll(textArea, context);
-                    SwingUtilsKt.showInfoDialog(replacements.getCount() + " occurrence(s) replaced.", "Replace All");
+                    SwingUtilsKt.showMessage(replacements.getCount() + " occurrence(s) replaced.", MessageKind.INFO, null, "Replace All");
                 }
             });
 

@@ -47,7 +47,7 @@ class SOMTest {
     @Test
     fun `test som network copy`() {
         // Set up original network
-        som.trainer.learningRate = 0.1
+        som.initialLearningRate = 0.1
         val testInput = doubleArrayOf(0.5, 0.7)
         with(net) {
             som.inputLayer.activationArray = testInput
@@ -62,7 +62,7 @@ class SOMTest {
             "Should have same number of synapse groups")
 
         // Verify properties
-        assertEquals(som.trainer.learningRate, copy.trainer.learningRate, "Learning rate should be copied")
+        assertEquals(som.initialLearningRate, copy.initialLearningRate, "Learning rate should be copied")
 
         // Test behavior
         with(net) {

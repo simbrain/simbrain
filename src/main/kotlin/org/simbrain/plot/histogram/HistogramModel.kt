@@ -5,6 +5,7 @@
 package org.simbrain.plot.histogram
 
 import org.jfree.data.xy.IntervalXYDataset
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries
 import org.simbrain.util.EdtUpdates
 import org.simbrain.workspace.AttributeContainer
@@ -34,9 +35,9 @@ class HistogramModel(
     var dataNames: MutableList<String> = ArrayList(),
 
     /**
-     * Initial number of bins.
+     * Initial number of bins, from [PlotPreferences.histogramBins] by default.
      */
-    var bins: Int = 25,
+    var bins: Int = PlotPreferences.histogramBins,
     title: String = "Histogram",
     xAxisName: String = "",
     yAxisName: String = "Count",

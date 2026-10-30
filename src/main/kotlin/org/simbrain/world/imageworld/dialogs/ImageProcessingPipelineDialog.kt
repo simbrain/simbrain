@@ -1,14 +1,13 @@
 package org.simbrain.world.imageworld.dialogs
 
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Theme
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.showWarningConfirmDialog
-import org.simbrain.util.showWarningDialog
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
 import org.simbrain.world.imageworld.filters.*
-import java.awt.*
+import java.awt.BorderLayout
+import java.awt.Component
+import java.awt.Dimension
+import java.awt.FlowLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import javax.swing.*
@@ -33,7 +32,7 @@ class ImageProcessingPipelineDialog(
         addButton(JButton("Clear All").apply {
             toolTipText = "Remove all operations from the pipeline"
             addActionListener {
-                if (showWarningConfirmDialog("Remove all operations from the pipeline?") == JOptionPane.YES_OPTION) {
+                if (showConfirm("Remove all operations from the pipeline?", okLabel = "Remove All")) {
                     pipeline.clearOperations()
                 }
             }
@@ -273,7 +272,7 @@ class ImageProcessingPipelineDialog(
                 pipeline.addOperation(operation)
             }
         } catch (e: Exception) {
-            showWarningDialog("Failed to create operation: ${e.message}")
+            showMessage("Failed to create operation: ${e.message}", MessageKind.WARNING)
         }
     }
 

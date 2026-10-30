@@ -269,12 +269,12 @@ class TinyLanguageModelNode(networkPanel: NetworkPanel, val tinyLanguageModel: T
 }
 
 /**
- * The trainer for a [TinyLanguageModel]: run, stop, or step training and watch the loss curve.
+ * The trainer for a [TinyLanguageModel]: step, run, or stop training and watch the error curve.
  * Shared by the canvas node's menu and the simulation's control panel.
  */
 fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialog {
     val iterationsLabel = JLabel("Iterations: ${trainer.iteration}")
-    val lossLabel = JLabel("Loss: ${trainer.lastTrainingError.roundToString(4)}")
+    val errorLabel = JLabel("Error: ${trainer.lastTrainingError.roundToString(4)}")
     val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
     val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
 
@@ -293,13 +293,13 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
     // labels would reflow the row as their values change width.
     val panel = JPanel(MigLayout("ins 12, fill, wrap 1", "[grow, fill]", "[][][grow, fill]"))
     panel.add(JPanel(MigLayout("ins 0, gap 8")).apply {
+        add(stepButton)
         add(trainButton)
         add(stopButton)
-        add(stepButton)
     })
     panel.add(JPanel(MigLayout("ins 0, gap 16", "[110!][130!][140!][]")).apply {
         add(iterationsLabel)
-        add(lossLabel)
+        add(errorLabel)
         add(accuracyLabel)
         add(windowsLabel)
     })
@@ -318,7 +318,7 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
         // Labels show the latest report, posted rather than awaited so training never waits on the EDT
         val labels = viewScope.uiLatest<TrainingStats>(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { stats ->
             iterationsLabel.text = "Iterations: ${trainer.iteration}"
-            lossLabel.text = "Loss: ${stats.trainingError.roundToString(4)}"
+            errorLabel.text = "Error: ${stats.trainingError.roundToString(4)}"
             accuracyLabel.text = "Accuracy: ${stats.trainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}"
         }
         trainer.events.postReportsTo(viewScope, labels)

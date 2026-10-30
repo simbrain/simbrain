@@ -4,6 +4,7 @@
  */
 package org.simbrain.util.projection
 
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.util.HSBInterpolate
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath.max
@@ -161,7 +162,7 @@ class DecayColoringManager: ColoringManager() {
 class FrequencyColoringManager: ColoringManager() {
 
     @UserParameter(label = "High frequency color", order = 10)
-    var highFrequencyColor = Color.green
+    var highFrequencyColor: Color = PlotPreferences.projectionHighlightColor
 
     private val visitCounts: MutableMap<DataPoint, Int> = HashMap()
 
@@ -200,7 +201,7 @@ class FrequencyColoringManager: ColoringManager() {
 class MarkovColoringManager: ColoringManager() {
 
     @UserParameter(label = "High probability color", order = 10)
-    var highProbabilityColor = Color.green
+    var highProbabilityColor: Color = PlotPreferences.projectionHighlightColor
 
     private val transitionCounts: MutableMap<DataPoint, MutableMap<DataPoint, Int>> = HashMap()
 

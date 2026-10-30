@@ -7,7 +7,7 @@ package org.simbrain.plot.timeseries
 
 import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
-import org.simbrain.plot.ChartColorMap
+import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.TimeSeriesEvents
 import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
@@ -84,7 +84,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
         label = "Fixed Width", description = "If true, the time series window never extends beyond a fixed with",
         order = 60
     )
-    var fixedWidth = false
+    var fixedWidth = PlotPreferences.timeSeriesFixedWidth
         set(value) {
             field = value
             if (value) {
@@ -99,7 +99,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
         }
 
     var windowSize by GuiEditable(
-        initValue = 100,
+        initValue = PlotPreferences.timeSeriesWindowSize,
         label = "Window size",
         description = "Size of window when fixed width is used.",
         conditionallyEnabledBy = TimeSeriesModel::fixedWidth,
@@ -137,7 +137,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
     )
 
     var recurrenceColorMap by GuiEditable(
-        initValue = ChartColorMap.JET,
+        initValue = PlotPreferences.recurrenceColorMap,
         label = "Color map",
         description = "How distances are mapped to colors in spectrum mode",
         onUpdate = { enableWidget(widgetValue(TimeSeriesModel::recurrenceMode) == RecurrenceMode.SPECTRUM) },

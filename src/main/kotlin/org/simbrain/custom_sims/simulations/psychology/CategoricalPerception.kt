@@ -7,7 +7,7 @@ import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
-import org.simbrain.util.showMessageDialog
+import org.simbrain.util.showResults
 import kotlin.math.sqrt
 
 // Tunable parameters
@@ -283,13 +283,9 @@ val categoricalPerception = newSim {
         return total / (a.size * b.size)
     }
 
-    fun runAnalysis(): String {
+    fun runAnalysis() {
         val activations = collectReprActivations()
-        val sb = StringBuilder()
-        sb.appendLine("=== Categoricity Analysis ===")
-        sb.appendLine("Condition: ${currentCondition.displayName}")
-        sb.appendLine("Repr layer size: $REPR_LAYER_SIZE  |  Samples/class: $trainSamplesPerClass")
-        sb.appendLine()
+        val condition = currentCondition
 
         val types = ShapeType.entries
         val withinDists = types.associateWith { withinClassDistance(activations[it]!!) }
@@ -303,31 +299,34 @@ val categoricalPerception = newSim {
             }
         }
 
-        sb.appendLine("Within-class distances (lower = more compact):")
-        types.forEach { t ->
-            sb.appendLine("  %-12s  %.4f".format(t.name, withinDists[t]))
-        }
-        sb.appendLine()
+        showResults("Repr Layer Analysis") {
+            note("Condition: ${condition.displayName}")
+            note("Repr layer size: $REPR_LAYER_SIZE, samples per class: $trainSamplesPerClass")
 
-        sb.appendLine("Between-class distances (higher = more separated):")
-        for (i in types.indices) {
-            for (j in i + 1 until types.size) {
-                val key = types[i] to types[j]
-                sb.appendLine("  %-12s ↔ %-12s  %.4f".format(types[i].name, types[j].name, betweenDists[key]))
+            section("Within-class distances") {
+                note("Lower means more compact")
+                types.forEach { t -> row(t.name, "%.4f".format(withinDists[t])) }
+            }
+
+            section("Between-class distances") {
+                note("Higher means more separated")
+                for (i in types.indices) {
+                    for (j in i + 1 until types.size) {
+                        row("${types[i].name} ↔ ${types[j].name}", "%.4f".format(betweenDists[types[i] to types[j]]))
+                    }
+                }
+            }
+
+            section("Categoricity ratio (within / mean between)") {
+                note("Below 1.0 means good categorical separation")
+                types.forEach { t ->
+                    val others = types.filter { it != t }
+                    val meanBetween = others.map { betweenDists[t to it]!! }.average()
+                    val ratio = if (meanBetween > 0) withinDists[t]!! / meanBetween else Double.NaN
+                    row(t.name, "%.4f".format(ratio))
+                }
             }
         }
-        sb.appendLine()
-
-        sb.appendLine("Categoricity ratio (within / mean-between):")
-        sb.appendLine("  (< 1.0 = good categorical separation)")
-        types.forEach { t ->
-            val others = types.filter { it != t }
-            val meanBetween = others.map { betweenDists[t to it]!! }.average()
-            val ratio = if (meanBetween > 0) withinDists[t]!! / meanBetween else Double.NaN
-            sb.appendLine("  %-12s  %.4f".format(t.name, ratio))
-        }
-
-        return sb.toString()
     }
 
     // Staged training helper
@@ -381,8 +380,7 @@ val categoricalPerception = newSim {
             addSeparator()
 
             addButton("Analyze Repr Layer") {
-                val result = runAnalysis()
-                showMessageDialog(result, "Repr Layer Analysis")
+                runAnalysis()
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 940, 677)

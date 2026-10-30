@@ -22,7 +22,7 @@ class CompetitiveNetworkTest {
     @Test
     fun `test competitive network copy`() {
         // Set up original network
-        cn.trainer.learningRate = 0.1
+        cn.learningRate = 0.2
         val testInput = doubleArrayOf(0.5, 0.3, 0.8)
         with(net) {
             cn.inputLayer.activationArray = testInput
@@ -37,7 +37,7 @@ class CompetitiveNetworkTest {
             "Should have same number of synapse groups")
 
         // Verify properties
-        assertEquals(cn.trainer.learningRate, copy.trainer.learningRate, "Learning rate should be copied")
+        assertEquals(cn.learningRate, copy.learningRate, "Learning rate should be copied")
 
         // Test behavior
         with(net) {

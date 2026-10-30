@@ -8,45 +8,19 @@
  */
 package org.simbrain.workspace.gui
 
-import org.simbrain.util.ResourceManager
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.Theme
-import org.simbrain.util.applyDialogPadding
-import org.simbrain.util.display
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.showWarningDialog
-import org.simbrain.workspace.Consumer
-import org.simbrain.workspace.MismatchedAttributesException
-import org.simbrain.workspace.Producer
-import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.attributeTypeColor
-import org.simbrain.workspace.attributeTypeName
-import org.simbrain.workspace.attributeTypesMatch
-import org.simbrain.workspace.couplings.Coupling
+import org.simbrain.workspace.*
 import org.simbrain.workspace.couplings.BroadcastOperation
+import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.couplings.CouplingOperation
 import org.simbrain.workspace.couplings.couplingOperationTypes
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager
 import smile.math.matrix.Matrix
-import java.awt.BorderLayout
-import java.awt.Component
-import java.awt.Dimension
-import java.awt.FlowLayout
-import java.awt.Window
+import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import java.lang.reflect.Type
-import javax.swing.DefaultListCellRenderer
-import javax.swing.DefaultListModel
-import javax.swing.JButton
-import javax.swing.JLabel
-import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.JScrollPane
-import javax.swing.JSplitPane
-import javax.swing.ListSelectionModel
-import javax.swing.SwingUtilities
-import javax.swing.ToolTipManager
+import javax.swing.*
 
 class CouplingTransformDialog(
     private val producer: Producer,
@@ -370,7 +344,7 @@ fun showTransformEditor(parent: Component?, workspace: Workspace, coupling: Coup
         } catch (e: Exception) {
             // Includes the coupling having been removed while the dialog was open, and an edit that
             // collides with an identical existing coupling
-            showWarningDialog(e.message ?: "Could not apply the transform chain", "Transforms")
+            showMessage(e.message ?: "Could not apply the transform chain", MessageKind.WARNING, title = "Transforms")
         }
     }.apply {
         setLocationRelativeTo(parent)
@@ -391,7 +365,7 @@ fun showTransformEditorForNewCoupling(parent: Component?, workspace: Workspace, 
         try {
             workspace.couplingManager.createCoupling(producer, consumer, transforms = transforms)
         } catch (e: Exception) {
-            showWarningDialog(e.message ?: "Could not create the coupling", "Transforms")
+            showMessage(e.message ?: "Could not create the coupling", MessageKind.WARNING, title = "Transforms")
         }
     }.apply {
         setLocationRelativeTo(parent)

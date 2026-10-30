@@ -27,12 +27,10 @@ import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
 import org.simbrain.util.table.addSimpleDefaults
 import org.simbrain.util.table.createShowEigenValuesAction
-import org.simbrain.workspace.couplings.getConsumer
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import smile.math.matrix.Matrix
 import javax.swing.JCheckBoxMenuItem
-import javax.swing.JOptionPane
 import javax.swing.JPopupMenu
 import javax.swing.JTabbedPane
 import javax.swing.SwingUtilities
@@ -84,7 +82,7 @@ fun NetworkPanel.dropInteriorSelectionIfDeselected(host: InteriorTileHost, selec
 /** An LFM's first edit since its weights loaded is confirmed; edits afterwards go straight through. */
 private fun confirmWeightEdit(model: GenerativeModel): Boolean =
     model !is LanguageModel || model.hasEditedWeights ||
-        showWarningConfirmDialog(LFM_EDIT_WARNING) == JOptionPane.OK_OPTION
+        showConfirm(LFM_EDIT_WARNING, okLabel = "Edit Weights", kind = MessageKind.WARNING)
 
 fun NetworkPanel.editTileWeights(model: GenerativeModel, tiles: List<TensorTile>, edit: WeightEdit) {
     if (!confirmWeightEdit(model)) return

@@ -170,7 +170,7 @@ val hopfieldSimContinuous = newSim {
                 wm.clamped = true
 
             }.apply {
-                toolTipText = "Applies one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
+                toolTipText = "Apply one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
             }
             //addSeparator()
             //addButton("Training Mode") {

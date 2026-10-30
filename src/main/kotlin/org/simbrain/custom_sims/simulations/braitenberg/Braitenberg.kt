@@ -38,13 +38,22 @@ val braitenbergSim = newSim {
 
     withGui {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addFormattedNumericTextField("Left weight", initValue = leftWeight) {
+            addFormattedNumericTextField(
+                "Left weight", initValue = leftWeight,
+                toolTip = "Weight from the left sensor to the left turn neuron. Press a pair button to apply it."
+            ) {
                 leftWeight = it
             }
-            addFormattedNumericTextField("Right weight", initValue = rightWeight) {
+            addFormattedNumericTextField(
+                "Right weight", initValue = rightWeight,
+                toolTip = "Weight from the right sensor to the right turn neuron. Press a pair button to apply it."
+            ) {
                 rightWeight = it
             }
-            addFormattedNumericTextField("Velocity", initValue = velocity) {
+            addFormattedNumericTextField(
+                "Velocity", initValue = velocity,
+                toolTip = "Forward speed of both vehicles. Press a pair button to apply it."
+            ) {
                 velocity = it
             }
             fun setVelocity() {
@@ -84,6 +93,8 @@ val braitenbergSim = newSim {
             }
             addButton("Same pair") {
                 initSamePair()
+            }.apply {
+                toolTipText = "Give both vehicles the left and right weights as entered."
             }
             addButton("Reversed pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -92,6 +103,8 @@ val braitenbergSim = newSim {
                 vehicle2.rightSynapse.strength = leftWeight
                 setVelocity()
                 updateBounds(leftWeight, rightWeight)
+            }.apply {
+                toolTipText = "Give vehicle 1 the weights as entered and vehicle 2 the same weights swapped left for right."
             }
             addButton("Opposite pair") {
                 vehicle1.leftSynapse.strength = leftWeight
@@ -100,6 +113,8 @@ val braitenbergSim = newSim {
                 vehicle2.rightSynapse.strength = -rightWeight
                 setVelocity()
                 updateBounds(leftWeight, rightWeight)
+            }.apply {
+                toolTipText = "Give vehicle 1 the weights as entered and vehicle 2 the same weights with their signs flipped."
             }
             initSamePair() // Default to same pair / revolving config
         }.awaitLayout()

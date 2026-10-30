@@ -256,7 +256,9 @@ val fieldImageDemo = newSim {
         }
         val controlBar = JPanel(BorderLayout(6, 0)).apply {
             border = BorderFactory.createEmptyBorder(2, 8, 2, 8)
-            add(JLabel("Threshold"), BorderLayout.WEST)
+            val thresholdToolTip = "Sensor readings below this percentage of full activation are hidden."
+            thresholdSlider.toolTipText = thresholdToolTip
+            add(JLabel("Threshold").apply { toolTipText = thresholdToolTip }, BorderLayout.WEST)
             add(thresholdSlider, BorderLayout.CENTER)
         }
         val fieldFrame = GenericJInternalFrame("Field Image", true, true, true, true).apply {

@@ -230,8 +230,14 @@ val objectTrackingSim = newSim("object_tracking") {
 
     withGui {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            val tfNumIterations: JTextField = addTextField("Number of iterations", "1000")
-            val cbRecordSpikes = addCheckBox("Record spikes", recordSpikes)
+            val tfNumIterations: JTextField = addTextField(
+                "Number of iterations", "1000",
+                toolTip = "Number of iterations recorded by Run trial."
+            )
+            val cbRecordSpikes = addCheckBox(
+                "Record spikes", recordSpikes,
+                toolTip = "Record 1/0 spikes instead of activations for each reservoir neuron. Takes effect on the next Run trial."
+            )
             addButton("Run trial") {
                 isRecording = true
                 recordSpikes = cbRecordSpikes.isSelected
@@ -240,6 +246,8 @@ val objectTrackingSim = newSim("object_tracking") {
                 showSaveDialog("", "reservoirdata.csv") {
                     writeText(data.toCsvString())
                 }
+            }.apply {
+                toolTipText = "Run the network for the number of iterations entered above, recording the reservoir, then offer to save the data."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)

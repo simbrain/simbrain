@@ -83,7 +83,10 @@ val simpleImageWorld = newSim {
         val networkPanel = getNetworkPanel(networkComponent)
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             repeat(outputs.size) { index ->
-                addTextField("Category ${index + 1}", "") { category ->
+                addTextField(
+                    "Category ${index + 1}", "",
+                    toolTip = "Name for category ${index + 1}; it labels output neuron ${index + 1}."
+                ) { category ->
                     outputs.neuronList[index].label = category
                 }
                 addButton("Save Image for Category ${index + 1}") {
@@ -97,11 +100,15 @@ val simpleImageWorld = newSim {
                     }
                     supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs[index].toDoubleArray())
                     supervisedModel.outputLayer.setActivations(DoubleArray(outputs.size) { if (it == index) 1.0 else 0.0 })
+                }.apply {
+                    toolTipText = "Save the current drawing as the training example for category ${index + 1}."
                 }
             }
             addSeparator()
             addButton("Train...") {
                 with(networkPanel) { supervisedModel.getSupervisedTrainingDialog().display() }
+            }.apply {
+                toolTipText = "Open the training dialog to train the network on the saved category images."
             }
         }.awaitLayout()
         var controlPanelHeight = controlPanel.size.height

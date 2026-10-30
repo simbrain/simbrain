@@ -28,7 +28,8 @@ private fun showCategorySelectionDialog(
     defaultMax: Int
 ): CategorySelection? {
     val checkboxes = allCategories.map { JCheckBox(it, it in defaultCategories) }
-    val spinner = JSpinner(SpinnerNumberModel(defaultMax, 1, 10_000, 10))
+    val maxToolTip = "Maximum number of images loaded for each selected category."
+    val spinner = JSpinner(SpinnerNumberModel(defaultMax, 1, 10_000, 10)).apply { toolTipText = maxToolTip }
 
     val cols = 4
     val numRows = (allCategories.size + cols - 1) / cols
@@ -37,7 +38,7 @@ private fun showCategorySelectionDialog(
     repeat(numRows * cols - allCategories.size) { grid.add(JLabel()) }
 
     val maxPanel = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
-        add(JLabel("Max images per category:  "))
+        add(JLabel("Max images per category:  ").apply { toolTipText = maxToolTip })
         add(spinner)
     }
 

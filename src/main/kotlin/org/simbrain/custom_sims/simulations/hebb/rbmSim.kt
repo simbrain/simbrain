@@ -120,7 +120,7 @@ val rbmSim = newSim {
                     }
                 }
             }.apply {
-                toolTipText = "Trains on all four built-in patterns in turn, repeated once per training iteration."
+                toolTipText = "Train on all four built-in patterns in turn, repeated once per training iteration."
             }
             addSeparator()
             addButton("Train on current pattern") {
@@ -131,7 +131,7 @@ val rbmSim = newSim {
                     }
                 }
             }.apply {
-                toolTipText = "Trains on the pattern currently on the visible layer, once per training iteration."
+                toolTipText = "Train on the pattern currently on the visible layer, once per training iteration."
             }
             addSeparator()
             addButton("Add noise") {
@@ -139,7 +139,7 @@ val rbmSim = newSim {
                     .sampleDouble(rbm.visibleLayer.size)
                     .toColumnVector()
             }.apply {
-                toolTipText = "Adds Gaussian noise to the visible layer to test pattern completion."
+                toolTipText = "Add Gaussian noise to the visible layer to test pattern completion."
             }
         }?.awaitLayout()
         place(networkComponent, controlPanel?.rightEdgeWithGap() ?: SIM_WINDOW_GAP, SIM_WINDOW_GAP, 815, 619)

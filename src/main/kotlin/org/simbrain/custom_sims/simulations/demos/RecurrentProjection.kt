@@ -139,12 +139,18 @@ suspend fun SimulationScope.setUpRecurrentSim(workspace: Workspace) {
         createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP) {
             addButton("Randomize activations") {
                 randomizeActivations(recurrentNet)
+            }.apply {
+                toolTipText = "Set every neuron to a random starting activation."
             }
             addButton("Randomize Weights") {
                 wts.forEach { it.randomize(UniformRealDistribution(-10.0, 10.0)) }
+            }.apply {
+                toolTipText = "Set every recurrent weight to a random value between -10 and 10, changing the network's dynamics."
             }
             addButton("Clear Plot") {
                 (getDesktopComponent(projectionPlot) as ProjectionDesktopComponent).clearData()
+            }.apply {
+                toolTipText = "Remove all points from the projection plot."
             }
         }
     }

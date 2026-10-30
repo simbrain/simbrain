@@ -281,9 +281,14 @@ val isopodSim = newSim { optionString ->
                         writeText(log.toString())
                     }
                 }
+            }.apply {
+                toolTipText = "Start the isopod at the center with a random heading, run until it reaches food, hits a wall, or times out, then offer to save the log."
             }
 
-            addTextField("Number of trials", "" + defaultNumTrials) {
+            addTextField(
+                "Number of trials", "" + defaultNumTrials,
+                toolTip = "Number of trials run by Run trials."
+            ) {
                 it.toIntOrNull()?.let { num ->
                     defaultNumTrials = num
                 }
@@ -296,6 +301,8 @@ val isopodSim = newSim { optionString ->
                         writeText(log.toString())
                     }
                 }
+            }.apply {
+                toolTipText = "Run the number of trials entered above, then offer to save the combined log."
             }
 
             // Uncomment below to create a custom button with a bespoke sim
@@ -317,6 +324,8 @@ val isopodSim = newSim { optionString ->
                 workspace.launch {
                     useSpeedInhibition()
                 }
+            }.apply {
+                toolTipText = "Toggle inhibitory connections from both sensors to the Straight neuron, so the isopod slows down near food."
             }
         }.awaitLayout()
         val networkWidth = 400

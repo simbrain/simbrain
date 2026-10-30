@@ -186,7 +186,7 @@ val somNetSmells = newSim {
                 somNet.reset()
                 labeler.clear()
                 network.events.updated.fire()
-            }.toolTipText = "Randomize the SOM weights, restore the initial learning parameters, and clear the labels"
+            }.toolTipText = "Randomize the SOM weights, restore the initial learning parameters, and clear the labels."
 
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 450, 720)

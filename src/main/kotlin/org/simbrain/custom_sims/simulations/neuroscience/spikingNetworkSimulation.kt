@@ -114,7 +114,11 @@ val spikingNetworkSimulation = newSim {
         val controlPanel = createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Randomize Activations") {
                 neuronCollection.randomize()
+            }.apply {
+                toolTipText = "Set every neuron to a random activation."
             }
+            // TODO: "Sparsity" is a misnomer: the value is passed to Sparse as connection density, so higher values
+            //  make more connections. Rename the button and dialog text.
             addButton("Sparsity") {
                 sparsity = showNumericInputDialog("Enter new sparsity (0.0 to 1.0):", sparsity) ?: return@addButton
 
@@ -145,6 +149,8 @@ val spikingNetworkSimulation = newSim {
                 // Add new synapses to network
                 network.addNetworkModelsAsync(newSynapses)
                 setUpSpikeResponders()
+            }.apply {
+                toolTipText = "Ask for a new connection density from 0 to 1, then rewire the network with fresh random synapses."
             }
             addButton("Excitatory Ratio") {
                 percentExcitatory = showNumericInputDialog("Enter percent excitatory (0.0 to 100.0):", percentExcitatory) ?: return@addButton
@@ -176,6 +182,8 @@ val spikingNetworkSimulation = newSim {
                 // Add new synapses to network
                 network.addNetworkModelsAsync(newSynapses)
                 setUpSpikeResponders()
+            }.apply {
+                toolTipText = "Ask for a new percentage of excitatory synapses, then rewire the network with fresh random synapses."
             }
             addButton("Delays") {
                 val newDelayMean = showNumericInputDialog("Enter new mean synaptic delay in milliseconds (Poisson parameter):", randDelay.p) ?: return@addButton
@@ -189,6 +197,8 @@ val spikingNetworkSimulation = newSim {
                 }.forEach { synapse ->
                     synapse.delay = randDelay.sampleInt()
                 }
+            }.apply {
+                toolTipText = "Ask for a new mean synaptic delay in milliseconds and give every synapse a new random delay with that mean."
             }
             addButton("Neuron Type") {
                 val selectedOption = showChoice(
@@ -221,6 +231,8 @@ val spikingNetworkSimulation = newSim {
                         }
                     }
                 }
+            }.apply {
+                toolTipText = "Switch every neuron to integrate-and-fire, Izhikevich, or spiking-threshold dynamics."
             }
             addButton("Add Pacemaker") {
                 if (pacemakerNeuron == null) {
@@ -260,6 +272,8 @@ val spikingNetworkSimulation = newSim {
                     val newFreq = showNumericInputDialog("Enter new pacemaker frequency (Hz):", currentFreq) ?: return@addButton
                     (pacemakerNeuron!!.updateRule as SinusoidalRule).frequency = newFreq
                 }
+            }.apply {
+                toolTipText = "Add a sinusoidal pacemaker neuron that drives the network, or change its frequency if one exists."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)

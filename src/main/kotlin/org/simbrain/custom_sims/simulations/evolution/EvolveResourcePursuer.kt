@@ -497,7 +497,10 @@ val evolveResourcePursuer = newSim { optionString ->
             }
         }
 
-        controlPanel.addButton("Open Trainer") { openTrainer() }
+        controlPanel.addButton(
+            "Open Trainer",
+            toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved agents."
+        ) { openTrainer() }
 
         panel.addButton("Load Workspace") {
             val loadOk = loadWorkspaceZipFromFileChooser()
@@ -579,6 +582,8 @@ val evolveResourcePursuer = newSim { optionString ->
                     (getDesktopComponent(odorWorldComponent) as OdorWorldDesktopComponent).worldPanel.scalingFactor = 0.5
                 }
             }
+        }.apply {
+            toolTipText = "Load a saved resource pursuer workspace and restore its energy and food-finding updates so it can be run."
         }
     }
 

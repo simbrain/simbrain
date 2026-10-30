@@ -338,18 +338,42 @@ val objectRecognition3D = newSim {
         place(odorWorldComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
         place(networkComponent, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 600, 800)
         createControlPanel("Configuration", SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addFormattedNumericTextField("Samples per class", samplesPerClass) { samplesPerClass = it }
-            addFormattedNumericTextField("Inner radius", innerRadius) { innerRadius = it }
-            addFormattedNumericTextField("Outer radius", outerRadius) { outerRadius = it }
-            addFormattedNumericTextField("Heading jitter (deg)", headingJitterDeg) { headingJitterDeg = it }
-            addFormattedNumericTextField("Target margin", targetMargin) { targetMargin = it }
-            addFormattedNumericTextField("View distance", viewDistance) { viewDistance = it }
-            addFormattedNumericTextField("Train fraction", trainFraction) { trainFraction = it }
+            addFormattedNumericTextField(
+                "Samples per class", samplesPerClass,
+                toolTip = "Number of views generated for each class. Larger values improve accuracy but use more memory."
+            ) { samplesPerClass = it }
+            addFormattedNumericTextField(
+                "Inner radius", innerRadius,
+                toolTip = "Closest distance from the target at which the mouse is placed for a sample view."
+            ) { innerRadius = it }
+            addFormattedNumericTextField(
+                "Outer radius", outerRadius,
+                toolTip = "Farthest distance from the target at which the mouse is placed for a sample view."
+            ) { outerRadius = it }
+            addFormattedNumericTextField(
+                "Heading jitter (deg)", headingJitterDeg,
+                toolTip = "Maximum random deviation, in degrees, of the mouse's heading from pointing straight at the target."
+            ) { headingJitterDeg = it }
+            addFormattedNumericTextField(
+                "Target margin", targetMargin,
+                toolTip = "Minimum distance between the target and the world edges when it is placed for a sample view."
+            ) { targetMargin = it }
+            addFormattedNumericTextField(
+                "View distance", viewDistance,
+                toolTip = "How far the mouse's 3D view can see."
+            ) { viewDistance = it }
+            addFormattedNumericTextField(
+                "Train fraction", trainFraction,
+                toolTip = "Fraction of generated samples used for training; the rest form the testing set."
+            ) { trainFraction = it }
             addSeparator()
-            addComboBox("Class 1", entityChoices, class1) { class1 = it }
-            addComboBox("Class 2", entityChoices, class2) { class2 = it }
-            addComboBox("Class 3", entityChoices, class3) { class3 = it }
-            addCheckBox("Include 'No Object' class", includeNoObject) { includeNoObject = it }
+            addComboBox("Class 1", entityChoices, class1, toolTip = "Object type used for the first class.") { class1 = it }
+            addComboBox("Class 2", entityChoices, class2, toolTip = "Object type used for the second class.") { class2 = it }
+            addComboBox("Class 3", entityChoices, class3, toolTip = "Object type used for the third class.") { class3 = it }
+            addCheckBox(
+                "Include 'No Object' class", includeNoObject,
+                toolTip = "Add a fourth class of views that face away from the target, so they show no object."
+            ) { includeNoObject = it }
             addSeparator()
             var hasGenerated = false
             addButton("Generate") {
@@ -373,6 +397,8 @@ val objectRecognition3D = newSim {
                 } finally {
                     isEnabled = true
                 }
+            }.apply {
+                toolTipText = "Generate training and testing views with these settings and build the CNN. Settings apply only when you generate."
             }
         }
     }

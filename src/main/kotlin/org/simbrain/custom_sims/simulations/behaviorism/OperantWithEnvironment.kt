@@ -302,6 +302,8 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
                 rewardNeuron.addInputValue(1.0)
                 punishNeuron.addInputValue(0.0)
                 SimbrainDesktop.workspace.iterateSuspend()
+            }.apply {
+                toolTipText = "Strengthen the active stimulus-behavior link (or the behavior's base probability if no stimulus is present), then advance one step."
             }
 
             addButton("Punish") {
@@ -309,12 +311,16 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
                 rewardNeuron.addInputValue(0.0)
                 punishNeuron.addInputValue(1.0)
                 SimbrainDesktop.workspace.iterateSuspend()
+            }.apply {
+                toolTipText = "Weaken the active stimulus-behavior link (or the behavior's base probability if no stimulus is present), then advance one step."
             }
 
             addButton("Don't reinforce or punish") {
                 rewardNeuron.addInputValue(0.0)
                 punishNeuron.addInputValue(0.0)
                 SimbrainDesktop.workspace.iterateSuspend()
+            }.apply {
+                toolTipText = "Advance one step without any learning."
             }
 
         }.awaitLayout()

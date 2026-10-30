@@ -139,11 +139,15 @@ val binaryReservoir = newSim {
         }
 
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP + 567 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            val tf_stdev: JTextField = addTextField("Weight stdev", "" + variance)
-            addComponent(tf_stdev)
+            val tf_stdev: JTextField = addTextField(
+                "Weight variance", "" + variance,
+                toolTip = "Variance of the random reservoir weights. Press Apply Variance to resample the weights."
+            )
             addButton("Apply Variance") {
                 val newVariance = tf_stdev.text.toDouble()
                 setVariance(newVariance)
+            }.apply {
+                toolTipText = "Resample every reservoir weight from a normal distribution with the variance entered above."
             }
             addButton("Run one trial") {
                 perturbAndRunNetwork(network)
@@ -151,6 +155,8 @@ val binaryReservoir = newSim {
                 showSaveDialog("", "activations.csv") {
                     writeText(activations.toCsvString())
                 }
+            }.apply {
+                toolTipText = "Randomize the reservoir, run a baseline and a perturbation, then offer to save the activations."
             }
 
 
@@ -167,6 +173,8 @@ val binaryReservoir = newSim {
                         }
                 }
 
+            }.apply {
+                toolTipText = "Ask for a folder, then run one trial for each weight variance from 0.1 up to 10 and save one CSV per variance."
             }
 
         }.awaitLayout()

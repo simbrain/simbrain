@@ -91,19 +91,19 @@ val SOMSim = newSim {
     withGui {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComboBox("Animal", animals.keys.toList(), selectedAnimal,
-                labelToolTip = "Put an animal's features on the input nodes") {
+                toolTip = "Put an animal's features on the input nodes.") {
                 selectedAnimal = it
                 showSelectedAnimal()
-            }.toolTipText = "Put an animal's features on the input nodes"
+            }
             addButton("Test") { testSelectedAnimal() }.toolTipText =
-                "Show which neuron wins the selected animal without changing any weights"
+                "Show which neuron wins the selected animal without changing any weights."
 
             addSeparator()
 
             addButton("Train All") { train(1) }.toolTipText =
-                "Present all sixteen animals once, in random order (16 training steps)"
+                "Present all sixteen animals once, in random order (16 training steps)."
             addButton("Train All ×10") { train(10) }.toolTipText =
-                "Present all sixteen animals in random order, ten times over (160 training steps)"
+                "Present all sixteen animals in random order, ten times over (160 training steps)."
 
             addSeparator()
 
@@ -112,7 +112,7 @@ val SOMSim = newSim {
                 som.reset()
                 labeler.clear()
                 testSelectedAnimal()
-            }.toolTipText = "Randomize the weights, restore the initial learning rate and neighborhood size, and clear the labels"
+            }.toolTipText = "Randomize the weights, restore the initial learning rate and neighborhood size, and clear the labels."
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 680, 750)
     }

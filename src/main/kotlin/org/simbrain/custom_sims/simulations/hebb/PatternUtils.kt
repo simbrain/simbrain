@@ -144,51 +144,51 @@ suspend fun SimulationScope.createPatternControlPanel(
             addButton("Clear pattern") {
                 layer.setActivations(DoubleArray(layer.size) { offValue })
             }.apply {
-                toolTipText = "Sets every neuron to $offValue, giving a blank canvas."
+                toolTipText = "Set every neuron to $offValue, giving a blank canvas."
             }
             addButton("Random pattern") {
                 layer.randomize(TwoValued(offValue, 1.0))
             }.apply {
-                toolTipText = "Sets each neuron randomly to $offValue or 1.0."
+                toolTipText = "Set each neuron randomly to $offValue or 1.0."
             }
             addButton("Randomize weights") {
                 randomizeWeights()
                 trainedPatterns?.clear()
             }.apply {
-                toolTipText = "Randomizes the weights, erasing any stored patterns."
+                toolTipText = "Randomize the weights, erasing any stored patterns."
             }
             addSeparator()
             addButton("Circle") {
                 applyCirclePattern(layer, isContinuous)
             }.apply {
-                toolTipText = "Sets the neurons to a ring pattern."
+                toolTipText = "Set the neurons to a ring pattern."
             }
             addButton("Square") {
                 applySquarePattern(layer, isContinuous)
             }.apply {
-                toolTipText = "Sets the neurons to a square outline pattern."
+                toolTipText = "Set the neurons to a square outline pattern."
             }
             addButton("Diagonal Line") {
                 applyLinePattern(layer, "diagonal", isContinuous)
             }.apply {
-                toolTipText = "Sets the neurons to a diagonal line pattern."
+                toolTipText = "Set the neurons to a diagonal line pattern."
             }
             addButton("Cross") {
                 applyCrossPattern(layer, isContinuous)
             }.apply {
-                toolTipText = "Sets the neurons to a cross pattern."
+                toolTipText = "Set the neurons to a cross pattern."
             }
             addSeparator()
             addButton("Show correlations") {
                 showPatternCorrelations(builtInPatterns(layer.size, isContinuous))
             }.apply {
-                toolTipText = "Shows how strongly each pair of built-in patterns overlaps. Highly correlated patterns tend to interfere."
+                toolTipText = "Show how strongly each pair of built-in patterns overlaps. Highly correlated patterns tend to interfere."
             }
             if (trainedPatterns != null) {
                 addButton("Show trained correlations") {
                     trainedPatterns.showCorrelations()
                 }.apply {
-                    toolTipText = "Shows how strongly each pair of patterns trained so far overlaps."
+                    toolTipText = "Show how strongly each pair of patterns trained so far overlaps."
                 }
             }
             addSeparator()

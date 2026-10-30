@@ -85,14 +85,24 @@ val bpttPatternGenerator = newSim {
             }
         }
         val panel = createControlPanel("Control Panel", 10, 10) {
-            PATTERN_NAMES.forEachIndexed { index, name -> addButton(name) { start(index) } }
+            PATTERN_NAMES.forEachIndexed { index, name ->
+                addButton(name) { start(index) }.apply {
+                    toolTipText = "Reset the network and cue the $name pattern, showing its first frame."
+                }
+            }
             addSeparator()
-            addButton("Iterate") { next() }
-            addButton("Reset") { reset() }
+            addButton("Iterate") { next() }.apply {
+                toolTipText = "Advance to the next frame of the cued pattern with blank input."
+            }
+            addButton("Reset") { reset() }.apply {
+                toolTipText = "Clear the recurrent state, input, and expected output."
+            }
             addSeparator()
             addButton("Show unrolled view") {
                 bptt.unrolledView = !bptt.unrolledView
                 text = if (bptt.unrolledView) "Hide unrolled view" else "Show unrolled view"
+            }.apply {
+                toolTipText = "Toggle between the compact network and the network unrolled through time."
             }
             addComponent(status)
         }.awaitLayout()

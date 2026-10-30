@@ -155,14 +155,17 @@ val npcSteeringDemo = newSim {
         }
 
         createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP) {
-            addCheckBox("Show steering debug", false) { enabled ->
+            addCheckBox(
+                "Show steering debug", false,
+                toolTip = "Overlay each moving agent's candidate headings, obstacle feelers, and current behavior."
+            ) { enabled ->
                 movingEntities.forEach {
                     it.showSteeringDebug = enabled
                     if (enabled) it.behavior.update(it)
                     it.events.updated.fire()
                 }
             }
-            addCheckBox("Show tilemap", true) { visible ->
+            addCheckBox("Show tilemap", true, toolTip = "Show or hide the tilemap background in the world.") { visible ->
                 odorWorld.tileMap.layers.forEach { it.visible = visible }
             }
         }

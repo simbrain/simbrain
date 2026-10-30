@@ -225,6 +225,7 @@ val landmarkCognitiveMap = newSim {
             add(graphPanel, BorderLayout.CENTER)
             add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
                 add(JButton("Reset map").apply {
+                    toolTipText = "Clear the landmark transition graph."
                     addActionListener {
                         graph.reset()
                         graphPanel.repaint()
@@ -236,12 +237,15 @@ val landmarkCognitiveMap = newSim {
         }
         addInternalFrame(graphFrame)
         val stateControlsFrame = createControlPanel("State Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP) {
-            addCheckBox("Show field plot", true) { visible ->
+            addCheckBox("Show field plot", true, toolTip = "Show or hide the Field Plot window.") { visible ->
                 fieldVisible.set(visible)
                 fieldFrame.isVisible = visible
                 if (visible) fieldImagePanel.repaint()
             }
-            addFormattedNumericTextField("Projection tolerance", projectionPlot.projector.tolerance) { tolerance ->
+            addFormattedNumericTextField(
+                "Projection tolerance", projectionPlot.projector.tolerance,
+                toolTip = "New states closer than this distance to an existing point are not added to the projection plot."
+            ) { tolerance ->
                 projectionPlot.projector.tolerance = tolerance.coerceAtLeast(0.0)
             }
         }
@@ -258,7 +262,9 @@ val landmarkCognitiveMap = newSim {
         }
         val fieldControlBar = JPanel(BorderLayout(6, 0)).apply {
             border = BorderFactory.createEmptyBorder(2, 8, 2, 8)
-            add(JLabel("Threshold"), BorderLayout.WEST)
+            val thresholdToolTip = "Decoded landmark readouts below this percentage of full activation are hidden."
+            fieldThresholdSlider.toolTipText = thresholdToolTip
+            add(JLabel("Threshold").apply { toolTipText = thresholdToolTip }, BorderLayout.WEST)
             add(fieldThresholdSlider, BorderLayout.CENTER)
         }
         fieldFrame = GenericJInternalFrame("Field Plot", true, true, true, true).apply {

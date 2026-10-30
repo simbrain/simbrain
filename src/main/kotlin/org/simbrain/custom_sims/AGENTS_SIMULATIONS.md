@@ -265,10 +265,10 @@ with(couplingManager) {
 withGui {
     createControlPanel("Control Panel", x, y) {
         addCheckBox("Label", initialValue, toolTip = "...") { checked -> /* handler */ }
-        addFormattedNumericTextField("Label", initValue) { value -> /* handler */ }
-        addSlider("Label", min, max, initial, tickSpacing) { value -> /* handler */ }
-        addButton("Label") { /* handler */ }
-        addComboBox("Label", options, selected) { value -> /* handler */ }
+        addFormattedNumericTextField("Label", initValue, toolTip = "...") { value -> /* handler */ }
+        addSlider("Label", min, max, initial, tickSpacing, toolTip = "...") { value -> /* handler */ }
+        addButton("Label") { /* handler */ }.apply { toolTipText = "..." }
+        addComboBox("Label", options, selected, toolTip = "...") { value -> /* handler */ }
         addComponent(customSwingComponent)
         addSeparator()
         addLabel("Text")
@@ -287,7 +287,7 @@ Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 Put reset controls (`Reset`, `Reset Network`, and the like) last in the panel, below their own `addSeparator()`,
 so they are not pressed by accident in the middle of a workflow.
 
-Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled fields, apply an explanatory tooltip to both the field and its label; use `toolTip = "..."` with `addTextField(...)` and `labelToolTip = "..."` when a distinct label tooltip is needed. For `addCheckBox(...)`, pass `toolTip = "..."`, which sets it on both the check box and its label; setting `.toolTipText` on the returned check box covers only the small box. When a control only takes effect while the simulation runs, say so in the tooltip, for example "Check this and press Run to ...". Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
+Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled controls, apply an explanatory tooltip to both the control and its label: pass `toolTip = "..."` to `addTextField(...)`, `addFormattedNumericTextField(...)`, `addComboBox(...)`, `addCheckBox(...)`, `addSlider(...)`, and `addSliderWithTextField(...)`, which set it on both; `addTextField` and `addComboBox` also accept `labelToolTip = "..."` when the label needs different text. Setting `.toolTipText` on the returned component covers only the component, not its label. For buttons, use `addButton(...) { ... }.apply { toolTipText = "..." }`; `EvolutionControlPanel.addButton` takes `toolTip = "..."`. Write tooltips as full sentences ending with a period. Describe actions in the imperative ("Run one training step.", not "Runs one training step."); describe value controls such as fields and sliders by what the value is ("Learning rate for the critic weights."). When a control only takes effect while the simulation runs, say so in the tooltip, for example "Check this and press Run to ...". Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
 
 ## Documentation
 

@@ -447,13 +447,13 @@ val braitenbergProgramLearning = newSim { optionString ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
                 poisonRewardMultiplier = selectedTask.poisonReward
             }
-            taskComboBox.toolTipText = "Select the learning task"
+            taskComboBox.toolTipText = "Select the learning task."
 
             addSeparator()
 
             addCheckBox(
                 "Learning Enabled", learningEnabled,
-                toolTip = "Enable/disable learning on program biases"
+                toolTip = "Enable/disable learning on program biases."
             ) { enabled ->
                 learningEnabled = enabled
             }
@@ -463,17 +463,17 @@ val braitenbergProgramLearning = newSim { optionString ->
             val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
                 learningRate = it
             }
-            lrField.toolTipText = "Step size for bias updates"
+            lrField.toolTipText = "Step size for bias updates."
 
             val gammaField = addFormattedNumericTextField("Gamma", initValue = gamma) {
                 gamma = it
             }
-            gammaField.toolTipText = "Discount factor for future rewards"
+            gammaField.toolTipText = "Discount factor for future rewards."
 
             val strengthField = addFormattedNumericTextField("Weight Strength", initValue = programWeightStrength) {
                 programWeightStrength = it
             }
-            strengthField.toolTipText = "Magnitude of weights when program is active"
+            strengthField.toolTipText = "Magnitude of weights when program is active."
 
             addSeparator()
 
@@ -481,7 +481,7 @@ val braitenbergProgramLearning = newSim { optionString ->
                 programNodes.forEach { it.bias = 0.0 }
                 criticWeights.forEach { it.strength = 0.0 }
             }
-            resetButton.toolTipText = "Reset all program biases to 0"
+            resetButton.toolTipText = "Reset all program biases to 0."
 
         }.awaitLayout()
 

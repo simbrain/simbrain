@@ -122,11 +122,12 @@ val localistAndDistributedRepresentations = newSim {
 
     withGui {
         val controls = createControlPanel("Representation controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addComboBox("Representation style", RepresentationStyle.entries, style, labelToolTip = "Switch between localist object codes and distributed feature patterns.") { selectedStyle ->
+            addComboBox(
+                "Representation style", RepresentationStyle.entries, style,
+                toolTip = "Switch between localist object codes and distributed feature patterns."
+            ) { selectedStyle ->
                 style = selectedStyle
                 refreshRepresentation()
-            }.apply {
-                toolTipText = "Switch between localist object codes and distributed feature patterns."
             }
         }.awaitLayout()
         place(networkComponent, controls.rightEdgeWithGap(), SIM_WINDOW_GAP, 500, 270)

@@ -152,7 +152,7 @@ val modernHopfieldSim = newSim {
                 increment = 0.1,
                 showValueField = true,
                 showTicks = true,
-                toolTip = "Controls retrieval selectivity: high values favor one memory; low values blend similar memories."
+                toolTip = "Retrieval selectivity: high values favor one memory; low values blend similar memories."
             ) { value ->
                 beta = value
             }
@@ -161,7 +161,7 @@ val modernHopfieldSim = newSim {
                 addButton("Use memory ${memoryIndex + 1}") {
                     query.setActivations(memories[memoryIndex])
                 }.apply {
-                    toolTipText = "Loads stored memory ${memoryIndex + 1} into the clamped query layer."
+                    toolTipText = "Load stored memory ${memoryIndex + 1} into the clamped query layer."
                 }
             }
             addButton("Add noise") {
@@ -169,14 +169,14 @@ val modernHopfieldSim = newSim {
                     if (Random.nextDouble() < 0.25) -value else value
                 }.toDoubleArray())
             }.apply {
-                toolTipText = "Flips the sign of about one quarter of query features before the next retrieval step."
+                toolTipText = "Flip the sign of about one quarter of query features before the next retrieval step."
             }
             addSeparator()
             addButton("Use retrieved pattern as query") {
                 query.setActivations(retrieved.activationArray)
                 retrieve()
             }.apply {
-                toolTipText = "Copies the retrieval to the query and immediately performs the next associative retrieval."
+                toolTipText = "Copy the retrieval to the query and immediately perform the next associative retrieval."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 760, 420)

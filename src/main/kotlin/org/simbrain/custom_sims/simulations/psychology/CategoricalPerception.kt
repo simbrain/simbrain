@@ -335,6 +335,8 @@ val categoricalPerception = newSim {
 
     val stagedTrainer = CnnTrainer(network, inputLayer, outputArray, cnnModel.trainerConfig)
 
+    // TODO: This changes currentCondition without updating the Training Condition combo box, which then shows a
+    //  stale selection.
     fun runStagedTraining(labelCondition: TrainingCondition) {
         val totalEpochs = STAGE1_EPOCHS + STAGE2_EPOCHS
         runWithProgressWindow(totalEpochs, "Staged Training") { epoch ->
@@ -360,8 +362,9 @@ val categoricalPerception = newSim {
 
     withGui {
         val controlPanel = createControlPanel("Analysis", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addLabel("Training Condition:")
-            addComboBox("", TrainingCondition.entries, currentCondition) { selectedCondition ->
+            val conditionToolTip = "Whether the training data includes L1 category labels along with the prototype sorting task."
+            addLabel("Training Condition:").apply { toolTipText = conditionToolTip }
+            addComboBox("", TrainingCondition.entries, currentCondition, toolTip = conditionToolTip) { selectedCondition ->
                 currentCondition = selectedCondition
                 val (newTrain, newTest) = buildDatasets(selectedCondition)
                 trainingSet = newTrain
@@ -375,12 +378,16 @@ val categoricalPerception = newSim {
 
             addButton("Run Staged Training") {
                 runStagedTraining(TrainingCondition.L1_LABELS)
+            }.apply {
+                toolTipText = "Train on prototype sorting alone, then continue with L1 labels added."
             }
 
             addSeparator()
 
             addButton("Analyze Repr Layer") {
                 runAnalysis()
+            }.apply {
+                toolTipText = "Report within-class and between-class distances in the representation layer for the current condition."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 940, 677)

@@ -98,21 +98,24 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
             SIM_WINDOW_GAP,
             SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP,
         ) {
-            addSliderWithTextField("Temperature", 0.01, 4.0, languageModel.temperature, 0.01) { temp ->
+            addSliderWithTextField(
+                "Temperature", 0.01, 4.0, languageModel.temperature, 0.01,
+                toolTip = "Higher values make generated text more random; lower values make it more predictable."
+            ) { temp ->
                 languageModel.temperature = temp
             }
 
             addButton("Settings...") {
                 languageModel.createEditorDialog("Language Model Settings").display()
             }.apply {
-                toolTipText = "Change prompt mode, token limit, sampling strategy, and other generation settings"
+                toolTipText = "Change prompt mode, token limit, sampling strategy, and other generation settings."
             }
 
             addButton("Reset") {
                 textWorldComponent.world.text = ""
                 languageModel.clearWindow()
             }.apply {
-                toolTipText = "Clear the document and start a new model context"
+                toolTipText = "Clear the document and start a new model context."
             }
 
             addSeparator()
@@ -120,30 +123,24 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
             val toolOptions = listOf("None", "Current time")
             addComboBox(
                 "Tools", toolOptions, if (languageModel.demoToolsEnabled) "Current time" else "None",
-                labelToolTip = "Choose tools to include when a new chat context begins; press Reset before sending",
+                toolTip = "Choose tools to include when a new chat context begins; press Reset before sending.",
             ) { selection ->
                 languageModel.demoToolsEnabled = selection == "Current time"
-            }.apply {
-                toolTipText = "Choose tools to include when a new chat context begins; press Reset before sending"
             }
 
             addComboBox(
                 "Color theme", DocumentStructureDisplay.entries, textWorldComponent.world.documentStructureDisplay,
-                labelToolTip = "Choose how chat roles, system text, and tool calls appear in the document",
+                toolTip = "Choose how chat roles, system text, and tool calls appear in the document.",
             ) { display ->
                 textWorldComponent.world.documentStructureDisplay = display
-            }.apply {
-                toolTipText = "Choose how chat roles, system text, and tool calls appear in the document"
             }
 
             addSeparator()
 
             val messageField = addTextField(
                 "Chat message", "",
-                labelToolTip = "In Chat prompt mode, add a user turn and generate an assistant reply",
-            ).apply {
-                toolTipText = "In Chat prompt mode, add a user turn and generate an assistant reply"
-            }
+                toolTip = "In Chat prompt mode, type a user turn; press Enter or Send message to generate an assistant reply.",
+            )
             fun sendChatMessage() {
                 if (!languageModel.isLoaded) return
                 val message = messageField.text.trim()
@@ -155,6 +152,8 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
             messageField.addActionListener { sendChatMessage() }
             addButton("Send message") {
                 sendChatMessage()
+            }.apply {
+                toolTipText = "In Chat prompt mode, add the message above as a user turn and generate an assistant reply."
             }
         }.awaitLayout()
         controlPanel.setLocation(

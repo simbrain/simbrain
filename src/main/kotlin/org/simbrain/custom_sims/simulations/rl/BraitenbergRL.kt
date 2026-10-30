@@ -725,36 +725,44 @@ val braitenbergRL = newSim { optionString ->
         // Combined control panel
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addLabel("Task:")
+            val taskToolTip = "Select the learning task: which objects to seek or avoid."
+            addLabel("Task:").apply { toolTipText = taskToolTip }
 
-            val taskComboBox = addComboBox("", tasks, tasks[0]) { selectedTask ->
+            addComboBox("", tasks, tasks[0], toolTip = taskToolTip) { selectedTask ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
                 poisonRewardMultiplier = selectedTask.poisonReward
+                // TODO: These resets are not reflected in the Learning Rate and Gamma fields, which keep showing
+                //  the old values.
                 learningRate = 0.05
                 gamma = 0.95
             }
-            taskComboBox.toolTipText = "Select the learning task: which objects to seek or avoid"
 
             addSeparator()
 
-            val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+            addFormattedNumericTextField(
+                "Learning Rate", initValue = learningRate,
+                toolTip = "Step size for weight updates (higher = faster but less stable)."
+            ) {
                 learningRate = it
             }
-            lrField.toolTipText = "Step size for weight updates (higher = faster but less stable)"
 
-            val gammaField = addFormattedNumericTextField("Gamma (Discount Factor)", initValue = gamma) {
+            addFormattedNumericTextField(
+                "Gamma (Discount Factor)", initValue = gamma,
+                toolTip = "Importance of future rewards (0-1, higher = more farsighted)."
+            ) {
                 gamma = it
             }
-            gammaField.toolTipText = "Importance of future rewards (0-1, higher = more farsighted)"
 
-            val speedBiasField = addFormattedNumericTextField("Speed Bias", initValue = straight.bias) {
+            addFormattedNumericTextField(
+                "Speed Bias", initValue = straight.bias,
+                toolTip = "Base forward speed (higher = faster default movement)."
+            ) {
                 straight.bias = it
             }
-            speedBiasField.toolTipText = "Base forward speed (higher = faster default movement)"
 
             addCheckBox(
                 "Learning Enabled", learningEnabled,
-                toolTip = "Enable/disable weight updates (unchecking freezes all weights)"
+                toolTip = "Enable/disable weight updates (unchecking freezes all weights)."
             ) { enabled ->
                 learningEnabled = enabled
                 // Clamp/unclamp trainable weights
@@ -766,7 +774,7 @@ val braitenbergRL = newSim { optionString ->
 
             addCheckBox(
                 "Train Speed Connections", trainSpeedConnections,
-                toolTip = "Include sensor-to-speed connections in learning"
+                toolTip = "Include sensor-to-speed connections in learning."
             ) { enabled ->
                 trainSpeedConnections = enabled
                 speedSynapses.forEach { syn ->
@@ -794,7 +802,7 @@ val braitenbergRL = newSim { optionString ->
                     swingInvokeLater { decayLabel.text = "Decay: ${getDecaySummary()}" }
                 }.display()
             }
-            decayEditButton.toolTipText = "Configure decay function for all sensors and rewards"
+            decayEditButton.toolTipText = "Configure decay function for all sensors and rewards."
 
             lateinit var weightSpaceButton: JButton
 
@@ -846,7 +854,7 @@ val braitenbergRL = newSim { optionString ->
                     showWeightSpaceFrame()
                 }
             }
-            weightSpaceButton.toolTipText = "Open a live display of cheese and poison actor weights"
+            weightSpaceButton.toolTipText = "Open a live display of cheese and poison actor weights."
 
             val timeSeriesButton = addButton("Show Time Series") {
                 if (plotFrame is JInternalFrame && !plotFrame.isIcon) {
@@ -858,7 +866,7 @@ val braitenbergRL = newSim { optionString ->
                     this@addButton.text = "Hide Time Series"
                 }
             }
-            timeSeriesButton.toolTipText = "Show reward, value, and TD error time series"
+            timeSeriesButton.toolTipText = "Show reward, value, and TD error time series."
 
             addSeparator()
 
@@ -868,7 +876,7 @@ val braitenbergRL = newSim { optionString ->
                 }
                 resetWeightSpaceTrajectories()
             }
-            randomResetButton.toolTipText = "Randomize all weights within their current bounds"
+            randomResetButton.toolTipText = "Randomize all weights within their current bounds."
 
             val zeroResetButton = addButton("Reset (0 Weights)") {
                 network.freeSynapses.forEach { s ->
@@ -876,7 +884,7 @@ val braitenbergRL = newSim { optionString ->
                 }
                 resetWeightSpaceTrajectories()
             }
-            zeroResetButton.toolTipText = "Set all weights to zero"
+            zeroResetButton.toolTipText = "Set all weights to zero."
 
         }.awaitLayout()
 

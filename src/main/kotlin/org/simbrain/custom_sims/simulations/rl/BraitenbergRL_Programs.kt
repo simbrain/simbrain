@@ -357,47 +357,74 @@ val braitenbergRLPrograms = newSim { optionString ->
 
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addLabel("Task:")
-            addComboBox("", tasks, tasks[0]) { selectedTask ->
+            val taskToolTip = "Set whether cheese and poison are rewarding or punishing."
+            addLabel("Task:").apply { toolTipText = taskToolTip }
+            addComboBox("", tasks, tasks[0], toolTip = taskToolTip) { selectedTask ->
                 cheeseRewardMultiplier = selectedTask.cheeseReward
                 poisonRewardMultiplier = selectedTask.poisonReward
             }
 
             addSeparator()
 
-            addCheckBox("Learning Enabled", learningEnabled) { learningEnabled = it }
+            addCheckBox(
+                "Learning Enabled", learningEnabled,
+                toolTip = "Update the actor and critic weights while the simulation runs. Uncheck to freeze what has been learned."
+            ) { learningEnabled = it }
 
-            addCheckBox("Sparse Reward (collision only)", sparseReward) { sparseReward = it }
+            addCheckBox(
+                "Sparse Reward (collision only)", sparseReward,
+                toolTip = "Give reward only when the mouse touches the cheese or poison. Uncheck for reward that grows as the mouse gets closer."
+            ) { sparseReward = it }
 
             addSeparator()
 
-            addFormattedNumericTextField("Critic Learning Rate", initValue = learningRate) {
+            addFormattedNumericTextField(
+                "Critic Learning Rate", initValue = learningRate,
+                toolTip = "How quickly the critic's value estimates change in response to TD error."
+            ) {
                 learningRate = it
             }
 
-            addFormattedNumericTextField("Actor Learning Rate", initValue = actorLearningRate) {
+            addFormattedNumericTextField(
+                "Actor Learning Rate", initValue = actorLearningRate,
+                toolTip = "How quickly the actor's preferences for each program change in response to TD error."
+            ) {
                 actorLearningRate = it
             }
 
-            addFormattedNumericTextField("Gamma", initValue = gamma) {
+            addFormattedNumericTextField(
+                "Gamma", initValue = gamma,
+                toolTip = "Discount factor: how much future rewards count compared with immediate ones (0 to 1)."
+            ) {
                 gamma = it
             }
 
-            addFormattedNumericTextField("Temperature", initValue = temperature) {
+            addFormattedNumericTextField(
+                "Temperature", initValue = temperature,
+                toolTip = "Randomness of program selection. Higher values explore more; lower values favor the best program."
+            ) {
                 temperature = it.coerceAtLeast(0.01)
             }
 
-            addFormattedNumericTextField("Speed Bias", initValue = straight.bias) {
+            addFormattedNumericTextField(
+                "Speed Bias", initValue = straight.bias,
+                toolTip = "Bias on the Straight neuron, which sets the mouse's forward speed."
+            ) {
                 straight.bias = it
             }
 
-            addFormattedNumericTextField("Weight Strength", initValue = programWeightStrength) {
+            addFormattedNumericTextField(
+                "Weight Strength", initValue = programWeightStrength,
+                toolTip = "Size of the sensor-to-turn weights each program uses to approach or avoid cheese and poison."
+            ) {
                 programWeightStrength = it
             }
 
             addSeparator()
 
-            addButton("Reset Learning") { resetLearning() }
+            addButton("Reset Learning") { resetLearning() }.apply {
+                toolTipText = "Clear the learned actor and critic weights so the mouse starts learning from scratch."
+            }
 
         }.awaitLayout()
 

@@ -182,12 +182,14 @@ val attentionAsGain = newSim {
     withGui {
         // Control panel on the left
         val controlPanel = createControlPanel("Attention Control", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addSlider("Left Gain", 0.1, 5.0, leftGain, 0.1) { value ->
+            addSlider("Left Gain", 0.1, 5.0, leftGain, 0.1,
+                toolTip = "Slope of the left-region neurons. Raising it simulates attending to the left side.") { value ->
                 leftGain = value
                 updateGains()
             }
             
-            addSlider("Right Gain", 0.1, 5.0, rightGain, 0.1) { value ->
+            addSlider("Right Gain", 0.1, 5.0, rightGain, 0.1,
+                toolTip = "Slope of the right-region neurons. Raising it simulates attending to the right side.") { value ->
                 rightGain = value
                 updateGains()
             }
@@ -196,28 +198,40 @@ val attentionAsGain = newSim {
             
             addButton("Image 1: Left bars") {
                 imageWorld.imageAlbum.setFrame(0)
+            }.apply {
+                toolTipText = "Show an image with bars on the left side only."
             }
             
             addButton("Image 2: Right bars") {
                 imageWorld.imageAlbum.setFrame(1)
+            }.apply {
+                toolTipText = "Show an image with bars on the right side only."
             }
             
             addButton("Image 3: Both sides") {
                 imageWorld.imageAlbum.setFrame(2)
+            }.apply {
+                toolTipText = "Show an image with bars on both sides, so the gains decide which side dominates."
             }
             
             addButton("Image 4: Horizontal line") {
                 imageWorld.imageAlbum.setFrame(3)
+            }.apply {
+                toolTipText = "Show an image with a horizontal line across both sides."
             }
             
             addButton("Image 5: Blank canvas") {
                 imageWorld.imageAlbum.setFrame(4)
+            }.apply {
+                toolTipText = "Show a blank image with no input."
             }
             
             addSeparator()
             
             addButton("Reset Network") {
                 network.clearActivations()
+            }.apply {
+                toolTipText = "Set every neuron's activation to zero; the gains are unchanged."
             }
         }.awaitLayout()
         

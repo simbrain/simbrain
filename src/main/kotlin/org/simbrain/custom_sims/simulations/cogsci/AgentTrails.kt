@@ -231,12 +231,18 @@ val kAgentTrails = newSim {
 
             addButton("Cheese") {
                 moveMouseVerticallyThroughLocation(cheeseLocation)
+            }.apply {
+                toolTipText = "Reset the objects and move the mouse straight up through the cheese."
             }
             addButton("Fish") {
                 moveMouseVerticallyThroughLocation(fishLocation)
+            }.apply {
+                toolTipText = "Reset the objects and move the mouse straight up through the fish."
             }
             addButton("Flower") {
                 moveMouseVerticallyThroughLocation(flowerLocation)
+            }.apply {
+                toolTipText = "Reset the objects and move the mouse straight up through the flower."
             }
             addButton("Cheese > Flower") {
                 workspace.launch {
@@ -253,6 +259,8 @@ val kAgentTrails = newSim {
                     workspace.iterateSuspend((dispersion * 1.5).toInt())
                     straightNeuron.activation = 0.0
                 }
+            }.apply {
+                toolTipText = "Move the mouse up to the cheese, then turn it right toward the flower."
             }
             addButton("Cheese > Fish") {
                 workspace.launch {
@@ -269,6 +277,8 @@ val kAgentTrails = newSim {
                     workspace.iterateSuspend((dispersion * 1.5).toInt())
                     straightNeuron.activation = 0.0
                 }
+            }.apply {
+                toolTipText = "Move the mouse up to the cheese, then turn it left toward the fish."
             }
             addButton("Random motion") {
                 workspace.launch {
@@ -289,6 +299,8 @@ val kAgentTrails = newSim {
                     flower.speed = 0.0
                     fish.speed = 0.0
                 }
+            }.apply {
+                toolTipText = "Place the mouse at the center and let the cheese, fish, and flower drift randomly past it for 200 steps."
             }
         }
 

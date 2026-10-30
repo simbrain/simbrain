@@ -45,18 +45,18 @@ val hebbianAssociator = newSim {
                 recurrentNet.isClamped = true
                 recurrentWeights.forEach { it.clamped = false }
             }.apply {
-                toolTipText = "Clamps nodes and unclamps weights"
+                toolTipText = "Clamp nodes and unclamp weights."
             }
             addButton("Test Mode (clamped weights)") {
                 recurrentNet.isClamped = false
                 recurrentWeights.forEach { it.clamped = true }
             }.apply {
-                toolTipText = "Clamps weights and unclamps nodes"
+                toolTipText = "Clamp weights and unclamp nodes."
             }
             addButton("All nodes to -1") {
                 recurrentNet.neuronList.forEach{n -> n.activation = -1.0}
             }.apply {
-                toolTipText = "Provides a `palette` for creating patterns"
+                toolTipText = "Provide a `palette` for creating patterns."
             }
             addTextField("Learning rate", "" + .1) {
                 it.toDoubleOrNull()?.let { num ->

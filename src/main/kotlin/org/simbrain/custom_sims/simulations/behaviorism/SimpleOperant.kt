@@ -112,6 +112,8 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
                 normalizeProbabilities()
                 updateNodeLabels()
                 SimbrainDesktop.workspace.simpleIterate()
+            }.apply {
+                toolTipText = "Raise the probability of the currently active behavior, then advance one step."
             }
 
             addButton("Punish Agent") {
@@ -124,10 +126,14 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
                 normalizeProbabilities()
                 updateNodeLabels()
                 SimbrainDesktop.workspace.simpleIterate()
+            }.apply {
+                toolTipText = "Lower the probability of the currently active behavior, then advance one step."
             }
 
             addButton("Don't reinforce or punish") {
                 SimbrainDesktop.workspace.simpleIterate()
+            }.apply {
+                toolTipText = "Advance one step without changing any behavior probabilities."
             }
         }.awaitLayout()
         place(

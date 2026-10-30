@@ -86,18 +86,20 @@ val roomSchemaSim = newSim {
             for ((room, features) in rooms) {
                 addButton(room) {
                     activateNodes(features)
+                }.apply {
+                    toolTipText = "Activate the features of a typical ${room.lowercase()} on the visible layer."
                 }
             }
             addSeparator()
             addButton("Show correlations") {
                 showPatternCorrelations(roomPatterns)
             }.apply {
-                toolTipText = "Shows how strongly each pair of room patterns overlaps."
+                toolTipText = "Show how strongly each pair of room patterns overlaps."
             }
             addButton("Show trained correlations") {
                 trainedPatterns.showCorrelations()
             }.apply {
-                toolTipText = "Shows how strongly each pair of patterns trained so far overlaps."
+                toolTipText = "Show how strongly each pair of patterns trained so far overlaps."
             }
             addSeparator()
             addButton("Train on Current Pattern") {
@@ -107,15 +109,21 @@ val roomSchemaSim = newSim {
                         rbm.trainOnCurrentPattern()
                     }
                 }
+            }.apply {
+                toolTipText = "Run 20 RBM training steps on the room features currently active on the visible layer."
             }
             addButton("Recall Current Pattern") {
                 workspace.iterateSuspend(10)
+            }.apply {
+                toolTipText = "Run the network for 10 steps so it settles toward a stored room schema."
             }
             addButton("Permute Current Pattern") {
                 rbm.visibleLayer.activationArray = rbm.visibleLayer
                     .activationArray
                     .map { flipBitWithChance(it.toInt(), 0.1).toDouble() }
                     .toDoubleArray()
+            }.apply {
+                toolTipText = "Flip each visible feature with 10% probability, to test whether recall restores the room."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 800, 600)

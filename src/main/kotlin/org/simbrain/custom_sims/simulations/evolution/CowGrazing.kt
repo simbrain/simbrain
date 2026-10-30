@@ -297,8 +297,14 @@ val grazingCows = newSim { optionString ->
         }
         createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            val numCowsTf = addTextField("Number of cows", "" + numCows)
-            val useAverageCB = addCheckBox("Use mean group fitness (else min)", useAverage)
+            val numCowsTf = addTextField(
+                "Number of cows", "" + numCows,
+                toolTip = "Number of cows evaluated together in each simulation. Takes effect the first time you open the trainer."
+            )
+            val useAverageCB = addCheckBox(
+                "Use mean group fitness (else min)", useAverage,
+                toolTip = "Score a group by its cows' mean fitness instead of the worst cow's. Takes effect the first time you open the trainer."
+            )
 
             addButton("Open Trainer") {
                 trainerDialog?.takeIf { it.isDisplayable }?.let {
@@ -366,6 +372,8 @@ val grazingCows = newSim { optionString ->
                     addCloseTask { trainerDialog = null }
                     makeVisible()
                 }
+            }.apply {
+                toolTipText = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved cows."
             }
 
             addButton("Load file") {
@@ -384,6 +392,8 @@ val grazingCows = newSim { optionString ->
                 world.entityList
                     .filter { e -> e.entityType == EntityType.Cow }
                     .forEach { addFindFlowerAction(workspace, it) }
+            }.apply {
+                toolTipText = "Load a saved grazing cow workspace and restore flower respawning so it can be run."
             }
         }
     }

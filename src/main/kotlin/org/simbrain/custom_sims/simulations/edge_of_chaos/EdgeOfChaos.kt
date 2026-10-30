@@ -113,12 +113,17 @@ val edgeOfChaos = newSim("edgeOfChaos") {
 
         // Set up control panel
         createControlPanel("Controller", SIM_WINDOW_GAP + 590 + SIM_WINDOW_GAP + 422 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            val tf_stdev = addTextField("Weight stdev", variance.toString())
+            val tf_stdev = addTextField(
+                "Weight stdev", variance.toString(),
+                toolTip = "Standard deviation of the reservoir weights. Low values give ordered dynamics, high values chaotic ones. Press Update to apply it."
+            )
             addButton("Update") {
                 // Update variance of weight strengths
                 variance = tf_stdev.text.toDouble()
                 val normalDist = NormalDistribution(0.0, variance)
                 sgReservoir.randomize(normalDist)
+            }.apply {
+                toolTipText = "Resample the reservoir weights from a normal distribution with the standard deviation entered above."
             }
         }
     }

@@ -132,25 +132,32 @@ val view3dDemo = newSim {
             addLabel("Use arrow keys in OdorWorld")
             addLabel("to move the agent")
             addSeparator()
-            addSlider("FOV", 30.0, 120.0, 90.0, 5.0) { value ->
+            addSlider("FOV", 30.0, 120.0, 90.0, 5.0,
+                toolTip = "Field of view of the 3D camera, in degrees.") { value ->
                 view3dSensor.fov = value
             }
-            addSlider("View Distance", 100.0, 800.0, 400.0, 50.0) { value ->
+            addSlider("View Distance", 100.0, 800.0, 400.0, 50.0,
+                toolTip = "Maximum distance, in pixels, that the camera renders.") { value ->
                 view3dSensor.viewDistance = value
             }
-            addSlider("Horizon Position", 0.1, 0.9, 0.5, 0.1) { value ->
+            addSlider("Horizon Position", 0.1, 0.9, 0.5, 0.1,
+                toolTip = "Where the horizon sits in the view, from 0 (bottom) to 1 (top).") { value ->
                 view3dSensor.horizonPosition = value
             }
-            addSlider("Camera Height", 4.0, 64.0, 16.0, 4.0) { value ->
+            addSlider("Camera Height", 4.0, 64.0, 16.0, 4.0,
+                toolTip = "Height of the camera above the ground, in world units.") { value ->
                 view3dSensor.cameraWorldHeight = value
             }
-            addSlider("Wall Height", 0.5, 4.0, 2.0, 0.5) { value ->
+            addSlider("Wall Height", 0.5, 4.0, 2.0, 0.5,
+                toolTip = "Height of the walls relative to the camera height; 1 reaches the horizon.") { value ->
                 view3dSensor.wallHeight = value
             }
-            addCheckBox("Wrap Around (no walls)", false) { checked ->
+            addCheckBox("Wrap Around (no walls)", false,
+                toolTip = "Remove the boundary walls so the agent leaving one edge reappears at the opposite edge.") { checked ->
                 odorWorld.wrapAround = checked
             }
-            addCheckBox("Billboard Sprites", true) { checked ->
+            addCheckBox("Billboard Sprites", true,
+                toolTip = "Draw objects facing the camera. Uncheck to draw them facing their own heading, foreshortened at angles.") { checked ->
                 view3dSensor.billboardSprites = checked
             }
         }

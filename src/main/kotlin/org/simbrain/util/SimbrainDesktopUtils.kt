@@ -223,8 +223,10 @@ class ControlPanelKt(title: String = "Control Panel"):
         columns: Int = 8,
         maximumFractionDigits: Int = 12,
         tab: String? = null,
+        toolTip: String? = null,
         crossinline onChange: (T) -> Unit
     ) = JFormattedTextField(initValue).also { textField ->
+        textField.toolTipText = toolTip
         textField.document.addDocumentListener(object : DocumentListener {
             override fun insertUpdate(e: DocumentEvent?) {
                 onChange(textField.value as T)
@@ -259,18 +261,24 @@ class ControlPanelKt(title: String = "Control Panel"):
                     }
                 }
             })
-            getTab(tab).addItem(label, textField)
+            getTab(tab).addItem(label, textField).toolTipText = toolTip
         }
     }
 
+    /**
+     * @param toolTip shown on both the combo box and its label
+     * @param labelToolTip overrides [toolTip] on the label
+     */
     inline fun <reified T> addComboBox(
         label: String,
         items: List<T>,
         initialSelection: T? = null,
         tab: String? = null,
         labelToolTip: String? = null,
+        toolTip: String? = null,
         crossinline onChange: (T) -> Unit = {}
     ) = JComboBox(items.toTypedArray()).also { comboBox ->
+        comboBox.toolTipText = toolTip
         if (initialSelection != null) {
             comboBox.selectedItem = initialSelection
         }
@@ -282,7 +290,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             if (label.isEmpty()) {
                 getTab(tab).addItem(comboBox)
             } else {
-                getTab(tab).addItem(label, comboBox).toolTipText = labelToolTip
+                getTab(tab).addItem(label, comboBox).toolTipText = labelToolTip ?: toolTip
             }
             pack()
         }

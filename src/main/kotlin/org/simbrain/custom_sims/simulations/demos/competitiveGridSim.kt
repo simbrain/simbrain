@@ -140,12 +140,12 @@ val competitiveGridSim = newSim {
                 addButton(label) {
                     competitive.inputLayer.neuronList.activations = pattern
                     winningLabel = label
-                }.toolTipText = "Put the ${pictureNames.getValue(label)} on the input grid"
+                }.toolTipText = "Put the ${pictureNames.getValue(label)} on the input grid."
             }
 
             addButton("Add Noise") {
                 competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
-            }.toolTipText = "Add small random values to the current input"
+            }.toolTipText = "Add small random values to the current input."
             addButton("Test") {
                 val savedLearningRate = competitive.learningRate
                 val savedLeaky = competitive.useLeakyLearning
@@ -155,19 +155,19 @@ val competitiveGridSim = newSim {
                 competitive.learningRate = savedLearningRate
                 competitive.useLeakyLearning = savedLeaky
                 labelTracker.updateWinner(winningLabel, competitive.competitive.neuronList.maxBy { it.activation })
-            }.toolTipText = "Show which unit wins the current pattern without changing any weights"
+            }.toolTipText = "Show which unit wins the current pattern without changing any weights."
 
             addSeparator()
 
-            addButton("Train") { train(1) }.toolTipText = "Run one training step on the current pattern"
-            addButton("Train ×10") { train(10) }.toolTipText = "Run ten training steps on the current pattern"
+            addButton("Train") { train(1) }.toolTipText = "Run one training step on the current pattern."
+            addButton("Train ×10") { train(10) }.toolTipText = "Run ten training steps on the current pattern."
 
             addSeparator()
 
             addButton("Reset") {
                 competitive.randomize()
                 labelTracker.clear(competitive.competitive.neuronList)
-            }.toolTipText = "Randomize the weights and clear the labels"
+            }.toolTipText = "Randomize the weights and clear the labels."
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 528, 728)
     }

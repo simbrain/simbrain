@@ -431,7 +431,7 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
             addButton("Train...", Dispatchers.Swing) {
                 languageModel.createTrainingDialog(SimbrainDesktop.frame).display()
             }.apply {
-                toolTipText = "Open the trainer: run, stop, or step training and watch the loss curve"
+                toolTipText = "Open the trainer: run, stop, or step training and watch the loss curve."
             }
 
             addButton("Reset") {
@@ -439,7 +439,7 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
                 languageModel.clearWindow()
             }.apply {
                 toolTipText = "Clear the document, the context window, and the diagram's activations; " +
-                    "trained weights are kept"
+                    "trained weights are kept."
             }
 
             addSeparator()
@@ -447,17 +447,22 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
             addButton("Show Vocabulary") {
                 val labels = languageModel.tokenLabels ?: arrayListOf()
                 showTextDialog("Vocabulary (${labels.size} tokens)", labels.joinToString("\n"))
+            }.apply {
+                toolTipText = "Open a list of every token the model knows."
             }
 
             addButton("Show Training Text") {
                 val corpus = languageModel.corpusTokenIds?.let(languageModel::decode) ?: "No training corpus"
                 showTextDialog("Training Text", corpus)
+            }.apply {
+                toolTipText = "Open the full text the model was trained on."
             }
 
             addSeparator()
 
             addSliderWithTextField(
-                "Temperature", 0.01, 2.0, languageModel.samplingTemperature, 0.01, showValueField = true
+                "Temperature", 0.01, 2.0, languageModel.samplingTemperature, 0.01, showValueField = true,
+                toolTip = "Higher values make generated text more random; lower values make it more predictable."
             ) { temp ->
                 languageModel.samplingTemperature = temp
             }
@@ -473,6 +478,8 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
                     }
                 }
                 dialog.display()
+            }.apply {
+                toolTipText = "Choose how the next token is picked from the model's predictions: greedy, top-k, or top-p sampling."
             }
 
         }.awaitLayout()

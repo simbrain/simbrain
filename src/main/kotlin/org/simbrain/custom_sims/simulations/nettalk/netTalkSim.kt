@@ -301,6 +301,7 @@ class NettalkReaderEvents : FlowEvents() {
 private class NettalkReaderPanel(private val reader: NettalkReader) : JPanel() {
 
     private val textArea = JTextArea(reader.text).apply {
+        toolTipText = "Text the network reads aloud, one letter window at a time. Edit it to try new words."
         lineWrap = true
         wrapStyleWord = true
         font = Font(Font.MONOSPACED, Font.PLAIN, 14)
@@ -332,7 +333,7 @@ private class NettalkReaderPanel(private val reader: NettalkReader) : JPanel() {
         add(windowSectionLabel, "growx, gapy 4 0")
         add(windowLabel, "alignx center, gapy 0 2")
         add(JButton("Reset").apply {
-            toolTipText = "Reset reading position to 0"
+            toolTipText = "Move the reading window back to the first letter."
             addActionListener { reader.reset() }
         }, "alignx right")
 

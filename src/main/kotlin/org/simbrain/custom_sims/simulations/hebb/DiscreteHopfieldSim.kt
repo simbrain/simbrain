@@ -166,7 +166,7 @@ val discreteHopfieldSim = newSim {
                 trainedPatterns.record(hopfield.neuronGroup.activationArray)
                 with(network) { hopfield.trainOnCurrentPattern() }
             }.apply {
-                toolTipText = "Applies one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
+                toolTipText = "Apply one Hebbian learning step, storing the current pattern (and its anti-pattern) in the weights."
             }
             val config = HopfieldTestConfig(
                 workspace = workspace,

@@ -260,12 +260,18 @@ val spiveyNet = newSim {
         val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addButton("Control Condition") {
                 applyControlCondition()
+            }.apply {
+                toolTipText = "Set up a trial with the target (candle) and an unrelated competitor (fork)."
             }
             addButton("Cohort Condition") {
                 applyCohortCondition()
+            }.apply {
+                toolTipText = "Set up a trial with the target (candle) and a competitor sharing its onset (candy)."
             }
             addButton("Rhyme Condition") {
                 applyRhymeCondition()
+            }.apply {
+                toolTipText = "Set up a trial with the target (candle) and a rhyming competitor (handle)."
             }
             addSeparator()
             addButton("Iterate") {
@@ -304,6 +310,8 @@ val spiveyNet = newSim {
                 workspace.iterateSuspend()
                 delay(100L)
                 mouse.drawTrailWithoutRunningWorkspace = false
+            }.apply {
+                toolTipText = "Present the next sound of \"candle\" and advance the network, mouse, and eye one step."
             }
             addButton("Reset") {
                 currentStatus.text = ""
@@ -311,6 +319,8 @@ val spiveyNet = newSim {
                 net.flatNeuronList.forEach { n -> n.clear() }
                 mouse.clearTrail()
                 eye.clearTrail()
+            }.apply {
+                toolTipText = "Return the mouse and eye to their starting points and clear the network and both trails."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 672, 716)

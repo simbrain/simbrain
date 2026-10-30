@@ -93,19 +93,25 @@ val excitatoryInhibitoryBalance = newSim {
     withGui {
         getNetworkPanel(networkComponent).freeWeightsVisible = false
         val controlPanel = createControlPanel("E/I Balance Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addSlider("Excitatory Drive", 0.0, 30.0, excDrive, 0.5) { value ->
+            addSlider("Excitatory Drive", 0.0, 30.0, excDrive, 0.5,
+                toolTip = "Background current delivered to every excitatory neuron.") { value ->
                 excDrive = value
                 updateDrives()
             }
-            addSlider("Inhibitory Drive", 0.0, 30.0, inhDrive, 0.5) { value ->
+            addSlider("Inhibitory Drive", 0.0, 30.0, inhDrive, 0.5,
+                toolTip = "Background current delivered to every inhibitory neuron.") { value ->
                 inhDrive = value
                 updateDrives()
             }
             addButton("Randomize Activations") {
                 neuronCollection.randomize()
+            }.apply {
+                toolTipText = "Set every neuron to a random activation."
             }
             addButton("Clear Activation") {
                 neurons.forEach { it.activation = 0.0 }
+            }.apply {
+                toolTipText = "Set every neuron's activation to zero."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 600, 600)

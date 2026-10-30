@@ -186,9 +186,21 @@ private suspend fun SimulationScope.installReaderUi(
             val learningRate = JSpinner(SpinnerNumberModel(reader.model.trainerConfig.learningRate, 0.0001, 1.0, 0.001))
             val errorText = JLabel("Sampled error: not yet trained")
             val status = JLabel("Choose an exposure schedule and train.")
-            val trainButton = JButton("Train")
-            val playButton = JButton("Play")
-            val resetButton = JButton("Reset weights")
+            val samplesToolTip = "Number of words sampled and trained on each time you press Train, or in each block while playing."
+            val samplingToolTip = "Sample words in proportion to their frequency, or all words equally often."
+            val learningRateToolTip = "Learning rate used for training."
+            samples.toolTipText = samplesToolTip
+            sampling.toolTipText = samplingToolTip
+            learningRate.toolTipText = learningRateToolTip
+            val trainButton = JButton("Train").apply {
+                toolTipText = "Train one block of sampled presentations."
+            }
+            val playButton = JButton("Play").apply {
+                toolTipText = "Train block after block until you press it again to stop."
+            }
+            val resetButton = JButton("Reset weights").apply {
+                toolTipText = "Reset the network weights and clear the error plot."
+            }
             val errorModel = TimeSeriesModel().apply { addTimeSeries("Sampled error") }
             val errorPanel = TimeSeriesPlotPanel(errorModel).apply {
                 preferredSize = Dimension(460, 260)
@@ -198,11 +210,11 @@ private suspend fun SimulationScope.installReaderUi(
             }
             val trainingControls = JPanel(GridLayout(0, 2, 8, 8)).apply {
                 border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
-                add(JLabel("Presentations per block"))
+                add(JLabel("Presentations per block").apply { toolTipText = samplesToolTip })
                 add(samples)
-                add(JLabel("Sampling"))
+                add(JLabel("Sampling").apply { toolTipText = samplingToolTip })
                 add(sampling)
-                add(JLabel("Learning rate"))
+                add(JLabel("Learning rate").apply { toolTipText = learningRateToolTip })
                 add(learningRate)
                 add(errorText)
                 add(status)
@@ -289,9 +301,14 @@ private suspend fun SimulationScope.installReaderUi(
             addButton("Training...", context = Dispatchers.Swing) {
                 feedback.text = EMPTY_TEST_FEEDBACK
                 showTrainingFrame()
+            }.apply {
+                toolTipText = "Open the training window, where you set the exposure schedule and train the network."
             }
             addSeparator()
-            addComboBox("Word", reader.dataset.words, selectedWord) { selectedWord = it }
+            addComboBox(
+                "Word", reader.dataset.words, selectedWord,
+                toolTip = "Word presented by Test word."
+            ) { selectedWord = it }
             addButton("Test word") {
                 val result = reader.evaluate(selectedWord)
                 feedback.text = if (reader.trainingPresentations == 0) {
@@ -299,19 +316,27 @@ private suspend fun SimulationScope.installReaderUi(
                 } else {
                     "Input:          ${selectedWord.word}\nTarget output:  ${selectedWord.pronunciation.joinToString(" ")}\nDecoded output: ${result.decodedPronunciation.joinToString(" ")}\nError:          ${"%.5f".format(result.error)}"
                 }
+            }.apply {
+                toolTipText = "Present the selected word and show its target and decoded pronunciations and the error."
             }
             addButton("Show word-frequency chart") {
                 feedback.text = EMPTY_TEST_FEEDBACK
                 showFrequencyChart()
+            }.apply {
+                toolTipText = "Chart the mean phonological error for high- and low-frequency words."
             }
             addButton("Show results table") {
                 feedback.text = EMPTY_TEST_FEEDBACK
                 showFrequencyResults()
+            }.apply {
+                toolTipText = "Open a table of the error for every word, with the mean error for each frequency band."
             }
             addSeparator()
             addButton("Reset") {
                 feedback.text = EMPTY_TEST_FEEDBACK
                 reader.reset()
+            }.apply {
+                toolTipText = "Reset the network weights to an untrained state."
             }
             addSeparator()
             feedback = JTextArea(EMPTY_TEST_FEEDBACK).apply {

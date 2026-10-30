@@ -467,7 +467,10 @@ val evolveMousePursuer = newSim { optionString ->
             }
         }
 
-        controlPanel.addButton("Open Trainer") { openTrainer() }
+        controlPanel.addButton(
+            "Open Trainer",
+            toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved mice."
+        ) { openTrainer() }
     }
 
     addSidebarInfo(

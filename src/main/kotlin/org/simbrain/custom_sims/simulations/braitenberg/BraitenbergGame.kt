@@ -51,15 +51,18 @@ val braitenbergGame = newSim {
                 vehicle1.straight.activation = velocity
                 updateBounds(leftWeight, rightWeight)
             }
-            addSlider("Left weight", -10.0, 10.0, 1.0, .01) {
+            addSlider("Left weight", -10.0, 10.0, 1.0, .01,
+                toolTip = "Weight from the left sensor to the left turn neuron.") {
                 leftWeight = it
                 updateVehicle()
             }
-            addSlider("Right weight", -10.0, 10.0, 1.0, .01) {
+            addSlider("Right weight", -10.0, 10.0, 1.0, .01,
+                toolTip = "Weight from the right sensor to the right turn neuron.") {
                 rightWeight = it
                 updateVehicle()
             }
-            addSlider("Velocity", -10.0, 10.0, .02, .01) {
+            addSlider("Velocity", -10.0, 10.0, .02, .01,
+                toolTip = "Forward speed of the vehicle. Negative values drive it backward.") {
                 velocity = it
                 updateVehicle()
             }

@@ -184,43 +184,41 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
     addButton("Train network...") {
         model.openTrainingDialog()
     }.apply {
-        toolTipText = "Opens the training dialog. This is a convenience: right-clicking the network and choosing Train opens the same dialog."
+        toolTipText = "Open the training dialog. This is a convenience: right-clicking the network and choosing Train opens the same dialog."
     }
-    val trainingSizeToolTip = "Train on fewer images to make overfitting visible. Press the dice button in the training dialog to start fresh."
     addComboBox(
         "Training examples",
         tinyMnistTrainingSizes,
         tinyMnistTrainingSizes.first(),
-        labelToolTip = trainingSizeToolTip
+        toolTip = "Train on fewer images to make overfitting visible. Press the dice button in the training dialog to start fresh."
     ) { size ->
         model.trainingSet = data.trainingSet.firstRows(size.count)
-    }.apply { toolTipText = trainingSizeToolTip }
-    val testingSetToolTip = "Test on altered copies of the test images, such as shifted or rotated digits."
+    }
     addComboBox(
         "Testing set",
         tinyMnistTestVariants,
         tinyMnistTestVariants.first(),
-        labelToolTip = testingSetToolTip
+        toolTip = "Test on altered copies of the test images, such as shifted or rotated digits."
     ) { variant ->
         model.testingSet = variant.applyTo(data.testingSet)
-    }.apply { toolTipText = testingSetToolTip }
+    }
     addSeparator()
     addButton("Random training image") {
         val dataset = model.trainingSet
         model.show(dataset.inputs[Random.nextInt(dataset.size)].toDoubleArray())
     }.apply {
-        toolTipText = "Runs a randomly chosen training image through the network."
+        toolTipText = "Run a randomly chosen training image through the network."
     }
     addButton("Random test image") {
         val dataset = model.testingSet
         model.show(dataset.inputs[Random.nextInt(dataset.size)].toDoubleArray())
     }.apply {
-        toolTipText = "Runs a randomly chosen test image, one the network was not trained on, through the network."
+        toolTipText = "Run a randomly chosen test image, one the network was not trained on, through the network."
     }
     addButton("Draw your own digit") {
         model.addDrawingWorld()
     }.apply {
-        toolTipText = "Opens an image world coupled to the input layer. Draw a digit, then press Run or Step to see the network's answer."
+        toolTipText = "Open an image world coupled to the input layer. Draw a digit, then press Run or Step to see the network's answer."
     }
     addSeparator()
     val progressBar = JProgressBar().apply {
@@ -271,7 +269,7 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
             withContext(Dispatchers.Swing) { isEnabled = true }
         }
     }.apply {
-        toolTipText = "Reports accuracy on the training set and on every testing set. Stop the simulation first if it is running."
+        toolTipText = "Report accuracy on the training set and on every testing set. Stop the simulation first if it is running."
     }
     addComponent(progressBar)
 }

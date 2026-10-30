@@ -224,21 +224,38 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
         }
 
         val controlPanel = createControlPanel("Thermotaxis Controls", 10, 10) {
-            addButton("Reset up") { resetSimulation() }
-            addButton("Reset left") { resetSimulation(180.0) }
-            addButton("Reset right") { resetSimulation(0.0) }
+            addButton("Reset up") { resetSimulation() }.apply {
+                toolTipText = "Reset the circuit and return the worm to the center of the plate, facing up."
+            }
+            addButton("Reset left") { resetSimulation(180.0) }.apply {
+                toolTipText = "Reset the circuit and return the worm to the center of the plate, facing left."
+            }
+            addButton("Reset right") { resetSimulation(0.0) }.apply {
+                toolTipText = "Reset the circuit and return the worm to the center of the plate, facing right."
+            }
             addButton("Reverse gradient", context = Dispatchers.Swing) {
                 gradient.direction *= -1.0
                 repaintThermalPlate()
+            }.apply {
+                toolTipText = "Swap the warm and cold sides of the plate."
             }
             suspend fun updateTemperatureOffset(delta: Double) = withContext(Dispatchers.Swing) {
                 gradient.offset += delta
                 repaintThermalPlate()
             }
-            addButton("Warm plate") { updateTemperatureOffset(0.5) }
-            addButton("Cool plate") { updateTemperatureOffset(-0.5) }
-            addCheckBox("Show trail", true) { showTrail -> worm.isShowTrail = showTrail }
-            addCheckBox("Use empirical turns", true) { enabled ->
+            addButton("Warm plate") { updateTemperatureOffset(0.5) }.apply {
+                toolTipText = "Raise the temperature of the whole plate by 0.5 °C."
+            }
+            addButton("Cool plate") { updateTemperatureOffset(-0.5) }.apply {
+                toolTipText = "Lower the temperature of the whole plate by 0.5 °C."
+            }
+            addCheckBox("Show trail", true, toolTip = "Draw the path the worm has traveled.") { showTrail ->
+                worm.isShowTrail = showTrail
+            }
+            addCheckBox(
+                "Use empirical turns", true,
+                toolTip = "Add the stochastic turns seen in real worms on top of the circuit's continuous steering. Uncheck to see the circuit alone."
+            ) { enabled ->
                 wormBehavior.useEmpiricalTurns = enabled
                 if (!enabled) wormBehavior.cancelTurn()
             }
@@ -254,6 +271,8 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
                     place(heatMap, heatMapX, networkHeight + 2 * SIM_WINDOW_GAP, 700, 300)
                     heatMapButton.isEnabled = false
                 }
+            }.apply {
+                toolTipText = "Open a heat map of the circuit neurons' activations. Only one can be added."
             }
             addButton("Run population simulation") {
                 val validationButton = this
@@ -321,6 +340,8 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
                         }
                     }
                 }
+            }.apply {
+                toolTipText = "Open options, then simulate many worms on the current plate and plot their trajectories together."
             }
         }.awaitLayout()
         controlPanel.setLocation(10, 10)

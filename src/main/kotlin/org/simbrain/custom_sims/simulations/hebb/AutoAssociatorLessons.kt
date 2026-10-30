@@ -72,9 +72,10 @@ private suspend fun SimulationScope.addAutoAssociatorControls(
 ) {
     withGui {
         val controls = createControlPanel("Hebbian associative memory", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addComboBox("Pattern encoding", PatternEncoding.entries, state.encoding) { state.selectEncoding(it) }.apply {
-                toolTipText = "Switch between 0/1 and −1/+1 patterns. Changing encoding resets weights and activations."
-            }
+            addComboBox(
+                "Pattern encoding", PatternEncoding.entries, state.encoding,
+                toolTip = "Switch between 0/1 and −1/+1 patterns. Changing encoding resets weights and activations."
+            ) { state.selectEncoding(it) }
             addButton("Pattern 1") { state.showPattern(0) }.apply {
                 toolTipText = "Load the first pattern and enable Hebbian learning."
             }

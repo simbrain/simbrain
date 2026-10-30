@@ -470,21 +470,27 @@ val actorCritic = newSim {
         // Control panel
         val controlPanel = createControlPanel("RL Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            val tfTrials = addTextField("Trials", "" + numTrials)
-            val tfGamma = addTextField("Discount (gamma)", "" + gamma)
-            val tfAlpha = addTextField("Alpha", "" + alpha)
-            val tfEpsilon = addTextField("Epsilon", "" + epsilon)
-            val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward)
-            val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward)
+            val tfTrials = addTextField("Trials", "" + numTrials, toolTip = "Number of trials performed by Run.")
+            val tfGamma = addTextField(
+                "Discount (gamma)", "" + gamma,
+                toolTip = "How much future rewards count, from 0 (next step only) to 1 (all future rewards equally). Applied on Run."
+            )
+            val tfAlpha = addTextField("Alpha", "" + alpha, toolTip = "Learning rate for the critic and actor weights. Applied on Run.")
+            val tfEpsilon = addTextField(
+                "Epsilon", "" + epsilon,
+                toolTip = "Probability of taking a random action instead of the best one (exploration). Applied on Run."
+            )
+            val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward, toolTip = "Reward for reaching the cheese. Applied on Run.")
+            val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward, toolTip = "Reward for touching the poison. Applied on Run.")
             val tfMazeSeed = addTextField(
                 "Maze Seed", "",
                 toolTip = "Whole number that picks a fixed maze layout. Leave blank for a random maze each time."
             )
-            addCheckBox("Show Grid", showGrid) {
+            addCheckBox("Show Grid", showGrid, toolTip = "Shade each tile by its learned value: green for positive, red for negative.") {
                 showGrid = it
                 refreshValueOverlay()
             }
-            addCheckBox("Show Values", showValues) {
+            addCheckBox("Show Values", showValues, toolTip = "Print each tile's learned value on the world.") {
                 showValues = it
                 refreshValueOverlay()
             }
@@ -492,10 +498,10 @@ val actorCritic = newSim {
                 val seed = tfMazeSeed.text.trim().toLongOrNull()
                 world.generateMaze(numTilesInADimension, numTilesInADimension, tileGridRatio, seed)
                 resetMouse()
-            }.apply { toolTipText = "Lay a new perfect maze over the grid and return the mouse to its start" }
+            }.apply { toolTipText = "Lay a new perfect maze over the grid and return the mouse to its start." }
             addButton("Clear Maze") {
                 world.clearMaze()
-            }.apply { toolTipText = "Remove the maze walls" }
+            }.apply { toolTipText = "Remove the maze walls." }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
             val progressLabel = JLabel("Status: ------ Ready ------")
             addComponent(progressLabel)
@@ -540,12 +546,16 @@ val actorCritic = newSim {
                     }
                 }
 
+            }.apply {
+                toolTipText = "Run the number of trials entered above, using the current parameter values; each trial ends when the mouse reaches the cheese."
             }
 
             addButton("Stop") {
                 goalAchieved = true
                 stop = true
                 progressLabel.text = "Status: Stopped"
+            }.apply {
+                toolTipText = "Stop after the current step."
             }
 
             addButton("Reset") {
@@ -555,6 +565,8 @@ val actorCritic = newSim {
                 value.auxValue = 0.0
                 resetMouse()
                 progressLabel.text = "Status: Reset"
+            }.apply {
+                toolTipText = "Zero the critic and actor weights and return the mouse to its start."
             }
 
             addSeparator()
@@ -568,7 +580,7 @@ val actorCritic = newSim {
                     this@addButton.text = "Show Time Series"
                 }
             }
-            timeSeriesButton.toolTipText = "Create or remove the reward, value, and TD error plot"
+            timeSeriesButton.toolTipText = "Create or remove the reward, value, and TD error plot."
         }.awaitLayout()
 
         val mainX = controlPanel.rightEdgeWithGap()

@@ -127,21 +127,28 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             addLabel("Brightness Array")
             addComponent(brightnessPanel)
             addSeparator()
-            addSlider("Input Gain", 0.1, 2.5, inputGain, 0.05) {
+            addSlider("Input Gain", 0.1, 2.5, inputGain, 0.05,
+                toolTip = "Multiplier applied to the brightness values before they reach the network (results are capped at 1).") {
                 inputGain = it
             }
-            addCheckBox("Reverse Input (1-x)", reverseInput) { enabled ->
+            addCheckBox("Reverse Input (1-x)", reverseInput,
+                toolTip = "Invert the brightness input, so dark regions drive the network instead of bright ones.") { enabled ->
                 reverseInput = enabled
             }
-            addSlider("Excitatory Lateral", 0.0, 0.6, excitStrength, 0.01) {
+            addSlider("Excitatory Lateral", 0.0, 0.6, excitStrength, 0.01,
+                toolTip = "Strength of the excitatory lateral connections between nearby neurons.") {
                 excitStrength = it
                 applyStrengths()
             }
-            addSlider("Inhibitory Lateral", 0.0, 1.2, inhibStrength, 0.01) {
+            addSlider("Inhibitory Lateral", 0.0, 1.2, inhibStrength, 0.01,
+                toolTip = "Strength of the inhibitory lateral connections that sharpen edges in the map.") {
                 inhibStrength = it
                 applyStrengths()
             }
-            addCheckBox("Raw Input Mode", rawInputMode) { enabled ->
+            // TODO: Raw Input Mode zeroes the strengths without moving the lateral sliders, and dragging a slider
+            //  while the mode is on silently re-enables that connection.
+            addCheckBox("Raw Input Mode", rawInputMode,
+                toolTip = "Turn off both lateral connections so the map shows the unprocessed input. Unchecking restores the previous strengths.") { enabled ->
                 rawInputMode = enabled
                 if (enabled) {
                     savedExcitStrength = excitStrength

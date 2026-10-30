@@ -33,16 +33,22 @@ val synthesizerDemo = newSim {
 
     withGui {
         val controlPanel = createControlPanel("Speak", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addComponent(textAreaPanel("Text", wordToSpeak) { wordToSpeak = it })
+            addComponent(textAreaPanel("Text", wordToSpeak, "English text for Speak text.") { wordToSpeak = it })
             addButton("Speak text") {
                 synthesizer.speakText(wordToSpeak.trim())
+            }.apply {
+                toolTipText = "Speak the text above as ordinary English."
             }
 
             addSeparator()
 
-            addComponent(textAreaPanel("Phonemes", phonemesToSpeak) { phonemesToSpeak = it })
+            addComponent(textAreaPanel("Phonemes", phonemesToSpeak, "eSpeak-ng phoneme string for Speak phonemes.") {
+                phonemesToSpeak = it
+            })
             addButton("Speak phonemes") {
                 synthesizer.speakPhonemes(phonemesToSpeak.trim())
+            }.apply {
+                toolTipText = "Speak the phoneme string above, written in eSpeak-ng phoneme notation."
             }
 
             addSeparator()
@@ -135,11 +141,15 @@ private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
     var phoneme = 'a'
     var stress = '0'
 
+    val phonemeToolTip = "NETtalk phoneme whose articulatory features are encoded below."
+    val stressToolTip = "NETtalk stress or syllable-boundary symbol encoded with the phoneme."
     val phonemeSelector = JComboBox(NettalkPhonology.phonemeFeatures.keys.toTypedArray()).apply {
         selectedItem = phoneme
+        toolTipText = phonemeToolTip
     }
     val stressSelector = JComboBox(NettalkPhonology.stressNames.map { it[0] }.toTypedArray()).apply {
         selectedItem = stress
+        toolTipText = stressToolTip
     }
     val vectorArea = JTextArea(3, 28).apply {
         isEditable = false
@@ -168,9 +178,9 @@ private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
     return JPanel(BorderLayout()).apply {
         add(JLabel("Articulatory feature vector"), BorderLayout.NORTH)
         add(JPanel(FlowLayout(FlowLayout.LEFT, 5, 0)).apply {
-            add(JLabel("Phoneme"))
+            add(JLabel("Phoneme").apply { toolTipText = phonemeToolTip })
             add(phonemeSelector)
-            add(JLabel("Stress"))
+            add(JLabel("Stress").apply { toolTipText = stressToolTip })
             add(stressSelector)
         }, BorderLayout.CENTER)
         add(JPanel(BorderLayout()).apply {
@@ -178,6 +188,7 @@ private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
                 preferredSize = Dimension(280, 70)
             }, BorderLayout.CENTER)
             add(JButton("Speak feature vector").apply {
+                toolTipText = "Decode the feature vector shown above to a phoneme and speak it."
                 addActionListener {
                     // Raw Swing listener; the suspend speech path paces itself off the event thread
                     speakScope.launch {
@@ -190,8 +201,9 @@ private fun featureVectorPanel(synthesizer: SpeechSynthesizer): JPanel {
     }
 }
 
-private fun textAreaPanel(label: String, initialText: String, onChange: (String) -> Unit): JPanel {
+private fun textAreaPanel(label: String, initialText: String, toolTip: String, onChange: (String) -> Unit): JPanel {
     val textArea = JTextArea(initialText, 4, 28).apply {
+        toolTipText = toolTip
         lineWrap = true
         wrapStyleWord = true
         document.addDocumentListener(object : DocumentListener {
@@ -201,7 +213,7 @@ private fun textAreaPanel(label: String, initialText: String, onChange: (String)
         })
     }
     return JPanel(BorderLayout()).apply {
-        add(JLabel(label), BorderLayout.NORTH)
+        add(JLabel(label).apply { toolTipText = toolTip }, BorderLayout.NORTH)
         add(JScrollPane(textArea).apply {
             preferredSize = Dimension(280, 90)
         }, BorderLayout.CENTER)

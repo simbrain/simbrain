@@ -115,11 +115,16 @@ val botvinickPlautSerialRecall = newSim {
                 it.toFront()
                 return
             }
-            val cycles = JSpinner(SpinnerNumberModel(12_000, 1, 200_000, 1_000))
+            val cyclesToolTip = "Number of training cycles run each time you press Train."
+            val cycles = JSpinner(SpinnerNumberModel(12_000, 1, 200_000, 1_000)).apply { toolTipText = cyclesToolTip }
             val errorText = JLabel("Cross entropy: ${if (model.trainingCycles == 0) "not yet trained" else model.lastLoss.format(4)}")
             val progressText = JLabel("${model.trainingCycles} completed cycles")
-            val trainButton = JButton("Train")
-            val resetButton = JButton("Reset weights")
+            val trainButton = JButton("Train").apply {
+                toolTipText = "Train for the number of cycles above and plot the cross-entropy loss."
+            }
+            val resetButton = JButton("Reset weights").apply {
+                toolTipText = "Randomize the weights, start a new trial, and clear the loss plot."
+            }
             val errorModel = TimeSeriesModel().apply { addTimeSeries("Cross entropy") }
             val errorPanel = TimeSeriesPlotPanel(errorModel).apply {
                 preferredSize = Dimension(460, 260)
@@ -129,7 +134,7 @@ val botvinickPlautSerialRecall = newSim {
             }
             val controls = JPanel(GridLayout(0, 2, 8, 8)).apply {
                 border = BorderFactory.createEmptyBorder(12, 12, 12, 12)
-                add(JLabel("Training cycles"))
+                add(JLabel("Training cycles").apply { toolTipText = cyclesToolTip })
                 add(cycles)
                 add(errorText)
                 add(progressText)
@@ -207,11 +212,14 @@ val botvinickPlautSerialRecall = newSim {
                 accuracyText.text = "${(100.0 * accuracy).format(1)}%"
             }
 
-            addComboBox("List length", (1..model.maxListLength).toList(), listLength) {
+            addComboBox(
+                "List length", (1..model.maxListLength).toList(), listLength,
+                toolTip = "Choose the length of the next displayed serial-recall trial."
+            ) {
                 listLength = it
                 resetTrial()
                 refresh()
-            }.apply { toolTipText = "Choose the length of the next displayed serial-recall trial." }
+            }
             addSeparator()
             addButton("New Trial") {
                 resetTrial()

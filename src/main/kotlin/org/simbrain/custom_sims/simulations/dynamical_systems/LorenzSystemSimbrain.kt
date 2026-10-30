@@ -179,6 +179,8 @@ val lorenzSystemSimbrain = newSim {
                 xNeuron.activation = 1.0
                 yNeuron.activation = 1.0
                 zNeuron.activation = 1.0
+            }.apply {
+                toolTipText = "Set x, y, and z back to 1 so the trajectory restarts from the same point."
             }
 
             addSeparator()
@@ -189,6 +191,8 @@ val lorenzSystemSimbrain = newSim {
                 rho = 28.0
                 beta = 8.0 / 3.0
                 updateWeights()
+            }.apply {
+                toolTipText = "Set σ = 10, ρ = 28, β = 8/3, Lorenz's classic chaotic attractor."
             }
 
             addButton("Stable - Converge to Origin") {
@@ -196,6 +200,8 @@ val lorenzSystemSimbrain = newSim {
                 rho = 0.5
                 beta = 8.0 / 3.0
                 updateWeights()
+            }.apply {
+                toolTipText = "Set ρ = 0.5 (below 1), so every trajectory settles at the origin."
             }
 
             addButton("Stable - Fixed Points") {
@@ -203,6 +209,8 @@ val lorenzSystemSimbrain = newSim {
                 rho = 10.0
                 beta = 8.0 / 3.0
                 updateWeights()
+            }.apply {
+                toolTipText = "Set ρ = 10, so trajectories settle at one of two fixed points."
             }
 
             addButton("Pre-Chaotic (Complex)") {
@@ -210,14 +218,27 @@ val lorenzSystemSimbrain = newSim {
                 rho = 24.5
                 beta = 8.0 / 3.0
                 updateWeights()
+            }.apply {
+                toolTipText = "Set ρ = 24.5, just below the onset of chaos, giving long transient spirals."
             }
 
             addSeparator()
             addLabel("<html><b>Custom Parameters</b></html>")
 
-            val sigmaField = addTextField("σ (sigma)", "10.0")
-            val rhoField = addTextField("ρ (rho)", "15.0")
-            val betaField = addTextField("β (beta)", "2.6667")
+            // TODO: The fields start at ρ = 15 although the system starts at ρ = 28, and the presets do not update
+            //  them, so the fields often do not show the parameters in use.
+            val sigmaField = addTextField(
+                "σ (sigma)", "10.0",
+                toolTip = "Rate at which x moves toward y. Press Apply Custom Parameters to use it."
+            )
+            val rhoField = addTextField(
+                "ρ (rho)", "15.0",
+                toolTip = "Main control parameter; chaos appears above about 24.74. Press Apply Custom Parameters to use it."
+            )
+            val betaField = addTextField(
+                "β (beta)", "2.6667",
+                toolTip = "Damping rate of z. Press Apply Custom Parameters to use it."
+            )
 
             addButton("Apply Custom Parameters") {
                 sigma = sigmaField.text.toDoubleOrNull() ?: sigma
@@ -229,6 +250,8 @@ val lorenzSystemSimbrain = newSim {
                 betaField.text = beta.toString()
 
                 updateWeights()
+            }.apply {
+                toolTipText = "Apply the σ, ρ, and β values entered above and update the network weights."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 386, 493)

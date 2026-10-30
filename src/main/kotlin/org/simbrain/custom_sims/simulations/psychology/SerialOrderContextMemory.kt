@@ -271,7 +271,10 @@ val serialOrderContextMemory = newSim {
 
             resetTrial()
             refreshLabels()
-            addComboBox("List length", (3..maxListLength).toList(), listLength) {
+            addComboBox(
+                "List length", (3..maxListLength).toList(), listLength,
+                toolTip = "Number of letters in each list. Changing it starts a new trial."
+            ) {
                 listLength = it
                 resetTrial()
                 refreshLabels()
@@ -284,13 +287,21 @@ val serialOrderContextMemory = newSim {
                 "Retention per step", 0.75, 1.0, weightDecay, 0.01,
                 toolTip = "Fraction of temporary binding weights and suppression traces retained after each step. 1.00 retains 100%; lower values cause faster decay."
             ) { weightDecay = it }
-            addButton("Reset") { resetTrial(); refreshLabels() }
-            addButton("Step") { stepTrial(); refreshLabels() }
+            addButton("Reset") { resetTrial(); refreshLabels() }.apply {
+                toolTipText = "Draw a new letter list and clear the learned weights, context, and suppression traces."
+            }
+            addButton("Step") { stepTrial(); refreshLabels() }.apply {
+                toolTipText = "Advance one encoding or recall position."
+            }
             addSeparator()
-            addButton("Run Trial") { runTrial(); refreshLabels() }
+            addButton("Run Trial") { runTrial(); refreshLabels() }.apply {
+                toolTipText = "Start a new list and run encoding and recall to completion."
+            }
             addButton("Run Benchmark") {
                 runBenchmark()
                 refreshLabels()
+            }.apply {
+                toolTipText = "Run 200 trials at several noise and retention levels and report accuracy, transposition distance, and intrusions."
             }
         }.awaitLayout()
 

@@ -67,9 +67,10 @@ class EvolutionControlPanel(val evaluatorParams: EvaluatorParams) {
     fun addButton(
         label: String,
         context: CoroutineContext = EmptyCoroutineContext,
+        toolTip: String? = null,
         task: suspend JButton.(ActionEvent) -> Unit
     ) {
-        panel?.addButton(label, context, task = task)
+        panel?.addButton(label, context, task = task)?.toolTipText = toolTip
     }
 
     /**

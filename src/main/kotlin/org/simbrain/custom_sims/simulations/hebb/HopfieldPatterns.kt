@@ -312,6 +312,8 @@ val hopfieldPatterns = newSim {
             for ((label, pattern) in patternMap) {
                 addButton(label) {
                     hopfield.neuronGroup.setActivations(pattern)
+                }.apply {
+                    toolTipText = "Put the ${label.removeSuffix(" Pattern")} pattern on the network."
                 }
             }
             addSeparator()
@@ -322,6 +324,8 @@ val hopfieldPatterns = newSim {
                 with(network) { hopfield.trainOnCurrentPattern() }
                 patternCnt += 1
 
+            }.apply {
+                toolTipText = "Store the pattern currently on the network, averaging it with the patterns already stored."
             }
             addButton("Permute 5 bits") {
                 hopfield.neuronGroup.setActivations(
@@ -329,13 +333,19 @@ val hopfieldPatterns = newSim {
                         5
                     )
                 )
+            }.apply {
+                toolTipText = "Flip 5 randomly chosen neurons of the current pattern, to test whether the network can restore it."
             }
             addSeparator()
             addButton("Show correlations") {
                 showPatternCorrelations(shortNames)
+            }.apply {
+                toolTipText = "Open a plot of the correlations between all of the built-in patterns."
             }
             addButton("Show trained correlations") {
                 trainedPatterns.showCorrelations()
+            }.apply {
+                toolTipText = "Open a plot of the correlations between the patterns trained so far with this panel."
             }
         }.awaitLayout()
         place(networkComponent, controlPanel.rightEdgeWithGap(), SIM_WINDOW_GAP, 509, 619)

@@ -95,13 +95,18 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
 
         // Set up control panel
         val controlPanel = createControlPanel("Controller", SIM_WINDOW_GAP + 588 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            val tf_stdev = addTextField("Weight stdev", variance.toString())
+            val tf_stdev = addTextField(
+                "Weight stdev", variance.toString(),
+                toolTip = "Standard deviation of the reservoir weights. Low values give ordered dynamics, high values chaotic ones. Press Update to apply it."
+            )
             addButton("Update") {
                 variance = tf_stdev.text.toDouble()
                 val normalDist1 = NormalDistribution(0.0, variance).apply { randomSeed = 42L }
                 sgRes1.randomize(normalDist1)
                 val normalDist2 = NormalDistribution(0.0, variance).apply { randomSeed = 42L }
                 sgRes2.randomize(normalDist2)
+            }.apply {
+                toolTipText = "Resample both reservoirs' weights, using the same seed, from a normal distribution with the standard deviation entered above."
             }
         }.awaitLayout()
         place(tsPlot, SIM_WINDOW_GAP + 588 + SIM_WINDOW_GAP, controlPanel.bottomEdgeWithGap(), 460, 434)

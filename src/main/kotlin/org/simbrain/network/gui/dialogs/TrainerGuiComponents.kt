@@ -94,7 +94,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
             (it.updateType as? SupervisedTrainer.UpdateMethod.Batch)?.let { batchUpdate ->
                 if (batchUpdate.batchSize !in 1..supervisedNetwork.trainingSet.size) {
                     batchUpdate.batchSize = batchUpdate.batchSize.coerceIn(1, supervisedNetwork.trainingSet.size)
-                    showWarningDialog("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}")
+                    showMessage("Batch size exceeds training set size; setting to ${batchUpdate.batchSize}", MessageKind.WARNING)
                 }
             }
             trainer.events.errorUpdated.fireAsync(currentStats())
@@ -456,10 +456,10 @@ class AddRemoveRows(
                         if (numUnits >= 0) {
                             tables.forEach { it.model.setNumRows(numUnits * rowsPerUnit) }
                         } else {
-                            showErrorDialog("Number of $unitName must be non-negative", "Invalid Input")
+                            showMessage("Number of $unitName must be non-negative", MessageKind.ERROR, title = "Invalid Input")
                         }
                     } catch (e: NumberFormatException) {
-                        showErrorDialog("Please enter a valid integer", "Invalid Input")
+                        showMessage("Please enter a valid integer", MessageKind.ERROR, title = "Invalid Input")
                     }
                 }
             }

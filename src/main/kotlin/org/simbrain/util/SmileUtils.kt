@@ -7,10 +7,7 @@ import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.MatrixDiffResult.*
 import org.simbrain.util.stats.ProbabilityDistribution
 import smile.math.matrix.Matrix
-import kotlin.math.abs
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 
 /**
@@ -405,17 +402,20 @@ fun Matrix.reluDerivative(): Matrix {
     return derivative
 }
 
-fun Matrix.eigenValuesString(precision: Int = 2, uniqueEigenvaluesOnly: Boolean = false) = eigen().sort().let {
-    val realParts = it.wr
-    val imaginaryParts = it.wi
+fun Matrix.eigenValuesString(precision: Int = 2, uniqueEigenvaluesOnly: Boolean = false) =
+    eigen().sort().valueStrings(precision, uniqueEigenvaluesOnly)
+
+private fun Matrix.EVD.valueStrings(precision: Int, uniqueEigenvaluesOnly: Boolean): List<String> {
+    val realParts = wr
+    val imaginaryParts = wi
     fun format(r: Double, i: Double, isPair: Boolean) = if (i == 0.0) {
             r.format(precision)
         } else {
             "${r.format(precision)}${if (isPair) "±" else "+"}${i.format(precision)}i"
-        }.replace(Regex("0\\."), ".")
+        }.replace(Regex("(?<![0-9])0\\."), ".")
         .replace("+-", "-")
 
-    (realParts zip imaginaryParts)
+    return (realParts zip imaginaryParts)
         .let { parts ->
             if (uniqueEigenvaluesOnly) {
                 parts.groupBy { (r, i) -> r.roundTo(3) to abs(i.roundTo(3)) }.values
@@ -432,6 +432,27 @@ fun Matrix.eigenValuesString(precision: Int = 2, uniqueEigenvaluesOnly: Boolean 
                 format(r, i, isPair = false)
             }
         }
+}
+
+/**
+ * Show the size, spectral radius, and eigenvalues of a square [matrix] in a results dialog.
+ */
+fun showEigenvalues(matrix: Matrix) {
+    val eigen = matrix.eigen().sort()
+    val spectralRadius = eigen.wr.indices.maxOf { hypot(eigen.wr[it], eigen.wi[it]) }
+    val values = eigen.valueStrings(precision = 2, uniqueEigenvaluesOnly = false)
+    showResults("Eigenvalues") {
+        section("Matrix") {
+            row("Size", "${matrix.nrow()} × ${matrix.ncol()}")
+            row("Spectral radius", spectralRadius.format(2))
+        }
+        section("Eigenvalues") {
+            note("Largest magnitude first; complex values as a ± bi")
+            values.chunked(4).forEachIndexed { i, chunk ->
+                row("${i * 4 + 1}–${i * 4 + chunk.size}", *chunk.toTypedArray())
+            }
+        }
+    }
 }
 
 fun Matrix.applyFunction(fn: (Double) -> Double): Matrix {

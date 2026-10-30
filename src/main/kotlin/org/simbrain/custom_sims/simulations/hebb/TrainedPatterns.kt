@@ -6,7 +6,7 @@
  */
 package org.simbrain.custom_sims.simulations.hebb
 
-import org.simbrain.util.showMessageDialog
+import org.simbrain.util.showMessage
 import kotlin.math.max
 import kotlin.math.min
 
@@ -98,10 +98,10 @@ class TrainedPatterns(
 
     fun showCorrelations() {
         if (entries.isEmpty()) {
-            showMessageDialog(
-                "No patterns have been trained yet. Load a pattern and press a train button first.",
-                "Trained pattern correlations",
-                rows = 3
+            showMessage(
+                "Load a pattern and press a train button, then show correlations again.",
+                heading = "No patterns trained yet",
+                title = "Trained pattern correlations"
             )
             return
         }

@@ -9,7 +9,6 @@ import java.awt.Color
 import java.io.File
 import java.util.prefs.Preferences
 import javax.swing.JButton
-import javax.swing.JOptionPane
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty
 import kotlin.reflect.full.declaredMemberProperties
@@ -262,8 +261,12 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder, title: String): StandardDi
         contentPane = ape
         addButton(JButton("Revert to Default").apply {
             addActionListener {
-                val result = showWarningConfirmDialog("Reverting to default preferences. This action cannot be undone.")
-                if (result == JOptionPane.YES_OPTION) {
+                if (showConfirm(
+                        "Reverting to default preferences. This action cannot be undone.",
+                        okLabel = "Revert",
+                        kind = MessageKind.WARNING
+                    )
+                ) {
                     prefHolder.revertToDefault()
                 }
                 closeDialogCancel()

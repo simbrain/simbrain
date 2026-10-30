@@ -1,14 +1,18 @@
 /** Presents a Font object compactly and accepts drafts from its dedicated font chooser. */
 package org.simbrain.util.propertyeditor
 
+import org.simbrain.util.MessageKind
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.util.widgets.FontChanges
 import org.simbrain.util.widgets.FontChooserPanel
 import java.awt.BorderLayout
 import java.awt.Font
-import javax.swing.*
+import javax.swing.JButton
+import javax.swing.JLabel
+import javax.swing.JPanel
+import javax.swing.SwingUtilities
 import kotlin.reflect.KProperty
 
 class FontWidget<O : EditableObject>(
@@ -32,7 +36,7 @@ class FontWidget<O : EditableObject>(
             object : StandardDialog(SwingUtilities.getWindowAncestor(widget), "Font") {
                 override fun closeDialogOk() {
                     if (!chooser.hasValidInput) {
-                        showWarningDialog("Enter a font name and a positive whole-number size.", "Invalid font")
+                        showMessage("Enter a font name and a positive whole-number size.", MessageKind.WARNING, title = "Invalid font")
                         return
                     }
                     super.closeDialogOk()

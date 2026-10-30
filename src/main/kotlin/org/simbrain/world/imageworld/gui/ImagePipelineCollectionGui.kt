@@ -11,7 +11,10 @@ import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import org.simbrain.world.imageworld.transformations.ImagePipelineCollection
 import java.awt.Color
 import java.awt.Dimension
-import javax.swing.*
+import javax.swing.JButton
+import javax.swing.JComboBox
+import javax.swing.JLabel
+import javax.swing.JToolBar
 
 /**
  * Provides a toolbar for adding, deleting, and setting a current pipeline
@@ -63,8 +66,7 @@ class ImagePipelineCollectionGui(
     }
     private val deletePipelineButton = JButton(imageWorldDesktopComponent.createAction(iconPath = "menu_icons/minus.png") {
         val currentPipeline = imagePipelineCollection.currentPipeline
-        val dialogResult = showWarningConfirmDialog("Are you sure you want to delete pipeline \"${currentPipeline.name}\"?")
-        if (dialogResult == JOptionPane.YES_OPTION) {
+        if (showConfirm("Are you sure you want to delete pipeline \"${currentPipeline.name}\"?", okLabel = "Delete")) {
             imagePipelineCollection.removePipeline(currentPipeline)
             // Set to first pipeline after deletion
             if (imagePipelineCollection.pipelines.isNotEmpty()) {
@@ -79,8 +81,7 @@ class ImagePipelineCollectionGui(
         description = "Fill canvas using current color",
         iconPath = "menu_icons/fill.png"
     ) {
-        val confirm = showWarningConfirmDialog("Are you sure you want to fill the canvas?")
-        if (confirm == JOptionPane.YES_OPTION) {
+        if (showConfirm("Are you sure you want to fill the canvas?", okLabel = "Fill")) {
             imageWorld.imageAlbum.currentImage.fill(imageWorld.penColor)
             imageWorld.imageAlbum.fireImageUpdate()
         }
@@ -91,8 +92,7 @@ class ImagePipelineCollectionGui(
         description = "Clear canvas (with black pixels)",
         iconPath = "menu_icons/Eraser.png"
     ) {
-        val confirm = showWarningConfirmDialog("Are you sure you want to clear the canvas?")
-        if (confirm == JOptionPane.YES_OPTION) {
+        if (showConfirm("Are you sure you want to clear the canvas?", okLabel = "Clear")) {
             imageWorld.imageAlbum.currentImage.fill(Color.black)
             imageWorld.imageAlbum.fireImageUpdate()
         }

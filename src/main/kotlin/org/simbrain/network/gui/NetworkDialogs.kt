@@ -666,7 +666,7 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
         freeSynapses.forEach { appendModel(it) }
     }
 
-    showMessageDialog(sb.toString(), "Network Debug Info", rows = 30, columns = 60)
+    showText(sb.toString(), "Network Debug Info")
 }
 
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {

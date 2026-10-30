@@ -58,10 +58,11 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 - Do not add class-level documentation just to repeat a file header; retain declaration documentation only when it independently clarifies a public API or non-obvious behavior
 - Skip a file header when it would be purely redundant, such as for a trivial file whose purpose is fully clear from its name and sole declaration
 - Apply this convention only to Kotlin source and test files, not Java files
-- Prefer dialog helpers in `org.simbrain.util.SwingUtils.kt` (e.g. `showWarningDialog`, `showWarningConfirmDialog`, `showInputDialog`) instead of creating new raw `JOptionPane` dialogs
+- Prefer dialog helpers in `org.simbrain.util.SwingUtils.kt` (`showMessage`, `showConfirm`, `showChoice`, `showResults`, `showText`, `showInputDialog`) instead of creating new raw `JOptionPane` dialogs
 - If a needed dialog helper does not exist, add a reusable utility in `SwingUtils.kt` rather than duplicating dialog setup in feature code
 - Do not use code comment separators of any kind (for example `// ----- Section -----`, `// --- Section ---`, `// ========`, or `// ── Section ─────────────────`)
 - Use minimal plain comments only when they add clarity
+- Write new comments and docs about the code as it now is: do not mention the discussion that produced a change, previous names, or what was renamed or replaced
 - Keep hand-written comments: explanations of intent, rationale, domain meaning, caveats, or decision history are valuable even if long or informal; never delete or rewrite them as part of a cleanup
 - Short `@param` / `@return` tags are fine (doc builders use them); trim one only when it is fully redundant with the summary sentence above it and adds no detail
 - When converting Java to Kotlin, prefer `?` over prose for nullability, but do not strip other Javadoc

@@ -465,14 +465,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                             }
                             isEnabled = canShowEigenValues
                         }) {
-                        val eigenValues = weightMatrix.weights.eigenValuesString()
-                        val formattedEigenvalues = eigenValues.chunked(10).joinToString("\n") { chunk ->
-                            chunk.joinToString(", ")
-                        }
-                        showMessageDialog(
-                            "[$formattedEigenvalues]",
-                            "Eigenvalues"
-                        )
+                        showEigenvalues(weightMatrix.weights)
                     }
                 )
                 contextMenu.add(

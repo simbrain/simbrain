@@ -13,10 +13,10 @@ import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.network.updaterules.activity_generators.SinusoidalRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.util.place
+import org.simbrain.util.showChoice
 import org.simbrain.util.showNumericInputDialog
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.util.stats.distributions.PoissonDistribution
-import javax.swing.JOptionPane
 import kotlin.math.sqrt
 
 /**
@@ -191,19 +191,13 @@ val spikingNetworkSimulation = newSim {
                 }
             }
             addButton("Neuron Type") {
-                val options = arrayOf("Integrate and Fire", "Izhikevich", "Spiking Threshold")
-                val selectedOption = JOptionPane.showOptionDialog(
-                    null,
+                val selectedOption = showChoice(
                     "Select neuron update rule:",
-                    "Change Neuron Type",
-                    JOptionPane.YES_NO_CANCEL_OPTION,
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    options,
-                    options[0]
+                    listOf("Integrate and Fire", "Izhikevich", "Spiking Threshold"),
+                    title = "Change Neuron Type"
                 )
 
-                if (selectedOption != JOptionPane.CLOSED_OPTION) {
+                if (selectedOption != null) {
                     // Change all neurons to the selected update rule
                     neurons.forEach { neuron ->
                         neuron.updateRule = when (selectedOption) {

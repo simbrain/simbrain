@@ -8,19 +8,12 @@
 package org.simbrain.util.widgets
 
 import net.miginfocom.swing.MigLayout
-import org.simbrain.util.showInfoDialog
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.MessageKind
+import org.simbrain.util.showMessage
 import java.util.regex.Matcher
 import java.util.regex.Pattern
 import java.util.regex.PatternSyntaxException
-import javax.swing.ButtonGroup
-import javax.swing.JButton
-import javax.swing.JCheckBox
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JRadioButton
-import javax.swing.JTextField
+import javax.swing.*
 
 class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPane) : JPanel() {
 
@@ -115,7 +108,7 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
         return try {
             Pattern.compile(patternText, flags)
         } catch (e: PatternSyntaxException) {
-            showWarningDialog("Invalid regular expression: ${e.description}")
+            showMessage("Invalid regular expression: ${e.description}", MessageKind.WARNING)
             null
         }
     }
@@ -170,7 +163,7 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
             val replacement = try {
                 matcher.replaceFirst(replacementText())
             } catch (e: RuntimeException) {
-                showWarningDialog("Invalid replacement: ${e.message}")
+                showMessage("Invalid replacement: ${e.message}", MessageKind.WARNING)
                 return
             }
             textPane.replaceSelection(replacement)
@@ -187,11 +180,11 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
             val replaced = try {
                 matcher.replaceAll(replacementText())
             } catch (e: RuntimeException) {
-                showWarningDialog("Invalid replacement: ${e.message}")
+                showMessage("Invalid replacement: ${e.message}", MessageKind.WARNING)
                 return
             }
             textPane.text = replaced
         }
-        showInfoDialog("$count occurrence(s) replaced.", "Replace All")
+        showMessage("$count occurrence(s) replaced.", title = "Replace All")
     }
 }

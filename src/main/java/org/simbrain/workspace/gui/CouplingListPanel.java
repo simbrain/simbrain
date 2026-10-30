@@ -1,13 +1,12 @@
 package org.simbrain.workspace.gui;
 
+import org.simbrain.util.MessageKind;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
-
-import static org.simbrain.workspace.gui.CouplingTransformDialogKt.showTransformEditor;
 
 import javax.swing.*;
 import java.awt.*;
@@ -16,6 +15,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.Collection;
+
+import static org.simbrain.workspace.gui.CouplingTransformDialogKt.showTransformEditor;
 
 /**
  * Displays a list of the current couplings in the network.
@@ -75,7 +76,7 @@ public class CouplingListPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             java.util.List<Coupling> selected = getSelectedCouplings();
             if (selected.size() != 1) {
-                SwingUtilsKt.showWarningDialog("Select a single coupling to edit its transforms.", "Edit Transforms");
+                SwingUtilsKt.showMessage("Select a single coupling to edit its transforms.", MessageKind.WARNING, null, "Edit Transforms");
                 return;
             }
             showTransformEditor(CouplingListPanel.this, desktop.getWorkspace(), selected.get(0));

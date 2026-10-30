@@ -1,8 +1,9 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.util.MessageKind
 import org.simbrain.util.StandardDialog
-import org.simbrain.util.showErrorDialog
+import org.simbrain.util.showMessage
 
 /**
  * Dialog for creating a generic layered network.
@@ -22,7 +23,7 @@ open class FeedForwardCreationDialog(protected val networkPanel: NetworkPanel) :
             networkCreationPanel.commit(networkPanel, "FeedForward")
             super.closeDialogOk()
         } catch (nfe: NumberFormatException) {
-            showErrorDialog("Inappropriate Field Values (Numbers only in all fields)")
+            showMessage("Inappropriate Field Values (Numbers only in all fields)", MessageKind.ERROR)
             nfe.printStackTrace()
         }
     }

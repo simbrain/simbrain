@@ -225,7 +225,7 @@ class WandPalettePanel(
             palette.removeAction(index)
             savePalette()
         } else {
-            showWarningDialog("Cannot delete the last action. The palette must have at least one action.", "Cannot Delete")
+            showMessage("Cannot delete the last action. The palette must have at least one action.", MessageKind.WARNING, title = "Cannot Delete")
         }
     }
 
@@ -250,13 +250,13 @@ class WandPalettePanel(
                 palette.setActions(imported.actions)
                 savePalette()
             } catch (e: Exception) {
-                showErrorDialog("Failed to import palette: ${e.message}", "Import Error")
+                showMessage("Failed to import palette: ${e.message}", MessageKind.ERROR, title = "Import Error")
             }
         }
     }
 
     private fun revertToDefault() {
-        if (showWarningConfirmDialog("Reset palette to default actions? This cannot be undone.") == JOptionPane.YES_OPTION) {
+        if (showConfirm("Reset palette to default actions? This cannot be undone.", okLabel = "Reset", kind = MessageKind.WARNING)) {
             val defaultPalette = WandPalette.createDefault()
             palette.setActions(defaultPalette.actions)
             savePalette()

@@ -11,10 +11,11 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
+import org.simbrain.util.MessageKind
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import org.simbrain.util.showWarningDialog
+import org.simbrain.util.showMessage
 import org.simbrain.util.stats.distributions.TwoValued
 import org.simbrain.util.stats.distributions.UniformIntegerDistribution
 import org.simbrain.util.table.BasicDataFrame
@@ -104,7 +105,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
                     syncDataSet()
                     train()
                 } catch(e: Exception) {
-                    showWarningDialog(e.message.toString())
+                    showMessage(e.message.toString(), MessageKind.WARNING)
                 }
             }
         }

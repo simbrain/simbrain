@@ -360,26 +360,26 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     override fun closeDialogOk() {
         val inputShape = getInputShape()
         if (inputShape == null) {
-            showErrorDialog("Invalid input shape.")
+            showMessage("Invalid input shape.", MessageKind.ERROR)
             return
         }
 
         if (tensorLayers.isEmpty()) {
-            showErrorDialog("Add at least one tensor layer.")
+            showMessage("Add at least one tensor layer.", MessageKind.ERROR)
             return
         }
 
         val outputNeurons = try {
             outputNeuronsField.text.trim().toInt().also { require(it > 0) }
         } catch (e: Exception) {
-            showErrorDialog("Invalid output neuron count.")
+            showMessage("Invalid output neuron count.", MessageKind.ERROR)
             return
         }
 
         // Validate dense layer neuron counts
         for ((i, spec) in denseLayers.withIndex()) {
             if (spec.neurons <= 0) {
-                showErrorDialog("Dense layer ${i + 1} must have > 0 neurons.")
+                showMessage("Dense layer ${i + 1} must have > 0 neurons.", MessageKind.ERROR)
                 return
             }
         }
@@ -390,7 +390,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
             try {
                 currentShape = spec.outputShape(currentShape)
             } catch (e: Exception) {
-                showErrorDialog("Error in tensor layer ${i + 1}: ${e.message}")
+                showMessage("Error in tensor layer ${i + 1}: ${e.message}", MessageKind.ERROR)
                 return
             }
         }

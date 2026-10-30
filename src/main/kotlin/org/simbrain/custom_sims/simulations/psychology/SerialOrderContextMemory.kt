@@ -10,7 +10,7 @@ import org.simbrain.network.util.alignNetworkModels
 import org.simbrain.util.format
 import org.simbrain.util.place
 import org.simbrain.util.point
-import org.simbrain.util.showResultsDialog
+import org.simbrain.util.showResults
 import kotlin.math.cos
 import kotlin.math.ln
 import kotlin.math.sqrt
@@ -234,7 +234,7 @@ val serialOrderContextMemory = newSim {
             resetTrial()
         }
         val columns = listOf("Accuracy", "Mean transposition distance", "Intrusions")
-        showResultsDialog("Positional Context Benchmark") {
+        showResults("Positional Context Benchmark") {
             note("Burgess-Hitch positional-context core, $trials trials per condition, list length $benchmarkListLength")
             section("Letter-selection noise sweep", columns) {
                 note("Retention per step held at ${savedDecayMultiplier.format(2)}")

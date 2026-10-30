@@ -79,13 +79,13 @@ fun fetchDataFromUrl(urlString: String): String? {
             progressWindow.close()
             return result.toString()
         } else {
-            showWarningDialog("Failed to fetch data. Response code: $responseCode")
             progressWindow.close()
+            showMessage("Failed to fetch data. Response code: $responseCode", MessageKind.WARNING)
             return null
         }
     } catch (e: Exception) {
         progressWindow?.close()
-        showWarningDialog("An error occurred: ${e.message}")
+        showMessage("An error occurred: ${e.message}", MessageKind.WARNING)
         return null
     }
 }
@@ -145,7 +145,7 @@ fun saveToCache(file: File, data: String) {
         file.parentFile.mkdirs() // Create parent directories if they don't exist
         file.writeText(data)
     } catch (e: IOException) {
-        showWarningDialog("Failed to save cache: ${e.message}")
+        showMessage("Failed to save cache: ${e.message}", MessageKind.WARNING)
     }
 }
 
@@ -215,7 +215,7 @@ fun fetchDataWithCache(urlString: String): String? {
 fun downloadFile(url: String, target: File, expectedChecksum: String? = null): Boolean {
     val digest: MessageDigest? = if (expectedChecksum != null) {
         digestFor(expectedChecksum)
-            ?: run { showWarningDialog("Unrecognised checksum length (${expectedChecksum.length} hex chars)"); return false }
+            ?: run { showMessage("Unrecognised checksum length (${expectedChecksum.length} hex chars)", MessageKind.WARNING); return false }
     } else null
 
     // Stream into a sibling .part and promote atomically, so an abrupt exit mid-download can
@@ -230,7 +230,7 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
         val response = client.send(request, HttpResponse.BodyHandlers.ofInputStream())
 
         if (response.statusCode() != 200) {
-            showWarningDialog("Failed to download ${target.name} (HTTP ${response.statusCode()})")
+            showMessage("Failed to download ${target.name} (HTTP ${response.statusCode()})", MessageKind.WARNING)
             return false
         }
 
@@ -256,7 +256,7 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
         progressWindow.close()
     } catch (e: Exception) {
         progressWindow?.close()
-        showWarningDialog("Error downloading ${target.name}: ${e.message}")
+        showMessage("Error downloading ${target.name}: ${e.message}", MessageKind.WARNING)
         part.delete()
         return false
     }
@@ -264,7 +264,13 @@ fun downloadFile(url: String, target: File, expectedChecksum: String? = null): B
     if (digest != null && expectedChecksum != null) {
         val actual = digest.digest().joinToString("") { "%02x".format(it) }
         if (!actual.equals(expectedChecksum, ignoreCase = true)) {
-            showWarningDialog("Checksum mismatch for ${target.name}.\nExpected: $expectedChecksum\nActual:   $actual")
+            showMessage(
+                "The checksum of ${target.name} does not match. The file may be incomplete or corrupted; " +
+                    "try downloading again.",
+                MessageKind.ERROR,
+                heading = "Download failed",
+                details = listOf("Expected" to expectedChecksum, "Actual" to actual)
+            )
             part.delete()
             return false
         }
@@ -378,7 +384,7 @@ fun fetchZipWithCache(url: String, expectedChecksum: String? = null): File? {
         }
     } catch (e: Exception) {
         extractDir.deleteRecursively()
-        showWarningDialog("Error extracting $zipName: ${e.message}")
+        showMessage("Error extracting $zipName: ${e.message}", MessageKind.WARNING)
         return null
     } finally {
         zipFile.delete()
@@ -419,7 +425,7 @@ fun extractTarGz(tarGzFile: File, destDir: File): Boolean {
         true
     } catch (e: Exception) {
         destDir.deleteRecursively()
-        showWarningDialog("Error extracting ${tarGzFile.name}: ${e.message}")
+        showMessage("Error extracting ${tarGzFile.name}: ${e.message}", MessageKind.WARNING)
         false
     }
 }

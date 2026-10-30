@@ -1,11 +1,12 @@
 package org.simbrain.world.imageworld
 
+import org.simbrain.util.MessageKind
+import org.simbrain.util.showMessage
 import java.awt.Image
 import java.awt.Toolkit
 import java.awt.datatransfer.*
 import java.awt.image.BufferedImage
 import java.io.IOException
-import org.simbrain.util.showWarningDialog
 
 class ImageClipboard(private val world: ImageWorld) : ClipboardOwner {
     private inner class TransferableImage(private val image: Image) : Transferable {
@@ -48,9 +49,9 @@ class ImageClipboard(private val world: ImageWorld) : ClipboardOwner {
                 graphics.dispose()
                 world.imageAlbum.addImage(bufferedImage)
             } catch (ex: UnsupportedFlavorException) {
-                showWarningDialog("Unable to read image from clipboard: ${ex.message}")
+                showMessage("Unable to read image from clipboard: ${ex.message}", MessageKind.WARNING)
             } catch (ex: IOException) {
-                showWarningDialog("Unable to read image from clipboard: ${ex.message}")
+                showMessage("Unable to read image from clipboard: ${ex.message}", MessageKind.WARNING)
             }
         }
     }

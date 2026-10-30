@@ -231,7 +231,7 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
     }
     addButton("Test generalization") {
         if (workspace.updater.isRunning) {
-            withContext(Dispatchers.Swing) { showWarningDialog("Stop the simulation before testing generalization.") }
+            withContext(Dispatchers.Swing) { showMessage("Stop the simulation before testing generalization.", MessageKind.WARNING) }
             return@addButton
         }
         val testingSets = tinyMnistTestVariants.map { it to it.applyTo(data.testingSet) }
@@ -259,7 +259,7 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
                 progressBar.value = 100
                 progressBar.string = "Done"
             }
-            showResultsDialog("Generalization accuracy") {
+            showResults("Generalization accuracy") {
                 section("Training set") {
                     row("${"%,d".format(trainingSet.size)} training images", formatPercent(trainingAccuracy))
                 }

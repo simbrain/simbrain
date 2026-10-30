@@ -234,10 +234,11 @@ val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
     )
     if (languageModel.trainer.testingWindows.isEmpty() && testTextFinal.isNotEmpty()) {
         withGui {
-            showWarningDialog(
-                "Warning: Test set is empty because there is insufficient test data.\n\n" +
-                "If test data is desired, at least ${contextSize + 1} tokens are required for the test set.\n" +
-                "To achieve this, consider lowering the train/test split ratio or using a larger dataset"
+            showMessage(
+                "If test data is desired, at least ${contextSize + 1} tokens are required for the test set. " +
+                    "To achieve this, consider lowering the train/test split ratio or using a larger dataset.",
+                MessageKind.WARNING,
+                heading = "Test set is empty because there is insufficient test data"
             )
         }
     }

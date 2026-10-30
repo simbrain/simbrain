@@ -1,7 +1,8 @@
 package org.simbrain.network.gui.dialogs
 
 import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.util.showErrorDialog
+import org.simbrain.util.MessageKind
+import org.simbrain.util.showMessage
 
 /**
  * Dialog for creating a Backprop network.
@@ -17,7 +18,7 @@ class BackpropCreationDialog(networkPanel: NetworkPanel) : FeedForwardCreationDi
             networkCreationPanel.commit(networkPanel, "Backprop")
             dispose()
         } catch (nfe: NumberFormatException) {
-            showErrorDialog("Inappropriate Field Values (Numbers only in all fields)")
+            showMessage("Inappropriate Field Values (Numbers only in all fields)", MessageKind.ERROR)
             nfe.printStackTrace()
         }
     }

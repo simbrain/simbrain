@@ -7,7 +7,7 @@ import org.simbrain.network.trainers.*
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.place
 import org.simbrain.util.runWithProgressWindow
-import org.simbrain.util.showResultsDialog
+import org.simbrain.util.showResults
 import kotlin.math.sqrt
 
 // Tunable parameters
@@ -299,7 +299,7 @@ val categoricalPerception = newSim {
             }
         }
 
-        showResultsDialog("Repr Layer Analysis") {
+        showResults("Repr Layer Analysis") {
             note("Condition: ${condition.displayName}")
             note("Repr layer size: $REPR_LAYER_SIZE, samples per class: $trainSamplesPerClass")
 

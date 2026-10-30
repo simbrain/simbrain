@@ -1,6 +1,7 @@
 package org.simbrain.workspace.gui.couplingmanager;
 
 import kotlin.Pair;
+import org.simbrain.util.MessageKind;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
@@ -16,10 +17,10 @@ import org.simbrain.workspace.gui.couplingmanager.AttributePanel.ProducerOrConsu
 import smile.math.matrix.Matrix;
 
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.lang.reflect.Type;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * GUI dialog for creating couplings.
@@ -144,7 +145,7 @@ public class DesktopCouplingManager extends JPanel {
         List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
 
         if ((producers.size() == 0) || (consumers.size() == 0)) {
-            SwingUtilsKt.showWarningDialog("You must select at least one consuming and producing attribute\nto create couplings.", "No Attributes Selected Warning");
+            SwingUtilsKt.showMessage("Select at least one consuming and one producing attribute to create couplings.", MessageKind.WARNING, "No attributes selected");
             return;
         }
 
@@ -156,7 +157,7 @@ public class DesktopCouplingManager extends JPanel {
                 desktop.getWorkspace().getCouplingManager().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
-            SwingUtilsKt.showWarningDialog(e.getMessage(), "Unmatched Attributes");
+            SwingUtilsKt.showMessage(Objects.requireNonNullElse(e.getMessage(), "The selected attributes cannot be coupled."), MessageKind.WARNING, null, "Unmatched Attributes");
         }
     }
 
@@ -169,7 +170,7 @@ public class DesktopCouplingManager extends JPanel {
         List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
 
         if (producers.size() != 1 || consumers.size() != 1) {
-            SwingUtilsKt.showWarningDialog("Select exactly one producer and one consumer\nto create a coupling with transforms.", "Add With Transforms");
+            SwingUtilsKt.showMessage("Select exactly one producer and one consumer to create a coupling with transforms.", MessageKind.WARNING, null, "Add With Transforms");
             return;
         }
         CouplingTransformDialogKt.showTransformEditorForNewCoupling(this, desktop.getWorkspace(), producers.get(0), consumers.get(0));

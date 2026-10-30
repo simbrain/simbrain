@@ -8,9 +8,10 @@ import org.simbrain.network.core.*
 import org.simbrain.network.trainers.CnnLossFunction
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.network.updaterules.SoftmaxRule
+import org.simbrain.util.MessageKind
 import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.place
-import org.simbrain.util.showWarningConfirmDialog
+import org.simbrain.util.showConfirm
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.world.odorworld.OdorWorldPreferences
@@ -21,7 +22,10 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.io.File
 import java.util.concurrent.atomic.AtomicBoolean
-import javax.swing.*
+import javax.swing.BorderFactory
+import javax.swing.JButton
+import javax.swing.JPanel
+import javax.swing.WindowConstants
 import kotlin.math.PI
 import kotlin.math.atan2
 import kotlin.math.cos
@@ -102,13 +106,15 @@ val objectRecognition3D = newSim {
         if (estMb <= maxMb * 0.3) {
             return@withContext true
         }
-        showWarningConfirmDialog(
+        showConfirm(
             """
             Estimated dataset size is about $estMb MB (max heap: $maxMb MB).
 
             This may cause an OutOfMemoryError. Continue anyway?
-            """.trimIndent()
-        ) == JOptionPane.YES_OPTION
+            """.trimIndent(),
+            okLabel = "Continue",
+            kind = MessageKind.WARNING
+        )
     }
 
     suspend fun generateAndBuild(cancelRequested: AtomicBoolean = AtomicBoolean(false)): Boolean {

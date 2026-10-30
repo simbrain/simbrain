@@ -8,6 +8,7 @@ import org.jfree.chart.plot.PlotOrientation;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYBarRenderer;
 import org.simbrain.plot.*;
+import org.simbrain.util.MessageKind;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 
@@ -16,6 +17,7 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Iterator;
+import java.util.Objects;
 
 /**
  * Panel to display histogram. Used both for the plot component and as a
@@ -161,7 +163,7 @@ public class HistogramPanel extends JPanel {
                     model.applyCurrentData();
                 } catch (NumberFormatException nfe) {
                     nfe.printStackTrace();
-                    SwingUtilsKt.showErrorDialog("Non-Integer number of bins.");
+                    SwingUtilsKt.showMessage("Non-Integer number of bins.", MessageKind.ERROR);
                 }
             }
 
@@ -212,10 +214,10 @@ public class HistogramPanel extends JPanel {
 
         } catch (IllegalArgumentException iaEx) {
             iaEx.printStackTrace();
-            SwingUtilsKt.showErrorDialog(iaEx.getMessage());
+            SwingUtilsKt.showMessage(Objects.requireNonNullElse(iaEx.getMessage(), "Could not create the histogram."), MessageKind.ERROR);
         } catch (IllegalStateException isEx) {
             isEx.printStackTrace();
-            SwingUtilsKt.showErrorDialog(isEx.getMessage());
+            SwingUtilsKt.showMessage(Objects.requireNonNullElse(isEx.getMessage(), "Could not create the histogram."), MessageKind.ERROR);
         }
         mainPanel = new SimbrainChartPanel(mainChart);
         // Per-notification repaints only mark the chart dirty; frames are self-clocked

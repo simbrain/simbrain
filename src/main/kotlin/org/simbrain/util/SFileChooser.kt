@@ -8,7 +8,6 @@ import java.util.*
 import javax.swing.JDialog
 import javax.swing.JFileChooser
 import javax.swing.JFrame
-import javax.swing.JOptionPane
 import javax.swing.filechooser.FileFilter
 
 /**
@@ -286,19 +285,10 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
      * @return whether the user selected "yes"
      */
     fun confirmOverwrite(file: File): Boolean {
-        val message = "The file \"" + file.getName() + "\" already exists. Overwrite?"
-
-        val options = arrayOf<Any?>("OK", "Cancel")
-
-        return JOptionPane.YES_OPTION == JOptionPane.showOptionDialog(
-            null,
-            message,
-            "Warning",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.WARNING_MESSAGE,
-            null,
-            options,
-            options[0]
+        return showConfirm(
+            "The file \"${file.name}\" already exists. Overwrite?",
+            okLabel = "Overwrite",
+            kind = MessageKind.WARNING
         )
     }
 
@@ -324,9 +314,7 @@ class SFileChooser(currentDirectory: String, description: String? = null, extens
     fun checkEmptyFileWarningDialog(file: File?) {
         if (file != null && checkEmptyFile) {
             if (file.exists() && file.length() == 0L) {
-                showWarningDialog("""
-                    Warning: The file "${file.name}" is empty.
-                """.trimIndent())
+                showMessage("The file \"${file.name}\" is empty.", MessageKind.WARNING)
             }
         }
     }

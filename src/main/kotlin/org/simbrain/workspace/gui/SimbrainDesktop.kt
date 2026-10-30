@@ -309,10 +309,11 @@ object SimbrainDesktop {
         val warnedCouplings = mutableSetOf<Coupling>()
         workspace.couplingManager.events.couplingFailed.on(Dispatchers.Swing) { failure ->
             if (warnedCouplings.add(failure.coupling)) {
-                showWarningDialog(
+                showMessage(
                     "Coupling ${failure.coupling.description} failed to update and will keep failing " +
                             "silently until fixed:\n${failure.cause}",
-                    "Coupling Failed"
+                    MessageKind.WARNING,
+                    title = "Coupling Failed"
                 )
             }
         }
@@ -1085,11 +1086,11 @@ object SimbrainDesktop {
             return true
         }
         return when (showHasChangedDialog()) {
-            JOptionPane.OK_OPTION -> {
+            0 -> {
                 save()
                 !workspace.changesExist()
             }
-            JOptionPane.NO_OPTION -> true
+            1 -> true
             else -> false
         }
     }
@@ -1114,7 +1115,7 @@ object SimbrainDesktop {
             e.printStackTrace(PrintWriter(sw))
             e.printStackTrace()
             val stackTrace = sw.toString()
-            showMessageDialog("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
+            showText("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
         }
 
         /*
@@ -1133,20 +1134,15 @@ object SimbrainDesktop {
     /**
      * Checks to see if anything has changed and then offers to save if true.
      *
-     * @return the JOptionPane pane result
+     * @return the index of the button clicked (Save, Don't Save, Cancel), or null if the dialog was closed
      */
-    private fun showHasChangedDialog(): Int {
-        val options = arrayOf("Save", "Don't Save", "Cancel")
-        return showOptionDialog(
-            """
-     The workspace has changed since last save,
-     Would you like to save these changes?
-     """.trimIndent(),
-            "Workspace Has Changed",
-            options,
-            0
-        )
-    }
+    private fun showHasChangedDialog(): Int? = showChoice(
+        "Would you like to save these changes?",
+        listOf("Save", "Don't Save", "Cancel"),
+        kind = MessageKind.WARNING,
+        heading = "The workspace has changed since it was last saved",
+        title = "Workspace Has Changed"
+    )
 
     /**
      * Quit application.

@@ -3,7 +3,7 @@ package org.simbrain.world.textworld.gui
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.Utils
 import org.simbrain.util.createAction
-import org.simbrain.util.showMessageDialog
+import org.simbrain.util.showText
 import org.simbrain.util.table.*
 import org.simbrain.world.textworld.TokenEmbedding
 import org.simbrain.world.textworld.createExtractEmbeddingAction
@@ -22,7 +22,7 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
         iconPath = "menu_icons/DocumentInfo.png",
     ) {
         (trainingDocument ?: initialTokenEmbedding.trainingDocument)?.let { document ->
-            showMessageDialog(document, "Source Document for Embedding")
+            showText(document, "Source Document for Embedding")
         }
     }.apply {
         // Enabled / disabled by [#trainingDocument]

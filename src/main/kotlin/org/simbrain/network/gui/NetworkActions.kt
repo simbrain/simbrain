@@ -555,7 +555,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             } catch (e: IOException) {
                 println("[DEBUG_LOG] Error saving file: ${e.message}")
                 e.printStackTrace()
-                showErrorDialog("Error saving file: ${e.message}", "Save error")
+                showMessage("Error saving file: ${e.message}", MessageKind.ERROR, title = "Save error")
             }
         } else {
             println("[DEBUG_LOG] No file selected for save")
@@ -991,7 +991,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             it.synapses.size > NetworkPreferences.synapseVisibilityThreshold
         }
         if (groupsAboveThreshold.isNotEmpty()) {
-            showWarningDialog("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}")
+            showMessage("Current visibility threshold: ${NetworkPreferences.synapseVisibilityThreshold}. \nCould not toggle visibility of:\n${groupsAboveThreshold.joinToString("\n") { "  ${it.displayName} (size: ${it.size()})" }}", MessageKind.WARNING)
         }
         // A manual toggle pins visibility: stop auto-tracking the threshold so the user's choice sticks.
         groupsBelowThreshold.forEach {

@@ -58,9 +58,6 @@ object UiWork {
         active -= poster
     }
 
-    /** The primitives with work scheduled, for diagnostics. */
-    internal fun activePosters(): List<UiPoster> = active.toList()
-
     /**
      * Runs every pending update now instead of when its rate cap next allows, so a caller about to paint (such as a
      * per-iteration display sync) draws the latest state. Must be called on the EDT.
@@ -112,13 +109,10 @@ sealed class UiPoster(private val scope: CoroutineScope, private val minInterval
     /** Runs the pending work on the EDT; returns false when there was none. */
     protected abstract fun runPending(): Boolean
 
-    internal abstract fun hasPending(): Boolean
+    protected abstract fun hasPending(): Boolean
 
     /** Drops pending work without running it. */
     protected abstract fun dropPending()
-
-    /** Whether a run loop is scheduled or running. */
-    internal val isRunning get() = running.get()
 
     /**
      * Applies anything pending right now, blocking until it has run on the EDT. For saves and other callers that

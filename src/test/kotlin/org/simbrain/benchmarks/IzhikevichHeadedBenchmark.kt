@@ -13,10 +13,8 @@
  * that harness does from it. The demo is 1000 neurons at p = 0.1 and dt = 0.5; the size sweep's networks scale weights
  * by 100 / in-degree.
  *
- * Diagnostic switches, recorded in the output when set: -Dbench.dirtyLog=true counts dirty-region requests by
- * component class; -Dbench.syncLog=true records which UI primitives are pending at each step's display sync;
- * -Dbench.noCount=true leaves out the spike counting (and so the firing rate); -Dbench.direct=true updates the network
- * directly instead of iterating the workspace.
+ * Diagnostic switches, recorded in the output when set: -Dbench.noCount=true leaves out the spike counting (and so the
+ * firing rate); -Dbench.direct=true updates the network directly instead of iterating the workspace.
  */
 package org.simbrain.benchmarks
 
@@ -36,36 +34,9 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.updaterules.IzhikevichMatrixData
 import org.simbrain.plot.rasterchart.RasterPlotComponent
-import org.simbrain.util.UiWork
 import org.simbrain.util.updateAction
 import org.simbrain.workspace.gui.SimbrainDesktop
-import java.awt.Component
-import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.atomic.AtomicLong
-import javax.swing.JComponent
-import javax.swing.JLabel
-import javax.swing.JList
-import javax.swing.RepaintManager
-import javax.swing.SwingUtilities
 import kotlin.system.exitProcess
-
-/**
- * With -Dbench.dirtyLog=true, counts dirty-region requests by component class, to see what the GUI repaints per step.
- */
-private class DirtyCountingRepaintManager : RepaintManager() {
-    val counts = ConcurrentHashMap<String, AtomicLong>()
-    private val reported = ConcurrentHashMap.newKeySet<String>()
-
-    override fun addDirtyRegion(c: JComponent, x: Int, y: Int, w: Int, h: Int) {
-        counts.computeIfAbsent(c.javaClass.name) { AtomicLong() }.incrementAndGet()
-        if ((c is JList<*> || c.javaClass == JLabel::class.java) && reported.add(c.javaClass.name)) {
-            val path = generateSequence(c as Component) { it.parent }.take(8).joinToString(" < ") { it.javaClass.simpleName.ifEmpty { it.javaClass.name } }
-            System.err.println("first dirty ${c.javaClass.name}: ${(c as? JLabel)?.text ?: ""} | $path")
-            Throwable().stackTrace.take(25).forEach { System.err.println("    at $it") }
-        }
-        super.addDirtyRegion(c, x, y, w, h)
-    }
-}
 
 private class Settings(
     val mode: String,
@@ -113,9 +84,6 @@ fun main(args: Array<String>) {
 private suspend fun run(sim: NewSimulation, settings: Settings) {
     val headed = settings.mode != "headless"
     val t0 = System.nanoTime()
-    val dirtyLog = if (headed && System.getProperty("bench.dirtyLog") == "true") {
-        DirtyCountingRepaintManager().also { m -> SwingUtilities.invokeAndWait { RepaintManager.setCurrentManager(m) } }
-    } else null
     val workspace = openDemo(sim, headed)
     val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().single()
     val network = networkComponent.network
@@ -153,24 +121,6 @@ private suspend fun run(sim: NewSimulation, settings: Settings) {
 
     val counter = if (headed) networkComponent.countFrames() else null
     if (headed) settleDesktop()
-    val syncLog = ConcurrentHashMap<String, AtomicLong>()
-    if (headed && System.getProperty("bench.syncLog") == "true") {
-        val original = workspace.displaySync!!
-        val refresh = networkComponent.networkPanel().refreshAfterUpdate
-        workspace.displaySync = {
-            withContext(Dispatchers.Swing) {
-                val active = UiWork.activePosters()
-                syncLog.computeIfAbsent("syncs") { AtomicLong() }.incrementAndGet()
-                syncLog.computeIfAbsent("active=${active.size}") { AtomicLong() }.incrementAndGet()
-                val state = "panel refresh running=${refresh.isRunning} active=${refresh in active} dirty=${refresh.hasPending()}"
-                syncLog.computeIfAbsent(state) { AtomicLong() }.incrementAndGet()
-                active.forEach { poster ->
-                    syncLog.computeIfAbsent("$poster #${System.identityHashCode(poster)}") { AtomicLong() }.incrementAndGet()
-                }
-            }
-            original()
-        }
-    }
     val buildS = (System.nanoTime() - t0) / 1e9
 
     val dt = network.timeStep
@@ -180,9 +130,6 @@ private suspend fun run(sim: NewSimulation, settings: Settings) {
 
     val steps = Math.round(settings.simMs / dt).toInt()
     counting = true
-    dirtyLog?.counts?.clear()
-    syncLog.clear()
-    dirtyLog?.let { System.err.println("=== timed run starts") }
     val frames0 = counter?.frames?.get() ?: 0
     val t2 = System.nanoTime()
     if (System.getProperty("bench.direct") == "true") repeat(steps) { network.update() } else workspace.iterateSuspend(steps)
@@ -190,10 +137,6 @@ private suspend fun run(sim: NewSimulation, settings: Settings) {
     val frames = (counter?.frames?.get() ?: 0) - frames0
     counting = false
 
-    dirtyLog?.counts?.entries?.sortedByDescending { it.value.get() }?.take(12)?.forEach { (name, n) ->
-        System.err.println("dirty %8d %s".format(n.get(), name))
-    }
-    syncLog.entries.sortedByDescending { it.value.get() }.forEach { (name, n) -> System.err.println("sync %8d %s".format(n.get(), name)) }
     val simS = settings.simMs / 1000.0
     emitResult(
         "simulator" to "simbrain-gui",

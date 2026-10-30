@@ -267,7 +267,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
      * final state.
      */
-    internal val refreshAfterUpdate = viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+    private val refreshAfterUpdate = viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
         // The canvas, not the whole panel: toolbars and the status bar don't change with an update
         canvas.repaint()
         timeLabel.update()

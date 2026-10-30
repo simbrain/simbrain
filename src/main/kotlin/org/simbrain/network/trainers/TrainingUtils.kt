@@ -867,17 +867,19 @@ fun splitDataSet(
 ): Pair<TrainingDataset, TrainingDataset> {
     require(splitRatio in 0.0..1.0) { "splitRatio must be between 0.0 and 1.0" }
 
-    // Generate the same row indices that will be used for data splitting
+    // Shuffle once and use the same indices for the data and the row names, so each name stays with its row
     val nrows = dataset.inputs.size
     val rowIndices = (0 until nrows).shuffled(random)
     val trainRowCount = (nrows * splitRatio).toInt()
     val trainRowIndices = rowIndices.take(trainRowCount)
     val testRowIndices = rowIndices.drop(trainRowCount)
 
-    // Split the data using the existing function (but we already know the indices)
-    val (training, testing) = splitDataSet(dataset.inputs, dataset.targets, splitRatio, random)
-    val (trainingInputs, trainingTargets) = training
-    val (testingInputs, testingTargets) = testing
+    fun MutableList<MutableList<Double>>.selectRows(indices: List<Int>) =
+        indices.map { this[it].toMutableList() }.toMutableList()
+    val trainingInputs = dataset.inputs.selectRows(trainRowIndices)
+    val trainingTargets = dataset.targets.selectRows(trainRowIndices)
+    val testingInputs = dataset.inputs.selectRows(testRowIndices)
+    val testingTargets = dataset.targets.selectRows(testRowIndices)
 
     val trainingDataset = TrainingDataset(
         inputs = trainingInputs,

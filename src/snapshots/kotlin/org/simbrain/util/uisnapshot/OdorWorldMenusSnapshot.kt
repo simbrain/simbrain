@@ -60,7 +60,7 @@ class OdorWorldMenusSnapshot : UiSnapshotDef {
 
         SwingUtilities.invokeAndWait {
             val panel = gui.worldPanel
-            val entityPopup: JPopupMenu = panel.getEntityNode(entity).createContextMenu(panel)
+            val entityPopup: JPopupMenu = panel.getEntityNode(entity).createContextMenu()
             val columns = JPanel(FlowLayout(FlowLayout.LEFT, 0, 0)).apply {
                 add(column("Edit", panel.editMenu.menuComponents.toList()))
                 add(column("Insert", panel.insertMenu.menuComponents.toList()))

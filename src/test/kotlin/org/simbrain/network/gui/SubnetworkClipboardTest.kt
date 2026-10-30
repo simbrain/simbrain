@@ -10,6 +10,7 @@ import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.subnetworks.*
+import org.simbrain.util.onEdt
 import org.simbrain.workspace.gui.SimbrainDesktop
 
 class SubnetworkClipboardTest {
@@ -31,7 +32,7 @@ class SubnetworkClipboardTest {
 
     private fun subnetCount() = network.getModels<Subnetwork>().size
     private fun freeTextCount() = network.getModels<NetworkTextObject>().size
-    private fun neuronNodeCount() = panel.filterScreenElements<NeuronNode>().size
+    private fun neuronNodeCount() = onEdt { panel.filterScreenElements<NeuronNode>().size }
 
     /** Node removal on delete is fire-and-forget; poll until the canvas settles to [expected]. */
     private suspend fun awaitNeuronNodeCount(expected: Int) {
@@ -141,7 +142,7 @@ class SubnetworkClipboardTest {
         duplicate(comp)
         panel.undoManager.undo()
         // Back-to-back with no settle: exercises the model->node map race directly (see CollectionUtils
-        // CompletableDeferredHashMap.set / removeIfValue and NetworkPanel.batchNodeRemoval).
+        // CompletableDeferredHashMap.set / removeIfValue and NetworkPanel's batched node removal).
         panel.undoManager.redo()
 
         assertEquals(2, subnetCount())

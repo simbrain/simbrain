@@ -104,12 +104,13 @@ class ShortTermPlasticity : SpikeResponder() {
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val udfData = responderData as STPScalarData
-        val spiked = synapse.source.isSpike && probabilisticSpikeCheck()
+        val spiked = synapse.source.isSpike && spikeGetsThrough(synapse)
         if (spiked) {
             udfData.update(time, U, D, F)
         }
         val jumpHeight = udfData.R * synapse.strength * udfData.u
         synapse.rawPSR = when (val sr = spikeResponderLocal) {
+            // The spike has passed this responder's probability; the inner responder only shapes the response
             is JumpAndDecay -> sr.jumpAndDecay(spiked, synapse.rawPSR, jumpHeight, timeStep)
             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
         }
@@ -123,16 +124,17 @@ class ShortTermPlasticity : SpikeResponder() {
         val stpData = responderData as STPMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
+            val psrMatrix = wm.materializePsrMatrix()
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
-                    val spiked = spikeData.spikes[j] && probabilisticSpikeCheck()
+                    val spiked = spikeData.spikes[j] && spikeGetsThroughInOrder()
                     if (spiked) {
                         stpData.updateSingle(i, j, time, U, D, F)
                     }
                     val jumpHeight = stpData.R[i, j] * wm.weights[i, j] * stpData.u[i, j]
-                    wm.psrMatrix.set(
+                    psrMatrix.set(
                         i, j, when (val sr = spikeResponderLocal) {
-                            is JumpAndDecay -> sr.jumpAndDecay(spiked, wm.psrMatrix[i, j], jumpHeight, timeStep)
+                            is JumpAndDecay -> sr.jumpAndDecay(spiked, psrMatrix[i, j], jumpHeight, timeStep)
                             else -> throw IllegalStateException("STP can only be used with JumpAndDecay")
                         })
                 }

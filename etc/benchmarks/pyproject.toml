@@ -1,0 +1,25 @@
+[project]
+name = "simbrain-benchmarks"
+version = "0"
+description = "Performance benchmarks of Simbrain 4 against Simbrain 3, Brian2 and PyTorch"
+requires-python = ">=3.12,<3.13"
+dependencies = [
+    "brian2==2.10.1",
+    # Brian2's runtime mode compiles its generated code with Cython
+    "cython==3.1.3",
+    "numpy==2.5.3",
+    "setuptools",
+    "torch==2.14.1",
+]
+
+[tool.uv]
+package = false
+
+# CPU-only PyTorch on Linux; the default Linux wheel bundles CUDA. macOS wheels are CPU-only already.
+[tool.uv.sources]
+torch = [{ index = "pytorch-cpu", marker = "sys_platform == 'linux'" }]
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true

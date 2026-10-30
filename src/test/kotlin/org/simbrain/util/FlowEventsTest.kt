@@ -257,86 +257,6 @@ class FlowEventsTest {
     }
 
     @Test
-    fun `batch debounce delivers all values fired in a window as one list`() = runBlocking {
-        val events = FlowEvents()
-        val event = events.BatchOneArgEvent<String>(interval = 50, timingMode = FlowEvents.TimingMode.Debounce)
-        val batches = Collections.synchronizedList(mutableListOf<List<String>>())
-
-        event.on(Dispatchers.Default) { batches.add(it) }
-        delay(50) // let the subscriber attach to the eagerly-shared flush flow
-
-        event.fire("a")
-        event.fire("b")
-        event.fire("c")
-        delay(150) // past the debounce window
-
-        // Unlike a plain debounced OneArgEvent (which would deliver only "c"), the batch carries every value.
-        assertEquals(1, batches.size)
-        assertEquals(setOf("a", "b", "c"), batches.single().toSet())
-        events.close()
-    }
-
-    @Test
-    fun `batch clears between windows so values are not redelivered`() = runBlocking {
-        val events = FlowEvents()
-        val event = events.BatchOneArgEvent<String>(interval = 50, timingMode = FlowEvents.TimingMode.Debounce)
-        val batches = Collections.synchronizedList(mutableListOf<List<String>>())
-
-        event.on(Dispatchers.Default) { batches.add(it) }
-        delay(50)
-
-        event.fire("a")
-        event.fire("b")
-        delay(150) // first window flushes [a, b]
-
-        event.fire("c")
-        delay(150) // second window flushes [c] only
-
-        assertEquals(2, batches.size)
-        assertEquals(setOf("a", "b"), batches[0].toSet())
-        assertEquals(listOf("c"), batches[1])
-        events.close()
-    }
-
-    @Test
-    fun `batch throttle flushes each fired value exactly once across windows`() = runBlocking {
-        val events = FlowEvents()
-        val event = events.BatchOneArgEvent<Int>(interval = 50, timingMode = FlowEvents.TimingMode.Throttle)
-        val batches = Collections.synchronizedList(mutableListOf<List<Int>>())
-
-        event.on(Dispatchers.Default) { batches.add(it) }
-        delay(50)
-
-        event.fire(1)
-        event.fire(2)
-        delay(150)
-
-        assertEquals(listOf(1, 2), batches.flatten().sorted()) // every value delivered once, no loss/dupe
-        events.close()
-    }
-
-    @Test
-    fun `cancelling a batch subscriber stops further delivery`() = runBlocking {
-        val events = FlowEvents()
-        val event = events.BatchOneArgEvent<Int>(interval = 50, timingMode = FlowEvents.TimingMode.Debounce)
-        val batches = Collections.synchronizedList(mutableListOf<List<Int>>())
-
-        val job = event.on(Dispatchers.Default) { batches.add(it) }
-        delay(50)
-        event.fire(1)
-        delay(150)
-        assertEquals(1, batches.size)
-
-        job.cancel() // the eager flush flow keeps draining (to nobody); delivery stops
-        delay(50)
-        event.fire(2)
-        delay(150)
-
-        assertEquals(1, batches.size)
-        events.close()
-    }
-
-    @Test
     fun `noarg awaitable event awaits all handlers before fire returns`() = runBlocking {
         val events = FlowEvents()
         val event = events.NoArgAwaitableEvent()
@@ -472,6 +392,64 @@ class FlowEventsTest {
         delay(50)
         event.fire("second")
         withTimeout(2000) { laterRan.await() }
+        events.close()
+    }
+
+    @Test
+    fun `an immediate handler runs on the firing thread before fire returns`() {
+        val events = FlowEvents()
+        val event = events.OneArgEvent<Int>()
+        val seen = mutableListOf<Pair<Int, Thread>>()
+        event.onImmediate { seen += it to Thread.currentThread() }
+
+        event.fire(1)
+        event.fire(2)
+
+        assertEquals(listOf(1, 2), seen.map { it.first })
+        assertTrue(seen.all { it.second === Thread.currentThread() })
+        events.close()
+    }
+
+    @Test
+    fun `an immediate handler on a changed event sees only real changes`() {
+        val events = FlowEvents()
+        val event = events.ChangedEvent<String>()
+        val seen = mutableListOf<Pair<String, String>>()
+        event.onImmediate { new, old -> seen += new to old }
+
+        event.fire("b", "a")
+        event.fire("b", "b")
+
+        assertEquals(listOf("b" to "a"), seen)
+        events.close()
+    }
+
+    @Test
+    fun `a throwing immediate handler neither breaks the firer nor skips other handlers`() {
+        val events = FlowEvents()
+        val event = events.NoArgEvent()
+        val ran = AtomicInteger()
+        event.onImmediate { throw IllegalStateException("expected by the test") }
+        event.onImmediate { ran.incrementAndGet() }
+
+        event.fire()
+
+        assertEquals(1, ran.get())
+        events.close()
+    }
+
+    @Test
+    fun `cancelling an immediate subscription stops it`() {
+        val events = FlowEvents()
+        val event = events.NoArgEvent()
+        val ran = AtomicInteger()
+        val subscription = event.onImmediate { ran.incrementAndGet() }
+
+        event.fire()
+        subscription.cancel()
+        event.fire()
+
+        assertEquals(1, ran.get())
         events.close()
     }
 }

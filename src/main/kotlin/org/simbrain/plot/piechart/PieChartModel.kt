@@ -1,11 +1,19 @@
+/**
+ * The pie chart's data: one slice per component of the coupled array, sized by its share of the total. Couplings
+ * post values and names from the updating thread; the JFreeChart dataset is EDT-confined and changes only when those
+ * land on the EDT.
+ */
 package org.simbrain.plot.piechart
 
 import com.thoughtworks.xstream.XStream
 import org.jfree.data.general.DefaultPieDataset
+import org.simbrain.plot.ChartUpdate
+import org.simbrain.plot.applyChartUpdates
+import org.simbrain.plot.componentLabel
+import org.simbrain.util.EdtUpdates
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.runOnEventThread
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import kotlin.math.abs
@@ -13,7 +21,7 @@ import kotlin.math.abs
 /**
  * Model data for pie charts.
  */
-class PieChartModel : AttributeContainer, EditableObject {
+class PieChartModel : AttributeContainer, EditableObject, AutoCloseable {
 
     override val id: String
         get() = "Pie Chart"
@@ -34,25 +42,14 @@ class PieChartModel : AttributeContainer, EditableObject {
     /**
      * Names of the incoming array's components, one per slice. Set via coupling events in
      * [PieChartComponent]. Setting new names renames any slices already in the dataset, so a label change
-     * shows without waiting for the next value update.
+     * shows without waiting for the next value update. Reads return the names applied so far.
      */
-    var componentNames = listOf<String>()
-        set(value) {
-            runOnEventThread {
-                field = value
-                if (isUninitialized == false && dataset.itemCount > 0) {
-                    // The producer now sends one value per name, so the slices are rebuilt to match: one
-                    // whose neuron was deleted goes rather than lingering under a stand-in number, and one
-                    // whose neuron came back shows at zero until the next update rather than being missing.
-                    val previous = (0 until dataset.itemCount).map { dataset.getValue(it) }
-                    dataset.clear()
-                    numSlices = if (value.isEmpty()) previous.size else value.size
-                    (0 until numSlices).forEach { i ->
-                        dataset.setValue(componentName(i), previous.getOrNull(i) ?: 0.0)
-                    }
-                }
-            }
-        }
+    var componentNames: List<String>
+        get() = names
+        set(value) = updates.post(ChartUpdate.Names(value))
+
+    /** The names currently applied to the dataset. Workspaces saved before this field load through [componentNames]. */
+    private var names = listOf<String>()
 
     /**
      * Track how many slices there are. If an array with a different number of
@@ -80,37 +77,68 @@ class PieChartModel : AttributeContainer, EditableObject {
         dataset.setValue("Empty pie", 1.0)
     }
 
+    /** Changes to the EDT-confined dataset. */
+    @Transient
+    private val updates = EdtUpdates<ChartUpdate> { applyChartUpdates(it, ::applyValues, ::applyNames) }
+
     /**
-     * Called by coupling producers via reflection.
+     * Called by coupling producers via reflection. The values are copied, since a producer may hand over a buffer it
+     * keeps writing to before the update lands on the event thread.
      */
     @Consumable
     fun setValues(vector: DoubleArray) {
         if (vector.isEmpty()) {
             throw IllegalArgumentException("Pie chart supplied with empty array")
         }
-        runOnEventThread {
-            updatePieStatus()
+        updates.post(ChartUpdate.Values(vector.copyOf()))
+    }
 
-            // Take care of size mismatches
-            if (vector.size != numSlices) {
-                dataset.clear()
-                numSlices = vector.size
-            }
+    /** Stops applying updates; called when the owning component leaves the workspace. */
+    override fun close() = updates.close()
 
-            val total = vector.sumOf { abs(it) }
+    /** Lands pending updates before XStream writes the dataset. */
+    private fun writeReplace(): Any {
+        updates.flush()
+        return this
+    }
 
-            // For minimal activation case just show a single pie slice
-            if (total < emptyPieThreshold) {
-                emptyPie()
-                return@runOnEventThread
-            }
-            for (i in vector.indices) {
-                dataset.setValue(componentName(i), abs(vector[i] / total))
+    private fun applyValues(vector: DoubleArray) {
+        updatePieStatus()
+
+        // Take care of size mismatches
+        if (vector.size != numSlices) {
+            dataset.clear()
+            numSlices = vector.size
+        }
+
+        val total = vector.sumOf { abs(it) }
+
+        // For minimal activation case just show a single pie slice
+        if (total < emptyPieThreshold) {
+            emptyPie()
+            return
+        }
+        for (i in vector.indices) {
+            dataset.setValue(componentName(i), abs(vector[i] / total))
+        }
+    }
+
+    private fun applyNames(value: List<String>) {
+        names = value
+        if (isUninitialized == false && dataset.itemCount > 0) {
+            // The producer now sends one value per name, so the slices are rebuilt to match: one
+            // whose neuron was deleted goes rather than lingering under a stand-in number, and one
+            // whose neuron came back shows at zero until the next update rather than being missing.
+            val previous = (0 until dataset.itemCount).map { dataset.getValue(it) }
+            dataset.clear()
+            numSlices = if (value.isEmpty()) previous.size else value.size
+            (0 until numSlices).forEach { i ->
+                dataset.setValue(componentName(i), previous.getOrNull(i) ?: 0.0)
             }
         }
     }
 
-    private fun componentName(i: Int) = componentNames.getOrElse(i) { "$i" }
+    private fun componentName(i: Int) = componentLabel(names, i)
 
     override val name: String
         get() = "Pie chart"

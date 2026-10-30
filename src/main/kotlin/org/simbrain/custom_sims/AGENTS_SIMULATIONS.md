@@ -99,6 +99,9 @@ val sm = SupervisedModel(inputLayer, outputLayer)
 sm.trainingSet = TrainingDataset(inputs, targets)
 ```
 
+Rows can be given as `List<List<Double>>` (copied into arrays) or as `MutableList<DoubleArray>`, which the dataset
+stores directly; use `DoubleArray` rows for large datasets.
+
 **Embodied Agent:**
 ```kotlin
 val odorWorld = addOdorWorldComponent("Environment")

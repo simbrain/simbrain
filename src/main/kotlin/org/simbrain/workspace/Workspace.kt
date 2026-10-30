@@ -121,6 +121,22 @@ class Workspace: CoroutineScope {
      */
     var updateDelay = 0
 
+    /**
+     * When false (the default), each iteration waits until open windows have drawn it before the next one runs, so a
+     * running simulation can be watched step by step. When true the simulation never waits for the display, which
+     * shows it at whatever frame rate it keeps up with; for sims where speed matters more than seeing every step, such
+     * as language-model generation. Has no effect without a desktop. Named so that workspaces saved before it existed,
+     * which load it as false, keep drawing every step.
+     */
+    var runAsFastAsPossible = false
+
+    /**
+     * Waits until the views have drawn the latest update. Installed by the desktop, so a workspace without one never
+     * touches the display.
+     */
+    @Transient
+    var displaySync: (suspend () -> Unit)? = null
+
     @Transient
     val couplingManager = CouplingManager(this)
 
@@ -173,6 +189,7 @@ class Workspace: CoroutineScope {
         // Remove all couplings associated with this component
         // this.getCouplingManager().removeCouplings(component);
         _componentList.remove(component)
+        component.closeOwnedModels()
         setWorkspaceChanged(true)
         events.componentRemoved.fire(component)
     }
@@ -313,6 +330,8 @@ class Workspace: CoroutineScope {
         currentFile = null
         simulationId = ""
         exposedTypeNames = LinkedHashSet()
+        updateDelay = 0
+        runAsFastAsPossible = false
         couplingManager.clear()
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()

@@ -51,7 +51,7 @@ val tinyMNIST = newSim {
 
     bp.inputLayer.gridMode = true
     bp.inputLayer.offset(-350.0, -225.0)
-    bp.inputLayer.inputData = data.testingSet.inputs.toMatrix()
+    bp.inputLayer.inputData = data.testingSet.inputs.toTypedArray().toMatrix()
     bp.outputLayer.offset(-350.0, 225.0)
     bp.outputLayer.circleMode = true
     bp.outputLayer.gridMode = true
@@ -149,7 +149,7 @@ val tinyMNIST = newSim {
                 get() = bp.testingSet
                 set(value) {
                     bp.testingSet = value
-                    bp.inputLayer.inputData = value.inputs.toMatrix()
+                    bp.inputLayer.inputData = value.inputs.toTypedArray().toMatrix()
                 }
 
             override suspend fun show(image: DoubleArray): DoubleArray {

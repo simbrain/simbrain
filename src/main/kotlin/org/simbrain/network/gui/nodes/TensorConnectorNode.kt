@@ -224,7 +224,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
         // Wire up events
         val connectorEvents = connector.events
-        connectorEvents.updated.on(Dispatchers.Default) { connectorEvents.updateGraphics.fire() }
+        connectorEvents.updated.on(Dispatchers.Default) { connectorEvents.updateGraphics.fire() }.untilDisposed()
         connectorEvents.updateGraphics.on(Dispatchers.Swing) {
             if (connector is ConvolutionConnector) {
                 if (connector.kernelGridMode) {
@@ -234,20 +234,20 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 }
             }
             updateDetailLabel()
-        }
+        }.untilDisposed()
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connectorDisplayText())
-        }
+        }.untilDisposed()
         connectorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             syncKernelDisplayMode()
-        }
+        }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
             arrow.invalidateFullBounds()
-        }
+        }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
             arrow.invalidateFullBounds()
-        }
+        }.untilDisposed()
 
         interactionBox.setText(connectorDisplayText())
         arrow.invalidateFullBounds()

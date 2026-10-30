@@ -95,7 +95,7 @@ private fun TrainingDataset.withLabels(condition: TrainingCondition): TrainingDa
         val classIndex = idx / samplesPerClass
         val shape = ShapeType.entries.getOrElse(classIndex) { ShapeType.CIRCLE }
         val labelVec = buildLabelVector(shape, condition)
-        (target + labelVec.toList()).toMutableList()
+        target + labelVec
     }.toMutableList()
     return TrainingDataset(
         inputs = inputs.toMutableList(),
@@ -239,7 +239,7 @@ val categoricalPerception = newSim {
         testConfiguration.testFrequency = 10
     }
 
-    inputLayer.activations = trainingSet.inputs[0].toDoubleArray()
+    inputLayer.activations = trainingSet.inputs[0]
 
     // Analysis functions
 
@@ -256,7 +256,7 @@ val categoricalPerception = newSim {
         trainingSet.inputs.forEachIndexed { idx, input ->
             val classIndex = idx / trainSamplesPerClass
             val shapeType = ShapeType.entries.getOrNull(classIndex) ?: return@forEachIndexed
-            inputLayer.activations = input.toDoubleArray()
+            inputLayer.activations = input
             network.update()
             result[shapeType]!!.add(reprLayer.activationArray.copyOf())
         }
@@ -371,7 +371,7 @@ val categoricalPerception = newSim {
                 testingSet = newTest
                 cnnModel.trainingSet = newTrain
                 cnnModel.testingSet = newTest
-                inputLayer.activations = newTrain.inputs[0].toDoubleArray()
+                inputLayer.activations = newTrain.inputs[0]
             }
 
             addSeparator()

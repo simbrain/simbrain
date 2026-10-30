@@ -47,8 +47,8 @@ fun loadTinyMnist(): TinyMnistData? {
  */
 class TestSetVariant(val label: String, val transform: (DoubleArray) -> DoubleArray) {
     fun applyTo(original: TrainingDataset) = TrainingDataset(
-        inputs = original.inputs.map { transform(it.toDoubleArray()).toMutableList() }.toMutableList(),
-        targets = original.targets.map { it.toMutableList() }.toMutableList(),
+        inputs = original.inputs.map { transform(it.copyOf()) }.toMutableList(),
+        targets = original.targets.map { it.copyOf() }.toMutableList(),
         inputSize = original.inputSize,
         targetSize = original.targetSize,
     )
@@ -127,7 +127,7 @@ suspend fun TrainingDataset.accuracy(
 ): Double {
     var correct = 0
     inputs.indices.forEach { i ->
-        if (predict(inputs[i].toDoubleArray()).argmax() == targets[i].toDoubleArray().argmax()) {
+        if (predict(inputs[i]).argmax() == targets[i].argmax()) {
             correct++
         }
         onProgress(i + 1)
@@ -205,13 +205,13 @@ private fun ControlPanelKt.addTinyMnistControls(data: TinyMnistData, model: Tiny
     addSeparator()
     addButton("Random training image") {
         val dataset = model.trainingSet
-        model.show(dataset.inputs[Random.nextInt(dataset.size)].toDoubleArray())
+        model.show(dataset.inputs[Random.nextInt(dataset.size)])
     }.apply {
         toolTipText = "Run a randomly chosen training image through the network."
     }
     addButton("Random test image") {
         val dataset = model.testingSet
-        model.show(dataset.inputs[Random.nextInt(dataset.size)].toDoubleArray())
+        model.show(dataset.inputs[Random.nextInt(dataset.size)])
     }.apply {
         toolTipText = "Run a randomly chosen test image, one the network was not trained on, through the network."
     }

@@ -69,8 +69,13 @@ class NeuronCircleNode(private val scalingFactor: () -> kotlin.Double = { 1.0 })
         getUnionOfChildrenBounds(boundsReference)
     }
 
-    private var activation: kotlin.Double = 0.0
-    private var graphicalBounds = -1.0..1.0
+    /** The activation currently drawn, so callers can skip redraws that would change nothing. */
+    var activation: kotlin.Double = 0.0
+        private set
+
+    /** The graphical bounds the drawn activation's color was computed against. */
+    var graphicalBounds = -1.0..1.0
+        private set
 
     /** Hides the number, for a circle standing in for a value that doesn't exist yet. */
     var activationTextHidden = false

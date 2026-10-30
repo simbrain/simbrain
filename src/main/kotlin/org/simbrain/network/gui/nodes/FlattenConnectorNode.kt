@@ -52,14 +52,14 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         val connectorEvents = connector.events
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connector.displayName)
-        }
+        }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
             arrow.invalidateFullBounds()
-        }
+        }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
             arrow.invalidateFullBounds()
-        }
+        }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
         arrow.invalidateFullBounds()

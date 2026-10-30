@@ -2,7 +2,9 @@ package org.simbrain.workspace.gui
 
 import com.thoughtworks.xstream.XStream
 import com.thoughtworks.xstream.io.xml.DomDriver
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.withContext
 import org.pmw.tinylog.Logger
 import org.simbrain.util.*
@@ -19,6 +21,7 @@ import java.awt.Dimension
 import java.awt.Rectangle
 import java.beans.PropertyVetoException
 import java.io.*
+import java.util.concurrent.atomic.AtomicBoolean
 import javax.swing.JPanel
 
 /**
@@ -41,6 +44,13 @@ var parentFrame: GenericFrame, workspaceComponent: E
 
     var workspaceComponent: E
         private set
+
+    /**
+     * Scope of this view: bind subscriptions with `cancelWith(viewScope)` and create view refreshes in it, and they end
+     * when the component really closes (not when the user cancels at the unsaved-changes prompt). Panels with their own
+     * scope tie it here the same way. Not named `ui`, which inside Swing code is a component's look-and-feel delegate.
+     */
+    val viewScope: CoroutineScope = UiScope()
 
     val exportAction = createAction(
         iconPath = "menu_icons/Save.png",
@@ -73,15 +83,15 @@ var parentFrame: GenericFrame, workspaceComponent: E
 
         // Add a default update listener
         val events = workspaceComponent.events
-        events.guiToggled.on { parentFrame.setVisible(workspaceComponent.isGuiOn) }
-        events.componentClosing.on { close() }
+        events.guiToggled.on { parentFrame.setVisible(workspaceComponent.isGuiOn) }.cancelWith(viewScope)
+        events.componentClosing.on { close() }.cancelWith(viewScope)
         events.componentMinimized.on { minimized ->
             try {
                 parentFrame.setIcon(minimized)
             } catch (e: PropertyVetoException) {
                 throw RuntimeException(e)
             }
-        }
+        }.cancelWith(viewScope)
         Logger.trace(this.javaClass.canonicalName + " created")
     }
 
@@ -93,7 +103,27 @@ var parentFrame: GenericFrame, workspaceComponent: E
             }
         }
         workspaceComponent.close()
+        disposeView()
     }
+
+    private val viewDisposed = AtomicBoolean(false)
+
+    /**
+     * Ends this view once its component is gone, whether it was closed from its window ([close]) or removed with the
+     * rest of the workspace when it was cleared or another was opened: calls [onClosed] and cancels [viewScope]. Runs
+     * only the first time.
+     */
+    fun disposeView() {
+        if (!viewDisposed.compareAndSet(false, true)) return
+        onClosed()
+        viewScope.cancel()
+    }
+
+    /**
+     * Releases resources [viewScope] does not cover (listeners registered outside the event system) once the component
+     * is really gone (see [disposeView]); not called when the user cancels at the unsaved-changes prompt.
+     */
+    protected open fun onClosed() {}
 
     /**
      * Dialog for importing a workspace component.
@@ -134,7 +164,6 @@ var parentFrame: GenericFrame, workspaceComponent: E
             return
         }
         val bounds = parentFrame.bounds
-        val workspace = workspaceComponent.workspace
         workspace.removeWorkspaceComponent(workspaceComponent)
         workspaceComponent = newComponent
         workspace.addWorkspaceComponent(workspaceComponent)

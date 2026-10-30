@@ -44,7 +44,7 @@ class TriangleReader(
         sampler.reset(seed)
         model.initWeights()
         model.initBiases()
-        with(trainer) { model.trainerConfig.optimizer.reset() }
+        model.trainerConfig.optimizer.reset()
         trainingPresentations = 0
         captureBaselineErrors()
     }

@@ -1,5 +1,6 @@
 package org.simbrain.plot
 
+import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
@@ -8,6 +9,9 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.histogram.HistogramComponent
 import org.simbrain.plot.histogram.HistogramModel
+import org.simbrain.util.UiWork
+import org.simbrain.util.getSimbrainXStream
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.workspace.Workspace
 
 
@@ -30,10 +34,11 @@ class HistogramTest {
         workspace.couplingManager.createCoupling(ng, histogram)
     }
 
+
     @Test
     fun `test data is transferred properly`() {
         ng.activationArray = doubleArrayOf(1.0, 2.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(2, histogram.data[0].size)
         assertEquals(1.0, histogram.data[0][0])
         assertEquals(2.0, histogram.data[0][1])
@@ -42,7 +47,7 @@ class HistogramTest {
     @Test
     fun `test equal inputs produce one bin of height 2`() {
         ng.activationArray = doubleArrayOf(2.0, 2.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(1, histogram.seriesData.first().data.count{
             it.count == 2
         })
@@ -51,12 +56,30 @@ class HistogramTest {
     @Test
     fun `test unequal inputs produce two bins of height 1`() {
         ng.activationArray = doubleArrayOf(1.0, 2.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(2, histogram.seriesData.first().data.count{
             it.count == 1
         })
     }
 
+    @Test
+    fun `each iteration replaces the previous data`() {
+        ng.activationArray = doubleArrayOf(1.0, 2.0)
+        workspace.iterateAndSettle()
+        ng.activationArray = doubleArrayOf(5.0, 5.0)
+        workspace.iterateAndSettle()
+        assertArrayEquals(doubleArrayOf(5.0, 5.0), histogram.data[0])
+    }
+
+    @Test
+    fun `saving right after adding data includes it and the reopened model keeps accepting data`() {
+        val model = HistogramModel()
+        model.addData(doubleArrayOf(0.5, 1.5, 2.5))
+        val xstream = getSimbrainXStream()
+        val restored = xstream.fromXML(xstream.toXML(model)) as HistogramModel
+        assertArrayEquals(doubleArrayOf(0.5, 1.5, 2.5), restored.data[0])
+        restored.addData(doubleArrayOf(9.0))
+        UiWork.awaitIdle()
+        assertArrayEquals(doubleArrayOf(9.0), restored.data[0])
+    }
 }
-
-

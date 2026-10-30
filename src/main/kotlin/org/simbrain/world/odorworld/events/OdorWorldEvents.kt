@@ -18,5 +18,4 @@ class OdorWorldEvents: FlowEvents() {
     val mazeChanged = NoArgEvent()
     val propertiesChanged = NoArgEvent()
     val zoomModeChanged = OneArgEvent<Boolean>()
-    val cleanups = HashMap<OdorWorldEntity, () -> Unit>()
 }

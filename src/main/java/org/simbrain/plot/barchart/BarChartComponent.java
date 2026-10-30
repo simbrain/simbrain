@@ -83,6 +83,11 @@ public class BarChartComponent extends WorkspaceComponent {
     }
 
     @Override
+    protected List<AutoCloseable> getCloseables() {
+        return List.of(model);
+    }
+
+    @Override
     public String getXml() {
         return BarChartModel.getXStream().toXML(model);
     }

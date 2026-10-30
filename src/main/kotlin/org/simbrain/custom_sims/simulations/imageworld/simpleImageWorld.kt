@@ -90,7 +90,7 @@ val simpleImageWorld = newSim {
                     outputs.neuronList[index].label = category
                 }
                 addButton("Save Image for Category ${index + 1}") {
-                    supervisedModel.trainingSet.inputs[index] = (imageWorld.currentPipeline?.brightness ?: doubleArrayOf()).toMutableList()
+                    supervisedModel.trainingSet.inputs[index] = (imageWorld.currentPipeline?.brightness ?: doubleArrayOf()).copyOf()
                     val image = imageWorld.currentImage.copy()
                     val frame = imageWorld.imageAlbum.frames[index]
                     frame.drawImage(image)
@@ -98,7 +98,7 @@ val simpleImageWorld = newSim {
                     if (index != imageWorld.imageAlbum.frameIndex) {
                         imageWorld.imageAlbum.clearCurrentImage()
                     }
-                    supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs[index].toDoubleArray())
+                    supervisedModel.inputLayer.setActivations(supervisedModel.trainingSet.inputs[index])
                     supervisedModel.outputLayer.setActivations(DoubleArray(outputs.size) { if (it == index) 1.0 else 0.0 })
                 }.apply {
                     toolTipText = "Save the current drawing as the training example for category ${index + 1}."

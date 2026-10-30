@@ -5,7 +5,7 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.updaterules.interfaces.MembranePotentialProvider
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
-import org.simbrain.network.util.EmptyScalarData
+import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.UserParameter
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
@@ -18,7 +18,7 @@ import kotlin.math.exp
  * Adapted from software written by Anthony Fodor, with help from Jonathan
  * Vickrey.
  */
-class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule,
+class HodgkinHuxleyRule : NeuronUpdateRule<HodgkinHuxleyData, EmptyMatrixData>(), NoisyUpdateRule,
     MembranePotentialProvider {
 
     override fun membranePotential(neuron: Neuron): Double = neuron.activation
@@ -39,9 +39,6 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
      */
     private val resting_v = 65.0
 
-    /**  */
-    private var dv = 0.0
-
     // remember that H&H voltages are -1 * present convention
     // TODO: should eventually calculate this instead of setting it
     // convert between internal use of V and the user's expectations
@@ -60,54 +57,11 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
     private val gl: Double
 
     /**
-     * voltage-dependent gating parameters
-     */
-    var n: Double = 0.0
-        private set
-    var m: Double = 0.0
-        private set
-    var h: Double = 0.0
-        private set
-
-    /**
-     * corresponding deltas
-     */
-    private var dn: Double
-    private var dm: Double
-    private var dh: Double
-
-    /**
-     * // rate constants
-     */
-    private var an: Double
-    private var bn: Double
-    private var am: Double
-    private var bm: Double
-    private var ah: Double
-    private var bh: Double
-
-    /**
      * Ek-Er, Ena - Er, Eleak - Er
      */
     private var vk: Double
     private var vna: Double
     private val vl: Double
-
-    /**  */
-    private var n4 = 0.0
-
-    /**  */
-    private var m3h = 0.0
-
-    /**
-     * Sodium current
-     */
-    private var na_current = 0.0
-
-    /**
-     * Potassium current
-     */
-    private var k_current = 0.0
 
     /**  */
     var temp: Double = 0.0
@@ -128,33 +82,33 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
      */
     override var addNoise: Boolean = false
 
+    override fun createScalarData() = HodgkinHuxleyData()
+
     context(Network)
-    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+    override fun apply(neuron: Neuron, data: HodgkinHuxleyData) {
         // Advances the model by dt and returns the new voltage
 
         val v = neuron.input
-        bh = 1 / (exp((v + 30) / 10) + 1)
-        ah = 0.07 * exp(v / 20)
-        dh = (ah * (1 - h) - bh * h) * timeStep
-        bm = 4 * exp(v / 18)
-        am = 0.1 * (v + 25) / (exp((v + 25) / 10) - 1)
-        bn = 0.125 * exp(v / 80)
-        an = 0.01 * (v + 10) / (exp((v + 10) / 10) - 1)
-        dm = (am * (1 - m) - bm * m) * timeStep
-        dn = (an * (1 - n) - bn * n) * timeStep
+        val rates = GatingRates(v)
+        val dh = (rates.ah * (1 - data.h) - rates.bh * data.h) * timeStep
+        val dm = (rates.am * (1 - data.m) - rates.bm * data.m) * timeStep
+        val dn = (rates.an * (1 - data.n) - rates.bn * data.n) * timeStep
 
-        n4 = n * n * n * n
-        m3h = m * m * m * h
+        val n4 = data.n * data.n * data.n * data.n
+        val m3h = data.m * data.m * data.m * data.h
 
-        na_current = gna * m3h * (v - vna)
-        k_current = gk * n4 * (v - vk)
+        val naCurrent = gna * m3h * (v - vna)
+        val kCurrent = gk * n4 * (v - vk)
+        // The -1 is to correct for the fact that in the H & H paper, the currents are reversed.
+        data.naCurrent = -1 * naCurrent
+        data.kCurrent = -1 * kCurrent
 
-        dv = -1 * timeStep * (k_current + na_current + gl * (v - vl)) / cm
+        val dv = -1 * timeStep * (kCurrent + naCurrent + gl * (v - vl)) / cm
 
         neuron.activation = -1 * (v + dv + resting_v)
-        h += dh
-        m += dm
-        n += dn
+        data.h += dh
+        data.m += dm
+        data.n += dn
 
         // if (vClampOn)
         // v = vClampValue;
@@ -164,41 +118,16 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
 
     // Initializer quickly hacked from old init. Zoë this is in your hands to fix! :)
     init {
-        val v = -70.0 // Arbitrary starting voltage
-        val dv = .001 // Arbitrary starting dv.  Not sure how to set.
         vna = -115.0
         vk = 12.0
         vl = -10.613
         gna = (perNaChannels * 120 / 100).toDouble()
         gk = (perKChannels * 36 / 100).toDouble()
         gl = 0.3
-
-        bh = 1 / (exp((v + 30) / 10) + 1)
-        ah = 0.07 * exp(v / 20)
-        bm = 4 * exp(v / 18)
-        am = 0.1 * (v + 25) / (exp((v + 25) / 10) - 1)
-        bn = 0.125 * exp(v / 80)
-        an = 0.01 * (v + 10) / (exp((v + 10) / 10) - 1)
-        dh = (ah * (1 - h) - bh * h) * dv
-        dm = (am * (1 - m) - bm * m) * dv
-        dn = (an * (1 - n) - bn * n) * dv
-
-        // start these parameters in steady state
-        n = an / (an + bn)
-        m = am / (am + bm)
-        h = ah / (ah + bh)
     }
 
     override val timeType: Network.TimeType
         get() = Network.TimeType.CONTINUOUS
-
-    fun get_n4(): Double {
-        return n4
-    }
-
-    fun get_m3h(): Double {
-        return m3h
-    }
 
     @get:Synchronized
     @set:Synchronized
@@ -215,16 +144,6 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
         set(Ek) {
             vk = -1 * Ek - resting_v
         }
-
-    // The -1 is to correct for the fact that in the H & H paper, the currents
-    // are reversed.
-    fun get_na_current(): Double {
-        return -1 * na_current
-    }
-
-    fun get_k_current(): Double {
-        return -1 * k_current
-    }
 
     // negative values set to zero
     @Synchronized
@@ -289,4 +208,45 @@ class HodgkinHuxleyRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
     override val name: String
         get() = "Hodgkin-Huxley"
 
+}
+
+/** Hodgkin and Huxley's voltage-dependent rate constants at membrane voltage [v], in the model's convention. */
+private class GatingRates(v: Double) {
+    val ah = 0.07 * exp(v / 20)
+    val bh = 1 / (exp((v + 30) / 10) + 1)
+    val am = 0.1 * (v + 25) / (exp((v + 25) / 10) - 1)
+    val bm = 4 * exp(v / 18)
+    val an = 0.01 * (v + 10) / (exp((v + 10) / 10) - 1)
+    val bn = 0.125 * exp(v / 80)
+}
+
+/**
+ * One neuron's [HodgkinHuxleyRule] state: the voltage-dependent gating variables, which start in their steady state
+ * at an arbitrary resting voltage, and the last sodium and potassium currents, for display. Kept per neuron so that
+ * neurons sharing a rule object each integrate their own gates.
+ */
+class HodgkinHuxleyData(
+    @UserParameter(label = "n", description = "Potassium activation gate", order = 1)
+    var n: Double = steadyState.run { an / (an + bn) },
+    @UserParameter(label = "m", description = "Sodium activation gate", order = 2)
+    var m: Double = steadyState.run { am / (am + bm) },
+    @UserParameter(label = "h", description = "Sodium inactivation gate", order = 3)
+    var h: Double = steadyState.run { ah / (ah + bh) }
+) : ScalarDataHolder {
+
+    @UserParameter(label = "Sodium current", displayOnly = true, order = 4)
+    var naCurrent = 0.0
+
+    @UserParameter(label = "Potassium current", displayOnly = true, order = 5)
+    var kCurrent = 0.0
+
+    override fun copy() = HodgkinHuxleyData(n, m, h).also {
+        it.naCurrent = naCurrent
+        it.kCurrent = kCurrent
+    }
+
+    private companion object {
+        // Arbitrary starting voltage
+        val steadyState = GatingRates(-70.0)
+    }
 }

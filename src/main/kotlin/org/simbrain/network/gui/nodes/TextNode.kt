@@ -27,9 +27,10 @@ open class TextNode(
         pStyledText.document = DefaultStyledDocument()
         this.addChild(pStyledText)
 
+        // Sims rewrite info text every iteration, so changes are marked and drawn once per frame
         val events = textObject.events
-        events.locationChanged.on(swingDispatcher) { this.recenterTextObject() }
-        events.textUpdated.on(swingDispatcher) { this.update() }
+        events.locationChanged.onImmediate { markDirty(LOCATION) }.untilDisposed()
+        events.textUpdated.onImmediate { markDirty(TEXT) }.untilDisposed()
 
         update()
     }
@@ -93,6 +94,10 @@ open class TextNode(
     override val toolTipText: String?
         get() = "Location: (" + textObject.locationX.toInt() + "," + textObject.locationY.toInt() + ")"
 
+    override fun syncFromModel(bits: Int) {
+        if (bits and TEXT != 0) update() else if (bits and LOCATION != 0) recenterTextObject()
+    }
+
     /**
      * Updates the position of the view text based on the position of the model
      * text object.
@@ -110,6 +115,12 @@ open class TextNode(
     }
 
     override val propertyDialog: StandardDialog get() = createEditDialog()
+
+    companion object {
+        // Protected so a subclass numbers its own bits after these
+        protected const val TEXT = 1
+        protected const val LOCATION = 2
+    }
 }
 
 /**

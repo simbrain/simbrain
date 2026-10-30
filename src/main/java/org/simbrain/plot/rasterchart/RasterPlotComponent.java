@@ -97,6 +97,11 @@ public class RasterPlotComponent extends WorkspaceComponent {
     }
 
     @Override
+    protected List<AutoCloseable> getCloseables() {
+        return List.of(model);
+    }
+
+    @Override
     public String getXml() {
         return RasterModel.getXStream().toXML(model);
     }

@@ -7,7 +7,6 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.piccolo2d.PNode
@@ -64,8 +63,6 @@ class GapJunctionNode(
 
     private var glyphScale = 1.0
 
-    private val subscriptionRemovers = mutableListOf<() -> Unit>()
-
     init {
         addChild(line)
         glyph.addChild(glyphBackground)
@@ -83,32 +80,25 @@ class GapJunctionNode(
         updateAppearance()
         updatePosition()
 
-        fun track(job: Job) {
-            subscriptionRemovers += { job.cancel() }
-        }
-        track(junction.events.locationChanged.on(dispatcher = Dispatchers.Swing) { updatePosition() })
-        track(junction.events.conductanceUpdated.on(dispatcher = Dispatchers.Swing) {
+        junction.events.locationChanged.on(dispatcher = Dispatchers.Swing) { updatePosition() }.untilDisposed()
+        junction.events.conductanceUpdated.on(dispatcher = Dispatchers.Swing) {
             updatePosition()
             updateAppearance()
-        })
+        }.untilDisposed()
         listOf(junction.neuron1, junction.neuron2).forEach { endpoint ->
-            track(endpoint.events.updateRuleChanged.on(dispatcher = Dispatchers.Swing) { _, _ -> updateAppearance() })
+            endpoint.events.updateRuleChanged.on(dispatcher = Dispatchers.Swing) { _, _ -> updateAppearance() }.untilDisposed()
         }
         fun connectsEndpoints(model: NetworkModel) = model is Synapse &&
             ((model.source === junction.neuron1 && model.target === junction.neuron2) ||
                 (model.source === junction.neuron2 && model.target === junction.neuron1))
         // modelAdded/modelRemoved are awaitable barrier events; subscribing them on the Swing
         // dispatcher would let an EDT-blocking fire await an invokeLater that can never run.
-        subscriptionRemovers += networkPanel.network.events.modelAdded.on(dispatcher = Dispatchers.Default) { model ->
+        networkPanel.network.events.modelAdded.on(dispatcher = Dispatchers.Default) { model ->
             if (connectsEndpoints(model)) withContext(Dispatchers.Swing) { updatePosition() }
-        }
-        subscriptionRemovers += networkPanel.network.events.modelRemoved.on(dispatcher = Dispatchers.Default) { model ->
+        }.untilDisposed()
+        networkPanel.network.events.modelRemoved.on(dispatcher = Dispatchers.Default) { model ->
             if (connectsEndpoints(model)) withContext(Dispatchers.Swing) { updatePosition() }
-        }
-        junction.events.deleted.on(dispatcher = Dispatchers.Default) {
-            subscriptionRemovers.forEach { it() }
-            subscriptionRemovers.clear()
-        }
+        }.untilDisposed()
     }
 
     private fun updatePosition() {

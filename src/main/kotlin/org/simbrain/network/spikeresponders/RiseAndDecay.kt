@@ -38,16 +38,17 @@ class RiseAndDecay : SpikeResponder() {
         val responseData = responderData as RiseAndDecayMatrixData
         val spikeData = na.dataHolder as SpikingMatrixData
         if (na.updateRule.isSpikingRule) {
+            val psrMatrix = wm.materializePsrMatrix()
             for (i in 0 until wm.weights.nrow()) {
                 for (j in 0 until wm.weights.ncol()) {
                     val (psr, recovery) = riseAndDecay(
-                        spikeData.spikes[j],
-                        wm.psrMatrix[i, j],
+                        spikeData.spikes[j] && spikeGetsThroughInOrder(),
+                        psrMatrix[i, j],
                         responseData.recoveryMatrix[i,j],
                         wm.weights[i, j],
                         timeStep
                     )
-                    wm.psrMatrix.set(i, j, psr)
+                    psrMatrix.set(i, j, psr)
                     responseData.recoveryMatrix.set(i,j, recovery)
                 }
             }
@@ -62,7 +63,7 @@ class RiseAndDecay : SpikeResponder() {
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
         val data = responderData as RiseAndDecayData
         val (psr, recovery) = riseAndDecay(
-            synapse.source.isSpike,
+            synapse.source.isSpike && spikeGetsThrough(synapse),
             synapse.rawPSR,
             data.recovery,
             synapse.strength,
@@ -72,15 +73,15 @@ class RiseAndDecay : SpikeResponder() {
         data.recovery = recovery
     }
 
-    context(Network)
-    fun riseAndDecay(spiked: Boolean,
+    /** [arrived] is after any [spikeProbability] check, which callers make. */
+    fun riseAndDecay(arrived: Boolean,
                              psr: Double,
                              recovery: Double,
                              jumpHeight: Double,
                              timeStep: Double): Pair<Double, Double> {
         return Pair(
             (psr + ((timeStep / timeConstant) * (Math.E * jumpHeight * recovery * (1 - psr) - psr))),
-            if (spiked && probabilisticSpikeCheck()) {
+            if (arrived) {
                 1.0
             } else {
                 recovery + timeStep / timeConstant * -recovery

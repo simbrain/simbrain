@@ -1,5 +1,10 @@
 package org.simbrain.plot
 
+import java.util.function.Supplier
+import org.simbrain.util.withEdtHeld
+import org.simbrain.util.onEdt
+import org.simbrain.util.UiWork
+import org.simbrain.plot.raster.RasterModel
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
@@ -7,6 +12,8 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.updaterules.SpikingThresholdRule
 import org.simbrain.plot.rasterchart.RasterPlotComponent
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.util.setValuesInPlace
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.serialization.WorkspaceSerializer
@@ -27,6 +34,7 @@ class RasterPlotTest {
         workspace.addWorkspaceComponent(nc)
         workspace.addWorkspaceComponent(rpc)
     }
+
 
     @Test
     fun `rows are named from the coupled producer and follow label changes`() {
@@ -52,13 +60,13 @@ class RasterPlotTest {
         }
         // Should produce (1,2) and (1,4) since after 1 iteration, since second and fourth components are above threshld
         na.activationArray = doubleArrayOf(-1.0, 0.0, 1.0, 0.0, 2.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(0).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(0).yValue)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(4.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         na.activationArray = doubleArrayOf(0.0, 0.0, 1.0, 2.0, -1.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(3).xValue)
@@ -73,8 +81,8 @@ class RasterPlotTest {
         na.isClamped = false
         na.updateRule = SpikingThresholdRule()
         na.inputs.setValuesInPlace { i, j -> if ((i + j) % 2 == 1 ) 100.0 else -100.0 }
-        workspace.simpleIterate()
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
@@ -116,11 +124,26 @@ class RasterPlotTest {
         assertEquals(1.0, rpc.model.dataset.getSeries(0).getDataItem(1).xValue)
         assertEquals(4.0, rpc.model.dataset.getSeries(0).getDataItem(1).yValue)
         na.activationArray = doubleArrayOf(0.0, 0.0, 1.0, 2.0, -1.0)
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).xValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(2).yValue)
         assertEquals(2.0, rpc.model.dataset.getSeries(0).getDataItem(3).xValue)
         assertEquals(3.0, rpc.model.dataset.getSeries(0).getDataItem(3).yValue)
     }
 
+    @Test
+    fun `clearing changes the dataset on the edt, not on the caller's thread`() {
+        val model = RasterModel(Supplier { 0 })
+        model.rasterConsumerList[0].setValues(doubleArrayOf(1.0))
+        UiWork.awaitIdle()
+
+        val countWhileEdtBusy = withEdtHeld {
+            model.clearData()
+            model.dataset.getSeries(0).itemCount
+        }
+        UiWork.awaitIdle()
+
+        assertEquals(1, countWhileEdtBusy)
+        assertEquals(0, onEdt { model.dataset.getSeries(0).itemCount })
+    }
 }

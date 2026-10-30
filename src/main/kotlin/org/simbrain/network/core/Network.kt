@@ -5,6 +5,7 @@ import org.simbrain.network.events.NetworkEvents
 import org.simbrain.network.gui.PlacementManager
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.network.util.SpikingMatrixData
 import org.simbrain.network.util.SpikingScalarData
@@ -35,6 +36,9 @@ import kotlin.random.Random
  * For details about network update see https://docs.simbrain.net/docs/network/updateLogic.html
  *
  * Note that much of the logic of the updates happens in [Layer.accumulateInputs] or [Neuron.accumulateInputs], and in [Connector.updatePSR] or [Synapse.updatePSR]
+ *
+ * The default buffered update ([bufferedUpdate]) follows a cached [NetworkUpdatePlan] and updates large sets of free
+ * neurons and learning synapses in parallel (see `ParallelUpdate.kt`).
  *
  */
 class Network: CoroutineScope, EditableObject {
@@ -154,13 +158,12 @@ class Network: CoroutineScope, EditableObject {
 
     private var shouldUpdateTimeType = true
 
-    private fun updateInternal(name: String) {
+    private suspend fun updateInternal(name: String) {
+        Blas.ensureDefaultThreads()
         // Main update
         updateManager.actionList.forEach {
-            runBlocking {
-                PerformanceMonitor.record(it, "${name}:${it.description}") {
-                    it.run()
-                }
+            PerformanceMonitor.record(it, "${name}:${it.description}") {
+                it.run()
             }
         }
 
@@ -179,7 +182,7 @@ class Network: CoroutineScope, EditableObject {
      */
     @JvmOverloads
     fun update(name: String = "") {
-        updateInternal(name)
+        runBlocking { updateInternal(name) }
         events.updated.fireAndBlock()
     }
 
@@ -208,12 +211,27 @@ class Network: CoroutineScope, EditableObject {
         }
     }
 
+    /** The plan [bufferedUpdate] follows. */
+    internal val updatePlan get() = networkModels.updatePlan
+
+    /**
+     * Whether [bufferedUpdate] runs large phases in parallel. Null follows [NetworkPreferences.parallelUpdate]; tests
+     * set it to compare a parallel update with a serial reference. Not saved.
+     */
+    @Transient
+    var parallelUpdate: Boolean? = null
+
     /**
      * Default asynchronous update method called by [org.simbrain.network.update_actions.BufferedUpdate].
      */
-    suspend fun bufferedUpdate()  = coroutineScope {
-        networkModels.all.forEach { it.accumulateInputs() }
-        networkModels.all.forEach { it.update() }
+    suspend fun bufferedUpdate() {
+        val plan = networkModels.updatePlan
+        val parallel = parallelUpdate ?: NetworkPreferences.parallelUpdate
+        plan.neuronChunks.forEachInParallel(parallel) { it.accumulateInputs() }
+        plan.otherModels.forEach { it.accumulateInputs() }
+        plan.neuronUpdateChunks.forEachInParallel(parallel) { it.update() }
+        plan.otherModels.forEach { it.update() }
+        plan.learningSynapseChunks.forEachInParallel(parallel) { it.update() }
     }
 
     /**
@@ -291,6 +309,28 @@ class Network: CoroutineScope, EditableObject {
     }
 
     /**
+     * Drops the update plan when a free neuron's update rule or a free synapse's learning rule is replaced, which
+     * changes which rules are shared and which synapses learn. One instance shared by every model, so each pays only
+     * a slot in its event's handler list rather than a subscription Job.
+     */
+    @Transient
+    private var ruleChanged: (Any?) -> Unit = { networkModels.invalidateUpdatePlan() }
+
+    private fun listenForRuleChanges(model: NetworkModel) {
+        when (model) {
+            is Neuron -> model.events.updateRuleChanged.addImmediate(ruleChanged)
+            is Synapse -> model.events.learningRuleUpdated.addImmediate(ruleChanged)
+        }
+    }
+
+    private fun stopListeningForRuleChanges(model: NetworkModel) {
+        when (model) {
+            is Neuron -> model.events.updateRuleChanged.removeImmediate(ruleChanged)
+            is Synapse -> model.events.learningRuleUpdated.removeImmediate(ruleChanged)
+        }
+    }
+
+    /**
      * Add a new [NetworkModel]. All network models must be added using this method.
      * For best results call with `?.await()` when possible.
      */
@@ -309,8 +349,10 @@ class Network: CoroutineScope, EditableObject {
                     events.boundsChanged.fire()
                 }
             }
+            listenForRuleChanges(model)
             model.events.deleted.on(Dispatchers.Default) {
                 networkModels.remove(it)
+                stopListeningForRuleChanges(it)
                 childToParentMap.remove(it)
                 events.modelRemoved.fire(it)
                 updatePriorityList()
@@ -445,10 +487,14 @@ class Network: CoroutineScope, EditableObject {
 
         updateCompleted = AtomicBoolean(false)
 
+        ruleChanged = { networkModels.invalidateUpdatePlan() }
+
         // Initialize update manager
         networkModels.allInUpdatingOrder.forEach { model ->
+            listenForRuleChanges(model)
             model.events.deleted.on(Dispatchers.Default) {
                 networkModels.remove(it)
+                stopListeningForRuleChanges(it)
                 events.modelRemoved.fire(it)
             }
         }
@@ -465,9 +511,11 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Returns the current number of iterations.
      *
+     * Rounded, since time accumulates floating point error and can fall just short of a whole number of steps.
+     *
      * @return the number of update iterations which have been run since the network was created.
      */
-    val iterations: Long get() = (time / timeStep).toLong()
+    val iterations: Long get() = Math.round(time / timeStep)
 
     /**
      * string version of time, with units.

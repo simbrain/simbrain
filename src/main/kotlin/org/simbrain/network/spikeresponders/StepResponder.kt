@@ -19,16 +19,36 @@ class StepResponder(
 
 ) : SpikeResponder() {
 
+    /**
+     * A step response is the weight while the source is within its response window and zero otherwise, so a weight
+     * matrix can sum it from the weights of the responding sources. Spike probabilities draw per synapse, so they
+     * take the full [apply].
+     */
+    context(Network)
+    override fun sourceFactors(connector: WeightMatrix): DoubleArray? {
+        if (useSpikeProbability) return null
+        val lastSpikeTimes = ((connector.source as? NeuronArray)?.dataHolder as? SpikingMatrixData)?.lastSpikeTimes
+            ?: return null
+        return DoubleArray(lastSpikeTimes.size) { if (isResponding(lastSpikeTimes[it])) 1.0 else 0.0 }
+    }
+
+    /** Whether a source that last spiked at [lastSpikeTime] is still within its response window. */
+    context(Network)
+    private fun isResponding(lastSpikeTime: Double) = lastSpikeTime + responseDuration * timeStep >= time
+
     context(Network)
     override fun apply(connector: Connector, responderData: MatrixDataHolder) {
         val weightMatrix = connector as WeightMatrix
         val lastSpikeTimes = ((weightMatrix.source as NeuronArray).dataHolder as SpikingMatrixData).lastSpikeTimes
-        for (i in 0 until connector.psrMatrix.ncol()) {
-            for (j in 0 until connector.psrMatrix.nrow()) {
-                if (lastSpikeTimes[i] + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
-                    connector.psrMatrix[j, i] = connector.weights[j, i]
+        val psrMatrix = weightMatrix.materializePsrMatrix()
+        val weights = connector.weights
+        for (i in 0 until psrMatrix.ncol()) {
+            val responding = isResponding(lastSpikeTimes[i])
+            for (j in 0 until psrMatrix.nrow()) {
+                if (responding && spikeGetsThroughInOrder()) {
+                    psrMatrix[j, i] = weights[j, i]
                 } else {
-                    connector.psrMatrix[j, i] = 0.0
+                    psrMatrix[j, i] = 0.0
                 }
             }
         }
@@ -36,7 +56,7 @@ class StepResponder(
 
     context(Network)
     override fun apply(synapse: Synapse, responderData: ScalarDataHolder) {
-        if (synapse.source.lastSpikeTime + responseDuration * timeStep >= time && probabilisticSpikeCheck()) {
+        if (isResponding(synapse.source.lastSpikeTime) && spikeGetsThrough(synapse)) {
             synapse.rawPSR = synapse.strength
         } else {
             synapse.rawPSR = 0.0

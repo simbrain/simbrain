@@ -59,6 +59,9 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     @UserParameter(label = "Learning rule", description = "Learning rule for updating weights.", order = 100)
     var learningRule: SynapseUpdateRule<*, *> = StaticSynapseRule()
 
+    /** Whether [learningRule] changes the weights; a static rule leaves nothing to update. */
+    val isLearning: Boolean get() = learningRule !is StaticSynapseRule
+
     /**
      * Only used if source connector's rule is spiking.
      */
@@ -106,16 +109,84 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
      * Must stay the same shape as [weights]. A matrix of another shape, such as the transposed one older builds
      * saved after the weight matrix dialog was committed, is replaced by a zero matrix of the right shape rather
      * than left to fail on the next update.
+     *
+     * For reading: displaying, copying and saving it. Responses computed straight from the weights are written into
+     * it on the first read after an update ([pendingPsrSource]). A spike responder that writes its entries in place
+     * gets it from [materializePsrMatrix] instead, and anything else replaces it through this setter.
      */
     @UserParameter(label = "PSR matrix", description = "Post-synaptic response matrix.", order = 300, tab = "Data")
     override var psrMatrix: Matrix = Matrix(target.size, source.size)
-        set(value) {
+        get() = synchronized(psrLock) {
+            writePendingPsrs(field)
+            field
+        }
+        set(value) = synchronized(psrLock) {
+            pendingPsrSource = null
+            invalidateDerivedPsrState()
             field = if (value.nrow() == weights.nrow() && value.ncol() == weights.ncol()) {
                 value
             } else {
                 Matrix(weights.nrow(), weights.ncol())
             }
         }
+
+    /**
+     * [psrMatrix], for a spike responder about to write its entries in place. The sums computed directly from the
+     * weights, and state derived from the matrix (see [psrGeneration]), stop standing for it.
+     */
+    fun materializePsrMatrix(): Matrix = synchronized(psrLock) {
+        psrMatrix.also { invalidateDerivedPsrState() }
+    }
+
+    /**
+     * Counts the changes to [psrMatrix] that responses computed from the weights do not account for: replacing it,
+     * or a spike responder writing its entries. State derived from the matrix, such as a [JumpAndDecay] trace,
+     * records the count it was derived at and is stale once the count moves on.
+     */
+    @Transient
+    @Volatile
+    var psrGeneration = 0L
+        private set
+
+    private fun invalidateDerivedPsrState() {
+        summedInputs = null
+        psrGeneration++
+    }
+
+    /**
+     * Guards the hand-off from [updatePSR] to [getSummedPSRs]. Reading [psrMatrix] fills it from [pendingPsrSource],
+     * and the property editor, copying and saving read it off the update thread, so a read landing between the two
+     * would otherwise leave the update summing a half-filled matrix.
+     */
+    @Transient
+    private val psrLock = Any()
+
+    /**
+     * Summed inputs from the last update when they were computed from the weights directly (a matrix-vector product
+     * for connectionist updates, the responding sources' weights for [SpikeResponder.sourceFactors]) rather than as
+     * row sums of a filled [psrMatrix]. Null after a spike responder writes [psrMatrix] or it is replaced.
+     */
+    @Transient
+    private var summedInputs: DoubleArray? = null
+
+    /**
+     * Per-source factors from the last update, either source activations (connectionist) or a spike responder's
+     * [SpikeResponder.sourceFactors], whose per-weight responses (weight times factor) have not been written to
+     * [psrMatrix] yet. Most targets only need the summed inputs, so [psrMatrix] is filled only when something reads it.
+     */
+    @Transient
+    private var pendingPsrSource: DoubleArray? = null
+
+    private fun writePendingPsrs(psrs: Matrix) {
+        val factors = pendingPsrSource ?: return
+        pendingPsrSource = null
+        for (j in 0 until psrs.ncol()) {
+            val factor = factors[j]
+            for (i in 0 until psrs.nrow()) {
+                psrs[i, j] = if (factor == 0.0) 0.0 else weights[i, j] * factor
+            }
+        }
+    }
 
     /**
      * A binary matrix with 1s corresponding to entries of the weight matrix that are greater than 1 and thus
@@ -196,7 +267,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         if (clamped) {
             return
         }
-        if (learningRule !is StaticSynapseRule) {
+        if (isLearning) {
             learningRule.apply(this, learningRuleData)
             updateMasks()
             events.updated.fire()
@@ -209,13 +280,15 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     /**
-     * Prepare the PSR Matrix for consumption by target layers.
+     * Prepare post-synaptic responses for consumption by target layers.
      *
-     * Most targets use the updated PSRMatrix by calling [getSummedPSRs].
+     * Most targets read them summed, by calling [getSummedPSRs]. Without a spike responder the sums are computed
+     * directly as a matrix-vector product, and [psrMatrix] is filled only if it is read. With a spike responder, the
+     * responder writes [psrMatrix] and its rows are summed.
      * Some targets like [ActivationSequence] bypass the PSRMatrix and compute a matrix product directly.
      */
     context(Network)
-    override fun updatePSR() {
+    override fun updatePSR(): Unit = synchronized(psrLock) {
         if (spikeResponder is NonResponder) {
 
             val sourceActivations = if (source is ActivationSequenceProcessor) {
@@ -232,14 +305,33 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
                 ?: activations
             }
 
-            // One "half" of a matrix product ([getSummedPSRs] does the rest). Source activations are element-wise multiplied by rows of matrix
-            psrMatrix.copyFrom(weights.scaleColumns(sourceActivations))
+            // The summed inputs are the matrix-vector product; the per-weight responses (each weight times its source
+            // activation) are left for psrMatrix to fill if it is read
+            val x = sourceActivations.col(0)
+            val summed = DoubleArray(weights.nrow())
+            weights.timesVectorInto(x, summed)
+            pendingPsrSource = x
+            summedInputs = summed
 
         } else {
             // Spiking case
-            spikeResponder.apply(this, spikeResponseData)
+            val factors = spikeResponder.sourceFactors(this)
+            if (factors != null) {
+                // Only sources with a nonzero factor contribute, so a step of a sparsely firing network visits a few
+                // columns of the weights rather than all of them
+                val summed = DoubleArray(weights.nrow())
+                weights.timesSparseVectorInto(factors, summed)
+                pendingPsrSource = factors
+                summedInputs = summed
+            } else {
+                // A responder that just stopped using factors continues from the responses they stood for
+                materializePsrMatrix()
+                spikeResponder.apply(this, spikeResponseData)
+            }
         }
     }
+
+    override fun getSummedPSRs(): DoubleArray = synchronized(psrLock) { summedInputs?.copyOf() ?: psrMatrix.rowSums() }
 
     private fun updateExcitatoryMask() {
         for (i in 0 until weights.nrow()) {
@@ -311,7 +403,7 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
         this.weights.copyFrom(other.weights)
         this.excitatoryMask.copyFrom(other.excitatoryMask)
         this.inhibitoryMask.copyFrom(other.inhibitoryMask)
-        this.psrMatrix.copyFrom(other.psrMatrix)
+        materializePsrMatrix().copyFrom(other.psrMatrix)
         this.learningRuleData = other.learningRuleData.copy()
         this.spikeResponseData = other.spikeResponseData.copy()
     }

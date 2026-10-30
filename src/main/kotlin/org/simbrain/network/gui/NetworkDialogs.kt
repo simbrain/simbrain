@@ -1,9 +1,7 @@
 /** Network dialog factories, including dispatch of property editors for a captured selection. */
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.RandomWeightInitializer
@@ -19,6 +17,7 @@ import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
+import org.simbrain.util.onUi
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -362,12 +361,9 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         connectionStrategyPanel.percentExcitatoryPanel.setPercentExcitatory(synapseGroup.synapses.percentExcitatory())
     }
 
-    val unregister = synapseGroup.events.updated.on(dispatcher = Dispatchers.Swing) {
+    // Synapse groups report an update every iteration; recomputing the panel's statistics each time would load the EDT
+    synapseGroup.events.updated.onUi(dialog.viewScope) {
         synapseAdjustmentPanel.fullUpdate()
-    }
-
-    dialog.addCloseTask {
-        unregister.cancel()
     }
 
     val synapsesEditorApplyPanel = synapsesEditor.createApplyPanel {

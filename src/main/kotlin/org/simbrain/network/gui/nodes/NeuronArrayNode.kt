@@ -265,27 +265,22 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             layoutNeuronCircles()
             updateShapeCaption()
             networkPanel.network.events.zoomToFitPage.fire()
-        }
+        }.untilDisposed()
         gridMode = neuronArray.gridMode
         showBias = neuronArray.isShowBias
 
         addChild(labelBackground)
 
-        events.updated.on(Dispatchers.Default) {
-            events.updateGraphics.fire()
-        }
-
-        events.updateGraphics.on(Dispatchers.Swing) {
-            updateActivationImage()
-        }
+        // Marked, not throttled: the panel's sync pass redraws once per frame, and a paced run's display sync draws
+        // every iteration
+        events.updated.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
+        events.updateGraphics.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
         events.updateRuleChanged.on(Dispatchers.Swing) {
             if (!neuronArray.updateRule.isSpikingRule) {
                 mainNode.removeChild(spikeImage)
             }
-        }
-        events.clampChanged.on(Dispatchers.Swing) {
-            updateActivationImage()
-        }
+        }.untilDisposed()
+        events.clampChanged.onImmediate { markDirty(ACTIVATIONS) }.untilDisposed()
 
         updateActivationImage()
         neuronCircleGroup.setOffset(NEURON_DIAMETER / 2.0, NEURON_DIAMETER / 2.0 + 20.0)
@@ -518,7 +513,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         }
     }
 
+    override fun syncFromModel(bits: Int) {
+        if (bits and ACTIVATIONS != 0) {
+            updateActivationImage()
+        }
+    }
+
     companion object {
+        private const val ACTIVATIONS = 1
+
         /** Outline color used to mark pixels in the per-pixel selection. */
         val PIXEL_SELECTION_COLOR: Color = Color(255, 200, 0)
     }

@@ -1,11 +1,12 @@
 package org.simbrain.plot
 
-import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.plot.timeseries.TimeSeriesModel
 import java.util.concurrent.atomic.AtomicReference
+import javax.swing.SwingUtilities
 
 class TimeSeriesConcurrencyTest {
 
@@ -59,11 +60,45 @@ class TimeSeriesConcurrencyTest {
         // setValues creates the series on first use, from whichever thread is running the couplings
         repeat(50) {
             time = it
-            runBlocking { model.setValues(DoubleArray(6) { component -> component.toDouble() }) }
+            model.setValues(DoubleArray(6) { component -> component.toDouble() })
         }
         reader.join()
 
         assertNull(failure.get(), "Reading the series list raced with setValues populating it: ${failure.get()}")
         assertTrue(model.timeSeriesList.size == 6)
     }
+
+    @Test
+    fun `setValues reads one version of the series list while another thread replaces it`() {
+        val model = TimeSeriesModel()
+        model.timeSupplier = { 0 }
+        repeat(6) { model.addTimeSeries("Series $it") }
+        val series = model.timeSeriesList.toList()
+
+        val failure = AtomicReference<Throwable?>(null)
+        // Stands in for syncTimeSeries, which clears the list and refills it on the event thread
+        val writer = Thread {
+            try {
+                repeat(5_000) {
+                    SwingUtilities.invokeAndWait {
+                        model.timeSeriesList.clear()
+                        model.timeSeriesList.addAll(series)
+                    }
+                }
+            } catch (e: Throwable) {
+                failure.compareAndSet(null, e)
+            }
+        }
+        writer.start()
+        try {
+            while (writer.isAlive) model.setValues(DoubleArray(6) { it.toDouble() })
+        } catch (e: Throwable) {
+            failure.compareAndSet(null, e)
+        }
+        writer.join()
+
+        assertNull(failure.get(), "setValues raced with the series list being replaced: ${failure.get()}")
+        assertEquals(series, model.timeSeriesList)
+    }
 }
+

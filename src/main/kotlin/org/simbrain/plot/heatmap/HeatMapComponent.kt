@@ -41,6 +41,8 @@ class HeatMapComponent @JvmOverloads constructor(
 
     override fun hasChangedSinceLastSave() = false
 
+    override val closeables: List<AutoCloseable> get() = listOf(model)
+
     override val xml: String get() = heatMapXStream.toXML(model)
 
     companion object {

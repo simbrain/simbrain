@@ -2,6 +2,7 @@ package org.simbrain.network.spikeresponders
 
 import org.simbrain.network.core.Connector
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.spikeresponders.*
 import org.simbrain.network.util.EmptyMatrixData
@@ -10,6 +11,7 @@ import org.simbrain.network.util.MatrixDataHolder
 import org.simbrain.network.util.ScalarDataHolder
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.stats.keyedUnitDouble
 import java.util.*
 
 /**
@@ -59,9 +61,41 @@ abstract class SpikeResponder : CopyableObject {
     context(Network)
     open fun apply(connector: Connector, responderData: MatrixDataHolder) {}
 
+    /**
+     * For a responder whose response at each synapse of a weight matrix is that synapse's weight times a factor that
+     * depends only on the source neuron, returns those per-source factors. The weight matrix then sums responses from
+     * its weights directly, visiting only sources with a nonzero factor, instead of having [apply] write every entry
+     * of its PSR matrix. Called once per update of the weight matrix, so a responder may advance per-source state
+     * here. Null, the default, means [apply] writes the PSR matrix.
+     */
     context(Network)
-    fun probabilisticSpikeCheck(): Boolean {
-        return !useSpikeProbability || random.nextDouble() < spikeProbability
+    open fun sourceFactors(connector: WeightMatrix): DoubleArray? = null
+
+    /**
+     * Whether a spike reaching [synapse] gets through, given [spikeProbability]. The draw is a hash of the network's
+     * seed, the synapse's id, this responder's type and the iteration, so free synapses, which update in parallel,
+     * get the same draws whatever order they update in.
+     */
+    context(Network)
+    fun spikeGetsThrough(synapse: Synapse): Boolean {
+        if (!useSpikeProbability) return true
+        val draw = keyedUnitDouble(
+            randomSeed,
+            (synapse.id?.hashCode() ?: 0).toLong(),
+            javaClass.name.hashCode().toLong(),
+            iterations
+        )
+        return draw < spikeProbability
+    }
+
+    /**
+     * Whether a spike gets through a weight matrix entry, given [spikeProbability]. Weight matrices update serially,
+     * so the draw comes from the network's generator in the order entries are visited.
+     */
+    context(Network)
+    fun spikeGetsThroughInOrder(): Boolean {
+        if (!useSpikeProbability) return true
+        return synchronized(random) { random.nextDouble() } < spikeProbability
     }
 
     /**

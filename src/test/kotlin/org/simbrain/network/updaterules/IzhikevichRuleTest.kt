@@ -4,7 +4,9 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.core.NeuronArray
 import kotlin.math.abs
+import kotlin.random.Random
 
 /**
  * Test suite for IzhikevichRule implementation validation against the original paper:
@@ -394,5 +396,26 @@ class IzhikevichRuleTest {
         // With default parameters, should get reasonable spiking activity
         assertTrue(spikeCount > 0, "Should get some spikes with default parameters")
         assertTrue(spikeCount < 50, "Should not spike every time step")
+    }
+
+    @Test
+    fun `a neuron array matches individual neurons with the same rule`() {
+        val rng = Random(9)
+        val network = Network().apply { timeStep = 0.5 }
+        val rule = IzhikevichRule().apply { backgroundCurrent = 3.0 }
+        val initial = DoubleArray(8) { rng.nextDouble(-70.0, 20.0) }
+        val array = NeuronArray(8).apply {
+            updateRule = rule.copy()
+            for (i in 0 until size) activations[i, 0] = initial[i]
+        }
+        val neurons = List(8) { i -> Neuron(rule.copy()).apply { activation = initial[i] } }
+        network.addNetworkModelsAsync(listOf(array) + neurons)
+        repeat(300) { step ->
+            val drive = DoubleArray(8) { rng.nextDouble(0.0, 12.0) }
+            array.addInputs(drive)
+            neurons.forEachIndexed { i, n -> n.addInputValue(drive[i]) }
+            network.update()
+            neurons.forEachIndexed { i, n -> assertEquals(n.activation, array.activations[i, 0], 0.0, "step $step neuron $i") }
+        }
     }
 } 

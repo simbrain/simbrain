@@ -8,6 +8,9 @@ package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.job
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
@@ -20,6 +23,7 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.piccolo.Tile
+import org.simbrain.util.piccolo.nodeSyncPass
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
@@ -52,6 +56,18 @@ class OdorWorldPanel(
 ) : CoroutineScope, JPanel() {
 
     override val coroutineContext get() = world.coroutineContext
+
+    /** Scope of this panel's view updates; cancelled when its desktop component closes. */
+    val viewScope = UiScope()
+
+    /**
+     * Entity nodes with model changes to draw, synced once per frame. A node whose sync throws is logged and skipped,
+     * since the rest of the batch would otherwise keep their pending marks and never be queued again.
+     */
+    internal val entitySync = viewScope.nodeSyncPass()
+
+    /** Keeps the camera on the selected entity, once per frame, after the world or a manual move changes it. */
+    private val cameraSync = viewScope.uiRefresh { centerCameraToSelectedEntity() }
 
     /**
      * The Piccolo PCanvas.
@@ -94,7 +110,7 @@ class OdorWorldPanel(
     /**
      * Draws maze walls above the tile layers and below entities.
      */
-    val mazeNode = MazeNode(world)
+    val mazeNode = MazeNode(world, viewScope)
 
     /**
      * Set to true while the user is dragging an entity, to suppress camera centering.
@@ -287,27 +303,20 @@ class OdorWorldPanel(
         canvas.addInputEventListener(WorldMouseHandler(this, world))
         canvas.addInputEventListener(WorldContextMenuEventHandler(this, world))
 
+        // The world outlives this panel, so every subscription on it ends with the panel's view scope
         world.events.entityAdded.on(swingDispatcher) { e ->
-            val node = EntityNode(e)
+            val node = EntityNode(e, this)
             canvas.layer.addChild(node)
             selectionManager.clear()
             selectionManager.add(node)
-
-            world.events.cleanups[e] = e.events.selected.on(swingDispatcher) {
-                selectionManager.clear()
-                selectionManager.add(node)
-            }
-        }
-        world.events.entityRemoved.on(Dispatchers.Default) {
-            world.events.cleanups[it]?.invoke()
-        }
-        world.events.updated.on(swingDispatcher) { this.centerCameraToSelectedEntity() }
+        }.cancelWith(viewScope)
+        world.events.updated.on(Dispatchers.Unconfined) { cameraSync.request() }.cancelWith(viewScope)
         world.events.frameAdvanced.on(swingDispatcher) {
             canvas.layer.childrenReference
                 .filterIsInstance<EntityNode>()
                 .forEach { it.advance() }
             repaint()
-        }
+        }.cancelWith(viewScope)
         world.events.animationStopped.on(swingDispatcher) {
             // When movement is stopped use the "static" animation so we don't show entities in strange
             // intermediate states
@@ -315,16 +324,21 @@ class OdorWorldPanel(
                 .filterIsInstance<EntityNode>()
                 .forEach { it.resetToStaticFrame() }
             repaint()
-        }
+        }.cancelWith(viewScope)
 
-        // Full tile map update
+        // Full tile map update. Each change subscribes to the current tile map in a fresh child scope and ends the
+        // previous one, so a replaced map stops driving the canvas and a resize, which refires this event, does not
+        // stack another set of handlers on the same map.
+        var tileMapScope: CoroutineScope? = null
         world.events.tileMapChanged.on(swingDispatcher) {
+            tileMapScope?.cancel()
+            val scope = CoroutineScope(SupervisorJob(viewScope.coroutineContext.job)).also { tileMapScope = it }
             world.tileMap.events.layersChanged.on(swingDispatcher) {
                 renderAllLayers(world)
-            }
+            }.cancelWith(scope)
             world.tileMap.events.mapSizeChanged.on(swingDispatcher) {
                 world.events.tileMapChanged.fire()
-            }
+            }.cancelWith(scope)
 
             // Single layer update
             world.tileMap.events.layerImageChanged.on(swingDispatcher) { (oldImage: PImage?, newImage: PImage?) ->
@@ -335,9 +349,9 @@ class OdorWorldPanel(
                 } else {
                     canvas.layer.addChild(newImage)
                 }
-            }
+            }.cancelWith(scope)
             renderAllLayers(world)
-        }
+        }.cancelWith(viewScope)
 
         world.events.worldStarted.on(Dispatchers.Default) {
             if (movementTimer != null) {
@@ -353,7 +367,7 @@ class OdorWorldPanel(
                     }, 50, 50)
                 }
             }
-        }
+        }.cancelWith(viewScope)
 
         world.events.worldStopped.on(Dispatchers.Default) {
             if (movementTimer == null) {
@@ -369,6 +383,10 @@ class OdorWorldPanel(
                 animationTimer?.cancel()
                 animationTimer = null
             }
+        }.cancelWith(viewScope)
+        viewScope.coroutineContext.job.invokeOnCompletion {
+            movementTimer?.cancel()
+            animationTimer?.cancel()
         }
 
         canvas.addInputEventListener(object : PBasicInputEventHandler() {
@@ -426,20 +444,24 @@ class OdorWorldPanel(
     }
 
     private fun renderAllLayers(world: OdorWorld) {
+        canvas.layer.childrenReference.filterIsInstance<EntityNode>().forEach { it.dispose() }
         canvas.layer.removeAllChildren()
         layerImageList = world.tileMap.createImageList()
         canvas.layer.addChildren(layerImageList)
         canvas.layer.addChild(mazeNode)
         for (oe in world.entityList) {
-            val node = EntityNode(oe)
+            val node = EntityNode(oe, this)
             canvas.layer.addChild(node)
         }
         repaint()
     }
 
+    /**
+     * Runs on the EDT, where Piccolo repaints what moved by itself; the camera only moves, and so only repaints the
+     * whole view, when the entity drifts off center.
+     */
     private fun centerCameraToSelectedEntity() {
         if (!world.isUseCameraCentering || isDraggingEntity) {
-            repaint()
             return
         }
 
@@ -452,7 +474,6 @@ class OdorWorldPanel(
                     canvas.camera.viewBounds.height
                 )
             )
-            repaint()
         }
     }
 
@@ -515,7 +536,7 @@ class OdorWorldPanel(
         if (isManualMovementMode || entity.isInTransit) {
             entity.applyMovement()
             entityNode.advance()
-            centerCameraToSelectedEntity()
+            cameraSync.request()
         }
     }
 
@@ -673,7 +694,7 @@ class OdorWorldPanel(
             ).apply {
                 world.events.zoomModeChanged.on(Dispatchers.Swing) {
                     updateFromExternalState()
-                }
+                }.cancelWith(viewScope)
             })
         }
     }

@@ -2,11 +2,18 @@ package org.simbrain.plot
 
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.plot.barchart.BarChartComponent
+import org.simbrain.plot.barchart.BarChartModel
+import org.simbrain.util.UiWork
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
+import org.simbrain.util.onEdt
+import org.simbrain.util.withEdtHeld
 import org.simbrain.workspace.Workspace
 
 class BarChartTest {
@@ -31,13 +38,13 @@ class BarChartTest {
         collection.activationArray = doubleArrayOf(0.25, 0.75)
         workspace.simpleIterate()
         awaitUntil(message = "Bars were not named after neuron labels") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Left", "Right")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Left", "Right") }
         }
         assertEquals(0.75, barChartComponent.model.getDataset().getValue(0, 1))
 
         neurons[0].label = "West"
         awaitUntil(message = "Bar name did not follow the neuron rename without an iteration") {
-            barChartComponent.model.getDataset().columnKeys == listOf("West", "Right")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("West", "Right") }
         }
         assertEquals(0.25, barChartComponent.model.getDataset().getValue(0, 0))
     }
@@ -62,14 +69,14 @@ class BarChartTest {
 
         collection.activationArray = doubleArrayOf(1.0, 2.0, 3.0)
         workspace.simpleIterate()
-        awaitUntil { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Beta", "Gamma") }
+        awaitUntil { onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Beta", "Gamma") } }
 
         runBlocking { neurons[1].delete() }
 
         // Without waiting for another update: the deleted neuron's bar goes, rather than staying behind
         // under the stand-in number it would get once it no longer has a name
         awaitUntil(message = "The deleted neuron's bar was not removed") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma") }
         }
 
         // Undoing a deletion restores collection membership through restoreNeuron
@@ -77,7 +84,7 @@ class BarChartTest {
         collection.restoreNeuron(neurons[1])
 
         awaitUntil(message = "The restored neuron's bar did not come back") {
-            barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma", "Beta")
+            onEdt { barChartComponent.model.getDataset().columnKeys == listOf("Alpha", "Gamma", "Beta") }
         }
     }
 
@@ -101,7 +108,42 @@ class BarChartTest {
             collection.getProducer("getInputArray") couple barChartComponent.model.getConsumer("setBarValues")
         }
 
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(listOf("1", "2"), barChartComponent.model.getDataset().columnKeys)
     }
+
+    @Test
+    fun `saving right after a value update includes that update`() {
+        val model = BarChartModel()
+        // Build and warm the serializer first, so the save below runs while the EDT is still held
+        val xstream = BarChartModel.getXStream()
+        xstream.toXML(BarChartModel())
+        var xml = ""
+        val save = withEdtHeld {
+            model.setBarValues(doubleArrayOf(0.5, 1.5))
+            Thread { xml = xstream.toXML(model) }.apply {
+                start()
+                // The save flushes the queued update on the EDT, so it waits there until the EDT is released
+                awaitUntil(message = "the save never waited for the EDT") { state == Thread.State.WAITING }
+            }
+        }
+        save.join(10_000)
+        assertFalse(save.isAlive, "the save did not finish once the EDT was released")
+        val restored = xstream.fromXML(xml) as BarChartModel
+        assertEquals(1.5, restored.getDataset().getValue(0, 1))
+    }
+
+    @Test
+    fun `a value array changed after it is sent does not change the bars`() {
+        val model = BarChartModel()
+        withEdtHeld {
+            // A producer such as a tensor layer hands over its live buffer and keeps writing to it
+            val values = doubleArrayOf(0.5, 1.5)
+            model.setBarValues(values)
+            values[1] = 9.0
+        }
+        UiWork.awaitIdle()
+        assertEquals(1.5, onEdt { model.getDataset().getValue(0, 1) })
+    }
 }
+

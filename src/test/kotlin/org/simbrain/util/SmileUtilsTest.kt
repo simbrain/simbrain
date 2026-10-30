@@ -478,6 +478,29 @@ class SmileUtilsTest {
     }
 
     @Test
+    fun `splitDataSet keeps each row name with its row`() {
+        val values = (0 until 20).map { it.toDouble() }
+        val dataset = TrainingDataset(
+            inputs = values.map { mutableListOf(it) }.toMutableList(),
+            targets = values.map { mutableListOf(-it) }.toMutableList(),
+            inputRowNames = values.map { "Row ${it.toInt()}" },
+            targetRowNames = values.map { "Row ${it.toInt()}" }
+        )
+
+        val (training, testing) = splitDataSet(dataset, 0.75, Random(7))
+
+        listOf(training, testing).forEach { split ->
+            split.inputs.indices.forEach { i ->
+                val value = split.inputs[i][0]
+                assertEquals("Row ${value.toInt()}", split.inputRowNames!![i])
+                assertEquals("Row ${value.toInt()}", split.targetRowNames!![i])
+                assertEquals(-value, split.targets[i][0])
+            }
+        }
+        assertEquals(values.toSet(), (training.inputs + testing.inputs).map { it[0] }.toSet())
+    }
+
+    @Test
     fun `test splitDataSet with TrainingDataset input`() {
         val inputs = mutableListOf(
             mutableListOf(1.0, 2.0),

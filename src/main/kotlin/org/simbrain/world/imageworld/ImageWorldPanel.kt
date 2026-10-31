@@ -1,6 +1,13 @@
+/**
+ * The canvas of an image world: paints the current pipeline's output and turns mouse drags into brush strokes on the
+ * album's current image. Also owns the actions that edit the album, and the [ImageHistory] that makes them undoable.
+ */
 package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.*
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.world.imageworld.ImageWorldPreferences.imageDirectory
@@ -11,6 +18,7 @@ import java.io.File
 import javax.swing.Action
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
+import javax.swing.SwingUtilities
 import kotlin.math.abs
 import kotlin.math.max
 import kotlin.math.min
@@ -35,6 +43,19 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
     @Transient
     private val clipboard = ImageClipboard(imageWorld)
 
+    /**
+     * Undo history for the image album. Lives here rather than on the world because it serves the person at this panel,
+     * and so is neither saved with the world nor kept when no one is looking.
+     */
+    val history = ImageHistory(imageWorld.imageAlbum).also { history ->
+        history.onChanged = { SwingUtilities.invokeLater { updateUndoActions() } }
+    }
+
+    /**
+     * The brush stroke being drawn, from its first changed pixel until the mouse is released.
+     */
+    private var stroke: ImageHistory.PendingPixelEdit? = null
+
     override fun paintComponent(g: Graphics) {
         super.paintComponent(g)
 
@@ -50,7 +71,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         coroutineScope = imageWorld,
         iconPath =  "menu_icons/minus.png"
     ) {
-        imageWorld.imageAlbum.deleteCurrentImage()
+        history.albumEdit("Delete image") { imageWorld.imageAlbum.deleteCurrentImage() }
     }
 
     val previousImageAction = createAction(
@@ -76,7 +97,34 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         iconPath =  "menu_icons/camera.png",
         keyboardShortcut = KeyCombination('S')
     ) {
-        imageWorld.imageAlbum.takeSnapshot()
+        history.albumEdit("Take snapshot") { imageWorld.imageAlbum.takeSnapshot() }
+    }
+
+    val undoAction = createAction(
+        "Undo",
+        description = "Undo last edit",
+        iconPath = "menu_icons/Undo.png",
+        keyboardShortcut = CmdOrCtrl + 'Z',
+        coroutineContext = Dispatchers.Swing
+    ) {
+        finishStroke()
+        history.undo()
+    }
+
+    val redoAction = createAction(
+        "Redo",
+        description = "Redo last undone edit",
+        iconPath = "menu_icons/Redo.png",
+        keyboardShortcuts = listOf(CmdOrCtrl + 'Y', CmdOrCtrl + Shift + 'Z'),
+        coroutineContext = Dispatchers.Swing
+    ) {
+        finishStroke()
+        history.redo()
+    }
+
+    private fun updateUndoActions() {
+        undoAction.isEnabled = history.canUndo
+        redoAction.isEnabled = history.canRedo
     }
 
     /**
@@ -90,7 +138,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
      * Paste image from current system clipboard.
      */
     var pasteAction: Action = createAction("Paste") {
-        clipboard.pasteImage()
+        history.albumEdit("Paste") { clipboard.pasteImage() }
     }
 
     val saveImageAction = createAction(
@@ -112,7 +160,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         if (!paintMode || evt.isControlDown || (evt.button == MouseEvent.BUTTON3)) {
             return
         }
-        val image = imageWorld.imageAlbum.currentImage
+        val image = stroke?.image ?: imageWorld.imageAlbum.currentImage
         val ratioX = 1.0 * width / image.width
         val ratioY = 1.0 * height / image.height
         val x = (evt.x / ratioX).toInt()
@@ -121,6 +169,11 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         // Basic boundary check for the center point
         if (x < 0 || x >= image.width || y < 0 || y >= image.height) {
             return
+        }
+
+        // Begun here rather than on mouse press, because a right-button drag draws without one
+        if (stroke == null) {
+            stroke = history.beginPixelEdit("Draw")
         }
 
         // Get the color to draw (inverted if shift is down)
@@ -176,6 +229,16 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
 
         g2d.dispose()
         imageWorld.imageAlbum.events.imageUpdate.fireAsync()
+    }
+
+    /**
+     * Record the current stroke, if there is one. Comparing pixels happens before the first suspension, so a stroke
+     * begun by the next mouse press cannot be mixed into this one.
+     */
+    private suspend fun finishStroke() {
+        val finished = stroke ?: return
+        stroke = null
+        finished.finish()?.let { history.record(it) }
     }
 
     /**
@@ -361,6 +424,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
             }
 
             override fun mousePressed(evt: MouseEvent) {
+                requestFocusInWindow()
                 // Reset last position when starting a new stroke
                 lastX = -1
                 lastY = -1
@@ -371,6 +435,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
                 // Reset last position when ending a stroke
                 lastX = -1
                 lastY = -1
+                launch(Dispatchers.Swing.immediate) { finishStroke() }
             }
 
             override fun mouseClicked(evt: MouseEvent) {
@@ -382,5 +447,6 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
         }
         addMouseListener(mouseAdapter)
         addMouseMotionListener(mouseAdapter)
+        updateUndoActions()
     }
 }

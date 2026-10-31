@@ -36,7 +36,7 @@ abstract class NetworkPanelDeleteUndoTestBase {
         // (get() caps at 1000ms and times out under shared-desktop load.)
         models.forEach { m -> awaitUntil { panel.modelNodeMap.peek(m) != null } }
         // Also settle the containing subnetwork's node: undo's restore does a blocking
-        // getImmediately<SubnetworkNode>(parent) (UndoManager.kt) that would otherwise time out at 1000ms
+        // getImmediately<SubnetworkNode>(parent) (UndeleteContext.kt) that would otherwise time out at 1000ms
         // if the subnetwork node is still pending under heavy test-load EDT.
         models.forEach { m ->
             network.getModels<Subnetwork>().firstOrNull { m in it.modelList.all }?.let { subnet ->

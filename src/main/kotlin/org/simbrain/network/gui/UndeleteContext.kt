@@ -1,8 +1,11 @@
 /**
- * Undo and redo for the network panel. [UndoManager] keeps the action stacks; [UndeleteContext] snapshots the
- * parent relationships of models about to be deleted and restores them afterwards, re-creating canvas nodes in
- * an order the panel can honor: connectors after every other model, since their node creation waits for their
- * endpoints' nodes.
+ * Delete and undelete support for undo in the network panel. [UndeleteContext] snapshots the parent relationships of
+ * models about to be deleted and restores them afterwards, re-creating canvas nodes in an order the panel can honor:
+ * connectors after every other model, since their node creation waits for their endpoints' nodes.
+ *
+ * [Network.deleteModels] is used quite a bit because undo/redo often involves deleting models.
+ *
+ * Also see [NetworkModel.afterRestore]
  */
 package org.simbrain.network.gui
 
@@ -12,95 +15,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
-import java.util.*
-
-/**
- * Manage undo / redo operations in the network panel.
- *
- * Related code can be found in callers to [addUndoableAction].
- *
- * [Network.deleteModels] is used quite a bit because undo/redo often involves deleting models.
- *
- * Also see [NetworkModel.afterRestore]
- *
- */
-class UndoManager {
-
-    /**
-     * All actions that can be undone are pushed to this stack.
-     */
-    val undoStack = Stack<UndoableAction>()
-
-    /**
-     * When an action is undone, it is popped off the undo stack and pushed on
-     * to this stack.
-     */
-    val redoStack = Stack<UndoableAction>()
-
-    fun addUndoableAction(action: UndoableAction) {
-        undoStack.push(action)
-        redoStack.removeAllElements()
-    }
-
-    fun addUndoableAction(
-        description: String,
-        undo: suspend () -> Unit,
-        redo: suspend () -> Unit
-    ) {
-        addUndoableAction(undoableAction(description, undo, redo))
-    }
-
-    /**
-     * Undo the last undoable action.
-     */
-    suspend fun undo() {
-        if (!undoStack.isEmpty()) {
-            val lastEvent = undoStack.pop()
-            lastEvent.undo()
-            redoStack.push(lastEvent)
-        }
-    }
-
-    /**
-     * Redo the last undone action.
-     */
-    suspend fun redo() {
-        if (!redoStack.isEmpty()) {
-            val redoEvent = redoStack.pop()
-            redoEvent.redo()
-            undoStack.push(redoEvent)
-        }
-    }
-
-    interface UndoableAction {
-        val description: String
-        suspend fun undo()
-        suspend fun redo()
-    }
-
-}
-
-fun undoableAction(
-    description: String,
-    undo: suspend () -> Unit,
-    redo: suspend () -> Unit) =
-    object : UndoableAction {
-
-        override val description = description
-
-        override suspend fun undo() {
-            undo()
-        }
-
-        override suspend fun redo() {
-            redo()
-        }
-    }
-
 
 class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<NetworkModel>) {
 

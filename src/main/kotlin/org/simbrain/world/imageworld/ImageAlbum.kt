@@ -41,6 +41,25 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     private var channels: Array<DoubleArray> = Array(3) { DoubleArray(0) }
 
     /**
+     * The album's frames and position at one moment. Images are held by reference, so this costs no pixel copies: it
+     * records which images the album held, not what was in them.
+     */
+    class State internal constructor(
+        internal val frames: List<BufferedImage>,
+        internal val frameIndex: Int,
+        internal val currentImage: BufferedImage,
+        internal val channels: Array<DoubleArray>
+    ) {
+        /**
+         * True if both states hold the same images in the same order, showing the same one.
+         */
+        internal fun isSameAs(other: State) = frameIndex == other.frameIndex
+                && currentImage === other.currentImage
+                && frames.size == other.frames.size
+                && frames.indices.all { frames[it] === other.frames[it] }
+    }
+
+    /**
      * Construct a new StaticImageSource.
      */
     constructor() : super()
@@ -54,6 +73,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * @throws IOException upon failure to read the requested file
      */
     suspend fun loadImage(filename: String) {
+        markChanged()
         _frames.clear()
         if (filename.isEmpty()) {
             setCurrentImage(BufferedImage(10, 10, BufferedImage.TYPE_INT_RGB))
@@ -83,8 +103,11 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
                 e.printStackTrace()
             }
         }
+        if (list.isEmpty()) return
+        markChanged()
         _frames.clear()
         _frames.addAll(list)
+        frameIndex = 0
         setCurrentImage(_frames[0])
     }
 
@@ -103,6 +126,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * Add a new image to the album and set the current frame to it.
      */
     suspend fun addImage(image: BufferedImage) {
+        markChanged()
         _frames.add(image)
         frameIndex = _frames.size - 1
         setCurrentImage(image)
@@ -113,6 +137,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * Create image from a provided image icon.
      */
     suspend fun loadImage(imageIcon: ImageIcon) {
+        markChanged()
         val image = BufferedImage(imageIcon.iconWidth, imageIcon.iconHeight, BufferedImage.TYPE_INT_RGB)
         val graphics = image.createGraphics()
         graphics.drawImage(imageIcon.image, 0, 0, null)
@@ -157,6 +182,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
     }
 
     suspend fun reset(width: Int, height: Int) {
+        markChanged()
         _frames.clear()
         frameIndex = 0
         val newImage = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
@@ -188,9 +214,38 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
             reset(currentImage.width, currentImage.height)
             return
         }
+        markChanged()
         _frames.removeAt(frameIndex)
         frameIndex = (frameIndex + _frames.size - 1) % _frames.size
         setCurrentImage(_frames[frameIndex])
+    }
+
+    /**
+     * The album as it is now, to hand back to [restoreState] later.
+     */
+    fun captureState() = State(_frames.toList(), frameIndex, currentImage, channels)
+
+    /**
+     * Return the album to a captured [state]. Not counted in [revision]: the caller is putting the album back, not
+     * changing it behind [ImageHistory]'s back.
+     */
+    suspend fun restoreState(state: State) {
+        _frames.clear()
+        _frames.addAll(state.frames)
+        frameIndex = state.frameIndex
+        channels = state.channels
+        setCurrentImage(state.currentImage)
+    }
+
+    /**
+     * Move to the frame holding [image], so that a change to it can be seen. Does nothing if the album does not hold it
+     * as a frame or already shows it.
+     */
+    suspend fun showFrameOf(image: BufferedImage) {
+        val index = _frames.indexOfFirst { it === image }
+        if (index >= 0 && index != frameIndex) {
+            setFrame(index)
+        }
     }
 
     /**
@@ -227,6 +282,7 @@ class ImageAlbum : ImageSource, AttributeContainer, EditableObject {
      * Update frames[0] pixel data from the channels arrays.
      */
     private fun updateImageFromChannels() {
+        markChanged()
         val image = _frames[0]
         val rgbArray = IntArray(image.width * image.height)
 

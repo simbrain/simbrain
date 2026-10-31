@@ -10,6 +10,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
+import org.simbrain.util.undoableAction
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test

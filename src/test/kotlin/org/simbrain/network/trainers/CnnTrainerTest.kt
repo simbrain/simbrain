@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 class CnnTrainerTest {
 
@@ -66,6 +67,11 @@ class CnnTrainerTest {
         }
 
         val dataset = TrainingDataset(inputs, targets, inputSize = 16, targetSize = 2)
+
+        // Rare random starts barely train in 30 iterations, so the starting point is fixed
+        val randomizer = NormalDistribution(0.0, .1).apply { randomSeed = 1 }
+        conv.randomize(randomizer)
+        dense.randomize(randomizer)
 
         // Create trainer
         val config = CnnTrainerConfig().apply {

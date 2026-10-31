@@ -217,7 +217,8 @@ fun SimulationScope.wireNetTalk(workspace: Workspace, reader: NettalkReader) {
             synthesizer.flushFeatureBuffer()
         }
     }
-    reader.events.textChanged.on {
+    // Immediate, so a queued clear can't land after the next iteration and wipe a phoneme read from the new text
+    reader.events.textChanged.onImmediate {
         synthesizer.clearFeatureBuffer()
     }
     workspace.addUpdateAction("Advance NETtalk reader") {

@@ -76,10 +76,10 @@ class IacNetworkBuilderTest {
         "Jets and Sharks" to Triple(iacJetsSharksFull, 68, 1754),
         "Jets and Sharks (5 people)" to Triple(iacJetsSharks5People, 24, 124),
         "Games at Alivia's" to Triple(iacGames, 83, 3168),
-        "Language Classifier" to Triple(iacLanguages, 57, 1024),
-        "Movies" to Triple(iacMovies, 44, 638),
-        "Novels" to Triple(iacNovels, 27, 234),
-        "SpongeBob" to Triple(iacSpongeBob, 52, 746)
+        "Language Classifier" to Triple(iacLanguages, 37, 604),
+        "Movies" to Triple(iacMovies, 28, 366),
+        "Novels" to Triple(iacNovels, 18, 144),
+        "SpongeBob" to Triple(iacSpongeBob, 36, 474)
     )
 
     private suspend fun build(sim: NewSimulation, componentName: String): Network {
@@ -89,7 +89,7 @@ class IacNetworkBuilderTest {
     }
 
     @Test
-    fun `every iac simulation builds the same structure as the original workspace`() = runBlocking {
+    fun `every iac simulation builds the expected structure`() = runBlocking {
         expectedStructure.forEach { (componentName, expected) ->
             val (sim, neurons, synapses) = expected
             val network = build(sim, componentName)

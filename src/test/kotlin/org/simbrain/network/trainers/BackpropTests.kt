@@ -171,11 +171,14 @@ class BackpropTests {
     }
 
     @Test
-    fun `train 10-7-10 auto-encoder`() {
+    fun `train 10-5-10 auto-encoder`() {
         val inputs = identityMutableList(10)
         val bp = BackpropNetwork(intArrayOf(10, 5, 10), null).apply {
+            // About one random start in seven settles in a local minimum, so the starting point is fixed
+            trainerConfig.weightInitializationStrategy = Xavier(seed = 3)
             initWeights()
-            initBiases()
+            val biasRandomizer = NormalDistribution(0.0, 0.01).apply { randomSeed = 3 }
+            (layerList - inputLayer).forEach { it.randomizeBiases(biasRandomizer) }
             trainerConfig.learningRate = .01
             trainingSet = TrainingDataset(
                 inputs = inputs,

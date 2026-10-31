@@ -51,7 +51,9 @@ class ProjectionDesktopComponentTest {
         }
         UiWork.awaitIdle()
 
-        assertTrue(tasks < 10, "300 points posted $tasks EDT tasks")
+        // Normally about 10. The count covers the whole JVM, so unrelated work can land in the window; posting per
+        // point would cost at least 300.
+        assertTrue(tasks < 100, "300 points posted $tasks EDT tasks")
         assertEquals(component.projector.dataset.kdTree.size, desktop.pointList.size)
     }
 }

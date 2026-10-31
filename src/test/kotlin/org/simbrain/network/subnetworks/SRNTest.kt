@@ -8,6 +8,7 @@ import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.trainers.SupervisedTrainer
 import org.simbrain.network.trainers.createDiagonalDataset
+import org.simbrain.util.stats.distributions.NormalDistribution
 
 class SRNTest {
 
@@ -20,7 +21,11 @@ class SRNTest {
         net.addNetworkModelsAsync(srn)
         srn.trainingSet = createDiagonalDataset(10, 10, shiftAmount = 1)
         with(net) {
-            srn.randomize()
+            // The input layer starts with random activations that reach the context layer through this first update,
+            // so it needs the seed too. Some starting points settle in a local minimum.
+            val randomizer = NormalDistribution(0.0, .1).apply { randomSeed = 1 }
+            srn.randomize(randomizer)
+            srn.inputLayer.randomize(randomizer)
             srn.update()
             srn.trainerConfig.learningRate = 0.01
 

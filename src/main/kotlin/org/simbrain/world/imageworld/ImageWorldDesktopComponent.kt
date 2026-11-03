@@ -1,12 +1,8 @@
 package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
-import org.simbrain.util.SFileChooser
-import org.simbrain.util.cancelWith
-import org.simbrain.util.createAction
-import org.simbrain.util.onUi
+import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.swingDispatcher
 import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.CouplingMenu
 import org.simbrain.workspace.gui.DesktopComponent
@@ -36,7 +32,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
     private fun setupMenuBar(frame: GenericFrame) {
         val menuBar = JMenuBar()
-        val fileMenu = JMenu("File  ")
+        val fileMenu = JMenu("File")
         menuBar.add(fileMenu)
 
         // Add load images menu item if it's an image album world
@@ -48,9 +44,6 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         val saveAllImages = JMenuItem(imageWorldPanel.saveImageAllAction)
         fileMenu.add(saveAllImages)
 
-        fileMenu.addSeparator()
-        fileMenu.add(imageWorldPanel.copyAction)
-        fileMenu.add(imageWorldPanel.pasteAction)
 
         fileMenu.addSeparator()
         fileMenu.add(actionManager.createImportAction(this))
@@ -92,6 +85,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         }
         editMenu.add(imageWorldPanel.undoAction)
         editMenu.add(imageWorldPanel.redoAction)
+        editMenu.addSeparator()
+        editMenu.add(imageWorldPanel.copyAction)
+        editMenu.add(imageWorldPanel.pasteAction)
         editMenu.addSeparator()
         editMenu.add(resetCanvasAction)
         editMenu.addSeparator()

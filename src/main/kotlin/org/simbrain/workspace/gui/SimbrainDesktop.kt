@@ -572,10 +572,13 @@ object SimbrainDesktop {
         fileMenu.addSeparator()
         fileMenu.add(actionManager.showUpdaterDialog)
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.showNetworkPreferencesAction)
-        fileMenu.add(actionManager.showOdorWorldPreferencesAction)
-        fileMenu.add(actionManager.showPlotPreferencesAction)
-        fileMenu.add(actionManager.showWorkspacePreferencesAction)
+        fileMenu.add(JMenu("Preferences").apply {
+            icon = ResourceManager.getSmallIcon("menu_icons/Prefs.png")
+            add(actionManager.showWorkspacePreferencesAction)
+            add(actionManager.showNetworkPreferencesAction)
+            add(actionManager.showOdorWorldPreferencesAction)
+            add(actionManager.showPlotPreferencesAction)
+        })
         fileMenu.addSeparator()
         fileMenu.add(actionManager.resetOnboardingWindows)
         // On macOS, Quit (with its Cmd-Q shortcut) lives in the application menu; see the quit handler

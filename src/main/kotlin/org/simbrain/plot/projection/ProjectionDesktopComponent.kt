@@ -30,6 +30,7 @@ import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.util.widgets.ToggleButton
 import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.*
 import java.awt.geom.Ellipse2D
 import javax.swing.*
@@ -309,6 +310,8 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
                 add(JMenuItem(importAction))
                 add(JMenuItem(exportAction))
                 addSeparator()
+                add(JMenuItem(actionManager.createRenameAction(this@ProjectionDesktopComponent)))
+                addSeparator()
                 add(JMenuItem(closeAction))
             })
             add(JMenu("Edit").apply {
@@ -316,10 +319,7 @@ class ProjectionDesktopComponent(frame: GenericFrame, component: ProjectionCompo
                 add(JMenuItem(prefsAction))
             })
             add(JMenu("Help").apply {
-                val helpItem = JMenuItem("Help")
-                val helpAction = ShowHelpAction("https://docs.simbrain.net/docs/plots/projectionPlot.html")
-                helpItem.action = helpAction
-                add(helpItem)
+                add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/plots/projectionPlot.html")))
             })
         }
 

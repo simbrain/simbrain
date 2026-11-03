@@ -33,7 +33,6 @@ import org.simbrain.custom_sims.simulations.psychology.*
 import org.simbrain.custom_sims.simulations.reading.triangleReadingSim
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
-import org.simbrain.custom_sims.simulations.tutorials.localistAndDistributedRepresentations
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -74,10 +73,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Braitenberg game") { braitenbergGame }
         item("Two Braitenberg vehicles") { braitenbergSim }
         item("Isopod simulation") { isopodSim }
-    }
-
-    dir("NPC behaviors") {
-        item("NPC basic demo") { npcSteeringDemo }
+        item("NPC basic demo", beta = true) { npcSteeringDemo }
     }
 
     dir("Reservoir networks") {
@@ -93,6 +89,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
         item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
+        item("Localist and distributed representations") { localistAndDistributedRepresentations }
         item("Mirror neurons") { mirrorLearning }
         item("Mouse and eye tracking") { spiveyNet }
         item("Temporal attention network", beta = true) { denisonNet }
@@ -208,10 +205,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
         item("Braitenberg program learning", beta = true) { braitenbergRLPrograms }
-    }
-
-    dir("Tutorials") {
-        item("Localist and distributed representations") { localistAndDistributedRepresentations }
     }
 
     dir("Vision") {

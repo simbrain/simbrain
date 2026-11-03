@@ -1,5 +1,5 @@
 /** An interactive tutorial contrasting one-hot and overlapping object representations. */
-package org.simbrain.custom_sims.simulations.tutorials
+package org.simbrain.custom_sims.simulations.psychology
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.NeuronCollection

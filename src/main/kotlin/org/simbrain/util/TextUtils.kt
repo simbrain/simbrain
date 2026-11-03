@@ -560,3 +560,8 @@ fun main() {
 operator fun String.div(other: String): String {
     return this + FS + other
 }
+
+/**
+ * This text with `&`, `<`, and `>` replaced by HTML entities, so it displays literally inside HTML.
+ */
+fun String.escapeHtml(): String = replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

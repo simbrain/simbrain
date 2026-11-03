@@ -1,5 +1,7 @@
 package org.simbrain.docviewer
 
+import org.simbrain.util.ThemeColor
+import org.simbrain.util.htmlHex
 import java.awt.*
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
@@ -15,7 +17,6 @@ import javax.swing.event.HyperlinkEvent
 import javax.swing.text.BadLocationException
 import javax.swing.text.DefaultHighlighter
 import javax.swing.text.html.HTMLDocument
-import org.simbrain.util.ThemeColor
 
 /**
  * Renders documentation as html and provides a browser style inline find bar (Cmd/Ctrl+F) over the rendered text,
@@ -40,7 +41,7 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
         isEditable = false
         // Swing's default HTML stylesheet paints links pure blue, which is muddy on the dark theme
         val link = UIManager.getColor("Component.linkColor") ?: Color(0x2A, 0x9A, 0xB2)
-        (document as? HTMLDocument)?.styleSheet?.addRule("a { color: #%02x%02x%02x; }".format(link.red, link.green, link.blue))
+        (document as? HTMLDocument)?.styleSheet?.addRule("a { color: ${link.htmlHex}; }")
         addHyperlinkListener { e ->
             if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
                 try {

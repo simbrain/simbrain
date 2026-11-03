@@ -2,6 +2,7 @@ package org.simbrain.network.smile
 
 import org.simbrain.network.smile.classifiers.KNNClassifier
 import org.simbrain.network.smile.classifiers.LogisticRegClassifier
+import org.simbrain.network.smile.classifiers.RandomForestClassifier
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.split
@@ -39,6 +40,18 @@ abstract class SimbrainClassifier(
      */
     var trainingStats = ""
 
+    /**
+     * Fraction of the training data classified correctly by the last fit, or NaN before training.
+     */
+    var trainingAccuracy = Double.NaN
+        private set
+
+    /**
+     * Fraction of the testing data classified correctly by the last fit, or NaN before training.
+     */
+    var testingAccuracy = Double.NaN
+        private set
+
     var testingStats = ""
 
     /**
@@ -58,6 +71,11 @@ abstract class SimbrainClassifier(
     }
 
     /**
+     * Index of a predicted label among the classes, used to pick the active output neuron or a plot color.
+     */
+    open fun classIndex(label: Int) = label
+
+    /**
      * Convert this model's integer prediction to an output vector.
      */
     open fun getOutputArray(winner: Int): DoubleArray {
@@ -66,12 +84,19 @@ abstract class SimbrainClassifier(
     }
 
     fun setTrainingStats(accuracy: Double) {
+        trainingAccuracy = accuracy
         trainingStats = "Accuracy: ${Utils.round(accuracy, 3)}"
     }
 
     fun setTestingStats(accuracy: Double) {
+        testingAccuracy = accuracy
         testingStats = "Accuracy: ${Utils.round(accuracy, 3)}"
     }
+
+    /**
+     * Fit the model to [trainingData].
+     */
+    fun fitTrainingData() = fit(trainingData.inputArrays, trainingData.targetArray)
 
     /**
      * For use with object type editor.
@@ -83,4 +108,8 @@ abstract class SimbrainClassifier(
 }
 
 val classifierTypes = listOf(
-    LogisticRegClassifier::class.java, SVMClassifier::class.java, KNNClassifier::class.java)
+    LogisticRegClassifier::class.java,
+    SVMClassifier::class.java,
+    KNNClassifier::class.java,
+    RandomForestClassifier::class.java
+)

@@ -397,15 +397,22 @@ private class CustomRenderer(val proj: ProjectionDesktopComponent) : XYLineAndSh
         }
     }
 
+    private fun isHot(point: DataPoint) = proj.projector.useHotPoint && point === proj.projector.dataset.currentPoint
+
+    override fun getItemShapeFilled(series: Int, index: Int) = !proj.pointList[index].hollow
+
     override fun getItemOutlinePaint(series: Int, index: Int): Paint {
-        return proj.projector.hotColor
+        val point = proj.pointList[index]
+        return if (point.hollow && !isHot(point)) getItemPaint(series, index) else proj.projector.hotColor
     }
 
     override fun getItemOutlineStroke(series: Int, index: Int): Stroke {
-        if (proj.projector.useHotPoint && proj.pointList[index] === proj.projector.dataset.currentPoint) {
-            return BasicStroke(6f)
+        val point = proj.pointList[index]
+        return when {
+            isHot(point) -> BasicStroke(6f)
+            point.hollow -> BasicStroke(2f)
+            else -> BasicStroke(0f)
         }
-        return BasicStroke(0f)
     }
 }
 

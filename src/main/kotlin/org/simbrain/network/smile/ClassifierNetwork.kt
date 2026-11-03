@@ -5,7 +5,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.activations
 import org.simbrain.network.smile.classifiers.SVMClassifier
 import org.simbrain.network.subnetworks.Subnetwork
-import org.simbrain.network.trainers.ClassificationDatasetEncoding
 import org.simbrain.network.trainers.makeBlobs
 import org.simbrain.network.util.Alignment
 import org.simbrain.network.util.Direction
@@ -28,8 +27,26 @@ import kotlin.reflect.full.primaryConstructor
  *
  */
 class ClassifierNetwork(
-    val classifier: SimbrainClassifier
+    classifier: SimbrainClassifier
 ) : Subnetwork(), EditableObject {
+
+    /**
+     * The wrapped classifier. It can be replaced by another with the same number of inputs and classes, for example
+     * to compare models on the same data without rebuilding the network.
+     */
+    var classifier: SimbrainClassifier = classifier
+        set(value) {
+            val nInputs = inputNeuronGroup.size
+            val nOutputs = outputNeuronGroup.size
+            require(value.trainingData.inputs.first().size == nInputs && value.numClasses == nOutputs) {
+                "Replacement classifier must have $nInputs inputs and $nOutputs classes"
+            }
+            field = value
+            label = value.name
+            winner = Integer.MIN_VALUE
+            outputNeuronGroup.neuronList.activations = List(nOutputs) { 0.0 }
+            events.updated.fire()
+        }
 
     /**
      * Integer winner produced by the Smile classifier when predict is called.
@@ -44,6 +61,11 @@ class ClassifierNetwork(
     val outputNeuronGroup = addNeuronCollection(List(classifier.numClasses) { Neuron() }).apply {
         label = "Output Layer"
         setLayoutBasedOnSize()
+        // Outputs are one-hot or probabilities, so 1 should show as fully saturated
+        neuronList.forEach {
+            it.upperBound = 1.0
+            it.lowerBound = 0.0
+        }
     }
 
     init {
@@ -60,9 +82,7 @@ class ClassifierNetwork(
      * Train the classifier using the current training data.
      */
     fun train() {
-        classifier.apply {
-            fit(trainingData.inputArrays, trainingData.targetArray)
-        }
+        classifier.fitTrainingData()
         events.updated.fire()
     }
 
@@ -128,10 +148,6 @@ class ClassifierNetwork(
         var nout by GuiEditable(
             initValue = 2,
             label = "Number of outputs (classes)",
-            description = "Ignored for some classifiers (e.g. SVM) that can only produce 2 outputs",
-            onUpdate = {
-                enableWidget(widgetValue(::classifierType) !is SVMClassifier)
-            },
             order = 20
         )
 
@@ -146,8 +162,7 @@ class ClassifierNetwork(
                     nSamples = 100,
                     nCenters = nout,
                     nFeatures = nin,
-                    clusterStd = 2.0,
-                    encoding = if (classifierType is SVMClassifier) ClassificationDatasetEncoding.Bipolar else ClassificationDatasetEncoding.Integer
+                    clusterStd = 2.0
                 )
                 constructor.call(dataset, 0.8)
             }!!

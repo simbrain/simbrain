@@ -2,6 +2,8 @@ package org.simbrain.custom_sims.simulations.rl
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import org.json.JSONObject
 import org.simbrain.custom_sims.*
 import org.simbrain.network.core.*
@@ -21,7 +23,7 @@ import java.awt.geom.Point2D
 import java.io.File
 import java.text.SimpleDateFormat
 import java.util.*
-import javax.swing.JButton
+import javax.swing.JCheckBox
 import javax.swing.JInternalFrame
 import javax.swing.JPanel
 import javax.swing.event.InternalFrameAdapter
@@ -804,7 +806,7 @@ val braitenbergRL = newSim { optionString ->
             }
             decayEditButton.toolTipText = "Configure decay function for all sensors and rewards."
 
-            lateinit var weightSpaceButton: JButton
+            lateinit var weightSpaceCheckBox: JCheckBox
 
             fun showWeightSpaceFrame() {
                 val existingFrame = weightSpaceFrame?.takeIf { it.isDisplayable }
@@ -825,7 +827,7 @@ val braitenbergRL = newSim { optionString ->
                             override fun internalFrameClosed(e: InternalFrameEvent) {
                                 weightSpacePanel = null
                                 weightSpaceFrame = null
-                                weightSpaceButton.text = "Show Weight Space"
+                                weightSpaceCheckBox.isSelected = false
                             }
                         })
                         isVisible = true
@@ -838,35 +840,29 @@ val braitenbergRL = newSim { optionString ->
                 frame.toFront()
                 frame.isSelected = true
                 repaintWeightSpacePanel()
-                weightSpaceButton.text = "Hide Weight Space"
             }
 
             fun hideWeightSpaceFrame() {
                 weightSpaceFrame?.takeIf { it.isDisplayable }?.let { it.isIcon = true }
-                weightSpaceButton.text = "Show Weight Space"
             }
 
-            weightSpaceButton = addButton("Show Weight Space") {
-                val frame = weightSpaceFrame?.takeIf { it.isDisplayable }
-                if (frame != null && !frame.isIcon) {
-                    hideWeightSpaceFrame()
-                } else {
-                    showWeightSpaceFrame()
+            weightSpaceCheckBox = addCheckBox(
+                "Show Weight Space", false,
+                toolTip = "Show a live display of cheese and poison actor weights."
+            ) { visible ->
+                withContext(Dispatchers.Swing) {
+                    if (visible) showWeightSpaceFrame() else hideWeightSpaceFrame()
                 }
             }
-            weightSpaceButton.toolTipText = "Open a live display of cheese and poison actor weights."
 
-            val timeSeriesButton = addButton("Show Time Series") {
-                if (plotFrame is JInternalFrame && !plotFrame.isIcon) {
-                    plotFrame.setIcon(true)
-                    this@addButton.text = "Show Time Series"
-                } else {
-                    plotFrame.setIcon(false)
-                    plotFrame.toFront()
-                    this@addButton.text = "Hide Time Series"
+            addCheckBox("Show Time Series", false, toolTip = "Show reward, value, and TD error time series.") { visible ->
+                withContext(Dispatchers.Swing) {
+                    if (plotFrame is JInternalFrame) {
+                        plotFrame.setIcon(!visible)
+                        if (visible) plotFrame.toFront()
+                    }
                 }
             }
-            timeSeriesButton.toolTipText = "Show reward, value, and TD error time series."
 
             addSeparator()
 
@@ -949,7 +945,7 @@ val braitenbergRL = newSim { optionString ->
     4. Click the workspace run button to start learning
     5. Watch the vehicle move around the environment as it learns
     6. Observe the `Reward, Value, TD Error` plot to monitor learning progress
-    7. Click `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
+    7. Check `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
 
     You can stop and examine weights at any time, then continue. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
 

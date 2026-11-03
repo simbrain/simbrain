@@ -287,6 +287,21 @@ Good examples: `braitenberg/Braitenberg.kt`, `demos/view3dDemo.kt`
 Put reset controls (`Reset`, `Reset Network`, and the like) last in the panel, below their own `addSeparator()`,
 so they are not pressed by accident in the middle of a workflow.
 
+Show or hide an optional window or display with a checkbox labeled `Show X`, not a button whose label flips
+between `Show X` and `Hide X`. A checkbox shows the current state at a glance, while a flipping label leaves
+it unclear whether it names the state or the action. This covers windows (plots, custom frames) as well as
+overlays inside a view (grids, trails). Keep the checkbox in sync with the window: make the window
+non-closable (`isClosable = false` on its frame) so the checkbox is the only way to hide it, or, for a custom
+frame that stays closable, uncheck the box when the frame closes. Hide a workspace component with
+`isGuiOn = false` to keep its data, or remove it if it should cost nothing while hidden. Use a button only for a one-shot action that
+opens a new window or dialog each time, such as `Show correlations` or `Open Trainer`.
+
+```kotlin
+addCheckBox("Show spikes", false, toolTip = "Show a raster plot of the spikes.") { visible ->
+    withContext(Dispatchers.Swing) { raster.isGuiOn = visible }
+}
+```
+
 Give every simulation-specific interactive control-panel control a concise tooltip, including buttons, text fields, formatted numeric fields, checkboxes, combo boxes, and sliders. For labelled controls, apply an explanatory tooltip to both the control and its label: pass `toolTip = "..."` to `addTextField(...)`, `addFormattedNumericTextField(...)`, `addComboBox(...)`, `addCheckBox(...)`, `addSlider(...)`, and `addSliderWithTextField(...)`, which set it on both; `addTextField` and `addComboBox` also accept `labelToolTip = "..."` when the label needs different text. Setting `.toolTipText` on the returned component covers only the component, not its label. For buttons, use `addButton(...) { ... }.apply { toolTipText = "..." }`; `EvolutionControlPanel.addButton` takes `toolTip = "..."`. Write tooltips as full sentences ending with a period. Describe actions in the imperative ("Run one training step.", not "Runs one training step."); describe value controls such as fields and sliders by what the value is ("Learning rate for the critic weights."). When a control only takes effect while the simulation runs, say so in the tooltip, for example "Check this and press Run to ...". Tooltips support quick discovery; the sidebar must provide the complete workflow and a separate scan-friendly line for every control, including controls in dialogs opened from the panel.
 
 ## Documentation

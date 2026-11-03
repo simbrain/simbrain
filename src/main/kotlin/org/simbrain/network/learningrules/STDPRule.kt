@@ -8,6 +8,12 @@ import org.simbrain.util.UserParameter
 import kotlin.math.exp
 
 /**
+ * Spike pairs further apart than this many time constants are ignored, as in most STDP implementations. The
+ * exponential has fallen below 1% by then, so this only removes tiny changes from spikes long past.
+ */
+private const val WINDOW_IN_TAUS = 5.0
+
+/**
  * Models spike time dependent plasticity STDP.
  *
  * Assumes source and target neurons are spiking neurons.
@@ -106,23 +112,26 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
 
     open var deltaW: Double = 0.0
 
+    /**
+     * Weight change for a pair of spikes [deltaT] apart (source minus target spike time, sign flipped when
+     * anti-Hebbian). Pairs further apart than [WINDOW_IN_TAUS] time constants, simultaneous spikes, and pairs where a
+     * neuron has not spiked yet change nothing.
+     */
+    private fun weightChange(deltaT: Double) = when {
+        deltaT < 0 && -deltaT <= WINDOW_IN_TAUS * tauPlus -> wPlus * exp(deltaT / tauPlus) * learningRate
+        deltaT > 0 && deltaT <= WINDOW_IN_TAUS * tauMinus -> -wMinus * exp(-deltaT / tauMinus) * learningRate
+        else -> 0.0
+    }
+
     context(Network)
     override fun apply(synapse: Synapse, data: EmptyScalarData) {
         if (synapse.source.isSpike || synapse.target.isSpike) {
             val deltaT = ((synapse.source.lastSpikeTime
                     - synapse.target.lastSpikeTime)
                     * (if (isHebbian) 1 else -1))
-            if (deltaT < 0) {
-                // LTP Case
-                deltaW = wPlus * exp(deltaT / tauPlus) * learningRate
-            } else if (deltaT > 0) {
-                // LTD Case
-                deltaW = -wMinus * exp(-deltaT / tauMinus) * learningRate
-            }
-
-            synapse.strength +=  deltaW * timeStep
+            deltaW = weightChange(deltaT)
+            synapse.strength += deltaW * timeStep
         }
-
     }
 
     context(Network)
@@ -152,17 +161,7 @@ open class STDPRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData> {
                         val deltaT = ((sourceSpikeTimes[j] - targetSpikeTimes[i]) 
                                 * (if (isHebbian) 1 else -1))
                         
-                        val deltaW = if (deltaT < 0) {
-                            // LTP Case
-                            wPlus * exp(deltaT / tauPlus) * learningRate
-                        } else if (deltaT > 0) {
-                            // LTD Case
-                            -wMinus * exp(-deltaT / tauMinus) * learningRate
-                        } else {
-                            0.0
-                        }
-                        
-                        weightMatrix.weights[i, j] += deltaW * timeStep
+                        weightMatrix.weights[i, j] += weightChange(deltaT) * timeStep
                     }
                 }
             }

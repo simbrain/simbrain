@@ -14,6 +14,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
  * **IACNeuron** implements an Interactive Activation and Competition neuron.
  */
 class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpdateRule, NoisyUpdateRule {
+
     @UserParameter(
         label = "Decay rate",
         description = "The rate at which activation decays to its resting value.",
@@ -70,15 +71,20 @@ class IACRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ClippedUpd
         return iac
     }
 
+    /**
+     * Only sources with positive activation send input; a unit below zero is inactive rather than a negative
+     * signal, so an inhibitory weight from it must not excite its target.
+     */
+    context(Network)
+    override fun synapticInput(neuron: Neuron, data: EmptyScalarData, psrSum: Double): Double =
+        neuron.fanIn.sumOf { if (it.source.activation > 0) it.psr else 0.0 }
+
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
 
         // Notation and algorithm from McClelland 1981, Proceedings of the third
-        // annual cog-sci meeting. Only sources with positive activation send input; a unit
-        // below zero is inactive rather than a negative signal, so an inhibitory weight from it
-        // must not excite its target.
-        val activeInputs = neuron.fanIn.sumOf { if (it.source.activation > 0) it.psr else 0.0 }
-        val netInput = neuron.input - neuron.weightedInputs + activeInputs
+        // annual cog-sci meeting. The net input counts only active sources; see synapticInput.
+        val netInput = neuron.input
 
         val effect = if (netInput >= 0) {
             (upperBound - neuron.activation) * netInput

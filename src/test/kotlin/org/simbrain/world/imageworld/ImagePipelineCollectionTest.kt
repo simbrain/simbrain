@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.simbrain.world.imageworld.ImageAlbum
+import org.simbrain.world.imageworld.filters.ImageOperation
 import org.simbrain.world.imageworld.filters.ImageProcessingPipeline
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -195,5 +196,44 @@ class ImagePipelineCollectionTest {
     @Test
     fun `test pipeline collection id`() {
         assertEquals("Image album", pipelineCollection.id)
+    }
+
+    private class CountingOperation : ImageOperation() {
+        var runs = 0
+        override fun applyOperation(input: BufferedImage): BufferedImage = input.also { runs++ }
+        override fun copy() = CountingOperation()
+    }
+
+    @Test
+    fun `an image update computes only the pipelines that are read`() = runBlocking {
+        val album = ImageAlbum()
+        val collection = ImagePipelineCollection(album)
+        val read = CountingOperation()
+        val unread = CountingOperation()
+        collection.addPipeline("Read") { addOperation(read) }
+        collection.addPipeline("Unread") { addOperation(unread) }
+        val readPipeline = collection.pipelines.first { it.name == "Read" }
+        read.runs = 0
+        unread.runs = 0
+
+        repeat(10) { album.addImage(BufferedImage(8, 8, BufferedImage.TYPE_INT_RGB)) }
+        readPipeline.processedImage
+
+        assertEquals(1, read.runs, "a read pipeline should compute once, when read")
+        assertEquals(0, unread.runs, "an unread pipeline was computed")
+    }
+
+    @Test
+    fun `a pipeline read after an image update reflects the new image`() = runBlocking {
+        val album = ImageAlbum()
+        val collection = ImagePipelineCollection(album)
+        val pipeline = collection.currentPipeline
+        album.addImage(BufferedImage(8, 8, BufferedImage.TYPE_INT_RGB))
+        pipeline.processedImage
+
+        album.addImage(BufferedImage(12, 6, BufferedImage.TYPE_INT_RGB))
+
+        assertEquals(12, pipeline.processedImage.width)
+        assertEquals(6, pipeline.processedImage.height)
     }
 }

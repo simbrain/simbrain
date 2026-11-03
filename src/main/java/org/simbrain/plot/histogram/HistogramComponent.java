@@ -59,6 +59,12 @@ public class HistogramComponent extends WorkspaceComponent {
         return new HistogramComponent(name, dataModel);
     }
 
+
+    @Override
+    protected List<AutoCloseable> getCloseables() {
+        return List.of(model);
+    }
+
     @Override
     public void save(final OutputStream output, final String format) {
         XStreamUtils.getSimbrainXStream().toXML(model, output);

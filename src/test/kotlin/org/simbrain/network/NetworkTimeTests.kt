@@ -60,4 +60,13 @@ class NetworkTimeTests {
         assertTrue(net.timeType == Network.TimeType.DISCRETE)
     }
 
+    @Test
+    fun `iterations count every update although time drifts from a whole number of steps`() {
+        val network = Network().apply { timeStep = 0.1 }
+        val miscounted = (1..1000).filter { step ->
+            network.updateTime()
+            network.iterations != step.toLong()
+        }
+        assertEquals(emptyList<Int>(), miscounted.take(5))
+    }
 }

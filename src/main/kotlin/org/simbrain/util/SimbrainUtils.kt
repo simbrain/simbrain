@@ -1,5 +1,6 @@
 package org.simbrain.util
 
+import java.util.concurrent.atomic.AtomicLong
 import kotlinx.coroutines.withTimeout
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
@@ -47,27 +48,32 @@ class LazyVarImpl<O, T>(val initializer: () -> T) : ReadWriteProperty<O, T>, Laz
  * only when marked as dirty or explicitly set externally. It helps in reducing redundant computations
  * or re-initializations for cases where the value is expected to remain constant until [CachedObject.invalidate] is
  * called.
+ *
+ * Safe to invalidate from one thread while another reads: each value is stored with the invalidation count it was
+ * computed under, so a computation that an invalidation overtook is never mistaken for current. Two readers racing
+ * after an invalidation may both compute; either result is current.
  */
 class CachedObject<T>(private val init: () -> T) {
 
-    private var isDirty = true
-    private var _value: T? = null
+    private class Entry<T>(val generation: Long, val value: T)
+
+    private val generation = AtomicLong()
+
+    @Volatile
+    private var entry: Entry<T>? = null
 
     var value: T
-        get() = if (isDirty) {
-            _value = init()
-            isDirty = false
-            _value!!
-        } else {
-            _value!!
+        get() {
+            val current = generation.get()
+            entry?.let { if (it.generation == current) return it.value }
+            return init().also { entry = Entry(current, it) }
         }
         set(value) {
-            _value = value
-            isDirty = false
+            entry = Entry(generation.get(), value)
         }
 
     fun invalidate() {
-        isDirty = true
+        generation.incrementAndGet()
     }
 }
 

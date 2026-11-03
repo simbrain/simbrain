@@ -6,11 +6,15 @@ import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.util.applyFunction
 import org.simbrain.util.assertMatrixEquals
 import org.simbrain.util.assertMatrixNotEquals
+import org.simbrain.util.flatten
 import org.simbrain.util.frobeniusNorm
 import org.simbrain.util.setValuesInPlace
 import smile.math.matrix.Matrix
+import kotlin.math.sqrt
+import kotlin.random.Random
 
 class OptimizerTest {
 
@@ -44,43 +48,37 @@ class OptimizerTest {
             doubleArrayOf(0.4, 0.2)
         ))
 
-        with(trainer) {
-            val result1 = optimizer.computeDelta(wm.weights, firstDelta)
-            // v_1 = 0.9 * 0 + firstDelta; update = lr * v_1
-            val expected1 = firstDelta.clone().mul(optimizer.learningRate)
+        val result1 = optimizer.computeDelta(wm.weights, firstDelta)
+        // v_1 = 0.9 * 0 + firstDelta; update = lr * v_1
+        val expected1 = firstDelta.clone().mul(optimizer.learningRate)
 
-            assertMatrixEquals(expected1, result1, "First update should be just learning_rate * delta")
-        }
+        assertMatrixEquals(expected1, result1, "First update should be just learning_rate * delta")
 
         val secondDelta = Matrix.of(arrayOf(
             doubleArrayOf(0.1, 0.3),
             doubleArrayOf(0.2, 0.1)
         ))
 
-        with(trainer) {
-            val result2 = optimizer.computeDelta(wm.weights, secondDelta)
-            // v_2 = 0.9 * v_1 + secondDelta = 0.9 * firstDelta + secondDelta; update = lr * v_2
-            val expectedVelocity = firstDelta.clone().mul(0.9).add(secondDelta)
-            val expected2 = expectedVelocity.clone().mul(optimizer.learningRate)
+        val result2 = optimizer.computeDelta(wm.weights, secondDelta)
+        // v_2 = 0.9 * v_1 + secondDelta = 0.9 * firstDelta + secondDelta; update = lr * v_2
+        val expectedVelocity = firstDelta.clone().mul(0.9).add(secondDelta)
+        val expected2 = expectedVelocity.clone().mul(optimizer.learningRate)
 
-            assertMatrixEquals(expected2, result2, "Second update should accumulate velocity")
-        }
+        assertMatrixEquals(expected2, result2, "Second update should accumulate velocity")
 
         val thirdDelta = Matrix.of(arrayOf(
             doubleArrayOf(0.05, 0.05),
             doubleArrayOf(0.05, 0.05)
         ))
 
-        with(trainer) {
-            val result3 = optimizer.computeDelta(wm.weights, thirdDelta)
-            // v_3 = 0.9 * v_2 + thirdDelta = 0.81 * firstDelta + 0.9 * secondDelta + thirdDelta
-            val expectedVelocity3 = firstDelta.clone().mul(0.9 * 0.9)
-                .add(secondDelta.clone().mul(0.9))
-                .add(thirdDelta)
-            val expected3 = expectedVelocity3.clone().mul(optimizer.learningRate)
+        val result3 = optimizer.computeDelta(wm.weights, thirdDelta)
+        // v_3 = 0.9 * v_2 + thirdDelta = 0.81 * firstDelta + 0.9 * secondDelta + thirdDelta
+        val expectedVelocity3 = firstDelta.clone().mul(0.9 * 0.9)
+            .add(secondDelta.clone().mul(0.9))
+            .add(thirdDelta)
+        val expected3 = expectedVelocity3.clone().mul(optimizer.learningRate)
 
-            assertMatrixEquals(expected3, result3, "Third update should accumulate full velocity history (Polyak momentum)")
-        }
+        assertMatrixEquals(expected3, result3, "Third update should accumulate full velocity history (Polyak momentum)")
     }
 
     @Test
@@ -94,19 +92,17 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            // First update to establish momentum
-            optimizer.computeDelta(wm.weights, delta)
-            
-            // Reset optimizer
-            optimizer.reset()
-            
-            // Next update should behave like first update (no momentum)
-            val result = optimizer.computeDelta(wm.weights, delta)
-            val expected = delta.clone().mul(optimizer.learningRate)
-            
-            assertMatrixEquals(expected, result, "After reset, should behave like first update")
-        }
+        // First update to establish momentum
+        optimizer.computeDelta(wm.weights, delta)
+        
+        // Reset optimizer
+        optimizer.reset()
+        
+        // Next update should behave like first update (no momentum)
+        val result = optimizer.computeDelta(wm.weights, delta)
+        val expected = delta.clone().mul(optimizer.learningRate)
+        
+        assertMatrixEquals(expected, result, "After reset, should behave like first update")
     }
 
     @Test
@@ -121,13 +117,11 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            val result1 = optimizer.computeDelta(wm.weights, delta)
-            val result2 = optimizer.computeDelta(wm.weights, delta)
-            
-            // With zero momentum, both results should be identical
-            assertMatrixEquals(result1, result2, "Zero momentum should produce identical results")
-        }
+        val result1 = optimizer.computeDelta(wm.weights, delta)
+        val result2 = optimizer.computeDelta(wm.weights, delta)
+        
+        // With zero momentum, both results should be identical
+        assertMatrixEquals(result1, result2, "Zero momentum should produce identical results")
     }
 
     @Test
@@ -143,26 +137,129 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            val result = optimizer.computeDelta(wm.weights, delta)
-            
-            // After first iteration, running mean should be approximately delta * (1 - beta1)
-            // and running variance should be approximately delta^2 * (1 - beta2)
-            // With bias correction for iteration 1
-            
-            assertNotNull(result)
-            assertEquals(wm.weights.nrow(), result.nrow())
-            assertEquals(wm.weights.ncol(), result.ncol())
-            
-            // All values should be finite and non-zero (given non-zero delta)
-            for (i in 0 until result.nrow()) {
-                for (j in 0 until result.ncol()) {
-                    val value = result[i, j]
-                    assertTrue(value.isFinite(), "Adam result should be finite")
-                    assertNotEquals(0.0, value, 1e-10, "Adam result should be non-zero for non-zero delta")
-                }
+        val result = optimizer.computeDelta(wm.weights, delta)
+        
+        // After first iteration, running mean should be approximately delta * (1 - beta1)
+        // and running variance should be approximately delta^2 * (1 - beta2)
+        // With bias correction for iteration 1
+        
+        assertNotNull(result)
+        assertEquals(wm.weights.nrow(), result.nrow())
+        assertEquals(wm.weights.ncol(), result.ncol())
+        
+        // All values should be finite and non-zero (given non-zero delta)
+        for (i in 0 until result.nrow()) {
+            for (j in 0 until result.ncol()) {
+                val value = result[i, j]
+                assertTrue(value.isFinite(), "Adam result should be finite")
+                assertNotEquals(0.0, value, 1e-10, "Adam result should be non-zero for non-zero delta")
             }
         }
+    }
+
+    @Test
+    fun `Adam matches the reference matrix formulation exactly over several steps`() {
+        // 7 x 5 is unpadded; 150 rows are stored with padded columns; a transposed delta takes the element-wise path
+        assertAdamMatchesReference(7, 5, transposedDelta = false)
+        assertAdamMatchesReference(150, 40, transposedDelta = false)
+        assertAdamMatchesReference(150, 40, transposedDelta = true)
+    }
+
+    private fun assertAdamMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
+        val optimizer = AdamOptimizer(beta1 = 0.85, beta2 = 0.995).apply { learningRate = 0.01 }
+        assertAdaptiveMatchesReference(optimizer, seed = 3, rows, cols, transposedDelta)
+    }
+
+    @Test
+    fun `AdamW matches the reference matrix formulation exactly over several steps`() {
+        assertAdamWMatchesReference(7, 5, transposedDelta = false)
+        assertAdamWMatchesReference(150, 40, transposedDelta = false)
+        assertAdamWMatchesReference(150, 40, transposedDelta = true)
+    }
+
+    private fun assertAdamWMatchesReference(rows: Int, cols: Int, transposedDelta: Boolean) {
+        val optimizer = AdamWOptimizer(beta1 = 0.85, beta2 = 0.995, weightDecay = 0.05, learningRateDecay = 0.02)
+            .apply { learningRate = 0.01 }
+        assertAdaptiveMatchesReference(optimizer, seed = 5, rows, cols, transposedDelta, learningRateDecay = 0.02, weightDecay = 0.05)
+    }
+
+    /**
+     * Compares [optimizer] with a reference matrix formulation of Adam (beta1 0.85, beta2 0.995, learning rate 0.01).
+     * Passing [weightDecay] makes the reference AdamW: random starting parameters that follow the computed deltas, and a
+     * decoupled decay term.
+     */
+    private fun assertAdaptiveMatchesReference(
+        optimizer: Optimizer,
+        seed: Int,
+        rows: Int,
+        cols: Int,
+        transposedDelta: Boolean,
+        learningRateDecay: Double = 0.0,
+        weightDecay: Double? = null,
+    ) {
+        val (_, _, trainer) = createTestNetwork()
+        trainer.config.optimizer = optimizer
+        val rng = Random(seed)
+        val parameters = Matrix(rows, cols)
+        if (weightDecay != null) {
+            for (i in 0 until rows) for (j in 0 until cols) parameters[i, j] = rng.nextDouble(-1.0, 1.0)
+        }
+        val mean = Matrix(rows, cols)
+        val variance = Matrix(rows, cols)
+        for (step in 1..5) {
+            optimizer.beginStep()
+            val values = Array(rows) { DoubleArray(cols) { rng.nextDouble(-1.0, 1.0) } }
+            val delta = if (transposedDelta) {
+                Matrix(cols, rows).apply { for (i in 0 until rows) for (j in 0 until cols) this[j, i] = values[i][j] }.transpose()
+            } else {
+                Matrix(rows, cols).apply { for (i in 0 until rows) for (j in 0 until cols) this[i, j] = values[i][j] }
+            }
+            val lr = 0.01 * Math.pow(1 - learningRateDecay, step.toDouble())
+            mean.mul(0.85).add(delta.clone().mul(1 - 0.85))
+            variance.mul(0.995).add(delta.clone().applyFunction { it * it }.mul(1 - 0.995))
+            val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(lr)
+                .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { sqrt(it) + 1e-8 })
+            if (weightDecay != null) expected.sub(parameters.clone().mul(lr * weightDecay))
+            val actual = optimizer.computeDelta(parameters, delta)
+            assertArrayEquals(expected.flatten(), actual.flatten(), 0.0)
+            if (weightDecay != null) parameters.add(actual)
+        }
+    }
+
+    @Test
+    fun `Adam bias correction counts optimizer steps, not trainer iterations`() {
+        val (_, wm, trainer) = createTestNetwork()
+        val optimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999).apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        // As in an epoch or sequential update: many steps within one trainer iteration
+        trainer.iteration = 7
+        val delta = Matrix.of(arrayOf(doubleArrayOf(0.3, -0.2), doubleArrayOf(0.1, 0.4)))
+        optimizer.beginStep()
+        val first = optimizer.computeDelta(wm.weights, delta)
+        // At step 1 the bias-corrected moments equal the gradient and its square, so each update is lr * sign(g)
+        assertEquals(0.01, first[0, 0], 1e-9)
+        assertEquals(-0.01, first[0, 1], 1e-9)
+        optimizer.beginStep()
+        val second = optimizer.computeDelta(wm.weights, delta)
+        // A constant gradient keeps the corrected moments equal to it at step 2 as well
+        assertEquals(0.01, second[0, 0], 1e-9)
+    }
+
+    @Test
+    fun `each training batch is one optimizer step`() {
+        val (net, _, trainer) = createTestNetwork()
+        var steps = 0
+        trainer.config.optimizer = object : Optimizer() {
+            override fun beginStep() { steps++ }
+            override fun computeDelta(matrix: Matrix, delta: Matrix) = Matrix(matrix.nrow(), matrix.ncol())
+            override fun reset() {}
+            override fun copy() = this
+        }
+        trainer.supervisedNetwork.trainingSet = TrainingDataset(
+            MutableList(4) { mutableListOf(1.0, 0.0) }, MutableList(4) { mutableListOf(0.0, 1.0) }
+        )
+        repeat(3) { trainer.trainBatch(0 until 4) }
+        assertEquals(3, steps)
     }
 
     @Test
@@ -177,25 +274,23 @@ class OptimizerTest {
             doubleArrayOf(0.0, 0.1)
         ))
         
-        with(trainer) {
-            // Test multiple iterations to verify bias correction changes
-            trainer.iteration = 1
-            val result1 = optimizer.computeDelta(wm.weights, delta)
-            
-            trainer.iteration = 2
-            val result2 = optimizer.computeDelta(wm.weights, delta)
-            
-            trainer.iteration = 10
-            val result10 = optimizer.computeDelta(wm.weights, delta)
-            
-            // Bias correction should make earlier iterations have larger updates
-            val norm1 = result1.frobeniusNorm()
-            val norm2 = result2.frobeniusNorm()
-            val norm10 = result10.frobeniusNorm()
-            
-            assertTrue(norm1 > norm2, "Earlier iterations should have larger updates due to bias correction")
-            assertTrue(norm2 > norm10, "Bias correction effect should diminish over iterations")
-        }
+        // Test multiple steps to verify bias correction changes
+        optimizer.beginStep()
+        val result1 = optimizer.computeDelta(wm.weights, delta)
+        
+        optimizer.beginStep()
+        val result2 = optimizer.computeDelta(wm.weights, delta)
+        
+        repeat(8) { optimizer.beginStep() }
+        val result10 = optimizer.computeDelta(wm.weights, delta)
+        
+        // Bias correction should make earlier iterations have larger updates
+        val norm1 = result1.frobeniusNorm()
+        val norm2 = result2.frobeniusNorm()
+        val norm10 = result10.frobeniusNorm()
+        
+        assertTrue(norm1 > norm2, "Earlier iterations should have larger updates due to bias correction")
+        assertTrue(norm2 > norm10, "Bias correction effect should diminish over iterations")
     }
 
     @Test
@@ -209,24 +304,22 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            trainer.iteration = 5
-            
-            // First update to establish running estimates
-            optimizer.computeDelta(wm.weights, delta)
-            trainer.iteration = 6
-            val result1 = optimizer.computeDelta(wm.weights, delta)
-            
-            // Reset optimizer - this clears running estimates and resets initial iteration
-            optimizer.reset()
-            trainer.iteration = 10  // Different iteration after reset
-            
-            // Next update should behave like early iterations due to reset
-            val result2 = optimizer.computeDelta(wm.weights, delta)
-            
-            // The reset should cause different behavior due to bias correction restarting
-            assertMatrixNotEquals(result1, result2, "Reset should clear running estimates and restart bias correction")
-        }
+        repeat(5) { optimizer.beginStep() }
+        
+        // First update to establish running estimates
+        optimizer.computeDelta(wm.weights, delta)
+        optimizer.beginStep()
+        val result1 = optimizer.computeDelta(wm.weights, delta)
+        
+        // Reset optimizer - this clears running estimates and restarts the step count
+        optimizer.reset()
+        optimizer.beginStep()
+        
+        // Next update should behave like early iterations due to reset
+        val result2 = optimizer.computeDelta(wm.weights, delta)
+        
+        // The reset should cause different behavior due to bias correction restarting
+        assertMatrixNotEquals(result1, result2, "Reset should clear running estimates and restart bias correction")
     }
 
     @Test
@@ -246,19 +339,30 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            val result = optimizer.computeDelta(wm.weights, delta)
-            
-            // AdamW should include weight decay component
-            // Expected: adam_update + (learning_rate * weight_decay * weights)
-            assertNotNull(result)
-            
-            // Verify weight decay contribution exists (result should be different from pure Adam)
-            val adamOnlyOptimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999)
-            val adamOnlyResult = adamOnlyOptimizer.computeDelta(wm.weights, delta)
-            
-            assertMatrixNotEquals(adamOnlyResult, result, "AdamW should differ from Adam due to weight decay")
-        }
+        val result = optimizer.computeDelta(wm.weights, delta)
+        
+        // AdamW should include weight decay component
+        // Expected: adam_update - (learning_rate * weight_decay * weights)
+        assertNotNull(result)
+        
+        // Verify weight decay contribution exists (result should be different from pure Adam)
+        val adamOnlyOptimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999)
+        val adamOnlyResult = adamOnlyOptimizer.computeDelta(wm.weights, delta)
+        
+        assertMatrixNotEquals(adamOnlyResult, result, "AdamW should differ from Adam due to weight decay")
+    }
+
+    @Test
+    fun `AdamW weight decay shrinks weights toward zero`() {
+        val (_, wm, trainer) = createTestNetwork()
+        val optimizer = AdamWOptimizer(beta1 = 0.9, beta2 = 0.999, weightDecay = 0.1).apply { learningRate = 0.01 }
+        trainer.config.optimizer = optimizer
+        wm.weights.setValuesInPlace { i, j -> if (i == j) 2.0 else -3.0 }
+        optimizer.beginStep()
+        // With no gradient the Adam term is zero, leaving only the decay: -lr * weightDecay * w
+        val update = optimizer.computeDelta(wm.weights, Matrix(2, 2))
+        assertEquals(-0.01 * 0.1 * 2.0, update[0, 0], 1e-15)
+        assertEquals(-0.01 * 0.1 * -3.0, update[0, 1], 1e-15)
     }
 
     @Test
@@ -273,20 +377,18 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            // Test at different iterations to verify learning rate decay
-            trainer.iteration = 1
-            val result1 = optimizer.computeDelta(wm.weights, delta)
-            
-            trainer.iteration = 10
-            val result10 = optimizer.computeDelta(wm.weights, delta)
-            
-            // Later iterations should have smaller updates due to learning rate decay
-            val norm1 = result1.frobeniusNorm()
-            val norm10 = result10.frobeniusNorm()
-            
-            assertTrue(norm1 > norm10, "Learning rate decay should reduce update magnitude over time")
-        }
+        // Test at different steps to verify learning rate decay
+        optimizer.beginStep()
+        val result1 = optimizer.computeDelta(wm.weights, delta)
+        
+        repeat(9) { optimizer.beginStep() }
+        val result10 = optimizer.computeDelta(wm.weights, delta)
+        
+        // Later iterations should have smaller updates due to learning rate decay
+        val norm1 = result1.frobeniusNorm()
+        val norm10 = result10.frobeniusNorm()
+        
+        assertTrue(norm1 > norm10, "Learning rate decay should reduce update magnitude over time")
     }
 
     @Test
@@ -302,12 +404,10 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        with(trainer) {
-            val adamwResult = adamw.computeDelta(wm.weights, delta)
-            val adamResult = adam.computeDelta(wm.weights, delta)
-            
-            assertMatrixEquals(adamResult, adamwResult, "AdamW with zero weight decay should match Adam")
-        }
+        val adamwResult = adamw.computeDelta(wm.weights, delta)
+        val adamResult = adam.computeDelta(wm.weights, delta)
+        
+        assertMatrixEquals(adamResult, adamwResult, "AdamW with zero weight decay should match Adam")
     }
 
     @Test
@@ -384,19 +484,17 @@ class OptimizerTest {
             doubleArrayOf(0.7, 0.8)
         ))
         
-        with(trainer) {
-            // Update different matrices with different deltas
-            val result1_1 = optimizer.computeDelta(wm.weights, delta1)
-            val result2_1 = optimizer.computeDelta(wm2.weights, delta2)
-            
-            // Second updates should show different momentum for each matrix
-            val result1_2 = optimizer.computeDelta(wm.weights, delta1)
-            val result2_2 = optimizer.computeDelta(wm2.weights, delta2)
-            
-            // Each matrix should maintain its own momentum state
-            assertMatrixNotEquals(result1_1, result1_2, "First matrix should show momentum effect")
-            assertMatrixNotEquals(result2_1, result2_2, "Second matrix should show momentum effect")
-        }
+        // Update different matrices with different deltas
+        val result1_1 = optimizer.computeDelta(wm.weights, delta1)
+        val result2_1 = optimizer.computeDelta(wm2.weights, delta2)
+        
+        // Second updates should show different momentum for each matrix
+        val result1_2 = optimizer.computeDelta(wm.weights, delta1)
+        val result2_2 = optimizer.computeDelta(wm2.weights, delta2)
+        
+        // Each matrix should maintain its own momentum state
+        assertMatrixNotEquals(result1_1, result1_2, "First matrix should show momentum effect")
+        assertMatrixNotEquals(result2_1, result2_2, "Second matrix should show momentum effect")
     }
 
     @Test
@@ -413,28 +511,24 @@ class OptimizerTest {
             doubleArrayOf(1e-10, 1e-10)
         ))
         
-        with(trainer) {
-            val result = optimizer.computeDelta(wm.weights, smallDelta)
-            
-            // Should not produce NaN or infinite values
-            for (i in 0 until result.nrow()) {
-                for (j in 0 until result.ncol()) {
-                    val value = result[i, j]
-                    assertTrue(value.isFinite(), "Adam should handle small gradients without numerical issues")
-                }
+        val result = optimizer.computeDelta(wm.weights, smallDelta)
+        
+        // Should not produce NaN or infinite values
+        for (i in 0 until result.nrow()) {
+            for (j in 0 until result.ncol()) {
+                val value = result[i, j]
+                assertTrue(value.isFinite(), "Adam should handle small gradients without numerical issues")
             }
         }
         
         // Test with zero gradients
         val zeroDelta = Matrix(wm.weights.nrow(), wm.weights.ncol())
-        with(trainer) {
-            val zeroResult = optimizer.computeDelta(wm.weights, zeroDelta)
-            
-            for (i in 0 until zeroResult.nrow()) {
-                for (j in 0 until zeroResult.ncol()) {
-                    val value = zeroResult[i, j]
-                    assertTrue(value.isFinite(), "Adam should handle zero gradients")
-                }
+        val zeroResult = optimizer.computeDelta(wm.weights, zeroDelta)
+        
+        for (i in 0 until zeroResult.nrow()) {
+            for (j in 0 until zeroResult.ncol()) {
+                val value = zeroResult[i, j]
+                assertTrue(value.isFinite(), "Adam should handle zero gradients")
             }
         }
     }
@@ -453,19 +547,17 @@ class OptimizerTest {
             doubleArrayOf(0.01, 0.01)
         ))
         
-        with(trainer) {
-            trainer.iteration = 1
-            val result1 = optimizer.computeDelta(wm.weights, delta)
-            
-            trainer.iteration = 10  // Learning rate should have decayed
-            val result10 = optimizer.computeDelta(wm.weights, delta)
-            
-            // Weight decay should use current (decayed) learning rate
-            val norm1 = result1.frobeniusNorm()
-            val norm10 = result10.frobeniusNorm()
-            
-            assertTrue(norm1 > norm10, "Weight decay should scale with decayed learning rate")
-        }
+        optimizer.beginStep()
+        val result1 = optimizer.computeDelta(wm.weights, delta)
+        
+        repeat(9) { optimizer.beginStep() }  // Learning rate should have decayed
+        val result10 = optimizer.computeDelta(wm.weights, delta)
+        
+        // Weight decay should use current (decayed) learning rate
+        val norm1 = result1.frobeniusNorm()
+        val norm10 = result10.frobeniusNorm()
+        
+        assertTrue(norm1 > norm10, "Weight decay should scale with decayed learning rate")
     }
 
 }

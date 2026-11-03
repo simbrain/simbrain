@@ -1,13 +1,16 @@
 /**
  * Piccolo overlay that draws an [OdorWorld]'s maze walls above the tile layers. Owned by [OdorWorldPanel], which
- * keeps it between the tile images and the entity nodes; it repaints itself on maze changes.
+ * keeps it between the tile images and the entity nodes; it repaints itself on maze changes until the panel's
+ * [viewScope] ends.
  */
 package org.simbrain.world.odorworld.gui
 
-import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.util.cancelWith
 import org.simbrain.world.odorworld.OdorWorld
 import org.simbrain.world.odorworld.WallSegment
 import java.awt.BasicStroke
@@ -16,7 +19,7 @@ import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.geom.Path2D
 
-class MazeNode(private val world: OdorWorld) : PNode() {
+class MazeNode(private val world: OdorWorld, viewScope: CoroutineScope) : PNode() {
 
     private val wallStroke = BasicStroke(4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
 
@@ -24,8 +27,8 @@ class MazeNode(private val world: OdorWorld) : PNode() {
         pickable = false
         childrenPickable = false
         refresh()
-        world.events.mazeChanged.on(Dispatchers.Swing) { refresh() }
-        world.events.tileMapChanged.on(Dispatchers.Swing) { refresh() }
+        world.events.mazeChanged.on(Dispatchers.Swing) { refresh() }.cancelWith(viewScope)
+        world.events.tileMapChanged.on(Dispatchers.Swing) { refresh() }.cancelWith(viewScope)
     }
 
     private fun refresh() {

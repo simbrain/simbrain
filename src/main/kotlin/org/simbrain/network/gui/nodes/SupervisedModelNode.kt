@@ -47,12 +47,12 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         node.model.events.deleted.on(swingDispatcher) {
             outlinedObjects.remove(node)
             outline.resetOutlinedNodes(outlinedObjects)
-        }
+        }.untilDisposed()
         node.model.events
         (node.model as? LocatableModel)?.let { locatableModel ->
             locatableModel.events.locationChanged.on(swingDispatcher) {
                 updateOutline()
-            }
+            }.untilDisposed()
             locatableModel.events.locationChanged.fire()
         }
 
@@ -87,12 +87,12 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
             })
             addSeparator()
             add(createAction("Add Current Data to Training Set") {
-                supervisedModel.trainingSet.inputs.add(supervisedModel.inputLayer.activationArray.toMutableList())
-                supervisedModel.trainingSet.targets.add(supervisedModel.outputLayer.activationArray.toMutableList())
+                supervisedModel.trainingSet.inputs.add(supervisedModel.inputLayer.activationArray.copyOf())
+                supervisedModel.trainingSet.targets.add(supervisedModel.outputLayer.activationArray.copyOf())
             })
             add(createAction("Add Current Data to Testing Set") {
-                supervisedModel.testingSet.inputs.add(supervisedModel.inputLayer.activationArray.toMutableList())
-                supervisedModel.testingSet.targets.add(supervisedModel.outputLayer.activationArray.toMutableList())
+                supervisedModel.testingSet.inputs.add(supervisedModel.inputLayer.activationArray.copyOf())
+                supervisedModel.testingSet.targets.add(supervisedModel.outputLayer.activationArray.copyOf())
             })
             addSeparator()
             add(createApplyImmediateLearningAction())
@@ -143,8 +143,8 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
         addChild(interactionBox)
 
         val events: LocationEvents = supervisedModel.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
-        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
+        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }.untilDisposed()
 
         createApplyImmediateLearningAction()
     }

@@ -1,0 +1,8 @@
+allprojects {
+  afterEvaluate { p ->
+    p.tasks.register("printTestClasspath") {
+      dependsOn("testClasses")
+      doLast { new File(System.getenv("CP_OUT")).text = p.sourceSets.test.runtimeClasspath.asPath }
+    }
+  }
+}

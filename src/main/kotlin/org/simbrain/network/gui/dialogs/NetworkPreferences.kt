@@ -317,6 +317,14 @@ object NetworkPreferences: PreferenceHolder() {
     var defaultLearningRate by DoublePreference(.1)
 
     @UserParameter(
+        label = "Parallel network updates",
+        description = "Update large networks on several processor cores at once. Small networks always update on one core.",
+        tab = "Model",
+        order = 30
+    )
+    var parallelUpdate by BooleanPreference(true)
+
+    @UserParameter(
         label = "Default connection strategy",
         description = "Default method for connecting neurons when creating synapses. Applied when using the 1-3 trick (press 1 to set sources, then 3 to connect with this strategy).",
         tab = "Connections",

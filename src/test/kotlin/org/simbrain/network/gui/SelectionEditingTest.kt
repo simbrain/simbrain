@@ -155,4 +155,22 @@ class SelectionEditingTest {
             }
         }
     }
+
+    @Test
+    fun `selected models follow every selection change`() {
+        SwingUtilities.invokeAndWait {
+            val panel = NetworkPanel(NetworkComponent("test", Network()))
+            val first = NeuronNode(panel, Neuron())
+            val second = NeuronNode(panel, Neuron())
+            val manager = panel.selectionManager
+            manager.set(first)
+            assertEquals(listOf(first.model), manager.selectedModels)
+            manager.add(second)
+            assertEquals(listOf(first.model, second.model), manager.selectedModels)
+            manager.toggle(first)
+            assertEquals(listOf(second.model), manager.selectedModels)
+            manager.clear()
+            assertEquals(emptyList<Any>(), manager.selectedModels)
+        }
+    }
 }

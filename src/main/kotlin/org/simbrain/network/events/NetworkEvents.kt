@@ -1,7 +1,6 @@
 package org.simbrain.network.events
 
 import org.simbrain.network.core.NetworkModel
-import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.FlowEvents
 
 /**
@@ -20,5 +19,4 @@ class NetworkEvents: FlowEvents() {
     val freeWeightVisibilityChanged = OneArgEvent<Boolean>()
     val synapseSpikingOnlyVisibilityChanged = OneArgEvent<Boolean>()
     val selected = OneArgEvent<List<NetworkModel>>()
-    val batchNodeRemoval = BatchOneArgEvent<ScreenElement>(interval = 10)
 }

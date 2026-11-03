@@ -1,12 +1,12 @@
 package org.simbrain.network.gui
 
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.util.awaitUntil
 import org.simbrain.workspace.gui.SimbrainDesktop
 
 /**
@@ -36,7 +36,7 @@ abstract class NetworkPanelDeleteUndoTestBase {
         // (get() caps at 1000ms and times out under shared-desktop load.)
         models.forEach { m -> awaitUntil { panel.modelNodeMap.peek(m) != null } }
         // Also settle the containing subnetwork's node: undo's restore does a blocking
-        // getImmediately<SubnetworkNode>(parent) (UndoManager.kt) that would otherwise time out at 1000ms
+        // getImmediately<SubnetworkNode>(parent) (UndeleteContext.kt) that would otherwise time out at 1000ms
         // if the subnetwork node is still pending under heavy test-load EDT.
         models.forEach { m ->
             network.getModels<Subnetwork>().firstOrNull { m in it.modelList.all }?.let { subnet ->
@@ -44,13 +44,5 @@ abstract class NetworkPanelDeleteUndoTestBase {
             }
         }
         panel.selectionManager.set(models.mapNotNull { panel.modelNodeMap.peek(it) })
-    }
-
-    /** Poll until [cond] holds or the timeout elapses (node creation/removal is async + debounced). */
-    protected suspend fun awaitUntil(timeoutMs: Int = 5000, cond: () -> Boolean) {
-        repeat(timeoutMs / 50) {
-            if (cond()) return
-            delay(50)
-        }
     }
 }

@@ -4,6 +4,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.events.TrainerEvents
@@ -30,7 +31,7 @@ import javax.swing.JPanel
 /**
  * Controls used by Supervised learning dialogs.
  */
-class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
+class TrainerControls(internal val trainer: SupervisedTrainer, supervisedNetwork: SupervisedNetwork, networkPanel: NetworkPanel): JPanel(), CoroutineScope {
 
     private val job = SupervisorJob()
 
@@ -160,16 +161,17 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
     }
 
     init {
-        
+        val errorPlot = ErrorTimeSeries(trainer)
+
         // Cancel the trainer's coroutine scope when this component is disposed
         onWindowClose {
             trainer.job.cancel()
             job.cancel()
+            errorPlot.dispose()
         }
 
         val errorPlotPanel = JPanel().apply {
             layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")
-            val errorPlot = ErrorTimeSeries(trainer)
             add(errorPlot, "growx, wrap")
 
             val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))
@@ -198,6 +200,7 @@ class TrainerControls(private val trainer: SupervisedTrainer, supervisedNetwork:
         runTools.add(initParamsButton)
         runTools.add(JButton(trainerPropsAction), "wrap")
         val statsPanel = TrainingStatsPanel(
+            scope = this,
             events = trainer.events,
             iteration = { trainer.iteration },
             resetIteration = {
@@ -242,8 +245,11 @@ data class TrainingStatsSettings(
 /**
  * The iteration count and training statistics shown beside the run controls of the supervised and CNN trainers.
  * Rows tied to a trainer setting are left out while that setting is off. Double-clicking resets the iteration count.
+ * Reports are posted rather than awaited, so training never waits on the EDT, and the panel stops listening when
+ * [scope] (its owner's) ends; the trainer outlives its views.
  */
 class TrainingStatsPanel(
+    scope: CoroutineScope,
     events: TrainerEvents,
     private val iteration: () -> Int,
     resetIteration: () -> Unit,
@@ -277,7 +283,7 @@ class TrainingStatsPanel(
             }
         })
 
-        events.errorUpdated.on(Dispatchers.Swing) { stats ->
+        val reports = scope.uiLatest<TrainingStats>(minIntervalMs = HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { stats ->
             trainingErrorValue.text = stats.trainingError.format(4)
             stats.testingError?.let { testingErrorValue.text = it.format(4) }
             stats.trainingAccuracy?.let { trainingAccuracyValue.text = formatAccuracy(it) }
@@ -285,9 +291,10 @@ class TrainingStatsPanel(
             stepSizeValue.text = formatStepSize(stats.effectiveStepSize)
             refresh()
         }
+        events.postReportsTo(scope, reports)
         // The stopping condition is checked after the stats for an iteration go out, so the early stopping row
         // is refreshed again once a run ends to show the state that stopped it.
-        events.endTraining.on(Dispatchers.Swing) { refresh() }
+        events.endTraining.on(Dispatchers.Swing) { refresh() }.cancelWith(scope)
 
         refresh()
     }
@@ -334,7 +341,35 @@ class TrainingStatsPanel(
     private fun formatStepSize(value: Double?) = value?.let { String.format("%.3g", it) } ?: "N/A"
 }
 
+/**
+ * Posts each training report to [target] without the trainer waiting on the EDT, until [scope] (the view's) ends; the
+ * trainer outlives its views. Testing values and accuracies arrive only every few iterations, so they carry forward
+ * from earlier reports instead of being lost when a later report supersedes theirs before it is shown.
+ */
+fun TrainerEvents.postReportsTo(scope: CoroutineScope, target: UiLatest<TrainingStats>) {
+    var reported: TrainingStats? = null
+    errorUpdated.on(Dispatchers.Unconfined) { stats ->
+        val merged = reported?.let { previous ->
+            stats.copy(
+                testingError = stats.testingError ?: previous.testingError,
+                trainingAccuracy = stats.trainingAccuracy ?: previous.trainingAccuracy,
+                testingAccuracy = stats.testingAccuracy ?: previous.testingAccuracy,
+            )
+        } ?: stats
+        reported = merged
+        target.post(merged)
+    }.cancelWith(scope)
+}
+
+/** Plots a trainer's training and testing error against iteration. */
 class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPanel() {
+
+    private sealed interface PlotUpdate {
+        class Point(val iteration: Int, val stats: TrainingStats) : PlotUpdate
+        object Reset : PlotUpdate
+    }
+
+    private val viewScope = UiScope()
 
     constructor(trainer: SupervisedTrainer) : this(trainer.events, { trainer.iteration })
 
@@ -370,25 +405,38 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
 
         model.addTimeSeries("Training Error")
 
-        errorRemover = events.errorUpdated.on(Dispatchers.Swing) { trainingStats ->
-            model.addData(0, iterationSupplier().toDouble(), trainingStats.trainingError)
-            trainingStats.testingError?.let {
-                if (model.timeSeriesList.size == 1) {
-                    model.addTimeSeries("Testing Error")
+        // Each report is bound to the iteration it came from and applied on the EDT in order with resets, so
+        // training never waits on the EDT and a reset can't be overtaken by points from before it
+        val updates = viewScope.uiInbox<PlotUpdate> { batch ->
+            batch.forEach { update ->
+                when (update) {
+                    is PlotUpdate.Point -> {
+                        val iteration = update.iteration.toDouble()
+                        model.addData(0, iteration, update.stats.trainingError)
+                        update.stats.testingError?.let {
+                            if (model.timeSeriesList.size == 1) {
+                                model.addTimeSeries("Testing Error")
+                            }
+                            model.addData(1, iteration, it)
+                        }
+                    }
+                    PlotUpdate.Reset -> model.clearData()
                 }
-                model.addData(1, iterationSupplier().toDouble(), it)
             }
         }
 
-        resetJob = events.iterationReset.on(Dispatchers.Swing) {
-            model.clearData()
+        errorRemover = events.errorUpdated.on(Dispatchers.Unconfined) { trainingStats ->
+            updates.post(PlotUpdate.Point(iterationSupplier(), trainingStats))
         }
+
+        resetJob = events.iterationReset.onImmediate { updates.post(PlotUpdate.Reset) }
     }
 
     /** Detaches the plot from the trainer's events; for dialogs whose trainer outlives them. */
     fun dispose() {
         errorRemover()
         resetJob.cancel()
+        viewScope.cancel()
     }
 }
 

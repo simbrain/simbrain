@@ -1,3 +1,8 @@
+/**
+ * Supervised training data: input and target rows of fixed width, stored as one primitive array per example so that
+ * trainers copy rows straight into batch matrices and large datasets take 8 bytes per value rather than a boxed
+ * Double each.
+ */
 package org.simbrain.network.trainers
 
 import org.simbrain.util.DoubleArrayConverter
@@ -8,15 +13,15 @@ import smile.math.matrix.Matrix
 import java.util.*
 
 class TrainingDataset(
-    val inputs: MutableList<MutableList<Double>> = mutableListOf(),
-    val targets: MutableList<MutableList<Double>> = mutableListOf(),
-    val inputSize: Int = if (inputs.isNotEmpty()) inputs[0].size else throw IllegalArgumentException("Cannot infer input size from empty data. Use constructor with explicit sizes."),
-    val targetSize: Int = if (targets.isNotEmpty()) targets[0].size else throw IllegalArgumentException("Cannot infer target size from empty data. Use constructor with explicit sizes."),
+    val inputs: MutableList<DoubleArray> = mutableListOf(),
+    val targets: MutableList<DoubleArray> = mutableListOf(),
+    val inputSize: Int = inferredWidth(inputs.firstOrNull()?.size, "input"),
+    val targetSize: Int = inferredWidth(targets.firstOrNull()?.size, "target"),
     val inputRowNames: List<String>? = null,
     val targetRowNames: List<String>? = null,
     val inputColumnNames: List<String>? = null,
     val targetColumnNames: List<String>? = null
-): Iterable<Pair<List<Double>, List<Double>>> {
+): Iterable<Pair<DoubleArray, DoubleArray>> {
 
     init {
         if (inputs.size != targets.size) {
@@ -40,18 +45,18 @@ class TrainingDataset(
 
     val size get() = inputs.size
 
-    override fun iterator(): Iterator<Pair<List<Double>, List<Double>>> = object : Iterator<Pair<List<Double>, List<Double>>> {
+    override fun iterator(): Iterator<Pair<DoubleArray, DoubleArray>> = object : Iterator<Pair<DoubleArray, DoubleArray>> {
         private var index = 0
         override fun hasNext() = index < size
-        override fun next(): Pair<List<Double>, List<Double>> {
+        override fun next(): Pair<DoubleArray, DoubleArray> {
             if (!hasNext()) throw NoSuchElementException()
             return (inputs[index] to targets[index]).also { index++ }
         }
     }
 
-    fun getInputRow(index: Int): Matrix = inputs[index].toDoubleArray().toColumnVector()
+    fun getInputRow(index: Int): Matrix = inputs[index].toColumnVector()
 
-    fun getTargetRow(index: Int): Matrix = targets[index].toDoubleArray().toColumnVector()
+    fun getTargetRow(index: Int): Matrix = targets[index].toColumnVector()
 
     /**
      * Customizes XStream marshalling for the two bulk fields only. `inputs` and `targets`
@@ -67,6 +72,26 @@ class TrainingDataset(
      * still parsed correctly.
      */
     companion object: WithXStreamPropertyConverter {
+
+        /**
+         * Builds a dataset from rows given as lists, as many simulations write them. The rows are copied into
+         * primitive arrays.
+         */
+        operator fun invoke(
+            inputs: List<List<Double>>,
+            targets: List<List<Double>>,
+            inputSize: Int = inferredWidth(inputs.firstOrNull()?.size, "input"),
+            targetSize: Int = inferredWidth(targets.firstOrNull()?.size, "target"),
+            inputRowNames: List<String>? = null,
+            targetRowNames: List<String>? = null,
+            inputColumnNames: List<String>? = null,
+            targetColumnNames: List<String>? = null
+        ) = TrainingDataset(
+            inputs.mapTo(ArrayList(inputs.size)) { it.toDoubleArray() },
+            targets.mapTo(ArrayList(targets.size)) { it.toDoubleArray() },
+            inputSize, targetSize, inputRowNames, targetRowNames, inputColumnNames, targetColumnNames
+        )
+
         override val xStreamPropertyConverter = createXStreamPropertyConverter<TrainingDataset>(
             marshal = {
                 on(TrainingDataset::inputs) { writer, _ -> writeMatrix(writer, "inputs", this) }
@@ -87,15 +112,14 @@ class TrainingDataset(
         private fun writeMatrix(
             writer: com.thoughtworks.xstream.io.HierarchicalStreamWriter,
             nodeName: String,
-            rows: List<List<Double>>,
+            rows: List<DoubleArray>,
         ) {
             val colCount = rows.firstOrNull()?.size ?: 0
             writer.startNode(nodeName)
             writer.startNode("rows"); writer.setValue(rows.size.toString()); writer.endNode()
             writer.startNode("cols"); writer.setValue(colCount.toString()); writer.endNode()
             val flat = DoubleArray(rows.size * colCount)
-            var k = 0
-            for (row in rows) for (v in row) flat[k++] = v
+            rows.forEachIndexed { r, row -> row.copyInto(flat, r * colCount) }
             writer.startNode("data")
             // Always use raw base64. DoubleArrayConverter.arrayToString switches to
             // a precision-5 JSON form below 100 elements, which would truncate data.
@@ -104,11 +128,11 @@ class TrainingDataset(
             writer.endNode()
         }
 
-        private fun readMatrix(reader: com.thoughtworks.xstream.io.HierarchicalStreamReader): MutableList<MutableList<Double>> {
+        private fun readMatrix(reader: com.thoughtworks.xstream.io.HierarchicalStreamReader): MutableList<DoubleArray> {
             var rows: Int? = null
             var cols: Int? = null
             var data: DoubleArray? = null
-            val legacyRows = mutableListOf<MutableList<Double>>()
+            val legacyRows = mutableListOf<DoubleArray>()
             var sawLegacy = false
 
             while (reader.hasMoreChildren()) {
@@ -125,7 +149,7 @@ class TrainingDataset(
                             if (reader.nodeName == "double") row.add(reader.value.toDouble())
                             reader.moveUp()
                         }
-                        legacyRows.add(row)
+                        legacyRows.add(row.toDoubleArray())
                     }
                 }
                 reader.moveUp()
@@ -136,14 +160,11 @@ class TrainingDataset(
             val c = cols ?: 0
             val d = data
             if (d == null || r * c == 0) return mutableListOf()
-            val out = ArrayList<MutableList<Double>>(r)
-            var k = 0
-            repeat(r) {
-                val row = ArrayList<Double>(c)
-                repeat(c) { row.add(d[k++]) }
-                out.add(row)
-            }
-            return out
+            return MutableList(r) { row -> d.copyOfRange(row * c, (row + 1) * c) }
         }
     }
 }
+
+/** The width of the first row, [firstRowSize], for a dataset built without an explicit size. */
+private fun inferredWidth(firstRowSize: Int?, what: String): Int = firstRowSize
+    ?: throw IllegalArgumentException("Cannot infer $what size from empty data. Use constructor with explicit sizes.")

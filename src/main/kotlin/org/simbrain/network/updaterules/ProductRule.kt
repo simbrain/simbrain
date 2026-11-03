@@ -10,6 +10,7 @@ import org.simbrain.util.UserParameter
  * units.  Used in "Long Short Term Memory" and "Sigma-Pi" networks.
  */
 class ProductRule : LinearRule() {
+
     /**
      * Whether to use weights or not.
      */
@@ -30,8 +31,13 @@ class ProductRule : LinearRule() {
         return pr
     }
 
+    /** The product of the incoming activations, or of the post-synaptic responses with [useWeights]. */
     context(Network)
-    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+    override fun synapticInput(neuron: Neuron, data: EmptyScalarData, psrSum: Double): Double {
+        // Special case of isolated neuron
+        if (neuron.fanIn.size == 0) {
+            return 0.0
+        }
         var `val` = 1.0
         if (useWeights) {
             for (s in neuron.fanIn) {
@@ -42,10 +48,12 @@ class ProductRule : LinearRule() {
                 `val` *= s.source.activation
             }
         }
-        // Special case of isolated neuron
-        if (neuron.fanIn.size == 0) {
-            `val` = 0.0
-        }
+        return `val`
+    }
+
+    context(Network)
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+        var `val` = neuron.input
 
         if (this.addNoise) {
             `val` += noiseGenerator.sampleDouble()

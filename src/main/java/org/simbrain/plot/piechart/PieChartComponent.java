@@ -83,6 +83,11 @@ public class PieChartComponent extends WorkspaceComponent {
     }
 
     @Override
+    protected List<AutoCloseable> getCloseables() {
+        return List.of(model);
+    }
+
+    @Override
     public String getXml() {
         return XStreamUtils.getSimbrainXStream().toXML(model);
     }

@@ -1,8 +1,11 @@
 /**
- * Undo and redo for the network panel. [UndoManager] keeps the action stacks; [UndeleteContext] snapshots the
- * parent relationships of models about to be deleted and restores them afterwards, re-creating canvas nodes in
- * an order the panel can honor: connectors after every other model, since their node creation waits for their
- * endpoints' nodes.
+ * Delete and undelete support for undo in the network panel. [UndeleteContext] snapshots the parent relationships of
+ * models about to be deleted and restores them afterwards, re-creating canvas nodes in an order the panel can honor:
+ * connectors after every other model, since their node creation waits for their endpoints' nodes.
+ *
+ * [Network.deleteModels] is used quite a bit because undo/redo often involves deleting models.
+ *
+ * Also see [NetworkModel.afterRestore]
  */
 package org.simbrain.network.gui
 
@@ -12,95 +15,9 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import org.simbrain.network.core.*
-import org.simbrain.network.gui.UndoManager.UndoableAction
 import org.simbrain.network.gui.nodes.*
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
-import java.util.*
-
-/**
- * Manage undo / redo operations in the network panel.
- *
- * Related code can be found in callers to [addUndoableAction].
- *
- * [Network.deleteModels] is used quite a bit because undo/redo often involves deleting models.
- *
- * Also see [NetworkModel.afterRestore]
- *
- */
-class UndoManager {
-
-    /**
-     * All actions that can be undone are pushed to this stack.
-     */
-    val undoStack = Stack<UndoableAction>()
-
-    /**
-     * When an action is undone, it is popped off the undo stack and pushed on
-     * to this stack.
-     */
-    val redoStack = Stack<UndoableAction>()
-
-    fun addUndoableAction(action: UndoableAction) {
-        undoStack.push(action)
-        redoStack.removeAllElements()
-    }
-
-    fun addUndoableAction(
-        description: String,
-        undo: suspend () -> Unit,
-        redo: suspend () -> Unit
-    ) {
-        addUndoableAction(undoableAction(description, undo, redo))
-    }
-
-    /**
-     * Undo the last undoable action.
-     */
-    suspend fun undo() {
-        if (!undoStack.isEmpty()) {
-            val lastEvent = undoStack.pop()
-            lastEvent.undo()
-            redoStack.push(lastEvent)
-        }
-    }
-
-    /**
-     * Redo the last undone action.
-     */
-    suspend fun redo() {
-        if (!redoStack.isEmpty()) {
-            val redoEvent = redoStack.pop()
-            redoEvent.redo()
-            undoStack.push(redoEvent)
-        }
-    }
-
-    interface UndoableAction {
-        val description: String
-        suspend fun undo()
-        suspend fun redo()
-    }
-
-}
-
-fun undoableAction(
-    description: String,
-    undo: suspend () -> Unit,
-    redo: suspend () -> Unit) =
-    object : UndoableAction {
-
-        override val description = description
-
-        override suspend fun undo() {
-            undo()
-        }
-
-        override suspend fun redo() {
-            redo()
-        }
-    }
-
 
 class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<NetworkModel>) {
 
@@ -133,26 +50,14 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         }
     }
 
-    // When undoing deletion of a group, its children must be re-added
+    // When undoing deletion of a group, its children must be re-added. Neurons of a NeuronCollection are not passed
+    // here: restoreCollectionNeurons re-adds them as a batch first.
     context(NetworkPanel)
     private suspend fun reAddToGroup(model: NetworkModel) {
         when (val parent = childToParentMaps.firstNotNullOfOrNull { it[model] }) {
-            is NeuronCollection -> {
-                (model as? Neuron)?.let { neuron ->
-                    network.addNetworkModel(neuron, usePlacementManager = false, useAutoAssignedId = false)
-                    parent.restoreNeuron(neuron)
-                    // The awaited addNetworkModel above already created the neuron's node, so a non-blocking
-                    // peek finds it; recreate only if it is somehow absent. Attach to the collection node.
-                    (modelNodeMap.peek(parent) as? NeuronCollectionNode)?.let { collectionNode ->
-                        val neuronNode = (modelNodeMap.peek(neuron) as? NeuronNode) ?: createNode(neuron)
-                        collectionNode.addNeuronNodes(listOf(neuronNode))
-                    }
-                }
-            }
-
             is SynapseGroup -> {
                 (model as? Synapse)?.let { synapse ->
-                    parent.synapses.add(synapse)
+                    parent.restoreSynapse(synapse)
                     // Restoring synapses changes the group's size; recompute its expanded/collapsed state.
                     // A flip to collapsed fires visibilityChanged, whose reconcile removes any loose nodes.
                     parent.refreshVisibility()
@@ -242,6 +147,24 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
     private fun immediateParent(model: NetworkModel): NetworkModel? =
         childToParentMaps.firstNotNullOfOrNull { it[model] }
 
+    /**
+     * Re-adds neurons that belonged to a [NeuronCollection] as one concurrent batch, then restores their
+     * membership and node grouping per collection in their original order. Awaiting each add in turn (as
+     * [reAddToGroup] does for other models) made undoing a bulk delete wait on the EDT's node creation once
+     * per neuron.
+     */
+    context(NetworkPanel)
+    private suspend fun restoreCollectionNeurons(neurons: List<Neuron>) {
+        if (neurons.isEmpty()) return
+        network.addNetworkModelsAsync(neurons, usePlacementManager = false, useAutoAssignedId = false).awaitAll()
+        neurons.groupBy { immediateParent(it) as NeuronCollection }.forEach { (collection, members) ->
+            members.forEach { collection.restoreNeuron(it) }
+            (modelNodeMap.peek(collection) as? NeuronCollectionNode)?.let { collectionNode ->
+                collectionNode.addNeuronNodes(members.map { (modelNodeMap.peek(it) as? NeuronNode) ?: createNode(it) })
+            }
+        }
+    }
+
     context(NetworkPanel)
     suspend fun restore(deletedModels: List<NetworkModel>) {
         restoreMapSnapshot()
@@ -253,15 +176,17 @@ class UndeleteContext(val networkPanel: NetworkPanel, modelsToDelete: List<Netwo
         // removal then resolves to an identity-safe no-op.
         val staleNodes = deletedModels.mapNotNull { model -> modelNodeMap.peek(model)?.let { model to it } }
         if (staleNodes.isNotEmpty()) {
-            withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> canvas.layer.removeChild(node) } }
+            withContext(Dispatchers.Swing) { staleNodes.forEach { (_, node) -> networkPanel.detachNode(node) } }
             staleNodes.forEach { (model, node) -> modelNodeMap.removeIfValue(model) { it === node } }
         }
         val modelsToReAdd = LinkedHashSet(deletedModels.reversed())
         // Adds models back to parent groups. Connectors go last: their node creation waits for their
         // endpoints' nodes, and the endpoints may be among the models restored here.
         val (connectors, others) = modelsToReAdd.partition { it.waitsForEndpointNodes() }
+        val collectionNeurons = others.filterIsInstance<Neuron>().filter { immediateParent(it) is NeuronCollection }
         try {
-            (others + connectors).forEach { reAddToGroup(it) }
+            restoreCollectionNeurons(collectionNeurons)
+            (others - collectionNeurons.toSet() + connectors).forEach { reAddToGroup(it) }
             // Add all models without parents back
             network.addNetworkModelsAsync(
                 modelsToReAdd.filter { hasNoParent(it) },

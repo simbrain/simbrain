@@ -2,6 +2,7 @@ package org.simbrain.world.imageworld.filters
 
 import org.simbrain.util.UserParameter
 import java.awt.image.BufferedImage
+import java.awt.image.DataBufferInt
 
 /**
  * An image operation that applies thresholding to convert images to binary (black/white).
@@ -22,29 +23,24 @@ class ThresholdOperation(
         val width = input.width
         val height = input.height
         val output = BufferedImage(width, height, BufferedImage.TYPE_INT_RGB)
-        
+
         // Convert threshold from 0.0-1.0 to 0-255
         val thresholdValue = (threshold * 255).toInt()
 
-        for (y in 0 until height) {
-            for (x in 0 until width) {
-                val rgb = input.getRGB(x, y)
-                
-                // Extract RGB components
-                val red = (rgb shr 16) and 0xFF
-                val green = (rgb shr 8) and 0xFF  
-                val blue = rgb and 0xFF
-                
-                // Calculate grayscale value using standard luminance formula
-                val grayscale = (red * 0.299 + green * 0.587 + blue * 0.114).toInt()
-                
-                // Apply threshold: above threshold = white (255), below = black (0)
-                val thresholdedValue = if (grayscale > thresholdValue) 255 else 0
-                
-                // Set all RGB components to the same value for grayscale output
-                val outputRgb = (thresholdedValue shl 16) or (thresholdedValue shl 8) or thresholdedValue
-                output.setRGB(x, y, outputRgb)
-            }
+        // Whole-image reads and writes: per-pixel getRGB/setRGB went through the color model for every pixel
+        val pixels = input.getRGB(0, 0, width, height, null, 0, width)
+        val out = (output.raster.dataBuffer as DataBufferInt).data
+        for (i in pixels.indices) {
+            val rgb = pixels[i]
+            val red = (rgb shr 16) and 0xFF
+            val green = (rgb shr 8) and 0xFF
+            val blue = rgb and 0xFF
+
+            // Calculate grayscale value using standard luminance formula
+            val grayscale = (red * 0.299 + green * 0.587 + blue * 0.114).toInt()
+
+            // Apply threshold: above threshold = white, below = black
+            out[i] = if (grayscale > thresholdValue) 0xFFFFFF else 0
         }
 
         return output

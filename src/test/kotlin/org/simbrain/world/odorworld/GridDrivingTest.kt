@@ -7,7 +7,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.simbrain.plot.awaitUntil
+import org.simbrain.util.awaitUntil
 import org.simbrain.util.piccolo.TileMap
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.MovementMode

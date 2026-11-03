@@ -3,6 +3,7 @@ package org.simbrain.network.desktop
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.util.cancelWith
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
@@ -18,7 +19,7 @@ import javax.swing.JMenuBar
 class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) :
     DesktopComponent<NetworkComponent>(frame, component) {
 
-    val networkPanel = NetworkPanel(component)
+    val networkPanel = NetworkPanel(component).also { it.viewScope.cancelWith(viewScope) }
 
     fun createFileMenu(): JMenu {
         val fileMenu = JMenu("File")
@@ -34,8 +35,7 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         return fileMenu
     }
 
-    override fun close() {
-        super.close()
+    override fun onClosed() {
         NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
     }
 
@@ -91,7 +91,7 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         // set to "gui off"
         component.events.guiToggled.on {
             networkPanel.guiOn = workspaceComponent.isGuiOn
-        }
+        }.cancelWith(viewScope)
     }
 
 }

@@ -2,7 +2,6 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.compositor.CompositorNode
@@ -34,6 +33,14 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
 
     private var compositorNode: CompositorNode? = null
 
+    /**
+     * Generation-driven refreshes coalesce at [HIGH_RATE_GUI_REFRESH_INTERVAL_MS]: syncing dirty
+     * tiles invalidates most of the interior, so at full decode speed a refresh per token would
+     * queue a full repaint per token. User-initiated paths (flips, menu actions) call
+     * [refreshView] directly.
+     */
+    private val generationRefresh = nodeScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
+
     override val generativeModel get() = languageModel
 
     override val interior get() = compositorNode
@@ -43,21 +50,17 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
         interactionBox.setText(languageModel.displayName)
 
         val events = languageModel.events
-        val subscriptions = listOf(
-            events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) },
-            events.locationChanged.on(swingDispatcher) { pullLocationFromModel() },
-            events.weightsLoaded.on(swingDispatcher) {
-                interactionBox.setText(languageModel.displayName)
-                rebuildInterior()
-            },
-            events.updated.on(Dispatchers.Default) { events.updateGraphics.fire() },
-            events.updateGraphics.on(swingDispatcher) { refreshViewThrottled() },
-            networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
-                networkPanel.dropInteriorSelectionIfDeselected(this, selection)
-            },
-        )
-        // Undo builds a fresh node, so a deleted node's subscriptions can go for good.
-        events.deleted.on(Dispatchers.Default) { subscriptions.forEach(Job::cancel) }
+        events.labelChanged.on(swingDispatcher) { _, _ -> interactionBox.setText(languageModel.displayName) }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { pullLocationFromModel() }.untilDisposed()
+        events.weightsLoaded.on(swingDispatcher) {
+            interactionBox.setText(languageModel.displayName)
+            rebuildInterior()
+        }.untilDisposed()
+        events.updated.onImmediate { generationRefresh.request() }.untilDisposed()
+        events.updateGraphics.onImmediate { generationRefresh.request() }.untilDisposed()
+        networkPanel.selectionManager.events.selection.on(swingDispatcher) { _, selection ->
+            networkPanel.dropInteriorSelectionIfDeselected(this, selection)
+        }.untilDisposed()
 
         rebuildInterior()
         pullLocationFromModel()
@@ -136,14 +139,6 @@ class LanguageModelNode(networkPanel: NetworkPanel, val languageModel: LanguageM
             outlineBounds.y - interactionBox.fullBounds.height / 2 + 0.5,
         )
     }
-
-    /**
-     * Generation-driven refreshes coalesce at [HIGH_RATE_GUI_REFRESH_INTERVAL_MS]: syncing dirty
-     * tiles invalidates most of the interior, so at full decode speed a refresh per token would
-     * queue a full repaint per token. User-initiated paths (flips, menu actions) call
-     * [refreshView] directly.
-     */
-    private val refreshViewThrottled = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { refreshView() }
 
     private fun refreshView() {
         val node = compositorNode ?: return

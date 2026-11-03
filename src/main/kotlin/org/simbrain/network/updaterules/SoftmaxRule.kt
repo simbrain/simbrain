@@ -5,6 +5,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.gui.nodes.ActivationSequenceProcessor
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
@@ -22,7 +23,7 @@ import kotlin.math.exp
  * Note that [org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule] is not overridden because the derivative
  * relative to the cross-entropy loss can be computed in a simplified way. See [org.simbrain.network.trainers.BackpropLossFunction]
  */
-class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), BoundedUpdateRule {
+class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), BoundedUpdateRule, BatchActivation {
 
     @UserParameter(
         label = "Temperature",
@@ -32,26 +33,15 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
         order = 10)
     var temperature = 1.0
 
-    private fun softmax(input: Matrix, temperature: Double, bias: Matrix = Matrix(input.nrow(), 1)): DoubleArray {
-        // These are often called "logits", that is, a set of unnormalized values
-        val max = input.flatten().max() // for max normalization to avoid overflow
-        val exponentials = (input.toDoubleArray() zip bias.toDoubleArray()).map { (i, b) -> exp(((i + b) - max) / temperature) }
-        val total = exponentials.sum()
-        
-        // for small values, return a uniform distribution
-        if (total < 1e-6) {
-            return DoubleArray(exponentials.size) { 1.0 / exponentials.size }
-        }
-        return exponentials.map { it/total }.toDoubleArray()
-    }
-
     context(Network) override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         val inputs = layer.inputs
         val biases = layer.biases
         
         if (layer is NeuronArray) {
-            layer.setActivations(softmax(inputs, temperature, biases))
+            // A neuron array's inputs already include its biases (see ArrayLayer.accumulateInputs)
+            layer.setActivations(softmax(inputs.toDoubleArray(), temperature))
         } else if (layer is ActivationSequenceProcessor){
+            // Activation sequences do not add biases to their inputs, so they are added here
             // Multiple rows case: apply softmax row-wise
             layer.activations = softmaxRowWise(inputs, temperature, biases)
         }
@@ -59,6 +49,17 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
 
     context(Network) override fun apply(neuron: Neuron, data: EmptyScalarData) {
         throw UnsupportedOperationException("SoftmaxRule does not support scalar data")
+    }
+
+    override val activatesBatches get() = true
+
+    override fun activateColumns(netInputs: Matrix): Matrix {
+        val result = Matrix(netInputs.nrow(), netInputs.ncol())
+        for (b in 0 until netInputs.ncol()) {
+            val column = softmax(DoubleArray(netInputs.nrow()) { netInputs[it, b] }, temperature)
+            for (i in column.indices) result[i, b] = column[i]
+        }
+        return result
     }
 
     override val name = "Softmax"
@@ -130,4 +131,20 @@ class SoftmaxRule: NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Bounded
         return result
     }
 
+}
+
+/**
+ * Softmax of [logits] (unnormalized values) at [temperature], or a uniform distribution when every exponential
+ * underflows. One vector's worth of [SoftmaxRule]'s layer update, which its batched form applies per column.
+ */
+private fun softmax(logits: DoubleArray, temperature: Double): DoubleArray {
+    val max = logits.max() // for max normalization to avoid overflow
+    val exponentials = logits.map { exp((it - max) / temperature) }
+    val total = exponentials.sum()
+
+    // for small values, return a uniform distribution
+    if (total < 1e-6) {
+        return DoubleArray(exponentials.size) { 1.0 / exponentials.size }
+    }
+    return exponentials.map { it / total }.toDoubleArray()
 }

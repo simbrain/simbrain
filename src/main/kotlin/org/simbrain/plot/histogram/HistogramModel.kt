@@ -1,10 +1,13 @@
+/**
+ * The histogram's data and JFreeChart dataset. Coupled arrays are posted from the updating thread and binned on the
+ * EDT, where the dataset is painted.
+ */
 package org.simbrain.plot.histogram
 
-import kotlinx.coroutines.withContext
 import org.jfree.data.xy.IntervalXYDataset
 import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.histogram.OverwritableHistogramDataset.ColoredDataSeries
-import org.simbrain.util.swingDispatcher
+import org.simbrain.util.EdtUpdates
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import java.awt.Color
@@ -39,7 +42,7 @@ class HistogramModel(
     xAxisName: String = "",
     yAxisName: String = "Count",
     colorPallet: Array<Color>? = null
-) : AttributeContainer {
+) : AttributeContainer, AutoCloseable {
 
     /**
      * The data set used to generate the histogram.
@@ -74,8 +77,30 @@ class HistogramModel(
      * @param histData the array of histogram data
      */
     @Consumable
-    suspend fun addData(histData: DoubleArray) {
-        withContext(swingDispatcher) { addDataToDataSeries(histData, 0) }
+    fun addData(histData: DoubleArray) = incoming.post(histData)
+
+    /**
+     * Data for the EDT-painted dataset, applied without the updating thread waiting on the EDT; only the newest
+     * array matters, since each replaces the last. Recreated in [readResolve] because this class is deserialized
+     * without running its constructor or field initializers.
+     */
+    @Transient
+    private var incoming = newIncoming()
+
+    private fun newIncoming() = EdtUpdates<DoubleArray> { batch -> addDataToDataSeries(batch.last(), 0) }
+
+    /** Stops applying queued data; called when the owning component leaves the workspace. */
+    override fun close() = incoming.close()
+
+    /** Lands queued data before XStream writes the series. */
+    private fun writeReplace(): Any {
+        incoming.flush()
+        return this
+    }
+
+    private fun readResolve(): Any {
+        incoming = newIncoming()
+        return this
     }
 
     fun applyCurrentData() {

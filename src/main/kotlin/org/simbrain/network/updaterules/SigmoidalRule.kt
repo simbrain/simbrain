@@ -1,5 +1,7 @@
 package org.simbrain.network.updaterules
 
+import smile.math.matrix.Matrix
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -14,7 +16,7 @@ import org.simbrain.util.addi
  * @author Zoë Tosi
  * @author Jeff Yoshimi
  */
-class SigmoidalRule : AbstractSigmoidalRule<EmptyScalarData, EmptyMatrixData>() {
+class SigmoidalRule : AbstractSigmoidalRule<EmptyScalarData, EmptyMatrixData>(), BatchActivation {
 
     override val timeType: Network.TimeType = Network.TimeType.DISCRETE
 
@@ -36,6 +38,10 @@ class SigmoidalRule : AbstractSigmoidalRule<EmptyScalarData, EmptyMatrixData>() 
         }
         array.activations = type.valueOf(weightedInputs, upperBound, lowerBound, slope)
     }
+
+    override val activatesBatches get() = true
+
+    override fun activateColumns(netInputs: Matrix): Matrix = type.valueOf(netInputs, upperBound, lowerBound, slope)
 
     override fun copy(): SigmoidalRule {
         var sr = SigmoidalRule()

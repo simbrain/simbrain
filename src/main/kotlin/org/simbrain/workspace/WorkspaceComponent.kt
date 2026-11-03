@@ -109,6 +109,15 @@ abstract class WorkspaceComponent(name: String) {
     }
 
     /**
+     * Models this component owns that hold resources to release, such as a plot model's queue of updates for the
+     * EDT. The workspace closes them when the component leaves it, whether its window was closed or the workspace
+     * was cleared, which removes components without closing them.
+     */
+    protected open val closeables: List<AutoCloseable> get() = emptyList()
+
+    internal fun closeOwnedModels() = closeables.forEach { it.close() }
+
+    /**
      * Closes the WorkspaceComponent.
      */
     open fun close() {

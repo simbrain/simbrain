@@ -42,6 +42,7 @@ fun matmul(
     require(out.rows >= aRows && out.cols == bCols) {
         "matmul out ${out.rows}x${out.cols} != ${aRows}x$bCols"
     }
+    Blas.ensureDefaultThreads()
     cblas_sgemm(
         CblasRowMajor,
         if (transposeA) CblasTrans else CblasNoTrans,
@@ -77,6 +78,7 @@ fun matvec(
         require(x.size >= a.cols) { "matvec x size ${x.size} < ${a.cols}" }
         require(out.size >= rowCount) { "matvec out size ${out.size} < rowCount $rowCount" }
     }
+    Blas.ensureDefaultThreads()
     cblas_sgemv(
         CblasRowMajor, if (transposeA) CblasTrans else CblasNoTrans,
         rowCount, a.cols,

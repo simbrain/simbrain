@@ -38,7 +38,7 @@ fun TrainingDataset.createDataSetPanel(
 ): DataSetPanel {
 
     fun createDataFrame(
-        data: MutableList<MutableList<Double>>,
+        data: List<DoubleArray>,
         rowNames: List<String>?,
         columnNames: List<String>?,
         expectedColumnCount: Int
@@ -416,7 +416,8 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
         })
         runControls.add(labelPanel, "wrap")
 
-        trainer.events.progressUpdated.on(Dispatchers.Swing) {
+        // Fired every training iteration; awaiting the EDT here would pace training by the display
+        trainer.events.progressUpdated.onUi(viewScope) {
             iterationsLabel.text = "" + trainer.iteration
         }
 

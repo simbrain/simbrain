@@ -136,10 +136,12 @@ class ConvolutionConnector(
      * Backward pass: computes kernel/bias gradients and propagates error to source tensor.
      * Assumes target.gradients contains the gradient from downstream.
      *
-     * Accumulates into [kernelGrads], [biasGrads], and [source].gradients.
+     * Accumulates into [kernelGrads], [biasGrads], and, when [propagateToSource], [source].gradients.
      * Call [clearGrads] and [source].clearGradients() before a new batch.
+     *
+     * @param propagateToSource false when nothing reads the source's gradients, as for a network's input image
      */
-    fun backward() {
+    fun backward(propagateToSource: Boolean = true) {
         ConvOps.conv2dBackwardKernels(
             target.gradients, target.shape,
             source.activations, source.shape,
@@ -147,6 +149,7 @@ class ConvolutionConnector(
             biasGrads,
             stride, padH, padW
         )
+        if (!propagateToSource) return
         ConvOps.conv2dBackwardInput(
             target.gradients, target.shape,
             kernels, numFilters, kernelSize,

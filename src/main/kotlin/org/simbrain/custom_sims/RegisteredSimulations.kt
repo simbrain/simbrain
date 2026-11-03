@@ -21,12 +21,11 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
+import org.simbrain.custom_sims.simulations.ml.decisionBoundaries
+import org.simbrain.custom_sims.simulations.ml.modelComparison
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
-import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
-import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
-import org.simbrain.custom_sims.simulations.neuroscience.nematodeThermotaxis
-import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
+import org.simbrain.custom_sims.simulations.neuroscience.*
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -144,6 +143,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("STDP") { stdpSim }
         item("Spiking network") { spikingNetworkSimulation }
         item("E/I balance") { excitatoryInhibitoryBalance }
+        item("Izhikevich network (1000 neurons)") { izhikevichNetwork }
+        item("Izhikevich network (array)") { izhikevichNetworkArray }
         item("Nematode simulation") { nematodeThermotaxis }
         item("Cortical layers", beta = true) { corticalLayers }
          //item("Cortical areas") { cortexKuramoto }
@@ -194,6 +195,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Machine learning") {
         item("Iris classifier") { irisClassifier }
+        item("Decision boundaries") { decisionBoundaries }
+        item("Model comparison") { modelComparison }
     }
 
     dir("Recurrent networks") {

@@ -14,9 +14,11 @@ import org.simbrain.custom_sims.simulations.nettalk.wireNetTalk
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.subnetworks.BackpropNetwork
 import org.simbrain.util.nettalk.NettalkEncoder
+import org.simbrain.util.withEdtHeld
 import org.simbrain.workspace.Workspace
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizer
 import org.simbrain.world.speechsynthesizer.SpeechSynthesizerComponent
+import javax.swing.SwingUtilities
 
 class NettalkFlushTest {
 
@@ -61,6 +63,19 @@ class NettalkFlushTest {
             val fixture = wiredWorkspace("hello ")
             val lengths = bufferLengthsPerIteration(fixture, 12)
             assertEquals(listOf(1, 2, 3, 4, 5, 0, 1, 2, 3, 4, 5, 0), lengths)
+        }
+    }
+
+    @Test
+    fun `a phoneme read right after a text edit stays buffered`() {
+        runBlocking {
+            val fixture = wiredWorkspace("hello")
+            withEdtHeld {
+                fixture.reader.text = "world"
+                fixture.workspace.iterateSuspend(1)
+            }
+            SwingUtilities.invokeAndWait {}
+            assertEquals(1, fixture.synthesizer.featureBufferLength)
         }
     }
 

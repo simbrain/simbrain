@@ -10,6 +10,7 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.util.cancelWith
 import org.simbrain.util.createAction
 import org.simbrain.util.display
 import org.simbrain.util.sizeIncluding
@@ -222,7 +223,7 @@ val NetworkPanel.viewMenu
                     this.state = networkPanel.autoZoom
                     networkPanel.network.events.zoomModeChanged.on(Dispatchers.Swing) {
                         this.state = it
-                    }
+                    }.cancelWith(networkPanel.viewScope)
                 })
             })
             addSeparator()
@@ -235,13 +236,13 @@ val NetworkPanel.viewMenu
                 this.state = networkPanel.freeWeightsVisible
                 networkPanel.network.events.freeWeightVisibilityChanged.on(Dispatchers.Swing) {
                     this.state = it
-                }
+                }.cancelWith(networkPanel.viewScope)
             })
             add(JCheckBoxMenuItem(toggleSynapseSpikingOnlyVisibility).apply {
                 this.state = networkPanel.synapseSpikingOnlyVisible
                 networkPanel.network.events.synapseSpikingOnlyVisibilityChanged.on(Dispatchers.Swing) {
                     this.state = it
-                }
+                }.cancelWith(networkPanel.viewScope)
             })
             val shapeCaptionsItem = JCheckBoxMenuItem(toggleShapeCaptions)
             add(shapeCaptionsItem)

@@ -1,5 +1,6 @@
 package org.simbrain.workspace.updater
 
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import org.simbrain.util.UpdateAction
@@ -19,9 +20,14 @@ object PerformanceMonitor {
     var enabled = false
 
     /**
-     * Asynchronously buffers measured events for tracking their performance stats.
+     * Asynchronously buffers measured events for tracking their performance stats. Emitting never waits for the
+     * collector, so a measured action is not held up by the display; if the collector falls behind, the oldest
+     * measurements are dropped.
      */
-    private val mutableSharedFlow = MutableSharedFlow<PerformanceMetrics>()
+    private val mutableSharedFlow = MutableSharedFlow<PerformanceMetrics>(
+        extraBufferCapacity = 1024,
+        onBufferOverflow = BufferOverflow.DROP_OLDEST
+    )
     val flow = mutableSharedFlow.asSharedFlow()
 
     /**
@@ -48,7 +54,7 @@ object PerformanceMonitor {
             }
             val thread = Thread.currentThread()
 
-            mutableSharedFlow.emit(PerformanceMetrics(identifier, name, thread.name, nanoTime))
+            mutableSharedFlow.tryEmit(PerformanceMetrics(identifier, name, thread.name, nanoTime))
         } else {
             block()
         }

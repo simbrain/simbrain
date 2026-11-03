@@ -66,7 +66,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         node.model.events.deleted.on(swingDispatcher) {
             outlinedObjects.remove(node)
             outline.resetOutlinedNodes(outlinedObjects)
-        }
+        }.untilDisposed()
         (node.model as? LocatableModel)?.events?.locationChanged?.fire()
 
         updateOutline()
@@ -209,8 +209,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         addChild(interactionBox)
 
         val events: LocationEvents = subnetwork.events
-        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }
-        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }
+        events.labelChanged.on(swingDispatcher) { _, _ -> updateText() }.untilDisposed()
+        events.locationChanged.on(swingDispatcher) { this.layoutChildren() }.untilDisposed()
     }
 
     override fun offset(dx: kotlin.Double, dy: kotlin.Double) {
@@ -255,9 +255,14 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val outlinedObjectBounds: PBounds
         get() = PBounds().apply { outlinedObjects.forEach { add(it.fullBounds) } }
 
+    override fun syncFromModel(bits: Int) {
+        if (bits and INFO != 0) layoutChildren()
+    }
+
     fun setInfoTextNode(infoTextNode: ScreenElement) {
         this.infoTextNode = infoTextNode
-        subnetwork.events.customInfoUpdated.on(swingDispatcher) { this.layoutChildren() }
+        // Fired every iteration by networks that report training state, so laid out once per frame
+        subnetwork.events.customInfoUpdated.onImmediate { markDirty(INFO) }.untilDisposed()
         layoutChildren() // Trigger initial positioning
     }
 
@@ -295,6 +300,11 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
         return interactionBox.isIntersecting(bound)
     }
 
+
+    companion object {
+        // Protected so a subclass numbers its own bits after these
+        protected const val INFO = 1
+    }
 
     /**
      * Basic interaction box for subnetwork nodes. Ensures a property dialog

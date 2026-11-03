@@ -1,5 +1,11 @@
+/**
+ * Base class for nodes on the network canvas: shared interactions (context menu, property dialog, tooltip), the node's
+ * lifetime ([nodeScope], [dispose]) and the dirty-mark contract by which model changes reach its visuals once per
+ * frame instead of once per event.
+ */
 package org.simbrain.network.gui.nodes
 
+import kotlinx.coroutines.CoroutineScope
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
@@ -12,7 +18,10 @@ import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.util.StandardDialog
 import org.simbrain.util.display
 import org.simbrain.util.int
+import org.simbrain.util.piccolo.NodeSync
+import org.simbrain.util.piccolo.ScopedNode
 import org.simbrain.util.piccolo.firstScreenElement
+import org.simbrain.util.piccolo.nodeScopeIn
 import java.awt.event.InputEvent
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
@@ -22,7 +31,7 @@ import javax.swing.SwingUtilities
  * and property dialog, and support. Screen elements are automatically support the primary user interactions in the
  * network panel.
  */
-abstract class ScreenElement protected constructor(val networkPanel: NetworkPanel) : PPath.Float() {
+abstract class ScreenElement protected constructor(val networkPanel: NetworkPanel) : PPath.Float(), ScopedNode {
     /**
      * Create a new abstract screen element with the specified network panel.
      */
@@ -35,6 +44,31 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
             }
         })
     }
+
+    final override val nodeScope: CoroutineScope = nodeScopeIn(networkPanel.viewScope)
+
+    /**
+     * Aspects of the model that changed since this node last synced, as subclass-defined bits. Model events only set
+     * bits here; the panel's per-frame sync pass then calls [syncFromModel] once with everything accumulated, so a
+     * model firing thousands of changes a second costs the EDT one update per frame rather than one task per change.
+     */
+    private val sync = NodeSync(this, nodeScope, networkPanel.nodeSync) { bits -> syncFromModel(bits) }
+
+    /**
+     * Records changed aspects and queues this node for the next sync pass, once however many marks arrive. Bits are
+     * numbered per class hierarchy: an open node class keeps its bits protected, so a subclass numbers its own after
+     * them.
+     */
+    protected fun markDirty(bits: Int) = sync.mark(bits)
+
+    /** Runs a pending sync now; called on the EDT by the panel's sync pass. */
+    internal fun syncPending() = sync.runPending()
+
+    /**
+     * Updates visuals from the model's current state for the aspects in [bits]. Runs on the EDT, at most once per
+     * frame, and should only touch visuals whose drawn value actually differs.
+     */
+    protected open fun syncFromModel(bits: Int) {}
 
     /**
      * Returns a reference to the model object this node represents.

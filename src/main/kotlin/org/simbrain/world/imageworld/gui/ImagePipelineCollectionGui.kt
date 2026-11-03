@@ -3,6 +3,7 @@ package org.simbrain.world.imageworld.gui
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.*
 import org.simbrain.util.widgets.ModelBackedComboBoxModel
 import org.simbrain.world.imageworld.ImageWorldDesktopComponent
@@ -79,23 +80,19 @@ class ImagePipelineCollectionGui(
     private val fillCanvasAction = imageWorldDesktopComponent.createAction(
         "Fill",
         description = "Fill canvas using current color",
-        iconPath = "menu_icons/fill.png"
+        iconPath = "menu_icons/fill.png",
+        coroutineContext = Dispatchers.Swing
     ) {
-        if (showConfirm("Are you sure you want to fill the canvas?", okLabel = "Fill")) {
-            imageWorld.imageAlbum.currentImage.fill(imageWorld.penColor)
-            imageWorld.imageAlbum.fireImageUpdate()
-        }
+        imageWorldDesktopComponent.imageHistory.pixelEdit("Fill") { it.fill(imageWorld.penColor) }
     }
 
     private val clearCanvasAction = imageWorldDesktopComponent.createAction(
         "Clear",
         description = "Clear canvas (with black pixels)",
-        iconPath = "menu_icons/Eraser.png"
+        iconPath = "menu_icons/Eraser.png",
+        coroutineContext = Dispatchers.Swing
     ) {
-        if (showConfirm("Are you sure you want to clear the canvas?", okLabel = "Clear")) {
-            imageWorld.imageAlbum.currentImage.fill(Color.black)
-            imageWorld.imageAlbum.fireImageUpdate()
-        }
+        imageWorldDesktopComponent.imageHistory.pixelEdit("Clear") { it.fill(Color.black) }
     }
 
     private val colorPickerButton = ColorPickerButton(imageWorld)

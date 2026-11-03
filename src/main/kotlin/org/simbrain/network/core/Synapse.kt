@@ -1,6 +1,5 @@
 package org.simbrain.network.core
 
-import kotlinx.coroutines.Dispatchers
 import org.simbrain.network.events.SynapseEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
@@ -92,6 +91,9 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             // change support initialized.
             events.learningRuleUpdated.fire(oldRule, learningRule)
         }
+
+    /** Whether [learningRule] changes the strength; a static rule leaves nothing to update. */
+    val isLearning: Boolean get() = learningRule !is StaticSynapseRule
 
     /**
      * Only used if source neuron is a spiking neuron.
@@ -259,8 +261,6 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
             source.addToFanOut(this)
             target.addToFanIn(this)
         }
-        source.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
-        target.events.locationChanged.on(Dispatchers.Default) { events.locationChanged.fire() }
     }
 
     /**
@@ -312,7 +312,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
         if (clamped) return
 
         // Update synapse strengths for non-static synapses
-        if (learningRule !is StaticSynapseRule) {
+        if (isLearning) {
             learningRule.apply(this, learningRuleData)
         }
     }

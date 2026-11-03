@@ -6,6 +6,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.Synapse
 import kotlin.math.PI
+import kotlin.math.sin
 import kotlin.math.abs
 
 class KuramotoRuleTest {
@@ -85,8 +86,9 @@ class KuramotoRuleTest {
         // Connect both n1 and n2 to n3
         val s13 = Synapse(n1, n3)
         val s23 = Synapse(n2, n3)
+        // Unequal, since n1 and n2 sit symmetrically on either side of n3 and equal pulls would cancel
         s13.strength = 1.0
-        s23.strength = 1.0
+        s23.strength = 0.5
         net.addNetworkModelsAsync(s13, s23)
         
         kuramotoRule3.slope = 0.0
@@ -94,8 +96,9 @@ class KuramotoRuleTest {
         
         net.update()
         
-        // n3 should be influenced by both n1 and n2
-        assertNotEquals(initialPhaseN3, n3.activation, "n3 phase should change due to multiple coupling")
+        // n3 is pulled by both n1 and n2 as they were before the update, averaged over its two inputs
+        val coupling = (1.0 * sin(PI / 4 - PI / 2) + 0.5 * sin(3 * PI / 4 - PI / 2)) / 2
+        assertEquals(initialPhaseN3 + net.timeStep * coupling, n3.activation, 1e-12)
         assertTrue(n3.activation >= 0.0 && n3.activation <= 2 * PI, "Phase should be within [0, 2π]")
     }
 

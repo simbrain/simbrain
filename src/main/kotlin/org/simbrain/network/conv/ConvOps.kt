@@ -30,39 +30,74 @@ object ConvOps {
         output: DoubleArray, outputShape: TensorShape,
         stride: Int, padH: Int, padW: Int
     ) {
+        require(outputShape.channels == numFilters) { "Output has ${outputShape.channels} channels for $numFilters filters" }
         val inC = inputShape.channels
         val inH = inputShape.height
         val inW = inputShape.width
-        val outH = outputShape.height
-        val outW = outputShape.width
-        val kernelArea = kernelSize * kernelSize
+        val byPosition = kernelsByPosition(kernels, numFilters, inC, kernelSize)
+        val sums = DoubleArray(numFilters)
 
-        for (f in 0 until numFilters) {
-            val filterOffset = f * inC * kernelArea
-            val bias = biases[f]
-            for (oh in 0 until outH) {
-                for (ow in 0 until outW) {
-                    var sum = bias
-                    val inHBase = oh * stride - padH
-                    val inWBase = ow * stride - padW
-                    for (c in 0 until inC) {
-                        val channelOffset = filterOffset + c * kernelArea
-                        for (kh in 0 until kernelSize) {
-                            val ih = inHBase + kh
-                            if (ih !in 0..<inH) continue
-                            for (kw in 0 until kernelSize) {
-                                val iw = inWBase + kw
-                                if (iw !in 0..<inW) continue
-                                val inputVal = input[inputShape.index(ih, iw, c)]
-                                val kernelVal = kernels[channelOffset + kh * kernelSize + kw]
-                                sum += inputVal * kernelVal
-                            }
+        for (oh in 0 until outputShape.height) {
+            val inHBase = oh * stride - padH
+            for (ow in 0 until outputShape.width) {
+                val inWBase = ow * stride - padW
+                System.arraycopy(biases, 0, sums, 0, numFilters)
+                for (kh in 0 until kernelSize) {
+                    val ih = inHBase + kh
+                    if (ih < 0 || ih >= inH) continue
+                    for (kw in 0 until kernelSize) {
+                        val iw = inWBase + kw
+                        if (iw < 0 || iw >= inW) continue
+                        val inBase = inputShape.index(ih, iw, 0)
+                        val kernelBase = (kh * kernelSize + kw) * inC * numFilters
+                        for (c in 0 until inC) {
+                            val x = input[inBase + c]
+                            if (x == 0.0) continue
+                            val k = kernelBase + c * numFilters
+                            for (f in 0 until numFilters) sums[f] += x * byPosition[k + f]
                         }
                     }
-                    output[outputShape.index(oh, ow, f)] += sum
                 }
+                val outBase = outputShape.index(oh, ow, 0)
+                for (f in 0 until numFilters) output[outBase + f] += sums[f]
             }
         }
+    }
+
+    /**
+     * [kernels], stored [filter][channel][kh][kw], rearranged to [kh][kw][channel][filter]. With HWC tensors the
+     * channels at one position are contiguous, and so are the filters for one input value, so the convolution loops
+     * run over contiguous memory with the padding checks hoisted out of them.
+     */
+    private fun kernelsByPosition(kernels: DoubleArray, numFilters: Int, inC: Int, kernelSize: Int): DoubleArray =
+        rearrangeKernels(kernels, numFilters, inC, kernelSize) { k, c, f -> positionChannelFilter(k, c, f, inC, numFilters) }
+
+    /** Index of kernel position [k] (kh * kernelSize + kw), channel [c] and filter [f] in [kh][kw][channel][filter] order. */
+    private fun positionChannelFilter(k: Int, c: Int, f: Int, inC: Int, numFilters: Int) = (k * inC + c) * numFilters + f
+
+    /** Index of kernel position [k], channel [c] and filter [f] in [kh][kw][filter][channel] order. */
+    private fun positionFilterChannel(k: Int, c: Int, f: Int, inC: Int, numFilters: Int) = (k * numFilters + f) * inC + c
+
+    /** [kernels], stored [filter][channel][kh][kw], copied to the position [index] gives each weight. */
+    private inline fun rearrangeKernels(
+        kernels: DoubleArray, numFilters: Int, inC: Int, kernelSize: Int,
+        index: (k: Int, c: Int, f: Int) -> Int
+    ): DoubleArray {
+        val area = kernelSize * kernelSize
+        val rearranged = DoubleArray(numFilters * inC * area)
+        for (f in 0 until numFilters) {
+            for (c in 0 until inC) {
+                val from = (f * inC + c) * area
+                for (k in 0 until area) rearranged[index(k, c, f)] = kernels[from + k]
+            }
+        }
+        return rearranged
+    }
+
+    /** True when any of the [count] gradients from [start] is nonzero; ReLU zeroes many whole output positions. */
+    private fun anyNonZero(values: DoubleArray, start: Int, count: Int): Boolean {
+        for (i in start until start + count) if (values[i] != 0.0) return true
+        return false
     }
 
     /**
@@ -162,32 +197,35 @@ object ConvOps {
         inputGrad: DoubleArray, inputShape: TensorShape,
         stride: Int, padH: Int, padW: Int
     ) {
+        require(outputShape.channels == numFilters) { "Output has ${outputShape.channels} channels for $numFilters filters" }
         val inC = inputShape.channels
         val inH = inputShape.height
         val inW = inputShape.width
-        val outH = outputShape.height
-        val outW = outputShape.width
-        val kernelArea = kernelSize * kernelSize
+        // [kh][kw][filter][channel]: each output gradient scales a contiguous run of channel weights, so the inner loop
+        // is independent multiply-adds rather than a sum whose every add waits on the last
+        val byPosition = rearrangeKernels(kernels, numFilters, inC, kernelSize) { k, c, f ->
+            positionFilterChannel(k, c, f, inC, numFilters)
+        }
 
-        for (f in 0 until numFilters) {
-            val filterOffset = f * inC * kernelArea
-            for (oh in 0 until outH) {
-                for (ow in 0 until outW) {
-                    val dOut = outputGrad[outputShape.index(oh, ow, f)]
-                    if (dOut == 0.0) continue
-                    val inHBase = oh * stride - padH
-                    val inWBase = ow * stride - padW
-                    for (c in 0 until inC) {
-                        val channelOffset = filterOffset + c * kernelArea
-                        for (kh in 0 until kernelSize) {
-                            val ih = inHBase + kh
-                            if (ih !in 0..<inH) continue
-                            for (kw in 0 until kernelSize) {
-                                val iw = inWBase + kw
-                                if (iw !in 0..<inW) continue
-                                inputGrad[inputShape.index(ih, iw, c)] +=
-                                    dOut * kernels[channelOffset + kh * kernelSize + kw]
-                            }
+        for (oh in 0 until outputShape.height) {
+            val inHBase = oh * stride - padH
+            for (ow in 0 until outputShape.width) {
+                val outBase = outputShape.index(oh, ow, 0)
+                if (!anyNonZero(outputGrad, outBase, numFilters)) continue
+                val inWBase = ow * stride - padW
+                for (kh in 0 until kernelSize) {
+                    val ih = inHBase + kh
+                    if (ih < 0 || ih >= inH) continue
+                    for (kw in 0 until kernelSize) {
+                        val iw = inWBase + kw
+                        if (iw < 0 || iw >= inW) continue
+                        val inBase = inputShape.index(ih, iw, 0)
+                        val kernelBase = (kh * kernelSize + kw) * numFilters * inC
+                        for (f in 0 until numFilters) {
+                            val g = outputGrad[outBase + f]
+                            if (g == 0.0) continue
+                            val k = kernelBase + f * inC
+                            for (c in 0 until inC) inputGrad[inBase + c] += g * byPosition[k + c]
                         }
                     }
                 }
@@ -209,36 +247,44 @@ object ConvOps {
         biasGrad: DoubleArray,
         stride: Int, padH: Int, padW: Int
     ) {
+        require(outputShape.channels == numFilters) { "Output has ${outputShape.channels} channels for $numFilters filters" }
         val inC = inputShape.channels
         val inH = inputShape.height
         val inW = inputShape.width
-        val outH = outputShape.height
-        val outW = outputShape.width
-        val kernelArea = kernelSize * kernelSize
+        val area = kernelSize * kernelSize
+        // Accumulated in [kh][kw][channel][filter] order, like the forward pass, then added in kernelGrad's order
+        val gradByPosition = DoubleArray(numFilters * inC * area)
 
-        for (f in 0 until numFilters) {
-            val filterOffset = f * inC * kernelArea
-            for (oh in 0 until outH) {
-                for (ow in 0 until outW) {
-                    val dOut = outputGrad[outputShape.index(oh, ow, f)]
-                    if (dOut == 0.0) continue
-                    biasGrad[f] += dOut
-                    val inHBase = oh * stride - padH
-                    val inWBase = ow * stride - padW
-                    for (c in 0 until inC) {
-                        val channelOffset = filterOffset + c * kernelArea
-                        for (kh in 0 until kernelSize) {
-                            val ih = inHBase + kh
-                            if (ih !in 0..<inH) continue
-                            for (kw in 0 until kernelSize) {
-                                val iw = inWBase + kw
-                                if (iw !in 0..<inW) continue
-                                kernelGrad[channelOffset + kh * kernelSize + kw] +=
-                                    dOut * input[inputShape.index(ih, iw, c)]
-                            }
+        for (oh in 0 until outputShape.height) {
+            val inHBase = oh * stride - padH
+            for (ow in 0 until outputShape.width) {
+                val outBase = outputShape.index(oh, ow, 0)
+                if (!anyNonZero(outputGrad, outBase, numFilters)) continue
+                for (f in 0 until numFilters) biasGrad[f] += outputGrad[outBase + f]
+                val inWBase = ow * stride - padW
+                for (kh in 0 until kernelSize) {
+                    val ih = inHBase + kh
+                    if (ih < 0 || ih >= inH) continue
+                    for (kw in 0 until kernelSize) {
+                        val iw = inWBase + kw
+                        if (iw < 0 || iw >= inW) continue
+                        val inBase = inputShape.index(ih, iw, 0)
+                        val kernelBase = (kh * kernelSize + kw) * inC * numFilters
+                        for (c in 0 until inC) {
+                            val x = input[inBase + c]
+                            if (x == 0.0) continue
+                            val k = kernelBase + c * numFilters
+                            for (f in 0 until numFilters) gradByPosition[k + f] += x * outputGrad[outBase + f]
                         }
                     }
                 }
+            }
+        }
+        // The inverse of kernelsByPosition, accumulating
+        for (f in 0 until numFilters) {
+            for (c in 0 until inC) {
+                val to = (f * inC + c) * area
+                for (k in 0 until area) kernelGrad[to + k] += gradByPosition[positionChannelFilter(k, c, f, inC, numFilters)]
             }
         }
     }

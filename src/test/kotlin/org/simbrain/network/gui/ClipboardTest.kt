@@ -7,6 +7,7 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
+import org.simbrain.util.onEdt
 import org.simbrain.util.point
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.math.matrix.Matrix
@@ -1015,7 +1016,7 @@ class ClipboardTest {
         val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
 
         networkPanel.selectionManager.add(
-            networkPanel.screenElements.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
+            onEdt { networkPanel.screenElements }.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
         )
         networkPanel.duplicate()
 
@@ -1086,7 +1087,7 @@ class ClipboardTest {
         val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
 
         networkPanel.selectionManager.add(
-            networkPanel.screenElements.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
+            onEdt { networkPanel.screenElements }.filter { it.model in listOf(sourceArray, targetArray, weightMatrix) }
         )
         networkPanel.duplicate()
         networkPanel.duplicate()
@@ -1916,7 +1917,7 @@ class ClipboardTest {
         val row = List(3) { Neuron().also { network.addNetworkModel(it) } }
         val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
 
-        networkPanel.selectionManager.set(networkPanel.screenElements.filter { it.model == row[0] })
+        networkPanel.selectionManager.set(onEdt { networkPanel.screenElements }.filter { it.model == row[0] })
         networkPanel.duplicate()
         // Duplicating again duplicates the fresh copy, which is what is selected after a duplicate
         networkPanel.duplicate()
@@ -1932,7 +1933,7 @@ class ClipboardTest {
         val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
         val sourceLocation = source.location
 
-        networkPanel.selectionManager.set(networkPanel.screenElements.filter { it.model == source })
+        networkPanel.selectionManager.set(onEdt { networkPanel.screenElements }.filter { it.model == source })
         networkPanel.duplicateInPlace()
 
         val copy = network.getModels<Neuron>().single { it != source }

@@ -135,9 +135,14 @@ fun List<List<Double>>.toMutableListOfLists(): MutableList<MutableList<Double>> 
 fun MutableList<MutableList<Double>>.copy(): MutableList<MutableList<Double>> =
     map { it.toMutableList() }.toMutableList()
 
+/**
+ * Copies of every row, so the copy shares no arrays with the original.
+ */
+fun List<DoubleArray>.copyRows(): MutableList<DoubleArray> = mapTo(ArrayList(size)) { it.copyOf() }
+
 fun TrainingDataset.copy(): TrainingDataset = TrainingDataset(
-    inputs = inputs.copy(),
-    targets = targets.copy(),
+    inputs = inputs.copyRows(),
+    targets = targets.copyRows(),
     inputSize = inputSize,
     targetSize = targetSize,
     inputRowNames = inputRowNames?.toMutableList(),
@@ -455,7 +460,7 @@ fun showEigenvalues(matrix: Matrix) {
     }
 }
 
-fun Matrix.applyFunction(fn: (Double) -> Double): Matrix {
+inline fun Matrix.applyFunction(fn: (Double) -> Double): Matrix {
     val result = Matrix(nrow(), ncol())
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
@@ -465,7 +470,7 @@ fun Matrix.applyFunction(fn: (Double) -> Double): Matrix {
     return result
 }
 
-fun Matrix.applyFunctionInPlace(fn: (Double) -> Double): Matrix {
+inline fun Matrix.applyFunctionInPlace(fn: (Double) -> Double): Matrix {
     for (i in 0 until nrow()) {
         for (j in 0 until ncol()) {
             set(i, j, fn(get(i, j)))

@@ -5,6 +5,7 @@ import org.simbrain.network.connections.*
 import org.simbrain.network.events.SynapseGroupEvents
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.SynapseNode
+import org.simbrain.util.CachedObject
 import org.simbrain.util.MessageKind
 import org.simbrain.util.SimbrainConstants
 import org.simbrain.util.showMessage
@@ -37,9 +38,37 @@ class SynapseGroup @JvmOverloads constructor(
     @Transient
     override var events = SynapseGroupEvents()
 
-    var synapses: MutableList<Synapse> = synapses.onEach { synapse ->
+    /**
+     * The synapses with a non-static learning rule, the only ones [update] has work for; a large group of static
+     * synapses would otherwise be walked serially on every update. Dropped when the list changes or a synapse's
+     * learning rule is replaced.
+     */
+    // `this.`: in an initializer, a bare `synapses` is the constructor parameter, not the group's current list
+    @Transient
+    private val learningSynapses = CachedObject { this.synapses.filter { it.isLearning } }
+
+    /** One instance shared by every synapse in the group, so each pays only a slot in its event's handler list. */
+    @Transient
+    private val learningRuleChanged: (Any?) -> Unit = { learningSynapses.invalidate() }
+
+    /**
+     * The group's synapses. Change them through [addSynapse], [restoreSynapse] and [restoreSynapses], which keep
+     * [learningSynapses] current.
+     */
+    val synapses: List<Synapse> = ArrayList(synapses).onEach { synapse ->
         synapse.isVisible = false
         addSynapseListener(synapse)
+    }
+
+    /**
+     * [synapses] for editing. The field is declared as a read-only list so other code cannot edit it in place, and
+     * keeps its name because saved workspaces store it under that name.
+     */
+    private val synapseList get() = synapses as MutableList<Synapse>
+
+    private inline fun editSynapses(edit: MutableList<Synapse>.() -> Unit) {
+        synapseList.edit()
+        learningSynapses.invalidate()
     }
 
     /**
@@ -110,15 +139,29 @@ class SynapseGroup @JvmOverloads constructor(
                 val deletedBySynapse = synapse.delete()
                 addAll(deletedBySynapse)
             }
-        }.also { synapses.clear() }
+        }.also { editSynapses { clear() } }
     }
 
+    /**
+     * True while [delete] tears the group down synapse by synapse. The per-synapse listeners then leave the list
+     * to be cleared at the end: shrinking it one by one would cross the visibility threshold partway through and
+     * have the GUI build loose nodes for synapses about to go, and emptying it would re-enter [delete].
+     */
+    @Transient
+    @Volatile
+    private var deleting = false
+
     override suspend fun delete(): List<NetworkModel> {
-        val removedSynapses = removeAllSynapses()
-        target.removeIncomingSg(this)
-        source.removeOutgoingSg(this)
-        events.deleted.fire(this)
-        return listOf(this) + removedSynapses
+        deleting = true
+        try {
+            val removedSynapses = removeAllSynapses()
+            target.removeIncomingSg(this)
+            source.removeOutgoingSg(this)
+            events.deleted.fire(this)
+            return listOf(this) + removedSynapses
+        } finally {
+            deleting = false
+        }
     }
 
     override suspend fun afterRestore(context: Any?) {
@@ -138,8 +181,17 @@ class SynapseGroup @JvmOverloads constructor(
         
         syn.isVisible = displaySynapses
         addSynapseListener(syn)
-        this.synapses.add(syn)
+        editSynapses { add(syn) }
         refreshVisibility()
+    }
+
+    /** Puts back a synapse of this group whose deletion is being undone. */
+    fun restoreSynapse(synapse: Synapse) = editSynapses { add(synapse) }
+
+    /** Puts back the group's synapses as they were when an addition being redone was first made. */
+    fun restoreSynapses(synapses: List<Synapse>) = editSynapses {
+        clear()
+        addAll(synapses)
     }
 
     fun isRecurrent(): Boolean {
@@ -148,7 +200,7 @@ class SynapseGroup @JvmOverloads constructor(
 
     context(Network)
     override fun update() {
-        this.synapses.forEach { it.update() }
+        learningSynapses.value.forEach { it.update() }
         events.updated.fire()
     }
 
@@ -258,8 +310,10 @@ class SynapseGroup @JvmOverloads constructor(
     }
 
     fun addSynapseListener(synapse: Synapse) {
+        synapse.events.learningRuleUpdated.addImmediate(learningRuleChanged)
         synapse.events.deleted.on(Dispatchers.Default) {
-            this.synapses.remove(it)
+            if (deleting) return@on
+            editSynapses { remove(it) }
             if (this.synapses.isEmpty()) {
                 this.delete()
             } else {

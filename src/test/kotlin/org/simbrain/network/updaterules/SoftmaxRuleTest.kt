@@ -5,7 +5,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NeuronArray
+import smile.math.matrix.Matrix
 import kotlin.math.abs
+import kotlin.math.exp
 
 class SoftmaxRuleTest {
 
@@ -17,6 +19,19 @@ class SoftmaxRuleTest {
 
     init {
         net.addNetworkModelsAsync(na)
+    }
+
+    @Test
+    fun `a neuron array's bias counts once`() {
+        val net = Network()
+        val na = NeuronArray(2).apply { updateRule = SoftmaxRule() }
+        net.addNetworkModelsAsync(na)
+        na.biases = Matrix.column(doubleArrayOf(1.0, -1.0))
+        na.addInputs(doubleArrayOf(0.5, 0.5))
+        net.update()
+        // Net inputs are 1.5 and -0.5, so softmax gives e^1.5 / (e^1.5 + e^-0.5)
+        val expected = exp(1.5) / (exp(1.5) + exp(-0.5))
+        assertEquals(expected, na.activationArray[0], 1e-12)
     }
 
     @Test

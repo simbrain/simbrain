@@ -2,7 +2,9 @@ package org.simbrain.world.imageworld
 
 import kotlinx.coroutines.CoroutineScope
 import org.simbrain.util.SFileChooser
+import org.simbrain.util.cancelWith
 import org.simbrain.util.createAction
+import org.simbrain.util.onUi
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.swingDispatcher
 import org.simbrain.util.widgets.ShowHelpAction
@@ -25,6 +27,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     private val imageWorld: ImageWorld = component.world
 
     private val imageWorldPanel = ImageWorldPanel(component)
+
+    val imageHistory get() = imageWorldPanel.history
 
     private val frameLabel = JLabel()
 
@@ -81,9 +85,14 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
                 JOptionPane.OK_CANCEL_OPTION
             )
             if (result == JOptionPane.OK_OPTION) {
-                imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
+                imageHistory.albumEdit("Reset canvas") {
+                    imageWorld.resetImageAlbum(wInp.text.toInt(), hInp.text.toInt())
+                }
             }
         }
+        editMenu.add(imageWorldPanel.undoAction)
+        editMenu.add(imageWorldPanel.redoAction)
+        editMenu.addSeparator()
         editMenu.add(resetCanvasAction)
         editMenu.addSeparator()
         imageWorld.imagePipelineCollection.currentPipeline?.let { pipeline ->
@@ -129,19 +138,20 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         layout = BorderLayout()
 
         // Main image
-        add(ImageWorldPanel(component), BorderLayout.CENTER)
-        imageWorld.imageAlbum.events.imageUpdate.on(swingDispatcher) {
+        add(imageWorldPanel, BorderLayout.CENTER)
+        // Sources such as a 3D view render a new image every iteration; awaiting the EDT here paced them by the display
+        imageWorld.imageAlbum.events.imageUpdate.onUi(viewScope) {
             updateToolbar()
             repaint()
         }
         imageWorld.imagePipelineCollection.events.pipelineChanged.on(swingDispatcher) { (_, _) ->
             updateToolbar()
             repaint()
-        }
+        }.cancelWith(viewScope)
         imageWorld.imagePipelineCollection.events.pipelineSelectionChanged.on(swingDispatcher) { _: ImageProcessingPipeline ->
             updateToolbar()
             repaint()
-        }
+        }.cancelWith(viewScope)
 
         // Toolbars
         val transformationGui = ImagePipelineCollectionGui(this, imageWorld.imagePipelineCollection)
@@ -170,7 +180,9 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
         if (files != null) {
             // Load the images
 
-            imageWorld.loadImages(files.filterNotNull().toTypedArray())
+            imageHistory.albumEdit("Load images") {
+                imageWorld.loadImages(files.filterNotNull().toTypedArray())
+            }
 
             // Update status of buttons
             updateToolbar()
@@ -181,6 +193,8 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
     }
 
     fun updateToolbar() {
+        imageHistory.discardIfStale()
+
         // Disable next / previous buttons when there is less than two images
         if (imageWorld.numImages < 2) {
             imageWorldPanel.nextImageAction.isEnabled = false

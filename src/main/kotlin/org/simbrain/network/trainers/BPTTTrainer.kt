@@ -1,6 +1,7 @@
 /** Trainer and fixed-sequence configuration for BPTT networks. */
 package org.simbrain.network.trainers
 
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.SynapseGroup
@@ -54,6 +55,7 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
     private val bpttConfig get() = bpttNetwork.trainerConfig
 
     override fun trainBatch(rowRange: IntRange, probe: StructuredProbe?): Double {
+        Blas.ensureDefaultThreads()
         val rows = rowRange.toList()
         if (rows.isEmpty()) return 0.0
 
@@ -71,8 +73,8 @@ class BPTTTrainer(network: Network, val bpttNetwork: BPTTNetwork) : SupervisedTr
             val synapseGroupAccumulator = HashMap<SynapseGroup, Matrix>()
             val biasesAccumulator = HashMap<Layer, Matrix>()
             val rawMatrixAccumulator = HashMap<Matrix, Matrix>()
-            val inputs = sequence.map { bpttNetwork.trainingSet.inputs[it].toDoubleArray().toColumnVector() }
-            val targets = sequence.map { bpttNetwork.trainingSet.targets[it].toDoubleArray().toColumnVector() }
+            val inputs = sequence.map { bpttNetwork.trainingSet.inputs[it].toColumnVector() }
+            val targets = sequence.map { bpttNetwork.trainingSet.targets[it].toColumnVector() }
             val activationTrace = if (drawingUnrolledView) mutableListOf<Map<Layer, Matrix>>() else null
 
             summedError += with(network) {

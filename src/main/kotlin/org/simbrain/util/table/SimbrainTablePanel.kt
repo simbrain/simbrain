@@ -1,14 +1,23 @@
+/**
+ * The table view of a [SimbrainDataFrame]: the panel with its toolbar and row headers, the JTable itself, and the
+ * row banding shared by tables whose rows are consumed in groups. The panel follows the data frame only while it is
+ * on screen.
+ */
 package org.simbrain.util.table
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
+import org.simbrain.util.UiScope
+import org.simbrain.util.cancelWith
 import org.simbrain.util.cartesianProduct
 import org.simbrain.util.Theme
 import org.simbrain.util.displayInDialog
+import org.simbrain.util.onUi
 import org.simbrain.util.widgets.RowNumberTable
 import java.awt.*
 import java.awt.event.*
@@ -53,46 +62,67 @@ open class SimbrainTablePanel @JvmOverloads constructor(
             }
         }
 
-    init {
+    /**
+     * Scope of the model subscriptions (current-row highlight, row names), alive while the panel is on screen. Many
+     * panels live in dialogs nobody disposes, so the subscriptions follow the panel's place in the component
+     * hierarchy instead.
+     */
+    private var viewScope: CoroutineScope? = null
 
-        fun scrollToVisible(row: Int) {
-            val cellRect = table.getCellRect(row, 0, true)
-            val viewRect = scrollPane.viewport.viewRect
-
-            // Determine if the cell is not visible within the viewport.
-            if (!viewRect.contains(cellRect)) {
-                // Determine the scroll direction and distance.
-                val toScroll = when {
-                    // Scroll up if the cell is above the viewport
-                    cellRect.y < viewRect.y -> cellRect.y - viewRect.y
-                    // Scroll down if the cell is below the viewport
-                    cellRect.y + cellRect.height > viewRect.y + viewRect.height -> cellRect.y + cellRect.height - viewRect.y - viewRect.height
-                    // No scrolling necessary if the cell is already visible
-                    else -> 0
-                }
-
-                // If scrolling is needed, calculate the new view position.
-                if (toScroll != 0) {
-                    val newViewPosY = viewRect.y + toScroll
-                    val newPoint = Point(viewRect.x, max(0, newViewPosY))
-                    scrollPane.viewport.viewPosition = newPoint
-                }
-
-                // Revalidate and repaint the scroll pane to reflect changes.
-                scrollPane.revalidate()
-                scrollPane.repaint()
-            }
-        }
-
-
-        model.events.currentRowChanged.on(Dispatchers.Swing) {
-            table.selectedRow = model.currentRowIndex
-            scrollToVisible(table.selectedRow)
-        }
-        model.events.rowNameChanged.on(Dispatchers.Swing) {
+    override fun addNotify() {
+        super.addNotify()
+        viewScope?.cancel()
+        viewScope = UiScope().also { scope ->
+            model.events.currentRowChanged.onUi(scope) { showCurrentRow() }
+            // Names may have changed while the panel was off screen
             scrollPane.rowNames = model.getAllRowNames()
+            model.events.rowNameChanged.on(Dispatchers.Swing) {
+                scrollPane.rowNames = model.getAllRowNames()
+            }.cancelWith(scope)
         }
+    }
 
+    override fun removeNotify() {
+        viewScope?.cancel()
+        viewScope = null
+        super.removeNotify()
+    }
+
+    private fun showCurrentRow() {
+        table.selectedRow = model.currentRowIndex
+        scrollToVisible(table.selectedRow)
+    }
+
+    private fun scrollToVisible(row: Int) {
+        val cellRect = table.getCellRect(row, 0, true)
+        val viewRect = scrollPane.viewport.viewRect
+
+        // Determine if the cell is not visible within the viewport.
+        if (!viewRect.contains(cellRect)) {
+            // Determine the scroll direction and distance.
+            val toScroll = when {
+                // Scroll up if the cell is above the viewport
+                cellRect.y < viewRect.y -> cellRect.y - viewRect.y
+                // Scroll down if the cell is below the viewport
+                cellRect.y + cellRect.height > viewRect.y + viewRect.height -> cellRect.y + cellRect.height - viewRect.y - viewRect.height
+                // No scrolling necessary if the cell is already visible
+                else -> 0
+            }
+
+            // If scrolling is needed, calculate the new view position.
+            if (toScroll != 0) {
+                val newViewPosY = viewRect.y + toScroll
+                val newPoint = Point(viewRect.x, max(0, newViewPosY))
+                scrollPane.viewport.viewPosition = newPoint
+            }
+
+            // Revalidate and repaint the scroll pane to reflect changes.
+            scrollPane.revalidate()
+            scrollPane.repaint()
+        }
+    }
+
+    init {
         // Putting the toolbar in the top part of a border layout to avoid problems with horizontal scrollbars in the
         // main panel
         layout = BorderLayout()

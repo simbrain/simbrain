@@ -7,6 +7,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
+import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.jfree.chart.ChartPanel
@@ -21,6 +22,7 @@ import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
+import org.simbrain.util.piccolo.processPiccoloChanges
 import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import org.simbrain.util.widgets.ProgressWindow
 import org.simbrain.util.widgets.ShowHelpAction
@@ -86,6 +88,9 @@ object SimbrainDesktop {
      * Name to display in Simbrain desktop window.
      */
     private val FRAME_TITLE = BuildInfo.applicationTitle
+
+    /** Owns the desktop's own EDT updates, which live as long as the application. */
+    private val desktopUi = UiScope()
 
     /**
      * The frame that will hold the workspace.
@@ -323,6 +328,7 @@ object SimbrainDesktop {
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on
             workspaceComponentDesktopComponentMap.remove(wc)
+            component.disposeView()
             component.parentFrame.dispose()
             if (!lastFocusedStack.isEmpty()) {
                 lastFocusedStack.remove(component)
@@ -334,7 +340,18 @@ object SimbrainDesktop {
             lastTimestep = 0
             updateTimeLabel()
         }
-        workspace.updater.events.workspaceUpdated.on { updateTimeLabel() }
+        // Each iteration waits for the windows to draw it, unless the workspace runs as fast as possible: pending view
+        // updates run now rather than at their next rate-capped turn, canvases turn the changes into repaint regions,
+        // then the dirty regions paint, once
+        workspace.displaySync = {
+            withContext(Dispatchers.Swing) {
+                UiWork.flushPending()
+                frame.processPiccoloChanges()
+                RepaintManager.currentManager(frame).paintDirtyRegions()
+            }
+        }
+        // Sampled at frame rate: a fast run updates thousands of times a second, and a task per update would bury the EDT
+        workspace.updater.events.workspaceUpdated.onUi(desktopUi, HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { updateTimeLabel() }
         workspace.updater.events.runStarted.on { StandardDialog.setSimulationRunning(true) }
         workspace.updater.events.runFinished.on { StandardDialog.setSimulationRunning(false) }
         workspaceBounds = Rectangle(

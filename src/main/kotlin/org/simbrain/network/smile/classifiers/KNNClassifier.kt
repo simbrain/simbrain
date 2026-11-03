@@ -31,7 +31,9 @@ class KNNClassifier(
             throw IllegalStateException("k must be less than the number of rows in the training dataset")
         }
         model = KNN.fit(inputs, targets, k)
-        setTrainingStats(Accuracy.of(targets, model?.predict(inputs)))
+        // Smile's neighbor search skips the stored point when queried with that same array, which would make this
+        // a leave-one-out score. Copies make it an ordinary training accuracy, comparable with other classifiers.
+        setTrainingStats(Accuracy.of(targets, model?.predict(inputs.map { it.copyOf() }.toTypedArray())))
         setTestingStats(Accuracy.of(testingData.targetArray, model?.predict(testingData.inputArrays)))
     }
 

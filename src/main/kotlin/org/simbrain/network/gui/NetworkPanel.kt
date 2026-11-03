@@ -10,6 +10,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
+import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
@@ -29,7 +30,10 @@ import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.network.subnetworks.*
 import org.simbrain.network.trainers.SupervisedModel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.BufferedPCanvas
 import org.simbrain.util.piccolo.Outline
+import org.simbrain.util.piccolo.nodeSyncPass
+import org.simbrain.util.piccolo.RasterCachedNode
 import org.simbrain.util.piccolo.setViewBoundsNoOverflow
 import org.simbrain.util.piccolo.unionOfGlobalFullBounds
 import org.simbrain.util.widgets.SimbrainToggleButton
@@ -47,9 +51,9 @@ import javax.swing.SwingUtilities
 import kotlin.math.pow
 import kotlin.reflect.KClass
 
-/**
- * Main GUI representation of a [Network].
- */
+/** Cap on how often the view refits to the network, matching the zoom event's own throttle. */
+private const val ZOOM_TO_FIT_INTERVAL_MS = 20L
+
 /**
  * Models whose node draws an arrow between two endpoint nodes and therefore must not exist on the canvas before
  * those nodes do; see [NetworkPanel.awaitEndpointNodes].
@@ -57,6 +61,9 @@ import kotlin.reflect.KClass
 internal fun NetworkModel.waitsForEndpointNodes() =
     this is Connector || this is TensorConnector || this is FlattenConnector || this is SynapseGroup
 
+/**
+ * Main GUI representation of a [Network].
+ */
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
@@ -67,11 +74,49 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val canvas = NetworkCanvas()
 
     /**
+     * Bottom tier of the canvas: connections (weight matrices, synapses, gap junctions, synapse groups, connectors).
+     * They change only on edits, not every iteration, so the tier is drawn from a cached image that any change to a
+     * connection invalidates; neurons changing above it don't touch it.
+     */
+    internal val edgeTier = RasterCachedNode().also {
+        // Nothing but the canvas background lies under the bottom tier, so the cache can blend over it exactly
+        it.background = { canvas.background }
+        canvas.layer.addChild(it)
+    }
+
+    /** Spike highlights for synapses, drawn over the cached connections so spikes don't invalidate the cache. */
+    internal val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
+
+    /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
+    private val nodeTier = PNode().also { canvas.layer.addChild(it) }
+
+    /**
      * Reference to the model network
      */
     val network: Network = networkComponent.network
 
     override val coroutineContext get() = network.coroutineContext
+
+    /**
+     * Owns the panel's EDT updates, which the network posts to without waiting on the EDT. Cancelled when the
+     * panel's desktop component closes. The panel's own coroutine context is the network's, which outlives it.
+     */
+    val viewScope = UiScope()
+
+    /**
+     * Per-frame sync pass for node visuals: model events only mark a node dirty and queue it here once, and each pass
+     * pulls the current model state into every queued node. Paced runs drain it every iteration through the
+     * workspace's display sync; unpaced runs sample it at frame rate, so the EDT never sees a task per model event.
+     * A node whose sync throws is logged and skipped: the rest of the batch already has its dirty bits set, so if
+     * the pass stopped there those nodes would never be queued again.
+     */
+    internal val nodeSync = viewScope.nodeSyncPass()
+
+    /** Removes [node] from the canvas for good, ending its subscriptions to its model. */
+    internal fun detachNode(node: ScreenElement) {
+        node.dispose()
+        node.removeFromParent()
+    }
 
     /**
      * Manage selection events where the "green handle" is added to nodes and other [NetworkModel]s
@@ -99,7 +144,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             field = value
             network.events.zoomModeChanged.fire(value)
             if (value) {
-                network.events.zoomToFitPage.fire()
+                zoomToFit.request()
             }
         }
 
@@ -162,8 +207,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         set(value) {
             field = value
             network.events.synapseSpikingOnlyVisibilityChanged.fire(value)
-            // Trigger a redraw by nudging synapse graphics via the throttled update event
-            // Individual SynapseNodes will listen and adjust their own visibility accordingly
+            // Individual SynapseNodes listen and repaint; while it is set, each draws nothing and takes picks only
+            // while its source spikes (SynapseNode.fullPaint and fullPick), and the spike overlay draws the spiking
+            // synapses
         }
 
     /**
@@ -171,7 +217,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var guiOn = true
 
-    private val forceZoomToFitPage = PreferenceChangeListener { network.events.zoomToFitPage.fire() }
+    private val forceZoomToFitPage = PreferenceChangeListener { zoomToFit.request() }
 
     /**
      * Called when preferences are updated. Ensures preference changes are applied immediately.
@@ -215,6 +261,46 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
 
     /**
+     * Full-canvas repaint after a network update, coalesced for high-rate model loops. This was
+     * introduced for language-model generation, where otherwise a full frame per token can make
+     * the post-update barrier pace the model. It also protects any future fast network simulation.
+     * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
+     * final state.
+     */
+    private val refreshAfterUpdate = viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) {
+        // The canvas, not the whole panel: toolbars and the status bar don't change with an update
+        canvas.repaint()
+        timeLabel.update()
+    }
+
+    /**
+     * Fits the view to the network (when auto zoom is on) and repaints. Requests coalesce, and a run follows the
+     * EDT work queued before it was requested, so it reads bounds that node updates already applied.
+     */
+    private val zoomToFit = viewScope.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
+        if (autoZoom) {
+            val filtered = screenElements.unionOfGlobalFullBounds()
+            canvas.camera.setViewBounds(
+                PBounds(filtered.getX() - 10, filtered.getY() - 10, filtered.getWidth() + 20, filtered.getHeight() + 20)
+            )
+        }
+        canvas.repaint()
+    }
+
+    /**
+     * Nodes whose models were deleted, removed from the canvas in batches. Deletion never waits on the EDT, and
+     * the view refits once the batch is gone rather than while deleted nodes still count toward its bounds.
+     */
+    private val nodeRemovals = viewScope.uiInbox<ScreenElement> { nodes ->
+        val unique = nodes.toSet()
+        unique.forEach { detachNode(it) }
+        // Removal can land after the model was re-added with a new node (undo then redo). Only clear the mapping
+        // if it still points at this node, so a stale removal never wipes a freshly recreated node.
+        unique.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
+        zoomToFit.request()
+    }
+
+    /**
      * Main initialization of the network panel.
      */
     init {
@@ -243,7 +329,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         // Repaint whenever window is opened or changed.
         addComponentListener(object : ComponentAdapter() {
             override fun componentResized(arg0: ComponentEvent) {
-                network.events.zoomToFitPage.fire()
+                zoomToFit.request()
             }
         })
 
@@ -276,39 +362,30 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      * Calls to lowerToBottom and raiseToTop should be avoided for top level screen elements in favor of using this function.
      */
     private fun addNodeOrdered(node: ScreenElement) {
-        fun findIndexOfType(type: KClass<out ScreenElement>): Int {
-            return canvas.layer.childrenIterator.toSequence().indexOfLast { it != null && it::class == type }
+        // Within the edge tier, weight matrices sit lowest, then synapses, gap junctions, synapse groups, and
+        // connectors; each kind goes after the last node of the kind below it. The search runs from the end of the
+        // tier, where the few nodes above the synapses sit, so it stops quickly even with many synapses
+        fun after(vararg types: KClass<out ScreenElement>): Int {
+            val children = edgeTier.childrenReference
+            for (i in children.indices.reversed()) {
+                if (types.any { it.isInstance(children[i]) }) return i + 1
+            }
+            return 0
         }
 
         when (node) {
-            is WeightMatrixNode -> {
-                canvas.layer.addChild(0, node)
-            }
-            is SynapseNode -> {
-                val index = findIndexOfType(WeightMatrixNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is GapJunctionNode -> {
-                val index = findIndexOfType(SynapseNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is SynapseGroupNode -> {
-                val index = findIndexOfType(SynapseNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is TensorConnectorNode -> {
-                val index = findIndexOfType(SynapseGroupNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            is FlattenConnectorNode -> {
-                val index = findIndexOfType(TensorConnectorNode::class)
-                canvas.layer.addChild(index + 1, node)
-            }
-            else -> {
-                canvas.layer.addChild(node)
-            }
+            is WeightMatrixNode -> edgeTier.addChild(0, node)
+            // After the last synapse rather than the first, so a large network appends instead of shifting every
+            // synapse already in the tier
+            is SynapseNode -> edgeTier.addChild(after(SynapseNode::class, WeightMatrixNode::class), node)
+            is GapJunctionNode -> edgeTier.addChild(after(SynapseNode::class), node)
+            is SynapseGroupNode -> edgeTier.addChild(after(SynapseNode::class), node)
+            is TensorConnectorNode -> edgeTier.addChild(after(SynapseGroupNode::class), node)
+            is FlattenConnectorNode -> edgeTier.addChild(after(TensorConnectorNode::class), node)
+            else -> nodeTier.addChild(node)
         }
     }
+
 
     /**
      * Add a screen element to the network panel and rezoom the page.
@@ -316,17 +393,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     private inline fun <T : ScreenElement> addScreenElement(block: () -> T) = block().also { node ->
         modelNodeMap[node.model] = node
         addNodeOrdered(node)
+        // Tied to the node, since undo gives the same model a new node and the old one must stop answering for it
         node.model.events.selected.on(Dispatchers.Default) {
             if (node is NeuronCollectionNode) {
                 selectionManager.add(node.getInteractionBox())
             } else {
                 selectionManager.add(node)
             }
-        }
-        node.model.events.deleted.on(Dispatchers.Default) {
-            network.events.batchNodeRemoval.fire(node)
-        }
-        network.events.zoomToFitPage.fire()
+        }.cancelWith(node.nodeScope)
+        node.model.events.deleted.on(Dispatchers.Unconfined) { nodeRemovals.post(node) }.cancelWith(node.nodeScope)
+        zoomToFit.request()
     }
 
     private suspend fun createNode(model: NetworkModel): ScreenElement {
@@ -432,7 +508,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         val looseNodes = HashMap<Synapse, SynapseNode>()
         fun dropLooseNode(synapse: Synapse) {
             looseNodes.remove(synapse)?.let { node ->
-                canvas.layer.removeChild(node)
+                detachNode(node)
                 modelNodeMap.removeIfValue(synapse) { it === node }
             }
         }
@@ -458,11 +534,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
         reconcileLooseSynapseNodes()
         val groupNode = addScreenElement { SynapseGroupNode(this, synapseGroup) }
-        // A group deleted and restored gets a new node while these handlers stay subscribed, so each pair
-        // only acts while its own node is still the group's node
+        // These handlers end with the group's node, but a group deleted and restored gets its new node before the
+        // old one's removal lands, so each pair only acts while its own node is still the group's node
         fun isCurrent() = modelNodeMap.peek(synapseGroup) === groupNode
-        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
-        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }
+        synapseGroup.events.visibilityChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }.cancelWith(groupNode.nodeScope)
+        synapseGroup.events.synapseListChanged.on(Dispatchers.Swing) { if (isCurrent()) reconcileLooseSynapseNodes() }.cancelWith(groupNode.nodeScope)
         return groupNode
     }
 
@@ -563,7 +639,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         )
 
-        network.events.zoomToFitPage.fire()
+        zoomToFit.request()
     }
 
     private fun createEditToolBar() = CustomToolBar().apply {
@@ -879,8 +955,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 redo = {
                     synapseGroupSynapses.entries.map { (sg, synapses) ->
                         launch {
-                            sg.synapses.clear()
-                            sg.synapses.addAll(synapses)
+                            sg.restoreSynapses(synapses)
                             network.addNetworkModel(sg, usePlacementManager = false, useAutoAssignedId = false)
                             sg.afterRestore()
                         }
@@ -914,67 +989,26 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             ).apply {
                 network.events.zoomModeChanged.on(Dispatchers.Swing) {
                     updateFromExternalState()
-                }
+                }.cancelWith(viewScope)
             })
         }
     }
 
-    /**
-     * Full-canvas repaint after a network update, coalesced for high-rate model loops. This was
-     * introduced for language-model generation, where otherwise a full frame per token can make
-     * the post-update barrier pace the model. It also protects any future fast network simulation.
-     * Slow and stepped updates still repaint immediately, and a trailing repaint renders the
-     * final state.
-     */
-    private val repaintOnUpdate = RateLimitedEdtAction(HIGH_RATE_GUI_REFRESH_INTERVAL_MS) { repaint() }
-
     private fun initEventHandlers() {
+        // The network outlives this panel, so its subscriptions end with the panel's view scope
         network.events.apply {
             modelAdded.on(Dispatchers.Swing) {
                 createNode(it)
-            }
-            modelRemoved.on(Dispatchers.Default) {
-                zoomToFitPage.fire()
-            }
-            batchNodeRemoval.on(Dispatchers.Default) { nodes ->
-                val nodesUniq = nodes.toSet()
-                withContext(Swing) {
-                    nodesUniq.forEach {
-                        canvas.layer.removeChild(it)
-                    }
-                }
-                // Removal is asynchronous (debounced) and can land after the model was re-added with a
-                // new node (undo then redo). Only clear the mapping if it still points at this node, so
-                // a stale removal never wipes a freshly recreated node.
-                nodesUniq.forEach { node -> modelNodeMap.removeIfValue(node.model) { it === node } }
-            }
-            updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }
-            updated.on(Dispatchers.Swing.immediate) {
-                repaintOnUpdate()
-                timeLabel.update()
-            }
-            zoomToFitPage.on(Dispatchers.Swing) {
-                if (autoZoom) {
-                    val filtered = screenElements.unionOfGlobalFullBounds()
-                    val adjustedFiltered = PBounds(
-                        filtered.getX() - 10, filtered.getY() - 10,
-                        filtered.getWidth() + 20, filtered.getHeight() + 20
-                    )
-                    launch(Dispatchers.Swing) {
-                        canvas.camera.setViewBounds(adjustedFiltered)
-                        repaint()
-                    }
-                }
-                launch(Dispatchers.Swing) {
-                    canvas.repaint()
-                }
-            }
-            boundsChanged.on(Dispatchers.Swing) {
-                zoomToFitPage.fire()
-            }
+            }.cancelWith(viewScope)
+            updateActionsChanged.on(Dispatchers.Swing) { timeLabel.update() }.cancelWith(viewScope)
+            // Posted, not awaited: updated is a barrier fired once per network iteration, and an EDT handler made
+            // every iteration wait in the EDT queue behind a full canvas repaint, pacing the simulation by the display
+            updated.on(Dispatchers.Unconfined) { refreshAfterUpdate.request() }.cancelWith(viewScope)
+            zoomToFitPage.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
+            boundsChanged.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             selected.on(Dispatchers.Default) { list ->
                 selectionManager.set(list.map { modelNodeMap.get(it) })
-            }
+            }.cancelWith(viewScope)
         }
 
     }
@@ -1035,7 +1069,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     fun getNode(model: NetworkModel) = runBlocking { modelNodeMap.get<ScreenElement>(model) }
 
-    inner class NetworkCanvas : PCanvas() {
+    inner class NetworkCanvas : BufferedPCanvas() {
         init {
             // Always render in high quality
             setDefaultRenderQuality(PPaintContext.HIGH_QUALITY_RENDERING)

@@ -126,7 +126,7 @@ fun ConvolutionalNeuralNetwork.getCnnTrainingDialog(): StandardDialog {
  * Controls for CNN training: Step/Run/Stop buttons, Randomize, iterations, error plot.
  */
 class CnnTrainerControls(
-    private val trainer: CnnTrainer
+    internal val trainer: CnnTrainer
 ) : JPanel(), CoroutineScope {
 
     private val controlsJob = SupervisorJob()
@@ -138,6 +138,7 @@ class CnnTrainerControls(
     private val stepActionRef: Action
 
     private val statsPanel = TrainingStatsPanel(
+        scope = this,
         events = trainer.events,
         iteration = { trainer.iteration },
         resetIteration = {
@@ -163,15 +164,17 @@ class CnnTrainerControls(
     }
 
     init {
+        val errorPlot = ErrorTimeSeries(trainer.events) { trainer.iteration }
+
         // Cancel coroutine scopes when this component is disposed
         onWindowClose {
             trainer.job.cancel()
             controlsJob.cancel()
+            errorPlot.dispose()
         }
 
         val errorPlotPanel = JPanel().apply {
             layout = MigLayout("ins 0, gap 0px 0px, fillx, wrap")
-            val errorPlot = ErrorTimeSeries(trainer.events) { trainer.iteration }
             add(errorPlot, "growx, wrap")
 
             val buttonPanel = JPanel(MigLayout("ins 0, gap 8px"))

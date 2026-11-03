@@ -50,7 +50,7 @@ public class UpdateActionManager {
     }
 
     /**
-     * Basically just the performance monitor for now.  (UpdateAll can be removed for custom sims).
+     * Actions that run every iteration and cannot be removed by the user. (UpdateAll can be removed for custom sims).
      */
     private final ArrayList<UpdateAction> nonRemovableActions = new ArrayList<>();
 

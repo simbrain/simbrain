@@ -53,35 +53,32 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) {
             invalidateArrow()
             updateInteractionBoxLocation()
-        }
+        }.untilDisposed()
         synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) {
             invalidateArrow()
             updateInteractionBoxLocation()
-        }
+        }.untilDisposed()
         
         // Listen to individual neuron movements for recurrent groups
         if (synapseGroup.isRecurrent()) {
             synapseGroup.source.neuronList.forEach { neuron ->
-                val cleanup = neuron.events.locationChanged.on(Dispatchers.Swing) {
+                neuron.events.locationChanged.on(Dispatchers.Swing) {
                     updateInteractionBoxLocation()
-                }
-                synapseGroup.events.deleted.on(Dispatchers.Default) {
-                    cleanup.cancel()
-                }
+                }.untilDisposed()
             }
         }
         updateInteractionBoxLocation()
 
         // Handle events
         val events = synapseGroup.events
-        events.labelChanged.on(Dispatchers.Swing) { _, _ -> updateText() }
-        events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }
+        events.labelChanged.on(Dispatchers.Swing) { _, _ -> updateText() }.untilDisposed()
+        events.visibilityChanged.on(Dispatchers.Swing) { setVisibility() }.untilDisposed()
         events.synapseRemoved.on(dispatcher = Dispatchers.Swing) {
             setVisibility()
-        }
+        }.untilDisposed()
         events.synapseListChanged.on(dispatcher = Dispatchers.Swing) {
             setVisibility()
-        }
+        }.untilDisposed()
         setVisibility()
         interactionBox.invalidateFullBounds()
 

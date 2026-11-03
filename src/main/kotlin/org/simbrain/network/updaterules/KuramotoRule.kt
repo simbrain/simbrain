@@ -27,6 +27,7 @@ import kotlin.math.sin
  */
 class KuramotoRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule,
     ClippedUpdateRule, NoisyUpdateRule {
+
     /**
      * Natural Frequency.
      */
@@ -62,16 +63,21 @@ class KuramotoRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Diffe
      */
     override var lowerBound: Double = DEFAULT_LOWER_BOUND
 
+    /** The coupling term: the mean over incoming synapses of strength times the sine of the phase difference. */
     context(Network)
-    override fun apply(neuron: Neuron, data: EmptyScalarData) {
-
+    override fun synapticInput(neuron: Neuron, data: EmptyScalarData, psrSum: Double): Double {
         var sum = 0.0
         for (s in neuron.fanIn) {
             sum += s.strength * sin(s.source.activation - neuron.activation)
         }
         var N = neuron.fanIn.size.toDouble()
         N = if ((N > 0)) N else 1.0
-        val theta_dot = slope + sum / N
+        return sum / N
+    }
+
+    context(Network)
+    override fun apply(neuron: Neuron, data: EmptyScalarData) {
+        val theta_dot = slope + neuron.input
 
         var theta = neuron.activation + (timeStep * theta_dot)
         theta = theta % (2 * Math.PI)

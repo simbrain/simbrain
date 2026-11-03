@@ -51,7 +51,7 @@ public class WorldContextMenuEventHandler extends PBasicInputEventHandler {
                     odorWorldPanel.clearSelection();
                     odorWorldPanel.getSelectionManager().add(entity);
                 }
-                menu = entity.createContextMenu(odorWorldPanel);
+                menu = entity.createContextMenu();
             } else {
                 menu = odorWorldPanel.getContextMenu();
             }

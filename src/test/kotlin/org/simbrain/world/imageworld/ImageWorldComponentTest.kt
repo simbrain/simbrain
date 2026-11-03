@@ -4,6 +4,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.simbrain.util.getBrightnessArray
 import java.awt.Color
 import java.awt.image.BufferedImage
 import java.io.ByteArrayInputStream
@@ -310,4 +311,29 @@ class ImageWorldComponentTest {
         assertTrue(world.imageAlbum.frameIndex < world.numImages)
     }
 
+    @Test
+    fun `loaded image world pipelines follow new source images`() = runBlocking {
+        val original = ImageWorldComponent("Original")
+        original.world.imageAlbum.addImage(filledImage(Color.BLACK))
+        original.world.imagePipelineCollection.currentPipeline.brightness
+
+        val loaded = ImageWorldComponent.open(
+            ByteArrayInputStream(original.xml!!.toByteArray(StandardCharsets.UTF_8)), "Loaded", "xml"
+        )
+        val pipeline = loaded.world.imagePipelineCollection.currentPipeline
+        val before = pipeline.brightness
+        val white = filledImage(Color.WHITE)
+        loaded.world.imageAlbum.addImage(white)
+
+        assertFalse(before.contentEquals(pipeline.brightness))
+        assertArrayEquals(white.getBrightnessArray(), pipeline.brightness)
+    }
+
+    private fun filledImage(color: Color) = BufferedImage(4, 3, BufferedImage.TYPE_INT_RGB).apply {
+        createGraphics().apply {
+            this.color = color
+            fillRect(0, 0, width, height)
+            dispose()
+        }
+    }
 }

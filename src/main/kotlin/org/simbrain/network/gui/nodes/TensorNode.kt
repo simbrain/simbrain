@@ -128,25 +128,25 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     init {
         val tensorEvents = tensorLayer.events
-        tensorEvents.clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }
+        tensorEvents.clampChanged.on(dispatcher = Dispatchers.Swing) { updateBorder() }.untilDisposed()
         tensorEvents.locationChanged.on(dispatcher = Dispatchers.Swing) {
             pullViewPositionFromModel()
             layoutChildren()
-        }
+        }.untilDisposed()
         tensorEvents.labelChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             interactionBox.setText(tensorLayer.displayName)
-        }
+        }.untilDisposed()
         tensorEvents.updated.on(Dispatchers.Default) {
             tensorEvents.updateGraphics.fire()
-        }
+        }.untilDisposed()
         tensorEvents.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
-        }
+        }.untilDisposed()
         tensorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             updateActivationImage()
             updateShapeCaption()
             updateBorder()
-        }
+        }.untilDisposed()
 
         addChild(interactionBox)
         interactionBox.setText(tensorLayer.displayName)

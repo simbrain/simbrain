@@ -35,6 +35,20 @@ abstract class ImageSource {
         private set
 
     /**
+     * Counts changes to the frames or pixels made through this source's own methods, such as loading images or a
+     * coupling writing pixels. Moving between frames does not count, and neither do edits a brush makes directly to an
+     * image. [ImageHistory] compares it to learn that the album moved on without it.
+     */
+    @Transient
+    @Volatile
+    var revision: Long = 0
+        private set
+
+    protected fun markChanged() {
+        revision++
+    }
+
+    /**
      * Construct a new ImageSourceAdapter with the specified currentImage.
      *
      * @param currentImage the image to provide from the source
@@ -77,6 +91,7 @@ abstract class ImageSource {
     }
 
     suspend fun clearCurrentImage() {
+        markChanged()
         setCurrentImage(BufferedImage(currentImage.width, currentImage.height, BufferedImage.TYPE_INT_RGB))
     }
 

@@ -138,11 +138,11 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
         events.updated.on(Dispatchers.Default) {
             events.updateGraphics.fire()
-        }
+        }.untilDisposed()
 
         events.updateGraphics.on(Dispatchers.Swing) {
             updateActivationImage()
-        }
+        }.untilDisposed()
 
         updateActivationImage()
         activationImage.offset(0.0, 5.0)

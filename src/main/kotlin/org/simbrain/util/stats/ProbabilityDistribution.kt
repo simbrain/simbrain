@@ -6,7 +6,6 @@ import com.thoughtworks.xstream.converters.reflection.ReflectionConverter
 import com.thoughtworks.xstream.converters.reflection.ReflectionProvider
 import com.thoughtworks.xstream.io.HierarchicalStreamReader
 import com.thoughtworks.xstream.mapper.Mapper
-import org.apache.commons.math3.random.JDKRandomGenerator
 import org.simbrain.util.createConstructorCallingConverter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.CopyableObject
@@ -28,7 +27,7 @@ abstract class ProbabilityDistribution() : CopyableObject {
      * Random generator for pseudo-random sequences on which a seed can be set.
      */
     @Transient
-    val randomGenerator = JDKRandomGenerator()
+    val randomGenerator = SimbrainRandomGenerator()
 
     /**
      * Use this to ensure two probability distributions return the same pseudo-random sequence of numbers.

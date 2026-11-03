@@ -90,25 +90,34 @@ fun getSimbrainXStream(): XStream {
 }
 
 /**
- * If [obj]'s class declares a `readResolve()` method, invoke it (via reflection, ignoring
- * access modifiers) and return whatever it returns. Otherwise return [obj] unchanged.
- *
- * Mirrors the behavior of `ObjectInputStream.readObject` for the standard Java
- * serialization protocol — only the runtime class's own declared method is considered,
- * not inherited ones, matching JLS rules.
+ * A serialization hook a class may declare, looked up once per class and invoked via reflection, ignoring access
+ * modifiers. Mirrors the behavior of `ObjectInputStream.readObject` for the standard Java serialization protocol —
+ * only the runtime class's own declared method is considered, not inherited ones, matching JLS rules.
  */
-private fun invokeReadResolveIfPresent(obj: Any): Any {
-    return try {
-        val method = obj::class.java.getDeclaredMethod("readResolve")
-        method.isAccessible = true
-        method.invoke(obj) ?: obj
-    } catch (_: NoSuchMethodException) {
-        obj
-    } catch (e: Exception) {
-        System.err.println("readResolve on ${obj::class.java.name} threw: ${e.message}")
-        obj
+private class DeclaredHook(private val name: String) {
+
+    private val methods = object : ClassValue<java.lang.reflect.Method?>() {
+        override fun computeValue(type: Class<*>) =
+            type.declaredMethods.firstOrNull { it.name == name && it.parameterCount == 0 }?.apply { isAccessible = true }
+    }
+
+    /** Invokes the hook on [obj] and returns its result, or [obj] when there is no hook or it throws. */
+    fun invoke(obj: Any): Any {
+        val method = methods.get(obj.javaClass) ?: return obj
+        return try {
+            method.invoke(obj) ?: obj
+        } catch (e: Exception) {
+            System.err.println("$name on ${obj.javaClass.name} threw: ${(e.cause ?: e).message}")
+            obj
+        }
     }
 }
+
+/** Run after an object is read, mirroring `ObjectInputStream.readObject`. */
+private val readResolveHook = DeclaredHook("readResolve")
+
+/** Run before an object is written; used e.g. to land data still queued for the EDT. */
+private val writeReplaceHook = DeclaredHook("writeReplace")
 
 /**
  * XStream support for Kotlin classes that require a constructor call. Which constructor to use can be specified by
@@ -127,7 +136,9 @@ fun createConstructorCallingConverter(
 ): ReflectionConverter {
     return object : ReflectionConverter(mapper, reflectionProvider) {
 
-        override fun marshal(source: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+        override fun marshal(original: Any, writer: HierarchicalStreamWriter, context: MarshallingContext) {
+            // Overriding marshal bypasses the stock converter's writeReplace call, so honor it here
+            val source = writeReplaceHook.invoke(original)
             val customMarshaller = (source::class.companionObjectInstance as? WithXStreamPropertyConverter)
                 ?.xStreamPropertyConverter
                 ?.createMarshaller()
@@ -294,7 +305,7 @@ fun createConstructorCallingConverter(
             // Invoke it explicitly so classes can re-wire transient listeners, recreate
             // coroutine scopes, etc. — without this, anything depending on readResolve
             // (event listeners, channels, etc.) silently fails after deserialization.
-            return invokeReadResolveIfPresent(convertedObject)
+            return readResolveHook.invoke(convertedObject)
         }
 
         override fun canConvert(type: Class<*>?): Boolean {

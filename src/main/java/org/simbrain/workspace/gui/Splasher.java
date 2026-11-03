@@ -55,6 +55,8 @@ public class Splasher {
 
         // Hack to force initialization of Smile matrix engine at startup and remove subsequent delays
         BLAS.engine.iamax(new float[]{1f, 2f, 3f});
+        // Apply Simbrain's default OpenBLAS thread count off the main thread, before the first network runs
+        org.simbrain.network.tensor.Blas.INSTANCE.ensureDefaultThreadsInBackground();
 
         // Same hack as above, for deep net engine
         // if (!Utils.isMacOSX() && !Utils.isLinux()) {

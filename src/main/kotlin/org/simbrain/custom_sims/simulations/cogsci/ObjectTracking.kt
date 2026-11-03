@@ -5,6 +5,7 @@ import org.simbrain.network.connections.Sparse
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.AllostaticUpdateRule
@@ -349,6 +350,10 @@ class AllostaticDataHolder(
 
     @UserParameter(label = "target", minimumValue = 1.0)
     var target = target
+
+    /** Incoming synapses whose spiking sources fired in the previous update, recorded while inputs are gathered. */
+    @Transient
+    var spikedInputs: List<Synapse> = emptyList()
 
     override fun copy(): SpikingScalarData {
         return AllostaticDataHolder(target, threshold)

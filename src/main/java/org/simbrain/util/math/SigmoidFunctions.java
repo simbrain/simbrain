@@ -1,5 +1,6 @@
 package org.simbrain.util.math;
 
+import java.util.function.DoubleUnaryOperator;
 import smile.math.matrix.Matrix;
 
 /**
@@ -28,13 +29,22 @@ public class SigmoidFunctions {
         return (diff / 2) * Math.tanh(a * val) + ((ceil + floor) / 2);
     }
 
-    public static Matrix tanh(Matrix in, double ceil, double floor, double slope) {
-        // Smile does not use BLAS for any of these operations so we are reusing the scalar function
+    /**
+     * Applies {@code function} to each entry of {@code in}. Smile does not use BLAS for any of these operations so we are
+     * reusing the scalar function.
+     */
+    private static Matrix map(Matrix in, DoubleUnaryOperator function) {
         var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, tanh(in.get(i, 0), ceil, floor, slope));
+        for (int j = 0; j < output.ncol(); j++) {
+            for (int i = 0; i < output.nrow(); i++) {
+                output.set(i, j, function.applyAsDouble(in.get(i, j)));
+            }
         }
         return output;
+    }
+
+    public static Matrix tanh(Matrix in, double ceil, double floor, double slope) {
+        return map(in, v -> tanh(v, ceil, floor, slope));
     }
 
     /**
@@ -72,12 +82,7 @@ public class SigmoidFunctions {
      * @param slope The slope of the curve at val == 0.
      */
     public static Matrix logistic(Matrix in, double ceil, double floor, double slope) {
-        // Smile does not use BLAS for any of these operations so we are reusing the scalar function
-        var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, logistic(in.get(i, 0), ceil, floor, slope));
-        }
-        return output;
+        return map(in, v -> logistic(v, ceil, floor, slope));
     }
 
     /**
@@ -98,12 +103,7 @@ public class SigmoidFunctions {
     }
 
     public static Matrix atan(Matrix in, double ceil, double floor, double slope) {
-        // Smile does not use BLAS for any of these operations so we are reusing the scalar function
-        var output = new Matrix(in.nrow(), in.ncol());
-        for (int i = 0; i < output.nrow(); i++) {
-            output.set(i, 0, atan(in.get(i, 0), ceil, floor, slope));
-        }
-        return output;
+        return map(in, v -> atan(v, ceil, floor, slope));
     }
 
     /*

@@ -46,6 +46,27 @@ import javax.swing.*
 import javax.swing.Action.SHORT_DESCRIPTION
 
 class NetworkActions(val networkPanel: NetworkPanel) {
+
+    /**
+     * Computes an action's enablement with [updateAction] now, then again whenever the selection or the source
+     * selection changes and, with [onModelAdded], after models are added. The network outlives the panel, so the
+     * model subscription ends with the panel's view scope.
+     *
+     * Enablement is recomputed on the EDT so recomputes run in event order; on a pool, a slow recompute
+     * from an earlier selection event could overwrite a later correct one and leave the action disabled.
+     * Model additions only post a rate-limited recompute: modelAdded is awaited per model, so an EDT
+     * handler would make bulk adds (paste, undo of a delete) wait on the EDT once per model.
+     */
+    private fun recomputeEnablementOnChanges(onModelAdded: Boolean = false, updateAction: () -> Unit) {
+        updateAction()
+        if (onModelAdded) {
+            val limited = networkPanel.viewScope.uiRefresh(HIGH_RATE_GUI_REFRESH_INTERVAL_MS, updateAction)
+            networkPanel.network.events.modelAdded.on(Dispatchers.Unconfined) { limited.request() }
+                .cancelWith(networkPanel.viewScope)
+        }
+        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+    }
     // For testing purposes only
     var fileChooserForTesting: SFileChooser? = null
     val addNeuronsAction = networkPanel.createAction(
@@ -750,10 +771,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             )
         }
 
-        updateAction()
-
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        recomputeEnablementOnChanges { updateAction() }
     }
 
     val connectWithGapJunction = networkPanel.createAction(
@@ -793,10 +811,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             )
         }
 
-        updateAction()
-
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        recomputeEnablementOnChanges { updateAction() }
     }
 
     val connectWithWeightMatrix = networkPanel.createAction(
@@ -815,10 +830,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             )
         }
 
-        updateAction()
-
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        recomputeEnablementOnChanges { updateAction() }
     }
 
     val connectWithSynapseGroup = networkPanel.createAction(
@@ -1271,13 +1283,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             )
         }
 
-        updateAction()
-
-        // Enablement is recomputed on the EDT so recomputes run in event order; on a pool, a slow recompute
-        // from an earlier selection event could overwrite a later correct one and leave the action disabled
-        networkPanel.network.events.modelAdded.on(Dispatchers.Swing) { updateAction() }
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        recomputeEnablementOnChanges(onModelAdded = true) { updateAction() }
 
     }
 
@@ -1384,11 +1390,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             )
         }
 
-        updateAction()
-
-        networkPanel.network.events.modelAdded.on(Dispatchers.Swing) { updateAction() }
-        networkPanel.selectionManager.events.selection.on(Dispatchers.Swing) { _, _ -> updateAction() }
-        networkPanel.selectionManager.events.sourceSelection.on(Dispatchers.Swing) { _, _ -> updateAction() }
+        recomputeEnablementOnChanges(onModelAdded = true) { updateAction() }
     }
 
     fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(
@@ -1459,8 +1461,7 @@ fun addSubnetworkAction(networkPanel: NetworkPanel, block: () -> Subnetwork) {
             }
 
             synapseGroupSynapsesMap.forEach { (group, synapses) ->
-                group.synapses.clear()
-                group.synapses.addAll(synapses)
+                group.restoreSynapses(synapses)
             }
 
             subnetwork.modelList.addAll(models)

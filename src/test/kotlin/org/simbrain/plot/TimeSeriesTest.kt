@@ -1,5 +1,7 @@
 package org.simbrain.plot
 
+import org.simbrain.util.withEdtHeld
+import org.simbrain.util.onEdt
 import kotlinx.coroutines.runBlocking
 import org.jfree.chart.renderer.AbstractRenderer
 import org.junit.jupiter.api.Assertions.*
@@ -17,7 +19,10 @@ import org.simbrain.plot.timeseries.TimeSeriesModel
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.plot.timeseries.TimeSeriesPlotPanel
 import org.simbrain.plot.timeseries.createTimeSeriesModel
+import org.simbrain.util.awaitUntil
+import org.simbrain.util.iterateAndSettle
 import org.simbrain.workspace.Workspace
+import org.simbrain.util.UiWork
 
 class TimeSeriesTest {
 
@@ -38,6 +43,7 @@ class TimeSeriesTest {
             }
 
             workspace.iterateSuspend(2)
+            UiWork.awaitIdle()
             assertEquals(0.5, timeSeriesComponent.model.timeSeriesList[0].series.getY(1) as Double, 0.0)
             assertEquals(0.0, timeSeriesComponent.model.timeSeriesList[1].series.getY(1) as Double, 0.0)
 
@@ -48,6 +54,7 @@ class TimeSeriesTest {
             assertEquals(2, workspace.time)
 
             workspace.iterateSuspend(2)
+            UiWork.awaitIdle()
 
             val newTimeSeriesComponent = workspace.getComponent("TimeSeries") as TimeSeriesPlotComponent
 
@@ -80,7 +87,7 @@ class TimeSeriesTest {
             timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
         }
 
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         assertEquals(1, timeSeriesComponent.model.timeSeriesList[1].series.itemCount)
 
         neurons[1].label = "Delta"
@@ -113,7 +120,7 @@ class TimeSeriesTest {
         awaitUntil(message = "Series were not named after neuron labels") {
             timeSeriesComponent.model.timeSeriesList.map { it.description } == listOf("Alpha", "Beta", "Gamma")
         }
-        repeat(3) { workspace.simpleIterate() }
+        workspace.iterateAndSettle(3)
         assertEquals(listOf(3, 3, 3), timeSeriesComponent.model.timeSeriesList.map { it.series.itemCount })
 
         runBlocking { neurons[1].delete() }
@@ -144,7 +151,7 @@ class TimeSeriesTest {
         workspace.couplingManager.createCoupling(collection, timeSeriesComponent.model)
 
         awaitUntil { timeSeriesComponent.model.timeSeriesList.size == 2 }
-        repeat(3) { workspace.simpleIterate() }
+        workspace.iterateAndSettle(3)
 
         val added = Neuron().apply { label = "Gamma" }
         network.addNetworkModelAsync(added)
@@ -183,7 +190,7 @@ class TimeSeriesTest {
                     listOf("Alpha", "Beta", neurons[2].id)
         }
 
-        workspace.simpleIterate()
+        workspace.iterateAndSettle()
         neurons[1].label = "Delta"
         awaitUntil(message = "Series name did not follow the neuron rename") {
             timeSeriesComponent.model.timeSeriesList.map { it.description } ==
@@ -248,8 +255,9 @@ class TimeSeriesTest {
         val populated = model.addTimeSeries("Alpha")
         repeat(3) {
             time = it
-            runBlocking { populated.setValue(it.toDouble() + 1) }
+            populated.setValue(it.toDouble() + 1)
         }
+        UiWork.awaitIdle()
         // Stands in for the series added when a deleted neuron is restored: it has no values until the
         // next update, and an empty JFreeChart series reports its bounds as NaN
         model.addTimeSeries("Beta")
@@ -269,11 +277,11 @@ class TimeSeriesTest {
         val large = model.addTimeSeries("Large")
         repeat(3) {
             time = it
-            runBlocking {
-                small.setValue(it.toDouble())
-                large.setValue(it * 100.0)
-            }
+            small.setValue(it.toDouble())
+            large.setValue(it * 100.0)
+            UiWork.awaitIdle()
         }
+        UiWork.awaitIdle()
         val panel = TimeSeriesPlotPanel(model)
         val plot = panel.chartPanel.chart.xyPlot
         assertTrue(plot.rangeAxis.range.upperBound >= 200.0)
@@ -362,6 +370,7 @@ class TimeSeriesTest {
         // Test adding data points
         workspace.resetTime()
         series.setValue(10.0)
+        UiWork.awaitIdle()
         
         val xySeries = series.series
         assertEquals(1, xySeries.itemCount)
@@ -371,6 +380,7 @@ class TimeSeriesTest {
         // Test progression over time using iteration
         workspace.iterateSuspend(1)
         series.setValue(20.0)
+        UiWork.awaitIdle()
         
         assertEquals(2, xySeries.itemCount)
         assertEquals(1, xySeries.getX(1))
@@ -403,6 +413,7 @@ class TimeSeriesTest {
         // Test auto range
         timeSeriesModel.isAutoRange = true
         series.setValue(100.0)
+        UiWork.awaitIdle()
         assertTrue(timeSeriesModel.isAutoRange)
         
         // Test fixed range
@@ -428,6 +439,7 @@ class TimeSeriesTest {
         series1.setValue(1.0)
         series2.setValue(2.0)  
         series3.setValue(3.0)
+        UiWork.awaitIdle()
 
         assertEquals(3, timeSeriesModel.dataset.seriesCount)
         
@@ -464,12 +476,14 @@ class TimeSeriesTest {
         
         customTime = 5
         series.setValue(100.0)
+        UiWork.awaitIdle()
         
         assertEquals(5, series.series.getX(0))
         assertEquals(100.0, series.series.getY(0))
         
         customTime = 10
         series.setValue(200.0)
+        UiWork.awaitIdle()
         
         assertEquals(10, series.series.getX(1))
         assertEquals(200.0, series.series.getY(1))
@@ -493,13 +507,15 @@ class TimeSeriesTest {
             series1.setValue(i.toDouble())
             series2.setValue((i * 2).toDouble())
         }
-        
+        UiWork.awaitIdle()
+
         assertEquals(5, series1.series.itemCount)
         assertEquals(5, series2.series.itemCount)
         
         // Clear all data
         timeSeriesModel.clearData()
-        
+        UiWork.awaitIdle()
+
         assertEquals(0, series1.series.itemCount)
         assertEquals(0, series2.series.itemCount)
         
@@ -507,4 +523,18 @@ class TimeSeriesTest {
         assertEquals(2, timeSeriesModel.timeSeriesList.size)
     }
 
+    @Test
+    fun `added data reaches the series on the edt and can be awaited`() = runBlocking {
+        val model = TimeSeriesModel()
+        val series = model.addTimeSeries("Series").series
+
+        val countWhileEdtBusy = withEdtHeld {
+            model.addData(0, 1.0, 2.0)
+            series.itemCount
+        }
+        model.awaitUpdates()
+
+        assertEquals(0, countWhileEdtBusy)
+        assertEquals(1, onEdt { series.itemCount })
+    }
 }

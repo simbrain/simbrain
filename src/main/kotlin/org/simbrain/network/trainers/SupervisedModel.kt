@@ -66,8 +66,8 @@ class SupervisedModel(
             )
         } else {
             TrainingDataset(
-                inputs = trainingInputs.copy(),
-                targets = trainingTargets.copy(),
+                inputs = trainingInputs.copyRows(),
+                targets = trainingTargets.copyRows(),
                 inputSize = inputLayer.size,
                 targetSize = outputLayer.size
             )
@@ -165,8 +165,8 @@ class SupervisedModel(
 
         inputLayer.isClamped = true
 
-        val newInput = inputLayer.activations.transpose().clone().toMutableListOfLists()[0]
-        val newTarget = Matrix.row(output).toMutableListOfLists()[0]
+        val newInput = inputLayer.activations.col(0)
+        val newTarget = output
         trainingSet.inputs.add(newInput)
         trainingSet.targets.add(newTarget)
 

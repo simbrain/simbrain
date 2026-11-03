@@ -1,5 +1,7 @@
 package org.simbrain.network.updaterules
 
+import smile.math.matrix.Matrix
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
@@ -13,7 +15,7 @@ import kotlin.math.*
 /**
  * GELU activation function. See [https://paperswithcode.com/method/gelu]
  */
-open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule {
+open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), DifferentiableUpdateRule, BatchActivation {
 
     context(Network)
     override fun apply(neuron: Neuron, data: EmptyScalarData) {
@@ -24,6 +26,11 @@ open class GELU : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Differen
     override fun apply(layer: Layer, dataHolder: EmptyMatrixData) {
         layer.activations.copyFrom(layer.inputs.applyFunction(::gelu))
     }
+
+    // The class is open, so a subclass may compute its layer update differently
+    override val activatesBatches get() = javaClass == GELU::class.java
+
+    override fun activateColumns(netInputs: Matrix): Matrix = netInputs.applyFunction(::gelu)
 
     fun clamp(x: Double, lower: Double, upper: Double): Double {
         return min(max(x, lower), upper)

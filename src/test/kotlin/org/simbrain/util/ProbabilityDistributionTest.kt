@@ -27,9 +27,15 @@ class ProbabilityDistributionTest {
      */
     val N = 1000
 
+    /**
+     * Fixes the samples behind the confidence interval checks. Each check would otherwise fail at random about alpha
+     * of the time, and the variance interval assumes normal data, so it is too narrow for skewed distributions.
+     */
+    private fun <T : ProbabilityDistribution> T.seeded() = apply { randomSeed = 1 }
+
     @Test
     fun `test continuous uniform`() {
-        val dist = UniformRealDistribution(0.0, 1.0)
+        val dist = UniformRealDistribution(0.0, 1.0).seeded()
 
         var sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
@@ -44,7 +50,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test uniform integer`() {
-        val dist = UniformIntegerDistribution(0, 1)
+        val dist = UniformIntegerDistribution(0, 1).seeded()
         var sample = dist.sampleDouble(N)
         // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
@@ -66,7 +72,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test two valued`() {
-        val dist = TwoValued(-1.0, 2.0)
+        val dist = TwoValued(-1.0, 2.0).seeded()
         var sample = dist.sampleDouble(N)
         assertTrue(sample.all { it == -1.0 || it == 2.0 })
         // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
@@ -92,7 +98,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test normal distribution`() {
-        val dist = NormalDistribution(1.0,.5)
+        val dist = NormalDistribution(1.0,.5).seeded()
         var sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
         assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
@@ -106,7 +112,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test poisson`() {
-        val dist = PoissonDistribution(1.0)
+        val dist = PoissonDistribution(1.0).seeded()
         val sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
         assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))
@@ -114,7 +120,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test exponential`() {
-        val dist = ExponentialDistribution(2.0)
+        val dist = ExponentialDistribution(2.0).seeded()
         var sample = dist.sampleDouble(N)
         // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
@@ -131,7 +137,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test exponential negation`() {
-        val dist = ExponentialDistribution()
+        val dist = ExponentialDistribution().seeded()
         dist.negate = true
         assertTrue(dist.sampleDouble() <= 0)
         assertTrue(dist.sampleInt() <= 0)
@@ -143,7 +149,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test log normal`() {
-        val dist = LogNormalDistribution(0.0, .25)
+        val dist = LogNormalDistribution(0.0, .25).seeded()
         var sample = dist.sampleDouble(N)
         // println("${dist.mean} in ${confidenceIntervalMean(sample.mean, sample.stdev, alpha, N)} ")
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
@@ -162,7 +168,7 @@ class ProbabilityDistributionTest {
 
     @Test
     fun `test gamma`() {
-        val dist = GammaDistribution()
+        val dist = GammaDistribution().seeded()
         var sample = dist.sampleDouble(N)
         assertTrue(dist.mean in confidenceIntervalMean(sample.mean, sample.stdev, alpha, N))
         assertTrue(dist.variance in confidenceIntervalVariance(sample.variance, alpha, N))

@@ -4,11 +4,13 @@
  */
 package org.simbrain.network.gui
 
+import org.simbrain.util.onEdt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
+import org.simbrain.util.undoableAction
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -691,7 +693,7 @@ class UndoManagerTest {
         // Screen nodes are built from model-added events; wait for both before selecting. A layer node's
         // child elements share its model, so pick the layer nodes by type rather than by label.
         fun layerNode(layer: NeuronArray) =
-            networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer }
+            onEdt { networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer } }
         awaitSettled { layerNode(inputLayer) != null && layerNode(outputLayer) != null }
 
         // Select the input layer as source and output layer as target.
@@ -782,7 +784,7 @@ class UndoManagerTest {
         // Screen nodes are built from model-added events; wait for both before selecting. A layer node's
         // child elements share its model, so pick the layer nodes by type rather than by label.
         fun layerNode(layer: NeuronArray) =
-            networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer }
+            onEdt { networkPanel.screenElements.filterIsInstance<NeuronArrayNode>().firstOrNull { it.model === layer } }
         awaitSettled { layerNode(inputLayer) != null && layerNode(outputLayer) != null }
 
         // Select the input layer as source and output layer as target.

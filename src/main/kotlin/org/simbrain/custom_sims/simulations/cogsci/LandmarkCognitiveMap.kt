@@ -295,8 +295,6 @@ val landmarkCognitiveMap = newSim {
                     listOf(mainState, objectReadouts)
                 )
                 trainingComplete.set(true)
-                // This setup finishes after the build does, but it is still not the user's work
-                workspace.markClean()
             }
         }
     }

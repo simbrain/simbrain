@@ -3,6 +3,7 @@ package org.simbrain.workspace
 
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withTimeout
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -15,7 +16,11 @@ import org.simbrain.util.UserEdits
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.table.BasicDataFrame
+import org.simbrain.util.table.SimbrainJTable
+import org.simbrain.world.odorworld.OdorWorldComponent
 import java.io.File
+import javax.swing.SwingUtilities
 
 class WorkspaceChangeTrackingTest {
 
@@ -108,6 +113,56 @@ class WorkspaceChangeTrackingTest {
         val reopened = Workspace()
         reopened.openWorkspace(file)
         assertFalse(reopened.hasUnsavedWork())
+    }
+
+    @Test
+    fun `resetting time keeps an earlier run as unsaved work`() = runBlocking {
+        val workspace = buildSim().workspace
+        workspace.iterateSuspend(5)
+        workspace.resetTime()
+        assertTrue(workspace.hasUnsavedWork())
+    }
+
+    @Test
+    fun `resetting time without running is not unsaved work`() = runBlocking {
+        val workspace = buildSim().workspace
+        workspace.resetTime()
+        assertFalse(workspace.hasUnsavedWork())
+    }
+
+    @Test
+    fun `deleting a model from an opened network is unsaved work`() = runBlocking {
+        val file = tempZip()
+        buildSim().workspace.save(file, headless = true)
+        val reopened = Workspace()
+        reopened.openWorkspace(file)
+        val network = reopened.componentList.filterIsInstance<NetworkComponent>().single().network
+        network.freeNeurons.first().delete()
+        withTimeout(2000) {
+            while (!reopened.hasUnsavedWork()) delay(10)
+        }
+    }
+
+    @Test
+    fun `setting the odor world grid size to its current value is not an edit`() = runBlocking {
+        val workspace = Workspace()
+        val odorWorld = OdorWorldComponent("World")
+        workspace.addWorkspaceComponent(odorWorld)
+        workspace.markClean()
+        odorWorld.world.gridCellSizeInTiles = odorWorld.world.gridCellSizeInTiles
+        assertFalse(workspace.hasUnsavedWork())
+        odorWorld.world.gridCellSizeInTiles = odorWorld.world.gridCellSizeInTiles + 1
+        assertTrue(workspace.hasUnsavedWork())
+    }
+
+    @Test
+    fun `a table cell edit that keeps the value is not an edit`() {
+        lateinit var table: SimbrainJTable
+        SwingUtilities.invokeAndWait { table = SimbrainJTable(BasicDataFrame(2, 2)) }
+        val unchanged = countReportsDuring { SwingUtilities.invokeAndWait { table.setValueAt(0.0, 0, 0) } }
+        val changed = countReportsDuring { SwingUtilities.invokeAndWait { table.setValueAt(5.0, 0, 0) } }
+        assertTrue(unchanged == 0)
+        assertTrue(changed == 1)
     }
 
     @Test

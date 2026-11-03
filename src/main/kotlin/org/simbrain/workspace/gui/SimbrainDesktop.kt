@@ -264,7 +264,7 @@ object SimbrainDesktop {
      */
     private val menuListener: MenuListener = object : MenuListener {
         override fun menuSelected(arg0: MenuEvent) {
-            actionManager.saveWorkspaceAction.isEnabled = workspace.changesExist()
+            actionManager.saveWorkspaceAction.isEnabled = canSave()
         }
 
         override fun menuDeselected(arg0: MenuEvent) {
@@ -516,7 +516,7 @@ object SimbrainDesktop {
             // Reset time if user double clicks on label.
             override fun mousePressed(event: MouseEvent) {
                 if (event.clickCount == 2) {
-                    workspace.updater.resetTime()
+                    workspace.resetTime()
                     lastTimestep = 0
                     updateTimeLabel()
                 }
@@ -985,14 +985,20 @@ object SimbrainDesktop {
     }
 
     /**
-     * If changes exist, show a change dialog, otherwise just save the current file.
+     * Whether Save would write anything: there are changes, or the workspace has never been written to a file.
+     */
+    private fun canSave() =
+        workspace.changesExist() || (workspace.currentFile == null && workspace.componentList.isNotEmpty())
+
+    /**
+     * Save to the current file, or ask for one if the workspace has never been saved. Does nothing if [canSave] is
+     * false.
      */
     fun save() {
 
         workspace.stop()
 
-        // Ignore the save command if there are no changes
-        if (workspace.changesExist()) {
+        if (canSave()) {
             // Check if save would be problematic and show warning
             if (workspace.isSaveProblematic(this)) {
                 if (!showSaveWarningDialog()) {

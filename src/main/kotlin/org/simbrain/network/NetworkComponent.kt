@@ -53,7 +53,7 @@ class NetworkComponent : WorkspaceComponent {
         network.allModelsDeep.forEach(::relayLabelChanges)
 
         // Immediate so that models added while a simulation builds are recorded before it is marked clean
-        event.modelsChanged.onImmediate { setChangedSinceLastSave(true) }
+        event.modelsChanged.onImmediate { markChanged() }
 
         event.modelAdded.on(Dispatchers.Default) { m ->
             relayLabelChanges(m)

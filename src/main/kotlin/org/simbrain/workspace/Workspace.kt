@@ -188,7 +188,7 @@ class Workspace: CoroutineScope {
         _componentList.add(component)
         component.workspace = this
         component.onWorkspaceAttached()
-        component.setChangedSinceLastSave(false)
+        component.markClean()
         markChanged()
 
         // If there is no custom name, use the id manager to produce a default name
@@ -410,7 +410,7 @@ class Workspace: CoroutineScope {
         workspaceChanged = false
         layoutChanged = false
         cleanTime = time
-        componentList.forEach { it.setChangedSinceLastSave(false) }
+        componentList.forEach { it.markClean() }
     }
 
     fun getComponent(name: String?): WorkspaceComponent? {
@@ -444,8 +444,15 @@ class Workspace: CoroutineScope {
     val time: Int
         get() = updater.time
 
+    /**
+     * Set time back to 0. Running before the reset still counts as unsaved work.
+     */
     fun resetTime() {
+        if (time != cleanTime) {
+            markChanged()
+        }
         updater.resetTime()
+        cleanTime = time
     }
 
     /**

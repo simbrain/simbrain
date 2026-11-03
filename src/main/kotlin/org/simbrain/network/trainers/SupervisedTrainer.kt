@@ -14,7 +14,6 @@ import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.sumOfSquares
-import org.simbrain.util.UserEdits
 import org.simbrain.util.UserParameter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
@@ -262,7 +261,6 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
     }
 
     private suspend fun trainOnceHandler() {
-        UserEdits.report()
         iteration++
 
         // Reset batch accuracy accumulators

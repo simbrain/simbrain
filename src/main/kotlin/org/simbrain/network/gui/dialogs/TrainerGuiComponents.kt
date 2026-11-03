@@ -52,6 +52,7 @@ class TrainerControls(internal val trainer: SupervisedTrainer, supervisedNetwork
         iconPath ="menu_icons/Play.png",
         description = "Iterate training until stop button is pressed"
     ) {
+        networkPanel.networkComponent.markChanged()
         trainer.startTraining()
     }
 
@@ -75,7 +76,8 @@ class TrainerControls(internal val trainer: SupervisedTrainer, supervisedNetwork
             }
         }
     ) {
-       trainer.trainOnce()
+        networkPanel.networkComponent.markChanged()
+        trainer.trainOnce()
     }
 
     private val initializeParameters = createAction(

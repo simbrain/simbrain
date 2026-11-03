@@ -526,8 +526,11 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
 
     /** The path a finished cell edit takes back to the model. */
     override fun setValueAt(aValue: Any?, row: Int, column: Int) {
+        val before = getValueAt(row, column)
         super.setValueAt(aValue, row, column)
-        UserEdits.report()
+        if (getValueAt(row, column) != before) {
+            UserEdits.report()
+        }
     }
 
     fun insertColumn() {

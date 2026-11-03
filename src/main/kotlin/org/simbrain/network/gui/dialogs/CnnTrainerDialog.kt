@@ -188,6 +188,7 @@ class CnnTrainerControls(
             iconPath = "menu_icons/Play.png",
             description = "Iterate training until stop button is pressed"
         ) {
+            UserEdits.report()
             trainer.startTraining()
         }
         runActionRef = runAction
@@ -208,6 +209,7 @@ class CnnTrainerControls(
                 trainer.events.endTraining.on { isEnabled = isValidationEnabled }
             }
         ) {
+            UserEdits.report()
             trainer.trainOnce()
         }
         stepActionRef = stepAction

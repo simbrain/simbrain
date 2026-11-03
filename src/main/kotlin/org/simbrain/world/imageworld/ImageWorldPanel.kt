@@ -48,10 +48,8 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
      * and so is neither saved with the world nor kept when no one is looking.
      */
     val history = ImageHistory(imageWorld.imageAlbum).also { history ->
-        history.onChanged = {
-            UserEdits.report()
-            SwingUtilities.invokeLater { updateUndoActions() }
-        }
+        history.onChanged = { SwingUtilities.invokeLater { updateUndoActions() } }
+        history.onEdited = { imageWorldComponent.markChanged() }
     }
 
     /**

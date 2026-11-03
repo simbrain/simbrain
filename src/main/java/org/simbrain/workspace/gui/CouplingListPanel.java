@@ -4,7 +4,6 @@ import org.simbrain.util.MessageKind;
 import org.simbrain.util.ResourceManager;
 import org.simbrain.util.SwingUtilsKt;
 import org.simbrain.util.Theme;
-import org.simbrain.util.UserEdits;
 import org.simbrain.workspace.couplings.Coupling;
 import org.simbrain.workspace.couplings.CouplingEvents;
 import org.simbrain.workspace.gui.couplingmanager.DesktopCouplingManager;
@@ -61,7 +60,7 @@ public class CouplingListPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
-            UserEdits.report();
+            desktop.getWorkspace().markChanged();
         }
     };
 

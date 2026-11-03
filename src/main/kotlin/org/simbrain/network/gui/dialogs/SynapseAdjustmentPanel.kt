@@ -30,6 +30,8 @@ class SynapseAdjustmentPanel(
     allRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
     excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
     inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0),
+    /** Called when a button changes the weights, as a user edit. */
+    val onEdit: () -> Unit = {},
     val onApply: () -> Unit = {}
 ) : JPanel() {
 
@@ -171,7 +173,7 @@ class SynapseAdjustmentPanel(
      */
     fun addActionListeners() {
         randomizeButton.addActionListener {
-            UserEdits.report()
+            onEdit()
             val view = synTypeSelector.selectedItem as SynapseView
             when (view) {
                 SynapseView.ALL, SynapseView.OVERLAY -> {
@@ -196,7 +198,7 @@ class SynapseAdjustmentPanel(
             initRandomizerPanel()
         }
         perturbButton.addActionListener {
-            UserEdits.report()
+            onEdit()
             perturberPanel.commitChanges()
             val view = synTypeSelector.selectedItem as SynapseView
             for (synapse in synapses) {
@@ -460,7 +462,7 @@ class SynapseAdjustmentPanel(
             addItem("Percent to change", tfIncreaseDecrease)
             addItem("Increase", increaseButton)
             increaseButton.addActionListener {
-                UserEdits.report()
+                onEdit()
                 val amount = tfIncreaseDecrease.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
                 for (synapse in synapses) {
@@ -472,7 +474,7 @@ class SynapseAdjustmentPanel(
             }
             addItem("Decrease", decreaseButton)
             decreaseButton.addActionListener {
-                UserEdits.report()
+                onEdit()
                 val amount = tfIncreaseDecrease.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
                 for (synapse in synapses) {
@@ -560,9 +562,10 @@ fun createSynapseAdjustmentPanel(
     synapses: List<Synapse>,
     all: ProbabilityDistribution = UniformRealDistribution(-1.0, 1.0),
     excitatoryRandomizer: ProbabilityDistribution = UniformRealDistribution(0.0, 1.0),
-    inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0)
+    inhibitoryRandomizer: ProbabilityDistribution = UniformRealDistribution(-1.0, 0.0),
+    onEdit: () -> Unit = {}
 ): SynapseAdjustmentPanel? {
-    val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer)
+    val sap = SynapseAdjustmentPanel(synapses, all, excitatoryRandomizer, inhibitoryRandomizer, onEdit)
     if (synapses.isEmpty()) {
         showMessage("No synapses to display", MessageKind.WARNING)
         return null

@@ -236,15 +236,17 @@ abstract class WorkspaceComponent(name: String) {
         get() = "xml"
 
     /**
-     * Set to true when a component changes, set to false after a component is
-     * saved.
-     *
-     * @param changedSinceLastSave whether this component has changed since the
-     * last save.
+     * Record a user edit to this component, so that closing it or discarding the workspace offers to save it.
      */
-    fun setChangedSinceLastSave(changedSinceLastSave: Boolean) {
-        Logger.debug("component changed")
-        this.changedSinceLastSave = changedSinceLastSave
+    fun markChanged() {
+        changedSinceLastSave = true
+    }
+
+    /**
+     * Forget recorded edits, as when this component has just been added, opened or saved.
+     */
+    internal fun markClean() {
+        changedSinceLastSave = false
     }
 
     /**

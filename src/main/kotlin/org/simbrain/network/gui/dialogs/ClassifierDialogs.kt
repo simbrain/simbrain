@@ -12,6 +12,7 @@ import org.simbrain.network.trainers.ClassificationDataset
 import org.simbrain.network.trainers.createClassificationDataset
 import org.simbrain.util.MessageKind
 import org.simbrain.util.StandardDialog
+import org.simbrain.util.UserEdits
 import org.simbrain.util.display
 import org.simbrain.util.onUi
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
@@ -103,6 +104,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
                 try {
                     classfierProps.commitChanges()
                     syncDataSet()
+                    UserEdits.report()
                     train()
                 } catch(e: Exception) {
                     showMessage(e.message.toString(), MessageKind.WARNING)

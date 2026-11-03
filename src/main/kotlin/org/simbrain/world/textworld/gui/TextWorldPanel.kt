@@ -13,7 +13,6 @@ import kotlinx.coroutines.swing.Swing
 import org.simbrain.util.HIGH_RATE_GUI_REFRESH_INTERVAL_MS
 import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
-import org.simbrain.util.UserEdits
 import org.simbrain.util.UiScope
 import org.simbrain.util.onUi
 import org.simbrain.util.widgets.SimbrainTextPane
@@ -43,6 +42,8 @@ import javax.swing.text.View
  */
 class TextWorldPanel(
     val world: TextWorld,
+    /** Called when the user types into or deletes from the text. */
+    private val onUserEdit: () -> Unit = {},
 ) : JPanel() {
 
     /**
@@ -162,7 +163,7 @@ class TextWorldPanel(
 
             override fun insertUpdate(arg0: DocumentEvent) {
                 if (updatingTextArea) return
-                UserEdits.report()
+                onUserEdit()
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)
@@ -175,7 +176,7 @@ class TextWorldPanel(
 
             override fun removeUpdate(arg0: DocumentEvent) {
                 if (updatingTextArea) return
-                UserEdits.report()
+                onUserEdit()
                 world.setTextNoEvent(textArea.text)
                 // Clamp caret position to valid range to avoid race condition
                 val validPosition = textArea.caretPosition.coerceIn(0, world.text.length)

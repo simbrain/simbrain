@@ -170,7 +170,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
             val endLocations = models.map { it.location }.toList()
             if (isDuplicateDrag) networkPanel.cursor = networkPanel.mouseCursor.cursor
             // Undoing a duplicate drag removes the copies (the paste's own undo entry), so there is no move to record
-            if (!isDuplicateDrag) networkPanel.undoManager.addUndoableAction(
+            // A click starts and ends a drag too, so record a move only if something moved
+            if (!isDuplicateDrag && endLocations != startLocations) networkPanel.undoManager.addUndoableAction(
                 description = "Move items",
                 undo = {
                     models.zip(startLocations).forEach { (m, l) -> m.location = l }

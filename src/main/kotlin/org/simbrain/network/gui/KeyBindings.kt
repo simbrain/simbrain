@@ -53,15 +53,16 @@ fun NetworkPanel.addKeyBindings() {
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {
-        markEdited()
-        selectionManager.filterSelectedModels<WeightMatrix>().forEach {
+        val matrices = selectionManager.filterSelectedModels<WeightMatrix>()
+        if (matrices.isNotEmpty()) networkComponent.markChanged()
+        matrices.forEach {
             it.diagonalize()
         }
     }
     bind(Ctrl + 'P') {showPiccoloDebugger()}
 
     bind(Alt + 'R') {
-        markEdited()
+        if (selectionManager.selectedModels.any { it is NeuronArray }) networkComponent.markChanged()
         selectionManager.selectedModels.forEach {
             if (it is NeuronArray) {
                 it.verticalLayout = !it.verticalLayout

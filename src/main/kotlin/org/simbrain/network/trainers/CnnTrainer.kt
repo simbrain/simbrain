@@ -7,7 +7,6 @@ import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.updaterules.SoftmaxRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
-import org.simbrain.util.UserEdits
 import org.simbrain.util.flatten
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -329,7 +328,6 @@ class CnnTrainer(
     }
 
     private suspend fun trainOnceHandler() {
-        UserEdits.report()
         iteration++
         batchAccuracySum = 0.0
         batchSampleCount = 0

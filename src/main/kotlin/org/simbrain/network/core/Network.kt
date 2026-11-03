@@ -497,6 +497,7 @@ class Network: CoroutineScope, EditableObject {
             model.events.deleted.on(Dispatchers.Default) {
                 networkModels.remove(it)
                 stopListeningForRuleChanges(it)
+                events.modelsChanged.fire()
                 events.modelRemoved.fire(it)
             }
         }

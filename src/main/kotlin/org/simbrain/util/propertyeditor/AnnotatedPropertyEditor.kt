@@ -3,6 +3,7 @@ package org.simbrain.util.propertyeditor
 
 import org.simbrain.util.LabelledItemPanel
 import org.simbrain.util.ThemeColor
+import org.simbrain.util.UserEdits
 import org.simbrain.util.UserParameter
 import org.simbrain.util.invokeLegacySetter
 import org.simbrain.util.swingInvokeLater
@@ -298,15 +299,27 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
         }
     }
 
-    fun commitChanges() {
+    /**
+     * @param reportEdits whether a commit that changes a value counts as a [UserEdits] edit. Pass false for objects
+     * that are not part of a workspace.
+     */
+    @JvmOverloads
+    fun commitChanges(reportEdits: Boolean = true) {
+        var changed = false
         parameterWidgetMap.forEach { (parameter, widget) ->
             if (widget.isConsistent && (widget !is TableParameterWidget<*, *> || widget.canEditInconsistentValues)) {
                 val isObjectWidget = widget is ObjectWidget<*, *> && !widget.useEnumStyle
                 if (isObjectWidget) {
-                    widget.objectTypeEditor.commitChanges()
+                    widget.objectTypeEditor.commitChanges(reportEdits)
                 }
                 editingObjects.forEach { eo ->
                     (parameter.property as? KMutableProperty1<O, Any>)?.let commitProperty@ { property ->
+                        changed = changed || if (isObjectWidget) {
+                            // Edits inside an object of the same type are reported by the nested commit above
+                            widget.value?.javaClass != property.getter.call(eo)?.javaClass
+                        } else {
+                            !valuesContentEqual(widget.valueFor(eo), property.getter.call(eo))
+                        }
                         if (isObjectWidget) {
                             (widget.value as? CopyableObject)?.let { co ->
                                 if (parameter.useLegacySetter) {
@@ -327,6 +340,9 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                     }
                 }
             }
+        }
+        if (changed && reportEdits) {
+            UserEdits.report()
         }
     }
 

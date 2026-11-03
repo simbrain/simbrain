@@ -53,6 +53,7 @@ fun NetworkPanel.addKeyBindings() {
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {
+        markEdited()
         selectionManager.filterSelectedModels<WeightMatrix>().forEach {
             it.diagonalize()
         }
@@ -60,6 +61,7 @@ fun NetworkPanel.addKeyBindings() {
     bind(Ctrl + 'P') {showPiccoloDebugger()}
 
     bind(Alt + 'R') {
+        markEdited()
         selectionManager.selectedModels.forEach {
             if (it is NeuronArray) {
                 it.verticalLayout = !it.verticalLayout

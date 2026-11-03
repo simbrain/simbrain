@@ -341,6 +341,7 @@ class Network: CoroutineScope, EditableObject {
                 assignId(model)
             }
             networkModels.add(model)
+            events.modelsChanged.fire()
             if (usePlacementManager && model is LocatableModel && model.shouldBePlaced) {
                 placementManager.placeObject(model)
             }
@@ -354,6 +355,7 @@ class Network: CoroutineScope, EditableObject {
                 networkModels.remove(it)
                 stopListeningForRuleChanges(it)
                 childToParentMap.remove(it)
+                events.modelsChanged.fire()
                 events.modelRemoved.fire(it)
                 updatePriorityList()
             }

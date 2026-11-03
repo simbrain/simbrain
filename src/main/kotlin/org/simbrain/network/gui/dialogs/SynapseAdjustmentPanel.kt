@@ -171,6 +171,7 @@ class SynapseAdjustmentPanel(
      */
     fun addActionListeners() {
         randomizeButton.addActionListener {
+            UserEdits.report()
             val view = synTypeSelector.selectedItem as SynapseView
             when (view) {
                 SynapseView.ALL, SynapseView.OVERLAY -> {
@@ -195,6 +196,7 @@ class SynapseAdjustmentPanel(
             initRandomizerPanel()
         }
         perturbButton.addActionListener {
+            UserEdits.report()
             perturberPanel.commitChanges()
             val view = synTypeSelector.selectedItem as SynapseView
             for (synapse in synapses) {
@@ -458,6 +460,7 @@ class SynapseAdjustmentPanel(
             addItem("Percent to change", tfIncreaseDecrease)
             addItem("Increase", increaseButton)
             increaseButton.addActionListener {
+                UserEdits.report()
                 val amount = tfIncreaseDecrease.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
                 for (synapse in synapses) {
@@ -469,6 +472,7 @@ class SynapseAdjustmentPanel(
             }
             addItem("Decrease", decreaseButton)
             decreaseButton.addActionListener {
+                UserEdits.report()
                 val amount = tfIncreaseDecrease.text.toDouble()
                 val view = synTypeSelector.selectedItem as SynapseView
                 for (synapse in synapses) {

@@ -46,6 +46,9 @@ class OdorWorldComponent : WorkspaceComponent {
             setChangedSinceLastSave(true)
         }
 
+        world.events.mazeChanged.onImmediate { setChangedSinceLastSave(true) }
+        world.events.propertiesChanged.onImmediate { setChangedSinceLastSave(true) }
+
         world.events.entityRemoved.on(Dispatchers.Default) { e: OdorWorldEntity ->
             fireAttributeContainerRemoved(e)
             e.sensors.forEach(this::fireAttributeContainerRemoved)

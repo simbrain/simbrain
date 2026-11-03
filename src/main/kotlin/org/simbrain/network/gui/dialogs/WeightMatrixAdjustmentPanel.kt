@@ -5,6 +5,7 @@ import org.simbrain.network.trainers.WeightInitializationStrategy
 import org.simbrain.plot.histogram.HistogramModel
 import org.simbrain.plot.histogram.HistogramPanel
 import org.simbrain.util.Theme
+import org.simbrain.util.UserEdits
 import org.simbrain.util.createApplyPanel
 import org.simbrain.util.flatten
 import org.simbrain.util.math.SimbrainMath
@@ -39,6 +40,7 @@ class WeightMatrixAdjustmentPanel(
     private val strategyEditor = AnnotatedPropertyEditor(initializationStrategy)
     private val strategyPanel = strategyEditor.createApplyPanel {
         commitChanges()
+        UserEdits.report()
         initializationStrategy.editingObject.initializeWeights(weightMatrix)
         updateDisplay()
     }

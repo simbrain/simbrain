@@ -274,7 +274,7 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder, title: String): StandardDi
             }
         })
         addCommitTask {
-            ape.commitChanges()
+            ape.commitChanges(reportEdits = false)
             prefHolder.fireChanged()
         }
     }

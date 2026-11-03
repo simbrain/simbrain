@@ -15,6 +15,7 @@ class NetworkEvents: FlowEvents() {
     val updated = NoArgAwaitableEvent()
     val modelAdded = AwaitableEvent<NetworkModel>()
     val modelRemoved = AwaitableEvent<NetworkModel>()
+    val modelsChanged = NoArgEvent()
     val updateActionsChanged = NoArgEvent()
     val freeWeightVisibilityChanged = OneArgEvent<Boolean>()
     val synapseSpikingOnlyVisibilityChanged = OneArgEvent<Boolean>()

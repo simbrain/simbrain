@@ -236,6 +236,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcuts = KeyCombination('R')
     ) {
+        networkPanel.markEdited()
         if (networkPanel.hasAnyPixelSelection()) {
             networkPanel.randomizeSelectedPixels()
             return@createConditionallyEnabledAction
@@ -254,6 +255,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Rand.png",
         keyboardShortcut = CmdOrCtrl + 'B'
     ) {
+        networkPanel.markEdited()
         with(network) {
             selectionManager.selectedModels
                 .filterIsInstance<Neuron>()
@@ -614,6 +616,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/Step.png",
         keyboardShortcut = KeyCombination(KeyEvent.VK_SPACE)
     ) {
+        networkPanel.markEdited()
         networkPanel.network.update()
     }
 
@@ -628,6 +631,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = KeyCombination('F'),
         coroutineContext = opStepContext
     ) {
+        networkPanel.markEdited()
         selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.stepInferenceOp() }
     }
 
@@ -638,6 +642,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = KeyCombination('B'),
         coroutineContext = opStepContext
     ) {
+        networkPanel.markEdited()
         selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.stepTrainingOp() }
     }
 
@@ -647,6 +652,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = Shift + 'B',
         coroutineContext = opStepContext
     ) {
+        networkPanel.markEdited()
         selectionManager.filterSelectedModels<TinyLanguageModel>().forEach { it.finishStepWalk() }
     }
 
@@ -1020,6 +1026,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         enablingCondition = EnablingConditions.SYNAPSES
     ) {
         DecayFunction.DecayFunctionSelector().createEditorDialog {
+            networkPanel.markEdited()
             selectionManager.filterSelectedModels<Synapse>()
                 .decayStrengthBasedOnLength(it.decayFunction)
         }.display()
@@ -1079,6 +1086,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             }
             addCommitTask {
                 editor.commitChanges()
+                networkPanel.markEdited()
                 selectionManager.filterSelectedModels<Neuron>().forEach { n ->
                     if (wrapper.editingObject.sampleDouble() > .5) n.polarity = SimbrainConstants.Polarity.EXCITATORY
                     else n.polarity = SimbrainConstants.Polarity.INHIBITORY

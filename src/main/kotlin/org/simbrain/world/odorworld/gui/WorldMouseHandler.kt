@@ -242,6 +242,7 @@ class WorldMouseHandler(
 
 
         // Continue to drag nodes that have already been selected
+        odorWorldPanel.odorWorldComponent.setChangedSinceLastSave(true)
         for (node in odorWorldPanel.selectedEntityNodes) {
             node.entity.location = selectedEntityLocations[node.entity]!!
         }

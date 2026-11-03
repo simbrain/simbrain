@@ -181,6 +181,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         task: suspend JButton.(ActionEvent) -> Unit
     ) = JButton(label).also { button ->
         button.addActionListener {
+            UserEdits.report()
             launch(buttonTaskContext + context) { button.task(it) }
         }
         launch(Dispatchers.Swing) {
@@ -283,6 +284,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             comboBox.selectedItem = initialSelection
         }
         comboBox.addActionListener {
+            UserEdits.report()
             @Suppress("UNCHECKED_CAST")
             onChange(comboBox.selectedItem as T)
         }
@@ -436,6 +438,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         JCheckBox().also { checkBox ->
             checkBox.toolTipText = toolTip
             checkBox.addActionListener {
+                UserEdits.report()
                 launch(buttonTaskContext) {
                     onChange(checkBox.isSelected)
                 }
@@ -491,6 +494,7 @@ class ControlPanelKt(title: String = "Control Panel"):
             task: suspend JButton.(ActionEvent) -> Unit
         ) = JButton(label).also { button ->
             button.addActionListener {
+                UserEdits.report()
                 parent.launch(parent.buttonTaskContext + context) { button.task(it) }
             }
             panel.add(button)

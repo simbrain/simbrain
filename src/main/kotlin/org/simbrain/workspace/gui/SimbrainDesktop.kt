@@ -276,6 +276,7 @@ object SimbrainDesktop {
 
     init {
         TypeOptionVisibility.exposedTypeNamesProvider = { workspace.exposedTypes }
+        UserEdits.onEdit = { workspace.markChanged() }
         frame.iconImages = listOf(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
             ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
@@ -424,13 +425,12 @@ object SimbrainDesktop {
                 event.component.setBounds(x, 0, width, height)
             }
 
-            // Workspace has changed
-            workspace.setWorkspaceChanged(true)
+            workspace.markLayoutChanged()
         }
 
         override fun componentResized(arg0: ComponentEvent) {
             // System.out.println("Component resized");
-            workspace.setWorkspaceChanged(true)
+            workspace.markLayoutChanged()
         }
     }
 
@@ -1099,13 +1099,13 @@ object SimbrainDesktop {
      * should be left alone
      */
     private fun confirmDiscardChanges(): Boolean {
-        if (workspace.componentList.isEmpty() || !workspace.changesExist()) {
+        if (workspace.componentList.isEmpty() || !workspace.hasUnsavedWork()) {
             return true
         }
         return when (showHasChangedDialog()) {
             0 -> {
                 save()
-                !workspace.changesExist()
+                !workspace.hasUnsavedWork()
             }
             1 -> true
             else -> false

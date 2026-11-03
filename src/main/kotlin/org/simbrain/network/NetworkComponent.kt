@@ -52,8 +52,10 @@ class NetworkComponent : WorkspaceComponent {
 
         network.allModelsDeep.forEach(::relayLabelChanges)
 
+        // Immediate so that models added while a simulation builds are recorded before it is marked clean
+        event.modelsChanged.onImmediate { setChangedSinceLastSave(true) }
+
         event.modelAdded.on(Dispatchers.Default) { m ->
-            setChangedSinceLastSave(true)
             relayLabelChanges(m)
             if (m is AttributeContainer) {
                 fireAttributeContainerAdded(m)
@@ -68,7 +70,6 @@ class NetworkComponent : WorkspaceComponent {
         }
 
         event.modelRemoved.on(Dispatchers.Default) { m ->
-            setChangedSinceLastSave(true)
             if (m is AttributeContainer) {
                 fireAttributeContainerRemoved(m)
                 m.childrenContainers?.forEach(::fireAttributeContainerRemoved)

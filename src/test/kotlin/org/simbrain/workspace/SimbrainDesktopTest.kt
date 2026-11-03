@@ -1,6 +1,8 @@
 package org.simbrain.workspace
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Test
 import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
@@ -27,6 +29,28 @@ class SimbrainDesktopTest {
         runBlocking {
             hiSim.run(SimbrainDesktop)
         }
+    }
+
+    @Test
+    fun `opening a simulation on the desktop leaves no unsaved work once its views settle`() {
+        val sim = newSim {
+            workspace.clearWorkspace()
+            val component = NetworkComponent("net1")
+            workspace.addWorkspaceComponent(component)
+            withGui {
+                place(component) {
+                    location = point(20, 20)
+                    width = 300
+                    height = 300
+                }
+            }
+        }
+        SimbrainDesktop.frame.isVisible = true
+        runBlocking {
+            sim.run(SimbrainDesktop)
+            delay(500)
+        }
+        assertFalse(SimbrainDesktop.workspace.hasUnsavedWork())
     }
 
 }

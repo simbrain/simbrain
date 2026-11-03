@@ -5,6 +5,7 @@ import kotlinx.coroutines.withContext
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.events.TrainerEvents
+import org.simbrain.util.UserEdits
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
@@ -75,6 +76,7 @@ class UnsupervisedTrainer: EditableObject {
 
     context(Network)
     suspend fun trainOnce(network: UnsupervisedNetwork) {
+        UserEdits.report()
         iteration++
         withContext(Dispatchers.Default) {
             network.trainOnInputData()

@@ -125,6 +125,8 @@ val srnElmanSentences = newSim {
     workspace.launch {
         delay(10L)
         workspace.iterateSuspend(1)
+        // This first step finishes after the build does, but it is still not the user's work
+        workspace.markClean()
     }
 
     addSidebarInfo(

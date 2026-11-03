@@ -83,6 +83,7 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         // Launch a coroutine to await all pending apply jobs, then finalize
         networkPanel.launch(Dispatchers.Swing) {
             jobs.joinAll()
+            networkPanel.markEdited()
             action?.endAction(networkPanel, undoState)
         }
     }

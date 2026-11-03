@@ -100,6 +100,7 @@ val TextWorldDesktopComponent.loadTextAction
         val chooser = SFileChooser(TextWorldPreferences.sampleTextsDirectory,"Text import", "txt")
         val theFile = chooser.showOpenDialog()
         if (theFile != null) {
+            UserEdits.report()
             workspaceComponent.world.text = Utils.readFileContents(theFile)
         }
     }

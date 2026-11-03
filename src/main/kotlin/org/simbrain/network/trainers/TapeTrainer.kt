@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.llm.TinyLmModel
+import org.simbrain.util.UserEdits
 
 /**
  * Trainer for tape-backed op-plan models ([TinyLmModel]): the same outer loop the
@@ -128,6 +129,7 @@ class TapeTrainer(val model: TinyLmModel) : CoroutineScope {
             stopHandler()
             return
         }
+        UserEdits.report()
         iteration++
 
         var totalLoss = 0.0

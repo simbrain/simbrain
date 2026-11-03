@@ -61,6 +61,7 @@ val SimbrainJTable.randomizeColumnAction
             columnModel.selectionModel.addListSelectionListener { updateAction() }
         }
     ) {
+        UserEdits.report()
         model.randomizeColumn(selectedColumn)
     }
 
@@ -205,6 +206,7 @@ val SimbrainJTable.setRowsColumnsAction
 
         val dimensions = createDimensionDialog()
         if (dimensions != null) {
+            UserEdits.report()
             val (newRows, newCols) = dimensions
             
             when (val tableModel = model) {
@@ -336,6 +338,7 @@ val SimbrainJTable.importArff
         val chooser = SFileChooser(WorkspacePreferences.tableDirectory, "", "arff")
         val arffFile = chooser.showOpenDialog()
         if (arffFile != null) {
+            UserEdits.report()
             WorkspacePreferences.tableDirectory = arffFile.parentFile.absolutePath
             model.let {
                 if (it is SmileDataFrame) {
@@ -388,6 +391,7 @@ fun SimbrainJTable.importCSVAction(
             return true
         }
         if (csvFile != null) {
+            UserEdits.report()
             if (customDir == null) {
                 WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
             }

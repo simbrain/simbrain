@@ -186,7 +186,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var nudgeAmount = NetworkPreferences.nudgeAmount
 
-    val undoManager = UndoManager()
+    val undoManager = UndoManager().apply { onChanged = { markEdited() } }
 
     /**
      * Whether to display free weights (those not in a synapse group) or not.
@@ -763,11 +763,20 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         updateLocationsWithUndoableAction("Nudge", models) { _, model -> model.location += point(dx * nudgeAmount, dy * nudgeAmount) }
     }
 
+    /**
+     * Record that the user changed the network in a way that does not go through [undoManager].
+     */
+    fun markEdited() {
+        networkComponent.setChangedSinceLastSave(true)
+    }
+
     fun toggleClamping() {
+        markEdited()
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.toggleClamping() }
     }
 
     fun incrementSelectedObjects() {
+        markEdited()
         if (hasAnyPixelSelection()) {
             incrementSelectedPixels()
             return
@@ -780,6 +789,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun decrementSelectedObjects() {
+        markEdited()
         if (hasAnyPixelSelection()) {
             decrementSelectedPixels()
             return
@@ -792,10 +802,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun clearSelectedObjects() {
+        markEdited()
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.clear() }
     }
 
     fun hardClearSelectedObjects() {
+        markEdited()
         if (hasAnyPixelSelection()) {
             clearSelectedPixels()
             return

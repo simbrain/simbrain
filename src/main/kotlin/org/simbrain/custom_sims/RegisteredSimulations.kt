@@ -90,11 +90,12 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Psychology") {
+        item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
+        item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
         item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
+        item("Mirror neurons") { mirrorLearning }
         item("Mouse and eye tracking") { spiveyNet }
-        item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
     }
 

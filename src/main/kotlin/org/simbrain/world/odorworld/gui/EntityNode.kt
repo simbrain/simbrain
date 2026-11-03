@@ -231,7 +231,7 @@ class EntityNode(
         addChild(steeringDebugNode)
         addChild(caption)
         updateCaption()
-        entity.events.captionChanged.on(dispatcher = Dispatchers.Swing) { updateCaption() }
+        entity.events.captionChanged.on(dispatcher = Dispatchers.Swing) { updateCaption() }.untilDisposed()
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on(dispatcher = Dispatchers.Swing) {

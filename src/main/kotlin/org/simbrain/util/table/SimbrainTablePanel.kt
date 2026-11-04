@@ -524,21 +524,21 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         val before = getValueAt(row, column)
         super.setValueAt(aValue, row, column)
         if (getValueAt(row, column) != before) {
-            UserEdits.report()
+            UnsavedChanges.mark()
         }
     }
 
     fun insertColumn() {
-        UserEdits.report()
+        UnsavedChanges.mark()
         model.insertColumn(selectedColumn)
     }
     fun insertRow() {
-        UserEdits.report()
+        UnsavedChanges.mark()
         model.insertRow(selectedRow)
     }
 
     fun deleteSelectedColumns() {
-        UserEdits.report()
+        UnsavedChanges.mark()
         for (i in 0 until selectedColumns.size) {
             if (columnCount <= 0) {
                 break
@@ -549,7 +549,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     }
 
     fun deleteSelectedRows() {
-        UserEdits.report()
+        UnsavedChanges.mark()
         for (i in 0 until selectedRows.size) {
             model.deleteRow(selectedRow, false)
         }
@@ -557,14 +557,14 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     }
 
     fun randomizeSelectedCells() {
-        UserEdits.report()
+        UnsavedChanges.mark()
         getSelectedCells().forEach { (x, y) ->
             model.setValueAt(model.cellRandomizer.sampleDouble(), x, y)
         }
     }
 
     fun fillSelectedCells(fillVal: Double) {
-        UserEdits.report()
+        UnsavedChanges.mark()
         getSelectedCells().forEach { (x, y) ->
             model.setValueAt(fillVal, x, y)
         }

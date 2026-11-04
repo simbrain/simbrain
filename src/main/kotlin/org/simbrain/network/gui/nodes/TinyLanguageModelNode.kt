@@ -9,11 +9,11 @@ import org.simbrain.network.compositor.CompositorNode
 import org.simbrain.network.compositor.TokenProbabilityCardStyle
 import org.simbrain.network.compositor.TokenProbabilitySnapshot
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.MouseEventHandler
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createCouplingMenu
 import org.simbrain.network.gui.createSelectionEditDialog
-import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.gui.dialogs.ErrorTimeSeries
 import org.simbrain.network.gui.dialogs.postReportsTo
 import org.simbrain.network.llm.TinyLanguageModel
@@ -278,9 +278,9 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
     val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
     val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
 
-    val trainButton = JButton("Train").apply { addActionListener { UserEdits.report(); trainer.launch { trainer.startTraining() } } }
+    val trainButton = JButton("Train").apply { addActionListener { UnsavedChanges.mark(); trainer.launch { trainer.startTraining() } } }
     val stopButton = JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } }
-    val stepButton = JButton("Step").apply { addActionListener { UserEdits.report(); trainer.launch { trainer.trainOnce() } } }
+    val stepButton = JButton("Step").apply { addActionListener { UnsavedChanges.mark(); trainer.launch { trainer.trainOnce() } } }
     fun syncButtons(running: Boolean) {
         trainButton.isEnabled = !running
         stepButton.isEnabled = !running

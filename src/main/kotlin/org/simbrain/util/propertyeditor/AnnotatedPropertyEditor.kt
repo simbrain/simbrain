@@ -1,12 +1,7 @@
 /** Builds shared property widgets and commits compatible edits to each target object. */
 package org.simbrain.util.propertyeditor
 
-import org.simbrain.util.LabelledItemPanel
-import org.simbrain.util.ThemeColor
-import org.simbrain.util.UserEdits
-import org.simbrain.util.UserParameter
-import org.simbrain.util.invokeLegacySetter
-import org.simbrain.util.swingInvokeLater
+import org.simbrain.util.*
 import smile.math.matrix.Matrix
 import java.awt.Color
 import javax.swing.*
@@ -300,17 +295,17 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
     }
 
     /**
-     * @param reportEdits whether a commit that changes a value counts as a [UserEdits] edit. Pass false for objects
+     * @param markUnsaved whether a commit that changes a value marks [UnsavedChanges]. Pass false for objects
      * that are not part of a workspace.
      */
     @JvmOverloads
-    fun commitChanges(reportEdits: Boolean = true) {
+    fun commitChanges(markUnsaved: Boolean = true) {
         var changed = false
         parameterWidgetMap.forEach { (parameter, widget) ->
             if (widget.isConsistent && (widget !is TableParameterWidget<*, *> || widget.canEditInconsistentValues)) {
                 val isObjectWidget = widget is ObjectWidget<*, *> && !widget.useEnumStyle
                 if (isObjectWidget) {
-                    widget.objectTypeEditor.commitChanges(reportEdits)
+                    widget.objectTypeEditor.commitChanges(markUnsaved)
                 }
                 editingObjects.forEach { eo ->
                     (parameter.property as? KMutableProperty1<O, Any>)?.let commitProperty@ { property ->
@@ -341,8 +336,8 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                 }
             }
         }
-        if (changed && reportEdits) {
-            UserEdits.report()
+        if (changed && markUnsaved) {
+            UnsavedChanges.mark()
         }
     }
 

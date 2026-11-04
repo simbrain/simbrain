@@ -198,7 +198,7 @@ class WandPalettePanel(
         // Create a default action wrapped for type selection
         val wrapper = objectWrapper("Action", AdjustValueAction() as WandAction)
         AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog {
-            commitChanges(reportEdits = false)
+            commitChanges(markUnsaved = false)
             val newAction = wrapper.editingObject
             palette.addAction(newAction)
             palette.selectAction(palette.actions.size - 1)
@@ -210,7 +210,7 @@ class WandPalettePanel(
         // Wrap the action so user can change its type
         val wrapper = objectWrapper("Action", palette.actions[index])
         AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog {
-            commitChanges(reportEdits = false)
+            commitChanges(markUnsaved = false)
             // Replace the action in the list (type may have changed)
             palette.actions[index] = wrapper.editingObject
             palette.events.actionEdited.fire(wrapper.editingObject)

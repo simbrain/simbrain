@@ -33,6 +33,7 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.gui.SimbrainDesktop.applyThemeIfChanged
+import org.simbrain.workspace.gui.SimbrainDesktop.canSave
 import org.simbrain.workspace.updater.PerformanceMonitor
 import org.simbrain.world.textworld.gui.TextWorldPanel
 import java.awt.*
@@ -276,7 +277,7 @@ object SimbrainDesktop {
 
     init {
         TypeOptionVisibility.exposedTypeNamesProvider = { workspace.exposedTypes }
-        UserEdits.onEdit = { workspace.markChanged() }
+        UnsavedChanges.onMark = { workspace.markChanged() }
         frame.iconImages = listOf(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
             ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),

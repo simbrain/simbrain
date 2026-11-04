@@ -1,7 +1,7 @@
 /**
  * The model behind the desktop: holds the components, couplings and update loop, opens and saves them, and decides what
- * counts as unsaved work. Editors mark their own component or report through [org.simbrain.util.UserEdits]; a workspace
- * becomes clean when it is built, opened, cleared or saved.
+ * counts as unsaved work. Editors mark their own component, or the workspace through
+ * [org.simbrain.util.UnsavedChanges]; a workspace becomes clean when it is built, opened, cleared or saved.
  */
 package org.simbrain.workspace
 

@@ -12,7 +12,7 @@ import org.simbrain.custom_sims.newSim
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
-import org.simbrain.util.UserEdits
+import org.simbrain.util.UnsavedChanges
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -179,12 +179,12 @@ class WorkspaceChangeTrackingTest {
 
     private fun countReportsDuring(block: () -> Unit): Int {
         var reports = 0
-        val previous = UserEdits.onEdit
-        UserEdits.onEdit = { reports++ }
+        val previous = UnsavedChanges.onMark
+        UnsavedChanges.onMark = { reports++ }
         try {
             block()
         } finally {
-            UserEdits.onEdit = previous
+            UnsavedChanges.onMark = previous
         }
         return reports
     }
@@ -209,6 +209,6 @@ class WorkspaceChangeTrackingTest {
         val edited = EditedObject()
         val editor = AnnotatedPropertyEditor(edited)
         edited.value = 2.0
-        assertTrue(countReportsDuring { editor.commitChanges(reportEdits = false) } == 0)
+        assertTrue(countReportsDuring { editor.commitChanges(markUnsaved = false) } == 0)
     }
 }

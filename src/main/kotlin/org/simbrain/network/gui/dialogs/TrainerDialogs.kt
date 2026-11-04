@@ -340,6 +340,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
             iconPath = "menu_icons/Step.png",
         ) {
             with(network) {
+                UserEdits.report()
                 launch {
                     trainer.events.beginTraining.fire()
                     trainer.trainOnce(unsupervisedNetwork)
@@ -360,6 +361,7 @@ fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, train
                 description = "Run training algorithm",
                 iconPath = "menu_icons/Play.png",
             ) {
+                UserEdits.report()
                 with(network) {
                     trainingJob = launch {
                         trainer.startTraining(unsupervisedNetwork)

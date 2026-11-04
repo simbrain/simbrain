@@ -18,7 +18,9 @@ import javax.swing.JLabel
 import javax.swing.JPanel
 
 class WeightMatrixAdjustmentPanel(
-    val weightMatrix: WeightMatrix
+    val weightMatrix: WeightMatrix,
+    /** Called when Apply changes the weights, as a user edit. */
+    val onEdit: () -> Unit = {}
 ) : JPanel() {
 
     private val weights: DoubleArray
@@ -39,6 +41,7 @@ class WeightMatrixAdjustmentPanel(
     private val strategyEditor = AnnotatedPropertyEditor(initializationStrategy)
     private val strategyPanel = strategyEditor.createApplyPanel {
         commitChanges()
+        onEdit()
         initializationStrategy.editingObject.initializeWeights(weightMatrix)
         updateDisplay()
     }

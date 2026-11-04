@@ -96,6 +96,7 @@ fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
                 try {
                     classfierProps.commitChanges()
                     syncDataSet()
+                    UserEdits.report()
                     train()
                 } catch(e: Exception) {
                     showMessage(e.message.toString(), MessageKind.WARNING)

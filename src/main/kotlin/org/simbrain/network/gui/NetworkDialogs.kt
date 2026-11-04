@@ -354,7 +354,8 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         synapseGroup.synapses,
         synapseGroup.weightRandomizer,
         exRandomizer,
-        inRandomizer
+        inRandomizer,
+        onEdit = { networkPanel.networkComponent.markChanged() }
     ) {
         synapsesEditor.refreshValues()
         matrixViewer.refreshValues()

@@ -1,3 +1,8 @@
+/**
+ * The model behind the desktop: holds the components, couplings and update loop, opens and saves them, and decides what
+ * counts as unsaved work. Editors mark their own component or report through [org.simbrain.util.UserEdits]; a workspace
+ * becomes clean when it is built, opened, cleared or saved.
+ */
 package org.simbrain.workspace
 
 import kotlinx.coroutines.*
@@ -75,10 +80,27 @@ class Workspace: CoroutineScope {
     val componentFactory = AbstractComponentFactory(this)
 
     /**
-     * Flag to indicate workspace has been changed since last save.
+     * Whether the workspace holds work that would be lost if it were discarded. Component edits are tracked by the
+     * components and time spent running by [cleanTime]; see [hasUnsavedWork].
      */
     @Transient
+    @Volatile
     private var workspaceChanged = false
+
+    /**
+     * Whether desktop window placement has changed. It is saved with the workspace, but is not worth a warning.
+     */
+    @Transient
+    @Volatile
+    private var layoutChanged = false
+
+    /**
+     * The [time] of the last [markClean]. A later time means the workspace has run since, without per-iteration
+     * bookkeeping in the update loop.
+     */
+    @Transient
+    @Volatile
+    private var cleanTime = 0
 
     /**
      * Current workspace file.
@@ -158,6 +180,7 @@ class Workspace: CoroutineScope {
 
     init {
         initIdManager()
+        couplingManager.events.couplingAdded.onImmediate { markChanged() }
     }
 
     fun addWorkspaceComponent(component: WorkspaceComponent) {
@@ -165,8 +188,8 @@ class Workspace: CoroutineScope {
         _componentList.add(component)
         component.workspace = this
         component.onWorkspaceAttached()
-        component.setChangedSinceLastSave(false)
-        setWorkspaceChanged(true)
+        component.markClean()
+        markChanged()
 
         // If there is no custom name, use the id manager to produce a default name
         if (component.name.isEmpty()) {
@@ -190,7 +213,7 @@ class Workspace: CoroutineScope {
         // this.getCouplingManager().removeCouplings(component);
         _componentList.remove(component)
         component.closeOwnedModels()
-        setWorkspaceChanged(true)
+        markChanged()
         events.componentRemoved.fire(component)
     }
 
@@ -326,7 +349,6 @@ class Workspace: CoroutineScope {
         stop()
         removeAllComponents()
         resetTime()
-        setWorkspaceChanged(false)
         currentFile = null
         simulationId = ""
         exposedTypeNames = LinkedHashSet()
@@ -336,6 +358,7 @@ class Workspace: CoroutineScope {
         events.workspaceCleared.fire()
         updater.updateManager.setDefaultUpdateActions()
         infoDoc.text = ""
+        markClean()
     }
 
     /**
@@ -354,26 +377,40 @@ class Workspace: CoroutineScope {
     }
 
     /**
-     * Check whether there have been changes in the workspace or its
-     * components.
-     *
-     * @return true if changes exist, false otherwise
+     * Whether saving would record anything new, including changes that are not worth a warning.
      */
-    fun changesExist(): Boolean {
-        return if (workspaceChanged) {
-            true
-        } else {
-            return componentList.any { it.hasChangedSinceLastSave() }
-        }
+    fun changesExist(): Boolean = layoutChanged || hasUnsavedWork()
+
+    /**
+     * Whether discarding the workspace would lose something that reloading it or rerunning its simulation would not
+     * bring back: an edit, or time spent running.
+     */
+    fun hasUnsavedWork(): Boolean =
+        workspaceChanged || time != cleanTime || componentList.any { it.hasChangedSinceLastSave() }
+
+    /**
+     * Record a change to the workspace itself. Component edits should mark their component instead.
+     */
+    fun markChanged() {
+        workspaceChanged = true
     }
 
     /**
-     * Sets whether the workspace has been changed.
-     *
-     * @param workspaceChanged Has workspace been changed value
+     * Record a change to desktop window placement.
      */
-    fun setWorkspaceChanged(workspaceChanged: Boolean) {
-        this.workspaceChanged = workspaceChanged
+    fun markLayoutChanged() {
+        layoutChanged = true
+    }
+
+    /**
+     * Make the current state the one [changesExist] and [hasUnsavedWork] compare against: the workspace as it was just
+     * built, opened, cleared or saved.
+     */
+    fun markClean() {
+        workspaceChanged = false
+        layoutChanged = false
+        cleanTime = time
+        componentList.forEach { it.markClean() }
     }
 
     fun getComponent(name: String?): WorkspaceComponent? {
@@ -407,8 +444,15 @@ class Workspace: CoroutineScope {
     val time: Int
         get() = updater.time
 
+    /**
+     * Set time back to 0. Running before the reset still counts as unsaved work.
+     */
     fun resetTime() {
+        if (time != cleanTime) {
+            markChanged()
+        }
         updater.resetTime()
+        cleanTime = time
     }
 
     /**
@@ -435,7 +479,7 @@ class Workspace: CoroutineScope {
                 }
                 currentFile = theFile
                 findSimulation()?.reopen(this, if (useDesktop) SimbrainDesktop else null)
-                setWorkspaceChanged(false)
+                markClean()
                 events.workspaceOpened.fire()
             }
         } catch (e: IOException) {
@@ -451,9 +495,7 @@ class Workspace: CoroutineScope {
                 try {
                     val serializer = WorkspaceSerializer(this)
                     serializer.serialize(ostream, headless)
-                    setWorkspaceChanged(false)
-                    // Components track their own edits, so clear those too or changesExist() stays true after a save
-                    componentList.forEach { it.setChangedSinceLastSave(false) }
+                    markClean()
                 } catch (e: Exception) {
                     e.printStackTrace()
                 } finally {

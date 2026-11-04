@@ -40,7 +40,7 @@ class WorkspaceComponentDeserializer {
         val componentClass = Class.forName(archivedComponent.className)
         val wc = deserializeWorkspaceComponent(componentClass, archivedComponent.name, input, null)
         componentKeys[archivedComponent.getUri()] = wc
-        wc.setChangedSinceLastSave(false)
+        wc.markClean()
         return wc
     }
 
@@ -67,7 +67,7 @@ class WorkspaceComponentDeserializer {
             if (openFunction != null) {
                 val obj = openFunction.call(componentClass.kotlin.companionObjectInstance, input, name, format)
                 if (obj is WorkspaceComponent) {
-                    obj.setChangedSinceLastSave(false)
+                    obj.markClean()
                     return obj
                 } else {
                     throw ReflectiveOperationException("Incompatible open method return type in class $componentClass")
@@ -81,7 +81,7 @@ class WorkspaceComponentDeserializer {
                 )
                 val obj = method.invoke(null, input, name, format)
                 if (obj is WorkspaceComponent) {
-                    obj.setChangedSinceLastSave(false)
+                    obj.markClean()
                     return obj
                 } else {
                     throw ReflectiveOperationException("Incompatible open method return type in class $componentClass")

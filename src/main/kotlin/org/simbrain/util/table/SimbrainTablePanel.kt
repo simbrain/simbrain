@@ -519,14 +519,26 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         return selectedRows.toList().cartesianProduct(selectedColumns.toList())
     }
 
+    /** The path a finished cell edit takes back to the model. */
+    override fun setValueAt(aValue: Any?, row: Int, column: Int) {
+        val before = getValueAt(row, column)
+        super.setValueAt(aValue, row, column)
+        if (getValueAt(row, column) != before) {
+            UserEdits.report()
+        }
+    }
+
     fun insertColumn() {
+        UserEdits.report()
         model.insertColumn(selectedColumn)
     }
     fun insertRow() {
+        UserEdits.report()
         model.insertRow(selectedRow)
     }
 
     fun deleteSelectedColumns() {
+        UserEdits.report()
         for (i in 0 until selectedColumns.size) {
             if (columnCount <= 0) {
                 break
@@ -537,6 +549,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     }
 
     fun deleteSelectedRows() {
+        UserEdits.report()
         for (i in 0 until selectedRows.size) {
             model.deleteRow(selectedRow, false)
         }
@@ -544,12 +557,14 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
     }
 
     fun randomizeSelectedCells() {
+        UserEdits.report()
         getSelectedCells().forEach { (x, y) ->
             model.setValueAt(model.cellRandomizer.sampleDouble(), x, y)
         }
     }
 
     fun fillSelectedCells(fillVal: Double) {
+        UserEdits.report()
         getSelectedCells().forEach { (x, y) ->
             model.setValueAt(fillVal, x, y)
         }

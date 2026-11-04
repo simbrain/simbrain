@@ -84,6 +84,9 @@ class DocViewerDesktopComponent(frame: GenericFrame, component: DocViewerCompone
             val index = sourceTabbedPane.selectedIndex
             // Assumes index of view tab is 0
             if (index == 0) {
+                if (docViewer.text != codeEditor.text) {
+                    workspaceComponent.markChanged()
+                }
                 docViewer.text = codeEditor.text
                 docViewer.render()
                 viewPanel.text = docViewer.renderedText

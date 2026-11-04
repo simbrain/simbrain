@@ -90,7 +90,7 @@ private suspend fun run(sim: NewSimulation, settings: Settings) {
     network.timeStep = settings.dt
     if (settings.variant == "network") {
         val rasters = workspace.componentList.filterIsInstance<RasterPlotComponent>()
-        rasters.forEach { it.setChangedSinceLastSave(false) }
+        rasters.forEach { it.markClean() }
         if (headed) {
             withContext(Dispatchers.Swing) { rasters.forEach { SimbrainDesktop.getDesktopComponentBlocking(it).close() } }
         } else {

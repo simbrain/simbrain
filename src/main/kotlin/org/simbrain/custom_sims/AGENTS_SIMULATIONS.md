@@ -458,6 +458,7 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 - Wrap GUI code in `withGui { }` for headless compatibility
 - Always call `workspace.clearWorkspace()` at start
 - Test save/reopen if using custom updates or control panels
+- A simulation is marked clean when its body returns. If it keeps working in the background after that (pretraining, a first step), call `workspace.markClean()` when that work finishes, or opening it will count as unsaved work
 - Control panels should not include a title label or top separator — the panel title is set via `createControlPanel("Title", ...)` and shown in the window frame
 - Use `showResults(title) { section(...) { row(label, value) } }` from `org.simbrain.util` to display analysis results that fit a label and value layout (accuracies, distances, benchmark sweeps), `showMessage(text)` for short prose, and `showText(text, title)` for long free-form text. Do not print results to the console or embed them in the control panel
 

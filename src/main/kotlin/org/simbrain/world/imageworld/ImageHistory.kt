@@ -49,6 +49,12 @@ class ImageHistory(
     var onChanged: () -> Unit by undoManager::onChanged
 
     /**
+     * Called when an edit is recorded, undone or redone, on any thread. Unlike [onChanged], not called when the
+     * history is forgotten because something else changed the album.
+     */
+    var onEdited: () -> Unit = {}
+
+    /**
      * Start an edit that happens over time, such as a brush stroke. Copies the current image, so it should be called
      * right before the first pixel changes. Pass the result to [record] when the edit is over.
      */
@@ -78,6 +84,7 @@ class ImageHistory(
     suspend fun record(edit: UndoManager.UndoableAction) = lock.withLock {
         discardStale()
         undoManager.addUndoableAction(edit)
+        onEdited()
     }
 
     /**
@@ -87,7 +94,10 @@ class ImageHistory(
         discardStale()
         val pending = beginPixelEdit(description)
         edit(pending.image)
-        pending.finish()?.let { undoManager.addUndoableAction(it) }
+        pending.finish()?.let {
+            undoManager.addUndoableAction(it)
+            onEdited()
+        }
         album.fireImageUpdate()
     }
 
@@ -103,16 +113,19 @@ class ImageHistory(
         syncedRevision = album.revision
         if (!after.isSameAs(before)) {
             undoManager.addUndoableAction(AlbumEdit(description, before, after))
+            onEdited()
         }
     }
 
     suspend fun undo() = lock.withLock {
         discardStale()
+        if (canUndo) onEdited()
         undoManager.undo()
     }
 
     suspend fun redo() = lock.withLock {
         discardStale()
+        if (canRedo) onEdited()
         undoManager.redo()
     }
 

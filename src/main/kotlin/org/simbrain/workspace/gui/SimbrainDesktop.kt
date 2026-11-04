@@ -264,7 +264,7 @@ object SimbrainDesktop {
      */
     private val menuListener: MenuListener = object : MenuListener {
         override fun menuSelected(arg0: MenuEvent) {
-            actionManager.saveWorkspaceAction.isEnabled = workspace.changesExist()
+            actionManager.saveWorkspaceAction.isEnabled = canSave()
         }
 
         override fun menuDeselected(arg0: MenuEvent) {
@@ -276,6 +276,7 @@ object SimbrainDesktop {
 
     init {
         TypeOptionVisibility.exposedTypeNamesProvider = { workspace.exposedTypes }
+        UserEdits.onEdit = { workspace.markChanged() }
         frame.iconImages = listOf(
             ResourceManager.getImage("simbrain_iconset/icon_20x20.png"),
             ResourceManager.getImage("simbrain_iconset/icon_32x32.png"),
@@ -424,13 +425,12 @@ object SimbrainDesktop {
                 event.component.setBounds(x, 0, width, height)
             }
 
-            // Workspace has changed
-            workspace.setWorkspaceChanged(true)
+            workspace.markLayoutChanged()
         }
 
         override fun componentResized(arg0: ComponentEvent) {
             // System.out.println("Component resized");
-            workspace.setWorkspaceChanged(true)
+            workspace.markLayoutChanged()
         }
     }
 
@@ -516,7 +516,7 @@ object SimbrainDesktop {
             // Reset time if user double clicks on label.
             override fun mousePressed(event: MouseEvent) {
                 if (event.clickCount == 2) {
-                    workspace.updater.resetTime()
+                    workspace.resetTime()
                     lastTimestep = 0
                     updateTimeLabel()
                 }
@@ -988,14 +988,20 @@ object SimbrainDesktop {
     }
 
     /**
-     * If changes exist, show a change dialog, otherwise just save the current file.
+     * Whether Save would write anything: there are changes, or the workspace has never been written to a file.
+     */
+    private fun canSave() =
+        workspace.changesExist() || (workspace.currentFile == null && workspace.componentList.isNotEmpty())
+
+    /**
+     * Save to the current file, or ask for one if the workspace has never been saved. Does nothing if [canSave] is
+     * false.
      */
     fun save() {
 
         workspace.stop()
 
-        // Ignore the save command if there are no changes
-        if (workspace.changesExist()) {
+        if (canSave()) {
             // Check if save would be problematic and show warning
             if (workspace.isSaveProblematic(this)) {
                 if (!showSaveWarningDialog()) {
@@ -1102,13 +1108,13 @@ object SimbrainDesktop {
      * should be left alone
      */
     private fun confirmDiscardChanges(): Boolean {
-        if (workspace.componentList.isEmpty() || !workspace.changesExist()) {
+        if (workspace.componentList.isEmpty() || !workspace.hasUnsavedWork()) {
             return true
         }
         return when (showHasChangedDialog()) {
             0 -> {
                 save()
-                !workspace.changesExist()
+                !workspace.hasUnsavedWork()
             }
             1 -> true
             else -> false

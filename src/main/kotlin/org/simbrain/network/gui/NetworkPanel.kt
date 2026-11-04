@@ -186,7 +186,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     var nudgeAmount = NetworkPreferences.nudgeAmount
 
-    val undoManager = UndoManager()
+    val undoManager = UndoManager().apply { onChanged = { networkComponent.markChanged() } }
 
     /**
      * Whether to display free weights (those not in a synapse group) or not.
@@ -691,6 +691,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         models: List<LocatableModel>,
         modification: (index: Int, model: LocatableModel) -> Unit
     ) {
+        if (models.isEmpty()) return
         val previousLocations = models.associateWith { it.location.copy() }
 
         models.forEachIndexed { index, model -> modification(index, model) }
@@ -763,11 +764,23 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         updateLocationsWithUndoableAction("Nudge", models) { _, model -> model.location += point(dx * nudgeAmount, dy * nudgeAmount) }
     }
 
+    /**
+     * Record an edit to the selection that does not go through [undoManager]. Keys that act on the selection do
+     * nothing when it is empty, so they should not count as edits then.
+     */
+    internal fun markChangedIfAnythingSelected() {
+        if (!selectionManager.isEmpty || hasAnyPixelSelection() || hasAnyWeightTileSelection()) {
+            networkComponent.markChanged()
+        }
+    }
+
     fun toggleClamping() {
+        markChangedIfAnythingSelected()
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.toggleClamping() }
     }
 
     fun incrementSelectedObjects() {
+        markChangedIfAnythingSelected()
         if (hasAnyPixelSelection()) {
             incrementSelectedPixels()
             return
@@ -780,6 +793,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun decrementSelectedObjects() {
+        markChangedIfAnythingSelected()
         if (hasAnyPixelSelection()) {
             decrementSelectedPixels()
             return
@@ -792,10 +806,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     fun clearSelectedObjects() {
+        markChangedIfAnythingSelected()
         selectionManager.filterSelectedModels<NetworkModel>().forEach { it.clear() }
     }
 
     fun hardClearSelectedObjects() {
+        markChangedIfAnythingSelected()
         if (hasAnyPixelSelection()) {
             clearSelectedPixels()
             return

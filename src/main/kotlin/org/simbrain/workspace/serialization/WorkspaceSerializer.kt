@@ -365,7 +365,7 @@ class WorkspaceSerializer(val workspace: Workspace) {
                     file.name, extension
                 ) as WorkspaceComponent
                 wc.currentFile = file
-                wc.setChangedSinceLastSave(false)
+                wc.markClean()
                 return wc
             } catch (e: java.lang.Exception) {
                 throw java.lang.RuntimeException(e)

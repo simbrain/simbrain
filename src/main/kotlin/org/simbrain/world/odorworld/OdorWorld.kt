@@ -125,8 +125,9 @@ class OdorWorld : EditableObject, Bounded, CoroutineScope {
     var gridCellSizeInTiles: Int = DEFAULT_GRID_CELL_SIZE_IN_TILES
         set(value) {
             val coerced = value.coerceAtLeast(1)
+            if (coerced == field) return
             // a maze's walls are laid out for the cell size it was generated with
-            if (coerced != field) maze = null
+            maze = null
             field = coerced
             events.mazeChanged.fire()
         }

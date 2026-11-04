@@ -89,6 +89,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         val chooser = SFileChooser(OdorWorldPreferences.tileMapDirectory, "Load TMX Tilemap", null, true)
         chooser.addExtension("tmx")
         chooser.showOpenDialog()?.let { file ->
+            odorWorldPanel.odorWorldComponent.markChanged()
             world.tileMap = loadTileMap(file)
             OdorWorldPreferences.tileMapDirectory = chooser.currentLocation!!
         }
@@ -99,6 +100,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         description = "Set the tile at the last clicked position on the selected layer"
     ) {
         showTilePicker(world.tileMap.tileSets) {
+            odorWorldPanel.odorWorldComponent.markChanged()
             val (x, y) = world.tileMap.pixelToGridCoordinate(world.lastClickedPosition)
             world.tileMap.setTile(x, y, it, world.selectedLayer)
         }
@@ -109,6 +111,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         description = "Fill every cell of the selected layer with one tile"
     ) {
         showTilePicker(world.tileMap.tileSets) {
+            odorWorldPanel.odorWorldComponent.markChanged()
             world.tileMap.fill(it, world.selectedLayer)
         }
     }
@@ -136,6 +139,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         name = "Edit layers...",
         description = "Add, remove, rename and reorder tile map layers"
     ) {
+        odorWorldPanel.odorWorldComponent.markChanged()
         world.layerEditor().display()
     }
 
@@ -148,6 +152,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
             var height by GuiEditable(initValue = canvas.camera.height.toInt() / world.tileMap.tileHeight)
         }
         AnnotatedPropertyEditor(size).displayInDialog {
+            odorWorldPanel.odorWorldComponent.markChanged()
             world.tileMap.updateMapSize(size.width, size.height)
         }
     }

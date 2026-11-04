@@ -49,6 +49,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
      */
     val history = ImageHistory(imageWorld.imageAlbum).also { history ->
         history.onChanged = { SwingUtilities.invokeLater { updateUndoActions() } }
+        history.onEdited = { imageWorldComponent.markChanged() }
     }
 
     /**

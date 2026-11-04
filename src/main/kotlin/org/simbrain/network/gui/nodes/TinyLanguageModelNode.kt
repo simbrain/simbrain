@@ -278,9 +278,9 @@ fun TinyLanguageModel.createTrainingDialog(parentWindow: Window?): StandardDialo
     val accuracyLabel = JLabel("Accuracy: ${trainer.lastTrainingAccuracy?.let { "${(it * 100).roundToString(1)}%" } ?: "N/A"}")
     val windowsLabel = JLabel("Training windows: ${trainer.trainingWindows.size}")
 
-    val trainButton = JButton("Train").apply { addActionListener { trainer.launch { trainer.startTraining() } } }
+    val trainButton = JButton("Train").apply { addActionListener { UserEdits.report(); trainer.launch { trainer.startTraining() } } }
     val stopButton = JButton("Stop").apply { addActionListener { trainer.launch { trainer.stopTraining() } } }
-    val stepButton = JButton("Step").apply { addActionListener { trainer.launch { trainer.trainOnce() } } }
+    val stepButton = JButton("Step").apply { addActionListener { UserEdits.report(); trainer.launch { trainer.trainOnce() } } }
     fun syncButtons(running: Boolean) {
         trainButton.isEnabled = !running
         stepButton.isEnabled = !running

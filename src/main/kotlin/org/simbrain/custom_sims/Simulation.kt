@@ -86,6 +86,7 @@ class NewSimulation(val id: String?, val task: suspend SimulationScope.(optionSt
                 withContext(SimulationBuildContext) {
                     task(optionString)
                     workspace.simulationId = id
+                    workspace.markClean()
                 }
             }
         }

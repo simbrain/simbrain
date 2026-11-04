@@ -60,6 +60,7 @@ public class CouplingListPanel extends JPanel {
         @Override
         public void actionPerformed(ActionEvent arg0) {
             desktop.getWorkspace().getCouplingManager().removeCouplings(getSelectedCouplings());
+            desktop.getWorkspace().markChanged();
         }
     };
 

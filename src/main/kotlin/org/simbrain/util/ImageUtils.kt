@@ -385,6 +385,12 @@ fun DoubleArray.toScaledImageData(imageWidth: Int, imageHeight: Int, arrayWidth:
 }
 
 /**
+ * This color as an HTML hex string such as `#1a2b3c`, for HTML and CSS in Swing components.
+ */
+val Color.htmlHex: String
+    get() = "#%02x%02x%02x".format(red, green, blue)
+
+/**
  * Generates a sequence of random colors using the HSB (hue, saturation, brightness) model which guarantees some
  * separation in color space
  */

@@ -1,3 +1,6 @@
+/**
+ * Desktop frame for the sound world, attaching its menu bar to [SoundWorldPanel].
+ */
 package org.simbrain.world.soundworld.gui
 
 import org.simbrain.util.genericframe.GenericFrame
@@ -12,11 +15,7 @@ import java.awt.event.ComponentEvent
 import javax.swing.JMenu
 import javax.swing.JMenuBar
 import javax.swing.JMenuItem
-import javax.swing.JToolBar
 
-/**
- * **ReaderComponentDesktopGui** is the gui view for the reader world.
- */
 class SoundWorldDesktopComponent(frame: GenericFrame, component: SoundWorldComponent) :
     DesktopComponent<SoundWorldComponent>(frame, component) {
     /**
@@ -30,24 +29,9 @@ class SoundWorldDesktopComponent(frame: GenericFrame, component: SoundWorldCompo
     private val file = JMenu("File")
 
     /**
-     * Edit menu Item.
-     */
-    private val edit = JMenu("Edit")
-
-    /**
-     * Opens user preferences dialog.
-     */
-    private val preferences = JMenuItem("Preferences")
-
-    /**
      * Opens the help dialog for SoundWorld.
      */
     private val help = JMenu("Help")
-
-    /**
-     * Help menu item.
-     */
-    private val helpItem = JMenuItem("Reader Help")
 
     /**
      * The pane representing the sound world.
@@ -63,9 +47,6 @@ class SoundWorldDesktopComponent(frame: GenericFrame, component: SoundWorldCompo
      * Creates a new frame of type SoundWorld.
      */
     init {
-        val openSaveToolBar = JToolBar()
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createImportAction(this))
-        openSaveToolBar.add(SimbrainDesktop.actionManager.createExportAction(this))
         this.preferredSize = Dimension(DEFAULT_WIDTH, DEFAULT_HEIGHT)
         addMenuBar()
         add(panel)
@@ -92,12 +73,13 @@ class SoundWorldDesktopComponent(frame: GenericFrame, component: SoundWorldCompo
         file.add(SimbrainDesktop.actionManager.createImportAction(this))
         file.add(SimbrainDesktop.actionManager.createExportAction(this))
         file.addSeparator()
+        file.add(SimbrainDesktop.actionManager.createRenameAction(this))
+        file.addSeparator()
+        file.add(SimbrainDesktop.actionManager.createCloseAction(this))
 
         // Help Menu
         menuBar.add(help)
-        val helpAction = ShowHelpAction("https://docs.simbrain.net/docs/worlds/soundworld.html")
-        helpItem.action = helpAction
-        help.add(helpItem)
+        help.add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/worlds/soundworld.html")))
 
         // Add menu
         parentFrame.jMenuBar = menuBar

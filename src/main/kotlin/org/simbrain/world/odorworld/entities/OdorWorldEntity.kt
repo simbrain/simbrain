@@ -271,6 +271,18 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.trailVisibilityChanged.fire(value, oldValue)
         }
 
+    /**
+     * Short text drawn beneath the entity, such as what it is doing, or null for none. Simulations set it; it is not
+     * saved.
+     */
+    @Transient
+    var caption: String? = null
+        set(value) {
+            if (field == value) return
+            field = value
+            events.captionChanged.fire()
+        }
+
     var distancePerAnimationFrame by GuiEditable(
         initValue = 10.0,
         label = "Distance per animation frame",

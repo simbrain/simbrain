@@ -4,12 +4,20 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.jfree.chart.LegendItem
 import org.jfree.chart.LegendItemCollection
+import org.jfree.chart.title.LegendTitle
+import org.jfree.chart.ui.Layer
+import org.jfree.chart.ui.RectangleEdge
 import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.network.smile.ClassifierNetwork
+import org.simbrain.network.smile.SimbrainClassifier
+import org.simbrain.plot.ChartSeriesPalette
+import org.simbrain.plot.applySimbrainChartTheme
+import org.simbrain.plot.projection.DecisionRegionAnnotation
 import org.simbrain.plot.projection.ProjectionComponent
 import org.simbrain.plot.projection.ProjectionDesktopComponent
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.projection.AuxDataColoringManager
+import org.simbrain.util.projection.CoordinateProjection
 import org.simbrain.util.projection.DataPoint
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -168,9 +176,13 @@ class ControlPanelKt(title: String = "Control Panel"):
         }
     }
 
-    fun addLabelledText(label: String, text: String, tab: String? = null) = JLabel(text).also {
+    /**
+     * @param toolTip shown on both the text and its label
+     */
+    fun addLabelledText(label: String, text: String, tab: String? = null, toolTip: String? = null) = JLabel(text).also {
+        it.toolTipText = toolTip
         launch(Dispatchers.Swing) {
-            getTab(tab).addItem(label, it)
+            getTab(tab).addItem(label, it).toolTipText = toolTip
         }
     }
 
@@ -357,7 +369,7 @@ class ControlPanelKt(title: String = "Control Panel"):
         tab: String? = null,
         toolTip: String? = null,
         onChange: suspend (Double) -> Unit = {}
-    ) {
+    ): JPanel {
         val slider = JSlider(
             (minValue / increment).toInt(),
             (maxValue / increment).toInt(),
@@ -390,8 +402,17 @@ class ControlPanelKt(title: String = "Control Panel"):
             }
         } else null
         
-        // Create a panel to hold both slider and text field
-        val panel = JPanel()
+        val labelComponent = JLabel(label)
+
+        // Create a panel to hold both slider and text field. Enabling or disabling it applies to the whole row.
+        val panel = object : JPanel() {
+            override fun setEnabled(enabled: Boolean) {
+                super.setEnabled(enabled)
+                slider.isEnabled = enabled
+                valueSpinner?.isEnabled = enabled
+                labelComponent.isEnabled = enabled
+            }
+        }
         panel.layout = BoxLayout(panel, BoxLayout.X_AXIS)
         panel.add(slider)
         valueSpinner?.let {
@@ -401,28 +422,40 @@ class ControlPanelKt(title: String = "Control Panel"):
             panel.add(it)
         }
         
+        // Set while the slider and the text field write their value into each other, so each change is reported once
+        var syncingField = false
+        var syncingSlider = false
+
         // Slider updates text field and calls onChange
         slider.addChangeListener {
+            if (syncingSlider) return@addChangeListener
             val value = slider.value * increment
+            syncingField = true
             valueSpinner?.value = value
+            syncingField = false
             launch {
                 onChange(value)
             }
         }
         
         valueSpinner?.addPropertyChangeListener("value") {
+            if (syncingField) return@addPropertyChangeListener
             val value = (valueSpinner.value as? Number)?.toDouble() ?: initValue
             val clampedValue = value.coerceIn(minValue, maxValue)
+            syncingSlider = true
             slider.value = (clampedValue / increment).toInt()
+            syncingSlider = false
             launch {
                 onChange(clampedValue)
             }
         }
         
         launch(Dispatchers.Swing) {
-            getTab(tab).addItem(label, panel).toolTipText = toolTip
+            labelComponent.toolTipText = toolTip
+            getTab(tab).addItemLabel(labelComponent, panel)
             pack()
         }
+        return panel
     }
 
     /**
@@ -525,27 +558,86 @@ suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
     return false
 }
 
-suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: ClassifierNetwork): ProjectionComponent {
-    val projectionComponent = ProjectionComponent("${smileClassifier.displayName} Plot").apply {
+/**
+ * Colors for classes in classifier plots: the Okabe-Ito palette, which stays distinguishable under common color
+ * vision deficiencies, starting with blue and orange so that two-class plots have the strongest contrast.
+ */
+val classifierColors = listOf(4, 0, 2, 6, 5, 1, 3, 7).map { ChartSeriesPalette.OKABE_ITO.colors[it] }
+
+fun classifierColor(classIndex: Int) = classifierColors[Math.floorMod(classIndex, classifierColors.size)]
+
+/**
+ * Plot a classifier's data colored by true class, with training points filled and test points hollow, and, as the
+ * network runs, each new input colored by the predicted class, so an input that lands among points of another color
+ * is easy to spot.
+ *
+ * For classifiers with two inputs the plot uses the raw inputs as axes and shades the background by the class the
+ * model predicts at each location, so the decision regions are visible and misclassified points stand out.
+ */
+suspend fun SimbrainDesktop.createClassifierProjectionPlot(
+    smileClassifier: ClassifierNetwork,
+    name: String = "${smileClassifier.displayName} Plot"
+): ProjectionComponent {
+    val showRegions = smileClassifier.inputSize == 2
+    val projectionComponent = ProjectionComponent(name).apply {
         projector.coloringManager = AuxDataColoringManager()
-    }
-    val colors = generateColorSequence().take(smileClassifier.outputNeuronGroup.size).toList()
-    with(smileClassifier) {
-        classifier.trainingData.inputs.forEach {
-            val vector = it.toDoubleArray()
-            val colorIndex = classifier.predict(vector).let { prediction ->
-                if (prediction < 0) 0 else prediction
-            }
-            projectionComponent.projector.addDataPoint(DataPoint(vector, aux = colors[colorIndex]))
+        // Keep every training point, even ones that nearly coincide
+        projector.tolerance = 1e-9
+        if (showRegions) {
+            projector.projectionMethod = CoordinateProjection()
         }
     }
+    fun plotData(classifier: SimbrainClassifier) = with(projectionComponent.projector) {
+        synchronized(dataset) {
+            dataset.clear()
+            events.datasetCleared.fire()
+        }
+        // From the whole dataset, so a class absent from one split still gets its own color
+        val labelOrder = classifier.dataset.targets.distinct().sorted()
+        listOf(classifier.trainingData to false, classifier.testingData to true).forEach { (data, hollow) ->
+            data.inputs.zip(data.targets).forEach { (input, target) ->
+                val point = DataPoint(input.toDoubleArray(), aux = classifierColor(labelOrder.indexOf(target)))
+                point.hollow = hollow
+                addDataPoint(point)
+            }
+        }
+        dataset.currentPoint = null
+        events.datasetChanged.fire()
+    }
+    plotData(smileClassifier.classifier)
+    val regions = if (showRegions) {
+        DecisionRegionAnnotation(
+            scope = workspace,
+            modelKey = { smileClassifier.classifier.model },
+            isActive = {
+                (projectionComponent.projector.projectionMethod as? CoordinateProjection)
+                    ?.let { it.dim1 == 0 && it.dim2 == 1 } == true
+            },
+            colors = List(smileClassifier.outputSize) { classifierColor(it) }
+        ) { point ->
+            with(smileClassifier.classifier) { model?.let { classIndex(it.predict(point)) } }
+        }
+    } else null
+    var lastClassifier = smileClassifier.classifier
+    var lastModel = lastClassifier.model
     val deregisterDeleteEvent = smileClassifier.events.deleted.on {
         workspace.removeWorkspaceComponent(projectionComponent)
     }
     val deregisterUpdateEvent = smileClassifier.events.updated.on(Dispatchers.Default) {
+        val classifier = smileClassifier.classifier
+        if (classifier !== lastClassifier) {
+            lastClassifier = classifier
+            plotData(classifier)
+        }
+        val model = classifier.model
+        if (model !== lastModel) {
+            lastModel = model
+            regions?.refresh()
+        }
+        if (model == null || smileClassifier.winner == Integer.MIN_VALUE) return@on
         val datapoint = DataPoint(
             smileClassifier.inputNeuronGroup.activationArray,
-            aux = colors.getOrNull(smileClassifier.winner)
+            aux = classifierColor(classifier.classIndex(smileClassifier.winner))
         )
         projectionComponent.projector.addDataPoint(datapoint)
     }
@@ -555,17 +647,30 @@ suspend fun SimbrainDesktop.createClassifierProjectionPlot(smileClassifier: Clas
     (getDesktopComponent(projectionComponent) as ProjectionDesktopComponent).apply {
         projector.dataset.currentPoint = null
         chart.apply {
-            xyPlot.fixedLegendItems = LegendItemCollection().apply {
-                (colors zip smileClassifier.outputNeuronGroup.labelArray).forEach { (color, label) ->
-                    add(LegendItem(label, color))
-                }
+            regions?.let { xyPlot.renderer.addAnnotation(it, Layer.BACKGROUND) }
+            if (showRegions) {
+                val (xLabel, yLabel) = smileClassifier.inputNeuronGroup.neuronList.map { it.label?.takeIf { it.isNotBlank() } }
+                xyPlot.domainAxis.label = xLabel ?: "Input 1"
+                xyPlot.rangeAxis.label = yLabel ?: "Input 2"
             }
+            xyPlot.fixedLegendItems = LegendItemCollection().apply {
+                val marker = java.awt.geom.Ellipse2D.Double(-4.0, -4.0, 8.0, 8.0)
+                smileClassifier.outputNeuronGroup.labelArray.forEachIndexed { i, label ->
+                    add(LegendItem(label, null, null, null, marker, classifierColor(i)))
+                }
+                add(LegendItem("Training", null, null, null, marker, Color.GRAY))
+                add(LegendItem("Test", null, null, null, marker, BasicStroke(2f), Color.GRAY))
+            }
+            addLegend(LegendTitle(xyPlot).apply { position = RectangleEdge.BOTTOM })
+            applySimbrainChartTheme()
         }
     }
-    workspace.events.componentRemoved.on {
+    lateinit var removalListener: Job
+    removalListener = workspace.events.componentRemoved.on {
         if (it == projectionComponent) {
             deregisterDeleteEvent()
             deregisterUpdateEvent.cancel()
+            removalListener.cancel()
         }
     }
     return projectionComponent

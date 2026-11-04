@@ -4,6 +4,11 @@ import org.simbrain.util.euclideanDistance
 
 class DataPoint @JvmOverloads constructor(val upstairsPoint: DoubleArray, downstairsDimension: Int = 2, var label: String? = null, var aux: Any? = null) {
 
+    /**
+     * Draw this point as an outline in its color rather than a filled shape, for example to mark test data.
+     */
+    var hollow = false
+
     val downstairsPoint = DoubleArray(downstairsDimension)
 
     fun setUpstairs(data: DoubleArray) {

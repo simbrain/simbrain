@@ -28,6 +28,7 @@ class EntityEvents: FlowEvents(), EntityLocationEvent {
     override val moved = NoArgEvent()
     val trailVisibilityChanged = ChangedEvent<Boolean>()
     val trailCleared = NoArgEvent()
+    val captionChanged = NoArgEvent()
     val selected = AwaitableEvent<OdorWorldEntity>()
 
 }

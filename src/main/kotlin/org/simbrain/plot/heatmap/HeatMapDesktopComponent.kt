@@ -5,9 +5,9 @@ package org.simbrain.plot.heatmap
 
 import org.simbrain.plot.actions.PlotActionManager
 import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.util.widgets.ShowHelpAction
 import org.simbrain.workspace.gui.DesktopComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
-import org.simbrain.util.widgets.ShowHelpAction
 import java.awt.BorderLayout
 import javax.swing.JMenu
 import javax.swing.JMenuBar
@@ -39,7 +39,7 @@ class HeatMapDesktopComponent(frame: GenericFrame, component: HeatMapComponent) 
             add(JMenuItem("Preferences...").apply { addActionListener { heatMapPanel.showPropertiesDialog() } })
         }
         val helpMenu = JMenu("Help").apply {
-            add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/plots/")))
+            add(JMenuItem(ShowHelpAction("https://docs.simbrain.net/docs/plots/heatMap.html")))
         }
         bar.add(fileMenu)
         bar.add(editMenu)

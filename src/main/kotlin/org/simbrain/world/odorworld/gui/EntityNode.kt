@@ -12,6 +12,7 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
+import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.Theme
@@ -104,6 +105,22 @@ class EntityNode(
      * Sprite node for rendering the entity image.
      */
     private val sprite = EntitySprite()
+
+    /**
+     * Text beneath the sprite showing [OdorWorldEntity.caption].
+     */
+    private val caption = PText().apply {
+        pickable = false
+        visible = false
+    }
+
+    private fun updateCaption() {
+        val text = entity.caption
+        caption.visible = !text.isNullOrEmpty()
+        if (text.isNullOrEmpty()) return
+        caption.text = text
+        caption.setOffset(-caption.width / 2, entity.entityType.height / 2.0 + 2)
+    }
 
     /**
      * Overlay that draws per-candidate context-steering rays plus wall feeler hits.
@@ -212,6 +229,9 @@ class EntityNode(
     init {
         addChild(sprite)
         addChild(steeringDebugNode)
+        addChild(caption)
+        updateCaption()
+        entity.events.captionChanged.on(dispatcher = Dispatchers.Swing) { updateCaption() }.untilDisposed()
         updateEntityAttributeModel()
         setOffset(entity.x, entity.y)
         entity.events.deleted.on(dispatcher = Dispatchers.Swing) {

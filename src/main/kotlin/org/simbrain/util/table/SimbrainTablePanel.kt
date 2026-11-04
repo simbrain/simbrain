@@ -12,13 +12,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.jdesktop.swingx.JXTableHeader
-import org.simbrain.util.UiScope
-import org.simbrain.util.UserEdits
-import org.simbrain.util.cancelWith
-import org.simbrain.util.cartesianProduct
-import org.simbrain.util.Theme
-import org.simbrain.util.displayInDialog
-import org.simbrain.util.onUi
+import org.simbrain.util.*
 import org.simbrain.util.widgets.RowNumberTable
 import java.awt.*
 import java.awt.event.*
@@ -315,7 +309,7 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
         rowSelectionAllowed = true
 
         if (useHeaders) {
-            tableHeader = JXTableHeader(columnModel).apply {
+            setTableHeader(JXTableHeader(columnModel).apply {
                 // Add mouse listener to handle column selection when clicking on headers
                 addMouseListener(object : MouseAdapter() {
                     override fun mousePressed(e: MouseEvent) {
@@ -331,8 +325,9 @@ class SimbrainJTable(val model: SimbrainDataFrame, useHeaders: Boolean = true) :
                         }
                     }
                 })
-            }
+            })
         }
+        getTableHeader()?.setReorderingAllowed(false)
 
         // FlatLaf turns off table grid lines by default (Table.showHorizontalLines/showVerticalLines
         // false, intercellSpacing 0,0). Re-enable them so data cells stay visually separated.

@@ -74,4 +74,59 @@ class STDPTest {
         }
     }
 
+    @Test
+    fun `test STDP ignores spike pairs further apart than five time constants`() {
+        val network = Network()
+        with(network) {
+            val pre = createSpikingNeuron("Pre").apply {
+                (dataHolder as SpikingScalarData).lastSpikeTime = 1.0
+            }
+            val post = createSpikingNeuron("Post").apply {
+                isSpike = true
+                (dataHolder as SpikingScalarData).lastSpikeTime = 52.0
+            }
+            val synapse = Synapse(pre, post).apply {
+                strength = 0.5
+                learningRule = STDPRule().apply {
+                    learningRate = 0.01
+                    wPlus = 1.0
+                    tauPlus = 10.0
+                }
+            }
+            network.addNetworkModelsAsync(pre, post, synapse)
+            (synapse.learningRule as STDPRule).apply(synapse, EmptyScalarData)
+            assert(synapse.strength == 0.5)
+        }
+    }
+
+    @Test
+    fun `test STDP does not change the weight when both neurons spike together`() {
+        val network = Network()
+        with(network) {
+            val pre = createSpikingNeuron("Pre").apply {
+                (dataHolder as SpikingScalarData).lastSpikeTime = 1.0
+            }
+            val post = createSpikingNeuron("Post").apply {
+                isSpike = true
+                (dataHolder as SpikingScalarData).lastSpikeTime = 2.0
+            }
+            val synapse = Synapse(pre, post).apply {
+                strength = 0.5
+                learningRule = STDPRule().apply {
+                    learningRate = 0.01
+                    wPlus = 1.0
+                    tauPlus = 10.0
+                }
+            }
+            network.addNetworkModelsAsync(pre, post, synapse)
+            val rule = synapse.learningRule as STDPRule
+            rule.apply(synapse, EmptyScalarData)
+            val afterPair = synapse.strength
+            (pre.dataHolder as SpikingScalarData).lastSpikeTime = 3.0
+            (post.dataHolder as SpikingScalarData).lastSpikeTime = 3.0
+            rule.apply(synapse, EmptyScalarData)
+            assert(synapse.strength == afterPair)
+        }
+    }
+
 }

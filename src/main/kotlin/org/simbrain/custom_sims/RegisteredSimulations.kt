@@ -21,14 +21,11 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
+import org.simbrain.custom_sims.simulations.ml.decisionBoundaries
+import org.simbrain.custom_sims.simulations.ml.modelComparison
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
-import org.simbrain.custom_sims.simulations.neuroscience.corticalLayers
-import org.simbrain.custom_sims.simulations.neuroscience.excitatoryInhibitoryBalance
-import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetwork
-import org.simbrain.custom_sims.simulations.neuroscience.izhikevichNetworkArray
-import org.simbrain.custom_sims.simulations.neuroscience.nematodeThermotaxis
-import org.simbrain.custom_sims.simulations.neuroscience.spikingNetworkSimulation
+import org.simbrain.custom_sims.simulations.neuroscience.*
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -36,7 +33,6 @@ import org.simbrain.custom_sims.simulations.psychology.*
 import org.simbrain.custom_sims.simulations.reading.triangleReadingSim
 import org.simbrain.custom_sims.simulations.rl.braitenbergRL
 import org.simbrain.custom_sims.simulations.rl.braitenbergRLPrograms
-import org.simbrain.custom_sims.simulations.tutorials.localistAndDistributedRepresentations
 import org.simbrain.util.StructureDir
 import org.simbrain.util.dir
 
@@ -77,10 +73,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Braitenberg game") { braitenbergGame }
         item("Two Braitenberg vehicles") { braitenbergSim }
         item("Isopod simulation") { isopodSim }
-    }
-
-    dir("NPC behaviors") {
-        item("NPC basic demo") { npcSteeringDemo }
+        item("NPC basic demo", beta = true) { npcSteeringDemo }
     }
 
     dir("Reservoir networks") {
@@ -92,11 +85,13 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Psychology") {
+        item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
+        item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
         item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
+        item("Localist and distributed representations") { localistAndDistributedRepresentations }
+        item("Mirror neurons") { mirrorLearning }
         item("Mouse and eye tracking") { spiveyNet }
-        item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Temporal attention network", beta = true) { denisonNet }
     }
 
@@ -197,6 +192,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Machine learning") {
         item("Iris classifier") { irisClassifier }
+        item("Decision boundaries") { decisionBoundaries }
+        item("Model comparison") { modelComparison }
     }
 
     dir("Recurrent networks") {
@@ -208,10 +205,6 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Actor critic") { actorCritic }
         item("Braitenberg RL") { braitenbergRL }
         item("Braitenberg program learning", beta = true) { braitenbergRLPrograms }
-    }
-
-    dir("Tutorials") {
-        item("Localist and distributed representations") { localistAndDistributedRepresentations }
     }
 
     dir("Vision") {

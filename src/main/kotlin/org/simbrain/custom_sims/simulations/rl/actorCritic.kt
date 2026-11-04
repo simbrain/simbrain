@@ -302,7 +302,7 @@ val actorCritic = newSim {
     
     The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to positive value (near rewards like cheese) and red proportional to negative value (near punishments like poison). Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed. Similarly, red regions form around the poison as the agent learns to avoid it.  
         
-    Use the `Show Time Series` button to open a [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window showing how `reward`, `value`, and `TD error` unfold as the simulation runs.
+    Check `Show Time Series` to open a [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window showing how `reward`, `value`, and `TD error` unfold as the simulation runs.
        
     Tip: To get the simulation to run faster, minimize the network window or make the weights in the network invisible (network > view > toggle weight visibility)
        
@@ -346,7 +346,7 @@ val actorCritic = newSim {
 
     8) `Show Values`: Toggles numeric value labels on the world tiles so you can inspect the learned value estimate for each location directly.
 
-    9) `Show Time Series`: Opens or hides the plot of reward, value, and TD error over time.
+    9) `Show Time Series`: Shows or hides the plot of reward, value, and TD error over time.
     
     ## Time Series
     
@@ -571,16 +571,9 @@ val actorCritic = newSim {
 
             addSeparator()
 
-            val timeSeriesButton = addButton("Show Time Series") {
-                if (plotFrame == null) {
-                    showTimeSeries()
-                    this@addButton.text = "Hide Time Series"
-                } else {
-                    hideTimeSeries()
-                    this@addButton.text = "Show Time Series"
-                }
+            addCheckBox("Show Time Series", false, toolTip = "Show a plot of reward, value, and TD error.") { visible ->
+                if (visible) showTimeSeries() else hideTimeSeries()
             }
-            timeSeriesButton.toolTipText = "Create or remove the reward, value, and TD error plot."
         }.awaitLayout()
 
         val mainX = controlPanel.rightEdgeWithGap()

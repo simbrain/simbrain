@@ -61,18 +61,12 @@ public class HistogramDesktopComponent extends DesktopComponent<HistogramCompone
         fileMenu.addSeparator();
         fileMenu.add(SimbrainDesktop.INSTANCE.getActionManager().createCloseAction(this));
 
-        // Not currently used
-        JMenu editMenu = new JMenu("Edit");
-        JMenuItem preferences = new JMenuItem("Preferences...");
-        editMenu.add(preferences);
-
         JMenu helpMenu = new JMenu("Help");
-        ShowHelpAction helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/plots/barChart.html");
+        ShowHelpAction helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/plots/histogram.html");
         JMenuItem helpItem = new JMenuItem(helpAction);
         helpMenu.add(helpItem);
 
         bar.add(fileMenu);
-        // bar.add(editMenu);
         bar.add(helpMenu);
 
         getParentFrame().setJMenuBar(bar);

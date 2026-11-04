@@ -290,8 +290,8 @@ class CouplingTransformDialog(
         return if (plain) {
             "$label (${input.attributeTypeName} \u2192 ${output.attributeTypeName})"
         } else {
-            "<html>$label (<font color='${input.attributeTypeColor.hex}'>${input.attributeTypeName}</font> \u2192 " +
-                    "<font color='${output.attributeTypeColor.hex}'>${output.attributeTypeName}</font>)</html>"
+            "<html>$label (<font color='${input.attributeTypeColor.htmlHex}'>${input.attributeTypeName}</font> \u2192 " +
+                    "<font color='${output.attributeTypeColor.htmlHex}'>${output.attributeTypeName}</font>)</html>"
         }
     }
 }
@@ -326,9 +326,6 @@ fun inferTargetArraySize(workspace: Workspace, consumer: Consumer): Int? = runCa
  */
 private val Component?.windowAncestor: Window?
     get() = this as? Window ?: this?.let { SwingUtilities.getWindowAncestor(it) }
-
-private val java.awt.Color.hex: String
-    get() = "#%02x%02x%02x".format(red, green, blue)
 
 /**
  * Edit the transform chain of an existing coupling; OK replaces the coupling's chain in place.

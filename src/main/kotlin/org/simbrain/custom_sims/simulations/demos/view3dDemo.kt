@@ -95,7 +95,7 @@ val view3dDemo = newSim {
     }
 
     // Add a flower
-    odorWorld.addEntity(300, 350, EntityType.Flower).apply {
+    odorWorld.addEntity(300, 350, EntityType.Marigold).apply {
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0, 0.0, 0.0, 0.0))
     }
 

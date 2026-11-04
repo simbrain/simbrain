@@ -27,6 +27,7 @@ import org.simbrain.util.table.BasicDataFrame
 import org.simbrain.world.imageworld.ImageAlbum
 import org.simbrain.world.imageworld.ImageWorld
 import org.simbrain.world.odorworld.OdorWorld
+import org.simbrain.world.odorworld.entities.EntityType
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty
 import kotlin.reflect.KProperty1
@@ -43,9 +44,11 @@ import kotlin.reflect.jvm.javaField
  */
 fun getSimbrainXStream(): XStream {
     return XStream(DomDriver("UTF-8")).apply {
-        // Accept the former rule name while writing the current class name.
+        // Accept former class names while writing the current ones.
         alias("org.simbrain.network.updaterules.BinaryRule", ThresholdRule::class.java)
         alias(ThresholdRule::class.java.name, ThresholdRule::class.java)
+        alias("org.simbrain.world.odorworld.entities.EntityType\$Flower", EntityType.Marigold::class.java)
+        alias(EntityType.Marigold::class.java.name, EntityType.Marigold::class.java)
         ignoreUnknownElements()
         allowTypesByWildcard(
             // be sure to sync these with the build.gradle simbrainJvmArgs --add-opens items

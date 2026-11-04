@@ -7,12 +7,8 @@ import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeuronCollection
 import org.simbrain.plot.projection.ProjectionComponent
-import org.simbrain.util.SmellSource
-import org.simbrain.util.place
-import org.simbrain.util.point
+import org.simbrain.util.*
 import org.simbrain.util.projection.HaloColoringManager
-import org.simbrain.util.setSpectralRadius
-import org.simbrain.util.ThemeColor
 import org.simbrain.util.stats.distributions.NormalDistribution
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
@@ -97,7 +93,7 @@ val cogMap3Objects = newSim {
         }
     }
 
-    val flower = odorWorld.addEntity(EntityType.Flower).apply {
+    val flower = odorWorld.addEntity(EntityType.Marigold).apply {
         location = flowerLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion

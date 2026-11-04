@@ -167,7 +167,7 @@ val kAgentTrails = newSim {
         }
     }
 
-    val flower = odorWorld.addEntity(EntityType.Flower).apply {
+    val flower = odorWorld.addEntity(EntityType.Marigold).apply {
         location = flowerLocation
         smellSource = SmellSource(doubleArrayOf(0.0, 1.0, 0.0)).apply {
             this.dispersion = dispersion

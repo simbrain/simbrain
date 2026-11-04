@@ -121,7 +121,7 @@ val testSim = newSim {
         odorWorld.addEntity(210, 120, EntityType.Swiss).apply {
             smellSource = SmellSource(doubleArrayOf(1.0, 0.5, 0.0))
         }
-        odorWorld.addEntity(10, 10, EntityType.Flower).apply {
+        odorWorld.addEntity(10, 10, EntityType.Marigold).apply {
             smellSource = SmellSource(doubleArrayOf(0.0, 0.5, 0.5))
         }
         odorWorld.addEntity(59, 200, EntityType.Candle).apply {

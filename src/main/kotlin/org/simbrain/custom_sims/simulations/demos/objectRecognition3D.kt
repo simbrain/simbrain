@@ -48,7 +48,7 @@ val objectRecognition3D = newSim {
     val entityChoices: List<EntityType> = listOf(
         EntityType.Swiss, EntityType.Gouda, EntityType.BlueCheese,
         EntityType.Bell, EntityType.Poison, EntityType.Candle,
-        EntityType.Fish, EntityType.Flower, EntityType.Dandelions,
+        EntityType.Fish, EntityType.Marigold, EntityType.Dandelions,
         EntityType.Geraniums, EntityType.Tulip, EntityType.Flax, EntityType.Pansy,
     )
 
@@ -61,7 +61,7 @@ val objectRecognition3D = newSim {
     var trainFraction = 0.85
     var class1: EntityType = EntityType.Swiss
     var class2: EntityType = EntityType.Poison
-    var class3: EntityType = EntityType.Flower
+    var class3: EntityType = EntityType.Marigold
     var includeNoObject = true
 
     val seed = 42L

@@ -70,7 +70,7 @@ suspend fun SimulationScope.createView3dNavigationScene(
         Triple(430, 120, EntityType.Fish),
         Triple(120, 430, EntityType.Candle),
         Triple(430, 430, EntityType.Poison),
-        Triple(flowerX.toInt(), flowerY.toInt(), EntityType.Flower),
+        Triple(flowerX.toInt(), flowerY.toInt(), EntityType.Marigold),
         Triple(190, 320, EntityType.Tulip),
         Triple(360, 300, EntityType.Pansy),
         Triple(90, 270, EntityType.Lion),

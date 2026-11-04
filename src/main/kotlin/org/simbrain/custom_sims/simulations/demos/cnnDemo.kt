@@ -53,7 +53,7 @@ val cnnDemo = newSim {
 
     // Add some objects
     odorWorld.addEntity(100, 100, EntityType.Swiss).name = "Swiss"
-    odorWorld.addEntity(300, 150, EntityType.Flower).name = "Flower"
+    odorWorld.addEntity(300, 150, EntityType.Marigold).name = "Flower"
     odorWorld.addEntity(200, 350, EntityType.Cow).name = "Cow"
 
     // Network

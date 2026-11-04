@@ -64,7 +64,7 @@ val landmarkCognitiveMap = newSim {
 
     val landmarks = listOf(
         LandmarkDefinition("Swiss", 100.0, 100.0, EntityType.Swiss),
-        LandmarkDefinition("Flower", 320.0, 90.0, EntityType.Flower),
+        LandmarkDefinition("Flower", 320.0, 90.0, EntityType.Marigold),
         LandmarkDefinition("Fish", 540.0, 100.0, EntityType.Fish),
         LandmarkDefinition("Candle", 100.0, 270.0, EntityType.Candle),
         LandmarkDefinition("Pansy", 540.0, 270.0, EntityType.Pansy),

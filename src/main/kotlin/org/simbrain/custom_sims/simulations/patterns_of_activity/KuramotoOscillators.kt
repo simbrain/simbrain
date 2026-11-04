@@ -48,7 +48,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     // Objects
     val cheese = oc.world.addEntity(55, 306, EntityType.Swiss, doubleArrayOf(25.0, 0.0, 0.0))
     cheese.smellSource.dispersion = dispersion
-    val flower = oc.world.addEntity(351, 311, EntityType.Flower, doubleArrayOf(0.0, 25.0, 0.0))
+    val flower = oc.world.addEntity(351, 311, EntityType.Marigold, doubleArrayOf(0.0, 25.0, 0.0))
     flower.smellSource.dispersion = dispersion
     val fish = oc.world.addEntity(160, 14, EntityType.Fish, doubleArrayOf(0.0, 0.0, 25.0))
     fish.smellSource.dispersion = dispersion

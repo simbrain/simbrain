@@ -79,7 +79,7 @@ class LandmarkCognitiveMapTest {
     fun `sensory state represents multiple landmarks and background`() {
         val encoder = LandmarkStateEncoder(
             listOf(
-                LandmarkDefinition("Flower", 0.0, 0.0, EntityType.Flower),
+                LandmarkDefinition("Flower", 0.0, 0.0, EntityType.Marigold),
                 LandmarkDefinition("Cheese", 100.0, 0.0, EntityType.Swiss)
             )
         )
@@ -100,7 +100,7 @@ class LandmarkCognitiveMapTest {
     @Test
     fun `wraparound distance contributes to sensory state`() {
         val encoder = LandmarkStateEncoder(
-            landmarks = listOf(LandmarkDefinition("Flower", 10.0, 300.0, EntityType.Flower)),
+            landmarks = listOf(LandmarkDefinition("Flower", 10.0, 300.0, EntityType.Marigold)),
             worldWidth = 600.0,
             worldHeight = 600.0
         )

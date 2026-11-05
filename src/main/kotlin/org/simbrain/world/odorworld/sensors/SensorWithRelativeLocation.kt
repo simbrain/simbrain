@@ -33,7 +33,8 @@ abstract class SensorWithRelativeLocation(
      */
     @UserParameter(
         label = "Sensor length",
-        description = "The distance in pixels from the center of the entity to which the sensor is to be added.",
+        description = "The distance in pixels from the center of the entity to which the sensor is to be added, " +
+                "at the entity's native size. Multiplied by the entity's scale when it scales its sensors.",
         order = 4
     )
     var radius: Double = DEFAULT_RADIUS
@@ -65,12 +66,14 @@ abstract class SensorWithRelativeLocation(
 
     /**
      * Returns the sensor location in the local coordinate frame of the entity.
-     * The entity containing the sensor should be passed in.
+     * The entity containing the sensor should be passed in. The [radius] is multiplied by the entity's
+     * [OdorWorldEntity.sensorScale], so a sensor on a resized entity keeps its place on the body when that is on.
      */
     fun computeRelativeLocation(entity: OdorWorldEntity): Point2D {
         val sensorLocation = Point2D.Double(0.0, 0.0)
-        sensorLocation.x = radius * cos(Math.toRadians(entity.heading + theta))
-        sensorLocation.y = -radius * sin(Math.toRadians(entity.heading + theta))
+        val r = radius * entity.sensorScale
+        sensorLocation.x = r * cos(Math.toRadians(entity.heading + theta))
+        sensorLocation.y = -r * sin(Math.toRadians(entity.heading + theta))
         return sensorLocation
     }
 

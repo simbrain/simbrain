@@ -29,6 +29,9 @@ class WorldSelectionManager {
                     NodeHandle.addSelectionHandleTo(it)
                 }
             }
+            (removed + added).mapNotNull { it as? EntityNode ?: it.parent as? EntityNode }.toSet().forEach { entityNode ->
+                entityNode.resizeHandlesVisible = new.any { entityNode.isBody(it) }
+            }
         }
     }
 

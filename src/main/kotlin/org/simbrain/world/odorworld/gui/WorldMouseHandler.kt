@@ -6,6 +6,7 @@ import org.piccolo2d.PNode
 import org.piccolo2d.event.PDragSequenceEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
+import org.piccolo2d.extras.handles.PHandle
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PNodeFilter
 import org.simbrain.util.*
@@ -320,8 +321,9 @@ class WorldMouseHandler(
             val isLayer = (node is PLayer)
             val isCamera = (node is PCamera)
             val isMarquee = (marquee == node)
+            val isHandle = (node is PHandle)
 
-            return (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee)
+            return (isPickable && boundsIntersects && !isLayer && !isCamera && !isMarquee && !isHandle)
         }
 
         /**

@@ -63,7 +63,7 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     /**
      * Multiplier on the entity type's native size. Sets the entity's world size, so it affects collisions and
-     * bounds as well as how the image is drawn. Sensor offsets are absolute and do not scale.
+     * bounds as well as how the image is drawn. Sensor offsets scale with it when [scaleSensors] is on.
      */
     var scale by GuiEditable(
         initValue = 1.0,
@@ -77,6 +77,26 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.sizeChanged.fire()
         }
     )
+
+    /**
+     * Whether sensor offsets are multiplied by [scale], so sensors keep their place on the body as the entity is
+     * resized. Off, a sensor's length is in world pixels whatever the entity's size.
+     */
+    var scaleSensors by GuiEditable(
+        initValue = true,
+        label = "Scale sensors",
+        description = "Move sensors in or out with the entity's scale, so they keep their place on its body. " +
+                "Off, sensor lengths are in world pixels whatever the entity's size.",
+        order = 4,
+        setter = {
+            field = it
+            events.sizeChanged.fire()
+        }
+    )
+
+    /** Factor applied to sensor offsets: [scale] when [scaleSensors] is on, otherwise 1. */
+    val sensorScale: Double
+        get() = if (scaleSensors) scale else 1.0
 
     @Transient
     private var locationPointDirty = true

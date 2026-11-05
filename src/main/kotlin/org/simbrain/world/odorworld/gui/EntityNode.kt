@@ -16,10 +16,13 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.gui.nodes.NodeHandle
 import org.simbrain.util.Theme
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
 import org.simbrain.util.piccolo.NodeSync
+import org.simbrain.util.piccolo.PixelExactImagePainter
+import org.simbrain.util.piccolo.PixelExactSpriteCache
 import org.simbrain.util.piccolo.ScopedNode
 import org.simbrain.util.piccolo.nodeScopeIn
 import org.simbrain.util.toRadian
@@ -39,6 +42,7 @@ import java.awt.RenderingHints
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import java.util.stream.Collectors
 import javax.swing.JPopupMenu
 import kotlin.math.abs
@@ -66,6 +70,8 @@ class EntityNode(
      * Uses the shared image utilities from OdorWorldUtils.
      */
     private inner class EntitySprite : PNode() {
+        private val imagePainter = PixelExactImagePainter()
+
         init {
             updateBounds()
         }
@@ -85,33 +91,33 @@ class EntityNode(
             // Pixel art stays crisp at or above native size; images drawn smaller (by entity scale, zoom, or both)
             // are smoothed so they do not alias
             val screenScale = sqrt(abs(g.transform.determinant)) * bounds.width / image.width
-            val previousInterpolation = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
-            g.setRenderingHint(
-                RenderingHints.KEY_INTERPOLATION,
-                if (screenScale < 1.0) RenderingHints.VALUE_INTERPOLATION_BILINEAR
-                else RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
-            )
+            val savedTransform = g.transform
 
-            if (proceduralImage != null) {
+            // Procedural images are drawn facing the entity's heading; image sprites carry their direction in the
+            // image itself
+            val dest = if (proceduralImage != null) {
                 g.translate(bounds.centerX, bounds.centerY)
                 g.rotate(-entity.heading.toRadian())
-                g.scale(bounds.width / image.width, bounds.height / image.height)
-                g.drawImage(image, -image.width / 2, -image.height / 2, null)
-                g.scale(image.width / bounds.width, image.height / bounds.height)
-                g.rotate(entity.heading.toRadian())
-                g.translate(-bounds.centerX, -bounds.centerY)
+                Rectangle2D.Double(-bounds.width / 2, -bounds.height / 2, bounds.width, bounds.height)
             } else {
-                val imgW = image.width.toDouble()
-                val imgH = image.height.toDouble()
-
-                g.translate(bounds.x, bounds.y)
-                g.scale(bounds.width / imgW, bounds.height / imgH)
-                g.drawImage(image, 0, 0, null)
-                g.scale(imgW / bounds.width, imgH / bounds.height)
-                g.translate(-bounds.x, -bounds.y)
+                Rectangle2D.Double(bounds.x, bounds.y, bounds.width, bounds.height)
             }
 
-            previousInterpolation?.let { g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, it) }
+            if (screenScale >= 1.0) {
+                // Enlarged pixel art is drawn pixel-exact: Java2D's nearest-neighbor blit lets the pixel grid stretch
+                // and jump as the view pans or clips through a large image. Entity images never change, so the
+                // shared sprite cache serves them; only an enlargement too big to cache whole is sampled per frame.
+                if (!PixelExactSpriteCache.paint(g, image, dest)) imagePainter.paint(g, image, dest)
+            } else {
+                val previousInterpolation = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
+                g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR)
+                g.translate(dest.x, dest.y)
+                g.scale(dest.width / image.width, dest.height / image.height)
+                g.drawImage(image, 0, 0, null)
+                previousInterpolation?.let { g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, it) }
+            }
+
+            g.transform = savedTransform
         }
     }
 
@@ -260,12 +266,13 @@ class EntityNode(
         }.untilDisposed()
         entity.world.events.updated.on(Dispatchers.Unconfined) { recordTrailPoint() }.untilDisposed()
         entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
-            sprite.updateBounds()
+            updateSpriteBounds()
             sprite.repaint()
         }.untilDisposed()
         entity.events.sizeChanged.on(dispatcher = Dispatchers.Swing) {
-            sprite.updateBounds()
+            updateSpriteBounds()
             updateCaption()
+            updateAttributesNodes()
             sprite.repaint()
         }.untilDisposed()
         entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->
@@ -487,6 +494,38 @@ class EntityNode(
     fun resetToStaticFrame() {
         entity.resetAnimation()
         sprite.repaint()
+    }
+
+    /**
+     * Resizes the sprite to the entity. This node reports the sprite's bounds as its own without ever setting them, so
+     * a selection outline drawn around this node, as when it is selected from its context menu, is told directly.
+     */
+    private fun updateSpriteBounds() {
+        sprite.updateBounds()
+        childrenReference.filterIsInstance<NodeHandle>().forEach { it.parentBoundsChanged() }
+    }
+
+    private var resizeHandles: EntityResizeHandles? = null
+
+    /** True if [node] is this entity's body rather than a sensor, effector or caption, so selecting it can resize the entity. */
+    fun isBody(node: PNode) = node === this || node === sprite
+
+    /** Whether the corner handles that resize the entity are shown; on while the body is selected. */
+    var resizeHandlesVisible: Boolean
+        get() = resizeHandles != null
+        set(value) {
+            if (value == (resizeHandles != null)) return
+            if (value) {
+                resizeHandles = EntityResizeHandles(this, sprite, panel)
+            } else {
+                resizeHandles?.detach()
+                resizeHandles = null
+            }
+        }
+
+    override fun dispose() {
+        resizeHandlesVisible = false
+        super.dispose()
     }
 
     fun createContextMenu() = JPopupMenu().apply {

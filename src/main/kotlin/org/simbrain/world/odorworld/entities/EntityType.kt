@@ -10,10 +10,10 @@ import java.awt.geom.Rectangle2D
  *
  * Images are loaded in [EntityNode]. Images are stored in `resources > odorworld`
  *
- * Images are not automatically rescaled to a desired size.
+ * Images are drawn to fit the entity's size, which is the type's width and height times the entity's scale.
  *
- * @param width: the actual width of the image in pixels (the image is not rescaled)
- * @param height: the actual height of the image
+ * @param width: default width of the entity in world pixels; usually the image's own width
+ * @param height: default height of the entity in world pixels
  * @param rotating: true if separate images are provided for different headings
  * @param headLocation location of the head in uv coordinates when the agent is facing East.
  *                     Both numbers are ratios. Example: (.5, .5) is the center of the image.
@@ -35,18 +35,18 @@ sealed class EntityType(
 ): EditableObject {
     object Swiss: EntityType("Swiss", rotating = false, width = 32, height = 32)
     object Gouda : EntityType("Gouda", rotating = false, width = 32, height = 32)
-    object BlueCheese : EntityType("Blue Cheese", imageName = "Bluecheese", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Bell : EntityType("Bell", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Poison : EntityType("Poison", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object BlueCheese : EntityType("Blue Cheese", imageName = "Bluecheese", rotating = false, width = 32, height = 32)
+    object Bell : EntityType("Bell", rotating = false, width = 32, height = 32)
+    object Poison : EntityType("Poison", rotating = false, width = 32, height = 32)
     object Candle : EntityType("Candle", rotating = false, width = 32, height = 32)
-    object Fish : EntityType("Fish", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object Fish : EntityType("Fish", rotating = false, width = 32, height = 32)
     object Marigold : EntityType("Marigold", rotating = false, width = 32, height = 32)
-    object Lily : EntityType("Lily", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object Lily : EntityType("Lily", rotating = false, width = 24, height = 28)
     object Dandelions : EntityType("Dandelions", rotating = false, width = 32, height = 32)
     object Geraniums : EntityType("Geraniums", rotating = false, width = 32, height = 32)
-    object Tulip : EntityType("Tulip", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Flax : EntityType("Flax", rotating = false, width = 32, height = 32, imageExt = "gif")
-    object Pansy : EntityType("Pansy", rotating = false, width = 32, height = 32, imageExt = "gif")
+    object Tulip : EntityType("Tulip", rotating = false, width = 32, height = 32)
+    object Flax : EntityType("Flax", rotating = false, width = 32, height = 32)
+    object Pansy : EntityType("Pansy", rotating = false, width = 32, height = 32)
     object Amy : EntityType("Amy", rotating = true, width = 96, height = 96, headLocation = point(0.5, 0.25))
     object Arno : EntityType("Arno", rotating = true, width = 96, height = 96)
     object Boy : EntityType("Boy", rotating = true, width = 96, height = 96)
@@ -56,7 +56,8 @@ sealed class EntityType(
     object Lion : EntityType("Lion", rotating = true, width = 96, height = 96)
     object Steve : EntityType("Steve", rotating = true, width = 96, height = 96)
     object Susi : EntityType("Susi", rotating = true, width = 96, height = 96)
-    object Isopod : EntityType("Isopod", rotating = true, width = 18, height = 18, numFrames = 2)
+    object Isopod : EntityType("Isopod", rotating = true, width = 18, height = 18, numFrames = 4)
+    object Pillbug : EntityType("Pillbug", rotating = true, width = 18, height = 18, numFrames = 4)
     object Nematode : EntityType("Nematode", rotating = true, width = 48, height = 48, numFrames = 4, headLocation = point(0.88, 0.5) )
     object Candy : EntityType("Candy", rotating = false, width = 35, height = 35)
     object Fork : EntityType("Fork", rotating = false, width = 16, height = 50)

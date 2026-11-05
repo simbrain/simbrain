@@ -26,15 +26,10 @@ import org.simbrain.world.odorworld.effectors.Effector
 import org.simbrain.world.odorworld.effectors.StraightMovement
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.events.EntityEvents
-import org.simbrain.world.odorworld.intersect
 import org.simbrain.world.odorworld.sensors.*
 import java.awt.geom.Point2D
 import java.util.concurrent.CopyOnWriteArrayList
-import kotlin.coroutines.Continuation
-import kotlin.coroutines.EmptyCoroutineContext
-import kotlin.coroutines.resume
-import kotlin.coroutines.resumeWithException
-import kotlin.coroutines.startCoroutine
+import kotlin.coroutines.*
 import kotlin.math.cos
 import kotlin.math.sign
 import kotlin.math.sin
@@ -65,6 +60,23 @@ class OdorWorldEntity @JvmOverloads constructor(
             events.typeChanged.fire(field, value)
             field = value
         }
+
+    /**
+     * Multiplier on the entity type's native size. Sets the entity's world size, so it affects collisions and
+     * bounds as well as how the image is drawn. Sensor offsets are absolute and do not scale.
+     */
+    var scale by GuiEditable(
+        initValue = 1.0,
+        label = "Scale",
+        description = "Size relative to the entity type's native size. Affects collisions as well as appearance.",
+        min = 0.05,
+        increment = 0.1,
+        order = 3,
+        setter = {
+            field = it
+            events.sizeChanged.fire()
+        }
+    )
 
     @Transient
     private var locationPointDirty = true
@@ -118,10 +130,10 @@ class OdorWorldEntity @JvmOverloads constructor(
         }
 
     override val width: Double
-        get() = entityType.width.toDouble()
+        get() = entityType.width * scale
 
     override val height: Double
-        get() = entityType.height.toDouble()
+        get() = entityType.height * scale
 
     var movementMode by GuiEditable(
         initValue = MovementMode.CONTINUOUS,

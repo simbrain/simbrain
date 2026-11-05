@@ -18,6 +18,7 @@ interface EntityLocationEvent {
 class EntityEvents: FlowEvents(), EntityLocationEvent {
     val updated = NoArgEvent()
     val typeChanged = ChangedEvent<EntityType>()
+    val sizeChanged = NoArgEvent()
     val deleted = OneArgEvent<OdorWorldEntity>()
     val sensorAdded = OneArgEvent<Sensor>()
     val sensorRemoved = OneArgEvent<Sensor>()

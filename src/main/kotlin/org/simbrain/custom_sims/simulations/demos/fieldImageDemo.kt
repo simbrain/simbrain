@@ -132,7 +132,7 @@ val fieldImageDemo = newSim {
         val screenWidth = view3dSensor.outputWidth
         val screenHeight = view3dSensor.outputHeight
         val spriteScreenX = ((screenWidth / 2.0) * (1 + transformX / transformY)).toInt()
-        val spriteWidth = ((entity.entityType.width * screenHeight) / transformY).toInt()
+        val spriteWidth = ((entity.width * screenHeight) / transformY).toInt()
             .coerceIn(1, screenWidth * 4)
         val drawStartX = (spriteScreenX - spriteWidth / 2).coerceIn(0, screenWidth)
         val drawEndX = (spriteScreenX + spriteWidth / 2).coerceIn(0, screenWidth)

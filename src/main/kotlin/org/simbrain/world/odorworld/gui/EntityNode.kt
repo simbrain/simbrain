@@ -8,7 +8,8 @@
  */
 package org.simbrain.world.odorworld.gui
 
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
 import org.piccolo2d.nodes.PPath
@@ -34,6 +35,7 @@ import org.simbrain.world.odorworld.sensors.Sensor
 import org.simbrain.world.odorworld.sensors.VisualizableEntityAttribute
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.RenderingHints
 import java.awt.geom.Ellipse2D
 import java.awt.geom.Line2D
 import java.awt.geom.Point2D
@@ -69,15 +71,28 @@ class EntityNode(
         }
 
         fun updateBounds() {
-            val w = entity.entityType.width.toDouble()
-            val h = entity.entityType.height.toDouble()
+            val w = entity.width
+            val h = entity.height
             setBounds(-w / 2, -h / 2, w, h)
         }
 
         override fun paint(paintContext: PPaintContext) {
             val bounds = boundsReference
             val g = paintContext.graphics
-            ProceduralEntityImages.getBaseImage(entity)?.let { image ->
+            val proceduralImage = ProceduralEntityImages.getBaseImage(entity)
+            val image = proceduralImage ?: entity.getCurrentImage()
+
+            // Pixel art stays crisp at or above native size; images drawn smaller (by entity scale, zoom, or both)
+            // are smoothed so they do not alias
+            val screenScale = sqrt(abs(g.transform.determinant)) * bounds.width / image.width
+            val previousInterpolation = g.getRenderingHint(RenderingHints.KEY_INTERPOLATION)
+            g.setRenderingHint(
+                RenderingHints.KEY_INTERPOLATION,
+                if (screenScale < 1.0) RenderingHints.VALUE_INTERPOLATION_BILINEAR
+                else RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR
+            )
+
+            if (proceduralImage != null) {
                 g.translate(bounds.centerX, bounds.centerY)
                 g.rotate(-entity.heading.toRadian())
                 g.scale(bounds.width / image.width, bounds.height / image.height)
@@ -85,19 +100,18 @@ class EntityNode(
                 g.scale(image.width / bounds.width, image.height / bounds.height)
                 g.rotate(entity.heading.toRadian())
                 g.translate(-bounds.centerX, -bounds.centerY)
-                return
+            } else {
+                val imgW = image.width.toDouble()
+                val imgH = image.height.toDouble()
+
+                g.translate(bounds.x, bounds.y)
+                g.scale(bounds.width / imgW, bounds.height / imgH)
+                g.drawImage(image, 0, 0, null)
+                g.scale(imgW / bounds.width, imgH / bounds.height)
+                g.translate(-bounds.x, -bounds.y)
             }
 
-            val image = entity.getCurrentImage()
-
-            val imgW = image.width.toDouble()
-            val imgH = image.height.toDouble()
-
-            g.translate(bounds.x, bounds.y)
-            g.scale(bounds.width / imgW, bounds.height / imgH)
-            g.drawImage(image, 0, 0, null)
-            g.scale(imgW / bounds.width, imgH / bounds.height)
-            g.translate(-bounds.x, -bounds.y)
+            previousInterpolation?.let { g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, it) }
         }
     }
 
@@ -119,7 +133,7 @@ class EntityNode(
         caption.visible = !text.isNullOrEmpty()
         if (text.isNullOrEmpty()) return
         caption.text = text
-        caption.setOffset(-caption.width / 2, entity.entityType.height / 2.0 + 2)
+        caption.setOffset(-caption.width / 2, entity.height / 2.0 + 2)
     }
 
     /**
@@ -247,6 +261,11 @@ class EntityNode(
         entity.world.events.updated.on(Dispatchers.Unconfined) { recordTrailPoint() }.untilDisposed()
         entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
             sprite.updateBounds()
+            sprite.repaint()
+        }.untilDisposed()
+        entity.events.sizeChanged.on(dispatcher = Dispatchers.Swing) {
+            sprite.updateBounds()
+            updateCaption()
             sprite.repaint()
         }.untilDisposed()
         entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->

@@ -83,8 +83,8 @@
 //     }
 //
 //     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Swiss.png"))
-//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.gif"))
-//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Fish.gif"))
+//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Poison.png"))
+//     // world.imageAlbum.addImage(ResourceManager.getBufferedImage("odorworld/static/Fish.png"))
 //
 //     with(couplingManager) {
 //         createCoupling(

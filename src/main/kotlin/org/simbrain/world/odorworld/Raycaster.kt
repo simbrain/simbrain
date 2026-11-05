@@ -7,6 +7,7 @@
  */
 package org.simbrain.world.odorworld
 
+import org.simbrain.world.odorworld.Raycaster.Companion.BRICK_ROWS_PER_CELL_HEIGHT
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import java.awt.Color
 import java.awt.image.BufferedImage
@@ -378,8 +379,8 @@ class Raycaster(private val screenWidth: Int, private val screenHeight: Int) {
 
         val spriteInfo = getEntityImage(entity, viewingAngle)
         val entityImage = spriteInfo.image
-        val entityWorldWidth = entity.entityType.width.toDouble()
-        val entityWorldHeight = entity.entityType.height.toDouble()
+        val entityWorldWidth = entity.width
+        val entityWorldHeight = entity.height
 
         val projectionConstant = screenHeight * cameraWorldHeight
         val floorScreenY = (horizon + projectionConstant / transformY).toInt()

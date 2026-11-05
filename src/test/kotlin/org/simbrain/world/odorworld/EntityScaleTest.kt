@@ -1,5 +1,6 @@
 /**
- * Checks that an entity's scale sets its world size and survives saving and loading.
+ * Checks that an entity's scale sets its world size and, unless turned off, its sensor offsets, and that both
+ * survive saving and loading.
  */
 package org.simbrain.world.odorworld
 
@@ -9,6 +10,7 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
+import org.simbrain.world.odorworld.sensors.SmellSensor
 
 class EntityScaleTest {
     @Test
@@ -42,5 +44,38 @@ class EntityScaleTest {
         assertNotEquals(xml, legacyXml)
         val restored = xstream.fromXML(legacyXml) as OdorWorld
         assertEquals(1.0, restored.entityList.single().scale)
+    }
+
+    @Test
+    fun `sensor offsets scale with the entity by default`() {
+        val world = OdorWorld()
+        val entity = OdorWorldEntity(world, EntityType.Mouse)
+        val sensor = SmellSensor(theta = 0.0, radius = 10.0)
+        entity.scale = 2.5
+        assertEquals(25.0, sensor.computeRelativeLocation(entity).x, 1e-9)
+        assertEquals(entity.x + 25.0, sensor.computeAbsoluteLocation(entity).x, 1e-9)
+    }
+
+    @Test
+    fun `sensor offsets stay in world pixels when scaling sensors is off`() {
+        val world = OdorWorld()
+        val entity = OdorWorldEntity(world, EntityType.Mouse)
+        val sensor = SmellSensor(theta = 0.0, radius = 10.0)
+        entity.scale = 2.5
+        entity.scaleSensors = false
+        assertEquals(10.0, sensor.computeRelativeLocation(entity).x, 1e-9)
+    }
+
+    @Test
+    fun `world saved without the sensor scaling flag loads with it on`() {
+        val world = OdorWorld()
+        runBlocking { world.addEntity(OdorWorldEntity(world, EntityType.Swiss).apply { scaleSensors = false }) }
+        val xstream = OdorWorldComponent.odorWorldXStream
+        val xml = xstream.toXML(world)
+        val legacyXml = xml.replace(Regex("""\s*<scaleSensors>false</scaleSensors>"""), "")
+        assertNotEquals(xml, legacyXml)
+        val restored = xstream.fromXML(legacyXml) as OdorWorld
+        assertEquals(true, restored.entityList.single().scaleSensors)
+        assertEquals(false, (xstream.fromXML(xml) as OdorWorld).entityList.single().scaleSensors)
     }
 }

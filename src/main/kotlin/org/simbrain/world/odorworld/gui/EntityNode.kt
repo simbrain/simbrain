@@ -267,6 +267,7 @@ class EntityNode(
         entity.events.sizeChanged.on(dispatcher = Dispatchers.Swing) {
             updateSpriteBounds()
             updateCaption()
+            updateAttributesNodes()
             sprite.repaint()
         }.untilDisposed()
         entity.events.trailVisibilityChanged.on(dispatcher = Dispatchers.Swing) { new, _ ->

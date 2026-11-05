@@ -158,6 +158,8 @@ val threeObjectDetector = newSim {
 
             # What to Do
 
+            ## Train the Network
+
             1. Click `Run`, then manually move the mouse around the world. Watch the output neurons as the mouse approaches each object. At first the network should do poorly at classifying the smells.
 
             2. Double-click on the `Backprop` model in the `Object Detector` network window to open the “Train Network” window.
@@ -169,6 +171,24 @@ val threeObjectDetector = newSim {
             pattern on the top.
 
             5. Close the training window, click `Run` again, and move the mouse around the world. The output neurons should now classify the nearby object more accurately.
+
+            ## Test Graceful Degradation
+
+            A network degrades gracefully when its performance declines gradually as it is damaged, rather than failing all at once.
+
+            1. Train the network as above.
+
+            2. Delete one weight (click it and press `Delete`).
+
+            3. Check the network's performance on each of the four cases: Gouda, Blue, Fish, and no object (mouse away from everything).
+                - Place the mouse near each object and click the workspace iterate button a few times until the outputs stop changing. The smell takes several steps to pass through the layers.
+                - Record the percentage of cases classified correctly, from 4/4 = 100% down to 0/4 = 0%.
+
+            4. Repeat steps 2 and 3, then plot percentage correct against the number of weights deleted.
+
+            Does performance fall off gradually or suddenly? Do some weights matter more than others?
+
+            You can also delete hidden nodes instead of weights. Performance will drop off much faster, since deleting a hidden node removes all six of its weights.
 
             # Credits
 

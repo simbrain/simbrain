@@ -16,6 +16,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
 import org.piccolo2d.util.PPaintContext
+import org.simbrain.network.gui.nodes.NodeHandle
 import org.simbrain.util.Theme
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
@@ -260,11 +261,11 @@ class EntityNode(
         }.untilDisposed()
         entity.world.events.updated.on(Dispatchers.Unconfined) { recordTrailPoint() }.untilDisposed()
         entity.events.typeChanged.on(dispatcher = Dispatchers.Swing) { _, _ ->
-            sprite.updateBounds()
+            updateSpriteBounds()
             sprite.repaint()
         }.untilDisposed()
         entity.events.sizeChanged.on(dispatcher = Dispatchers.Swing) {
-            sprite.updateBounds()
+            updateSpriteBounds()
             updateCaption()
             sprite.repaint()
         }.untilDisposed()
@@ -487,6 +488,38 @@ class EntityNode(
     fun resetToStaticFrame() {
         entity.resetAnimation()
         sprite.repaint()
+    }
+
+    /**
+     * Resizes the sprite to the entity. This node reports the sprite's bounds as its own without ever setting them, so
+     * a selection outline drawn around this node, as when it is selected from its context menu, is told directly.
+     */
+    private fun updateSpriteBounds() {
+        sprite.updateBounds()
+        childrenReference.filterIsInstance<NodeHandle>().forEach { it.parentBoundsChanged() }
+    }
+
+    private var resizeHandles: EntityResizeHandles? = null
+
+    /** True if [node] is this entity's body rather than a sensor, effector or caption, so selecting it can resize the entity. */
+    fun isBody(node: PNode) = node === this || node === sprite
+
+    /** Whether the corner handles that resize the entity are shown; on while the body is selected. */
+    var resizeHandlesVisible: Boolean
+        get() = resizeHandles != null
+        set(value) {
+            if (value == (resizeHandles != null)) return
+            if (value) {
+                resizeHandles = EntityResizeHandles(this, sprite, panel)
+            } else {
+                resizeHandles?.detach()
+                resizeHandles = null
+            }
+        }
+
+    override fun dispose() {
+        resizeHandlesVisible = false
+        super.dispose()
     }
 
     fun createContextMenu() = JPopupMenu().apply {

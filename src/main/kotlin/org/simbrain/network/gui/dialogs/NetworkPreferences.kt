@@ -184,7 +184,7 @@ object NetworkPreferences: PreferenceHolder() {
 
     @UserParameter(
         label = "Show shape captions",
-        description = "Show shapes as captions under tensors (height × width × channels), convolution kernels " +
+        description = "Show shapes as captions under tensors (channels × height × width), convolution kernels " +
                 "(filters × channels × height × width), and weight matrices (rows × columns as displayed)",
         tab = "GUI",
         order = 24

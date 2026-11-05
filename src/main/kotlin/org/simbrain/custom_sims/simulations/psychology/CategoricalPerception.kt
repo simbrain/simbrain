@@ -137,7 +137,7 @@ val categoricalPerception = newSim {
     val trainSamplesPerClass = trainingSet.inputs.size / ShapeType.entries.size
 
     // CNN Pipeline
-    // Input(50×50×1) → Conv1(3×3, 4 filters, SAME, ReLU) → Pool1(2×2)
+    // Input(1×50×50) → Conv1(3×3, 4 filters, SAME, ReLU) → Pool1(2×2)
     //               → Conv2(3×3, 8 filters, SAME, ReLU) → Pool2(2×2)
     //               → Flatten → ReprLayer(REPR_LAYER_SIZE, sigmoid) ← analysis target
     //               → Output(56)  [49 prototype (7×7) + 7 labels]

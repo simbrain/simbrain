@@ -11,7 +11,7 @@ import org.simbrain.world.odorworld.sensors.View3DSensor
 /**
  * Demo simulation showing a CNN pipeline connected to a 3D view sensor.
  *
- * Pipeline: View3DSensor (64x64x3) -> Conv1 -> ReLU -> Pool1 -> Conv2 -> ReLU -> Pool2 -> Flatten -> Dense
+ * Pipeline: View3DSensor (3x64x64) -> Conv1 -> ReLU -> Pool1 -> Conv2 -> ReLU -> Pool2 -> Flatten -> Dense
  */
 val cnnDemo = newSim {
 
@@ -69,7 +69,7 @@ val cnnDemo = newSim {
     network.addNetworkModelAsync(inputTensorLayer, usePlacementManager = false)
     inputTensorLayer.setLocation(0.0, 0.0)
 
-    // Conv1: 3x3, 8 filters, SAME padding -> output 64x64x8
+    // Conv1: 3x3, 8 filters, SAME padding -> output 8x64x64
     val conv1OutputShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv1Output = TensorLayer(conv1OutputShape).apply {
         label = "Conv1"
@@ -80,7 +80,7 @@ val cnnDemo = newSim {
     val conv1 = ConvolutionConnector(inputTensorLayer, conv1Output, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
     network.addNetworkModelAsync(conv1, usePlacementManager = false)
 
-    // MaxPool1: 2x2 -> output 32x32x8
+    // MaxPool1: 2x2 -> output 8x32x32
     val pool1OutputShape = conv1OutputShape.poolOutputShape(2, 2)
     val pool1Layer = TensorLayer(pool1OutputShape).apply {
         label = "Pool1"
@@ -90,7 +90,7 @@ val cnnDemo = newSim {
     val pool1 = PoolingConnector(conv1Output, pool1Layer, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
     network.addNetworkModelAsync(pool1, usePlacementManager = false)
 
-    // Conv2: 3x3, 16 filters, SAME padding -> output 32x32x16
+    // Conv2: 3x3, 16 filters, SAME padding -> output 16x32x32
     val conv2OutputShape = pool1OutputShape.convOutputShape(3, 1, Padding.SAME, 16)
     val conv2Layer = TensorLayer(conv2OutputShape).apply {
         label = "Conv2"

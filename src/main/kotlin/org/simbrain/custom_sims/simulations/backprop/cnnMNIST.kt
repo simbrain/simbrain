@@ -17,7 +17,7 @@ import javax.swing.SwingUtilities
 /**
  * CNN version of the Tiny MNIST simulation.
  *
- * Pipeline: Input(20x20x1) → Conv(3x3, 5 filters, SAME, ReLU) → MaxPool(2x2)
+ * Pipeline: Input(1x20x20) → Conv(3x3, 5 filters, SAME, ReLU) → MaxPool(2x2)
  *         → Conv(3x3, 8 filters, SAME, ReLU) → MaxPool(2x2)
  *         → Flatten(200) → Dense(10)
  *
@@ -49,7 +49,7 @@ val cnnMNIST = newSim {
     val flatY = -125.0
     val outputY = -442.0
 
-    // Input: 20x20x1
+    // Input: 1x20x20
     val inputShape = TensorShape(20, 20, 1)
     val inputTensorLayer = TensorLayer(inputShape).apply {
         label = "Input"
@@ -57,7 +57,7 @@ val cnnMNIST = newSim {
     }
     inputTensorLayer.setLocation(leftX, inputY)
 
-    // Conv1: 3x3, 5 filters, SAME → 20x20x5
+    // Conv1: 3x3, 5 filters, SAME → 5x20x20
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 5)
     val conv1Out = TensorLayer(conv1OutShape).apply {
         label = "Conv1"
@@ -66,7 +66,7 @@ val cnnMNIST = newSim {
     conv1Out.setLocation(leftX, conv1Y)
     val conv1 = ConvolutionConnector(inputTensorLayer, conv1Out, kernelSize = 3, numFilters = 5, stride = 1, padding = Padding.SAME)
 
-    // Pool1: 2x2 → 10x10x5
+    // Pool1: 2x2 → 5x10x10
     val pool1OutShape = conv1OutShape.poolOutputShape(2, 2)
     val poolLayer1 = TensorLayer(pool1OutShape).apply {
         label = "Pool1"
@@ -74,7 +74,7 @@ val cnnMNIST = newSim {
     poolLayer1.setLocation(leftX, pool1Y)
     val pool1 = PoolingConnector(conv1Out, poolLayer1, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
-    // Conv2: 3x3, 8 filters, SAME → 10x10x8
+    // Conv2: 3x3, 8 filters, SAME → 8x10x10
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv2Out = TensorLayer(conv2OutShape).apply {
         label = "Conv2"
@@ -83,7 +83,7 @@ val cnnMNIST = newSim {
     conv2Out.setLocation(rightX, conv2Y)
     val conv2 = ConvolutionConnector(poolLayer1, conv2Out, kernelSize = 3, numFilters = 8, stride = 1, padding = Padding.SAME)
 
-    // Pool2: 2x2 → 5x5x8
+    // Pool2: 2x2 → 8x5x5
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val poolLayer2 = TensorLayer(pool2OutShape).apply {
         label = "Pool2"
@@ -91,7 +91,7 @@ val cnnMNIST = newSim {
     poolLayer2.setLocation(rightX, pool2Y)
     val pool2 = PoolingConnector(conv2Out, poolLayer2, poolSize = 2, stride = 2, poolingType = PoolingType.MAX)
 
-    // Flatten: 5x5x8 = 200
+    // Flatten: 8x5x5 = 200
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
         label = "Flatten"

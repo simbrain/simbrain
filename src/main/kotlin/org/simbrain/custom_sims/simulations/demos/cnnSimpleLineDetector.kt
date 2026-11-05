@@ -14,7 +14,7 @@ import org.simbrain.util.place
 /**
  * Demo simulation showing a trainable CNN pipeline with synthetic data.
  *
- * Pipeline: Input(16x16x1) -> Conv1(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) 
+ * Pipeline: Input(1x16x16) -> Conv1(3x3, 8 filters, SAME, ReLU) -> MaxPool(2x2) 
  *         -> Conv2(3x3, 16 filters, SAME, ReLU) -> MaxPool(2x2) -> Flatten -> Dense(3)
  *
  * Three synthetic pattern classes with random positions to demonstrate CNN translation invariance.
@@ -26,7 +26,7 @@ val cnnSimpleLineDetector = newSim {
     val networkComponent = addNetworkComponent("CNN Training")
     val network = networkComponent.network
 
-    // Input: 16x16x1
+    // Input: 1x16x16
     val inputShape = TensorShape(16, 16, 1)
     val inputLayer = TensorLayer(inputShape).apply {
         label = "Input"
@@ -34,7 +34,7 @@ val cnnSimpleLineDetector = newSim {
     }
     inputLayer.setLocation(-430.0, 373.0)
 
-    // Conv1: 3x3, 8 filters, SAME -> 16x16x8
+    // Conv1: 3x3, 8 filters, SAME -> 8x16x16
     val conv1OutShape = inputShape.convOutputShape(3, 1, Padding.SAME, 8)
     val conv1Layer = TensorLayer(conv1OutShape).apply {
         label = "Conv1"
@@ -55,7 +55,7 @@ val cnnSimpleLineDetector = newSim {
         label = "Pooling 1"
     }
 
-    // Conv2: 3x3, 16 filters, SAME -> 8x8x16
+    // Conv2: 3x3, 16 filters, SAME -> 16x8x8
     val conv2OutShape = pool1OutShape.convOutputShape(3, 1, Padding.SAME, 16)
     val conv2Layer = TensorLayer(conv2OutShape).apply {
         label = "Conv2"
@@ -66,7 +66,7 @@ val cnnSimpleLineDetector = newSim {
         label = "Convolution 2"
     }
 
-    // Pool2: 2x2 -> 4x4x16
+    // Pool2: 2x2 -> 16x4x4
     val pool2OutShape = conv2OutShape.poolOutputShape(2, 2)
     val pool2Layer = TensorLayer(pool2OutShape).apply {
         label = "Pool2"
@@ -76,7 +76,7 @@ val cnnSimpleLineDetector = newSim {
         label = "Pooling 2"
     }
 
-    // Flatten: 4x4x16 = 256 -> NeuronArray(256)
+    // Flatten: 16x4x4 = 256 -> NeuronArray(256)
     val flatSize = pool2OutShape.size
     val flatArray = NeuronArray(flatSize).apply {
         label = "Flattened"

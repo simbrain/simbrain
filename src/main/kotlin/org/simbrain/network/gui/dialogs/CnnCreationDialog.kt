@@ -59,7 +59,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     private val outputNeuronsField = JTextField("10", 4)
 
     // Layer list displays
-    // Columns: index | description | -> | H | x | W | x | C | Edit | up | down | Remove
+    // Columns: index | description | -> | C | x | H | x | W | Edit | up | down | Remove
     private val tensorLayerListPanel = JPanel(MigLayout(
         "fillx, ins 0, gapy 4",
         "[][grow,fill][][right][][right][][right][][][][]"
@@ -78,12 +78,12 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         // Input shape section
         val inputPanel = JPanel(MigLayout("ins 0", "[][][][][][]"))
         inputPanel.add(JLabel("Input Shape:"))
+        inputPanel.add(JLabel("C:"))
+        inputPanel.add(channelsField)
         inputPanel.add(JLabel("H:"))
         inputPanel.add(heightField)
         inputPanel.add(JLabel("W:"))
         inputPanel.add(widthField)
-        inputPanel.add(JLabel("C:"))
-        inputPanel.add(channelsField)
         mainPanel.add(inputPanel)
 
         // Auto-update on input shape changes
@@ -263,12 +263,12 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
                     tensorLayerListPanel.add(JLabel(spec.description()))
                     // Arrow
                     tensorLayerListPanel.add(JLabel("\u2192"))
-                    // H x W x C in separate right-aligned columns
+                    // C x H x W in separate right-aligned columns
+                    tensorLayerListPanel.add(JLabel("${out.channels}"), "right")
+                    tensorLayerListPanel.add(JLabel("\u00d7"))
                     tensorLayerListPanel.add(JLabel("${out.height}"), "right")
                     tensorLayerListPanel.add(JLabel("\u00d7"))
                     tensorLayerListPanel.add(JLabel("${out.width}"), "right")
-                    tensorLayerListPanel.add(JLabel("\u00d7"))
-                    tensorLayerListPanel.add(JLabel("${out.channels}"), "right")
                     currentShape = out
                 } catch (e: Exception) {
                     tensorLayerListPanel.add(

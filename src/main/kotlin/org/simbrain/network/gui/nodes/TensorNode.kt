@@ -497,7 +497,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     override val toolTipText: String
         get() = createTooltipTextWithLocation(tensorLayer) {
-            "${tensorLayer.displayName}\nShape: ${tensorLayer.shape.displayString} (height × width × channels)"
+            "${tensorLayer.displayName}\nShape: ${tensorLayer.shape.displayString} (channels × height × width)"
         }
 
     inner class TensorInteractionBox(net: NetworkPanel) : InteractionBox(net) {

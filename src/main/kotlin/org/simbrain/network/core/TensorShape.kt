@@ -50,10 +50,13 @@ data class TensorShape(val height: Int, val width: Int, val channels: Int = 1) {
         return TensorShape(outH, outW, channels)
     }
 
-    /** Shape formatted for on-screen labels, e.g. "32×32×3". */
-    val displayString: String get() = "${height}×${width}×${channels}"
+    /**
+     * Shape formatted for on-screen labels in channels × height × width order (as in PyTorch), e.g. "3×32×32".
+     * This is display order only; storage is HWC.
+     */
+    val displayString: String get() = "${channels}×${height}×${width}"
 
-    override fun toString(): String = "${height}x${width}x${channels}"
+    override fun toString(): String = "${channels}x${height}x${width}"
 }
 
 /**

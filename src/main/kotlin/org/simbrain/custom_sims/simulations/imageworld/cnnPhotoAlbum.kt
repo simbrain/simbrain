@@ -173,7 +173,7 @@ private fun loadCategoryImages(): Map<String, List<File>>? {
 /**
  * CNN Object Detector: trains a small CNN on Caltech101 RGB images.
  *
- * Pipeline: Input(100×100×3) → Conv1(3×3, 4f, SAME, ReLU) → Pool1(5×5, s=5, MAX)
+ * Pipeline: Input(3×100×100) → Conv1(3×3, 4f, SAME, ReLU) → Pool1(5×5, s=5, MAX)
  *         → Conv2(3×3, 8f, SAME, ReLU) → Pool2(4×4, s=4, MAX)
  *         → Flatten(200) → Dense(N classes)
  *

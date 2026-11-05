@@ -7,6 +7,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.awt.Color
 import java.io.File
+import java.util.concurrent.CopyOnWriteArraySet
 import java.util.prefs.Preferences
 import javax.swing.JButton
 import kotlin.reflect.KMutableProperty1
@@ -46,28 +47,35 @@ fun getSimbrainConfigDirectory(): File {
 }
 
 /**
- * Marker interface for classes that hold [Preference] objects.
+ * A set of no-argument change listeners. Views should subscribe with [onUi], which ties the listener to their
+ * view scope and moves the refresh onto the EDT, rather than registering and unregistering by hand. Listeners may
+ * be added and removed from any thread, including while [fireChanged] is running.
  */
-open class PreferenceHolder: EditableObject {
+open class ChangeNotifier {
 
-    val events = mutableSetOf<() -> Unit>()
+    private val listeners = CopyOnWriteArraySet<() -> Unit>()
 
-    fun registerChangeListener(preferenceLoader: () -> Unit) {
-        events.add(preferenceLoader)
+    fun registerChangeListener(listener: () -> Unit) {
+        listeners.add(listener)
     }
 
-    fun unregisterChangeListener(preferenceLoader: () -> Unit) {
-        events.remove(preferenceLoader)
+    fun unregisterChangeListener(listener: () -> Unit) {
+        listeners.remove(listener)
     }
 
-    /**
-     * Notify listeners that preferences changed. Called once per dialog commit or revert rather than from
-     * [onCommit], which the property editor calls once per committed property.
-     */
+    internal val listenerCount get() = listeners.size
+
+    /** Calls every listener on the calling thread. */
     fun fireChanged() {
-        events.forEach { it() }
+        listeners.forEach { it() }
     }
 }
+
+/**
+ * Base class for objects that hold [Preference] objects. Listeners are notified once per dialog commit or revert
+ * rather than from [onCommit], which the property editor calls once per committed property.
+ */
+open class PreferenceHolder: ChangeNotifier(), EditableObject
 
 val systemPreferences = Preferences.userRoot().node("/org/simbrain")
 

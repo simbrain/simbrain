@@ -313,6 +313,51 @@ class UiUpdatesTest {
     }
 
     @Test
+    fun `a change subscription coalesces fires into one run on the edt`() {
+        val scope = UiScope()
+        val notifier = ChangeNotifier()
+        val runs = AtomicInteger()
+        var onEdt = true
+        notifier.onUi(scope, minIntervalMs = 0) {
+            onEdt = onEdt && SwingUtilities.isEventDispatchThread()
+            runs.incrementAndGet()
+        }
+
+        withEdtHeld { repeat(10) { notifier.fireChanged() } }
+        UiWork.awaitIdle()
+
+        assertEquals(1, runs.get())
+        assertTrue(onEdt)
+        scope.cancel()
+    }
+
+    @Test
+    fun `a change subscription unregisters its listener when the scope ends`() {
+        val scope = UiScope()
+        val notifier = ChangeNotifier()
+        val runs = AtomicInteger()
+        notifier.onUi(scope, minIntervalMs = 0) { runs.incrementAndGet() }
+
+        scope.cancel()
+        notifier.fireChanged()
+        UiWork.awaitIdle()
+
+        assertEquals(0, notifier.listenerCount)
+        assertEquals(0, runs.get())
+    }
+
+    @Test
+    fun `a change subscription ended early leaves no listener and no scope child behind`() {
+        val scope = UiScope()
+        val notifier = ChangeNotifier()
+
+        repeat(100) { notifier.onUi(scope) { }.cancel() }
+
+        assertEquals(0, notifier.listenerCount)
+        assertEquals(0, scope.coroutineContext.job.children.count())
+    }
+
+    @Test
     fun `a panel scope bound to its window's scope ends with it`() {
         val window = UiScope()
         val panel = UiScope().cancelWith(window)

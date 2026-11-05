@@ -155,6 +155,12 @@ object Theme {
     @JvmStatic val isDark: Boolean get() = UIManager.getBoolean("laf.dark")
 
     /**
+     * Fired on the EDT after a live light/dark switch has been installed, for views that bake theme-derived colors
+     * that [com.formdev.flatlaf.FlatLaf.updateUI] cannot reach. Subscribe with [onUi] on the view's scope.
+     */
+    @JvmField val changed = ChangeNotifier()
+
+    /**
      * Background for alternating bands of table rows: a wash of the text color over the table background.
      *
      * The dark fraction is more than twice the light one because the same proportional step is a much

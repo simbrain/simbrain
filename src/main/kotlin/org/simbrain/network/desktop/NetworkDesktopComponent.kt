@@ -2,7 +2,6 @@ package org.simbrain.network.desktop
 
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.gui.*
-import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.cancelWith
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.workspace.gui.DesktopComponent
@@ -33,10 +32,6 @@ class NetworkDesktopComponent(frame: GenericFrame, component: NetworkComponent) 
         fileMenu.addSeparator()
         fileMenu.add(actionManager.createCloseAction(this))
         return fileMenu
-    }
-
-    override fun onClosed() {
-        NetworkPreferences.unregisterChangeListener(networkPanel.preferenceLoader)
     }
 
     companion object {

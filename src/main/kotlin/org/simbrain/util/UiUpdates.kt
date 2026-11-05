@@ -318,6 +318,18 @@ fun FlowEvents.NoArgAwaitableEvent.onUi(scope: CoroutineScope, minIntervalMs: Lo
     return on(Dispatchers.Unconfined) { refresh.request() }.cancelWith(scope)
 }
 
+/**
+ * Runs [block] on the EDT after each [ChangeNotifier.fireChanged], such as a [PreferenceHolder] commit or a
+ * [Theme.changed] switch, until [scope] ends. The view's own subscription replaces registering and unregistering a
+ * listener by hand, and replaces the desktop walking its windows to refresh views by type.
+ */
+fun ChangeNotifier.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, block: () -> Unit): Job {
+    val refresh = scope.uiRefresh(minIntervalMs, block)
+    val listener = { refresh.request() }
+    registerChangeListener(listener)
+    return { unregisterChangeListener(listener) }.cancelWith(scope)
+}
+
 /** [onUi] for a valued awaitable event: only the newest value since the last run is applied. */
 fun <T> FlowEvents.AwaitableEvent<T>.onUi(scope: CoroutineScope, minIntervalMs: Long = UI_FRAME_MS, apply: (T) -> Unit): Job {
     val latest = scope.uiLatest(minIntervalMs, apply)

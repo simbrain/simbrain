@@ -220,7 +220,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     private val forceZoomToFitPage = PreferenceChangeListener { zoomToFit.request() }
 
     /**
-     * Called when preferences are updated. Ensures preference changes are applied immediately.
+     * Applies [NetworkPreferences] and re-reads theme-derived colors. Runs after each preferences commit and live
+     * theme switch until [viewScope] ends.
      */
     val preferenceLoader = {
 
@@ -306,8 +307,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     init {
         super.setLayout(BorderLayout())
 
-        NetworkPreferences.registerChangeListener(preferenceLoader)
         preferenceLoader()
+        NetworkPreferences.onUi(viewScope) { preferenceLoader() }
+        Theme.changed.onUi(viewScope) { preferenceLoader() }
 
         network.placementManager.visibleBounds = { canvas.camera.viewBounds }
 

@@ -10,14 +10,10 @@ import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
-import org.jfree.chart.ChartPanel
 import org.pmw.tinylog.Logger
 import org.simbrain.console.ConsoleDesktopComponent
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
-import org.simbrain.network.gui.NetworkPanel
-import org.simbrain.plot.PlotPreferences
-import org.simbrain.plot.applySimbrainChartTheme
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
 import org.simbrain.util.genericframe.GenericJFrame
@@ -75,7 +71,6 @@ object SimbrainDesktop {
         // Apply theme changes committed in the Workspace Preferences dialog, and follow the OS
         // appearance live while in System mode (macOS fires this when system dark mode is toggled).
         WorkspacePreferences.registerChangeListener { applyThemeIfChanged() }
-        PlotPreferences.registerChangeListener { refreshCharts() }
         Toolkit.getDefaultToolkit().addPropertyChangeListener("apple.awt.application.appearance") {
             applyThemeIfChanged()
         }
@@ -649,40 +644,25 @@ object SimbrainDesktop {
     }
 
     /**
-     * Re-theme every open chart so it re-reads the [PlotPreferences] series palette and line width, then
-     * repaint so legend swatches follow.
-     */
-    private fun refreshCharts() {
-        fun walk(c: Component) {
-            if (c is ChartPanel) c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
-            if (c is Container) c.components.forEach(::walk)
-        }
-        Window.getWindows().forEach {
-            walk(it)
-            it.repaint()
-        }
-    }
-
-    /**
      * Re-applies theme-derived colors that [FlatLaf.updateUI] leaves stale because they are not
-     * Swing UIResource values: JFreeChart plots bake their chrome at build time, and the desktop
-     * background and table grid colors are set explicitly.
+     * Swing UIResource values: the desktop background, table grid colors, and syntax and text world
+     * styling are set explicitly. Views with a view scope (the network canvas, charts) subscribe to
+     * [Theme.changed] themselves, which is fired at the end.
      */
     private fun refreshThemedChrome() {
         desktopPane.background = UIManager.getColor("Desktop.background")
         fun walk(c: Component) {
             when (c) {
-                is ChartPanel -> c.chart?.let { it.applySimbrainChartTheme(); it.fireChartChanged() }
                 is JTable -> c.gridColor = Theme.divider
-                is NetworkPanel -> c.preferenceLoader()
                 is RSyntaxTextArea -> c.applyLafSyntaxTheme()
                 is TextWorldPanel -> c.restyleDocument()
             }
             if (c is Container) c.components.forEach(::walk)
         }
-        // Every visible chart/table is inside some window — the desktop frame (which holds the
+        // Every visible table and text view is inside some window — the desktop frame (which holds the
         // internal frames) plus any dialogs/detached frames — so this reaches them all.
         Window.getWindows().forEach(::walk)
+        Theme.changed.fireChanged()
     }
 
     private fun createInsertMenu(): JMenu {

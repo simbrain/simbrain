@@ -510,21 +510,34 @@ class EntityNode(
     /** True if [node] is this entity's body rather than a sensor, effector or caption, so selecting it can resize the entity. */
     fun isBody(node: PNode) = node === this || node === sprite
 
-    /** Whether the corner handles that resize the entity are shown; on while the body is selected. */
-    var resizeHandlesVisible: Boolean
-        get() = resizeHandles != null
+    /** Whether this entity's body is selected, which makes its resize handles available. */
+    var bodySelected = false
         set(value) {
-            if (value == (resizeHandles != null)) return
-            if (value) {
-                resizeHandles = EntityResizeHandles(this, sprite, panel)
-            } else {
-                resizeHandles?.detach()
-                resizeHandles = null
-            }
+            field = value
+            refreshResizeHandles()
         }
 
+    /** Whether the corner handles that resize the entity are shown. */
+    val resizeHandlesVisible: Boolean get() = resizeHandles != null
+
+    /**
+     * Shows the resize handles while the body is selected and [OdorWorldPanel.resizeHandlesRevealed] is true. Handles
+     * with a drag in progress stay until the drag ends, so letting go of Alt mid-drag does not cut the resize short.
+     */
+    fun refreshResizeHandles() {
+        val show = bodySelected && panel.resizeHandlesRevealed
+        if (show == resizeHandlesVisible) return
+        if (show) {
+            resizeHandles = EntityResizeHandles(this, sprite, panel)
+        } else if (resizeHandles?.isDragging != true) {
+            resizeHandles?.detach()
+            resizeHandles = null
+        }
+    }
+
     override fun dispose() {
-        resizeHandlesVisible = false
+        resizeHandles?.detach()
+        resizeHandles = null
         super.dispose()
     }
 

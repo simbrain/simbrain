@@ -16,7 +16,7 @@ import java.awt.geom.Point2D
 import javax.swing.SwingUtilities
 
 /**
- * Resize handles on a selection of entities, from a tiny isopod to a cow, with a drag in progress on the cheese's
+ * Resize handles, revealed by holding Alt, on a selection of entities, from a tiny isopod to a cow, with a drag in progress on the cheese's
  * bottom right handle, which scales the whole selection and shows the readout.
  */
 class OdorWorldResizeHandlesSnapshot : UiSnapshotDef {
@@ -53,6 +53,12 @@ class OdorWorldResizeHandlesSnapshot : UiSnapshotDef {
             panel.selectionManager.selection = nodes.map<EntityNode, PNode> { it }.toMutableSet()
         }
         SwingUtilities.invokeAndWait { }
+        // Handles show only while Alt is held; a mouse move with Alt down reveals them
+        SwingUtilities.invokeAndWait {
+            panel.canvas.dispatchEvent(
+                MouseEvent(panel.canvas, MouseEvent.MOUSE_MOVED, 0L, InputEvent.ALT_DOWN_MASK, 5, 5, 0, false)
+            )
+        }
         SwingUtilities.invokeAndWait {
             val swiss = panel.canvas.layer.childrenReference.filterIsInstance<EntityNode>().first { it.entity === entities[0] }
             val handle = swiss.getAllNodes(null, null)
@@ -63,9 +69,10 @@ class OdorWorldResizeHandlesSnapshot : UiSnapshotDef {
             fun send(id: Int, x: Double, y: Double, mods: Int) = panel.canvas.dispatchEvent(
                 MouseEvent(panel.canvas, id, 0L, mods, x.toInt(), y.toInt(), 1, false, MouseEvent.BUTTON1)
             )
-            send(MouseEvent.MOUSE_MOVED, from.x, from.y, 0)
-            send(MouseEvent.MOUSE_PRESSED, from.x, from.y, InputEvent.BUTTON1_DOWN_MASK)
-            for (i in 1..4) send(MouseEvent.MOUSE_DRAGGED, from.x + 4 * i, from.y + 4 * i, InputEvent.BUTTON1_DOWN_MASK)
+            val alt = InputEvent.ALT_DOWN_MASK
+            send(MouseEvent.MOUSE_MOVED, from.x, from.y, alt)
+            send(MouseEvent.MOUSE_PRESSED, from.x, from.y, InputEvent.BUTTON1_DOWN_MASK or alt)
+            for (i in 1..4) send(MouseEvent.MOUSE_DRAGGED, from.x + 4 * i, from.y + 4 * i, InputEvent.BUTTON1_DOWN_MASK or alt)
         }
         // Size changes reach the nodes through queued Swing tasks; let them all run before the frame is captured
         repeat(5) {

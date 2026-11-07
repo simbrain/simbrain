@@ -1,6 +1,7 @@
 /**
- * Corner handles that resize odor world entities by dragging. Each selected [EntityNode] shows four handles just
- * outside its selection outline, kept at a constant screen size whatever the zoom. Dragging any corner sets
+ * Corner handles that resize odor world entities by dragging. While Alt (Option on macOS) is held, or always if
+ * [org.simbrain.world.odorworld.OdorWorldPreferences.alwaysShowResizeHandles] is on, each selected [EntityNode] shows
+ * four handles just outside its selection outline, kept at a constant screen size whatever the zoom. Dragging any corner sets
  * [OdorWorldEntity.scale] about the entity's center, so its location never changes, and applies the same ratio to
  * every selected entity. The scale math lives in [ResizeScaling] so it can be tested without a canvas.
  */
@@ -27,6 +28,7 @@ import java.awt.event.InputEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.beans.PropertyChangeListener
+import javax.swing.SwingUtilities
 import javax.swing.UIManager
 import kotlin.math.abs
 import kotlin.math.max
@@ -132,6 +134,9 @@ internal class EntityResizeHandles(
         body.removeChildren(handles)
     }
 
+    /** True while one of these handles is being dragged. */
+    val isDragging: Boolean get() = handles.any { it.isDragging }
+
     private val viewScale: Double get() = camera.viewScale.takeIf { it > 0 } ?: 1.0
 
     /**
@@ -156,6 +161,8 @@ internal class EntityResizeHandles(
 
         private var hovered = false
         private var drag: ResizeDrag? = null
+
+        val isDragging: Boolean get() = drag != null
 
         init {
             stroke = null
@@ -223,6 +230,8 @@ internal class EntityResizeHandles(
                 hovered = false
                 panel.canvas.popCursor()
             }
+            // Alt may have been released during the drag; hide the handles once this event is done with them
+            SwingUtilities.invokeLater { entityNode.refreshResizeHandles() }
         }
 
         private fun globalToParent(point: Point2D): Point2D = parent?.globalToLocal(Point2D.Double(point.x, point.y)) ?: point

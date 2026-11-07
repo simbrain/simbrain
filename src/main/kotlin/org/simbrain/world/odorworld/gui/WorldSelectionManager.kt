@@ -30,7 +30,7 @@ class WorldSelectionManager {
                 }
             }
             (removed + added).mapNotNull { it as? EntityNode ?: it.parent as? EntityNode }.toSet().forEach { entityNode ->
-                entityNode.resizeHandlesVisible = new.any { entityNode.isBody(it) }
+                entityNode.bodySelected = new.any { entityNode.isBody(it) }
             }
         }
     }

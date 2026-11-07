@@ -1,6 +1,6 @@
 /**
- * Resize handles on a live odor world panel: they appear only while an entity's body is selected, and a mouse drag on
- * one goes to the handle rather than to the panel's move and lasso handler.
+ * Resize handles on a live odor world panel: they appear only while an entity's body is selected and Alt is held, and
+ * a mouse drag on one goes to the handle rather than to the panel's move and lasso handler.
  */
 package org.simbrain.world.odorworld.gui
 
@@ -37,6 +37,12 @@ class EntityResizeHandlesTest {
             onEdt { panel.selectionManager.selection = selected.map<OdorWorldEntity, PNode> { node(it) }.toMutableSet() }
             onEdt { }
         }
+
+        /** Moves the mouse over an empty corner of the canvas, with Alt held or not. */
+        fun hover(alt: Boolean) {
+            mouse(panel, MouseEvent.MOUSE_MOVED, Point2D.Double(5.0, 5.0), if (alt) InputEvent.ALT_DOWN_MASK else 0)
+            onEdt { }
+        }
     }
 
     private fun fixture(vararg locations: Point2D): Fixture {
@@ -65,27 +71,32 @@ class EntityResizeHandlesTest {
         return Fixture(panel, entities)
     }
 
-    private fun mouse(panel: OdorWorldPanel, id: Int, p: Point2D, modifiers: Int) {
-        SwingUtilities.invokeAndWait {
-            panel.canvas.dispatchEvent(
-                MouseEvent(
-                    panel.canvas, id, System.currentTimeMillis(), modifiers, p.x.toInt(), p.y.toInt(), 1, false,
-                    MouseEvent.BUTTON1
+    private companion object {
+        fun mouse(panel: OdorWorldPanel, id: Int, p: Point2D, modifiers: Int) {
+            SwingUtilities.invokeAndWait {
+                panel.canvas.dispatchEvent(
+                    MouseEvent(
+                        panel.canvas, id, System.currentTimeMillis(), modifiers, p.x.toInt(), p.y.toInt(), 1, false,
+                        MouseEvent.BUTTON1
+                    )
                 )
-            )
+            }
         }
     }
 
-    private fun drag(panel: OdorWorldPanel, from: Point2D, to: Point2D) {
-        val down = InputEvent.BUTTON1_DOWN_MASK
-        mouse(panel, MouseEvent.MOUSE_MOVED, from, 0)
+    /** Drags with Alt held from [from] to [to]; [midway] runs on the EDT halfway through, with the button still down. */
+    private fun drag(panel: OdorWorldPanel, from: Point2D, to: Point2D, midway: () -> Unit = {}) {
+        val alt = InputEvent.ALT_DOWN_MASK
+        val down = InputEvent.BUTTON1_DOWN_MASK or alt
+        mouse(panel, MouseEvent.MOUSE_MOVED, from, alt)
         mouse(panel, MouseEvent.MOUSE_PRESSED, from, down)
-        val steps = 5
+        val steps = 6
         for (i in 1..steps) {
             val t = i.toDouble() / steps
             mouse(panel, MouseEvent.MOUSE_DRAGGED, Point2D.Double(from.x + (to.x - from.x) * t, from.y + (to.y - from.y) * t), down)
+            if (i == steps / 2) onEdt { midway() }
         }
-        mouse(panel, MouseEvent.MOUSE_RELEASED, to, 0)
+        mouse(panel, MouseEvent.MOUSE_RELEASED, to, alt)
         onEdt { }
     }
 
@@ -99,9 +110,10 @@ class EntityResizeHandlesTest {
         f.resizeHandles(entity).maxBy { onEdt { it.globalFullBounds.centerX + it.globalFullBounds.centerY } }
 
     @Test
-    fun `selecting an entity shows four handles and deselecting removes them`() {
+    fun `selecting an entity with Alt held shows four handles and deselecting removes them`() {
         val f = fixture(Point2D.Double(150.0, 150.0))
         val entity = f.entities.single()
+        f.hover(alt = true)
         assertEquals(0, f.resizeHandles(entity).size)
 
         f.select(entity)
@@ -113,10 +125,46 @@ class EntityResizeHandlesTest {
     }
 
     @Test
+    fun `a selected entity shows handles only while Alt is held`() {
+        val f = fixture(Point2D.Double(150.0, 150.0))
+        val entity = f.entities.single()
+        f.select(entity)
+        assertEquals(0, f.resizeHandles(entity).size)
+
+        f.hover(alt = true)
+        assertEquals(4, f.resizeHandles(entity).size)
+
+        f.hover(alt = false)
+        assertEquals(0, f.resizeHandles(entity).size)
+    }
+
+    @Test
+    fun `releasing Alt mid-drag finishes the resize and then hides the handles`() {
+        val f = fixture(Point2D.Double(150.0, 150.0))
+        val entity = f.entities.single()
+        f.select(entity)
+        f.hover(alt = true)
+        val from = handleCenterOnCanvas(f.panel, bottomRightHandle(f, entity))
+        val d = 16.0
+        var handlesMidway = -1
+
+        drag(f.panel, from, Point2D.Double(from.x + d, from.y + d)) {
+            f.panel.resizeKeyDown = false
+            handlesMidway = f.node(entity).getAllNodes(null, null).count { it is PHandle && it !is NodeHandle }
+        }
+        onEdt { }
+
+        assertEquals(4, handlesMidway)
+        assertEquals(2.0, entity.scale, 1e-6)
+        assertEquals(0, f.resizeHandles(entity).size)
+    }
+
+    @Test
     fun `dragging the bottom right handle outward grows the entity about its center`() {
         val f = fixture(Point2D.Double(150.0, 150.0))
         val entity = f.entities.single()
         f.select(entity)
+        f.hover(alt = true)
         val from = handleCenterOnCanvas(f.panel, bottomRightHandle(f, entity))
         val d = 16.0
 
@@ -134,6 +182,7 @@ class EntityResizeHandlesTest {
         a.scale = 0.5
         onEdt { }
         f.select(a, b)
+        f.hover(alt = true)
         val from = handleCenterOnCanvas(f.panel, bottomRightHandle(f, b))
         val d = 8.0
 
@@ -151,12 +200,14 @@ class EntityResizeHandlesTest {
         entity.scale = 2.5
         onEdt { }
         f.select(entity)
+        f.hover(alt = true)
         val at = handleCenterOnCanvas(f.panel, bottomRightHandle(f, entity))
 
         SwingUtilities.invokeAndWait {
             for (clicks in 1..2) {
                 for (id in listOf(MouseEvent.MOUSE_PRESSED, MouseEvent.MOUSE_RELEASED, MouseEvent.MOUSE_CLICKED)) {
-                    val mods = if (id == MouseEvent.MOUSE_PRESSED) InputEvent.BUTTON1_DOWN_MASK else 0
+                    val mods = InputEvent.ALT_DOWN_MASK or
+                        if (id == MouseEvent.MOUSE_PRESSED) InputEvent.BUTTON1_DOWN_MASK else 0
                     f.panel.canvas.dispatchEvent(
                         MouseEvent(f.panel.canvas, id, 0L, mods, at.x.toInt(), at.y.toInt(), clicks, false, MouseEvent.BUTTON1)
                     )

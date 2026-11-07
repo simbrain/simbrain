@@ -32,6 +32,8 @@ import org.simbrain.world.odorworld.gui.*
 import java.awt.BorderLayout
 import java.awt.Color
 import java.awt.Dimension
+import java.awt.KeyEventDispatcher
+import java.awt.KeyboardFocusManager
 import java.awt.Rectangle
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
@@ -39,6 +41,7 @@ import java.awt.event.MouseEvent
 import java.awt.event.MouseWheelEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import java.beans.PropertyChangeListener
 import java.util.*
 import javax.swing.JPanel
 import javax.swing.JPopupMenu
@@ -116,6 +119,22 @@ class OdorWorldPanel(
      * Set to true while the user is dragging an entity, to suppress camera centering.
      */
     var isDraggingEntity = false
+
+    /** True while Alt (Option on macOS) is held, which reveals the resize handles of selected entities. */
+    internal var resizeKeyDown = false
+        set(value) {
+            if (field == value) return
+            field = value
+            refreshResizeHandles()
+        }
+
+    /** Whether selected entities show their resize handles: while Alt is held, or always if the preference is on. */
+    val resizeHandlesRevealed: Boolean
+        get() = resizeKeyDown || OdorWorldPreferences.alwaysShowResizeHandles
+
+    fun refreshResizeHandles() {
+        canvas.layer.childrenReference.filterIsInstance<EntityNode>().forEach { it.refreshResizeHandles() }
+    }
 
     val odorWorldActions: OdorWorldActions = OdorWorldActions(this)
 
@@ -298,6 +317,8 @@ class OdorWorldPanel(
         canvas.removeInputEventListener(zoomEventHandler)
 
         addKeyBindings()
+        trackResizeKey()
+        OdorWorldPreferences.onUi(viewScope) { refreshResizeHandles() }
 
         // Mouse events
         canvas.addInputEventListener(WorldMouseHandler(this, world))
@@ -427,6 +448,32 @@ class OdorWorldPanel(
                 }
             }
         })
+    }
+
+    /**
+     * Follows Alt across the whole application rather than only while the canvas has focus, so the handles appear as
+     * soon as the key goes down, whatever was last clicked. A release that goes to another application is never
+     * seen, so the state also clears when the active window changes and is resynced on every mouse move over the
+     * canvas.
+     */
+    private fun trackResizeKey() {
+        val focusManager = KeyboardFocusManager.getCurrentKeyboardFocusManager()
+        val keyDispatcher = KeyEventDispatcher { event ->
+            resizeKeyDown = event.isAltDown
+            false
+        }
+        val activeWindowListener = PropertyChangeListener { resizeKeyDown = false }
+        focusManager.addKeyEventDispatcher(keyDispatcher)
+        focusManager.addPropertyChangeListener("activeWindow", activeWindowListener)
+        canvas.addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseMoved(event: PInputEvent) {
+                resizeKeyDown = event.isAltDown
+            }
+        })
+        viewScope.coroutineContext.job.invokeOnCompletion {
+            focusManager.removeKeyEventDispatcher(keyDispatcher)
+            focusManager.removePropertyChangeListener("activeWindow", activeWindowListener)
+        }
     }
 
     private var lastCanvasSize: Dimension? = null

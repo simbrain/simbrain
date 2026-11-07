@@ -1,0 +1,25 @@
+<!--
+  bespoke Simbrain glyph: coupling manager (producers column wired to consumers column)
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <circle cx="4" cy="5" r="1.5" />
+  <circle cx="4" cy="12" r="1.5" />
+  <circle cx="4" cy="19" r="1.5" />
+  <circle cx="20" cy="5" r="1.5" />
+  <circle cx="20" cy="12" r="1.5" />
+  <circle cx="20" cy="19" r="1.5" />
+  <path d="M8.5 5L15.5 5" />
+  <path d="M13.5 7L15.5 5L13.5 3" />
+  <path d="M8.12 13.8L15.88 17.2" />
+  <path d="M13.24 18.23L15.88 17.2L14.85 14.56" />
+</svg>

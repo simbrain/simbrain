@@ -68,7 +68,7 @@ class SynapseGroupInteractionBox(
             menu.addSeparator()
             menu.add(
                 JMenuItem(networkPanel.createAction(
-                    iconPath = "menu_icons/grid.png",
+                    iconPath = "menu_icons/WeightMatrix.png",
                     name = "Show weight matrix...",
                 ) {
                     WeightMatrixViewer(

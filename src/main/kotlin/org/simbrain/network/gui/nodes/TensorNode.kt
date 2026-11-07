@@ -44,6 +44,10 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         mainNode.addChild(this)
         pickable = true
         addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
+            override fun mouseEntered(event: org.piccolo2d.event.PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+                event.isHandled = true
+            }
             override fun mouseMoved(event: org.piccolo2d.event.PInputEvent) {
                 val localPt = event.getPositionRelativeTo(this@apply)
                 val tensorH = (localPt.y / imageSize * tensorLayer.shape.height).toInt()
@@ -51,11 +55,29 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
                 val tensorW = (localPt.x / imageSize * tensorLayer.shape.width).toInt()
                     .coerceIn(0, tensorLayer.shape.width - 1)
                 networkPanel.updateReceptiveFieldTrace(tensorLayer, tensorH, tensorW)
+                networkPanel.showPixelTooltip(event, hasPixelSelection = false) { pixelTooltipText(tensorH, tensorW) }
             }
             override fun mouseExited(event: org.piccolo2d.event.PInputEvent) {
                 networkPanel.clearReceptiveFieldTrace()
+                networkPanel.hideCanvasTooltip()
             }
         })
+    }
+
+    /**
+     * Value readout at ([h], [w]) for what the main image shows: all three channels in RGB composite mode, otherwise
+     * the current channel, numbered from 1 as in the channel label.
+     */
+    internal fun pixelTooltipText(h: Int, w: Int): String {
+        val position = "(h $h, w $w)"
+        val showsComposite = !tensorLayer.thumbnailStripMode && tensorLayer.rgbComposite && tensorLayer.shape.channels == 3
+        return if (showsComposite) {
+            val (r, g, b) = (0 until 3).map { tensorLayer[h, w, it].formatSignificant(3) }
+            "$position: R $r, G $g, B $b"
+        } else {
+            val ch = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
+            "Ch ${ch + 1} $position: ${tensorLayer[h, w, ch].formatSignificant(3)}"
+        }
     }
     private val channelLabel = PText("").apply {
         font = Theme.label

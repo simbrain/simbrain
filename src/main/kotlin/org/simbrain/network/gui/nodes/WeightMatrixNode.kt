@@ -152,9 +152,13 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 val localPt = event.getPositionRelativeTo(imageBox)
                 val ij = pixelToWeightCell(wm, localPt) ?: return
                 networkPanel.updateWeightMatrixCellTrace(wm, ij.first, ij.second)
+                networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) {
+                    cellTooltipText(wm, ij.first, ij.second)
+                }
             }
             override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearNeuronArrayTrace()
+                networkPanel.hideCanvasTooltip()
             }
             override fun mousePressed(event: PInputEvent) {
                 val wm = weightMatrix as? WeightMatrix ?: return
@@ -300,6 +304,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             offsetY = boxOffset.y
         )
     }
+
+    /** Value readout for the weight from source neuron [sourceCol] to target neuron [targetRow]. */
+    internal fun cellTooltipText(wm: WeightMatrix, targetRow: Int, sourceCol: Int): String =
+        "Source $sourceCol → Target $targetRow: ${wm.weights[targetRow, sourceCol].formatSignificant(3)}"
 
     /**
      * Map a pixel inside [imageBox] to a `(targetRow, sourceCol)` cell of [wm], respecting the

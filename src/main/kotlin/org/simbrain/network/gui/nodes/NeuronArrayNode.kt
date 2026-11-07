@@ -1,3 +1,4 @@
+/** Draws a neuron array as a pixel image or circles and handles per-pixel hover, tracing, and quick-edit selection. */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -64,8 +65,12 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                         networkPanel.updateNeuronArrayTrace(neuronArray, i)
                         event.isHandled = true
                     }
+                    override fun mouseMoved(event: PInputEvent) {
+                        networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) { pixelTooltipText(i) }
+                    }
                     override fun mouseExited(event: PInputEvent) {
                         networkPanel.clearNeuronArrayTrace()
+                        networkPanel.hideCanvasTooltip()
                     }
                     override fun mousePressed(event: PInputEvent) {
                         networkPanel.pressPixel(event, this@NeuronArrayNode) { selectPixel(i, addToSelection = it) }
@@ -101,17 +106,37 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 event.isHandled = true
             }
             override fun mouseMoved(event: PInputEvent) {
-                val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
+                val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply))
+                if (idx == null) {
+                    // Blank cells past the last neuron in a partially filled grid
+                    if (networkPanel.canvas.toolTipText != null) networkPanel.hideCanvasTooltip()
+                    return
+                }
                 networkPanel.updateNeuronArrayTrace(neuronArray, idx)
+                networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) { pixelTooltipText(idx) }
             }
             override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearNeuronArrayTrace()
+                networkPanel.hideCanvasTooltip()
             }
             override fun mousePressed(event: PInputEvent) {
                 val idx = pixelToNeuronIndex(event.getPositionRelativeTo(this@apply)) ?: return
                 networkPanel.pressPixel(event, this@NeuronArrayNode) { selectPixel(idx, addToSelection = it) }
             }
         })
+    }
+
+    /** Value readout for the neuron at [idx], with its display cell when the array is laid out in two dimensions. */
+    internal fun pixelTooltipText(idx: Int): String? {
+        val value = neuronArray.activationArray.getOrNull(idx) ?: return null
+        val twoDimensional = (gridMode || neuronArray.circleMode) &&
+            neuronArray.displayRows > 1 && neuronArray.displayColumns > 1
+        val cell = if (twoDimensional) {
+            neuronArray.displayCellOf(idx).let { (row, col) -> " (row $row, col $col)" }
+        } else {
+            ""
+        }
+        return "Neuron $idx$cell: ${value.formatSignificant(3)}"
     }
 
     /** Map a pixel within [activationImage] to a neuron index, respecting layout mode. */

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Assertions.assertArrayEquals
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.simbrain.util.geneticalgorithm.toProbabilityWeight
+import java.util.Locale
 
 class MathUtilsKtTest {
 
@@ -17,6 +18,26 @@ class MathUtilsKtTest {
         assertEquals("1", 1.2.formatAdaptive(0, minPrecision = 0))
         assertEquals("0", (-0.01).formatAdaptive(1, minPrecision = 0))
         assertEquals("-Infinity", Double.NEGATIVE_INFINITY.formatAdaptive(1, minPrecision = 0))
+    }
+
+    @Test
+    fun `test significant digit formatting`() {
+        assertEquals("0.732", 0.73219.formatSignificant(3))
+        assertEquals("0.5", 0.5.formatSignificant(3))
+        assertEquals("1", 1.0.formatSignificant(3))
+        assertEquals("-12.5", (-12.54).formatSignificant(3))
+        assertEquals("1230", 1234.5.formatSignificant(3))
+        assertEquals("0", 0.0.formatSignificant(3))
+        assertEquals("1.23e-05", 0.0000123456.formatSignificant(3))
+        assertEquals("4.57e+04", 45678.0.formatSignificant(3))
+        assertEquals("NaN", Double.NaN.formatSignificant(3))
+        val previous = Locale.getDefault()
+        try {
+            Locale.setDefault(Locale.GERMANY)
+            assertEquals("1.23e-05", 0.0000123456.formatSignificant(3))
+        } finally {
+            Locale.setDefault(previous)
+        }
     }
 
     @Test

@@ -117,7 +117,7 @@ fun NetworkPanel.hasAnyPixelSelection(): Boolean =
 
 /**
  * Hide any visible canvas tooltip right away and keep it hidden until the mouse next enters a node.
- * Called when the mouse enters a pixel surface and when a pixel selection begins, so the node-level
+ * Called when the mouse enters or leaves a pixel surface and when a pixel selection begins, so the node-level
  * summary box does not sit over the cells being traced or edited. Clearing the text alone leaves an
  * already-open tooltip up until Swing's dismiss delay, so the shared manager is toggled to force the
  * popup closed.
@@ -129,6 +129,25 @@ fun NetworkPanel.hideCanvasTooltip() {
         isEnabled = true
     }
 }
+
+/**
+ * Set the canvas tooltip to the value readout for the pixel under the mouse. The readout is withheld while Alt
+ * (the pixel-edit modifier) is held, while the hovered node has a pixel selection, outside the selection cursor,
+ * and while the workspace runs: a tooltip only refreshes when the mouse moves, so during a run it would show a
+ * stale value.
+ */
+fun NetworkPanel.showPixelTooltip(event: PInputEvent, hasPixelSelection: Boolean, text: () -> String?) {
+    val suppressed = event.isAltDown || hasPixelSelection ||
+        mouseCursor != MouseEventHandler.MouseCursor.Selection || isWorkspaceRunning
+    canvas.toolTipText = if (suppressed) null else text()
+}
+
+private val NetworkPanel.isWorkspaceRunning: Boolean
+    get() = try {
+        networkComponent.workspace.updater.isRunning
+    } catch (_: UninitializedPropertyAccessException) {
+        false
+    }
 
 /** Drop all pixel selections (e.g. on Escape). */
 fun NetworkPanel.clearAllPixelSelections() {

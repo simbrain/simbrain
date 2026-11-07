@@ -7,7 +7,11 @@ import kotlinx.coroutines.*
 import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.stats.distributions.TwoValued
 import smile.math.matrix.Matrix
+import java.math.BigDecimal
+import java.math.MathContext
+import java.util.Locale
 import java.util.concurrent.atomic.AtomicLong
+import kotlin.math.abs
 import kotlin.math.ln
 import kotlin.math.min
 import kotlin.math.sqrt
@@ -49,6 +53,22 @@ fun Double.formatAdaptive(maxPrecision: Int, minPrecision: Int = 1): String {
     }
     return withoutEmptyFraction.removePrefix("-").let { magnitude ->
         if (magnitude.all { it == '0' || it == '.' || it == ',' }) magnitude else withoutEmptyFraction
+    }
+}
+
+/**
+ * Format to [digits] significant digits for compact value readouts, dropping trailing zeroes. Magnitudes below 1e-3
+ * or at least 1e4 use scientific notation so tiny and huge values stay short.
+ */
+fun Double.formatSignificant(digits: Int): String {
+    require(digits > 0) { "Significant digits must be positive" }
+    if (isNaN() || isInfinite()) return toString()
+    if (this == 0.0) return "0"
+    val magnitude = abs(this)
+    return if (magnitude >= 1e-3 && magnitude < 1e4) {
+        BigDecimal(this).round(MathContext(digits)).stripTrailingZeros().toPlainString()
+    } else {
+        "%.${digits - 1}e".format(Locale.ROOT, this)
     }
 }
 

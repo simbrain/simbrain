@@ -47,9 +47,11 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             override fun mouseMoved(event: PInputEvent) {
                 val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
                 networkPanel.updateActivationSequenceTrace(activationSequence, row, col)
+                networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) { cellTooltipText(row, col) }
             }
             override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearNeuronArrayTrace()
+                networkPanel.hideCanvasTooltip()
             }
             override fun mousePressed(event: PInputEvent) {
                 val (row, col) = pixelToCell(event.getPositionRelativeTo(this@apply)) ?: return
@@ -75,6 +77,10 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
     override val toolTipText: String?
         get() = if (pixelSelection.isNotEmpty()) null else super.toolTipText
+
+    /** Value readout for the cell at sequence position [row] and feature [col]. */
+    internal fun cellTooltipText(row: Int, col: Int): String =
+        "Position $row, feature $col: ${activationSequence.activations[row, col].formatSignificant(3)}"
 
     /** Map a pixel within [activationImage] to a `(position row, feature col)` cell. */
     private fun pixelToCell(localPt: Point2D): Pair<Int, Int>? {

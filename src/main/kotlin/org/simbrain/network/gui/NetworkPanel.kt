@@ -1108,26 +1108,27 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                     if (swingEvent.preciseWheelRotation != 0.0 && autoZoom) {
                         autoZoom = false
                     }
-                    scale(1 / newScale)
+                    scale(1 / newScale, event.position)
                 }
             })
             addInputEventListener(WandEventHandler(this@NetworkPanel))
         }
 
         /**
-         * Change the current zoom level up or down by the scaling factor.
+         * Change the current zoom level up or down by the scaling factor, keeping [anchor] (in view coordinates)
+         * at the same screen position. Without an anchor the view center stays fixed.
          *
          * For example:
          * 1.1 zooms in by ~10%
          * 0.9 zooms out by ~10%
          */
-        fun scale(scalingFactor: Double) {
-            val canvasCenter: Point2D = camera.bounds.center
-            val (x, y) = camera.localToView(canvasCenter)
-            val newWidth = camera.viewBounds.width / scalingFactor
-            val newHeight = camera.viewBounds.height / scalingFactor
-            val newX = x - newWidth / 2
-            val newY = y - newHeight / 2
+        fun scale(scalingFactor: Double, anchor: Point2D? = null) {
+            val viewBounds = camera.viewBounds
+            val (x, y) = anchor ?: camera.localToView(camera.bounds.center)
+            val newWidth = viewBounds.width / scalingFactor
+            val newHeight = viewBounds.height / scalingFactor
+            val newX = x - (x - viewBounds.x) / scalingFactor
+            val newY = y - (y - viewBounds.y) / scalingFactor
             camera.setViewBoundsNoOverflow(Rectangle2D.Double(newX, newY, newWidth, newHeight))
         }
     }

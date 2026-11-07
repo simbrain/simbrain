@@ -20,14 +20,14 @@ class IconGallerySnapshot : UiSnapshotDef {
         "Save", "Open", "export", "import", "Extract", "Copy", "Cut", "Paste", "Undo", "Redo",
         "Play", "Stop", "Step", "Reset", "ZoomIn", "ZoomOut", "ZoomFitPage", "ZoomReset",
         "plus", "minus", "Prefs", "Tools", "Properties", "PenToSquare", "DocumentInfo", "Eraser",
-        "Help", "Info", "Link", "chainIcon", "brokenChainIcon", "Up", "Down", "UpFull", "DownFull",
+        "Help", "Info", "Link", "Coupling", "CouplingList", "chainIcon", "brokenChainIcon", "Up", "Down", "UpFull", "DownFull",
         "TangoIcons-GoNext", "TangoIcons-GoPrevious", "BarChart", "histogram", "PieChart",
-        "TimeSeries", "ScatterIcon", "Table", "grid", "TableBold", "AddTableColumn",
+        "TimeSeries", "ScatterIcon", "Table", "grid", "TableBold", "WeightMatrix", "PriorityTable", "AddTableColumn",
         "DeleteTableColumn", "AddTableRow", "DeleteTableRow", "fill", "Fill_0", "Rand", "Rand_C",
         "AlignHorizontal", "AlignVertical", "SpaceHorizontal", "SpaceVertical", "Arrow", "Hand",
         "Sequence", "TestInput", "Text", "Terminal", "speaker", "World", "camera", "photo", "Trophy",
         "lambda", "Gauge",
-        // domain (still raster until later stages)
+        // domain
         "ActivationTool", "Clamp", "CubeShadow", "network_icon_black", "mouse_icon", "swiss_icon",
         "PixelPlot", "RasterPlot"
     ).map { "menu_icons/$it.png" }

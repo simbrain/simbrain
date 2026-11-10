@@ -532,7 +532,6 @@ object SimbrainDesktop {
         menuBar.add(createViewMenu())
         menuBar.add(createInsertMenu())
         menuBar.add(createScriptMenu())
-        menuBar.add(createCoupleMenu())
         menuBar.add(createHelpMenu())
         frame.jMenuBar = menuBar
     }
@@ -587,6 +586,8 @@ object SimbrainDesktop {
 
     private fun createViewMenu(): JMenu {
         val viewMenu = JMenu("View")
+        viewMenu.add(JMenuItem(actionManager.openCouplingManagerAction))
+        viewMenu.addSeparator()
         viewMenu.add(JMenuItem(actionManager.toggleBottomDock))
         viewMenu.add(JMenuItem(actionManager.toggleInfoDock))
         viewMenu.addSeparator()
@@ -684,13 +685,6 @@ object SimbrainDesktop {
         insertMenu.add(actionManager.newDocViewerAction)
         insertMenu.add(actionManager.newConsoleAction)
         return insertMenu
-    }
-
-    private fun createCoupleMenu(): JMenu {
-        val coupleMenu = JMenu("Couplings")
-        coupleMenu.add(actionManager.openCouplingManagerAction)
-        coupleMenu.add(actionManager.openCouplingListAction)
-        return coupleMenu
     }
 
     private fun createHelpMenu(): JMenu {

@@ -169,15 +169,6 @@ class WorkspaceActions {
         DesktopCouplingManager(SimbrainDesktop).displayInDialog(title = "Couplings") {  }
     }
 
-    val openCouplingListAction = desktopPane.createAction(
-        iconPath = "menu_icons/CouplingList.png",
-        name = "Open coupling list...",
-        description = "Open list of workspace couplings.",
-        coroutineScope = workspace
-    ) {
-        CouplingListPanel(SimbrainDesktop, SimbrainDesktop.workspace.couplings).displayInDialog {  }
-    }
-
     val resetOnboardingWindows = desktopPane.createAction(
         name = "Reset onboarding windows",
         description = "All onboarding windows will be reset to appear again.",

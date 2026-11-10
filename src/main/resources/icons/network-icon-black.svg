@@ -1,5 +1,5 @@
 <!--
-  bespoke Simbrain glyph: neural network (three nodes feeding two, W-pattern like the legacy icon)
+  bespoke Simbrain glyph: network (three nodes feeding three, seven links)
 -->
 <svg
   xmlns="http://www.w3.org/2000/svg"
@@ -12,13 +12,17 @@
   stroke-linecap="round"
   stroke-linejoin="round"
 >
-  <circle cx="4" cy="6" r="2" />
-  <circle cx="12" cy="6" r="2" />
-  <circle cx="20" cy="6" r="2" />
-  <circle cx="7.5" cy="18" r="2" />
-  <circle cx="16.5" cy="18" r="2" />
-  <path d="M4.73 8.5L6.77 15.5" />
-  <path d="M11.09 8.43L8.41 15.57" />
-  <path d="M12.91 8.43L15.59 15.57" />
-  <path d="M19.27 8.5L17.23 15.5" />
+  <circle cx="4" cy="5" r="2"/>
+  <circle cx="12" cy="5" r="2"/>
+  <circle cx="20" cy="5" r="2"/>
+  <circle cx="4" cy="19" r="2"/>
+  <circle cx="12" cy="19" r="2"/>
+  <circle cx="20" cy="19" r="2"/>
+  <path d="M4.00 8.00L4.00 16.00"/>
+  <path d="M5.49 7.60L10.51 16.40"/>
+  <path d="M10.51 7.60L5.49 16.40"/>
+  <path d="M12.00 8.00L12.00 16.00"/>
+  <path d="M13.49 7.60L18.51 16.40"/>
+  <path d="M18.51 7.60L13.49 16.40"/>
+  <path d="M20.00 8.00L20.00 16.00"/>
 </svg>

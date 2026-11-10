@@ -55,7 +55,7 @@ class WorkspaceActions {
     val toggleBottomDock = createAction(
         name = "Bottom dock",
         description = "Show/hide bottom panels",
-        iconPath = "menu_icons/Tools.png"
+        iconPath = "menu_icons/BottomDock.png"
     ) {
         SimbrainDesktop.bottomDockSplitter.toggleDock(WorkspacePreferences.bottomDockSize)
     }

@@ -1,0 +1,24 @@
+<!--
+  bespoke Simbrain glyph: pixel plot (filled cells on, hollow cells off)
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <rect x="3" y="3" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="10.5" y="4" width="3" height="3" rx=".5" />
+  <rect x="16" y="3" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="4" y="10.5" width="3" height="3" rx=".5" />
+  <rect x="9.5" y="9.5" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="17" y="10.5" width="3" height="3" rx=".5" />
+  <rect x="3" y="16" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="9.5" y="16" width="5" height="5" fill="currentColor" stroke="none" />
+  <rect x="17" y="17" width="3" height="3" rx=".5" />
+</svg>

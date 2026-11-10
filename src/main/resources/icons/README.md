@@ -26,5 +26,11 @@ So **dropping a correctly-named SVG into this folder auto-upgrades that icon —
 
 ## Source set
 
-Standard-action icons are sourced from [Tabler Icons](https://tabler.io/icons) (MIT), filled style where a
-filled variant exists, outline otherwise. Domain-specific glyphs (network, odorworld, plots) are bespoke.
+Icons are sourced from [Tabler Icons](https://tabler.io/icons) (MIT), outline style only: the filled set
+is partial, so mixing styles produces mismatched pairs. When Tabler has nothing that fits, a bespoke glyph is
+drawn on Tabler's grid (24×24 viewBox, `stroke-width="2"`, round caps and joins, `stroke="currentColor"`) and
+starts with a `bespoke Simbrain glyph: ...` comment instead of Tabler's tag header. Examples: the `op-*`
+transformer glyphs, `mouse-icon`, `network-icon-black`, `pixel-plot`, `coupling` and `coupling-list`.
+
+Check icons at their real 16 px size, in light and dark, with
+`./gradlew processResources uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.IconGallerySnapshot -Ptheme=dark`.

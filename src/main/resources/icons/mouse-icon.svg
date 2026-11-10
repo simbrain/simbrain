@@ -1,0 +1,19 @@
+<!--
+  bespoke Simbrain glyph: odor world mouse, simplified side view for 16px
+-->
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  width="24"
+  height="24"
+  viewBox="0 0 24 24"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="2"
+  stroke-linecap="round"
+  stroke-linejoin="round"
+>
+  <path d="M22 14.5q-4 -6 -11 -5.5q-7 .5 -7 5.5q0 3.5 5 3.5h9q3 0 4 -3.5z"/>
+  <path d="M12.6 9.4a3 3 0 1 1 5 1.2"/>
+  <path d="M17.5 13v.01"/>
+  <path d="M4.3 16c-3 .5 -3 4 0 4.5c1.5 .3 2.5 -.3 3.5 .5"/>
+</svg>

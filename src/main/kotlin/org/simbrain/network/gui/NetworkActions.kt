@@ -407,7 +407,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showWeightMatrixAction = networkPanel.createConditionallyEnabledAction(
         name = "Display/edit matrix for free weights...",
         description = "Show a weight matrix connecting source neurons (adorned with red squares) and target neurons (regular green selection)",
-        iconPath = "menu_icons/grid.png",
+        iconPath = "menu_icons/WeightMatrix.png",
         enablingCondition = EnablingConditions.SOURCE_AND_TARGET_NEURONS,
     ) {
         val sources = selectionManager.filterSelectedSourceModels<Neuron>()
@@ -892,7 +892,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     val showPriorityTableAction = networkPanel.createAction(
         name = "Show priority table...",
         description = "Show a table of all network models and their update priorities",
-        iconPath = "menu_icons/grid.png"
+        iconPath = "menu_icons/PriorityTable.png"
     ) {
         networkPanel.showPriorityTableDialog()
     }

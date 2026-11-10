@@ -55,7 +55,7 @@ class WorkspaceActions {
     val toggleBottomDock = createAction(
         name = "Bottom dock",
         description = "Show/hide bottom panels",
-        iconPath = "menu_icons/Tools.png"
+        iconPath = "menu_icons/BottomDock.png"
     ) {
         SimbrainDesktop.bottomDockSplitter.toggleDock(WorkspacePreferences.bottomDockSize)
     }
@@ -161,7 +161,7 @@ class WorkspaceActions {
     }
 
     val openCouplingManagerAction = desktopPane.createAction(
-        iconPath = "menu_icons/Link.png",
+        iconPath = "menu_icons/Coupling.png",
         name = "Open coupling manager...",
         description = "Open workspace coupling manager.",
         coroutineScope = workspace
@@ -170,7 +170,7 @@ class WorkspaceActions {
     }
 
     val openCouplingListAction = desktopPane.createAction(
-        iconPath = "menu_icons/Table.png",
+        iconPath = "menu_icons/CouplingList.png",
         name = "Open coupling list...",
         description = "Open list of workspace couplings.",
         coroutineScope = workspace
@@ -458,7 +458,7 @@ class WorkspaceActions {
         producer = producer,
         plotType = plotType,
         objectName = objectName,
-        iconPath = "menu_icons/grid.png",
+        iconPath = "menu_icons/PixelPlot.png",
         componentCreator = { name -> PixelPlotComponent(name) },
         consumerProvider = {
             it.pixelPlot.getConsumer(PixelPlot::setBrightness)

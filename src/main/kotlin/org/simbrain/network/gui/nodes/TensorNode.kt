@@ -1,9 +1,14 @@
-/** Displays a tensor's channels and delegates property editing to the selected model group. */
+/**
+ * Displays a tensor's channels and delegates property editing to the selected model group. Cells of the main
+ * image can be selected and edited one at a time through [PixelSelectionHost].
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PPaintContext
@@ -17,7 +22,11 @@ import org.simbrain.util.piccolo.addBorder
 import org.simbrain.workspace.gui.SimbrainDesktop.actionManager
 import java.awt.BasicStroke
 import java.awt.Color
+import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import javax.swing.JMenu
 import javax.swing.JPopupMenu
@@ -26,7 +35,8 @@ import javax.swing.SwingUtilities
 /**
  * GUI node for a [TensorLayer]. Shows stacked channel images with navigation buttons.
  */
-class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : ScreenElement(networkPanel) {
+class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : ScreenElement(networkPanel),
+    PixelSelectionHost {
 
     private val interactionBox = TensorInteractionBox(networkPanel)
 
@@ -43,25 +53,49 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     private val activationImage = SimbrainImage().apply {
         mainNode.addChild(this)
         pickable = true
-        addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
-            override fun mouseEntered(event: org.piccolo2d.event.PInputEvent) {
+        markAsPixelTarget()
+        addInputEventListener(object : PBasicInputEventHandler() {
+            override fun mouseEntered(event: PInputEvent) {
                 networkPanel.hideCanvasTooltip()
                 event.isHandled = true
             }
-            override fun mouseMoved(event: org.piccolo2d.event.PInputEvent) {
-                val localPt = event.getPositionRelativeTo(this@apply)
-                val tensorH = (localPt.y / imageSize * tensorLayer.shape.height).toInt()
-                    .coerceIn(0, tensorLayer.shape.height - 1)
-                val tensorW = (localPt.x / imageSize * tensorLayer.shape.width).toInt()
-                    .coerceIn(0, tensorLayer.shape.width - 1)
+            override fun mouseMoved(event: PInputEvent) {
+                val (tensorH, tensorW) = pixelToCell(event.getPositionRelativeTo(this@apply))
                 networkPanel.updateReceptiveFieldTrace(tensorLayer, tensorH, tensorW)
-                networkPanel.showPixelTooltip(event, hasPixelSelection = false) { pixelTooltipText(tensorH, tensorW) }
+                networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) { pixelTooltipText(tensorH, tensorW) }
             }
-            override fun mouseExited(event: org.piccolo2d.event.PInputEvent) {
+            override fun mouseExited(event: PInputEvent) {
                 networkPanel.clearReceptiveFieldTrace()
                 networkPanel.hideCanvasTooltip()
             }
+            override fun mousePressed(event: PInputEvent) {
+                val (tensorH, tensorW) = pixelToCell(event.getPositionRelativeTo(this@apply))
+                networkPanel.pressPixel(event, this@TensorNode) { selectCell(tensorH, tensorW, addToSelection = it) }
+            }
         })
+    }
+
+    /** True when the main image shows the three channels blended as RGB rather than one channel. */
+    private val showsComposite: Boolean
+        get() = !tensorLayer.thumbnailStripMode && tensorLayer.rgbComposite && tensorLayer.shape.channels == 3
+
+    /**
+     * Channels the main image shows right now. A receptive field trace can switch the current channel for as long
+     * as the mouse hovers another layer, so this is not always the channel the user navigated to.
+     */
+    private val displayedChannels: IntRange
+        get() = if (showsComposite) {
+            0 until 3
+        } else {
+            tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1).let { it..it }
+        }
+
+    /** Map a point within [activationImage] to a `(h, w)` cell. */
+    private fun pixelToCell(localPt: Point2D): Pair<Int, Int> {
+        val shape = tensorLayer.shape
+        val h = (localPt.y / imageSize * shape.height).toInt().coerceIn(0, shape.height - 1)
+        val w = (localPt.x / imageSize * shape.width).toInt().coerceIn(0, shape.width - 1)
+        return h to w
     }
 
     /**
@@ -70,15 +104,62 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
      */
     internal fun pixelTooltipText(h: Int, w: Int): String {
         val position = "(h $h, w $w)"
-        val showsComposite = !tensorLayer.thumbnailStripMode && tensorLayer.rgbComposite && tensorLayer.shape.channels == 3
         return if (showsComposite) {
             val (r, g, b) = (0 until 3).map { tensorLayer[h, w, it].formatSignificant(3) }
             "$position: R $r, G $g, B $b"
         } else {
-            val ch = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
+            val ch = displayedChannels.first
             "Ch ${ch + 1} $position: ${tensorLayer[h, w, ch].formatSignificant(3)}"
         }
     }
+
+    /**
+     * Activations the user has selected for quick-edit, as indices into the layer's flat HWC array. A cell of the
+     * RGB composite stands for three activations, one per channel. Empty means no pixel selection is active; in
+     * that case increment/decrement/clear/randomize fall through to whole-layer behavior.
+     *
+     * Only the selected activations on the [displayedChannels] are outlined. The selection is dropped when the
+     * user steps to another channel or the image switches between one channel and the composite, but kept when a
+     * receptive field trace changes the channel temporarily.
+     */
+    var pixelSelection: Set<Int> = emptySet()
+        set(value) {
+            field = value
+            selectionMadeOnComposite = showsComposite
+            if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
+            repaint()
+        }
+
+    /** Whether the main image showed the RGB composite when [pixelSelection] was last set. */
+    private var selectionMadeOnComposite = false
+
+    override val hasPixelSelection get() = pixelSelection.isNotEmpty()
+
+    override fun clearPixelSelection() {
+        if (pixelSelection.isNotEmpty()) pixelSelection = emptySet()
+    }
+
+    override fun selectedPixels() = pixelSelection.sorted().map { PixelTarget.TensorPixel(tensorLayer, it) }
+
+    override fun pixelsUnder(ellipse: Ellipse2D): List<PixelTarget> {
+        val shape = tensorLayer.shape
+        return activationImage.cellsIntersectingGlobalEllipse(
+            ellipse, shape.height, shape.width, imageSize / shape.width, imageSize / shape.height
+        ) { h, w -> h to w }.flatMap { (h, w) ->
+            displayedChannels.map { PixelTarget.TensorPixel(tensorLayer, shape.index(h, w, it)) }
+        }
+    }
+
+    /** Pick or toggle the cell at ([h], [w]) on the displayed channels as part of the per-pixel selection. */
+    private fun selectCell(h: Int, w: Int, addToSelection: Boolean) {
+        val cell = displayedChannels.map { tensorLayer.shape.index(h, w, it) }.toSet()
+        pixelSelection = if (addToSelection) {
+            if (pixelSelection.containsAll(cell)) pixelSelection - cell else pixelSelection + cell
+        } else {
+            cell
+        }
+    }
+
     private val channelLabel = PText("").apply {
         font = Theme.label
         textPaint = NetworkTheme.current.valueText
@@ -114,7 +195,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             val x = thumbStartX + c * (thumbSize + thumbGap)
             setBounds(x, thumbStripY, thumbSize, thumbSize)
             addInputEventListener(object : org.piccolo2d.event.PBasicInputEventHandler() {
-                override fun mouseClicked(event: org.piccolo2d.event.PInputEvent) {
+                override fun mouseClicked(event: PInputEvent) {
+                    clearPixelSelection()
                     tensorLayer.currentChannel = c
                 }
             })
@@ -165,6 +247,9 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             updateActivationImage()
         }.untilDisposed()
         tensorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
+            // A selection made on the composite spans three channels and one made on a single channel spans one,
+            // so neither matches the cells of the other view
+            if (showsComposite != selectionMadeOnComposite) clearPixelSelection()
             updateActivationImage()
             updateShapeCaption()
             updateBorder()
@@ -232,7 +317,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     private fun renderCurrentChannelToMainImage() {
         val ch = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
         extractChannel(ch)
-        channelBuffer.writeSimbrainColorImage(mainImage)
+        channelBuffer.writeSimbrainColorImage(mainImage, tensorLayer.graphicalBounds)
         activationImage.image = mainImage
         activationImage.setBounds(0.0, 0.0, imageSize, imageSize)
         activationImage.addBorder()
@@ -277,7 +362,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         val selectedCh = tensorLayer.currentChannel.coerceIn(0, tensorLayer.shape.channels - 1)
         for (c in 0 until numChannels) {
             extractChannel(c)
-            channelBuffer.writeSimbrainColorImage(thumbImages[c])
+            channelBuffer.writeSimbrainColorImage(thumbImages[c], tensorLayer.graphicalBounds)
             thumbPImages[c].invalidatePaint()
 
             // Update border: highlight for selected, default for others
@@ -328,12 +413,14 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
     fun nextChannel() {
         if (!tensorLayer.rgbComposite) {
+            clearPixelSelection()
             tensorLayer.currentChannel = (tensorLayer.currentChannel + 1) % tensorLayer.shape.channels
         }
     }
 
     fun previousChannel() {
         if (!tensorLayer.rgbComposite) {
+            clearPixelSelection()
             tensorLayer.currentChannel = (tensorLayer.currentChannel - 1 + tensorLayer.shape.channels) % tensorLayer.shape.channels
         }
     }
@@ -414,6 +501,8 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             }
         }
 
+        drawPixelSelection(g2)
+
         // Numeric overlay (re-extract current channel since channelBuffer may have been
         // overwritten by thumbnail strip rendering which iterates all channels)
         if (NetworkPreferences.showNumericOverlays
@@ -429,6 +518,24 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         }
     }
 
+    private fun drawPixelSelection(g2: Graphics2D) {
+        if (pixelSelection.isEmpty()) return
+        val shape = tensorLayer.shape
+        val cellW = imageSize / shape.width
+        val cellH = imageSize / shape.height
+        val channels = displayedChannels
+        g2.color = NeuronArrayNode.PIXEL_SELECTION_COLOR
+        // Thinner on fine grids so the outline does not swallow the cell it marks
+        g2.stroke = BasicStroke((minOf(cellW, cellH) / 3).coerceIn(1.0, 3.0).toFloat())
+        pixelSelection
+            .filter { it % shape.channels in channels }
+            .map { it / shape.channels }
+            .distinct()
+            .forEach { cell ->
+                g2.draw(Rectangle2D.Double(cell % shape.width * cellW, cell / shape.width * cellH, cellW, cellH))
+            }
+    }
+
     override val contextMenu: JPopupMenu
         get() {
             val contextMenu = JPopupMenu()
@@ -440,7 +547,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
 
             // Edit
             contextMenu.add(networkPanel.createAction(name = "Edit Tensor...") {
-                propertyDialog.display()
+                createEditDialog().display()
             })
             contextMenu.addSeparator()
 
@@ -513,12 +620,12 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
     }
 
     override val propertyDialog: StandardDialog
-        get() = createEditDialog()
+        get() = (if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else null) ?: createEditDialog()
 
     override val model: TensorLayer get() = tensorLayer
 
-    override val toolTipText: String
-        get() = createTooltipTextWithLocation(tensorLayer) {
+    override val toolTipText: String?
+        get() = if (pixelSelection.isNotEmpty()) null else createTooltipTextWithLocation(tensorLayer) {
             "${tensorLayer.displayName}\nShape: ${tensorLayer.shape.displayString} (channels × height × width)"
         }
 
@@ -529,7 +636,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             get() = this@TensorNode.propertyDialog
         override val model: TensorLayer
             get() = this@TensorNode.tensorLayer
-        override val toolTipText: String
+        override val toolTipText: String?
             get() = this@TensorNode.toolTipText
     }
 }

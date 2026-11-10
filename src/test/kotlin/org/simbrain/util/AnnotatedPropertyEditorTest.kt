@@ -21,7 +21,10 @@ import java.awt.Color
 import javax.swing.JComboBox
 import javax.swing.JLabel
 import javax.swing.JComponent
+import javax.swing.JDialog
 import javax.swing.JSpinner
+import javax.swing.JTabbedPane
+import javax.swing.SwingUtilities
 import kotlin.reflect.full.declaredMemberProperties
 
 /**
@@ -228,6 +231,23 @@ class AnnotatedPropertyEditorTest {
         ape.commitChanges()
         assertArrayEquals(doubleArrayOf(5.0, 0.0, 0.0, 0.0), l1.biases)
         assertArrayEquals(doubleArrayOf(5.0, 0.0, 0.0, 1.0), l2.biases)
+    }
+
+    @Test
+    fun `tensor tables take up the extra room when the editor is enlarged`() {
+        val layer = TensorLayer(TensorShape(28, 28))
+        SwingUtilities.invokeAndWait {
+            val ape = AnnotatedPropertyEditor(layer)
+            (ape.mainPanel as JTabbedPane).let { it.selectedIndex = it.indexOfTab("Data") }
+            val table = (ape.propertyNameWidgetMap["activations"] as TensorWidget).tablePanel
+            val dialog = JDialog().apply { contentPane = ape; pack() }
+            val packed = table.size
+            dialog.setSize(dialog.width + 300, dialog.height + 300)
+            dialog.validate()
+            assertTrue(table.width >= packed.width + 250, "width ${packed.width} -> ${table.width}")
+            assertTrue(table.height > packed.height + 100, "height ${packed.height} -> ${table.height}")
+            dialog.dispose()
+        }
     }
 
     @Test

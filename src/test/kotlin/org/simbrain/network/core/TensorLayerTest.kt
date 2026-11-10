@@ -133,4 +133,20 @@ class TensorLayerTest {
 
         assertEquals(0.0, tensorLayer.activations[0], 1e-10) // tanh(0) = 0
     }
+
+    @Test
+    fun `increment and decrement shift every activation by the increment amount`() {
+        val tensorLayer = TensorLayer(TensorShape(2, 2, 2))
+        tensorLayer.increment = 0.5
+        tensorLayer[1, 1, 1] = 2.0
+
+        tensorLayer.increment()
+        assertEquals(2.5, tensorLayer[1, 1, 1])
+        assertEquals(0.5, tensorLayer[0, 0, 0])
+
+        tensorLayer.decrement()
+        tensorLayer.decrement()
+        assertEquals(1.5, tensorLayer[1, 1, 1])
+        assertEquals(-0.5, tensorLayer[0, 0, 0])
+    }
 }

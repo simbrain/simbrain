@@ -71,12 +71,42 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
             events.clampChanged.fire()
         }
 
+    @UserParameter(label = "Increment amount", description = "Amount to change activations by when using the up and down arrow keys.", increment = .1, order = 25)
+    var increment = .1
+
     @UserParameter(label = "Thumbnail Strip", description = "Show all channels as a thumbnail strip", tab = "GUI", order = 30)
     var thumbnailStripMode = true
         set(value) {
             field = value
             events.visualPropertiesChanged.fire()
         }
+
+    @UserParameter(
+        label = "Graphical lower bound",
+        description = "Activation drawn at full cool color. Lower activations look the same. Raise the magnitude to tell apart large negative values.",
+        tab = "GUI",
+        order = 40
+    )
+    var graphicalLowerBound = -1.0
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
+    @UserParameter(
+        label = "Graphical upper bound",
+        description = "Activation drawn at full hot color. Higher activations look the same. Raise it to tell apart large values, for example with linear or relu activations.",
+        tab = "GUI",
+        order = 41
+    )
+    var graphicalUpperBound = 1.0
+        set(value) {
+            field = value
+            events.visualPropertiesChanged.fire()
+        }
+
+    /** Range of activations spanned by the color scale. Only affects how the layer is drawn. */
+    val graphicalBounds get() = graphicalLowerBound..graphicalUpperBound
 
     var rgbComposite = false
         set(value) {
@@ -308,8 +338,40 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
         isClamped = !isClamped
     }
 
+    override fun increment() {
+        val activations = activations
+        for (i in activations.indices) {
+            activations[i] += increment
+        }
+        events.updated.fire()
+    }
+
+    override fun decrement() {
+        val activations = activations
+        for (i in activations.indices) {
+            activations[i] -= increment
+        }
+        events.updated.fire()
+    }
+
     fun clearGradients() {
         gradients.fill(0.0)
+    }
+
+    /**
+     * Take on everything the user can set on [source] apart from its values, label and location: how it computes
+     * (activation function, clamping, increment) and how it is drawn.
+     */
+    fun copySettingsFrom(source: TensorLayer) {
+        activationFunction = source.activationFunction
+        isClamped = source.isClamped
+        increment = source.increment
+        // Turning the composite on turns the thumbnail strip off, so the strip is set second
+        rgbComposite = source.rgbComposite
+        thumbnailStripMode = source.thumbnailStripMode
+        currentChannel = source.currentChannel
+        graphicalLowerBound = source.graphicalLowerBound
+        graphicalUpperBound = source.graphicalUpperBound
     }
 
     override fun clear() {

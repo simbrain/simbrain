@@ -40,7 +40,7 @@ import kotlin.math.sqrt
  * subclasses of Layer.
  */
 class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) :
-    ArrayLayerNode(networkPanel, neuronArray) {
+    ArrayLayerNode(networkPanel, neuronArray), PixelSelectionHost {
 
     val imageNodeGroup = PNode().apply {
         if (!neuronArray.circleMode) {
@@ -195,6 +195,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
+
+    override val hasPixelSelection get() = pixelSelection.isNotEmpty()
+
+    override fun clearPixelSelection() {
+        if (pixelSelection.isNotEmpty()) pixelSelection = emptySet()
+    }
+
+    override fun selectedPixels() = pixelSelection.sorted().map { PixelTarget.ArrayPixel(neuronArray, it) }
+
+    override fun pixelsUnder(ellipse: Ellipse2D) =
+        collectCellsInGlobalEllipse(ellipse).map { PixelTarget.ArrayPixel(neuronArray, it) }
 
     override val toolTipText: String?
         get() = if (pixelSelection.isNotEmpty()) null else super.toolTipText

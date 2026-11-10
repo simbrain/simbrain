@@ -30,7 +30,7 @@ import javax.swing.JPopupMenu
  * PNode representation for [ActivationSequence]
  */
 class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence: ActivationSequence) :
-    ArrayLayerNode(networkPanel, activationSequence) {
+    ArrayLayerNode(networkPanel, activationSequence), PixelSelectionHost {
 
     /**
      * Main pixel image for activations.
@@ -74,6 +74,18 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
             if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
+
+    override val hasPixelSelection get() = pixelSelection.isNotEmpty()
+
+    override fun clearPixelSelection() {
+        if (pixelSelection.isNotEmpty()) pixelSelection = emptySet()
+    }
+
+    override fun selectedPixels() =
+        pixelSelection.map { (row, col) -> PixelTarget.SequencePixel(activationSequence, row, col) }
+
+    override fun pixelsUnder(ellipse: Ellipse2D) =
+        collectCellsInGlobalEllipse(ellipse).map { (row, col) -> PixelTarget.SequencePixel(activationSequence, row, col) }
 
     override val toolTipText: String?
         get() = if (pixelSelection.isNotEmpty()) null else super.toolTipText

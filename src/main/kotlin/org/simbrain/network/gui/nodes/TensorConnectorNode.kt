@@ -1,9 +1,15 @@
-/** Displays tensor connections and edits selected connectors of the same underlying model type. */
+/**
+ * Displays tensor connections and edits selected connectors of the same underlying model type. Convolutions also
+ * show their kernels, one at a time or as a grid sized to the space between the two layers, and let individual
+ * kernel weights be selected and edited through [PixelSelectionHost].
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PNode
+import org.piccolo2d.event.PBasicInputEventHandler
+import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
 import org.piccolo2d.util.PBounds
@@ -20,21 +26,45 @@ import org.simbrain.util.widgets.bezierArrow
 import java.awt.BasicStroke
 import java.awt.Graphics2D
 import java.awt.RenderingHints
+import java.awt.geom.CubicCurve2D
+import java.awt.geom.Ellipse2D
+import java.awt.geom.Rectangle2D
 import java.awt.image.BufferedImage
 import javax.swing.JPopupMenu
+import kotlin.math.abs
+import kotlin.math.ceil
 
 /**
  * GUI node for a [TensorConnector]. Draws an arrow between source and target TensorNodes.
  * For [ConvolutionConnector], also shows a kernel heatmap with filter/channel navigation.
  */
 class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConnector) :
-    ScreenElement(networkPanel) {
+    ScreenElement(networkPanel), PixelSelectionHost {
 
     val sourceNode by lazy { networkPanel.getNode(connector.source) }
     val targetNode by lazy { networkPanel.getNode(connector.target) }
 
+    /**
+     * Kernel weights the user has selected for quick-edit, as indices into [ConvolutionConnector.kernels]. Empty
+     * means no pixel selection is active; in that case increment/decrement/clear/randomize fall through to
+     * whole-connector behavior.
+     *
+     * The single kernel view only outlines the selected weights of the kernel it shows. The selection is dropped
+     * when the user steps to another kernel, but kept when a receptive field trace does so temporarily.
+     */
+    var pixelSelection: Set<Int> = emptySet()
+        set(value) {
+            field = value
+            if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
+            repaint()
+        }
+
     private val imgSize = 60
-    val imageBox = ImageBox(imgSize, imgSize, 1f)
+    val imageBox = ImageBox(imgSize, imgSize, 1f).apply {
+        (connector as? ConvolutionConnector)?.let { conv ->
+            makeKernelPixelSurface(conv) { currentFilter to currentInputChannel }
+        }
+    }
 
     val interactionBox = TensorConnectorInteractionBox(networkPanel)
 
@@ -91,59 +121,221 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }}
     }
 
-    /** Pre-allocated grid cell PImage nodes: [filter][channel]. */
+    /** Column labels of the kernel grid, one per input channel. */
+    private val kernelColumnLabels: List<PText> = (connector as? ConvolutionConnector)?.let { conv ->
+        List(conv.source.shape.channels) { kernelGridLabel("C${it + 1}") }
+    } ?: emptyList()
+
+    /** Row labels of the kernel grid, one per filter. */
+    private val kernelRowLabels: List<PText> = (connector as? ConvolutionConnector)?.let { conv ->
+        List(conv.numFilters) { kernelGridLabel("F${it + 1}") }
+    } ?: emptyList()
+
+    private fun kernelGridLabel(text: String) = PText(text).apply {
+        textPaint = NetworkTheme.current.valueText
+        kernelGridGroup.addChild(this)
+    }
+
+    /** Pre-allocated grid cell PImage nodes: [filter][channel]. Placed by [layoutKernelGrid]. */
     private val gridCellPImages: Array<Array<SimbrainImage>>? = (connector as? ConvolutionConnector)?.let { conv ->
-        val kSize = conv.kernelSize
-        val numFilters = conv.numFilters
-        val inputChannels = conv.source.shape.channels
-        val cellSize = (120.0 / maxOf(numFilters, inputChannels)).coerceIn(8.0, 20.0)
-        val gap = 2.0
-        val labelOffset = 14.0
-
-        // Add column labels ("C1", "C2", ...) along top
-        for (c in 0 until inputChannels) {
-            val label = PText("C${c + 1}").apply {
-                font = Theme.font(7)
-                textPaint = NetworkTheme.current.valueText
+        Array(conv.numFilters) { f ->
+            Array(conv.source.shape.channels) { c ->
+                SimbrainImage(gridCellImages!![f][c]).apply {
+                    kernelGridGroup.addChild(this)
+                    makeKernelPixelSurface(conv) { f to c }
+                }
             }
-            label.setOffset(
-                labelOffset + c * (cellSize + gap) + (cellSize - label.width) / 2,
-                0.0
-            )
-            kernelGridGroup.addChild(label)
+        }
+    }
+
+    /** Thin outline around each grid cell: [filter][channel]. */
+    private val gridCellBorders: Array<Array<PPath>>? = (connector as? ConvolutionConnector)?.let { conv ->
+        Array(conv.numFilters) {
+            Array(conv.source.shape.channels) {
+                createRectangle(0.0, 0.0, 1.0, 1.0).apply {
+                    paint = null
+                    strokePaint = NetworkTheme.current.imageBorder
+                    stroke = BasicStroke(0.5f)
+                    pickable = false
+                    kernelGridGroup.addChild(this)
+                }
+            }
+        }
+    }
+
+    /** Side of one kernel tile in the grid, as last laid out. */
+    private var kernelTileSize = 0.0
+
+    /**
+     * Place the grid's tiles and labels for tiles of side [tileSize]. Labels shrink with the tiles, and where they
+     * would still run into each other only every few are shown.
+     */
+    private fun layoutKernelGrid(tileSize: kotlin.Double) {
+        val images = gridCellPImages ?: return
+        val borders = gridCellBorders ?: return
+        kernelTileSize = tileSize
+        val pitch = tileSize + kernelTileGap(tileSize)
+
+        val labelFont = Theme.font((tileSize * 0.4).toInt().coerceIn(5, 10))
+        (kernelColumnLabels + kernelRowLabels).forEach { it.font = labelFont }
+        val left = kernelRowLabels.maxOf { it.width } + KERNEL_LABEL_GAP
+        val top = kernelColumnLabels.maxOf { it.height } + KERNEL_LABEL_GAP
+
+        val columnStep = ceil((kernelColumnLabels.maxOf { it.width } + 1) / pitch).toInt().coerceAtLeast(1)
+        kernelColumnLabels.forEachIndexed { c, label ->
+            label.visible = c % columnStep == 0
+            label.setOffset(left + c * pitch + (tileSize - label.width) / 2, 0.0)
+        }
+        val rowStep = ceil(kernelRowLabels.maxOf { it.height } / pitch).toInt().coerceAtLeast(1)
+        kernelRowLabels.forEachIndexed { f, label ->
+            label.visible = f % rowStep == 0
+            label.setOffset(0.0, top + f * pitch + (tileSize - label.height) / 2)
         }
 
-        // Add row labels ("F1", "F2", ...) along left
-        for (f in 0 until numFilters) {
-            val label = PText("F${f + 1}").apply {
-                font = Theme.font(7)
-                textPaint = NetworkTheme.current.valueText
+        for (f in images.indices) {
+            for (c in images[f].indices) {
+                val x = left + c * pitch
+                val y = top + f * pitch
+                images[f][c].setBounds(x, y, tileSize, tileSize)
+                borders[f][c].setBounds(x, y, tileSize, tileSize)
             }
-            label.setOffset(
-                0.0,
-                labelOffset + f * (cellSize + gap) + (cellSize - label.height) / 2
-            )
-            kernelGridGroup.addChild(label)
         }
+        // The group's own bounds are what selection handles attach to
+        kernelGridGroup.getUnionOfChildrenBounds(null)?.let { kernelGridGroup.setBounds(it) }
+    }
 
-        // Create PImage and border nodes for each cell
-        Array(numFilters) { f ->
-            Array(inputChannels) { c ->
-                val x = labelOffset + c * (cellSize + gap)
-                val y = labelOffset + f * (cellSize + gap)
-                val pImage = SimbrainImage(gridCellImages!![f][c])
-                pImage.setBounds(x, y, cellSize, cellSize)
-                kernelGridGroup.addChild(pImage)
+    /** Height the label box takes above the kernel grid, with the space between them. */
+    private val kernelGridChromeAbove: kotlin.Double
+        get() = interactionBox.fullBounds.height + KERNEL_GRID_LABEL_BOX_GAP
 
-                // Thin border
-                val border = createRectangle(x, y, cellSize, cellSize)
-                border.paint = null
-                border.strokePaint = NetworkTheme.current.imageBorder
-                border.stroke = BasicStroke(0.5f)
-                kernelGridGroup.addChild(border)
+    /** Height the shape caption takes below the kernel grid, with the space between them. */
+    private val kernelGridChromeBelow: kotlin.Double
+        get() = if (shapeCaption.visible) shapeCaption.height + KERNEL_GRID_CAPTION_GAP else 0.0
 
-                pImage
+    /**
+     * Side of one kernel tile such that the grid fills the space between the source and target layers. That
+     * space is taken from the arrow's [shaft], which runs from the edge of the source layer to the base of the
+     * arrowhead: along the shaft the grid gets its length, less a margin and, for layers stacked vertically, the
+     * room its label box and caption take. Across the shaft nothing bounds the grid, so it gets a fixed extent.
+     * Tiles stop growing at [KERNEL_TILE_MAX] and stop shrinking at [KERNEL_TILE_MIN], below which the grid
+     * overruns the space.
+     */
+    private fun fittedKernelTileSize(conv: ConvolutionConnector, shaft: CubicCurve2D): kotlin.Double {
+        val shaftWidth = abs(shaft.x2 - shaft.x1)
+        val shaftHeight = abs(shaft.y2 - shaft.y1)
+        val (availableWidth, availableHeight) = if (shaftHeight >= shaftWidth) {
+            val chrome = kernelGridChromeAbove + kernelGridChromeBelow
+            KERNEL_GRID_CROSS_EXTENT to shaftHeight - chrome - 2 * KERNEL_GRID_MARGIN
+        } else {
+            shaftWidth - 2 * KERNEL_GRID_MARGIN to KERNEL_GRID_CROSS_EXTENT
+        }
+        val columns = conv.source.shape.channels
+        val rows = conv.numFilters
+        fun tileSizeWithGap(gap: kotlin.Double) = minOf(
+            (availableWidth - KERNEL_LABEL_ALLOWANCE - (columns - 1) * gap) / columns,
+            (availableHeight - KERNEL_LABEL_ALLOWANCE - (rows - 1) * gap) / rows
+        )
+        val roomy = tileSizeWithGap(KERNEL_TILE_GAP)
+        val tileSize = if (roomy >= KERNEL_COMPACT_BELOW) {
+            roomy
+        } else {
+            // Small tiles are laid out with a narrower gap, which leaves them slightly more room
+            tileSizeWithGap(KERNEL_COMPACT_TILE_GAP).coerceAtMost(KERNEL_COMPACT_BELOW - 0.01)
+        }
+        return tileSize.coerceIn(KERNEL_TILE_MIN, KERNEL_TILE_MAX)
+    }
+
+    /** Re-lay out the grid if the space along the arrow's [shaft] now calls for a different tile size. */
+    private fun fitKernelGrid(conv: ConvolutionConnector, shaft: CubicCurve2D) {
+        val fitted = fittedKernelTileSize(conv, shaft)
+        if (abs(fitted - kernelTileSize) > 0.25) layoutKernelGrid(fitted)
+    }
+
+    /**
+     * Make this node, which draws the kernel given by [slice] as a filter and input channel, respond to the mouse
+     * weight by weight: a value readout on hover and selection on press.
+     */
+    private fun PNode.makeKernelPixelSurface(conv: ConvolutionConnector, slice: () -> Pair<Int, Int>) {
+        val surface = this
+        pickable = true
+        markAsPixelTarget()
+        addInputEventListener(object : PBasicInputEventHandler() {
+            private fun weightIndexAt(event: PInputEvent): Int {
+                val point = event.getPositionRelativeTo(surface)
+                val k = conv.kernelSize
+                val row = ((point.y - surface.bounds.y) / surface.bounds.height * k).toInt().coerceIn(0, k - 1)
+                val col = ((point.x - surface.bounds.x) / surface.bounds.width * k).toInt().coerceIn(0, k - 1)
+                val (filter, channel) = slice()
+                return conv.kernelIndex(filter, channel, row, col)
             }
+            override fun mouseEntered(event: PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+                event.isHandled = true
+            }
+            override fun mouseMoved(event: PInputEvent) {
+                networkPanel.showPixelTooltip(event, pixelSelection.isNotEmpty()) {
+                    kernelTooltipText(conv, weightIndexAt(event))
+                }
+            }
+            override fun mouseExited(event: PInputEvent) {
+                networkPanel.hideCanvasTooltip()
+            }
+            override fun mousePressed(event: PInputEvent) {
+                val index = weightIndexAt(event)
+                networkPanel.pressPixel(event, this@TensorConnectorNode) { selectWeight(index, addToSelection = it) }
+            }
+        })
+    }
+
+    /** Value readout for the kernel weight at [index], with filter and channel numbered from 1 as in the labels. */
+    internal fun kernelTooltipText(conv: ConvolutionConnector, index: Int): String {
+        val (filter, channel, row, col) = kernelCellOf(conv, index)
+        return "F${filter + 1} C${channel + 1} (row $row, col $col): ${conv.kernels[index].formatSignificant(3)}"
+    }
+
+    /** Filter, input channel, row and column of the kernel weight at [index]. */
+    private fun kernelCellOf(conv: ConvolutionConnector, index: Int): List<Int> {
+        val k = conv.kernelSize
+        val channels = conv.source.shape.channels
+        return listOf(index / (k * k * channels), index / (k * k) % channels, index / k % k, index % k)
+    }
+
+    private fun selectWeight(index: Int, addToSelection: Boolean) {
+        pixelSelection = if (addToSelection) {
+            if (index in pixelSelection) pixelSelection - index else pixelSelection + index
+        } else {
+            setOf(index)
+        }
+    }
+
+    override val hasPixelSelection get() = pixelSelection.isNotEmpty()
+
+    override fun clearPixelSelection() {
+        if (pixelSelection.isNotEmpty()) pixelSelection = emptySet()
+    }
+
+    override fun selectedPixels(): List<PixelTarget> {
+        val conv = connector as? ConvolutionConnector ?: return emptyList()
+        return pixelSelection.sorted().map { PixelTarget.KernelPixel(conv, it) }
+    }
+
+    override fun pixelsUnder(ellipse: Ellipse2D): List<PixelTarget> {
+        val conv = connector as? ConvolutionConnector ?: return emptyList()
+        val k = conv.kernelSize
+        fun PNode.weightsUnder(filter: Int, channel: Int): List<PixelTarget> {
+            val brush = Rectangle2D.Double().apply { setRect(ellipse.bounds2D) }
+            globalToLocal(brush)
+            val cellW = bounds.width / k
+            val cellH = bounds.height / k
+            return (0 until k * k)
+                .filter { brush.intersects(bounds.x + it % k * cellW, bounds.y + it / k * cellH, cellW, cellH) }
+                .map { PixelTarget.KernelPixel(conv, conv.kernelIndex(filter, channel, it / k, it % k)) }
+        }
+        return if (conv.kernelGridMode) {
+            val images = gridCellPImages ?: return emptyList()
+            images.flatMapIndexed { f, row -> row.flatMapIndexed { c, image -> image.weightsUnder(f, c) } }
+        } else {
+            imageBox.weightsUnder(currentFilter, currentInputChannel)
         }
     }
 
@@ -168,12 +360,17 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
                 val conv = connector as? ConvolutionConnector
                 if (conv != null && conv.kernelGridMode) {
-                    // Grid mode: center kernelGridGroup on midpoint
-                    kernelGridGroup.centerFullBoundsOnPoint(px, py)
+                    // Grid mode: size the grid to the space between the layers, then center it, together with
+                    // the label box above it and the caption below it, on the midpoint
+                    if (curve != null) fitKernelGrid(conv, curve)
+                    val gridY = py + (kernelGridChromeAbove - kernelGridChromeBelow) / 2.0
+                    kernelGridGroup.centerFullBoundsOnPoint(px, gridY)
                     val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
-                    shapeCaption.centerFullBoundsOnPoint(px, py + gridHalfH + shapeCaption.height / 2.0 + 4.0)
+                    shapeCaption.centerFullBoundsOnPoint(
+                        px, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
+                    )
                     interactionBox.centerFullBoundsOnPoint(
-                        px, py - gridHalfH - interactionBox.fullBounds.height / 2.0 - 3.0
+                        px, gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
                     )
                 } else if (connector is ConvolutionConnector) {
                     imageBox.centerFullBoundsOnPoint(px, py)
@@ -214,12 +411,9 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             addChild(detailLabel)
             addChild(kernelGridGroup)
             addChild(shapeCaption)
+            layoutKernelGrid(KERNEL_TILE_DEFAULT)
             renderKernelImage()
             syncKernelDisplayMode()
-            // Set kernelGridGroup's own bounds so NodeHandle selection handles work
-            kernelGridGroup.getUnionOfChildrenBounds(null)?.let { cb ->
-                kernelGridGroup.setBounds(cb)
-            }
         }
 
         // Wire up events
@@ -389,6 +583,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun nextFilter() {
         val conv = connector as? ConvolutionConnector ?: return
+        clearPixelSelection()
         currentFilter = (currentFilter + 1) % conv.numFilters
         renderKernelImage()
         updateDetailLabel()
@@ -396,6 +591,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun previousFilter() {
         val conv = connector as? ConvolutionConnector ?: return
+        clearPixelSelection()
         currentFilter = (currentFilter - 1 + conv.numFilters) % conv.numFilters
         renderKernelImage()
         updateDetailLabel()
@@ -403,6 +599,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun nextInputChannel() {
         val conv = connector as? ConvolutionConnector ?: return
+        clearPixelSelection()
         currentInputChannel = (currentInputChannel + 1) % conv.source.shape.channels
         renderKernelImage()
         updateDetailLabel()
@@ -410,6 +607,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun previousInputChannel() {
         val conv = connector as? ConvolutionConnector ?: return
+        clearPixelSelection()
         currentInputChannel = (currentInputChannel - 1 + conv.source.shape.channels) % conv.source.shape.channels
         renderKernelImage()
         updateDetailLabel()
@@ -479,12 +677,35 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             }
         }
 
+        if (conv != null) drawPixelSelection(g2, conv)
+
         if (NetworkPreferences.showNumericOverlays && conv != null) {
             if (conv.kernelGridMode) {
                 drawKernelGridNumericOverlay(g2, conv)
             } else {
                 drawSingleKernelNumericOverlay(g2, conv)
             }
+        }
+    }
+
+    private fun drawPixelSelection(g2: Graphics2D, conv: ConvolutionConnector) {
+        if (pixelSelection.isEmpty()) return
+        val k = conv.kernelSize
+        g2.color = NeuronArrayNode.PIXEL_SELECTION_COLOR
+        for (index in pixelSelection) {
+            val (filter, channel, row, col) = kernelCellOf(conv, index)
+            // Top left corner and side of the kernel this weight is drawn in, or skip it if that kernel is not shown
+            val (x, y, side) = if (conv.kernelGridMode) {
+                val cell = gridCellPImages?.getOrNull(filter)?.getOrNull(channel)?.bounds ?: continue
+                Triple(kernelGridGroup.offset.x + cell.x, kernelGridGroup.offset.y + cell.y, cell.width)
+            } else {
+                if (filter != currentFilter || channel != currentInputChannel) continue
+                Triple(imageBox.offset.x, imageBox.offset.y, imgSize.toDouble())
+            }
+            val cellSize = side / k
+            // Thinner on small tiles so the outline does not swallow the weight it marks
+            g2.stroke = BasicStroke((cellSize / 3).coerceIn(1.0, 3.0).toFloat())
+            g2.draw(Rectangle2D.Double(x + col * cellSize, y + row * cellSize, cellSize, cellSize))
         }
     }
 
@@ -503,7 +724,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             contextMenu.add(networkPanel.networkActions.deleteAction)
             contextMenu.addSeparator()
             contextMenu.add(networkPanel.createAction(name = "Edit...") {
-                propertyDialog?.display()
+                createEditDialog()?.display()
             })
 
             if (connector is ConvolutionConnector) {
@@ -527,13 +748,14 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         return networkPanel.createSelectionEditDialog(connector)
     }
 
-    override val propertyDialog: StandardDialog? get() = createEditDialog()
+    override val propertyDialog: StandardDialog?
+        get() = (if (pixelSelection.isNotEmpty()) networkPanel.createPixelEditDialog() else null) ?: createEditDialog()
 
     override val model: TensorConnector get() = connector
 
     /** Tooltip giving the full input/output shapes and, for convolutions, the kernel shape with named axes. */
-    override val toolTipText: String
-        get() = createTooltipText(connector) {
+    override val toolTipText: String?
+        get() = if (pixelSelection.isNotEmpty()) null else createTooltipText(connector) {
             val src = connector.source.shape.displayString
             val tgt = connector.target.shape.displayString
             when (connector) {
@@ -579,7 +801,43 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         override val isDraggable: Boolean get() = false
         override val model: TensorConnector
             get() = this@TensorConnectorNode.connector
-        override val toolTipText: String
+        override val toolTipText: String?
             get() = this@TensorConnectorNode.toolTipText
+    }
+
+    companion object {
+
+        /** Tile side before the first layout against the layers. */
+        private const val KERNEL_TILE_DEFAULT = 20.0
+
+        private const val KERNEL_TILE_MIN = 8.0
+
+        private const val KERNEL_TILE_MAX = 80.0
+
+        private const val KERNEL_TILE_GAP = 2.0
+
+        /** Tiles smaller than this are spaced by [KERNEL_COMPACT_TILE_GAP] instead of [KERNEL_TILE_GAP]. */
+        private const val KERNEL_COMPACT_BELOW = 10.0
+
+        private const val KERNEL_COMPACT_TILE_GAP = 1.0
+
+        private fun kernelTileGap(tileSize: kotlin.Double) =
+            if (tileSize < KERNEL_COMPACT_BELOW) KERNEL_COMPACT_TILE_GAP else KERNEL_TILE_GAP
+
+        /** Space between the grid's labels and its tiles. */
+        private const val KERNEL_LABEL_GAP = 2.0
+
+        /** Room set aside for the row or column labels when fitting the grid, whatever font they end up in. */
+        private const val KERNEL_LABEL_ALLOWANCE = 16.0
+
+        /** How far the grid may extend across the direction its layers are separated in. */
+        private const val KERNEL_GRID_CROSS_EXTENT = 240.0
+
+        /** Space kept clear between the grid, with its label box and caption, and each end of the arrow's shaft. */
+        private const val KERNEL_GRID_MARGIN = 6.0
+
+        private const val KERNEL_GRID_LABEL_BOX_GAP = 3.0
+
+        private const val KERNEL_GRID_CAPTION_GAP = 4.0
     }
 }

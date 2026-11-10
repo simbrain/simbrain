@@ -300,4 +300,29 @@ class TensorLayerNetworkTest {
         assertTrue(tensorLayer.outgoingFlattenConnectors.isEmpty(),
             "Tensor should have no outgoing flatten connectors after target deletion")
     }
+
+    @Test
+    fun `graphical bounds and increment round trip and default when a saved layer lacks them`() {
+        val net = Network()
+        val layer = TensorLayer(TensorShape(2, 2, 1)).apply {
+            label = "layer"
+            graphicalLowerBound = -3.0
+            graphicalUpperBound = 5.0
+            increment = 0.25
+        }
+        net.addNetworkModelAsync(layer, usePlacementManager = false)
+        val xstream = getNetworkXStream()
+        val xml = xstream.toXML(net)
+
+        val restored = (xstream.fromXML(xml) as Network).getModelByLabel(TensorLayer::class.java, "layer")!!
+        assertEquals(-3.0..5.0, restored.graphicalBounds)
+        assertEquals(0.25, restored.increment)
+
+        // A layer saved before these settings existed has no such elements
+        val olderXml = xml.replace(Regex("<(graphicalLowerBound|graphicalUpperBound|increment)>[^<]*</\\1>"), "")
+        assertFalse(olderXml.contains("graphicalUpperBound"))
+        val older = (xstream.fromXML(olderXml) as Network).getModelByLabel(TensorLayer::class.java, "layer")!!
+        assertEquals(-1.0..1.0, older.graphicalBounds)
+        assertEquals(0.1, older.increment)
+    }
 }

@@ -76,6 +76,10 @@ class ConvolutionConnector(
         tensorDescriptor = ConvolutionConnector::kernelDescriptor
     )
 
+    /** Index into [kernels] of the weight at ([row], [col]) of the kernel joining input [channel] to [filter]. */
+    fun kernelIndex(filter: Int, channel: Int, row: Int, col: Int): Int =
+        ((filter * inputChannels + channel) * kernelSize + row) * kernelSize + col
+
     /** Per-filter biases */
     val filterBiases = DoubleArray(numFilters)
 

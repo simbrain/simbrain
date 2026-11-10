@@ -365,6 +365,12 @@ sealed class ParameterWidget<O : EditableObject, T>(val parameter: GuiEditable<O
         }
     }
 
+    /**
+     * True if the widget should take up extra room when its editor is made larger, rather than staying at its
+     * preferred size.
+     */
+    open val growsWithEditor: Boolean get() = false
+
     abstract val value: T
 
     /**
@@ -1021,6 +1027,8 @@ class TensorWidget<O : EditableObject>(
     isConsistent: Boolean,
     private val descriptor: TensorDescriptor
 ) : TableParameterWidget<O, DoubleArray>(editor, parameter, isConsistent) {
+
+    override val growsWithEditor get() = true
 
     /** One BasicDataFrame per slice (tab). */
     val sliceModels: List<BasicDataFrame> = (0 until descriptor.numSlices).map { sliceIdx ->

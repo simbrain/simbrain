@@ -311,8 +311,8 @@ class AdjustValueAction(
 
     override suspend fun applyToPixel(pixel: PixelTarget, networkPanel: NetworkPanel, undoState: MutableMap<Any, Any?>) {
         val targetMatches = when (target) {
-            is AdjustValueTarget.NeuronActivation -> pixel is PixelTarget.ArrayPixel || pixel is PixelTarget.SequencePixel
-            is AdjustValueTarget.SynapseStrength -> pixel is PixelTarget.MatrixPixel
+            is AdjustValueTarget.NeuronActivation -> pixel.isActivation
+            is AdjustValueTarget.SynapseStrength -> !pixel.isActivation
         }
         if (!targetMatches) return
         undoState.putIfAbsent(pixel, pixel.read())
@@ -340,13 +340,6 @@ class AdjustValueAction(
             val neuronRedos = neuronDiffs.keys.associateWith { it.activation }
             val synapseRedos = synapseDiffs.keys.associateWith { it.strength }
             val pixelRedos = pixelDiffs.keys.associateWith { it.read() }
-            val affectedPixelComponents = pixelDiffs.keys.map {
-                when (it) {
-                    is PixelTarget.ArrayPixel -> it.array
-                    is PixelTarget.MatrixPixel -> it.wm
-                    is PixelTarget.SequencePixel -> it.seq
-                }
-            }.distinct()
 
             networkPanel.undoManager.addUndoableAction(
                 description = undoDescription(totalCount),
@@ -354,25 +347,13 @@ class AdjustValueAction(
                     neuronDiffs.forEach { (neuron, prev) -> neuron.activation = prev }
                     synapseDiffs.forEach { (synapse, prev) -> synapse.strength = prev }
                     pixelDiffs.forEach { (pixel, prev) -> pixel.write(prev) }
-                    affectedPixelComponents.forEach { c ->
-                        when (c) {
-                            is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
-                            is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
-                            is org.simbrain.network.core.ActivationSequence -> c.events.updated.fire()
-                        }
-                    }
+                    pixelDiffs.keys.fireUpdatedOncePerModel()
                 },
                 redo = {
                     neuronRedos.forEach { (neuron, redo) -> neuron.activation = redo }
                     synapseRedos.forEach { (synapse, redo) -> synapse.strength = redo }
                     pixelRedos.forEach { (pixel, redo) -> pixel.write(redo) }
-                    affectedPixelComponents.forEach { c ->
-                        when (c) {
-                            is org.simbrain.network.core.NeuronArray -> c.events.updated.fire()
-                            is org.simbrain.network.core.WeightMatrix -> c.events.updated.fire()
-                            is org.simbrain.network.core.ActivationSequence -> c.events.updated.fire()
-                        }
-                    }
+                    pixelDiffs.keys.fireUpdatedOncePerModel()
                 }
             )
         }

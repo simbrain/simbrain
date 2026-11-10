@@ -318,4 +318,71 @@ class ConvolutionalNeuralNetworkTest {
         // ...and flatten node is synchronized for GUI/inspection.
         assertEquals(10.0, flatArray.activationArray.sum(), 1e-10)
     }
+
+    private fun convNetwork(): ConvolutionalNeuralNetwork {
+        val inputShape = TensorShape(4, 4, 1)
+        val input = TensorLayer(inputShape).apply {
+            isClamped = true
+            activations = DoubleArray(inputShape.size) { (it % 5) - 2.0 }
+        }
+        val convOut = TensorLayer(inputShape.convOutputShape(3, 1, Padding.SAME, 2)).apply {
+            activationFunction = TensorActivation.RELU
+        }
+        ConvolutionConnector(input, convOut, kernelSize = 3, numFilters = 2, stride = 1, padding = Padding.SAME)
+        val flat = NeuronArray(convOut.shape.size)
+        FlattenConnector(convOut, flat)
+        val output = NeuronArray(3)
+        WeightMatrix(flat, output)
+        return ConvolutionalNeuralNetwork(input, output)
+    }
+
+    private val ConvolutionalNeuralNetwork.firstConvolution
+        get() = inputTensorLayer.outgoingTensorConnectors.first() as ConvolutionConnector
+
+    @Test
+    fun `copy computes the same output as the original`() {
+        val net = Network()
+        val cnn = convNetwork()
+        val copy = cnn.copy()
+        net.addNetworkModelAsync(cnn)
+        net.addNetworkModelAsync(copy)
+
+        with(net) {
+            cnn.update()
+            copy.update()
+        }
+
+        assertEquals(TensorActivation.RELU, copy.firstConvolution.target.activationFunction)
+        // The convolution produces negative values here, so losing the relu would change the result
+        assertTrue(cnn.firstConvolution.target.preActivations.any { it < 0 })
+        assertArrayEquals(cnn.outputArray.activationArray, copy.outputArray.activationArray, 1e-10)
+    }
+
+    @Test
+    fun `copy keeps how layers and kernels are drawn`() {
+        val cnn = convNetwork()
+        cnn.firstConvolution.apply {
+            kernelGridMode = true
+            increment = 0.25
+        }
+        cnn.firstConvolution.target.apply {
+            thumbnailStripMode = false
+            currentChannel = 1
+            graphicalUpperBound = 5.0
+            graphicalLowerBound = -2.0
+            increment = 0.5
+        }
+
+        val copy = cnn.copy()
+
+        assertTrue(copy.inputTensorLayer.isClamped)
+        assertTrue(copy.firstConvolution.kernelGridMode)
+        assertEquals(0.25, copy.firstConvolution.increment)
+        copy.firstConvolution.target.let {
+            assertFalse(it.thumbnailStripMode)
+            assertEquals(1, it.currentChannel)
+            assertEquals(-2.0..5.0, it.graphicalBounds)
+            assertEquals(0.5, it.increment)
+        }
+    }
 }

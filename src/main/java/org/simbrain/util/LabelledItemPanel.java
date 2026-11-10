@@ -87,6 +87,23 @@ public class LabelledItemPanel extends JPanel {
     }
 
     /**
+     * Add a labeled item that takes any width and height the panel has to spare,
+     * such as a table. Extra height is shared between the growing items of a
+     * panel, and the item is not held to the width cap of ordinary fields.
+     *
+     * @param labelText The label text for the item.
+     * @param item      The item to be added.
+     * @return The label created for the item.
+     */
+    public JLabel addGrowingItem(final String labelText, final JComponent item) {
+        JLabel label = new JLabel(labelText);
+        add(label, labelCC(0, myNextItemRow));
+        add(item, "cell 1 " + myNextItemRow + ", grow, pushy, gaptop " + Theme.componentGap);
+        myNextItemRow++;
+        return label;
+    }
+
+    /**
      * Provides support for multi-column labeled item panels. Adds a label and
      * item to the panel on the current row, at the specified column.
      *

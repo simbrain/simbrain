@@ -35,7 +35,8 @@ import javax.swing.*
 /**
  * A visual representation of a weight matrix
  */
-class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel) {
+class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel),
+    PixelSelectionHost {
     /**
      * Width of the [imageBox]
      */
@@ -110,6 +111,22 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             if (value.isNotEmpty()) networkPanel.hideCanvasTooltip()
             repaint()
         }
+
+    override val hasPixelSelection get() = pixelSelection.isNotEmpty()
+
+    override fun clearPixelSelection() {
+        if (pixelSelection.isNotEmpty()) pixelSelection = emptySet()
+    }
+
+    override fun selectedPixels(): List<PixelTarget> {
+        val wm = weightMatrix as? WeightMatrix ?: return emptyList()
+        return pixelSelection.map { (row, col) -> PixelTarget.MatrixPixel(wm, row, col) }
+    }
+
+    override fun pixelsUnder(ellipse: Ellipse2D): List<PixelTarget> {
+        val wm = weightMatrix as? WeightMatrix ?: return emptyList()
+        return collectCellsInGlobalEllipse(ellipse).map { (row, col) -> PixelTarget.MatrixPixel(wm, row, col) }
+    }
 
     private fun selectCell(row: Int, col: Int, addToSelection: Boolean) {
         val wm = weightMatrix as? WeightMatrix ?: return

@@ -167,7 +167,7 @@ class ConvolutionalNeuralNetwork(
         val newInput = TensorLayer(inputTensorLayer.shape).apply {
             System.arraycopy(inputTensorLayer.activations, 0, activations, 0, activations.size)
             System.arraycopy(inputTensorLayer.biases, 0, biases, 0, biases.size)
-            isClamped = inputTensorLayer.isClamped
+            copySettingsFrom(inputTensorLayer)
             label = inputTensorLayer.label
             location = inputTensorLayer.location
         }
@@ -178,6 +178,7 @@ class ConvolutionalNeuralNetwork(
             val origTensor = tensorLayerStages[i]
             val newTensorLayer = TensorLayer(origTensor.shape).apply {
                 System.arraycopy(origTensor.biases, 0, biases, 0, biases.size)
+                copySettingsFrom(origTensor)
                 label = origTensor.label
                 location = origTensor.location
             }
@@ -187,6 +188,8 @@ class ConvolutionalNeuralNetwork(
                     ConvolutionConnector(prevTensor, newTensorLayer, origConn.kernelSize, origConn.numFilters, origConn.stride, origConn.padding).apply {
                         System.arraycopy(origConn.kernels, 0, kernels, 0, kernels.size)
                         System.arraycopy(origConn.filterBiases, 0, filterBiases, 0, filterBiases.size)
+                        increment = origConn.increment
+                        kernelGridMode = origConn.kernelGridMode
                     }
                 }
                 is PoolingConnector -> {

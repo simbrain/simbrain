@@ -131,7 +131,12 @@ class AnnotatedPropertyEditor<O : EditableObject> @JvmOverloads constructor(
                 getLabelledItemPanel(parameter.tab).addItem(widget.component)
                 null
             } else {
-                val label = getLabelledItemPanel(parameter.tab).addItem(parameter.label, widget.component)
+                val panel = getLabelledItemPanel(parameter.tab)
+                val label = if (widget.growsWithEditor) {
+                    panel.addGrowingItem(parameter.label, widget.component)
+                } else {
+                    panel.addItem(parameter.label, widget.component)
+                }
                 label.toolTipText = parameter.description
                 parameter to label
             }

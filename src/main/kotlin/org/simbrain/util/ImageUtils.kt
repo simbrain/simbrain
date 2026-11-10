@@ -112,17 +112,24 @@ fun DoubleArray.toSimbrainColorImage(
 /**
  * Write Simbrain color values directly into the backing array of [dest], avoiding all intermediate allocations.
  * [dest] should be a [BufferedImage.TYPE_INT_RGB] image whose dimensions match the data.
+ *
+ * @param bounds values at the low end are drawn fully [neg] and values at the high end fully [pos], with zero at
+ * [mid]. Values beyond the bounds saturate, and a side whose bound does not extend past zero is drawn as [mid].
  */
 fun DoubleArray.writeSimbrainColorImage(
     dest: BufferedImage,
+    bounds: ClosedFloatingPointRange<Double> = -1.0..1.0,
     neg: Color = NetworkTheme.current.coolNode,
     mid: Color = NetworkTheme.current.neutralMidpoint,
     pos: Color = NetworkTheme.current.hotNode,
 ) {
     val pixels = (dest.raster.dataBuffer as DataBufferInt).data
     val len = min(size, pixels.size)
+    val negScale = if (bounds.start < 0) -1.0 / bounds.start else 0.0
+    val posScale = if (bounds.endInclusive > 0) 1.0 / bounds.endInclusive else 0.0
     for (i in 0 until len) {
-        pixels[i] = this[i].toSimbrainColor(neg, mid, pos)
+        val value = this[i]
+        pixels[i] = (value * if (value < 0) negScale else posScale).toSimbrainColor(neg, mid, pos)
     }
     if (size < pixels.size) {
         pixels.fill(mid.rgb, size, pixels.size)

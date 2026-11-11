@@ -20,6 +20,14 @@
  *
  * Unrolling during training is virtual: there is one of each weight matrix however many columns are
  * drawn, and every column's gradient is summed into it.
+ *
+ * Each drawn copy of a matrix is sized to its arrow by the rule a real [WeightMatrixNode] sizes its image by, up
+ * to that image's usual size, and the columns are spaced so that the arrow between two of them shows on either
+ * side of a copy of that size.
+ *
+ * The arrow into the rolled network is the one part drawn outside this node. The real recurrent matrix sits on
+ * it, and this node is drawn over every connection, so the arrow goes under the connections instead, where the
+ * matrix covers it the way any matrix covers its arrow. [dispose] takes it away again.
  */
 package org.simbrain.network.gui.nodes
 
@@ -35,7 +43,9 @@ import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.piccolo.addBorder
 import org.simbrain.util.widgets.BezierArrow
+import org.simbrain.util.widgets.BezierArrowTemplate
 import org.simbrain.util.widgets.bezierArrow
+import java.awt.geom.CubicCurve2D
 import java.awt.geom.Rectangle2D
 import kotlin.math.max
 import kotlin.math.round
@@ -175,7 +185,8 @@ class BPTTUnrolledView(
     private class MatrixImage(
         private val matrix: WeightMatrix,
         private val image: SimbrainImage,
-        private val rect: Rectangle2D
+        val rect: Rectangle2D,
+        val shaft: CubicCurve2D?
     ) {
         lateinit var border: PPath
             private set
@@ -207,6 +218,9 @@ class BPTTUnrolledView(
     private val arrowsByWeights = mutableMapOf<SharedWeights, MutableList<BezierArrow>>()
 
     private val matrixImagesByWeights = mutableMapOf<SharedWeights, MutableList<MatrixImage>>()
+
+    /** The arrow into the rolled network, which is drawn under the canvas's connections rather than in this node. */
+    private var liveArrow: BezierArrow? = null
 
     private var caption: PText? = null
 
@@ -265,6 +279,8 @@ class BPTTUnrolledView(
     fun rebuild() {
         builtFrom = buildSignature()
         removeAllChildren()
+        liveArrow?.removeFromParent()
+        liveArrow = null
         columns.clear()
         arrowsByWeights.clear()
         matrixImagesByWeights.clear()
@@ -290,9 +306,9 @@ class BPTTUnrolledView(
 
         // Derived rather than fixed because a layer can be much wider than any constant would anticipate:
         // eight neurons drawn as circles are wider than three drawn as a strip. Columns have to clear each
-        // other and the recurrent matrix copy that sits on the arrow between them, or a wide layer ends up
-        // drawn on top of its own connections.
-        val columnPitch = max(MIN_COLUMN_PITCH, widestLayer + MATRIX_SIZE + 2 * MATRIX_CLEARANCE)
+        // other and leave the arrow between them long enough to show on either side of the recurrent matrix
+        // copy that sits on it, or a wide layer ends up drawn on top of its own connections.
+        val columnPitch = max(MIN_COLUMN_PITCH, widestLayer + RECURRENT_GAP)
 
         // Oldest first, so the last entry is the rolled network. Prior steps sit to its left, which is
         // why their offsets are negative.
@@ -380,12 +396,28 @@ class BPTTUnrolledView(
     fun matrixImageCount(weights: SharedWeights) = matrixImagesByWeights[weights]?.size ?: 0
 
     /**
+     * For each drawn copy of [weights], the fraction of its arrow's shaft, from the source layer to the base of
+     * the arrowhead, that the copy covers.
+     */
+    internal fun matrixImageArrowShares(weights: SharedWeights): List<Double> =
+        matrixImagesByWeights[weights].orEmpty().mapNotNull { copy ->
+            copy.shaft?.let { copy.rect.width / it.p1.distance(it.p2) }
+        }
+
+    /**
      * Keep the drawing aligned with the rolled network as it is dragged. Children are laid out relative
      * to the hidden layer, so following the network is a translation rather than a rebuild.
      */
     fun syncPosition() {
         val anchor = bptt.hiddenLayer.location
         setOffset(anchor.x, anchor.y)
+        liveArrow?.setOffset(anchor.x, anchor.y)
+    }
+
+    /** Remove what this view draws outside itself. Called when the view is taken off the canvas. */
+    fun dispose() {
+        liveArrow?.removeFromParent()
+        liveArrow = null
     }
 
     /**
@@ -469,25 +501,58 @@ class BPTTUnrolledView(
     }
 
     private fun addArrow(from: Rectangle2D, to: Rectangle2D, weights: SharedWeights, withMatrix: Boolean) {
-        val arrow = bezierArrow { color = NetworkTheme.current.connectorArrow }
-        addChild(arrow)
+        var shaft: CubicCurve2D? = null
+        val arrow = bezierArrow {
+            color = NetworkTheme.current.connectorArrow
+            if (weights == SharedWeights.RECURRENT) {
+                // Nothing is drawn beside a layer for the arrow to clear, as its label is above it
+                padding {
+                    tail = RECURRENT_ARROW_PADDING
+                    head = RECURRENT_ARROW_PADDING + arrowSize
+                }
+            }
+            onUpdated { shaft = it }
+        }
+        if (weights == SharedWeights.RECURRENT && !withMatrix) {
+            // The real recurrent matrix sits on this arrow, and covers it only if the arrow is under the connections
+            arrow.pickable = false
+            arrow.childrenPickable = false
+            networkPanel.addUnderConnections(arrow)
+            // Laid out in this node's coordinates, so it has to sit at this node's offset
+            bptt.hiddenLayer.location.let { arrow.setOffset(it.x, it.y) }
+            liveArrow = arrow
+        } else {
+            addChild(arrow)
+        }
         arrow.layout(from.outlines, to.outlines, false)
         arrowsByWeights.getOrPut(weights) { mutableListOf() }.add(arrow)
         if (withMatrix) {
-            addMatrixImage(weights, (from.centerX + to.centerX) / 2, (from.centerY + to.centerY) / 2)
+            addMatrixImage(weights, shaft, (from.centerX + to.centerX) / 2, (from.centerY + to.centerY) / 2)
         }
     }
 
-    /** A copy of one of the real matrices, centred on the arrow that applies it. */
-    private fun addMatrixImage(weights: SharedWeights, centerX: kotlin.Double, centerY: kotlin.Double) {
+    /**
+     * A copy of one of the real matrices, sized to the [shaft] of the arrow that applies it and centred on it.
+     * Copies stop growing at the size the columns are spaced for, so that those on the arrows between columns
+     * and those within a column stay the same size however far apart the layers are. An arrow that could not be
+     * drawn has no shaft, and its copy goes at the given centre.
+     */
+    private fun addMatrixImage(
+        weights: SharedWeights,
+        shaft: CubicCurve2D?,
+        centerX: kotlin.Double,
+        centerY: kotlin.Double
+    ) {
         val matrix = matrixFor(weights) ?: return
+        val room = shaft?.let { WeightMatrixNode.imageRoom(it) }
+        val side = room?.let { WeightMatrixNode.fittedImageSide(it).coerceAtMost(MATRIX_SIZE) } ?: MATRIX_SIZE
         val rect = Rectangle2D.Double(
-            centerX - MATRIX_SIZE / 2, centerY - MATRIX_SIZE / 2, MATRIX_SIZE, MATRIX_SIZE
+            (room?.centerX ?: centerX) - side / 2, (room?.centerY ?: centerY) - side / 2, side, side
         )
         val image = SimbrainImage()
         addChild(image)
         // The border reads the image's bounds, so the first render has to happen before it is added.
-        val matrixImage = MatrixImage(matrix, image, rect)
+        val matrixImage = MatrixImage(matrix, image, rect, shaft)
         matrixImage.refresh()
         addChild(matrixImage.attachBorder())
         matrixImagesByWeights.getOrPut(weights) { mutableListOf() }.add(matrixImage)
@@ -503,14 +568,24 @@ class BPTTUnrolledView(
         /** Floor for the spacing between drawn columns, used when the layers are narrow enough not to set it. */
         private const val MIN_COLUMN_PITCH = 300.0
 
-        /** Breathing room on either side of a matrix copy sitting between two columns. */
-        private const val MATRIX_CLEARANCE = 30.0
+        /** Space between a layer and each end of the arrow that crosses to the same layer in the next column. */
+        private const val RECURRENT_ARROW_PADDING = 10.0
+
+        /**
+         * Space between the layers of neighbouring columns: enough that a matrix copy of the usual size takes
+         * up no more of the arrow's shaft than a real matrix image is allowed to, plus the arrowhead and the
+         * space at each end of the arrow.
+         */
+        private val RECURRENT_GAP =
+            MATRIX_SIZE / WeightMatrixNode.IMAGE_FILL +
+                    2 * RECURRENT_ARROW_PADDING + BezierArrowTemplate().padding.arrowSize
+
+        /** Largest a matrix copy is drawn, which is the size of a real [WeightMatrixNode]'s image at its usual size. */
+        private const val MATRIX_SIZE = WeightMatrixNode.IMAGE_SIDE_DEFAULT
 
         /** Plain visual breathing room between the rolled network's drawn extent and the newest column. */
         private const val COLUMN_GAP = 90.0
 
-        /** Matches the image box a real [WeightMatrixNode] draws, so the copies read as the same thing. */
-        private const val MATRIX_SIZE = 90.0
         private const val LABEL_GAP = 14.0
         private const val STEP_LABEL_GAP = 24.0
         private const val CAPTION_GAP = 52.0

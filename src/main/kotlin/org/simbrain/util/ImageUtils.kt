@@ -381,9 +381,18 @@ fun Matrix.toScaledImageData(imageWidth: Int, imageHeight: Int, scale: Double): 
     return flatten().toScaledImageData(imageWidth, imageHeight, ncol(), nrow(), scale)
 }
 
-fun DoubleArray.toScaledImageData(imageWidth: Int, imageHeight: Int, arrayWidth: Int, arrayHeight: Int, scale: Double): ImageData {
+/**
+ * Width and height in pixels that [toScaledImageData] renders an array at: the size it is displayed at, but no
+ * more than one pixel per entry.
+ */
+fun scaledImageSize(imageWidth: Int, imageHeight: Int, arrayWidth: Int, arrayHeight: Int, scale: Double): Pair<Int, Int> {
     val width = (imageWidth * scale).coerceIn(1.0, min(arrayWidth, weightMatrixImageMaxSize).toDouble()).toInt()
     val height = (imageHeight * scale).coerceIn(1.0, min(arrayHeight, weightMatrixImageMaxSize).toDouble()).toInt()
+    return width to height
+}
+
+fun DoubleArray.toScaledImageData(imageWidth: Int, imageHeight: Int, arrayWidth: Int, arrayHeight: Int, scale: Double): ImageData {
+    val (width, height) = scaledImageSize(imageWidth, imageHeight, arrayWidth, arrayHeight, scale)
 
     val imageBound = Rectangle2D.Double(0.0, 0.0, width.toDouble(), height.toDouble())
     val matrixBound = Rectangle2D.Double(0.0, 0.0, arrayWidth.toDouble(), arrayHeight.toDouble())

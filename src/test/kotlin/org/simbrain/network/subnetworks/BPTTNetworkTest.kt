@@ -16,16 +16,35 @@ import org.simbrain.network.core.getModelByLabel
 import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.nodes.BPTTUnrolledView
+import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.network.trainers.BPTTTrainer
 import org.simbrain.network.trainers.SupervisedTrainerConfig
 import org.simbrain.network.trainers.createDiagonalDataset
 import org.simbrain.util.copy
 import org.simbrain.util.toDoubleArray
+import org.simbrain.util.widgets.BezierArrow
 import smile.math.matrix.Matrix
+import java.awt.Dimension
+import javax.swing.JDialog
+import javax.swing.SwingUtilities
 import kotlin.math.abs
 import kotlin.random.Random
 
 class BPTTNetworkTest {
+
+    /**
+     * An unrolled view of [bptt] that is not on the canvas. Built on the event thread because it adds its arrow
+     * into the rolled network to the panel's canvas, which the event thread is adding the network's nodes to.
+     */
+    private fun unrolledView(bptt: BPTTNetwork, panel: NetworkPanel): BPTTUnrolledView {
+        lateinit var view: BPTTUnrolledView
+        // The lambda stands in for the rolled network's measured extent, which on the canvas comes from the
+        // subnetwork outline
+        SwingUtilities.invokeAndWait {
+            view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        }
+        return view
+    }
 
     @Test
     fun `test bptt training`() {
@@ -190,9 +209,8 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.sequenceLength = 4
 
-        // Stands in for the rolled network's measured extent, which on the canvas comes from the
-        // subnetwork outline. Only the count of columns and arrows is under test, not where they land.
-        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        // Only the count of columns and arrows is under test, not where they land.
+        val view = unrolledView(bptt, panel)
         assertEquals(3, view.columns.size) { "Four steps means three columns plus the rolled network" }
         assertEquals(4, view.stepCount) { "The rolled network is the fourth step, not a fifth one" }
 
@@ -203,7 +221,7 @@ class BPTTNetworkTest {
         }
 
         bptt.trainerConfig.sequenceLength = 1
-        view.rebuild()
+        SwingUtilities.invokeAndWait { view.rebuild() }
         assertEquals(0, view.columns.size) { "At depth one there is nothing to unroll" }
     }
 
@@ -242,7 +260,7 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.sequenceLength = 4
 
-        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        val view = unrolledView(bptt, panel)
 
         // An arrow without its matrix reads as a bare connection while its neighbours are labelled, which
         // is the inconsistency the copies exist to remove. The one exception is the arrow into the live
@@ -254,6 +272,71 @@ class BPTTNetworkTest {
             view.arrowCount(BPTTUnrolledView.SharedWeights.RECURRENT) - 1,
             view.matrixImageCount(BPTTUnrolledView.SharedWeights.RECURRENT)
         ) { "Every recurrent arrow but the one the real node covers should carry a copy" }
+    }
+
+    @Test
+    fun `every matrix copy leaves part of its arrow showing`() = runBlocking {
+        val net = Network()
+        val panel = NetworkPanel(NetworkComponent("test", net))
+        val bptt = BPTTNetwork(4, 3, 4)
+        net.addNetworkModelsAsync(bptt)
+        bptt.trainerConfig.sequenceLength = 4
+
+        val view = unrolledView(bptt, panel)
+
+        BPTTUnrolledView.SharedWeights.entries.forEach { weights ->
+            val shares = view.matrixImageArrowShares(weights)
+            assertEquals(view.matrixImageCount(weights), shares.size) { "Every $weights copy sits on a drawn arrow" }
+            shares.forEach { share ->
+                assertTrue(share < 0.75) { "A $weights copy covers $share of its arrow's shaft" }
+            }
+        }
+    }
+
+    @Test
+    fun `the arrow into the rolled network is drawn under the recurrent matrix and goes away with the view`() {
+        val net = Network()
+        val panel = NetworkPanel(NetworkComponent("test", net))
+        val bptt = BPTTNetwork(4, 3, 4)
+        bptt.trainerConfig.sequenceLength = 4
+        runBlocking { net.addNetworkModel(bptt, usePlacementManager = false) }
+        SwingUtilities.invokeAndWait {
+            panel.preferredSize = Dimension(800, 600)
+            JDialog().apply { contentPane = panel; pack() }
+        }
+
+        // The view is shown and laid out by event-thread tasks that queue further ones
+        fun settle() {
+            Thread.sleep(200)
+            repeat(5) { SwingUtilities.invokeAndWait { panel.canvas.layer.fullBounds } }
+        }
+        fun arrowsUnderConnections(): List<BezierArrow> {
+            var arrows = emptyList<BezierArrow>()
+            SwingUtilities.invokeAndWait {
+                arrows = panel.connectionUnderlay.childrenReference.filterIsInstance<BezierArrow>()
+            }
+            return arrows
+        }
+
+        SwingUtilities.invokeAndWait { bptt.unrolledView = true }
+        settle()
+        assertEquals(1, arrowsUnderConnections().size) { "Only the arrow the real recurrent matrix sits on goes there" }
+        SwingUtilities.invokeAndWait {
+            val tier = panel.edgeTier.childrenReference
+            val recurrentNode = tier.indexOfFirst { it is WeightMatrixNode && it.weightMatrix == bptt.hiddenToHidden }
+            assertTrue(recurrentNode > tier.indexOf(panel.connectionUnderlay)) { "The matrix is drawn after its arrow" }
+        }
+
+        SwingUtilities.invokeAndWait { bptt.unrolledView = false }
+        settle()
+        assertTrue(arrowsUnderConnections().isEmpty()) { "Hiding the view takes its arrow with it" }
+
+        SwingUtilities.invokeAndWait { bptt.unrolledView = true }
+        settle()
+        assertEquals(1, arrowsUnderConnections().size)
+        bptt.deleteBlocking()
+        settle()
+        assertTrue(arrowsUnderConnections().isEmpty()) { "Deleting the network takes the arrow with it" }
     }
 
     @Test

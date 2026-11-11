@@ -62,9 +62,14 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
             }
 
             onUpdated { curve ->
-                val offset = if (isBidirectional()) 0.25 else 0.5
-                val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
-                weightMatrixNode.placeAt(x, y)
+                val bidirectional = isBidirectional()
+                val offset = if (bidirectional) 0.25 else 0.5
+                if (curve != null) {
+                    weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional)
+                } else {
+                    val (x, y) = line(source.location, target.location).p(offset)
+                    weightMatrixNode.placeAt(x, y)
+                }
             }
 
         }

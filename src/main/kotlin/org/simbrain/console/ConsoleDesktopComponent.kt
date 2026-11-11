@@ -14,10 +14,16 @@ import javax.swing.JMenuBar
 class ConsoleDesktopComponent(frame: GenericFrame, component: ConsoleComponent) :
     DesktopComponent<ConsoleComponent>(frame, component) {
 
+    private val consolePanel = CommandConsolePanel(component.workspace, SimbrainDesktop)
+
+    override fun onClosed() {
+        consolePanel.close()
+    }
+
     init {
         preferredSize = Dimension(500, 400)
         layout = BorderLayout()
-        add(CommandConsolePanel(component.workspace, SimbrainDesktop), BorderLayout.CENTER)
+        add(consolePanel, BorderLayout.CENTER)
 
         val actions = SimbrainDesktop.actionManager
         parentFrame.setJMenuBar(JMenuBar().apply {

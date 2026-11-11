@@ -6,10 +6,13 @@
 package org.simbrain.console
 
 import com.formdev.flatlaf.FlatLaf
+import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.simbrain.util.Theme
@@ -46,8 +49,10 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         onClearScreen = { swingInvokeLater { clearTranscript() } }
     }
 
-    /** Keeps commands in the order entered. A long command suspends, which lets stop through while it runs. */
-    private val commandScope = CoroutineScope(Dispatchers.Default.limitedParallelism(1) + SupervisorJob())
+    private val commandScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
+    /** Commands waiting to run. Each runs to the end before the next starts, so their output never interleaves. */
+    private val queue = Channel<QueuedLine>(Channel.UNLIMITED)
 
     private val plain = SimpleAttributeSet().apply {
         StyleConstants.setFontFamily(this, Font.MONOSPACED)
@@ -82,6 +87,7 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         val intro = "Simbrain commands. Enter help for a list."
         insertOutput(intro)
         textPane.styledDocument.setCharacterAttributes(intro.indexOf("help"), "help".length, bold, false)
+        commandScope.launch { runQueue() }
 
         bindKey("ENTER", "console-enter") { enterLine() }
         bindKey("UP", "console-previous") { moveThroughHistory(-1) }
@@ -101,26 +107,38 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         })
     }
 
-    /** Run [line] as though it had been typed. The job finishes once its output is in the transcript. */
-    fun submit(line: String): Job = submitLines(listOf(line))
-
-    /** @param remainder what to leave as input after the lines have run */
-    private fun submitLines(lines: List<String>, remainder: String = ""): Job = commandScope.launch {
-        for (line in lines) {
-            withContext(swingDispatcher) {
-                replaceInput(line)
-                commitInput()
-            }
-            runAndShow(line)
+    /** Run [line] as though it had been entered. The job finishes once its output is in the transcript. */
+    fun submit(line: String): Job {
+        val queued = QueuedLine(line)
+        if (shell.isImmediate(line)) {
+            commandScope.launch { runAndShow(queued) }
+        } else {
+            queue.trySend(queued)
         }
-        if (remainder.isNotEmpty()) withContext(swingDispatcher) { replaceInput(remainder) }
+        return queued.done
     }
 
-    private suspend fun runAndShow(line: String) {
-        val result = shell.execute(line)
-        withContext(swingDispatcher) {
-            if (result.isNotEmpty()) insertOutput(result)
-            refreshPrompt()
+    /** Stop running commands. Called when the console is closed. */
+    fun close() {
+        queue.close()
+        commandScope.cancel()
+    }
+
+    private suspend fun runQueue() {
+        for (queued in queue) runAndShow(queued)
+    }
+
+    /** Shows the line after the prompt, runs it, and shows its output. */
+    private suspend fun runAndShow(queued: QueuedLine) {
+        try {
+            withContext(swingDispatcher) { insertOutput(shell.prompt, queued.line) }
+            val result = shell.execute(queued.line)
+            withContext(swingDispatcher) {
+                if (result.isNotEmpty()) insertOutput(result)
+                refreshPrompt()
+            }
+        } finally {
+            queued.done.complete()
         }
     }
 
@@ -132,10 +150,11 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
     }
 
     private fun enterLine() {
-        val line = commitInput()
+        val line = currentInput()
+        replaceInput("")
         if (line.isNotBlank() && history.lastOrNull() != line) history += line
         historyIndex = history.size
-        commandScope.launch { runAndShow(line) }
+        submit(line)
     }
 
     private fun moveThroughHistory(step: Int) {
@@ -158,8 +177,8 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
             return
         }
         val complete = listOf(currentInput() + lines.first()) + lines.subList(1, lines.size - 1)
-        replaceInput("")
-        submitLines(complete.filter { it.isNotBlank() }, remainder = lines.last())
+        replaceInput(lines.last())
+        complete.filter { it.isNotBlank() }.forEach(::submit)
     }
 
     private fun currentInput() = document.getText(inputStart, document.length - inputStart)
@@ -178,15 +197,6 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         textPane.caretPosition = document.length
     }
 
-    /** End the current line, start a new prompt, and return what was on the line. */
-    private fun commitInput(): String {
-        val line = currentInput()
-        edit { document.insertString(document.length, "\n", plain) }
-        writePrompt()
-        scrollToInput()
-        return line
-    }
-
     private fun writePrompt() {
         promptStart = document.length
         edit { document.insertString(promptStart, shell.prompt, plain) }
@@ -194,12 +204,16 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         textPane.caretPosition = inputStart
     }
 
-    internal fun insertOutput(text: String) {
+    /** Add a line to the transcript, above the prompt. Text after [plainText] is bold, as for a command. */
+    internal fun insertOutput(plainText: String, boldText: String = "") {
         keepingCaretInInput {
-            val added = text + "\n"
-            edit { document.insertString(promptStart, added, plain) }
-            promptStart += added.length
-            inputStart += added.length
+            edit {
+                document.insertString(promptStart, plainText, plain)
+                document.insertString(promptStart + plainText.length, boldText + "\n", if (boldText.isEmpty()) plain else bold)
+            }
+            val added = plainText.length + boldText.length + 1
+            promptStart += added
+            inputStart += added
             trimTranscript()
         }
         scrollToInput()
@@ -244,6 +258,10 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         SwingUtilities.invokeLater {
             textPane.modelToView2D(document.length)?.bounds?.let(textPane::scrollRectToVisible)
         }
+    }
+
+    private class QueuedLine(val line: String) {
+        val done: CompletableJob = Job()
     }
 
     /** Black on white or white on black, following the theme. */

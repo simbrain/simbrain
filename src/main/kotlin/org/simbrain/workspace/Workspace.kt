@@ -487,23 +487,19 @@ class Workspace: CoroutineScope {
         }
     }
 
+    /**
+     * @return whether the file was written
+     */
     @JvmOverloads
-    fun save(file: File?, headless: Boolean = false) {
-        if (file != null) {
-            try {
-                val ostream = FileOutputStream(file)
-                try {
-                    val serializer = WorkspaceSerializer(this)
-                    serializer.serialize(ostream, headless)
-                    markClean()
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                } finally {
-                    ostream.close()
-                }
-            } catch (e: IOException) {
-                e.printStackTrace()
-            }
+    fun save(file: File?, headless: Boolean = false): Boolean {
+        if (file == null) return false
+        return try {
+            FileOutputStream(file).use { WorkspaceSerializer(this).serialize(it, headless) }
+            markClean()
+            true
+        } catch (e: Exception) {
+            e.printStackTrace()
+            false
         }
     }
 

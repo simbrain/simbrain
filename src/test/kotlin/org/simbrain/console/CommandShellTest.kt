@@ -17,6 +17,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.workspace.Workspace
 import java.io.File
@@ -509,10 +510,10 @@ class CommandShellTest {
         val shell = shellWithNetwork()
         val file = File(dir, "saved.zip")
         assertEquals("Saved saved.zip.", shell.run("save ${file.path}"))
-        shell.run("rm net1")
+        shell.run("rm net1/Synapse_1")
         assertEquals("There are unsaved changes. Save first, or use open <file> force.", shell.run("open ${file.path}"))
         assertEquals("Opened saved.zip.", shell.run("open ${file.path} force"))
-        assertEquals("net1", shell.run("ls"))
+        assertTrue("Synapse_1" in shell.run("ls net1"))
     }
 
     @Test
@@ -543,7 +544,7 @@ class CommandShellTest {
     fun `source stops at the first problem and names the line`(@TempDir dir: File) {
         val shell = CommandShell(Workspace())
         val file = File(dir, "bad.txt").apply { writeText("add network net1\nnope\nadd network net2\n") }
-        assertEquals("bad.txt, line 2: Unknown command: nope. Enter help for a list.", shell.run("source ${file.path}"))
+        assertEquals("Added net1.\nbad.txt, line 2: Unknown command: nope. Enter help for a list.", shell.run("source ${file.path}"))
         assertEquals("net1", shell.run("ls"))
     }
 
@@ -621,6 +622,59 @@ class CommandShellTest {
     @Test
     fun `select rejects something that is not a model`() {
         assertEquals("net1 can't be selected.", shellWithNetwork().run("select net1"))
+    }
+
+    @Test
+    fun `select and at reach models inside a subnetwork`() {
+        val workspace = Workspace()
+        val component = NetworkComponent("net1")
+        val hopfield = Hopfield(3)
+        runBlocking { component.network.addNetworkModels(hopfield) }
+        workspace.addWorkspaceComponent(component)
+        val inner = hopfield.neuronGroup.neuronList.first()
+        val shell = CommandShell(workspace, selectedModels = { listOf(inner) })
+        val selections = CopyOnWriteArrayList<List<NetworkModel>>()
+        component.network.events.selected.on(Dispatchers.Unconfined) { selections.add(it) }
+
+        assertEquals("Selected 3 object(s).", shell.run("select net1/${hopfield.id}/${hopfield.neuronGroup.id}/*"))
+        assertEquals("Selected 1 object(s).", shell.run("select @"))
+        runBlocking { withTimeout(30_000) { while (selections.size < 2) delay(5) } }
+        assertEquals(3, selections[0].size)
+        assertEquals(listOf(inner), selections[1])
+    }
+
+    @Test
+    fun `save reports a failure and keeps the previous file`(@TempDir dir: File) {
+        val shell = shellWithNetwork()
+        val missing = File(dir, "missing/a.zip").path
+        assertEquals("No such folder: ${File(dir, "missing").path}", shell.run("save $missing"))
+        assertEquals(null, shell.workspace.currentFile)
+    }
+
+    @Test
+    fun `adding a component with a bad option leaves nothing behind`() {
+        val shell = CommandShell(Workspace())
+        assertTrue(shell.run("add network net1 foo=1").startsWith("Network has no property foo"))
+        assertEquals("(empty)", shell.run("ls"))
+        assertEquals("Added net1.", shell.run("add network net1"))
+    }
+
+    @Test
+    fun `source keeps the output before a problem`(@TempDir dir: File) {
+        val shell = CommandShell(Workspace())
+        val file = File(dir, "bad.txt").apply { writeText("add network net1\nls\nnope\n") }
+        assertEquals(
+            "Added net1.\nnet1\nbad.txt, line 3: Unknown command: nope. Enter help for a list.",
+            shell.run("source ${file.path}")
+        )
+    }
+
+    @Test
+    fun `types hidden from dialogs are hidden here too`() {
+        val shell = shellWithNetwork()
+        val output = shell.run("set net1/Neuron_1 rule=Allostatic")
+        assertTrue(output.startsWith("Unknown value for updateRule: Allostatic."), output)
+        assertFalse(shell.complete("set net1/Neuron_1 rule=").options.any { it.contains("Allostatic") })
     }
 
     @Test

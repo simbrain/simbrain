@@ -10,8 +10,10 @@ import org.simbrain.util.invokeLegacySetter
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import java.math.BigDecimal
 import java.math.MathContext
+import java.util.concurrent.ConcurrentHashMap
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -35,13 +37,21 @@ class EditableProperty(
     val name: String get() = property.name
 }
 
+/** The editable properties of each class, found by reflection once per class. */
+private val editableByClass = ConcurrentHashMap<KClass<*>, List<KProperty1<Any, *>>>()
+
 @Suppress("UNCHECKED_CAST")
-fun editablePropertiesOf(obj: Any): List<EditableProperty> =
-    (obj::class.allSuperclasses + obj::class)
+fun editablePropertiesOf(obj: Any): List<EditableProperty> {
+    val known = editableByClass[obj::class]
+    if (known != null) return known.mapNotNull { editableProperty(obj, it) }.sortedBy { it.order }
+    val found = (obj::class.allSuperclasses + obj::class)
         .flatMap { it.declaredMemberProperties }
         .mapNotNull { property -> editableProperty(obj, property as KProperty1<Any, *>) }
         .distinctBy { it.name }
         .sortedBy { it.order }
+    editableByClass[obj::class] = found.map { it.property }
+    return found
+}
 
 private fun editableProperty(obj: Any, property: KProperty1<Any, *>): EditableProperty? = runCatching {
     property.isAccessible = true
@@ -127,8 +137,12 @@ private fun parseBoolean(property: EditableProperty, text: String): Boolean = wh
     else -> fail("${property.name} needs true or false: $text")
 }
 
-private fun typeList(property: EditableProperty): Map<String, Class<out CopyableObject>>? =
-    (property.value as? CopyableObject)?.getTypeList()?.let(::typeOptions)
+/** The types a property can be set to, leaving out hidden types as its dialog does. */
+private fun typeList(property: EditableProperty): Map<String, Class<out CopyableObject>>? {
+    val current = property.value as? CopyableObject ?: return null
+    val types = current.getTypeList() ?: return null
+    return typeOptions(types.filter { TypeOptionVisibility.isVisible(it.kotlin, listOf(current::class)) })
+}
 
 /** Names for a list of selectable types, as they would be typed. */
 fun <T : Any> typeOptions(types: List<Class<out T>>): Map<String, Class<out T>> =

@@ -133,11 +133,7 @@ public class AbstractComponentFactory {
     }
 
     public void createWorkspaceComponent(String name) {
-        if (workspaceComponentFactories.containsKey(name)) {
-            workspace.addWorkspaceComponent(workspaceComponentFactories.get(name).get());
-        } else {
-            throw new IllegalArgumentException("No component type factory is registered for " + name);
-        }
+        workspace.addWorkspaceComponent(newWorkspaceComponent(name));
     }
 
     /**
@@ -148,20 +144,15 @@ public class AbstractComponentFactory {
     }
 
     /**
-     * Create a component of the given type with the given name, and add it to the workspace.
+     * Create a component of the given type without adding it to the workspace, so it can be configured first.
      *
-     * @param type          a type from {@link #getWorkspaceComponentTypes()}
-     * @param componentName the name, or empty to use a default name
-     * @return the new component
+     * @param type a type from {@link #getWorkspaceComponentTypes()}
      */
-    public WorkspaceComponent createWorkspaceComponent(String type, String componentName) {
+    public WorkspaceComponent newWorkspaceComponent(String type) {
         if (!workspaceComponentFactories.containsKey(type)) {
             throw new IllegalArgumentException("No component type factory is registered for " + type);
         }
-        WorkspaceComponent component = workspaceComponentFactories.get(type).get();
-        component.setName(componentName);
-        workspace.addWorkspaceComponent(component);
-        return component;
+        return workspaceComponentFactories.get(type).get();
     }
 
     public DesktopComponent createGuiComponent(GenericFrame frame, WorkspaceComponent workspaceComponent) {

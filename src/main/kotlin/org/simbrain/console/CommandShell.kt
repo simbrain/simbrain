@@ -22,6 +22,7 @@ import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.io.File
 import java.lang.reflect.InvocationTargetException
+import java.util.IdentityHashMap
 
 private const val MAX_SOURCE_DEPTH = 8
 private const val MAX_LISTED = 500
@@ -50,6 +51,8 @@ val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.m
 /**
  * @param group the heading it appears under in help
  * @param listsItems if true, the action returns one item per line, which are shown side by side unless piped
+ * @param immediate if true, the command runs as soon as it is entered instead of waiting for earlier commands, as
+ * `stop` must
  */
 class Command(
     val name: String,
@@ -58,6 +61,7 @@ class Command(
     val group: String,
     val examples: List<String>,
     val listsItems: Boolean,
+    val immediate: Boolean,
     val completer: Completer,
     val action: suspend CommandShell.(args: List<String>) -> String
 )
@@ -77,10 +81,11 @@ class CommandRegistry {
         group: String = "",
         examples: List<String> = emptyList(),
         listsItems: Boolean = false,
+        immediate: Boolean = false,
         completer: Completer = noCompletion,
         action: suspend CommandShell.(args: List<String>) -> String
     ) {
-        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, completer, action)
+        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, immediate, completer, action)
     }
 }
 
@@ -131,14 +136,21 @@ class CommandShell(
     suspend fun execute(line: String): String {
         return try {
             runLine(line)
-        } catch (e: CommandException) {
-            e.message.orEmpty()
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            val cause = (e as? InvocationTargetException)?.targetException ?: e
-            "Error: ${cause.message ?: cause::class.simpleName}"
+            problemText(e)
         }
+    }
+
+    /** Whether [line] is a command that should not wait for earlier ones. */
+    fun isImmediate(line: String): Boolean =
+        runCatching { parseLine(line).words.firstOrNull()?.let { registry[it]?.immediate } }.getOrNull() == true
+
+    private fun problemText(e: Exception): String {
+        if (e is CommandException) return e.message.orEmpty()
+        val cause = (e as? InvocationTargetException)?.targetException ?: e
+        return "Error: ${cause.message ?: cause::class.simpleName}"
     }
 
     private suspend fun runLine(line: String): String {
@@ -158,18 +170,23 @@ class CommandShell(
         return if (items.size > MAX_LISTED) "$shown\n... and ${items.size - MAX_LISTED} more" else shown
     }
 
-    /** Run the lines of a file in order, stopping at the first problem. */
+    /** Run the lines of a file in order, stopping at the first problem, which is reported after the earlier output. */
     suspend fun runFile(file: File): String {
         if (sourceDepth >= MAX_SOURCE_DEPTH) fail("Files are nested too deeply.")
         sourceDepth++
         try {
-            return file.readLines().mapIndexedNotNull { index, line ->
+            val outputs = mutableListOf<String>()
+            for ((index, line) in file.readLines().withIndex()) {
                 try {
-                    runLine(line).ifEmpty { null }
-                } catch (e: CommandException) {
-                    fail("${file.name}, line ${index + 1}: ${e.message}")
+                    runLine(line).takeIf { it.isNotEmpty() }?.let(outputs::add)
+                } catch (e: CancellationException) {
+                    throw e
+                } catch (e: Exception) {
+                    outputs += "${file.name}, line ${index + 1}: ${problemText(e)}"
+                    fail(outputs.joinToString("\n"))
                 }
-            }.joinToString("\n")
+            }
+            return outputs.joinToString("\n")
         } finally {
             sourceDepth--
         }
@@ -194,12 +211,24 @@ class CommandShell(
     /** Find what a command's target refers to, which unlike [resolveAll] can also be the GUI selection. */
     suspend fun targets(path: String): List<Node> {
         if (path == "@") {
-            return selectedModels().map { model ->
-                val owner = networkComponents.firstOrNull { model in it.network.allModelsDeep }
-                Node(listOfNotNull(owner?.name, model.id), model)
-            }.ifEmpty { fail("Nothing is selected.") }
+            val selected = selectedModels().ifEmpty { fail("Nothing is selected.") }
+            val nodesByModel = IdentityHashMap<Any, Node>()
+            networkComponents.forEach { component ->
+                descendants(Node(listOf(component.name), component)).forEach { nodesByModel.putIfAbsent(it.value, it) }
+            }
+            return selected.map { model -> nodesByModel[model] ?: Node(listOf(model.id.orEmpty()), model) }
         }
         return resolveAll(path).ifEmpty { fail("Not found: $path") }
+    }
+
+    /** Everything below [node], each before its own contents. A neuron in a collection appears under both. */
+    fun descendants(node: Node): Sequence<Node> = sequence {
+        val children = childrenOf(node.value) ?: return@sequence
+        for ((name, child) in children) {
+            val childNode = Node(node.path + name, child)
+            yield(childNode)
+            yieldAll(descendants(childNode))
+        }
     }
 
     val networkComponents: List<NetworkComponent>

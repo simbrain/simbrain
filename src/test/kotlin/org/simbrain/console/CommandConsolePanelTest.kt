@@ -3,9 +3,11 @@ package org.simbrain.console
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.workspace.Workspace
@@ -14,8 +16,7 @@ import javax.swing.text.StyleConstants
 
 class CommandConsolePanelTest {
 
-    private fun panel(): CommandConsolePanel {
-        val workspace = Workspace().apply { addWorkspaceComponent(NetworkComponent("net1")) }
+    private fun panel(workspace: Workspace = Workspace().apply { addWorkspaceComponent(NetworkComponent("net1")) }): CommandConsolePanel {
         lateinit var panel: CommandConsolePanel
         SwingUtilities.invokeAndWait { panel = CommandConsolePanel(workspace) }
         return panel
@@ -36,9 +37,9 @@ class CommandConsolePanelTest {
         onEdt { textPane.actionMap.get(action).actionPerformed(null) }
 
     private fun CommandConsolePanel.awaitText(expected: String) = runBlocking {
-        withTimeout(30_000) {
+        withTimeoutOrNull(30_000) {
             while (expected !in text) delay(5)
-        }
+        } ?: fail("Timed out waiting for \"$expected\" in:\n$text")
     }
 
     private fun CommandConsolePanel.enter(line: String, expected: String) {
@@ -184,10 +185,32 @@ class CommandConsolePanelTest {
     fun `pasting several lines runs them in order and keeps the last fragment`() {
         val panel = panel()
         onEdt { panel.pasteText("add neurons 1\nls net1\npartial") }
-        panel.awaitText("> partial")
+        panel.awaitText("> ls net1\nNeuron_1")
         val text = panel.text
         assertTrue(text.indexOf("Added Neuron_1") < text.indexOf("> ls net1"), text)
         assertTrue(text.endsWith("> partial"), text)
+    }
+
+    @Test
+    fun `pasted commands leave what is being typed alone`() {
+        val panel = panel()
+        onEdt { panel.pasteText("run 20\nls net1\n") }
+        panel.type("abc")
+        panel.awaitText("> ls net1\n(empty)")
+        val text = panel.text
+        assertTrue(text.endsWith("> abc"), text)
+        assertTrue(text.indexOf("Ran 20") < text.indexOf("> ls net1"), text)
+    }
+
+    @Test
+    fun `stop runs while another command is running`() {
+        val workspace = Workspace().apply { addWorkspaceComponent(NetworkComponent("net1")) }
+        val panel = panel(workspace)
+        panel.submit("run 100000000")
+        runBlocking { withTimeout(30_000) { while (workspace.time < 2) delay(5) } }
+        panel.submit("stop")
+        panel.awaitText("Ran ")
+        assertTrue(panel.text.indexOf("> stop") < panel.text.indexOf("Ran "), panel.text)
     }
 
     @Test

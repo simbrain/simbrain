@@ -4,6 +4,8 @@
 package org.simbrain.console
 
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
 import org.simbrain.custom_sims.simulations
 import org.simbrain.network.NetworkComponent
@@ -131,13 +133,13 @@ val workspaceCommands: CommandRegistry = commands {
         completer = pathCompletion
     ) { args ->
         val word = onePath(args)
-        val models = if (word == "none") emptyList() else targets(word).map { node ->
-            node.value as? NetworkModel ?: fail("${node.name} can't be selected.")
-        }
+        val nodes = if (word == "none") emptyList() else targets(word)
+        nodes.firstOrNull { it.value !is NetworkModel }?.let { fail("${it.name} can't be selected.") }
+        val byNetwork = nodes.groupBy { networkOf(it) }
         networkComponents.forEach { component ->
-            component.network.selectModels(models.filter { it in component.network.allModelsDeep })
+            component.network.selectModels(byNetwork[component.network].orEmpty().map { it.value as NetworkModel })
         }
-        if (word == "none") "" else "Selected ${models.size} object(s)."
+        if (word == "none") "" else "Selected ${nodes.size} object(s)."
     }
 
     command(
@@ -347,10 +349,8 @@ val workspaceCommands: CommandRegistry = commands {
             val iterations = args.single().toIntOrNull()?.takeIf { it > 0 }
                 ?: fail("Iterations must be a positive whole number: ${args.single()}")
             var remaining = iterations
-            // Leaves the shell's command queue while iterating, so that stop can be entered
-            withContext(Dispatchers.Default) {
-                workspace.iterateWhile { --remaining > 0 && workspace.updater.isRunning }
-            }
+            val context = currentCoroutineContext()
+            workspace.iterateWhile { --remaining > 0 && workspace.updater.isRunning && context.isActive }
             "Ran ${iterations - remaining} of $iterations iterations. Time: ${workspace.time}"
         }
     }
@@ -361,7 +361,8 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             "stop"
         ),
-        description = "Stop the workspace after the current iteration."
+        description = "Stop the workspace after the current iteration. Runs at once, even while another command is running.",
+        immediate = true
     ) { _ ->
         workspace.stop()
         "Stopped. Time: ${workspace.time}"
@@ -386,15 +387,19 @@ val workspaceCommands: CommandRegistry = commands {
         name = "sim",
         group = "Run",
         examples = listOf(
-            "sim XOR"
+            "sim XOR",
+            "sim XOR force"
         ),
-        usage = "sim <name>",
-        description = "Open a simulation, replacing the current workspace.",
+        usage = "sim <name> [force]",
+        description = "Open a simulation, replacing the current workspace. force discards unsaved changes.",
         completer = { _, partial -> wordCandidates(simulations.items.map { it.first }.toList(), partial) }
     ) { args ->
         val theDesktop = desktop ?: fail("Simulations can only be opened from the desktop.")
-        if (args.isEmpty()) fail("Usage: sim <name>")
-        val sim = chooseOption(simulations.items.toMap(), args.joinToString(" "), "simulation")
+        val force = args.size > 1 && args.last() == "force"
+        val nameArgs = if (force) args.dropLast(1) else args
+        if (nameArgs.isEmpty()) fail("Usage: sim <name> [force]")
+        val sim = chooseOption(simulations.items.toMap(), nameArgs.joinToString(" "), "simulation")
+        requireNothingUnsaved(force, "sim <name> force")
         withContext(Dispatchers.Default) { sim.run(theDesktop) }
         ""
     }
@@ -412,7 +417,7 @@ val workspaceCommands: CommandRegistry = commands {
         if (args.isEmpty() || args.size > 2 || (args.size == 2 && args[1] != "force")) fail("Usage: open <file> [force]")
         val file = workspaceFile(args[0])
         if (!file.isFile) fail("No such file: ${file.path}")
-        if (args.size == 1 && workspace.changesExist()) fail("There are unsaved changes. Save first, or use open <file> force.")
+        requireNothingUnsaved(force = args.size == 2, "open <file> force")
         workspace.openWorkspace(file, useDesktop = desktop != null)
         "Opened ${file.name}."
     }
@@ -435,7 +440,8 @@ val workspaceCommands: CommandRegistry = commands {
             ?: workspace.currentFile
             ?: fail("This workspace has no file yet. Use save <file>.")
         if (file.exists() && file != workspace.currentFile && !force) fail("${file.name} exists. Use save <file> force.")
-        workspace.save(file, headless = desktop == null)
+        if (file.absoluteFile.parentFile?.isDirectory == false) fail("No such folder: ${file.absoluteFile.parent}")
+        if (!workspace.save(file, headless = desktop == null)) fail("Could not save ${file.path}.")
         workspace.currentFile = file
         "Saved ${file.name}."
     }
@@ -675,8 +681,10 @@ private fun CommandShell.addComponent(type: String, arguments: Arguments): Strin
     val name = arguments.words.getOrNull(1).orEmpty()
     if ("/" in name) fail("Names can't contain /.")
     if (name.isNotEmpty() && workspace.getComponent(name) != null) fail("There is already a component named $name.")
-    val component = workspace.componentFactory.createWorkspaceComponent(factoryName, name)
+    val component = workspace.componentFactory.newWorkspaceComponent(factoryName)
+    component.name = name
     arguments.options.forEach { (key, value) -> assign((component as? NetworkComponent)?.network ?: component, key, value) }
+    workspace.addWorkspaceComponent(component)
     return "Added ${component.name}."
 }
 
@@ -786,6 +794,14 @@ private fun modelsIn(nodes: List<Node>): List<NetworkModel> = nodes.flatMap { no
         is NetworkComponent -> value.network.allModels.toList()
         is NetworkModel -> listOf(value)
         else -> fail("${node.name} has no network models.")
+    }
+}
+
+/** Stops the workspace, then fails if replacing it would lose work, unless [force] is given. */
+private fun CommandShell.requireNothingUnsaved(force: Boolean, forceUsage: String) {
+    workspace.stop()
+    if (!force && workspace.componentList.isNotEmpty() && workspace.hasUnsavedWork()) {
+        fail("There are unsaved changes. Save first, or use $forceUsage.")
     }
 }
 

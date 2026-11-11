@@ -309,9 +309,9 @@ val corticalLayers = newSim {
         [Excitatory and inhibitory](https://docs.simbrain.net/docs/network/networkDialogs.html#excitatory--inhibitory-ratio) neuron populations are assigned according to experimentally observed ratios 
         (~`20%` inhibitory neurons). Connection densities between layers are based on the empirical data shown above.
 
-        # What to Do
+        # Activities
 
-        Exploring layer dynamics:
+        ## Activity: Explore layer dynamics
 
         1. Click `Run` to start the simulation.
         

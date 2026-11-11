@@ -112,7 +112,9 @@ val localistAndDistributedRepresentations = newSim {
 
         - `Representation style`: Switches the odors received by the mouse between localist object codes and distributed feature patterns.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Compare localist and distributed codes
 
         1. Run the workspace and drag the mouse toward each object. In localist mode, one matching object unit becomes most active.
         2. Select `Distributed` from the control panel and repeat. Several feature units now activate at different strengths.

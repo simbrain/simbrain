@@ -113,11 +113,16 @@ val competitiveGridSim = newSim {
             - `Train ×10`: Run ten training steps on the current pattern.
             - `Reset`: Randomize the weights and clear the labels.
 
-            # What to Do
+            # Activities
+
+            ## Activity 1: Give each picture its own unit
 
             1. Train the pictures in turn, one step each, for a few rounds, then test each one. This gives every picture its own unit only about one time in seven.
             2. Press `Reset` and commit instead: select a picture and press `Train ×10` twice before moving on, then test each picture. This almost always works.
-            3. Right-click the competitive network, choose `Edit`, and turn off `Normalize inputs`. Train again. One unit now wins every picture. Its weights grow toward `1` on every pixel it is trained on, so it responds to the other pictures with their full pixel overlap, far more than any untrained unit.
+
+            ## Activity 2: Turn off input normalization
+
+            Right-click the competitive network, choose `Edit`, and turn off `Normalize inputs`. Train again. One unit now wins every picture. Its weights grow toward `1` on every pixel it is trained on, so it responds to the other pictures with their full pixel overlap, far more than any untrained unit.
 
             # Credits
 

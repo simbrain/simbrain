@@ -596,7 +596,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
         # Simulation Details
 
-        This simulation simulates the evolution of a neural network until the `target fitness` in the control panel is met, exceeded, or when it has reached the `maximum generation`. The
+        This simulation simulates the evolution of a neural network until the `target fitness` in the trainer's `Evolution properties` dialog is met, exceeded, or when it has reached the `maximum generation`. The
         goal of this simulation is to evolve until it is as close as possible to the `target fitness`.
 
         In simple terms, the fitness is calculated as `calories(t) - hunger(t)` where `calories` is calculated as `totalActivation(t) + Movement(t)`.
@@ -627,18 +627,20 @@ val evolveResourcePursuer = newSim { optionString ->
         Then a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the
         `target fitness` or better, or when the evolutionary process ends.
 
-        # What to Do
+        # Activities
 
-        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. As mentioned before, there are genes that can be activated to allow
+        ## Activity: Evolve a resource pursuer
+
+        In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works. As mentioned before, there are genes that can be activated to allow
         the simulation to have additional mutations. Click on the dropdown box next to the gene you want active, and change it to `Yes`. Below are the steps to evolving the simulation:
 
-        1) Specify the parameters of the simulation.
+        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
             - The addition of more mutations.
 
-        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        2. After confirming the parameters are what you want, click `Run` in the trainer to start the simulation.
 
-        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+        3. Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
 

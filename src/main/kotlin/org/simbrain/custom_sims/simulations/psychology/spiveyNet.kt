@@ -373,47 +373,39 @@ val spiveyNet = newSim {
                 a smaller, later bulge toward the handle rather than the stronger early bulge seen in the cohort condition. Eye movements should be
                 less strongly drawn to the handle than in the cohort condition, and any competitor-directed fixation should tend to appear later.
         
-        # What to Do
-        
-        ## Compare conditions
-        
-        **To compare mouse traces across conditions:** switch directly between `Control`, `Cohort`, and `Rhyming` without pressing `Reset`.
-        Those condition buttons start a new trial but preserve the existing trails, so multiple trajectories can remain visible together.
-        
-        1. Control Condition
-        - Click on the `Control condition` button.
-        - Click the `iterate` button repeatedly.
-        - Observe the mouse goes straight to the candle, with little or no bulge toward the fork.
-        - Observe the eye marker quickly locks on to the candle and usually stays there.
-        
-        2. Cohort Condition
-        - Click on the `Cohort condition` button.
-        - Click the `iterate` button repeatedly.
-        - Observe the mouse trace bulges most strongly in this condition, bowing toward the candy before returning to the candle.
-        - Observe the eye marker shows the strongest competition in this condition, often hesitating between candle and candy before committing.
+        # Activities
 
-        3. Rhyming Condition
-        - Click on the `Rhyming condition` button.
-        - Click the `iterate` button repeatedly.
-        - Observe the mouse trace shows a smaller, later bulge toward the handle than the cohort-condition bulge toward candy.
-        - Observe the eye marker mostly favors the candle, with any pull toward handle tending to be weaker and later than in the cohort condition.
-        
+        ## Activity 1: Compare conditions
+
+        Switch directly between `Control`, `Cohort`, and `Rhyming` without pressing `Reset`.
+        Those condition buttons start a new trial but preserve the existing trails, so multiple trajectories can remain visible together.
+
+        1. Click the `Control condition` button, then click the `iterate` button repeatedly.
+           - Observe the mouse goes straight to the candle, with little or no bulge toward the fork.
+           - Observe the eye marker quickly locks on to the candle and usually stays there.
+        2. Click the `Cohort condition` button, then click the `iterate` button repeatedly.
+           - Observe the mouse trace bulges most strongly in this condition, bowing toward the candy before returning to the candle.
+           - Observe the eye marker shows the strongest competition in this condition, often hesitating between candle and candy before committing.
+        3. Click the `Rhyming condition` button, then click the `iterate` button repeatedly.
+           - Observe the mouse trace shows a smaller, later bulge toward the handle than the cohort-condition bulge toward candy.
+           - Observe the eye marker mostly favors the candle, with any pull toward handle tending to be weaker and later than in the cohort condition.
+
         You can reset at any time using the `reset button` to erase all the trajectories.
-        Pressing `Control`, `Cohort`, or `Rhyming` starts over without erasing trajectories, which is the intended way to compare conditions on the same display.  
-       
-        ## To plot activations 
-        
+
+        ## Activity 2: Plot activations
+
         In (Spivey, 2025) time series plots for activations in different parts of the network are shown,
-        which illustrate the dynamics governing the mouse traces. 
-        
+        which illustrate the dynamics governing the mouse traces.
+
         <img src="//localfiles/simulations/images/visualWorld/spiveyActivationDynamics.png" alt="Activation dynamics icon" height="200">
-        
+
         This can also be simulated in Simbrain (but note the colors and details will be slightly different)
-        
-        1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc).  
-        1. Select `Plot > Time Series Plot` from the dropdown.
-        1. Repeat the steps above (selecting a condition then iterating) to see activation dynamics in the time series.
-        1. There will generally be four lines corresponding to the four nodes in each neuron group.
+
+        1. Right-click on the interaction box (the yellow box of the groups of nodes) of whatever network is of interest (eyes, integration, etc).
+        2. Select `Plot > Time Series Plot` from the dropdown.
+        3. Repeat the steps in Activity 1 (selecting a condition then iterating) to see activation dynamics in the time series.
+
+        There will generally be four lines corresponding to the four nodes in each neuron group.
         
         # References
         

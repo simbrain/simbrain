@@ -45,21 +45,23 @@ val backpropAutoEncoder = newSim {
 
         The training set contains input patterns that are also used as target patterns. Training succeeds when the compressed hidden representation can reconstruct those inputs at the output layer.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train the auto-encoder
 
         1. Double-click on the `Backprop` network in the `Backprop` network window to open the `Train Network` window.
 
-        2. In the top area of this window, select the `Iterate training until the stop button is pressed` button to play the simulation.
+        2. In the top area of this window, select the `Iterate training until stop button is pressed` button to play the simulation.
 
         3. The `Sum Squared Error` should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
 
-        4. Click `Apply current row as input and increment selected row` to check the network's performance.
+        4. Click `Apply current row as input to network` to check the network's performance. With `Auto advance` checked, each click moves to the next row.
 
         5. As you click the pattern on the bottom should be matched by the pattern on the top.
 
-        ## Further Studies
+        ## Explore further
 
-        By default this kind of auto-encoding training set is used for networks, so it's easy to set up this kind of simulation with different sized hidden layers, or different numbers
+        - By default this kind of auto-encoding training set is used for networks, so it's easy to set up this kind of simulation with different sized hidden layers, or different numbers
         of hidden layers. You can add a new network using `insert > subnetwork > backprop` and use different numbers for the hidden layer, and then follow the directions above. As the
         hidden layer gets smaller, it should become harder to train.
 

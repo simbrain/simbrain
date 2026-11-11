@@ -107,13 +107,18 @@ val nlpSimBasic = newSim {
        Selecting rows and clicking the view embedding button produces a similarity heatmap based on cosine similarity,
        where higher values indicate greater similarity.
 
-       # What to Do
+       # Activities
+
+       ## Activity: Build the word embedding space
 
        1. Run the simulation.
        2. Observe the interface: the text world on the left and the PCA projection on the right.
        3. Step through the text using `Step`. Each word’s embedding will be added to the projection plot.
        4. Use the matrix and heatmap tools to examine co-occurrence structure and similarity values. Compare, for example, `bus` and `butterfly`.
-       5. Try loading a different corpus from the simulations/texts folder. Notice how changing the training text alters the positions of words in the projection plot.
+
+       ## Explore further
+
+       - Try loading a different corpus from the simulations/texts folder. Notice how changing the training text alters the positions of words in the projection plot.
 
        # Credits
 

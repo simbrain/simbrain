@@ -81,7 +81,9 @@ val spikingNeuron = newSim {
         When a spike occurs, a [jump-and-decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html) spike responder simulates how spikes affect downstream neurons,
         creating smooth post-synaptic potentials. Spike transmission is modeled by a spike responder, which applies a transient signal to the post-synaptic neuron.
         
-        # What to Do
+        # Activities
+
+        ## Activity 1: Drive the neuron with input
 
         1. Click `Run` to begin the simulation.
         2. Click the `Input` neuron, then press the up/down arrow keys to raise or lower its activation.
@@ -89,14 +91,14 @@ val spikingNeuron = newSim {
             - The spike activity in the `Spikes` plot
             - The smooth post-synaptic response in the `Spike Responses` plot
 
-        ## Exploration of the Izhikevich parameters
+        ## Activity 2: Explore the Izhikevich parameters
 
         You can change the Izhikevich parameters by double-clicking the `Spiking` neuron and then modifying the parameters, A, B, C, and D. 
         
         Use the [Izhikevich documentation](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) to explore different firing behaviors. The bottom of that page has a 
         list of parameter settings you can try, for example, `Tonic Bursting` or `Phasic Spiking`. Observe the different behaviors in the `Spikes` plot.
         
-        ## Exploration of other spiking neuron models and spike responders
+        ## Activity 3: Explore other spiking neuron models and spike responders
         
         You can also experiment with other spike responders by double-clicking the connection from `Spiking` to `Post-Synaptic Response`, then changing the current spike responder 
         to a different [spike responder](https://docs.simbrain.net/docs/network/spikeresponders/). In addition to this, you can also change the spiking neuron model to a different 

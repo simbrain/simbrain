@@ -47,7 +47,9 @@ val recurrentNetArrayBased = newSim {
 
             The basic thing you do in this simulation is press `Run` in the desktop window and watch dynamics unfold.
              
-            # What to Do
+            # Activities
+
+            ## Activity: Study the dynamics
             
             Basic method to study dynamics in this model:
             
@@ -56,12 +58,12 @@ val recurrentNetArrayBased = newSim {
             - At any time you can press the `Clear` button (the eraser) in the projection plot to start over with your plot.
             - You can press the `clamp` button in the plot, assuming PCA, to _freeze_ the current projection pattern.
 
-            ## Other Things to Try
+            ## Explore further
             
             - Right click on the weight matrix and view the eigenvalues and associate its behavior with the dominant eigenvalue.
             - Right click on the weight matrix and set the spectral radius. Values a little below `1` can produce interesting dynamics.
             - Double click on the neuron array and change the update rule, and see how this impacts the dynamics. 
-            - Changing the type of projection, for example changing it to `Sammon` and pressing `play` to see an alternative way of projecting data.
+            - Changing the type of projection, for example changing it to `Sammon` and pressing `Run` to see an alternative way of projecting data.
             
             # Credits
             

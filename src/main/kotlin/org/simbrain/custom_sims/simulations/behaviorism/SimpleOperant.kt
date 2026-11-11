@@ -171,7 +171,9 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             When you reward a behavior, its probability increases. When you punish it, the probability decreases. After each learning event, probabilities are normalized so they always
             sum to `1.0`.
 
-            # What to Do
+            # Activities
+
+            ## Activity: Train a target behavior
             
             1. Run the simulation to see random behavior selection based on current probabilities
             
@@ -186,7 +188,9 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             
             5. Continue training until the desired behavior becomes highly probable
             
-            6. Experiment with different reinforcement schedules or try training different behaviors
+            ## Explore further
+
+            - Experiment with different reinforcement schedules or try training different behaviors
 
             # References
             

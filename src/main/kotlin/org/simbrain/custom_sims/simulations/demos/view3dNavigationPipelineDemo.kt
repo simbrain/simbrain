@@ -118,13 +118,17 @@ val view3dNavigationPipelineDemo = newSim {
 
         The `Image World` receives a live stream from the agent's view and applies an edge-detection pipeline to it.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Watch the edge-detected views
 
         Click `Run` and watch Amy wander through the world. The `Image World` updates live with edge-detected views of the landmarks she passes. You can also move her manually with the keyboard or mouse.
          
-       In the `Image World` you can edit the current pipeline and see how this changes the presentation. You can:
+        ## Activity 2: Edit the pipeline
 
-        - Open the `Pipeline View` toolbar and edit the current pipeline.
+        In the `Image World` you can edit the current pipeline and see how this changes the presentation. You can:
+
+        - In the `Pipeline View` window, click the toolbar's `Edit pipeline` button to edit the current pipeline.
         - Double click the edge detection operation to adjust its algorithm and parameters.
         - Observe how these changes affect processed output while you move.
 

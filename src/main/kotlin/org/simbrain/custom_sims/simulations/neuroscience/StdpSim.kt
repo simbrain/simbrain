@@ -130,20 +130,22 @@ val stdpSim = newSim {
          decaying post-synaptic effects.
         - `Synapse Strength Plot`: A time series graph shows how the Pre→Post connection strength changes over time.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Run the simulation
 
         1. Click `Run` to begin the simulation.
         2. Inspect the data table to see when the Pre and Post neurons receive input.
         3. Observe how the Pre → Post synaptic weight changes in the time series plot.
         4. Try reversing the spike order to watch the synapse weaken.
 
-        ## Exploring the model
+        ## Explore further
 
         - Modify the data table to change the spike timing between Pre and Post.
         - Double-click the synapse to adjust parameters like `tauPlus`, `tauMinus`, `wPlus`, `wMinus`, and `learningRate`.
         - Add delays, multiple spikes, or repeat patterns in the input to simulate bursting behavior.
-            1. Reduce the time constants to explore more sensitive or rapid learning responses.
-            2. Observe how changes in spike order and timing influence the pattern of plasticity.
+        - Reduce the time constants to explore more sensitive or rapid learning responses.
+        - Observe how changes in spike order and timing influence the pattern of plasticity.
 
         # Credits
 

@@ -2,11 +2,7 @@ package org.simbrain.custom_sims.simulations
 
 import org.simbrain.custom_sims.*
 import org.simbrain.network.connections.Sparse
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.updaterules.AllostaticUpdateRule
 import org.simbrain.network.updaterules.LinearRule
@@ -277,24 +273,26 @@ val objectTrackingSim = newSim("object_tracking") {
         
         Note that the agent's ability to track the cheese is not pre-built in the agent (i.e., it is not being told to track the object). Instead, it emerges from the dynamics within the reservoir network.
         
-        # What to Do
+        # Activities
         
         In this simulation, the only configurations are `Number of iterations` and `Record spikes`. Before explaining the utilization of these configurations, to explore this simulation:
         
-        1) Run the simulation.
+        ## Activity 1: Observe representational drift
+
+        1. Run the simulation.
         
-        2) While it runs, look at the reservoir network. To observe its state: right-click the `Reservoir` group tag → `plot` → `projection plot`. 
+        2. While it runs, look at the reservoir network. To observe its state: right-click the `Reservoir` group tag → `plot` → `projection plot`. 
         
             - In this projection plot, each point represents a unique reservoir state; as the object moves in one direction, its representations stabilize, where the activation will alternate
             between the pre-existing states. Once the object changes directions, the reservoir's representations destabilize and it re-generates new states for the new pattern of movement.
             This transition illustrates representational drift.
          
-        3) Observe the agent's behavior in correspondence to the reservoir network's representations in the PCA plot.
+        3. Observe the agent's behavior in correspondence to the reservoir network's representations in the PCA plot.
         
-        ## Conducting Research With The Object Tracking Simulation
+        ## Activity 2: Conduct research with the simulation
          
         Using the configurations, you can utilize this simulation to conduct research. The `Number of iterations` is the number of timesteps before the reservoir network's activation 
-        is saved into an Excel spreadsheet. If you also want to record the activation spikes that occur in the reservoir network, check the `Record spikes` box. After saving the data,
+        is saved into a CSV file. If you also want to record the activation spikes that occur in the reservoir network, check the `Record spikes` box. After saving the data,
         you can analyze the data. For example, analyzing when representational drift happens and how often it occurs. When doing this, you can also analyze how changes in the [simulation 
         code](https://docs.simbrain.net/docs/simulations/) can affect the agent's behaviors like changing the learning rate or the synaptic weight values.
         

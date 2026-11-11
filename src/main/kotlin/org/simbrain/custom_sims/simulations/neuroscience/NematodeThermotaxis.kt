@@ -20,7 +20,6 @@ import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
 import org.simbrain.network.updaterules.AfdThermoreceptorRule
-import org.simbrain.workspace.couplings.ScaleOperation
 import org.simbrain.plot.heatmap.HeatMapModel
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.getDesktopComponentAs
@@ -30,6 +29,7 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.showAPEOptionDialog
 import org.simbrain.util.widgets.ProgressWindow
+import org.simbrain.workspace.couplings.ScaleOperation
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import org.simbrain.world.odorworld.effectors.Turning
 import org.simbrain.world.odorworld.entities.EntityType
@@ -41,7 +41,6 @@ import java.awt.event.WindowAdapter
 import java.awt.event.WindowEvent
 import java.awt.geom.Line2D
 import java.util.concurrent.atomic.AtomicBoolean
-import java.util.concurrent.atomic.AtomicReference
 import javax.swing.*
 import kotlin.math.*
 
@@ -371,13 +370,24 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
 
         Tip: For better performance, minimize the network window while the simulation is running. Each workspace iteration advances the model by one 0.1-second step, so long migrations take many iterations; use the workspace run controls to let it run.
 
-        # What to Do
+        # Activities
 
-        1. Click `Run` and watch the worm move. With `Use empirical turns` enabled, it changes direction stochastically as well as steering continuously; an individual trail may wander even though a population should tend toward warmth over time.
-        2. Click `Run population simulation` to view many trajectories together. The defaults are 12 worms for 1500 seconds; use more worms or longer runs for a clearer aggregate tendency. Reverse the gradient before starting a population simulation to see the warm-directed tendency reverse sides.
-        3. Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is tight, circling movement when the worm heads toward the cold and much straighter movement when it heads toward the warm, rather than reliable migration in one short run.
-        4. Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment.
-        5. Click `Add activation heat map` to graph the seven circuit neurons over time.
+        ## Activity 1: Watch one worm
+
+        Click `Run` and watch the worm move. With `Use empirical turns` enabled, it changes direction stochastically as well as steering continuously; an individual trail may wander even though a population should tend toward warmth over time.
+
+        ## Activity 2: Run a population
+
+        Click `Run population simulation` to view many trajectories together. The defaults are 12 worms for 1500 seconds; use more worms or longer runs for a clearer aggregate tendency. Reverse the gradient before starting a population simulation to see the warm-directed tendency reverse sides.
+
+        ## Activity 3: Isolate the steering circuit
+
+        Turn off `Use empirical turns` to isolate the steering circuit. The clearest signature is tight, circling movement when the worm heads toward the cold and much straighter movement when it heads toward the warm, rather than reliable migration in one short run.
+
+        ## Explore further
+
+        - Use `Reverse gradient`, `Warm plate`, and `Cool plate` to change the visible thermal environment.
+        - Click `Add activation heat map` to graph the seven circuit neurons over time.
 
         # Details of This Simulation
 

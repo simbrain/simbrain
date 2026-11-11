@@ -62,9 +62,37 @@ class DocViewer: EditableObject {
                     body {
                         margin-left: 12px;
                         margin-right: 12px;
+                        font-family: SansSerif;
+                        font-size: 12pt;
                     }
                     ul, ol {
                         margin-left: 16px;
+                    }
+                    h1 {
+                        font-size: 18pt;
+                        font-weight: normal;
+                        margin-top: 18px;
+                        margin-bottom: 4px;
+                        padding-bottom: 3px;
+                    }
+                    h2 {
+                        font-size: 13pt;
+                        margin-top: 14px;
+                        margin-bottom: 2px;
+                        padding-left: 6px;
+                    }
+                    h3 {
+                        font-size: 12pt;
+                        margin-top: 10px;
+                        margin-bottom: 0px;
+                    }
+                    p {
+                        margin-top: 4px;
+                        margin-bottom: 6px;
+                    }
+                    code {
+                        font-size: 11pt;
+                        font-weight: bold;
                     }
                 </style>
             </head>

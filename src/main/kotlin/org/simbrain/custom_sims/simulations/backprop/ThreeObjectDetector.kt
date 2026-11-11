@@ -156,23 +156,23 @@ val threeObjectDetector = newSim {
 
             This simulation uses backprop to train a network to identify smells.
 
-            # What to Do
+            # Activities
 
-            ## Train the Network
+            ## Activity 1: Train the network
 
             1. Click `Run`, then manually move the mouse around the world. Watch the output neurons as the mouse approaches each object. At first the network should do poorly at classifying the smells.
 
             2. Double-click on the `Backprop` model in the `Object Detector` network window to open the “Train Network” window.
 
-            3. In the top area of this window, select the `Iterate training until the stop button is pressed` button to train the network.
+            3. In the top area of this window, select the `Iterate training until stop button is pressed` button to train the network.
                 - The “Sum Squared Error” should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
 
-            4. Click `Apply current row as input and increment selected row` to check the network's performance. As you click the pattern on the bottom should be matched by the
+            4. Click `Apply current row as input to network` to check the network's performance. With `Auto advance` checked, each click moves to the next row. As you click the pattern on the bottom should be matched by the
             pattern on the top.
 
             5. Close the training window, click `Run` again, and move the mouse around the world. The output neurons should now classify the nearby object more accurately.
 
-            ## Test Graceful Degradation
+            ## Activity 2: Test graceful degradation
 
             A network degrades gracefully when its performance declines gradually as it is damaged, rather than failing all at once.
 

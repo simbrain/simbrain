@@ -937,38 +937,9 @@ val braitenbergRL = newSim { optionString ->
 
     Objects automatically respawn at new locations when the agent collides with them. This prevents the vehicle from getting stuck on objects and encourages continuous exploration. Objects always respect a minimum separation distance of `100` pixels from each other to avoid confusion during learning.
 
-    # What to Do
-
-    1. Select a task from the `Task` dropdown menu in the control panel
-    2. Check `Learning Enabled` to allow weight updates
-    3. Optionally check `Train Speed Connections` to include speed modulation learning
-    4. Click the workspace run button to start learning
-    5. Watch the vehicle move around the environment as it learns
-    6. Observe the `Reward, Value, TD Error` plot to monitor learning progress
-    7. Check `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
-
-    You can stop and examine weights at any time, then continue. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
-
-    **Performance tip**: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations. Another option is to leave the odor world open since it does not impact performance much and it's fun to watch it learn.
-
-    During training, watch:
-    - How the vehicle's movement patterns change over time
-    - The `Reward` trace showing how total reward changes
-    - The `Value` trace showing the critic's learned predictions
-    - The `TD Error` showing the learning signal
-    - The network weights updating in real-time
-    - The `Show Weight Space` display, where each point shows the current left and right turn weights for cheese or poison. Points above the anti-diagonal indicate mostly pursuing behavior; points below it indicate mostly avoiding behavior.
-
-    You can adjust parameters to see their effects:
-
-    - `Learning Rate`: Controls how quickly weights change (higher = faster but less stable learning)
-    - `Gamma`: Discount factor for future rewards (higher = more farsighted)
-    - `Dispersion`: Sensor range (higher = wider detection)
-    - `Speed Bias`: Base forward speed (higher = faster default movement)
-
     ## Reward Configuration
 
-    The proximity rewards use configurable decay functions. Each object type (cheese and poison) has independent settings:
+    The proximity rewards use a configurable decay function. Cheese and poison share one decay function, set with `Edit Decay Function...`. The settings are:
 
     - `Max Reward`: Maximum reward magnitude (default: `15.0`)
     - `Decay Function`: How reward diminishes with distance
@@ -981,8 +952,6 @@ val braitenbergRL = newSim { optionString ->
     The actual reward is: `maxReward × decayFunction(distance) × taskMultiplier`
 
     Task multipliers determine whether objects are rewarding (`+1`) or punishing (`-1`).
-
-    After training on one task, try clicking `Reset` and training on a different task to see how the vehicle adapts.
 
     ## Interpreting the Graphs
 
@@ -1014,6 +983,43 @@ val braitenbergRL = newSim { optionString ->
     - Upward spikes occur when a penalizing object (poison) disappears. This is an unexpected positive change: at the previous step the agent was close to something bad, and at the current step it's far away.
 
     These spikes represent genuine prediction errors: the critic didn't predict the object would suddenly teleport! However, these spikes don't disrupt learning much because weight updates are proportional to both TD error AND input activation: `Δw = learningRate × tdError × activation`. When objects respawn far away, sensor activations are near zero, so even though TD error is large, the weight changes are minimal. The algorithm only learns strongly when sensory signals are present, which is exactly what we want.
+
+    # Activities
+
+    ## Activity 1: Train the vehicle on a task
+
+    1. Select a task from the `Task` dropdown menu in the control panel
+    2. Check `Learning Enabled` to allow weight updates
+    3. Optionally check `Train Speed Connections` to include speed modulation learning
+    4. Click the workspace run button to start learning
+    5. Watch the vehicle move around the environment as it learns
+    6. Check `Show Time Series` and observe the `Reward, Value, TD Error` plot to monitor learning progress
+    7. Check `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
+
+    You can stop and examine weights at any time, then continue. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
+
+    **Performance tip**: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations. Another option is to leave the odor world open since it does not impact performance much and it's fun to watch it learn.
+
+    During training, watch:
+    - How the vehicle's movement patterns change over time
+    - The `Reward` trace showing how total reward changes
+    - The `Value` trace showing the critic's learned predictions
+    - The `TD Error` showing the learning signal
+    - The network weights updating in real-time
+    - The `Show Weight Space` display, where each point shows the current left and right turn weights for cheese or poison. Points above the anti-diagonal indicate mostly pursuing behavior; points below it indicate mostly avoiding behavior.
+
+    ## Activity 2: Adjust the parameters
+
+    You can adjust parameters to see their effects:
+
+    - `Learning Rate`: Controls how quickly weights change (higher = faster but less stable learning)
+    - `Gamma`: Discount factor for future rewards (higher = more farsighted)
+    - `Dispersion`: Sensor range (higher = wider detection), set with `Edit Decay Function...`
+    - `Speed Bias`: Base forward speed (higher = faster default movement)
+
+    ## Activity 3: Train on a different task
+
+    After training on one task, try clicking `Reset (Random Weights)` or `Reset (0 Weights)` and training on a different task to see how the vehicle adapts.
 
     # References
 

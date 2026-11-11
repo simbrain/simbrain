@@ -279,16 +279,16 @@ val botvinickPlautSerialRecall = newSim {
 
         A **transposition error** is a recall-order error: an item is remembered but appears in the wrong position. For example, recalling `A C B D` after seeing `A B C D` exchanges the items from positions 2 and 3. The transposition plot groups these errors by how far an item moved. An item shown in position 2 but recalled in position 3 is a one-position error; an item shown in position 2 but recalled in position 5 is a three-position error. More frequency near the middle of this plot means that nearby positions are more often confused than distant positions.
 
-        # What to Do
+        # Activities
 
-        ## Test Recall Before and After Training
+        ## Activity 1: Test recall before and after training
 
         1. Choose a list length, click `New Trial`, and use `Step` to walk through the trial. Before training, the network recalls poorly: its hidden activity has no learned structure for maintaining and reading out the list.
         2. Click `Training...`, leave `Training cycles` at the default 12,000, and click `Train`. Watch cross-entropy fall in the training window.
         3. Click `New Trial` and use `Step` again. The output still echoes items during encoding, but after the recall cue it should now reproduce the remembered list and then `End` much more accurately.
         4. Try shorter training runs after `Reset weights` to see how incomplete learning produces worse recall, especially later in a list.
 
-        ## Evaluate Aggregate Recall
+        ## Activity 2: Evaluate aggregate recall
 
         1. Click `Evaluate` before training. The untrained network's three plots are poor: whole-list and serial-position accuracy are near chance, and its recall-order error pattern is not meaningful.
         2. After the default training run, click `Evaluate` again. Compare the replacement plots: whole-list accuracy should improve, serial-position accuracy should rise, and the transposition distribution now describes the trained model's characteristic recall-order errors.

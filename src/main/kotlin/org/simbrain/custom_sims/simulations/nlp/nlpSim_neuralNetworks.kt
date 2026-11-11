@@ -93,7 +93,9 @@ val nlpSimBasicNN = newSim {
         
         The network learns by trying to predict the next word in a sequence. Through this process, it develops internal representations (word embeddings) that capture semantic relationships between words.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Run and train the network
         
         1. **Run the simulation** to see the network processing text
         
@@ -103,7 +105,9 @@ val nlpSimBasicNN = newSim {
         
         4. **Train the network** by right-clicking on the SRN and selecting training options to improve predictions
         
-        5. **Experiment with different texts** by loading other text files from the simulations/texts folder
+        ## Explore further
+
+        - **Experiment with different texts** by loading other text files from the simulations/texts folder
 
         # References
         

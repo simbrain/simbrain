@@ -326,20 +326,26 @@ val serialOrderContextMemory = newSim {
 
         The paper specifies functional network layers, not a one-to-one anatomical map. The positional-context signal is a candidate for a distributed timing or temporal-context representation in working-memory circuitry; letter nodes stand for lexical representations in language-related cortex. The simulation should therefore be read as a neural process model, not as a diagram of particular brain regions.
 
-        # What To Do
+        This is a stripped-down implementation, not the complete phonological-loop model. The omitted phoneme layers are needed for phonological similarity, word length, modality, rehearsal, and lexicality effects; the implemented context-letter competitive-queuing circuit is the mechanism that stores and recalls serial order.
+
+        # Activities
+
+        ## Activity 1: Step through a trial
 
         Press `Step` through encoding. Watch the context window move and the synapses to the currently presented letter strengthen. During recall there is no external letter input: the replayed context drives letter competition through those learned synapses.
+
+        ## Activity 2: Vary one parameter at a time
 
         Start with the default settings and press `Run Trial`: recall should be nearly perfect. Then experiment with one parameter at a time:
 
         - Lower `Retention per step`. Each step then preserves less of the temporary context-to-letter weights, especially weakening early letters before recall, so accuracy falls. A value of 1.00 retains 100%; lower values mean more decay.
         - Raise `Letter-selection noise`. The context sequence remains unchanged, but the hidden noise added to letter competition can make a competing letter win. Because neighboring contexts overlap most, errors are usually nearby transpositions.
 
+        ## Activity 3: Run the benchmark
+
         `Run Benchmark` runs two four-condition sweeps, with 200 trials per condition, at the current list length. The noise sweep holds the selected retention-per-step value fixed; the retention-per-step sweep holds the selected letter-selection noise fixed. It reports accuracy, transposition distance, and intrusions, then restores both controls.
 
         Transposition distance is the number of positions between a wrongly recalled letter's original and recalled locations. For example, if `A B C D` is recalled as `A C B D`, both `B` and `C` have distance 1. The benchmark reports the mean distance for in-list transpositions; intrusions are recalled letters not present in the target list.
-
-        This is a stripped-down implementation, not the complete phonological-loop model. The omitted phoneme layers are needed for phonological similarity, word length, modality, rehearsal, and lexicality effects; the implemented context-letter competitive-queuing circuit is the mechanism that stores and recalls serial order.
 
         # Reference
 

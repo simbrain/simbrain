@@ -230,13 +230,22 @@ val cnnMNIST = newSim {
 
         - `Test generalization`: Reports accuracy on the training set and on every testing set. The progress bar below it shows how far along it is. Stop the simulation first if it is running.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Train the network
+
         1. Press `Train network...` in the control panel, or right-click the `CNN MNIST` outline and select `Train...`
         2. Click `Run` to start training, `Stop` to pause
         3. Watch the loss plot decrease
-        4. Close the dialog and use `Random training image` and `Random test image` to see how the network classifies individual images
-        5. In the training dialog, use the `Training data` / `Testing data` tabs to browse examples, and click `Apply inputs` on a row to see the network's prediction
-        6. Press `Test generalization`. Compare the results with the `Feed-forward MNIST` simulation: the CNN usually keeps more of its accuracy on digits shifted a pixel or two, because max pooling lets a feature move slightly without changing the pooled output. Both networks fail once digits move several pixels, since the final dense layer still depends on where the pooled features are.
+
+        ## Activity 2: Classify individual images
+
+        1. Close the dialog and use `Random training image` and `Random test image` to see how the network classifies individual images
+        2. In the training dialog, use the `Training data` / `Testing data` tabs to browse examples, and click `Apply inputs` on a row to see the network's prediction
+
+        ## Activity 3: Test generalization
+
+        Press `Test generalization`. Compare the results with the `Feed-forward MNIST` simulation: the CNN usually keeps more of its accuracy on digits shifted a pixel or two, because max pooling lets a feature move slightly without changing the pooled output. Both networks fail once digits move several pixels, since the final dense layer still depends on where the pooled features are.
         """.trimIndent()
     )
 }

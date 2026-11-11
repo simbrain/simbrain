@@ -135,7 +135,7 @@ val braitenbergSim = newSim {
         
         For a quick sense of what is possible in this simulation, press `play` to run the simulation, click in the world window and press `T` to turn on trails, and [observe the pattern they make](https://bsky.app/profile/jyoshimi.bsky.social/post/3lsbun2wtdc2d).
          
-        For more simulations you can skip to the "What to Do" section below.
+        For more simulations you can skip to the "Activities" section below.
         
         # Simulation Details
         
@@ -165,7 +165,9 @@ val braitenbergSim = newSim {
         
             - Example: Vehicle `1` has weights `(100, 50)` and Vehicle `2` has weights `(-50, -100)`. 
         
-        # What to Do
+        # Activities
+
+        ## Activity 1: Adjust the vehicles
         
         In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run and observe the behaviors. Below are the steps:
         
@@ -178,17 +180,17 @@ val braitenbergSim = newSim {
         
         **Note**: After changing the weight strength values, press one of the three buttons to confirm the change.
         
-        ## Some Sample Behaviors
+        ## Activity 2: Try some sample behaviors
         
         Below are some example behaviors that you can use to observe a variety of behaviors that emerge from the interaction of two Braitenberg vehicles.
         
-        1) `(100, 50)` and `Same pair`: Revolving behavior (attracting revolving type relative equilibrium).
-        2) `(100, 80)` and `Same pair`: Revolving meander (attracting relative periodic orbit).
-        3) `(100, 50)` and `Reversed pair`: Side by side behavior (attracting translating type relative equilibrium).
-        4) `(20, 25)` and `Reversed pair`: Side by side meander (attracting translating type relative periodic orbit).
-        5) `(100, 50)` and `Opposite pair`: Pursuer-avoider behavior.
+        - `(100, 50)` and `Same pair`: Revolving behavior (attracting revolving type relative equilibrium).
+        - `(100, 80)` and `Same pair`: Revolving meander (attracting relative periodic orbit).
+        - `(100, 50)` and `Reversed pair`: Side by side behavior (attracting translating type relative equilibrium).
+        - `(20, 25)` and `Reversed pair`: Side by side meander (attracting translating type relative periodic orbit).
+        - `(100, 50)` and `Opposite pair`: Pursuer-avoider behavior.
         
-        ## Observing Bifurcations
+        ## Activity 3: Observe bifurcations
         
         You can see several bifurcations by setting the `left weight` to `100` and then varying the `right weight` (each time you change the number, press `Same pair` and run the simulation to get a feel for what 
         happens). 

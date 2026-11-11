@@ -87,7 +87,9 @@ val twoNeuronDynamics = newSim("two-neuron-dynamics") {
           without clearing the plot. This does not create a second comparison trajectory.
         - `Clear plot`: discard samples while leaving the network state unchanged.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Compare periodic and chaotic regimes
 
         1. Run `Period 6 (0.8)` for at least `1000` updates, then `Clear plot` to
            separate the settled orbit from its transient. Observe regularly spaced
@@ -96,10 +98,13 @@ val twoNeuronDynamics = newSim("two-neuron-dynamics") {
            the periodic pattern. Similar states need not remain close indefinitely.
         3. Compare gains `1.04`, `1.07`, and `1.09` to see period doubling. The plot
            retains `300` samples, enough to display multiple repetitions.
-        4. Explore nearby gains, or edit individual synapses. For a reproducible
-           initial condition, pause before selecting a preset or resetting.
-        5. Reset the chaotic preset and compare runs with and without an immediate
-           perturbation. Early activity is similar, but later trajectories can diverge.
+
+        ## Activity 2: Test sensitivity to perturbation
+
+        Reset the chaotic preset and compare runs with and without an immediate
+        perturbation. Early activity is similar, but later trajectories can diverge.
+
+        ## Activity 3: Read the recurrence plot
 
         Use the recurrence plot and time series to get a feel for how different dynamical regimes behave.
         
@@ -109,6 +114,11 @@ val twoNeuronDynamics = newSim("two-neuron-dynamics") {
         always appears and does not establish periodicity. Tiny numerical residuals
         near the zero fixed point can affect a relative threshold. Recurrence structure
         alone does not establish chaos; long transients can also appear irregular.
+
+        ## Explore further
+
+        - Explore nearby gains, or edit individual synapses. For a reproducible
+          initial condition, pause before selecting a preset or resetting.
         """.trimIndent()
     )
     networkComponent.network.events.zoomToFitPage.fire()

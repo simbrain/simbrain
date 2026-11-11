@@ -326,7 +326,9 @@ val cnnObjectDetector = newSim {
         On startup a dialog lets you choose which categories to train on and
         how many images per category (default 50). Select at least 2 categories.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train and test the detector
 
         1. Right-click the `CNN Photo Album` outline and select `Train...`
         2. Click `Run` to train; watch the loss and accuracy improve

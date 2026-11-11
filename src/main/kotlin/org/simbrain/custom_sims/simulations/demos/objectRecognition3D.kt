@@ -435,7 +435,10 @@ val objectRecognition3D = newSim {
           so the target falls behind the FOV and the view contains only
           the tilemap and boundary walls.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train and test the recognizer
+
         1. Adjust the parameters and class selections in the `Configuration` panel.
         2. Click `Generate` to build the datasets and CNN.
         3. Right-click the `3D Object CNN` subnet and select `Train...`

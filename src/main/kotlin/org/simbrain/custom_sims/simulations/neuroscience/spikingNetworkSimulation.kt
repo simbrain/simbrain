@@ -309,9 +309,7 @@ val spikingNetworkSimulation = newSim {
         Different features of the network like [sparsity](https://docs.simbrain.net/docs/network/connections/sparse.html), the fraction of possible synaptic connections formed in the network,
         and excitatory ratio (the percentage of connections that excite neurons versus inhibit them) can have an impact on network dynamics.
 
-        # What to Do
-
-        ## Using the Control Panel
+        ## Control Panel Settings
 
         The control panel provides several ways to explore network dynamics:
 
@@ -335,7 +333,9 @@ val spikingNetworkSimulation = newSim {
         - `Add Pacemaker`: Adds a sinusoidal pacemaker neuron that drives the network rhythmically. The pacemaker connects to all neurons and can induce periodic bursting behavior. You can set the frequency
         (in Hz) to control the rhythm. If you see too many or too few spikes in the raster plot, adjust the pacemaker frequency or other network parameters.
 
-        ## Observing Network Dynamics
+        # Activities
+
+        ## Activity: Observe network dynamics
 
         1. Click `Run` to start the simulation.
 
@@ -347,7 +347,7 @@ val spikingNetworkSimulation = newSim {
             - Are neurons spiking together (synchrony)?
             - Are firing patterns regular (limit cycles) or irregular (probably chaotic)?
 
-        ## Other Things to Try:
+        ## Explore further
 
         IMPORTANT NOTE: Press `5` or on the neuron display window, click `View` then `Toggle Weight Visibility` to toggle weight visibility connections, and increase performance and run simulation. Bring them
         back when simulation is paused to edit and see spikes more clearly.

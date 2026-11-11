@@ -166,7 +166,9 @@ val SOMSim = newSim {
         After `Train All`, `Train All ×10`, or `Reset`, the selected animal goes back on the input nodes and its winner
         lights up.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train and test the map
 
         1. The map opens untrained, with random weights and no labels. Press `Train All` once: each animal is
            labeled as soon as training presents it, and at this point the animals are scattered or piled onto a
@@ -182,7 +184,7 @@ val SOMSim = newSim {
         6. Press `Reset` and train again. The regions land in different places each time, but the same groups
            form.
 
-        ## Things to Try
+        ## Explore further
 
         - Select a SOM neuron, right-click the SOM network's interaction box, and choose `Recall SOM memory`. The
           neuron's weights appear on the input nodes, showing the feature profile it has learned. Try an unlabeled

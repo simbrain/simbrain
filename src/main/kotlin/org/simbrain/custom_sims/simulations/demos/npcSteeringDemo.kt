@@ -118,14 +118,16 @@ val npcSteeringDemo = newSim {
         headings around the agent, scores each by interest minus danger, and picks
         the best. See `world/odorworld/behaviors/`.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Watch the entities steer
 
         Press `Run`. Watch the Mouse track down the cheeses, the cheeses
         flee in different directions, and the Fish meander around the obstacles
         without bumping them. To simplify the setup, delete some entities by
         selecting them and pressing `Delete`.
 
-        ## Things to Try
+        ## Explore further
 
         - Drag a cheese close to the mouse — watch it react.
         - Drag the Pansy or Tulip into the cheese's escape path.

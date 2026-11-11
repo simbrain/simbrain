@@ -30,12 +30,7 @@ import org.simbrain.world.odorworld.behaviors.Pursue
 import org.simbrain.world.odorworld.entities.EntityType
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import javax.swing.JInternalFrame
-import kotlin.math.abs
-import kotlin.math.cos
-import kotlin.math.exp
-import kotlin.math.max
-import kotlin.math.min
-import kotlin.math.sin
+import kotlin.math.*
 import kotlin.random.Random
 
 val mirrorLearning = newSim("mirror_learning") {
@@ -174,9 +169,9 @@ val mirrorLearning = newSim("mirror_learning") {
         - `Show spikes` shows a raster plot of every neuron's spikes.
         - `Reset learning` sets the weights to zero and changes `Mirror` labels back to `Motor`.
 
-        # What to Do
+        # Activities
 
-        Steps 1 to 3 are the core: watch the adult, have the child act, then watch the adult again.
+        ## Activity 1: Watch the adult, act, then watch again
 
         1. Before the child does anything, press `Watch adult go`. The visual neurons fire from `far` to `near`, but
            the motor neurons stay silent. There are no mirror neurons yet. Check `Show spikes` to see this as a
@@ -187,17 +182,29 @@ val mirrorLearning = newSim("mirror_learning") {
         3. Press `Watch adult go` again. Now the motor neurons fire, from `start` to `grab`, while the child only
            watches. That is a mirror response, and the label changes to `Mirror: go to candy`. From now on, watching
            also strengthens the weights, because the visual spikes come just before motor spikes.
-        4. Set `Object` to `Bell` and press `Watch adult go`. There is no mirror response, because the child has
-           never gone to the bell. Press `Go` once and watch again, and the bell neurons respond too.
-        5. To see single spikes, drag a box around the `Motor: go to candy` neurons, right-click one, and choose the
-           time series plot. Press `Watch adult go`, and each spike shows as a sharp peak.
-        6. Press `Reset learning` and uncheck `Child can see self`. Press `Go` as often as you like, then
-           `Watch adult go`. There is no mirror response: doing without seeing teaches nothing. Check the box again
-           when you are done.
-        7. Advanced: click the network, press `W` to select every weight, and press Cmd-E (Ctrl-E on Windows and
-           Linux). Set `Learning rate` to 0.1 (it starts at $LEARNING_RATE). Press `Reset learning`, press `Go`
-           twice, then `Watch adult go`. The response is weak or absent and the label usually stays `Motor`. It takes more
-           trips to get a clear response. Set the rate back to $LEARNING_RATE when you are done.
+
+        ## Activity 2: Try a new object
+
+        Set `Object` to `Bell` and press `Watch adult go`. There is no mirror response, because the child has
+        never gone to the bell. Press `Go` once and watch again, and the bell neurons respond too.
+
+        ## Activity 3: See single spikes
+
+        To see single spikes, drag a box around the `Motor: go to candy` neurons, right-click one, and choose the
+        time series plot. Press `Watch adult go`, and each spike shows as a sharp peak.
+
+        ## Activity 4: Do without seeing
+
+        Press `Reset learning` and uncheck `Child can see self`. Press `Go` as often as you like, then
+        `Watch adult go`. There is no mirror response: doing without seeing teaches nothing. Check the box again
+        when you are done.
+
+        ## Activity 5: Change the learning rate (advanced)
+
+        Click the network, press `W` to select every weight, and press Cmd-E (Ctrl-E on Windows and
+        Linux). Set `Learning rate` to 0.1 (it starts at $LEARNING_RATE). Press `Reset learning`, press `Go`
+        twice, then `Watch adult go`. The response is weak or absent and the label usually stays `Motor`. It takes more
+        trips to get a clear response. Set the rate back to $LEARNING_RATE when you are done.
 
         # References
 

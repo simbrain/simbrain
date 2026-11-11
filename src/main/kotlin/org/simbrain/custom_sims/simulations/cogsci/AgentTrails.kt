@@ -47,7 +47,9 @@ val kAgentTrails = newSim {
 
     For a more theoretical application of this simulation, we recommend reading the paper that accompanies the simulation.
 
-    # What to Do
+    # Activities
+
+    ## Activity: Train the predictor on all paths
 
     In this simulation, the mouse is the agent with 3 objects: the cheese, fish, and flower. The mouse has 5 excursions it can take: to the cheese, to the fish, to the flower, to the cheese then flower,
     and to the cheese then fish. The sensory states and predictions show each excursion. The red corresponds to the path that the mouse is currently traveling, and the gray shows all the possible paths that

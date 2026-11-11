@@ -757,9 +757,13 @@ addSidebarInfo(
 
     Denison et al.'s result has a distinctive shape: `T1` performance rises with SOA and then levels off, while `T2` shows an early dip before recovering. The sweep recreates this broad qualitative pattern, along with the separation between valid, neutral, and invalid cue conditions. Compare the two sweep windows to the figure rather than treating their evidence scale as a direct numerical reproduction of behavioral `d′`.
 
-    ## What to do
+    # Activities
 
-    **Simulate an individual trial.** Select an `Attention Cue`, `SOA`, and `Report Target`, then click `Start`. Change `SOA` between trials to see how the gap between targets affects attention allocation and decision evidence. Use `Step 10` repeatedly to watch the trial unfold and observe each event along this timeline:
+    For better performance during a trial or SOA sweep, minimize the `Attention` and `Evidence (CW + / CCW -)` windows.
+
+    ## Activity 1: Simulate an individual trial
+
+    Select an `Attention Cue`, `SOA`, and `Report Target`, then click `Start`. Change `SOA` between trials to see how the gap between targets affects attention allocation and decision evidence. Use `Step 10` repeatedly to watch the trial unfold and observe each event along this timeline:
 
     ```text
     0 ms        500 ms      530 ms          500 + SOA ms     530 + SOA ms
@@ -769,15 +773,15 @@ addSidebarInfo(
 
     Watch Sensory 1 respond at each grating onset, Sensory 2 sustain that response, Sensory 3 show later normalization, and the decision-evidence nodes accumulate signed tilt information.
 
-    **Replicate paper conditions with an SOA sweep.** Use `Run SOA Sweep` to evaluate every paper stimulus condition directly and compare valid, neutral, and invalid curves. Look for voluntary-attention tradeoffs, SOA-dependent `T1` sensitivity, and an attentional-blink-like dip for `T2`.
+    ## Activity 2: Replicate paper conditions with an SOA sweep
 
-    For better performance during a trial or SOA sweep, minimize the `Attention` and `Evidence (CW + / CCW -)` windows.
+    Use `Run SOA Sweep` to evaluate every paper stimulus condition directly and compare valid, neutral, and invalid curves. Look for voluntary-attention tradeoffs, SOA-dependent `T1` sensitivity, and an attentional-blink-like dip for `T2`.
 
-    ## Reference
+    # Reference
 
     Denison, R. N., Carrasco, M., & Heeger, D. J. (2021). [_A dynamic normalization model of temporal attention_](https://www.nature.com/articles/s41562-021-01129-1). _Nature Human Behaviour_, _5_(12), 1674–1685.
 
-    ## Credits
+    # Credits
 
     [Jensen Guo](https://www.linkedin.com/in/jensen-guo/)
 

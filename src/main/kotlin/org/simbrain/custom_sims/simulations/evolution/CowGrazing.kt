@@ -408,7 +408,7 @@ val grazingCows = newSim { optionString ->
         # Simulation Details
         
         This simulation simulates the evolution of a neural network, or multiple neural networks until the target fitness is met, exceeded, or when it has reached the maximum generation. The goal of this simulation is to 
-        evolve until it is as close as possible to the target fitness. By default, the target fitness is the 10th percentile, and if it is the target mean group fitness, the target fitness would be the 50th percentile.
+        evolve until it is as close as possible to the target fitness. By default, the target fitness is evaluated at the 10th percentile of the population (`Evaluation percentile`). Each simulation's fitness is the minimum fitness of its cows, or their mean if `Use mean group fitness (else min)` is checked.
         
         For a more in-depth look into how the fitness is calculated, use this [page](https://docs.simbrain.net/docs/simulations/) as a guide to see the simulation code. For a comprehensive look into how evolutionary 
         simulations are developed in Simbrain, look [here](https://docs.simbrain.net/docs/evolution/).
@@ -426,17 +426,19 @@ val grazingCows = newSim { optionString ->
         Then, a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target fitness` has been achieved. This process continues until the simulation has reached the target
         fitness or better, or when the evolutionary process ends.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Evolve a grazing cow
         
         In this simulation, similar to the other evolutionary simulations, the control panel sets cow-specific options and the trainer controls the evolutionary process. Below are the steps to evolving the simulation:
         
         1. Specify the parameters of the simulation.
         
-            - `Number of agents` (e.g., cows)
+            - `Number of cows`
             
-            - Use of mean group target fitness (`50th` percentile) vs default fitness (`10th` percentile)
+            - `Use mean group fitness (else min)`: score each simulation by the mean fitness of its cows instead of the minimum
 
-            - Evolution parameters in the `Trainer Properties` dialog
+            - Evolution parameters in the trainer's `Evolution properties` dialog
         
         2. After confirming the parameters are what you want, click on the `Open Trainer` button.
         

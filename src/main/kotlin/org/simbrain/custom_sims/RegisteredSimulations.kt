@@ -87,7 +87,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Psychology") {
         item("Botvinick-Plaut serial recall (BPTT)") { botvinickPlautSerialRecall }
         item("Burgess-Hitch positional context memory", beta = true) { serialOrderContextMemory }
-        item("Categorical perception", beta = true) { categoricalPerception }
+        // item("Categorical perception", beta = true) { categoricalPerception }
         item("Heat-cold illusion") { heatColdSim }
         item("Localist and distributed representations") { localistAndDistributedRepresentations }
         item("Mirror neurons") { mirrorLearning }

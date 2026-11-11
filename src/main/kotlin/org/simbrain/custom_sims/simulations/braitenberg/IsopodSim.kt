@@ -362,21 +362,23 @@ val isopodSim = newSim { optionString ->
         The graphs are showing multiple trials where we place the isopod in the center of the world, let it go, and see what it does. Each trial can either terminate in it obtaining food, hitting a wall, or the max
         trials running out. The bias controls its speed in these sims (prob something to change) and so generally these guys aren't finding the food, which is in the four corners.
         
-        # What to Do
+        # Activities
+
+        ## Activity: Run trials and compare behaviors
         
         Below is the general method to use this simulation:
         
-        1) Click `Run one trial` to see how the isopod reacts to its environment. To run multiple trials, click `Run trials`.
+        1. Click `Run one trial` to see how the isopod reacts to its environment. To run multiple trials, click `Run trials`.
         
-        2) Observe the isopod's behavior.
+        2. Observe the isopod's behavior.
         
-        3) To make it have more naturalistic behaviors, click `Speed inhibition`. 
+        3. To make it have more naturalistic behaviors, click `Speed inhibition`. 
         
-        4) Observe the difference in behaviors.
+        4. Observe the difference in behaviors.
 
-        5) Save the results.
+        5. Save the results.
         
-        6) Analyze the results in a statistical computing environment.
+        6. Analyze the results in a statistical computing environment.
 
 
         # References

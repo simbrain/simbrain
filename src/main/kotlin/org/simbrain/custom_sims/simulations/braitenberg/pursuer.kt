@@ -160,7 +160,9 @@ val pursuer = newSim {
 
         The agent will move to the left if its left sensor is activated by an object on its left side, heading straight towards it. And if it senses a source on its right side, the agent will move to the right and straight towards the object. 
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Watch the agent chase the cheese
         
         In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
         
@@ -170,7 +172,7 @@ val pursuer = newSim {
         
         3. Press `Stop` to stop the network from running
         
-        ## Other Observations
+        ## Activity 2: Control the velocity
         
         In this simulation, you can control the velocity of the agent's movement. There are three key value ranges to observe: positive, zero, negative. To do this: 
         
@@ -178,6 +180,8 @@ val pursuer = newSim {
         
         2. Press the up/down arrow keys to control the neuron's activation (i.e., velocity)
         
+        ## Activity 3: Control the sensor strength
+
         In addition to controlling the velocity, you can control the strength of the agent's sensors by changing the values of the weights from sensors to orientation. This changes how aggressive the agent turns in response to the object. To do this:
         
         1. Click on either weights between the sensor neurons and turn neurons

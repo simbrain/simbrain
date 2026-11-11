@@ -80,20 +80,35 @@ val irisClassifier = newSim {
     - `Previous` and `Next`: step through the flowers in order, loading each onto the inputs.
     - `Status`: which flower is loaded, its true species, and the model's prediction.
 
-    # What to Do
+    # Activities
 
-    ## Getting started
+    ## Activity 1: Compare the models
 
-    1. Compare the models. Press `Compare all models`. Every model gets `93.3%` of the test flowers right, far above the baseline, but training accuracy runs from `97.5%` for K nearest neighbors to `100%` for the random forest. Models always do better on flowers they were trained on, which is why test accuracy is the honest score.
-    2. Try some test flowers. Pick a classifier, and with `Flowers` set to `Test flowers`, press `Setosa`, `Versicolor`, and `Virginica` a few times each. Each press loads a random flower of that species onto the input neurons, the output neuron for the predicted species turns on, and `Status` says whether the prediction is right. The flower is outlined in red in the plot.
-    3. Try some training flowers. Set `Flowers` to `Training flowers` and press the species buttons again. The model has seen these flowers before, so it gets nearly all of them right.
+    Press `Compare all models`. Every model gets `93.3%` of the test flowers right, far above the baseline, but training accuracy runs from `97.5%` for K nearest neighbors to `100%` for the random forest. Models always do better on flowers they were trained on, which is why test accuracy is the honest score.
 
-    ## Going further
+    ## Activity 2: Try some test flowers
 
-    4. Look at the clouds. In the plot, Setosa forms a cloud of its own, far from the others, so it is easy to recognize. Versicolor and Virginica overlap, so some of those flowers are hard to tell apart.
-    5. Change one measurement. Press `Versicolor`. Double-click the `Petal length` input neuron, set its activation to `6`, press `OK`, and then press the `Iterate workspace` button (the step icon) in the main toolbar. The prediction switches to `Virginica`. Now set petal length to `1.5`: the flower becomes a `Setosa`.
-    6. Find what matters. Press `Versicolor` again and change `Sepal length` instead, anywhere from `3` to `8`. With `K nearest neighbors` selected, the prediction almost always stays `Versicolor`. The petals carry most of the information that separates the species.
-    7. Find the hard flowers. Set `Flowers` to `Test flowers` and press `Next` repeatedly, watching `Status`. Test flowers `26` and `30` are Versicolor, but the model calls them Virginica. Look at their input neurons: their petals are about `5` cm long and `1.6` to `1.7` cm wide, which is typical of a Virginica. In the plot they land near where the Versicolor and Virginica clouds meet. Change `Classifier` and check them again: every model misses the same two flowers. When every model makes the same mistake, the problem is not the model: those flowers really do look like the other species.
+    Pick a classifier, and with `Flowers` set to `Test flowers`, press `Setosa`, `Versicolor`, and `Virginica` a few times each. Each press loads a random flower of that species onto the input neurons, the output neuron for the predicted species turns on, and `Status` says whether the prediction is right. The flower is outlined in red in the plot.
+
+    ## Activity 3: Try some training flowers
+
+    Set `Flowers` to `Training flowers` and press the species buttons again. The model has seen these flowers before, so it gets nearly all of them right.
+
+    ## Activity 4: Look at the clouds
+
+    In the plot, Setosa forms a cloud of its own, far from the others, so it is easy to recognize. Versicolor and Virginica overlap, so some of those flowers are hard to tell apart.
+
+    ## Activity 5: Change one measurement
+
+    Press `Versicolor`. Double-click the `Petal length` input neuron, set its activation to `6`, press `OK`, and then press the `Iterate workspace` button (the step icon) in the main toolbar. The prediction switches to `Virginica`. Now set petal length to `1.5`: the flower becomes a `Setosa`.
+
+    ## Activity 6: Find what matters
+
+    Press `Versicolor` again and change `Sepal length` instead, anywhere from `3` to `8`. With `K nearest neighbors` selected, the prediction almost always stays `Versicolor`. The petals carry most of the information that separates the species.
+
+    ## Activity 7: Find the hard flowers
+
+    Set `Flowers` to `Test flowers` and press `Next` repeatedly, watching `Status`. Test flowers `26` and `30` are Versicolor, but the model calls them Virginica. Look at their input neurons: their petals are about `5` cm long and `1.6` to `1.7` cm wide, which is typical of a Virginica. In the plot they land near where the Versicolor and Virginica clouds meet. Change `Classifier` and check them again: every model misses the same two flowers. When every model makes the same mistake, the problem is not the model: those flowers really do look like the other species.
 
     # Credits
 

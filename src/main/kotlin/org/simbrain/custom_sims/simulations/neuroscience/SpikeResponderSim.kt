@@ -127,14 +127,16 @@ val spikeResponderSim = newSim {
 
         Learn more in the [Spike Responders Overview](https://docs.simbrain.net/docs/network/spikeresponders/).
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Compare spike responses
 
         1. Click `Run` to start the simulation. 
         2. Select the `Input neuron` and use the up/down arrow keys to change its activation. 
         3. Watch the `Izhikevich neuron` fire in response.
         4. Observe each downstream neuron's unique post-synaptic response in the Spike Responders plot.
         
-         ## Exploration of other spiking neuron models
+        ## Activity 2: Explore other spiking neuron models
         
         You can also change the spiking neuron model to a different model (i.e., Izhikevich, [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html),
         etc) to see how different learning models interact with different spike responders.

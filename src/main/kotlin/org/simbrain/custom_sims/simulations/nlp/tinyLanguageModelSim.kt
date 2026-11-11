@@ -538,43 +538,43 @@ private val TINY_LM_SIDEBAR = """
 
         The `current position token probabilities` display at the top shows a circle for each token in the vocabulary and the probability associated with each. A red circle is drawn around the token the model just sampled, which is added to the text on the next iteration. It is generally one of the more probable ones (see "sampling strategy" in docs for more information on how this selection is made).
 
-        # What to Do
+        ## Saving
 
-        ## Train the model
+        Save the workspace to preserve the trained weights — they are stored in the workspace file and restored exactly on reopening.
+
+        # Activities
+
+        ## Activity 1: Train the model
 
         The model starts untrained. Click `Train...` in the control panel (or right-click the model's title tab and choose `Train...`), then click `Train` and watch the loss curve fall. Stop when it flattens. The weight tiles visibly change as training runs, and the attention deck develops structure.
 
-        ## Generate text
+        ## Activity 2: Generate text
 
         1. Type a prompt in the `Text Inputs` component
-        2. Click `Play` (or `Step`) in the main toolbar
+        2. Click `Run` (or `Step`) in the main toolbar
         3. Each workspace step runs the full model on the current context and samples one new token
 
         There is no start or stop mode: the model writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
         Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` turns amber when there is no usable prompt, explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
 
-        ## Step through the computation, one operation at a time
+        ## Activity 3: Step through the computation, one operation at a time
 
         Right-click the model:
 
         - `Step forward pass one op` runs a single operation of the forward pass. The active operation's glyph lights up, and every tile the computation hasn't reached yet is dimmed. Step repeatedly and watch values flow from the embeddings up to the probabilities.
-        - `Step training one op` walks an entire training step: the forward pass op by op, then the loss, then every gradient in reverse order back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on `Gradient view` to see the gradient values themselves flowing backward through the tiles.
+        - `Step training one op` walks an entire training step: the forward pass op by op, then the loss, then every gradient in reverse order back down the same diagram, and finally the optimizer update (weight tiles flash as they change). Turn on `Show last training gradients` to see the gradient values themselves flowing backward through the tiles.
         - `Finish current step walk` completes a walk you started.
 
         With the model selected, the keyboard shortcuts F and B do this quickly.
 
-        ## Explore
+        ## Explore further
 
         - Right-click a tile to trace its data-flow paths through the diagram, plot its values, or clear, randomize, and nudge a weight matrix.
         - Double-click a tile to open its dialog: rename it, read its values, or edit a weight matrix cell by cell.
         - Hover over any cell to read its exact value; drag tiles to rearrange the diagram.
         - Adjust `Temperature` and the sampling strategy in the control panel and compare generated text.
         - Try more heads or layers in the startup dialog. With two layers you can watch the logit lens improve across both.
-
-        ## Saving
-
-        Save the workspace to preserve the trained weights — they are stored in the workspace file and restored exactly on reopening.
 
         # Credits
 

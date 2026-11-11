@@ -203,37 +203,37 @@ val binaryReservoir = newSim {
         measure called the perturbational complexity index (PCI), which is associated with consciousness in humans and other animals (Comolatti et al., 2019).
         In this simulation, the relationship between PCI and edge-of-chaos activation dynamics is studied in a binary reservoir network.
 
-        The `run one trial` button produces one file for the specified `weight stdev`. You can also see the set variance and the actual variance in your programming environment
-        after you apply the `weight stdev`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
+        The `run one trial` button produces one file for the specified `Weight variance`. You can also see the set variance and the actual variance in your programming environment
+        after you apply the `Weight variance`. Whereas, the `run one trial per parameter` button will produce a set of files, one for each mean weight variance of a geometric 
         progression (from `0.1` to `10`). This makes it possible to study how PCI varies with `weight variance`, which is known to be a control parameter for putting networks 
         into different dynamical regimes, from ordered to chaotic and in between edge of chaos. For an in-depth description and illustration of the different dynamical 
         regimes, refer to the `Edge of Chaos bitstream` simulation.
         
-        # What to Do
+        # Activities
         
-        In this simulation, similarly to the other reservoir network simulations, the only configuration to the simulation is the `weight stdev`. Below are two different ways
+        In this simulation, similarly to the other reservoir network simulations, the only configuration to the simulation is the `Weight variance`. Below are two different ways
         that you can utilize this simulation.
         
-        ## Observing The Edge of Chaos
+        ## Activity 1: Observe the edge of chaos
         
-        1) Change the `weight stdev` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+        1. Change the `Weight variance` value and press the `Apply Variance` button to change the reservoir's weight distribution.
                         
-        2) Start the simulation by clicking on the `run` button.
+        2. Start the simulation by clicking on the `run` button.
         
-        3) Now, observe the changes in the PCA plot and in its activation patterns to determine its current dynamical state.   
+        3. Now, observe the changes in the PCA plot and in its activation patterns to determine its current dynamical state.   
         
-        5) To reset the simulation, stop the simulation by clicking the `run` button again, and click on the reservoir, then press `k`. Afterwards, press the `clear` button in the 
+        4. To reset the simulation, stop the simulation by clicking the `run` button again, and click on the reservoir, then press `k`. Afterwards, press the `clear` button in the 
         PCA plot to clear the points.
         
-        6) Afterwards, click back on the `cursor` icon, and left-click outside of the reservoir to unselect all neurons.
+        5. Afterwards, click back on the `cursor` icon, and left-click outside of the reservoir to unselect all neurons.
 
-        ## Conducting Research on the Relationship between PCI and Dynamical Regimes
+        ## Activity 2: Research the relationship between PCI and dynamical regimes
         
-        1) Change the `weight stdev` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+        1. Change the `Weight variance` value and press the `Apply Variance` button to change the reservoir's weight distribution.
         
-        2) Click the `run one trial` button or, the `run one trial per parameter` button.
+        2. Click the `run one trial` button or, the `run one trial per parameter` button.
         
-        3) Save it to your device after the simulation finishes.  
+        3. Save it to your device after the simulation finishes.  
         
         # References
         

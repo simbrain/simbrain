@@ -122,9 +122,24 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         - **Intrinsic probabilities** (shown as labels on behavior neurons) determine baseline or spontaneous behavior tendencies
         - **Connections** between stimuli and behaviors can be strengthened or weakened through learning. These connections determine behaviors that are conditional on the presence of stimuli.
 
-        # What to Do
+        ## How the Code Works
 
-        1. Click `Play` to start the simulation and observe the agent's initial random behavior.
+        This section is included to clarify what is happening, for those curious about the underlying algorithm. The simulation uses two different learning rules depending on whether a stimulus is present. The goal is to show how spontaneous behaviors can be transferred to discriminative stimuli, allowing the agent to operate on its environment to obtain things that have been rewarded in the past.
+
+        When no stimulus is detected (total stimulus activation ≤ `0.1`), the code updates the intrinsic probability associated with the winning behavior neuron. This
+        changes the spontaneous or baseline tendency to perform that behavior. For example, rewarding wiggling when no objects are near increases the spontaneous wiggle probability.
+
+        When a stimulus is detected (total stimulus activation > `0.1`), the code updates the weight between the active stimulus neuron and the winning behavior neuron, either strengthening it (when rewarding) or weakening it (when punishing). This creates
+        a conditional stimulus–response association. For example, rewarding wiggling near the candle strengthens the candle→wiggle connection. Punishing wiggling near the candle weakens the candle→wiggle connection.
+
+        This simple threshold-based switching between algorithms allows the simulation to model both spontaneous operant behavior and
+        discriminative stimulus control.
+
+        # Activities
+
+        ## Activity 1: Train the agent with reward and punishment
+
+        1. Click `Run` to start the simulation and observe the agent's initial random behavior.
 
         2. Train the agent to perform a behavior spontaneously. When you see the agent perform a behavior you want to encourage (e.g., wiggling), click `Reward`. The intrinsic
         probability for that behavior will increase, making it more likely to occur spontaneously.
@@ -146,7 +161,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
            - Notice how the agent's behavior becomes more predictable near certain objects
            - Observe how intrinsic behavior probabilities (shown on the behavior neurons) adjust when no stimuli are present
 
-        ## Discriminative Stimulus Control
+        ## Activity 2: Demonstrate discriminative stimulus control
 
         At this point you can demonstrate the idea of a _discriminative stimulus_ (also called a _controlling stimulus_). This is a stimulus that, after training, increases the
         probability of an operant behavior. It signals the relationship between a behavior and a reinforcer. The behavior can then be said to be under the control of that stimulus.
@@ -154,19 +169,6 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
         In this simulation, you might first train the agent to wiggle spontaneously by rewarding wiggling when no objects are near. Then you can transfer control of this behavior to
         the candle by rewarding wiggling only when the candle is present. To do this, first put the spontaneously wiggling mouse by the candle and reinforce it a few times. Then move the candle away and start to punish wiggling in order to extinguish it as a spontaneous behavior (in practice, it would be better to stop reinforcing it, but that takes too long in simbrain). After that, wiggling only happens around the candle. Wiggling is now under the control of the candle; the candle is the "controlling" or "discriminative" stimulus for this behavior.
-
-        ## How the Code Works
-
-        This section is included to clarify what is happening, for those curious about the underlying algorithm. The simulation uses two different learning rules depending on whether a stimulus is present. The goal is to show how spontaneous behaviors can be transferred to discriminative stimuli, allowing the agent to operate on its environment to obtain things that have been rewarded in the past.
-
-        When no stimulus is detected (total stimulus activation ≤ `0.1`), the code updates the intrinsic probability associated with the winning behavior neuron. This
-        changes the spontaneous or baseline tendency to perform that behavior. For example, rewarding wiggling when no objects are near increases the spontaneous wiggle probability.
-
-        When a stimulus is detected (total stimulus activation > `0.1`), the code updates the weight between the active stimulus neuron and the winning behavior neuron, either strengthening it (when rewarding) or weakening it (when punishing). This creates
-        a conditional stimulus–response association. For example, rewarding wiggling near the candle strengthens the candle→wiggle connection. Punishing wiggling near the candle weakens the candle→wiggle connection.
-
-        This simple threshold-based switching between algorithms allows the simulation to model both spontaneous operant behavior and
-        discriminative stimulus control.
 
         # References
 

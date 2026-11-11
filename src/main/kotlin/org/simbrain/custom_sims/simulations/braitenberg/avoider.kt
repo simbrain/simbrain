@@ -186,7 +186,9 @@ val avoider = newSim {
 
         The agent will orient to the left if its right sensor is activated by an object on its right side, moving away from it. If it senses an object on its left side, the agent will orient to the right and move away from the object.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Watch the agent avoid objects
 
         In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
 
@@ -196,20 +198,22 @@ val avoider = newSim {
 
         3. Press `Stop` to stop the network from running
 
-        ## Other Observations
+        ## Activity 2: Control the velocity
 
         In this simulation, you can control the velocity of the agent's movement. There are three key value ranges to observe: positive, zero, negative. To do this:
 
         1. Click on the `Straight` neuron
 
-        2) Press the up/down arrow keys to control the neuron's activation (e.g., velocity).
+        2. Press the up/down arrow keys to control the neuron's activation (e.g., velocity).
+
+        ## Activity 3: Control the sensor strength
 
         In addition to controlling the velocity, you can control the strength of the agent's sensors by changing the values of the weights from sensors to orientation. This changes
         how aggressive the agent turns in response to the object. To do this:
 
-        1) Click on either weights between the sensor neurons and turn neurons.
+        1. Click on either weights between the sensor neurons and turn neurons.
 
-        2) Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object).
+        2. Press the up/down arrow keys to control their strength (e.g., the agent's turn aggression towards the object).
 
         # References
 

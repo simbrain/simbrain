@@ -55,22 +55,27 @@ val hopfieldPatterns = newSim {
         However, in this example, we perform a synchronous update, updating all the neurons at once. Run the network and you will observe
         that it will converge to some pattern (hopefully it's one that you trained!). You will also see that the network goes to a lower energy state.
                     
-        # What to Do        
-        
-        1. Select one of the patterns on the button panel. 
-        2. Press the `Train` button to train the network on that pattern. Each time you press `Train` it will "burn in" the pattern further.
+        # Activities
+
+        ## Activity 1: Train and recall a pattern
+
+        1. Select one of the patterns on the button panel.
+        2. Press the `Train on current pattern` button to train the network on that pattern. Each time you press it, it will "burn in" the pattern further.
         3. Note that it will learn both the pattern and its anti-pattern.
         4. To confirm the pattern is remembered, try randomizing the network with `N -> R` and then iterating by pressing space to see if the pattern is recreated.
-        5. You can also manually create part of the pattern you trained the network and see if it can recreate it.
-        6. You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
-        
-        ## Experiments
-        
-        - Train the network on the `E`, `F`, and `L` patterns, then randomize and iterate the network (`N -> R`). What do you notice?
-        - Click on `Show correlations`. What do you notice about the above patterns?
-        - Now, reset the network try to train the network to try to remember as many patterns as possible. Recall that the theoretical limit is `15%` of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
-        - Click on `Show correlations` again and note that some patterns are correlated, for example `L`, `E`, and `F`. The network should not do as well learning those patterns (they might interfere in different ways). 
-        - Click on `Show trained correlations` to compare only the patterns you have trained. Each row shows a picture of the pattern. A pattern that differs from a named one by a few units is labelled like `E ~3`, and `×2` means it was trained twice.
+
+        ## Activity 2: Complete partial or altered patterns
+
+        - You can also manually create part of the pattern you trained the network and see if it can recreate it.
+        - You can also select an already trained pattern and changing a few of the neurons to see if it will go back to the pattern.
+
+        ## Activity 3: Test correlated patterns
+
+        1. Train the network on the `E`, `F`, and `L` patterns, then randomize and iterate the network (`N -> R`). What do you notice?
+        2. Click on `Show correlations`. What do you notice about the above patterns?
+        3. Now, reset the network and try to train it to remember as many patterns as possible. Recall that the theoretical limit is `15%` of the number of nodes, assuming uncorrelated patterns. See how close you can get to that limit.
+        4. Click on `Show correlations` again and note that some patterns are correlated, for example `L`, `E`, and `F`. The network should not do as well learning those patterns (they might interfere in different ways).
+        5. Click on `Show trained correlations` to compare only the patterns you have trained. Each row shows a picture of the pattern. A pattern that differs from a named one by a few units is labelled like `E ~3`, and `×2` means it was trained twice.
 
         # Credits
         

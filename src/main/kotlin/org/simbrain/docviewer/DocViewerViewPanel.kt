@@ -1,5 +1,6 @@
 package org.simbrain.docviewer
 
+import org.simbrain.util.Theme
 import org.simbrain.util.ThemeColor
 import org.simbrain.util.htmlHex
 import java.awt.*
@@ -36,12 +37,16 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
             }
         }
 
-    val renderedTextPanel = JEditorPane().apply {
+    val renderedTextPanel = object : JEditorPane() {
+        // A live theme switch calls updateUI, so the theme colors are re-applied here
+        override fun updateUI() {
+            super.updateUI()
+            applyThemeStyles()
+        }
+    }.apply {
         contentType = "text/html"
         isEditable = false
-        // Swing's default HTML stylesheet paints links pure blue, which is muddy on the dark theme
-        val link = UIManager.getColor("Component.linkColor") ?: Color(0x2A, 0x9A, 0xB2)
-        (document as? HTMLDocument)?.styleSheet?.addRule("a { color: ${link.htmlHex}; }")
+        applyThemeStyles()
         addHyperlinkListener { e ->
             if (e.eventType == HyperlinkEvent.EventType.ACTIVATED) {
                 try {
@@ -283,5 +288,20 @@ class DocViewerViewPanel : JPanel(BorderLayout()) {
     companion object {
         private var lastSearch = ""
         private var lastMatchCase = false
+    }
+}
+
+/**
+ * Adds the theme-dependent rules to the rendered html: link color, the heading rules, and the activity bar.
+ * Sizes and spacing are theme independent and live in [DocViewer.render].
+ */
+private fun JEditorPane.applyThemeStyles() {
+    // Swing's default HTML stylesheet paints links pure blue, which is muddy on the dark theme
+    val link = UIManager.getColor("Component.linkColor") ?: Color(0x2A, 0x9A, 0xB2)
+    (document as? HTMLDocument)?.styleSheet?.apply {
+        addRule("a { color: ${link.htmlHex}; }")
+        addRule("h1 { border-bottom: 2px solid ${Theme.foreground.htmlHex}; }")
+        addRule("h2 { border-left: 4px solid ${Theme.foreground.htmlHex}; }")
+        addRule("h3 { color: ${Theme.mutedText.htmlHex}; }")
     }
 }

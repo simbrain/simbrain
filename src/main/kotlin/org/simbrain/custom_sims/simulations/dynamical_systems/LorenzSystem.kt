@@ -202,11 +202,18 @@ val lorenzSystem = newSim {
 
         **Chaotic** (`ρ = 28`, standard parameters): The famous butterfly attractor emerges. Trajectories loop unpredictably around two centers, never repeating but remaining bounded. This is the regime that made the Lorenz system famous.
 
-        # What to Do
+        ## Visualization Tips
 
-        Press `Play` in the toolbar to start the simulation. The `Lorenz Attractor` projection plot shows the system's trajectory in 2D using PCA, with recent points shown in red that fade to transparency over time.
+        - The projection plot uses decay coloring: recent points appear red and gradually fade to transparency, making it easy to see the current trajectory
+        - For chaotic parameters, the butterfly shape becomes visible after `~500` iterations
+        - Right-click the `Lorenz Variables` neuron collection and create a time series plot to see how `x`, `y`, and `z` evolve over time
+        - Different regimes produce distinct patterns: settling points (stable), loops (pre-chaotic), or irregular wandering (chaotic)
 
-        ## Explore Different Regimes
+        # Activities
+
+        ## Activity 1: Explore different regimes
+
+        Press `Run` in the toolbar to start the simulation. The `Lorenz Attractor` projection plot shows the system's trajectory in 2D using PCA, with recent points shown in red that fade to transparency over time.
 
         Use the preset buttons in the `Lorenz Parameters` control panel to explore different dynamical behaviors:
 
@@ -218,7 +225,7 @@ val lorenzSystem = newSim {
 
         4. Explore `Pre-Chaotic (Complex)` to observe transitional behavior near the edge of chaos.
 
-        ## Test Sensitivity to Initial Conditions
+        ## Activity 2: Test sensitivity to initial conditions
 
         With chaotic parameters active:
 
@@ -227,9 +234,9 @@ val lorenzSystem = newSim {
         3. Click inside the `Lorenz System` network window and manually adjust one neuron's activation slightly (e.g., change `x` from `1.0` to `1.001`)
         4. Watch how quickly the trajectories diverge despite nearly identical starting points
 
-        ## Experiment with Parameters
+        ## Activity 3: Experiment with parameters
 
-        The `Custom Parameters` section shows values for a stable fixed-point regime (`σ=10`, `ρ=15`, `β=2.67`). Try these or your own values:
+        The `Custom Parameters` section shows values for a stable fixed-point regime (`σ=10`, `ρ=15`, `β=2.7`). Try these or your own values:
 
         1. Enter custom values in the parameter fields
         2. Click `Apply Custom Parameters`
@@ -238,13 +245,6 @@ val lorenzSystem = newSim {
         5. Run the simulation to see the new behavior
 
         **Important**: Always clear the projection plot data when changing parameters to avoid mixing trajectories from different parameter regimes.
-
-        ## Visualization Tips
-
-        - The projection plot uses decay coloring: recent points appear red and gradually fade to transparency, making it easy to see the current trajectory
-        - For chaotic parameters, the butterfly shape becomes visible after `~500` iterations
-        - Right-click the `Lorenz Variables` neuron collection and create a time series plot to see how `x`, `y`, and `z` evolve over time
-        - Different regimes produce distinct patterns: settling points (stable), loops (pre-chaotic), or irregular wandering (chaotic)
 
         # References
 

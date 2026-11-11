@@ -198,7 +198,9 @@ val fieldImageDemo = newSim {
         experimenting with how this kind of graphical display could be used to
         show a simple, momentary field of salient contents.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Watch the field of consciousness
 
         Press `Run` and watch as the agent moves around. A plausible "field of
         consciousness" is shown in the field panel, with labels appearing and

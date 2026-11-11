@@ -154,7 +154,10 @@ val cnnSimpleLineDetector = newSim {
         Each pattern appears at different locations to demonstrate the CNN's ability
         to learn position-invariant features.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train and test the network
+
         1. Right-click the `CNN` outline and select `Train...` to open the training dialog
         2. Use `Step`, `Run`, and `Stop` buttons to train
         3. Watch both training (red) and testing (blue) error decrease
@@ -164,7 +167,8 @@ val cnnSimpleLineDetector = newSim {
            - Click `apply current row as input to network`
            - Watch the output layer neurons show predictions
         
-        ## Things to Try
+        ## Explore further
+
         Training accuracy typically ranges from 60-80%, varying with random weight 
         initialization. Try randomizing the network a few times and retraining to see 
         how high you can get it!

@@ -21,7 +21,7 @@ other, and nodes in different pools that belong together excite each other. Acti
 network spreads activation to related nodes, so the network settles into a pattern that completes the cue. This
 models associative memory retrieval, including generalization from partial or ambiguous cues.
 
-# What to Do
+# Activities
 
 ${whatToDo.trimIndent()}
 
@@ -35,8 +35,14 @@ ${credits.trimIndent()}
 """.trimIndent()
 
 val defaultIacWhatToDo = """
-- Click a node to select it and press the up arrow key to add activation to it. Then press play in the main toolbar and watch activation spread to related nodes.
-- To try another cue, press `N` in the network window to select all neurons and `C` to clear their activations.
-- The network has many synapses. Press `5` in the network window to hide the weight lines if they clutter the view.
+## Activity: Spread activation from a cue
+
+1. Click a node to select it and press the up arrow key to add activation to it. Then press `Run` in the main toolbar and watch activation spread to related nodes.
+2. To try another cue, press `N` in the network window to select all neurons and `C` to clear their activations.
+
+The network has many synapses. Press `5` in the network window to hide the weight lines if they clutter the view.
+
+## Explore further
+
 - Try activating a node in a property pool rather than an instance to see which instances share that property, and try activating two nodes at once to see how the network resolves conflicting cues.
 """.trimIndent()

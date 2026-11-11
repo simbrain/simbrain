@@ -65,6 +65,16 @@ val pathCompletion: Completer = { _, partial -> pathCandidates(partial) }
 val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.map { it.name }, partial) }
 
 /**
+ * An example in help: what it does, then lines that can be copied and pasted back to run it. The description is shown
+ * as a comment, so it can be copied along with the lines.
+ */
+class Example(val description: String, vararg lines: String) {
+    val lines: List<String> = lines.toList()
+
+    override fun toString() = (listOf("# $description") + lines).joinToString("\n")
+}
+
+/**
  * @param group the heading it appears under in help
  * @param listsItems if true, the action returns one item per line, which are shown side by side unless piped
  * @param immediate if true, the command runs as soon as it is entered instead of waiting for earlier commands, as
@@ -76,7 +86,7 @@ class Command(
     val usage: String,
     val description: String,
     val group: String,
-    val examples: List<String>,
+    val examples: List<Example>,
     val listsItems: Boolean,
     val immediate: Boolean,
     val takesWhere: Boolean,
@@ -97,7 +107,7 @@ class CommandRegistry {
         usage: String = name,
         description: String,
         group: String = "",
-        examples: List<String> = emptyList(),
+        examples: List<Example> = emptyList(),
         listsItems: Boolean = false,
         immediate: Boolean = false,
         takesWhere: Boolean = false,
@@ -137,6 +147,12 @@ class CommandShell(
 
     private var sourceDepth = 0
 
+    /**
+     * Whether this shell is in a Console window, which is part of the workspace and so closes when the workspace is
+     * replaced, as opposed to the Terminal tab of the desktop, which stays open.
+     */
+    var inWorkspaceWindow = false
+
     /** Called by the `cls` command. */
     var onClearScreen: () -> Unit = {}
 
@@ -165,6 +181,9 @@ class CommandShell(
             problemText(e)
         }
     }
+
+    /** Run a line, throwing a [CommandException] for a problem instead of returning it as text. */
+    internal suspend fun executeOrThrow(line: String): String = runLine(line)
 
     /** Whether [line] is a command that should not wait for earlier ones. */
     fun isImmediate(line: String): Boolean =

@@ -44,13 +44,14 @@ val workspaceCommands: CommandRegistry = commands {
         name = "ls",
         group = "Inspect",
         examples = listOf(
-            "ls",
-            "ls net1",
-            "ls net1/Neuron_*",
-            "ls net1 where activation>0.5",
-            "ls net1 where type=Synapse",
-            "ls net1 where type=Neuron and fanIn=0",
-            "ls net1 | grep Synapse"
+            Example("List the components in the workspace", "ls"),
+            Example("List what is in net1", "ls net1"),
+            Example("List the neurons in net1", "ls net1/Neuron_*"),
+            Example("List neurons anywhere in the workspace", "ls **/Neuron_*"),
+            Example("List the neurons in net1 whose activation is above 0.5", "ls net1 where activation>0.5"),
+            Example("List the synapses in net1", "ls net1 where type=Synapse"),
+            Example("List the neurons in net1 that nothing connects to", "ls net1 where type=Neuron and fanIn=0"),
+            Example("List what is in net1, keeping lines that mention Synapse", "ls net1 | grep Synapse")
         ),
         usage = "ls [path] [where condition]",
         description = "List contents, or what matches a pattern.",
@@ -66,9 +67,9 @@ val workspaceCommands: CommandRegistry = commands {
         name = "cd",
         group = "Inspect",
         examples = listOf(
-            "cd net1",
-            "cd ..",
-            "cd"
+            Example("Go into net1, so that paths start there", "cd net1"),
+            Example("Go up one level", "cd .."),
+            Example("Go back to the workspace", "cd")
         ),
         usage = "cd [path]",
         description = "Change the current location. With no path, return to the workspace.",
@@ -86,10 +87,10 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Inspect",
         takesWhere = true,
         examples = listOf(
-            "show",
-            "show net1/Neuron_1",
-            "show @",
-            "show net1/Neuron_1 | grep rule"
+            Example("Describe the workspace", "show"),
+            Example("Show the properties of a neuron", "show net1/Neuron_1"),
+            Example("Show what is selected in the GUI", "show @"),
+            Example("Show only the lines about a neuron's update rule", "show net1/Neuron_1 | grep rule")
         ),
         usage = "show [path] [where condition]",
         description = "Show the properties of one or more objects.",
@@ -105,8 +106,9 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Inspect",
         takesWhere = true,
         examples = listOf(
-            "get net1/Neuron_1 activation",
-            "get net1/Neuron_* activation"
+            Example("Print a neuron's activation", "get net1/Neuron_1 activation"),
+            Example("Print the activation of every neuron in net1", "get net1/Neuron_* activation"),
+            Example("Print the strength of every synapse in net1", "get net1/* strength where type=Synapse")
         ),
         usage = "get <path> <property> [where condition]",
         description = "Print one property of one or more objects.",
@@ -128,10 +130,10 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Inspect",
         takesWhere = true,
         examples = listOf(
-            "select net1/Neuron_*",
-            "select net1/input",
-            "select net1/* where activation>0.5",
-            "select none"
+            Example("Select the neurons in net1", "select net1/Neuron_*"),
+            Example("Make a collection labelled input, then select it by its label", "add collection 3 in=net1 label=input", "select net1/input"),
+            Example("Select the neurons in net1 whose activation is above 0.5", "select net1/* where activation>0.5"),
+            Example("Clear the selection", "select none")
         ),
         usage = "select <path or none> [where condition]",
         description = "Select models in the GUI, replacing the current selection. Refer to them afterwards with @.",
@@ -151,12 +153,13 @@ val workspaceCommands: CommandRegistry = commands {
         name = "set",
         group = "Build",
         examples = listOf(
-            "set net1/Neuron_1 activation=1",
-            "set net1/Neuron_* rule=Sigmoidal rule.slope=2",
-            "set @ clamped=true",
-            "set Neuron_{1..10} activation=rand()*10",
-            "set net1/* strength=randn(0,0.1) where type=Synapse",
-            "set net1/Neuron_* activation=i/n"
+            Example("Set a neuron's activation", "set net1/Neuron_1 activation=1"),
+            Example("Make the neurons in net1 sigmoidal, then change a setting of the new rule", "set net1/Neuron_* rule=Sigmoidal rule.slope=2"),
+            Example("Clamp what is selected in the GUI", "set @ clamped=true"),
+            Example("Give two neurons their own random activations between 0 and 10", "set net1/Neuron_{1..2} activation=rand()*10"),
+            Example("Give every synapse in net1 a small random strength", "set net1/* strength=randn(0,0.1) where type=Synapse"),
+            Example("Spread the activations in net1 evenly from 0 up toward 1", "set net1/Neuron_* activation=i/n"),
+            Example("Double every activation in net1", "set net1/Neuron_* activation=activation*2")
         ),
         usage = "set <path> key=value ... [where condition]",
         description = "Set properties. Selectable types are set by name, and their settings use dots. A number can be " +
@@ -187,11 +190,12 @@ val workspaceCommands: CommandRegistry = commands {
         name = "add",
         group = "Build",
         examples = listOf(
-            "add network net1",
-            "add neurons 10 rule=Sigmoidal",
-            "add collection 5 label=input layout=line",
-            "add neurons 2 in=net2",
-            "add timeseries plot1"
+            Example("Add a network named net2", "add network net2"),
+            Example("Add ten sigmoidal neurons to net1", "add neurons 10 in=net1 rule=Sigmoidal"),
+            Example("Add five neurons with random activations", "add neurons 5 in=net1 activation=rand()"),
+            Example("Add a collection of five neurons in a line, labelled input", "add collection 5 in=net1 label=input layout=line"),
+            Example("Add a time series plot named plot2", "add timeseries plot2"),
+            Example("Build a small network from scratch and give it random activations", "add network demo", "add neurons 10 in=demo", "set demo/Neuron_* activation=rand()")
         ),
         usage = "add <type> [count or name] [in=path] [layout=type] [key=value ...]",
         description = "Add neurons, a collection, or a component.",
@@ -211,9 +215,9 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         takesWhere = true,
         examples = listOf(
-            "connect net1/Neuron_1 net1/Neuron_2 strength=0.5",
-            "connect net1/input net1/output",
-            "connect net1/input net1/output sparse"
+            Example("Connect two neurons with a strength of 0.5", "connect net1/Neuron_1 net1/Neuron_2 strength=0.5"),
+            Example("Connect the neurons in net1 to each other sparsely, with random strengths", "connect net1/Neuron_* net1/Neuron_* sparse strength=randn(0,0.5)"),
+            Example("Make two collections and join them with a synapse group", "add collection 3 in=net1 label=left", "add collection 3 in=net1 label=right", "connect net1/left net1/right")
         ),
         usage = "connect <source> <target> [strategy] [key=value ...]",
         description = "Connect neurons or collections. Strategies: " +
@@ -229,8 +233,8 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         takesWhere = true,
         examples = listOf(
-            "couple net1/Neuron_1 \"plot1/Series 1\"",
-            "couple net1/Neuron_1:activation net2/Neuron_1:addInputValue"
+            Example("Make a plot and send a neuron's activation to it", "add timeseries plot1", "couple net1/Neuron_1 \"plot1/Series 1\""),
+            Example("Send one neuron's activation to another neuron's input", "couple net1/Neuron_1:activation net1/Neuron_2:addInputValue")
         ),
         usage = "couple <producer[:attribute]> <consumer[:attribute]>",
         description = "Couple objects so that values flow between them each iteration. See attrs for attribute names.",
@@ -244,7 +248,7 @@ val workspaceCommands: CommandRegistry = commands {
         name = "couplings",
         group = "Inspect",
         examples = listOf(
-            "couplings"
+            Example("List the couplings, numbered for uncouple", "couplings")
         ),
         description = "List the couplings in the workspace."
     ) { _ ->
@@ -258,8 +262,8 @@ val workspaceCommands: CommandRegistry = commands {
         name = "uncouple",
         group = "Build",
         examples = listOf(
-            "uncouple 1",
-            "uncouple all"
+            Example("Remove the first coupling listed by couplings", "uncouple 1"),
+            Example("Remove every coupling", "uncouple all")
         ),
         usage = "uncouple <number or all>",
         description = "Remove a coupling, using its number from couplings."
@@ -279,7 +283,7 @@ val workspaceCommands: CommandRegistry = commands {
         name = "attrs",
         group = "Inspect",
         examples = listOf(
-            "attrs net1/Neuron_1"
+            Example("See what a neuron can send to and receive from other components", "attrs net1/Neuron_1")
         ),
         usage = "attrs <path>",
         description = "List what an object can produce and consume, for couple.",
@@ -298,9 +302,9 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         takesWhere = true,
         examples = listOf(
-            "rm net1/Synapse_1",
-            "rm net1/Neuron_*",
-            "rm net1"
+            Example("Remove a synapse", "rm net1/Synapse_1"),
+            Example("Remove every synapse in net1", "rm net1/* where type=Synapse"),
+            Example("Remove a whole component", "rm net1")
         ),
         usage = "rm <path> [where condition]",
         description = "Remove models or components. There is no undo.",
@@ -312,9 +316,9 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         takesWhere = true,
         examples = listOf(
-            "randomize net1",
-            "randomize net1/Neuron_1",
-            "randomize @"
+            Example("Randomize everything in net1", "randomize net1"),
+            Example("Randomize one neuron", "randomize net1/Neuron_1"),
+            Example("Randomize what is selected in the GUI", "randomize @")
         ),
         usage = "randomize <path> [where condition]",
         description = "Randomize models, or everything in a network.",
@@ -330,8 +334,9 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         takesWhere = true,
         examples = listOf(
-            "clear net1",
-            "clear @"
+            Example("Clear the activations in net1", "clear net1"),
+            Example("Clear a neuron, wherever it is", "clear Neuron_1"),
+            Example("Clear what is selected in the GUI", "clear @")
         ),
         usage = "clear <path> [where condition]",
         description = "Clear models, or the activations in a network.",
@@ -353,8 +358,8 @@ val workspaceCommands: CommandRegistry = commands {
         name = "run",
         group = "Run",
         examples = listOf(
-            "run",
-            "run 100"
+            Example("Run for 100 iterations", "run 100"),
+            Example("Run until stopped. Enter stop to halt", "run")
         ),
         usage = "run [iterations]",
         description = "Run the workspace for a number of iterations, or until stop if none is given."
@@ -381,7 +386,7 @@ val workspaceCommands: CommandRegistry = commands {
         name = "stop",
         group = "Run",
         examples = listOf(
-            "stop"
+            Example("Stop running", "stop")
         ),
         description = "Stop the workspace after the current iteration. Runs at once, even while another command is running.",
         immediate = true
@@ -394,8 +399,8 @@ val workspaceCommands: CommandRegistry = commands {
         name = "sims",
         group = "Run",
         examples = listOf(
-            "sims",
-            "sims xor"
+            Example("List every simulation", "sims"),
+            Example("List the simulations whose names mention xor", "sims xor")
         ),
         usage = "sims [text]",
         description = "List simulations, optionally those whose names contain some text."
@@ -409,11 +414,12 @@ val workspaceCommands: CommandRegistry = commands {
         name = "sim",
         group = "Run",
         examples = listOf(
-            "sim XOR",
-            "sim XOR force"
+            Example("Open the XOR simulation, discarding unsaved changes", "sim XOR force"),
+            Example("Open the XOR simulation and look at its layers", "sim XOR force", "ls XOR where type=NeuronCollection", "get XOR/** activation where type=Neuron")
         ),
         usage = "sim <name> [force]",
-        description = "Open a simulation, replacing the current workspace. force discards unsaved changes.",
+        description = "Open a simulation, replacing the current workspace. force discards unsaved changes. A Console " +
+                "window closes with the workspace, so use the Terminal tab at the bottom of the desktop to keep going.",
         completer = { _, partial -> wordCandidates(simulations.items.map { it.first }.toList(), partial) }
     ) { args ->
         val theDesktop = desktop ?: fail("Simulations can only be opened from the desktop.")
@@ -421,7 +427,7 @@ val workspaceCommands: CommandRegistry = commands {
         val nameArgs = if (force) args.dropLast(1) else args
         if (nameArgs.isEmpty()) fail("Usage: sim <name> [force]")
         val sim = chooseOption(simulations.items.toMap(), nameArgs.joinToString(" "), "simulation")
-        requireNothingUnsaved(force, "sim <name> force")
+        requireSafeToReplace(force, "sim <name> force")
         withContext(Dispatchers.Default) { sim.run(theDesktop) }
         ""
     }
@@ -430,16 +436,17 @@ val workspaceCommands: CommandRegistry = commands {
         name = "open",
         group = "Files",
         examples = listOf(
-            "open mywork.zip",
-            "open mywork.zip force"
+            Example("Open a workspace file", "open mywork.zip"),
+            Example("Open a workspace file, discarding unsaved changes", "open mywork.zip force")
         ),
         usage = "open <file> [force]",
-        description = "Open a workspace file, replacing the current workspace. force discards unsaved changes."
+        description = "Open a workspace file, replacing the current workspace. force discards unsaved changes. A " +
+                "Console window closes with the workspace, so use the Terminal tab at the bottom of the desktop to keep going."
     ) { args ->
         if (args.isEmpty() || args.size > 2 || (args.size == 2 && args[1] != "force")) fail("Usage: open <file> [force]")
         val file = workspaceFile(args[0])
         if (!file.isFile) fail("No such file: ${file.path}")
-        requireNothingUnsaved(force = args.size == 2, "open <file> force")
+        requireSafeToReplace(force = args.size == 2, "open <file> force")
         workspace.openWorkspace(file, useDesktop = desktop != null)
         "Opened ${file.name}."
     }
@@ -448,9 +455,9 @@ val workspaceCommands: CommandRegistry = commands {
         name = "save",
         group = "Files",
         examples = listOf(
-            "save",
-            "save mywork.zip",
-            "save mywork.zip force"
+            Example("Save to the file the workspace came from", "save"),
+            Example("Save to a new file", "save mywork.zip"),
+            Example("Save over an existing file", "save mywork.zip force")
         ),
         usage = "save [file] [force]",
         description = "Save the workspace. force replaces an existing file."
@@ -472,7 +479,7 @@ val workspaceCommands: CommandRegistry = commands {
         name = "source",
         group = "Files",
         examples = listOf(
-            "source build.txt"
+            Example("Run the commands in a text file, one per line", "source build.txt")
         ),
         usage = "source <file>",
         description = "Run the commands in a text file. Lines starting with # are comments."
@@ -486,7 +493,7 @@ val workspaceCommands: CommandRegistry = commands {
         name = "cls",
         group = "Other",
         examples = listOf(
-            "cls"
+            Example("Clear the screen", "cls")
         ),
         description = "Clear the screen."
     ) { _ ->
@@ -498,8 +505,8 @@ val workspaceCommands: CommandRegistry = commands {
         name = "help",
         group = "Other",
         examples = listOf(
-            "help",
-            "help ls"
+            Example("List the commands", "help"),
+            Example("Describe ls, with examples", "help ls")
         ),
         usage = "help [command]",
         description = "List commands, or describe one.",
@@ -515,8 +522,8 @@ val workspaceCommands: CommandRegistry = commands {
                     "expressions, as in rand()*10 (see help set). Tab completes, and Esc cancels a long command."
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
-            val examples = command.examples.joinToString("") { "\n  $it" }
-            "${command.usage}\n${command.description}" + if (examples.isEmpty()) "" else "\n\nExamples:$examples"
+            val examples = command.examples.joinToString("\n\n") { it.toString() }
+            "${command.usage}\n${command.description}" + if (examples.isEmpty()) "" else "\n\nExamples, which can be copied and pasted:\n\n$examples"
         }
     }
 }
@@ -808,8 +815,15 @@ private fun modelsIn(nodes: List<Node>): List<NetworkModel> = nodes.flatMap { no
     }
 }
 
-/** Stops the workspace, then fails if replacing it would lose work, unless [force] is given. */
-private fun CommandShell.requireNothingUnsaved(force: Boolean, forceUsage: String) {
+/**
+ * Before the workspace is replaced: unless [force] is given, fails if this is a Console window, which would close, or
+ * if work would be lost. Then stops the workspace.
+ */
+private fun CommandShell.requireSafeToReplace(force: Boolean, forceUsage: String) {
+    if (!force && inWorkspaceWindow) {
+        fail("This would close this console window, which is part of the workspace. Use the Terminal tab at the " +
+                "bottom of the desktop, which stays open, or use $forceUsage.")
+    }
     workspace.stop()
     if (!force && workspace.componentList.isNotEmpty() && workspace.hasUnsavedWork()) {
         fail("There are unsaved changes. Save first, or use $forceUsage.")

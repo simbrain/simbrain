@@ -517,6 +517,16 @@ class CommandShellTest {
     }
 
     @Test
+    fun `a console window warns before opening a workspace would close it`(@TempDir dir: File) {
+        val shell = shellWithNetwork()
+        val file = File(dir, "saved.zip")
+        shell.run("save ${file.path}")
+        shell.inWorkspaceWindow = true
+        assertTrue(shell.run("open ${file.path}").startsWith("This would close this console window"))
+        assertEquals("Opened saved.zip.", shell.run("open ${file.path} force"))
+    }
+
+    @Test
     fun `save adds the extension and will not replace a file without force`(@TempDir dir: File) {
         val shell = shellWithNetwork()
         File(dir, "taken.zip").writeText("x")
@@ -776,15 +786,47 @@ class CommandShellTest {
     }
 
     @Test
-    fun `help on a command shows examples`() {
-        assertTrue(shellWithNetwork().run("help ls").contains("Examples:\n  ls\n  ls net1"))
+    fun `help on a command shows examples as comments and commands`() {
+        assertTrue(shellWithNetwork().run("help ls").contains("# List the components in the workspace\nls\n\n# List what is in net1\nls net1"))
     }
 
     @Test
-    fun `every example starts with its own command and parses`() {
+    fun `every example line is a known command or a comment`() {
         for (command in workspaceCommands.all) {
             assertTrue(command.examples.isNotEmpty(), command.name)
-            command.examples.forEach { assertEquals(command.name, tokenize(it).first(), it) }
+            for (example in command.examples) {
+                val firstWords = example.toString().lines().mapNotNull { tokenize(it).firstOrNull() }
+                firstWords.forEach { assertTrue(workspaceCommands[it] != null, "$it in $example") }
+                assertTrue(command.name in firstWords, example.toString())
+            }
+        }
+    }
+
+    @Test
+    fun `every example runs in a small workspace`() {
+        val needsFilesOrDesktop = setOf("sim", "open", "save", "source")
+        for (command in workspaceCommands.all.filter { it.name !in needsFilesOrDesktop }) {
+            for (example in command.examples) {
+                val workspace = Workspace()
+                val component = NetworkComponent("net1")
+                val first = Neuron().apply { activation = 0.75 }
+                val second = Neuron()
+                runBlocking { component.network.addNetworkModels(first, second, Synapse(first, second)) }
+                workspace.addWorkspaceComponent(component)
+                val shell = CommandShell(workspace, selectedModels = { listOf(first) })
+                runBlocking {
+                    shell.executeOrThrow("couple net1/Neuron_1:activation net1/Neuron_2:addInputValue")
+                    for (line in example.lines) {
+                        try {
+                            withTimeout(30_000) { shell.executeOrThrow(line) }
+                        } catch (e: CommandException) {
+                            throw AssertionError("$line in \"${example.description}\": ${e.message}")
+                        }
+                    }
+                }
+                workspace.stop()
+                runBlocking { withTimeout(30_000) { while (workspace.updater.isRunning) delay(5) } }
+            }
         }
     }
 }

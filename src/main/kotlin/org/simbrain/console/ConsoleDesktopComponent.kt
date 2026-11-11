@@ -14,7 +14,7 @@ import javax.swing.JMenuBar
 class ConsoleDesktopComponent(frame: GenericFrame, component: ConsoleComponent) :
     DesktopComponent<ConsoleComponent>(frame, component) {
 
-    private val consolePanel = CommandConsolePanel(component.workspace, SimbrainDesktop)
+    private val consolePanel = CommandConsolePanel(component.workspace, SimbrainDesktop, inWorkspaceWindow = true)
 
     override fun onClosed() {
         consolePanel.close()

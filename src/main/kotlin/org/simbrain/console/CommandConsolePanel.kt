@@ -64,9 +64,15 @@ internal fun statusText(progress: Progress?): String {
     return "$bar ${(fraction * 100).roundToInt()}% ${progress.what} ${"%,d".format(progress.done)} of ${"%,d".format(total)}. $hint"
 }
 
-class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null) : JPanel(BorderLayout()) {
+/** @param inWorkspaceWindow whether the panel is in a Console window, which closes when the workspace is replaced */
+class CommandConsolePanel(
+    workspace: Workspace,
+    desktop: SimbrainDesktop? = null,
+    inWorkspaceWindow: Boolean = false
+) : JPanel(BorderLayout()) {
 
     private val shell = CommandShell(workspace, desktop).apply {
+        this.inWorkspaceWindow = inWorkspaceWindow
         onClearScreen = { swingInvokeLater { clearTranscript() } }
     }
 

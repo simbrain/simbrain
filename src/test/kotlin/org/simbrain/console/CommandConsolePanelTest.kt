@@ -11,7 +11,10 @@ import org.junit.jupiter.api.Assertions.fail
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.workspace.Workspace
+import java.awt.datatransfer.Clipboard
+import java.awt.datatransfer.DataFlavor
 import javax.swing.SwingUtilities
+import javax.swing.TransferHandler
 import javax.swing.text.StyleConstants
 
 class CommandConsolePanelTest {
@@ -239,6 +242,25 @@ class CommandConsolePanelTest {
         )
         assertEquals("Searching: 52,000 objects. Esc to cancel.", statusText(Progress("Searching", 52_000)))
         assertEquals("Working. Esc to cancel.", statusText(null))
+    }
+
+    @Test
+    fun `examples copied from help can be pasted back to run them`() {
+        val panel = panel()
+        panel.enter("help ls", "Examples")
+        val clipboard = Clipboard("test")
+        onEdt {
+            val text = panel.textPane.document.getText(0, panel.textPane.document.length)
+            val start = text.indexOf("# List the components")
+            val end = text.indexOf("# List the neurons in net1\n")
+            panel.textPane.select(start, end)
+            panel.textPane.transferHandler.exportToClipboard(panel.textPane, clipboard, TransferHandler.COPY)
+        }
+        val copied = clipboard.getData(DataFlavor.stringFlavor) as String
+        assertEquals("# List the components in the workspace\nls\n\n# List what is in net1\nls net1\n\n", copied)
+        onEdt { panel.pasteText(copied) }
+        panel.awaitText("> ls net1\n(empty)")
+        assertTrue(panel.text.contains("> ls\nnet1\n"), panel.text)
     }
 
     @Test

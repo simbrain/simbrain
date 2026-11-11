@@ -59,7 +59,10 @@ val workspaceCommands: CommandRegistry = commands {
         val whereAt = args.indexOf("where")
         val pathArgs = if (whereAt >= 0) args.take(whereAt) else args
         val condition = if (whereAt >= 0) Condition.parse(args.drop(whereAt + 1).joinToString(" ")) else null
-        val nodes = listedNodes(pathArgs).filter { condition == null || condition.matches(it) }
+        val listed = listedNodes(pathArgs)
+        val nodes = if (condition == null) listed else buildList {
+            forEachWithProgress(listed, "Checking") { if (condition.matches(it)) add(it) }
+        }
         if (nodes.isEmpty()) "(empty)" else nodes.joinToString("\n") { quoted(it.name) }
     }
 
@@ -115,7 +118,9 @@ val workspaceCommands: CommandRegistry = commands {
     ) { args ->
         if (args.size != 2) fail("Usage: get <path> <property>")
         val nodes = targets(args[0])
-        val values = nodes.map { it to (readValue(it, args[1]) ?: fail("${it.name} has no property ${args[1]}.")) }
+        val values = buildList {
+            forEachWithProgress(nodes, "Reading") { add(it to (readValue(it, args[1]) ?: fail("${it.name} has no property ${args[1]}."))) }
+        }
         values.singleOrNull()?.second?.let(::formatValue)
             ?: values.joinToString("\n") { (node, value) -> "${node.name}: ${formatValue(value)}" }
     }
@@ -163,7 +168,7 @@ val workspaceCommands: CommandRegistry = commands {
         val parsed = Arguments.parse(args)
         if (parsed.words.size != 1 || parsed.options.isEmpty()) fail("Usage: set <path> key=value ...")
         val nodes = targets(parsed.words.single())
-        for (node in nodes) {
+        forEachWithProgress(nodes, "Setting") { node ->
             parsed.options.forEach { (key, value) -> assign(editableObject(node), key, value) }
         }
         if (nodes.size == 1) "" else "Set ${nodes.size} objects."
@@ -350,7 +355,10 @@ val workspaceCommands: CommandRegistry = commands {
                 ?: fail("Iterations must be a positive whole number: ${args.single()}")
             var remaining = iterations
             val context = currentCoroutineContext()
-            workspace.iterateWhile { --remaining > 0 && workspace.updater.isRunning && context.isActive }
+            workspace.iterateWhile {
+                progress = Progress("Running", iterations - remaining + 1, iterations)
+                --remaining > 0 && workspace.updater.isRunning && context.isActive
+            }
             "Ran ${iterations - remaining} of $iterations iterations. Time: ${workspace.time}"
         }
     }
@@ -486,9 +494,10 @@ val workspaceCommands: CommandRegistry = commands {
         if (args.isEmpty()) {
             registry.all.groupBy { it.group }.entries.joinToString("\n\n") { (group, members) ->
                 group + "\n" + members.joinToString("\n") { "  ${it.usage}" }
-            } + "\n\nEnter help <command> for details and examples. Paths look like net1/Neuron_1. Use .. to go up, / " +
-                    "for the workspace, * and ? to match several, and @ for what is selected in the GUI. Add | grep " +
-                    "<text> to filter output. Tab completes."
+            } + "\n\nEnter help <command> for details and examples. Paths look like net1/Neuron_1, and a name by " +
+                    "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
+                    "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. Add | grep " +
+                    "<text> to filter output. Tab completes, and Esc cancels a long command."
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
             val examples = command.examples.joinToString("") { "\n  $it" }
@@ -595,14 +604,14 @@ private fun readValue(node: Node, key: String): Any? =
     findProperty(editableObject(node), key)?.let { it.value ?: "none" } ?: extraFacts(node.value)[key]
 
 private fun CommandShell.propertyCandidates(path: String, partial: String, suffix: String): List<Candidate> {
-    val node = resolveAll(path).firstOrNull() ?: return emptyList()
+    val node = resolveQuietly(path).firstOrNull() ?: return emptyList()
     return editablePropertiesOf(editableObject(node))
         .filter { it.name.startsWith(partial, ignoreCase = true) }
         .map { Candidate(it.name, suffix.ifEmpty { " " }) }
 }
 
 private fun CommandShell.valueCandidates(path: String, partial: String): List<Candidate> {
-    val node = resolveAll(path).firstOrNull() ?: return emptyList()
+    val node = resolveQuietly(path).firstOrNull() ?: return emptyList()
     val key = partial.substringBefore("=")
     val property = findProperty(editableObject(node), key) ?: return emptyList()
     return valueOptions(property)
@@ -613,7 +622,7 @@ private fun CommandShell.valueCandidates(path: String, partial: String): List<Ca
 private fun CommandShell.addableTypes(): List<String> =
     NEURON_TYPE_WORDS + workspace.componentFactory.workspaceComponentTypes.map { normalized(it) }.sorted()
 
-private fun CommandShell.targetNetwork(inPath: String?): Network {
+private suspend fun CommandShell.targetNetwork(inPath: String?): Network {
     if (inPath != null) {
         val node = resolve(inPath)
         return networkOf(node) ?: fail("${node.name} is not in a network.")

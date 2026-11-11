@@ -214,6 +214,34 @@ class CommandConsolePanelTest {
     }
 
     @Test
+    fun `a long command shows progress and escape cancels it`() {
+        val workspace = Workspace().apply { addWorkspaceComponent(NetworkComponent("net1")) }
+        val panel = panel(workspace)
+        panel.type("abc")
+        panel.submit("run 100000000")
+        panel.submit("ls")
+        panel.awaitText("Esc to cancel.")
+        assertTrue(panel.text.contains("Running"), panel.text)
+        panel.press("console-cancel")
+        panel.awaitText("Cancelled.")
+        val text = panel.text
+        assertTrue("Dropped 1 waiting command(s)." in text, text)
+        assertFalse("Esc to cancel." in text, text)
+        assertTrue(text.endsWith("Cancelled.\n> abc"), text)
+        runBlocking { withTimeout(30_000) { while (workspace.updater.isRunning) delay(5) } }
+    }
+
+    @Test
+    fun `the status line shows a bar when the total is known`() {
+        assertEquals(
+            "[#####...............] 25% Setting 250 of 1,000. Esc to cancel.",
+            statusText(Progress("Setting", 250, 1000))
+        )
+        assertEquals("Searching: 52,000 objects. Esc to cancel.", statusText(Progress("Searching", 52_000)))
+        assertEquals("Working. Esc to cancel.", statusText(null))
+    }
+
+    @Test
     fun `cls clears the transcript`() {
         val panel = panel()
         panel.enter("ls", "net1\n")

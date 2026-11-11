@@ -677,6 +677,97 @@ class CommandShellTest {
         assertFalse(shell.complete("set net1/Neuron_1 rule=").options.any { it.contains("Allostatic") })
     }
 
+    private fun shellWithTwoNetworks(): CommandShell {
+        val shell = shellWithNetwork()
+        val second = NetworkComponent("net2")
+        runBlocking { second.network.addNetworkModels(Neuron().apply { activation = 0.25 }) }
+        shell.workspace.addWorkspaceComponent(second)
+        return shell
+    }
+
+    @Test
+    fun `a bare name is found wherever it is`() {
+        val shell = shellWithNetwork()
+        assertEquals("0.75", shell.run("get Neuron_1 activation"))
+        shell.run("set Synapse_1 strength=2")
+        assertEquals("2", shell.run("get net1/Synapse_1 strength"))
+    }
+
+    @Test
+    fun `a name in several places is reported with its places`() {
+        assertEquals(
+            "Neuron_1 is in 2 places: net1/Neuron_1, net2/Neuron_1. Use a longer path.",
+            shellWithTwoNetworks().run("get Neuron_1 activation")
+        )
+    }
+
+    @Test
+    fun `the current location is searched before everywhere`() {
+        val shell = shellWithTwoNetworks()
+        shell.run("cd net2")
+        assertEquals("0.25", shell.run("get Neuron_1 activation"))
+        assertEquals("0.75", shell.run("get net1/Neuron_1 activation"))
+    }
+
+    @Test
+    fun `a name matches ignoring case and punctuation`() {
+        assertEquals("0.75", shellWithNetwork().run("get neuron1 activation"))
+    }
+
+    @Test
+    fun `a component is found from inside another`() {
+        val shell = shellWithTwoNetworks()
+        shell.run("cd net1")
+        assertEquals("Neuron_1", shell.run("ls net2"))
+    }
+
+    @Test
+    fun `a neuron in a collection is one object, not two places`() {
+        val shell = shellWithNetwork()
+        shell.run("add collection 2 in=net1 label=group")
+        val inCollection = shell.run("ls net1/group").split("  ").first()
+        assertEquals("0", shell.run("get $inCollection activation"))
+    }
+
+    @Test
+    fun `a range stands for each of its values`() {
+        val shell = shellWithNetwork()
+        shell.run("add neurons 3 in=net1")
+        assertEquals("Set 3 objects.", shell.run("set net1/Neuron_{2..4} activation=0.5"))
+        assertEquals("Neuron_1: 0.75\nNeuron_2: 0.5\nNeuron_3: 0.5\nNeuron_4: 0.5\nNeuron_5: 0", shell.run("get net1/Neuron_* activation"))
+        assertEquals("Neuron_1: 0.75\nNeuron_5: 0", shell.run("get Neuron_{1,5} activation"))
+    }
+
+    @Test
+    fun `two stars match at any depth`() {
+        val shell = shellWithTwoNetworks()
+        assertEquals("Neuron_1  Neuron_2  Neuron_1", shell.run("ls **/Neuron_*"))
+    }
+
+    @Test
+    fun `a pattern that matches nothing suggests looking everywhere`() {
+        assertEquals("Not found: Neuron_*. To look everywhere, use **/Neuron_*.", shellWithNetwork().run("ls Neuron_*"))
+    }
+
+    @Test
+    fun `braces expand like a shell`() {
+        assertEquals(listOf("n1", "n2", "n3"), expandBraces("n{1..3}"))
+        assertEquals(listOf("n3", "n2"), expandBraces("n{3..2}"))
+        assertEquals(listOf("a/x1", "a/x2", "b/x1", "b/x2"), expandBraces("{a,b}/x{1..2}"))
+        assertEquals(listOf("plain{x}"), expandBraces("plain{x}"))
+        assertTrue(shellWithNetwork().run("ls Neuron_{1..1000000}").contains("too large"))
+    }
+
+    @Test
+    fun `a long command reports progress`() {
+        val shell = shellWithNetwork()
+        shell.run("add neurons 1000 in=net1")
+        shell.run("set net1/Neuron_* activation=1")
+        val progress = shell.progress!!
+        assertEquals("Setting", progress.what)
+        assertEquals(1002, progress.total)
+    }
+
     @Test
     fun `help groups commands`() {
         val listing = shellWithNetwork().run("help")

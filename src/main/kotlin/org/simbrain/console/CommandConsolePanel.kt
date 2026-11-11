@@ -6,13 +6,18 @@
 package org.simbrain.console
 
 import com.formdev.flatlaf.FlatLaf
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.CompletableJob
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.simbrain.util.Theme
@@ -40,8 +45,24 @@ import javax.swing.text.AttributeSet
 import javax.swing.text.DocumentFilter
 import javax.swing.text.SimpleAttributeSet
 import javax.swing.text.StyleConstants
+import kotlin.math.roundToInt
 
 private const val MAX_TRANSCRIPT_LINES = 5000
+private const val STATUS_DELAY_MS = 500L
+private const val STATUS_INTERVAL_MS = 100L
+private const val BAR_WIDTH = 20
+
+/** The status line for a running command: a bar if its size is known, otherwise a count. */
+internal fun statusText(progress: Progress?): String {
+    val hint = "Esc to cancel."
+    progress ?: return "Working. $hint"
+    val total = progress.total
+    if (total == null || total <= 0) return "${progress.what}: ${"%,d".format(progress.done)} objects. $hint"
+    val fraction = (progress.done.toDouble() / total).coerceIn(0.0, 1.0)
+    val filled = (fraction * BAR_WIDTH).roundToInt()
+    val bar = "[" + "#".repeat(filled) + ".".repeat(BAR_WIDTH - filled) + "]"
+    return "$bar ${(fraction * 100).roundToInt()}% ${progress.what} ${"%,d".format(progress.done)} of ${"%,d".format(total)}. $hint"
+}
 
 class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null) : JPanel(BorderLayout()) {
 
@@ -69,9 +90,15 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
 
     private val document = textPane.styledDocument as AbstractDocument
 
+    /** The document is the transcript, then a status line while a long command runs, then the prompt, then the input. */
+    private var statusStart = 0
+
     private var promptStart = 0
 
     private var inputStart = 0
+
+    @Volatile
+    private var runningJob: Job? = null
 
     /** True while the panel itself is changing the document, which the read-only protection does not apply to. */
     private var editing = false
@@ -93,6 +120,7 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         bindKey("UP", "console-previous") { moveThroughHistory(-1) }
         bindKey("DOWN", "console-next") { moveThroughHistory(1) }
         bindKey("TAB", "console-complete") { completeInput() }
+        bindKey("ESCAPE", "console-cancel") { cancelRunning() }
         bindKey("HOME", "console-home") { textPane.caretPosition = inputStart }
         bindKey("meta LEFT", "console-home") { textPane.caretPosition = inputStart }
 
@@ -124,21 +152,70 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         commandScope.cancel()
     }
 
-    private suspend fun runQueue() {
-        for (queued in queue) runAndShow(queued)
+    private suspend fun runQueue() = coroutineScope {
+        for (queued in queue) {
+            shell.progress = null
+            val job = launch { runAndShow(queued, showsProgress = true) }
+            runningJob = job
+            job.join()
+            runningJob = null
+        }
     }
 
-    /** Shows the line after the prompt, runs it, and shows its output. */
-    private suspend fun runAndShow(queued: QueuedLine) {
+    /** Cancel the running command and drop any waiting to run. */
+    private fun cancelRunning() {
+        val job = runningJob ?: return
+        var dropped = 0
+        while (true) {
+            val waiting = queue.tryReceive().getOrNull() ?: break
+            waiting.done.complete()
+            dropped++
+        }
+        job.cancel()
+        if (dropped > 0) insertOutput("Dropped $dropped waiting command(s).")
+    }
+
+    /**
+     * Shows the line after the prompt, runs it, and shows its output.
+     *
+     * @param showsProgress whether to show a status line if the command takes a while
+     */
+    private suspend fun runAndShow(queued: QueuedLine, showsProgress: Boolean = false) = coroutineScope {
+        val status = if (showsProgress) launch { showStatusWhileRunning() } else null
         try {
             withContext(swingDispatcher) { insertOutput(shell.prompt, queued.line) }
             val result = shell.execute(queued.line)
+            status?.cancelAndJoin()
             withContext(swingDispatcher) {
+                setStatus(null)
                 if (result.isNotEmpty()) insertOutput(result)
                 refreshPrompt()
             }
+        } catch (e: CancellationException) {
+            withContext(NonCancellable + swingDispatcher) {
+                setStatus(null)
+                insertOutput(cancelledText())
+                refreshPrompt()
+            }
+            throw e
         } finally {
             queued.done.complete()
+        }
+    }
+
+    private fun cancelledText() =
+        if (shell.progress?.what == "Searching") {
+            "Cancelled. A longer path, such as net1/Neuron_1, searches less."
+        } else {
+            "Cancelled."
+        }
+
+    private suspend fun showStatusWhileRunning() {
+        delay(STATUS_DELAY_MS)
+        while (true) {
+            val text = statusText(shell.progress)
+            withContext(swingDispatcher) { setStatus(text) }
+            delay(STATUS_INTERVAL_MS)
         }
     }
 
@@ -198,6 +275,7 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
     }
 
     private fun writePrompt() {
+        statusStart = document.length
         promptStart = document.length
         edit { document.insertString(promptStart, shell.prompt, plain) }
         inputStart = document.length
@@ -208,13 +286,30 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
     internal fun insertOutput(plainText: String, boldText: String = "") {
         keepingCaretInInput {
             edit {
-                document.insertString(promptStart, plainText, plain)
-                document.insertString(promptStart + plainText.length, boldText + "\n", if (boldText.isEmpty()) plain else bold)
+                document.insertString(statusStart, plainText, plain)
+                document.insertString(statusStart + plainText.length, boldText + "\n", if (boldText.isEmpty()) plain else bold)
             }
-            val added = plainText.length + boldText.length + 1
-            promptStart += added
-            inputStart += added
+            shiftFromStatus(plainText.length + boldText.length + 1)
             trimTranscript()
+        }
+        scrollToInput()
+    }
+
+    private fun shiftFromStatus(added: Int) {
+        statusStart += added
+        promptStart += added
+        inputStart += added
+    }
+
+    /** Show [text] on the line above the prompt, or remove that line if null. */
+    private fun setStatus(text: String?) {
+        val line = text?.let { it + "\n" } ?: ""
+        val oldLength = promptStart - statusStart
+        if (document.getText(statusStart, oldLength) == line) return
+        keepingCaretInInput {
+            edit { document.replace(statusStart, oldLength, line, plain) }
+            promptStart += line.length - oldLength
+            inputStart += line.length - oldLength
         }
         scrollToInput()
     }
@@ -240,17 +335,16 @@ class CommandConsolePanel(workspace: Workspace, desktop: SimbrainDesktop? = null
         val excess = root.elementCount - MAX_TRANSCRIPT_LINES
         if (excess <= 0) return
         val end = root.getElement(excess).startOffset
-        if (end > promptStart) return
+        if (end > statusStart) return
         edit { document.remove(0, end) }
-        promptStart -= end
-        inputStart -= end
+        shiftFromStatus(-end)
     }
 
     private fun clearTranscript() {
         keepingCaretInInput {
-            edit { document.remove(0, promptStart) }
-            inputStart -= promptStart
-            promptStart = 0
+            val removed = statusStart
+            edit { document.remove(0, removed) }
+            shiftFromStatus(-removed)
         }
     }
 

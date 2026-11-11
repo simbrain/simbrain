@@ -1,8 +1,8 @@
 /**
  * The Simbrain command language: a line is a command name followed by words and `key=value` options, and the workspace
- * is navigated like a filesystem of components and their contents. Paths may use `*` and `?`, and `@` stands for what
- * is selected in the GUI. Output can be filtered with `| grep`. There are deliberately no variables, loops, or
- * expressions.
+ * is navigated like a filesystem of components and their contents. A bare name is found wherever it is, as long as it
+ * is in only one place. Paths may use `*`, `?`, `**`, and shell-style `{1..10}` ranges, and `@` stands for what is
+ * selected in the GUI. Output can be filtered with `| grep`. There are deliberately no variables or loops.
  *
  * [CommandShell] parses lines, tracks the current location, resolves paths, and completes partial input. The commands
  * themselves are declared with [commands] in `WorkspaceCommands.kt`.
@@ -10,6 +10,10 @@
 package org.simbrain.console
 
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.yield
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
@@ -23,9 +27,14 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.IdentityHashMap
+import kotlin.math.abs
 
 private const val MAX_SOURCE_DEPTH = 8
 private const val MAX_LISTED = 500
+private const val MAX_PLACES = 5
+private const val MAX_EXPANSION = 100_000
+private const val PROGRESS_INTERVAL = 256
+private const val SEARCH_REPORT_INTERVAL = 1024
 
 /** A problem with what the user entered. The message is shown as is. */
 class CommandException(message: String) : Exception(message)
@@ -121,6 +130,10 @@ class CommandShell(
     /** Called by the `cls` command. */
     var onClearScreen: () -> Unit = {}
 
+    /** How far the running command has got, if it reports progress. Cleared by whoever starts a command. */
+    @Volatile
+    var progress: Progress? = null
+
     private val root get() = Node(emptyList(), workspace)
 
     val prompt: String get() = current.path.joinToString("/") + "> "
@@ -167,7 +180,7 @@ class CommandShell(
 
     private fun sideBySide(items: List<String>): String {
         val shown = items.take(MAX_LISTED).joinToString("  ")
-        return if (items.size > MAX_LISTED) "$shown\n... and ${items.size - MAX_LISTED} more" else shown
+        return if (items.size > MAX_LISTED) "$shown\n... and ${items.size - MAX_LISTED} more. Narrow with a longer path or where." else shown
     }
 
     /** Run the lines of a file in order, stopping at the first problem, which is reported after the earlier output. */
@@ -192,21 +205,86 @@ class CommandShell(
         }
     }
 
-    /** Find the one thing a path refers to. A path starting with `/` is from the workspace, any other from [current]. */
-    fun resolve(path: String): Node {
+    /** Find the one thing a path refers to. */
+    suspend fun resolve(path: String): Node {
         val found = resolveAll(path)
         return when (found.size) {
-            0 -> fail("Not found: $path")
+            0 -> fail(notFound(path))
             1 -> found.single()
             else -> fail("$path matches ${found.size} things. Expected one.")
         }
     }
 
-    /** Find everything a path refers to, which can be several things if it uses `*` or `?`. */
-    fun resolveAll(path: String): List<Node> {
-        val start = if (path.startsWith("/")) root else current
-        return walk(start, path.split("/").filter { it.isNotEmpty() })
+    /**
+     * Find everything a path refers to. A path starting with `/` is from the workspace, any other from [current]. A
+     * name that is not found there is looked for everywhere, and must then be in only one place. `*` and `?` match
+     * within one level, `**` matches any number of levels, and `{1..3}` or `{a,b}` stands for each of its values.
+     */
+    suspend fun resolveAll(path: String): List<Node> = find(path, searchTick())
+
+    /** Like [resolveAll] but empty rather than failing, and not cancellable. For completion. */
+    fun resolveQuietly(path: String): List<Node> = runCatching { find(path) {} }.getOrDefault(emptyList())
+
+    /**
+     * Run [action] on each item, reporting progress and letting the command be cancelled. For commands that may act
+     * on many objects.
+     */
+    suspend fun <T> forEachWithProgress(items: List<T>, what: String, action: suspend (T) -> Unit) {
+        items.forEachIndexed { index, item ->
+            if (index % PROGRESS_INTERVAL == 0) {
+                yield()
+                progress = Progress(what, index, items.size)
+            }
+            action(item)
+        }
     }
+
+    private fun find(path: String, tick: () -> Unit): List<Node> {
+        val paths = expandBraces(path)
+        val local = paths.flatMap { walkPath(it, tick) }
+        if (local.isNotEmpty() || !searchesEverywhere(path)) return distinctValues(local)
+        return distinctValues(paths.flatMap { searchEverywhere(it, tick) })
+    }
+
+    private fun walkPath(path: String, tick: () -> Unit): List<Node> =
+        walk(if (path.startsWith("/")) root else current, path.split("/").filter { it.isNotEmpty() }, tick)
+
+    /** Whether a path not found from the current location is looked for everywhere: a relative path starting with a name. */
+    private fun searchesEverywhere(path: String): Boolean {
+        val first = path.split("/").firstOrNull { it.isNotEmpty() } ?: return false
+        return !path.startsWith("/") && first !in listOf(".", "..", "**") && !isPattern(first)
+    }
+
+    private fun searchEverywhere(path: String, tick: () -> Unit): List<Node> {
+        val segments = path.split("/").filter { it.isNotEmpty() }
+        val starts = distinctValues(descendants(root, tick).filter { nameMatches(it, segments.first()) }.toList())
+        val found = starts.map { walk(it, segments.drop(1), tick) }.filter { it.isNotEmpty() }
+        if (found.size > 1) {
+            val places = found.map { it.first().path.joinToString("/") }
+            fail("$path is in ${places.size} places: ${places.take(MAX_PLACES).joinToString(", ")}" +
+                    (if (places.size > MAX_PLACES) ", ..." else "") + ". Use a longer path.")
+        }
+        return found.singleOrNull().orEmpty()
+    }
+
+    /** Counts the objects a search visits, reporting progress and stopping if the command is cancelled. */
+    private suspend fun searchTick(): () -> Unit {
+        val job = currentCoroutineContext()[Job]
+        var searched = 0
+        return {
+            if (++searched % SEARCH_REPORT_INTERVAL == 0) {
+                job?.ensureActive()
+                progress = Progress("Searching", searched)
+            }
+        }
+    }
+
+    private fun notFound(path: String) =
+        if (isPattern(path) && !path.startsWith("/") && !path.startsWith("**")) {
+            "Not found: $path. To look everywhere, use **/$path."
+        } else {
+            "Not found: $path"
+        }
 
     /** Find what a command's target refers to, which unlike [resolveAll] can also be the GUI selection. */
     suspend fun targets(path: String): List<Node> {
@@ -218,16 +296,21 @@ class CommandShell(
             }
             return selected.map { model -> nodesByModel[model] ?: Node(listOf(model.id.orEmpty()), model) }
         }
-        return resolveAll(path).ifEmpty { fail("Not found: $path") }
+        return resolveAll(path).ifEmpty { fail(notFound(path)) }
     }
 
-    /** Everything below [node], each before its own contents. A neuron in a collection appears under both. */
-    fun descendants(node: Node): Sequence<Node> = sequence {
+    /**
+     * Everything below [node], each before its own contents. A neuron in a collection appears under both.
+     *
+     * @param tick called for each object visited
+     */
+    fun descendants(node: Node, tick: () -> Unit = {}): Sequence<Node> = sequence {
         val children = childrenOf(node.value) ?: return@sequence
         for ((name, child) in children) {
+            tick()
             val childNode = Node(node.path + name, child)
             yield(childNode)
-            yieldAll(descendants(childNode))
+            yieldAll(descendants(childNode, tick))
         }
     }
 
@@ -277,21 +360,22 @@ class CommandShell(
 
     fun pathCandidates(partial: String): List<Candidate> {
         val prefix = partial.substring(0, partial.lastIndexOf('/') + 1)
-        val parent = if (prefix.isEmpty()) current else resolveAll(prefix).singleOrNull() ?: return emptyList()
+        val parent = if (prefix.isEmpty()) current else resolveQuietly(prefix).singleOrNull() ?: return emptyList()
         val children = childrenOf(parent.value) ?: return emptyList()
         return children
             .filterKeys { it.startsWith(partial.removePrefix(prefix), ignoreCase = true) }
             .map { (name, child) -> Candidate(prefix + name, if (childrenOf(child) != null) "/" else " ") }
     }
 
-    private fun walk(start: Node, segments: List<String>): List<Node> =
-        segments.fold(listOf(start)) { nodes, segment -> nodes.flatMap { step(it, segment) } }
+    private fun walk(start: Node, segments: List<String>, tick: () -> Unit = {}): List<Node> =
+        segments.fold(listOf(start)) { nodes, segment -> nodes.flatMap { step(it, segment, tick) } }
 
-    private fun step(node: Node, segment: String): List<Node> {
+    private fun step(node: Node, segment: String, tick: () -> Unit): List<Node> {
         if (segment == ".") return listOf(node)
         if (segment == "..") return walk(root, node.path.dropLast(1))
+        if (segment == "**") return listOf(node) + descendants(node, tick)
         val children = childrenOf(node.value) ?: return emptyList()
-        val names = if ('*' in segment || '?' in segment) {
+        val names = if (isPattern(segment)) {
             val pattern = globToRegex(segment)
             children.keys.filter { pattern.matches(it) }
         } else {
@@ -300,10 +384,61 @@ class CommandShell(
         return names.map { Node(node.path + it, children.getValue(it)) }
     }
 
+    /** Prefers an exact match, then a match ignoring case, then a label, then a match ignoring punctuation. */
     private fun findChildName(children: Map<String, Any>, segment: String): String? =
         children.keys.firstOrNull { it == segment }
             ?: children.keys.filter { it.equals(segment, ignoreCase = true) }.singleOrNull()
             ?: children.filterValues { (it as? NetworkModel)?.label.equals(segment, ignoreCase = true) }.keys.singleOrNull()
+            ?: children.keys.filter { looselyEqual(it, segment) }.singleOrNull()
+
+    private fun nameMatches(node: Node, segment: String): Boolean =
+        node.name.equals(segment, ignoreCase = true) ||
+                (node.value as? NetworkModel)?.label.equals(segment, ignoreCase = true) ||
+                looselyEqual(node.name, segment)
+}
+
+/** Equal ignoring case and punctuation, so that neuron1 matches Neuron_1. */
+private fun looselyEqual(name: String, typed: String) = normalized(typed).let { it.isNotEmpty() && it == normalized(name) }
+
+/**
+ * How far a long command has got, for a progress display.
+ *
+ * @param total how many items there are, if known
+ */
+class Progress(val what: String, val done: Int, val total: Int? = null)
+
+private fun isPattern(text: String) = '*' in text || '?' in text
+
+/** One node for each object, the one with the shortest path, in the order they were found. */
+private fun distinctValues(nodes: List<Node>): List<Node> {
+    val best = IdentityHashMap<Any, Node>()
+    for (node in nodes) {
+        val previous = best[node.value]
+        if (previous == null || node.path.size < previous.path.size) best[node.value] = node
+    }
+    return nodes.filter { best[it.value] === it }
+}
+
+private val bracePattern = Regex("""\{([^{}]*)}""")
+private val rangePattern = Regex("""^(-?\d+)\.\.(-?\d+)$""")
+
+/** Expand `{1..3}` and `{a,b}` into each of their values, as a shell does. */
+fun expandBraces(text: String): List<String> {
+    val match = bracePattern.find(text) ?: return listOf(text)
+    val inside = match.groupValues[1]
+    val range = rangePattern.find(inside)
+    val values = when {
+        range != null -> {
+            val (from, to) = range.destructured.toList().map { it.toLong() }
+            if (abs(to - from) >= MAX_EXPANSION) fail("The range {$inside} is too large.")
+            (if (from <= to) from..to else from downTo to).map { it.toString() }
+        }
+        "," in inside -> inside.split(",")
+        else -> return listOf(text)
+    }
+    val expanded = values.flatMap { expandBraces(text.replaceRange(match.range, it)) }
+    if (expanded.size > MAX_EXPANSION) fail("$text stands for too many names.")
+    return expanded
 }
 
 private suspend fun desktopSelection(workspace: Workspace, desktop: SimbrainDesktop?): List<NetworkModel> {

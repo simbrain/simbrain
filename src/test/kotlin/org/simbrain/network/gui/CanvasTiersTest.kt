@@ -10,6 +10,7 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
+import org.piccolo2d.PNode
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
 import org.simbrain.network.gui.nodes.NeuronCollectionNode
@@ -77,5 +78,25 @@ class CanvasTiersTest {
         // The group's own synapses are drawn as synapse nodes as well
         assertEquals(band.sorted(), band)
         assertEquals(listOf(0, 1, 2), band.distinct())
+    }
+
+    @Test
+    fun `drawing put under the connections stays under connections added after it`() = runBlocking {
+        val network = Network()
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        val underlay = PNode()
+        onEdt { panel.addUnderConnections(underlay) }
+        val arrays = List(2) { NeuronArray(3).also { network.addNetworkModel(it) } }
+        network.addNetworkModel(WeightMatrix(arrays[0], arrays[1]))
+        val (a, b) = network.addNeurons(2)
+        network.addNetworkModel(Synapse(a, b))
+        UiWork.awaitIdle()
+
+        onEdt {
+            val tier = panel.edgeTier.childrenReference
+            assertEquals(panel.connectionUnderlay, underlay.parent)
+            assertEquals(0, tier.indexOf(panel.connectionUnderlay))
+            assertTrue(tier.any { it is WeightMatrixNode } && tier.any { it is SynapseNode })
+        }
     }
 }

@@ -49,6 +49,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      */
     private var imageSide = IMAGE_SIDE_DEFAULT
 
+    /** Pixel dimensions of the image as last rendered, which a change of [imageSide] does not always change. */
+    private var renderedSize: Pair<Int, Int>? = null
+
     private val boxThickness = 2f
 
     private var networkPanelScalingFactor = networkPanel.scalingFactor
@@ -272,14 +275,27 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             above = interactionBox.fullBounds.height,
             below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0
         )
-        val fitted = imageSide(room)
+        val fitted = fittedImageSide(room)
         if (abs(fitted - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
             imageSide = fitted
+            // Stretches the image already rendered, which is all a small matrix needs
             imageBox.resize(fitted, fitted)
-            // The image is rendered at the resolution it is displayed at
-            markDirty(WEIGHTS)
+            if (renderSize() != renderedSize) markDirty(WEIGHTS)
         }
         placeAt(room.centerX, room.centerY)
+    }
+
+    /**
+     * Pixel dimensions the matrix is rendered at for the current [imageSide]: the resolution it is displayed at,
+     * but no more than one pixel per weight.
+     */
+    private fun renderSize(): Pair<Int, Int> {
+        val matrix = (weightMatrix as WeightMatrix).weights
+        val imagePixels = ceil(imageSide).toInt()
+        return scaledImageSize(
+            imagePixels, imagePixels, matrix.ncol(), matrix.nrow(),
+            networkPanel.scalingFactor * getScreenScalingFactor()
+        )
     }
 
     /**
@@ -301,6 +317,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
         val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTargetSource) it else it.transposed() }
         imageBox.image = img
+        renderedSize = renderSize()
     }
 
     override fun paint(paintContext: PPaintContext) {
@@ -685,7 +702,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         /**
          * Room for a weight matrix image on the [shaft] of the arrow it is drawn on, at [position] along it, with
          * [above] and [below] taken up by what is drawn over and under the image. Anything that draws a matrix on
-         * an arrow sizes it with this and [imageSide], so that every drawing of a matrix follows the same rule.
+         * an arrow sizes it with this and [fittedImageSide], so that every drawing of a matrix follows the same rule.
          */
         internal fun imageRoom(
             shaft: CubicCurve2D,
@@ -696,7 +713,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL, comfortable = IMAGE_SIDE_DEFAULT)
 
         /** Side of the weight matrix image that goes in [room]. */
-        internal fun imageSide(room: ShaftRoom) = room.squareSide(IMAGE_SIDE_MIN, IMAGE_SIDE_MAX)
+        internal fun fittedImageSide(room: ShaftRoom) = room.squareSide(IMAGE_SIDE_MIN, IMAGE_SIDE_MAX)
 
         /**
          * Side of the image on a self-connection, and the side it reaches between two layers by filling the gap

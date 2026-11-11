@@ -399,7 +399,7 @@ class BPTTUnrolledView(
      * For each drawn copy of [weights], the fraction of its arrow's shaft, from the source layer to the base of
      * the arrowhead, that the copy covers.
      */
-    fun matrixImageArrowShares(weights: SharedWeights): List<Double> =
+    internal fun matrixImageArrowShares(weights: SharedWeights): List<Double> =
         matrixImagesByWeights[weights].orEmpty().mapNotNull { copy ->
             copy.shaft?.let { copy.rect.width / it.p1.distance(it.p2) }
         }
@@ -411,11 +411,7 @@ class BPTTUnrolledView(
     fun syncPosition() {
         val anchor = bptt.hiddenLayer.location
         setOffset(anchor.x, anchor.y)
-        liveArrow?.let {
-            it.setOffset(anchor.x, anchor.y)
-            // A matrix node built since the arrow was added would have gone in beneath it
-            networkPanel.addUnderConnections(it)
-        }
+        liveArrow?.setOffset(anchor.x, anchor.y)
     }
 
     /** Remove what this view draws outside itself. Called when the view is taken off the canvas. */
@@ -549,7 +545,7 @@ class BPTTUnrolledView(
     ) {
         val matrix = matrixFor(weights) ?: return
         val room = shaft?.let { WeightMatrixNode.imageRoom(it) }
-        val side = room?.let { WeightMatrixNode.imageSide(it).coerceAtMost(MATRIX_SIZE) } ?: MATRIX_SIZE
+        val side = room?.let { WeightMatrixNode.fittedImageSide(it).coerceAtMost(MATRIX_SIZE) } ?: MATRIX_SIZE
         val rect = Rectangle2D.Double(
             (room?.centerX ?: centerX) - side / 2, (room?.centerY ?: centerY) - side / 2, side, side
         )

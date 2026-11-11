@@ -68,6 +68,12 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     override val model: NetworkModel
         get() = bptt
 
+    override fun dispose() {
+        super.dispose()
+        // Part of the view is drawn outside this node, so it does not leave the canvas with it
+        unrolledViewNode?.dispose()
+    }
+
     override val contextMenu: JPopupMenu
         get() = JPopupMenu().apply {
             applyBasicActions()

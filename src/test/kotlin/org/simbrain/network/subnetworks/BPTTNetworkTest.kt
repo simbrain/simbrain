@@ -32,6 +32,20 @@ import kotlin.random.Random
 
 class BPTTNetworkTest {
 
+    /**
+     * An unrolled view of [bptt] that is not on the canvas. Built on the event thread because it adds its arrow
+     * into the rolled network to the panel's canvas, which the event thread is adding the network's nodes to.
+     */
+    private fun unrolledView(bptt: BPTTNetwork, panel: NetworkPanel): BPTTUnrolledView {
+        lateinit var view: BPTTUnrolledView
+        // The lambda stands in for the rolled network's measured extent, which on the canvas comes from the
+        // subnetwork outline
+        SwingUtilities.invokeAndWait {
+            view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        }
+        return view
+    }
+
     @Test
     fun `test bptt training`() {
         val net = Network()
@@ -195,9 +209,8 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.sequenceLength = 4
 
-        // Stands in for the rolled network's measured extent, which on the canvas comes from the
-        // subnetwork outline. Only the count of columns and arrows is under test, not where they land.
-        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        // Only the count of columns and arrows is under test, not where they land.
+        val view = unrolledView(bptt, panel)
         assertEquals(3, view.columns.size) { "Four steps means three columns plus the rolled network" }
         assertEquals(4, view.stepCount) { "The rolled network is the fourth step, not a fifth one" }
 
@@ -208,7 +221,7 @@ class BPTTNetworkTest {
         }
 
         bptt.trainerConfig.sequenceLength = 1
-        view.rebuild()
+        SwingUtilities.invokeAndWait { view.rebuild() }
         assertEquals(0, view.columns.size) { "At depth one there is nothing to unroll" }
     }
 
@@ -247,7 +260,7 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.sequenceLength = 4
 
-        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        val view = unrolledView(bptt, panel)
 
         // An arrow without its matrix reads as a bare connection while its neighbours are labelled, which
         // is the inconsistency the copies exist to remove. The one exception is the arrow into the live
@@ -269,7 +282,7 @@ class BPTTNetworkTest {
         net.addNetworkModelsAsync(bptt)
         bptt.trainerConfig.sequenceLength = 4
 
-        val view = BPTTUnrolledView(bptt, panel) { bptt.hiddenLayer.location.x - 200.0 }
+        val view = unrolledView(bptt, panel)
 
         BPTTUnrolledView.SharedWeights.entries.forEach { weights ->
             val shares = view.matrixImageArrowShares(weights)
@@ -297,23 +310,33 @@ class BPTTNetworkTest {
             Thread.sleep(200)
             repeat(5) { SwingUtilities.invokeAndWait { panel.canvas.layer.fullBounds } }
         }
-        fun connectionTier(): List<Any?> {
-            var children = emptyList<Any?>()
-            SwingUtilities.invokeAndWait { children = panel.edgeTier.childrenReference.toList() }
-            return children
+        fun arrowsUnderConnections(): List<BezierArrow> {
+            var arrows = emptyList<BezierArrow>()
+            SwingUtilities.invokeAndWait {
+                arrows = panel.connectionUnderlay.childrenReference.filterIsInstance<BezierArrow>()
+            }
+            return arrows
         }
 
         SwingUtilities.invokeAndWait { bptt.unrolledView = true }
         settle()
-        val shown = connectionTier()
-        val arrows = shown.filterIsInstance<BezierArrow>()
-        assertEquals(1, arrows.size) { "Only the arrow the real recurrent matrix sits on is drawn among the connections" }
-        val recurrentNode = shown.indexOfFirst { it is WeightMatrixNode && it.weightMatrix == bptt.hiddenToHidden }
-        assertTrue(recurrentNode > shown.indexOf(arrows.single())) { "The matrix has to be drawn after its arrow" }
+        assertEquals(1, arrowsUnderConnections().size) { "Only the arrow the real recurrent matrix sits on goes there" }
+        SwingUtilities.invokeAndWait {
+            val tier = panel.edgeTier.childrenReference
+            val recurrentNode = tier.indexOfFirst { it is WeightMatrixNode && it.weightMatrix == bptt.hiddenToHidden }
+            assertTrue(recurrentNode > tier.indexOf(panel.connectionUnderlay)) { "The matrix is drawn after its arrow" }
+        }
 
         SwingUtilities.invokeAndWait { bptt.unrolledView = false }
         settle()
-        assertTrue(connectionTier().none { it is BezierArrow }) { "Hiding the view takes its arrow with it" }
+        assertTrue(arrowsUnderConnections().isEmpty()) { "Hiding the view takes its arrow with it" }
+
+        SwingUtilities.invokeAndWait { bptt.unrolledView = true }
+        settle()
+        assertEquals(1, arrowsUnderConnections().size)
+        bptt.deleteBlocking()
+        settle()
+        assertTrue(arrowsUnderConnections().isEmpty()) { "Deleting the network takes the arrow with it" }
     }
 
     @Test

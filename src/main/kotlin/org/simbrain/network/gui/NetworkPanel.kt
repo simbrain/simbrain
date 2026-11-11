@@ -84,6 +84,12 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         canvas.layer.addChild(it)
     }
 
+    /**
+     * First child of the [edgeTier], holding drawing that stands for no model object but has to pass beneath a
+     * connection's node, which nothing in the tier above the connections can do.
+     */
+    internal val connectionUnderlay = PNode().also { edgeTier.addChild(it) }
+
     /** Spike highlights for synapses, drawn over the cached connections so spikes don't invalidate the cache. */
     internal val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
 
@@ -367,16 +373,18 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         // Within the edge tier, weight matrices sit lowest, then synapses, gap junctions, synapse groups, and
         // connectors; each kind goes after the last node of the kind below it. The search runs from the end of the
         // tier, where the few nodes above the synapses sit, so it stops quickly even with many synapses
+        // The first child of the tier is the underlay that every connection is drawn over
+        val firstConnection = edgeTier.indexOfChild(connectionUnderlay) + 1
         fun after(vararg types: KClass<out ScreenElement>): Int {
             val children = edgeTier.childrenReference
             for (i in children.indices.reversed()) {
                 if (types.any { it.isInstance(children[i]) }) return i + 1
             }
-            return 0
+            return firstConnection
         }
 
         when (node) {
-            is WeightMatrixNode -> edgeTier.addChild(0, node)
+            is WeightMatrixNode -> edgeTier.addChild(firstConnection, node)
             // After the last synapse rather than the first, so a large network appends instead of shifting every
             // synapse already in the tier
             is SynapseNode -> edgeTier.addChild(after(SynapseNode::class, WeightMatrixNode::class), node)
@@ -388,12 +396,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    /**
-     * Draw [node] under every connection. For drawing that stands for no model object but has to pass beneath a
-     * connection's node, which nothing in the tier above the connections can do. Whoever adds it removes it.
-     */
+    /** Draw [node] under every connection, present and future. Whoever adds it removes it. */
     internal fun addUnderConnections(node: PNode) {
-        if (node.parent !== edgeTier || edgeTier.indexOfChild(node) != 0) edgeTier.addChild(0, node)
+        connectionUnderlay.addChild(node)
     }
 
 

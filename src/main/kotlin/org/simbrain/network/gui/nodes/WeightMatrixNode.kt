@@ -1,4 +1,7 @@
-/** Displays weight matrices and supplies property/data dialogs for explicit editing targets. */
+/**
+ * Displays weight matrices, as an image sized to the space between the two layers, and supplies property/data
+ * dialogs for explicit editing targets.
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
@@ -26,11 +29,14 @@ import java.awt.BasicStroke
 import java.awt.Graphics2D
 import java.awt.RenderingHints
 import java.awt.event.ActionEvent
+import java.awt.geom.CubicCurve2D
 import java.awt.geom.Ellipse2D
 import java.beans.PropertyChangeListener
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
+import kotlin.math.abs
+import kotlin.math.ceil
 
 /**
  * A visual representation of a weight matrix
@@ -38,14 +44,10 @@ import javax.swing.*
 class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel),
     PixelSelectionHost {
     /**
-     * Width of the [imageBox]
+     * Side of the square [imageBox]. Fitted to the space between the two layers by [placeOnShaft]; a
+     * self-connection, which has no such space, keeps the default.
      */
-    private val imageWidth = 90
-
-    /**
-     * Height of the [imageBox]
-     */
-    private val imageHeight = 90
+    private var imageSide = IMAGE_SIDE_DEFAULT
 
     private val boxThickness = 2f
 
@@ -54,7 +56,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     /**
      * A box around the [imageBox]
      */
-    val imageBox = ImageBox(imageWidth, imageHeight, boxThickness)
+    val imageBox = ImageBox(imageSide, imageSide, boxThickness)
 
     private val arrow = WeightMatrixArrow(this)
 
@@ -91,8 +93,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         val targetSource = NetworkPreferences.weightMatrixTargetSource
         val displayRows = if (targetSource) nTargets else nSources
         val displayCols = if (targetSource) nSources else nTargets
-        val cellW = imageWidth.toDouble() / displayCols
-        val cellH = imageHeight.toDouble() / displayRows
+        val cellW = imageSide / displayCols
+        val cellH = imageSide / displayRows
         return imageBox.cellsIntersectingGlobalEllipse(ellipse, displayRows, displayCols, cellW, cellH) { displayRow, displayCol ->
             if (targetSource) displayRow to displayCol else displayCol to displayRow
         }
@@ -247,7 +249,37 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     fun placeAt(x: kotlin.Double, y: kotlin.Double) {
         imageBox.centerFullBoundsOnPoint(x, y)
         interactionBox.centerFullBoundsOnPoint(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
-        shapeCaption.centerFullBoundsOnPoint(x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + 3.0)
+        shapeCaption.centerFullBoundsOnPoint(
+            x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP
+        )
+    }
+
+    /**
+     * Size the image to the room between the two layers and place it there, at [position] along the arrow's
+     * [shaft] from 0 at the source layer to 1 at the base of the arrowhead, with the label box above it and the
+     * caption below. A matrix that is [shared] with one running the other way keeps to its half of the gap.
+     *
+     * The image fills the gap until it is [IMAGE_SIDE_DEFAULT] across. Between layers further apart it grows only
+     * as far as leaves it, with its label box and caption, [IMAGE_FILL] of the gap, so that the arrow shows on
+     * either side of it. It stops growing at [IMAGE_SIDE_MAX] and stops shrinking at [IMAGE_SIDE_MIN], below which
+     * it overruns the room.
+     */
+    fun placeOnShaft(shaft: CubicCurve2D, position: kotlin.Double, shared: Boolean) {
+        val room = imageRoom(
+            shaft,
+            position,
+            shared,
+            above = interactionBox.fullBounds.height,
+            below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0
+        )
+        val fitted = imageSide(room)
+        if (abs(fitted - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            imageSide = fitted
+            imageBox.resize(fitted, fitted)
+            // The image is rendered at the resolution it is displayed at
+            markDirty(WEIGHTS)
+        }
+        placeAt(room.centerX, room.centerY)
     }
 
     /**
@@ -264,7 +296,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         val scale = networkPanel.scalingFactor * screenScalingFactor
 
         // Create the image data from the weight matrix using nearest neighbor interpolation
-        val imageData = matrix.toScaledImageData(imageWidth, imageHeight, scale)
+        val imagePixels = ceil(imageSide).toInt()
+        val imageData = matrix.toScaledImageData(imagePixels, imagePixels, scale)
 
         val img = imageData.toSimbrainColorImage().let { if (NetworkPreferences.weightMatrixTargetSource) it else it.transposed() }
         imageBox.image = img
@@ -314,7 +347,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         g2.drawNumericOverlay(
             data = data,
             rows = rows, cols = cols,
-            imageWidth = imageWidth.toDouble(), imageHeight = imageHeight.toDouble(),
+            imageWidth = imageSide, imageHeight = imageSide,
             scalingFactor = networkPanel.scalingFactor,
             decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
             offsetX = boxOffset.x,
@@ -344,8 +377,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             displayRows = nSources
             displayCols = nTargets
         }
-        val displayRow = ((localPt.y / imageHeight) * displayRows).toInt().coerceIn(0, displayRows - 1)
-        val displayCol = ((localPt.x / imageWidth) * displayCols).toInt().coerceIn(0, displayCols - 1)
+        val displayRow = ((localPt.y / imageSide) * displayRows).toInt().coerceIn(0, displayRows - 1)
+        val displayCol = ((localPt.x / imageSide) * displayCols).toInt().coerceIn(0, displayCols - 1)
         return if (NetworkPreferences.weightMatrixTargetSource) {
             displayRow to displayCol
         } else {
@@ -362,8 +395,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         val targetSource = NetworkPreferences.weightMatrixTargetSource
         val displayRows = if (targetSource) nTargets else nSources
         val displayCols = if (targetSource) nSources else nTargets
-        val cellW = imageWidth.toDouble() / displayCols
-        val cellH = imageHeight.toDouble() / displayRows
+        val cellW = imageSide / displayCols
+        val cellH = imageSide / displayRows
         val boxOffset = imageBox.offset
 
         g2.color = NeuronArrayNode.PIXEL_SELECTION_COLOR
@@ -403,8 +436,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             displayRow = h.col
             displayCol = h.row
         }
-        val cellW = imageWidth.toDouble() / displayCols
-        val cellH = imageHeight.toDouble() / displayRows
+        val cellW = imageSide / displayCols
+        val cellH = imageSide / displayRows
         val boxOffset = imageBox.offset
 
         g2.color = h.color
@@ -418,11 +451,11 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             }
             displayRow != null -> {
                 val r = displayRow.coerceIn(0, displayRows - 1)
-                java.awt.geom.Rectangle2D.Double(boxOffset.x, boxOffset.y + r * cellH, imageWidth.toDouble(), cellH)
+                java.awt.geom.Rectangle2D.Double(boxOffset.x, boxOffset.y + r * cellH, imageSide, cellH)
             }
             displayCol != null -> {
                 val c = displayCol.coerceIn(0, displayCols - 1)
-                java.awt.geom.Rectangle2D.Double(boxOffset.x + c * cellW, boxOffset.y, cellW, imageHeight.toDouble())
+                java.awt.geom.Rectangle2D.Double(boxOffset.x + c * cellW, boxOffset.y, cellW, imageSide)
             }
             else -> return
         }
@@ -648,5 +681,40 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     companion object {
         private const val WEIGHTS = 1
+
+        /**
+         * Room for a weight matrix image on the [shaft] of the arrow it is drawn on, at [position] along it, with
+         * [above] and [below] taken up by what is drawn over and under the image. Anything that draws a matrix on
+         * an arrow sizes it with this and [imageSide], so that every drawing of a matrix follows the same rule.
+         */
+        internal fun imageRoom(
+            shaft: CubicCurve2D,
+            position: kotlin.Double = 0.5,
+            shared: Boolean = false,
+            above: kotlin.Double = 0.0,
+            below: kotlin.Double = 0.0
+        ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL, comfortable = IMAGE_SIDE_DEFAULT)
+
+        /** Side of the weight matrix image that goes in [room]. */
+        internal fun imageSide(room: ShaftRoom) = room.squareSide(IMAGE_SIDE_MIN, IMAGE_SIDE_MAX)
+
+        /**
+         * Side of the image on a self-connection, and the side it reaches between two layers by filling the gap
+         * between them.
+         */
+        internal const val IMAGE_SIDE_DEFAULT = 90.0
+
+        private const val IMAGE_SIDE_MIN = 30.0
+
+        private const val IMAGE_SIDE_MAX = 180.0
+
+        /**
+         * Fraction of the gap between the layers that an image larger than [IMAGE_SIDE_DEFAULT] takes up together
+         * with its label box and caption.
+         */
+        internal const val IMAGE_FILL = 0.6
+
+        /** Space between the image and the shape caption under it. */
+        private const val CAPTION_GAP = 3.0
     }
 }

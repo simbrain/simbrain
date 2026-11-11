@@ -218,7 +218,10 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
     }
 
     private fun detachUnrolledView() {
-        unrolledViewNode?.let { removeChild(it) }
+        unrolledViewNode?.let {
+            it.dispose()
+            removeChild(it)
+        }
         unrolledViewNode = null
         setDecoration(null)
     }

@@ -388,6 +388,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
+    /**
+     * Draw [node] under every connection. For drawing that stands for no model object but has to pass beneath a
+     * connection's node, which nothing in the tier above the connections can do. Whoever adds it removes it.
+     */
+    internal fun addUnderConnections(node: PNode) {
+        if (node.parent !== edgeTier || edgeTier.indexOfChild(node) != 0) edgeTier.addChild(0, node)
+    }
+
 
     /**
      * Add a screen element to the network panel and rezoom the page.

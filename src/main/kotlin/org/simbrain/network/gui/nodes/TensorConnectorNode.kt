@@ -1,7 +1,7 @@
 /**
  * Displays tensor connections and edits selected connectors of the same underlying model type. Convolutions also
- * show their kernels, one at a time or as a grid sized to the space between the two layers, and let individual
- * kernel weights be selected and edited through [PixelSelectionHost].
+ * show their kernels, one at a time or as a grid, sized either way to the space between the two layers, and let
+ * individual kernel weights be selected and edited through [PixelSelectionHost].
  */
 package org.simbrain.network.gui.nodes
 
@@ -59,8 +59,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             repaint()
         }
 
-    private val imgSize = 60
-    val imageBox = ImageBox(imgSize, imgSize, 1f).apply {
+    /** Side of the kernel image in the single kernel view, as last fitted. */
+    private var kernelImageSide = KERNEL_IMAGE_DEFAULT
+
+    val imageBox = ImageBox(kernelImageSide, kernelImageSide, 1f).apply {
         (connector as? ConvolutionConnector)?.let { conv ->
             makeKernelPixelSurface(conv) { currentFilter to currentInputChannel }
         }
@@ -212,23 +214,18 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     private val kernelGridChromeBelow: kotlin.Double
         get() = if (shapeCaption.visible) shapeCaption.height + KERNEL_GRID_CAPTION_GAP else 0.0
 
+    /** Room for the kernel grid on the arrow's [shaft], with its label box above it and its caption below. */
+    private fun kernelGridRoom(shaft: CubicCurve2D) =
+        shaftRoom(shaft, above = kernelGridChromeAbove, below = kernelGridChromeBelow)
+
     /**
-     * Side of one kernel tile such that the grid fills the space between the source and target layers. That
-     * space is taken from the arrow's [shaft], which runs from the edge of the source layer to the base of the
-     * arrowhead: along the shaft the grid gets its length, less a margin and, for layers stacked vertically, the
-     * room its label box and caption take. Across the shaft nothing bounds the grid, so it gets a fixed extent.
-     * Tiles stop growing at [KERNEL_TILE_MAX] and stop shrinking at [KERNEL_TILE_MIN], below which the grid
-     * overruns the space.
+     * Side of one kernel tile such that the grid fills the [room] between the source and target layers. In a
+     * direction the layers do not limit the grid, it gets a fixed extent. Tiles stop growing at
+     * [KERNEL_TILE_MAX] and stop shrinking at [KERNEL_TILE_MIN], below which the grid overruns the room.
      */
-    private fun fittedKernelTileSize(conv: ConvolutionConnector, shaft: CubicCurve2D): kotlin.Double {
-        val shaftWidth = abs(shaft.x2 - shaft.x1)
-        val shaftHeight = abs(shaft.y2 - shaft.y1)
-        val (availableWidth, availableHeight) = if (shaftHeight >= shaftWidth) {
-            val chrome = kernelGridChromeAbove + kernelGridChromeBelow
-            KERNEL_GRID_CROSS_EXTENT to shaftHeight - chrome - 2 * KERNEL_GRID_MARGIN
-        } else {
-            shaftWidth - 2 * KERNEL_GRID_MARGIN to KERNEL_GRID_CROSS_EXTENT
-        }
+    private fun fittedKernelTileSize(conv: ConvolutionConnector, room: ShaftRoom): kotlin.Double {
+        val availableWidth = if (room.width.isFinite()) room.width else KERNEL_GRID_CROSS_EXTENT
+        val availableHeight = if (room.height.isFinite()) room.height else KERNEL_GRID_CROSS_EXTENT
         val columns = conv.source.shape.channels
         val rows = conv.numFilters
         fun tileSizeWithGap(gap: kotlin.Double) = minOf(
@@ -245,10 +242,51 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         return tileSize.coerceIn(KERNEL_TILE_MIN, KERNEL_TILE_MAX)
     }
 
-    /** Re-lay out the grid if the space along the arrow's [shaft] now calls for a different tile size. */
-    private fun fitKernelGrid(conv: ConvolutionConnector, shaft: CubicCurve2D) {
-        val fitted = fittedKernelTileSize(conv, shaft)
-        if (abs(fitted - kernelTileSize) > 0.25) layoutKernelGrid(fitted)
+    /** Re-lay out the grid if its [room] now calls for a different tile size. */
+    private fun fitKernelGrid(conv: ConvolutionConnector, room: ShaftRoom) {
+        val fitted = fittedKernelTileSize(conv, room)
+        if (abs(fitted - kernelTileSize) > ShaftRoom.RESIZE_THRESHOLD) layoutKernelGrid(fitted)
+    }
+
+    /** Height of what the single kernel view stacks above its image: the label box and a navigation button. */
+    private val kernelImageChromeAbove: kotlin.Double
+        get() = interactionBox.fullBounds.height + KERNEL_IMAGE_LABEL_BOX_GAP +
+                filterPrevButton!!.fullBounds.height + KERNEL_IMAGE_BUTTON_GAP
+
+    /**
+     * Height of what the single kernel view stacks below its image: a navigation button, the detail label and the
+     * shape caption.
+     */
+    private val kernelImageChromeBelow: kotlin.Double
+        get() = KERNEL_IMAGE_BUTTON_GAP + filterNextButton!!.fullBounds.height +
+                KERNEL_IMAGE_DETAIL_OFFSET + detailLabel.fullBounds.height / 2.0 +
+                if (shapeCaption.visible) KERNEL_IMAGE_CAPTION_GAP + shapeCaption.height else 0.0
+
+    /**
+     * Room for the single kernel view's image on the arrow's [shaft], with its navigation buttons around it, the
+     * label box above it and the detail label and caption below. The image fills the gap until it is
+     * [KERNEL_IMAGE_DEFAULT] across; between layers further apart the view as a whole is held to
+     * [KERNEL_IMAGE_FILL] of the gap, so that the arrow shows on either side of it.
+     */
+    private fun kernelImageRoom(shaft: CubicCurve2D) = shaftRoom(
+        shaft,
+        above = kernelImageChromeAbove,
+        below = kernelImageChromeBelow,
+        beside = KERNEL_IMAGE_BUTTON_GAP + channelPrevButton!!.fullBounds.width,
+        fill = KERNEL_IMAGE_FILL,
+        comfortable = KERNEL_IMAGE_DEFAULT
+    )
+
+    /**
+     * Size the single kernel view's image to its [room], between [KERNEL_IMAGE_MIN], below which it overruns the
+     * room, and [KERNEL_IMAGE_MAX].
+     */
+    private fun fitKernelImage(room: ShaftRoom) {
+        val fitted = room.squareSide(KERNEL_IMAGE_MIN, KERNEL_IMAGE_MAX)
+        if (abs(fitted - kernelImageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            kernelImageSide = fitted
+            imageBox.resize(fitted, fitted)
+        }
     }
 
     /**
@@ -360,38 +398,48 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
                 val conv = connector as? ConvolutionConnector
                 if (conv != null && conv.kernelGridMode) {
-                    // Grid mode: size the grid to the space between the layers, then center it, together with
-                    // the label box above it and the caption below it, on the midpoint
-                    if (curve != null) fitKernelGrid(conv, curve)
-                    val gridY = py + (kernelGridChromeAbove - kernelGridChromeBelow) / 2.0
-                    kernelGridGroup.centerFullBoundsOnPoint(px, gridY)
+                    // Grid mode: size the grid to the room between the layers and place it there, with the label
+                    // box above it and the caption below it
+                    val room = curve?.let { kernelGridRoom(it) }
+                    if (room != null) fitKernelGrid(conv, room)
+                    val gridX = room?.centerX ?: px
+                    val gridY = room?.centerY ?: py
+                    kernelGridGroup.centerFullBoundsOnPoint(gridX, gridY)
                     val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
                     shapeCaption.centerFullBoundsOnPoint(
-                        px, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
+                        gridX, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
                     )
                     interactionBox.centerFullBoundsOnPoint(
-                        px, gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
+                        gridX,
+                        gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
                     )
-                } else if (connector is ConvolutionConnector) {
-                    imageBox.centerFullBoundsOnPoint(px, py)
+                } else if (conv != null) {
+                    // Single kernel mode: size the image to the room between the layers and place it there,
+                    // with its buttons, labels and caption around it
+                    val room = curve?.let { kernelImageRoom(it) }
+                    if (room != null) fitKernelImage(room)
+                    val imageX = room?.centerX ?: px
+                    val imageY = room?.centerY ?: py
+                    imageBox.centerFullBoundsOnPoint(imageX, imageY)
 
-                    val hi = imgSize.toDouble() / 2.0
-                    val gap = 3.0
+                    val hi = kernelImageSide / 2.0
+                    val gap = KERNEL_IMAGE_BUTTON_GAP
                     val bh = filterPrevButton!!.fullBounds.height
                     val bw = channelPrevButton!!.fullBounds.width
 
-                    filterPrevButton.centerFullBoundsOnPoint(px, py - hi - gap - bh / 2)
-                    filterNextButton!!.centerFullBoundsOnPoint(px, py + hi + gap + bh / 2)
-                    channelPrevButton.centerFullBoundsOnPoint(px - hi - gap - bw / 2, py)
-                    channelNextButton!!.centerFullBoundsOnPoint(px + hi + gap + bw / 2, py)
+                    filterPrevButton.centerFullBoundsOnPoint(imageX, imageY - hi - gap - bh / 2)
+                    filterNextButton!!.centerFullBoundsOnPoint(imageX, imageY + hi + gap + bh / 2)
+                    channelPrevButton.centerFullBoundsOnPoint(imageX - hi - gap - bw / 2, imageY)
+                    channelNextButton!!.centerFullBoundsOnPoint(imageX + hi + gap + bw / 2, imageY)
 
-                    val bottomEdge = py + hi + gap + bh
-                    detailLabel.centerFullBoundsOnPoint(px, bottomEdge + 6.0)
+                    val bottomEdge = imageY + hi + gap + bh
+                    detailLabel.centerFullBoundsOnPoint(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
                     shapeCaption.centerFullBoundsOnPoint(
-                        px, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + 3.0
+                        imageX, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
                     )
                     interactionBox.centerFullBoundsOnPoint(
-                        px, py - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - 1.0
+                        imageX,
+                        imageY - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
                     )
                 } else {
                     interactionBox.centerFullBoundsOnPoint(px, py)
@@ -535,7 +583,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         g2.drawNumericOverlay(
             data = slice,
             rows = kSize, cols = kSize,
-            imageWidth = imgSize.toDouble(), imageHeight = imgSize.toDouble(),
+            imageWidth = kernelImageSide, imageHeight = kernelImageSide,
             scalingFactor = networkPanel.scalingFactor,
             decimalPlaces = NetworkPreferences.neuronActivationDecimalPlaces,
             offsetX = boxOffset.x,
@@ -700,7 +748,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 Triple(kernelGridGroup.offset.x + cell.x, kernelGridGroup.offset.y + cell.y, cell.width)
             } else {
                 if (filter != currentFilter || channel != currentInputChannel) continue
-                Triple(imageBox.offset.x, imageBox.offset.y, imgSize.toDouble())
+                Triple(imageBox.offset.x, imageBox.offset.y, kernelImageSide)
             }
             val cellSize = side / k
             // Thinner on small tiles so the outline does not swallow the weight it marks
@@ -830,14 +878,34 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         /** Room set aside for the row or column labels when fitting the grid, whatever font they end up in. */
         private const val KERNEL_LABEL_ALLOWANCE = 16.0
 
-        /** How far the grid may extend across the direction its layers are separated in. */
+        /** How far the grid may extend in a direction its layers do not limit it in. */
         private const val KERNEL_GRID_CROSS_EXTENT = 240.0
-
-        /** Space kept clear between the grid, with its label box and caption, and each end of the arrow's shaft. */
-        private const val KERNEL_GRID_MARGIN = 6.0
 
         private const val KERNEL_GRID_LABEL_BOX_GAP = 3.0
 
         private const val KERNEL_GRID_CAPTION_GAP = 4.0
+
+        /** Side the single kernel view's image reaches by filling the gap between the layers. */
+        private const val KERNEL_IMAGE_DEFAULT = 60.0
+
+        private const val KERNEL_IMAGE_MIN = 24.0
+
+        private const val KERNEL_IMAGE_MAX = 120.0
+
+        /**
+         * Fraction of the gap between the layers that the single kernel view takes up, image and all, once its
+         * image is larger than [KERNEL_IMAGE_DEFAULT].
+         */
+        private const val KERNEL_IMAGE_FILL = 0.6
+
+        /** Space between the single kernel view's image and each navigation button. */
+        private const val KERNEL_IMAGE_BUTTON_GAP = 3.0
+
+        private const val KERNEL_IMAGE_LABEL_BOX_GAP = 1.0
+
+        /** Distance from the navigation button below the single kernel view's image to the middle of its label. */
+        private const val KERNEL_IMAGE_DETAIL_OFFSET = 6.0
+
+        private const val KERNEL_IMAGE_CAPTION_GAP = 3.0
     }
 }

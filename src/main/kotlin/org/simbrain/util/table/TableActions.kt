@@ -14,7 +14,6 @@ import org.simbrain.util.widgets.CorrPlotPanel
 import org.simbrain.workspace.WorkspacePreferences
 import org.simbrain.workspace.gui.SimbrainDesktop
 import smile.io.Read
-import smile.math.matrix.Matrix
 import smile.plot.swing.BoxPlot
 import smile.plot.swing.Histogram
 import smile.plot.swing.PlotGrid
@@ -365,7 +364,14 @@ val SimbrainJTable.importCsv
     get() = importCSVAction()
 
 /**
- * @dataTypes The data types to use for all cells in the table. Defaults to String. TODO: provide support for per-column data types.
+ * Import a csv file into this table. Once a file is chosen, a [CsvImportDialog] previews it so the user can say
+ * whether it starts with column or row names.
+ *
+ * @param fixedColumns if true the file must have as many columns as the table; if false the table takes the shape
+ * of the file
+ * @param skipImportOptions if true, import with [defaultOptions] without showing the dialog
+ * @param dataType the type of every column when the table takes the shape of the file. If null, a column is numeric
+ * when all of its values are numbers and text otherwise.
  */
 fun SimbrainJTable.importCSVAction(
     fixedColumns: Boolean = true,
@@ -380,98 +386,52 @@ fun SimbrainJTable.importCSVAction(
     description = "Import comma separated values file",
     iconPath = "menu_icons/import.png"
 ) {
-    fun import(options: ImportExportOptions = defaultOptions) {
-        val chooser = SFileChooser(customDir?:WorkspacePreferences.tableDirectory, "", "csv")
-        val csvFile = chooser.showOpenDialog(parentComponent)
-        fun checkColumns(numColumns: Int): Boolean {
-            if (numColumns != model.columnCount) {
-                showMessage("Trying to import a table with the wrong number of columns ", MessageKind.WARNING)
-                return false
-            }
-            return true
-        }
-        if (csvFile != null) {
-            UnsavedChanges.mark()
-            if (customDir == null) {
-                WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
-            }
-            model.let {
-                if (it is BasicDataFrame) {
-                    val rawData = Utils.getStringMatrix(csvFile)
-                    val importedData = createFrom2DArray(rawData, options, dataType)
-                    if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        // Perform cell-by-cell data parsing with type validation
-                        val numRows = importedData.data.size
-                        val numCols = importedData.data.firstOrNull()?.size ?: 0
-                        
-                        // Resize the table if needed
-                        if (it.rowCount != numRows) {
-                            it.setNumRows(numRows)
-                        }
-                        
-                        // Update column names and row names first
-                        it.columnNames = importedData.columnNames
-                        it.rowNames = importedData.rowNames
-                        
-                        // Parse each cell individually using the column's data type
-                        for (row in 0 until numRows) {
-                            for (col in 0 until numCols) {
-                                val rawValue = importedData.data[row][col]
-                                it.withValidatedValue(rawValue, col) { parsedValue ->
-                                    it.data[row][col] = parsedValue
-                                }
-                            }
-                        }
-                        
-                        it.fireTableStructureChanged()
-                    }
-                } else if (it is MatrixDataFrame) {
-                    val rawData = Utils.getDoubleMatrix(csvFile).map { l -> l.toTypedArray() }.toTypedArray()
-                    val importedData = createFrom2DArray(rawData, options, dataType)
-                    if (!fixedColumns || checkColumns(importedData.columnCount)) {
-                        // Perform cell-by-cell data parsing for MatrixDataFrame (all numeric)
-                        val numRows = importedData.data.size
-                        val numCols = importedData.data.firstOrNull()?.size ?: 0
-                        
-                        // Create new matrix with proper dimensions
-                        it.data = Matrix(numRows, numCols)
-                        
-                        // Update column names and row names first
-                        it.columnNames = importedData.columnNames
-                        it.rowNames = importedData.rowNames
-                        
-                        // Parse each cell individually using tryParsingDouble
-                        for (row in 0 until numRows) {
-                            for (col in 0 until numCols) {
-                                val rawValue = importedData.data[row][col]
-                                try {
-                                    it.data[row, col] = tryParsingDouble(rawValue)
-                                } catch (e: NumberFormatException) {
-                                    // If parsing fails, use 0.0 as default for numeric matrix
-                                    it.data[row, col] = 0.0
-                                }
-                            }
-                        }
-                        
-                        it.fireTableStructureChanged()
-                    }
-                } else if (it is SmileDataFrame) {
-                    val data = Read.csv(csvFile.absolutePath)
-                    if (!fixedColumns || checkColumns(data.ncol())) {
-                        it.df = data
-                        it.fireTableStructureChanged()
-                    }
-                }
-            }
-        }
+    val chooser = SFileChooser(customDir ?: WorkspacePreferences.tableDirectory, "", "csv")
+    val csvFile = chooser.showOpenDialog(parentComponent) ?: return@createAction
+    if (customDir == null) {
+        WorkspacePreferences.tableDirectory = csvFile.parentFile.absolutePath
     }
+
+    val table = model
+    if (table is SmileDataFrame) {
+        val data = Read.csv(csvFile.absolutePath)
+        if (fixedColumns && data.ncol() != table.columnCount) {
+            showMessage("Trying to import a table with the wrong number of columns ", MessageKind.WARNING)
+        } else {
+            UnsavedChanges.mark()
+            table.df = data
+            table.fireTableStructureChanged()
+        }
+        return@createAction
+    }
+
+    val raw = Utils.getStringMatrix(csvFile) ?: return@createAction
+    val requiredColumnCount = if (fixedColumns) table.columnCount else null
+
+    fun plan(options: ImportExportOptions) = planCsvImport(
+        raw,
+        options,
+        existingColumns = table.columns,
+        fixedColumns = fixedColumns,
+        dataType = if (table is MatrixDataFrame) Double::class else dataType
+    )
+
+    fun import(plan: CsvImportPlan) {
+        UnsavedChanges.mark()
+        table.applyCsvImport(plan)
+    }
+
     if (skipImportOptions) {
-        import()
+        val plan = plan(defaultOptions)
+        val problem = plan.blockingProblem(requiredColumnCount)
+        if (problem != null) {
+            showMessage(problem, MessageKind.WARNING)
+        } else {
+            import(plan)
+        }
     } else {
-        val options = ImportExportOptions()
-        options.createEditorDialog("Import CSV") {
-            import(it)
-        }.display(parentComponent, isModal)
+        CsvImportDialog(csvFile.name, raw, requiredColumnCount, makePlan = ::plan, onImport = ::import)
+            .display(parentComponent, isModal)
     }
 }
 

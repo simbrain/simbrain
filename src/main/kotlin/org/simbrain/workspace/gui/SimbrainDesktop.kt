@@ -179,8 +179,8 @@ object SimbrainDesktop {
     val bottomDockSplitter = SimbrainDesktopDock(
         mainComponent = sideDockSplitter,
         dockComponent = JTabbedPane().apply {
-            addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
             addTab("Terminal", null, terminalPanel, "Simbrain command line")
+            addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
             addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
             addChangeListener {
                 PerformanceMonitor.enabled = selectedComponent is PerformanceMonitorPanel

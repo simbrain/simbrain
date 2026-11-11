@@ -14,6 +14,7 @@ import org.simbrain.util.propertyeditor.TypeOptionVisibility
 import java.math.BigDecimal
 import java.math.MathContext
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.math.floor
 import kotlin.reflect.KClass
 import kotlin.reflect.KMutableProperty1
 import kotlin.reflect.KProperty1
@@ -24,6 +25,8 @@ import kotlin.reflect.jvm.isAccessible
 
 private const val MAX_VALUE_LENGTH = 200
 private const val NUMBER_PRECISION = 6
+private const val MIN_PARTIAL_NAME = 3
+private const val MAX_CACHED_EXPRESSIONS = 200
 
 class EditableProperty(
     val owner: Any,
@@ -88,14 +91,17 @@ fun findProperty(obj: Any, key: String, exactOnly: Boolean = false): EditablePro
     return findProperty(property.value ?: return null, key.substringAfter("."), exactOnly)
 }
 
-/** Set a property from text, converting to the type of the property. */
+/**
+ * Set a property from text, converting to the type of the property. A number can be given as an expression, as in
+ * `rand()*10` or `activation*2`, evaluated in [context].
+ */
 @Suppress("UNCHECKED_CAST")
-fun assign(obj: Any, key: String, text: String) {
+fun assign(obj: Any, key: String, text: String, context: ExpressionContext = ExpressionContext { propertyValue(obj, it) }) {
     val found = findProperty(obj, key)
         ?: fail("${obj::class.simpleName} has no property $key. Use show to see its properties.")
     if (found.displayOnly) fail("${found.name} is read-only.")
     val property = found.property as? KMutableProperty1<Any, Any?> ?: fail("${found.name} is read-only.")
-    val value = convert(found, text)
+    val value = convert(found, text, context)
     if (found.useLegacySetter) property.invokeLegacySetter(found.owner, value) else property.setter.call(found.owner, value)
     (found.owner as? EditableObject)?.onCommit()
 }
@@ -110,17 +116,48 @@ fun valueOptions(property: EditableProperty): List<String> {
     }
 }
 
-private fun convert(property: EditableProperty, text: String): Any? {
+/** The value of a property for use in an expression, or [Expression.MISSING] if there is none. */
+fun propertyValue(obj: Any, name: String): Any? {
+    val found = findProperty(obj, name, exactOnly = true)
+        ?: findProperty(obj, name).takeIf { name.length >= MIN_PARTIAL_NAME }
+        ?: return Expression.MISSING
+    return found.value
+}
+
+private val parsedExpressions = ConcurrentHashMap<String, Expression>()
+
+private fun parsedExpression(text: String): Expression {
+    if (parsedExpressions.size > MAX_CACHED_EXPRESSIONS) parsedExpressions.clear()
+    return parsedExpressions.getOrPut(text) { Expression.parse(text) }
+}
+
+private val identifier = Regex("[A-Za-z_][A-Za-z0-9_]*")
+
+private fun evaluateNumber(property: EditableProperty, text: String, context: ExpressionContext): Double {
+    text.toDoubleOrNull()?.let { return it }
+    return try {
+        parsedExpression(text).evaluateNumber(context)
+    } catch (e: CommandException) {
+        if (identifier.matches(text)) fail("${property.name} needs a number: $text") else throw e
+    }
+}
+
+private fun convert(property: EditableProperty, text: String, context: ExpressionContext): Any? {
     val type = property.property.returnType
     if (text.equals("none", ignoreCase = true) && type.isMarkedNullable) return null
     val cls = type.classifier as? KClass<*>
-    fun <T : Any> number(parse: (String) -> T?): T = parse(text) ?: fail("${property.name} needs a number: $text")
+    fun number() = evaluateNumber(property, text, context)
+    fun whole(): Long {
+        val value = number()
+        if (value != floor(value) || value.isInfinite()) fail("${property.name} needs a whole number: ${formatValue(value)}")
+        return value.toLong()
+    }
     return when {
-        cls == Double::class -> number(String::toDoubleOrNull)
-        cls == Float::class -> number(String::toFloatOrNull)
-        cls == Int::class -> number(String::toIntOrNull)
-        cls == Long::class -> number(String::toLongOrNull)
-        cls == Short::class -> number(String::toShortOrNull)
+        cls == Double::class -> number()
+        cls == Float::class -> number().toFloat()
+        cls == Int::class -> whole().toInt()
+        cls == Long::class -> whole()
+        cls == Short::class -> whole().toShort()
         cls == Boolean::class -> parseBoolean(property, text)
         cls == String::class -> text
         cls?.java?.isEnum == true -> chooseOption(cls.java.enumConstants.associateBy { it.toString() }, text, property.name)

@@ -347,7 +347,7 @@ class CommandShellTest {
 
     @Test
     fun `a bad condition is reported`() {
-        assertEquals("Expected a condition like activation>0.5: oops", shellWithNetwork().run("ls net1 where oops"))
+        assertEquals("Nothing has a property called oops. Use show to see property names.", shellWithNetwork().run("ls net1 where oops"))
     }
 
     @Test

@@ -49,20 +49,16 @@ val workspaceCommands: CommandRegistry = commands {
             "ls net1/Neuron_*",
             "ls net1 where activation>0.5",
             "ls net1 where type=Synapse",
+            "ls net1 where type=Neuron and fanIn=0",
             "ls net1 | grep Synapse"
         ),
         usage = "ls [path] [where condition]",
         description = "List contents, or what matches a pattern.",
         listsItems = true,
+        takesWhere = true,
         completer = pathCompletion
     ) { args ->
-        val whereAt = args.indexOf("where")
-        val pathArgs = if (whereAt >= 0) args.take(whereAt) else args
-        val condition = if (whereAt >= 0) Condition.parse(args.drop(whereAt + 1).joinToString(" ")) else null
-        val listed = listedNodes(pathArgs)
-        val nodes = if (condition == null) listed else buildList {
-            forEachWithProgress(listed, "Checking") { if (condition.matches(it)) add(it) }
-        }
+        val nodes = applyWhere(listedNodes(args))
         if (nodes.isEmpty()) "(empty)" else nodes.joinToString("\n") { quoted(it.name) }
     }
 
@@ -88,13 +84,14 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "show",
         group = "Inspect",
+        takesWhere = true,
         examples = listOf(
             "show",
             "show net1/Neuron_1",
             "show @",
             "show net1/Neuron_1 | grep rule"
         ),
-        usage = "show [path]",
+        usage = "show [path] [where condition]",
         description = "Show the properties of one or more objects.",
         completer = pathCompletion
     ) { args ->
@@ -106,11 +103,12 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "get",
         group = "Inspect",
+        takesWhere = true,
         examples = listOf(
             "get net1/Neuron_1 activation",
             "get net1/Neuron_* activation"
         ),
-        usage = "get <path> <property>",
+        usage = "get <path> <property> [where condition]",
         description = "Print one property of one or more objects.",
         completer = { prior, partial ->
             if (prior.isEmpty()) pathCandidates(partial) else propertyCandidates(prior.first(), partial, "")
@@ -128,12 +126,14 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "select",
         group = "Inspect",
+        takesWhere = true,
         examples = listOf(
             "select net1/Neuron_*",
             "select net1/input",
+            "select net1/* where activation>0.5",
             "select none"
         ),
-        usage = "select <path or none>",
+        usage = "select <path or none> [where condition]",
         description = "Select models in the GUI, replacing the current selection. Refer to them afterwards with @.",
         completer = pathCompletion
     ) { args ->
@@ -153,10 +153,17 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             "set net1/Neuron_1 activation=1",
             "set net1/Neuron_* rule=Sigmoidal rule.slope=2",
-            "set @ clamped=true"
+            "set @ clamped=true",
+            "set Neuron_{1..10} activation=rand()*10",
+            "set net1/* strength=randn(0,0.1) where type=Synapse",
+            "set net1/Neuron_* activation=i/n"
         ),
-        usage = "set <path> key=value ...",
-        description = "Set properties. Selectable types are set by name, and their settings use dots.",
+        usage = "set <path> key=value ... [where condition]",
+        description = "Set properties. Selectable types are set by name, and their settings use dots. A number can be " +
+                "an expression, worked out for each object: use + - * / ^, rand(), rand(a,b), randn(mean,sd), abs, " +
+                "sqrt, exp, log, min, max, round, the object's own properties, i for its position from 0, and n for " +
+                "how many there are. Leave out spaces, or put the expression in quotes.",
+        takesWhere = true,
         completer = { prior, partial ->
             when {
                 prior.isEmpty() -> pathCandidates(partial)
@@ -168,8 +175,10 @@ val workspaceCommands: CommandRegistry = commands {
         val parsed = Arguments.parse(args)
         if (parsed.words.size != 1 || parsed.options.isEmpty()) fail("Usage: set <path> key=value ...")
         val nodes = targets(parsed.words.single())
+        var index = 0
         forEachWithProgress(nodes, "Setting") { node ->
-            parsed.options.forEach { (key, value) -> assign(editableObject(node), key, value) }
+            val context = expressionContext(node, index++, nodes.size)
+            parsed.options.forEach { (key, value) -> assign(editableObject(node), key, value, context) }
         }
         if (nodes.size == 1) "" else "Set ${nodes.size} objects."
     }
@@ -200,6 +209,7 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "connect",
         group = "Build",
+        takesWhere = true,
         examples = listOf(
             "connect net1/Neuron_1 net1/Neuron_2 strength=0.5",
             "connect net1/input net1/output",
@@ -217,6 +227,7 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "couple",
         group = "Build",
+        takesWhere = true,
         examples = listOf(
             "couple net1/Neuron_1 \"plot1/Series 1\"",
             "couple net1/Neuron_1:activation net2/Neuron_1:addInputValue"
@@ -285,12 +296,13 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "rm",
         group = "Build",
+        takesWhere = true,
         examples = listOf(
             "rm net1/Synapse_1",
             "rm net1/Neuron_*",
             "rm net1"
         ),
-        usage = "rm <path>",
+        usage = "rm <path> [where condition]",
         description = "Remove models or components. There is no undo.",
         completer = pathCompletion
     ) { args -> remove(targets(onePath(args))) }
@@ -298,12 +310,13 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "randomize",
         group = "Build",
+        takesWhere = true,
         examples = listOf(
             "randomize net1",
             "randomize net1/Neuron_1",
             "randomize @"
         ),
-        usage = "randomize <path>",
+        usage = "randomize <path> [where condition]",
         description = "Randomize models, or everything in a network.",
         completer = pathCompletion
     ) { args ->
@@ -315,11 +328,12 @@ val workspaceCommands: CommandRegistry = commands {
     command(
         name = "clear",
         group = "Build",
+        takesWhere = true,
         examples = listOf(
             "clear net1",
             "clear @"
         ),
-        usage = "clear <path>",
+        usage = "clear <path> [where condition]",
         description = "Clear models, or the activations in a network.",
         completer = pathCompletion
     ) { args ->
@@ -496,8 +510,9 @@ val workspaceCommands: CommandRegistry = commands {
                 group + "\n" + members.joinToString("\n") { "  ${it.usage}" }
             } + "\n\nEnter help <command> for details and examples. Paths look like net1/Neuron_1, and a name by " +
                     "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
-                    "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. Add | grep " +
-                    "<text> to filter output. Tab completes, and Esc cancels a long command."
+                    "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. End a line with " +
+                    "where <condition> to act only on some objects, and | grep <text> to filter output. Numbers can be " +
+                    "expressions, as in rand()*10 (see help set). Tab completes, and Esc cancels a long command."
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
             val examples = command.examples.joinToString("") { "\n  $it" }
@@ -516,42 +531,6 @@ private class Arguments(val words: List<String>, val options: Map<String, String
     }
 }
 
-private class Condition(val key: String, val operator: String, val text: String) {
-
-    fun matches(node: Node): Boolean {
-        val actual = if (key.equals("type", ignoreCase = true)) node.value::class.simpleName else readValue(node, key)
-        actual ?: return false
-        val left = (actual as? Number)?.toDouble() ?: formatValue(actual).toDoubleOrNull()
-        val right = text.toDoubleOrNull()
-        if (left != null && right != null) {
-            return when (operator) {
-                ">" -> left > right
-                "<" -> left < right
-                ">=" -> left >= right
-                "<=" -> left <= right
-                "!=" -> left != right
-                else -> left == right
-            }
-        }
-        val same = formatValue(actual).equals(text, ignoreCase = true)
-        return when (operator) {
-            "=" -> same
-            "!=" -> !same
-            else -> false
-        }
-    }
-
-    companion object {
-        private val pattern = Regex("""^\s*([\w.]+)\s*(>=|<=|!=|=|>|<)\s*(.+?)\s*$""")
-
-        fun parse(text: String): Condition {
-            val match = pattern.find(text) ?: fail("Expected a condition like activation>0.5: $text")
-            val (key, operator, value) = match.destructured
-            return Condition(key, operator, value)
-        }
-    }
-}
-
 private fun onePath(args: List<String>): String =
     args.singleOrNull() ?: fail("Expected one path. Put names containing spaces in quotes.")
 
@@ -561,8 +540,10 @@ private suspend fun CommandShell.listedNodes(args: List<String>): List<Node> {
         1 -> args.single()
         else -> fail("Expected one path. Put names containing spaces in quotes.")
     }
-    if (path == "@" || (path != null && ('*' in path || '?' in path))) return targets(path)
-    val node = if (path == null) current else resolve(path)
+    if (path == "@") return selection()
+    val found = if (path == null) listOf(current) else resolveAll(path).ifEmpty { fail(notFound(path)) }
+    if (found.size > 1 || path?.let { '*' in it || '?' in it || '{' in it } == true) return found
+    val node = found.single()
     val children = childrenOf(node.value) ?: fail("${node.name} has no contents. Use show to see its properties.")
     return children.map { (name, value) -> Node(node.path + name, value) }
 }
@@ -599,6 +580,16 @@ private fun extraFacts(value: Any): Map<String, Any> = when (value) {
     is Synapse -> linkedMapOf("source" to value.source.id.orEmpty(), "target" to value.target.id.orEmpty())
     else -> emptyMap()
 }
+
+/** The value of a name in a `where` condition or an expression about [node], or [Expression.MISSING]. */
+fun valueOf(node: Node, name: String): Any? {
+    if (name.equals("type", ignoreCase = true)) return node.value::class.simpleName
+    val value = propertyValue(editableObject(node), name)
+    if (value !== Expression.MISSING) return value
+    return extraFacts(node.value)[name] ?: Expression.MISSING
+}
+
+private fun expressionContext(node: Node, index: Int, count: Int) = ExpressionContext(index, count) { valueOf(node, it) }
 
 private fun readValue(node: Node, key: String): Any? =
     findProperty(editableObject(node), key)?.let { it.value ?: "none" } ?: extraFacts(node.value)[key]
@@ -648,8 +639,12 @@ private suspend fun CommandShell.addNeurons(arguments: Arguments): String {
     val options = arguments.options.toMutableMap()
     val network = targetNetwork(options.remove("in"))
     val layout = layoutFrom(options.remove("layout"))
-    val neurons = List(countFrom(arguments.words.drop(1))) {
-        Neuron().apply { options.forEach { (key, value) -> assign(this, key, value) } }
+    val count = countFrom(arguments.words.drop(1))
+    val neurons = List(count) { index ->
+        Neuron().apply {
+            val context = ExpressionContext(index, count) { propertyValue(this, it) }
+            options.forEach { (key, value) -> assign(this, key, value, context) }
+        }
     }
     network.addNetworkModels(neurons)
     layout.setInitialLocation(neurons.topLeftLocation)
@@ -667,7 +662,9 @@ private suspend fun CommandShell.addCollection(arguments: Arguments): String {
         if (findProperty(collection, key, exactOnly = true) != null) {
             assign(collection, key, value)
         } else {
-            neurons.forEach { assign(it, key, value) }
+            neurons.forEachIndexed { index, neuron ->
+                assign(neuron, key, value, ExpressionContext(index, neurons.size) { propertyValue(neuron, it) })
+            }
         }
     }
     network.addNetworkModels(neurons)
@@ -714,14 +711,19 @@ private suspend fun CommandShell.connect(arguments: Arguments): String {
     val targetCollection = destinations.singleOrNull()?.value as? NeuronCollection
     if (sourceCollection != null && targetCollection != null) {
         val group = SynapseGroup(sourceCollection, targetCollection, strategy)
-        group.synapses.forEach { synapse -> synapseOptions.forEach { (key, value) -> assign(synapse, key, value) } }
+        group.synapses.forEachIndexed { index, synapse -> configureSynapse(synapse, synapseOptions, index, group.synapses.size) }
         network.addNetworkModel(group)
         return "Added ${group.id} with ${group.synapses.size} synapse(s)."
     }
     val synapses = strategy.connectNeurons(neuronsIn(sources), neuronsIn(destinations))
-    synapses.forEach { synapse -> synapseOptions.forEach { (key, value) -> assign(synapse, key, value) } }
+    synapses.forEachIndexed { index, synapse -> configureSynapse(synapse, synapseOptions, index, synapses.size) }
     network.addNetworkModels(synapses)
     return "Added ${synapses.size} synapse(s)."
+}
+
+private fun configureSynapse(synapse: Synapse, options: List<Map.Entry<String, String>>, index: Int, count: Int) {
+    val context = ExpressionContext(index, count) { propertyValue(synapse, it) }
+    options.forEach { (key, value) -> assign(synapse, key, value, context) }
 }
 
 private fun neuronsIn(nodes: List<Node>): List<Neuron> = nodes.flatMap { node ->

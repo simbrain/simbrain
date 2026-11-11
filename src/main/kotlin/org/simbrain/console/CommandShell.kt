@@ -2,7 +2,9 @@
  * The Simbrain command language: a line is a command name followed by words and `key=value` options, and the workspace
  * is navigated like a filesystem of components and their contents. A bare name is found wherever it is, as long as it
  * is in only one place. Paths may use `*`, `?`, `**`, and shell-style `{1..10}` ranges, and `@` stands for what is
- * selected in the GUI. Output can be filtered with `| grep`. There are deliberately no variables or loops.
+ * selected in the GUI. A `where` condition at the end of a line filters what a command acts on, and numeric values
+ * can be expressions evaluated for each object (see `Expressions.kt`). Output can be filtered with `| grep`. There
+ * are deliberately no variables or loops.
  *
  * [CommandShell] parses lines, tracks the current location, resolves paths, and completes partial input. The commands
  * themselves are declared with [commands] in `WorkspaceCommands.kt`.
@@ -13,6 +15,7 @@ import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.currentCoroutineContext
 import kotlinx.coroutines.ensureActive
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.yield
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -27,6 +30,10 @@ import org.simbrain.workspace.gui.SimbrainDesktop
 import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.IdentityHashMap
+import java.util.concurrent.ConcurrentHashMap
+import kotlin.coroutines.AbstractCoroutineContextElement
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
 
 private const val MAX_SOURCE_DEPTH = 8
@@ -62,6 +69,7 @@ val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.m
  * @param listsItems if true, the action returns one item per line, which are shown side by side unless piped
  * @param immediate if true, the command runs as soon as it is entered instead of waiting for earlier commands, as
  * `stop` must
+ * @param takesWhere whether a `where` condition at the end of the line filters what the command acts on
  */
 class Command(
     val name: String,
@@ -71,6 +79,7 @@ class Command(
     val examples: List<String>,
     val listsItems: Boolean,
     val immediate: Boolean,
+    val takesWhere: Boolean,
     val completer: Completer,
     val action: suspend CommandShell.(args: List<String>) -> String
 )
@@ -91,10 +100,11 @@ class CommandRegistry {
         examples: List<String> = emptyList(),
         listsItems: Boolean = false,
         immediate: Boolean = false,
+        takesWhere: Boolean = false,
         completer: Completer = noCompletion,
         action: suspend CommandShell.(args: List<String>) -> String
     ) {
-        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, immediate, completer, action)
+        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, immediate, takesWhere, completer, action)
     }
 }
 
@@ -170,7 +180,14 @@ class CommandShell(
         val parsed = parseLine(line)
         val name = parsed.words.firstOrNull() ?: return ""
         val command = registry[name] ?: fail("Unknown command: $name. Enter help for a list.")
-        val output = command.action(this, parsed.words.drop(1))
+        val whereAt = parsed.words.indexOf("where").takeIf { it > 0 }
+        val args = parsed.words.subList(1, whereAt ?: parsed.words.size)
+        val condition = whereAt?.let { at ->
+            if (!command.takesWhere) fail("$name can't be used with where.")
+            val text = parsed.words.drop(at + 1).joinToString(" ").ifBlank { fail("Expected a condition after where.") }
+            WhereCondition(Expression.parse(text))
+        }
+        val output = withContext(condition ?: EmptyCoroutineContext) { command.action(this@CommandShell, args) }
         return when {
             parsed.filter != null -> output.lines().filter { it.contains(parsed.filter, ignoreCase = true) }.joinToString("\n")
             command.listsItems -> sideBySide(output.lines())
@@ -279,24 +296,45 @@ class CommandShell(
         }
     }
 
-    private fun notFound(path: String) =
+    fun notFound(path: String) =
         if (isPattern(path) && !path.startsWith("/") && !path.startsWith("**")) {
             "Not found: $path. To look everywhere, use **/$path."
         } else {
             "Not found: $path"
         }
 
-    /** Find what a command's target refers to, which unlike [resolveAll] can also be the GUI selection. */
+    /**
+     * Find what a command acts on: what a path refers to, or the GUI selection for `@`, filtered by the command's
+     * `where` condition if it has one.
+     */
     suspend fun targets(path: String): List<Node> {
-        if (path == "@") {
-            val selected = selectedModels().ifEmpty { fail("Nothing is selected.") }
-            val nodesByModel = IdentityHashMap<Any, Node>()
-            networkComponents.forEach { component ->
-                descendants(Node(listOf(component.name), component)).forEach { nodesByModel.putIfAbsent(it.value, it) }
-            }
-            return selected.map { model -> nodesByModel[model] ?: Node(listOf(model.id.orEmpty()), model) }
+        val found = if (path == "@") selection() else resolveAll(path).ifEmpty { fail(notFound(path)) }
+        return applyWhere(found).ifEmpty { fail("Nothing matches the condition.") }
+    }
+
+    /** The models selected in the GUI. */
+    suspend fun selection(): List<Node> {
+        val selected = selectedModels().ifEmpty { fail("Nothing is selected.") }
+        val nodesByModel = IdentityHashMap<Any, Node>()
+        networkComponents.forEach { component ->
+            descendants(Node(listOf(component.name), component)).forEach { nodesByModel.putIfAbsent(it.value, it) }
         }
-        return resolveAll(path).ifEmpty { fail(notFound(path)) }
+        return selected.map { model -> nodesByModel[model] ?: Node(listOf(model.id.orEmpty()), model) }
+    }
+
+    /** Keep the nodes that meet the running command's `where` condition, or all of them if there is none. */
+    suspend fun applyWhere(nodes: List<Node>): List<Node> {
+        val condition = currentCoroutineContext()[WhereCondition]?.expression ?: return nodes
+        val found = ConcurrentHashMap.newKeySet<String>()
+        val kept = buildList {
+            forEachWithProgress(nodes, "Checking") { node ->
+                val context = ExpressionContext { name -> valueOf(node, name).also { if (it !== Expression.MISSING) found += name } }
+                if (condition.test(context)) add(node)
+            }
+        }
+        val unknown = condition.missingNames - found
+        if (kept.isEmpty() && unknown.isNotEmpty()) fail("Nothing has a property called ${unknown.first()}. Use show to see property names.")
+        return kept
     }
 
     /**
@@ -399,6 +437,11 @@ class CommandShell(
 
 /** Equal ignoring case and punctuation, so that neuron1 matches Neuron_1. */
 private fun looselyEqual(name: String, typed: String) = normalized(typed).let { it.isNotEmpty() && it == normalized(name) }
+
+/** The `where` condition of the running command. */
+private class WhereCondition(val expression: Expression) : AbstractCoroutineContextElement(WhereCondition) {
+    companion object Key : CoroutineContext.Key<WhereCondition>
+}
 
 /**
  * How far a long command has got, for a progress display.

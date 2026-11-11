@@ -1038,7 +1038,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             zoomToFitPage.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             boundsChanged.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             selected.on(Dispatchers.Default) { list ->
-                selectionManager.set(list.map { modelNodeMap.get(it) })
+                selectionManager.set(list.map { modelNodeMap.get<ScreenElement>(it) }.map { node ->
+                    if (node is NeuronCollectionNode) node.getInteractionBox() else node
+                })
             }.cancelWith(viewScope)
         }
 

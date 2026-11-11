@@ -1,3 +1,0 @@
-iterate() {
-	workspace.iterate();
-}

@@ -1,0 +1,31 @@
+package org.simbrain.console
+
+import org.simbrain.util.genericframe.GenericFrame
+import org.simbrain.workspace.gui.DesktopComponent
+import org.simbrain.workspace.gui.SimbrainDesktop
+import java.awt.BorderLayout
+import java.awt.Dimension
+import javax.swing.JMenu
+import javax.swing.JMenuBar
+
+/**
+ * A desktop window containing a [CommandConsolePanel].
+ */
+class ConsoleDesktopComponent(frame: GenericFrame, component: ConsoleComponent) :
+    DesktopComponent<ConsoleComponent>(frame, component) {
+
+    init {
+        preferredSize = Dimension(500, 400)
+        layout = BorderLayout()
+        add(CommandConsolePanel(component.workspace, SimbrainDesktop), BorderLayout.CENTER)
+
+        val actions = SimbrainDesktop.actionManager
+        parentFrame.setJMenuBar(JMenuBar().apply {
+            add(JMenu("File").apply {
+                add(actions.createRenameAction(this@ConsoleDesktopComponent))
+                addSeparator()
+                add(actions.createCloseAction(this@ConsoleDesktopComponent))
+            })
+        })
+    }
+}

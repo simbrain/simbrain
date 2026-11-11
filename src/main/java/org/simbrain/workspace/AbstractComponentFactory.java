@@ -40,6 +40,7 @@ import org.simbrain.world.textworld.gui.TextWorldDesktopComponent;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -137,6 +138,30 @@ public class AbstractComponentFactory {
         } else {
             throw new IllegalArgumentException("No component type factory is registered for " + name);
         }
+    }
+
+    /**
+     * The type names that can be passed to the create methods.
+     */
+    public Set<String> getWorkspaceComponentTypes() {
+        return workspaceComponentFactories.keySet();
+    }
+
+    /**
+     * Create a component of the given type with the given name, and add it to the workspace.
+     *
+     * @param type          a type from {@link #getWorkspaceComponentTypes()}
+     * @param componentName the name, or empty to use a default name
+     * @return the new component
+     */
+    public WorkspaceComponent createWorkspaceComponent(String type, String componentName) {
+        if (!workspaceComponentFactories.containsKey(type)) {
+            throw new IllegalArgumentException("No component type factory is registered for " + type);
+        }
+        WorkspaceComponent component = workspaceComponentFactories.get(type).get();
+        component.setName(componentName);
+        workspace.addWorkspaceComponent(component);
+        return component;
     }
 
     public DesktopComponent createGuiComponent(GenericFrame frame, WorkspaceComponent workspaceComponent) {

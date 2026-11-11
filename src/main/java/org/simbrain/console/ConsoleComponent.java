@@ -6,7 +6,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 /**
- * Workspace component corresponding to a beanshell window.
+ * Workspace component corresponding to a command line window.
  */
 public class ConsoleComponent extends WorkspaceComponent {
 

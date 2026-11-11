@@ -1,0 +1,372 @@
+/**
+ * The Simbrain command language: a line is a command name followed by words and `key=value` options, and the workspace
+ * is navigated like a filesystem of components and their contents. Paths may use `*` and `?`, and `@` stands for what
+ * is selected in the GUI. Output can be filtered with `| grep`. There are deliberately no variables, loops, or
+ * expressions.
+ *
+ * [CommandShell] parses lines, tracks the current location, resolves paths, and completes partial input. The commands
+ * themselves are declared with [commands] in `WorkspaceCommands.kt`.
+ */
+package org.simbrain.console
+
+import kotlinx.coroutines.CancellationException
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.desktop.NetworkDesktopComponent
+import org.simbrain.network.subnetworks.Subnetwork
+import org.simbrain.workspace.Workspace
+import org.simbrain.workspace.WorkspaceComponent
+import org.simbrain.workspace.gui.SimbrainDesktop
+import java.io.File
+import java.lang.reflect.InvocationTargetException
+
+private const val MAX_SOURCE_DEPTH = 8
+private const val MAX_LISTED = 500
+
+/** A problem with what the user entered. The message is shown as is. */
+class CommandException(message: String) : Exception(message)
+
+fun fail(message: String): Nothing = throw CommandException(message)
+
+/**
+ * A possible completion.
+ *
+ * @param text what to insert
+ * @param suffix what follows it when it is the only match: a space to start the next word, `/` to continue a path, or
+ * `=` to supply a value
+ */
+class Candidate(val text: String, val suffix: String = " ")
+
+/** Offers completions for a word, given the words before it. */
+typealias Completer = CommandShell.(priorArgs: List<String>, partial: String) -> List<Candidate>
+
+val noCompletion: Completer = { _, _ -> emptyList() }
+val pathCompletion: Completer = { _, partial -> pathCandidates(partial) }
+val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.map { it.name }, partial) }
+
+/**
+ * @param group the heading it appears under in help
+ * @param listsItems if true, the action returns one item per line, which are shown side by side unless piped
+ */
+class Command(
+    val name: String,
+    val usage: String,
+    val description: String,
+    val group: String,
+    val examples: List<String>,
+    val listsItems: Boolean,
+    val completer: Completer,
+    val action: suspend CommandShell.(args: List<String>) -> String
+)
+
+class CommandRegistry {
+
+    private val commandsByName = linkedMapOf<String, Command>()
+
+    val all: Collection<Command> get() = commandsByName.values
+
+    operator fun get(name: String): Command? = commandsByName[name]
+
+    fun command(
+        name: String,
+        usage: String = name,
+        description: String,
+        group: String = "",
+        examples: List<String> = emptyList(),
+        listsItems: Boolean = false,
+        completer: Completer = noCompletion,
+        action: suspend CommandShell.(args: List<String>) -> String
+    ) {
+        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, completer, action)
+    }
+}
+
+fun commands(block: CommandRegistry.() -> Unit) = CommandRegistry().apply(block)
+
+/** A location in the workspace: the names leading to it and the object found there. */
+class Node(val path: List<String>, val value: Any) {
+    val name: String get() = path.lastOrNull() ?: "Workspace"
+}
+
+/**
+ * @param line the line after completion
+ * @param options the possible completions, when there is more than one
+ */
+class Completion(val line: String, val options: List<String>)
+
+/**
+ * @param desktop the desktop, if there is one. Commands that need a GUI report that they cannot run without it.
+ * @param selectedModels what `@` refers to
+ */
+class CommandShell(
+    val workspace: Workspace,
+    val desktop: SimbrainDesktop? = null,
+    val registry: CommandRegistry = workspaceCommands,
+    private val selectedModels: suspend () -> List<NetworkModel> = { desktopSelection(workspace, desktop) }
+) {
+
+    @Volatile
+    private var currentPath: List<String> = emptyList()
+
+    private var sourceDepth = 0
+
+    /** Called by the `cls` command. */
+    var onClearScreen: () -> Unit = {}
+
+    private val root get() = Node(emptyList(), workspace)
+
+    val prompt: String get() = current.path.joinToString("/") + "> "
+
+    /** The current location, which falls back to the workspace if what it pointed to has been removed or renamed. */
+    val current: Node
+        get() = walk(root, currentPath).singleOrNull() ?: root.also { currentPath = emptyList() }
+
+    /**
+     * Run a line and return the text to show for it, which is empty when there is nothing to say. Problems with the
+     * line or the command are returned as text as well.
+     */
+    suspend fun execute(line: String): String {
+        return try {
+            runLine(line)
+        } catch (e: CommandException) {
+            e.message.orEmpty()
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            val cause = (e as? InvocationTargetException)?.targetException ?: e
+            "Error: ${cause.message ?: cause::class.simpleName}"
+        }
+    }
+
+    private suspend fun runLine(line: String): String {
+        val parsed = parseLine(line)
+        val name = parsed.words.firstOrNull() ?: return ""
+        val command = registry[name] ?: fail("Unknown command: $name. Enter help for a list.")
+        val output = command.action(this, parsed.words.drop(1))
+        return when {
+            parsed.filter != null -> output.lines().filter { it.contains(parsed.filter, ignoreCase = true) }.joinToString("\n")
+            command.listsItems -> sideBySide(output.lines())
+            else -> output
+        }
+    }
+
+    private fun sideBySide(items: List<String>): String {
+        val shown = items.take(MAX_LISTED).joinToString("  ")
+        return if (items.size > MAX_LISTED) "$shown\n... and ${items.size - MAX_LISTED} more" else shown
+    }
+
+    /** Run the lines of a file in order, stopping at the first problem. */
+    suspend fun runFile(file: File): String {
+        if (sourceDepth >= MAX_SOURCE_DEPTH) fail("Files are nested too deeply.")
+        sourceDepth++
+        try {
+            return file.readLines().mapIndexedNotNull { index, line ->
+                try {
+                    runLine(line).ifEmpty { null }
+                } catch (e: CommandException) {
+                    fail("${file.name}, line ${index + 1}: ${e.message}")
+                }
+            }.joinToString("\n")
+        } finally {
+            sourceDepth--
+        }
+    }
+
+    /** Find the one thing a path refers to. A path starting with `/` is from the workspace, any other from [current]. */
+    fun resolve(path: String): Node {
+        val found = resolveAll(path)
+        return when (found.size) {
+            0 -> fail("Not found: $path")
+            1 -> found.single()
+            else -> fail("$path matches ${found.size} things. Expected one.")
+        }
+    }
+
+    /** Find everything a path refers to, which can be several things if it uses `*` or `?`. */
+    fun resolveAll(path: String): List<Node> {
+        val start = if (path.startsWith("/")) root else current
+        return walk(start, path.split("/").filter { it.isNotEmpty() })
+    }
+
+    /** Find what a command's target refers to, which unlike [resolveAll] can also be the GUI selection. */
+    suspend fun targets(path: String): List<Node> {
+        if (path == "@") {
+            return selectedModels().map { model ->
+                val owner = networkComponents.firstOrNull { model in it.network.allModelsDeep }
+                Node(listOfNotNull(owner?.name, model.id), model)
+            }.ifEmpty { fail("Nothing is selected.") }
+        }
+        return resolveAll(path).ifEmpty { fail("Not found: $path") }
+    }
+
+    val networkComponents: List<NetworkComponent>
+        get() = workspace.componentList.filterIsInstance<NetworkComponent>()
+
+    /** The network that a node is in, if any. */
+    fun networkOf(node: Node): Network? =
+        networkComponents.firstOrNull { it.name == node.path.firstOrNull() }?.network
+
+    fun changeLocation(node: Node) {
+        currentPath = node.path
+    }
+
+    /** Complete the last word of [line]: a command name if it is the first word, otherwise as its command specifies. */
+    fun complete(line: String): Completion {
+        val scanned = scan(line)
+        if (scanned.pipes.isNotEmpty()) return Completion(line, emptyList())
+        val tokenStart = scanned.lastTokenStart ?: line.length
+        val partial = if (scanned.lastTokenStart != null) scanned.tokens.last() else ""
+        val priorTokens = if (scanned.lastTokenStart != null) scanned.tokens.dropLast(1) else scanned.tokens
+
+        val candidates = if (priorTokens.isEmpty()) {
+            wordCandidates(registry.all.map { it.name }, partial)
+        } else {
+            registry[priorTokens.first()]?.completer?.invoke(this, priorTokens.drop(1), partial).orEmpty()
+        }
+
+        val head = line.substring(0, tokenStart)
+        return when (candidates.size) {
+            0 -> Completion(line, emptyList())
+            1 -> {
+                val only = candidates.single()
+                val completed = if (only.suffix.isBlank()) quoted(only.text) + only.suffix else quoted(only.text + only.suffix)
+                Completion(head + completed, emptyList())
+            }
+            else -> {
+                val shared = candidates.map { it.text }.reduce { a, b -> a.commonPrefixWith(b, ignoreCase = true) }
+                val completed = if (shared.length > partial.length) head + quoted(shared) else line
+                Completion(completed, candidates.map { it.text })
+            }
+        }
+    }
+
+    fun wordCandidates(words: Collection<String>, partial: String) =
+        words.filter { it.startsWith(partial, ignoreCase = true) }.map { Candidate(it) }
+
+    fun pathCandidates(partial: String): List<Candidate> {
+        val prefix = partial.substring(0, partial.lastIndexOf('/') + 1)
+        val parent = if (prefix.isEmpty()) current else resolveAll(prefix).singleOrNull() ?: return emptyList()
+        val children = childrenOf(parent.value) ?: return emptyList()
+        return children
+            .filterKeys { it.startsWith(partial.removePrefix(prefix), ignoreCase = true) }
+            .map { (name, child) -> Candidate(prefix + name, if (childrenOf(child) != null) "/" else " ") }
+    }
+
+    private fun walk(start: Node, segments: List<String>): List<Node> =
+        segments.fold(listOf(start)) { nodes, segment -> nodes.flatMap { step(it, segment) } }
+
+    private fun step(node: Node, segment: String): List<Node> {
+        if (segment == ".") return listOf(node)
+        if (segment == "..") return walk(root, node.path.dropLast(1))
+        val children = childrenOf(node.value) ?: return emptyList()
+        val names = if ('*' in segment || '?' in segment) {
+            val pattern = globToRegex(segment)
+            children.keys.filter { pattern.matches(it) }
+        } else {
+            listOfNotNull(findChildName(children, segment))
+        }
+        return names.map { Node(node.path + it, children.getValue(it)) }
+    }
+
+    private fun findChildName(children: Map<String, Any>, segment: String): String? =
+        children.keys.firstOrNull { it == segment }
+            ?: children.keys.filter { it.equals(segment, ignoreCase = true) }.singleOrNull()
+            ?: children.filterValues { (it as? NetworkModel)?.label.equals(segment, ignoreCase = true) }.keys.singleOrNull()
+}
+
+private suspend fun desktopSelection(workspace: Workspace, desktop: SimbrainDesktop?): List<NetworkModel> {
+    if (desktop == null) return emptyList()
+    return workspace.componentList.filterIsInstance<NetworkComponent>().filter { it.isGuiOn }.flatMap { component ->
+        (desktop.getDesktopComponent(component) as NetworkDesktopComponent).networkPanel.selectionManager.selectedModels
+    }
+}
+
+private fun globToRegex(glob: String) = Regex(
+    glob.split("*").joinToString(".*") { part -> part.split("?").joinToString(".") { Regex.escape(it) } },
+    RegexOption.IGNORE_CASE
+)
+
+/** The named contents of a workspace object, in display order, or null if it is not something that has contents. */
+fun childrenOf(value: Any): Map<String, Any>? = when (value) {
+    is Workspace -> value.componentList.associateBy { it.name }
+    is NetworkComponent -> value.network.allModels.named { it.id }
+    is WorkspaceComponent -> value.attributeContainers.named { it.id }
+    is Subnetwork -> value.modelList.all.named { it.id }
+    is NeuronCollection -> value.neuronList.named { it.id }
+    is SynapseGroup -> value.synapses.named { it.id }
+    else -> null
+}
+
+private fun <T : Any> Iterable<T>.named(name: (T) -> String?): Map<String, Any> =
+    mapNotNull { item -> name(item)?.let { it to item } }.toMap(linkedMapOf())
+
+/** Puts a word in quotes if it needs them to be read back as one word. */
+fun quoted(word: String) = if (word.any { it.isWhitespace() }) "\"$word\"" else word
+
+/**
+ * @param tokens the words of the line, with quotes removed
+ * @param lastTokenStart where the last word begins, or null if the line does not end in a word
+ * @param pipes for each `|` outside quotes, how many words came before it
+ */
+private class ScannedLine(
+    val tokens: List<String>,
+    val lastTokenStart: Int?,
+    val unterminatedQuote: Boolean,
+    val pipes: List<Int>
+)
+
+private fun scan(line: String): ScannedLine {
+    val tokens = mutableListOf<String>()
+    val pipes = mutableListOf<Int>()
+    val word = StringBuilder()
+    var wordStart: Int? = null
+    var quote: Char? = null
+
+    fun endWord() {
+        if (wordStart != null) {
+            tokens += word.toString()
+            word.clear()
+            wordStart = null
+        }
+    }
+
+    for ((index, char) in line.withIndex()) {
+        when {
+            quote != null -> if (char == quote) quote = null else word.append(char)
+            char == '#' && wordStart == null -> break
+            char.isWhitespace() -> endWord()
+            char == '|' -> {
+                endWord()
+                pipes += tokens.size
+            }
+            else -> {
+                if (wordStart == null) wordStart = index
+                if (char == '"' || char == '\'') quote = char else word.append(char)
+            }
+        }
+    }
+    val lastStart = wordStart
+    endWord()
+    return ScannedLine(tokens, lastStart, quote != null, pipes)
+}
+
+/**
+ * @param words the words of the command
+ * @param filter the text given to `| grep`, if any
+ */
+private class ParsedLine(val words: List<String>, val filter: String?)
+
+private fun parseLine(line: String): ParsedLine {
+    val scanned = scan(line)
+    if (scanned.unterminatedQuote) fail("Unterminated quote.")
+    val pipe = scanned.pipes.firstOrNull() ?: return ParsedLine(scanned.tokens, null)
+    val piped = scanned.tokens.drop(pipe)
+    if (scanned.pipes.size > 1 || piped.size < 2 || piped.first() != "grep") fail("The only pipe is | grep <text>.")
+    return ParsedLine(scanned.tokens.take(pipe), piped.drop(1).joinToString(" "))
+}
+
+/** Split a line into words, respecting quotes and dropping a `#` comment. */
+fun tokenize(line: String): List<String> = parseLine(line).words

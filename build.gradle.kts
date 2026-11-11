@@ -208,8 +208,6 @@ dependencies {
     // https://mvnrepository.com/artifact/com.fifesoft/rsyntaxtextarea
     implementation(group = "com.fifesoft", name = "rsyntaxtextarea", version = "3.4.0")
 
-    // https://mvnrepository.com/artifact/org.beanshell/bsh
-    implementation(group = "org.beanshell", name = "bsh", version = "2.0b5")
 
     implementation(group = "org.jetbrains", name = "markdown", version = "0.7.3")
 

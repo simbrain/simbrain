@@ -133,9 +133,9 @@ class CsvImportDialog(
             }
             unreadable > 0 -> {
                 messageLabel.text = if (unreadable == 1) {
-                    "1 value is not a number and will be imported as 0."
+                    "1 value is empty or not a number and will be imported as 0."
                 } else {
-                    "%,d values are not numbers and will be imported as 0.".format(unreadable)
+                    "%,d values are empty or not numbers and will be imported as 0.".format(unreadable)
                 }
                 messageLabel.foreground = Theme.warningText
             }

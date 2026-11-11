@@ -36,7 +36,8 @@ class CsvImportPlan(
     fun valueAt(row: Int, col: Int): Any = parse(row, col) ?: columns[col].type.defaultValue
 
     /**
-     * How many cells hold text that does not fit their column's type.
+     * How many cells hold text that does not fit their column's type. An empty cell in a numeric column is one of
+     * them.
      */
     val unreadableCount: Int by lazy {
         val typedColumns = columns.indices.filter { columns[it].type != Column.DataType.StringType }

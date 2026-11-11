@@ -86,6 +86,14 @@ class CsvImportTest {
     }
 
     @Test
+    fun `an empty value in a numeric column is unreadable and imports as zero`() {
+        val plan = planCsvImport(csv("1,2", "3,", "5,6"), ImportExportOptions())
+        assertEquals(Column.DataType.DoubleType, plan.columns[1].type)
+        assertEquals(1, plan.unreadableCount)
+        assertEquals(0.0, plan.valueAt(1, 1))
+    }
+
+    @Test
     fun `short rows are padded to the widest row`() {
         val plan = planCsvImport(csv("1,2,3", "4", "5,6"), ImportExportOptions())
         assertEquals(3, plan.columnCount)

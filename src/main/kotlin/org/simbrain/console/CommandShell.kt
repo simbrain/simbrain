@@ -71,8 +71,25 @@ val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.m
 class Example(val description: String, vararg lines: String) {
     val lines: List<String> = lines.toList()
 
-    override fun toString() = (listOf("# $description") + lines).joinToString("\n")
+    override fun toString() = plainText(styled())
+
+    /** The description as a comment, then the commands in bold, as they appear when typed. */
+    fun styled() = (listOf("# $description") + lines.map(::bold)).joinToString("\n")
 }
+
+private const val BOLD_START = '\u0001'
+private const val BOLD_END = '\u0002'
+
+/** Marks text to be shown in bold by a terminal. [CommandShell.execute] removes the marks. */
+fun bold(text: String) = "$BOLD_START$text$BOLD_END"
+
+fun plainText(styled: String) = styled.filterNot { it == BOLD_START || it == BOLD_END }
+
+/** The pieces of text marked with [bold], each with whether it is bold. */
+fun styledSegments(styled: String): List<Pair<String, Boolean>> =
+    Regex("$BOLD_START([^$BOLD_END]*)$BOLD_END|[^$BOLD_START]+").findAll(styled).map { match ->
+        if (match.value.startsWith(BOLD_START)) match.groupValues[1] to true else match.value to false
+    }.toList()
 
 /**
  * @param group the heading it appears under in help
@@ -148,10 +165,10 @@ class CommandShell(
     private var sourceDepth = 0
 
     /**
-     * Whether this shell is in a Console window, which is part of the workspace and so closes when the workspace is
-     * replaced, as opposed to the Terminal tab of the desktop, which stays open.
+     * Set for a shell in a Console window, which is part of the workspace and closes when the workspace is replaced.
+     * Commands that replace the workspace are sent here instead, to run in the desktop's Terminal tab.
      */
-    var inWorkspaceWindow = false
+    var relayToTerminal: ((String) -> Unit)? = null
 
     /** Called by the `cls` command. */
     var onClearScreen: () -> Unit = {}
@@ -172,7 +189,10 @@ class CommandShell(
      * Run a line and return the text to show for it, which is empty when there is nothing to say. Problems with the
      * line or the command are returned as text as well.
      */
-    suspend fun execute(line: String): String {
+    suspend fun execute(line: String): String = plainText(executeStyled(line))
+
+    /** Like [execute], but parts of the text that should be bold are marked with [bold]. */
+    suspend fun executeStyled(line: String): String {
         return try {
             runLine(line)
         } catch (e: CancellationException) {
@@ -208,7 +228,7 @@ class CommandShell(
         }
         val output = withContext(condition ?: EmptyCoroutineContext) { command.action(this@CommandShell, args) }
         return when {
-            parsed.filter != null -> output.lines().filter { it.contains(parsed.filter, ignoreCase = true) }.joinToString("\n")
+            parsed.filter != null -> output.lines().filter { plainText(it).contains(parsed.filter, ignoreCase = true) }.joinToString("\n")
             command.listsItems -> sideBySide(output.lines())
             else -> output
         }

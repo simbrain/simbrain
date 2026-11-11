@@ -35,6 +35,8 @@ import org.simbrain.workspace.couplings.Coupling
 import java.io.File
 
 private const val MAX_SHOWN = 50
+private const val RELAYED = "This window closes when the workspace is replaced, so this is running in the Terminal tab " +
+        "at the bottom of the desktop, which stays open."
 private const val WORKSPACE_EXTENSION = "zip"
 private val NEURON_TYPE_WORDS = listOf("neurons", "collection")
 
@@ -418,8 +420,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Open the XOR simulation and look at its layers", "sim XOR force", "ls XOR where type=NeuronCollection", "get XOR/** activation where type=Neuron")
         ),
         usage = "sim <name> [force]",
-        description = "Open a simulation, replacing the current workspace. force discards unsaved changes. A Console " +
-                "window closes with the workspace, so use the Terminal tab at the bottom of the desktop to keep going.",
+        description = "Open a simulation, replacing the current workspace. force discards unsaved changes. From a " +
+                "Console window, which closes with the workspace, it runs in the Terminal tab at the bottom of the desktop.",
         completer = { _, partial -> wordCandidates(simulations.items.map { it.first }.toList(), partial) }
     ) { args ->
         val theDesktop = desktop ?: fail("Simulations can only be opened from the desktop.")
@@ -427,6 +429,10 @@ val workspaceCommands: CommandRegistry = commands {
         val nameArgs = if (force) args.dropLast(1) else args
         if (nameArgs.isEmpty()) fail("Usage: sim <name> [force]")
         val sim = chooseOption(simulations.items.toMap(), nameArgs.joinToString(" "), "simulation")
+        relayToTerminal?.let { relay ->
+            relay("sim " + args.joinToString(" ") { quoted(it) })
+            return@command RELAYED
+        }
         requireSafeToReplace(force, "sim <name> force")
         withContext(Dispatchers.Default) { sim.run(theDesktop) }
         ""
@@ -440,12 +446,16 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Open a workspace file, discarding unsaved changes", "open mywork.zip force")
         ),
         usage = "open <file> [force]",
-        description = "Open a workspace file, replacing the current workspace. force discards unsaved changes. A " +
-                "Console window closes with the workspace, so use the Terminal tab at the bottom of the desktop to keep going."
+        description = "Open a workspace file, replacing the current workspace. force discards unsaved changes. From a " +
+                "Console window, which closes with the workspace, it runs in the Terminal tab at the bottom of the desktop."
     ) { args ->
         if (args.isEmpty() || args.size > 2 || (args.size == 2 && args[1] != "force")) fail("Usage: open <file> [force]")
         val file = workspaceFile(args[0])
         if (!file.isFile) fail("No such file: ${file.path}")
+        relayToTerminal?.let { relay ->
+            relay("open " + args.joinToString(" ") { quoted(it) })
+            return@command RELAYED
+        }
         requireSafeToReplace(force = args.size == 2, "open <file> force")
         workspace.openWorkspace(file, useDesktop = desktop != null)
         "Opened ${file.name}."
@@ -490,6 +500,28 @@ val workspaceCommands: CommandRegistry = commands {
     }
 
     command(
+        name = "examples",
+        group = "Other",
+        examples = listOf(
+            Example("Show an example of each command", "examples"),
+            Example("Show every example for set", "examples set")
+        ),
+        usage = "examples [command]",
+        description = "Show examples to copy and paste back in. Each says what it does, then gives the commands.",
+        completer = commandCompletion
+    ) { args ->
+        when (args.size) {
+            0 -> "One example of each command. Enter examples <command> for more.\n\n" +
+                    registry.all.mapNotNull { it.examples.firstOrNull()?.styled() }.joinToString("\n\n")
+            1 -> {
+                val command = registry[args.single()] ?: fail("Unknown command: ${args.single()}")
+                command.examples.joinToString("\n\n") { it.styled() }
+            }
+            else -> fail("Usage: examples [command]")
+        }
+    }
+
+    command(
         name = "cls",
         group = "Other",
         examples = listOf(
@@ -514,16 +546,17 @@ val workspaceCommands: CommandRegistry = commands {
     ) { args ->
         if (args.isEmpty()) {
             registry.all.groupBy { it.group }.entries.joinToString("\n\n") { (group, members) ->
-                group + "\n" + members.joinToString("\n") { "  ${it.usage}" }
-            } + "\n\nEnter help <command> for details and examples. Paths look like net1/Neuron_1, and a name by " +
+                group + "\n" + members.joinToString("\n") { "  " + styledUsage(it) }
+            } + "\n\nIn usage, <x> must be given and [x] is optional. Enter help <command> for details, and " +
+                    "examples for commands to copy and paste. Paths look like net1/Neuron_1, and a name by " +
                     "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
                     "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. End a line with " +
                     "where <condition> to act only on some objects, and | grep <text> to filter output. Numbers can be " +
-                    "expressions, as in rand()*10 (see help set). Tab completes, and Esc cancels a long command."
+                    "expressions, as in rand()*10 (see help set). Tab completes, and Ctrl+C or Esc cancels a long command."
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
-            val examples = command.examples.joinToString("\n\n") { it.toString() }
-            "${command.usage}\n${command.description}" + if (examples.isEmpty()) "" else "\n\nExamples, which can be copied and pasted:\n\n$examples"
+            val examples = command.examples.joinToString("\n\n") { it.styled() }
+            "${styledUsage(command)}\n${command.description}" + if (examples.isEmpty()) "" else "\n\nExamples, which can be copied and pasted:\n\n$examples"
         }
     }
 }
@@ -537,6 +570,9 @@ private class Arguments(val words: List<String>, val options: Map<String, String
         }
     }
 }
+
+/** A command's usage with its name in bold. */
+private fun styledUsage(command: Command) = bold(command.name) + command.usage.removePrefix(command.name)
 
 private fun onePath(args: List<String>): String =
     args.singleOrNull() ?: fail("Expected one path. Put names containing spaces in quotes.")
@@ -815,15 +851,8 @@ private fun modelsIn(nodes: List<Node>): List<NetworkModel> = nodes.flatMap { no
     }
 }
 
-/**
- * Before the workspace is replaced: unless [force] is given, fails if this is a Console window, which would close, or
- * if work would be lost. Then stops the workspace.
- */
+/** Stops the workspace, then fails if replacing it would lose work, unless [force] is given. */
 private fun CommandShell.requireSafeToReplace(force: Boolean, forceUsage: String) {
-    if (!force && inWorkspaceWindow) {
-        fail("This would close this console window, which is part of the workspace. Use the Terminal tab at the " +
-                "bottom of the desktop, which stays open, or use $forceUsage.")
-    }
     workspace.stop()
     if (!force && workspace.componentList.isNotEmpty() && workspace.hasUnsavedWork()) {
         fail("There are unsaved changes. Save first, or use $forceUsage.")

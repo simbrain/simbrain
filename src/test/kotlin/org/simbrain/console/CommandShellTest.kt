@@ -517,13 +517,31 @@ class CommandShellTest {
     }
 
     @Test
-    fun `a console window warns before opening a workspace would close it`(@TempDir dir: File) {
+    fun `a console window sends open to the terminal tab`(@TempDir dir: File) {
         val shell = shellWithNetwork()
         val file = File(dir, "saved.zip")
         shell.run("save ${file.path}")
-        shell.inWorkspaceWindow = true
-        assertTrue(shell.run("open ${file.path}").startsWith("This would close this console window"))
-        assertEquals("Opened saved.zip.", shell.run("open ${file.path} force"))
+        val relayed = mutableListOf<String>()
+        shell.relayToTerminal = { relayed += it }
+        assertTrue(shell.run("open ${file.path} force").contains("running in the Terminal tab"))
+        assertEquals(listOf("open ${file.path} force"), relayed)
+        assertEquals("net1", shell.run("ls"))
+    }
+
+    @Test
+    fun `examples shows one of each command, or all for one command`() {
+        val shell = shellWithNetwork()
+        val all = shell.run("examples")
+        assertTrue(all.contains("# List the components in the workspace\nls\n\n# Go into net1"), all)
+        assertEquals(workspaceCommands["set"]!!.examples.joinToString("\n\n"), shell.run("examples set"))
+    }
+
+    @Test
+    fun `help marks command names bold for the terminal`() {
+        val shell = shellWithNetwork()
+        val styled = runBlocking { shell.executeStyled("help") }
+        assertTrue(styled.contains("  ${bold("ls")} [path]"), styled)
+        assertEquals("ls [path]", plainText(bold("ls") + " [path]"))
     }
 
     @Test

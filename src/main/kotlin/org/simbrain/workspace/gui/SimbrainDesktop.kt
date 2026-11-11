@@ -174,11 +174,13 @@ object SimbrainDesktop {
         })
     }
 
+    private val terminalPanel = CommandConsolePanel(workspace, this)
+
     val bottomDockSplitter = SimbrainDesktopDock(
         mainComponent = sideDockSplitter,
         dockComponent = JTabbedPane().apply {
             addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
-            addTab("Terminal", null, CommandConsolePanel(this@SimbrainDesktop.workspace, this@SimbrainDesktop), "Simbrain command line")
+            addTab("Terminal", null, terminalPanel, "Simbrain command line")
             addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
             addChangeListener {
                 PerformanceMonitor.enabled = selectedComponent is PerformanceMonitorPanel
@@ -196,6 +198,13 @@ object SimbrainDesktop {
         if (WorkspacePreferences.showBottomDockByDefault) {
             showDock()
         }
+    }
+
+    /** Show the Terminal tab and run [line] there, for commands that would close a Console window. */
+    fun runInTerminal(line: String) = swingInvokeLater {
+        bottomDockSplitter.showDock()
+        (bottomDockSplitter.dockComponent as JTabbedPane).selectedComponent = terminalPanel
+        terminalPanel.submit(line)
     }
 
     private val workspaceBounds: Rectangle

@@ -54,7 +54,7 @@ private const val BAR_WIDTH = 20
 
 /** The status line for a running command: a bar if its size is known, otherwise a count. */
 internal fun statusText(progress: Progress?): String {
-    val hint = "Esc to cancel."
+    val hint = "Ctrl+C or Esc to cancel."
     progress ?: return "Working. $hint"
     val total = progress.total
     if (total == null || total <= 0) return "${progress.what}: ${"%,d".format(progress.done)} objects. $hint"
@@ -64,15 +64,18 @@ internal fun statusText(progress: Progress?): String {
     return "$bar ${(fraction * 100).roundToInt()}% ${progress.what} ${"%,d".format(progress.done)} of ${"%,d".format(total)}. $hint"
 }
 
-/** @param inWorkspaceWindow whether the panel is in a Console window, which closes when the workspace is replaced */
+/**
+ * @param relayToTerminal for a panel in a Console window, which closes when the workspace is replaced: where to send
+ * commands that replace the workspace
+ */
 class CommandConsolePanel(
     workspace: Workspace,
     desktop: SimbrainDesktop? = null,
-    inWorkspaceWindow: Boolean = false
+    relayToTerminal: ((String) -> Unit)? = null
 ) : JPanel(BorderLayout()) {
 
     private val shell = CommandShell(workspace, desktop).apply {
-        this.inWorkspaceWindow = inWorkspaceWindow
+        this.relayToTerminal = relayToTerminal
         onClearScreen = { swingInvokeLater { clearTranscript() } }
     }
 
@@ -117,9 +120,7 @@ class CommandConsolePanel(
         add(JScrollPane(textPane).apply { border = BorderFactory.createEmptyBorder() }, BorderLayout.CENTER)
         document.documentFilter = InputFilter()
         writePrompt()
-        val intro = "Simbrain commands. Enter help for a list."
-        insertOutput(intro)
-        textPane.styledDocument.setCharacterAttributes(intro.indexOf("help"), "help".length, bold, false)
+        insertOutput("Simbrain commands. Enter ${bold("help")} for a list, or ${bold("examples")} for some to copy and paste.")
         commandScope.launch { runQueue() }
 
         bindKey("ENTER", "console-enter") { enterLine() }
@@ -127,6 +128,7 @@ class CommandConsolePanel(
         bindKey("DOWN", "console-next") { moveThroughHistory(1) }
         bindKey("TAB", "console-complete") { completeInput() }
         bindKey("ESCAPE", "console-cancel") { cancelRunning() }
+        bindKey("ctrl C", "console-interrupt") { interrupt() }
         bindKey("HOME", "console-home") { textPane.caretPosition = inputStart }
         bindKey("meta LEFT", "console-home") { textPane.caretPosition = inputStart }
 
@@ -168,6 +170,15 @@ class CommandConsolePanel(
         }
     }
 
+    /** Copy if text is selected, as Ctrl+C does on Windows, otherwise cancel what is running or discard the input. */
+    private fun interrupt() {
+        when {
+            !textPane.selectedText.isNullOrEmpty() -> textPane.copy()
+            runningJob != null -> cancelRunning()
+            else -> replaceInput("")
+        }
+    }
+
     /** Cancel the running command and drop any waiting to run. */
     private fun cancelRunning() {
         val job = runningJob ?: return
@@ -190,7 +201,7 @@ class CommandConsolePanel(
         val status = if (showsProgress) launch { showStatusWhileRunning() } else null
         try {
             withContext(swingDispatcher) { insertOutput(shell.prompt, queued.line) }
-            val result = shell.execute(queued.line)
+            val result = shell.executeStyled(queued.line)
             status?.cancelAndJoin()
             withContext(swingDispatcher) {
                 setStatus(null)
@@ -288,14 +299,21 @@ class CommandConsolePanel(
         textPane.caretPosition = inputStart
     }
 
-    /** Add a line to the transcript, above the prompt. Text after [plainText] is bold, as for a command. */
-    internal fun insertOutput(plainText: String, boldText: String = "") {
+    /**
+     * Add a line to the transcript, above the prompt. Parts of [text] marked with [org.simbrain.console.bold] are bold,
+     * and so is [boldText], which follows it, as for a command after its prompt.
+     */
+    internal fun insertOutput(text: String, boldText: String = "") {
+        val segments = styledSegments(text) + (boldText to true) + ("\n" to false)
         keepingCaretInInput {
+            var offset = statusStart
             edit {
-                document.insertString(statusStart, plainText, plain)
-                document.insertString(statusStart + plainText.length, boldText + "\n", if (boldText.isEmpty()) plain else bold)
+                for ((segment, isBold) in segments.filter { it.first.isNotEmpty() }) {
+                    document.insertString(offset, segment, if (isBold) bold else plain)
+                    offset += segment.length
+                }
             }
-            shiftFromStatus(plainText.length + boldText.length + 1)
+            shiftFromStatus(offset - statusStart)
             trimTranscript()
         }
         scrollToInput()

@@ -19,6 +19,10 @@ import org.simbrain.network.core.PoolingConnector
 import org.simbrain.network.core.TensorConnector
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_COMPACT_TILE_GAP
+import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_TILE_GAP
+import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_TILE_MAX
+import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_TILE_MIN
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
 import org.simbrain.util.widgets.BezierArrow
@@ -732,7 +736,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
                 // Kernel grid toggle
                 contextMenu.add(networkPanel.createAction(
-                    name = if (connector.kernelGridMode) "Single Kernel View" else "Kernel Grid View"
+                    name = if (connector.kernelGridMode) "Single Channel View" else "Filter Bank View"
                 ) {
                     connector.kernelGridMode = !connector.kernelGridMode
                 })

@@ -216,7 +216,7 @@ class CnnTrainerControls(
 
         val initializeParameters = createAction(
             name = "Init parameters",
-            description = "Re-initialize CNN kernels and dense weights",
+            description = "Re-initialize CNN filters and dense weights",
             iconPath = "menu_icons/Rand.png",
         ) {
             trainer.randomize()

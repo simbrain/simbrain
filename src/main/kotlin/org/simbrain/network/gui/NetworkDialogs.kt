@@ -17,7 +17,6 @@ import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.llm.obtainWeightsInteractive
 import org.simbrain.network.smile.ClassifierNetwork
 import org.simbrain.util.*
-import org.simbrain.util.onUi
 import org.simbrain.util.piccolo.SceneGraphBrowser
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
@@ -223,7 +222,7 @@ fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
  * Template for convolution layer creation dialog.
  */
 class ConvLayerTemplate : EditableObject {
-    @UserParameter(label = "Kernel Size", description = "Spatial size of kernel", minimumValue = 1.0, order = 1)
+    @UserParameter(label = "Filter Size", description = "Spatial size of each filter", minimumValue = 1.0, order = 1)
     var kernelSize = 3
 
     @UserParameter(label = "Num Filters", description = "Number of output filters", minimumValue = 1.0, order = 2)
@@ -234,7 +233,7 @@ class ConvLayerTemplate : EditableObject {
 
     @UserParameter(
         label = "Padding",
-        description = "Valid keeps the kernel inside the input with no padding, while Same pads the input so the kernel can extend beyond the original edges.",
+        description = "Valid keeps the filter inside the input with no padding, while Same pads the input so the filter can extend beyond the original edges.",
         order = 4
     )
     var padding = Padding.SAME

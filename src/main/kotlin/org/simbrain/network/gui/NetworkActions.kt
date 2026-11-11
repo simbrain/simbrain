@@ -718,7 +718,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
      */
     val toggleShapeCaptions = networkPanel.createAction(
         name = "Show shape captions",
-        description = "Show shapes under tensors, convolution kernels, and weight matrices"
+        description = "Show shapes under tensors, filter banks, and weight matrices"
     ) { event ->
         NetworkPreferences.showShapeCaptions =
             (event?.source as? JCheckBoxMenuItem)?.state ?: !NetworkPreferences.showShapeCaptions

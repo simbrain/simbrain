@@ -18,7 +18,7 @@ import kotlin.math.sqrt
  */
 class ConvolutionConnector(
     source: TensorLayer, target: TensorLayer,
-    @UserParameter(label = "Kernel Size", description = "Spatial size of convolution kernel", displayOnly = true, order = 1)
+    @UserParameter(label = "Filter Size", description = "Spatial size of each filter", displayOnly = true, order = 1)
     val kernelSize: Int = 3,
     @UserParameter(label = "Num Filters", description = "Number of output filters", displayOnly = true, order = 2)
     val numFilters: Int = 8,
@@ -26,17 +26,17 @@ class ConvolutionConnector(
     val stride: Int = 1,
     @UserParameter(
         label = "Padding",
-        description = "Valid keeps the kernel inside the input with no padding, while Same pads the input so the kernel can extend beyond the original edges.",
+        description = "Valid keeps the filter inside the input with no padding, while Same pads the input so the filter can extend beyond the original edges.",
         displayOnly = true,
         order = 4
     )
     val padding: Padding = Padding.SAME
 ) : TensorConnector(source, target) {
 
-    @UserParameter(label = "Increment amount", description = "Amount to increment kernel weights by when using arrow keys.", increment = .1, order = 20)
+    @UserParameter(label = "Increment amount", description = "Amount to increment filter weights by when using arrow keys.", increment = .1, order = 20)
     var increment = .1
 
-    @UserParameter(label = "Kernel Grid", description = "Show all kernels in a grid", tab = "GUI", order = 50)
+    @UserParameter(label = "Filter Bank Grid", description = "Show all filters in a grid, with one row per filter and one column per input channel", tab = "GUI", order = 50)
     var kernelGridMode = false
         set(value) {
             field = value
@@ -70,7 +70,7 @@ class ConvolutionConnector(
     /** Flat kernel weights: [numFilters][inputChannels][kH][kW] */
     var kernels by GuiEditable(
         initValue = DoubleArray(numFilters * inputChannels * kernelArea),
-        label = "Kernels",
+        label = "Filters",
         tab = "Data",
         order = 100,
         tensorDescriptor = ConvolutionConnector::kernelDescriptor

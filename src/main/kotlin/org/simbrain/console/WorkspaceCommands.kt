@@ -12,25 +12,13 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
 import org.simbrain.network.connections.ConnectionStrategy
 import org.simbrain.network.connections.connectionTypes
-import org.simbrain.network.core.Network
-import org.simbrain.network.core.NetworkModel
-import org.simbrain.network.core.Neuron
-import org.simbrain.network.core.NeuronCollection
-import org.simbrain.network.core.Synapse
-import org.simbrain.network.core.SynapseGroup
-import org.simbrain.network.core.topLeftLocation
+import org.simbrain.network.core.*
 import org.simbrain.network.gui.subnetworkProtectedModels
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.Layout
 import org.simbrain.util.callNoArgConstructor
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.workspace.Attribute
-import org.simbrain.workspace.AttributeContainer
-import org.simbrain.workspace.Consumer
-import org.simbrain.workspace.Producer
-import org.simbrain.workspace.Workspace
-import org.simbrain.workspace.WorkspaceComponent
-import org.simbrain.workspace.attributeTypesMatch
+import org.simbrain.workspace.*
 import org.simbrain.workspace.couplings.Coupling
 import java.io.File
 
@@ -53,6 +41,13 @@ val workspaceCommands: CommandRegistry = commands {
             Example("List the neurons in net1 whose activation is above 0.5", "ls net1 where activation>0.5"),
             Example("List the synapses in net1", "ls net1 where type=Synapse"),
             Example("List the neurons in net1 that nothing connects to", "ls net1 where type=Neuron and fanIn=0"),
+            Example("List the neurons in net1 that connect to something", "ls net1 where fanOut>0"),
+            Example("List the neurons in net1 that are inactive or receive connections", "ls net1 where type=Neuron and (activation=0 or fanIn>0)"),
+            Example("List the neurons in net1 whose activation is far from 0 in either direction", "ls net1 where abs(activation)>0.5"),
+            Example("List the synapses that come from Neuron_1", "ls net1 where source=Neuron_1"),
+            Example("List the linear neurons in net1", "ls net1 where rule=Linear"),
+            Example("Clamp a neuron, then list the neurons that are not clamped", "set net1/Neuron_1 clamped=true", "ls net1 where type=Neuron and not clamped=true"),
+            Example("List every neuron in the workspace", "ls ** where type=Neuron"),
             Example("List what is in net1, keeping lines that mention Synapse", "ls net1 | grep Synapse")
         ),
         usage = "ls [path] [where condition]",
@@ -110,7 +105,12 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Print a neuron's activation", "get net1/Neuron_1 activation"),
             Example("Print the activation of every neuron in net1", "get net1/Neuron_* activation"),
-            Example("Print the strength of every synapse in net1", "get net1/* strength where type=Synapse")
+            Example("Print the strength of every synapse in net1", "get net1/* strength where type=Synapse"),
+            Example("Print how many connections each neuron in net1 receives", "get net1/Neuron_* fanIn"),
+            Example("Print the bias of the neurons in net1 that send connections", "get net1/* bias where type=Neuron and fanOut>0"),
+            Example("Print where a synapse starts", "get net1/Synapse_1 source"),
+            Example("Print the update rule of each neuron in net1", "get net1/Neuron_* rule"),
+            Example("Print the activations in net1, keeping the line for Neuron_1", "get net1/Neuron_* activation | grep Neuron_1")
         ),
         usage = "get <path> <property> [where condition]",
         description = "Print one property of one or more objects.",
@@ -135,6 +135,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Select the neurons in net1", "select net1/Neuron_*"),
             Example("Make a collection labelled input, then select it by its label", "add collection 3 in=net1 label=input", "select net1/input"),
             Example("Select the neurons in net1 whose activation is above 0.5", "select net1/* where activation>0.5"),
+            Example("Select the synapses in net1", "select net1/* where type=Synapse"),
+            Example("Select every neuron in the workspace that nothing connects to", "select ** where type=Neuron and fanIn=0"),
             Example("Clear the selection", "select none")
         ),
         usage = "select <path or none> [where condition]",
@@ -161,7 +163,20 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Give two neurons their own random activations between 0 and 10", "set net1/Neuron_{1..2} activation=rand()*10"),
             Example("Give every synapse in net1 a small random strength", "set net1/* strength=randn(0,0.1) where type=Synapse"),
             Example("Spread the activations in net1 evenly from 0 up toward 1", "set net1/Neuron_* activation=i/n"),
-            Example("Double every activation in net1", "set net1/Neuron_* activation=activation*2")
+            Example("Double every activation in net1", "set net1/Neuron_* activation=activation*2"),
+            Example("Give the neurons in net1 above 0.5 random activations between -1 and 1", "set net1/* activation=rand(-1,1) where type=Neuron and activation>0.5"),
+            Example("Set two properties at once", "set net1/Neuron_1 activation=0.5 bias=0.1"),
+            Example("Give each neuron in net1 a random bias between -1 and 1", "set net1/Neuron_* bias=rand(-1,1)"),
+            Example("Give each neuron in net1 its position as its activation: 0, 1, 2, and so on", "set net1/Neuron_* activation=i"),
+            Example("Copy each neuron's activation into its bias", "set net1/Neuron_* bias=activation"),
+            Example("Round each activation in net1 to one decimal place", "set net1/Neuron_* activation=round(activation*10)/10"),
+            Example("Flip the sign of every synapse in net1", "set net1/* strength=-strength where type=Synapse"),
+            Example("Make the negative synapses in net1 zero", "set net1/* strength=max(strength,0) where type=Synapse"),
+            Example("Set the bounds of every synapse in net1", "set net1/* upperBound=1 lowerBound=-1 where type=Synapse"),
+            Example("Make the neurons in net1 sigmoidal with random slopes", "set net1/Neuron_* rule=Sigmoidal rule.slope=rand(1,3)"),
+            Example("Make the neurons in net1 excitatory", "set net1/Neuron_* polarity=Excitatory"),
+            Example("Clamp the neurons in net1 that nothing connects to", "set net1/* clamped=true where type=Neuron and fanIn=0"),
+            Example("Add ten neurons, spread their activations, then clamp the top half", "add neurons 10 in=net1", "set net1/Neuron_* activation=i/n", "set net1/Neuron_* clamped=true where activation>=0.5")
         ),
         usage = "set <path> key=value ... [where condition]",
         description = "Set properties. Selectable types are set by name, and their settings use dots. A number can be " +
@@ -306,6 +321,8 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Remove a synapse", "rm net1/Synapse_1"),
             Example("Remove every synapse in net1", "rm net1/* where type=Synapse"),
+            Example("Add five neurons, then remove the neurons in net1 with no connections", "add neurons 5 in=net1", "rm net1/* where type=Neuron and fanIn=0 and fanOut=0"),
+            Example("Weaken a synapse, then remove the weak synapses in net1", "set net1/Synapse_1 strength=0.01", "rm net1/* where type=Synapse and abs(strength)<0.1"),
             Example("Remove a whole component", "rm net1")
         ),
         usage = "rm <path> [where condition]",
@@ -320,7 +337,10 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Randomize everything in net1", "randomize net1"),
             Example("Randomize one neuron", "randomize net1/Neuron_1"),
-            Example("Randomize what is selected in the GUI", "randomize @")
+            Example("Randomize what is selected in the GUI", "randomize @"),
+            Example("Randomize the neurons in net1 whose activation is above 0.5", "randomize net1/* where type=Neuron and activation>0.5"),
+            Example("Randomize every neuron in the workspace that nothing connects to", "randomize ** where type=Neuron and fanIn=0"),
+            Example("Randomize just the synapses in net1", "randomize net1/* where type=Synapse")
         ),
         usage = "randomize <path> [where condition]",
         description = "Randomize models, or everything in a network.",
@@ -338,7 +358,8 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Clear the activations in net1", "clear net1"),
             Example("Clear a neuron, wherever it is", "clear Neuron_1"),
-            Example("Clear what is selected in the GUI", "clear @")
+            Example("Clear what is selected in the GUI", "clear @"),
+            Example("Clear the neurons in net1 whose activation is above 0.5", "clear net1/* where type=Neuron and activation>0.5")
         ),
         usage = "clear <path> [where condition]",
         description = "Clear models, or the activations in a network.",

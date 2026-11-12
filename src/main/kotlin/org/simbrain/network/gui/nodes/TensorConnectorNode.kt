@@ -489,14 +489,14 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            invalidateLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            invalidateLayout()
         }.untilDisposed()
 
         interactionBox.setText(connectorDisplayText())
-        arrow.invalidateFullBounds()
+        invalidateLayout()
         updateDetailLabel()
     }
 
@@ -523,7 +523,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             renderKernelImage()
             updateDetailLabel()
         }
-        arrow.invalidateFullBounds()
+        invalidateLayout()
     }
 
     /** Trace highlight set by the receptive field tracer. */
@@ -680,6 +680,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
+        // Laying out the arrow replaces its shape and moves what is drawn on it. A validation pass only goes back
+        // over children changed here when this node is itself marked, which it is not when a child that kept its
+        // size started the pass, as the label box does on a zoom
+        invalidateFullBounds()
     }
 
     override fun paint(paintContext: PPaintContext) {

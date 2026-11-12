@@ -55,14 +55,14 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            invalidateLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            invalidateLayout()
         }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
-        arrow.invalidateFullBounds()
+        invalidateLayout()
     }
 
     fun updateArrowColorFromPreferences() {
@@ -80,6 +80,10 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
+        // Laying out the arrow replaces its shape and moves what is drawn on it. A validation pass only goes back
+        // over children changed here when this node is itself marked, which it is not when a child that kept its
+        // size started the pass, as the label box does on a zoom
+        invalidateFullBounds()
     }
 
     override val isDraggable: Boolean = false

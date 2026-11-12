@@ -98,8 +98,11 @@ public class Outline extends PNode {
         if (dirtyBounds) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
-                for (PNode drawn : drawnBy(node)) {
-                    bounds.add(drawn.getFullBounds());
+                // The footprint rather than the full bounds, which grow with a selection handle
+                bounds.add(node.getFootprint());
+                PNode connectionDrawing = node.getConnectionDrawing();
+                if (connectionDrawing != null) {
+                    bounds.add(connectionDrawing.getFullBounds());
                 }
             }
             for (PNode node : decorations) {

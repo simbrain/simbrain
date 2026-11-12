@@ -683,8 +683,8 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
     private fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
-        val srcTopBounds = sourceNode?.globalFullBounds ?: return
-        val tgtTopBounds = targetNode?.globalFullBounds ?: return
+        val srcTopBounds = sourceNode?.footprint ?: return
+        val tgtTopBounds = targetNode?.footprint ?: return
         arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
@@ -779,6 +779,26 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         connector.label?.takeIf { it.isNotEmpty() } ?: connector.name
 
     override val isDraggable: Boolean = false
+
+    /** The label box and, for a convolution, whichever kernel drawing is showing with what goes around it. */
+    override fun measureFootprint(): PBounds {
+        val conv = connector as? ConvolutionConnector ?: return footprintOf(interactionBox.globalBounds)
+        val caption = shapeCaption.globalBounds.takeIf { shapeCaption.visible }
+        return if (conv.kernelGridMode) {
+            footprintOf(interactionBox.globalBounds, kernelGridGroup.globalBounds, caption)
+        } else {
+            footprintOf(
+                interactionBox.globalBounds,
+                imageBox.box.globalFullBounds,
+                filterPrevButton?.globalFullBounds,
+                filterNextButton?.globalFullBounds,
+                channelPrevButton?.globalFullBounds,
+                channelNextButton?.globalFullBounds,
+                detailLabel.globalBounds,
+                caption
+            )
+        }
+    }
 
     override val contextMenu: JPopupMenu
         get() {

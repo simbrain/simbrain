@@ -91,6 +91,25 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     val globalDrawnBounds: PBounds
         get() = globalFullBounds.also { bounds -> connectionDrawing?.let { bounds.add(it.globalFullBounds) } }
 
+    /**
+     * The space this element takes up on the canvas, in canvas coordinates: what it draws in its own place, without
+     * its [connectionDrawing] and without selection handles, which come and go. What is laid out around an
+     * element, such as a connector's arrow or a subnetwork's outline, is laid out against this, so that it does not
+     * shift when the element is selected. An element that does not say otherwise counts everything in its node.
+     */
+    val footprint: PBounds
+        get() {
+            // Validates the node, so that its parts are measured where layout puts them: an element in a tier above
+            // the one being laid out has not been reached by the validation pass yet. The connection drawing goes
+            // first, since a connector's arrow places what the connector draws on it
+            connectionDrawing?.fullBoundsReference
+            fullBoundsReference
+            return measureFootprint()
+        }
+
+    /** Measures the [footprint]. Called once the node's own layout is up to date. */
+    protected open fun measureFootprint(): PBounds = globalFullBounds
+
     private var viewListener: PropertyChangeListener? = null
 
     /**
@@ -217,4 +236,12 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * by [NetworkPanel] when the canvas is recolored.
      */
     open fun refreshTheme() {}
+}
+
+/**
+ * The bounds of everything in [parts] that takes up space. A part with nothing to draw has bounds without size at a
+ * place that means nothing, which must not be counted.
+ */
+internal fun footprintOf(vararg parts: PBounds?) = PBounds().apply {
+    parts.forEach { if (it != null && it.width > 0 && it.height > 0) add(it) }
 }

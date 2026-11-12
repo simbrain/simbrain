@@ -22,7 +22,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     private val sourceNodeOutlines get() = with(weightMatrixNode.sourceNode) {
         when (this) {
             is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
-            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
+            else -> directionalOutlines(this.footprint, this.globalBounds)
         }
     }
     private val target get() = weightMatrixNode.model.target
@@ -35,7 +35,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     private val targetNodeOutlines get() = with(weightMatrixNode.targetNode) {
         when (this) {
             is NeuronCollectionNode -> outlinedObjects.globalFullBounds.outlines
-            else -> directionalOutlines(this.globalFullBounds, this.globalBounds)
+            else -> directionalOutlines(this.footprint, this.globalBounds)
         }
     }
     private fun isBidirectional() = target.outgoingConnectors.any { it.target == source }

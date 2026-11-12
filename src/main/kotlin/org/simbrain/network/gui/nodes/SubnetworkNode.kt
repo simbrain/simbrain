@@ -255,7 +255,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     protected val outlinedObjectBounds: PBounds
         get() = PBounds().apply {
             outlinedObjects.forEach { node ->
-                add(node.fullBounds)
+                add(node.footprint)
                 node.connectionDrawing?.let { add(it.fullBounds) }
             }
         }

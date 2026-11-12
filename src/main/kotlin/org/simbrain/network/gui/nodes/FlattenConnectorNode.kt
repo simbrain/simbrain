@@ -78,8 +78,8 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
     private fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
-        val srcTopBounds = sourceNode?.globalFullBounds ?: return
-        val tgtTopBounds = targetNode?.globalFullBounds ?: return
+        val srcTopBounds = sourceNode?.footprint ?: return
+        val tgtTopBounds = targetNode?.footprint ?: return
         arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
@@ -88,6 +88,9 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
     }
 
     override val isDraggable: Boolean = false
+
+    /** The label box. */
+    override fun measureFootprint() = footprintOf(interactionBox.globalBounds)
 
     override val contextMenu: JPopupMenu
         get() {

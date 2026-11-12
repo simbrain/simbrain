@@ -471,6 +471,13 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override val isDraggable: Boolean = false
 
+    /** The image with its label box and, when it is showing, its caption. */
+    override fun measureFootprint() = footprintOf(
+        imageBox.box.globalFullBounds,
+        interactionBox.globalBounds,
+        shapeCaption.globalBounds.takeIf { shapeCaption.visible }
+    )
+
     override val toolTipText: String?
         get() = if (pixelSelection.isNotEmpty()) null else createTooltipText(weightMatrix)
 

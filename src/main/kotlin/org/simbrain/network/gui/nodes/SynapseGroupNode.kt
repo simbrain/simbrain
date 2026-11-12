@@ -146,6 +146,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     override val isDraggable: Boolean = false
 
+    /** The label box. */
+    override fun measureFootprint() = footprintOf(interactionBox.globalBounds)
+
     override val model: SynapseGroup
         get() = synapseGroup
 

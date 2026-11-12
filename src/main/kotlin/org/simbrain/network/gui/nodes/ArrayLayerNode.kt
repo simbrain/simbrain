@@ -156,6 +156,9 @@ abstract class ArrayLayerNode(networkPanel: NetworkPanel, val layer: ArrayLayer)
 
     override val isDraggable = true
 
+    /** The border box and the label box on top of it. */
+    override fun measureFootprint() = footprintOf(globalBounds, interactionBox.globalBounds)
+
     public override fun layoutChildren() {
         interactionBox.centerFullBoundsOnPoint(
             borderBox.fullBounds.centerX,

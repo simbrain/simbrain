@@ -171,6 +171,8 @@ class CanvasBoundsTest {
         steps.zoomInAndOut()
         steps.step("unrolling") { bptt.unrolledView = true }
         steps.step("moving the unrolled network") { bptt.location = Point2D.Double(0.0, 0.0) }
+        steps.zoomInAndOut()
+        steps.step("zooming back to full size") { panel.canvas.camera.viewScale = 1.0 }
         steps.step("rolling back up") { bptt.unrolledView = false }
         steps.assertSettledThroughout()
     }

@@ -1,8 +1,8 @@
 /**
- * The network canvas is layered bottom to top as connections (a cached tier), spike highlights, then nodes: every
- * connection node, including subclasses such as directed synapse group arrows, lands in the connection tier, and
- * neurons and collections land above it. Within the connection tier, weight matrices sit lowest, then synapses, then
- * synapse groups.
+ * The network canvas is layered bottom to top as the lines and arrows of connections (a cached tier), spike
+ * highlights, what connectors draw on their arrows, then nodes. A synapse is wholly in the connection tier. A
+ * connector that draws on its arrow has its node in the tier above and only its arrow in the connection tier, where
+ * weight matrix arrows sit lowest, then synapses, then synapse group arrows.
  */
 package org.simbrain.network.gui
 
@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test
 import org.piccolo2d.PNode
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.nodes.ConnectionDrawing
+import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.network.gui.nodes.NeuronCollectionNode
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseGroupNode
@@ -24,7 +26,7 @@ import org.simbrain.util.onEdt
 class CanvasTiersTest {
 
     @Test
-    fun `connections sit in the cached tier below spike highlights and nodes`() = runBlocking {
+    fun `connections sit in the cached tier below spike highlights, connector drawings and nodes`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))
         val (a, b) = network.addNeurons(2)
@@ -32,27 +34,35 @@ class CanvasTiersTest {
         val source = NeuronCollection(network.addNeurons(3)).also { network.addNetworkModel(it) }
         val target = NeuronCollection(network.addNeurons(3)).also { network.addNetworkModel(it) }
         network.addNetworkModel(SynapseGroup(source, target))
+        val arrays = List(2) { NeuronArray(3).also { network.addNetworkModel(it) } }
+        network.addNetworkModel(WeightMatrix(arrays[0], arrays[1]))
         UiWork.awaitIdle()
 
         onEdt {
             val layer = panel.canvas.layer
             val edgeIndex = layer.indexOfChild(panel.edgeTier)
             val overlayIndex = layer.indexOfChild(panel.spikeOverlay)
+            val connectorIndex = layer.indexOfChild(panel.connectorTier)
             val nodes = panel.screenElements
-            val connections = nodes.filter { it is SynapseNode || it is SynapseGroupNode }
-            val others = nodes.filter { it is NeuronNode || it is NeuronCollectionNode }
+            val synapses = nodes.filterIsInstance<SynapseNode>()
+            val connectors = nodes.filter { it is SynapseGroupNode || it is WeightMatrixNode }
+            val others = nodes.filter { it is NeuronNode || it is NeuronCollectionNode || it is NeuronArrayNode }
 
-            assertTrue(connections.any { it is SynapseGroupNode } && connections.any { it is SynapseNode })
-            connections.forEach { assertEquals(panel.edgeTier, it.parent, "${it::class.simpleName} is not in the connection tier") }
-            others.forEach { node ->
-                assertTrue(layer.indexOfChild(node.parent) > overlayIndex, "${node::class.simpleName} is not above the connections")
+            assertTrue(synapses.isNotEmpty() && connectors.any { it is SynapseGroupNode } && connectors.any { it is WeightMatrixNode })
+            synapses.forEach { assertEquals(panel.edgeTier, it.parent, "A synapse is not in the connection tier") }
+            connectors.forEach {
+                assertEquals(panel.connectorTier, it.parent, "${it::class.simpleName} is not in the connector tier")
+                assertEquals(panel.edgeTier, it.connectionDrawing?.parent, "The arrow of ${it::class.simpleName} is not in the connection tier")
             }
-            assertTrue(edgeIndex < overlayIndex)
+            others.forEach { node ->
+                assertTrue(layer.indexOfChild(node.parent) > connectorIndex, "${node::class.simpleName} is not above the connectors")
+            }
+            assertTrue(edgeIndex < overlayIndex && overlayIndex < connectorIndex)
         }
     }
 
     @Test
-    fun `within the connection tier weight matrices sit below synapses, and synapses below synapse groups`() = runBlocking {
+    fun `within the connection tier weight matrix arrows sit below synapses, and synapses below synapse groups`() = runBlocking {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("test", network))
         val arrays = List(2) { NeuronArray(3).also { network.addNetworkModel(it) } }
@@ -68,7 +78,7 @@ class CanvasTiersTest {
         UiWork.awaitIdle()
 
         val band = onEdt { panel.edgeTier.childrenReference.toList() }.map {
-            when (it) {
+            when ((it as? ConnectionDrawing)?.owner ?: it) {
                 is WeightMatrixNode -> 0
                 is SynapseNode -> 1
                 is SynapseGroupNode -> 2
@@ -96,7 +106,7 @@ class CanvasTiersTest {
             val tier = panel.edgeTier.childrenReference
             assertEquals(panel.connectionUnderlay, underlay.parent)
             assertEquals(0, tier.indexOf(panel.connectionUnderlay))
-            assertTrue(tier.any { it is WeightMatrixNode } && tier.any { it is SynapseNode })
+            assertTrue(tier.any { (it as? ConnectionDrawing)?.owner is WeightMatrixNode } && tier.any { it is SynapseNode })
         }
     }
 }

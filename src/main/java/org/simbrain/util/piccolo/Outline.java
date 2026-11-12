@@ -9,6 +9,7 @@ import org.simbrain.util.NetworkTheme;
 import java.awt.*;
 import java.beans.PropertyChangeListener;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -60,12 +61,23 @@ public class Outline extends PNode {
      */
     public void resetOutlinedNodes(Set<? extends ScreenElement> outlinedNodes) {
         if (this.outlinedNodes != null) {
-            this.outlinedNodes.forEach(node -> node.removePropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
+            this.outlinedNodes.forEach(node -> drawnBy(node).forEach(
+                    drawn -> drawn.removePropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty)));
         }
-        outlinedNodes.forEach(node -> node.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty));
+        outlinedNodes.forEach(node -> drawnBy(node).forEach(
+                drawn -> drawn.addPropertyChangeListener(PROPERTY_FULL_BOUNDS, markBoundsDirty)));
         this.outlinedNodes = outlinedNodes;
         dirtyBounds = true;
         invalidateFullBounds();
+    }
+
+    /**
+     * The nodes an outlined element is drawn by: its own, and what it draws among the connections, which is not
+     * inside its own node.
+     */
+    private static List<PNode> drawnBy(ScreenElement node) {
+        PNode connectionDrawing = node.getConnectionDrawing();
+        return connectionDrawing == null ? List.of(node) : List.of(node, connectionDrawing);
     }
 
     /**
@@ -86,7 +98,9 @@ public class Outline extends PNode {
         if (dirtyBounds) {
             PBounds bounds = new PBounds();
             for (ScreenElement node : outlinedNodes) {
-                bounds.add(node.getFullBounds());
+                for (PNode drawn : drawnBy(node)) {
+                    bounds.add(drawn.getFullBounds());
+                }
             }
             for (PNode node : decorations) {
                 bounds.add(node.getFullBounds());

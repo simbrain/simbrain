@@ -25,6 +25,9 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
 
     val interactionBox = FlattenConnectorInteractionBox(networkPanel)
 
+    /** The arrow, whose layout also places the label box on its shaft. */
+    override val connectionDrawing = ConnectionDrawing(this) { layoutArrow() }
+
     private val arrow: BezierArrow
 
     init {
@@ -46,31 +49,33 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
             }
         }
 
-        addChild(arrow)
+        connectionDrawing.addChild(arrow)
         addChild(interactionBox)
 
         val connectorEvents = connector.events
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connector.displayName)
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateLayout()
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateLayout()
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
-        invalidateLayout()
+        layoutConnectionWithView()
+        connectionDrawing.invalidateLayout()
     }
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
-        layoutChildren()
+        layoutArrow()
     }
 
-    override fun layoutChildren() {
+    private fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.globalFullBounds ?: return
@@ -80,10 +85,6 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
-        // Laying out the arrow replaces its shape and moves what is drawn on it. A validation pass only goes back
-        // over children changed here when this node is itself marked, which it is not when a child that kept its
-        // size started the pass, as the label box does on a zoom
-        invalidateFullBounds()
     }
 
     override val isDraggable: Boolean = false

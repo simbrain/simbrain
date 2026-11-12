@@ -381,6 +381,9 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }
     }
 
+    /** The arrow, whose layout also places the kernel drawing, label box and caption on its shaft. */
+    override val connectionDrawing = ConnectionDrawing(this) { layoutArrow() }
+
     private val arrow: BezierArrow
 
     init {
@@ -451,7 +454,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             }
         }
 
-        addChild(arrow)
+        connectionDrawing.addChild(arrow)
         addChild(interactionBox)
 
         if (connector is ConvolutionConnector) {
@@ -483,20 +486,22 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }.untilDisposed()
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connectorDisplayText())
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
         connectorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             syncKernelDisplayMode()
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateLayout()
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateLayout()
+            connectionDrawing.invalidateLayout()
         }.untilDisposed()
 
         interactionBox.setText(connectorDisplayText())
-        invalidateLayout()
+        layoutConnectionWithView()
+        connectionDrawing.invalidateLayout()
         updateDetailLabel()
     }
 
@@ -523,7 +528,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             renderKernelImage()
             updateDetailLabel()
         }
-        invalidateLayout()
+        connectionDrawing.invalidateLayout()
     }
 
     /** Trace highlight set by the receptive field tracer. */
@@ -629,7 +634,12 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         detailLabel.textPaint = NetworkTheme.current.valueText
         if (connector is ConvolutionConnector) {
             val c = connector
-            detailLabel.text = "F${currentFilter + 1}/${c.numFilters} Ch${currentInputChannel + 1}/${c.source.shape.channels}"
+            val text = "F${currentFilter + 1}/${c.numFilters} Ch${currentInputChannel + 1}/${c.source.shape.channels}"
+            if (text != detailLabel.text) {
+                detailLabel.text = text
+                // The label is centered under the kernel, so a change in its width moves it
+                connectionDrawing.invalidateLayout()
+            }
         }
     }
 
@@ -667,10 +677,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
-        layoutChildren()
+        layoutArrow()
     }
 
-    override fun layoutChildren() {
+    private fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.globalFullBounds ?: return
@@ -680,10 +690,6 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
-        // Laying out the arrow replaces its shape and moves what is drawn on it. A validation pass only goes back
-        // over children changed here when this node is itself marked, which it is not when a child that kept its
-        // size started the pass, as the label box does on a zoom
-        invalidateFullBounds()
     }
 
     override fun paint(paintContext: PPaintContext) {

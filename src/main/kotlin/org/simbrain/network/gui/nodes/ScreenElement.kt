@@ -6,6 +6,7 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.CoroutineScope
+import org.piccolo2d.PCamera
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
@@ -23,6 +24,7 @@ import org.simbrain.util.piccolo.ScopedNode
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.nodeScopeIn
 import java.awt.event.InputEvent
+import java.beans.PropertyChangeListener
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
@@ -74,6 +76,41 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * Returns a reference to the model object this node represents.
      */
     abstract val model: NetworkModel
+
+    /**
+     * What this element draws among the connections, under everything connectors draw on their arrows, or null if
+     * it draws nothing there. The panel puts it in the connection tier when it adds this element and takes it out
+     * when it removes the element.
+     */
+    open val connectionDrawing: ConnectionDrawing? get() = null
+
+    /**
+     * Everything this element draws, in canvas coordinates: its own node and its [connectionDrawing], which is not
+     * part of the node's full bounds.
+     */
+    val globalDrawnBounds: PBounds
+        get() = globalFullBounds.also { bounds -> connectionDrawing?.let { bounds.add(it.globalFullBounds) } }
+
+    private var viewListener: PropertyChangeListener? = null
+
+    /**
+     * Lay the [connectionDrawing] out again whenever the view pans or zooms. Label boxes are rescaled with the
+     * zoom, and what a connector places around its label box has to follow. Ends when the node is disposed.
+     */
+    protected fun layoutConnectionWithView() {
+        if (viewListener != null) return
+        val listener = PropertyChangeListener { connectionDrawing?.invalidateLayout() }
+        viewListener = listener
+        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
+    }
+
+    override fun dispose() {
+        super.dispose()
+        viewListener?.let {
+            networkPanel.canvas.camera.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, it)
+        }
+        viewListener = null
+    }
 
     /**
      * Return true if this screen element accepts a source [NodeHandle].
@@ -164,7 +201,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * Returns true if the provided bounds intersect this screen element
      */
     open fun isIntersecting(bound: PBounds?): Boolean {
-        return globalFullBounds.intersects(bound)
+        return globalDrawnBounds.intersects(bound)
     }
 
     /**

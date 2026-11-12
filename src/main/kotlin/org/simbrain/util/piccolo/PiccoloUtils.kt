@@ -9,6 +9,7 @@ import org.piccolo2d.nodes.PImage
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PAffineTransform
 import org.piccolo2d.util.PBounds
+import org.simbrain.network.gui.nodes.ConnectionDrawing
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.component1
@@ -46,14 +47,22 @@ fun Container.processPiccoloChanges() {
     }
 }
 
+/**
+ * The node this one belongs to: the element a [ConnectionDrawing] is part of, which is not above it on the canvas,
+ * and otherwise the parent.
+ */
+private val PNode.belongsTo: PNode?
+    get() = (this as? ConnectionDrawing)?.owner ?: parent
+
+/** The screen elements this node is or belongs to, nearest first. */
 val PNode.screenElements
-    get() = generateSequence(this) { it.parent }.filterIsInstance<ScreenElement>()
+    get() = generateSequence(this) { it.belongsTo }.filterIsInstance<ScreenElement>()
 
 val PNode.firstScreenElement
     get() = screenElements.firstOrNull()
 
 val PNode?.hasScreenElement
-    get() = this?.parents?.any { it is ScreenElement } ?: false
+    get() = this?.belongsTo?.screenElements?.any() ?: false
 
 val PInputEvent.isDoubleClick
     get() = clickCount == 2 && button == MouseEvent.BUTTON1

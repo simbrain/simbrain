@@ -6,7 +6,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.PCamera
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
@@ -31,7 +30,6 @@ import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Ellipse2D
-import java.beans.PropertyChangeListener
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -62,6 +60,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     val imageBox = ImageBox(imageSide, imageSide, boxThickness)
 
     private val arrow = WeightMatrixArrow(this)
+
+    /** The arrow, whose layout also places the image, label box and caption on its shaft. */
+    override val connectionDrawing = ConnectionDrawing(this) { arrow.layout() }.also { it.addChild(arrow) }
 
     /**
      * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
@@ -144,9 +145,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
     }
 
-    /** Keeps the arrow attached while the view pans and zooms; removed when the node leaves the canvas. */
-    private val cameraListener: PropertyChangeListener
-
     init {
         pickable = true
         val events = weightMatrix.events
@@ -158,7 +156,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             interactionBox.setText(weightMatrix.displayName)
         }.untilDisposed()
         addChild(interactionBox)
-        addChild(arrow)
         addChild(imageBox)
         addChild(shapeCaption)
         updateShapeCaption()
@@ -190,7 +187,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         })
         
         fun updateLocations() {
-            arrow.invalidateFullBounds()
+            connectionDrawing.invalidateLayout()
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
@@ -204,19 +201,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }?.untilDisposed()
-        cameraListener = PropertyChangeListener { updateLocations() }
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
-        networkPanel
-        invalidateFullBounds()
+        layoutConnectionWithView()
+        updateLocations()
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()
         renderMatrixToImage()
-    }
-
-    override fun dispose() {
-        super.dispose()
-        networkPanel.canvas.camera.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
     }
 
     override fun syncFromModel(bits: Int) {

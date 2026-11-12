@@ -253,7 +253,12 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
      * would be reacting to bounds it is itself part of.
      */
     protected val outlinedObjectBounds: PBounds
-        get() = PBounds().apply { outlinedObjects.forEach { add(it.fullBounds) } }
+        get() = PBounds().apply {
+            outlinedObjects.forEach { node ->
+                add(node.fullBounds)
+                node.connectionDrawing?.let { add(it.fullBounds) }
+            }
+        }
 
     override fun syncFromModel(bits: Int) {
         if (bits and INFO != 0) layoutChildren()

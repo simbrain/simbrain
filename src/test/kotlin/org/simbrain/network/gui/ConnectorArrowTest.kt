@@ -1,7 +1,9 @@
 /**
- * What a connector's arrow does beyond being drawn: a click on it selects the connector, mouse events on it reach
- * the connector's node, and a loop that reaches past the layers counts toward the extent of a subnetwork's outline
- * and of the view fitted to the network.
+ * A connector's arrow is drawn among the connections while the rest of the connector is drawn above them. Checks
+ * that the arrow still belongs to the connector: a click on it selects the connector, mouse events on it reach the
+ * connector's node, it leaves the canvas with the connector, and a loop that reaches past the layers counts toward
+ * the extent of a subnetwork's outline and of the view fitted to the network. Also checks that what a connector
+ * draws on its arrow is in front of other connections.
  */
 package org.simbrain.network.gui
 
@@ -17,18 +19,22 @@ import org.simbrain.network.core.ConvolutionConnector
 import org.simbrain.network.core.FlattenConnector
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Padding
+import org.simbrain.network.core.Synapse
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.TensorLayer
 import org.simbrain.network.core.TensorShape
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeurons
+import org.simbrain.network.gui.nodes.ConnectionDrawing
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.network.subnetworks.BPTTNetwork
 import org.simbrain.util.onEdt
+import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
 import java.awt.Dimension
@@ -234,6 +240,50 @@ class ConnectorArrowTest {
             val view = PBounds(panel.canvas.camera.viewBounds)
             assertTrue(view.contains(loop), "view $view loop $loop")
             assertTrue(view.contains(image), "view $view image $image")
+        }
+    }
+
+    @Test
+    fun `a weight matrix image is picked ahead of a synapse that runs across it`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -420.0)
+        val matrix = WeightMatrix(source, target)
+        val left = Neuron()
+        val right = Neuron()
+        val synapse = Synapse(left, right)
+        val panel = panelFor(Network(), source, target, matrix, left, right, synapse)
+        val image = onEdt { (panel.getNode(matrix) as WeightMatrixNode).imageBox.globalFullBounds }
+        onEdt {
+            left.location = Point2D.Double(image.x - 100.0, image.centerY)
+            right.location = Point2D.Double(image.maxX + 100.0, image.centerY)
+        }
+        panel.validateCanvas()
+
+        onEdt {
+            val point = Point2D.Double(image.centerX, image.centerY)
+            assertTrue(panel.getNode(synapse)!!.globalFullBounds.contains(point), "The synapse does not cross the image")
+            val inView = panel.canvas.camera.viewToLocal(Point2D.Double(point.x, point.y))
+            val picked = panel.canvas.camera.pick(inView.x, inView.y, 1.0).pickedNode
+            val pickedModel = picked.firstScreenElement?.model
+            assertTrue(pickedModel === matrix, "Picked $pickedModel")
+        }
+    }
+
+    @Test
+    fun `deleting a connector takes its arrow off the canvas`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -420.0)
+        val matrix = WeightMatrix(source, target)
+        val network = Network()
+        val panel = panelFor(network, source, target, matrix)
+        assertEquals(1, onEdt { panel.canvas.layer.allNodes.filterIsInstance<BezierArrow>().size })
+
+        runBlocking { network.deleteModels(listOf(matrix)) }
+        panel.awaitCanvasIdle()
+
+        onEdt {
+            assertTrue(panel.canvas.layer.allNodes.none { it is BezierArrow }, "The arrow is still on the canvas")
+            assertTrue(panel.edgeTier.childrenReference.none { it is ConnectionDrawing })
         }
     }
 }

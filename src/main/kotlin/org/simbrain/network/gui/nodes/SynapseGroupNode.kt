@@ -30,6 +30,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     var interactionBox: SynapseGroupInteractionBox
 
+    /** Holds whichever of the two drawings of the group is in use. Each lays itself out and places the label box. */
+    override val connectionDrawing = ConnectionDrawing(this)
+
     val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as NeuronCollectionNode }
     val targetNode by lazy { networkPanel.getNode(synapseGroup.target) as NeuronCollectionNode }
 
@@ -86,9 +89,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox.contextMenu
     }
 
-    private fun removeEverythingButInteractionBox() {
-        removeChild(directedNode)
-        removeChild(expandedNode)
+    private fun removeBothDrawings() {
+        directedNode?.let { connectionDrawing.removeChild(it) }
+        expandedNode?.let { connectionDrawing.removeChild(it) }
     }
 
     fun updateInteractionBoxLocation() {
@@ -114,20 +117,18 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     private fun setVisibility() {
         if (synapseGroup.displaySynapses) {
-            removeEverythingButInteractionBox()
+            removeBothDrawings()
             if (expandedNode == null) {
                 expandedNode = SynapseGroupNodeExpanded(networkPanel, this)
             }
-            addChild(expandedNode)
-            interactionBox.raiseAbove(expandedNode)
+            connectionDrawing.addChild(expandedNode)
             currentNode = expandedNode
         } else {
-            removeEverythingButInteractionBox()
+            removeBothDrawings()
             if (directedNode == null) {
                 directedNode = SynapseGroupNodeDirected(this)
             }
-            addChild(directedNode)
-            interactionBox.raiseAbove(directedNode)
+            connectionDrawing.addChild(directedNode)
             currentNode = directedNode
         }
     }

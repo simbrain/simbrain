@@ -80,10 +80,11 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
             is RecurrentArrow -> arrow.updateColorFromPreferences()
             is BezierArrow -> arrow.updateColorFromPreferences()
         }
-        layoutChildren()
+        layout()
     }
 
-    override fun layoutChildren() {
+    /** Draw the arrow between the two layers as they now are, and place what the matrix draws on it. */
+    fun layout() {
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) ->
                 weightMatrixNode.placeAt(x, y)

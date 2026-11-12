@@ -74,9 +74,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     val canvas = NetworkCanvas()
 
     /**
-     * Bottom tier of the canvas: connections (weight matrices, synapses, gap junctions, synapse groups, connectors).
-     * They change only on edits, not every iteration, so the tier is drawn from a cached image that any change to a
-     * connection invalidates; neurons changing above it don't touch it.
+     * Bottom tier of the canvas: the lines and arrows of connections (synapses, gap junctions, and the arrows of
+     * weight matrices, synapse groups and connectors). They change only on edits, not every iteration, so the tier
+     * is drawn from a cached image that any change to a connection invalidates; what changes above it doesn't
+     * touch it.
      */
     internal val edgeTier = RasterCachedNode().also {
         // Nothing but the canvas background lies under the bottom tier, so the cache can blend over it exactly
@@ -92,6 +93,13 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     /** Spike highlights for synapses, drawn over the cached connections so spikes don't invalidate the cache. */
     internal val spikeOverlay = SpikeOverlayNode().also { canvas.layer.addChild(it) }
+
+    /**
+     * Middle tier: what connectors draw on their arrows, such as weight matrix images, kernels and label boxes. It is
+     * drawn over every line and arrow in the [edgeTier], whichever connection they belong to, and under the layers.
+     * A connector's node is here; its arrow is the node's [ScreenElement.connectionDrawing], in the [edgeTier].
+     */
+    internal val connectorTier = PNode().also { canvas.layer.addChild(it) }
 
     /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
     private val nodeTier = PNode().also { canvas.layer.addChild(it) }
@@ -122,6 +130,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     internal fun detachNode(node: ScreenElement) {
         node.dispose()
         node.removeFromParent()
+        node.connectionDrawing?.removeFromParent()
     }
 
     /**
@@ -286,7 +295,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     private val zoomToFit = viewScope.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
         if (autoZoom) {
-            val filtered = screenElements.unionOfGlobalFullBounds()
+            // An element's drawing among the connections is not inside the element's own node
+            val filtered = screenElements.flatMap { listOfNotNull(it, it.connectionDrawing) }.unionOfGlobalFullBounds()
             canvas.camera.setViewBounds(
                 PBounds(filtered.getX() - 10, filtered.getY() - 10, filtered.getWidth() + 20, filtered.getHeight() + 20)
             )
@@ -365,34 +375,44 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         canvas.layer.allNodes.filterIsInstance(clazz)
 
     /**
-     * Screenelements follow a standard pattern to be displayed properly.
-     * For example, Synapse nodes are always at the bottom, then SynapseGroupNodes right above them.
-     * Calls to lowerToBottom and raiseToTop should be avoided for top level screen elements in favor of using this function.
+     * Screen elements go in the tier for their kind, and within the connection tier in a fixed order of kinds, so
+     * that they are drawn over each other the same way however the network was built. Calls to lowerToBottom and
+     * raiseToTop should be avoided for top level screen elements in favor of using this function.
      */
     private fun addNodeOrdered(node: ScreenElement) {
-        // Within the edge tier, weight matrices sit lowest, then synapses, gap junctions, synapse groups, and
-        // connectors; each kind goes after the last node of the kind below it. The search runs from the end of the
-        // tier, where the few nodes above the synapses sit, so it stops quickly even with many synapses
+        // Within the edge tier, weight matrix arrows sit lowest, then synapses, gap junctions, synapse group arrows,
+        // and connector arrows; each kind goes after the last of the kind below it. The search runs from the end of
+        // the tier, where the few drawings above the synapses sit, so it stops quickly even with many synapses
         // The first child of the tier is the underlay that every connection is drawn over
         val firstConnection = edgeTier.indexOfChild(connectionUnderlay) + 1
         fun after(vararg types: KClass<out ScreenElement>): Int {
             val children = edgeTier.childrenReference
             for (i in children.indices.reversed()) {
-                if (types.any { it.isInstance(children[i]) }) return i + 1
+                val element = (children[i] as? ConnectionDrawing)?.owner ?: children[i]
+                if (types.any { it.isInstance(element) }) return i + 1
             }
             return firstConnection
         }
 
-        when (node) {
-            is WeightMatrixNode -> edgeTier.addChild(firstConnection, node)
+        val edgeIndex = when (node) {
+            is WeightMatrixNode -> firstConnection
             // After the last synapse rather than the first, so a large network appends instead of shifting every
             // synapse already in the tier
-            is SynapseNode -> edgeTier.addChild(after(SynapseNode::class, WeightMatrixNode::class), node)
-            is GapJunctionNode -> edgeTier.addChild(after(SynapseNode::class), node)
-            is SynapseGroupNode -> edgeTier.addChild(after(SynapseNode::class), node)
-            is TensorConnectorNode -> edgeTier.addChild(after(SynapseGroupNode::class), node)
-            is FlattenConnectorNode -> edgeTier.addChild(after(TensorConnectorNode::class), node)
-            else -> nodeTier.addChild(node)
+            is SynapseNode -> after(SynapseNode::class, WeightMatrixNode::class)
+            is GapJunctionNode -> after(SynapseNode::class)
+            is SynapseGroupNode -> after(SynapseNode::class)
+            is TensorConnectorNode -> after(SynapseGroupNode::class)
+            is FlattenConnectorNode -> after(TensorConnectorNode::class)
+            else -> null
+        }
+        val drawing = node.connectionDrawing
+        when {
+            edgeIndex == null -> nodeTier.addChild(node)
+            drawing == null -> edgeTier.addChild(edgeIndex, node)
+            else -> {
+                edgeTier.addChild(edgeIndex, drawing)
+                connectorTier.addChild(node)
+            }
         }
     }
 

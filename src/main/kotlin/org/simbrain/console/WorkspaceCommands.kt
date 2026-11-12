@@ -20,15 +20,29 @@ import org.simbrain.util.callNoArgConstructor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.*
 import org.simbrain.workspace.couplings.Coupling
-import java.io.File
 
 private const val MAX_SHOWN = 50
 private const val RELAYED = "This window closes when the workspace is replaced, so this is running in the Terminal tab " +
         "at the bottom of the desktop, which stays open."
-private const val WORKSPACE_EXTENSION = "zip"
 private val NEURON_TYPE_WORDS = listOf("neurons", "collection")
 
+/** A sequence of examples, each building on the last, shown by `tour`. */
+val tour = listOf(
+    Example("Make a network of 20 neurons with random activations", "add network demo", "add neurons 20 in=demo activation=rand()"),
+    Example("Connect them sparsely, using half of the possible connections, with random strengths", "connect demo/Neuron_* demo/Neuron_* sparse connectionDensity=0.5 strength=randn(0,0.5)"),
+    Example("Select the neurons that connect to more than two others", "select demo/* where type=Neuron and fanOut>2"),
+    Example("Print how many connections each neuron sends", "get demo/Neuron_* fanOut"),
+    Example("Prune the weak synapses", "rm demo/* where type=Synapse and abs(strength)<0.2"),
+    Example("Strengthen the synapses that are left by 10%", "set demo/* strength=strength*1.1 where type=Synapse"),
+    Example("Make the neurons sigmoidal, each with its own random slope", "set demo/Neuron_* rule=Sigmoidal rule.slope=rand(1,3)"),
+    Example("Clamp the first five neurons on, as inputs", "set demo/Neuron_{1..5} clamped=true activation=1"),
+    Example("Plot a neuron's activation, then run", "add timeseries plot1", "couple demo/Neuron_10 \"plot1/Series 1\"", "run 50"),
+    Example("List the neurons that ended up active", "ls demo where type=Neuron and activation>0.5")
+)
+
 val workspaceCommands: CommandRegistry = commands {
+
+    conditionCompleter = { args, prior, partial -> conditionCandidates(args, prior, partial) }
 
     command(
         name = "ls",
@@ -115,7 +129,8 @@ val workspaceCommands: CommandRegistry = commands {
         usage = "get <path> <property> [where condition]",
         description = "Print one property of one or more objects.",
         completer = { prior, partial ->
-            if (prior.isEmpty()) pathCandidates(partial) else propertyCandidates(prior.first(), partial, "")
+            if (prior.isEmpty()) pathCandidates(partial)
+            else wordCandidates(resolveQuietly(prior.first()).oneOfEachType().flatMap(::readableNames).distinct(), partial)
         }
     ) { args ->
         if (args.size != 2) fail("Usage: get <path> <property>")
@@ -136,6 +151,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Make a collection labelled input, then select it by its label", "add collection 3 in=net1 label=input", "select net1/input"),
             Example("Select the neurons in net1 whose activation is above 0.5", "select net1/* where activation>0.5"),
             Example("Select the synapses in net1", "select net1/* where type=Synapse"),
+            Example("Select the neurons in net1 that connect to something", "select net1/* where type=Neuron and fanOut>0"),
+            Example("Add neurons, connect them all to each other, then select the neurons that connect to more than two", "add neurons 3 in=net1", "connect net1/Neuron_* net1/Neuron_* all", "select net1/* where type=Neuron and fanOut>2"),
             Example("Select every neuron in the workspace that nothing connects to", "select ** where type=Neuron and fanIn=0"),
             Example("Clear the selection", "select none")
         ),
@@ -166,6 +183,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Double every activation in net1", "set net1/Neuron_* activation=activation*2"),
             Example("Give the neurons in net1 above 0.5 random activations between -1 and 1", "set net1/* activation=rand(-1,1) where type=Neuron and activation>0.5"),
             Example("Set two properties at once", "set net1/Neuron_1 activation=0.5 bias=0.1"),
+            Example("Set the bias of the neurons in net1 whose activation is above 0.2", "set net1/* bias=0.8 where type=Neuron and activation>0.2"),
+            Example("Do the same for every network in the workspace", "set ** bias=0.8 where type=Neuron and activation>0.2"),
             Example("Give each neuron in net1 a random bias between -1 and 1", "set net1/Neuron_* bias=rand(-1,1)"),
             Example("Give each neuron in net1 its position as its activation: 0, 1, 2, and so on", "set net1/Neuron_* activation=i"),
             Example("Copy each neuron's activation into its bias", "set net1/Neuron_* bias=activation"),
@@ -209,6 +228,7 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Add a network named net2", "add network net2"),
             Example("Add ten sigmoidal neurons to net1", "add neurons 10 in=net1 rule=Sigmoidal"),
+            Example("Go into net1, then add neurons to it", "cd net1", "add neurons 10"),
             Example("Add five neurons with random activations", "add neurons 5 in=net1 activation=rand()"),
             Example("Add a collection of five neurons in a line, labelled input", "add collection 5 in=net1 label=input layout=line"),
             Example("Add a time series plot named plot2", "add timeseries plot2"),
@@ -234,7 +254,11 @@ val workspaceCommands: CommandRegistry = commands {
         examples = listOf(
             Example("Connect two neurons with a strength of 0.5", "connect net1/Neuron_1 net1/Neuron_2 strength=0.5"),
             Example("Connect the neurons in net1 to each other sparsely, with random strengths", "connect net1/Neuron_* net1/Neuron_* sparse strength=randn(0,0.5)"),
-            Example("Make two collections and join them with a synapse group", "add collection 3 in=net1 label=left", "add collection 3 in=net1 label=right", "connect net1/left net1/right")
+            Example("Connect the neurons in net1 sparsely, with 30% of the possible connections", "connect net1/Neuron_* net1/Neuron_* sparse connectionDensity=0.3"),
+            Example("Connect each neuron in net1 to one other neuron", "connect net1/Neuron_* net1/Neuron_* fixed degree=1"),
+            Example("Connect every neuron in net1 to every one, including itself", "connect net1/Neuron_* net1/Neuron_* all allowSelfConnection=true"),
+            Example("Make two collections and join them with a synapse group", "add collection 3 in=net1 label=left", "add collection 3 in=net1 label=right", "connect net1/left net1/right"),
+            Example("Make two collections and join them sparsely", "add collection 5 in=net1 label=left", "add collection 5 in=net1 label=right", "connect net1/left net1/right sparse connectionDensity=0.5")
         ),
         usage = "connect <source> <target> [strategy] [key=value ...]",
         description = "Connect neurons or collections. Strategies: " +
@@ -460,67 +484,6 @@ val workspaceCommands: CommandRegistry = commands {
     }
 
     command(
-        name = "open",
-        group = "Files",
-        examples = listOf(
-            Example("Open a workspace file", "open mywork.zip"),
-            Example("Open a workspace file, discarding unsaved changes", "open mywork.zip force")
-        ),
-        usage = "open <file> [force]",
-        description = "Open a workspace file, replacing the current workspace. force discards unsaved changes. From a " +
-                "Console window, which closes with the workspace, it runs in the Terminal tab at the bottom of the desktop."
-    ) { args ->
-        if (args.isEmpty() || args.size > 2 || (args.size == 2 && args[1] != "force")) fail("Usage: open <file> [force]")
-        val file = workspaceFile(args[0])
-        if (!file.isFile) fail("No such file: ${file.path}")
-        relayToTerminal?.let { relay ->
-            relay("open " + args.joinToString(" ") { quoted(it) })
-            return@command RELAYED
-        }
-        requireSafeToReplace(force = args.size == 2, "open <file> force")
-        workspace.openWorkspace(file, useDesktop = desktop != null)
-        "Opened ${file.name}."
-    }
-
-    command(
-        name = "save",
-        group = "Files",
-        examples = listOf(
-            Example("Save to the file the workspace came from", "save"),
-            Example("Save to a new file", "save mywork.zip"),
-            Example("Save over an existing file", "save mywork.zip force")
-        ),
-        usage = "save [file] [force]",
-        description = "Save the workspace. force replaces an existing file."
-    ) { args ->
-        val force = args.lastOrNull() == "force"
-        val pathArgs = if (force) args.dropLast(1) else args
-        if (pathArgs.size > 1) fail("Usage: save [file] [force]")
-        val file = pathArgs.firstOrNull()?.let(::workspaceFile)
-            ?: workspace.currentFile
-            ?: fail("This workspace has no file yet. Use save <file>.")
-        if (file.exists() && file != workspace.currentFile && !force) fail("${file.name} exists. Use save <file> force.")
-        if (file.absoluteFile.parentFile?.isDirectory == false) fail("No such folder: ${file.absoluteFile.parent}")
-        if (!workspace.save(file, headless = desktop == null)) fail("Could not save ${file.path}.")
-        workspace.currentFile = file
-        "Saved ${file.name}."
-    }
-
-    command(
-        name = "source",
-        group = "Files",
-        examples = listOf(
-            Example("Run the commands in a text file, one per line", "source build.txt")
-        ),
-        usage = "source <file>",
-        description = "Run the commands in a text file. Lines starting with # are comments."
-    ) { args ->
-        val file = File(expandHome(args.singleOrNull() ?: fail("Usage: source <file>")))
-        if (!file.isFile) fail("No such file: ${file.path}")
-        runFile(file)
-    }
-
-    command(
         name = "examples",
         group = "Other",
         examples = listOf(
@@ -540,6 +503,18 @@ val workspaceCommands: CommandRegistry = commands {
             }
             else -> fail("Usage: examples [command]")
         }
+    }
+
+    command(
+        name = "tour",
+        group = "Other",
+        examples = listOf(
+            Example("Show the tour", "tour")
+        ),
+        description = "Show examples that build a small network step by step, to paste in order."
+    ) { args ->
+        if (args.isNotEmpty()) fail("Usage: tour")
+        "Paste these in order. Each builds on the last.\n\n" + tour.joinToString("\n\n") { it.styled() }
     }
 
     command(
@@ -658,20 +633,79 @@ private fun expressionContext(node: Node, index: Int, count: Int) = ExpressionCo
 private fun readValue(node: Node, key: String): Any? =
     findProperty(editableObject(node), key)?.let { it.value ?: "none" } ?: extraFacts(node.value)[key]
 
-private fun CommandShell.propertyCandidates(path: String, partial: String, suffix: String): List<Candidate> {
-    val node = resolveQuietly(path).firstOrNull() ?: return emptyList()
-    return editablePropertiesOf(editableObject(node))
-        .filter { it.name.startsWith(partial, ignoreCase = true) }
-        .map { Candidate(it.name, suffix.ifEmpty { " " }) }
-}
+private fun List<Node>.oneOfEachType() = distinctBy { it.value::class }
+
+private fun settableNames(node: Node) = editablePropertiesOf(editableObject(node)).map { it.name }
+
+/** Names that get, show, and where can read: the editable properties and the facts worked out for the object. */
+private fun readableNames(node: Node) = settableNames(node) + extraFacts(node.value).keys
+
+private fun CommandShell.propertyCandidates(path: String, partial: String, suffix: String): List<Candidate> =
+    resolveQuietly(path).oneOfEachType().flatMap(::settableNames).distinct()
+        .filter { it.startsWith(partial, ignoreCase = true) }
+        .map { Candidate(it, suffix.ifEmpty { " " }) }
+
+private fun optionsFor(nodes: List<Node>, name: String): List<String> =
+    nodes.firstNotNullOfOrNull { findProperty(editableObject(it), name) }?.let(::valueOptions).orEmpty()
 
 private fun CommandShell.valueCandidates(path: String, partial: String): List<Candidate> {
-    val node = resolveQuietly(path).firstOrNull() ?: return emptyList()
     val key = partial.substringBefore("=")
-    val property = findProperty(editableObject(node), key) ?: return emptyList()
-    return valueOptions(property)
+    return optionsFor(resolveQuietly(path).oneOfEachType(), key)
         .filter { it.startsWith(partial.substringAfter("="), ignoreCase = true) }
         .map { Candidate("$key=$it") }
+}
+
+/** Kinds of object a `where` condition may be about: what the paths match, or what they contain if they are places. */
+private fun CommandShell.conditionSubjects(args: List<String>): List<Node> {
+    val found = args.filter { '=' !in it }.flatMap { resolveQuietly(it.substringBefore(':')) }.ifEmpty { listOf(current) }
+    return found.oneOfEachType().flatMap { node ->
+        childrenOf(node.value)?.map { (name, child) -> Node(node.path + name, child) } ?: listOf(node)
+    }.oneOfEachType()
+}
+
+private fun conditionValues(subjects: List<Node>, name: String): List<String> =
+    if (name.equals("type", ignoreCase = true)) subjects.mapNotNull { it.value::class.simpleName }.distinct()
+    else optionsFor(subjects, name)
+
+private val comparisonWords = setOf("=", "==", "!=", "<", ">", "<=", ">=")
+private val partialComparison = Regex("(.*?)([A-Za-z_][A-Za-z0-9_]*)(!=|==|=)([^=<>!()]*)")
+private val partialName = Regex("(.*[^A-Za-z0-9_.])?([A-Za-z_][A-Za-z0-9_]*)?")
+private val endsInComparison = Regex(".*[^=<>!]\\s*(=|==|!=|<|>|<=|>=)\\s*[^=<>!(\\s]+")
+
+/** Whether [words] end with a whole comparison, after which `and` or `or` comes next. */
+private fun endsComparison(words: List<String>): Boolean {
+    val last = words.lastOrNull() ?: return false
+    if (last in comparisonWords || last in setOf("and", "or", "not")) return false
+    return endsInComparison.matches(last) || words.getOrNull(words.size - 2) in comparisonWords ||
+            (last.first() in "=<>!" && words.size >= 2)
+}
+
+/**
+ * Completions in a `where` condition: property names, `type`, and the facts worked out for objects; the values of a
+ * property after `=`; and `and`, `or`, and `not` where they fit.
+ */
+private fun CommandShell.conditionCandidates(args: List<String>, prior: List<String>, partial: String): List<Candidate> {
+    val subjects = conditionSubjects(args)
+    if (prior.lastOrNull() in setOf("=", "==", "!=")) {
+        val name = prior.getOrNull(prior.size - 2) ?: return emptyList()
+        return wordCandidates(conditionValues(subjects, name), partial)
+    }
+    partialComparison.matchEntire(partial)?.let { match ->
+        val (head, name, operator, value) = match.destructured
+        return conditionValues(subjects, name)
+            .filter { it.startsWith(value, ignoreCase = true) }
+            .map { Candidate("$head$name$operator$it") }
+    }
+    val match = partialName.matchEntire(partial) ?: return emptyList()
+    val head = match.groupValues[1]
+    val word = match.groupValues[2]
+    if (head.isNotEmpty() && word.isEmpty()) return emptyList()
+    if (head.isEmpty() && endsComparison(prior)) return wordCandidates(listOf("and", "or"), partial)
+    val names = (listOf("type") + subjects.flatMap(::readableNames)).distinct()
+        .filter { it.startsWith(word, ignoreCase = true) }
+        .map { Candidate(head + it, "") }
+    val not = if (head.isEmpty() || head.endsWith("(")) wordCandidates(listOf("not"), word) else emptyList()
+    return names + not.map { Candidate(head + it.text) }
 }
 
 private fun CommandShell.addableTypes(): List<String> =
@@ -878,12 +912,4 @@ private fun CommandShell.requireSafeToReplace(force: Boolean, forceUsage: String
     if (!force && workspace.componentList.isNotEmpty() && workspace.hasUnsavedWork()) {
         fail("There are unsaved changes. Save first, or use $forceUsage.")
     }
-}
-
-private fun expandHome(path: String) =
-    if (path == "~" || path.startsWith("~/")) System.getProperty("user.home") + path.drop(1) else path
-
-private fun workspaceFile(path: String): File {
-    val file = File(expandHome(path))
-    return if (file.extension.isEmpty()) File(file.path + "." + WORKSPACE_EXTENSION) else file
 }

@@ -11,7 +11,6 @@ import org.junit.jupiter.api.Assertions.assertNotEquals
 import org.junit.jupiter.api.Assertions.assertNotSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.io.TempDir
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
@@ -20,7 +19,6 @@ import org.simbrain.network.core.Synapse
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.workspace.Workspace
-import java.io.File
 import java.util.concurrent.CopyOnWriteArrayList
 
 class CommandShellTest {
@@ -506,34 +504,27 @@ class CommandShellTest {
     }
 
     @Test
-    fun `save and open round trip a workspace`(@TempDir dir: File) {
-        val shell = shellWithNetwork()
-        val file = File(dir, "saved.zip")
-        assertEquals("Saved saved.zip.", shell.run("save ${file.path}"))
-        shell.run("rm net1/Synapse_1")
-        assertEquals("There are unsaved changes. Save first, or use open <file> force.", shell.run("open ${file.path}"))
-        assertEquals("Opened saved.zip.", shell.run("open ${file.path} force"))
-        assertTrue("Synapse_1" in shell.run("ls net1"))
-    }
-
-    @Test
-    fun `a console window sends open to the terminal tab`(@TempDir dir: File) {
-        val shell = shellWithNetwork()
-        val file = File(dir, "saved.zip")
-        shell.run("save ${file.path}")
-        val relayed = mutableListOf<String>()
-        shell.relayToTerminal = { relayed += it }
-        assertTrue(shell.run("open ${file.path} force").contains("running in the Terminal tab"))
-        assertEquals(listOf("open ${file.path} force"), relayed)
-        assertEquals("net1", shell.run("ls"))
-    }
-
-    @Test
     fun `examples shows one of each command, or all for one command`() {
         val shell = shellWithNetwork()
         val all = shell.run("examples")
         assertTrue(all.contains("# List the components in the workspace\nls\n\n# Go into net1"), all)
+        assertTrue(shell.run("tour").endsWith(tour.joinToString("\n\n")))
         assertEquals(workspaceCommands["set"]!!.examples.joinToString("\n\n"), shell.run("examples set"))
+    }
+
+    @Test
+    fun `the tour runs in order in an empty workspace`() {
+        val shell = CommandShell(Workspace())
+        runBlocking {
+            for (line in tour.flatMap { it.lines }) {
+                try {
+                    withTimeout(30_000) { shell.executeOrThrow(line) }
+                } catch (e: CommandException) {
+                    throw AssertionError("$line: ${e.message}")
+                }
+            }
+        }
+        shell.workspace.stop()
     }
 
     @Test
@@ -542,45 +533,6 @@ class CommandShellTest {
         val styled = runBlocking { shell.executeStyled("help") }
         assertTrue(styled.contains("  ${bold("ls")} [path]"), styled)
         assertEquals("ls [path]", plainText(bold("ls") + " [path]"))
-    }
-
-    @Test
-    fun `save adds the extension and will not replace a file without force`(@TempDir dir: File) {
-        val shell = shellWithNetwork()
-        File(dir, "taken.zip").writeText("x")
-        val path = File(dir, "taken").path
-        assertEquals("taken.zip exists. Use save <file> force.", shell.run("save $path"))
-        assertEquals("Saved taken.zip.", shell.run("save $path force"))
-    }
-
-    @Test
-    fun `save needs a file for a new workspace`() {
-        assertEquals("This workspace has no file yet. Use save <file>.", shellWithNetwork().run("save"))
-    }
-
-    @Test
-    fun `source runs a file and skips comments`(@TempDir dir: File) {
-        val shell = CommandShell(Workspace())
-        val file = File(dir, "build.txt").apply {
-            writeText("# a network\nadd network net1\n\nadd neurons 2\nset net1/Neuron_1 activation=1\n")
-        }
-        assertEquals("Added net1.\nAdded Neuron_1 to Neuron_2.", shell.run("source ${file.path}"))
-        assertEquals(1.0, shell.neuron("Neuron_1").activation)
-    }
-
-    @Test
-    fun `source stops at the first problem and names the line`(@TempDir dir: File) {
-        val shell = CommandShell(Workspace())
-        val file = File(dir, "bad.txt").apply { writeText("add network net1\nnope\nadd network net2\n") }
-        assertEquals("Added net1.\nbad.txt, line 2: Unknown command: nope. Enter help for a list.", shell.run("source ${file.path}"))
-        assertEquals("net1", shell.run("ls"))
-    }
-
-    @Test
-    fun `a file that sources itself is stopped`(@TempDir dir: File) {
-        val file = File(dir, "loop.txt")
-        file.writeText("source ${file.path}\n")
-        assertTrue(shellWithNetwork().run("source ${file.path}").contains("Files are nested too deeply."))
     }
 
     @Test
@@ -596,6 +548,39 @@ class CommandShellTest {
         val shell = shellWithNetwork()
         assertEquals("set net1/Neuron_1 activation=", shell.complete("set net1/Neuron_1 activ").line)
         assertEquals("set net1/Neuron_1 updateRule=Sigmoidal ", shell.complete("set net1/Neuron_1 updateRule=Sigmoidal").line)
+    }
+
+    @Test
+    fun `get completes facts as well as properties`() {
+        val shell = shellWithNetwork()
+        assertEquals("get net1/Neuron_1 fanOut ", shell.complete("get net1/Neuron_1 fanO").line)
+        assertEquals("set net1/Neuron_1 fanO", shell.complete("set net1/Neuron_1 fanO").line)
+    }
+
+    @Test
+    fun `where completes names from what the path contains`() {
+        val shell = shellWithNetwork()
+        assertEquals("ls net1 where fanOut", shell.complete("ls net1 where fanO").line)
+        val options = shell.complete("ls net1 where ").options
+        assertTrue("activation" in options && "strength" in options && "type" in options && "not" in options, "$options")
+        assertEquals("set net1/* strength=0 where (fanOut", shell.complete("set net1/* strength=0 where (fanO").line)
+    }
+
+    @Test
+    fun `where completes values after equals`() {
+        val shell = shellWithNetwork()
+        assertEquals(listOf("type=Neuron", "type=Synapse"), shell.complete("ls net1 where type=").options.sorted())
+        assertEquals("ls net1 where type=Synapse ", shell.complete("ls net1 where type=Syn").line)
+        assertEquals("ls net1 where type = Synapse ", shell.complete("ls net1 where type = Syn").line)
+        assertEquals("ls net1 where clamped=true ", shell.complete("ls net1 where clamped=t").line)
+    }
+
+    @Test
+    fun `where completes and or after a comparison`() {
+        val shell = shellWithNetwork()
+        assertEquals(listOf("and", "or"), shell.complete("ls net1 where activation>0.5 ").options)
+        assertEquals("ls net1 where fanIn > 0 and ", shell.complete("ls net1 where fanIn > 0 a").line)
+        assertEquals("ls net1 where activation>0.5", shell.complete("ls net1 where activation>0.5").line)
     }
 
     @Test
@@ -672,29 +657,11 @@ class CommandShellTest {
     }
 
     @Test
-    fun `save reports a failure and keeps the previous file`(@TempDir dir: File) {
-        val shell = shellWithNetwork()
-        val missing = File(dir, "missing/a.zip").path
-        assertEquals("No such folder: ${File(dir, "missing").path}", shell.run("save $missing"))
-        assertEquals(null, shell.workspace.currentFile)
-    }
-
-    @Test
     fun `adding a component with a bad option leaves nothing behind`() {
         val shell = CommandShell(Workspace())
         assertTrue(shell.run("add network net1 foo=1").startsWith("Network has no property foo"))
         assertEquals("(empty)", shell.run("ls"))
         assertEquals("Added net1.", shell.run("add network net1"))
-    }
-
-    @Test
-    fun `source keeps the output before a problem`(@TempDir dir: File) {
-        val shell = CommandShell(Workspace())
-        val file = File(dir, "bad.txt").apply { writeText("add network net1\nls\nnope\n") }
-        assertEquals(
-            "Added net1.\nnet1\nbad.txt, line 3: Unknown command: nope. Enter help for a list.",
-            shell.run("source ${file.path}")
-        )
     }
 
     @Test
@@ -800,7 +767,7 @@ class CommandShellTest {
     fun `help groups commands`() {
         val listing = shellWithNetwork().run("help")
         assertTrue(listing.startsWith("Inspect\n  ls"), listing)
-        listOf("Build", "Run", "Files").forEach { assertTrue(it in listing, it) }
+        listOf("Build", "Run", "Other").forEach { assertTrue(it in listing, it) }
     }
 
     @Test
@@ -822,8 +789,8 @@ class CommandShellTest {
 
     @Test
     fun `every example runs in a small workspace`() {
-        val needsFilesOrDesktop = setOf("sim", "open", "save", "source")
-        for (command in workspaceCommands.all.filter { it.name !in needsFilesOrDesktop }) {
+        val needsDesktop = setOf("sim")
+        for (command in workspaceCommands.all.filter { it.name !in needsDesktop }) {
             for (example in command.examples) {
                 val workspace = Workspace()
                 val component = NetworkComponent("net1")

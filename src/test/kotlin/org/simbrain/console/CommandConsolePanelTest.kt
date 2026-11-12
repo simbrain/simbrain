@@ -126,7 +126,7 @@ class CommandConsolePanelTest {
         panel.type("s")
         panel.press("console-complete")
         val text = panel.text
-        assertTrue("show" in text && "stop" in text && "save" in text, text)
+        assertTrue("show" in text && "stop" in text && "set" in text, text)
         assertTrue(text.endsWith("> s"), text)
     }
 

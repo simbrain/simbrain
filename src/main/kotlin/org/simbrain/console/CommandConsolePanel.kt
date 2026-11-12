@@ -120,7 +120,10 @@ class CommandConsolePanel(
         add(JScrollPane(textPane).apply { border = BorderFactory.createEmptyBorder() }, BorderLayout.CENTER)
         document.documentFilter = InputFilter()
         writePrompt()
-        insertOutput("Simbrain commands. Enter ${bold("help")} for a list, or ${bold("examples")} for some to copy and paste.")
+        insertOutput(
+            "Simbrain commands. Enter ${bold("help")} for a list, ${bold("examples")} for some to copy and paste, " +
+                    "or ${bold("tour")} for a step-by-step walkthrough."
+        )
         commandScope.launch { runQueue() }
 
         bindKey("ENTER", "console-enter") { enterLine() }

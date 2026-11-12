@@ -27,7 +27,6 @@ import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
-import java.io.File
 import java.lang.reflect.InvocationTargetException
 import java.util.IdentityHashMap
 import java.util.concurrent.ConcurrentHashMap
@@ -36,7 +35,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 import kotlin.math.abs
 
-private const val MAX_SOURCE_DEPTH = 8
 private const val MAX_LISTED = 500
 private const val MAX_PLACES = 5
 private const val MAX_EXPANSION = 100_000
@@ -61,6 +59,12 @@ class Candidate(val text: String, val suffix: String = " ")
 typealias Completer = CommandShell.(priorArgs: List<String>, partial: String) -> List<Candidate>
 
 val noCompletion: Completer = { _, _ -> emptyList() }
+
+/**
+ * Offers completions for a word in a `where` condition, given the command's arguments before `where` and the words of
+ * the condition before the one being completed.
+ */
+typealias ConditionCompleter = CommandShell.(args: List<String>, priorWords: List<String>, partial: String) -> List<Candidate>
 val pathCompletion: Completer = { _, partial -> pathCandidates(partial) }
 val commandCompletion: Completer = { _, partial -> wordCandidates(registry.all.map { it.name }, partial) }
 
@@ -119,6 +123,8 @@ class CommandRegistry {
 
     operator fun get(name: String): Command? = commandsByName[name]
 
+    var conditionCompleter: ConditionCompleter = { _, _, _ -> emptyList() }
+
     fun command(
         name: String,
         usage: String = name,
@@ -161,8 +167,6 @@ class CommandShell(
 
     @Volatile
     private var currentPath: List<String> = emptyList()
-
-    private var sourceDepth = 0
 
     /**
      * Set for a shell in a Console window, which is part of the workspace and closes when the workspace is replaced.
@@ -237,28 +241,6 @@ class CommandShell(
     private fun sideBySide(items: List<String>): String {
         val shown = items.take(MAX_LISTED).joinToString("  ")
         return if (items.size > MAX_LISTED) "$shown\n... and ${items.size - MAX_LISTED} more. Narrow with a longer path or where." else shown
-    }
-
-    /** Run the lines of a file in order, stopping at the first problem, which is reported after the earlier output. */
-    suspend fun runFile(file: File): String {
-        if (sourceDepth >= MAX_SOURCE_DEPTH) fail("Files are nested too deeply.")
-        sourceDepth++
-        try {
-            val outputs = mutableListOf<String>()
-            for ((index, line) in file.readLines().withIndex()) {
-                try {
-                    runLine(line).takeIf { it.isNotEmpty() }?.let(outputs::add)
-                } catch (e: CancellationException) {
-                    throw e
-                } catch (e: Exception) {
-                    outputs += "${file.name}, line ${index + 1}: ${problemText(e)}"
-                    fail(outputs.joinToString("\n"))
-                }
-            }
-            return outputs.joinToString("\n")
-        } finally {
-            sourceDepth--
-        }
     }
 
     /** Find the one thing a path refers to. */
@@ -410,10 +392,14 @@ class CommandShell(
         val partial = if (scanned.lastTokenStart != null) scanned.tokens.last() else ""
         val priorTokens = if (scanned.lastTokenStart != null) scanned.tokens.dropLast(1) else scanned.tokens
 
-        val candidates = if (priorTokens.isEmpty()) {
-            wordCandidates(registry.all.map { it.name }, partial)
-        } else {
-            registry[priorTokens.first()]?.completer?.invoke(this, priorTokens.drop(1), partial).orEmpty()
+        val command = priorTokens.firstOrNull()?.let { registry[it] }
+        val whereAt = priorTokens.indexOf("where")
+        val candidates = when {
+            priorTokens.isEmpty() -> wordCandidates(registry.all.map { it.name }, partial)
+            command == null -> emptyList()
+            command.takesWhere && whereAt > 0 ->
+                registry.conditionCompleter(this, priorTokens.subList(1, whereAt), priorTokens.drop(whereAt + 1), partial)
+            else -> command.completer(this, priorTokens.drop(1), partial)
         }
 
         val head = line.substring(0, tokenStart)

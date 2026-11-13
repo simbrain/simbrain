@@ -169,6 +169,10 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("SOM network (smell)") { somNetSmells }
     }
 
+    dir("Developer") {
+        item("Connector layout cases", beta = true) { connectorLayoutCases }
+    }
+
     dir("Dynamical systems") {
         item("Logistic map") { logisticMap }
         item("Two-neuron dynamics") { twoNeuronDynamics }

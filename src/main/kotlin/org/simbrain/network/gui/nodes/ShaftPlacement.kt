@@ -1,0 +1,238 @@
+/**
+ * Decides where on its arrow a connector's drawing goes and how large it is, given what else is on the canvas. A
+ * drawing is a square of adjustable size, such as a weight matrix image, with fixed parts around it, such as a label
+ * box above and a caption below. A label box on its own is a drawing whose square has no size.
+ *
+ * The drawing is kept clear of every obstacle: layers, including the two the arrow joins, the arrowhead, and the
+ * drawings of connectors placed before it. It goes as near to its preferred place on the arrow as it can at the size
+ * it would have with the arrow to itself, sliding along the arrow to get clear, and only where no place on the arrow
+ * has room for that size does it shrink.
+ */
+package org.simbrain.network.gui.nodes
+
+import org.simbrain.util.p
+import java.awt.geom.CubicCurve2D
+import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
+import kotlin.math.abs
+import kotlin.math.ceil
+import kotlin.math.hypot
+import kotlin.math.max
+import kotlin.math.min
+
+/**
+ * What a connector draws on its arrow, as placement sees it.
+ *
+ * @param above height of what is stacked above the square, such as a label box
+ * @param below height of what is stacked below the square, such as a caption
+ * @param beside width of what is on each side of the square
+ * @param minWidth width of the widest fixed part, such as a label box, which the drawing is never narrower than
+ * @param minSide side of the square below which it is not shrunk, even where that leaves it overlapping
+ * @param maxSide side of the square above which it is not grown
+ * @param comfortable side the square may reach by filling the room it has outright, so that [fill] only holds back
+ * a square larger than this
+ * @param fill fraction of the arrow that the drawing may take up, which leaves the rest of the arrow showing
+ */
+internal class ShaftDrawing(
+    val above: Double = 0.0,
+    val below: Double = 0.0,
+    val beside: Double = 0.0,
+    val minWidth: Double = 0.0,
+    val minSide: Double = 0.0,
+    val maxSide: Double = 0.0,
+    val comfortable: Double = 0.0,
+    val fill: Double = 1.0
+) {
+
+    /** Half the width of the drawing when its square is [side] across. */
+    fun halfWidth(side: Double) = max(side / 2 + beside, minWidth / 2)
+
+    /** The space the drawing takes up when its square is [side] across and centered on ([x], [y]). */
+    fun footprintAt(x: Double, y: Double, side: Double): Rectangle2D = Rectangle2D.Double(
+        x - halfWidth(side), y - side / 2 - above, 2 * halfWidth(side), side + above + below
+    )
+
+    /**
+     * Side of the largest square centered on ([x], [y]) for which the drawing, with [margin] around it, stays clear
+     * of [obstacle]. Negative when the drawing cannot be clear of it there at any size.
+     *
+     * @param squareOnly measure for the square and what is beside it alone, letting the widest fixed part overlap
+     */
+    fun roomBeside(x: Double, y: Double, obstacle: Rectangle2D, margin: Double, squareOnly: Boolean = false): Double {
+        val gapX = max(obstacle.x - x, x - obstacle.maxX)
+        val fits = squareOnly || gapX >= minWidth / 2 + margin
+        val roomAcross = if (fits) 2 * (gapX - beside - margin) else Double.NEGATIVE_INFINITY
+        val roomAlong = when {
+            obstacle.maxY <= y -> 2 * (y - obstacle.maxY - above - margin)
+            obstacle.y >= y -> 2 * (obstacle.y - y - below - margin)
+            else -> Double.NEGATIVE_INFINITY
+        }
+        return max(roomAcross, roomAlong)
+    }
+}
+
+/**
+ * Where a drawing goes on its arrow.
+ *
+ * @param centerX where the center of the square goes
+ * @param centerY where the center of the square goes
+ * @param side side of the square
+ * @param position how far along the shaft the center is, from 0 at the source layer to 1 at the base of the arrowhead
+ */
+internal class ShaftPlacement(val centerX: Double, val centerY: Double, val side: Double, val position: Double)
+
+internal object ShaftPlacer {
+
+    /** Space kept clear between a drawing and an obstacle. */
+    const val MARGIN = 6.0
+
+    /** How near either end of the shaft the center of a drawing may go. */
+    private const val END_CLEARANCE = 0.08
+
+    /** Distance along the shaft between the places first tried, which are then refined. */
+    private const val SAMPLE_SPACING = 4.0
+
+    private const val REFINEMENT_STEPS = 16
+
+    /** A size this much short of the one wanted still counts as having room for it. */
+    private const val SIZE_TOLERANCE = 0.01
+
+    /** Length of an arrowhead, which starts where the shaft ends, and half its width. */
+    private const val HEAD_LENGTH = 35.0
+    private const val HEAD_HALF_WIDTH = 20.0
+
+    private const val FAR = 1.0e7
+
+    /**
+     * Place [drawing] on [shaft], which runs from an edge of the source layer to the base of the arrowhead.
+     *
+     * @param obstacles what the drawing is kept clear of, in canvas coordinates
+     * @param ownLayers the two layers the arrow joins, which are obstacles as well. A label box wider than the gap
+     * between two layers side by side is let overlap them, where the square still has to fit between them
+     * @param preferred where on the shaft the drawing goes when nothing is in the way, from 0 to 1
+     * @param shared whether a connector running the other way draws in the same gap, in which case this one keeps to
+     * the half nearer its source
+     */
+    fun place(
+        shaft: CubicCurve2D,
+        drawing: ShaftDrawing,
+        obstacles: List<Rectangle2D>,
+        ownLayers: List<Rectangle2D> = emptyList(),
+        preferred: Double = 0.5,
+        shared: Boolean = false
+    ): ShaftPlacement {
+        val length = shaft.arcLength()
+        val preferredPoint = shaft.p(preferred)
+        if (length <= 0.0) return ShaftPlacement(preferredPoint.x, preferredPoint.y, drawing.minSide, preferred)
+
+        // The arrow's own ends limit the drawing as its layers do
+        val ends = ownLayers + listOfNotNull(arrowhead(shaft), farHalf(shaft).takeIf { shared })
+
+        // The size the drawing has with the arrow to itself. Along a slanted arrow the fixed parts take up less of
+        // its length than their height or width
+        val (alongX, alongY) = shaft.direction()
+        val taken = abs(alongY) * (drawing.above + drawing.below) + abs(alongX) * 2 * drawing.beside
+        val available = if (shared) length / 2 else length
+        val wanted = max(drawing.comfortable, drawing.fill * available - taken).coerceIn(drawing.minSide, drawing.maxSide)
+
+        fun roomAt(position: Double): Double {
+            val point = shaft.p(position)
+            var room = Double.POSITIVE_INFINITY
+            for (obstacle in obstacles) {
+                // The arrow's layers are obstacles like any other, apart from the allowance made for them below
+                if (ownLayers.any { it == obstacle }) continue
+                room = min(room, drawing.roomBeside(point.x, point.y, obstacle, MARGIN))
+            }
+            for (end in ends) room = min(room, drawing.roomBeside(point.x, point.y, end, MARGIN, squareOnly = true))
+            return room
+        }
+
+        // How far the drawing as a whole is from where it is preferred. With more above the square than below it,
+        // the drawing as a whole is centered above the square
+        fun distanceFromPreferred(position: Double): Double {
+            val point = shaft.p(position)
+            return hypot(point.x - preferredPoint.x, point.y + (drawing.below - drawing.above) / 2 - preferredPoint.y)
+        }
+
+        /** The position among [candidates] with room for the size wanted that is nearest the preferred one. */
+        fun nearestWithRoom(candidates: List<Double>) =
+            candidates.filter { roomAt(it) >= wanted - SIZE_TOLERANCE }.minByOrNull { distanceFromPreferred(it) }
+
+        /** The position among [candidates] with the most room, and of those the nearest the preferred one. */
+        fun roomiest(candidates: List<Double>) =
+            candidates.maxWith(compareBy<Double> { roomAt(it) }.thenBy { -distanceFromPreferred(it) })
+
+        val samples = ceil(length / SAMPLE_SPACING).toInt().coerceIn(40, 400)
+        val step = (1 - 2 * END_CLEARANCE) / samples
+        val positions = List(samples + 1) { END_CLEARANCE + it * step }
+        fun around(position: Double) = List(2 * REFINEMENT_STEPS + 1) {
+            (position + (it - REFINEMENT_STEPS) * step / REFINEMENT_STEPS).coerceIn(END_CLEARANCE, 1 - END_CLEARANCE)
+        }
+
+        val withRoom = nearestWithRoom(positions)
+        val position: Double
+        val side: Double
+        if (withRoom != null) {
+            // Room for the size wanted: slide no further than needed
+            position = nearestWithRoom(around(withRoom)) ?: withRoom
+            side = wanted
+        } else {
+            // No room for it anywhere: go where there is most, and shrink to that
+            position = roomiest(around(roomiest(positions)))
+            side = min(wanted, roomAt(position)).coerceAtLeast(drawing.minSide)
+        }
+        val center = shaft.p(position)
+        return ShaftPlacement(center.x, center.y, side, position)
+    }
+
+    private fun CubicCurve2D.arcLength(): Double {
+        var length = 0.0
+        var previous = p(0.0)
+        for (i in 1..32) {
+            val next = p(i / 32.0)
+            length += previous.distance(next)
+            previous = next
+        }
+        return length
+    }
+
+    /** Unit vector from the start of the shaft to its end. */
+    private fun CubicCurve2D.direction(): Pair<Double, Double> {
+        val length = hypot(x2 - x1, y2 - y1)
+        return if (length == 0.0) 0.0 to 0.0 else (x2 - x1) / length to (y2 - y1) / length
+    }
+
+    /** The space the arrowhead takes up beyond the end of the shaft. */
+    private fun arrowhead(shaft: CubicCurve2D): Rectangle2D? {
+        var headX = shaft.x2 - shaft.ctrlX2
+        var headY = shaft.y2 - shaft.ctrlY2
+        val length = hypot(headX, headY)
+        if (length == 0.0) return null
+        headX /= length
+        headY /= length
+        val tip = Point2D.Double(shaft.x2 + headX * HEAD_LENGTH, shaft.y2 + headY * HEAD_LENGTH)
+        val across = HEAD_HALF_WIDTH
+        return Rectangle2D.Double(
+            min(shaft.x2, tip.x) - across * abs(headY),
+            min(shaft.y2, tip.y) - across * abs(headX),
+            abs(tip.x - shaft.x2) + 2 * across * abs(headY),
+            abs(tip.y - shaft.y2) + 2 * across * abs(headX)
+        )
+    }
+
+    /**
+     * Everything on the far side of the middle of the shaft from its source, across the direction the shaft leaves
+     * the source in.
+     */
+    private fun farHalf(shaft: CubicCurve2D): Rectangle2D {
+        val outX = shaft.ctrlX1 - shaft.x1
+        val outY = shaft.ctrlY1 - shaft.y1
+        val middleX = (shaft.x1 + shaft.x2) / 2
+        val middleY = (shaft.y1 + shaft.y2) / 2
+        return if (abs(outX) > abs(outY)) {
+            if (outX > 0) Rectangle2D.Double(middleX, -FAR, FAR, 2 * FAR) else Rectangle2D.Double(middleX - FAR, -FAR, FAR, 2 * FAR)
+        } else {
+            if (outY > 0) Rectangle2D.Double(-FAR, middleY, 2 * FAR, FAR) else Rectangle2D.Double(-FAR, middleY - FAR, 2 * FAR, FAR)
+        }
+    }
+}

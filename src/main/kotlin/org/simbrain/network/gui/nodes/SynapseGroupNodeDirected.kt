@@ -6,6 +6,7 @@ import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
+import java.awt.geom.CubicCurve2D
 import java.awt.geom.Point2D
 
 /**
@@ -43,7 +44,14 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
         }
     }.also { addChild(it) }
 
-    /** Where the group's label box goes on the arrow, as last laid out. */
+    /** The shaft of the arrow as last laid out, or null for a loop, or for collections no arrow can be drawn between. */
+    var shaft: CubicCurve2D? = null
+        private set
+
+    /** How far along the [shaft] the group's label box goes when nothing is in the way. */
+    val labelPosition get() = if (isBidirectional()) 0.75 else 0.5
+
+    /** Where the group's label box goes when there is no [shaft] to place it on, as last laid out. */
     var labelPoint: Point2D? = null
         private set
 
@@ -52,10 +60,8 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { labelPoint = it }
             is BezierArrow -> {
-                val bidirectional = isBidirectional()
-                val offset = if (bidirectional) 0.75 else 0.5
-                val shaft = arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, bidirectional)
-                labelPoint = shaft?.p(offset) ?: line(source.location, target.location).p(offset)
+                shaft = arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional())
+                labelPoint = line(source.location, target.location).p(labelPosition)
             }
         }
     }

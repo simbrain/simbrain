@@ -1,6 +1,7 @@
 /**
- * The pass that lays out a panel's connectors: each connector that asked is laid out once, arrows before what is
- * drawn on them, and the pass is part of the canvas's own update, ahead of its bounds validation.
+ * The pass that lays out a panel's connectors: the arrow of each connector that asked is drawn once, every arrow
+ * before any drawing is placed, each drawing is placed knowing where the layers and the drawings before it are, and
+ * the pass is part of the canvas's own update, ahead of its bounds validation.
  */
 package org.simbrain.network.gui
 
@@ -20,29 +21,48 @@ import org.simbrain.util.onEdt
 import org.simbrain.util.widgets.BezierArrow
 import java.awt.Dimension
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 import javax.swing.JDialog
 import javax.swing.SwingUtilities
 
 class ConnectionLayoutTest {
 
-    /** A connector that records what the pass asks of it. */
-    private class RecordingConnector(private val label: String, private val log: MutableList<String>) : PNode(), LaidOutConnector {
+    /** A connector that records what the pass asks of it, and takes up [space] once placed. */
+    private class RecordingConnector(
+        private val label: String,
+        private val log: MutableList<String>,
+        private val space: Rectangle2D? = null
+    ) : PNode(), LaidOutConnector {
+
+        var layersSeen: List<Rectangle2D> = emptyList()
+        var drawingsSeen: List<Rectangle2D> = emptyList()
+
         override fun layoutArrow() {
             log += "arrow $label"
         }
 
-        override fun placeOnArrow() {
+        override fun placeOnArrow(obstacles: Obstacles): Rectangle2D? {
             log += "place $label"
+            layersSeen = obstacles.layers.toList()
+            drawingsSeen = obstacles.drawings.toList()
+            return space
         }
     }
+
+    /** A layout for the recording connectors on [canvas], in the order they were added to it. */
+    private fun layoutFor(canvas: PCanvas, layers: List<Rectangle2D> = emptyList()) = ConnectionLayout(
+        canvas,
+        connectors = { canvas.layer.childrenReference.filterIsInstance<LaidOutConnector>() },
+        layers = { layers }
+    )
 
     /** Lets the update a request schedules run. */
     private fun awaitEdt() = repeat(3) { SwingUtilities.invokeAndWait { } }
 
     @Test
-    fun `a connector that asks several times is laid out once, and every arrow is drawn before anything is placed`() {
+    fun `a connector that asks several times has its arrow drawn once, and every arrow is drawn before anything is placed`() {
         val canvas = onEdt { PCanvas() }
-        val layout = onEdt { ConnectionLayout(canvas) }
+        val layout = onEdt { layoutFor(canvas) }
         val log = mutableListOf<String>()
         val first = RecordingConnector("first", log)
         val second = RecordingConnector("second", log)
@@ -59,9 +79,9 @@ class ConnectionLayoutTest {
     }
 
     @Test
-    fun `a connector that is not on the canvas is not laid out`() {
+    fun `a connector that has left the canvas is not laid out`() {
         val canvas = onEdt { PCanvas() }
-        val layout = onEdt { ConnectionLayout(canvas) }
+        val layout = onEdt { layoutFor(canvas) }
         val log = mutableListOf<String>()
         val removed = RecordingConnector("removed", log)
         onEdt {
@@ -75,9 +95,35 @@ class ConnectionLayoutTest {
     }
 
     @Test
+    fun `each drawing is placed knowing where the layers and the drawings placed before it are`() {
+        val canvas = onEdt { PCanvas() }
+        val layer = Rectangle2D.Double(0.0, 0.0, 100.0, 40.0)
+        val layout = onEdt { layoutFor(canvas, layers = listOf(layer)) }
+        val log = mutableListOf<String>()
+        val firstSpace = Rectangle2D.Double(0.0, 100.0, 50.0, 50.0)
+        val first = RecordingConnector("first", log, space = firstSpace)
+        val second = RecordingConnector("second", log)
+        onEdt {
+            canvas.layer.addChild(first)
+            canvas.layer.addChild(second)
+            layout.requestPlacement()
+        }
+        awaitEdt()
+
+        onEdt {
+            // Nothing asked for its arrow to be drawn again, so only the drawings are placed
+            assertEquals(listOf("place first", "place second"), log.toList())
+            assertEquals(listOf<Rectangle2D>(layer), first.layersSeen)
+            assertTrue(first.drawingsSeen.isEmpty())
+            assertEquals(listOf<Rectangle2D>(layer), second.layersSeen)
+            assertEquals(listOf<Rectangle2D>(firstSpace), second.drawingsSeen)
+        }
+    }
+
+    @Test
     fun `a request can be made off the event thread`() {
         val canvas = onEdt { PCanvas() }
-        val layout = onEdt { ConnectionLayout(canvas) }
+        val layout = onEdt { layoutFor(canvas) }
         val log = mutableListOf<String>()
         val connector = RecordingConnector("connector", log)
         onEdt { canvas.layer.addChild(connector) }

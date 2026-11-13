@@ -3,10 +3,14 @@
  * drawing is a square of adjustable size, such as a weight matrix image, with fixed parts around it, such as a label
  * box above and a caption below. A label box on its own is a drawing whose square has no size.
  *
- * The drawing is kept clear of every obstacle: layers, including the two the arrow joins, the arrowhead, and the
- * drawings of connectors placed before it. It goes as near to its preferred place on the arrow as it can at the size
- * it would have with the arrow to itself, sliding along the arrow to get clear, and only where no place on the arrow
- * has room for that size does it shrink.
+ * The drawing is kept clear of layers, including the two the arrow joins, of the arrowhead, and of the drawings of
+ * connectors placed before it. It goes as near to its preferred place on the arrow as it can at the size it would
+ * have with the arrow to itself, sliding along the arrow to get clear, and only where no place on the arrow has room
+ * for that size does it shrink. The square shrinks to keep itself clear, never to keep a label box wider than it
+ * clear, which is left overlapping instead.
+ *
+ * Where it cannot be clear of everything, it is kept clear of layers first, since layers are drawn over it and
+ * would hide it, and overlaps other drawings as little as it can.
  */
 package org.simbrain.network.gui.nodes
 
@@ -52,23 +56,34 @@ internal class ShaftDrawing(
         x - halfWidth(side), y - side / 2 - above, 2 * halfWidth(side), side + above + below
     )
 
+    /** Whether the drawing has a square at all, rather than being a label box on its own. */
+    val hasSquare get() = maxSide > 0.0
+
     /**
      * Side of the largest square centered on ([x], [y]) for which the drawing, with [margin] around it, stays clear
-     * of [obstacle]. Negative when the drawing cannot be clear of it there at any size.
+     * of [obstacle]. Negative when the drawing cannot be clear of it there at any size, and the more negative the
+     * further it would have to move to get clear.
      *
      * @param squareOnly measure for the square and what is beside it alone, letting the widest fixed part overlap
      */
     fun roomBeside(x: Double, y: Double, obstacle: Rectangle2D, margin: Double, squareOnly: Boolean = false): Double {
-        val gapX = max(obstacle.x - x, x - obstacle.maxX)
-        val fits = squareOnly || gapX >= minWidth / 2 + margin
-        val roomAcross = if (fits) 2 * (gapX - beside - margin) else Double.NEGATIVE_INFINITY
-        val roomAlong = when {
-            obstacle.maxY <= y -> 2 * (y - obstacle.maxY - above - margin)
-            obstacle.y >= y -> 2 * (obstacle.y - y - below - margin)
-            else -> Double.NEGATIVE_INFINITY
+        // Clear space to the nearer side of the obstacle, negative when the center is within its width
+        val clearAcross = max(obstacle.x - x, x - obstacle.maxX) - margin
+        val roomAcross = if (squareOnly || clearAcross >= minWidth / 2) {
+            2 * (clearAcross - beside)
+        } else {
+            2 * (clearAcross - minWidth / 2)
         }
+        // Clear space above an obstacle below the center or below one above it, whichever is nearer to enough
+        val roomAlong = 2 * max(y - obstacle.maxY - above - margin, obstacle.y - y - below - margin)
         return max(roomAcross, roomAlong)
     }
+}
+
+/** A label box on its own, as placement on an arrow sees it: a drawing whose square has no size. */
+internal fun InteractionBox.asShaftDrawing(): ShaftDrawing {
+    val box = fullBounds
+    return ShaftDrawing(above = box.height / 2, below = box.height / 2, minWidth = box.width)
 }
 
 /**
@@ -106,9 +121,11 @@ internal object ShaftPlacer {
     /**
      * Place [drawing] on [shaft], which runs from an edge of the source layer to the base of the arrowhead.
      *
-     * @param obstacles what the drawing is kept clear of, in canvas coordinates
-     * @param ownLayers the two layers the arrow joins, which are obstacles as well. A label box wider than the gap
-     * between two layers side by side is let overlap them, where the square still has to fit between them
+     * @param layers the space taken up by each layer on the canvas, in canvas coordinates
+     * @param drawings the space taken up by the drawings of the connectors placed before this one
+     * @param ownLayers the two layers the arrow joins, which are obstacles as well. The label box of a drawing
+     * with a square is let overlap them, as it must between two layers side by side that are closer together than
+     * it is wide, where the square still has to fit between them
      * @param preferred where on the shaft the drawing goes when nothing is in the way, from 0 to 1
      * @param shared whether a connector running the other way draws in the same gap, in which case this one keeps to
      * the half nearer its source
@@ -116,7 +133,8 @@ internal object ShaftPlacer {
     fun place(
         shaft: CubicCurve2D,
         drawing: ShaftDrawing,
-        obstacles: List<Rectangle2D>,
+        layers: List<Rectangle2D>,
+        drawings: List<Rectangle2D> = emptyList(),
         ownLayers: List<Rectangle2D> = emptyList(),
         preferred: Double = 0.5,
         shared: Boolean = false
@@ -127,6 +145,9 @@ internal object ShaftPlacer {
 
         // The arrow's own ends limit the drawing as its layers do
         val ends = ownLayers + listOfNotNull(arrowhead(shaft), farHalf(shaft).takeIf { shared })
+        val otherLayers = layers.filter { layer -> ownLayers.none { it == layer } }
+        // What the drawing has to have room for beside a layer before its room beside other drawings counts
+        val leastSide = drawing.minSide
 
         // The size the drawing has with the arrow to itself. Along a slanted arrow the fixed parts take up less of
         // its length than their height or width
@@ -135,32 +156,12 @@ internal object ShaftPlacer {
         val available = if (shared) length / 2 else length
         val wanted = max(drawing.comfortable, drawing.fill * available - taken).coerceIn(drawing.minSide, drawing.maxSide)
 
-        fun roomAt(position: Double): Double {
-            val point = shaft.p(position)
-            var room = Double.POSITIVE_INFINITY
-            for (obstacle in obstacles) {
-                // The arrow's layers are obstacles like any other, apart from the allowance made for them below
-                if (ownLayers.any { it == obstacle }) continue
-                room = min(room, drawing.roomBeside(point.x, point.y, obstacle, MARGIN))
-            }
-            for (end in ends) room = min(room, drawing.roomBeside(point.x, point.y, end, MARGIN, squareOnly = true))
-            return room
-        }
-
         // How far the drawing as a whole is from where it is preferred. With more above the square than below it,
         // the drawing as a whole is centered above the square
         fun distanceFromPreferred(position: Double): Double {
             val point = shaft.p(position)
             return hypot(point.x - preferredPoint.x, point.y + (drawing.below - drawing.above) / 2 - preferredPoint.y)
         }
-
-        /** The position among [candidates] with room for the size wanted that is nearest the preferred one. */
-        fun nearestWithRoom(candidates: List<Double>) =
-            candidates.filter { roomAt(it) >= wanted - SIZE_TOLERANCE }.minByOrNull { distanceFromPreferred(it) }
-
-        /** The position among [candidates] with the most room, and of those the nearest the preferred one. */
-        fun roomiest(candidates: List<Double>) =
-            candidates.maxWith(compareBy<Double> { roomAt(it) }.thenBy { -distanceFromPreferred(it) })
 
         val samples = ceil(length / SAMPLE_SPACING).toInt().coerceIn(40, 400)
         val step = (1 - 2 * END_CLEARANCE) / samples
@@ -169,20 +170,70 @@ internal object ShaftPlacer {
             (position + (it - REFINEMENT_STEPS) * step / REFINEMENT_STEPS).coerceIn(END_CLEARANCE, 1 - END_CLEARANCE)
         }
 
-        val withRoom = nearestWithRoom(positions)
-        val position: Double
-        val side: Double
-        if (withRoom != null) {
-            // Room for the size wanted: slide no further than needed
-            position = nearestWithRoom(around(withRoom)) ?: withRoom
-            side = wanted
-        } else {
-            // No room for it anywhere: go where there is most, and shrink to that
-            position = roomiest(around(roomiest(positions)))
-            side = min(wanted, roomAt(position)).coerceAtLeast(drawing.minSide)
+        /**
+         * The best place on the shaft, keeping either the whole drawing clear of the obstacles or, with
+         * [squareOnly], only its square and what is beside it.
+         */
+        fun search(squareOnly: Boolean): ShaftPlacement {
+            /** Room at [position] beside the layers and the arrow's own ends. */
+            fun roomBesideLayers(position: Double): Double {
+                val point = shaft.p(position)
+                var room = Double.POSITIVE_INFINITY
+                for (layer in otherLayers) {
+                    room = min(room, drawing.roomBeside(point.x, point.y, layer, MARGIN, squareOnly))
+                }
+                for (end in ends) {
+                    room = min(room, drawing.roomBeside(point.x, point.y, end, MARGIN, squareOnly = drawing.hasSquare))
+                }
+                return room
+            }
+
+            /** Room at [position] beside everything. */
+            fun roomAt(position: Double): Double {
+                val point = shaft.p(position)
+                var room = roomBesideLayers(position)
+                for (other in drawings) {
+                    room = min(room, drawing.roomBeside(point.x, point.y, other, MARGIN, squareOnly))
+                }
+                return room
+            }
+
+            /** The position among [candidates] with room for the size wanted that is nearest the preferred one. */
+            fun nearestWithRoom(candidates: List<Double>) =
+                candidates.filter { roomAt(it) >= wanted - SIZE_TOLERANCE }.minByOrNull { distanceFromPreferred(it) }
+
+            /**
+             * The position among [candidates] that is clear of the layers, if any is, and of those the one with the
+             * most room beside everything, and of those the nearest the preferred one.
+             */
+            fun roomiest(candidates: List<Double>) = candidates.maxWith(
+                compareBy<Double> { min(roomBesideLayers(it), leastSide) }
+                    .thenBy { roomAt(it) }
+                    .thenBy { -distanceFromPreferred(it) }
+            )
+
+            val withRoom = nearestWithRoom(positions)
+            val position: Double
+            val side: Double
+            if (withRoom != null) {
+                // Room for the size wanted: slide no further than needed
+                position = nearestWithRoom(around(withRoom)) ?: withRoom
+                side = wanted
+            } else {
+                // No room for it anywhere: go where there is most, and shrink to that
+                position = roomiest(around(roomiest(positions)))
+                side = min(wanted, roomAt(position)).coerceAtLeast(drawing.minSide)
+            }
+            val center = shaft.p(position)
+            return ShaftPlacement(center.x, center.y, side, position)
         }
-        val center = shaft.p(position)
-        return ShaftPlacement(center.x, center.y, side, position)
+
+        // A label box wider than the square is kept clear of what is around it by sliding, but the square is not
+        // shrunk for its sake: a label box that overlaps its neighbor reads better than an image too small to see
+        val allClear = search(squareOnly = false)
+        if (!drawing.hasSquare || allClear.side >= wanted - SIZE_TOLERANCE) return allClear
+        val squareClear = search(squareOnly = true)
+        return if (squareClear.side > allClear.side + SIZE_TOLERANCE) squareClear else allClear
     }
 
     private fun CubicCurve2D.arcLength(): Double {

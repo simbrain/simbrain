@@ -9,8 +9,11 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.LaidOutConnector
+import org.simbrain.network.gui.Obstacles
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.centerOn
+import java.awt.geom.Rectangle2D
 
 
 class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGroup) :
@@ -41,14 +44,27 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         if (drawnAsArrow) directedNode?.layout()
     }
 
-    /** Place the label box on the arrow, or between the two collections when the synapses are showing. */
-    override fun placeOnArrow() {
-        val onArrow = directedNode?.labelPoint?.takeIf { drawnAsArrow }
-        if (onArrow != null) {
-            interactionBox.centerFullBoundsOnPoint(onArrow.x, onArrow.y)
+    /**
+     * Place the label box on the arrow, clear of [obstacles] where there is room, or between the two collections
+     * when the synapses are showing.
+     */
+    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
+        val arrow = directedNode?.takeIf { drawnAsArrow }
+        val curve = arrow?.shaft
+        val fixedPoint = arrow?.labelPoint
+        if (arrow != null && curve != null) {
+            val label = interactionBox.asShaftDrawing()
+            val ownLayers = listOf(sourceNode.footprint, targetNode.footprint)
+            val placement = ShaftPlacer.place(
+                curve, label, obstacles.layers, obstacles.drawings, ownLayers, preferred = arrow.labelPosition
+            )
+            interactionBox.centerOn(placement.centerX, placement.centerY)
+        } else if (fixedPoint != null) {
+            interactionBox.centerOn(fixedPoint.x, fixedPoint.y)
         } else {
             updateInteractionBoxLocation()
         }
+        return interactionBox.globalFullBounds
     }
 
     val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as NeuronCollectionNode }

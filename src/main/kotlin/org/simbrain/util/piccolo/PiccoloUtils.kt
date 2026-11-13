@@ -64,6 +64,17 @@ val PNode.firstScreenElement
 val PNode?.hasScreenElement
     get() = this?.belongsTo?.screenElements?.any() ?: false
 
+/**
+ * Center this node's full bounds on ([x], [y]) unless they are centered there already. A layout that runs often
+ * uses this so that a node left where it was is not marked as changed and repainted.
+ */
+fun PNode.centerOn(x: Double, y: Double) {
+    val current = fullBounds
+    if (kotlin.math.abs(current.centerX - x) > 1e-3 || kotlin.math.abs(current.centerY - y) > 1e-3) {
+        centerFullBoundsOnPoint(x, y)
+    }
+}
+
 val PInputEvent.isDoubleClick
     get() = clickCount == 2 && button == MouseEvent.BUTTON1
 

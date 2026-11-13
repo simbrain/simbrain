@@ -41,7 +41,7 @@ class ShaftPlacementTest {
         for (gap in listOf(100.0, 140.0, 200.0, 260.0, 400.0, 900.0)) {
             val shaft = upwardShaft(gap)
             val layers = listOf(layerBelow, layerAbove(gap))
-            val placement = ShaftPlacer.place(shaft, image, obstacles = layers, ownLayers = layers)
+            val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
             val room = shaftRoom(
                 shaft, above = image.above, below = image.below, fill = image.fill, comfortable = image.comfortable
@@ -59,7 +59,7 @@ class ShaftPlacementTest {
         val layers = listOf(
             Rectangle2D.Double(-61.0, -38.0, 122.0, 60.0), Rectangle2D.Double(239.0, -338.0, 122.0, 60.0)
         )
-        val placement = ShaftPlacer.place(shaft, image, obstacles = layers, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
         val acrossTheGap = shaftRoom(shaft, above = 20.0, below = 10.0, fill = 0.6, comfortable = 90.0)
             .squareSide(image.minSide, image.maxSide)
@@ -71,11 +71,11 @@ class ShaftPlacementTest {
     fun `a drawing slides along its arrow to get clear of an obstacle and keeps its size`() {
         val shaft = upwardShaft(900.0)
         val layers = listOf(layerBelow, layerAbove(900.0))
-        val alone = ShaftPlacer.place(shaft, image, obstacles = layers, ownLayers = layers)
+        val alone = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
         // A layer the arrow passes behind, over the middle of the shaft
         val inTheWay = Rectangle2D.Double(-60.0, -480.0, 120.0, 60.0)
 
-        val placement = ShaftPlacer.place(shaft, image, obstacles = layers + inTheWay, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers + inTheWay, ownLayers = layers)
 
         assertEquals(alone.side, placement.side, 1e-6)
         assertFalse(placement.footprint(image).grownBy(ShaftPlacer.MARGIN - 0.5).intersects(inTheWay))
@@ -90,10 +90,10 @@ class ShaftPlacementTest {
     fun `a drawing shrinks only when nowhere on its arrow has room for it`() {
         val shaft = upwardShaft(400.0)
         val layers = listOf(layerBelow, layerAbove(400.0))
-        val alone = ShaftPlacer.place(shaft, image, obstacles = layers, ownLayers = layers)
+        val alone = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
         val inTheWay = Rectangle2D.Double(-60.0, -230.0, 120.0, 60.0)
 
-        val placement = ShaftPlacer.place(shaft, image, obstacles = layers + inTheWay, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers + inTheWay, ownLayers = layers)
 
         assertTrue(placement.side < alone.side, "side ${placement.side}, alone ${alone.side}")
         assertTrue(placement.side > image.minSide, "side ${placement.side}")
@@ -106,7 +106,7 @@ class ShaftPlacementTest {
         val layers = listOf(layerBelow, layerAbove(120.0))
         val covering = Rectangle2D.Double(-200.0, -200.0, 400.0, 250.0)
 
-        val placement = ShaftPlacer.place(shaft, image, obstacles = layers + covering, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers + covering, ownLayers = layers)
 
         assertEquals(image.minSide, placement.side, 1e-9)
     }
@@ -119,7 +119,7 @@ class ShaftPlacementTest {
         // The obstacle approaches the middle of the shaft from below and stops short of passing it
         for (top in generateSequence(-250.0) { it - 2.0 }.takeWhile { it >= -380.0 }) {
             val inTheWay = Rectangle2D.Double(-60.0, top, 120.0, 60.0)
-            val placement = ShaftPlacer.place(shaft, image, obstacles = layers + inTheWay, ownLayers = layers)
+            val placement = ShaftPlacer.place(shaft, image, layers = layers + inTheWay, ownLayers = layers)
             previous?.let {
                 assertTrue(abs(placement.centerY - it.centerY) <= 3.0, "moved from ${it.centerY} to ${placement.centerY}")
                 assertEquals(it.side, placement.side, 0.5)
@@ -133,7 +133,7 @@ class ShaftPlacementTest {
         val shaft = upwardShaft(400.0)
         val layers = listOf(layerBelow, layerAbove(400.0))
         val placement = ShaftPlacer.place(
-            shaft, image, obstacles = layers, ownLayers = layers, preferred = 0.25, shared = true
+            shaft, image, layers = layers, ownLayers = layers, preferred = 0.25, shared = true
         )
 
         val room = shaftRoom(
@@ -148,11 +148,11 @@ class ShaftPlacementTest {
     fun `a label box slides clear of an earlier connector's drawing`() {
         val shaft = upwardShaft(400.0)
         val layers = listOf(layerBelow, layerAbove(400.0))
-        val middle = ShaftPlacer.place(shaft, label, obstacles = layers, ownLayers = layers)
+        val middle = ShaftPlacer.place(shaft, label, layers = layers, ownLayers = layers)
         assertEquals(-200.0, middle.centerY, 1.0)
         val earlier = Rectangle2D.Double(-40.0, -240.0, 80.0, 80.0)
 
-        val placement = ShaftPlacer.place(shaft, label, obstacles = layers + earlier, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, label, layers = layers, drawings = listOf(earlier), ownLayers = layers)
 
         assertFalse(placement.footprint(label).intersects(earlier))
         assertEquals(0.0, placement.side, 1e-9)
@@ -163,7 +163,7 @@ class ShaftPlacementTest {
         val shaft = CubicCurve2D.Double(0.0, 0.0, 40.0, 0.0, 40.0, 0.0, 80.0, 0.0)
         val layers = listOf(Rectangle2D.Double(-120.0, -22.0, 120.0, 44.0), Rectangle2D.Double(120.0, -22.0, 120.0, 44.0))
 
-        val placement = ShaftPlacer.place(shaft, image, obstacles = layers, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
         assertEquals(80.0 - 2 * ShaftPlacer.MARGIN, placement.side, 0.5)
     }

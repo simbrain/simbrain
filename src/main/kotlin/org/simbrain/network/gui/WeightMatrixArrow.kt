@@ -16,6 +16,7 @@ import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Point2D
+import java.awt.geom.Rectangle2D
 
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
@@ -92,17 +93,21 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
         }
     }
 
-    /** Place what the matrix draws on the arrow as [layout] last drew it. */
-    fun placeMatrix() {
+    /**
+     * Place what the matrix draws on the arrow as [layout] last drew it, clear of [obstacles] where there is room.
+     *
+     * @return the space it now takes up
+     */
+    fun placeMatrix(obstacles: Obstacles): Rectangle2D? {
         if (arrow is RecurrentArrow) {
-            loopAnchor?.let { weightMatrixNode.placeAt(it.x, it.y) }
-            return
+            return loopAnchor?.let { weightMatrixNode.placeAt(it.x, it.y) }
         }
         val bidirectional = isBidirectional()
         val offset = if (bidirectional) 0.25 else 0.5
         val curve = shaft
-        if (curve != null) {
-            weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional)
+        return if (curve != null) {
+            val ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint)
+            weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional, obstacles, ownLayers)
         } else {
             val (x, y) = line(source.location, target.location).p(offset)
             weightMatrixNode.placeAt(x, y)

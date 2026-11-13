@@ -25,6 +25,7 @@ import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_TILE_
 import org.simbrain.network.gui.nodes.TensorConnectorNode.Companion.KERNEL_TILE_MIN
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.SimbrainImage
+import org.simbrain.util.piccolo.centerOn
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.BasicStroke
@@ -267,29 +268,28 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 if (shapeCaption.visible) KERNEL_IMAGE_CAPTION_GAP + shapeCaption.height else 0.0
 
     /**
-     * Room for the single kernel view's image on the arrow's [shaft], with its navigation buttons around it, the
-     * label box above it and the detail label and caption below. The image fills the gap until it is
-     * [KERNEL_IMAGE_DEFAULT] across; between layers further apart the view as a whole is held to
-     * [KERNEL_IMAGE_FILL] of the gap, so that the arrow shows on either side of it.
+     * The single kernel view as placement on the arrow sees it: its image, with its navigation buttons around it,
+     * the label box above it and the detail label and caption below. With the arrow to itself the image fills the
+     * room it has until it is [KERNEL_IMAGE_DEFAULT] across; on a longer arrow the view as a whole is held to
+     * [KERNEL_IMAGE_FILL] of the arrow, so that the arrow shows on either side of it. The image stops growing at
+     * [KERNEL_IMAGE_MAX] and stops shrinking at [KERNEL_IMAGE_MIN], below which it overlaps what is in the way.
      */
-    private fun kernelImageRoom(shaft: CubicCurve2D) = shaftRoom(
-        shaft,
+    private fun kernelImageDrawing() = ShaftDrawing(
         above = kernelImageChromeAbove,
         below = kernelImageChromeBelow,
         beside = KERNEL_IMAGE_BUTTON_GAP + channelPrevButton!!.fullBounds.width,
-        fill = KERNEL_IMAGE_FILL,
-        comfortable = KERNEL_IMAGE_DEFAULT
+        minWidth = interactionBox.fullBounds.width,
+        minSide = KERNEL_IMAGE_MIN,
+        maxSide = KERNEL_IMAGE_MAX,
+        comfortable = KERNEL_IMAGE_DEFAULT,
+        fill = KERNEL_IMAGE_FILL
     )
 
-    /**
-     * Size the single kernel view's image to its [room], between [KERNEL_IMAGE_MIN], below which it overruns the
-     * room, and [KERNEL_IMAGE_MAX].
-     */
-    private fun fitKernelImage(room: ShaftRoom) {
-        val fitted = room.squareSide(KERNEL_IMAGE_MIN, KERNEL_IMAGE_MAX)
-        if (abs(fitted - kernelImageSide) > ShaftRoom.RESIZE_THRESHOLD) {
-            kernelImageSide = fitted
-            imageBox.resize(fitted, fitted)
+    /** Draw the single kernel view's image [side] across. */
+    private fun fitKernelImage(side: kotlin.Double) {
+        if (abs(side - kernelImageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            kernelImageSide = side
+            imageBox.resize(side, side)
         }
     }
 
@@ -637,12 +637,16 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         )
     }
 
-    /** Place the kernel drawing that is showing, with its label box and what goes around it, on the arrow's shaft. */
-    override fun placeOnArrow() {
+    /**
+     * Place the kernel drawing that is showing, with its label box and what goes around it, on the arrow's shaft,
+     * clear of [obstacles] where there is room. The kernel grid is fitted to the gap between its two layers alone.
+     */
+    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
         val curve = shaft
         val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
         val px = pt.x
         val py = pt.y
+        val ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
 
         val conv = connector as? ConvolutionConnector
         if (conv != null && conv.kernelGridMode) {
@@ -652,47 +656,51 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             if (room != null) fitKernelGrid(conv, room)
             val gridX = room?.centerX ?: px
             val gridY = room?.centerY ?: py
-            kernelGridGroup.centerFullBoundsOnPoint(gridX, gridY)
+            kernelGridGroup.centerOn(gridX, gridY)
             val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
-            shapeCaption.centerFullBoundsOnPoint(
+            shapeCaption.centerOn(
                 gridX, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
             )
-            interactionBox.centerFullBoundsOnPoint(
+            interactionBox.centerOn(
                 gridX,
                 gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
             )
         } else if (conv != null) {
-            // Single kernel mode: size the image to the room between the layers and place it there,
-            // with its buttons, labels and caption around it
-            val room = curve?.let { kernelImageRoom(it) }
-            if (room != null) fitKernelImage(room)
-            val imageX = room?.centerX ?: px
-            val imageY = room?.centerY ?: py
-            imageBox.centerFullBoundsOnPoint(imageX, imageY)
+            // Single kernel mode: size the image and place it on the shaft, with its buttons, labels and caption
+            // around it
+            val placement = curve?.let {
+                ShaftPlacer.place(it, kernelImageDrawing(), obstacles.layers, obstacles.drawings, ownLayers)
+            }
+            if (placement != null) fitKernelImage(placement.side)
+            val imageX = placement?.centerX ?: px
+            val imageY = placement?.centerY ?: py
+            imageBox.centerOn(imageX, imageY)
 
             val hi = kernelImageSide / 2.0
             val gap = KERNEL_IMAGE_BUTTON_GAP
             val bh = filterPrevButton!!.fullBounds.height
             val bw = channelPrevButton!!.fullBounds.width
 
-            filterPrevButton.centerFullBoundsOnPoint(imageX, imageY - hi - gap - bh / 2)
-            filterNextButton!!.centerFullBoundsOnPoint(imageX, imageY + hi + gap + bh / 2)
-            channelPrevButton.centerFullBoundsOnPoint(imageX - hi - gap - bw / 2, imageY)
-            channelNextButton!!.centerFullBoundsOnPoint(imageX + hi + gap + bw / 2, imageY)
+            filterPrevButton.centerOn(imageX, imageY - hi - gap - bh / 2)
+            filterNextButton!!.centerOn(imageX, imageY + hi + gap + bh / 2)
+            channelPrevButton.centerOn(imageX - hi - gap - bw / 2, imageY)
+            channelNextButton!!.centerOn(imageX + hi + gap + bw / 2, imageY)
 
             val bottomEdge = imageY + hi + gap + bh
-            detailLabel.centerFullBoundsOnPoint(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
-            shapeCaption.centerFullBoundsOnPoint(
+            detailLabel.centerOn(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
+            shapeCaption.centerOn(
                 imageX, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
             )
-            interactionBox.centerFullBoundsOnPoint(
+            interactionBox.centerOn(
                 imageX,
                 imageY - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
             )
         } else {
-            interactionBox.centerFullBoundsOnPoint(px, py)
+            val label = interactionBox.asShaftDrawing()
+            val center = curve?.let { ShaftPlacer.place(it, label, obstacles.layers, obstacles.drawings, ownLayers) }
+            interactionBox.centerOn(center?.centerX ?: px, center?.centerY ?: py)
         }
-
+        return measureFootprint()
     }
 
     override fun paint(paintContext: PPaintContext) {

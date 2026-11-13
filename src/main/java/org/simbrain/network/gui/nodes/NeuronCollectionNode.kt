@@ -150,6 +150,8 @@ class NeuronCollectionNode(
     /** The outline around the neurons and the label box on top of it. */
     override fun measureFootprint() = footprintOf(outlinedObjects.globalFullBounds, interactionBox.globalBounds)
 
+    override val isConnectorObstacle get() = true
+
     override fun isIntersecting(bound: PBounds?) = interactionBox.isIntersecting(bound)
 
     override fun acceptsSourceHandle() = true

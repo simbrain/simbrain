@@ -109,6 +109,9 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     /** Measures the [footprint]. Called once the node's own layout is up to date. */
     protected open fun measureFootprint(): PBounds = globalFullBounds
 
+    /** Whether connectors keep what they draw on their arrows clear of this element, as they do of a layer. */
+    open val isConnectorObstacle: Boolean get() = false
+
     private var viewListener: PropertyChangeListener? = null
 
     /** Have the panel lay this connector out again, once however many times it is asked before it does. */

@@ -49,6 +49,7 @@ import java.util.prefs.PreferenceChangeListener
 import javax.swing.JPanel
 import javax.swing.SwingUtilities
 import kotlin.math.pow
+import java.beans.PropertyChangeListener
 import kotlin.reflect.KClass
 
 /** Cap on how often the view refits to the network, matching the zoom event's own throttle. */
@@ -104,8 +105,22 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
     private val nodeTier = PNode().also { canvas.layer.addChild(it) }
 
-    /** Lays out the arrows of connectors and what connectors draw on them, once per update of the canvas. */
-    internal val connectionLayout = ConnectionLayout(canvas)
+    /**
+     * Lays out the arrows of connectors and what connectors draw on them, once per update of the canvas. Drawings
+     * are placed in the order their connectors were added, so an earlier one keeps its place when a later one is
+     * drawn across it.
+     */
+    internal val connectionLayout = ConnectionLayout(
+        canvas,
+        connectors = { connectorTier.childrenReference.filterIsInstance<LaidOutConnector>() },
+        layers = {
+            nodeTier.childrenReference.filterIsInstance<ScreenElement>().filter { it.isConnectorObstacle }
+                .map { it.footprint }
+        }
+    )
+
+    /** Has connectors place their drawings again when a layer they keep clear of moves or changes size. */
+    private val obstacleChanged = PropertyChangeListener { connectionLayout.requestPlacement() }
 
     /**
      * Reference to the model network
@@ -134,6 +149,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         node.dispose()
         node.removeFromParent()
         node.connectionDrawing?.removeFromParent()
+        // What it was in the way of may now go back to where it would rather be
+        if (node.isConnectorObstacle || node is LaidOutConnector) connectionLayout.requestPlacement()
     }
 
     /**
@@ -420,6 +437,11 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             }
         }
         if (node is LaidOutConnector) connectionLayout.request(node)
+        if (node.isConnectorObstacle) {
+            node.addPropertyChangeListener(PNode.PROPERTY_TRANSFORM, obstacleChanged)
+            node.addPropertyChangeListener(PNode.PROPERTY_FULL_BOUNDS, obstacleChanged)
+            connectionLayout.requestPlacement()
+        }
     }
 
     /** Draw [node] under every connection, present and future. Whoever adds it removes it. */

@@ -6,13 +6,16 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
 import org.simbrain.network.gui.LaidOutConnector
+import org.simbrain.network.gui.Obstacles
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
+import org.simbrain.util.piccolo.centerOn
 import java.awt.geom.CubicCurve2D
+import java.awt.geom.Rectangle2D
 import javax.swing.JPopupMenu
 
 /**
@@ -84,10 +87,19 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         )
     }
 
-    /** Place the label box on the arrow's shaft. */
-    override fun placeOnArrow() {
-        val pt = shaft?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
-        interactionBox.centerFullBoundsOnPoint(pt.x, pt.y)
+    /** Place the label box on the arrow's shaft, clear of [obstacles] where there is room. */
+    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
+        val label = interactionBox.asShaftDrawing()
+        val curve = shaft
+        val center = if (curve != null) {
+            val ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+            ShaftPlacer.place(curve, label, obstacles.layers, obstacles.drawings, ownLayers)
+                .let { point(it.centerX, it.centerY) }
+        } else {
+            line(connector.source.location, connector.target.location).p(0.5)
+        }
+        interactionBox.centerOn(center.x, center.y)
+        return label.footprintAt(center.x, center.y, 0.0)
     }
 
     override val isDraggable: Boolean = false

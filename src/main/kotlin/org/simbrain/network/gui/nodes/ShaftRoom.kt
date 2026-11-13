@@ -1,6 +1,8 @@
 /**
- * Measures the gap between two layers from the arrow joining them, so that what a connector draws on the arrow,
- * such as a weight matrix image, a kernel or a kernel grid, can be sized to that gap.
+ * Measures the gap between two layers from the arrow joining them, so that a drawing on the arrow can be sized to
+ * that gap alone. The kernel grid of a convolution and the copies of weight matrices in an unrolled recurrent network
+ * are sized this way. What other connectors draw on their arrows is sized and placed by [ShaftPlacer], which also
+ * keeps it clear of everything else on the canvas.
  */
 package org.simbrain.network.gui.nodes
 

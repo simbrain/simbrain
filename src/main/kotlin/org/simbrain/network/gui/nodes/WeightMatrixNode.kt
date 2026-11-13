@@ -17,6 +17,7 @@ import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.onUi
+import org.simbrain.util.piccolo.centerOn
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
@@ -30,6 +31,7 @@ import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Ellipse2D
+import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -66,7 +68,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     override fun layoutArrow() = arrow.layout()
 
     /** Place the image, label box and caption on the arrow's shaft. */
-    override fun placeOnArrow() = arrow.placeMatrix()
+    override fun placeOnArrow(obstacles: Obstacles) = arrow.placeMatrix(obstacles)
 
     /**
      * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
@@ -241,41 +243,60 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         shapeCaption.refresh()
     }
 
-    /** Center the image box on ([x], [y]) with the interaction box above it and the shape caption below. */
-    fun placeAt(x: kotlin.Double, y: kotlin.Double) {
-        imageBox.centerFullBoundsOnPoint(x, y)
-        interactionBox.centerFullBoundsOnPoint(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
-        shapeCaption.centerFullBoundsOnPoint(
-            x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP
-        )
+    /** The image with what is drawn around it, as placement on the arrow sees it. */
+    private fun drawing() = ShaftDrawing(
+        above = interactionBox.fullBounds.height,
+        below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0,
+        minWidth = interactionBox.fullBounds.width,
+        minSide = IMAGE_SIDE_MIN,
+        maxSide = IMAGE_SIDE_MAX,
+        comfortable = IMAGE_SIDE_DEFAULT,
+        fill = IMAGE_FILL
+    )
+
+    /**
+     * Center the image box on ([x], [y]) with the interaction box above it and the shape caption below.
+     *
+     * @return the space the three now take up
+     */
+    fun placeAt(x: kotlin.Double, y: kotlin.Double): Rectangle2D {
+        imageBox.centerOn(x, y)
+        interactionBox.centerOn(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
+        shapeCaption.centerOn(x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP)
+        return drawing().footprintAt(x, y, imageSide)
     }
 
     /**
-     * Size the image to the room between the two layers and place it there, at [position] along the arrow's
-     * [shaft] from 0 at the source layer to 1 at the base of the arrowhead, with the label box above it and the
-     * caption below. A matrix that is [shared] with one running the other way keeps to its half of the gap.
+     * Size the image and place it on the arrow's [shaft], with the label box above it and the caption below, clear
+     * of [obstacles] where there is room. It goes at [position] along the shaft, from 0 at the source layer to 1 at
+     * the base of the arrowhead, unless something is in the way there, in which case it slides along the shaft. A
+     * matrix that is [shared] with one running the other way keeps to its half of the gap.
      *
-     * The image fills the gap until it is [IMAGE_SIDE_DEFAULT] across. Between layers further apart it grows only
-     * as far as leaves it, with its label box and caption, [IMAGE_FILL] of the gap, so that the arrow shows on
-     * either side of it. It stops growing at [IMAGE_SIDE_MAX] and stops shrinking at [IMAGE_SIDE_MIN], below which
-     * it overruns the room.
+     * With the arrow to itself the image fills the room it has until it is [IMAGE_SIDE_DEFAULT] across. On a longer
+     * arrow it grows only as far as leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that
+     * the arrow shows on either side of it. It stops growing at [IMAGE_SIDE_MAX]. It shrinks only where nowhere on
+     * the arrow has room for it, and stops at [IMAGE_SIDE_MIN], below which it overlaps what is in the way.
+     *
+     * @param ownLayers the space taken up by the two layers the matrix joins
+     * @return the space the image, label box and caption now take up
      */
-    fun placeOnShaft(shaft: CubicCurve2D, position: kotlin.Double, shared: Boolean) {
-        val room = imageRoom(
-            shaft,
-            position,
-            shared,
-            above = interactionBox.fullBounds.height,
-            below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0
+    fun placeOnShaft(
+        shaft: CubicCurve2D,
+        position: kotlin.Double,
+        shared: Boolean,
+        obstacles: Obstacles,
+        ownLayers: List<Rectangle2D>
+    ): Rectangle2D {
+        val placement = ShaftPlacer.place(
+            shaft, drawing(), obstacles.layers, obstacles.drawings, ownLayers, position, shared
         )
-        val fitted = fittedImageSide(room)
-        if (abs(fitted - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
-            imageSide = fitted
+        if (abs(placement.side - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            imageSide = placement.side
             // Stretches the image already rendered, which is all a small matrix needs
-            imageBox.resize(fitted, fitted)
+            imageBox.resize(imageSide, imageSide)
             if (renderSize() != renderedSize) markDirty(WEIGHTS)
         }
-        placeAt(room.centerX, room.centerY)
+        return placeAt(placement.centerX, placement.centerY)
     }
 
     /**

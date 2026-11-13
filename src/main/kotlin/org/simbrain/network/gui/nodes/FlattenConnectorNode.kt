@@ -5,12 +5,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
+import org.simbrain.network.gui.LaidOutConnector
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
+import java.awt.geom.CubicCurve2D
 import javax.swing.JPopupMenu
 
 /**
@@ -18,17 +20,19 @@ import javax.swing.JPopupMenu
  * to the target NeuronArrayNode, with an [InteractionBox] showing the connector label.
  */
 class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenConnector) :
-    ScreenElement(networkPanel) {
+    ScreenElement(networkPanel), LaidOutConnector {
 
     val sourceNode by lazy { networkPanel.getNode(connector.source) }
     val targetNode by lazy { networkPanel.getNode(connector.target) }
 
     val interactionBox = FlattenConnectorInteractionBox(networkPanel)
 
-    /** The arrow, whose layout also places the label box on its shaft. */
-    override val connectionDrawing = ConnectionDrawing(this) { layoutArrow() }
+    override val connectionDrawing = ConnectionDrawing(this)
 
     private val arrow: BezierArrow
+
+    /** The shaft of the arrow as last laid out, or null for layers no arrow can be drawn between. */
+    private var shaft: CubicCurve2D? = null
 
     init {
         pickable = true
@@ -42,11 +46,6 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
             }
 
             lateralOffset { 0.5 }
-
-            onUpdated { curve ->
-                val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
-                interactionBox.centerFullBoundsOnPoint(pt.x, pt.y)
-            }
         }
 
         connectionDrawing.addChild(arrow)
@@ -55,36 +54,40 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         val connectorEvents = connector.events
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connector.displayName)
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
-        layoutConnectionWithView()
-        connectionDrawing.invalidateLayout()
+        layoutWithView()
     }
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
-        layoutArrow()
     }
 
-    private fun layoutArrow() {
+    override fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.footprint ?: return
         val tgtTopBounds = targetNode?.footprint ?: return
-        arrow.layout(
+        shaft = arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
+    }
+
+    /** Place the label box on the arrow's shaft. */
+    override fun placeOnArrow() {
+        val pt = shaft?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
+        interactionBox.centerFullBoundsOnPoint(pt.x, pt.y)
     }
 
     override val isDraggable: Boolean = false

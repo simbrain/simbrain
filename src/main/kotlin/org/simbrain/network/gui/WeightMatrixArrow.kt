@@ -1,3 +1,8 @@
+/**
+ * The arrow of a weight matrix: a curve between two layers, or a loop for a matrix from a layer to itself. It is drawn
+ * among the connections, as the matrix node's connection drawing, and laid out in two steps by the panel's
+ * [ConnectionLayout]: the arrow first, then what the matrix draws on it.
+ */
 package org.simbrain.network.gui
 
 import org.piccolo2d.PNode
@@ -9,6 +14,8 @@ import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
+import java.awt.geom.CubicCurve2D
+import java.awt.geom.Point2D
 
 class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode() {
 
@@ -61,35 +68,44 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                 if (isBidirectional()) 0.35 else 0.5
             }
 
-            onUpdated { curve ->
-                val bidirectional = isBidirectional()
-                val offset = if (bidirectional) 0.25 else 0.5
-                if (curve != null) {
-                    weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional)
-                } else {
-                    val (x, y) = line(source.location, target.location).p(offset)
-                    weightMatrixNode.placeAt(x, y)
-                }
-            }
-
         }
     }.also { addChild(it) }
+
+    /** The shaft of the arrow as last laid out, or null for a loop, or for layers no arrow can be drawn between. */
+    private var shaft: CubicCurve2D? = null
+
+    /** Where what the matrix draws goes on a loop, as last laid out. */
+    private var loopAnchor: Point2D? = null
 
     fun updateColorFromPreferences() {
         when (arrow) {
             is RecurrentArrow -> arrow.updateColorFromPreferences()
             is BezierArrow -> arrow.updateColorFromPreferences()
         }
-        layout()
     }
 
-    /** Draw the arrow between the two layers as they now are, and place what the matrix draws on it. */
+    /** Draw the arrow between the two layers as they now are. */
     fun layout() {
         when (arrow) {
-            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) ->
-                weightMatrixNode.placeAt(x, y)
-            }
-            is BezierArrow -> arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
+            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { loopAnchor = it }
+            is BezierArrow -> shaft = arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
+        }
+    }
+
+    /** Place what the matrix draws on the arrow as [layout] last drew it. */
+    fun placeMatrix() {
+        if (arrow is RecurrentArrow) {
+            loopAnchor?.let { weightMatrixNode.placeAt(it.x, it.y) }
+            return
+        }
+        val bidirectional = isBidirectional()
+        val offset = if (bidirectional) 0.25 else 0.5
+        val curve = shaft
+        if (curve != null) {
+            weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional)
+        } else {
+            val (x, y) = line(source.location, target.location).p(offset)
+            weightMatrixNode.placeAt(x, y)
         }
     }
 }

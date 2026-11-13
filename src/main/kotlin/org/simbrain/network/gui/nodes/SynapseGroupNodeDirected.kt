@@ -6,7 +6,7 @@ import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
-import javax.swing.SwingUtilities
+import java.awt.geom.Point2D
 
 /**
  * PNode representation of a directed "green arrow" (representing a group of synapses) from one
@@ -16,7 +16,7 @@ import javax.swing.SwingUtilities
  * @author Jeff Yoshimi
  * @author Leo Yulin Li
  */
-class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) : PNode(), SynapseGroupNode.Arrow {
+class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) : PNode() {
 
     private val source = synapseGroupNode.synapseGroup.source
     private val sourceNodeBounds get() = synapseGroupNode.sourceNode.outlinedObjects.globalFullBounds
@@ -40,19 +40,23 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
                 tail = 0.0
             }
 
-            onUpdated { curve ->
-                val offset = if (isBidirectional()) 0.75 else 0.5
-                val (x, y) = curve?.p(offset) ?: line(source.location, target.location).p(offset)
-                SwingUtilities.invokeLater { synapseGroupNode.interactionBox.centerFullBoundsOnPoint(x, y) }
-            }
-
         }
     }.also { addChild(it) }
 
-    override fun layoutChildren() {
+    /** Where the group's label box goes on the arrow, as last laid out. */
+    var labelPoint: Point2D? = null
+        private set
+
+    /** Draw the arrow between the two collections as they now are. */
+    fun layout() {
         when (arrow) {
-            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { (x, y) -> synapseGroupNode.interactionBox.centerFullBoundsOnPoint(x, y) }
-            is BezierArrow -> arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional())
+            is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { labelPoint = it }
+            is BezierArrow -> {
+                val bidirectional = isBidirectional()
+                val offset = if (bidirectional) 0.75 else 0.5
+                val shaft = arrow.layout(sourceNodeBounds.outlines, targetNodeBounds.outlines, bidirectional)
+                labelPoint = shaft?.p(offset) ?: line(source.location, target.location).p(offset)
+            }
         }
     }
 

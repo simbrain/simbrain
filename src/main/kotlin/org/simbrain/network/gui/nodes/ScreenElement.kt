@@ -14,6 +14,7 @@ import org.piccolo2d.nodes.PPath
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.LocatableModel
 import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.gui.LaidOutConnector
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createTooltipTextWithLocation
 import org.simbrain.util.StandardDialog
@@ -99,10 +100,8 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      */
     val footprint: PBounds
         get() {
-            // Validates the node, so that its parts are measured where layout puts them: an element in a tier above
-            // the one being laid out has not been reached by the validation pass yet. The connection drawing goes
-            // first, since a connector's arrow places what the connector draws on it
-            connectionDrawing?.fullBoundsReference
+            // Validates the node, so that its parts are measured where its own layout puts them. The validation
+            // pass may not have reached it yet
             fullBoundsReference
             return measureFootprint()
         }
@@ -112,13 +111,16 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
 
     private var viewListener: PropertyChangeListener? = null
 
+    /** Have the panel lay this connector out again, once however many times it is asked before it does. */
+    protected fun LaidOutConnector.requestLayout() = networkPanel.connectionLayout.request(this)
+
     /**
-     * Lay the [connectionDrawing] out again whenever the view pans or zooms. Label boxes are rescaled with the
-     * zoom, and what a connector places around its label box has to follow. Ends when the node is disposed.
+     * Lay this connector out again whenever the view pans or zooms. Label boxes are rescaled with the zoom, and
+     * what a connector places around its label box has to follow. Ends when the node is disposed.
      */
-    protected fun layoutConnectionWithView() {
+    protected fun LaidOutConnector.layoutWithView() {
         if (viewListener != null) return
-        val listener = PropertyChangeListener { connectionDrawing?.invalidateLayout() }
+        val listener = PropertyChangeListener { requestLayout() }
         viewListener = listener
         networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
     }

@@ -43,7 +43,7 @@ import kotlin.math.ceil
  * For [ConvolutionConnector], also shows a kernel heatmap with filter/channel navigation.
  */
 class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConnector) :
-    ScreenElement(networkPanel), PixelSelectionHost {
+    ScreenElement(networkPanel), PixelSelectionHost, LaidOutConnector {
 
     val sourceNode by lazy { networkPanel.getNode(connector.source) }
     val targetNode by lazy { networkPanel.getNode(connector.target) }
@@ -381,10 +381,12 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }
     }
 
-    /** The arrow, whose layout also places the kernel drawing, label box and caption on its shaft. */
-    override val connectionDrawing = ConnectionDrawing(this) { layoutArrow() }
+    override val connectionDrawing = ConnectionDrawing(this)
 
     private val arrow: BezierArrow
+
+    /** The shaft of the arrow as last laid out, or null for layers no arrow can be drawn between. */
+    private var shaft: CubicCurve2D? = null
 
     init {
         pickable = true
@@ -397,61 +399,6 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             }
 
             lateralOffset { 0.5 }
-
-            onUpdated { curve ->
-                val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
-                val px = pt.x
-                val py = pt.y
-
-                val conv = connector as? ConvolutionConnector
-                if (conv != null && conv.kernelGridMode) {
-                    // Grid mode: size the grid to the room between the layers and place it there, with the label
-                    // box above it and the caption below it
-                    val room = curve?.let { kernelGridRoom(it) }
-                    if (room != null) fitKernelGrid(conv, room)
-                    val gridX = room?.centerX ?: px
-                    val gridY = room?.centerY ?: py
-                    kernelGridGroup.centerFullBoundsOnPoint(gridX, gridY)
-                    val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
-                    shapeCaption.centerFullBoundsOnPoint(
-                        gridX, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
-                    )
-                    interactionBox.centerFullBoundsOnPoint(
-                        gridX,
-                        gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
-                    )
-                } else if (conv != null) {
-                    // Single kernel mode: size the image to the room between the layers and place it there,
-                    // with its buttons, labels and caption around it
-                    val room = curve?.let { kernelImageRoom(it) }
-                    if (room != null) fitKernelImage(room)
-                    val imageX = room?.centerX ?: px
-                    val imageY = room?.centerY ?: py
-                    imageBox.centerFullBoundsOnPoint(imageX, imageY)
-
-                    val hi = kernelImageSide / 2.0
-                    val gap = KERNEL_IMAGE_BUTTON_GAP
-                    val bh = filterPrevButton!!.fullBounds.height
-                    val bw = channelPrevButton!!.fullBounds.width
-
-                    filterPrevButton.centerFullBoundsOnPoint(imageX, imageY - hi - gap - bh / 2)
-                    filterNextButton!!.centerFullBoundsOnPoint(imageX, imageY + hi + gap + bh / 2)
-                    channelPrevButton.centerFullBoundsOnPoint(imageX - hi - gap - bw / 2, imageY)
-                    channelNextButton!!.centerFullBoundsOnPoint(imageX + hi + gap + bw / 2, imageY)
-
-                    val bottomEdge = imageY + hi + gap + bh
-                    detailLabel.centerFullBoundsOnPoint(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
-                    shapeCaption.centerFullBoundsOnPoint(
-                        imageX, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
-                    )
-                    interactionBox.centerFullBoundsOnPoint(
-                        imageX,
-                        imageY - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
-                    )
-                } else {
-                    interactionBox.centerFullBoundsOnPoint(px, py)
-                }
-            }
         }
 
         connectionDrawing.addChild(arrow)
@@ -486,22 +433,21 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }.untilDisposed()
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connectorDisplayText())
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
         connectorEvents.visualPropertiesChanged.on(Dispatchers.Swing) {
             syncKernelDisplayMode()
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }.untilDisposed()
 
         interactionBox.setText(connectorDisplayText())
-        layoutConnectionWithView()
-        connectionDrawing.invalidateLayout()
+        layoutWithView()
         updateDetailLabel()
     }
 
@@ -528,7 +474,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             renderKernelImage()
             updateDetailLabel()
         }
-        connectionDrawing.invalidateLayout()
+        requestLayout()
     }
 
     /** Trace highlight set by the receptive field tracer. */
@@ -638,7 +584,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
             if (text != detailLabel.text) {
                 detailLabel.text = text
                 // The label is centered under the kernel, so a change in its width moves it
-                connectionDrawing.invalidateLayout()
+                requestLayout()
             }
         }
     }
@@ -677,19 +623,76 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
-        layoutArrow()
     }
 
-    private fun layoutArrow() {
+    override fun layoutArrow() {
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.footprint ?: return
         val tgtTopBounds = targetNode?.footprint ?: return
-        arrow.layout(
+        shaft = arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
             false
         )
+    }
+
+    /** Place the kernel drawing that is showing, with its label box and what goes around it, on the arrow's shaft. */
+    override fun placeOnArrow() {
+        val curve = shaft
+        val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
+        val px = pt.x
+        val py = pt.y
+
+        val conv = connector as? ConvolutionConnector
+        if (conv != null && conv.kernelGridMode) {
+            // Grid mode: size the grid to the room between the layers and place it there, with the label
+            // box above it and the caption below it
+            val room = curve?.let { kernelGridRoom(it) }
+            if (room != null) fitKernelGrid(conv, room)
+            val gridX = room?.centerX ?: px
+            val gridY = room?.centerY ?: py
+            kernelGridGroup.centerFullBoundsOnPoint(gridX, gridY)
+            val gridHalfH = kernelGridGroup.fullBounds.height / 2.0
+            shapeCaption.centerFullBoundsOnPoint(
+                gridX, gridY + gridHalfH + shapeCaption.height / 2.0 + KERNEL_GRID_CAPTION_GAP
+            )
+            interactionBox.centerFullBoundsOnPoint(
+                gridX,
+                gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
+            )
+        } else if (conv != null) {
+            // Single kernel mode: size the image to the room between the layers and place it there,
+            // with its buttons, labels and caption around it
+            val room = curve?.let { kernelImageRoom(it) }
+            if (room != null) fitKernelImage(room)
+            val imageX = room?.centerX ?: px
+            val imageY = room?.centerY ?: py
+            imageBox.centerFullBoundsOnPoint(imageX, imageY)
+
+            val hi = kernelImageSide / 2.0
+            val gap = KERNEL_IMAGE_BUTTON_GAP
+            val bh = filterPrevButton!!.fullBounds.height
+            val bw = channelPrevButton!!.fullBounds.width
+
+            filterPrevButton.centerFullBoundsOnPoint(imageX, imageY - hi - gap - bh / 2)
+            filterNextButton!!.centerFullBoundsOnPoint(imageX, imageY + hi + gap + bh / 2)
+            channelPrevButton.centerFullBoundsOnPoint(imageX - hi - gap - bw / 2, imageY)
+            channelNextButton!!.centerFullBoundsOnPoint(imageX + hi + gap + bw / 2, imageY)
+
+            val bottomEdge = imageY + hi + gap + bh
+            detailLabel.centerFullBoundsOnPoint(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
+            shapeCaption.centerFullBoundsOnPoint(
+                imageX, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
+            )
+            interactionBox.centerFullBoundsOnPoint(
+                imageX,
+                imageY - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
+            )
+        } else {
+            interactionBox.centerFullBoundsOnPoint(px, py)
+        }
+
     }
 
     override fun paint(paintContext: PPaintContext) {

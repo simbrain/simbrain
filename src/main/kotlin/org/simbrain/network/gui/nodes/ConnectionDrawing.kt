@@ -12,11 +12,8 @@ import org.piccolo2d.event.PInputEventListener
 
 /**
  * @param owner the element this is part of
- * @param layout lays out what is drawn here, and may place what [owner] draws on it. Asked for with
- * [invalidateLayout], which is safe from event handlers but not from the owner's own layout: the connection tier
- * is validated before the owner's tier, so a mark made from there is left behind by the pass that is running.
  */
-class ConnectionDrawing(val owner: ScreenElement, private val layout: () -> Unit = {}) : PNode() {
+class ConnectionDrawing(val owner: ScreenElement) : PNode() {
 
     init {
         // Piccolo offers an event to the nodes above the picked one, which the owner is not
@@ -29,11 +26,5 @@ class ConnectionDrawing(val owner: ScreenElement, private val layout: () -> Unit
                 }
             }
         })
-    }
-
-    override fun layoutChildren() {
-        layout()
-        // A validation pass only goes back over children changed by a layout when the node laid out is itself marked
-        invalidateFullBounds()
     }
 }

@@ -104,6 +104,9 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     /** Top tier: neurons, arrays, collections, subnetworks, text and every other node, drawn over the connections. */
     private val nodeTier = PNode().also { canvas.layer.addChild(it) }
 
+    /** Lays out the arrows of connectors and what connectors draw on them, once per update of the canvas. */
+    internal val connectionLayout = ConnectionLayout(canvas)
+
     /**
      * Reference to the model network
      */
@@ -295,6 +298,8 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
      */
     private val zoomToFit = viewScope.uiRefresh(ZOOM_TO_FIT_INTERVAL_MS) {
         if (autoZoom) {
+            // Measured outside the canvas's update, so connectors still waiting to be laid out are laid out first
+            connectionLayout.flush()
             // An element's drawing among the connections is not inside the element's own node
             val filtered = screenElements.flatMap { listOfNotNull(it, it.connectionDrawing) }.unionOfGlobalFullBounds()
             canvas.camera.setViewBounds(
@@ -414,6 +419,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                 connectorTier.addChild(node)
             }
         }
+        if (node is LaidOutConnector) connectionLayout.request(node)
     }
 
     /** Draw [node] under every connection, present and future. Whoever adds it removes it. */

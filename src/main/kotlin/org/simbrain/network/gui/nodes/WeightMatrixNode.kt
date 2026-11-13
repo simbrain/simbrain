@@ -40,7 +40,7 @@ import kotlin.math.ceil
  * A visual representation of a weight matrix
  */
 class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel),
-    PixelSelectionHost {
+    PixelSelectionHost, LaidOutConnector {
     /**
      * Side of the square [imageBox]. Fitted to the space between the two layers by [placeOnShaft]; a
      * self-connection, which has no such space, keeps the default.
@@ -61,8 +61,12 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     private val arrow = WeightMatrixArrow(this)
 
-    /** The arrow, whose layout also places the image, label box and caption on its shaft. */
-    override val connectionDrawing = ConnectionDrawing(this) { arrow.layout() }.also { it.addChild(arrow) }
+    override val connectionDrawing = ConnectionDrawing(this).also { it.addChild(arrow) }
+
+    override fun layoutArrow() = arrow.layout()
+
+    /** Place the image, label box and caption on the arrow's shaft. */
+    override fun placeOnArrow() = arrow.placeMatrix()
 
     /**
      * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
@@ -187,7 +191,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         })
         
         fun updateLocations() {
-            connectionDrawing.invalidateLayout()
+            requestLayout()
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
@@ -201,8 +205,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }?.untilDisposed()
-        layoutConnectionWithView()
-        updateLocations()
+        layoutWithView()
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()

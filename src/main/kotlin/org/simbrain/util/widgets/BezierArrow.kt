@@ -51,9 +51,10 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     /**
      * Update the shape of the arrow base on the outlines of source and target.
      *
-     * @return the updated curve model
+     * @return the shaft of the arrow, from the edge of the source to the base of the arrowhead, or null if the two
+     * are placed so that no arrow can be drawn between them
      */
-    fun layout(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean) {
+    fun layout(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean): CubicCurve2D? {
 
         // 0. clear old arrow
         removeAllChildren()
@@ -71,7 +72,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                     } else {
                         it.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
                     }
-                }.also { if (it == null) updateEvent(null) } ?: return
+                }.also { if (it == null) updateEvent(null) } ?: return null
 
         // 2. compute the curve
         val curveModel = cubicBezier(
@@ -99,6 +100,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         // 5. call back
         updateEvent(curveModel)
 
+        return curveModel
     }
 
     /**

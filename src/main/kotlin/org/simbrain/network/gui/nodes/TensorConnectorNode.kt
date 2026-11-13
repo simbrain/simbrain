@@ -625,7 +625,20 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         arrow.updateColorFromPreferences()
     }
 
-    override fun layoutArrow() {
+    /** The space taken up by the two layers the connector joins. */
+    private fun ownLayers(): List<Rectangle2D> = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+
+    /** The space the two layers took up when the arrow was last drawn. */
+    private var drawnBetween: List<Rectangle2D>? = null
+
+    /** The space taken up by the layers in [layers] that the connector does not join. */
+    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
+        val own = ownLayers()
+        return layers.filter { layer -> own.none { it == layer } }
+    }
+
+    override fun layoutArrow(layers: List<Rectangle2D>) {
+        drawnBetween = ownLayers()
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.footprint ?: return
@@ -633,20 +646,37 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         shaft = arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
-            false
+            false,
+            otherLayers(layers)
         )
     }
 
+    /** One of the two layers changed since the arrow was drawn, or another layer is or was in the arrow's way. */
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) =
+        ownLayers() != drawnBetween || arrow.affectedBy(otherLayers(layers))
+
     /**
-     * Place the kernel drawing that is showing, with its label box and what goes around it, on the arrow's shaft,
-     * clear of [obstacles] where there is room. The kernel grid is fitted to the gap between its two layers alone.
+     * The single kernel view, or the label box of a connector with no kernel, to be placed on the arrow's shaft. The
+     * kernel grid has a place of its own, in the gap between its two layers.
      */
-    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
+    override fun drawingToPlace(): ShaftItem? {
+        val curve = shaft ?: return null
+        val conv = connector as? ConvolutionConnector
+        if (conv != null && conv.kernelGridMode) return null
+        val drawing = if (conv != null) kernelImageDrawing() else interactionBox.asShaftDrawing()
+        return ShaftItem(curve, drawing, ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint))
+    }
+
+    /**
+     * Put the kernel drawing that is showing, with its label box and what goes around it, where [placement] says.
+     * Without one, the kernel grid is fitted to the gap between its two layers, and anything else goes in the
+     * middle of the arrow.
+     */
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D {
         val curve = shaft
         val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
-        val px = pt.x
-        val py = pt.y
-        val ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+        val px = placement?.centerX ?: pt.x
+        val py = placement?.centerY ?: pt.y
 
         val conv = connector as? ConvolutionConnector
         if (conv != null && conv.kernelGridMode) {
@@ -666,39 +696,31 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
                 gridY - gridHalfH - interactionBox.fullBounds.height / 2.0 - KERNEL_GRID_LABEL_BOX_GAP
             )
         } else if (conv != null) {
-            // Single kernel mode: size the image and place it on the shaft, with its buttons, labels and caption
-            // around it
-            val placement = curve?.let {
-                ShaftPlacer.place(it, kernelImageDrawing(), obstacles.layers, obstacles.drawings, ownLayers)
-            }
+            // Single kernel mode: the image at its size, with its buttons, labels and caption around it
             if (placement != null) fitKernelImage(placement.side)
-            val imageX = placement?.centerX ?: px
-            val imageY = placement?.centerY ?: py
-            imageBox.centerOn(imageX, imageY)
+            imageBox.centerOn(px, py)
 
             val hi = kernelImageSide / 2.0
             val gap = KERNEL_IMAGE_BUTTON_GAP
             val bh = filterPrevButton!!.fullBounds.height
             val bw = channelPrevButton!!.fullBounds.width
 
-            filterPrevButton.centerOn(imageX, imageY - hi - gap - bh / 2)
-            filterNextButton!!.centerOn(imageX, imageY + hi + gap + bh / 2)
-            channelPrevButton.centerOn(imageX - hi - gap - bw / 2, imageY)
-            channelNextButton!!.centerOn(imageX + hi + gap + bw / 2, imageY)
+            filterPrevButton.centerOn(px, py - hi - gap - bh / 2)
+            filterNextButton!!.centerOn(px, py + hi + gap + bh / 2)
+            channelPrevButton.centerOn(px - hi - gap - bw / 2, py)
+            channelNextButton!!.centerOn(px + hi + gap + bw / 2, py)
 
-            val bottomEdge = imageY + hi + gap + bh
-            detailLabel.centerOn(imageX, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
+            val bottomEdge = py + hi + gap + bh
+            detailLabel.centerOn(px, bottomEdge + KERNEL_IMAGE_DETAIL_OFFSET)
             shapeCaption.centerOn(
-                imageX, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
+                px, detailLabel.fullBounds.maxY + shapeCaption.height / 2.0 + KERNEL_IMAGE_CAPTION_GAP
             )
             interactionBox.centerOn(
-                imageX,
-                imageY - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
+                px,
+                py - hi - gap - bh - interactionBox.fullBounds.height / 2.0 - KERNEL_IMAGE_LABEL_BOX_GAP
             )
         } else {
-            val label = interactionBox.asShaftDrawing()
-            val center = curve?.let { ShaftPlacer.place(it, label, obstacles.layers, obstacles.drawings, ownLayers) }
-            interactionBox.centerOn(center?.centerX ?: px, center?.centerY ?: py)
+            interactionBox.centerOn(px, py)
         }
         return measureFootprint()
     }

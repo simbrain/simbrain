@@ -9,7 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.gui.LaidOutConnector
-import org.simbrain.network.gui.Obstacles
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.centerOn
@@ -40,29 +39,34 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
     /** Whether the group is drawn as a single arrow rather than as its synapses. */
     private val drawnAsArrow get() = !synapseGroup.displaySynapses
 
-    override fun layoutArrow() {
-        if (drawnAsArrow) directedNode?.layout()
+    override fun layoutArrow(layers: List<Rectangle2D>) {
+        if (drawnAsArrow) directedNode?.layout(layers)
+    }
+
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) = drawnAsArrow && directedNode?.affectedBy(layers) == true
+
+    /** The label box, to be placed on the arrow's shaft when the group is drawn as an arrow that has one. */
+    override fun drawingToPlace(): ShaftItem? {
+        val arrow = directedNode?.takeIf { drawnAsArrow } ?: return null
+        val curve = arrow.shaft ?: return null
+        return ShaftItem(
+            curve,
+            interactionBox.asShaftDrawing(),
+            ownLayers = listOf(sourceNode.footprint, targetNode.footprint),
+            preferred = arrow.labelPosition
+        )
     }
 
     /**
-     * Place the label box on the arrow, clear of [obstacles] where there is room, or between the two collections
-     * when the synapses are showing.
+     * Put the label box where [placement] says. Without one it goes on the loop of a group from a collection to
+     * itself, or between the two collections when the synapses are showing.
      */
-    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
-        val arrow = directedNode?.takeIf { drawnAsArrow }
-        val curve = arrow?.shaft
-        val fixedPoint = arrow?.labelPoint
-        if (arrow != null && curve != null) {
-            val label = interactionBox.asShaftDrawing()
-            val ownLayers = listOf(sourceNode.footprint, targetNode.footprint)
-            val placement = ShaftPlacer.place(
-                curve, label, obstacles.layers, obstacles.drawings, ownLayers, preferred = arrow.labelPosition
-            )
-            interactionBox.centerOn(placement.centerX, placement.centerY)
-        } else if (fixedPoint != null) {
-            interactionBox.centerOn(fixedPoint.x, fixedPoint.y)
-        } else {
-            updateInteractionBoxLocation()
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D {
+        val offShaft = directedNode?.takeIf { drawnAsArrow }?.labelPoint
+        when {
+            placement != null -> interactionBox.centerOn(placement.centerX, placement.centerY)
+            offShaft != null -> interactionBox.centerOn(offShaft.x, offShaft.y)
+            else -> updateInteractionBoxLocation()
         }
         return interactionBox.globalFullBounds
     }

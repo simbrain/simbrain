@@ -1,7 +1,7 @@
 /**
  * The pass that lays out a panel's connectors: the arrow of each connector that asked is drawn once, every arrow
- * before any drawing is placed, each drawing is placed knowing where the layers and the drawings before it are, and
- * the pass is part of the canvas's own update, ahead of its bounds validation.
+ * before any drawing is placed, drawings on shafts are placed clear of the layers and of drawings with a place of
+ * their own, and the pass is part of the canvas's own update, ahead of its bounds validation.
  */
 package org.simbrain.network.gui
 
@@ -16,10 +16,14 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.gui.nodes.ShaftDrawing
+import org.simbrain.network.gui.nodes.ShaftItem
+import org.simbrain.network.gui.nodes.ShaftPlacement
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.onEdt
 import org.simbrain.util.widgets.BezierArrow
 import java.awt.Dimension
+import java.awt.geom.CubicCurve2D
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import javax.swing.JDialog
@@ -27,24 +31,30 @@ import javax.swing.SwingUtilities
 
 class ConnectionLayoutTest {
 
-    /** A connector that records what the pass asks of it, and takes up [space] once placed. */
+    /**
+     * A connector that records what the pass asks of it. With [item] it has a drawing for the pass to place; without,
+     * it places its own and takes up [space].
+     */
     private class RecordingConnector(
         private val label: String,
         private val log: MutableList<String>,
+        private val item: ShaftItem? = null,
         private val space: Rectangle2D? = null
     ) : PNode(), LaidOutConnector {
 
-        var layersSeen: List<Rectangle2D> = emptyList()
-        var drawingsSeen: List<Rectangle2D> = emptyList()
+        var placement: ShaftPlacement? = null
 
-        override fun layoutArrow() {
+        override fun layoutArrow(layers: List<Rectangle2D>) {
             log += "arrow $label"
         }
 
-        override fun placeOnArrow(obstacles: Obstacles): Rectangle2D? {
+        override fun arrowAffectedBy(layers: List<Rectangle2D>) = false
+
+        override fun drawingToPlace() = item
+
+        override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D? {
             log += "place $label"
-            layersSeen = obstacles.layers.toList()
-            drawingsSeen = obstacles.drawings.toList()
+            this.placement = placement
             return space
         }
     }
@@ -95,28 +105,32 @@ class ConnectionLayoutTest {
     }
 
     @Test
-    fun `each drawing is placed knowing where the layers and the drawings placed before it are`() {
+    fun `a drawing on a shaft is placed clear of a layer and of a drawing with a place of its own`() {
         val canvas = onEdt { PCanvas() }
-        val layer = Rectangle2D.Double(0.0, 0.0, 100.0, 40.0)
+        // A shaft straight up from the origin, with a layer across the middle of it
+        val shaft = CubicCurve2D.Double(0.0, 0.0, 0.0, -300.0, 0.0, -300.0, 0.0, -600.0)
+        val layer = Rectangle2D.Double(-60.0, -330.0, 120.0, 60.0)
         val layout = onEdt { layoutFor(canvas, layers = listOf(layer)) }
         val log = mutableListOf<String>()
-        val firstSpace = Rectangle2D.Double(0.0, 100.0, 50.0, 50.0)
-        val first = RecordingConnector("first", log, space = firstSpace)
-        val second = RecordingConnector("second", log)
+        // Takes up the part of the shaft below the layer
+        val ownPlace = Rectangle2D.Double(-60.0, -260.0, 120.0, 250.0)
+        val fixed = RecordingConnector("fixed", log, space = ownPlace)
+        val label = ShaftDrawing(above = 8.0, below = 8.0, minWidth = 100.0)
+        val onShaft = RecordingConnector("on shaft", log, item = ShaftItem(shaft, label))
         onEdt {
-            canvas.layer.addChild(first)
-            canvas.layer.addChild(second)
+            canvas.layer.addChild(onShaft)
+            canvas.layer.addChild(fixed)
             layout.requestPlacement()
         }
         awaitEdt()
 
         onEdt {
-            // Nothing asked for its arrow to be drawn again, so only the drawings are placed
-            assertEquals(listOf("place first", "place second"), log.toList())
-            assertEquals(listOf<Rectangle2D>(layer), first.layersSeen)
-            assertTrue(first.drawingsSeen.isEmpty())
-            assertEquals(listOf<Rectangle2D>(layer), second.layersSeen)
-            assertEquals(listOf<Rectangle2D>(firstSpace), second.drawingsSeen)
+            // Nothing asked for its arrow to be drawn again, so only the drawings are placed, the fixed one first
+            assertEquals(listOf("place fixed", "place on shaft"), log.toList())
+            val placement = onShaft.placement!!
+            val footprint = label.footprintAt(placement.centerX, placement.centerY, placement.side)
+            assertTrue(!footprint.intersects(layer) && !footprint.intersects(ownPlace), "placed at $footprint")
+            assertEquals(null, fixed.placement)
         }
     }
 

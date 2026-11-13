@@ -6,7 +6,6 @@ import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
 import org.simbrain.network.gui.LaidOutConnector
-import org.simbrain.network.gui.Obstacles
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.NetworkPreferences
@@ -75,7 +74,20 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         arrow.updateColorFromPreferences()
     }
 
-    override fun layoutArrow() {
+    /** The space taken up by the two layers the connector joins. */
+    private fun ownLayers(): List<Rectangle2D> = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+
+    /** The space the two layers took up when the arrow was last drawn. */
+    private var drawnBetween: List<Rectangle2D>? = null
+
+    /** The space taken up by the layers in [layers] that the connector does not join. */
+    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
+        val own = ownLayers()
+        return layers.filter { layer -> own.none { it == layer } }
+    }
+
+    override fun layoutArrow(layers: List<Rectangle2D>) {
+        drawnBetween = ownLayers()
         val srcBodyBounds = sourceNode?.globalBounds ?: return
         val tgtBodyBounds = targetNode?.globalBounds ?: return
         val srcTopBounds = sourceNode?.footprint ?: return
@@ -83,23 +95,28 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         shaft = arrow.layout(
             directionalOutlines(srcTopBounds, srcBodyBounds),
             directionalOutlines(tgtTopBounds, tgtBodyBounds),
-            false
+            false,
+            otherLayers(layers)
         )
     }
 
-    /** Place the label box on the arrow's shaft, clear of [obstacles] where there is room. */
-    override fun placeOnArrow(obstacles: Obstacles): Rectangle2D {
-        val label = interactionBox.asShaftDrawing()
-        val curve = shaft
-        val center = if (curve != null) {
-            val ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
-            ShaftPlacer.place(curve, label, obstacles.layers, obstacles.drawings, ownLayers)
-                .let { point(it.centerX, it.centerY) }
-        } else {
-            line(connector.source.location, connector.target.location).p(0.5)
-        }
+    /** One of the two layers changed since the arrow was drawn, or another layer is or was in the arrow's way. */
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) =
+        ownLayers() != drawnBetween || arrow.affectedBy(otherLayers(layers))
+
+    /** The label box, to be placed on the arrow's shaft. */
+    override fun drawingToPlace(): ShaftItem? {
+        val curve = shaft ?: return null
+        return ShaftItem(
+            curve, interactionBox.asShaftDrawing(), ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+        )
+    }
+
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D {
+        val center = placement?.let { point(it.centerX, it.centerY) }
+            ?: line(connector.source.location, connector.target.location).p(0.5)
         interactionBox.centerOn(center.x, center.y)
-        return label.footprintAt(center.x, center.y, 0.0)
+        return interactionBox.asShaftDrawing().footprintAt(center.x, center.y, 0.0)
     }
 
     override val isDraggable: Boolean = false

@@ -9,9 +9,11 @@ import org.piccolo2d.PNode
 import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronCollectionNode
+import org.simbrain.network.gui.nodes.ShaftItem
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
+import org.simbrain.util.widgets.RECIPROCAL_ARROW_SHIFT
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.CubicCurve2D
@@ -65,8 +67,9 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                 }
             }
 
-            lateralOffset {
-                if (isBidirectional()) 0.35 else 0.5
+            // Beside the arrow of the matrix that runs the other way, when there is one
+            lateralShift {
+                if (isBidirectional()) RECIPROCAL_ARROW_SHIFT else 0.0
             }
 
         }
@@ -85,32 +88,56 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
         }
     }
 
-    /** Draw the arrow between the two layers as they now are. */
-    fun layout() {
+    /** The space taken up by the two layers the matrix joins. */
+    private fun ownLayers(): List<Rectangle2D> =
+        listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint)
+
+    /** The space the two layers took up when the arrow was last drawn. */
+    private var drawnBetween: List<Rectangle2D>? = null
+
+    /** The space taken up by the layers in [layers] that the matrix does not join. */
+    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
+        val own = ownLayers()
+        return layers.filter { layer -> own.none { it == layer } }
+    }
+
+    /** Draw the arrow between the two layers as they now are, around any of [layers] that is in its way. */
+    fun layout(layers: List<Rectangle2D>) {
+        drawnBetween = ownLayers()
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { loopAnchor = it }
-            is BezierArrow -> shaft = arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional())
+            is BezierArrow -> {
+                shaft = arrow.layout(sourceNodeOutlines, targetNodeOutlines, isBidirectional(), otherLayers(layers))
+            }
         }
     }
 
     /**
-     * Place what the matrix draws on the arrow as [layout] last drew it, clear of [obstacles] where there is room.
-     *
-     * @return the space it now takes up
+     * Whether the arrow has to be drawn again: one of its two layers is not where or as large as it was when the
+     * arrow was drawn, one of [layers] is now in its way, or it goes around one that may have moved.
      */
-    fun placeMatrix(obstacles: Obstacles): Rectangle2D? {
-        if (arrow is RecurrentArrow) {
-            return loopAnchor?.let { weightMatrixNode.placeAt(it.x, it.y) }
-        }
+    fun affectedBy(layers: List<Rectangle2D>) =
+        ownLayers() != drawnBetween || (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
+
+    /** What the matrix draws, to be placed on the arrow as [layout] last drew it, or null if it is not on a shaft. */
+    fun matrixToPlace(): ShaftItem? {
+        val curve = shaft ?: return null
+        if (arrow is RecurrentArrow) return null
         val bidirectional = isBidirectional()
-        val offset = if (bidirectional) 0.25 else 0.5
-        val curve = shaft
-        return if (curve != null) {
-            val ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint)
-            weightMatrixNode.placeOnShaft(curve, offset, shared = bidirectional, obstacles, ownLayers)
-        } else {
-            val (x, y) = line(source.location, target.location).p(offset)
-            weightMatrixNode.placeAt(x, y)
-        }
+        return ShaftItem(
+            curve,
+            weightMatrixNode.drawing(),
+            ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint),
+            preferred = if (bidirectional) 0.25 else 0.5,
+            shared = bidirectional
+        )
     }
+
+    /** Where what the matrix draws goes when it is not on a shaft: on the loop, or between layers too close for an arrow. */
+    fun placeOffShaft(): Rectangle2D? {
+        if (arrow is RecurrentArrow) return loopAnchor?.let { weightMatrixNode.placeAt(it.x, it.y) }
+        val (x, y) = line(source.location, target.location).p(if (isBidirectional()) 0.25 else 0.5)
+        return weightMatrixNode.placeAt(x, y)
+    }
+
 }

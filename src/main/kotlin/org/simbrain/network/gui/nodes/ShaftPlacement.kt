@@ -11,6 +11,11 @@
  *
  * Where it cannot be clear of everything, it is kept clear of layers first, since layers are drawn over it and
  * would hide it, and overlaps other drawings as little as it can.
+ *
+ * Drawings that would collide if each were placed as though the others were not there are placed together instead:
+ * all of them are moved the same way along their arrows, and if that is not enough the largest of them are shrunk
+ * until they fit. Neither gives way to the other, so arrangements that mirror each other are drawn mirroring each
+ * other.
  */
 package org.simbrain.network.gui.nodes
 
@@ -37,7 +42,7 @@ import kotlin.math.min
  * a square larger than this
  * @param fill fraction of the arrow that the drawing may take up, which leaves the rest of the arrow showing
  */
-internal class ShaftDrawing(
+class ShaftDrawing(
     val above: Double = 0.0,
     val below: Double = 0.0,
     val beside: Double = 0.0,
@@ -81,7 +86,7 @@ internal class ShaftDrawing(
 }
 
 /** A label box on its own, as placement on an arrow sees it: a drawing whose square has no size. */
-internal fun InteractionBox.asShaftDrawing(): ShaftDrawing {
+fun InteractionBox.asShaftDrawing(): ShaftDrawing {
     val box = fullBounds
     return ShaftDrawing(above = box.height / 2, below = box.height / 2, minWidth = box.width)
 }
@@ -94,9 +99,26 @@ internal fun InteractionBox.asShaftDrawing(): ShaftDrawing {
  * @param side side of the square
  * @param position how far along the shaft the center is, from 0 at the source layer to 1 at the base of the arrowhead
  */
-internal class ShaftPlacement(val centerX: Double, val centerY: Double, val side: Double, val position: Double)
+class ShaftPlacement(val centerX: Double, val centerY: Double, val side: Double, val position: Double)
 
-internal object ShaftPlacer {
+/**
+ * A connector's drawing waiting to be placed on its arrow among the drawings of other connectors.
+ *
+ * @param shaft the arrow's shaft, from an edge of the source layer to the base of the arrowhead
+ * @param ownLayers the space taken up by the two layers the arrow joins, in canvas coordinates
+ * @param preferred where on the shaft the drawing goes when nothing is in the way, from 0 to 1
+ * @param shared whether a connector running the other way draws in the same gap, in which case this one keeps to the
+ * half nearer its source
+ */
+class ShaftItem(
+    val shaft: CubicCurve2D,
+    val drawing: ShaftDrawing,
+    val ownLayers: List<Rectangle2D> = emptyList(),
+    val preferred: Double = 0.5,
+    val shared: Boolean = false
+)
+
+object ShaftPlacer {
 
     /** Space kept clear between a drawing and an obstacle. */
     const val MARGIN = 6.0
@@ -111,6 +133,7 @@ internal object ShaftPlacer {
 
     /** A size this much short of the one wanted still counts as having room for it. */
     private const val SIZE_TOLERANCE = 0.01
+
 
     /** Length of an arrowhead, which starts where the shaft ends, and half its width. */
     private const val HEAD_LENGTH = 35.0
@@ -234,6 +257,200 @@ internal object ShaftPlacer {
         if (!drawing.hasSquare || allClear.side >= wanted - SIZE_TOLERANCE) return allClear
         val squareClear = search(squareOnly = true)
         return if (squareClear.side > allClear.side + SIZE_TOLERANCE) squareClear else allClear
+    }
+
+    /** Place [item] as [place] does. */
+    fun place(item: ShaftItem, layers: List<Rectangle2D>, drawings: List<Rectangle2D> = emptyList()) =
+        place(item.shaft, item.drawing, layers, drawings, item.ownLayers, item.preferred, item.shared)
+
+    /**
+     * Place every one of [items] on its arrow. Each is placed as though the others were not there, and those that
+     * would then collide are placed together by [placeTogether]. Where an item that collides with nothing still has
+     * to keep clear of a group placed before it, the group keeps its place.
+     *
+     * @param layers the space taken up by each layer on the canvas, in canvas coordinates
+     * @param fixed the space taken up by drawings that are not on a shaft and so do not move
+     * @return where each item goes, in the order of [items]
+     */
+    fun placeAll(items: List<ShaftItem>, layers: List<Rectangle2D>, fixed: List<Rectangle2D> = emptyList()): List<ShaftPlacement> {
+        val alone = items.map { place(it, layers, fixed) }
+        val placed = fixed.toMutableList()
+        val result = arrayOfNulls<ShaftPlacement>(items.size)
+        for (group in collidingGroups(items, alone)) {
+            val placements = if (group.size == 1) {
+                listOf(place(items[group.single()], layers, placed))
+            } else {
+                placeTogether(group.map { items[it] }, group.map { alone[it] }, layers, placed)
+            }
+            group.forEachIndexed { n, index ->
+                result[index] = placements[n]
+                placed += items[index].footprint(placements[n])
+            }
+        }
+        return result.map { it!! }
+    }
+
+    /** The space [this] takes up when placed as [placement] says. */
+    fun ShaftItem.footprint(placement: ShaftPlacement) =
+        drawing.footprintAt(placement.centerX, placement.centerY, placement.side)
+
+    /**
+     * The items grouped so that any two whose drawings would be within [MARGIN] of each other, placed as [alone]
+     * says, are in the same group. Groups are in the order of their first items, as indices into [items].
+     */
+    private fun collidingGroups(items: List<ShaftItem>, alone: List<ShaftPlacement>): List<List<Int>> {
+        val footprints = items.indices.map { items[it].footprint(alone[it]) }
+        val groupOf = IntArray(items.size) { it }
+        fun find(index: Int): Int {
+            var root = index
+            while (groupOf[root] != root) root = groupOf[root]
+            return root
+        }
+        for (i in items.indices) {
+            val grown = Rectangle2D.Double(
+                footprints[i].x - MARGIN, footprints[i].y - MARGIN,
+                footprints[i].width + 2 * MARGIN, footprints[i].height + 2 * MARGIN
+            )
+            for (j in i + 1 until items.size) {
+                if (grown.intersects(footprints[j])) groupOf[max(find(i), find(j))] = min(find(i), find(j))
+            }
+        }
+        return items.indices.groupBy { find(it) }.toSortedMap().values.toList()
+    }
+
+    /**
+     * Place [items], which would collide if each went where [alone] says, so that neither gives way to the other.
+     * All are moved the same distance along their shafts, as a fraction of the shaft, toward their sources or toward
+     * their targets, as little as gets them clear of each other. Where no such move gets them clear at the sizes
+     * they have alone, they go where the least has to be given up, and none is left larger than a size they all
+     * share: the largest shrink first, and a drawing already smaller than that keeps its size.
+     *
+     * @param alone where each item goes with the others not there, in the order of [items]
+     * @param layers the space taken up by each layer on the canvas, in canvas coordinates
+     * @param drawings the space taken up by drawings already placed
+     */
+    fun placeTogether(
+        items: List<ShaftItem>,
+        alone: List<ShaftPlacement>,
+        layers: List<Rectangle2D>,
+        drawings: List<Rectangle2D> = emptyList()
+    ): List<ShaftPlacement> {
+        val ends = items.map { it.ownLayers + listOfNotNull(arrowhead(it.shaft), farHalf(it.shaft).takeIf { _ -> it.shared }) }
+        val otherLayers = items.map { item -> layers.filter { layer -> item.ownLayers.none { it == layer } } }
+        val largest = alone.maxOf { it.side }
+        // What every drawing has to have room for beside a layer before its room beside other drawings counts
+        val leastSide = items.filter { it.drawing.hasSquare }.maxOfOrNull { it.drawing.minSide } ?: 0.0
+
+        fun positionsAt(shift: Double) =
+            items.indices.map { (alone[it].position + shift).coerceIn(END_CLEARANCE, 1 - END_CLEARANCE) }
+
+        /** The side of item [index] when no drawing is larger than [limit]. */
+        fun sideWithin(limit: Double, index: Int) = min(alone[index].side, limit)
+
+        /**
+         * The limit that [room] for one drawing puts on the size of them all: none, if it has room for the size it
+         * has alone, and otherwise the room it has, which is negative where it is not clear at any size.
+         */
+        fun limitFrom(room: Double, side: Double) = if (room >= side) Double.POSITIVE_INFINITY else room
+
+        /**
+         * The largest size that items [i] and [j] may both be limited to and still be clear of each other at
+         * [points], or a negative measure of how far apart they would have to move when they are not clear at any.
+         */
+        fun limitBetween(i: Int, j: Int, points: List<Point2D>, squareOnly: Boolean): Double {
+            fun halfWidth(index: Int, side: Double): Double {
+                val drawing = items[index].drawing
+                return if (squareOnly && drawing.hasSquare) side / 2 + drawing.beside else drawing.halfWidth(side)
+            }
+            val (upper, lower) = if (points[i].y <= points[j].y) i to j else j to i
+            fun clearance(limit: Double): Double {
+                val across = abs(points[i].x - points[j].x) - MARGIN -
+                    halfWidth(i, sideWithin(limit, i)) - halfWidth(j, sideWithin(limit, j))
+                val along = (points[lower].y - sideWithin(limit, lower) / 2 - items[lower].drawing.above) -
+                    (points[upper].y + sideWithin(limit, upper) / 2 + items[upper].drawing.below) - MARGIN
+                return max(across, along)
+            }
+            val touching = clearance(0.0)
+            if (touching < 0.0) return touching
+            var colliding = max(alone[i].side, alone[j].side)
+            if (clearance(colliding) >= 0.0) return Double.POSITIVE_INFINITY
+            var clear = 0.0
+            repeat(24) {
+                val middle = (clear + colliding) / 2
+                if (clearance(middle) >= 0.0) clear = middle else colliding = middle
+            }
+            return clear
+        }
+
+        /** The size the drawings may be limited to at [shift]: beside the layers alone, and beside everything. */
+        fun limitsAt(shift: Double, squareOnly: Boolean): Pair<Double, Double> {
+            val points = positionsAt(shift).mapIndexed { index, position -> items[index].shaft.p(position) }
+            var besideLayers = Double.POSITIVE_INFINITY
+            for (i in items.indices) {
+                val drawing = items[i].drawing
+                val x = points[i].x
+                val y = points[i].y
+                for (layer in otherLayers[i]) {
+                    besideLayers = min(besideLayers, limitFrom(drawing.roomBeside(x, y, layer, MARGIN, squareOnly), alone[i].side))
+                }
+                for (end in ends[i]) {
+                    val room = drawing.roomBeside(x, y, end, MARGIN, squareOnly = drawing.hasSquare)
+                    besideLayers = min(besideLayers, limitFrom(room, alone[i].side))
+                }
+            }
+            var besideAll = besideLayers
+            for (i in items.indices) {
+                val drawing = items[i].drawing
+                for (other in drawings) {
+                    val room = drawing.roomBeside(points[i].x, points[i].y, other, MARGIN, squareOnly)
+                    besideAll = min(besideAll, limitFrom(room, alone[i].side))
+                }
+                for (j in i + 1 until items.size) besideAll = min(besideAll, limitBetween(i, j, points, squareOnly))
+            }
+            return besideLayers to besideAll
+        }
+
+        val longest = items.maxOf { it.shaft.arcLength() }
+        val samples = ceil(longest / SAMPLE_SPACING).toInt().coerceIn(40, 400)
+        val step = (1 - 2 * END_CLEARANCE) / samples
+        // Nearest first, and toward the sources before toward the targets
+        val shifts = listOf(0.0) + (1..samples).flatMap { listOf(-it * step, it * step) }
+        fun around(shift: Double) = List(2 * REFINEMENT_STEPS + 1) { shift + (it - REFINEMENT_STEPS) * step / REFINEMENT_STEPS }
+
+        /** The shift to make and the size to limit to, keeping whole drawings clear or only their squares. */
+        fun search(squareOnly: Boolean): Pair<Double, Double> {
+            val measured = HashMap<Double, Pair<Double, Double>>()
+            fun limits(shift: Double) = measured.getOrPut(shift) { limitsAt(shift, squareOnly) }
+            fun fits(shift: Double) = limits(shift).second >= largest - SIZE_TOLERANCE
+            val roomiest = compareBy<Double> { min(limits(it).first, leastSide) }
+                .thenBy { limits(it).second }
+                .thenBy { -abs(it) }
+            val fitting = shifts.firstOrNull { fits(it) }
+            val shift = if (fitting != null) {
+                around(fitting).filter { fits(it) }.minByOrNull { abs(it) } ?: fitting
+            } else {
+                around(shifts.maxWith(roomiest)).maxWith(roomiest)
+            }
+            return shift to limits(shift).second.coerceAtMost(largest)
+        }
+
+        // As for a drawing on its own: a label box is kept clear by moving, but nothing is shrunk for its sake
+        var (shift, limit) = search(squareOnly = false)
+        if (limit < largest - SIZE_TOLERANCE && items.any { it.drawing.hasSquare }) {
+            val squares = search(squareOnly = true)
+            if (squares.second > limit + SIZE_TOLERANCE) {
+                shift = squares.first
+                limit = squares.second
+            }
+        }
+
+        val positions = positionsAt(shift)
+        return items.indices.map { index ->
+            val item = items[index]
+            val center = item.shaft.p(positions[index])
+            val side = if (item.drawing.hasSquare) sideWithin(limit, index).coerceAtLeast(item.drawing.minSide) else 0.0
+            ShaftPlacement(center.x, center.y, side, positions[index])
+        }
     }
 
     private fun CubicCurve2D.arcLength(): Double {

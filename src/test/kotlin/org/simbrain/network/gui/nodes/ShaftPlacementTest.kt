@@ -1,6 +1,7 @@
 /**
  * Placement of a connector's drawing on its arrow: its size with the arrow to itself, sliding along the arrow to get
- * clear of an obstacle, and shrinking only where nowhere on the arrow has room.
+ * clear of an obstacle, and shrinking only where nowhere on the arrow has room. Also placement of several drawings
+ * that would collide, which move and shrink together rather than one giving way to another.
  */
 package org.simbrain.network.gui.nodes
 
@@ -166,5 +167,93 @@ class ShaftPlacementTest {
         val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
         assertEquals(80.0 - 2 * ShaftPlacer.MARGIN, placement.side, 0.5)
+    }
+
+    /** Shaft from ([fromX], 0) straight to ([toX], -[gap]). */
+    private fun slantedShaft(fromX: Double, toX: Double, gap: Double) =
+        CubicCurve2D.Double(fromX, 0.0, fromX, -gap / 3, toX, -2 * gap / 3, toX, -gap)
+
+    @Test
+    fun `drawings that do not collide are each placed as they would be alone`() {
+        val left = ShaftItem(slantedShaft(0.0, 0.0, 400.0), image)
+        val right = ShaftItem(slantedShaft(600.0, 600.0, 400.0), image)
+
+        val placements = ShaftPlacer.placeAll(listOf(left, right), layers = emptyList())
+
+        listOf(left, right).zip(placements).forEach { (item, placement) ->
+            val alone = ShaftPlacer.place(item, layers = emptyList())
+            assertEquals(alone.centerY, placement.centerY, 1e-6)
+            assertEquals(alone.side, placement.side, 1e-6)
+        }
+    }
+
+    @Test
+    fun `two drawings on crossing arrows move apart the same way and keep the same size`() {
+        // Two arrows that cross in the middle, each the mirror image of the other
+        val rising = ShaftItem(slantedShaft(-150.0, 150.0, 600.0), image)
+        val falling = ShaftItem(slantedShaft(150.0, -150.0, 600.0), image)
+        val alone = ShaftPlacer.place(rising, layers = emptyList())
+
+        val (first, second) = ShaftPlacer.placeAll(listOf(rising, falling), layers = emptyList())
+
+        assertFalse(first.footprint(image).intersects(second.footprint(image)))
+        assertEquals(alone.side, first.side, 0.1, "Neither should shrink while there is room to move")
+        assertEquals(first.side, second.side, 1e-6)
+        assertEquals(first.centerY, second.centerY, 1e-6)
+        assertEquals(first.centerX, -second.centerX, 1e-6)
+    }
+
+    @Test
+    fun `drawings that cannot move apart shrink to the same size`() {
+        // Two arrows side by side, too close for both drawings at full size wherever they go
+        val left = ShaftItem(slantedShaft(0.0, 0.0, 400.0), image)
+        val right = ShaftItem(slantedShaft(110.0, 110.0, 400.0), image)
+        val alone = ShaftPlacer.place(left, layers = emptyList())
+
+        val (first, second) = ShaftPlacer.placeAll(listOf(left, right), layers = emptyList())
+
+        assertTrue(first.side < alone.side, "side ${first.side}, alone ${alone.side}")
+        assertEquals(first.side, second.side, 1e-6)
+        assertTrue(first.side > image.minSide)
+        // The squares are clear of each other; the label boxes, which are wider, are left to overlap
+        assertTrue(second.centerX - first.centerX >= first.side + ShaftPlacer.MARGIN - 0.5)
+    }
+
+    @Test
+    fun `three drawings on arrows that converge are placed mirroring each other`() {
+        val target = 0.0
+        val items = listOf(-260.0, 0.0, 260.0).map { ShaftItem(slantedShaft(it, target, 500.0), image) }
+
+        val placements = ShaftPlacer.placeAll(items, layers = emptyList())
+
+        assertEquals(placements[0].position, placements[2].position, 1e-6)
+        assertEquals(placements[0].side, placements[2].side, 1e-6)
+        assertEquals(placements[0].side, placements[1].side, 1e-6)
+        assertEquals(placements[0].centerX, -placements[2].centerX, 1e-6)
+        assertEquals(0.0, placements[1].centerX, 1e-6)
+        for (i in 0..1) {
+            assertFalse(placements[i].footprint(image).intersects(placements[i + 1].footprint(image)))
+        }
+    }
+
+    @Test
+    fun `a large drawing gives way before a small one beside it does`() {
+        // A short arrow with a small drawing, and beside it a long arrow whose drawing is as large as drawings get
+        val short = ShaftItem(slantedShaft(0.0, 0.0, 130.0), image)
+        val long = ShaftItem(slantedShaft(130.0, 130.0, 900.0), image)
+        val layers = listOf(Rectangle2D.Double(-60.0, -400.0, 120.0, 220.0))
+        val shortAlone = ShaftPlacer.place(short, layers)
+        val longAlone = ShaftPlacer.place(long, layers)
+        assertTrue(longAlone.side > shortAlone.side + 40.0)
+
+        // The long arrow passes a layer for most of its length, so its drawing has to stay beside the small one
+        val blocked = listOf(Rectangle2D.Double(60.0, -900.0, 400.0, 640.0))
+        val (small, large) = ShaftPlacer.placeAll(listOf(short, long), layers + blocked)
+
+        assertEquals(shortAlone.side, small.side, 0.5, "The smaller drawing should keep its size")
+        assertFalse(
+            Rectangle2D.Double(small.centerX - small.side / 2, small.centerY - small.side / 2, small.side, small.side)
+                .intersects(large.centerX - large.side / 2, large.centerY - large.side / 2, large.side, large.side)
+        )
     }
 }

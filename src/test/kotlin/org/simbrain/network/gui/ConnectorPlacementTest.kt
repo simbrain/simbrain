@@ -1,7 +1,7 @@
 /**
  * What connectors draw on their arrows is kept clear of layers and of each other on a panel: drawings that would
- * land on the same spot are moved apart, a drawing whose arrow passes a layer is moved off that layer, and a drawing
- * gets out of the way of a layer dragged across it.
+ * land on the same spot are moved apart without one giving way to the other, an arrow whose way a layer blocks goes
+ * around the layer, and a drawing gets out of the way of a layer dragged across it.
  */
 package org.simbrain.network.gui
 
@@ -15,9 +15,12 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.onEdt
+import org.simbrain.util.widgets.BezierArrow
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import javax.swing.JDialog
@@ -60,6 +63,63 @@ class ConnectorPlacementTest {
         listOf(lowerLeft, lowerRight, upperLeft, upperRight).forEach { layer ->
             assertFalse(second.intersects(panel.footprintOf(layer)), "second $second overlaps a layer")
         }
+        // Neither gives way to the other: the same size, at the same height, either side of the middle
+        val firstImage = panel.imageOf(rising)
+        val secondImage = panel.imageOf(falling)
+        assertEquals(firstImage.width, secondImage.width, 0.5)
+        assertEquals(firstImage.centerY, secondImage.centerY, 0.5)
+        assertEquals(115.0 - firstImage.centerX, secondImage.centerX - 115.0, 1.0)
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair run parallel between layers of different widths`() {
+        val network = Network()
+        val wide = NeuronCollection(runBlocking { network.addNeurons(9) })
+        onEdt { wide.neuronList.forEachIndexed { index, neuron -> neuron.location = Point2D.Double((index - 4) * 45.0, 0.0) } }
+        val narrow = arrayAt(0.0, -460.0)
+        val up = WeightMatrix(wide, narrow)
+        val down = WeightMatrix(narrow, wide)
+        val panel = panelFor(network, wide, narrow, up, down)
+
+        val arrows = onEdt { panel.canvas.layer.allNodes.filterIsInstance<BezierArrow>().map { it.globalFullBounds } }
+        assertEquals(2, arrows.size)
+        // An arrow straight up or down is as wide as its head and no wider
+        arrows.forEach { assertEquals(40.0, it.width, 1.0, "arrow $it") }
+        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 0.5)
+    }
+
+    @Test
+    fun `an arrow whose way a layer blocks goes around the layer, and straight again when the layer has gone`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val lower = WeightMatrix(bottom, middle)
+        val upper = WeightMatrix(middle, top)
+        val network = Network()
+        val panel = panelFor(network, bottom, middle, top, lower, upper)
+        val lowerAlone = panel.imageOf(lower)
+        val skip = WeightMatrix(bottom, top)
+        runBlocking { network.addNetworkModel(skip, usePlacementManager = false) }
+        panel.validateCanvas()
+        fun skipArrow() = onEdt {
+            (panel.getNode(skip) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>()
+                .single().globalFullBounds
+        }
+
+        val inTheWay = panel.footprintOf(middle)
+        val around = skipArrow()
+        assertTrue(around.maxX > inTheWay.maxX + 40.0 || around.x < inTheWay.x - 40.0, "arrow $around layer $inTheWay")
+        assertFalse(panel.footprintOf(skip).intersects(inTheWay))
+        assertTrue(panel.imageOf(skip).width > 60.0, "image ${panel.imageOf(skip)}")
+        // The connections it used to share a line with are the size they were without it, and about where they were
+        assertEquals(lowerAlone.width, panel.imageOf(lower).width, 0.5)
+        assertEquals(lowerAlone.centerY, panel.imageOf(lower).centerY, 5.0)
+
+        onEdt { middle.location = Point2D.Double(500.0, -270.0) }
+        panel.awaitCanvasIdle()
+
+        assertEquals(40.0, skipArrow().width, 1.0, "The arrow should run straight up again")
+        assertTrue(panel.canvasBoundsReport().settled)
     }
 
     @Test

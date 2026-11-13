@@ -65,10 +65,23 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override val connectionDrawing = ConnectionDrawing(this).also { it.addChild(arrow) }
 
-    override fun layoutArrow() = arrow.layout()
+    override fun layoutArrow(layers: List<Rectangle2D>) = arrow.layout(layers)
 
-    /** Place the image, label box and caption on the arrow's shaft. */
-    override fun placeOnArrow(obstacles: Obstacles) = arrow.placeMatrix(obstacles)
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) = arrow.affectedBy(layers)
+
+    override fun drawingToPlace() = arrow.matrixToPlace()
+
+    /** Put the image, with its label box and caption, where [placement] says, at the size it says. */
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D? {
+        placement ?: return arrow.placeOffShaft()
+        if (abs(placement.side - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            imageSide = placement.side
+            // Stretches the image already rendered, which is all a small matrix needs
+            imageBox.resize(imageSide, imageSide)
+            if (renderSize() != renderedSize) markDirty(WEIGHTS)
+        }
+        return placeAt(placement.centerX, placement.centerY)
+    }
 
     /**
      * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
@@ -243,8 +256,14 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         shapeCaption.refresh()
     }
 
-    /** The image with what is drawn around it, as placement on the arrow sees it. */
-    private fun drawing() = ShaftDrawing(
+    /**
+     * The image with what is drawn around it, as placement on the arrow sees it. With the arrow to itself the image
+     * fills the room it has until it is [IMAGE_SIDE_DEFAULT] across. On a longer arrow it grows only as far as
+     * leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that the arrow shows on either side
+     * of it. It stops growing at [IMAGE_SIDE_MAX], and stops shrinking at [IMAGE_SIDE_MIN], below which it overlaps
+     * what is in the way.
+     */
+    internal fun drawing() = ShaftDrawing(
         above = interactionBox.fullBounds.height,
         below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0,
         minWidth = interactionBox.fullBounds.width,
@@ -264,39 +283,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         interactionBox.centerOn(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
         shapeCaption.centerOn(x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP)
         return drawing().footprintAt(x, y, imageSide)
-    }
-
-    /**
-     * Size the image and place it on the arrow's [shaft], with the label box above it and the caption below, clear
-     * of [obstacles] where there is room. It goes at [position] along the shaft, from 0 at the source layer to 1 at
-     * the base of the arrowhead, unless something is in the way there, in which case it slides along the shaft. A
-     * matrix that is [shared] with one running the other way keeps to its half of the gap.
-     *
-     * With the arrow to itself the image fills the room it has until it is [IMAGE_SIDE_DEFAULT] across. On a longer
-     * arrow it grows only as far as leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that
-     * the arrow shows on either side of it. It stops growing at [IMAGE_SIDE_MAX]. It shrinks only where nowhere on
-     * the arrow has room for it, and stops at [IMAGE_SIDE_MIN], below which it overlaps what is in the way.
-     *
-     * @param ownLayers the space taken up by the two layers the matrix joins
-     * @return the space the image, label box and caption now take up
-     */
-    fun placeOnShaft(
-        shaft: CubicCurve2D,
-        position: kotlin.Double,
-        shared: Boolean,
-        obstacles: Obstacles,
-        ownLayers: List<Rectangle2D>
-    ): Rectangle2D {
-        val placement = ShaftPlacer.place(
-            shaft, drawing(), obstacles.layers, obstacles.drawings, ownLayers, position, shared
-        )
-        if (abs(placement.side - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
-            imageSide = placement.side
-            // Stretches the image already rendered, which is all a small matrix needs
-            imageBox.resize(imageSide, imageSide)
-            if (renderSize() != renderedSize) markDirty(WEIGHTS)
-        }
-        return placeAt(placement.centerX, placement.centerY)
     }
 
     /**

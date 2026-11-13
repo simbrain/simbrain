@@ -51,8 +51,11 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
     var shaft: CubicCurve2D? = null
         private set
 
-    /** How far along the [shaft] the group's label box goes when nothing is in the way. */
-    val labelPosition get() = if (isBidirectional()) 0.75 else 0.5
+    /**
+     * How far along the [shaft] the group's label box goes when nothing is in the way. Beside the arrow of a group
+     * that runs the other way it goes toward the target, clear of that group's label box.
+     */
+    val labelPosition get() = if (isBidirectional() && (arrow as? BezierArrow)?.hasOwnLane != true) 0.75 else 0.5
 
     /** Where the group's label box goes when there is no [shaft] to place it on, as last laid out. */
     var labelPoint: Point2D? = null

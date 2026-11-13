@@ -92,13 +92,20 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                     if (it == null) {
                         shaft = null
                         isDetour = false
+                        hasOwnLane = false
                         updateEvent(null)
                     }
                 } ?: return null
 
         // 2. compute the curve
         val shift = shiftFor(sourceSide, targetSide, requestedShift)
-        val directCurve = cubicBezier(
+        // Two arrows that should run side by side cannot where one of the sides they join is too short for both
+        val aroundTheCorner = if (shift < requestedShift - 0.5) {
+            aroundTheCorner(sourceSide, targetSide, sourceOutlines, targetOutlines)
+        } else {
+            null
+        }
+        val directCurve = aroundTheCorner?.first ?: cubicBezier(
                 sourceSide.tailOffset(shift),
                 sourceSide.tailOffset(shift) + deltaVector.abs * sourceSide.unitNormal * 0.5,
                 targetSide.headOffset(shift) + deltaVector.abs * targetSide.unitNormal * 0.5,
@@ -107,8 +114,9 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         val inTheWay = blockers.filter { directCurve.passesThrough(it) }
         val detour = if (inTheWay.isEmpty()) null else detourAround(inTheWay, sourceOutlines, targetOutlines, requestedShift)
         val curveModel = detour?.first ?: directCurve
-        val headSide = detour?.second ?: targetSide
+        val headSide = detour?.second ?: aroundTheCorner?.second ?: targetSide
         isDetour = detour != null
+        hasOwnLane = detour != null || aroundTheCorner != null
         shaft = curveModel
 
         // 3. transform the tip onto the head location and union it with the stroked curve
@@ -156,6 +164,14 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         private set
 
     /**
+     * Whether the arrow as last laid out runs clear of the arrow that runs the other way between the same two
+     * layers, rather than beside it in the gap between them: it goes around something, or attaches around the
+     * corner from a side too short for both.
+     */
+    var hasOwnLane = false
+        private set
+
+    /**
      * Whether the arrow would be laid out differently among [blockers] than it last was: it goes around something,
      * which may have moved, or something is now in its way.
      */
@@ -195,6 +211,49 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
             }
             .minByOrNull { it.first }
             ?.let { it.second to it.third }
+    }
+
+    /**
+     * A way between two sides of which one is too short for this arrow and the one that runs the other way to
+     * attach to it side by side. This arrow attaches around the corner from the short side instead, on the flank of
+     * that layer nearer its own end of the long side, and the other arrow takes the opposite flank, so that the two
+     * pass either side of the narrow layer. Null where the long side is not long enough to reach past the narrow
+     * layer.
+     *
+     * @return the curve and the side of the target it arrives at
+     */
+    private fun aroundTheCorner(
+        sourceSide: Line2D,
+        targetSide: Line2D,
+        sourceOutlines: RectangleSides,
+        targetOutlines: RectangleSides
+    ): Pair<CubicCurve2D, Line2D>? {
+        fun Line2D.length() = p1.distance(p2)
+        val targetIsNarrow = targetSide.length() < sourceSide.length()
+        val longSide = if (targetIsNarrow) sourceSide else targetSide
+        val shortSide = if (targetIsNarrow) targetSide else sourceSide
+        val narrowOutlines = if (targetIsNarrow) targetOutlines else sourceOutlines
+        // Far enough along the long side to come up beside the narrow layer and turn in to its flank
+        val endPadding = if (targetIsNarrow) headPadding else tailPadding
+        val reach = shortSide.length() / 2 + endPadding + ROOM_TO_TURN
+        val shift = reach.coerceAtMost(longSide.length() / 2 - thickness / 2)
+        if (shift < shortSide.length() / 2 + thickness) return null
+        val fraction = 0.5 - shift / longSide.length()
+        val onLongSide = if (targetIsNarrow) {
+            longSide.p(fraction) + longSide.unitNormal * tailPadding
+        } else {
+            longSide.p(1 - fraction) + longSide.unitNormal * headPadding
+        }
+        val flank = narrowOutlines.toList()
+            .filter { abs(it.unitNormal dot shortSide.unitNormal) < 0.5 }
+            .minByOrNull { it.midPoint distanceSqTo onLongSide } ?: return null
+        val onFlank = flank.midPoint + flank.unitNormal * endPadding
+        val (tail, tailSide) = if (targetIsNarrow) onLongSide to longSide else onFlank to flank
+        val (head, arrivalSide) = if (targetIsNarrow) onFlank to flank else onLongSide to longSide
+        val delta = (head - tail).abs
+        // Out from each side far enough to turn the corner without a kink
+        fun outFrom(side: Line2D) = side.unitNormal * max(ROOM_TO_TURN, (delta * side.unitNormal.abs).let { it.x + it.y } * 0.5)
+        return cubicBezier(tail, tail + outFrom(tailSide), head + outFrom(arrivalSide), head) to arrivalSide
     }
 
     private val RectangleSides.center
@@ -288,6 +347,9 @@ private const val DETOUR_CLEARANCE = 80.0
 
 /** The least an arrow that goes around something bows out. */
 private const val MINIMUM_BOW = 60.0
+
+/** Room an arrow that attaches around the corner from a short side has to turn in to the side it attaches to. */
+private const val ROOM_TO_TURN = 45.0
 
 private const val SAMPLES_ALONG_CURVE = 32
 

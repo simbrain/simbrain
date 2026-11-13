@@ -122,14 +122,16 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     /** What the matrix draws, to be placed on the arrow as [layout] last drew it, or null if it is not on a shaft. */
     fun matrixToPlace(): ShaftItem? {
         val curve = shaft ?: return null
-        if (arrow is RecurrentArrow) return null
-        val bidirectional = isBidirectional()
+        if (arrow !is BezierArrow) return null
+        // Beside the arrow of a matrix that runs the other way, each matrix draws in the half of the gap nearer its
+        // source. An arrow with a lane of its own has the whole of it
+        val sharesGap = isBidirectional() && !arrow.hasOwnLane
         return ShaftItem(
             curve,
             weightMatrixNode.drawing(),
             ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint),
-            preferred = if (bidirectional) 0.25 else 0.5,
-            shared = bidirectional
+            preferred = if (sharesGap) 0.25 else 0.5,
+            shared = sharesGap
         )
     }
 

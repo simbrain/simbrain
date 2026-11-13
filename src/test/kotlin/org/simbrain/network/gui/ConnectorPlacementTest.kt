@@ -89,6 +89,40 @@ class ConnectorPlacementTest {
     }
 
     @Test
+    fun `the arrows of a reciprocal pair pass either side of a layer too narrow for both`() {
+        val network = Network()
+        val wide = NeuronCollection(runBlocking { network.addNeurons(9) })
+        onEdt { wide.neuronList.forEachIndexed { index, neuron -> neuron.location = Point2D.Double((index - 4) * 45.0, 0.0) } }
+        // Drawn as a column, whose bottom edge has no room for two arrows side by side
+        val tall = NeuronArray(8).apply {
+            verticalLayout = true
+            location = Point2D.Double(0.0, -460.0)
+        }
+        val up = WeightMatrix(wide, tall)
+        val down = WeightMatrix(tall, wide)
+        val panel = panelFor(network, wide, tall, up, down)
+        fun arrowOf(matrix: WeightMatrix) = onEdt {
+            (panel.getNode(matrix) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single()
+        }
+
+        val narrow = panel.footprintOf(tall)
+        val upArrow = onEdt { arrowOf(up).globalFullBounds }
+        val downArrow = onEdt { arrowOf(down).globalFullBounds }
+        assertTrue(onEdt { arrowOf(up).hasOwnLane && arrowOf(down).hasOwnLane })
+        // One reaches out past the layer on its left and the other on its right
+        fun reachesLeftOnly(arrow: PBounds) = arrow.x < narrow.x - 20.0 && arrow.maxX < narrow.maxX + 20.0
+        fun reachesRightOnly(arrow: PBounds) = arrow.maxX > narrow.maxX + 20.0 && arrow.x > narrow.x - 20.0
+        val arrows = listOf(upArrow, downArrow)
+        assertTrue(arrows.any { reachesLeftOnly(it) } && arrows.any { reachesRightOnly(it) }) {
+            "up $upArrow down $downArrow layer $narrow"
+        }
+        // Each has the whole of its arrow, so the two images are the same size and clear of each other
+        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 1.0)
+        assertFalse(panel.imageOf(up).intersects(panel.imageOf(down)))
+        assertTrue(panel.imageOf(up).width > 60.0, "image ${panel.imageOf(up)}")
+    }
+
+    @Test
     fun `an arrow whose way a layer blocks goes around the layer, and straight again when the layer has gone`() {
         val bottom = arrayAt(0.0, 0.0)
         val middle = arrayAt(0.0, -270.0)

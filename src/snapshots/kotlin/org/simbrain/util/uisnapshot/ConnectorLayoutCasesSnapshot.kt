@@ -21,7 +21,7 @@ class ConnectorLayoutCasesSnapshot : UiSnapshotDef {
     override fun build(): Component {
         val network = Network()
         val panel = NetworkPanel(NetworkComponent("snapshot", network)).apply {
-            preferredSize = Dimension(2200, 2000)
+            preferredSize = Dimension(2200, 2800)
         }
         runBlocking { network.addConnectorLayoutCases() }
         SwingUtilities.invokeAndWait { JDialog().apply { contentPane = panel; pack() } }

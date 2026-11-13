@@ -45,8 +45,9 @@ val connectorLayoutCases = newSim("connector_layout_cases") {
             # The cases
 
             - **Feed-forward**: three layers of different sizes in a stack.
-            - **Reciprocal pair**: two layers connected in both directions, once with layers of the same size and
-            once with a wide layer and a narrow one.
+            - **Reciprocal pair**: two layers connected in both directions: layers of the same size, a wide layer
+            and a narrow one, a wide layer below a tall one, and a tall layer beside a wide one.
+            - **Tall layer into a wide one**: a chain through layers that differ in both width and height.
             - **Skip connection**: a stack with a connection from the bottom layer straight to the top one, and a
             deeper stack with two skips that overlap.
             - **Fan-in** and **fan-out**: several layers feeding one, and one feeding several.
@@ -77,8 +78,17 @@ suspend fun Network.addConnectorLayoutCases() {
         "Reciprocal pair, same size" to {
             reciprocal(array(0.0, 0.0), array(0.0, -460.0))
         },
-        "Reciprocal pair, different sizes" to {
+        "Reciprocal pair, different widths" to {
             reciprocal(collection(0.0, 0.0, 9), array(0.0, -460.0, 4))
+        },
+        "Reciprocal pair, wide below tall" to {
+            reciprocal(collection(0.0, 0.0, 9), tallArray(0.0, -460.0))
+        },
+        "Reciprocal pair, tall beside wide" to {
+            reciprocal(tallArray(-250.0, -270.0), collection(180.0, -270.0, 7))
+        },
+        "Tall layer into a wide one" to {
+            chain(tallArray(0.0, 0.0), collection(0.0, -460.0, 9), gridArray(0.0, -880.0))
         },
         "Skip connection" to {
             val (bottom, _, top) = chain(array(0.0, 0.0), array(0.0, -270.0), array(0.0, -540.0))
@@ -144,7 +154,7 @@ suspend fun Network.addConnectorLayoutCases() {
 
 private const val CASES_PER_ROW = 4
 private const val CELL_WIDTH = 860.0
-private const val CELL_HEIGHT = 940.0
+private const val CELL_HEIGHT = 1100.0
 
 /**
  * Builds one case. Positions are given relative to the middle of the bottom of the case's cell, with layers stacked
@@ -161,11 +171,23 @@ private class LayoutCase(val network: Network, val baseX: Double, val baseY: Dou
         add(NetworkTextObject(text).apply {
             fontSize = 22
             isBold = true
-            location = point(baseX - 330.0, baseY - 790.0)
+            location = point(baseX - 330.0, baseY - 1010.0)
         })
     }
 
     suspend fun array(x: Double, y: Double, size: Int = 6) = add(NeuronArray(size).apply {
+        location = point(baseX + x, baseY + y)
+    })
+
+    /** An array drawn as a column, which is much taller than it is wide. */
+    suspend fun tallArray(x: Double, y: Double, size: Int = 8) = add(NeuronArray(size).apply {
+        verticalLayout = true
+        location = point(baseX + x, baseY + y)
+    })
+
+    /** An array drawn as a grid, which is both wider and taller than a strip. */
+    suspend fun gridArray(x: Double, y: Double, size: Int = 36) = add(NeuronArray(size).apply {
+        gridMode = true
         location = point(baseX + x, baseY + y)
     })
 

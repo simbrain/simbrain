@@ -10,12 +10,14 @@ import org.simbrain.network.core.ArrayLayer
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronCollectionNode
 import org.simbrain.network.gui.nodes.ShaftItem
+import org.simbrain.network.gui.nodes.ShaftPlacement
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RECIPROCAL_ARROW_SHIFT
 import org.simbrain.util.widgets.RecurrentArrow
 import org.simbrain.util.widgets.RoutedShaft
+import org.simbrain.util.widgets.WIDEST_ON_RECIPROCAL_ARROW
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Point2D
@@ -63,6 +65,11 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
                     else -> defaultTail
                 }
                 head = when (target) {
+                    is ArrayLayer -> 5.0 + arrowSize
+                    else -> defaultHead
+                }
+                // Where the curve of a matrix arrow that arrives at the source ends
+                tailBesideAnother = when (source) {
                     is ArrayLayer -> 5.0 + arrowSize
                     else -> defaultHead
                 }
@@ -130,13 +137,13 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
      * Have the arrow join other sides of the two layers when it is next drawn, if the matrix was left cramped where
      * it now runs, or the sides it joins by itself again once the matrix would have room there.
      *
-     * @param placedSide the size the image was just given
+     * @param placed where the image was just placed on the arrow, or null if it was not placed on it
      * @return whether the arrow should be drawn again
      */
-    fun reconsiderRoute(placedSide: kotlin.Double, layers: List<Rectangle2D>, drawings: List<Rectangle2D>): Boolean {
+    fun reconsiderRoute(placed: ShaftPlacement?, layers: List<Rectangle2D>, drawings: List<Rectangle2D>): Boolean {
         if (arrow !is BezierArrow) return false
         val route = ArrowRouting.choose(
-            arrow, sourceNodeOutlines, targetNodeOutlines, isBidirectional(), ::matrixOn, placedSide, layers, drawings
+            arrow, sourceNodeOutlines, targetNodeOutlines, isBidirectional(), ::matrixOn, placed, layers, drawings
         )
         if (route == arrow.route) return false
         arrow.route = route
@@ -145,8 +152,8 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     /**
      * What the matrix draws, as it would be placed on [shaft]. Beside the arrow of a matrix that runs the other
-     * way, each matrix draws in the half of the gap nearer its source. An arrow with a lane of its own has the whole
-     * of it.
+     * way, each matrix draws in the half of the gap nearer its source, and no wider than keeps it off the other
+     * arrow. An arrow with a lane of its own has the whole of it.
      */
     private fun matrixOn(shaft: RoutedShaft): ShaftItem {
         val sharesGap = isBidirectional() && !shaft.hasOwnLane
@@ -154,8 +161,10 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
             shaft.curve,
             weightMatrixNode.drawing(),
             ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint),
-            preferred = if (sharesGap) 0.25 else 0.5,
-            shared = sharesGap
+            preferred = if (sharesGap) shaft.middleOfNearHalf else 0.5,
+            shared = sharesGap,
+            lead = shaft.lead,
+            widest = if (sharesGap) WIDEST_ON_RECIPROCAL_ARROW else kotlin.Double.POSITIVE_INFINITY
         )
     }
 
@@ -163,7 +172,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     fun matrixToPlace(): ShaftItem? {
         val curve = shaft ?: return null
         if (arrow !is BezierArrow) return null
-        return matrixOn(RoutedShaft(curve, arrow.hasOwnLane))
+        return matrixOn(RoutedShaft(curve, arrow.hasOwnLane, arrow.lead))
     }
 
     /** Where what the matrix draws goes when it is not on a shaft: on the loop, or between layers too close for an arrow. */

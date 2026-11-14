@@ -53,8 +53,6 @@ internal class ShaftRoom(val width: Double, val height: Double, val centerX: Dou
  * @param beside width of what accompanies the drawing on each side
  * @param fill fraction of the gap that the drawing may take up together with what accompanies it, which leaves the
  * rest of the arrow showing on either side of it
- * @param comfortable size the drawing may reach by filling the gap outright, so that [fill] only holds back a
- * drawing larger than this
  */
 internal fun shaftRoom(
     shaft: CubicCurve2D,
@@ -63,8 +61,7 @@ internal fun shaftRoom(
     above: Double = 0.0,
     below: Double = 0.0,
     beside: Double = 0.0,
-    fill: Double = 1.0,
-    comfortable: Double = 0.0
+    fill: Double = 1.0
 ): ShaftRoom {
     val center = shaft.p(position)
     // Direction the shaft leaves the source layer in, and the direction it would leave the target layer in
@@ -96,13 +93,9 @@ internal fun shaftRoom(
 
     /**
      * Room for the drawing in a [span] of which what accompanies it has [taken] some and [margin] is kept clear.
-     * The drawing has the [fill] fraction of the span to share with what accompanies it, or all of the span while
-     * that leaves it no larger than [upTo].
+     * The drawing has the [fill] fraction of the span to share with what accompanies it.
      */
-    fun roomIn(span: Double, taken: Double, margin: Double, upTo: Double): Double {
-        val whole = span - taken - margin
-        return max(min(whole, upTo), min(span * fill - taken, whole))
-    }
+    fun roomIn(span: Double, taken: Double, margin: Double) = min(span * fill - taken, span - taken - margin)
 
     /**
      * Room and center for the drawing between [low] and [high], with [before] and [after] taken up on either side
@@ -111,12 +104,12 @@ internal fun shaftRoom(
     fun fit(low: Double, high: Double, shaftCenter: Double, before: Double, after: Double): Pair<Double, Double> =
         when {
             low.isFinite() && high.isFinite() ->
-                roomIn(high - low, before + after, 2 * ShaftRoom.MARGIN, comfortable) to
+                roomIn(high - low, before + after, 2 * ShaftRoom.MARGIN) to
                         (low + high + before - after) / 2
             low.isFinite() ->
-                2 * roomIn(shaftCenter - low, before, ShaftRoom.MARGIN, comfortable / 2) to shaftCenter
+                2 * roomIn(shaftCenter - low, before, ShaftRoom.MARGIN) to shaftCenter
             high.isFinite() ->
-                2 * roomIn(high - shaftCenter, after, ShaftRoom.MARGIN, comfortable / 2) to shaftCenter
+                2 * roomIn(high - shaftCenter, after, ShaftRoom.MARGIN) to shaftCenter
             else -> Double.POSITIVE_INFINITY to shaftCenter
         }
     val (width, centerX) = fit(left, right, center.x, beside, beside)

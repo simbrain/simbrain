@@ -46,7 +46,10 @@ val connectorLayoutCases = newSim("connector_layout_cases") {
 
             - **Feed-forward**: three layers of different sizes in a stack.
             - **Reciprocal pair**: two layers connected in both directions: layers of the same size, a wide layer
-            and a narrow one, a wide layer below a tall one, and a tall layer beside a wide one.
+            and a narrow one, a wide layer below a tall one, and a tall layer beside a wide one. In the staggered
+            pairs one layer is up and to the side of the other. Their two arrows should never cross: they run side
+            by side while one layer is still mostly above the other, and go round opposite corners once the layers
+            are on a diagonal.
             - **Tall layer into a wide one**: a chain through layers that differ in both width and height.
             - **Layers close together**: layers stacked and side by side with too little room between them for an
             image, alone and as reciprocal pairs. The arrows should bow out to where there is room.
@@ -69,6 +72,9 @@ val connectorLayoutCases = newSim("connector_layout_cases") {
             - Select a connector and delete it, then undo.
             - In the close together cases, drag the two layers apart until the arrow goes straight between them
             again, and back together until it bows out. It should not flick between the two on the way.
+            - Drag one layer of a reciprocal pair in a circle around the other. The two arrows should stay clear
+            of each other all the way round.
+            - Zoom out, add a layer, and check that its label box is as large as the others.
         """.trimIndent()
     )
 }
@@ -90,6 +96,11 @@ suspend fun Network.addConnectorLayoutCases() {
         },
         "Reciprocal pair, tall beside wide" to {
             reciprocal(tallArray(-250.0, -270.0), collection(180.0, -270.0, 7))
+        },
+        "Reciprocal pair, staggered" to {
+            reciprocal(array(-230.0, 0.0), array(-170.0, -260.0))
+            reciprocal(array(60.0, 0.0), array(260.0, -260.0))
+            reciprocal(array(-150.0, -520.0), array(170.0, -800.0))
         },
         "Tall layer into a wide one" to {
             chain(tallArray(0.0, 0.0), collection(0.0, -460.0, 9), gridArray(0.0, -880.0))

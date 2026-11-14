@@ -20,7 +20,9 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.nodes.WeightMatrixNode
 import org.simbrain.util.onEdt
+import org.simbrain.util.p
 import org.simbrain.util.widgets.BezierArrow
+import org.simbrain.util.widgets.RECIPROCAL_ARROW_SHIFT
 import java.awt.Dimension
 import java.awt.geom.Point2D
 import javax.swing.JDialog
@@ -85,7 +87,8 @@ class ConnectorPlacementTest {
         assertEquals(2, arrows.size)
         // An arrow straight up or down is as wide as its head and no wider
         arrows.forEach { assertEquals(40.0, it.width, 1.0, "arrow $it") }
-        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 0.5)
+        // One arrow starts at the edge of its layer and the other a little way off, so they differ a little in length
+        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 2.0)
     }
 
     @Test
@@ -126,6 +129,61 @@ class ConnectorPlacementTest {
         (getNode(matrix) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single()
     }
 
+    /** Points along the shaft of the arrow of [matrix], from its source end. */
+    private fun NetworkPanel.shaftPointsOf(matrix: WeightMatrix): List<Point2D> {
+        val shaft = onEdt { arrowOf(matrix).shaft!! }
+        return (0..64).map { shaft.p(it / 64.0) }
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers a little to one side of each other run alongside each other`() {
+        for (across in listOf(40.0, 60.0, 80.0)) {
+            val below = arrayAt(0.0, 0.0)
+            val above = arrayAt(across, -260.0)
+            val up = WeightMatrix(below, above)
+            val down = WeightMatrix(above, below)
+            val panel = panelFor(Network(), below, above, up, down)
+
+            assertFalse(onEdt { panel.arrowOf(up).hasOwnLane || panel.arrowOf(down).hasOwnLane }, "across $across")
+            // The same curve side by side: every point of one is the same step across from a point of the other
+            val going = panel.shaftPointsOf(up)
+            val coming = panel.shaftPointsOf(down).reversed()
+            going.zip(coming).forEach { (there, back) ->
+                assertEquals(2 * RECIPROCAL_ARROW_SHIFT, there.x - back.x, 0.5, "across $across")
+                assertEquals(there.y, back.y, 0.5, "across $across")
+            }
+            assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 0.5, "across $across")
+        }
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers on a diagonal turn opposite corners and do not meet`() {
+        for ((across, up) in listOf(200.0 to 260.0, 300.0 to 260.0, 420.0 to 420.0, -300.0 to 260.0, 200.0 to 160.0)) {
+            val below = arrayAt(0.0, 0.0)
+            val above = arrayAt(across, -up)
+            val there = WeightMatrix(below, above)
+            val back = WeightMatrix(above, below)
+            val panel = panelFor(Network(), below, above, there, back)
+            val case = "across $across up $up"
+
+            assertTrue(onEdt { panel.arrowOf(there).hasOwnLane && panel.arrowOf(back).hasOwnLane }, case)
+            val going = panel.shaftPointsOf(there)
+            val coming = panel.shaftPointsOf(back)
+            val nearest = going.minOf { a -> coming.minOf { b -> a.distance(b) } }
+            assertTrue(nearest > 40.0, "$case: the arrows come within $nearest of each other")
+            // One either side of the line between the middles of the two layers
+            val from = panel.footprintOf(below)
+            val to = panel.footprintOf(above)
+            fun side(point: Point2D) =
+                (to.centerX - from.centerX) * (point.y - from.centerY) - (to.centerY - from.centerY) * (point.x - from.centerX)
+            assertTrue(side(going[32]) * side(coming[32]) < 0.0, case)
+            // Each keeps to the right of its direction
+            assertTrue(side(going[32]) > 0.0, case)
+            assertFalse(panel.footprintOf(there).intersects(panel.footprintOf(back)), case)
+            assertTrue(panel.canvasBoundsReport().settled, case)
+        }
+    }
+
     @Test
     fun `an arrow between layers too close for its image bows out to where the image has room`() {
         val below = arrayAt(0.0, 0.0)
@@ -135,7 +193,7 @@ class ConnectorPlacementTest {
 
         assertTrue(onEdt { panel.arrowOf(matrix).hasOwnLane }, "The arrow should have moved to other sides")
         val image = panel.imageOf(matrix)
-        assertTrue(image.width > 60.0, "image $image")
+        assertTrue(image.width > 40.0, "image $image")
         listOf(below, above).forEach { assertFalse(image.intersects(panel.footprintOf(it)), "image $image over a layer") }
         assertTrue(panel.canvasBoundsReport().settled)
     }
@@ -283,14 +341,16 @@ class ConnectorPlacementTest {
         val network = Network()
         val panel = panelFor(network, source, target, matrix, inTheWay)
         val pushed = panel.imageOf(matrix)
+        // On an arrow that goes around the layer
+        val line = panel.footprintOf(source).centerX
+        assertTrue(kotlin.math.abs(pushed.centerX - line) > 60.0, "pushed $pushed")
 
         runBlocking { network.deleteModels(listOf(inTheWay)) }
         panel.awaitCanvasIdle()
 
         val free = panel.imageOf(matrix)
-        assertTrue(kotlin.math.abs(free.centerY - (-450.0)) < kotlin.math.abs(pushed.centerY - (-450.0)) - 20.0) {
-            "pushed $pushed free $free"
-        }
+        assertEquals(line, free.centerX, 1.0, "pushed $pushed free $free")
+        assertEquals(-450.0, free.centerY, 40.0, "pushed $pushed free $free")
     }
 
     @Test

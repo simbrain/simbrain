@@ -70,12 +70,16 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     override fun arrowAffectedBy(layers: List<Rectangle2D>) = arrow.affectedBy(layers)
 
     override fun reconsiderRoute(layers: List<Rectangle2D>, drawings: List<Rectangle2D>) =
-        arrow.reconsiderRoute(imageSide, layers, drawings)
+        arrow.reconsiderRoute(placedOnArrow, layers, drawings)
+
+    /** Where the image was last placed on the arrow, or null if it was last placed off it. */
+    private var placedOnArrow: ShaftPlacement? = null
 
     override fun drawingToPlace() = arrow.matrixToPlace()
 
     /** Put the image, with its label box and caption, where [placement] says, at the size it says. */
     override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D? {
+        placedOnArrow = placement
         placement ?: return arrow.placeOffShaft()
         if (abs(placement.side - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
             imageSide = placement.side
@@ -261,10 +265,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     /**
      * The image with what is drawn around it, as placement on the arrow sees it. With the arrow to itself the image
-     * fills the room it has until it is [IMAGE_SIDE_DEFAULT] across. On a longer arrow it grows only as far as
-     * leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that the arrow shows on either side
-     * of it. It stops growing at [IMAGE_SIDE_MAX], and stops shrinking at [IMAGE_SIDE_MIN], below which it overlaps
-     * what is in the way.
+     * is as large as leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that the arrow shows
+     * on either side of it. It stops growing at [IMAGE_SIDE_MAX], and stops shrinking at [IMAGE_SIDE_MIN], below
+     * which it overlaps what is in the way.
      */
     internal fun drawing() = ShaftDrawing(
         above = interactionBox.layoutHeight,
@@ -272,7 +275,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         minWidth = interactionBox.layoutWidth,
         minSide = IMAGE_SIDE_MIN,
         maxSide = IMAGE_SIDE_MAX,
-        comfortable = IMAGE_SIDE_DEFAULT,
         fill = IMAGE_FILL
     )
 
@@ -720,26 +722,21 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             shared: Boolean = false,
             above: kotlin.Double = 0.0,
             below: kotlin.Double = 0.0
-        ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL, comfortable = IMAGE_SIDE_DEFAULT)
+        ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL)
 
         /** Side of the weight matrix image that goes in [room]. */
         internal fun fittedImageSide(room: ShaftRoom) = room.squareSide(IMAGE_SIDE_MIN, IMAGE_SIDE_MAX)
 
-        /**
-         * Side of the image on a self-connection, and the side it reaches between two layers by filling the gap
-         * between them.
-         */
+        /** Side of the image where it is not sized for an arrow, as on a self-connection. */
         internal const val IMAGE_SIDE_DEFAULT = 90.0
 
         private const val IMAGE_SIDE_MIN = 30.0
 
-        private const val IMAGE_SIDE_MAX = 180.0
+        /** The largest the image is on an arrow, however long the arrow. */
+        private const val IMAGE_SIDE_MAX = IMAGE_SIDE_DEFAULT
 
-        /**
-         * Fraction of the gap between the layers that an image larger than [IMAGE_SIDE_DEFAULT] takes up together
-         * with its label box and caption.
-         */
-        internal const val IMAGE_FILL = 0.6
+        /** Fraction of its arrow that an image takes up together with its label box and caption. */
+        internal const val IMAGE_FILL = 0.5
 
         /** Space between the image and the shape caption under it. */
         private const val CAPTION_GAP = 3.0

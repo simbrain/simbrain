@@ -269,10 +269,10 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /**
      * The single kernel view as placement on the arrow sees it: its image, with its navigation buttons around it,
-     * the label box above it and the detail label and caption below. With the arrow to itself the image fills the
-     * room it has until it is [KERNEL_IMAGE_DEFAULT] across; on a longer arrow the view as a whole is held to
-     * [KERNEL_IMAGE_FILL] of the arrow, so that the arrow shows on either side of it. The image stops growing at
-     * [KERNEL_IMAGE_MAX] and stops shrinking at [KERNEL_IMAGE_MIN], below which it overlaps what is in the way.
+     * the label box above it and the detail label and caption below. With the arrow to itself the view as a whole
+     * takes up [KERNEL_IMAGE_FILL] of the arrow, so that the arrow shows on either side of it. The image stops
+     * growing at [KERNEL_IMAGE_MAX] and stops shrinking at [KERNEL_IMAGE_MIN], below which it overlaps what is in
+     * the way.
      */
     private fun kernelImageDrawing() = ShaftDrawing(
         above = kernelImageChromeAbove,
@@ -281,7 +281,6 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         minWidth = interactionBox.layoutWidth,
         minSide = KERNEL_IMAGE_MIN,
         maxSide = KERNEL_IMAGE_MAX,
-        comfortable = KERNEL_IMAGE_DEFAULT,
         fill = KERNEL_IMAGE_FILL
     )
 
@@ -952,18 +951,15 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
         private const val KERNEL_GRID_CAPTION_GAP = 4.0
 
-        /** Side the single kernel view's image reaches by filling the gap between the layers. */
+        /** Side of the single kernel view's image before it is sized for its arrow. */
         private const val KERNEL_IMAGE_DEFAULT = 60.0
 
         private const val KERNEL_IMAGE_MIN = 24.0
 
         private const val KERNEL_IMAGE_MAX = 120.0
 
-        /**
-         * Fraction of the gap between the layers that the single kernel view takes up, image and all, once its
-         * image is larger than [KERNEL_IMAGE_DEFAULT].
-         */
-        private const val KERNEL_IMAGE_FILL = 0.6
+        /** Fraction of its arrow that the single kernel view takes up, image and all. */
+        private const val KERNEL_IMAGE_FILL = 0.5
 
         /** Space between the single kernel view's image and each navigation button. */
         private const val KERNEL_IMAGE_BUTTON_GAP = 3.0

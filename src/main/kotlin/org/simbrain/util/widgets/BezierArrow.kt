@@ -1,3 +1,8 @@
+/**
+ * Curved arrows between two rectangular outlines, as connectors draw them between layers: which sides of the
+ * outlines an arrow joins, the curve it takes between them, how it gets around what is in its way, and how two
+ * arrows between the same pair of outlines, one each way, are kept from crossing.
+ */
 package org.simbrain.util.widgets
 
 import org.piccolo2d.PNode
@@ -10,6 +15,8 @@ import java.awt.geom.AffineTransform
 import java.awt.geom.Area
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Line2D
+import java.awt.geom.Path2D
+import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import kotlin.math.abs
 import kotlin.math.max
@@ -35,6 +42,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     private var color: Color = template.color
     private val headPadding = template.padding.head
     private val tailPadding = template.padding.tail
+    private val tailBesideAnother = template.padding.tailBesideAnother
     private val _lateralOffset = template.lateralOffset
     private val lateralOffset get() = _lateralOffset()
     private val _lateralShift = template.lateralShift
@@ -78,6 +86,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
             shaft = null
             isDetour = false
             hasOwnLane = false
+            lead = 0.0
             updateEvent(null)
             return null
         }
@@ -90,13 +99,24 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         isDetour = detour != null
         hasOwnLane = detour != null || plan.hasOwnLane
         shaft = curveModel
+        val leadFrom = plan.leadFrom.takeIf { detour == null }
+        lead = leadFrom?.distance(curveModel.p1) ?: 0.0
 
         // 3. transform the tip onto the head location and union it with the stroked curve
         val tipTransform = AffineTransform().apply {
             translate(curveModel.x2, curveModel.y2)
             rotate(headSide.normalTheta)
         }
-        val arrowShape = Area(BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER).createStrokedShape(curveModel)).apply {
+        val drawn = Path2D.Double().apply {
+            if (leadFrom != null) {
+                moveTo(leadFrom.x, leadFrom.y)
+                lineTo(curveModel.x1, curveModel.y1)
+            } else {
+                moveTo(curveModel.x1, curveModel.y1)
+            }
+            curveTo(curveModel.ctrlX1, curveModel.ctrlY1, curveModel.ctrlX2, curveModel.ctrlY2, curveModel.x2, curveModel.y2)
+        }
+        val arrowShape = Area(BasicStroke(thickness, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND).createStrokedShape(drawn)).apply {
             add(Area(tipTransform.createTransformedShape(arrowTipShape)))
         }
 
@@ -133,31 +153,191 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
      */
     var route: ArrowRoute? = null
 
-    /** A way for the arrow to run between two outlines. */
-    private class Plan(val curve: CubicCurve2D, val headSide: Line2D, val route: ArrowRoute, val hasOwnLane: Boolean)
+    /**
+     * A way for the arrow to run between two outlines.
+     *
+     * @param leadFrom where the arrow is drawn straight from before its curve starts, or null where it starts with
+     * its curve
+     */
+    private class Plan(
+        val curve: CubicCurve2D,
+        val headSide: Line2D,
+        val route: ArrowRoute,
+        val hasOwnLane: Boolean,
+        val leadFrom: Point2D? = null
+    ) {
+        val lead get() = leadFrom?.distance(curve.p1) ?: 0.0
+    }
 
     /**
-     * The way the arrow runs when no sides are asked for: between the nearest pair of sides that face each other,
-     * or, for one of two arrows between the same layers, the pair that leaves its source most squarely.
+     * Where an arrow between two sides attaches.
+     *
+     * @param tail where the arrow is drawn from, beside the source
+     * @param start where its curve starts, which is further out than [tail] for an arrow that runs straight at first
+     * @param head where its curve ends, at the base of the arrowhead
+     */
+    private class Ends(val tail: Point2D, val start: Point2D, val head: Point2D) {
+        val leadFrom get() = tail.takeIf { it.distance(start) > 0.0 }
+    }
+
+    /**
+     * Where the arrow attaches between [sourceSide] and [targetSide].
+     *
+     * An arrow that runs beside one the other way is laid out so that the two are the same curve side by side, which
+     * keeps them from crossing. Its curve starts as far out from the source as the curve of the other arrow ends,
+     * and the arrow runs straight up to there. And where the two sides face each other but are far enough apart
+     * sideways that the curves would slant into each other between the layers, both arrows attach nearer each other's
+     * layer along the sides, each layer giving up the same distance for as long as its side has room.
+     */
+    private fun endsBetween(sourceSide: Line2D, targetSide: Line2D, requestedShift: Double): Ends {
+        val shift = shiftFor(sourceSide, targetSide, requestedShift)
+        val tail = sourceSide.tailOffset(shift)
+        val head = targetSide.headOffset(shift)
+        if (requestedShift <= 0.0) return Ends(tail, tail, head)
+        val outward = sourceSide.unitNormal
+
+        fun endsWith(lead: Double): Ends {
+            val run = ((head - tail) dot outward) - lead
+            val (sourceMove, targetMove) = movesNearer(sourceSide, targetSide, tail, head, shift, run)
+            val from = tail + sourceMove
+            return Ends(from, from + outward * lead, head + targetMove)
+        }
+
+        val lead = ((tailBesideAnother ?: tailPadding) - tailPadding).coerceAtLeast(0.0)
+        if (lead > 0.0) {
+            val ends = endsWith(lead)
+            val line = ends.head - ends.start
+            // Between layers too close for the curve to start further out, it starts where the arrow does
+            if ((line dot outward) >= SHORTEST_CURVE_BESIDE_ANOTHER && (line.norm dot outward) > 0.3) return ends
+        }
+        return endsWith(0.0)
+    }
+
+    /**
+     * How far along their sides the two ends of an arrow that runs beside another move toward each other, as the
+     * move of the end on the source and the move of the end on the target. Nothing where the sides do not face each
+     * other, or where the arrow already goes no further across than [STEEPEST_BESIDE_ANOTHER] allows for its [run]
+     * out from the source.
+     */
+    private fun movesNearer(
+        sourceSide: Line2D,
+        targetSide: Line2D,
+        tail: Point2D,
+        head: Point2D,
+        shift: Double,
+        run: Double
+    ): Pair<Point2D, Point2D> {
+        val none = point(0.0, 0.0) to point(0.0, 0.0)
+        val sourceLength = sourceSide.p1.distance(sourceSide.p2)
+        if (sourceLength == 0.0 || (sourceSide.unitNormal dot targetSide.unitNormal) > -0.9) return none
+        val along = (sourceSide.p2 - sourceSide.p1) / sourceLength
+        val across = (head - tail) dot along
+        val excess = abs(across) - STEEPEST_BESIDE_ANOTHER * max(run, 0.0)
+        if (excess <= 0.0) return none
+        val toward = along * (if (across > 0) 1.0 else -1.0)
+
+        /** How far the two arrows can move along [side] in [direction] from where they are centered on it. */
+        fun travel(side: Line2D, center: Point2D, direction: Point2D) =
+            (max((side.p1 - center) dot direction, (side.p2 - center) dot direction) - shift - thickness)
+                .coerceAtLeast(0.0)
+        val sourceTravel = travel(sourceSide, sourceSide.p(lateralOffset), toward)
+        val targetTravel = travel(targetSide, targetSide.p(1 - lateralOffset), -toward)
+        // Half each, and what one side has no room for goes to the other
+        var sourceMove = min(excess / 2, sourceTravel)
+        var targetMove = min(excess / 2, targetTravel)
+        sourceMove = min(excess - targetMove, sourceTravel)
+        targetMove = min(excess - sourceMove, targetTravel)
+        return toward * sourceMove to toward * -targetMove
+    }
+
+    /**
+     * Whether an arrow between these ends goes further across than [STEEPEST_BESIDE_ANOTHER] allows for the
+     * distance it runs out from [sourceSide], so that two such arrows side by side would run into each other.
+     */
+    private fun Ends.slantsFrom(sourceSide: Line2D): Boolean {
+        val line = head - start
+        val outward = sourceSide.unitNormal
+        val run = line dot outward
+        val across = (line - outward * run).magnitude
+        return across > STEEPEST_BESIDE_ANOTHER * run + 0.5
+    }
+
+    /**
+     * A way for one of two arrows between the same layers to turn a corner: it leaves one side of its source and
+     * arrives at a side of its target at a right angle to that one, bulging to the right of its direction. The
+     * arrow the other way does the same, which takes it round the opposite corner, so that the two go round the
+     * space between the layers and do not meet. Null where either has no room to turn.
+     */
+    private fun turnBesideAnother(sourceOutlines: RectangleSides, targetOutlines: RectangleSides): Plan? {
+        val (ends, sourceSide, targetSide) = rightTurn(sourceOutlines, targetOutlines) ?: return null
+        rightTurn(targetOutlines, sourceOutlines) ?: return null
+        val sides = ArrowRoute(sourceOutlines.toList().indexOf(sourceSide), targetOutlines.toList().indexOf(targetSide))
+        return Plan(curveBetween(ends, sourceSide, targetSide), targetSide, sides, hasOwnLane = true)
+    }
+
+    /**
+     * The sides an arrow [from] one outline [to] another joins to turn a corner on the right of its direction, with
+     * where it attaches to them, or null where it has no room to turn.
+     */
+    private fun rightTurn(from: RectangleSides, to: RectangleSides): Triple<Ends, Line2D, Line2D>? =
+        (from.toList() cartesianProduct to.toList())
+            .filter { (source, target) -> abs(source.unitNormal dot target.unitNormal) < 0.1 }
+            .map { (source, target) ->
+                val tail = source.tailOffset(0.0)
+                Triple(Ends(tail, tail, target.headOffset(0.0)), source, target)
+            }
+            .firstOrNull { (ends, source, target) ->
+                val line = ends.head - ends.tail
+                val out = line dot source.unitNormal
+                val into = -(line dot target.unitNormal)
+                // Where the arrow would turn if it ran straight out of its source and straight in to its target
+                val corner = ends.tail + source.unitNormal * out
+                val toTheRight = point(-line.y, line.x)
+                out >= ROOM_TO_TURN && into >= ROOM_TO_TURN &&
+                    ((corner - (ends.tail + ends.head) / 2.0) dot toTheRight) > 0.0
+            }
+
+    /** The curve between [ends], which leaves [sourceSide] and arrives at [targetSide] at a right angle. */
+    private fun curveBetween(ends: Ends, sourceSide: Line2D, targetSide: Line2D): CubicCurve2D {
+        val delta = ends.head - ends.start
+        return cubicBezier(
+                ends.start,
+                ends.start + delta.abs * sourceSide.unitNormal * 0.5,
+                ends.head + delta.abs * targetSide.unitNormal * 0.5,
+                ends.head
+        )
+    }
+
+    /**
+     * The way the arrow runs when no sides are asked for: between the nearest pair of sides that face each other.
+     *
+     * One of two arrows between the same layers runs beside the other, between the sides that face each other
+     * that it leaves most squarely. Where the layers are so far apart sideways that the two would slant into each
+     * other on the way, each turns a corner instead, as [turnBesideAnother] has it.
      */
     private fun usualPlan(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean): Plan? {
         val requestedShift = _lateralShift()
-        val (deltaVector, sourceSide, targetSide) = (sourceOutlines.toList() cartesianProduct targetOutlines.toList())
-                .map { (source, target) ->
-                    val shift = shiftFor(source, target, requestedShift)
-                    Triple(target.headOffset(shift) - source.tailOffset(shift), source, target)
-                }
-                .filter { (line, source, target) ->
+        val candidates = (sourceOutlines.toList() cartesianProduct targetOutlines.toList())
+                .map { (source, target) -> Triple(endsBetween(source, target, requestedShift), source, target) }
+                .filter { (ends, source, target) ->
                     // make sure the curve does not bend backward
+                    val line = ends.head - ends.start
                     line.norm dot source.unitNormal > 0.3 && line.norm dot target.unitNormal < -0.3
                 }
-                .let {
-                    if (bidirectional) {
-                        it.maxByOrNull { (line, source, _) -> line dot source.normal }
-                    } else {
-                        it.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
-                    }
-                } ?: return null
+        val (ends, sourceSide, targetSide) = if (bidirectional) {
+            val squarest = compareBy<Triple<Ends, Line2D, Line2D>> { (ends, source, _) ->
+                (ends.head - ends.start) dot source.normal
+            }
+            val facing = candidates
+                .filter { (_, source, target) -> (source.unitNormal dot target.unitNormal) < -0.9 }
+                .maxWithOrNull(squarest)
+            if (facing == null || facing.first.slantsFrom(facing.second)) {
+                turnBesideAnother(sourceOutlines, targetOutlines)?.let { return it }
+            }
+            facing ?: candidates.maxWithOrNull(squarest)
+        } else {
+            candidates.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
+        } ?: return null
         val sides = ArrowRoute(sourceOutlines.toList().indexOf(sourceSide), targetOutlines.toList().indexOf(targetSide))
         val shift = shiftFor(sourceSide, targetSide, requestedShift)
         // Two arrows that should run side by side cannot where one of the sides they join is too short for both
@@ -166,13 +346,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
                 return Plan(curve, arrivalSide, sides, hasOwnLane = true)
             }
         }
-        val curve = cubicBezier(
-                sourceSide.tailOffset(shift),
-                sourceSide.tailOffset(shift) + deltaVector.abs * sourceSide.unitNormal * 0.5,
-                targetSide.headOffset(shift) + deltaVector.abs * targetSide.unitNormal * 0.5,
-                targetSide.headOffset(shift)
-        )
-        return Plan(curve, targetSide, sides, hasOwnLane = false)
+        return Plan(curveBetween(ends, sourceSide, targetSide), targetSide, sides, hasOwnLane = false, ends.leadFrom)
     }
 
     /**
@@ -195,17 +369,11 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
             val curve = cubicBezier(tail, tail + outward * bow, head + outward * bow, head)
             return Plan(curve, targetSide, route, hasOwnLane = true)
         }
-        val shift = shiftFor(sourceSide, targetSide, _lateralShift())
-        val delta = targetSide.headOffset(shift) - sourceSide.tailOffset(shift)
+        val ends = endsBetween(sourceSide, targetSide, _lateralShift())
+        val delta = ends.head - ends.start
         val bendsBackward = !(delta.norm dot sourceSide.unitNormal > 0.3 && delta.norm dot targetSide.unitNormal < -0.3)
         if (bendsBackward) return null
-        val curve = cubicBezier(
-                sourceSide.tailOffset(shift),
-                sourceSide.tailOffset(shift) + delta.abs * sourceSide.unitNormal * 0.5,
-                targetSide.headOffset(shift) + delta.abs * targetSide.unitNormal * 0.5,
-                targetSide.headOffset(shift)
-        )
-        return Plan(curve, targetSide, route, hasOwnLane = false)
+        return Plan(curveBetween(ends, sourceSide, targetSide), targetSide, route, hasOwnLane = false, ends.leadFrom)
     }
 
     /**
@@ -219,7 +387,7 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         bidirectional: Boolean
     ): RoutedShaft? {
         val plan = if (route == null) usualPlan(sourceOutlines, targetOutlines, bidirectional) else planFor(route, sourceOutlines, targetOutlines)
-        return plan?.let { RoutedShaft(it.curve, it.hasOwnLane) }
+        return plan?.let { RoutedShaft(it.curve, it.hasOwnLane, it.lead) }
     }
 
     /**
@@ -251,6 +419,10 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
     /** The shaft of the arrow as last laid out, or null before then or where no arrow could be drawn. */
     var shaft: CubicCurve2D? = null
+        private set
+
+    /** How far the arrow as last laid out runs straight out from its source before its [shaft] starts. */
+    var lead = 0.0
         private set
 
     /** Whether the arrow as last laid out goes around something that was in its way. */
@@ -415,6 +587,14 @@ class BezierArrowTemplate {
         val defaultTail get() = default
         var head = defaultHead
         var tail = defaultTail
+
+        /**
+         * How far from its source the curve of the arrow starts when it runs beside an arrow the other way. Set to
+         * how far from that layer the curve of the other arrow ends, which is its head padding, the two arrows are
+         * the same curve side by side and do not cross. The arrow is drawn straight from [tail] up to there. Null
+         * for a curve that starts at [tail] regardless.
+         */
+        var tailBesideAnother: Double? = null
     }
 
     /** Where along a side the arrow attaches, as a fraction of the side. */
@@ -446,8 +626,20 @@ data class ArrowRoute(val sourceSide: Int, val targetSide: Int)
  * A shaft an arrow could have.
  *
  * @param hasOwnLane whether an arrow on it runs clear of an arrow the other way between the same two layers
+ * @param lead how far the arrow runs straight out from its source before the shaft starts
  */
-class RoutedShaft(val curve: CubicCurve2D, val hasOwnLane: Boolean)
+class RoutedShaft(val curve: CubicCurve2D, val hasOwnLane: Boolean, val lead: Double = 0.0) {
+
+    /**
+     * How far along the curve the middle of the half of the arrow nearer its source is, counting the [lead] before
+     * the curve and the arrowhead after it, which is about as long.
+     */
+    val middleOfNearHalf: Double
+        get() {
+            val length = curve.p1.distance(curve.p2)
+            return if (length == 0.0) 0.25 else (0.25 - 0.5 * lead / length).coerceIn(0.0, 1.0)
+        }
+}
 
 /** Space left between an arrow that goes around something and what it goes around, for what is drawn on the arrow. */
 private const val DETOUR_CLEARANCE = 80.0
@@ -455,16 +647,34 @@ private const val DETOUR_CLEARANCE = 80.0
 /** The least an arrow that goes around something bows out. */
 private const val MINIMUM_BOW = 60.0
 
-/** Room an arrow that attaches around the corner from a short side has to turn in to the side it attaches to. */
+/**
+ * Room an arrow that turns a corner has to turn in: how far out it runs from the side it leaves, and how far in to
+ * the side it arrives at.
+ */
 private const val ROOM_TO_TURN = 45.0
 
 private const val SAMPLES_ALONG_CURVE = 32
+
+/**
+ * How far across an arrow that runs beside another may go for the distance it runs out from its source. Further
+ * across than this, the two curves slant so much between the layers that they run into each other.
+ */
+private const val STEEPEST_BESIDE_ANOTHER = 0.5
+
+/** The least distance out from its source that the curve of an arrow beside another covers when it starts further out. */
+private const val SHORTEST_CURVE_BESIDE_ANOTHER = 20.0
 
 /**
  * How far from the middle of the sides they join each of two arrows between the same two layers, one each way,
  * attaches. Enough for the two arrowheads to clear each other.
  */
 const val RECIPROCAL_ARROW_SHIFT = 22.0
+
+/**
+ * The widest that something centered on one of two such arrows can be without covering the other, for arrows of the
+ * usual thickness.
+ */
+const val WIDEST_ON_RECIPROCAL_ARROW = 64.0
 
 /**
  * Builder function for a bezier arrow

@@ -20,6 +20,7 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.ScreenElement
 import org.simbrain.network.gui.nodes.TensorConnectorNode
 import org.simbrain.network.gui.nodes.WeightMatrixNode
+import org.simbrain.util.widgets.BezierArrow
 import java.awt.Dimension
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
@@ -96,17 +97,18 @@ class ConnectorImageFitTest {
     }
 
     @Test
-    fun `weight matrix image between layers far apart leaves much of the arrow showing`() {
-        val source = arrayAt(0.0, 0.0)
-        val target = arrayAt(0.0, -420.0)
-        val wm = WeightMatrix(source, target)
-        val f = Fixture(source, target, wm)
-        val node = f.node(wm) as WeightMatrixNode
+    fun `weight matrix image leaves half of its arrow showing whatever the space between the layers`() {
+        for (distance in listOf(240.0, 270.0, 300.0)) {
+            val source = arrayAt(0.0, 0.0)
+            val target = arrayAt(0.0, -distance)
+            val wm = WeightMatrix(source, target)
+            val f = Fixture(source, target, wm)
+            val node = f.node(wm) as WeightMatrixNode
 
-        val drawn = node.imageBox.globalFullBounds.createUnion(node.interactionBox.globalFullBounds)
-        val gap = f.node(source).globalFullBounds.y - f.node(target).globalFullBounds.maxY
-        assertTrue(drawn.height < 0.7 * gap, "drawn ${drawn.height} gap $gap")
-        assertTrue(drawn.height > 0.4 * gap, "drawn ${drawn.height} gap $gap")
+            val shaft = node.connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single().shaft!!
+            // The image with its label box and caption, against the arrow from the layer to the base of its head
+            assertEquals(0.5 * (shaft.y1 - shaft.y2), node.footprint.height, 2.0, "at a distance of $distance")
+        }
     }
 
     @Test
@@ -121,8 +123,9 @@ class ConnectorImageFitTest {
         val sourceBounds = f.node(source).globalFullBounds
         val targetBounds = f.node(target).globalFullBounds
         assertTrue(image.x > sourceBounds.maxX && image.maxX < targetBounds.x, "image $image")
-        // More than a sliver of the gap, which the arrowhead also takes part of
-        assertTrue(image.width > (targetBounds.x - sourceBounds.maxX) / 2, "image $image")
+        // More than a sliver of the gap, which the arrowhead also takes part of, and no more than half of it
+        val gap = targetBounds.x - sourceBounds.maxX
+        assertTrue(image.width > gap / 3 && image.width < gap / 2, "image $image gap $gap")
     }
 
     @Test

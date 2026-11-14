@@ -42,6 +42,7 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
             padding {
                 head = arrowSize
                 tail = 0.0
+                tailBesideAnother = arrowSize
             }
 
         }

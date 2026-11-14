@@ -17,7 +17,7 @@ class ShaftPlacementTest {
 
     /** A weight matrix image with a label box above it and a caption below. */
     private val image = ShaftDrawing(
-        above = 20.0, below = 10.0, minWidth = 90.0, minSide = 30.0, maxSide = 180.0, comfortable = 90.0, fill = 0.6
+        above = 20.0, below = 10.0, minWidth = 90.0, minSide = 30.0, maxSide = 180.0, fill = 0.6
     )
 
     private val label = ShaftDrawing(above = 8.0, below = 8.0, minWidth = 100.0)
@@ -38,15 +38,13 @@ class ShaftPlacementTest {
 
     @Test
     fun `between layers that face each other a drawing is sized and centered as the gap between them allows`() {
-        // Gaps the drawing fills outright, gaps where the fill fraction holds it back, and gaps it is largest in
+        // Gaps the drawing is smallest in, gaps where it has its fraction of the arrow, and gaps it is largest in
         for (gap in listOf(100.0, 140.0, 200.0, 260.0, 400.0, 900.0)) {
             val shaft = upwardShaft(gap)
             val layers = listOf(layerBelow, layerAbove(gap))
             val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
-            val room = shaftRoom(
-                shaft, above = image.above, below = image.below, fill = image.fill, comfortable = image.comfortable
-            )
+            val room = shaftRoom(shaft, above = image.above, below = image.below, fill = image.fill)
             assertEquals(room.squareSide(image.minSide, image.maxSide), placement.side, 0.5, "side with a gap of $gap")
             assertEquals(room.centerX, placement.centerX, 0.5, "center with a gap of $gap")
             assertEquals(room.centerY, placement.centerY, 1.0, "center with a gap of $gap")
@@ -62,7 +60,7 @@ class ShaftPlacementTest {
         )
         val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
-        val acrossTheGap = shaftRoom(shaft, above = 20.0, below = 10.0, fill = 0.6, comfortable = 90.0)
+        val acrossTheGap = shaftRoom(shaft, above = 20.0, below = 10.0, fill = 0.6)
             .squareSide(image.minSide, image.maxSide)
         assertTrue(placement.side > acrossTheGap + 30.0, "side ${placement.side}, across the gap $acrossTheGap")
         layers.forEach { assertFalse(placement.footprint(image).intersects(it), "overlaps $it") }
@@ -137,11 +135,8 @@ class ShaftPlacementTest {
             shaft, image, layers = layers, ownLayers = layers, preferred = 0.25, shared = true
         )
 
-        val room = shaftRoom(
-            shaft, position = 0.25, shared = true, above = image.above, below = image.below,
-            fill = image.fill, comfortable = image.comfortable
-        )
-        assertEquals(room.squareSide(image.minSide, image.maxSide), placement.side, 0.5)
+        // Sized for the whole arrow, which is more than its half of the gap has room for
+        assertEquals(200.0 - image.above - image.below - 2 * ShaftPlacer.MARGIN, placement.side, 0.5)
         assertTrue(placement.footprint(image).y >= -200.0, "footprint ${placement.footprint(image)}")
     }
 
@@ -160,13 +155,62 @@ class ShaftPlacementTest {
     }
 
     @Test
-    fun `a label box wider than the gap between layers side by side still lets the image fill the gap`() {
+    fun `a label box wider than the gap between layers side by side does not shrink the image`() {
         val shaft = CubicCurve2D.Double(0.0, 0.0, 40.0, 0.0, 40.0, 0.0, 80.0, 0.0)
         val layers = listOf(Rectangle2D.Double(-120.0, -22.0, 120.0, 44.0), Rectangle2D.Double(120.0, -22.0, 120.0, 44.0))
 
         val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
 
-        assertEquals(80.0 - 2 * ShaftPlacer.MARGIN, placement.side, 0.5)
+        assertEquals(80.0 * image.fill, placement.side, 0.5)
+    }
+
+    @Test
+    fun `a drawing takes up the same fraction of its arrow whatever the length of the arrow`() {
+        for (gap in listOf(150.0, 200.0, 300.0)) {
+            val shaft = upwardShaft(gap)
+            val layers = listOf(layerBelow, layerAbove(gap))
+
+            val placement = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
+
+            assertEquals(image.fill * gap, placement.footprint(image).height, 0.5, "with a gap of $gap")
+        }
+    }
+
+    @Test
+    fun `a drawing on a slanted arrow is smaller, since it covers more of the arrow than its side`() {
+        val straight = ShaftPlacer.place(ShaftItem(upwardShaft(300.0), image), layers = emptyList())
+        // As long, and at 45 degrees
+        val across = 300.0 / kotlin.math.sqrt(2.0)
+        val slanted = ShaftPlacer.place(
+            ShaftItem(CubicCurve2D.Double(0.0, 0.0, across / 3, -across / 3, 2 * across / 3, -2 * across / 3, across, -across), image),
+            layers = emptyList()
+        )
+
+        assertTrue(slanted.side < straight.side - 20.0, "slanted ${slanted.side}, straight ${straight.side}")
+    }
+
+    @Test
+    fun `the length an arrow runs before its shaft counts toward the size of its drawing`() {
+        val shaft = upwardShaft(200.0)
+
+        val without = ShaftPlacer.place(ShaftItem(shaft, image), layers = emptyList())
+        val with = ShaftPlacer.place(ShaftItem(shaft, image, lead = 40.0), layers = emptyList())
+
+        assertEquals(without.side + image.fill * 40.0, with.side, 0.5)
+    }
+
+    @Test
+    fun `a placement says how much room there was where the drawing was put`() {
+        val roomy = upwardShaft(400.0)
+        val tight = upwardShaft(60.0)
+
+        val inRoom = ShaftPlacer.place(roomy, image, layers = listOf(layerBelow, layerAbove(400.0)), ownLayers = listOf(layerBelow, layerAbove(400.0)))
+        val cramped = ShaftPlacer.place(tight, image, layers = listOf(layerBelow, layerAbove(60.0)), ownLayers = listOf(layerBelow, layerAbove(60.0)))
+
+        assertTrue(inRoom.room >= inRoom.side, "room ${inRoom.room}, side ${inRoom.side}")
+        // Kept at its smallest size though there is not room for that
+        assertEquals(image.minSide, cramped.side, 1e-9)
+        assertTrue(cramped.room < image.minSide, "room ${cramped.room}")
     }
 
     /** Shaft from ([fromX], 0) straight to ([toX], -[gap]). */

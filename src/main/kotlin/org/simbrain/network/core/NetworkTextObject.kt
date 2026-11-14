@@ -2,6 +2,7 @@ package org.simbrain.network.core
 
 import org.simbrain.network.events.TextObjectEvents
 import org.simbrain.util.propertyeditor.EditableObject
+import java.awt.Color
 import java.awt.Font
 import java.awt.geom.Point2D
 
@@ -31,6 +32,15 @@ open class NetworkTextObject : EditableObject, LocatableModel {
 
     var isBold: Boolean = false
 
+    /**
+     * Text color, or null to use the network theme's text color.
+     */
+    var color: Color? = null
+        set(value) {
+            field = value
+            events.textUpdated.fire()
+        }
+
     @Transient
     override val events: TextObjectEvents = TextObjectEvents()
 
@@ -49,6 +59,7 @@ open class NetworkTextObject : EditableObject, LocatableModel {
         this.fontName = text.fontName
         this.isBold = text.isBold
         this.isItalic = text.isItalic
+        this.color = text.color
     }
 
     override fun toString(): String {

@@ -21,6 +21,9 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
+import org.simbrain.custom_sims.simulations.leabra.leabraInhibition
+import org.simbrain.custom_sims.simulations.leabra.leabraVocabulary
+import org.simbrain.custom_sims.simulations.leabra.pointNeuronSim
 import org.simbrain.custom_sims.simulations.ml.decisionBoundaries
 import org.simbrain.custom_sims.simulations.ml.modelComparison
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
@@ -176,9 +179,11 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Lorenz attractor (pure Simbrain)") { lorenzSystemSimbrain }
     }
 
-    //dir("Leabra") {
-    //    item("Point neuron") { pointNeuronSim }
-    //}
+    dir("Leabra") {
+        item("Point neuron", beta = true) { pointNeuronSim }
+        item("Layer inhibition", beta = true) { leabraInhibition }
+        item("Learning words", beta = true) { leabraVocabulary }
+    }
 
     dir("Associative memory") {
         item("Hebbian associative memory") { autoAssociator }

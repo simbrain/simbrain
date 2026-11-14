@@ -42,6 +42,7 @@ import javax.swing.text.DefaultFormatterFactory
 import javax.swing.text.NumberFormatter
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
+import kotlin.math.roundToInt
 
 /**
  * Utility to make it easy to set location of a [SimbrainDesktop] component.
@@ -320,9 +321,9 @@ class ControlPanelKt(title: String = "Control Panel"):
         toolTip: String? = null,
         onChange: suspend (Double) -> Unit = {}
     ) = JSlider(
-        (minValue / increment).toInt(),
-        (maxValue / increment).toInt(),
-        (initValue / increment).toInt()
+        (minValue / increment).roundToInt(),
+        (maxValue / increment).roundToInt(),
+        (initValue / increment).roundToInt()
     ).also { slider ->
         slider.toolTipText = toolTip
         slider.paintTicks = true
@@ -330,9 +331,9 @@ class ControlPanelKt(title: String = "Control Panel"):
 
         // Set specific labels for min, max, and mid values
         val labelTable = Hashtable<Int, JLabel>()
-        val minLabelValue = (minValue / increment).toInt()
-        val midLabelValue = ((minValue + maxValue) / (2 * increment)).toInt()
-        val maxLabelValue = (maxValue / increment).toInt()
+        val minLabelValue = (minValue / increment).roundToInt()
+        val midLabelValue = ((minValue + maxValue) / (2 * increment)).roundToInt()
+        val maxLabelValue = (maxValue / increment).roundToInt()
 
         labelTable[minLabelValue] = JLabel(String.format("%.1f", minValue))
         labelTable[midLabelValue] = JLabel(String.format("%.1f", (minValue + maxValue) / 2))

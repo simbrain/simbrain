@@ -95,15 +95,32 @@ fun findProperty(obj: Any, key: String, exactOnly: Boolean = false): EditablePro
  * Set a property from text, converting to the type of the property. A number can be given as an expression, as in
  * `rand()*10` or `activation*2`, evaluated in [context].
  */
-@Suppress("UNCHECKED_CAST")
 fun assign(obj: Any, key: String, text: String, context: ExpressionContext = ExpressionContext { propertyValue(obj, it) }) {
+    val assignment = assignment(obj, key, text, context)
+    val found = assignment.property
+    if (found.useLegacySetter) {
+        assignment.mutable.invokeLegacySetter(found.owner, assignment.value)
+    } else {
+        assignment.mutable.setter.call(found.owner, assignment.value)
+    }
+    (found.owner as? EditableObject)?.onCommit()
+}
+
+/** Fail as [assign] would for this key and text, without changing anything. */
+fun checkAssignable(obj: Any, key: String, text: String, context: ExpressionContext = ExpressionContext { propertyValue(obj, it) }) {
+    assignment(obj, key, text, context)
+}
+
+/** A property that can be set, and the value that some text stands for. */
+private class Assignment(val property: EditableProperty, val mutable: KMutableProperty1<Any, Any?>, val value: Any?)
+
+@Suppress("UNCHECKED_CAST")
+private fun assignment(obj: Any, key: String, text: String, context: ExpressionContext): Assignment {
     val found = findProperty(obj, key)
         ?: fail("${obj::class.simpleName} has no property $key. Use show to see its properties.")
     if (found.displayOnly) fail("${found.name} is read-only.")
-    val property = found.property as? KMutableProperty1<Any, Any?> ?: fail("${found.name} is read-only.")
-    val value = convert(found, text, context)
-    if (found.useLegacySetter) property.invokeLegacySetter(found.owner, value) else property.setter.call(found.owner, value)
-    (found.owner as? EditableObject)?.onCommit()
+    val mutable = found.property as? KMutableProperty1<Any, Any?> ?: fail("${found.name} is read-only.")
+    return Assignment(found, mutable, convert(found, text, context))
 }
 
 /** The values that can be chosen from for a property, if it has a fixed set of them. */

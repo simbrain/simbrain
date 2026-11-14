@@ -5,8 +5,10 @@ package org.simbrain.console
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import org.simbrain.custom_sims.simulations
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
@@ -22,6 +24,7 @@ import org.simbrain.workspace.*
 import org.simbrain.workspace.couplings.Coupling
 
 private const val MAX_SHOWN = 50
+private const val RUN_START_TIMEOUT_MS = 5000L
 private const val RELAYED = "This window closes when the workspace is replaced, so this is running in the Terminal tab " +
         "at the bottom of the desktop, which stays open."
 private val NEURON_TYPE_WORDS = listOf("neurons", "collection")
@@ -38,6 +41,13 @@ val tour = listOf(
     Example("Clamp the first five neurons on, as inputs", "set demo/Neuron_{1..5} clamped=true activation=1"),
     Example("Plot a neuron's activation, then run", "add timeseries plot1", "couple demo/Neuron_10 \"plot1/Series 1\"", "run 50"),
     Example("List the neurons that ended up active", "ls demo where type=Neuron and activation>0.5")
+)
+
+/** Examples of `where` conditions, shown by `help where`. */
+val whereExamples = listOf(
+    Example("List the neurons in net1 whose activation is above 0.5", "ls net1 where type=Neuron and activation>0.5"),
+    Example("Print the strength of the strong synapses in net1", "get net1/* strength where type=Synapse and abs(strength)>0.5"),
+    Example("List what is labelled hidden layer in net1", "ls net1 where label=\"hidden layer\"")
 )
 
 val workspaceCommands: CommandRegistry = commands {
@@ -214,10 +224,22 @@ val workspaceCommands: CommandRegistry = commands {
         val parsed = Arguments.parse(args)
         if (parsed.words.size != 1 || parsed.options.isEmpty()) fail("Usage: set <path> key=value ...")
         val nodes = targets(parsed.words.single())
+        // A property that some of the objects lack, or a value that can't be used, is reported before anything is
+        // changed. A setting reached through a dot is checked as it is set, since another option on the line may
+        // replace what it belongs to, as rule=Sigmoidal does for rule.slope.
+        val checkedFirst = parsed.options.filterKeys { "." !in it }.ifEmpty { parsed.options }
+        nodes.oneOfEachType().forEach { node ->
+            val context = expressionContext(node, 0, nodes.size)
+            checkedFirst.forEach { (key, value) -> checkAssignable(editableObject(node), key, value, context) }
+        }
         var index = 0
-        forEachWithProgress(nodes, "Setting") { node ->
-            val context = expressionContext(node, index++, nodes.size)
-            parsed.options.forEach { (key, value) -> assign(editableObject(node), key, value, context) }
+        try {
+            forEachWithProgress(nodes, "Setting") { node ->
+                val context = expressionContext(node, index++, nodes.size)
+                parsed.options.forEach { (key, value) -> assign(editableObject(node), key, value, context) }
+            }
+        } finally {
+            markChanged(nodes)
         }
         if (nodes.size == 1) "" else "Set ${nodes.size} objects."
     }
@@ -317,6 +339,7 @@ val workspaceCommands: CommandRegistry = commands {
             listOf(word.toIntOrNull()?.let { manager.couplings.getOrNull(it - 1) } ?: fail("No coupling numbered $word."))
         }
         manager.removeCouplings(toRemove)
+        if (toRemove.isNotEmpty()) workspace.markChanged()
         "Removed ${toRemove.size} coupling(s)."
     }
 
@@ -370,8 +393,13 @@ val workspaceCommands: CommandRegistry = commands {
         description = "Randomize models, or everything in a network.",
         completer = pathCompletion
     ) { args ->
-        val models = modelsIn(targets(onePath(args)))
-        models.forEach { it.randomize() }
+        val nodes = targets(onePath(args))
+        val models = modelsIn(nodes)
+        try {
+            forEachWithProgress(models, "Randomizing") { it.randomize() }
+        } finally {
+            markChanged(nodes)
+        }
         "Randomized ${models.size} model(s)."
     }
 
@@ -389,16 +417,19 @@ val workspaceCommands: CommandRegistry = commands {
         description = "Clear models, or the activations in a network.",
         completer = pathCompletion
     ) { args ->
-        var cleared = 0
-        for (node in targets(onePath(args))) {
-            when (val value = node.value) {
-                is NetworkComponent -> value.network.clearActivations()
-                is NetworkModel -> value.clear()
-                else -> fail("${node.name} can't be cleared.")
+        val nodes = targets(onePath(args))
+        nodes.firstOrNull { it.value !is NetworkComponent && it.value !is NetworkModel }?.let { fail("${it.name} can't be cleared.") }
+        try {
+            forEachWithProgress(nodes, "Clearing") { node ->
+                when (val value = node.value) {
+                    is NetworkComponent -> value.network.clearActivations()
+                    is NetworkModel -> value.clear()
+                }
             }
-            cleared++
+        } finally {
+            markChanged(nodes)
         }
-        "Cleared $cleared object(s)."
+        "Cleared ${nodes.size} object(s)."
     }
 
     command(
@@ -415,6 +446,8 @@ val workspaceCommands: CommandRegistry = commands {
         if (workspace.updater.isRunning) fail("Already running. Enter stop first.")
         if (args.isEmpty()) {
             workspace.run()
+            // Running starts in the background, and a stop that arrives before it has started is lost
+            withTimeoutOrNull(RUN_START_TIMEOUT_MS) { while (!workspace.updater.isRunning) delay(1) }
             "Running. Enter stop to halt."
         } else {
             val iterations = args.single().toIntOrNull()?.takeIf { it > 0 }
@@ -534,11 +567,12 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Other",
         examples = listOf(
             Example("List the commands", "help"),
-            Example("Describe ls, with examples", "help ls")
+            Example("Describe ls, with examples", "help ls"),
+            Example("Describe where conditions, with examples", "help where")
         ),
         usage = "help [command]",
-        description = "List commands, or describe one.",
-        completer = commandCompletion
+        description = "List commands, or describe one. help where describes conditions.",
+        completer = { _, partial -> wordCandidates(registry.all.map { it.name } + "where", partial) }
     ) { args ->
         if (args.isEmpty()) {
             registry.all.groupBy { it.group }.entries.joinToString("\n\n") { (group, members) ->
@@ -547,8 +581,11 @@ val workspaceCommands: CommandRegistry = commands {
                     "examples for commands to copy and paste. Paths look like net1/Neuron_1, and a name by " +
                     "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
                     "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. End a line with " +
-                    "where <condition> to act only on some objects, and | grep <text> to filter output. Numbers can be " +
-                    "expressions, as in rand()*10 (see help set). Tab completes, and Ctrl+C or Esc cancels a long command."
+                    "where <condition> to act only on some objects (see help where), and | grep <text> to filter output. " +
+                    "Numbers can be expressions, as in rand()*10 (see help set). Tab completes, and Ctrl+C or Esc " +
+                    "cancels a long command."
+        } else if (args.first() == "where") {
+            whereHelp(registry)
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
             val examples = command.examples.joinToString("\n\n") { it.styled() }
@@ -566,6 +603,15 @@ private class Arguments(val words: List<String>, val options: Map<String, String
         }
     }
 }
+
+private fun whereHelp(registry: CommandRegistry): String =
+    "${bold("where")} <condition>\n" +
+            "End a line with where and a condition to act only on the objects that meet it. Compare a property, type, " +
+            "or a fact that show lists, such as fanIn, using = != < > <= >=. Combine comparisons with and, or, not, " +
+            "and parentheses, and use the arithmetic and functions that set does. Put a value that contains spaces " +
+            "in quotes. An object that lacks the property does not match.\n\n" +
+            "Commands that take where: ${registry.all.filter { it.takesWhere }.joinToString(", ") { it.name }}\n\n" +
+            "Examples, which can be copied and pasted:\n\n" + whereExamples.joinToString("\n\n") { it.styled() }
 
 /** A command's usage with its name in bold. */
 private fun styledUsage(command: Command) = bold(command.name) + command.usage.removePrefix(command.name)
@@ -588,6 +634,14 @@ private suspend fun CommandShell.listedNodes(args: List<String>): List<Node> {
 }
 
 private fun editableObject(node: Node): Any = (node.value as? NetworkComponent)?.network ?: node.value
+
+/**
+ * Record that a command edited [nodes], so that closing their components or replacing the workspace offers to save.
+ * Adding and removing models is recorded by the network itself; changes to what is already there are not.
+ */
+private fun CommandShell.markChanged(nodes: List<Node>) {
+    nodes.mapNotNull { it.path.firstOrNull() }.distinct().forEach { workspace.getComponent(it)?.markChanged() }
+}
 
 private fun describe(node: Node): String {
     val value = node.value

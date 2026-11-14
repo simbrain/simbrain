@@ -223,11 +223,12 @@ class CommandShell(
         val parsed = parseLine(line)
         val name = parsed.words.firstOrNull() ?: return ""
         val command = registry[name] ?: fail("Unknown command: $name. Enter help for a list.")
-        val whereAt = parsed.words.indexOf("where").takeIf { it > 0 }
+        // For a command that takes no condition, where as the last word is an ordinary word, as in help where
+        val whereAt = parsed.words.indexOf("where").takeIf { it > 0 && (command.takesWhere || it < parsed.words.lastIndex) }
         val args = parsed.words.subList(1, whereAt ?: parsed.words.size)
         val condition = whereAt?.let { at ->
             if (!command.takesWhere) fail("$name can't be used with where.")
-            val text = parsed.words.drop(at + 1).joinToString(" ").ifBlank { fail("Expected a condition after where.") }
+            val text = parsed.conditionAfter(at).ifBlank { fail("Expected a condition after where.") }
             WhereCondition(Expression.parse(text))
         }
         val output = withContext(condition ?: EmptyCoroutineContext) { command.action(this@CommandShell, args) }
@@ -278,14 +279,18 @@ class CommandShell(
     }
 
     private fun find(path: String, tick: () -> Unit): List<Node> {
+        val lookup = Lookup(tick)
+        val start = current
         val paths = expandBraces(path)
-        val local = paths.flatMap { walkPath(it, tick) }
+        val local = paths.flatMap { walkPath(start, it, lookup) }
         if (local.isNotEmpty() || !searchesEverywhere(path)) return distinctValues(local)
-        return distinctValues(paths.flatMap { searchEverywhere(it, tick) })
+        return distinctValues(paths.flatMap { searchEverywhere(it, lookup) })
     }
 
-    private fun walkPath(path: String, tick: () -> Unit): List<Node> =
-        walk(if (path.startsWith("/")) root else current, path.split("/").filter { it.isNotEmpty() }, tick)
+    private fun walkPath(start: Node, path: String, lookup: Lookup): List<Node> {
+        lookup.tick()
+        return walk(if (path.startsWith("/")) root else start, path.split("/").filter { it.isNotEmpty() }, lookup)
+    }
 
     /** Whether a path not found from the current location is looked for everywhere: a relative path starting with a name. */
     private fun searchesEverywhere(path: String): Boolean {
@@ -293,10 +298,11 @@ class CommandShell(
         return !path.startsWith("/") && first !in listOf(".", "..", "**") && !isPattern(first)
     }
 
-    private fun searchEverywhere(path: String, tick: () -> Unit): List<Node> {
+    private fun searchEverywhere(path: String, lookup: Lookup): List<Node> {
+        lookup.tick()
         val segments = path.split("/").filter { it.isNotEmpty() }
-        val starts = distinctValues(descendants(root, tick).filter { nameMatches(it, segments.first()) }.toList())
-        val found = starts.map { walk(it, segments.drop(1), tick) }.filter { it.isNotEmpty() }
+        val starts = distinctValues(lookup.everythingNamed(segments.first()) { descendants(root, lookup) })
+        val found = starts.map { walk(it, segments.drop(1), lookup) }.filter { it.isNotEmpty() }
         if (found.size > 1) {
             val places = found.map { it.first().path.joinToString("/") }
             fail("$path is in ${places.size} places: ${places.take(MAX_PLACES).joinToString(", ")}" +
@@ -363,13 +369,15 @@ class CommandShell(
      *
      * @param tick called for each object visited
      */
-    fun descendants(node: Node, tick: () -> Unit = {}): Sequence<Node> = sequence {
-        val children = childrenOf(node.value) ?: return@sequence
+    fun descendants(node: Node, tick: () -> Unit = {}): Sequence<Node> = descendants(node, Lookup(tick))
+
+    private fun descendants(node: Node, lookup: Lookup): Sequence<Node> = sequence {
+        val children = lookup.contentsOf(node.value) ?: return@sequence
         for ((name, child) in children) {
-            tick()
+            lookup.tick()
             val childNode = Node(node.path + name, child)
             yield(childNode)
-            yieldAll(descendants(childNode, tick))
+            yieldAll(descendants(childNode, lookup))
         }
     }
 
@@ -430,14 +438,14 @@ class CommandShell(
             .map { (name, child) -> Candidate(prefix + name, if (childrenOf(child) != null) "/" else " ") }
     }
 
-    private fun walk(start: Node, segments: List<String>, tick: () -> Unit = {}): List<Node> =
-        segments.fold(listOf(start)) { nodes, segment -> nodes.flatMap { step(it, segment, tick) } }
+    private fun walk(start: Node, segments: List<String>, lookup: Lookup = Lookup()): List<Node> =
+        segments.fold(listOf(start)) { nodes, segment -> nodes.flatMap { step(it, segment, lookup) } }
 
-    private fun step(node: Node, segment: String, tick: () -> Unit): List<Node> {
+    private fun step(node: Node, segment: String, lookup: Lookup): List<Node> {
         if (segment == ".") return listOf(node)
-        if (segment == "..") return walk(root, node.path.dropLast(1))
-        if (segment == "**") return listOf(node) + descendants(node, tick)
-        val children = childrenOf(node.value) ?: return emptyList()
+        if (segment == "..") return walk(root, node.path.dropLast(1), lookup)
+        if (segment == "**") return listOf(node) + descendants(node, lookup)
+        val children = lookup.contentsOf(node.value) ?: return emptyList()
         val names = if (isPattern(segment)) {
             val pattern = globToRegex(segment)
             children.keys.filter { pattern.matches(it) }
@@ -449,15 +457,58 @@ class CommandShell(
 
     /** Prefers an exact match, then a match ignoring case, then a label, then a match ignoring punctuation. */
     private fun findChildName(children: Map<String, Any>, segment: String): String? =
-        children.keys.firstOrNull { it == segment }
+        segment.takeIf { it in children }
             ?: children.keys.filter { it.equals(segment, ignoreCase = true) }.singleOrNull()
             ?: children.filterValues { (it as? NetworkModel)?.label.equals(segment, ignoreCase = true) }.keys.singleOrNull()
             ?: children.keys.filter { looselyEqual(it, segment) }.singleOrNull()
+}
 
-    private fun nameMatches(node: Node, segment: String): Boolean =
-        node.name.equals(segment, ignoreCase = true) ||
-                (node.value as? NetworkModel)?.label.equals(segment, ignoreCase = true) ||
-                looselyEqual(node.name, segment)
+/**
+ * What one resolution of a path shares across the names the path stands for, so that a range such as `{1..1000}` reads
+ * the contents of each object once instead of once per name.
+ *
+ * @param tick called for each object visited and each name tried
+ */
+private class Lookup(val tick: () -> Unit = {}) {
+
+    private val contents = IdentityHashMap<Any, Map<String, Any>?>()
+
+    private var names: NameIndex? = null
+
+    fun contentsOf(value: Any): Map<String, Any>? =
+        if (contents.containsKey(value)) contents[value] else childrenOf(value).also { contents[value] = it }
+
+    /** The nodes among [everything] that [segment] names, in the order they were found. */
+    fun everythingNamed(segment: String, everything: () -> Sequence<Node>): List<Node> =
+        (names ?: NameIndex(everything()).also { names = it }).matching(segment)
+}
+
+/**
+ * Nodes by the names they can be found under: their name or label ignoring case, or their name ignoring punctuation
+ * as well, so that neuron1 finds Neuron_1.
+ */
+private class NameIndex(nodes: Sequence<Node>) {
+
+    private val position = IdentityHashMap<Node, Int>()
+    private val byName = HashMap<String, MutableList<Node>>()
+    private val byLabel = HashMap<String, MutableList<Node>>()
+    private val byLooseName = HashMap<String, MutableList<Node>>()
+
+    init {
+        for (node in nodes) {
+            position[node] = position.size
+            byName.getOrPut(node.name.lowercase()) { mutableListOf() } += node
+            (node.value as? NetworkModel)?.label?.let { label -> byLabel.getOrPut(label.lowercase()) { mutableListOf() } += node }
+            normalized(node.name).takeIf { it.isNotEmpty() }?.let { loose -> byLooseName.getOrPut(loose) { mutableListOf() } += node }
+        }
+    }
+
+    fun matching(segment: String): List<Node> {
+        val lowercase = segment.lowercase()
+        return (byName[lowercase].orEmpty() + byLabel[lowercase].orEmpty() + byLooseName[normalized(segment)].orEmpty())
+            .distinct()
+            .sortedBy { position.getValue(it) }
+    }
 }
 
 /** Equal ignoring case and punctuation, so that neuron1 matches Neuron_1. */
@@ -504,8 +555,11 @@ fun expandBraces(text: String): List<String> {
         "," in inside -> inside.split(",")
         else -> return listOf(text)
     }
-    val expanded = values.flatMap { expandBraces(text.replaceRange(match.range, it)) }
-    if (expanded.size > MAX_EXPANSION) fail("$text stands for too many names.")
+    val expanded = mutableListOf<String>()
+    for (value in values) {
+        expanded += expandBraces(text.replaceRange(match.range, value))
+        if (expanded.size > MAX_EXPANSION) fail("$text stands for too many names.")
+    }
     return expanded
 }
 
@@ -540,26 +594,36 @@ fun quoted(word: String) = if (word.any { it.isWhitespace() }) "\"$word\"" else 
 
 /**
  * @param tokens the words of the line, with quotes removed
+ * @param tokenStarts where each word begins in the line
  * @param lastTokenStart where the last word begins, or null if the line does not end in a word
  * @param pipes for each `|` outside quotes, how many words came before it
+ * @param pipeOffsets where each of those is in the line
+ * @param end where the line stops being read: at a comment, or its end
  */
 private class ScannedLine(
     val tokens: List<String>,
+    val tokenStarts: List<Int>,
     val lastTokenStart: Int?,
     val unterminatedQuote: Boolean,
-    val pipes: List<Int>
+    val pipes: List<Int>,
+    val pipeOffsets: List<Int>,
+    val end: Int
 )
 
 private fun scan(line: String): ScannedLine {
     val tokens = mutableListOf<String>()
+    val tokenStarts = mutableListOf<Int>()
     val pipes = mutableListOf<Int>()
+    val pipeOffsets = mutableListOf<Int>()
     val word = StringBuilder()
     var wordStart: Int? = null
     var quote: Char? = null
+    var end = line.length
 
     fun endWord() {
-        if (wordStart != null) {
+        wordStart?.let { start ->
             tokens += word.toString()
+            tokenStarts += start
             word.clear()
             wordStart = null
         }
@@ -568,11 +632,15 @@ private fun scan(line: String): ScannedLine {
     for ((index, char) in line.withIndex()) {
         when {
             quote != null -> if (char == quote) quote = null else word.append(char)
-            char == '#' && wordStart == null -> break
+            char == '#' && wordStart == null -> {
+                end = index
+                break
+            }
             char.isWhitespace() -> endWord()
             char == '|' -> {
                 endWord()
                 pipes += tokens.size
+                pipeOffsets += index
             }
             else -> {
                 if (wordStart == null) wordStart = index
@@ -582,22 +650,46 @@ private fun scan(line: String): ScannedLine {
     }
     val lastStart = wordStart
     endWord()
-    return ScannedLine(tokens, lastStart, quote != null, pipes)
+    return ScannedLine(tokens, tokenStarts, lastStart, quote != null, pipes, pipeOffsets, end)
 }
 
 /**
  * @param words the words of the command
  * @param filter the text given to `| grep`, if any
+ * @param line the line as it was entered
+ * @param wordStarts where each word begins in [line]
+ * @param end where the command stops in [line]: at a pipe, a comment, or the end
  */
-private class ParsedLine(val words: List<String>, val filter: String?)
+private class ParsedLine(
+    val words: List<String>,
+    val filter: String?,
+    private val line: String,
+    private val wordStarts: List<Int>,
+    private val end: Int
+) {
+
+    /**
+     * The condition that follows the word at [whereAt], as it was entered, so that quotes around a value reach the
+     * expression parser. A condition given as one quoted word is taken without its quotes.
+     */
+    fun conditionAfter(whereAt: Int): String {
+        val start = wordStarts.getOrNull(whereAt + 1) ?: return ""
+        val entered = line.substring(start, end).trim()
+        val quote = entered.first()
+        val oneQuotedWord = words.size == whereAt + 2 && (quote == '"' || quote == '\'') &&
+                entered.last() == quote && entered.count { it == quote } == 2
+        return if (oneQuotedWord) words.last() else entered
+    }
+}
 
 private fun parseLine(line: String): ParsedLine {
     val scanned = scan(line)
     if (scanned.unterminatedQuote) fail("Unterminated quote.")
-    val pipe = scanned.pipes.firstOrNull() ?: return ParsedLine(scanned.tokens, null)
+    val pipe = scanned.pipes.firstOrNull()
+        ?: return ParsedLine(scanned.tokens, null, line, scanned.tokenStarts, scanned.end)
     val piped = scanned.tokens.drop(pipe)
     if (scanned.pipes.size > 1 || piped.size < 2 || piped.first() != "grep") fail("The only pipe is | grep <text>.")
-    return ParsedLine(scanned.tokens.take(pipe), piped.drop(1).joinToString(" "))
+    return ParsedLine(scanned.tokens.take(pipe), piped.drop(1).joinToString(" "), line, scanned.tokenStarts, scanned.pipeOffsets.first())
 }
 
 /** Split a line into words, respecting quotes and dropping a `#` comment. */

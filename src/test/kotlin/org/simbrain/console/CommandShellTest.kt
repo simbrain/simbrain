@@ -814,4 +814,85 @@ class CommandShellTest {
             }
         }
     }
+
+    @Test
+    fun `stop entered right after run stops the workspace`() {
+        repeat(40) {
+            val shell = shellWithNetwork()
+            shell.run("run")
+            shell.run("stop")
+            // Long enough for a run that had not started when stop arrived to start
+            runBlocking { delay(50) }
+            assertFalse(shell.workspace.updater.isRunning)
+        }
+    }
+
+    @Test
+    fun `changing what is already there counts as unsaved work`() {
+        val edits = listOf(
+            "set net1/Neuron_1 activation=1",
+            "set net1/Synapse_1 strength=2",
+            "randomize net1",
+            "clear net1/Neuron_1",
+            "uncouple all"
+        )
+        for (line in edits) {
+            val shell = shellWithNetwork()
+            shell.run("couple net1/Neuron_1:activation net1/Neuron_2:addInputValue")
+            shell.workspace.markClean()
+            assertFalse(shell.workspace.hasUnsavedWork(), line)
+            shell.run(line)
+            assertTrue(shell.workspace.hasUnsavedWork(), line)
+        }
+    }
+
+    @Test
+    fun `help where describes conditions`() {
+        val help = shellWithNetwork().run("help where")
+        assertTrue(help.startsWith("where <condition>"), help)
+        assertTrue("ls net1 where label=\"hidden layer\"" in help, help)
+    }
+
+    @Test
+    fun `a condition after a command that takes none is reported`() {
+        assertEquals("add can't be used with where.", shellWithNetwork().run("add neurons 2 where activation>0"))
+    }
+
+    @Test
+    fun `the where examples run in a small workspace`() {
+        val shell = shellWithNetwork()
+        shell.run("set net1/Synapse_1 strength=0.9")
+        runBlocking { whereExamples.flatMap { it.lines }.forEach { shell.executeOrThrow(it) } }
+    }
+
+    @Test
+    fun `a where value containing spaces can be quoted`() {
+        val shell = shellWithNetwork()
+        shell.run("set net1/Neuron_1 label=\"my neuron\"")
+        assertEquals("Neuron_1", shell.run("ls net1 where label=\"my neuron\""))
+        assertEquals("Neuron_1", shell.run("ls net1 where label = 'my neuron'"))
+        assertEquals("Neuron_1", shell.run("ls net1 where \"label='my neuron'\""))
+        assertEquals("Neuron_1", shell.run("ls net1 where label=\"my neuron\" | grep Neuron"))
+        assertEquals("Neuron_1", shell.run("ls net1 where label=\"my neuron\" # the labelled one"))
+    }
+
+    @Test
+    fun `set changes nothing when a value is bad or some objects lack the property`() {
+        val shell = shellWithNetwork()
+        assertEquals("bias needs a number: oops", shell.run("set net1/Neuron_* activation=0.2 bias=oops"))
+        assertEquals("Neuron_1: 0.75\nNeuron_2: 0", shell.run("get net1/Neuron_* activation"))
+        assertEquals(
+            "Synapse has no property activation. Use show to see its properties.",
+            shell.run("set net1/* activation=0.2")
+        )
+        assertEquals("Neuron_1: 0.75\nNeuron_2: 0", shell.run("get net1/Neuron_* activation"))
+    }
+
+    @Test
+    fun `a range of ranges that stands for too many names is refused`() {
+        assertEquals(
+            "{1..99999}{1..99999} stands for too many names.",
+            shellWithNetwork().run("ls {1..99999}{1..99999}")
+        )
+    }
 }

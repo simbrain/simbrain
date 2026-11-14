@@ -213,7 +213,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** Height the label box takes above the kernel grid, with the space between them. */
     private val kernelGridChromeAbove: kotlin.Double
-        get() = interactionBox.fullBounds.height + KERNEL_GRID_LABEL_BOX_GAP
+        get() = interactionBox.layoutHeight + KERNEL_GRID_LABEL_BOX_GAP
 
     /** Height the shape caption takes below the kernel grid, with the space between them. */
     private val kernelGridChromeBelow: kotlin.Double
@@ -255,7 +255,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** Height of what the single kernel view stacks above its image: the label box and a navigation button. */
     private val kernelImageChromeAbove: kotlin.Double
-        get() = interactionBox.fullBounds.height + KERNEL_IMAGE_LABEL_BOX_GAP +
+        get() = interactionBox.layoutHeight + KERNEL_IMAGE_LABEL_BOX_GAP +
                 filterPrevButton!!.fullBounds.height + KERNEL_IMAGE_BUTTON_GAP
 
     /**
@@ -278,7 +278,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         above = kernelImageChromeAbove,
         below = kernelImageChromeBelow,
         beside = KERNEL_IMAGE_BUTTON_GAP + channelPrevButton!!.fullBounds.width,
-        minWidth = interactionBox.fullBounds.width,
+        minWidth = interactionBox.layoutWidth,
         minSide = KERNEL_IMAGE_MIN,
         maxSide = KERNEL_IMAGE_MAX,
         comfortable = KERNEL_IMAGE_DEFAULT,
@@ -815,13 +815,13 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
 
     /** The label box and, for a convolution, whichever kernel drawing is showing with what goes around it. */
     override fun measureFootprint(): PBounds {
-        val conv = connector as? ConvolutionConnector ?: return footprintOf(interactionBox.globalBounds)
+        val conv = connector as? ConvolutionConnector ?: return footprintOf(interactionBox.layoutBoundsCentered)
         val caption = shapeCaption.globalBounds.takeIf { shapeCaption.visible }
         return if (conv.kernelGridMode) {
-            footprintOf(interactionBox.globalBounds, kernelGridGroup.globalBounds, caption)
+            footprintOf(interactionBox.layoutBounds, kernelGridGroup.globalBounds, caption)
         } else {
             footprintOf(
-                interactionBox.globalBounds,
+                interactionBox.layoutBounds,
                 imageBox.box.globalFullBounds,
                 filterPrevButton?.globalFullBounds,
                 filterNextButton?.globalFullBounds,

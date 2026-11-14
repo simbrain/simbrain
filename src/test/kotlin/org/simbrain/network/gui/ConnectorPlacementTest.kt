@@ -292,4 +292,45 @@ class ConnectorPlacementTest {
             "pushed $pushed free $free"
         }
     }
+
+    @Test
+    fun `zooming the view out and back in changes nothing about the layout`() {
+        // Layers just far enough apart that the arrow runs straight, a reciprocal pair, and a skip connection
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -190.0)
+        val left = arrayAt(300.0, 0.0)
+        val right = arrayAt(300.0, -420.0)
+        val bottom = arrayAt(600.0, 0.0)
+        val middle = arrayAt(600.0, -270.0)
+        val top = arrayAt(600.0, -540.0)
+        val matrices = listOf(
+            WeightMatrix(below, above), WeightMatrix(left, right), WeightMatrix(right, left),
+            WeightMatrix(bottom, middle), WeightMatrix(middle, top), WeightMatrix(bottom, top)
+        )
+        val layers = listOf(below, above, left, right, bottom, middle, top)
+        val panel = panelFor(Network(), *layers.toTypedArray(), *matrices.toTypedArray())
+        fun layout() = onEdt {
+            layers.map { layer ->
+                panel.getNode(layer)!!.footprint.let { "%.4f %.4f %.4f %.4f".format(it.x, it.y, it.width, it.height) }
+            } + matrices.flatMap { matrix ->
+                val arrow = panel.arrowOf(matrix)
+                val shaft = arrow.shaft!!
+                listOf(
+                    "${arrow.route} ${arrow.hasOwnLane}",
+                    listOf(shaft.x1, shaft.y1, shaft.ctrlX1, shaft.ctrlY1, shaft.ctrlX2, shaft.ctrlY2, shaft.x2, shaft.y2)
+                        .joinToString { "%.4f".format(it) },
+                    panel.imageOf(matrix).let { "%.4f %.4f %.4f".format(it.centerX, it.centerY, it.width) },
+                    panel.getNode(matrix)!!.footprint.let { "%.4f %.4f %.4f %.4f".format(it.x, it.y, it.width, it.height) }
+                )
+            }
+        }
+        val atFullSize = layout()
+        assertTrue(onEdt { !panel.arrowOf(matrices[0]).hasOwnLane }, "The first arrow should start out straight")
+
+        for (scale in listOf(0.6, 0.25, 0.1, 0.5, 1.0, 2.5, 1.0)) {
+            onEdt { panel.canvas.camera.viewScale = scale }
+            panel.awaitCanvasIdle()
+            assertEquals(atFullSize, layout(), "at a view scale of $scale")
+        }
+    }
 }

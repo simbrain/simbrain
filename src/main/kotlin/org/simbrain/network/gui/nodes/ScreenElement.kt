@@ -96,7 +96,9 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * The space this element takes up on the canvas, in canvas coordinates: what it draws in its own place, without
      * its [connectionDrawing] and without selection handles, which come and go. What is laid out around an
      * element, such as a connector's arrow or a subnetwork's outline, is laid out against this, so that it does not
-     * shift when the element is selected. An element that does not say otherwise counts everything in its node.
+     * shift when the element is selected. A label box counts at its full size, though it is drawn larger when the
+     * view is zoomed out, so that zooming moves nothing either. An element that does not say otherwise counts
+     * everything in its node.
      */
     val footprint: PBounds
         get() {
@@ -118,12 +120,13 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
     protected fun LaidOutConnector.requestLayout() = networkPanel.connectionLayout.request(this)
 
     /**
-     * Lay this connector out again whenever the view pans or zooms. Label boxes are rescaled with the zoom, and
-     * what a connector places around its label box has to follow. Ends when the node is disposed.
+     * Place what connectors draw again whenever the view pans or zooms. Label boxes are drawn larger as the view
+     * zooms out, and a label box that sits on top of a drawing has to stay on top of it. Nothing else moves: the
+     * layout is worked out for label boxes at full size. Ends when the node is disposed.
      */
     protected fun LaidOutConnector.layoutWithView() {
         if (viewListener != null) return
-        val listener = PropertyChangeListener { requestLayout() }
+        val listener = PropertyChangeListener { networkPanel.connectionLayout.requestPlacement() }
         viewListener = listener
         networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
     }

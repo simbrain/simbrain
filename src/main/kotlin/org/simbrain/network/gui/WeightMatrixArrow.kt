@@ -96,6 +96,9 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     /** The space the two layers took up when the arrow was last drawn. */
     private var drawnBetween: List<Rectangle2D>? = null
 
+    /** Whether a matrix ran the other way between the two layers when the arrow was last drawn. */
+    private var drawnBesideAnother = false
+
     /** The space taken up by the layers in [layers] that the matrix does not join. */
     private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
         val own = ownLayers()
@@ -105,6 +108,7 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     /** Draw the arrow between the two layers as they now are, around any of [layers] that is in its way. */
     fun layout(layers: List<Rectangle2D>) {
         drawnBetween = ownLayers()
+        drawnBesideAnother = isBidirectional()
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { loopAnchor = it }
             is BezierArrow -> {
@@ -115,10 +119,12 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
 
     /**
      * Whether the arrow has to be drawn again: one of its two layers is not where or as large as it was when the
-     * arrow was drawn, one of [layers] is now in its way, or it goes around one that may have moved.
+     * arrow was drawn, a matrix that runs the other way has been added or removed, one of [layers] is now in its
+     * way, or it goes around one that may have moved.
      */
     fun affectedBy(layers: List<Rectangle2D>) =
-        ownLayers() != drawnBetween || (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
+        ownLayers() != drawnBetween || isBidirectional() != drawnBesideAnother ||
+            (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
 
     /**
      * Have the arrow join other sides of the two layers when it is next drawn, if the matrix was left cramped where

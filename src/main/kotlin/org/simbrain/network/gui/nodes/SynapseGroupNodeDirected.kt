@@ -68,6 +68,9 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
     /** The space the two collections took up when the arrow was last drawn. */
     private var drawnBetween: List<Rectangle2D>? = null
 
+    /** Whether a group ran the other way between the two collections when the arrow was last drawn. */
+    private var drawnBesideAnother = false
+
     /** The space taken up by the layers in [layers] that the group does not join. */
     private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
         val own = ownLayers()
@@ -77,6 +80,7 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
     /** Draw the arrow between the two collections as they now are, around any of [layers] that is in its way. */
     fun layout(layers: List<Rectangle2D>) {
         drawnBetween = ownLayers()
+        drawnBesideAnother = isBidirectional()
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { labelPoint = it }
             is BezierArrow -> {
@@ -90,10 +94,12 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
 
     /**
      * Whether the arrow has to be drawn again: one of its two collections is not where or as large as it was when
-     * the arrow was drawn, one of [layers] is now in its way, or it goes around one that may have moved.
+     * the arrow was drawn, a group that runs the other way has been added or removed, one of [layers] is now in its
+     * way, or it goes around one that may have moved.
      */
     fun affectedBy(layers: List<Rectangle2D>) =
-        ownLayers() != drawnBetween || (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
+        ownLayers() != drawnBetween || isBidirectional() != drawnBesideAnother ||
+            (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
 
     /** Re-read the themed [NetworkPreferences.synapseGroupArrowColor] (e.g. after a light/dark switch). */
     fun updateColorFromPreferences() {

@@ -148,7 +148,7 @@ class NeuronCollectionNode(
     override val isDraggable = true
 
     /** The outline around the neurons and the label box on top of it. */
-    override fun measureFootprint() = footprintOf(outlinedObjects.globalFullBounds, interactionBox.globalBounds)
+    override fun measureFootprint() = footprintOf(outlinedObjects.globalFullBounds, interactionBox.layoutBounds)
 
     override val isConnectorObstacle get() = true
 

@@ -267,9 +267,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      * what is in the way.
      */
     internal fun drawing() = ShaftDrawing(
-        above = interactionBox.fullBounds.height,
+        above = interactionBox.layoutHeight,
         below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0,
-        minWidth = interactionBox.fullBounds.width,
+        minWidth = interactionBox.layoutWidth,
         minSide = IMAGE_SIDE_MIN,
         maxSide = IMAGE_SIDE_MAX,
         comfortable = IMAGE_SIDE_DEFAULT,
@@ -487,7 +487,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     /** The image with its label box and, when it is showing, its caption. */
     override fun measureFootprint() = footprintOf(
         imageBox.box.globalFullBounds,
-        interactionBox.globalBounds,
+        interactionBox.layoutBounds,
         shapeCaption.globalBounds.takeIf { shapeCaption.visible }
     )
 

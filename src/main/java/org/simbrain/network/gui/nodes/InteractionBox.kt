@@ -6,6 +6,7 @@ import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
+import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
@@ -41,6 +42,32 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
     val zoomListener: PropertyChangeListener = PropertyChangeListener { evt: PropertyChangeEvent? ->
         setScale(zoomRescale(networkPanel.canvas.camera.viewScale))
     }
+
+    /**
+     * Width of the box at full size. The box is drawn larger than this when the view is zoomed out, so that its
+     * text stays readable, but what is laid out around it is laid out for this width, so that zooming moves nothing.
+     */
+    val layoutWidth: kotlin.Double get() = bounds.width
+
+    /** Height of the box at full size. See [layoutWidth]. */
+    val layoutHeight: kotlin.Double get() = bounds.height
+
+    /**
+     * The space the box takes up at full size, in canvas coordinates, for a box that sits on top of something: it
+     * has the middle and the bottom edge the box is drawn with, which stay where they are as the box is drawn larger.
+     */
+    val layoutBounds: PBounds
+        get() {
+            val drawn = globalFullBounds
+            return PBounds(drawn.centerX - layoutWidth / 2, drawn.maxY - layoutHeight, layoutWidth, layoutHeight)
+        }
+
+    /** The space the box takes up at full size, in canvas coordinates, for a box that is centered on a point. */
+    val layoutBoundsCentered: PBounds
+        get() {
+            val drawn = globalFullBounds
+            return PBounds(drawn.centerX - layoutWidth / 2, drawn.centerY - layoutHeight / 2, layoutWidth, layoutHeight)
+        }
 
     /**
      * Rectangle that displays the box.

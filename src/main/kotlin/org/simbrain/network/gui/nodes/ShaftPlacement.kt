@@ -85,11 +85,12 @@ class ShaftDrawing(
     }
 }
 
-/** A label box on its own, as placement on an arrow sees it: a drawing whose square has no size. */
-fun InteractionBox.asShaftDrawing(): ShaftDrawing {
-    val box = fullBounds
-    return ShaftDrawing(above = box.height / 2, below = box.height / 2, minWidth = box.width)
-}
+/**
+ * A label box on its own, as placement on an arrow sees it: a drawing whose square has no size. It is placed for
+ * its full size, whatever size it is drawn at.
+ */
+fun InteractionBox.asShaftDrawing() =
+    ShaftDrawing(above = layoutHeight / 2, below = layoutHeight / 2, minWidth = layoutWidth)
 
 /**
  * Where a drawing goes on its arrow.

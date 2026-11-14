@@ -54,6 +54,14 @@ class FootprintTest {
 
     private fun NetworkPanel.footprintOf(model: NetworkModel): PBounds = onEdt { getNode(model)!!.footprint }
 
+    /** Two rectangles are the same but for the width of a border. */
+    private fun assertSameSpace(expected: PBounds, actual: PBounds) {
+        assertEquals(expected.x, actual.x, 0.5)
+        assertEquals(expected.y, actual.y, 0.5)
+        assertEquals(expected.width, actual.width, 0.5)
+        assertEquals(expected.height, actual.height, 0.5)
+    }
+
     private fun NetworkPanel.fullBoundsOf(model: NetworkModel): PBounds = onEdt { getNode(model)!!.globalFullBounds }
 
     /** Selects the node of [model] and waits for its selection handle to be drawn. */
@@ -160,7 +168,7 @@ class FootprintTest {
 
         onEdt {
             val node = panel.getNode(flatten) as FlattenConnectorNode
-            assertEquals(node.interactionBox.globalBounds, node.footprint)
+            assertSameSpace(node.interactionBox.globalBounds, node.footprint)
         }
     }
 
@@ -177,7 +185,7 @@ class FootprintTest {
 
         onEdt {
             val node = panel.getNode(group) as SynapseGroupNode
-            assertEquals(node.interactionBox.globalBounds, node.footprint)
+            assertSameSpace(node.interactionBox.globalBounds, node.footprint)
         }
     }
 

@@ -92,7 +92,7 @@ val pursuer = newSim {
     // Configure odor world - from OdorWorld1.xml
     odorWorld.apply {
         wrapAround = true
-        isObjectsBlockMovement = false
+        isObjectsBlockMovement = true
     }
     
     // Create mouse agent

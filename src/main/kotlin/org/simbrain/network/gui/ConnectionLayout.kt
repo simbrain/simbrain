@@ -38,6 +38,16 @@ interface LaidOutConnector {
     fun arrowAffectedBy(layers: List<Rectangle2D>): Boolean
 
     /**
+     * Decide, now that the drawing has been placed, whether the arrow should join other sides of its two layers
+     * than it does: other sides where the drawing was left cramped, or the usual ones again once they have room.
+     * The arrow is then drawn that way by the next [layoutArrow].
+     *
+     * @param drawings the space taken up by what the other connectors draw, as just placed
+     * @return whether the arrow should be drawn again
+     */
+    fun reconsiderRoute(layers: List<Rectangle2D>, drawings: List<Rectangle2D>): Boolean = false
+
+    /**
      * What the connector draws on its arrow, as [layoutArrow] last drew it, for the panel to place among the
      * drawings of the other connectors, or null if it goes at a place of its own, as the image on a loop does.
      */
@@ -68,6 +78,9 @@ class ConnectionLayout(
 
     /** Whether drawings are waiting to be placed again although no arrow changed, as when a layer moved. */
     private var placementPending = false
+
+    /** The space each connector's drawing took up when last placed. */
+    private val placed = HashMap<LaidOutConnector, Rectangle2D>()
 
     private var updateScheduled = false
 
@@ -117,22 +130,50 @@ class ConnectionLayout(
         try {
             val all = connectors()
             val layerSpaces = layers()
+            placed.keys.retainAll(all.toSet())
+            fun drawingsBeside(connector: LaidOutConnector) = placed.filterKeys { it !== connector }.values.toList()
             // A connector that has left the canvas since it asked is skipped. One not yet on it asks again when added
             val asked = redraw.filter { (it as? PNode)?.parent != null }.toSet()
-            (asked + all.filter { it !in asked && logged { it.arrowAffectedBy(layerSpaces) } == true })
-                .forEach { logged { it.layoutArrow(layerSpaces) } }
-            val items = all.map { connector -> logged { connector.drawingToPlace() } }
-            // Drawings with a place of their own go first, since the others keep clear of them
-            val fixed = mutableListOf<Rectangle2D>()
-            all.forEachIndexed { index, connector ->
-                if (items[index] == null) logged { connector.placeDrawing(null) }?.let { fixed.add(it) }
+            var toDraw: Collection<LaidOutConnector> =
+                asked + all.filter { it !in asked && logged { it.arrowAffectedBy(layerSpaces) } == true }
+            // Where the drawings land can leave an arrow better joined to other sides, which moves the drawings
+            // again. The rules for moving an arrow keep that from going on, and the count makes sure of it
+            for (round in 1..ROUNDS) {
+                toDraw.forEach { connector -> logged { connector.layoutArrow(layerSpaces) } }
+
+                val items = all.map { connector -> logged { connector.drawingToPlace() } }
+                // Drawings with a place of their own go first, since the others keep clear of them
+                val fixed = mutableListOf<Rectangle2D>()
+                all.forEachIndexed { index, connector ->
+                    if (items[index] == null) {
+                        val space = logged { connector.placeDrawing(null) }
+                        if (space != null) {
+                            fixed.add(space)
+                            placed[connector] = space
+                        } else {
+                            placed.remove(connector)
+                        }
+                    }
+                }
+                val movable = all.indices.filter { items[it] != null }
+                val placements = ShaftPlacer.placeAll(movable.map { items[it]!! }, layerSpaces, fixed)
+                movable.forEachIndexed { n, index ->
+                    val space = logged { all[index].placeDrawing(placements[n]) }
+                    if (space != null) placed[all[index]] = space else placed.remove(all[index])
+                }
+
+                if (round == ROUNDS) break
+                toDraw = all.filter { logged { it.reconsiderRoute(layerSpaces, drawingsBeside(it)) } == true }
+                if (toDraw.isEmpty()) break
             }
-            val movable = all.indices.filter { items[it] != null }
-            val placements = ShaftPlacer.placeAll(movable.map { items[it]!! }, layerSpaces, fixed)
-            movable.forEachIndexed { n, index -> logged { all[index].placeDrawing(placements[n]) } }
         } finally {
             running = false
         }
+    }
+
+    private companion object {
+        /** The most times arrows are drawn and drawings placed in one pass. */
+        const val ROUNDS = 3
     }
 
     /** One connector failing to lay out must not leave the rest where they were. */

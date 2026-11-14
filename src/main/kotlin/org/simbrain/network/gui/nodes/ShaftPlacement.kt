@@ -172,12 +172,7 @@ object ShaftPlacer {
         // What the drawing has to have room for beside a layer before its room beside other drawings counts
         val leastSide = drawing.minSide
 
-        // The size the drawing has with the arrow to itself. Along a slanted arrow the fixed parts take up less of
-        // its length than their height or width
-        val (alongX, alongY) = shaft.direction()
-        val taken = abs(alongY) * (drawing.above + drawing.below) + abs(alongX) * 2 * drawing.beside
-        val available = if (shared) length / 2 else length
-        val wanted = max(drawing.comfortable, drawing.fill * available - taken).coerceIn(drawing.minSide, drawing.maxSide)
+        val wanted = wantedSide(shaft, drawing, shared)
 
         // How far the drawing as a whole is from where it is preferred. With more above the square than below it,
         // the drawing as a whole is centered above the square
@@ -262,6 +257,22 @@ object ShaftPlacer {
     /** Place [item] as [place] does. */
     fun place(item: ShaftItem, layers: List<Rectangle2D>, drawings: List<Rectangle2D> = emptyList()) =
         place(item.shaft, item.drawing, layers, drawings, item.ownLayers, item.preferred, item.shared)
+
+    /** The size the square of [item] has with its arrow to itself. */
+    fun wantedSide(item: ShaftItem) = wantedSide(item.shaft, item.drawing, item.shared)
+
+    /**
+     * The size the square of [drawing] has with [shaft] to itself: enough to fill the room it has up to the size
+     * that is comfortable, and beyond that as much as leaves the rest of the arrow showing. Along a slanted arrow
+     * the fixed parts take up less of its length than their height or width.
+     */
+    private fun wantedSide(shaft: CubicCurve2D, drawing: ShaftDrawing, shared: Boolean): Double {
+        val length = shaft.arcLength()
+        val (alongX, alongY) = shaft.direction()
+        val taken = abs(alongY) * (drawing.above + drawing.below) + abs(alongX) * 2 * drawing.beside
+        val available = if (shared) length / 2 else length
+        return max(drawing.comfortable, drawing.fill * available - taken).coerceIn(drawing.minSide, drawing.maxSide)
+    }
 
     /**
      * Place every one of [items] on its arrow. Each is placed as though the others were not there, and those that

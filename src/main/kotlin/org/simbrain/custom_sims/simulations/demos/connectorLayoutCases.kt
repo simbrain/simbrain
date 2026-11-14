@@ -48,6 +48,8 @@ val connectorLayoutCases = newSim("connector_layout_cases") {
             - **Reciprocal pair**: two layers connected in both directions: layers of the same size, a wide layer
             and a narrow one, a wide layer below a tall one, and a tall layer beside a wide one.
             - **Tall layer into a wide one**: a chain through layers that differ in both width and height.
+            - **Layers close together**: layers stacked and side by side with too little room between them for an
+            image, alone and as reciprocal pairs. The arrows should bow out to where there is room.
             - **Skip connection**: a stack with a connection from the bottom layer straight to the top one, and a
             deeper stack with two skips that overlap.
             - **Fan-in** and **fan-out**: several layers feeding one, and one feeding several.
@@ -65,6 +67,8 @@ val connectorLayoutCases = newSim("connector_layout_cases") {
             - In the symmetric cases, compare the two sides: the arrows should mirror each other and the images
             should be the same size.
             - Select a connector and delete it, then undo.
+            - In the close together cases, drag the two layers apart until the arrow goes straight between them
+            again, and back together until it bows out. It should not flick between the two on the way.
         """.trimIndent()
     )
 }
@@ -89,6 +93,14 @@ suspend fun Network.addConnectorLayoutCases() {
         },
         "Tall layer into a wide one" to {
             chain(tallArray(0.0, 0.0), collection(0.0, -460.0, 9), gridArray(0.0, -880.0))
+        },
+        "Layers close together" to {
+            chain(array(-200.0, 0.0), array(-200.0, -110.0))
+            chain(array(60.0, -60.0), array(230.0, -60.0))
+        },
+        "Reciprocal pair, close together" to {
+            reciprocal(array(-200.0, 0.0), array(-200.0, -120.0))
+            reciprocal(array(60.0, -60.0), array(240.0, -60.0))
         },
         "Skip connection" to {
             val (bottom, _, top) = chain(array(0.0, 0.0), array(0.0, -270.0), array(0.0, -540.0))

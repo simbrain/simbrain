@@ -71,52 +71,24 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         // 0. clear old arrow
         removeAllChildren()
 
-        // 1. for each source and target, find a side of the outline to let the arrow connect
-        val requestedShift = _lateralShift()
-        val (deltaVector, sourceSide, targetSide) = (sourceOutlines.toList() cartesianProduct targetOutlines.toList())
-                .map { (source, target) ->
-                    val shift = shiftFor(source, target, requestedShift)
-                    Triple(target.headOffset(shift) - source.tailOffset(shift), source, target)
-                }
-                .filter { (line, source, target) ->
-                    // make sure the curve does not bend backward
-                    line.norm dot source.unitNormal > 0.3 && line.norm dot target.unitNormal < -0.3
-                }
-                .let {
-                    if (bidirectional) {
-                        it.maxByOrNull { (line, source, _) -> line dot source.normal }
-                    } else {
-                        it.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
-                    }
-                }.also {
-                    if (it == null) {
-                        shaft = null
-                        isDetour = false
-                        hasOwnLane = false
-                        updateEvent(null)
-                    }
-                } ?: return null
-
-        // 2. compute the curve
-        val shift = shiftFor(sourceSide, targetSide, requestedShift)
-        // Two arrows that should run side by side cannot where one of the sides they join is too short for both
-        val aroundTheCorner = if (shift < requestedShift - 0.5) {
-            aroundTheCorner(sourceSide, targetSide, sourceOutlines, targetOutlines)
-        } else {
-            null
+        // 1. find the way the arrow runs: the one asked for, if it can be taken, and otherwise the usual one
+        val plan = route?.let { planFor(it, sourceOutlines, targetOutlines) }
+            ?: usualPlan(sourceOutlines, targetOutlines, bidirectional)
+        if (plan == null) {
+            shaft = null
+            isDetour = false
+            hasOwnLane = false
+            updateEvent(null)
+            return null
         }
-        val directCurve = aroundTheCorner?.first ?: cubicBezier(
-                sourceSide.tailOffset(shift),
-                sourceSide.tailOffset(shift) + deltaVector.abs * sourceSide.unitNormal * 0.5,
-                targetSide.headOffset(shift) + deltaVector.abs * targetSide.unitNormal * 0.5,
-                targetSide.headOffset(shift)
-        )
-        val inTheWay = blockers.filter { directCurve.passesThrough(it) }
-        val detour = if (inTheWay.isEmpty()) null else detourAround(inTheWay, sourceOutlines, targetOutlines, requestedShift)
-        val curveModel = detour?.first ?: directCurve
-        val headSide = detour?.second ?: aroundTheCorner?.second ?: targetSide
+
+        // 2. go around anything in that way
+        val inTheWay = blockers.filter { plan.curve.passesThrough(it) }
+        val detour = if (inTheWay.isEmpty()) null else detourAround(inTheWay, sourceOutlines, targetOutlines, _lateralShift())
+        val curveModel = detour?.first ?: plan.curve
+        val headSide = detour?.second ?: plan.headSide
         isDetour = detour != null
-        hasOwnLane = detour != null || aroundTheCorner != null
+        hasOwnLane = detour != null || plan.hasOwnLane
         shaft = curveModel
 
         // 3. transform the tip onto the head location and union it with the stroked curve
@@ -154,6 +126,128 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     fun updateColorFromPreferences() {
         updateColor(NetworkPreferences.connectorArrowColor)
     }
+
+    /**
+     * The sides the arrow is to join when it is next laid out, or null for the sides it joins by itself. Ignored
+     * while the two outlines are placed so that those sides cannot be joined.
+     */
+    var route: ArrowRoute? = null
+
+    /** A way for the arrow to run between two outlines. */
+    private class Plan(val curve: CubicCurve2D, val headSide: Line2D, val route: ArrowRoute, val hasOwnLane: Boolean)
+
+    /**
+     * The way the arrow runs when no sides are asked for: between the nearest pair of sides that face each other,
+     * or, for one of two arrows between the same layers, the pair that leaves its source most squarely.
+     */
+    private fun usualPlan(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean): Plan? {
+        val requestedShift = _lateralShift()
+        val (deltaVector, sourceSide, targetSide) = (sourceOutlines.toList() cartesianProduct targetOutlines.toList())
+                .map { (source, target) ->
+                    val shift = shiftFor(source, target, requestedShift)
+                    Triple(target.headOffset(shift) - source.tailOffset(shift), source, target)
+                }
+                .filter { (line, source, target) ->
+                    // make sure the curve does not bend backward
+                    line.norm dot source.unitNormal > 0.3 && line.norm dot target.unitNormal < -0.3
+                }
+                .let {
+                    if (bidirectional) {
+                        it.maxByOrNull { (line, source, _) -> line dot source.normal }
+                    } else {
+                        it.minByOrNull { (_, source, target) -> source.midPoint distanceSqTo target.midPoint }
+                    }
+                } ?: return null
+        val sides = ArrowRoute(sourceOutlines.toList().indexOf(sourceSide), targetOutlines.toList().indexOf(targetSide))
+        val shift = shiftFor(sourceSide, targetSide, requestedShift)
+        // Two arrows that should run side by side cannot where one of the sides they join is too short for both
+        if (shift < requestedShift - 0.5) {
+            aroundTheCorner(sourceSide, targetSide, sourceOutlines, targetOutlines)?.let { (curve, arrivalSide) ->
+                return Plan(curve, arrivalSide, sides, hasOwnLane = true)
+            }
+        }
+        val curve = cubicBezier(
+                sourceSide.tailOffset(shift),
+                sourceSide.tailOffset(shift) + deltaVector.abs * sourceSide.unitNormal * 0.5,
+                targetSide.headOffset(shift) + deltaVector.abs * targetSide.unitNormal * 0.5,
+                targetSide.headOffset(shift)
+        )
+        return Plan(curve, targetSide, sides, hasOwnLane = false)
+    }
+
+    /**
+     * The way the arrow runs between the sides [route] names, or null if they cannot be joined as the outlines are
+     * placed. Between the same side of each outline, the arrow bows outward from that side, far enough out to carry
+     * what is drawn on it clear of both.
+     */
+    private fun planFor(route: ArrowRoute, sourceOutlines: RectangleSides, targetOutlines: RectangleSides): Plan? {
+        val sourceSide = sourceOutlines.toList()[route.sourceSide]
+        val targetSide = targetOutlines.toList()[route.targetSide]
+        if (route.sourceSide == route.targetSide) {
+            val between = (targetOutlines.center - sourceOutlines.center).norm
+            if (abs(sourceSide.unitNormal dot between) >= 0.5) return null
+            val tail = sourceSide.tailOffset(0.0)
+            val head = targetSide.headOffset(0.0)
+            val outward = sourceSide.unitNormal
+            val reach = (sourceOutlines.corners() + targetOutlines.corners()).maxOf { it dot outward } + DETOUR_CLEARANCE
+            val start = ((tail dot outward) + (head dot outward)) / 2
+            val bow = max(MINIMUM_BOW, (reach - start) / 0.75)
+            val curve = cubicBezier(tail, tail + outward * bow, head + outward * bow, head)
+            return Plan(curve, targetSide, route, hasOwnLane = true)
+        }
+        val shift = shiftFor(sourceSide, targetSide, _lateralShift())
+        val delta = targetSide.headOffset(shift) - sourceSide.tailOffset(shift)
+        val bendsBackward = !(delta.norm dot sourceSide.unitNormal > 0.3 && delta.norm dot targetSide.unitNormal < -0.3)
+        if (bendsBackward) return null
+        val curve = cubicBezier(
+                sourceSide.tailOffset(shift),
+                sourceSide.tailOffset(shift) + delta.abs * sourceSide.unitNormal * 0.5,
+                targetSide.headOffset(shift) + delta.abs * targetSide.unitNormal * 0.5,
+                targetSide.headOffset(shift)
+        )
+        return Plan(curve, targetSide, route, hasOwnLane = false)
+    }
+
+    /**
+     * The shaft the arrow would have between the sides [route] names, or between the sides it joins by itself for
+     * null, without laying it out. Null if no arrow can be drawn that way.
+     */
+    fun shaftFor(
+        route: ArrowRoute?,
+        sourceOutlines: RectangleSides,
+        targetOutlines: RectangleSides,
+        bidirectional: Boolean
+    ): RoutedShaft? {
+        val plan = if (route == null) usualPlan(sourceOutlines, targetOutlines, bidirectional) else planFor(route, sourceOutlines, targetOutlines)
+        return plan?.let { RoutedShaft(it.curve, it.hasOwnLane) }
+    }
+
+    /**
+     * The other sides the arrow could join. One of two arrows between the same layers has a single other way: a bow
+     * on the side to the right of its direction, so that the two bow on opposite sides. An arrow on its own may join
+     * any other pair of sides that face each other, or bow on either side.
+     */
+    fun otherRoutes(sourceOutlines: RectangleSides, targetOutlines: RectangleSides, bidirectional: Boolean): List<ArrowRoute> {
+        val usual = usualPlan(sourceOutlines, targetOutlines, bidirectional)?.route
+        val sources = sourceOutlines.toList()
+        val between = (targetOutlines.center - sourceOutlines.center).norm
+        val across = sources.indices.filter { abs(sources[it].unitNormal dot between) < 0.5 }
+        val bows = if (bidirectional) {
+            val right = point(-between.y, between.x)
+            listOfNotNull(across.maxByOrNull { sources[it].unitNormal dot right })
+        } else {
+            across
+        }.map { ArrowRoute(it, it) }
+        val facing = if (bidirectional) {
+            emptyList()
+        } else {
+            sources.indices.flatMap { source -> sources.indices.map { target -> ArrowRoute(source, target) } }
+                .filter { it.sourceSide != it.targetSide && planFor(it, sourceOutlines, targetOutlines) != null }
+        }
+        return (facing + bows).filter { it != usual }
+    }
+
+    private fun RectangleSides.corners() = listOf(top.p1, top.p2, bottom.p1, bottom.p2)
 
     /** The shaft of the arrow as last laid out, or null before then or where no arrow could be drawn. */
     var shaft: CubicCurve2D? = null
@@ -341,6 +435,19 @@ class BezierArrowTemplate {
         updateEvent = block
     }
 }
+
+/**
+ * A pair of sides for an arrow to join: one of the source and one of the target, each counted from the top round by
+ * the right, the bottom and the left.
+ */
+data class ArrowRoute(val sourceSide: Int, val targetSide: Int)
+
+/**
+ * A shaft an arrow could have.
+ *
+ * @param hasOwnLane whether an arrow on it runs clear of an arrow the other way between the same two layers
+ */
+class RoutedShaft(val curve: CubicCurve2D, val hasOwnLane: Boolean)
 
 /** Space left between an arrow that goes around something and what it goes around, for what is drawn on the arrow. */
 private const val DETOUR_CLEARANCE = 80.0

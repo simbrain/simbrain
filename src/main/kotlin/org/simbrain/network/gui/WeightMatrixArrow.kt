@@ -15,6 +15,7 @@ import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.RECIPROCAL_ARROW_SHIFT
 import org.simbrain.util.widgets.RecurrentArrow
+import org.simbrain.util.widgets.RoutedShaft
 import org.simbrain.util.widgets.bezierArrow
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Point2D
@@ -119,20 +120,44 @@ class WeightMatrixArrow(private val weightMatrixNode: WeightMatrixNode) : PNode(
     fun affectedBy(layers: List<Rectangle2D>) =
         ownLayers() != drawnBetween || (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
 
-    /** What the matrix draws, to be placed on the arrow as [layout] last drew it, or null if it is not on a shaft. */
-    fun matrixToPlace(): ShaftItem? {
-        val curve = shaft ?: return null
-        if (arrow !is BezierArrow) return null
-        // Beside the arrow of a matrix that runs the other way, each matrix draws in the half of the gap nearer its
-        // source. An arrow with a lane of its own has the whole of it
-        val sharesGap = isBidirectional() && !arrow.hasOwnLane
+    /**
+     * Have the arrow join other sides of the two layers when it is next drawn, if the matrix was left cramped where
+     * it now runs, or the sides it joins by itself again once the matrix would have room there.
+     *
+     * @param placedSide the size the image was just given
+     * @return whether the arrow should be drawn again
+     */
+    fun reconsiderRoute(placedSide: kotlin.Double, layers: List<Rectangle2D>, drawings: List<Rectangle2D>): Boolean {
+        if (arrow !is BezierArrow) return false
+        val route = ArrowRouting.choose(
+            arrow, sourceNodeOutlines, targetNodeOutlines, isBidirectional(), ::matrixOn, placedSide, layers, drawings
+        )
+        if (route == arrow.route) return false
+        arrow.route = route
+        return true
+    }
+
+    /**
+     * What the matrix draws, as it would be placed on [shaft]. Beside the arrow of a matrix that runs the other
+     * way, each matrix draws in the half of the gap nearer its source. An arrow with a lane of its own has the whole
+     * of it.
+     */
+    private fun matrixOn(shaft: RoutedShaft): ShaftItem {
+        val sharesGap = isBidirectional() && !shaft.hasOwnLane
         return ShaftItem(
-            curve,
+            shaft.curve,
             weightMatrixNode.drawing(),
             ownLayers = listOf(weightMatrixNode.sourceNode.footprint, weightMatrixNode.targetNode.footprint),
             preferred = if (sharesGap) 0.25 else 0.5,
             shared = sharesGap
         )
+    }
+
+    /** What the matrix draws, to be placed on the arrow as [layout] last drew it, or null if it is not on a shaft. */
+    fun matrixToPlace(): ShaftItem? {
+        val curve = shaft ?: return null
+        if (arrow !is BezierArrow) return null
+        return matrixOn(RoutedShaft(curve, arrow.hasOwnLane))
     }
 
     /** Where what the matrix draws goes when it is not on a shaft: on the loop, or between layers too close for an arrow. */

@@ -122,6 +122,68 @@ class ConnectorPlacementTest {
         assertTrue(panel.imageOf(up).width > 60.0, "image ${panel.imageOf(up)}")
     }
 
+    private fun NetworkPanel.arrowOf(matrix: WeightMatrix): BezierArrow = onEdt {
+        (getNode(matrix) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single()
+    }
+
+    @Test
+    fun `an arrow between layers too close for its image bows out to where the image has room`() {
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -110.0)
+        val matrix = WeightMatrix(below, above)
+        val panel = panelFor(Network(), below, above, matrix)
+
+        assertTrue(onEdt { panel.arrowOf(matrix).hasOwnLane }, "The arrow should have moved to other sides")
+        val image = panel.imageOf(matrix)
+        assertTrue(image.width > 60.0, "image $image")
+        listOf(below, above).forEach { assertFalse(image.intersects(panel.footprintOf(it)), "image $image over a layer") }
+        assertTrue(panel.canvasBoundsReport().settled)
+    }
+
+    @Test
+    fun `an arrow that bowed out goes straight again only once there is clearly room, and does not flick between`() {
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -110.0)
+        val matrix = WeightMatrix(below, above)
+        val panel = panelFor(Network(), below, above, matrix)
+        fun bowedAt(distance: Double): Boolean {
+            onEdt { above.location = Point2D.Double(0.0, -distance) }
+            panel.awaitCanvasIdle()
+            return onEdt { panel.arrowOf(matrix).hasOwnLane }
+        }
+        val distances = generateSequence(110.0) { it + 10.0 }.takeWhile { it <= 330.0 }.toList()
+
+        val movingApart = distances.map { bowedAt(it) }
+        val movingTogether = distances.reversed().map { bowedAt(it) }.reversed()
+
+        // One change of mind each way
+        assertEquals(1, movingApart.zipWithNext().count { (a, b) -> a != b }, "apart $movingApart")
+        assertEquals(1, movingTogether.zipWithNext().count { (a, b) -> a != b }, "together $movingTogether")
+        assertTrue(movingApart.first() && !movingApart.last())
+        // It takes less room to stay straight than it took to go straight again
+        val straightFrom = distances[movingApart.indexOf(false)]
+        val bowedUpTo = distances[movingTogether.lastIndexOf(true)]
+        assertTrue(bowedUpTo < straightFrom - 15.0, "goes straight at $straightFrom, bows again at $bowedUpTo")
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers too close together bow out on opposite sides`() {
+        val left = arrayAt(0.0, 0.0)
+        val right = arrayAt(180.0, 0.0)
+        val there = WeightMatrix(left, right)
+        val back = WeightMatrix(right, left)
+        val panel = panelFor(Network(), left, right, there, back)
+
+        assertTrue(onEdt { panel.arrowOf(there).hasOwnLane && panel.arrowOf(back).hasOwnLane })
+        val layersMiddle = panel.footprintOf(left).centerY
+        val images = listOf(panel.imageOf(there), panel.imageOf(back))
+        assertTrue(images.any { it.maxY < layersMiddle } && images.any { it.y > layersMiddle }, "images $images")
+        images.forEach { image ->
+            assertTrue(image.width > 50.0, "image $image")
+            listOf(left, right).forEach { assertFalse(image.intersects(panel.footprintOf(it)), "image $image over a layer") }
+        }
+    }
+
     @Test
     fun `an arrow whose way a layer blocks goes around the layer, and straight again when the layer has gone`() {
         val bottom = arrayAt(0.0, 0.0)

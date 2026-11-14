@@ -69,6 +69,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
 
     override fun arrowAffectedBy(layers: List<Rectangle2D>) = arrow.affectedBy(layers)
 
+    override fun reconsiderRoute(layers: List<Rectangle2D>, drawings: List<Rectangle2D>) =
+        arrow.reconsiderRoute(imageSide, layers, drawings)
+
     override fun drawingToPlace() = arrow.matrixToPlace()
 
     /** Put the image, with its label box and caption, where [placement] says, at the size it says. */

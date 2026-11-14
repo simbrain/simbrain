@@ -24,6 +24,7 @@ import org.simbrain.network.core.TensorShape
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.nodes.FlattenConnectorNode
+import org.simbrain.network.gui.nodes.InteractionBox
 import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.gui.nodes.SynapseGroupNode
 import org.simbrain.network.gui.nodes.TensorConnectorNode
@@ -85,6 +86,28 @@ class FootprintTest {
     }
 
     @Test
+    fun `a label box made while the view is zoomed out is drawn as large as the ones already there`() {
+        val first = NeuronArray(4).apply { location = Point2D.Double(0.0, 0.0) }
+        val network = Network()
+        val panel = panelFor(network, first)
+        onEdt { panel.canvas.camera.viewScale = 0.3 }
+        panel.validateCanvas()
+
+        val second = NeuronArray(4).apply { location = Point2D.Double(300.0, 0.0) }
+        runBlocking { network.addNetworkModel(second, usePlacementManager = false) }
+        panel.validateCanvas()
+
+        val scales = onEdt { listOf(first, second).map { panel.getNode(it)!!.allNodes.filterIsInstance<InteractionBox>().single().scale } }
+        assertTrue(scales[0] > 1.5, "scale ${scales[0]}")
+        assertEquals(scales[0], scales[1], 1e-9)
+        // And as large as each other once zoomed back in
+        onEdt { panel.canvas.camera.viewScale = 1.0 }
+        panel.validateCanvas()
+        onEdt { listOf(first, second).map { panel.getNode(it)!!.allNodes.filterIsInstance<InteractionBox>().single().scale } }
+            .forEach { assertEquals(1.0, it, 1e-9) }
+    }
+
+    @Test
     fun `selecting a tensor layer does not change its footprint`() {
         val layer = TensorLayer(TensorShape(4, 4, 2)).apply { location = Point2D.Double(0.0, 0.0) }
         val panel = panelFor(Network(), layer)
@@ -113,12 +136,14 @@ class FootprintTest {
         val panel = panelFor(Network(), source, target, matrix)
         val footprint = panel.footprintOf(matrix)
         val fullBounds = panel.fullBoundsOf(matrix)
-        // The arrow is not in the node, so before selection everything in the node is footprint
-        assertEquals(fullBounds, footprint)
+        // The arrow is not in the node, so before selection everything in the node is footprint, give or take the
+        // outline of the label box
+        listOf(fullBounds.x to footprint.x, fullBounds.y to footprint.y, fullBounds.maxX to footprint.maxX, fullBounds.maxY to footprint.maxY)
+            .forEach { (drawn, counted) -> assertEquals(drawn, counted, 0.5) }
         onEdt {
             val node = panel.getNode(matrix) as WeightMatrixNode
             assertTrue(footprint.contains(node.imageBox.globalBounds))
-            assertTrue(footprint.contains(node.interactionBox.globalBounds))
+            assertTrue(footprint.contains(node.interactionBox.layoutBounds))
         }
 
         panel.select(matrix)

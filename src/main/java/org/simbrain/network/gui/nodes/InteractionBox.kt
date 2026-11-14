@@ -89,6 +89,8 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         applyThemeColors()
 
         networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener)
+        // A box made while the view is zoomed out is drawn as large as the boxes already there
+        setScale(zoomRescale(networkPanel.canvas.camera.viewScale))
     }
 
     /** Re-apply the themed tab colors (fill, border, label, kebab dots). */

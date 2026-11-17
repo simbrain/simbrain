@@ -52,7 +52,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         return ShaftItem(
             curve,
             interactionBox.asShaftDrawing(),
-            ownLayers = listOf(sourceNode.footprint, targetNode.footprint),
+            ownLayers = arrow.joined.footprints(),
             preferred = arrow.labelPosition
         )
     }
@@ -80,11 +80,6 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.displayName)
         addChild(interactionBox)
-        interactionBox.addPropertyChangeListener { evt ->
-            if (evt.propertyName == "width") {
-                requestLayout()
-            }
-        }
         synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { requestLayout() }.untilDisposed()
         synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { requestLayout() }.untilDisposed()
 
@@ -161,6 +156,8 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
      */
     fun updateText() {
         interactionBox.setText(synapseGroup.displayName)
+        // The label box is placed by its middle, which a change of width moves
+        requestLayout()
     }
 
     override fun refreshTheme() {

@@ -44,8 +44,8 @@ import kotlin.math.ceil
 class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel),
     PixelSelectionHost, LaidOutConnector {
     /**
-     * Side of the square [imageBox]. Fitted to the space between the two layers by [placeOnShaft]; a
-     * self-connection, which has no such space, keeps the default.
+     * Side of the square [imageBox]. Set by [placeDrawing] to the size the image is given on its arrow; a
+     * self-connection, which is not placed on an arrow, keeps the default.
      */
     private var imageSide = IMAGE_SIDE_DEFAULT
 
@@ -180,6 +180,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         events.clampChanged.on(Dispatchers.Swing) { setClamped((weightMatrix as WeightMatrix).clamped) }.untilDisposed()
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel ->
             interactionBox.setText(weightMatrix.displayName)
+            // The label box is placed by its middle, which a change of width moves, and its width guides placement
+            requestLayout()
         }.untilDisposed()
         addChild(interactionBox)
         addChild(imageBox)
@@ -227,7 +229,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }?.untilDisposed()
-        layoutWithView()
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()
@@ -712,9 +713,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         private const val WEIGHTS = 1
 
         /**
-         * Room for a weight matrix image on the [shaft] of the arrow it is drawn on, at [position] along it, with
-         * [above] and [below] taken up by what is drawn over and under the image. Anything that draws a matrix on
-         * an arrow sizes it with this and [fittedImageSide], so that every drawing of a matrix follows the same rule.
+         * Room for a weight matrix image on the [shaft] of an arrow outside the panel's connection layout, at
+         * [position] along it, with [above] and [below] taken up by what is drawn over and under the image. The
+         * copies of a matrix in an unrolled view are sized with this and [fittedImageSide], by the same fraction
+         * of the arrow as the node's own image.
          */
         internal fun imageRoom(
             shaft: CubicCurve2D,

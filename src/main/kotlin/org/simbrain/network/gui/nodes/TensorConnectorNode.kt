@@ -446,7 +446,6 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         }.untilDisposed()
 
         interactionBox.setText(connectorDisplayText())
-        layoutWithView()
         updateDetailLabel()
     }
 
@@ -624,35 +623,24 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         arrow.updateColorFromPreferences()
     }
 
-    /** The space taken up by the two layers the connector joins. */
-    private fun ownLayers(): List<Rectangle2D> = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
-
-    /** The space the two layers took up when the arrow was last drawn. */
-    private var drawnBetween: List<Rectangle2D>? = null
-
-    /** The space taken up by the layers in [layers] that the connector does not join. */
-    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
-        val own = ownLayers()
-        return layers.filter { layer -> own.none { it == layer } }
-    }
+    /** The two layers the connector joins. */
+    private val joined = JoinedLayers({ sourceNode }, { targetNode })
 
     override fun layoutArrow(layers: List<Rectangle2D>) {
-        drawnBetween = ownLayers()
-        val srcBodyBounds = sourceNode?.globalBounds ?: return
-        val tgtBodyBounds = targetNode?.globalBounds ?: return
-        val srcTopBounds = sourceNode?.footprint ?: return
-        val tgtTopBounds = targetNode?.footprint ?: return
+        joined.arrowDrawn()
+        val source = sourceNode ?: return
+        val target = targetNode ?: return
         shaft = arrow.layout(
-            directionalOutlines(srcTopBounds, srcBodyBounds),
-            directionalOutlines(tgtTopBounds, tgtBodyBounds),
+            directionalOutlines(source.footprint, source.globalBounds),
+            directionalOutlines(target.footprint, target.globalBounds),
             false,
-            otherLayers(layers)
+            joined.blockers(layers)
         )
     }
 
-    /** One of the two layers changed since the arrow was drawn, or another layer is or was in the arrow's way. */
+    /** One of the two layers changed since the arrow was drawn, or the layers in the arrow's way have. */
     override fun arrowAffectedBy(layers: List<Rectangle2D>) =
-        ownLayers() != drawnBetween || arrow.affectedBy(otherLayers(layers))
+        joined.changedSinceDrawn || arrow.affectedBy(joined.blockers(layers))
 
     /**
      * The single kernel view, or the label box of a connector with no kernel, to be placed on the arrow's shaft. The
@@ -663,7 +651,7 @@ class TensorConnectorNode(networkPanel: NetworkPanel, val connector: TensorConne
         val conv = connector as? ConvolutionConnector
         if (conv != null && conv.kernelGridMode) return null
         val drawing = if (conv != null) kernelImageDrawing() else interactionBox.asShaftDrawing()
-        return ShaftItem(curve, drawing, ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint))
+        return ShaftItem(curve, drawing, ownLayers = joined.footprints())
     }
 
     /**

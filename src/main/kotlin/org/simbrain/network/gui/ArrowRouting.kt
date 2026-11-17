@@ -36,6 +36,8 @@ internal object ArrowRouting {
      * @param placed where the drawing was last placed on the arrow as it now runs, or null if it was not
      * @param layers the space taken up by each layer on the canvas
      * @param drawings the space taken up by what the other connectors draw
+     * @param blockers the layers the arrow goes around when they are in its way. A way that one of them blocks is
+     * not a way the arrow can be moved to, since it would be drawn around the layer instead
      */
     fun choose(
         arrow: BezierArrow,
@@ -45,7 +47,8 @@ internal object ArrowRouting {
         drawingOn: (RoutedShaft) -> ShaftItem,
         placed: ShaftPlacement?,
         layers: List<Rectangle2D>,
-        drawings: List<Rectangle2D>
+        drawings: List<Rectangle2D>,
+        blockers: List<Rectangle2D> = emptyList()
     ): ArrowRoute? {
         /** Where the drawing would go on [route], placed on its own among the others where they now are. */
         fun placedOn(route: ArrowRoute?): ShaftPlacement? {
@@ -53,8 +56,15 @@ internal object ArrowRouting {
             return ShaftPlacer.place(drawingOn(shaft), layers, drawings)
         }
 
+        /** Whether the arrow can run along [route] as it is, with no layer to go around. */
+        fun isClear(route: ArrowRoute?): Boolean {
+            val shaft = arrow.shaftFor(route, sourceOutlines, targetOutlines, bidirectional) ?: return false
+            return !arrow.isBlocked(shaft.curve, blockers)
+        }
+
         /** The other ways the arrow could run, with where the drawing would go on each. */
         fun others() = arrow.otherRoutes(sourceOutlines, targetOutlines, bidirectional)
+            .filter { isClear(it) }
             .mapNotNull { route -> placedOn(route)?.let { route to it } }
         val largestThenRoomiest = compareBy<Pair<ArrowRoute, ShaftPlacement>> { it.second.side }.thenBy { it.second.room }
 
@@ -62,7 +72,7 @@ internal object ArrowRouting {
         val usualShaft = arrow.shaftFor(null, sourceOutlines, targetOutlines, bidirectional)
         if (usualShaft == null) {
             // No arrow can be drawn the usual way, as between two layers that all but touch: any other way is better
-            if (current != null && arrow.shaftFor(current, sourceOutlines, targetOutlines, bidirectional) != null) return current
+            if (current != null && isClear(current)) return current
             return others().maxWithOrNull(largestThenRoomiest)?.first
         }
         val usual = drawingOn(usualShaft)
@@ -70,12 +80,14 @@ internal object ArrowRouting {
         // The room under which the drawing counts as cramped on the usual way
         val cramped = max(smallest, MOVE_BELOW * ShaftPlacer.wantedSide(usual))
         if (current != null) {
+            // Stays for as long as the way it moved to can be taken
+            if (!isClear(current)) return null
+            // The usual way would be drawn around a layer, where the drawing has not been measured
+            if (!isClear(null)) return current
             // Placed on its own the drawing gets no more room than it would placed with the others, so this errs
             // toward staying where it moved to
             val onUsual = placedOn(null) ?: return current
-            if (onUsual.room >= RETURN_AT * cramped) return null
-            // Stays for as long as the way it moved to can be taken
-            return current.takeIf { arrow.shaftFor(it, sourceOutlines, targetOutlines, bidirectional) != null }
+            return if (onUsual.room >= RETURN_AT * cramped) null else current
         }
         if (placed == null || placed.room >= cramped) return null
         return others()

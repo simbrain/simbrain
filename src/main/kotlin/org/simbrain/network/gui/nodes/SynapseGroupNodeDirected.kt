@@ -1,6 +1,12 @@
+/**
+ * The single arrow a synapse group is drawn as when its synapses are not showing: a curve between its two
+ * collections, or a loop for a group from a collection to itself. It is laid out by the panel's connection layout
+ * through the group's [SynapseGroupNode], which also places the label box on it.
+ */
 package org.simbrain.network.gui.nodes
 
 import org.piccolo2d.PNode
+import org.simbrain.network.gui.JoinedLayers
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
@@ -62,31 +68,21 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
     var labelPoint: Point2D? = null
         private set
 
-    /** The space taken up by the two collections the group joins. */
-    private fun ownLayers(): List<Rectangle2D> =
-        listOf(synapseGroupNode.sourceNode.footprint, synapseGroupNode.targetNode.footprint)
-
-    /** The space the two collections took up when the arrow was last drawn. */
-    private var drawnBetween: List<Rectangle2D>? = null
+    /** The two collections the group joins. */
+    internal val joined = JoinedLayers({ synapseGroupNode.sourceNode }, { synapseGroupNode.targetNode })
 
     /** Whether a group ran the other way between the two collections when the arrow was last drawn. */
     private var drawnBesideAnother = false
 
-    /** The space taken up by the layers in [layers] that the group does not join. */
-    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
-        val own = ownLayers()
-        return layers.filter { layer -> own.none { it == layer } }
-    }
-
     /** Draw the arrow between the two collections as they now are, around any of [layers] that is in its way. */
     fun layout(layers: List<Rectangle2D>) {
-        drawnBetween = ownLayers()
+        joined.arrowDrawn()
         drawnBesideAnother = isBidirectional()
         when (arrow) {
             is RecurrentArrow -> arrow.layout(sourceNodeBounds.centerLeft + point(15, 0)) { labelPoint = it }
             is BezierArrow -> {
                 shaft = arrow.layout(
-                    sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional(), otherLayers(layers)
+                    sourceNodeBounds.outlines, targetNodeBounds.outlines, isBidirectional(), joined.blockers(layers)
                 )
                 labelPoint = line(source.location, target.location).p(labelPosition)
             }
@@ -95,12 +91,12 @@ class SynapseGroupNodeDirected(private val synapseGroupNode: SynapseGroupNode) :
 
     /**
      * Whether the arrow has to be drawn again: one of its two collections is not where or as large as it was when
-     * the arrow was drawn, a group that runs the other way has been added or removed, one of [layers] is now in its
-     * way, or it goes around one that may have moved.
+     * the arrow was drawn, a group that runs the other way has been added or removed, or the layers in its way are
+     * not the ones it was drawn around.
      */
     fun affectedBy(layers: List<Rectangle2D>) =
-        ownLayers() != drawnBetween || isBidirectional() != drawnBesideAnother ||
-            (arrow is BezierArrow && arrow.affectedBy(otherLayers(layers)))
+        joined.changedSinceDrawn || isBidirectional() != drawnBesideAnother ||
+            (arrow is BezierArrow && arrow.affectedBy(joined.blockers(layers)))
 
     /** Re-read the themed [NetworkPreferences.synapseGroupArrowColor] (e.g. after a light/dark switch). */
     fun updateColorFromPreferences() {

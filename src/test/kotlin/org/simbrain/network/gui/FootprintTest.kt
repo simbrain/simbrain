@@ -129,6 +129,19 @@ class FootprintTest {
     }
 
     @Test
+    fun `selecting a neuron at the edge of a collection leaves the collection's footprint as it was`() {
+        val network = Network()
+        val neurons = runBlocking { network.addNeurons(4) }
+        val collection = NeuronCollection(neurons)
+        val panel = panelFor(network, collection)
+        val footprint = panel.footprintOf(collection)
+
+        panel.select(neurons.first())
+
+        assertEquals(footprint, panel.footprintOf(collection))
+    }
+
+    @Test
     fun `a weight matrix's footprint is its image, label box and caption, selected or not`() {
         val source = arrayAt(0.0, 0.0)
         val target = arrayAt(0.0, -420.0)

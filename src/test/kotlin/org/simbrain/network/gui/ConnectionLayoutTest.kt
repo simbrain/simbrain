@@ -89,6 +89,30 @@ class ConnectionLayoutTest {
     }
 
     @Test
+    fun `measuring the layers during a pass does not bring on another pass`() {
+        val canvas = onEdt { PCanvas() }
+        lateinit var layout: ConnectionLayout
+        onEdt {
+            layout = ConnectionLayout(
+                canvas,
+                connectors = { canvas.layer.childrenReference.filterIsInstance<LaidOutConnector>() },
+                // A layer that is measured for the first time since it moved says that its bounds changed
+                layers = { layout.requestPlacement(); emptyList() }
+            )
+        }
+        val log = mutableListOf<String>()
+        val connector = RecordingConnector("only", log)
+        onEdt {
+            canvas.layer.addChild(connector)
+            layout.requestPlacement()
+        }
+        awaitEdt()
+
+        assertEquals(1, onEdt { layout.passes })
+        assertEquals(listOf("place only"), onEdt { log.toList() })
+    }
+
+    @Test
     fun `a connector that has left the canvas is not laid out`() {
         val canvas = onEdt { PCanvas() }
         val layout = onEdt { layoutFor(canvas) }

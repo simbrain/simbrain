@@ -1,8 +1,12 @@
 /**
  * Lays out the connectors of a network panel in one pass: draws the arrow of each connector whose layers changed or
- * whose way another layer now blocks, then places what every connector draws on its arrow. The drawings are placed together, kept clear of the layers
- * and of each other. Connectors and layers ask for a pass whenever something it depends on changes, and however many
- * ask before it runs, it runs once.
+ * whose way another layer now blocks, then places what every connector draws on its arrow. The drawings are placed
+ * together, kept clear of the layers and of each other. Connectors and layers ask for a pass whenever something it
+ * depends on changes, and however many ask before it runs, it runs once.
+ *
+ * Label boxes are drawn larger as the view zooms out, and a label box that sits on top of a drawing has to stay on
+ * top of it, so a pass also runs when the size they are drawn at changes. Nothing else moves then, since the layout
+ * is worked out for label boxes at full size, and panning the view changes nothing at all.
  *
  * The pass runs at the start of the canvas's own update, before it validates bounds and works out what to repaint.
  * A layer and the arrows attached to it are therefore redrawn in the same paint, and the layout is finished before
@@ -10,9 +14,11 @@
  */
 package org.simbrain.network.gui
 
+import org.piccolo2d.PCamera
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
 import org.piccolo2d.PRoot
+import org.simbrain.network.gui.nodes.InteractionBox
 import org.simbrain.network.gui.nodes.ShaftItem
 import org.simbrain.network.gui.nodes.ShaftPlacement
 import org.simbrain.network.gui.nodes.ShaftPlacer
@@ -86,17 +92,38 @@ class ConnectionLayout(
 
     private var running = false
 
+    /** How many passes have run. */
+    internal var passes = 0
+        private set
+
+    /** How much larger than full size label boxes were drawn when the view last changed. */
+    private var labelRescale = InteractionBox.zoomRescale(canvas.camera.viewScale)
+
     init {
         canvas.root.addInputSource(object : PRoot.InputSource {
             override fun processInput() = runPending()
         })
+        canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM) {
+            val rescale = InteractionBox.zoomRescale(canvas.camera.viewScale)
+            if (rescale != labelRescale) {
+                labelRescale = rescale
+                requestPlacement()
+            }
+        }
     }
 
     /** Draw the arrow of [connector] again in the next pass, and place every drawing. Safe from any thread. */
     fun request(connector: LaidOutConnector) = schedule { pending.add(connector) }
 
-    /** Place every drawing again in the next pass, because something they keep clear of changed. Safe from any thread. */
-    fun requestPlacement() = schedule { placementPending = true }
+    /**
+     * Place every drawing again in the next pass, because something they keep clear of changed. Safe from any
+     * thread. Does nothing during a pass: measuring a layer that has moved since it was last measured has the layer
+     * report the change, which the pass doing the measuring already takes in.
+     */
+    fun requestPlacement() {
+        if (running && SwingUtilities.isEventDispatchThread()) return
+        schedule { placementPending = true }
+    }
 
     private inline fun schedule(note: () -> Unit) {
         synchronized(pending) {
@@ -127,6 +154,7 @@ class ConnectionLayout(
             placementPending = false
         }
         running = true
+        passes++
         try {
             val all = connectors()
             val layerSpaces = layers()

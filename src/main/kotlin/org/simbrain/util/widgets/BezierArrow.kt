@@ -82,17 +82,20 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         // 1. find the way the arrow runs: the one asked for, if it can be taken, and otherwise the usual one
         val plan = route?.let { planFor(it, sourceOutlines, targetOutlines) }
             ?: usualPlan(sourceOutlines, targetOutlines, bidirectional)
+        planned = plan?.curve
         if (plan == null) {
             shaft = null
             isDetour = false
             hasOwnLane = false
             lead = 0.0
+            wentAround = emptyList()
             updateEvent(null)
             return null
         }
 
         // 2. go around anything in that way
         val inTheWay = blockers.filter { plan.curve.passesThrough(it) }
+        wentAround = inTheWay
         val detour = if (inTheWay.isEmpty()) null else detourAround(inTheWay, sourceOutlines, targetOutlines, _lateralShift())
         val curveModel = detour?.first ?: plan.curve
         val headSide = detour?.second ?: plan.headSide
@@ -360,13 +363,8 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         if (route.sourceSide == route.targetSide) {
             val between = (targetOutlines.center - sourceOutlines.center).norm
             if (abs(sourceSide.unitNormal dot between) >= 0.5) return null
-            val tail = sourceSide.tailOffset(0.0)
-            val head = targetSide.headOffset(0.0)
-            val outward = sourceSide.unitNormal
-            val reach = (sourceOutlines.corners() + targetOutlines.corners()).maxOf { it dot outward } + DETOUR_CLEARANCE
-            val start = ((tail dot outward) + (head dot outward)) / 2
-            val bow = max(MINIMUM_BOW, (reach - start) / 0.75)
-            val curve = cubicBezier(tail, tail + outward * bow, head + outward * bow, head)
+            val past = sourceOutlines.corners() + targetOutlines.corners()
+            val (_, curve) = bowPast(past, sourceSide.tailOffset(0.0), targetSide.headOffset(0.0), sourceSide.unitNormal)
             return Plan(curve, targetSide, route, hasOwnLane = true)
         }
         val ends = endsBetween(sourceSide, targetSide, _lateralShift())
@@ -417,6 +415,21 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
     private fun RectangleSides.corners() = listOf(top.p1, top.p2, bottom.p1, bottom.p2)
 
+    /**
+     * A curve from [tail] to [head] that leaves and arrives square to [outward] and bows out that way, far enough
+     * to pass [corners] with room to spare for what is drawn on the arrow.
+     *
+     * @return how far the curve bows, and the curve
+     */
+    private fun bowPast(corners: List<Point2D>, tail: Point2D, head: Point2D, outward: Point2D): Pair<Double, CubicCurve2D> {
+        // How far out the corners reach on this side, and how far out the ends of the arrow are
+        val reach = corners.maxOf { it dot outward } + DETOUR_CLEARANCE
+        val start = ((tail dot outward) + (head dot outward)) / 2
+        // The middle of a curve bowed by a distance is three quarters of that distance out
+        val bow = max(MINIMUM_BOW, (reach - start) / 0.75)
+        return bow to cubicBezier(tail, tail + outward * bow, head + outward * bow, head)
+    }
+
     /** The shaft of the arrow as last laid out, or null before then or where no arrow could be drawn. */
     var shaft: CubicCurve2D? = null
         private set
@@ -429,6 +442,12 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
     var isDetour = false
         private set
 
+    /** The curve the arrow would have taken when last laid out had nothing been in its way. */
+    private var planned: CubicCurve2D? = null
+
+    /** What was in the way of the [planned] curve when the arrow was last laid out. */
+    private var wentAround: List<Rectangle2D> = emptyList()
+
     /**
      * Whether the arrow as last laid out runs clear of the arrow that runs the other way between the same two
      * layers, rather than beside it in the gap between them: it goes around something, or attaches around the
@@ -438,10 +457,14 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         private set
 
     /**
-     * Whether the arrow would be laid out differently among [blockers] than it last was: it goes around something,
-     * which may have moved, or something is now in its way.
+     * Whether the arrow would be laid out differently among [blockers] than it last was: what is in its way is not
+     * what was in its way then.
      */
-    fun affectedBy(blockers: List<Rectangle2D>) = isDetour || (shaft?.let { curve -> blockers.any { curve.passesThrough(it) } } ?: false)
+    fun affectedBy(blockers: List<Rectangle2D>) =
+        planned?.let { curve -> blockers.filter { curve.passesThrough(it) } != wentAround } ?: false
+
+    /** Whether an arrow along [curve] would pass through any of [blockers], and so be drawn around it instead. */
+    fun isBlocked(curve: CubicCurve2D, blockers: List<Rectangle2D>) = blockers.any { curve.passesThrough(it) }
 
     private fun CubicCurve2D.passesThrough(blocker: Rectangle2D) =
         (0..SAMPLES_ALONG_CURVE).any { blocker.contains(p(it.toDouble() / SAMPLES_ALONG_CURVE)) }
@@ -450,7 +473,8 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
      * A way from the source to the target around [inTheWay], which the usual way passes through. The arrow leaves
      * one side of the source and arrives at the same side of the target, bowing outward far enough to pass what is
      * in the way with room to spare for what is drawn on the arrow. Of the sides that face across the line from the
-     * source to the target, it takes the one that needs the smaller bow.
+     * source to the target, it takes the one that needs the smaller bow. One of two arrows between the same layers
+     * takes the side to the right of its direction instead, so that the two go around on opposite sides.
      *
      * @return the curve and the side of the target it arrives at
      */
@@ -461,19 +485,27 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
         requestedShift: Double
     ): Pair<CubicCurve2D, Line2D>? {
         val between = (targetOutlines.center - sourceOutlines.center).norm
-        return sourceOutlines.toList().zip(targetOutlines.toList())
+        val besideAnother = requestedShift > 0.0
+        val sides = sourceOutlines.toList().zip(targetOutlines.toList())
             .filter { (sourceSide, _) -> abs(sourceSide.unitNormal dot between) < 0.5 }
+        if (besideAnother) {
+            val toTheRight = point(-between.y, between.x)
+            val (sourceSide, targetSide) = sides.maxByOrNull { (sourceSide, _) -> sourceSide.unitNormal dot toTheRight }
+                ?: return null
+            // The side is not shared with the other arrow, which goes around on the opposite one
+            val (_, curve) = bowPast(
+                inTheWay.flatMap { it.vertices.toList() }, sourceSide.tailOffset(0.0), targetSide.headOffset(0.0),
+                sourceSide.unitNormal
+            )
+            return curve to targetSide
+        }
+        return sides
             .map { (sourceSide, targetSide) ->
-                val shift = shiftFor(sourceSide, targetSide, requestedShift)
-                val tail = sourceSide.tailOffset(shift)
-                val head = targetSide.headOffset(shift)
-                val outward = sourceSide.unitNormal
-                // How far out what is in the way reaches on this side, and how far out the ends of the arrow are
-                val reach = inTheWay.maxOf { blocker -> blocker.corners().maxOf { it dot outward } } + DETOUR_CLEARANCE
-                val start = ((tail dot outward) + (head dot outward)) / 2
-                // The middle of a curve bowed by a distance is three quarters of that distance out
-                val bow = max(MINIMUM_BOW, (reach - start) / 0.75)
-                Triple(bow, cubicBezier(tail, tail + outward * bow, head + outward * bow, head), targetSide)
+                val (bow, curve) = bowPast(
+                    inTheWay.flatMap { it.vertices.toList() }, sourceSide.tailOffset(0.0), targetSide.headOffset(0.0),
+                    sourceSide.unitNormal
+                )
+                Triple(bow, curve, targetSide)
             }
             .minByOrNull { it.first }
             ?.let { it.second to it.third }
@@ -524,8 +556,6 @@ class BezierArrow(template: BezierArrowTemplate) : PNode() {
 
     private val RectangleSides.center
         get() = point((left.midPoint.x + right.midPoint.x) / 2, (top.midPoint.y + bottom.midPoint.y) / 2)
-
-    private fun Rectangle2D.corners() = listOf(point(x, y), point(maxX, y), point(x, maxY), point(maxX, maxY))
 
     /**
      * How far from the middle of the sides it joins the arrow attaches, given how far it was asked to. The same at

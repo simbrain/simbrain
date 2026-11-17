@@ -16,6 +16,7 @@ import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.core.addNeurons
 import org.simbrain.network.gui.nodes.WeightMatrixNode
@@ -274,6 +275,127 @@ class ConnectorPlacementTest {
 
         assertEquals(40.0, skipArrow().width, 1.0, "The arrow should run straight up again")
         assertTrue(panel.canvasBoundsReport().settled)
+    }
+
+    @Test
+    fun `an arrow between two collections inside a larger one runs straight between them`() {
+        val network = Network()
+        val neurons = runBlocking { network.addNeurons(10) }
+        onEdt {
+            neurons.forEachIndexed { index, neuron ->
+                neuron.location = Point2D.Double(index * 45.0 + (if (index >= 5) 300.0 else 0.0), 0.0)
+            }
+        }
+        val left = NeuronCollection(neurons.take(5))
+        val right = NeuronCollection(neurons.drop(5))
+        val all = NeuronCollection(neurons)
+        val matrix = WeightMatrix(left, right)
+        val panel = panelFor(network, left, right, all, matrix)
+
+        assertFalse(onEdt { panel.arrowOf(matrix).isDetour }, "The arrow should not try to go around what it is inside")
+        val image = panel.imageOf(matrix)
+        assertTrue(image.x > panel.footprintOf(left).maxX && image.maxX < panel.footprintOf(right).x, "image $image")
+        assertEquals(panel.footprintOf(left).centerY, image.centerY, 40.0, "image $image")
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair with a layer between their layers go around it on opposite sides`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val up = WeightMatrix(bottom, top)
+        val down = WeightMatrix(top, bottom)
+        val panel = panelFor(Network(), bottom, middle, top, up, down)
+
+        val inTheWay = panel.footprintOf(middle)
+        val arrows = listOf(up, down).map { matrix -> onEdt { panel.arrowOf(matrix).globalFullBounds } }
+        assertTrue(arrows.any { it.maxX > inTheWay.maxX + 40.0 } && arrows.any { it.x < inTheWay.x - 40.0 }, "arrows $arrows")
+        val going = panel.shaftPointsOf(up)
+        val coming = panel.shaftPointsOf(down)
+        val nearest = going.minOf { a -> coming.minOf { b -> a.distance(b) } }
+        assertTrue(nearest > 30.0, "The arrows come within $nearest of each other")
+        assertFalse(panel.footprintOf(up).intersects(panel.footprintOf(down)))
+    }
+
+    @Test
+    fun `an arrow that goes around a layer is not drawn again when nothing it depends on has changed`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val skip = WeightMatrix(bottom, top)
+        val elsewhere = arrayAt(900.0, -200.0)
+        val panel = panelFor(Network(), bottom, middle, top, skip, elsewhere)
+        assertTrue(onEdt { panel.arrowOf(skip).isDetour })
+        val drawn = onEdt { panel.arrowOf(skip).getChild(0) }
+
+        onEdt { elsewhere.location = Point2D.Double(950.0, -260.0) }
+        panel.awaitCanvasIdle()
+
+        assertTrue(onEdt { panel.arrowOf(skip).getChild(0) } === drawn, "The arrow was drawn again")
+    }
+
+    @Test
+    fun `panning the view does not lay the connectors out again, and zooming out past full size does`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -300.0)
+        val matrix = WeightMatrix(source, target)
+        val panel = panelFor(Network(), source, target, matrix)
+        panel.awaitCanvasIdle()
+        val before = onEdt { panel.connectionLayout.passes }
+
+        onEdt { panel.canvas.camera.translateView(40.0, 25.0) }
+        panel.awaitCanvasIdle()
+        assertEquals(before, onEdt { panel.connectionLayout.passes })
+
+        onEdt { panel.canvas.camera.viewScale = 0.5 }
+        panel.awaitCanvasIdle()
+        assertTrue(onEdt { panel.connectionLayout.passes } > before)
+        // The label box is drawn larger, and still sits on top of the image
+        val node = onEdt { panel.getNode(matrix) as WeightMatrixNode }
+        assertEquals(
+            onEdt { node.imageBox.globalBounds.y }, onEdt { node.interactionBox.globalFullBounds.maxY }, 1.0
+        )
+    }
+
+    @Test
+    fun `a matrix given a longer label keeps its label box centered over its image`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -300.0)
+        val matrix = WeightMatrix(source, target)
+        val panel = panelFor(Network(), source, target, matrix)
+        val node = onEdt { panel.getNode(matrix) as WeightMatrixNode }
+
+        onEdt { matrix.label = "A much longer label than it had" }
+        panel.awaitCanvasIdle()
+
+        assertEquals(panel.imageOf(matrix).centerX, onEdt { node.interactionBox.globalFullBounds.centerX }, 1.0)
+    }
+
+    @Test
+    fun `a synapse group given a longer label keeps its label box centered on its arrow`() {
+        val network = Network()
+        val neurons = runBlocking { network.addNeurons(8) }
+        onEdt {
+            neurons.forEachIndexed { index, neuron ->
+                neuron.location = Point2D.Double((index % 4) * 45.0, if (index >= 4) -300.0 else 0.0)
+            }
+        }
+        val below = NeuronCollection(neurons.take(4))
+        val above = NeuronCollection(neurons.drop(4))
+        val group = SynapseGroup(below, above).apply {
+            autoVisibility = false
+            displaySynapses = false
+        }
+        val panel = panelFor(network, below, above, group)
+        panel.awaitCanvasIdle()
+        fun labelCenter() = onEdt { panel.getNode(group)!!.footprint.let { Point2D.Double(it.centerX, it.centerY) } }
+        val before = labelCenter()
+
+        onEdt { group.label = "A much longer label than it had" }
+        panel.awaitCanvasIdle()
+
+        assertEquals(before.x, labelCenter().x, 1.0)
+        assertEquals(before.y, labelCenter().y, 1.0)
     }
 
     @Test

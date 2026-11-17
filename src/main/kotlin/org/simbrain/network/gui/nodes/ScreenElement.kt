@@ -6,7 +6,7 @@
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.CoroutineScope
-import org.piccolo2d.PCamera
+import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.event.PInputEventFilter
@@ -25,7 +25,6 @@ import org.simbrain.util.piccolo.ScopedNode
 import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.nodeScopeIn
 import java.awt.event.InputEvent
-import java.beans.PropertyChangeListener
 import javax.swing.JPopupMenu
 import javax.swing.SwingUtilities
 
@@ -98,7 +97,7 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * element, such as a connector's arrow or a subnetwork's outline, is laid out against this, so that it does not
      * shift when the element is selected. A label box counts at its full size, though it is drawn larger when the
      * view is zoomed out, so that zooming moves nothing either. An element that does not say otherwise counts
-     * everything in its node.
+     * everything in its node but its handles.
      */
     val footprint: PBounds
         get() {
@@ -109,35 +108,21 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
         }
 
     /** Measures the [footprint]. Called once the node's own layout is up to date. */
-    protected open fun measureFootprint(): PBounds = globalFullBounds
+    protected open fun measureFootprint(): PBounds {
+        if (childrenReference.none { it is NodeHandle }) return globalFullBounds
+        val counted = PBounds()
+        if (!boundsReference.isEmpty) counted.add(boundsReference)
+        childrenReference.filterIsInstance<PNode>().forEach { child ->
+            if (child !is NodeHandle && !child.fullBoundsReference.isEmpty) counted.add(child.fullBoundsReference)
+        }
+        return PBounds(localToGlobal(counted))
+    }
 
     /** Whether connectors keep what they draw on their arrows clear of this element, as they do of a layer. */
     open val isConnectorObstacle: Boolean get() = false
 
-    private var viewListener: PropertyChangeListener? = null
-
     /** Have the panel lay this connector out again, once however many times it is asked before it does. */
     protected fun LaidOutConnector.requestLayout() = networkPanel.connectionLayout.request(this)
-
-    /**
-     * Place what connectors draw again whenever the view pans or zooms. Label boxes are drawn larger as the view
-     * zooms out, and a label box that sits on top of a drawing has to stay on top of it. Nothing else moves: the
-     * layout is worked out for label boxes at full size. Ends when the node is disposed.
-     */
-    protected fun LaidOutConnector.layoutWithView() {
-        if (viewListener != null) return
-        val listener = PropertyChangeListener { networkPanel.connectionLayout.requestPlacement() }
-        viewListener = listener
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, listener)
-    }
-
-    override fun dispose() {
-        super.dispose()
-        viewListener?.let {
-            networkPanel.canvas.camera.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, it)
-        }
-        viewListener = null
-    }
 
     /**
      * Return true if this screen element accepts a source [NodeHandle].

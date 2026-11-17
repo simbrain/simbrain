@@ -13,7 +13,9 @@
  * clear, which is left overlapping instead.
  *
  * Where it cannot be clear of everything, it is kept clear of layers first, since layers are drawn over it and
- * would hide it, and overlaps other drawings as little as it can.
+ * would hide it, and overlaps other drawings as little as it can. A layer that both ends of the arrow are inside,
+ * as a collection is that contains the two collections the arrow joins, is not kept clear of, since nowhere on the
+ * arrow is clear of it.
  *
  * Drawings that would collide if each were placed as though the others were not there are placed together instead:
  * all of them are moved the same way along their arrows, and if that is not enough the largest of them are shrunk
@@ -194,7 +196,7 @@ object ShaftPlacer {
 
         // The arrow's own ends limit the drawing as its layers do
         val ends = ownLayers + listOfNotNull(arrowhead(shaft), farHalf(shaft).takeIf { shared })
-        val otherLayers = layers.filter { layer -> ownLayers.none { it == layer } }
+        val otherLayers = layersToClear(layers, shaft, ownLayers)
         // What the drawing has to have room for beside a layer before its room beside other drawings counts
         val leastSide = drawing.minSide
 
@@ -281,6 +283,15 @@ object ShaftPlacer {
         return if (squareClear.side > allClear.side + SIZE_TOLERANCE) squareClear else allClear
     }
 
+    /**
+     * Those of [layers] that a drawing on [shaft] is kept clear of as layers the arrow does not join: not the two
+     * it does join, and not one that both ends of the shaft are inside.
+     */
+    private fun layersToClear(layers: List<Rectangle2D>, shaft: CubicCurve2D, ownLayers: List<Rectangle2D>) =
+        layers.filter { layer ->
+            ownLayers.none { it == layer } && !(layer.contains(shaft.p1) && layer.contains(shaft.p2))
+        }
+
     /** Place [item] as [place] does. */
     fun place(item: ShaftItem, layers: List<Rectangle2D>, drawings: List<Rectangle2D> = emptyList()) =
         place(
@@ -319,7 +330,11 @@ object ShaftPlacer {
         val result = arrayOfNulls<ShaftPlacement>(items.size)
         for (group in collidingGroups(items, alone)) {
             val placements = if (group.size == 1) {
-                listOf(place(items[group.single()], layers, placed))
+                val index = group.single()
+                // Where it went alone still stands unless a group placed since has come to where that is
+                val taken = items[index].footprint(alone[index]).grownBy(MARGIN)
+                val since = placed.subList(fixed.size, placed.size)
+                listOf(if (since.none { it.intersects(taken) }) alone[index] else place(items[index], layers, placed))
             } else {
                 placeTogether(group.map { items[it] }, group.map { alone[it] }, layers, placed)
             }
@@ -348,10 +363,7 @@ object ShaftPlacer {
             return root
         }
         for (i in items.indices) {
-            val grown = Rectangle2D.Double(
-                footprints[i].x - MARGIN, footprints[i].y - MARGIN,
-                footprints[i].width + 2 * MARGIN, footprints[i].height + 2 * MARGIN
-            )
+            val grown = footprints[i].grownBy(MARGIN)
             for (j in i + 1 until items.size) {
                 if (grown.intersects(footprints[j])) groupOf[max(find(i), find(j))] = min(find(i), find(j))
             }
@@ -377,7 +389,7 @@ object ShaftPlacer {
         drawings: List<Rectangle2D> = emptyList()
     ): List<ShaftPlacement> {
         val ends = items.map { it.ownLayers + listOfNotNull(arrowhead(it.shaft), farHalf(it.shaft).takeIf { _ -> it.shared }) }
-        val otherLayers = items.map { item -> layers.filter { layer -> item.ownLayers.none { it == layer } } }
+        val otherLayers = items.map { item -> layersToClear(layers, item.shaft, item.ownLayers) }
         val largest = alone.maxOf { it.side }
         // What every drawing has to have room for beside a layer before its room beside other drawings counts
         val leastSide = items.filter { it.drawing.hasSquare }.maxOfOrNull { it.drawing.minSide } ?: 0.0
@@ -494,6 +506,9 @@ object ShaftPlacer {
             ShaftPlacement(center.x, center.y, side, positions[index], min(alone[index].room, limit))
         }
     }
+
+    private fun Rectangle2D.grownBy(margin: Double) =
+        Rectangle2D.Double(x - margin, y - margin, width + 2 * margin, height + 2 * margin)
 
     private fun CubicCurve2D.arcLength(): Double {
         var length = 0.0

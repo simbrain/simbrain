@@ -105,9 +105,22 @@ class ShaftPlacementTest {
         val layers = listOf(layerBelow, layerAbove(120.0))
         val covering = Rectangle2D.Double(-200.0, -200.0, 400.0, 250.0)
 
-        val placement = ShaftPlacer.place(shaft, image, layers = layers + covering, ownLayers = layers)
+        val placement = ShaftPlacer.place(shaft, image, layers = layers, drawings = listOf(covering), ownLayers = layers)
 
         assertEquals(image.minSide, placement.side, 1e-9)
+    }
+
+    @Test
+    fun `a layer that both ends of the arrow are inside does not count as in the way`() {
+        val shaft = upwardShaft(300.0)
+        val layers = listOf(layerBelow, layerAbove(300.0))
+        val alone = ShaftPlacer.place(shaft, image, layers = layers, ownLayers = layers)
+        val around = Rectangle2D.Double(-200.0, -500.0, 400.0, 600.0)
+
+        val placement = ShaftPlacer.place(shaft, image, layers = layers + around, ownLayers = layers)
+
+        assertEquals(alone.side, placement.side, 1e-9)
+        assertEquals(alone.centerY, placement.centerY, 1e-9)
     }
 
     @Test

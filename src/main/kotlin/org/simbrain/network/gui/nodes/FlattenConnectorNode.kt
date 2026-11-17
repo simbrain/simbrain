@@ -5,6 +5,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
+import org.simbrain.network.gui.JoinedLayers
 import org.simbrain.network.gui.LaidOutConnector
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSelectionEditDialog
@@ -67,48 +68,36 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
         }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
-        layoutWithView()
     }
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
     }
 
-    /** The space taken up by the two layers the connector joins. */
-    private fun ownLayers(): List<Rectangle2D> = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
-
-    /** The space the two layers took up when the arrow was last drawn. */
-    private var drawnBetween: List<Rectangle2D>? = null
-
-    /** The space taken up by the layers in [layers] that the connector does not join. */
-    private fun otherLayers(layers: List<Rectangle2D>): List<Rectangle2D> {
-        val own = ownLayers()
-        return layers.filter { layer -> own.none { it == layer } }
-    }
+    /** The two layers the connector joins. */
+    private val joined = JoinedLayers({ sourceNode }, { targetNode })
 
     override fun layoutArrow(layers: List<Rectangle2D>) {
-        drawnBetween = ownLayers()
-        val srcBodyBounds = sourceNode?.globalBounds ?: return
-        val tgtBodyBounds = targetNode?.globalBounds ?: return
-        val srcTopBounds = sourceNode?.footprint ?: return
-        val tgtTopBounds = targetNode?.footprint ?: return
+        joined.arrowDrawn()
+        val source = sourceNode ?: return
+        val target = targetNode ?: return
         shaft = arrow.layout(
-            directionalOutlines(srcTopBounds, srcBodyBounds),
-            directionalOutlines(tgtTopBounds, tgtBodyBounds),
+            directionalOutlines(source.footprint, source.globalBounds),
+            directionalOutlines(target.footprint, target.globalBounds),
             false,
-            otherLayers(layers)
+            joined.blockers(layers)
         )
     }
 
-    /** One of the two layers changed since the arrow was drawn, or another layer is or was in the arrow's way. */
+    /** One of the two layers changed since the arrow was drawn, or the layers in the arrow's way have. */
     override fun arrowAffectedBy(layers: List<Rectangle2D>) =
-        ownLayers() != drawnBetween || arrow.affectedBy(otherLayers(layers))
+        joined.changedSinceDrawn || arrow.affectedBy(joined.blockers(layers))
 
     /** The label box, to be placed on the arrow's shaft. */
     override fun drawingToPlace(): ShaftItem? {
         val curve = shaft ?: return null
         return ShaftItem(
-            curve, interactionBox.asShaftDrawing(), ownLayers = listOfNotNull(sourceNode?.footprint, targetNode?.footprint)
+            curve, interactionBox.asShaftDrawing(), ownLayers = joined.footprints()
         )
     }
 

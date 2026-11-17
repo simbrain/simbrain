@@ -701,7 +701,7 @@ class CnnTrainer(
         denseLayers.forEach { layer ->
             config.weightInitializationStrategy.initializeWeights(layer.sourceWeightMatrix)
             val targetLayer = layer.sourceWeightMatrix.target as ArrayLayer
-            targetLayer.biasArray.fill(0.0)
+            targetLayer.biases.fill(0.0)
             targetLayer.events.updated.fire()
             layer.syncFromNetwork()
             layer.clearGrads()

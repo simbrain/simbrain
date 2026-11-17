@@ -385,4 +385,21 @@ class ConvolutionalNeuralNetworkTest {
             assertEquals(0.5, it.increment)
         }
     }
+
+    @Test
+    fun `randomize zeroes dense layer biases`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply { isClamped = true }
+        val flatArray = NeuronArray(4)
+        val outputArray = NeuronArray(2)
+        FlattenConnector(inputTensorLayer, flatArray)
+        WeightMatrix(flatArray, outputArray)
+        val cnn = ConvolutionalNeuralNetwork(inputTensorLayer, outputArray)
+        net.addNetworkModelAsync(cnn)
+        outputArray.biases.fill(0.7)
+
+        cnn.randomize()
+
+        assertArrayEquals(doubleArrayOf(0.0, 0.0), outputArray.biasArray, 0.0)
+    }
 }

@@ -289,4 +289,23 @@ class CnnTrainerTest {
 
         assertArrayEquals(doubleArrayOf(0.2, 0.3, 0.4, 0.5), source.gradients, 1e-12)
     }
+
+    @Test
+    fun `initializing parameters zeroes dense layer biases`() {
+        val net = Network()
+        val inputTensorLayer = TensorLayer(TensorShape(2, 2, 1)).apply { isClamped = true }
+        val flatArray = NeuronArray(4)
+        val outputArray = NeuronArray(2)
+        val flatten = FlattenConnector(inputTensorLayer, flatArray)
+        val dense = WeightMatrix(flatArray, outputArray)
+        listOf(inputTensorLayer, flatArray, flatten, outputArray, dense).forEach {
+            net.addNetworkModelAsync(it, usePlacementManager = false)
+        }
+        val trainer = CnnTrainer(net, inputTensorLayer, outputArray, CnnTrainerConfig())
+        outputArray.biases.fill(0.7)
+
+        trainer.initParameters()
+
+        assertArrayEquals(doubleArrayOf(0.0, 0.0), outputArray.biasArray, 0.0)
+    }
 }

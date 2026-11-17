@@ -155,7 +155,7 @@ class ConvolutionalNeuralNetwork(
             it.events.updated.fire()
         }
         denseNeuronArrays.forEach {
-            it.biasArray.fill(0.0)
+            it.biases.fill(0.0)
             it.events.updated.fire()
         }
     }

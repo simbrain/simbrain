@@ -768,4 +768,50 @@ class OptimizerTest {
         }
     }
 
+    @Test
+    fun `config learning rate is the current optimizer's`() {
+        val config = SupervisedTrainerConfig()
+        config.optimizer = BasicOptimizer()
+        config.learningRate = 0.1
+        assertEquals(0.1, config.optimizer.learningRate)
+
+        config.optimizer = AdamOptimizer().apply { learningRate = 0.3 }
+        assertEquals(0.3, config.learningRate)
+
+        val copy = config.copy()
+        copy.learningRate = 0.2
+        assertEquals(0.2, copy.optimizer.learningRate)
+        assertEquals(0.3, config.optimizer.learningRate)
+    }
+
+    @Test
+    fun `config learning rate survives saving and loading`() {
+        val config = SupervisedTrainerConfig()
+        config.optimizer = BasicOptimizer().apply { learningRate = 0.02 }
+
+        val loaded = getSimbrainXStream().fromXML(getSimbrainXStream().toXML(config)) as SupervisedTrainerConfig
+
+        assertEquals(0.02, loaded.optimizer.learningRate)
+        loaded.learningRate = 0.5
+        assertEquals(0.5, loaded.optimizer.learningRate)
+    }
+
+    @Test
+    fun `a learning rate saved beside the optimizer does not replace the optimizer's own`() {
+        val besideOptimizer = "<learningRate>0.01</learningRate>"
+        val optimizer = """
+            <optimizer class="org.simbrain.network.trainers.BasicOptimizer">
+              <momentum>0.8</momentum>
+              <learningRate>0.02</learningRate>
+            </optimizer>"""
+        listOf(besideOptimizer + optimizer, optimizer + besideOptimizer).forEach { body ->
+            val xml = """
+                <org.simbrain.network.trainers.SupervisedTrainerConfig>$body
+                </org.simbrain.network.trainers.SupervisedTrainerConfig>"""
+            val loaded = getSimbrainXStream().fromXML(xml) as SupervisedTrainerConfig
+            assertEquals(0.02, loaded.optimizer.learningRate)
+            assertEquals(0.02, loaded.learningRate)
+        }
+    }
+
 }

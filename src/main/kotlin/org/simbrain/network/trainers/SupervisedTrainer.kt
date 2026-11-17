@@ -15,6 +15,7 @@ import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.sumOfSquares
 import org.simbrain.util.UserParameter
+import org.simbrain.util.XStreamNotRestored
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -113,7 +114,16 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     override val name = "Optimizer properties"
 
-    var learningRate by optimizer::learningRate
+    /**
+     * The current [optimizer]'s learning rate. It is saved with the optimizer, and a value saved under this name is not
+     * read back, since it could be applied after the optimizer's own.
+     */
+    @XStreamNotRestored
+    var learningRate: Double
+        get() = optimizer.learningRate
+        set(value) {
+            optimizer.learningRate = value
+        }
 
     fun <T: SupervisedTrainerConfig> copyCurrentInto(toCopy: T) = toCopy.also {
         it.lossFunction = lossFunction

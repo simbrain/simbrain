@@ -26,7 +26,7 @@ class CommandConsolePanelSnapshot : UiSnapshotDef {
             panel = CommandConsolePanel(workspace).apply { preferredSize = Dimension(640, 420) }
         }
         runBlocking {
-            listOf("ls net1", "cd net1", "add neurons 3 rule=Sigmoidal", "set Neuron_3 activation=0.5", "ls where activation>0.4", "get Neuron_* activation", "show Neuron_3 | grep rule", "help connect", "run 10").forEach { panel.submit(it).join() }
+            listOf("ls net1", "cd net1", "add neurons 3 updateRule=Sigmoidal", "set Neuron_3 activation=0.5", "ls where activation>0.4", "get Neuron_* activation", "show Neuron_3 | grep rule", "help connect", "run 10").forEach { panel.submit(it).join() }
         }
         return panel
     }

@@ -1,7 +1,9 @@
 /**
  * The Simbrain command language: a line is a command name followed by words and `key=value` options, and the workspace
  * is navigated like a filesystem of components and their contents. A bare name is found wherever it is, as long as it
- * is in only one place. Paths may use `*`, `?`, `**`, and shell-style `{1..10}` ranges, and `@` stands for what is
+ * is in only one place. Names are given in full, in any case: a command never acts on a guess at what a partial or
+ * approximate name means, and completion is where such a name is turned into a real one (see [looseMatches]).
+ * Paths may use `*`, `?`, `**`, and shell-style `{1..10}` ranges, and `@` stands for what is
  * selected in the GUI. A `where` condition at the end of a line filters what a command acts on, and numeric values
  * can be expressions evaluated for each object (see `Expressions.kt`). Output can be filtered with `| grep`. There
  * are deliberately no variables or loops.
@@ -37,6 +39,7 @@ import kotlin.math.abs
 
 private const val MAX_LISTED = 500
 private const val MAX_PLACES = 5
+private const val MAX_COMPLETIONS_EVERYWHERE = 50
 private const val MAX_EXPANSION = 100_000
 private const val PROGRESS_INTERVAL = 256
 private const val SEARCH_REPORT_INTERVAL = 1024
@@ -323,12 +326,16 @@ class CommandShell(
         }
     }
 
-    fun notFound(path: String) =
-        if (isPattern(path) && !path.startsWith("/") && !path.startsWith("**")) {
-            "Not found: $path. To look everywhere, use **/$path."
-        } else {
-            "Not found: $path"
+    /** Says that nothing has this path, and what it may have been meant to be. */
+    fun notFound(path: String): String {
+        if (isPattern(path)) {
+            return if (!path.startsWith("/") && !path.startsWith("**")) "Not found: $path. To look everywhere, use **/$path." else "Not found: $path"
         }
+        val close = runCatching { pathCandidates(path) }.getOrDefault(emptyList()).map { quoted(it.text) }
+        if (close.isEmpty()) return "Not found: $path"
+        return "Not found: $path. Did you mean ${close.take(MAX_PLACES).joinToString(", ")}" +
+                (if (close.size > MAX_PLACES) ", ..." else "") + "? Tab completes names."
+    }
 
     /**
      * Find what a command acts on: what a path refers to, or the GUI selection for `@`, filtered by the command's
@@ -426,16 +433,31 @@ class CommandShell(
         }
     }
 
-    fun wordCandidates(words: Collection<String>, partial: String) =
-        words.filter { it.startsWith(partial, ignoreCase = true) }.map { Candidate(it) }
+    fun wordCandidates(words: Collection<String>, partial: String) = looseMatches(words, partial).map { Candidate(it) }
 
+    /**
+     * Completions for a path: what the last part of it could mean among the contents of what comes before, or for a
+     * name by itself that is not in the current location, where it could be anywhere in the workspace.
+     */
     fun pathCandidates(partial: String): List<Candidate> {
         val prefix = partial.substring(0, partial.lastIndexOf('/') + 1)
         val parent = if (prefix.isEmpty()) current else resolveQuietly(prefix).singleOrNull() ?: return emptyList()
-        val children = childrenOf(parent.value) ?: return emptyList()
-        return children
-            .filterKeys { it.startsWith(partial.removePrefix(prefix), ignoreCase = true) }
-            .map { (name, child) -> Candidate(prefix + name, if (childrenOf(child) != null) "/" else " ") }
+        val children = childrenOf(parent.value).orEmpty()
+        val typed = partial.removePrefix(prefix)
+        val local = looseMatches(children.keys, typed)
+            .map { name -> Candidate(prefix + name, if (childrenOf(children.getValue(name)) != null) "/" else " ") }
+        return if (local.isNotEmpty() || prefix.isNotEmpty()) local else candidatesEverywhere(typed)
+    }
+
+    private fun candidatesEverywhere(typed: String): List<Candidate> {
+        val wanted = normalized(typed)
+        if (wanted.isEmpty()) return emptyList()
+        fun names(node: Node) = listOfNotNull(node.name, (node.value as? NetworkModel)?.label).map(::normalized)
+        fun matching(test: (String) -> Boolean) =
+            distinctValues(descendants(root).filter { node -> names(node).any(test) }.take(MAX_COMPLETIONS_EVERYWHERE).toList())
+        val found = matching { it.startsWith(wanted) }.ifEmpty { matching { wanted in it } }
+        val fromWorkspace = if (current.path.isEmpty()) "" else "/"
+        return found.map { Candidate(fromWorkspace + it.path.joinToString("/"), if (childrenOf(it.value) != null) "/" else " ") }
     }
 
     private fun walk(start: Node, segments: List<String>, lookup: Lookup = Lookup()): List<Node> =
@@ -455,12 +477,22 @@ class CommandShell(
         return names.map { Node(node.path + it, children.getValue(it)) }
     }
 
-    /** Prefers an exact match, then a match ignoring case, then a label, then a match ignoring punctuation. */
+    /** Prefers an exact match, then a match ignoring case, then a label. */
     private fun findChildName(children: Map<String, Any>, segment: String): String? =
         segment.takeIf { it in children }
             ?: children.keys.filter { it.equals(segment, ignoreCase = true) }.singleOrNull()
             ?: children.filterValues { (it as? NetworkModel)?.label.equals(segment, ignoreCase = true) }.keys.singleOrNull()
-            ?: children.keys.filter { looselyEqual(it, segment) }.singleOrNull()
+}
+
+/**
+ * The names a partly typed word could be completed to: those that start with it, or failing that those that start
+ * with it ignoring punctuation, as Neuron_1 does for neuron1, or failing that those that contain it.
+ */
+fun looseMatches(names: Collection<String>, typed: String): List<String> {
+    val starting = names.filter { it.startsWith(typed, ignoreCase = true) }
+    val wanted = normalized(typed)
+    if (starting.isNotEmpty() || wanted.isEmpty()) return starting
+    return names.filter { normalized(it).startsWith(wanted) }.ifEmpty { names.filter { wanted in normalized(it) } }
 }
 
 /**
@@ -483,36 +515,26 @@ private class Lookup(val tick: () -> Unit = {}) {
         (names ?: NameIndex(everything()).also { names = it }).matching(segment)
 }
 
-/**
- * Nodes by the names they can be found under: their name or label ignoring case, or their name ignoring punctuation
- * as well, so that neuron1 finds Neuron_1.
- */
+/** Nodes by the names they can be found under: their name or their label, ignoring case. */
 private class NameIndex(nodes: Sequence<Node>) {
 
     private val position = IdentityHashMap<Node, Int>()
     private val byName = HashMap<String, MutableList<Node>>()
     private val byLabel = HashMap<String, MutableList<Node>>()
-    private val byLooseName = HashMap<String, MutableList<Node>>()
 
     init {
         for (node in nodes) {
             position[node] = position.size
             byName.getOrPut(node.name.lowercase()) { mutableListOf() } += node
             (node.value as? NetworkModel)?.label?.let { label -> byLabel.getOrPut(label.lowercase()) { mutableListOf() } += node }
-            normalized(node.name).takeIf { it.isNotEmpty() }?.let { loose -> byLooseName.getOrPut(loose) { mutableListOf() } += node }
         }
     }
 
     fun matching(segment: String): List<Node> {
         val lowercase = segment.lowercase()
-        return (byName[lowercase].orEmpty() + byLabel[lowercase].orEmpty() + byLooseName[normalized(segment)].orEmpty())
-            .distinct()
-            .sortedBy { position.getValue(it) }
+        return (byName[lowercase].orEmpty() + byLabel[lowercase].orEmpty()).distinct().sortedBy { position.getValue(it) }
     }
 }
-
-/** Equal ignoring case and punctuation, so that neuron1 matches Neuron_1. */
-private fun looselyEqual(name: String, typed: String) = normalized(typed).let { it.isNotEmpty() && it == normalized(name) }
 
 /** The `where` condition of the running command. */
 private class WhereCondition(val expression: Expression) : AbstractCoroutineContextElement(WhereCondition) {

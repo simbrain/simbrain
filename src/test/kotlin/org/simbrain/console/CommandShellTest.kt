@@ -283,7 +283,7 @@ class CommandShellTest {
     @Test
     fun `set replaces an update rule by name and reaches into it`() {
         val shell = shellWithNetwork()
-        shell.run("set net1/Neuron_1 rule=Sigmoidal updateRule.slope=2")
+        shell.run("set net1/Neuron_1 updateRule=Sigmoidal updateRule.slope=2")
         val rule = shell.neuron("Neuron_1").updateRule
         assertTrue(rule is SigmoidalRule, rule.toString())
         assertEquals(2.0, (rule as SigmoidalRule).slope)
@@ -292,7 +292,7 @@ class CommandShellTest {
     @Test
     fun `set gives each object its own update rule`() {
         val shell = shellWithNetwork()
-        shell.run("set net1/Neuron_* rule=Sigmoidal")
+        shell.run("set net1/Neuron_* updateRule=Sigmoidal")
         assertNotSame(shell.neuron("Neuron_1").updateRule, shell.neuron("Neuron_2").updateRule)
     }
 
@@ -319,7 +319,8 @@ class CommandShellTest {
             shell.run("set net1/Neuron_1 nope=1")
         )
         assertEquals("activation needs a number: abc", shell.run("set net1/Neuron_1 activation=abc"))
-        assertTrue(shell.run("set net1/Neuron_1 rule=zzz").startsWith("Unknown value for updateRule: zzz. Options:"))
+        assertEquals("Unknown value for updateRule: sig. Did you mean Sigmoidal?", shell.run("set net1/Neuron_1 updateRule=sig"))
+        assertTrue(shell.run("set net1/Neuron_1 updateRule=zzz").startsWith("Unknown value for updateRule: zzz. Options:"))
     }
 
     @Test
@@ -383,7 +384,7 @@ class CommandShellTest {
     @Test
     fun `add neurons uses the only network and applies options`() {
         val shell = shellWithNetwork()
-        assertEquals("Added Neuron_3 to Neuron_5.", shell.run("add neurons 3 rule=Sigmoidal"))
+        assertEquals("Added Neuron_3 to Neuron_5.", shell.run("add neurons 3 updateRule=Sigmoidal"))
         assertEquals(5, shell.network().getModels<Neuron>().size)
         assertTrue(shell.neuron("Neuron_4").updateRule is SigmoidalRule)
     }
@@ -412,7 +413,7 @@ class CommandShellTest {
     @Test
     fun `a collection can be labelled, reached by label, and given a rule`() {
         val shell = shellWithNetwork()
-        assertEquals("Added NeuronCollection_1 with 3 neuron(s).", shell.run("add collection 3 label=input rule=Sigmoidal"))
+        assertEquals("Added NeuronCollection_1 with 3 neuron(s).", shell.run("add collection 3 label=input updateRule=Sigmoidal"))
         assertEquals(3, shell.run("ls net1/input").split("  ").size)
         assertTrue(shell.network().getModels<NeuronCollection>().single().neuronList.all { it.updateRule is SigmoidalRule })
     }
@@ -483,8 +484,33 @@ class CommandShellTest {
         val shell = shellWithNetwork()
         assertEquals("Removed 1 object(s).", shell.run("rm net1/Synapse_1"))
         assertEquals(0, shell.network().getModels<Synapse>().size)
+        shell.workspace.markClean()
         shell.run("rm net1")
         assertEquals("(empty)", shell.run("ls"))
+    }
+
+    @Test
+    fun `rm needs force to remove a component with unsaved changes`() {
+        val shell = shellWithNetwork()
+        shell.run("add neurons 1 in=net1")
+        assertEquals("net1 has unsaved changes. Save it first, or use rm <path> force.", shell.run("rm net1"))
+        assertEquals("net1 has unsaved changes. Save it first, or use rm <path> force.", shell.run("rm * where type=NetworkComponent"))
+        assertEquals("net1", shell.run("ls"))
+        assertEquals("Removed 1 object(s).", shell.run("rm net1 force"))
+        assertEquals("(empty)", shell.run("ls"))
+    }
+
+    @Test
+    fun `rm force works with a condition and does not affect removing models`() {
+        val shell = shellWithNetwork()
+        assertEquals("Removed 1 object(s).", shell.run("rm net1/* where type=Synapse"))
+        assertEquals("Removed 1 object(s).", shell.run("rm * force where type=NetworkComponent"))
+        assertEquals("(empty)", shell.run("ls"))
+    }
+
+    @Test
+    fun `rm completes force after the path`() {
+        assertEquals("rm net1 force ", shellWithNetwork().complete("rm net1 fo").line)
     }
 
     @Test
@@ -667,9 +693,9 @@ class CommandShellTest {
     @Test
     fun `types hidden from dialogs are hidden here too`() {
         val shell = shellWithNetwork()
-        val output = shell.run("set net1/Neuron_1 rule=Allostatic")
+        val output = shell.run("set net1/Neuron_1 updateRule=Allostatic")
         assertTrue(output.startsWith("Unknown value for updateRule: Allostatic."), output)
-        assertFalse(shell.complete("set net1/Neuron_1 rule=").options.any { it.contains("Allostatic") })
+        assertFalse(shell.complete("set net1/Neuron_1 updateRule=").options.any { it.contains("Allostatic") })
     }
 
     private fun shellWithTwoNetworks(): CommandShell {
@@ -705,8 +731,82 @@ class CommandShellTest {
     }
 
     @Test
-    fun `a name matches ignoring case and punctuation`() {
-        assertEquals("0.75", shellWithNetwork().run("get neuron1 activation"))
+    fun `an approximate name is not acted on, and what it may mean is suggested`() {
+        val shell = shellWithNetwork()
+        assertEquals("Not found: neuron1. Did you mean net1/Neuron_1? Tab completes names.", shell.run("get neuron1 activation"))
+        assertEquals("Not found: net1/neuron2. Did you mean net1/Neuron_2? Tab completes names.", shell.run("rm net1/neuron2"))
+        assertEquals(2, shell.network().getModels<Neuron>().size)
+        assertEquals("0.75", shell.run("get neuron_1 activation"))
+    }
+
+    @Test
+    fun `completion turns an approximate name into the real one`() {
+        val shell = shellWithNetwork()
+        assertEquals("rm net1/Neuron_2 ", shell.complete("rm net1/neuron2").line)
+        assertEquals("get net1/Neuron_1 ", shell.complete("get neuron1").line)
+        shell.run("cd net1")
+        assertEquals("get Neuron_1 ", shell.complete("get neuron1").line)
+    }
+
+    @Test
+    fun `completion finds a name anywhere from part of it`() {
+        val shell = shellWithNetwork()
+        val completion = shell.complete("show euron")
+        assertEquals(listOf("net1/Neuron_1", "net1/Neuron_2"), completion.options)
+        assertEquals("show net1/Neuron_", completion.line)
+    }
+
+    @Test
+    fun `a partial property name is not acted on, and completion supplies the real one`() {
+        val shell = shellWithNetwork()
+        assertEquals(
+            "Neuron has no property act. Did you mean activation? Use show to see its properties.",
+            shell.run("set net1/Neuron_1 act=0.3")
+        )
+        assertEquals(
+            "Neuron has no property rule. Did you mean updateRule? Use show to see its properties.",
+            shell.run("set net1/Neuron_1 rule=Sigmoidal")
+        )
+        assertEquals("0.75", shell.run("get net1/Neuron_1 activation"))
+        assertEquals("set net1/Neuron_1 updateRule=", shell.complete("set net1/Neuron_1 rule").line)
+        assertEquals("get net1/Neuron_1 updateRule ", shell.complete("get net1/Neuron_1 rule").line)
+    }
+
+    @Test
+    fun `a partial property name in a condition matches nothing, and completion supplies the real one`() {
+        val shell = shellWithNetwork()
+        assertEquals("Nothing has a property called act. Use show to see property names.", shell.run("ls net1 where act>0.5"))
+        assertEquals("ls net1 where activation", shell.complete("ls net1 where activ").line)
+        val options = shell.complete("ls net1 where rule").options
+        assertTrue("updateRule" in options && "learningRule" in options, options.toString())
+        assertEquals("ls net1/Neuron_* where updateRule", shell.complete("ls net1/Neuron_* where rule").line)
+    }
+
+    @Test
+    fun `a partial option is not acted on, and completion supplies the real one`() {
+        val shell = shellWithNetwork()
+        assertEquals(
+            "Unknown value for strategy: all. Did you mean AllToAll?",
+            shell.run("connect net1/Neuron_2 net1/Neuron_1 all")
+        )
+        assertEquals("Unknown value for updateRule: sig. Did you mean Sigmoidal?", shell.run("set net1/Neuron_1 updateRule=sig"))
+        assertEquals(1, shell.network().getModels<Synapse>().size)
+        assertEquals("connect net1/Neuron_2 net1/Neuron_1 AllToAll ", shell.complete("connect net1/Neuron_2 net1/Neuron_1 all").line)
+        assertEquals("connect net1/Neuron_2 net1/Neuron_1 FixedDegree ", shell.complete("connect net1/Neuron_2 net1/Neuron_1 degree").line)
+        assertEquals("Added 1 synapse(s).", shell.run("connect net1/Neuron_2 net1/Neuron_1 alltoall"))
+    }
+
+    @Test
+    fun `couple completes attribute names and reports a partial one`() {
+        val shell = shellWithNetwork()
+        assertEquals("couple net1/Neuron_1:activation ", shell.complete("couple net1/Neuron_1:activ").line)
+        assertEquals(
+            "couple net1/Neuron_1:activation net1/Neuron_2:addInputValue ",
+            shell.complete("couple net1/Neuron_1:activation net1/Neuron_2:addinput").line
+        )
+        val output = shell.run("couple net1/Neuron_1:activ net1/Neuron_2:addInputValue")
+        assertTrue(output.startsWith("Neuron_1 has no attribute activ. Did you mean activation"), output)
+        assertEquals("(none)", shell.run("couplings"))
     }
 
     @Test

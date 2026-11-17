@@ -37,7 +37,7 @@ val tour = listOf(
     Example("Print how many connections each neuron sends", "get demo/Neuron_* fanOut"),
     Example("Prune the weak synapses", "rm demo/* where type=Synapse and abs(strength)<0.2"),
     Example("Strengthen the synapses that are left by 10%", "set demo/* strength=strength*1.1 where type=Synapse"),
-    Example("Make the neurons sigmoidal, each with its own random slope", "set demo/Neuron_* rule=Sigmoidal rule.slope=rand(1,3)"),
+    Example("Make the neurons sigmoidal, each with its own random slope", "set demo/Neuron_* updateRule=Sigmoidal updateRule.slope=rand(1,3)"),
     Example("Clamp the first five neurons on, as inputs", "set demo/Neuron_{1..5} clamped=true activation=1"),
     Example("Plot a neuron's activation, then run", "add timeseries plot1", "couple demo/Neuron_10 \"plot1/Series 1\"", "run 50"),
     Example("List the neurons that ended up active", "ls demo where type=Neuron and activation>0.5")
@@ -69,7 +69,7 @@ val workspaceCommands: CommandRegistry = commands {
             Example("List the neurons in net1 that are inactive or receive connections", "ls net1 where type=Neuron and (activation=0 or fanIn>0)"),
             Example("List the neurons in net1 whose activation is far from 0 in either direction", "ls net1 where abs(activation)>0.5"),
             Example("List the synapses that come from Neuron_1", "ls net1 where source=Neuron_1"),
-            Example("List the linear neurons in net1", "ls net1 where rule=Linear"),
+            Example("List the linear neurons in net1", "ls net1 where updateRule=Linear"),
             Example("Clamp a neuron, then list the neurons that are not clamped", "set net1/Neuron_1 clamped=true", "ls net1 where type=Neuron and not clamped=true"),
             Example("List every neuron in the workspace", "ls ** where type=Neuron"),
             Example("List what is in net1, keeping lines that mention Synapse", "ls net1 | grep Synapse")
@@ -133,7 +133,7 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Print how many connections each neuron in net1 receives", "get net1/Neuron_* fanIn"),
             Example("Print the bias of the neurons in net1 that send connections", "get net1/* bias where type=Neuron and fanOut>0"),
             Example("Print where a synapse starts", "get net1/Synapse_1 source"),
-            Example("Print the update rule of each neuron in net1", "get net1/Neuron_* rule"),
+            Example("Print the update rule of each neuron in net1", "get net1/Neuron_* updateRule"),
             Example("Print the activations in net1, keeping the line for Neuron_1", "get net1/Neuron_* activation | grep Neuron_1")
         ),
         usage = "get <path> <property> [where condition]",
@@ -162,7 +162,7 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Select the neurons in net1 whose activation is above 0.5", "select net1/* where activation>0.5"),
             Example("Select the synapses in net1", "select net1/* where type=Synapse"),
             Example("Select the neurons in net1 that connect to something", "select net1/* where type=Neuron and fanOut>0"),
-            Example("Add neurons, connect them all to each other, then select the neurons that connect to more than two", "add neurons 3 in=net1", "connect net1/Neuron_* net1/Neuron_* all", "select net1/* where type=Neuron and fanOut>2"),
+            Example("Add neurons, connect them all to each other, then select the neurons that connect to more than two", "add neurons 3 in=net1", "connect net1/Neuron_* net1/Neuron_* AllToAll", "select net1/* where type=Neuron and fanOut>2"),
             Example("Select every neuron in the workspace that nothing connects to", "select ** where type=Neuron and fanIn=0"),
             Example("Clear the selection", "select none")
         ),
@@ -185,7 +185,7 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         examples = listOf(
             Example("Set a neuron's activation", "set net1/Neuron_1 activation=1"),
-            Example("Make the neurons in net1 sigmoidal, then change a setting of the new rule", "set net1/Neuron_* rule=Sigmoidal rule.slope=2"),
+            Example("Make the neurons in net1 sigmoidal, then change a setting of the new rule", "set net1/Neuron_* updateRule=Sigmoidal updateRule.slope=2"),
             Example("Clamp what is selected in the GUI", "set @ clamped=true"),
             Example("Give two neurons their own random activations between 0 and 10", "set net1/Neuron_{1..2} activation=rand()*10"),
             Example("Give every synapse in net1 a small random strength", "set net1/* strength=randn(0,0.1) where type=Synapse"),
@@ -202,7 +202,7 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Flip the sign of every synapse in net1", "set net1/* strength=-strength where type=Synapse"),
             Example("Make the negative synapses in net1 zero", "set net1/* strength=max(strength,0) where type=Synapse"),
             Example("Set the bounds of every synapse in net1", "set net1/* upperBound=1 lowerBound=-1 where type=Synapse"),
-            Example("Make the neurons in net1 sigmoidal with random slopes", "set net1/Neuron_* rule=Sigmoidal rule.slope=rand(1,3)"),
+            Example("Make the neurons in net1 sigmoidal with random slopes", "set net1/Neuron_* updateRule=Sigmoidal updateRule.slope=rand(1,3)"),
             Example("Make the neurons in net1 excitatory", "set net1/Neuron_* polarity=Excitatory"),
             Example("Clamp the neurons in net1 that nothing connects to", "set net1/* clamped=true where type=Neuron and fanIn=0"),
             Example("Add ten neurons, spread their activations, then clamp the top half", "add neurons 10 in=net1", "set net1/Neuron_* activation=i/n", "set net1/Neuron_* clamped=true where activation>=0.5")
@@ -249,7 +249,7 @@ val workspaceCommands: CommandRegistry = commands {
         group = "Build",
         examples = listOf(
             Example("Add a network named net2", "add network net2"),
-            Example("Add ten sigmoidal neurons to net1", "add neurons 10 in=net1 rule=Sigmoidal"),
+            Example("Add ten sigmoidal neurons to net1", "add neurons 10 in=net1 updateRule=Sigmoidal"),
             Example("Go into net1, then add neurons to it", "cd net1", "add neurons 10"),
             Example("Add five neurons with random activations", "add neurons 5 in=net1 activation=rand()"),
             Example("Add a collection of five neurons in a line, labelled input", "add collection 5 in=net1 label=input layout=line"),
@@ -277,8 +277,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Connect two neurons with a strength of 0.5", "connect net1/Neuron_1 net1/Neuron_2 strength=0.5"),
             Example("Connect the neurons in net1 to each other sparsely, with random strengths", "connect net1/Neuron_* net1/Neuron_* sparse strength=randn(0,0.5)"),
             Example("Connect the neurons in net1 sparsely, with 30% of the possible connections", "connect net1/Neuron_* net1/Neuron_* sparse connectionDensity=0.3"),
-            Example("Connect each neuron in net1 to one other neuron", "connect net1/Neuron_* net1/Neuron_* fixed degree=1"),
-            Example("Connect every neuron in net1 to every one, including itself", "connect net1/Neuron_* net1/Neuron_* all allowSelfConnection=true"),
+            Example("Connect each neuron in net1 to one other neuron", "connect net1/Neuron_* net1/Neuron_* FixedDegree degree=1"),
+            Example("Connect every neuron in net1 to every one, including itself", "connect net1/Neuron_* net1/Neuron_* AllToAll allowSelfConnection=true"),
             Example("Make two collections and join them with a synapse group", "add collection 3 in=net1 label=left", "add collection 3 in=net1 label=right", "connect net1/left net1/right"),
             Example("Make two collections and join them sparsely", "add collection 5 in=net1 label=left", "add collection 5 in=net1 label=right", "connect net1/left net1/right sparse connectionDensity=0.5")
         ),
@@ -301,7 +301,9 @@ val workspaceCommands: CommandRegistry = commands {
         ),
         usage = "couple <producer[:attribute]> <consumer[:attribute]>",
         description = "Couple objects so that values flow between them each iteration. See attrs for attribute names.",
-        completer = pathCompletion
+        completer = { prior, partial ->
+            if (":" in partial) attributeCandidates(partial, producing = prior.isEmpty()) else pathCandidates(partial)
+        }
     ) { args ->
         if (args.size != 2) fail("Usage: couple <producer[:attribute]> <consumer[:attribute]>")
         couple(args[0], args[1])
@@ -370,12 +372,17 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Remove every synapse in net1", "rm net1/* where type=Synapse"),
             Example("Add five neurons, then remove the neurons in net1 with no connections", "add neurons 5 in=net1", "rm net1/* where type=Neuron and fanIn=0 and fanOut=0"),
             Example("Weaken a synapse, then remove the weak synapses in net1", "set net1/Synapse_1 strength=0.01", "rm net1/* where type=Synapse and abs(strength)<0.1"),
-            Example("Remove a whole component", "rm net1")
+            Example("Remove a whole component", "rm net1"),
+            Example("Change a component, then remove it without saving the change", "add neurons 2 in=net1", "rm net1 force")
         ),
-        usage = "rm <path> [where condition]",
-        description = "Remove models or components. There is no undo.",
-        completer = pathCompletion
-    ) { args -> remove(targets(onePath(args))) }
+        usage = "rm <path> [force] [where condition]",
+        description = "Remove models or components. There is no undo. A component with unsaved changes is only " +
+                "removed with force.",
+        completer = { prior, partial -> if (prior.isEmpty()) pathCandidates(partial) else wordCandidates(listOf("force"), partial) }
+    ) { args ->
+        val force = args.size > 1 && args.last() == "force"
+        remove(targets(onePath(if (force) args.dropLast(1) else args)), force)
+    }
 
     command(
         name = "randomize",
@@ -582,8 +589,9 @@ val workspaceCommands: CommandRegistry = commands {
                     "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
                     "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. End a line with " +
                     "where <condition> to act only on some objects (see help where), and | grep <text> to filter output. " +
-                    "Numbers can be expressions, as in rand()*10 (see help set). Tab completes, and Ctrl+C or Esc " +
-                    "cancels a long command."
+                    "Numbers can be expressions, as in rand()*10 (see help set). Names are given in full, in any " +
+                    "case. Tab completes a name from part of it, as updateRule from rule or Neuron_1 from " +
+                    "neuron1, and Ctrl+C or Esc cancels a long command."
         } else if (args.first() == "where") {
             whereHelp(registry)
         } else {
@@ -695,8 +703,7 @@ private fun settableNames(node: Node) = editablePropertiesOf(editableObject(node
 private fun readableNames(node: Node) = settableNames(node) + extraFacts(node.value).keys
 
 private fun CommandShell.propertyCandidates(path: String, partial: String, suffix: String): List<Candidate> =
-    resolveQuietly(path).oneOfEachType().flatMap(::settableNames).distinct()
-        .filter { it.startsWith(partial, ignoreCase = true) }
+    looseMatches(resolveQuietly(path).oneOfEachType().flatMap(::settableNames).distinct(), partial)
         .map { Candidate(it, suffix.ifEmpty { " " }) }
 
 private fun optionsFor(nodes: List<Node>, name: String): List<String> =
@@ -704,8 +711,7 @@ private fun optionsFor(nodes: List<Node>, name: String): List<String> =
 
 private fun CommandShell.valueCandidates(path: String, partial: String): List<Candidate> {
     val key = partial.substringBefore("=")
-    return optionsFor(resolveQuietly(path).oneOfEachType(), key)
-        .filter { it.startsWith(partial.substringAfter("="), ignoreCase = true) }
+    return looseMatches(optionsFor(resolveQuietly(path).oneOfEachType(), key), partial.substringAfter("="))
         .map { Candidate("$key=$it") }
 }
 
@@ -746,17 +752,14 @@ private fun CommandShell.conditionCandidates(args: List<String>, prior: List<Str
     }
     partialComparison.matchEntire(partial)?.let { match ->
         val (head, name, operator, value) = match.destructured
-        return conditionValues(subjects, name)
-            .filter { it.startsWith(value, ignoreCase = true) }
-            .map { Candidate("$head$name$operator$it") }
+        return looseMatches(conditionValues(subjects, name), value).map { Candidate("$head$name$operator$it") }
     }
     val match = partialName.matchEntire(partial) ?: return emptyList()
     val head = match.groupValues[1]
     val word = match.groupValues[2]
     if (head.isNotEmpty() && word.isEmpty()) return emptyList()
     if (head.isEmpty() && endsComparison(prior)) return wordCandidates(listOf("and", "or"), partial)
-    val names = (listOf("type") + subjects.flatMap(::readableNames)).distinct()
-        .filter { it.startsWith(word, ignoreCase = true) }
+    val names = looseMatches((listOf("type") + subjects.flatMap(::readableNames)).distinct(), word)
         .map { Candidate(head + it, "") }
     val not = if (head.isEmpty() || head.endsWith("(")) wordCandidates(listOf("not"), word) else emptyList()
     return names + not.map { Candidate(head + it.text) }
@@ -811,7 +814,7 @@ private suspend fun CommandShell.addCollection(arguments: Arguments): String {
     val neurons = List(countFrom(arguments.words.drop(1))) { Neuron() }
     val collection = NeuronCollection(neurons)
     for ((key, value) in options) {
-        if (findProperty(collection, key, exactOnly = true) != null) {
+        if (findProperty(collection, key) != null) {
             assign(collection, key, value)
         } else {
             neurons.forEachIndexed { index, neuron ->
@@ -856,7 +859,7 @@ private suspend fun CommandShell.connect(arguments: Arguments): String {
     val strategy = arguments.words.getOrNull(2)
         ?.let { chooseOption(typeOptions<ConnectionStrategy>(connectionTypes), it, "strategy").kotlin.callNoArgConstructor() }
         ?: AllToAll()
-    val (strategyOptions, synapseOptions) = arguments.options.entries.partition { findProperty(strategy, it.key, exactOnly = true) != null }
+    val (strategyOptions, synapseOptions) = arguments.options.entries.partition { findProperty(strategy, it.key) != null }
     strategyOptions.forEach { (key, value) -> assign(strategy, key, value) }
 
     val sourceCollection = sources.singleOrNull()?.value as? NeuronCollection
@@ -888,6 +891,16 @@ private fun neuronsIn(nodes: List<Node>): List<Neuron> = nodes.flatMap { node ->
 
 private fun attributeContainer(node: Node): AttributeContainer =
     node.value as? AttributeContainer ?: fail("${node.name} can't be coupled. Use a neuron, synapse, plot series, or similar.")
+
+/** Completions for the attribute after the colon in `path:attribute`, among what the path produces or consumes. */
+private fun CommandShell.attributeCandidates(partial: String, producing: Boolean): List<Candidate> {
+    val path = partial.substringBeforeLast(":")
+    val containers = resolveQuietly(path).mapNotNull { it.value as? AttributeContainer }.distinctBy { it::class }
+    val names = with(workspace.couplingManager) {
+        containers.flatMap { container -> (if (producing) container.producers else container.consumers).map(::attributeName) }
+    }.distinct()
+    return looseMatches(names, partial.substringAfterLast(":")).map { Candidate("$path:$it") }
+}
 
 private fun attributeName(attribute: Attribute): String {
     val method = attribute.method.name
@@ -933,15 +946,22 @@ private fun CommandShell.coupleOne(
 private fun <T : Attribute> List<T>.named(attribute: String?, container: AttributeContainer): List<T> {
     if (attribute == null) return this
     val wanted = normalized(attribute)
-    return filter { normalized(attributeName(it)) == wanted }
-        .ifEmpty { filter { wanted in normalized(attributeName(it)) } }
-        .ifEmpty { fail("${container.id} has no attribute $attribute. See attrs.") }
+    return filter { normalized(attributeName(it)) == wanted }.ifEmpty {
+        val close = looseMatches(map { attributeName(it) }.distinct(), attribute)
+        fail("${container.id} has no attribute $attribute." +
+                (if (close.isEmpty()) "" else " Did you mean ${close.joinToString(", ")}?") + " See attrs.")
+    }
 }
 
-private suspend fun CommandShell.remove(nodes: List<Node>): String {
+/** @param force whether to remove components that have unsaved changes */
+private suspend fun CommandShell.remove(nodes: List<Node>, force: Boolean): String {
     val components = nodes.mapNotNull { it.value as? WorkspaceComponent }
     val modelNodes = nodes.filter { it.value is NetworkModel }
     nodes.firstOrNull { it.value !is WorkspaceComponent && it.value !is NetworkModel }?.let { fail("${it.name} can't be removed.") }
+    if (!force) {
+        components.firstOrNull { it.hasChangedSinceLastSave() }
+            ?.let { fail("${it.name} has unsaved changes. Save it first, or use rm <path> force.") }
+    }
     for ((network, group) in modelNodes.groupBy { networkOf(it) ?: fail("${it.name} is not in a network.") }) {
         val models = group.map { it.value as NetworkModel }
         val protectedModels = network.subnetworkProtectedModels(models)

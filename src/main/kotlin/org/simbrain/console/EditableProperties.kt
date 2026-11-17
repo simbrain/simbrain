@@ -25,7 +25,7 @@ import kotlin.reflect.jvm.isAccessible
 
 private const val MAX_VALUE_LENGTH = 200
 private const val NUMBER_PRECISION = 6
-private const val MIN_PARTIAL_NAME = 3
+private const val MAX_SUGGESTIONS = 3
 private const val MAX_CACHED_EXPRESSIONS = 200
 
 class EditableProperty(
@@ -74,21 +74,25 @@ private fun editableProperty(obj: Any, property: KProperty1<Any, *>): EditablePr
 }.getOrNull()
 
 /**
- * Find a property by key, which can be its name or its dialog label and can reach into nested objects, as in
- * `updateRule.slope`.
- *
- * @param exactOnly if false, a word that is part of exactly one property name is also accepted, such as `rule`
+ * Find a property by key, which is its name or its dialog label in full, ignoring case and spaces, and can reach into
+ * nested objects, as in `updateRule.slope`.
  */
-fun findProperty(obj: Any, key: String, exactOnly: Boolean = false): EditableProperty? {
+fun findProperty(obj: Any, key: String): EditableProperty? {
     val head = key.substringBefore(".")
     val properties = editablePropertiesOf(obj)
     val wanted = normalized(head)
     val property = properties.firstOrNull { it.name == head }
         ?: properties.firstOrNull { normalized(it.name) == wanted || normalized(it.label) == wanted }
-        ?: properties.filter { !exactOnly && wanted in normalized(it.name) }.singleOrNull()
         ?: return null
     if ("." !in key) return property
-    return findProperty(property.value ?: return null, key.substringAfter("."), exactOnly)
+    return findProperty(property.value ?: return null, key.substringAfter("."))
+}
+
+/** What a key that names no property of [obj] may have been meant to be, as the end of a sentence, or nothing. */
+private fun didYouMean(obj: Any, key: String): String {
+    val owner = if ("." in key) findProperty(obj, key.substringBeforeLast("."))?.value ?: return "" else obj
+    val close = looseMatches(editablePropertiesOf(owner).map { it.name }, key.substringAfterLast("."))
+    return if (close.isEmpty()) "" else " Did you mean ${close.take(MAX_SUGGESTIONS).joinToString(", ")}?"
 }
 
 /**
@@ -117,7 +121,7 @@ private class Assignment(val property: EditableProperty, val mutable: KMutablePr
 @Suppress("UNCHECKED_CAST")
 private fun assignment(obj: Any, key: String, text: String, context: ExpressionContext): Assignment {
     val found = findProperty(obj, key)
-        ?: fail("${obj::class.simpleName} has no property $key. Use show to see its properties.")
+        ?: fail("${obj::class.simpleName} has no property $key.${didYouMean(obj, key)} Use show to see its properties.")
     if (found.displayOnly) fail("${found.name} is read-only.")
     val mutable = found.property as? KMutableProperty1<Any, Any?> ?: fail("${found.name} is read-only.")
     return Assignment(found, mutable, convert(found, text, context))
@@ -135,9 +139,7 @@ fun valueOptions(property: EditableProperty): List<String> {
 
 /** The value of a property for use in an expression, or [Expression.MISSING] if there is none. */
 fun propertyValue(obj: Any, name: String): Any? {
-    val found = findProperty(obj, name, exactOnly = true)
-        ?: findProperty(obj, name).takeIf { name.length >= MIN_PARTIAL_NAME }
-        ?: return Expression.MISSING
+    val found = findProperty(obj, name) ?: return Expression.MISSING
     return found.value
 }
 
@@ -198,18 +200,17 @@ private fun typeList(property: EditableProperty): Map<String, Class<out Copyable
     return typeOptions(types.filter { TypeOptionVisibility.isVisible(it.kotlin, listOf(current::class)) })
 }
 
-/** Names for a list of selectable types, as they would be typed. */
+/** Names for a list of selectable types, as they would be typed: a rule or a layout is named without that word. */
 fun <T : Any> typeOptions(types: List<Class<out T>>): Map<String, Class<out T>> =
-    types.associateBy { it.simpleName.removeSuffix("Rule") }
+    types.associateBy { it.simpleName.removeSuffix("Rule").removeSuffix("Layout") }
 
-/** Pick from named options by exact name, then by the start of a name, then by part of a name. */
+/** Pick from named options by a name in full, ignoring case and punctuation. */
 fun <T> chooseOption(options: Map<String, T>, text: String, what: String): T {
     val wanted = normalized(text)
-    val match = options.entries.firstOrNull { normalized(it.key) == wanted }
-        ?: options.entries.filter { normalized(it.key).startsWith(wanted) }.singleOrNull()
-        ?: options.entries.filter { wanted in normalized(it.key) }.singleOrNull()
-        ?: fail("Unknown value for $what: $text. Options: ${options.keys.joinToString(", ")}")
-    return match.value
+    options.entries.firstOrNull { normalized(it.key) == wanted }?.let { return it.value }
+    val close = looseMatches(options.keys, text)
+    if (close.isEmpty()) fail("Unknown value for $what: $text. Options: ${options.keys.joinToString(", ")}")
+    fail("Unknown value for $what: $text. Did you mean ${close.take(MAX_SUGGESTIONS).joinToString(", ")}?")
 }
 
 fun normalized(text: String) = text.lowercase().filter { it.isLetterOrDigit() }

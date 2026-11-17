@@ -227,6 +227,16 @@ fun leabraLayer(size: Int, label: String) = NeuronArray(size).apply {
 }
 
 /**
+ * Projections for every weight matrix in [network]. A matrix whose source comes after its target in [layers] is a
+ * feedback projection and gets [feedbackScale]; the rest get 1.
+ */
+fun leabraProjections(network: Network, layers: List<NeuronArray>, feedbackScale: Double) =
+    network.getModels<WeightMatrix>().map {
+        val feedback = layers.indexOf(it.source as NeuronArray) > layers.indexOf(it.target as NeuronArray)
+        LeabraProjection(it, if (feedback) feedbackScale else 1.0)
+    }
+
+/**
  * A projection from [source] to [target] with weights drawn uniformly from 0.25 to 0.75.
  */
 fun leabraProjection(source: NeuronArray, target: NeuronArray, relativeScale: Double = 1.0): LeabraProjection {

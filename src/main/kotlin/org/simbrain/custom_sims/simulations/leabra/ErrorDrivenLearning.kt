@@ -1,7 +1,7 @@
 /**
- * A Leabra network learns Spanish words for eight pictures, like studying flashcards. The minus phase is the
- * network's guess and the plus phase is being shown the answer. Settling, phases, and learning are handled by
- * [LeabraTrainer].
+ * Error-driven learning in Leabra. A network learns Spanish words for eight pictures, like studying flashcards. The
+ * minus phase is the network's guess and the plus phase is being shown the answer. Settling, phases, and learning
+ * are handled by [LeabraTrainer].
  */
 package org.simbrain.custom_sims.simulations.leabra
 
@@ -15,12 +15,11 @@ import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.core.NeuronArray
-import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.nodes.WeightMatrixNode
-import org.simbrain.network.trainers.LeabraProjection
 import org.simbrain.network.trainers.LeabraTrainer
 import org.simbrain.network.trainers.leabraLayer
 import org.simbrain.network.trainers.leabraProjection
+import org.simbrain.network.trainers.leabraProjections
 import org.simbrain.network.updaterules.LeabraRule
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
 import org.simbrain.util.place
@@ -31,7 +30,7 @@ import java.awt.BasicStroke
 import java.awt.Color
 import javax.swing.JComboBox
 
-val leabraVocabulary = newSim("leabra_vocabulary") {
+val errorDrivenLearning = newSim("leabra_vocabulary") {
     workspace.clearWorkspace()
     exposeTypes(LeabraRule::class)
 
@@ -63,7 +62,7 @@ val leabraVocabulary = newSim("leabra_vocabulary") {
     val learningText = NetworkTextObject("").apply {
         fontSize = 20
         isBold = true
-        color = LEARNING_TEXT_COLOR
+        color = LEABRA_MESSAGE_COLOR
         location = point(250, -150)
     }
     network.addNetworkModels(
@@ -73,22 +72,27 @@ val leabraVocabulary = newSim("leabra_vocabulary") {
 
     addTimeSeriesComponent(ERROR_PLOT, "Percent wrong")
 
-    setUpLeabraVocabulary(workspace)
+    setUpErrorDrivenLearning(workspace)
 
     addSidebarInfo(
         """
-        # Learning words with Leabra
+        # Error-driven learning
 
-        A [Leabra](https://github.com/emer/leabra) network learns the Spanish words for eight pictures, the way a
-        student studies flashcards. It illustrates three principles of Leabra:
+        A [Leabra](https://github.com/emer/leabra) network learns from its mistakes: it guesses, is shown the
+        answer, and adjusts. Here it learns the Spanish words for eight pictures, the way a student studies
+        flashcards. It illustrates three principles of Leabra:
 
         1. Learning from expectation and outcome. The network first guesses the word, then is shown the answer, and
            its weights change so that next time its guess will be closer to the answer.
         2. Bidirectional connections. The answer flows back from the `Word` layer to the `Hidden` layer, so hidden
            units learn too, even though they are never told the answer.
         3. Sparse, distributed representations. In the `Hidden` layer, inhibition lets only a few units be active
-           at once, and each picture is represented by its own small set of them. Pictures that look alike share
-           some of these units, which lets the network name a picture from part of it.
+           at once, and each picture is represented by its own small set of them. Half a picture still activates
+           most of its set, so the network can name it from part of it. Pictures that look alike share some units,
+           which is where its mistakes come from.
+
+        This simulation builds on `Point neuron` and `Layer inhibition`. Every unit is a point neuron, and every
+        layer has the same inhibition. What it adds is learning.
 
         # Simulation Details
 
@@ -101,8 +105,7 @@ val leabraVocabulary = newSim("leabra_vocabulary") {
         were active together in the plus phase than in the minus phase. This is error-driven learning, but no error
         is computed explicitly: the difference between the two phases plays that role.
 
-        Units are point neurons like the one in the `Point neuron` simulation, and each layer has the inhibition
-        shown in the `Layer inhibition` simulation. This is a simplified version of Leabra. It omits running activity averages, Hebbian learning, and weight
+        This is a simplified version of Leabra. It omits running activity averages, Hebbian learning, and weight
         contrast enhancement, among other things.
 
         ## Control Panel Settings
@@ -168,7 +171,7 @@ val leabraVocabulary = newSim("leabra_vocabulary") {
         """.trimIndent(),
         width = 330
     )
-}.registerReopenFunction { workspace -> setUpLeabraVocabulary(workspace) }
+}.registerReopenFunction { workspace -> setUpErrorDrivenLearning(workspace) }
 
 class Flashcard(val english: String, val spanish: String, drawing: String) {
     val picture = drawing.trimIndent().filterNot { it.isWhitespace() }.map { if (it == '#') 1.0 else 0.0 }.toDoubleArray()
@@ -255,17 +258,13 @@ private const val WORD = "Word"
 private const val ERROR_PLOT = "Leabra flashcard errors"
 private const val PICTURE_SIZE = 49
 private const val PICTURE_COLUMNS = 7
-private const val FEEDBACK_SCALE = 0.3
 private const val FLASH_MARGIN = 6.0
 private const val LEARNING_FLASH_MILLIS = 500L
 private const val FADE_MILLIS = 400L
 private val LEARNING_FLASH_COLOR = Color(255, 200, 0, 130)
-private val LEARNING_TEXT_COLOR = Color(215, 140, 0)
 private const val LEARNING_TEXT = "Learning!"
 
 private fun quoted(word: String) = "\"$word\""
-
-private fun answer(index: Int) = DoubleArray(flashcards.size) { if (it == index) 1.0 else 0.0 }
 
 /**
  * A random half of [picture]'s lit pixels.
@@ -277,29 +276,26 @@ private fun partOf(picture: DoubleArray): DoubleArray {
 }
 
 /**
- * A trainer for the picture, hidden, and word layers of a network built by [leabraVocabulary].
+ * A trainer for the picture, hidden, and word layers of a network built by [errorDrivenLearning].
  */
-fun vocabularyTrainer(network: Network): LeabraTrainer {
+fun flashcardTrainer(network: Network): LeabraTrainer {
     val arrays = network.getModels<NeuronArray>()
     val layers = listOf(PICTURE, HIDDEN, WORD).map { name -> arrays.first { it.label == name } }
     val (picture, _, word) = layers
-    val projections = network.getModels<WeightMatrix>().map {
-        val feedback = layers.indexOf(it.source as NeuronArray) > layers.indexOf(it.target as NeuronArray)
-        LeabraProjection(it, if (feedback) FEEDBACK_SCALE else 1.0)
-    }
+    val projections = leabraProjections(network, layers, FEEDBACK_SCALE)
     return LeabraTrainer(network, layers, projections, picture, word).apply {
         expectedActivity[picture] = flashcards.map { it.picture.average() }.average()
         expectedActivity[word] = 1.0 / flashcards.size
     }
 }
 
-private suspend fun SimulationScope.setUpLeabraVocabulary(workspace: Workspace) {
+private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspace) {
     val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
     val network = networkComponent.network
-    val trainer = vocabularyTrainer(network)
+    val trainer = flashcardTrainer(network)
     val word = trainer.outputLayer
     val pictures = flashcards.map { it.picture }
-    val answers = flashcards.indices.map(::answer)
+    val answers = flashcards.indices.map { oneHot(flashcards.size, it) }
 
     val plot = workspace.componentList.filterIsInstance<TimeSeriesPlotComponent>().first { it.name == ERROR_PLOT }
     var pass = plot.model.timeSeriesList.firstOrNull()?.series?.itemCount ?: 0
@@ -361,7 +357,7 @@ private suspend fun SimulationScope.setUpLeabraVocabulary(workspace: Workspace) 
                     ).apply {
                         paint = LEARNING_FLASH_COLOR
                         stroke = BasicStroke(3f)
-                        strokePaint = LEARNING_TEXT_COLOR
+                        strokePaint = LEABRA_MESSAGE_COLOR
                         pickable = false
                         networkPanel.canvas.layer.addChild(this)
                     }

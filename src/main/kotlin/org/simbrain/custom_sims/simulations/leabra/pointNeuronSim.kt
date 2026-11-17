@@ -60,16 +60,21 @@ val pointNeuronSim = newSim("leabra_point_neuron") {
         The basic unit of [Leabra](https://github.com/emer/leabra) is a point neuron: a neuron reduced to a single
         point whose membrane potential is pulled up and down by three kinds of ion channels.
 
+        This is the first of a series of Leabra simulations, each built on the ones before. The rest all use this
+        neuron.
+
         # Simulation Details
 
         Excitatory channels pull the membrane potential toward 1, inhibitory channels toward 0.25, and leak channels
-        toward 0.3. Each channel's pull is its conductance, the fraction of channels open, times its distance from
-        the membrane potential. The membrane potential settles where these pulls balance.
+        toward 0.3. Each channel's pull is its conductance times its distance from the membrane potential, where
+        conductance is the fraction of channels open times their maximum strength. The membrane potential settles
+        where these pulls balance.
 
         Activation stands for firing rate. It is zero until excitation is strong enough to push the membrane
         potential past threshold (0.5), then rises steeply and saturates near 1.
 
-        Here the excitatory and inhibitory input neurons set the excitatory and inhibitory conductances directly.
+        Here the excitatory and inhibitory input neurons set the fraction of excitatory and inhibitory channels
+        open. Leak channels are always open, so their conductance is just their strength.
 
         ## Control Panel Settings
 

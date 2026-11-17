@@ -104,10 +104,8 @@ class LeabraRule : NeuronUpdateRule<EmptyScalarData, LeabraMatrixData>() {
      * Return the layer to its resting state.
      */
     fun reset(layer: Layer, dataHolder: LeabraMatrixData) {
-        dataHolder.ge.fill(0.0)
-        dataHolder.vm.fill(initVm)
-        dataHolder.feedbackInhibition = 0.0
-        dataHolder.gi = 0.0
+        dataHolder.initVm = initVm
+        dataHolder.clear()
         layer.activations.fill(0.0)
     }
 
@@ -146,7 +144,11 @@ class LeabraRule : NeuronUpdateRule<EmptyScalarData, LeabraMatrixData>() {
     }
 }
 
-class LeabraMatrixData(val size: Int, val initVm: Double = 0.4) : MatrixDataHolder {
+/**
+ * Per-layer state for [LeabraRule]. [initVm] is the membrane potential [clear] returns to; [LeabraRule.reset] keeps it
+ * in step with the rule's current setting.
+ */
+class LeabraMatrixData(val size: Int, var initVm: Double = 0.4) : MatrixDataHolder {
 
     @UserParameter(label = "Excitatory conductance", description = "Time-integrated excitatory conductance of each neuron.")
     var ge = DoubleArray(size)

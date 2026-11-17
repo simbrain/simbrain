@@ -14,7 +14,7 @@ import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
 import kotlin.math.abs
 
-class LeabraVocabularyTest {
+class ErrorDrivenLearningTest {
 
     @Test
     fun `flashcard pictures are all 7 by 7 and distinct`() {
@@ -25,7 +25,7 @@ class LeabraVocabularyTest {
     @Test
     fun `simulation settles headlessly and survives save and reopen`() = runBlocking {
         val scope = SimulationScope()
-        leabraVocabulary.task.invoke(scope, null)
+        errorDrivenLearning.task.invoke(scope, null)
         val workspace = scope.workspace
 
         fun network() = (workspace.getComponent("Leabra network") as NetworkComponent).network
@@ -46,7 +46,7 @@ class LeabraVocabularyTest {
         val bytes = ByteArrayOutputStream().also { serializer.serialize(it, true) }.toByteArray()
         workspace.clearWorkspace()
         serializer.deserialize(ByteArrayInputStream(bytes))
-        leabraVocabulary.reopen(workspace)
+        errorDrivenLearning.reopen(workspace)
 
         val word = network().getModels<NeuronArray>().first { it.label == "Word" }
         assertTrue(word.updateRule is LeabraRule)
@@ -57,9 +57,9 @@ class LeabraVocabularyTest {
     @Test
     fun `showing the answer shifts hidden units and practice on one card makes the network guess its word`() = runBlocking {
         val scope = SimulationScope()
-        leabraVocabulary.task.invoke(scope, null)
+        errorDrivenLearning.task.invoke(scope, null)
         val network = (scope.workspace.getComponent("Leabra network") as NetworkComponent).network
-        val trainer = vocabularyTrainer(network)
+        val trainer = flashcardTrainer(network)
         val (_, hidden, word) = trainer.layers
         val sun = flashcards.first()
 
@@ -68,7 +68,7 @@ class LeabraVocabularyTest {
             val minus = trainer.snapshot()
             val acts = word.activationArray
             val guess = acts.indices.maxBy { acts[it] }
-            trainer.clamp(word, DoubleArray(flashcards.size) { if (it == 0) 1.0 else 0.0 })
+            trainer.clamp(word, oneHot(flashcards.size, 0))
             repeat(trainer.plusCycles) { trainer.cycle(fireEvents = false) }
             val plus = trainer.snapshot()
             trainer.learn(minus, plus)
@@ -90,12 +90,12 @@ class LeabraVocabularyTest {
     @Test
     fun `deck is learned, half pictures are named above chance, and a wrong answer is learned and undone`() = runBlocking {
         val scope = SimulationScope()
-        leabraVocabulary.task.invoke(scope, null)
+        errorDrivenLearning.task.invoke(scope, null)
         val network = (scope.workspace.getComponent("Leabra network") as NetworkComponent).network
-        val trainer = vocabularyTrainer(network)
+        val trainer = flashcardTrainer(network)
         val word = trainer.outputLayer
         val pictures = flashcards.map { it.picture }
-        val answers = flashcards.indices.map { i -> DoubleArray(flashcards.size) { if (it == i) 1.0 else 0.0 } }
+        val answers = flashcards.indices.map { oneHot(flashcards.size, it) }
         fun guess(input: DoubleArray): Int {
             trainer.test(input, fireEvents = false)
             val acts = word.activationArray

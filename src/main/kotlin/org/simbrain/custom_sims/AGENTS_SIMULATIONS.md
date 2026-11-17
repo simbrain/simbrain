@@ -345,6 +345,7 @@ Standard template and intent:
 
 - `# Simulation Name`
   Brief explanation of the simulation. Be clear and concise. Length depends on the simulation: paper-based models may need more context; simpler sims may only need a few sentences.
+  Open with the point of the simulation in plain language, before any science. Keep background brief and get to the model quickly. Put qualifications last in the intro, and simplifications in `# Simulation Details`. `psychology/MirrorLearning.kt` is a model intro.
 - `# Simulation Details`
   Technical background and specifics of the simulation. Use `##` subsections when needed.
 - `## Control Panel Settings`
@@ -354,6 +355,8 @@ Standard template and intent:
   - Give each separate thing to do its own `## Activity N: Title` subsection, with a short title saying what the activity does. When there is only one, use `## Activity: Title` with no number. Steps always go inside an activity, never directly under `# Activities`.
   - Number steps only when they are done in order. Put observations for a step as indented bullets under it.
   - End an activity with what the user should see when that outcome is known to happen.
+  - When a step stands for something in the model's story, say so in plain terms ("This models the child watching the adult"), even if it seems redundant. This matters most in the first activity and when the action is unusual.
+  - When an activity's point is not obvious from its steps, open with a sentence saying what it should give a feel for, for example how a raster plot shows two populations coming to predict each other.
   - Put open-ended suggestions in a final unnumbered `## Explore further` list.
   - Keep reference material, such as metric definitions, in `# Simulation Details`, not in an activity.
 - `# Links`

@@ -18,6 +18,7 @@ import org.simbrain.network.layouts.LineLayout
 import org.simbrain.network.learningrules.STDPRule
 import org.simbrain.network.spikeresponders.JumpAndDecay
 import org.simbrain.network.updaterules.IzhikevichRule
+import org.simbrain.network.updaterules.IzhikevichScalarData
 import org.simbrain.plot.rasterchart.RasterPlotComponent
 import org.simbrain.util.place
 import org.simbrain.util.toRadian
@@ -118,28 +119,22 @@ val mirrorLearning = newSim("mirror_learning") {
         Seeing an action, done by yourself or someone else, can become connected to doing it. This simulation has
         seeing neurons and doing neurons, and you can watch the connections between them form.
 
-        [Mirror neurons](https://en.wikipedia.org/wiki/Mirror_neuron) fire both when a monkey acts and when it
-        watches another perform the same action. In humans, including children, the evidence comes from brain imaging
-        and EEG, such as suppression of the mu rhythm while watching actions (Bowman et al., 2017). Where mirror
-        neurons come from is debated. Some treat them as an adaptation for understanding actions
-        ([Rizzolatti & Craighero, 2004](https://doi.org/10.1146/annurev.neuro.27.070203.144230)), others hold that
-        they are learned by association ([Heyes, 2010](https://doi.org/10.1016/j.neubiorev.2009.11.007)), and many
-        take a middle view. Strong evidence for learning is that practice can reverse them: after people practiced
-        moving one finger while watching a different finger move, watching that finger activated the first
-        ([Catmur et al., 2007](https://doi.org/10.1016/j.cub.2007.08.006)). This simulation illustrates the learning
-        side.
+        [Mirror neurons](https://en.wikipedia.org/wiki/Mirror_neuron) fire both when an animal acts and when it
+        watches another perform the same action. Where they come from is debated. Some see them as an inborn
+        adaptation, shaped by evolution for understanding actions
+        ([Rizzolatti & Craighero, 2004](https://doi.org/10.1146/annurev.neuro.27.070203.144230)). Others hold that
+        they are learned by association ([Heyes, 2010](https://doi.org/10.1016/j.neubiorev.2009.11.007)).
 
-        One source of the link is watching yourself act. When you do something and see yourself doing it, the sight
-        and the movement become linked. Later, seeing someone else do it drives the same visual neurons, and through
-        them the movement. This simulation models that case, with one big simplification: the child sees her own trip
-        from her own point of view and the adult's from the outside, yet here the same visual neurons respond to
-        both. For actions you cannot see yourself do, such as facial expressions, Heyes argues the link comes from
-        being imitated by others (Ray & Heyes, 2011).
+        On the learning view, one way the link forms is by watching yourself act. When you do something and see
+        yourself doing it, the sight and the movement become linked. Later, seeing someone else do it drives the same
+        visual neurons, and through them the movement.
 
-        The network is a child's brain, with four populations of spiking neurons:
+        This simulation is a toy model of that idea, loosely based on Heyes (2010) and Keysers and Gazzola (2014).
+        The network models a child's brain, with four populations of spiking neurons:
 
         - `Visual: going to candy` and `Visual: going to bell` are seeing neurons. They fire when the child sees
-          anyone going to that object, herself included. Each prefers a distance, from `far` to `near`.
+          anyone going to that object, herself included. Each neuron fires most at one distance, from `far` to
+          `near`.
         - `Motor: go to candy` and `Motor: go to bell` are doing neurons for the phases of a movement: `start`,
           `walk`, `slow down`, and `grab`. When one fires clearly while the child only watches, its label changes
           to `Mirror`.
@@ -148,69 +143,88 @@ val mirrorLearning = newSim("mirror_learning") {
         go with which phases. The lines between neurons show the weights as they grow, and a caption under each
         person shows the phase of the movement.
 
+        Watching yourself is not the only source of mirror neurons. For actions you cannot see yourself do, such as
+        facial expressions, Heyes argues the link comes from being imitated by others (Ray & Heyes, 2011).
+
         # Simulation Details
 
-        The neurons are Izhikevich spiking neurons. The weights learn with spike-timing-dependent plasticity (STDP),
-        a widely used rule for spiking networks. A weight grows when a visual spike comes within about 10
-        milliseconds before a motor spike. The part of STDP that weakens weights is turned off, so in effect weights
-        grow when visual and motor neurons fire together. When the child goes and sees herself, far views become
-        linked to `start` and close views to `grab`.
+        The neurons are [Izhikevich](https://docs.simbrain.net/docs/network/neurons/izhikevich.html) spiking
+        neurons. The weights learn with
+        [spike-timing-dependent plasticity](https://docs.simbrain.net/docs/network/synapses/stdp.html) (STDP), a
+        widely used rule for spiking networks. A weight grows when a visual spike comes within about 10 milliseconds
+        before a motor spike. The part of STDP that weakens weights is turned off, so in effect weights grow when
+        visual and motor neurons fire together. When the child goes and sees herself, far views become linked to
+        `start` and close views to `grab`. Once there is a mirror response, watching alone also strengthens the
+        weights, because visual spikes then come just before motor spikes.
 
-        Two further simplifications. Heyes stresses contingency, that seeing must predict doing, but this rule only
-        responds to co-occurrence. And here seeing and doing happen at the same moment, while real visual feedback
-        lags the movement, which Keysers and Gazzola (2014) argue makes mirror neurons predictive.
+        ## Simplifications
 
-        ## Control Panel Settings
+        - The child sees her own trip from her own point of view and the adult's from the outside, yet here the same
+          visual neurons respond to both.
+        - Heyes stresses contingency, that seeing must predict doing, but this rule only responds to co-occurrence.
+        - Seeing and doing happen at the same moment, while real visual feedback lags the movement, which Keysers
+          and Gazzola (2014) argue makes mirror neurons predictive.
+
+        # Control Panel
 
         - `Object` chooses where people go.
         - `Watch adult go` makes the adult go while the child watches.
-        - `Go` makes the child go. Buttons do nothing while a trip is under way.
+        - `Go` makes the child go.
+        - `Step` steps whatever the last action taken was, one time step at a time. Before any action, it steps
+          the child.
+        - A trip must finish before another can start. To finish a stepped trip, press its button or keep pressing
+          `Step`.
         - `Child can see self`: uncheck it to have the child act without seeing herself, as if in the dark.
         - `Show spikes` shows a raster plot of every neuron's spikes.
-        - `Reset learning` sets the weights to zero and changes `Mirror` labels back to `Motor`.
+        - `Reset` sets the weights to zero, clears the spikes and neuron activity, and changes `Mirror` labels back
+          to `Motor`.
 
         # Activities
 
-        ## Activity 1: Watch the adult, act, then watch again
+        ## Activity 1: Watch mirror neurons form
 
-        1. Before the child does anything, press `Watch adult go`. The visual neurons fire from `far` to `near`, but
-           the motor neurons stay silent. There are no mirror neurons yet. Check `Show spikes` to see this as a
-           raster plot.
-        2. Press `Go`, wait for the child to get home, and press `Go` again. The child both does and sees, so the
-           `Motor: go to candy` and `Visual: going to candy` neurons fire together, and the weights between them
-           grow.
-        3. Press `Watch adult go` again. Now the motor neurons fire, from `start` to `grab`, while the child only
-           watches. That is a mirror response, and the label changes to `Mirror: go to candy`. From now on, watching
-           also strengthens the weights, because the visual spikes come just before motor spikes.
+        Start with the child only watching the adult. Then she goes herself, and the connections form.
 
-        ## Activity 2: Try a new object
+        1. Press `Watch adult go`. This models the child watching the adult go to the candy. The visual neurons
+           fire, but the motor neurons stay silent. There are no mirror neurons yet.
+        2. Press `Go`, wait for the child to get home, and press `Go` again. The child is now both doing an action
+           and seeing herself do it, so visual and motor neurons fire together, and the weights from the visual to
+           the motor neurons grow.
+        3. Press `Watch adult go` again. Now the motor neurons fire while the child only watches, and the label
+           changes to `Mirror: go to candy`.
+
+        ## Activity 2: See the spikes
+
+        This activity gives a feel for spike rasters, where each row is a neuron and each mark is a spike. When two
+        populations spike together, the connections between them grow, and later spikes in one predict spikes in
+        the other.
+
+        Press `Reset`, check `Show spikes`, and repeat Activity 1. While the adult goes, the visual neurons fire in
+        turn from `far` to `near`. After the child has gone, the motor neurons fire too, from `start` to `grab`.
+
+        ## Activity 3: Try a new object
 
         Set `Object` to `Bell` and press `Watch adult go`. There is no mirror response, because the child has
         never gone to the bell. Press `Go` once and watch again, and the bell neurons respond too.
 
-        ## Activity 3: See single spikes
+        ## Activity 4: See single spikes
 
         To see single spikes, drag a box around the `Motor: go to candy` neurons, right-click one, and choose the
         time series plot. Press `Watch adult go`, and each spike shows as a sharp peak.
 
-        ## Activity 4: Do without seeing
+        ## Activity 5: Do without seeing
 
-        Press `Reset learning` and uncheck `Child can see self`. Press `Go` as often as you like, then
-        `Watch adult go`. There is no mirror response: doing without seeing teaches nothing. Check the box again
-        when you are done.
+        Press `Reset` and uncheck `Child can see self`. Press `Go` as often as you like, then `Watch adult go`.
+        There is no mirror response: doing without seeing teaches nothing. Check the box again when you are done.
 
-        ## Activity 5: Change the learning rate (advanced)
+        ## Activity 6: Change the learning rate (advanced)
 
         Click the network, press `W` to select every weight, and press Cmd-E (Ctrl-E on Windows and
-        Linux). Set `Learning rate` to 0.1 (it starts at $LEARNING_RATE). Press `Reset learning`, press `Go`
+        Linux). Set `Learning rate` to 0.1 (it starts at $LEARNING_RATE). Press `Reset`, press `Go`
         twice, then `Watch adult go`. The response is weak or absent and the label usually stays `Motor`. It takes more
         trips to get a clear response. Set the rate back to $LEARNING_RATE when you are done.
 
         # References
-
-        Bowman, L. C., Thorpe, S. G., Cannon, E. N., & Fox, N. A. (2017). [_Action mechanisms for social cognition:
-        Behavioral and neural correlates of developing theory of mind_](https://doi.org/10.1111/desc.12447).
-        Developmental Science, 20(5), e12447.
 
         Heyes, C. (2010). [_Where do mirror neurons come from?_](https://doi.org/10.1016/j.neubiorev.2009.11.007)
         Neuroscience & Biobehavioral Reviews, 34(4), 575–583.
@@ -373,6 +387,20 @@ class MirrorReaches(
         }
     }
 
+    /**
+     * End any trip under way, such as one paused partway by stepping, and send everyone home.
+     */
+    fun cancel() {
+        actors = emptyList()
+        target = null
+        holdCounts.clear()
+        restCount = 0
+        sendHome(child)
+        sendHome(adult)
+        child.caption = null
+        adult.caption = null
+    }
+
     fun step() {
         val target = target ?: return
         if (restCount > 0) {
@@ -533,6 +561,7 @@ suspend fun SimulationScope.setUpMirrorLearning(workspace: Workspace): MirrorTri
     val trips = MirrorTrips(reaches, ::trip)
     var busy = false
     var target = reaches.candy
+    var lastActors = listOf(reaches.child)
 
     fun launchOnce(block: suspend () -> Unit) {
         if (busy) return
@@ -552,11 +581,28 @@ suspend fun SimulationScope.setUpMirrorLearning(workspace: Workspace): MirrorTri
                 "Object", listOf(CANDY, BELL), CANDY,
                 toolTip = "The object the buttons below send people to."
             ) { name -> target = if (name == CANDY) reaches.candy else reaches.bell }
-            addButton("Watch adult go") { launchOnce { trip(listOf(reaches.adult), target) } }.apply {
+            addButton("Watch adult go") {
+                if (reaches.isReaching && reaches.isChildActing) return@addButton
+                lastActors = listOf(reaches.adult)
+                launchOnce { trip(lastActors, target) }
+            }.apply {
                 toolTipText = "The adult goes to the object while the child watches."
             }
-            addButton("Go") { launchOnce { trip(listOf(reaches.child), target) } }.apply {
+            addButton("Go") {
+                if (reaches.isReaching && !reaches.isChildActing) return@addButton
+                lastActors = listOf(reaches.child)
+                launchOnce { trip(lastActors, target) }
+            }.apply {
                 toolTipText = "The child goes to the object."
+            }
+            addButton("Step") {
+                if (workspace.updater.isRunning) return@addButton
+                launchOnce {
+                    reaches.start(lastActors, target)
+                    workspace.iterateSuspend()
+                }
+            }.apply {
+                toolTipText = "Step whatever the last action taken was, one time step at a time."
             }
             addCheckBox(
                 "Child can see self", reaches.childSeesSelf,
@@ -567,13 +613,22 @@ suspend fun SimulationScope.setUpMirrorLearning(workspace: Workspace): MirrorTri
                 withContext(Dispatchers.Main) { raster.isGuiOn = it }
             }
             addSeparator()
-            addButton("Reset learning") {
+            addButton("Reset") {
                 if (busy) return@addButton
+                reaches.cancel()
                 synapses.forEach { it.strength = 0.0 }
+                populations.forEach { population ->
+                    population.clear()
+                    population.neuronList.forEach {
+                        it.activation = RESTING_POTENTIAL
+                        (it.dataHolder as? IzhikevichScalarData)?.recovery = 0.0
+                    }
+                }
+                raster.model.clearData()
                 relabel(motorCandy, mirror = false)
                 relabel(motorBell, mirror = false)
             }.apply {
-                toolTipText = "Set every visual to motor weight back to zero and restore the Motor labels."
+                toolTipText = "Set the weights to zero, clear spikes and neuron activity, and restore the Motor labels."
             }
         }.awaitLayout()
 

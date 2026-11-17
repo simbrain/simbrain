@@ -16,10 +16,14 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.gui.NetworkPanel
+import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.subnetworks.Hopfield
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.workspace.Workspace
 import java.util.concurrent.CopyOnWriteArrayList
+import javax.swing.SwingUtilities
+import kotlin.math.sqrt
 
 class CommandShellTest {
 
@@ -986,6 +990,52 @@ class CommandShellTest {
             shell.run("set net1/* activation=0.2")
         )
         assertEquals("Neuron_1: 0.75\nNeuron_2: 0", shell.run("get net1/Neuron_* activation"))
+    }
+
+    @Test
+    fun `select warns about what is not drawn on the canvas and selects the rest`() {
+        val workspace = Workspace()
+        val component = NetworkComponent("net1")
+        workspace.addWorkspaceComponent(component)
+        lateinit var panel: NetworkPanel
+        SwingUtilities.invokeAndWait { panel = NetworkPanel(component) }
+        val shell = CommandShell(workspace, networkPanel = { panel })
+        // Enough neurons that the synapse group between them is drawn as one arrow
+        val size = sqrt(NetworkPreferences.synapseVisibilityThreshold.toDouble()).toInt() + 1
+        shell.run("add collection $size in=net1 label=left")
+        shell.run("add collection $size in=net1 label=right")
+        shell.run("connect net1/left net1/right")
+
+        val output = shell.run("select net1/** where type=Neuron or type=Synapse")
+
+        assertTrue(
+            output.startsWith("Selected ${2 * size} object(s).\nWarning: ${size * size} more matched but are not drawn on the canvas"),
+            output
+        )
+        runBlocking { withTimeout(30_000) { while (panel.selectionManager.selection.size != 2 * size) delay(5) } }
+    }
+
+    @Test
+    fun `a stray word after a command that takes none is reported`() {
+        val shell = shellWithNetwork()
+        assertEquals("Usage: couplings", shell.run("couplings now"))
+        assertEquals("Usage: cls", shell.run("cls extra"))
+        assertEquals("Usage: help [command]", shell.run("help ls cd"))
+    }
+
+    @Test
+    fun `clear by itself points to cls`() {
+        assertEquals("clear needs a path, as in clear net1. To clear the screen, use cls.", shellWithNetwork().run("clear"))
+    }
+
+    @Test
+    fun `stop still stops when a stray word follows it`() {
+        val shell = shellWithNetwork()
+        shell.run("run")
+        val output = shell.run("stop now please")
+        assertTrue(output.startsWith("Stopped. Time: "), output)
+        assertTrue(output.endsWith("\nstop takes nothing after it, so now please was ignored."), output)
+        runBlocking { withTimeout(30_000) { while (shell.workspace.updater.isRunning) delay(5) } }
     }
 
     @Test

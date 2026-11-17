@@ -1,7 +1,8 @@
 /**
  * A terminal for a [CommandShell]: one scrolling text pane holding the transcript, then the prompt, then what is being
  * typed. Everything before the input is read-only, and output from a command that finishes later is inserted above the
- * prompt, so it never lands in the middle of what is being typed. Commands run off the event thread.
+ * prompt, so it never lands in the middle of what is being typed. Commands run off the event thread. Lines pasted
+ * together run one after another until one fails, and the rest are then listed instead of run.
  */
 package org.simbrain.console
 
@@ -51,6 +52,7 @@ private const val MAX_TRANSCRIPT_LINES = 5000
 private const val STATUS_DELAY_MS = 500L
 private const val STATUS_INTERVAL_MS = 100L
 private const val BAR_WIDTH = 20
+private const val MAX_NOT_RUN_SHOWN = 10
 
 /** The status line for a running command: a bar if its size is known, otherwise a count. */
 internal fun statusText(progress: Progress?): String {
@@ -62,6 +64,14 @@ internal fun statusText(progress: Progress?): String {
     val filled = (fraction * BAR_WIDTH).roundToInt()
     val bar = "[" + "#".repeat(filled) + ".".repeat(BAR_WIDTH - filled) + "]"
     return "$bar ${(fraction * 100).roundToInt()}% ${progress.what} ${"%,d".format(progress.done)} of ${"%,d".format(total)}. $hint"
+}
+
+/** What is shown after a pasted line fails, for the lines pasted after it. */
+internal fun notRunText(lines: List<String>): String {
+    val count = if (lines.size == 1) "1 pasted line was" else "${lines.size} pasted lines were"
+    val shown = lines.take(MAX_NOT_RUN_SHOWN).joinToString("\n") { "  $it" }
+    val more = if (lines.size > MAX_NOT_RUN_SHOWN) "\n  ... and ${lines.size - MAX_NOT_RUN_SHOWN} more" else ""
+    return "Stopped here. $count not run:\n$shown$more"
 }
 
 /**
@@ -147,9 +157,10 @@ class CommandConsolePanel(
     }
 
     /** Run [line] as though it had been entered. The job finishes once its output is in the transcript. */
-    fun submit(line: String): Job {
-        val queued = QueuedLine(line)
-        if (shell.isImmediate(line)) {
+    fun submit(line: String): Job = submit(QueuedLine(line))
+
+    private fun submit(queued: QueuedLine): Job {
+        if (shell.isImmediate(queued.line)) {
             commandScope.launch { runAndShow(queued) }
         } else {
             queue.trySend(queued)
@@ -165,6 +176,10 @@ class CommandConsolePanel(
 
     private suspend fun runQueue() = coroutineScope {
         for (queued in queue) {
+            if (queued.batch?.stopped == true) {
+                queued.done.complete()
+                continue
+            }
             shell.progress = null
             val job = launch { runAndShow(queued, showsProgress = true) }
             runningJob = job
@@ -204,11 +219,13 @@ class CommandConsolePanel(
         val status = if (showsProgress) launch { showStatusWhileRunning() } else null
         try {
             withContext(swingDispatcher) { insertOutput(shell.prompt, queued.line) }
-            val result = shell.executeStyled(queued.line)
+            val outcome = shell.outcomeOf(queued.line)
             status?.cancelAndJoin()
+            val notRun = if (outcome.failed) stopBatchAt(queued) else emptyList()
             withContext(swingDispatcher) {
                 setStatus(null)
-                if (result.isNotEmpty()) insertOutput(result)
+                if (outcome.text.isNotEmpty()) insertOutput(outcome.text)
+                if (notRun.isNotEmpty()) insertOutput(notRunText(notRun))
                 refreshPrompt()
             }
         } catch (e: CancellationException) {
@@ -221,6 +238,16 @@ class CommandConsolePanel(
         } finally {
             queued.done.complete()
         }
+    }
+
+    /**
+     * Keep the lines pasted after a line that failed from running, since they are likely to depend on it. Returns
+     * those lines.
+     */
+    private fun stopBatchAt(queued: QueuedLine): List<String> {
+        val batch = queued.batch ?: return emptyList()
+        batch.stopped = true
+        return batch.lines.drop(queued.indexInBatch + 1).filterNot(shell::isImmediate)
     }
 
     private fun cancelledText() =
@@ -273,9 +300,10 @@ class CommandConsolePanel(
             textPane.replaceSelection(text)
             return
         }
-        val complete = listOf(currentInput() + lines.first()) + lines.subList(1, lines.size - 1)
+        val complete = (listOf(currentInput() + lines.first()) + lines.subList(1, lines.size - 1)).filter { it.isNotBlank() }
         replaceInput(lines.last())
-        complete.filter { it.isNotBlank() }.forEach(::submit)
+        val batch = Batch(complete)
+        complete.forEachIndexed { index, line -> submit(QueuedLine(line, batch, index)) }
     }
 
     private fun currentInput() = document.getText(inputStart, document.length - inputStart)
@@ -381,7 +409,14 @@ class CommandConsolePanel(
         }
     }
 
-    private class QueuedLine(val line: String) {
+    /** Lines pasted together. Once one of them fails, those after it are not run. */
+    private class Batch(val lines: List<String>) {
+        @Volatile
+        var stopped = false
+    }
+
+    /** @param batch what the line was pasted with, if it was pasted, and [indexInBatch] its place there */
+    private class QueuedLine(val line: String, val batch: Batch? = null, val indexInBatch: Int = 0) {
         val done: CompletableJob = Job()
     }
 

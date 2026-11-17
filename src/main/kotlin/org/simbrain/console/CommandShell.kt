@@ -25,6 +25,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.desktop.NetworkDesktopComponent
+import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
@@ -152,6 +153,14 @@ class Node(val path: List<String>, val value: Any) {
 }
 
 /**
+ * What running a line gave.
+ *
+ * @param text what to show for it
+ * @param failed whether the text reports a problem with the line rather than what it did
+ */
+class Outcome(val text: String, val failed: Boolean)
+
+/**
  * @param line the line after completion
  * @param options the possible completions, when there is more than one
  */
@@ -159,12 +168,14 @@ class Completion(val line: String, val options: List<String>)
 
 /**
  * @param desktop the desktop, if there is one. Commands that need a GUI report that they cannot run without it.
+ * @param networkPanel the canvas a network is shown on, if it has one
  * @param selectedModels what `@` refers to
  */
 class CommandShell(
     val workspace: Workspace,
     val desktop: SimbrainDesktop? = null,
     val registry: CommandRegistry = workspaceCommands,
+    private val networkPanel: suspend (NetworkComponent) -> NetworkPanel? = { desktopPanel(desktop, it) },
     private val selectedModels: suspend () -> List<NetworkModel> = { desktopSelection(workspace, desktop) }
 ) {
 
@@ -199,15 +210,21 @@ class CommandShell(
     suspend fun execute(line: String): String = plainText(executeStyled(line))
 
     /** Like [execute], but parts of the text that should be bold are marked with [bold]. */
-    suspend fun executeStyled(line: String): String {
+    suspend fun executeStyled(line: String): String = outcomeOf(line).text
+
+    /** Like [executeStyled], and also says whether the text reports a problem. */
+    suspend fun outcomeOf(line: String): Outcome {
         return try {
-            runLine(line)
+            Outcome(runLine(line), failed = false)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
-            problemText(e)
+            Outcome(problemText(e), failed = true)
         }
     }
+
+    /** The canvas that [component] is shown on, or null if it has none, as when there is no desktop. */
+    suspend fun panelOf(component: NetworkComponent): NetworkPanel? = networkPanel(component)
 
     /** Run a line, throwing a [CommandException] for a problem instead of returning it as text. */
     internal suspend fun executeOrThrow(line: String): String = runLine(line)
@@ -585,12 +602,14 @@ fun expandBraces(text: String): List<String> {
     return expanded
 }
 
-private suspend fun desktopSelection(workspace: Workspace, desktop: SimbrainDesktop?): List<NetworkModel> {
-    if (desktop == null) return emptyList()
-    return workspace.componentList.filterIsInstance<NetworkComponent>().filter { it.isGuiOn }.flatMap { component ->
-        (desktop.getDesktopComponent(component) as NetworkDesktopComponent).networkPanel.selectionManager.selectedModels
-    }
+private suspend fun desktopPanel(desktop: SimbrainDesktop?, component: NetworkComponent): NetworkPanel? {
+    if (desktop == null || !component.isGuiOn) return null
+    return (desktop.getDesktopComponent(component) as? NetworkDesktopComponent)?.networkPanel
 }
+
+private suspend fun desktopSelection(workspace: Workspace, desktop: SimbrainDesktop?): List<NetworkModel> =
+    workspace.componentList.filterIsInstance<NetworkComponent>()
+        .flatMap { component -> desktopPanel(desktop, component)?.selectionManager?.selectedModels.orEmpty() }
 
 private fun globToRegex(glob: String) = Regex(
     glob.split("*").joinToString(".*") { part -> part.split("?").joinToString(".") { Regex.escape(it) } },

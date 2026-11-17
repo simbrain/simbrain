@@ -298,4 +298,38 @@ class CommandConsolePanelTest {
             }
         }
     }
+
+    @Test
+    fun `a pasted line that fails keeps the lines after it from running, and lists them`() {
+        val panel = panel()
+        onEdt { panel.pasteText("add neurons 1\nset net1/Nope x=1\nadd neurons 5\nls net1\n") }
+        panel.awaitText("Not found: net1/Nope\nStopped here. 2 pasted lines were not run:\n  add neurons 5\n  ls net1\n")
+        panel.enter("ls net1", "> ls net1\nNeuron_1\n")
+        assertFalse("Neuron_2" in panel.text, panel.text)
+    }
+
+    @Test
+    fun `a typed line that fails does not keep later lines from running`() {
+        val panel = panel()
+        panel.enter("set net1/Nope x=1", "Not found: net1/Nope")
+        panel.enter("add neurons 1", "Added Neuron_1.")
+        assertFalse("Stopped here" in panel.text, panel.text)
+    }
+
+    @Test
+    fun `a paste after one that stopped runs normally`() {
+        val panel = panel()
+        onEdt { panel.pasteText("set net1/Nope x=1\nadd neurons 5\n") }
+        panel.awaitText("Stopped here. 1 pasted line was not run:\n  add neurons 5\n")
+        onEdt { panel.pasteText("add neurons 1\nls net1\n") }
+        panel.awaitText("> ls net1\nNeuron_1\n")
+    }
+
+    @Test
+    fun `the lines not run are listed up to a limit`() {
+        assertEquals("Stopped here. 1 pasted line was not run:\n  ls", notRunText(listOf("ls")))
+        val text = notRunText(List(12) { "ls $it" })
+        assertTrue(text.startsWith("Stopped here. 12 pasted lines were not run:\n  ls 0\n"), text)
+        assertTrue(text.endsWith("  ls 9\n  ... and 2 more"), text)
+    }
 }

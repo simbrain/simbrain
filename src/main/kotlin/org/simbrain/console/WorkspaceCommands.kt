@@ -174,10 +174,21 @@ val workspaceCommands: CommandRegistry = commands {
         val nodes = if (word == "none") emptyList() else targets(word)
         nodes.firstOrNull { it.value !is NetworkModel }?.let { fail("${it.name} can't be selected.") }
         val byNetwork = nodes.groupBy { networkOf(it) }
+        var notDrawn = 0
         networkComponents.forEach { component ->
-            component.network.selectModels(byNetwork[component.network].orEmpty().map { it.value as NetworkModel })
+            val models = byNetwork[component.network].orEmpty().map { it.value as NetworkModel }
+            // Only what is drawn can be selected, and asking the canvas to select anything else selects nothing at all
+            val panel = panelOf(component)
+            val drawn = if (panel == null) models else models.filter { panel.modelNodeMap.peek(it) != null }
+            notDrawn += models.size - drawn.size
+            component.network.selectModels(drawn)
         }
-        if (word == "none") "" else "Selected ${nodes.size} object(s)."
+        when {
+            word == "none" -> ""
+            notDrawn == 0 -> "Selected ${nodes.size} object(s)."
+            else -> "Selected ${nodes.size - notDrawn} object(s).\nWarning: $notDrawn more matched but are not drawn " +
+                    "on the canvas, so they were not selected. The synapses of a large synapse group are drawn as one arrow."
+        }
     }
 
     command(
@@ -316,7 +327,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("List the couplings, numbered for uncouple", "couplings")
         ),
         description = "List the couplings in the workspace."
-    ) { _ ->
+    ) { args ->
+        noArguments(args, "couplings")
         workspace.couplingManager.couplings
             .mapIndexed { index, coupling -> "${index + 1}  ${coupling.id}" }
             .joinToString("\n")
@@ -424,6 +436,7 @@ val workspaceCommands: CommandRegistry = commands {
         description = "Clear models, or the activations in a network.",
         completer = pathCompletion
     ) { args ->
+        if (args.isEmpty()) fail("clear needs a path, as in clear net1. To clear the screen, use cls.")
         val nodes = targets(onePath(args))
         nodes.firstOrNull { it.value !is NetworkComponent && it.value !is NetworkModel }?.let { fail("${it.name} can't be cleared.") }
         try {
@@ -477,9 +490,11 @@ val workspaceCommands: CommandRegistry = commands {
         ),
         description = "Stop the workspace after the current iteration. Runs at once, even while another command is running.",
         immediate = true
-    ) { _ ->
+    ) { args ->
+        // Stopping is not held up by a stray word after it
         workspace.stop()
-        "Stopped. Time: ${workspace.time}"
+        "Stopped. Time: ${workspace.time}" +
+                if (args.isEmpty()) "" else "\nstop takes nothing after it, so ${args.joinToString(" ")} was ignored."
     }
 
     command(
@@ -564,7 +579,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Clear the screen", "cls")
         ),
         description = "Clear the screen."
-    ) { _ ->
+    ) { args ->
+        noArguments(args, "cls")
         onClearScreen()
         ""
     }
@@ -581,6 +597,7 @@ val workspaceCommands: CommandRegistry = commands {
         description = "List commands, or describe one. help where describes conditions.",
         completer = { _, partial -> wordCandidates(registry.all.map { it.name } + "where", partial) }
     ) { args ->
+        if (args.size > 1) fail("Usage: help [command]")
         if (args.isEmpty()) {
             registry.all.groupBy { it.group }.entries.joinToString("\n\n") { (group, members) ->
                 group + "\n" + members.joinToString("\n") { "  " + styledUsage(it) }
@@ -623,6 +640,10 @@ private fun whereHelp(registry: CommandRegistry): String =
 
 /** A command's usage with its name in bold. */
 private fun styledUsage(command: Command) = bold(command.name) + command.usage.removePrefix(command.name)
+
+private fun noArguments(args: List<String>, usage: String) {
+    if (args.isNotEmpty()) fail("Usage: $usage")
+}
 
 private fun onePath(args: List<String>): String =
     args.singleOrNull() ?: fail("Expected one path. Put names containing spaces in quotes.")

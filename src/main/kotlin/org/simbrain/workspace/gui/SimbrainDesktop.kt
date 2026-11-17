@@ -1,7 +1,5 @@
 package org.simbrain.workspace.gui
 
-import bsh.Interpreter
-import bsh.util.JConsole
 import com.formdev.flatlaf.FlatLaf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -11,7 +9,7 @@ import kotlinx.coroutines.withContext
 import net.miginfocom.swing.MigLayout
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea
 import org.pmw.tinylog.Logger
-import org.simbrain.console.ConsoleDesktopComponent
+import org.simbrain.console.CommandConsolePanel
 import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.util.*
@@ -47,7 +45,6 @@ import javax.swing.event.*
 /**
  * Creates a singleton Swing-based environment for working with a workspace.
  *
- * Also provides wrappers for GUI elements called from a terminal.
  *
  * @author Matt Watson
  * @author Jeff Yoshimi
@@ -177,14 +174,16 @@ object SimbrainDesktop {
         })
     }
 
+    private val terminalPanel = CommandConsolePanel(workspace, this)
+
     val bottomDockSplitter = SimbrainDesktopDock(
         mainComponent = sideDockSplitter,
         dockComponent = JTabbedPane().apply {
+            addTab("Terminal", null, terminalPanel, "Simbrain command line")
             addTab("Components", null, ComponentPanel(this@SimbrainDesktop), "Show workspace components")
-            addTab("Terminal", null, terminalPanel, "Simbrain terminal")
             addTab("Performance", null, PerformanceMonitorPanel(this@SimbrainDesktop.workspace), "Performance monitoring")
             addChangeListener {
-                PerformanceMonitor.enabled = selectedIndex == 2
+                PerformanceMonitor.enabled = selectedComponent is PerformanceMonitorPanel
             }
         },
         orientation = JSplitPane.VERTICAL_SPLIT,
@@ -201,14 +200,16 @@ object SimbrainDesktop {
         }
     }
 
+    /** Show the Terminal tab and run [line] there, for commands that would close a Console window. */
+    fun runInTerminal(line: String) = swingInvokeLater {
+        bottomDockSplitter.showDock()
+        (bottomDockSplitter.dockComponent as JTabbedPane).selectedComponent = terminalPanel
+        terminalPanel.submit(line)
+    }
+
     private val workspaceBounds: Rectangle
 
     val actionManager = WorkspaceActions()
-
-    /**
-     * Interpreter for terminal.
-     */
-    private var interpreter: Interpreter? = null
 
     /**
      * Time indicator.
@@ -395,9 +396,6 @@ object SimbrainDesktop {
             Taskbar.getTaskbar().iconImage = ResourceManager.getImage("simbrain_iconset/icon_128x128.png")
         }
 
-        // Start terminal
-        Thread(interpreter).start()
-
         // Make dragging a little faster but perhaps uglier.
         // desktop.setDragMode(JDesktopPane.OUTLINE_DRAG_MODE);
     }
@@ -444,27 +442,6 @@ object SimbrainDesktop {
                 }
             }
         }
-    }
-
-    private val terminalPanel: JConsole
-        get() {
-            val console = JConsole()
-            interpreter = ConsoleDesktopComponent.getSimbrainInterpreter(console, workspace).also {
-                try {
-                    it.set("desktop", this)
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
-            }
-            console.preferredSize = Dimension(400, 300)
-            return console
-        }
-
-    /**
-     * Print text to Simbrain terminal.
-     */
-    fun printToTerminal(toPrint: String?) {
-        interpreter!!.println(toPrint)
     }
 
     private fun createToolBar(): JToolBar {
@@ -1304,7 +1281,7 @@ object SimbrainDesktop {
     }
 
     /**
-     * Called by componentBounds.bsh
+     * Used by the component bounds action.
      */
     fun getComponentBoundsString() = desktopPane.allFrames.joinToString("\n") {
         "${it.title} (${it.x}, ${it.y}, ${it.width}, ${it.height})"
@@ -1317,18 +1294,6 @@ object SimbrainDesktop {
     fun createDesktopComponent(parentFrame: GenericFrame?, component: WorkspaceComponent): DesktopComponent<*> {
         val genericFrame = parentFrame ?: DesktopInternalFrame(component)
         return component.workspace.componentFactory.createGuiComponent(genericFrame, component)
-    }
-
-    /**
-     * Show Gui View of a workspace component. Used from terminal.
-     */
-    fun showJFrame(component: WorkspaceComponent) {
-        val theFrame = GenericJFrame()
-        val desktopComponent = createDesktopComponent(theFrame, component)
-        theFrame.isResizable = true
-        theFrame.isVisible = true
-        theFrame.setBounds(100, 100, 200, 200)
-        theFrame.contentPane = desktopComponent
     }
 
     /**

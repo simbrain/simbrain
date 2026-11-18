@@ -9,6 +9,7 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.getNetworkXStream
 import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.applyFunction
 import org.simbrain.util.assertMatrixEquals
@@ -764,6 +765,24 @@ class OptimizerTest {
             listOf(twins.arrayTrainer, twins.collectionTrainer).forEach { trainer ->
                 val xml = getSimbrainXStream().toXML(trainer.config.optimizer)
                 assertFalse(xml.contains("<rows>")) { "Saved optimizer should hold no matrices, but was:\n${xml.take(600)}" }
+            }
+        }
+    }
+
+    @Test
+    fun `training continues after a network is saved and loaded`() {
+        listOf<() -> Optimizer>({ BasicOptimizer() }, { AdamOptimizer() }, { AdamWOptimizer() }).forEach { optimizer ->
+            val twins = TwinNetworks(optimizer)
+            twins.trainBoth(3)
+            listOf(twins.arrayNetwork, twins.collectionNetwork).forEach { network ->
+                val loaded = getNetworkXStream().fromXML(getNetworkXStream().toXML(network)) as Network
+                val model = loaded.getModels(SupervisedModel::class.java).first()
+                val trainer = SupervisedTrainer(loaded, model)
+                assertEquals(optimizer()::class, trainer.config.optimizer::class)
+                repeat(3) {
+                    val error = with(loaded) { trainer.trainBatch(0 until 4) }
+                    assertTrue(error.isFinite())
+                }
             }
         }
     }

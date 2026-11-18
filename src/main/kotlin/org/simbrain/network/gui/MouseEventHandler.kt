@@ -31,6 +31,11 @@ import java.awt.geom.Rectangle2D
 import java.awt.image.BaseMultiResolutionImage
 import java.awt.image.BufferedImage
 
+/**
+ * How far, in canvas pixels, the cursor can travel between press and release and still count as a click.
+ */
+private const val CLICK_SLOP = 3.0
+
 /** True when the canvas pan modifier is held — cmd on macOS, ctrl elsewhere. */
 val PInputEvent.isPanKeyDown get() = if (Utils.isMacOSX()) isMetaDown else isControlDown
 
@@ -118,13 +123,16 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         }
     }
 
-    override fun mouseClicked(event: PInputEvent?) {
-        super.mouseClicked(event)
-        event?.position?.let {
-            if (event.pickedNode.firstScreenElement == null) {
-                networkPanel.network.placementManager.insertionPoint = it
-            }
-        }
+    /**
+     * A press and release on empty canvas that stays within [CLICK_SLOP] sets the insertion point to where the press
+     * was. Judged from the press and release rather than from mouse-clicked events, because those are not sent when
+     * the cursor moves at all in between, which a real click often does by a pixel.
+     */
+    private fun setInsertionPointOnClick(release: PInputEvent) {
+        // The picked node of a release is the one that was pressed on
+        if (release.pickedNode.firstScreenElement != null) return
+        if (release.canvasPosition.distance(mousePressedCanvasPoint) > CLICK_SLOP) return
+        networkPanel.network.placementManager.insertionPoint = marqueeStartPosition
     }
 
     /**
@@ -191,6 +199,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     override fun endDrag(event: PInputEvent) {
         super.endDrag(event)
+        setInsertionPointOnClick(event)
         if (mode == Mode.SELECTION) {
             selectionMarquee.visible = false
         } else {

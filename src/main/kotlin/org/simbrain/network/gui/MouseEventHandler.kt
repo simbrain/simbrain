@@ -1,3 +1,8 @@
+/**
+ * Mouse handling for the network canvas with the selection or pan cursor: a click on empty canvas sets the insertion
+ * point, a drag on empty canvas selects with a marquee, a drag on a node moves the selection (or, with alt held,
+ * drags out a duplicate of it), and the pan key or pan cursor pans the view. Also defines the canvas cursors.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -52,17 +57,43 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
     private var previousAutoZoomState: Boolean = true
 
     /**
-     * True for an alt-drag, which drags out a duplicate of the selection rather than moving it.
+     * The current drag when it is an alt-drag of something that can be copied, which drags out a duplicate of the
+     * selection rather than moving it. Null for any other drag.
      */
-    private var isDuplicateDrag = false
-
-    private var duplicateStarted = false
+    private var duplicateDrag: DuplicateDrag? = null
 
     /**
-     * True while the duplicate for an alt-drag is being created. Nothing is moved in the meantime; the copies catch
-     * up with the cursor once they exist.
+     * @param start where the drag began
      */
-    private var awaitingDuplicate = false
+    private class DuplicateDrag(val start: Point2D) {
+
+        /**
+         * Where the cursor has got to.
+         */
+        var end: Point2D = start
+
+        var phase = Phase.ARMED
+
+        enum class Phase {
+
+            /**
+             * The cursor has not moved yet, so nothing has been copied. A press and release without moving copies
+             * nothing.
+             */
+            ARMED,
+
+            /**
+             * The copies are being created. Nothing is moved in the meantime; the copies catch up with the cursor
+             * once they exist.
+             */
+            CREATING,
+
+            /**
+             * The copies exist, are selected, and follow the cursor.
+             */
+            DRAGGING_COPIES
+        }
+    }
 
     private val selectionMarquee by lazy {
         with(marqueeStartPosition) { SelectionMarquee(x.toFloat(), y.toFloat()) }.also {
@@ -106,11 +137,9 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
         previousAutoZoomState = networkPanel.autoZoom
 
         val pickedNode: PNode? = event.pickedNode
-        isDuplicateDrag = false
-        duplicateStarted = false
+        duplicateDrag = null
         pickedNode?.firstScreenElement?.let { pickedScreenElement ->
             mode = Mode.DRAG
-            isDuplicateDrag = event.isAltDown
             networkPanel.autoZoom = false
             // A plain press on a node outside its pixels selects the whole node, so pixel selections go
             if (!event.isShiftDown && !pickedNode.isPixelTarget) {
@@ -125,6 +154,10 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 if (!event.isShiftDown) {
                     networkPanel.selectionManager.set(pickedScreenElement)
                 }
+            }
+            // An alt-drag of things that cannot be copied is an ordinary move
+            if (event.isAltDown && Clipboard.wouldCopy(networkPanel.selectionManager.selectedModels)) {
+                duplicateDrag = DuplicateDrag(event.position)
             }
         }
 
@@ -168,6 +201,7 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
                 .filterSelectedModels<LocatableModel>()
             val startLocations = startLocations.toList()
             val endLocations = models.map { it.location }.toList()
+            val isDuplicateDrag = duplicateDrag != null
             if (isDuplicateDrag) networkPanel.cursor = networkPanel.mouseCursor.cursor
             // Undoing a duplicate drag removes the copies (the paste's own undo entry), so there is no move to record
             // A click starts and ends a drag too, so record a move only if something moved
@@ -226,11 +260,17 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      * drag that. See [screenElements].
      */
     private fun dragItems(event: PInputEvent) {
-        if (awaitingDuplicate) return
-        val hasMoved = event.position.distance(marqueeStartPosition) > 0
-        if (isDuplicateDrag && mode == Mode.DRAG && !duplicateStarted && hasMoved) {
-            startDuplicateDrag()
-            return
+        val duplicate = duplicateDrag?.takeIf { mode == Mode.DRAG }
+        if (duplicate != null) {
+            duplicate.end = event.position
+            when (duplicate.phase) {
+                DuplicateDrag.Phase.ARMED -> {
+                    if (duplicate.end.distance(duplicate.start) > 0) createDuplicate(duplicate)
+                    return
+                }
+                DuplicateDrag.Phase.CREATING -> return
+                DuplicateDrag.Phase.DRAGGING_COPIES -> {}
+            }
         }
         val delta = event.position - marqueeEndPosition
         offsetSelection(delta.x, delta.y)
@@ -243,21 +283,27 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
 
     /**
      * Duplicate the selection on top of itself, then move the copies (now selected) to where the cursor has got to.
-     * The originals never move.
+     * The originals never move. If no copies could be made, nothing is moved for them and the rest of the drag is an
+     * ordinary move.
      */
-    private fun startDuplicateDrag() {
-        duplicateStarted = true
-        awaitingDuplicate = true
+    private fun createDuplicate(drag: DuplicateDrag) {
+        drag.phase = DuplicateDrag.Phase.CREATING
         // The platform's copy-drag cursor (on macOS, the arrow with a green plus badge)
         networkPanel.cursor = DragSource.DefaultCopyDrop
         networkPanel.launch {
+            var copied = false
             try {
-                networkPanel.duplicateInPlace()
+                copied = networkPanel.duplicateInPlace()
             } finally {
                 withContext(Dispatchers.Swing) {
-                    val dragged = marqueeEndPosition - marqueeStartPosition
-                    offsetSelection(dragged.x, dragged.y)
-                    awaitingDuplicate = false
+                    if (copied) {
+                        drag.phase = DuplicateDrag.Phase.DRAGGING_COPIES
+                        val dragged = drag.end - drag.start
+                        offsetSelection(dragged.x, dragged.y)
+                    } else if (duplicateDrag === drag) {
+                        duplicateDrag = null
+                        networkPanel.cursor = networkPanel.mouseCursor.cursor
+                    }
                 }
             }
         }

@@ -1,6 +1,7 @@
 package org.simbrain.network.gui
 
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.*
@@ -24,6 +25,11 @@ class PlacementManagerTest {
         placementManager.placeCopies(copies, source, placement)
         return copies
     }
+
+    /**
+     * Refills the clipboard, as copying [models] in any network would.
+     */
+    private fun copyToClipboard(vararg models: NetworkModel) = Clipboard.add(models.toList())
 
     private fun assertNoOverlap(models: List<LocatableModel>) {
         val locations = models.map { it.location }
@@ -141,7 +147,7 @@ class PlacementManagerTest {
     fun `test pastes after dragging an in-place copy away continue in the direction of the drag`() {
         val net = Network()
         val n1 = net.addPlacedNeuron()
-        net.placementManager.onCopy()
+        copyToClipboard(n1)
         val (dragged) = net.copyOf(listOf(n1), CopyPlacement.IN_PLACE)
         dragged.location = point(n1.x + 10, n1.y - 80)
         val (paste1) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
@@ -156,14 +162,14 @@ class PlacementManagerTest {
     fun `test moving a paste and pasting again repeats the move until the clipboard changes`() {
         val net = Network()
         val n1 = net.addPlacedNeuron()
-        net.placementManager.onCopy()
+        copyToClipboard(n1)
         val (paste1) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         paste1.location = point(n1.x, n1.y + 100)
         val (paste2) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         assertEquals(n1.x, paste2.x, .01)
         assertEquals(n1.y + 200, paste2.y, .01)
 
-        net.placementManager.onCopy()
+        copyToClipboard(n1)
         val (paste3) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         assertEquals(n1.x + NEURON_FOOTPRINT, paste3.x, .01)
         assertEquals(n1.y, paste3.y, .01)
@@ -173,7 +179,7 @@ class PlacementManagerTest {
     fun `test paste goes to an insertion point set after the copy`() {
         val net = Network()
         val n1 = net.addPlacedNeuron()
-        net.placementManager.onCopy()
+        copyToClipboard(n1)
         net.placementManager.insertionPoint = point(500.0, 300.0)
         val (copy) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         assertEquals(500.0, copy.x, .01)
@@ -185,7 +191,7 @@ class PlacementManagerTest {
         val net = Network()
         net.placementManager.insertionPoint = point(500.0, 300.0)
         val n1 = net.addPlacedNeuron()
-        net.placementManager.onCopy()
+        copyToClipboard(n1)
         val (paste1) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         val (paste2) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
         assertEquals(n1.x + NEURON_FOOTPRINT, paste1.x, .01)
@@ -204,11 +210,97 @@ class PlacementManagerTest {
     }
 
     @Test
-    fun `test first free offset skips blocked candidates`() {
-        val footprint = Rectangle2D.Double(0.0, 0.0, 10.0, 10.0)
-        val occupied = listOf(Rectangle2D.Double(0.0, 0.0, 10.0, 10.0), Rectangle2D.Double(10.0, 0.0, 10.0, 10.0))
-        val candidates = sequenceOf(point(0.0, 0.0), point(10.0, 0.0), point(20.0, 0.0))
-        assertEquals(point(20.0, 0.0), firstFreeOffset(footprint, occupied, candidates))
+    fun `test adds skip a slot that is taken`() {
+        val net = Network()
+        val n1 = net.addPlacedNeuron()
+        val blocker = Neuron().apply { location = point(n1.x + NEURON_FOOTPRINT, n1.y) }
+        net.addNetworkModelAsync(blocker, usePlacementManager = false)
+        val n2 = net.addPlacedNeuron()
+        assertEquals(n1.x + 2 * NEURON_FOOTPRINT, n2.x, .01)
+        assertEquals(n1.y, n2.y, .01)
+    }
+
+    @Test
+    fun `test a full row of adds wraps to a new row below`() {
+        val net = Network()
+        val neurons = List(2 * SLOTS_PER_ROW + 5) { net.addPlacedNeuron() }
+        assertNoOverlap(neurons)
+        val first = neurons.first()
+        val startOfSecondRow = neurons[SLOTS_PER_ROW]
+        assertEquals(first.x + (SLOTS_PER_ROW - 1) * NEURON_FOOTPRINT, neurons[SLOTS_PER_ROW - 1].x, .01)
+        assertEquals(first.x, startOfSecondRow.x, .01)
+        assertEquals(first.y + NEURON_FOOTPRINT, startOfSecondRow.y, .01)
+        assertEquals(first.y + 2 * NEURON_FOOTPRINT, neurons.last().y, .01)
+    }
+
+    @Test
+    fun `test an add made while the insertion point is off-screen does not replace it`() {
+        val net = Network()
+        var visible = Rectangle2D.Double(1000.0, 1000.0, 200.0, 100.0)
+        net.placementManager.visibleBounds = { visible }
+        net.placementManager.insertionPoint = point(0.0, 0.0)
+        val offScreenAdd = net.addPlacedNeuron()
+        assertEquals(point(1100.0, 1050.0), offScreenAdd.location)
+        assertEquals(point(0.0, 0.0), net.placementManager.insertionPoint)
+
+        // The view moves so that the insertion point is back on-screen
+        visible = Rectangle2D.Double(-100.0, -100.0, 2000.0, 2000.0)
+        val onScreenAdd = net.addPlacedNeuron()
+        assertEquals(point(0.0, 0.0), onScreenAdd.location)
+    }
+
+    @Test
+    fun `test adds do not set the insertion point`() {
+        val net = Network()
+        net.addPlacedNeuron()
+        assertNull(net.placementManager.insertionPoint)
+    }
+
+    @Test
+    fun `test a paste at the insertion point starts a new trail even after it is nudged`() {
+        val net = Network()
+        val n1 = net.addPlacedNeuron()
+        copyToClipboard(n1)
+        net.placementManager.insertionPoint = point(500.0, 300.0)
+        val (paste1) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
+        paste1.location = point(paste1.x + 10, paste1.y)
+        val (paste2) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
+        assertEquals(paste1.x + NEURON_FOOTPRINT, paste2.x, .01)
+        assertEquals(paste1.y, paste2.y, .01)
+        // Moving that paste then sets the step for the ones after it
+        paste2.location = point(paste1.x, paste1.y + 80)
+        val (paste3) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
+        assertEquals(paste1.x, paste3.x, .01)
+        assertEquals(paste1.y + 160, paste3.y, .01)
+    }
+
+    @Test
+    fun `test copying in another network ends this network's paste trail`() {
+        val net = Network()
+        val n1 = net.addPlacedNeuron()
+        copyToClipboard(n1)
+        val (paste1) = net.copyOf(listOf(n1), CopyPlacement.PASTE)
+        paste1.location = point(n1.x, n1.y + 100)
+
+        val otherNet = Network()
+        val other = otherNet.addPlacedNeuron()
+        copyToClipboard(other)
+        val (paste2) = net.copyOf(listOf(other), CopyPlacement.PASTE)
+        // Not continuing the trail below the first paste, which would put it at y + 200
+        assertEquals(n1.y, paste2.y, .01)
+        assertNoOverlap(listOf(n1, paste1, paste2))
+    }
+
+    @Test
+    fun `test a click made before copying in another network does not direct the paste`() {
+        val net = Network()
+        val n1 = net.addPlacedNeuron()
+        net.placementManager.insertionPoint = point(500.0, 300.0)
+        val other = Network().addPlacedNeuron()
+        copyToClipboard(other)
+        val (paste) = net.copyOf(listOf(other), CopyPlacement.PASTE)
+        assertEquals(n1.x + NEURON_FOOTPRINT, paste.x, .01)
+        assertEquals(n1.y, paste.y, .01)
     }
 
 }

@@ -719,7 +719,6 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     fun copy() {
         if (selectionManager.isEmpty) return
-        network.placementManager.onCopy()
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
     }
@@ -742,11 +741,14 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
 
     /**
      * Duplicate the selection on top of itself and select the copies, for callers that then move them (alt-drag).
+     *
+     * @return whether any copies were made. When nothing in the selection can be copied, the clipboard and the
+     * selection are left as they were.
      */
-    suspend fun duplicateInPlace() {
-        if (selectionManager.isEmpty) return
+    suspend fun duplicateInPlace(): Boolean {
+        if (!Clipboard.wouldCopy(selectionManager.selectedModels)) return false
         copy()
-        Clipboard.paste(this, CopyPlacement.IN_PLACE)
+        return Clipboard.paste(this, CopyPlacement.IN_PLACE).isNotEmpty()
     }
 
     private fun updateLocationsWithUndoableAction(

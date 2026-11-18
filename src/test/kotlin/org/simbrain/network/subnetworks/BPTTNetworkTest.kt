@@ -322,9 +322,12 @@ class BPTTNetworkTest {
         settle()
         assertEquals(1, arrowsUnderConnections().size) { "Only the arrow the real recurrent matrix sits on goes there" }
         SwingUtilities.invokeAndWait {
-            val tier = panel.edgeTier.childrenReference
-            val recurrentNode = tier.indexOfFirst { it is WeightMatrixNode && it.weightMatrix == bptt.hiddenToHidden }
-            assertTrue(recurrentNode > tier.indexOf(panel.connectionUnderlay)) { "The matrix is drawn after its arrow" }
+            val layer = panel.canvas.layer
+            val recurrentNode = panel.getNode(bptt.hiddenToHidden) as WeightMatrixNode
+            assertEquals(panel.edgeTier, panel.connectionUnderlay.parent)
+            assertTrue(layer.indexOfChild(recurrentNode.parent) > layer.indexOfChild(panel.edgeTier)) {
+                "The matrix is drawn after its arrow"
+            }
         }
 
         SwingUtilities.invokeAndWait { bptt.unrolledView = false }

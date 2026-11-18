@@ -6,7 +6,6 @@ package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
-import org.piccolo2d.PCamera
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.util.PBounds
@@ -18,6 +17,7 @@ import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.onUi
+import org.simbrain.util.piccolo.centerOn
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
 import org.simbrain.util.table.SimbrainTablePanel
@@ -31,7 +31,7 @@ import java.awt.RenderingHints
 import java.awt.event.ActionEvent
 import java.awt.geom.CubicCurve2D
 import java.awt.geom.Ellipse2D
-import java.beans.PropertyChangeListener
+import java.awt.geom.Rectangle2D
 import java.util.*
 import java.util.function.Consumer
 import javax.swing.*
@@ -42,10 +42,10 @@ import kotlin.math.ceil
  * A visual representation of a weight matrix
  */
 class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) : ScreenElement(networkPanel),
-    PixelSelectionHost {
+    PixelSelectionHost, LaidOutConnector {
     /**
-     * Side of the square [imageBox]. Fitted to the space between the two layers by [placeOnShaft]; a
-     * self-connection, which has no such space, keeps the default.
+     * Side of the square [imageBox]. Set by [placeDrawing] to the size the image is given on its arrow; a
+     * self-connection, which is not placed on an arrow, keeps the default.
      */
     private var imageSide = IMAGE_SIDE_DEFAULT
 
@@ -62,6 +62,33 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     val imageBox = ImageBox(imageSide, imageSide, boxThickness)
 
     private val arrow = WeightMatrixArrow(this)
+
+    override val connectionDrawing = ConnectionDrawing(this).also { it.addChild(arrow) }
+
+    override fun layoutArrow(layers: List<Rectangle2D>) = arrow.layout(layers)
+
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) = arrow.affectedBy(layers)
+
+    override fun reconsiderRoute(layers: List<Rectangle2D>, drawings: List<Rectangle2D>) =
+        arrow.reconsiderRoute(placedOnArrow, layers, drawings)
+
+    /** Where the image was last placed on the arrow, or null if it was last placed off it. */
+    private var placedOnArrow: ShaftPlacement? = null
+
+    override fun drawingToPlace() = arrow.matrixToPlace()
+
+    /** Put the image, with its label box and caption, where [placement] says, at the size it says. */
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D? {
+        placedOnArrow = placement
+        placement ?: return arrow.placeOffShaft()
+        if (abs(placement.side - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
+            imageSide = placement.side
+            // Stretches the image already rendered, which is all a small matrix needs
+            imageBox.resize(imageSide, imageSide)
+            if (renderSize() != renderedSize) markDirty(WEIGHTS)
+        }
+        return placeAt(placement.centerX, placement.centerY)
+    }
 
     /**
      * Whether to draw the connecting arrow. The matrix's image box and label are unaffected, so hiding
@@ -144,9 +171,6 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         }
     }
 
-    /** Keeps the arrow attached while the view pans and zooms; removed when the node leaves the canvas. */
-    private val cameraListener: PropertyChangeListener
-
     init {
         pickable = true
         val events = weightMatrix.events
@@ -156,9 +180,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         events.clampChanged.on(Dispatchers.Swing) { setClamped((weightMatrix as WeightMatrix).clamped) }.untilDisposed()
         events.labelChanged.on(Dispatchers.Swing) { _, newLabel ->
             interactionBox.setText(weightMatrix.displayName)
+            // The label box is placed by its middle, which a change of width moves, and its width guides placement
+            requestLayout()
         }.untilDisposed()
         addChild(interactionBox)
-        addChild(arrow)
         addChild(imageBox)
         addChild(shapeCaption)
         updateShapeCaption()
@@ -190,7 +215,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         })
         
         fun updateLocations() {
-            arrow.invalidateFullBounds()
+            requestLayout()
         }
         weightMatrix.source.events.locationChanged.on(Dispatchers.Swing) {
             updateLocations()
@@ -204,19 +229,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         (weightMatrix.target as? NeuronArray)?.events?.visualPropertiesChanged?.on(Dispatchers.Swing) {
             updateLocations()
         }?.untilDisposed()
-        cameraListener = PropertyChangeListener { updateLocations() }
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
-        networkPanel
-        invalidateFullBounds()
         setClamped((weightMatrix as WeightMatrix).clamped)
         interactionBox.setText(weightMatrix.displayName)
         interactionBox.raiseToTop()
         renderMatrixToImage()
-    }
-
-    override fun dispose() {
-        super.dispose()
-        networkPanel.canvas.camera.removePropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, cameraListener)
     }
 
     override fun syncFromModel(bits: Int) {
@@ -248,41 +264,31 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         shapeCaption.refresh()
     }
 
-    /** Center the image box on ([x], [y]) with the interaction box above it and the shape caption below. */
-    fun placeAt(x: kotlin.Double, y: kotlin.Double) {
-        imageBox.centerFullBoundsOnPoint(x, y)
-        interactionBox.centerFullBoundsOnPoint(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
-        shapeCaption.centerFullBoundsOnPoint(
-            x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP
-        )
-    }
+    /**
+     * The image with what is drawn around it, as placement on the arrow sees it. With the arrow to itself the image
+     * is as large as leaves it, with its label box and caption, [IMAGE_FILL] of the arrow, so that the arrow shows
+     * on either side of it. It stops growing at [IMAGE_SIDE_MAX], and stops shrinking at [IMAGE_SIDE_MIN], below
+     * which it overlaps what is in the way.
+     */
+    internal fun drawing() = ShaftDrawing(
+        above = interactionBox.layoutHeight,
+        below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0,
+        minWidth = interactionBox.layoutWidth,
+        minSide = IMAGE_SIDE_MIN,
+        maxSide = IMAGE_SIDE_MAX,
+        fill = IMAGE_FILL
+    )
 
     /**
-     * Size the image to the room between the two layers and place it there, at [position] along the arrow's
-     * [shaft] from 0 at the source layer to 1 at the base of the arrowhead, with the label box above it and the
-     * caption below. A matrix that is [shared] with one running the other way keeps to its half of the gap.
+     * Center the image box on ([x], [y]) with the interaction box above it and the shape caption below.
      *
-     * The image fills the gap until it is [IMAGE_SIDE_DEFAULT] across. Between layers further apart it grows only
-     * as far as leaves it, with its label box and caption, [IMAGE_FILL] of the gap, so that the arrow shows on
-     * either side of it. It stops growing at [IMAGE_SIDE_MAX] and stops shrinking at [IMAGE_SIDE_MIN], below which
-     * it overruns the room.
+     * @return the space the three now take up
      */
-    fun placeOnShaft(shaft: CubicCurve2D, position: kotlin.Double, shared: Boolean) {
-        val room = imageRoom(
-            shaft,
-            position,
-            shared,
-            above = interactionBox.fullBounds.height,
-            below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0
-        )
-        val fitted = fittedImageSide(room)
-        if (abs(fitted - imageSide) > ShaftRoom.RESIZE_THRESHOLD) {
-            imageSide = fitted
-            // Stretches the image already rendered, which is all a small matrix needs
-            imageBox.resize(fitted, fitted)
-            if (renderSize() != renderedSize) markDirty(WEIGHTS)
-        }
-        placeAt(room.centerX, room.centerY)
+    fun placeAt(x: kotlin.Double, y: kotlin.Double): Rectangle2D {
+        imageBox.centerOn(x, y)
+        interactionBox.centerOn(x, y - imageBox.height / 2.0 - interactionBox.fullBounds.height / 2.0)
+        shapeCaption.centerOn(x, y + imageBox.height / 2.0 + shapeCaption.height / 2.0 + CAPTION_GAP)
+        return drawing().footprintAt(x, y, imageSide)
     }
 
     /**
@@ -480,6 +486,13 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     }
 
     override val isDraggable: Boolean = false
+
+    /** The image with its label box and, when it is showing, its caption. */
+    override fun measureFootprint() = footprintOf(
+        imageBox.box.globalFullBounds,
+        interactionBox.layoutBounds,
+        shapeCaption.globalBounds.takeIf { shapeCaption.visible }
+    )
 
     override val toolTipText: String?
         get() = if (pixelSelection.isNotEmpty()) null else createTooltipText(weightMatrix)
@@ -700,9 +713,10 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
         private const val WEIGHTS = 1
 
         /**
-         * Room for a weight matrix image on the [shaft] of the arrow it is drawn on, at [position] along it, with
-         * [above] and [below] taken up by what is drawn over and under the image. Anything that draws a matrix on
-         * an arrow sizes it with this and [fittedImageSide], so that every drawing of a matrix follows the same rule.
+         * Room for a weight matrix image on the [shaft] of an arrow outside the panel's connection layout, at
+         * [position] along it, with [above] and [below] taken up by what is drawn over and under the image. The
+         * copies of a matrix in an unrolled view are sized with this and [fittedImageSide], by the same fraction
+         * of the arrow as the node's own image.
          */
         internal fun imageRoom(
             shaft: CubicCurve2D,
@@ -710,26 +724,21 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             shared: Boolean = false,
             above: kotlin.Double = 0.0,
             below: kotlin.Double = 0.0
-        ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL, comfortable = IMAGE_SIDE_DEFAULT)
+        ) = shaftRoom(shaft, position, shared, above, below, fill = IMAGE_FILL)
 
         /** Side of the weight matrix image that goes in [room]. */
         internal fun fittedImageSide(room: ShaftRoom) = room.squareSide(IMAGE_SIDE_MIN, IMAGE_SIDE_MAX)
 
-        /**
-         * Side of the image on a self-connection, and the side it reaches between two layers by filling the gap
-         * between them.
-         */
+        /** Side of the image where it is not sized for an arrow, as on a self-connection. */
         internal const val IMAGE_SIDE_DEFAULT = 90.0
 
         private const val IMAGE_SIDE_MIN = 30.0
 
-        private const val IMAGE_SIDE_MAX = 180.0
+        /** The largest the image is on an arrow, however long the arrow. */
+        private const val IMAGE_SIDE_MAX = IMAGE_SIDE_DEFAULT
 
-        /**
-         * Fraction of the gap between the layers that an image larger than [IMAGE_SIDE_DEFAULT] takes up together
-         * with its label box and caption.
-         */
-        internal const val IMAGE_FILL = 0.6
+        /** Fraction of its arrow that an image takes up together with its label box and caption. */
+        internal const val IMAGE_FILL = 0.5
 
         /** Space between the image and the shape caption under it. */
         private const val CAPTION_GAP = 3.0

@@ -1,0 +1,518 @@
+/**
+ * What connectors draw on their arrows is kept clear of layers and of each other on a panel: drawings that would
+ * land on the same spot are moved apart without one giving way to the other, an arrow whose way a layer blocks goes
+ * around the layer, and a drawing gets out of the way of a layer dragged across it.
+ */
+package org.simbrain.network.gui
+
+import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Test
+import org.piccolo2d.util.PBounds
+import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.Network
+import org.simbrain.network.core.NetworkModel
+import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.addNeurons
+import org.simbrain.network.gui.nodes.WeightMatrixNode
+import org.simbrain.util.onEdt
+import org.simbrain.util.p
+import org.simbrain.util.widgets.BezierArrow
+import org.simbrain.util.widgets.RECIPROCAL_ARROW_SHIFT
+import java.awt.Dimension
+import java.awt.geom.Point2D
+import javax.swing.JDialog
+
+class ConnectorPlacementTest {
+
+    /** A panel laid out at a fixed size and validated, showing [network] with [models] added to it. */
+    private fun panelFor(network: Network, vararg models: NetworkModel): NetworkPanel {
+        val panel = NetworkPanel(NetworkComponent("test", network))
+        runBlocking { models.forEach { network.addNetworkModel(it, usePlacementManager = false) } }
+        onEdt {
+            panel.preferredSize = Dimension(800, 800)
+            JDialog().apply { contentPane = panel; pack() }
+            panel.autoZoom = false
+        }
+        panel.validateCanvas()
+        return panel
+    }
+
+    private fun arrayAt(x: Double, y: Double) = NeuronArray(4).apply { location = Point2D.Double(x, y) }
+
+    private fun NetworkPanel.footprintOf(model: NetworkModel): PBounds = onEdt { getNode(model)!!.footprint }
+
+    private fun NetworkPanel.imageOf(matrix: WeightMatrix): PBounds =
+        onEdt { (getNode(matrix) as WeightMatrixNode).imageBox.globalBounds }
+
+    @Test
+    fun `two matrices whose arrows cross are drawn apart`() {
+        val lowerLeft = arrayAt(0.0, 0.0)
+        val lowerRight = arrayAt(230.0, 0.0)
+        val upperLeft = arrayAt(0.0, -520.0)
+        val upperRight = arrayAt(230.0, -520.0)
+        val rising = WeightMatrix(lowerLeft, upperRight)
+        val falling = WeightMatrix(lowerRight, upperLeft)
+        val panel = panelFor(Network(), lowerLeft, lowerRight, upperLeft, upperRight, rising, falling)
+
+        val first = panel.footprintOf(rising)
+        val second = panel.footprintOf(falling)
+        assertFalse(first.intersects(second), "first $first second $second")
+        listOf(lowerLeft, lowerRight, upperLeft, upperRight).forEach { layer ->
+            assertFalse(second.intersects(panel.footprintOf(layer)), "second $second overlaps a layer")
+        }
+        // Neither gives way to the other: the same size, at the same height, either side of the middle
+        val firstImage = panel.imageOf(rising)
+        val secondImage = panel.imageOf(falling)
+        assertEquals(firstImage.width, secondImage.width, 0.5)
+        assertEquals(firstImage.centerY, secondImage.centerY, 0.5)
+        assertEquals(115.0 - firstImage.centerX, secondImage.centerX - 115.0, 1.0)
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair run parallel between layers of different widths`() {
+        val network = Network()
+        val wide = NeuronCollection(runBlocking { network.addNeurons(9) })
+        onEdt { wide.neuronList.forEachIndexed { index, neuron -> neuron.location = Point2D.Double((index - 4) * 45.0, 0.0) } }
+        val narrow = arrayAt(0.0, -460.0)
+        val up = WeightMatrix(wide, narrow)
+        val down = WeightMatrix(narrow, wide)
+        val panel = panelFor(network, wide, narrow, up, down)
+
+        val arrows = onEdt { panel.canvas.layer.allNodes.filterIsInstance<BezierArrow>().map { it.globalFullBounds } }
+        assertEquals(2, arrows.size)
+        // An arrow straight up or down is as wide as its head and no wider
+        arrows.forEach { assertEquals(40.0, it.width, 1.0, "arrow $it") }
+        // One arrow starts at the edge of its layer and the other a little way off, so they differ a little in length
+        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 2.0)
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair pass either side of a layer too narrow for both`() {
+        val network = Network()
+        val wide = NeuronCollection(runBlocking { network.addNeurons(9) })
+        onEdt { wide.neuronList.forEachIndexed { index, neuron -> neuron.location = Point2D.Double((index - 4) * 45.0, 0.0) } }
+        // Drawn as a column, whose bottom edge has no room for two arrows side by side
+        val tall = NeuronArray(8).apply {
+            verticalLayout = true
+            location = Point2D.Double(0.0, -460.0)
+        }
+        val up = WeightMatrix(wide, tall)
+        val down = WeightMatrix(tall, wide)
+        val panel = panelFor(network, wide, tall, up, down)
+        fun arrowOf(matrix: WeightMatrix) = onEdt {
+            (panel.getNode(matrix) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single()
+        }
+
+        val narrow = panel.footprintOf(tall)
+        val upArrow = onEdt { arrowOf(up).globalFullBounds }
+        val downArrow = onEdt { arrowOf(down).globalFullBounds }
+        assertTrue(onEdt { arrowOf(up).hasOwnLane && arrowOf(down).hasOwnLane })
+        // One reaches out past the layer on its left and the other on its right
+        fun reachesLeftOnly(arrow: PBounds) = arrow.x < narrow.x - 20.0 && arrow.maxX < narrow.maxX + 20.0
+        fun reachesRightOnly(arrow: PBounds) = arrow.maxX > narrow.maxX + 20.0 && arrow.x > narrow.x - 20.0
+        val arrows = listOf(upArrow, downArrow)
+        assertTrue(arrows.any { reachesLeftOnly(it) } && arrows.any { reachesRightOnly(it) }) {
+            "up $upArrow down $downArrow layer $narrow"
+        }
+        // Each has the whole of its arrow, so the two images are the same size and clear of each other
+        assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 1.0)
+        assertFalse(panel.imageOf(up).intersects(panel.imageOf(down)))
+        assertTrue(panel.imageOf(up).width > 60.0, "image ${panel.imageOf(up)}")
+    }
+
+    private fun NetworkPanel.arrowOf(matrix: WeightMatrix): BezierArrow = onEdt {
+        (getNode(matrix) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>().single()
+    }
+
+    /** Points along the shaft of the arrow of [matrix], from its source end. */
+    private fun NetworkPanel.shaftPointsOf(matrix: WeightMatrix): List<Point2D> {
+        val shaft = onEdt { arrowOf(matrix).shaft!! }
+        return (0..64).map { shaft.p(it / 64.0) }
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers a little to one side of each other run alongside each other`() {
+        for (across in listOf(40.0, 60.0, 80.0)) {
+            val below = arrayAt(0.0, 0.0)
+            val above = arrayAt(across, -260.0)
+            val up = WeightMatrix(below, above)
+            val down = WeightMatrix(above, below)
+            val panel = panelFor(Network(), below, above, up, down)
+
+            assertFalse(onEdt { panel.arrowOf(up).hasOwnLane || panel.arrowOf(down).hasOwnLane }, "across $across")
+            // The same curve side by side: every point of one is the same step across from a point of the other
+            val going = panel.shaftPointsOf(up)
+            val coming = panel.shaftPointsOf(down).reversed()
+            going.zip(coming).forEach { (there, back) ->
+                assertEquals(2 * RECIPROCAL_ARROW_SHIFT, there.x - back.x, 0.5, "across $across")
+                assertEquals(there.y, back.y, 0.5, "across $across")
+            }
+            assertEquals(panel.imageOf(up).width, panel.imageOf(down).width, 0.5, "across $across")
+        }
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers on a diagonal turn opposite corners and do not meet`() {
+        for ((across, up) in listOf(200.0 to 260.0, 300.0 to 260.0, 420.0 to 420.0, -300.0 to 260.0, 200.0 to 160.0)) {
+            val below = arrayAt(0.0, 0.0)
+            val above = arrayAt(across, -up)
+            val there = WeightMatrix(below, above)
+            val back = WeightMatrix(above, below)
+            val panel = panelFor(Network(), below, above, there, back)
+            val case = "across $across up $up"
+
+            assertTrue(onEdt { panel.arrowOf(there).hasOwnLane && panel.arrowOf(back).hasOwnLane }, case)
+            val going = panel.shaftPointsOf(there)
+            val coming = panel.shaftPointsOf(back)
+            val nearest = going.minOf { a -> coming.minOf { b -> a.distance(b) } }
+            assertTrue(nearest > 40.0, "$case: the arrows come within $nearest of each other")
+            // One either side of the line between the middles of the two layers
+            val from = panel.footprintOf(below)
+            val to = panel.footprintOf(above)
+            fun side(point: Point2D) =
+                (to.centerX - from.centerX) * (point.y - from.centerY) - (to.centerY - from.centerY) * (point.x - from.centerX)
+            assertTrue(side(going[32]) * side(coming[32]) < 0.0, case)
+            // Each keeps to the right of its direction
+            assertTrue(side(going[32]) > 0.0, case)
+            assertFalse(panel.footprintOf(there).intersects(panel.footprintOf(back)), case)
+            assertTrue(panel.canvasBoundsReport().settled, case)
+        }
+    }
+
+    @Test
+    fun `an arrow between layers too close for its image bows out to where the image has room`() {
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -110.0)
+        val matrix = WeightMatrix(below, above)
+        val panel = panelFor(Network(), below, above, matrix)
+
+        assertTrue(onEdt { panel.arrowOf(matrix).hasOwnLane }, "The arrow should have moved to other sides")
+        val image = panel.imageOf(matrix)
+        assertTrue(image.width > 40.0, "image $image")
+        listOf(below, above).forEach { assertFalse(image.intersects(panel.footprintOf(it)), "image $image over a layer") }
+        assertTrue(panel.canvasBoundsReport().settled)
+    }
+
+    @Test
+    fun `an arrow that bowed out goes straight again only once there is clearly room, and does not flick between`() {
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -110.0)
+        val matrix = WeightMatrix(below, above)
+        val panel = panelFor(Network(), below, above, matrix)
+        fun bowedAt(distance: Double): Boolean {
+            onEdt { above.location = Point2D.Double(0.0, -distance) }
+            panel.awaitCanvasIdle()
+            return onEdt { panel.arrowOf(matrix).hasOwnLane }
+        }
+        val distances = generateSequence(110.0) { it + 10.0 }.takeWhile { it <= 330.0 }.toList()
+
+        val movingApart = distances.map { bowedAt(it) }
+        val movingTogether = distances.reversed().map { bowedAt(it) }.reversed()
+
+        // One change of mind each way
+        assertEquals(1, movingApart.zipWithNext().count { (a, b) -> a != b }, "apart $movingApart")
+        assertEquals(1, movingTogether.zipWithNext().count { (a, b) -> a != b }, "together $movingTogether")
+        assertTrue(movingApart.first() && !movingApart.last())
+        // It takes less room to stay straight than it took to go straight again
+        val straightFrom = distances[movingApart.indexOf(false)]
+        val bowedUpTo = distances[movingTogether.lastIndexOf(true)]
+        assertTrue(bowedUpTo < straightFrom - 15.0, "goes straight at $straightFrom, bows again at $bowedUpTo")
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair between layers too close together bow out on opposite sides`() {
+        val left = arrayAt(0.0, 0.0)
+        val right = arrayAt(180.0, 0.0)
+        val there = WeightMatrix(left, right)
+        val back = WeightMatrix(right, left)
+        val panel = panelFor(Network(), left, right, there, back)
+
+        assertTrue(onEdt { panel.arrowOf(there).hasOwnLane && panel.arrowOf(back).hasOwnLane })
+        val layersMiddle = panel.footprintOf(left).centerY
+        val images = listOf(panel.imageOf(there), panel.imageOf(back))
+        assertTrue(images.any { it.maxY < layersMiddle } && images.any { it.y > layersMiddle }, "images $images")
+        images.forEach { image ->
+            assertTrue(image.width > 50.0, "image $image")
+            listOf(left, right).forEach { assertFalse(image.intersects(panel.footprintOf(it)), "image $image over a layer") }
+        }
+    }
+
+    @Test
+    fun `an arrow whose way a layer blocks goes around the layer, and straight again when the layer has gone`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val lower = WeightMatrix(bottom, middle)
+        val upper = WeightMatrix(middle, top)
+        val network = Network()
+        val panel = panelFor(network, bottom, middle, top, lower, upper)
+        val lowerAlone = panel.imageOf(lower)
+        val skip = WeightMatrix(bottom, top)
+        runBlocking { network.addNetworkModel(skip, usePlacementManager = false) }
+        panel.validateCanvas()
+        fun skipArrow() = onEdt {
+            (panel.getNode(skip) as WeightMatrixNode).connectionDrawing.allNodes.filterIsInstance<BezierArrow>()
+                .single().globalFullBounds
+        }
+
+        val inTheWay = panel.footprintOf(middle)
+        val around = skipArrow()
+        assertTrue(around.maxX > inTheWay.maxX + 40.0 || around.x < inTheWay.x - 40.0, "arrow $around layer $inTheWay")
+        assertFalse(panel.footprintOf(skip).intersects(inTheWay))
+        assertTrue(panel.imageOf(skip).width > 60.0, "image ${panel.imageOf(skip)}")
+        // The connections it used to share a line with are the size they were without it, and about where they were
+        assertEquals(lowerAlone.width, panel.imageOf(lower).width, 0.5)
+        assertEquals(lowerAlone.centerY, panel.imageOf(lower).centerY, 5.0)
+
+        onEdt { middle.location = Point2D.Double(500.0, -270.0) }
+        panel.awaitCanvasIdle()
+
+        assertEquals(40.0, skipArrow().width, 1.0, "The arrow should run straight up again")
+        assertTrue(panel.canvasBoundsReport().settled)
+    }
+
+    @Test
+    fun `an arrow between two collections inside a larger one runs straight between them`() {
+        val network = Network()
+        val neurons = runBlocking { network.addNeurons(10) }
+        onEdt {
+            neurons.forEachIndexed { index, neuron ->
+                neuron.location = Point2D.Double(index * 45.0 + (if (index >= 5) 300.0 else 0.0), 0.0)
+            }
+        }
+        val left = NeuronCollection(neurons.take(5))
+        val right = NeuronCollection(neurons.drop(5))
+        val all = NeuronCollection(neurons)
+        val matrix = WeightMatrix(left, right)
+        val panel = panelFor(network, left, right, all, matrix)
+
+        assertFalse(onEdt { panel.arrowOf(matrix).isDetour }, "The arrow should not try to go around what it is inside")
+        val image = panel.imageOf(matrix)
+        assertTrue(image.x > panel.footprintOf(left).maxX && image.maxX < panel.footprintOf(right).x, "image $image")
+        assertEquals(panel.footprintOf(left).centerY, image.centerY, 40.0, "image $image")
+    }
+
+    @Test
+    fun `the arrows of a reciprocal pair with a layer between their layers go around it on opposite sides`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val up = WeightMatrix(bottom, top)
+        val down = WeightMatrix(top, bottom)
+        val panel = panelFor(Network(), bottom, middle, top, up, down)
+
+        val inTheWay = panel.footprintOf(middle)
+        val arrows = listOf(up, down).map { matrix -> onEdt { panel.arrowOf(matrix).globalFullBounds } }
+        assertTrue(arrows.any { it.maxX > inTheWay.maxX + 40.0 } && arrows.any { it.x < inTheWay.x - 40.0 }, "arrows $arrows")
+        val going = panel.shaftPointsOf(up)
+        val coming = panel.shaftPointsOf(down)
+        val nearest = going.minOf { a -> coming.minOf { b -> a.distance(b) } }
+        assertTrue(nearest > 30.0, "The arrows come within $nearest of each other")
+        assertFalse(panel.footprintOf(up).intersects(panel.footprintOf(down)))
+    }
+
+    @Test
+    fun `an arrow that goes around a layer is not drawn again when nothing it depends on has changed`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(0.0, -270.0)
+        val top = arrayAt(0.0, -540.0)
+        val skip = WeightMatrix(bottom, top)
+        val elsewhere = arrayAt(900.0, -200.0)
+        val panel = panelFor(Network(), bottom, middle, top, skip, elsewhere)
+        assertTrue(onEdt { panel.arrowOf(skip).isDetour })
+        val drawn = onEdt { panel.arrowOf(skip).getChild(0) }
+
+        onEdt { elsewhere.location = Point2D.Double(950.0, -260.0) }
+        panel.awaitCanvasIdle()
+
+        assertTrue(onEdt { panel.arrowOf(skip).getChild(0) } === drawn, "The arrow was drawn again")
+    }
+
+    @Test
+    fun `panning the view does not lay the connectors out again, and zooming out past full size does`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -300.0)
+        val matrix = WeightMatrix(source, target)
+        val panel = panelFor(Network(), source, target, matrix)
+        panel.awaitCanvasIdle()
+        val before = onEdt { panel.connectionLayout.passes }
+
+        onEdt { panel.canvas.camera.translateView(40.0, 25.0) }
+        panel.awaitCanvasIdle()
+        assertEquals(before, onEdt { panel.connectionLayout.passes })
+
+        onEdt { panel.canvas.camera.viewScale = 0.5 }
+        panel.awaitCanvasIdle()
+        assertTrue(onEdt { panel.connectionLayout.passes } > before)
+        // The label box is drawn larger, and still sits on top of the image
+        val node = onEdt { panel.getNode(matrix) as WeightMatrixNode }
+        assertEquals(
+            onEdt { node.imageBox.globalBounds.y }, onEdt { node.interactionBox.globalFullBounds.maxY }, 1.0
+        )
+    }
+
+    @Test
+    fun `a matrix given a longer label keeps its label box centered over its image`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -300.0)
+        val matrix = WeightMatrix(source, target)
+        val panel = panelFor(Network(), source, target, matrix)
+        val node = onEdt { panel.getNode(matrix) as WeightMatrixNode }
+
+        onEdt { matrix.label = "A much longer label than it had" }
+        panel.awaitCanvasIdle()
+
+        assertEquals(panel.imageOf(matrix).centerX, onEdt { node.interactionBox.globalFullBounds.centerX }, 1.0)
+    }
+
+    @Test
+    fun `a synapse group given a longer label keeps its label box centered on its arrow`() {
+        val network = Network()
+        val neurons = runBlocking { network.addNeurons(8) }
+        onEdt {
+            neurons.forEachIndexed { index, neuron ->
+                neuron.location = Point2D.Double((index % 4) * 45.0, if (index >= 4) -300.0 else 0.0)
+            }
+        }
+        val below = NeuronCollection(neurons.take(4))
+        val above = NeuronCollection(neurons.drop(4))
+        val group = SynapseGroup(below, above).apply {
+            autoVisibility = false
+            displaySynapses = false
+        }
+        val panel = panelFor(network, below, above, group)
+        panel.awaitCanvasIdle()
+        fun labelCenter() = onEdt { panel.getNode(group)!!.footprint.let { Point2D.Double(it.centerX, it.centerY) } }
+        val before = labelCenter()
+
+        onEdt { group.label = "A much longer label than it had" }
+        panel.awaitCanvasIdle()
+
+        assertEquals(before.x, labelCenter().x, 1.0)
+        assertEquals(before.y, labelCenter().y, 1.0)
+    }
+
+    @Test
+    fun `a matrix whose arrow passes a layer it does not join is drawn clear of that layer`() {
+        val bottom = arrayAt(0.0, 0.0)
+        val middle = arrayAt(160.0, -400.0)
+        val top = arrayAt(320.0, -800.0)
+        val skip = WeightMatrix(bottom, top)
+        val panel = panelFor(Network(), bottom, middle, top, skip)
+
+        // The middle of the arrow is behind the middle layer
+        val inTheWay = panel.footprintOf(middle)
+        val image = panel.imageOf(skip)
+        assertFalse(panel.footprintOf(skip).intersects(inTheWay), "footprint ${panel.footprintOf(skip)} layer $inTheWay")
+        assertTrue(image.width > 60.0, "The image should slide clear rather than shrink: $image")
+    }
+
+    @Test
+    fun `a matrix gets out of the way of a layer dragged across it and goes back when the layer has gone`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -900.0)
+        val matrix = WeightMatrix(source, target)
+        val passerBy = arrayAt(500.0, -450.0)
+        val panel = panelFor(Network(), source, target, matrix, passerBy)
+        val atRest = panel.imageOf(matrix)
+
+        // Dragged over the middle of the arrow, where the image is
+        onEdt { passerBy.location = Point2D.Double(0.0, -450.0) }
+        panel.awaitCanvasIdle()
+
+        val pushed = panel.imageOf(matrix)
+        assertFalse(panel.footprintOf(matrix).intersects(panel.footprintOf(passerBy)), "image $pushed")
+        assertEquals(atRest.width, pushed.width, 0.5, "The image should keep its size")
+        assertTrue(panel.canvasBoundsReport().settled)
+
+        onEdt { passerBy.location = Point2D.Double(500.0, -450.0) }
+        panel.awaitCanvasIdle()
+
+        val back = panel.imageOf(matrix)
+        assertEquals(atRest.centerY, back.centerY, 0.5)
+        assertEquals(atRest.width, back.width, 0.5)
+    }
+
+    @Test
+    fun `a matrix is not moved by a layer that is nowhere near it`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -420.0)
+        val matrix = WeightMatrix(source, target)
+        val elsewhere = arrayAt(600.0, -200.0)
+        val panel = panelFor(Network(), source, target, matrix, elsewhere)
+        val before = panel.imageOf(matrix)
+
+        onEdt { elsewhere.location = Point2D.Double(450.0, -260.0) }
+        panel.awaitCanvasIdle()
+
+        assertEquals(before, panel.imageOf(matrix))
+    }
+
+    @Test
+    fun `deleting a layer lets a matrix it was in the way of go back to the middle of its arrow`() {
+        val source = arrayAt(0.0, 0.0)
+        val target = arrayAt(0.0, -900.0)
+        val matrix = WeightMatrix(source, target)
+        val inTheWay = arrayAt(0.0, -450.0)
+        val network = Network()
+        val panel = panelFor(network, source, target, matrix, inTheWay)
+        val pushed = panel.imageOf(matrix)
+        // On an arrow that goes around the layer
+        val line = panel.footprintOf(source).centerX
+        assertTrue(kotlin.math.abs(pushed.centerX - line) > 60.0, "pushed $pushed")
+
+        runBlocking { network.deleteModels(listOf(inTheWay)) }
+        panel.awaitCanvasIdle()
+
+        val free = panel.imageOf(matrix)
+        assertEquals(line, free.centerX, 1.0, "pushed $pushed free $free")
+        assertEquals(-450.0, free.centerY, 40.0, "pushed $pushed free $free")
+    }
+
+    @Test
+    fun `zooming the view out and back in changes nothing about the layout`() {
+        // Layers just far enough apart that the arrow runs straight, a reciprocal pair, and a skip connection
+        val below = arrayAt(0.0, 0.0)
+        val above = arrayAt(0.0, -190.0)
+        val left = arrayAt(300.0, 0.0)
+        val right = arrayAt(300.0, -420.0)
+        val bottom = arrayAt(600.0, 0.0)
+        val middle = arrayAt(600.0, -270.0)
+        val top = arrayAt(600.0, -540.0)
+        val matrices = listOf(
+            WeightMatrix(below, above), WeightMatrix(left, right), WeightMatrix(right, left),
+            WeightMatrix(bottom, middle), WeightMatrix(middle, top), WeightMatrix(bottom, top)
+        )
+        val layers = listOf(below, above, left, right, bottom, middle, top)
+        val panel = panelFor(Network(), *layers.toTypedArray(), *matrices.toTypedArray())
+        fun layout() = onEdt {
+            layers.map { layer ->
+                panel.getNode(layer)!!.footprint.let { "%.4f %.4f %.4f %.4f".format(it.x, it.y, it.width, it.height) }
+            } + matrices.flatMap { matrix ->
+                val arrow = panel.arrowOf(matrix)
+                val shaft = arrow.shaft!!
+                listOf(
+                    "${arrow.route} ${arrow.hasOwnLane}",
+                    listOf(shaft.x1, shaft.y1, shaft.ctrlX1, shaft.ctrlY1, shaft.ctrlX2, shaft.ctrlY2, shaft.x2, shaft.y2)
+                        .joinToString { "%.4f".format(it) },
+                    panel.imageOf(matrix).let { "%.4f %.4f %.4f".format(it.centerX, it.centerY, it.width) },
+                    panel.getNode(matrix)!!.footprint.let { "%.4f %.4f %.4f %.4f".format(it.x, it.y, it.width, it.height) }
+                )
+            }
+        }
+        val atFullSize = layout()
+        assertTrue(onEdt { !panel.arrowOf(matrices[0]).hasOwnLane }, "The first arrow should start out straight")
+
+        for (scale in listOf(0.6, 0.25, 0.1, 0.5, 1.0, 2.5, 1.0)) {
+            onEdt { panel.canvas.camera.viewScale = scale }
+            panel.awaitCanvasIdle()
+            assertEquals(atFullSize, layout(), "at a view scale of $scale")
+        }
+    }
+}

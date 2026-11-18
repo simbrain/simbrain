@@ -150,11 +150,13 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
      * how it draws itself. Both are checked here rather than driven by an event because a layer's size is
      * pushed back from its node only after that node lays out, so a mode change is not fully known at the
      * moment it is announced.
+     *
+     * The drawing is rebuilt before the outline is laid out, because the outline encloses it, and the label box
+     * and info text are placed against the outline.
      */
     override fun layoutChildren() {
-        super.layoutChildren()
-        val view = unrolledViewNode ?: return
-        if ((!view.laidOut && measureRolledLeftEdge() != null) || view.stale()) {
+        val view = unrolledViewNode
+        if (view != null && ((!view.laidOut && measureRolledLeftEdge() != null) || view.stale())) {
             view.rebuild()
             positionUnrolledView()
             refreshUnrolledActivations()
@@ -162,6 +164,7 @@ class BPTTNode(networkPanel: NetworkPanel, private val bptt: BPTTNetwork) :
             // itself, both of which change the extent the canvas should be fitted to.
             requestZoomToFit()
         }
+        super.layoutChildren()
     }
 
     /**

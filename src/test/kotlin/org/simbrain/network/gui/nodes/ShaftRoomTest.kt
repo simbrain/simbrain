@@ -70,17 +70,6 @@ class ShaftRoomTest {
     }
 
     @Test
-    fun `a drawing fills the gap up to its comfortable size before the fill fraction applies`() {
-        fun height(comfortable: Double) =
-            shaftRoom(upwardShaft(), above = 20.0, below = 10.0, fill = 0.6, comfortable = comfortable).height
-        // The fraction alone already gives 90
-        assertEquals(90.0, height(60.0), 1e-9)
-        assertEquals(120.0, height(120.0), 1e-9)
-        // Never more than the gap has
-        assertEquals(200.0 - 30.0 - 2 * margin, height(500.0), 1e-9)
-    }
-
-    @Test
     fun `a fill fraction holds a drawing limited on one side to its share of the distance to that side`() {
         val shaft = CubicCurve2D.Double(0.0, 0.0, 0.0, -100.0, 50.0, -150.0, 150.0, -150.0)
         val onShaft = shaft.p(0.5)

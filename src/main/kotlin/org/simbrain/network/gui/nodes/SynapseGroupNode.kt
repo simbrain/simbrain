@@ -1,19 +1,22 @@
+/**
+ * Displays a synapse group as a label box with either a single arrow between its two collections or, when its
+ * synapses are showing, nothing more, since each synapse then has a node of its own. The arrow is the group's
+ * connection drawing, and the panel's connection layout places the label box.
+ */
 package org.simbrain.network.gui.nodes
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.simbrain.network.core.SynapseGroup
+import org.simbrain.network.gui.LaidOutConnector
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.*
+import org.simbrain.util.piccolo.centerOn
+import java.awt.geom.Rectangle2D
 
 
 class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGroup) :
-    ScreenElement(networkPanel) {
-
-    /**
-     * Reference to the currently used PNode type.
-     */
-    private var currentNode: Arrow? = null
+    ScreenElement(networkPanel), LaidOutConnector {
 
     /**
      * PNode that represents an aggregate of visible "loose" [SynapseNode]s.
@@ -30,6 +33,44 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     var interactionBox: SynapseGroupInteractionBox
 
+    /** Holds whichever of the two drawings of the group is in use. */
+    override val connectionDrawing = ConnectionDrawing(this)
+
+    /** Whether the group is drawn as a single arrow rather than as its synapses. */
+    private val drawnAsArrow get() = !synapseGroup.displaySynapses
+
+    override fun layoutArrow(layers: List<Rectangle2D>) {
+        if (drawnAsArrow) directedNode?.layout(layers)
+    }
+
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) = drawnAsArrow && directedNode?.affectedBy(layers) == true
+
+    /** The label box, to be placed on the arrow's shaft when the group is drawn as an arrow that has one. */
+    override fun drawingToPlace(): ShaftItem? {
+        val arrow = directedNode?.takeIf { drawnAsArrow } ?: return null
+        val curve = arrow.shaft ?: return null
+        return ShaftItem(
+            curve,
+            interactionBox.asShaftDrawing(),
+            ownLayers = arrow.joined.footprints(),
+            preferred = arrow.labelPosition
+        )
+    }
+
+    /**
+     * Put the label box where [placement] says. Without one it goes on the loop of a group from a collection to
+     * itself, or between the two collections when the synapses are showing.
+     */
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D {
+        val offShaft = directedNode?.takeIf { drawnAsArrow }?.labelPoint
+        when {
+            placement != null -> interactionBox.centerOn(placement.centerX, placement.centerY)
+            offShaft != null -> interactionBox.centerOn(offShaft.x, offShaft.y)
+            else -> updateInteractionBoxLocation()
+        }
+        return interactionBox.layoutBoundsCentered
+    }
+
     val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as NeuronCollectionNode }
     val targetNode by lazy { networkPanel.getNode(synapseGroup.target) as NeuronCollectionNode }
 
@@ -39,32 +80,13 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox = SynapseGroupInteractionBox(networkPanel, synapseGroup, this)
         interactionBox.setText(synapseGroup.displayName)
         addChild(interactionBox)
-        interactionBox.addPropertyChangeListener { evt ->
-            if (evt.propertyName == "width") {
-                updateInteractionBoxLocation()
-            }
-        }
-        fun invalidateArrow() {
-            when (currentNode) {
-                directedNode -> directedNode?.invalidateFullBounds()
-                expandedNode -> expandedNode?.invalidateFullBounds()
-            }
-        }
-        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateArrow()
-            updateInteractionBoxLocation()
-        }.untilDisposed()
-        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) {
-            invalidateArrow()
-            updateInteractionBoxLocation()
-        }.untilDisposed()
-        
+        synapseGroup.source.events.locationChanged.on(Dispatchers.Swing) { requestLayout() }.untilDisposed()
+        synapseGroup.target.events.locationChanged.on(Dispatchers.Swing) { requestLayout() }.untilDisposed()
+
         // Listen to individual neuron movements for recurrent groups
         if (synapseGroup.isRecurrent()) {
             synapseGroup.source.neuronList.forEach { neuron ->
-                neuron.events.locationChanged.on(Dispatchers.Swing) {
-                    updateInteractionBoxLocation()
-                }.untilDisposed()
+                neuron.events.locationChanged.on(Dispatchers.Swing) { requestLayout() }.untilDisposed()
             }
         }
         updateInteractionBoxLocation()
@@ -86,9 +108,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
         interactionBox.contextMenu
     }
 
-    private fun removeEverythingButInteractionBox() {
-        removeChild(directedNode)
-        removeChild(expandedNode)
+    private fun removeBothDrawings() {
+        directedNode?.let { connectionDrawing.removeChild(it) }
+        expandedNode?.let { connectionDrawing.removeChild(it) }
     }
 
     fun updateInteractionBoxLocation() {
@@ -114,22 +136,19 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     private fun setVisibility() {
         if (synapseGroup.displaySynapses) {
-            removeEverythingButInteractionBox()
+            removeBothDrawings()
             if (expandedNode == null) {
                 expandedNode = SynapseGroupNodeExpanded(networkPanel, this)
             }
-            addChild(expandedNode)
-            interactionBox.raiseAbove(expandedNode)
-            currentNode = expandedNode
+            connectionDrawing.addChild(expandedNode)
         } else {
-            removeEverythingButInteractionBox()
+            removeBothDrawings()
             if (directedNode == null) {
                 directedNode = SynapseGroupNodeDirected(this)
             }
-            addChild(directedNode)
-            interactionBox.raiseAbove(directedNode)
-            currentNode = directedNode
+            connectionDrawing.addChild(directedNode)
         }
+        requestLayout()
     }
 
     /**
@@ -137,6 +156,8 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
      */
     fun updateText() {
         interactionBox.setText(synapseGroup.displayName)
+        // The label box is placed by its middle, which a change of width moves
+        requestLayout()
     }
 
     override fun refreshTheme() {
@@ -145,14 +166,9 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
 
     override val isDraggable: Boolean = false
 
+    /** The label box. */
+    override fun measureFootprint() = footprintOf(interactionBox.layoutBoundsCentered)
+
     override val model: SynapseGroup
         get() = synapseGroup
-
-    /**
-     * Interface for all PNodes used in as the main representation for a synapse group.
-     */
-    interface Arrow {
-        fun layoutChildren()
-    }
-
 }

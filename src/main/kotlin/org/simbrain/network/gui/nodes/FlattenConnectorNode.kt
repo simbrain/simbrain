@@ -5,12 +5,17 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.util.PBounds
 import org.simbrain.network.core.FlattenConnector
+import org.simbrain.network.gui.JoinedLayers
+import org.simbrain.network.gui.LaidOutConnector
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.createSelectionEditDialog
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
 import org.simbrain.util.widgets.BezierArrow
 import org.simbrain.util.widgets.bezierArrow
+import org.simbrain.util.piccolo.centerOn
+import java.awt.geom.CubicCurve2D
+import java.awt.geom.Rectangle2D
 import javax.swing.JPopupMenu
 
 /**
@@ -18,14 +23,19 @@ import javax.swing.JPopupMenu
  * to the target NeuronArrayNode, with an [InteractionBox] showing the connector label.
  */
 class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenConnector) :
-    ScreenElement(networkPanel) {
+    ScreenElement(networkPanel), LaidOutConnector {
 
     val sourceNode by lazy { networkPanel.getNode(connector.source) }
     val targetNode by lazy { networkPanel.getNode(connector.target) }
 
     val interactionBox = FlattenConnectorInteractionBox(networkPanel)
 
+    override val connectionDrawing = ConnectionDrawing(this)
+
     private val arrow: BezierArrow
+
+    /** The shaft of the arrow as last laid out, or null for layers no arrow can be drawn between. */
+    private var shaft: CubicCurve2D? = null
 
     init {
         pickable = true
@@ -39,50 +49,69 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
             }
 
             lateralOffset { 0.5 }
-
-            onUpdated { curve ->
-                val pt = curve?.p(0.5) ?: line(connector.source.location, connector.target.location).p(0.5)
-                interactionBox.centerFullBoundsOnPoint(pt.x, pt.y)
-            }
         }
 
-        addChild(arrow)
+        connectionDrawing.addChild(arrow)
         addChild(interactionBox)
 
         val connectorEvents = connector.events
         connectorEvents.labelChanged.on(Dispatchers.Swing) { _, _ ->
             interactionBox.setText(connector.displayName)
+            requestLayout()
         }.untilDisposed()
 
         connector.source.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            requestLayout()
         }.untilDisposed()
         connector.target.events.locationChanged.on(Dispatchers.Swing) {
-            arrow.invalidateFullBounds()
+            requestLayout()
         }.untilDisposed()
 
         interactionBox.setText(connector.displayName)
-        arrow.invalidateFullBounds()
     }
 
     fun updateArrowColorFromPreferences() {
         arrow.updateColorFromPreferences()
-        layoutChildren()
     }
 
-    override fun layoutChildren() {
-        val srcBodyBounds = sourceNode?.globalBounds ?: return
-        val tgtBodyBounds = targetNode?.globalBounds ?: return
-        val srcTopBounds = sourceNode?.globalFullBounds ?: return
-        val tgtTopBounds = targetNode?.globalFullBounds ?: return
-        arrow.layout(
-            directionalOutlines(srcTopBounds, srcBodyBounds),
-            directionalOutlines(tgtTopBounds, tgtBodyBounds),
-            false
+    /** The two layers the connector joins. */
+    private val joined = JoinedLayers({ sourceNode }, { targetNode })
+
+    override fun layoutArrow(layers: List<Rectangle2D>) {
+        joined.arrowDrawn()
+        val source = sourceNode ?: return
+        val target = targetNode ?: return
+        shaft = arrow.layout(
+            directionalOutlines(source.footprint, source.globalBounds),
+            directionalOutlines(target.footprint, target.globalBounds),
+            false,
+            joined.blockers(layers)
         )
     }
 
+    /** One of the two layers changed since the arrow was drawn, or the layers in the arrow's way have. */
+    override fun arrowAffectedBy(layers: List<Rectangle2D>) =
+        joined.changedSinceDrawn || arrow.affectedBy(joined.blockers(layers))
+
+    /** The label box, to be placed on the arrow's shaft. */
+    override fun drawingToPlace(): ShaftItem? {
+        val curve = shaft ?: return null
+        return ShaftItem(
+            curve, interactionBox.asShaftDrawing(), ownLayers = joined.footprints()
+        )
+    }
+
+    override fun placeDrawing(placement: ShaftPlacement?): Rectangle2D {
+        val center = placement?.let { point(it.centerX, it.centerY) }
+            ?: line(connector.source.location, connector.target.location).p(0.5)
+        interactionBox.centerOn(center.x, center.y)
+        return interactionBox.asShaftDrawing().footprintAt(center.x, center.y, 0.0)
+    }
+
     override val isDraggable: Boolean = false
+
+    /** The label box. */
+    override fun measureFootprint() = footprintOf(interactionBox.layoutBoundsCentered)
 
     override val contextMenu: JPopupMenu
         get() {

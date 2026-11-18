@@ -154,9 +154,9 @@ val simpleImageWorld = newSim {
         To view your training data,  you can open the training dialog and click the step button in the input table. This will place the patters back 
          in the input layer, but not in the image world.
         
-        # What to Do
+        # Activities
         
-        ## Basic Workflow
+        ## Activity: Train and test a classifier
         
         1. Draw images in the Image World canvas using the drawing tools
         
@@ -168,7 +168,7 @@ val simpleImageWorld = newSim {
         
         You can review your training dialog. This dialog shows all training examples and their target outputs. Use this to verify what patterns you've saved and to see the actual input arrays (note that the images themselves won't display in the training dialog, only the numerical input data).
 
-        ## Training Strategies
+        ## Explore further
         
         You can approach this simulation in several ways:
         

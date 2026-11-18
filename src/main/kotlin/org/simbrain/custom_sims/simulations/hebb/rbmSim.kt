@@ -52,24 +52,19 @@ val rbmSim = newSim {
             - `Train on current pattern`: Trains on whatever pattern is currently on the visible layer, once per training iteration.
             - `Add noise`: Adds Gaussian noise to the visible layer so you can watch the network clean it up.
 
-            # What to Do
+            # Activities
+
+            ## Activity 1: Train and test the network
 
             Click `Train On All Patterns` to train the RBM on all four built-in patterns. The network will iterate through each pattern multiple times based on the `Training 
             iterations` parameter.
 
             To test the trained network:
-            - Click on the visible layer to select it.
-            - Press `R` to randomize the activations.
-            - Press `spacebar` repeatedly to let the network reconstruct one of the learned patterns from the random input.
+            1. Click on the visible layer to select it.
+            2. Press `R` to randomize the activations.
+            3. Press `spacebar` repeatedly to let the network reconstruct one of the learned patterns from the random input.
 
-            ## Experiment
-
-            - Try training individual patterns by clicking a pattern button, then clicking `Train on current pattern`.
-            - Train different patterns with different iterations to see how well they are remembered.
-            - Use the `Add noise` button to add noise to the visible layer and observe pattern completion.
-            - Adjust `Training iterations` to see how learning quality changes with more or fewer iterations.
-
-            ## Creating Custom Patterns
+            ## Activity 2: Create custom patterns
 
             To create your own patterns for training:
             1. Right-click on the visible layer and select `Add image world`.
@@ -78,7 +73,14 @@ val rbmSim = newSim {
             4. Right-click on the RBM network and select `Add Current Pattern to Training Data`.
             5. Repeat for each custom pattern you want to train on.
             6. Use `Train On All Patterns` or `Train on current pattern` as before.
-            
+
+            ## Explore further
+
+            - Try training individual patterns by clicking a pattern button, then clicking `Train on current pattern`.
+            - Train different patterns with different iterations to see how well they are remembered.
+            - Use the `Add noise` button to add noise to the visible layer and observe pattern completion.
+            - Adjust `Training iterations` to see how learning quality changes with more or fewer iterations.
+
             # Credits
             
             Jasmine Lau

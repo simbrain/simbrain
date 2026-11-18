@@ -150,7 +150,9 @@ val srnElmanSentences = newSim {
 
         The SRN processes these sentences one word at a time, using its recurrent connections to maintain context and predict the next word based on grammatical constraints.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train the network to predict next words
 
         1. Run the simulation to see the network processing the current sentence.
 
@@ -160,10 +162,13 @@ val srnElmanSentences = newSim {
 
         4. Observe predictions in the `Output Text World` to see what words the network thinks should come next.
 
-        5. Experiment with parameters:
-           - Adjust the `number of training sentences`
-           - Modify the `learning rate`
-           - Change the `hidden layer size`
+        ## Explore further
+
+        Experiment with parameters:
+
+        - Adjust the `number of training sentences` by editing the script
+        - Modify the `learning rate`
+        - Change the `hidden layer size` by editing the script
 
         # References
 

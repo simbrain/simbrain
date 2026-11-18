@@ -113,7 +113,9 @@ val spikeResponderSimArray = newSim {
             3. Rise and Decay: Gradual rise and fall
             4. Short Term Plasticity: Adaptive responses based on spike history
 
-        # What to Do
+        # Activities
+
+        ## Activity: Compare spike responder arrays
         
         1. `Run` the simulation to see the array-based spiking behavior.
         

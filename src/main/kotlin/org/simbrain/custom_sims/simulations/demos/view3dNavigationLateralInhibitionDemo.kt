@@ -194,7 +194,9 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         It is a simplified model, not a realistic retinal circuit, and it's also fairly provisional (as of Spring 2026). 
         We have only recently implemented 3d and this is a first example of what's possible. More is coming!
 
-        # What to Do
+        # Activities
+
+        ## Activity: Compare lateral inhibition settings
 
         1. Click `Run` and watch Amy wander through `Odor World`, or move her manually.
         2. Watch `Brightness Array` in the control panel to see the raw data sent to the network

@@ -108,16 +108,18 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
 
         This simulation links embodied 3D vision to unsupervised competitive learning.
 
-        ## What to Do
+        ## Concept
+
+        Competitive neurons self-organize so different units specialize to recurring visual patterns in active experience.
+
+        # Activities
+
+        ## Activity: Watch features self-organize
 
         1. Move the agent to sample different viewpoints and landmarks.
         2. Watch `Winner` and the `Winner Prototype` image update over time.
         3. Switch `Input Mode` between `Raw` and `Edge`.
         4. Adjust learning settings (learning rate, normalization, leaky learning).
-
-        ## Concept
-
-        Competitive neurons self-organize so different units specialize to recurring visual patterns in active experience.
         """.trimIndent()
     )
 }

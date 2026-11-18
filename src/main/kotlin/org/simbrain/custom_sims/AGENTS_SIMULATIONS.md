@@ -321,9 +321,14 @@ addSidebarInfo("""
     # Simulation Details
     Technical details...
     
-    # What to Do
+    # Activities
+
+    ## Activity 1: Short descriptive title
     1. Click `Run`
     2. Observe...
+
+    ## Explore further
+    - Open-ended things to try...
 """, width = 300)
 ```
 
@@ -333,18 +338,27 @@ Do not set `initiallyOpened` on `addSidebarInfo(...)` unless a simulation has a 
 
 Good examples to study:
 - `psychology/spiveyNet.kt`
+- `neuroscience/StdpSim.kt`
 - the reservoir simulations
 
 Standard template and intent:
 
 - `# Simulation Name`
   Brief explanation of the simulation. Be clear and concise. Length depends on the simulation: paper-based models may need more context; simpler sims may only need a few sentences.
+  Open with the point of the simulation in plain language, before any science. Keep background brief and get to the model quickly. Put qualifications last in the intro, and simplifications in `# Simulation Details`. `psychology/MirrorLearning.kt` is a model intro.
 - `# Simulation Details`
   Technical background and specifics of the simulation. Use `##` subsections when needed.
 - `## Control Panel Settings`
-  Required subsection for simulations with control panels. Place it near the top of the documentation or use a top-level `# Control Panel` when the controls are central to the workflow. Give every visible control its own line; explain what it changes, what it opens, and what the user should expect from it. Put this section before `# What to Do` so readers can consult the control reference before following the workflow.
-- `# What to Do`
-  Explain how to run the simulation and what the user should try. Use `##` subsections for demos, experiments, or exploration paths when helpful.
+  Required subsection for simulations with control panels. Place it near the top of the documentation or use a top-level `# Control Panel` when the controls are central to the workflow. Give every visible control its own line; explain what it changes, what it opens, and what the user should expect from it. Put this section before `# Activities` so readers can consult the control reference before following the workflow.
+- `# Activities`
+  How to run the simulation and what the user should try, as numbered activities:
+  - Give each separate thing to do its own `## Activity N: Title` subsection, with a short title saying what the activity does. When there is only one, use `## Activity: Title` with no number. Steps always go inside an activity, never directly under `# Activities`.
+  - Number steps only when they are done in order. Put observations for a step as indented bullets under it.
+  - End an activity with what the user should see when that outcome is known to happen.
+  - When a step stands for something in the model's story, say so in plain terms ("This models the child watching the adult"), even if it seems redundant. This matters most in the first activity and when the action is unusual.
+  - When an activity's point is not obvious from its steps, open with a sentence saying what it should give a feel for, for example how a raster plot shows two populations coming to predict each other.
+  - Put open-ended suggestions in a final unnumbered `## Explore further` list.
+  - Keep reference material, such as metric definitions, in `# Simulation Details`, not in an activity.
 - `# Links`
   Optional. Include links to demos or related material, with one or two sentences explaining what each link shows.
 - `# References`

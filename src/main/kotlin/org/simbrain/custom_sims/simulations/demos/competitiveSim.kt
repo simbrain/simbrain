@@ -64,14 +64,16 @@ val competitiveSim = newSim {
         - `Train ×10`: Run ten training steps on the current pattern.
         - `Reset`: Randomize the weights and clear the labels.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Give each pattern its own unit
 
         1. Select each pattern and press `Test` to see the starting position. Usually two or more patterns share a unit.
         2. Train the patterns in turn, one step each, for a few rounds, then test each one. Taking turns rarely works: on about one start in eight.
         3. Press `Reset` and commit instead: select a pattern and press `Train ×10` twice before moving on to the next pattern. Then test each pattern. This works about nine times in ten.
         4. If two patterns still share a unit, train one of them more until the other one moves to a new unit.
 
-        ## Things to Try
+        ## Explore further
 
         Right-click the competitive network and choose `Edit` to change these.
 

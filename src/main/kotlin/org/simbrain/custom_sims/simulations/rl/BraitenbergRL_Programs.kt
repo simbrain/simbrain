@@ -546,13 +546,15 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     This makes credit assignment much harder than in `Braitenberg RL`, where TD updates direct sensor-to-motor weights.
 
-    # What to Do
-
-    Click `Run` and watch how the program probabilities change as the agent encounters cheese and poison.
-
     ## Reading the Display
 
     The program nodes display probabilities, not binary activations. In successful runs one program becomes dominant. In many runs the probabilities stay ambiguous, spike briefly, or drift back toward uniform.
+
+    # Activities
+
+    ## Activity: Watch the program probabilities
+
+    Click `Run` and watch how the program probabilities change as the agent encounters cheese and poison.
 
     """.trimIndent()
     )

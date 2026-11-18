@@ -212,7 +212,7 @@ val evolveXor = newSim {
 
         # Simulation Details
 
-        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the `maximum generation`. The
+        This simulation simulates the evolution of a neural network until the `target error` in the trainer's `Evolution properties` dialog is met, exceeded, or when it has reached the `maximum generation`. The
         goal of this simulation is to evolve until it is as close as possible to the `target error`.
 
         In this simulation, the `target error` is calculated as the difference between the existing dataset (i.e., neuron groups) and the actual solution to the XOR problem.
@@ -230,15 +230,17 @@ val evolveXor = newSim {
         After each generation, a percentage of the top performer(s) is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has
         reached the `target error` or lower, or when the evolutionary process ends.
 
-        # What to Do
+        # Activities
 
-        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works. Below are the steps to evolving the simulation:
+        ## Activity: Evolve a network for XOR
 
-        1) Specify the parameters of the simulation.
+        In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works. Below are the steps to evolving the simulation:
 
-        2) After confirming the parameters are what you want, click on the `Evolve` button to start the simulation.
+        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
-        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+        2. After confirming the parameters are what you want, click `Run` in the trainer to start the simulation.
+
+        3. Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
 

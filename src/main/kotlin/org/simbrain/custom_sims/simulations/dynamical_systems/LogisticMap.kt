@@ -67,16 +67,18 @@ val logisticMap = newSim("logistic-map") {
         - `Reset initial condition`: restart at `0.2` and clear the plot, keeping the current rule settings.
         - `Clear plot`: discard recorded samples without changing the neuron or growth rate.
 
-        # What to Do
+        # Activities
 
-        1. Select `Period 2 (3.2)` and press Play. Compare it with `Period 4 (3.5)`
+        ## Activity 1: Compare periodic and chaotic regimes
+
+        1. Select `Period 2 (3.2)` and press `Run`. Compare it with `Period 4 (3.5)`
            and `Period 8 (3.55)` to see period doubling.
         2. After about `200` updates, use `Clear plot` to examine settled dynamics
            without the initial transient. The plot retains the latest `250` samples.
         3. Try `Chaotic (3.9)`, then `Period 3 window (3.83)`. Chaos is not simply
            increasing disorder as the growth rate increases.
-        4. Double-click the neuron to explore other growth rates between `0` and `4`.
-           Avoid initial activations at the bounds, which lead to the zero fixed point.
+
+        ## Activity 2: Read the recurrence plot
 
         The recurrence plot can be used to visualize how different dynamical regimes look.
         
@@ -92,6 +94,11 @@ val logisticMap = newSim("logistic-map") {
         the largest pairwise distance in the current window, not an absolute distance.
         At a settled fixed point all states coincide and the recurrence plot fills in;
         tiny floating-point residuals can affect this relative threshold.
+
+        ## Explore further
+
+        - Double-click the neuron to explore other growth rates between `0` and `4`.
+          Avoid initial activations at the bounds, which lead to the zero fixed point.
         """.trimIndent()
     )
     networkComponent.network.events.zoomToFitPage.fire()

@@ -18,7 +18,9 @@ val competitiveImageSim = newSim {
             
             This is like the competitive grid network, but the simulation is made up of two windows, the Network window, and the Image World window. In the Network window, the input layer is arranged into a grid of neurons, and the competitive group is initialized with randomized weights. The Image World window is made of colored images that act as the patterns for this simulation’s input neurons to the mirror. 
             
-            # What to Do
+            # Activities
+
+            ## Activity: Train the network on the images
             
             - Select different image patterns using the buttons at the bottom of the Image World window
             - Each time an image is chosen and the network is iterated, the network trains a neuron to respond to the selected pattern
@@ -27,7 +29,7 @@ val competitiveImageSim = newSim {
             
             Over time, the output neurons improve their ability to classify the clusters in the input space. The objective is to train the network so that each input pattern triggers a distinct output neuron.
             
-            ## Testing Advanced Features
+            ## Explore further
             
             Right-click the competitive group to access advanced parameters. Here are experiments to try:
             

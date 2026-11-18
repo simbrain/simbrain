@@ -148,9 +148,9 @@ val excitatoryInhibitoryBalance = newSim {
         The key feature is independent control over excitatory and inhibitory drive via background current. This allows
         you to explore the parameter space from healthy balanced activity to pathological extremes.
 
-        # What to Do
+        # Activities
 
-        ## Exploring E/I Balance
+        ## Activity: Explore E/I balance
 
         1. Click `Run` to start the simulation with default parameters (both drives at 0).
 
@@ -165,7 +165,7 @@ val excitatoryInhibitoryBalance = newSim {
             - **Low inhibitory drive** (e.g., excitatory=6-8, inhibitory=0-2): Network may show excessive synchrony,
             sustained bursts, or runaway activity resembling seizures.
 
-        ## Other Things to Try
+        ## Explore further
 
         - Select all neurons (`n`) and double-click to adjust Izhikevich parameters (a, b, c, d) for different firing patterns
         - Select all synapses (`w`) and double-click to modify spike responders or add learning rules like STDP

@@ -118,38 +118,44 @@ val classicalConditioning = newSim("classical conditioning") {
         - **Conditioned Response (CR)**: The learned response to the conditioned stimulus.
         - **Extinction**: The weakening of the association when the CS is presented without the US over time.        
         
-        # What to Do
+        # Activities
 
-        Below are steps to exploring the different behaviors that emerge from classical conditioning and how you can invoke them in the simulation. After each
-        invocation, reset the simulation by reopening the simulation before testing the other responses.
-        
-        1. Unconditioned Stimulus and Response
-           - Run the simulation and move the `cheese` near the `mouse`.
-           - The `mouse` will respond (e.g., approach or activate). 
-           - `Cheese` is the `US`; the mouse's reaction is the `UR`.
-        
-        2. Neutral Stimulus
-           - Move the `bell` near the `mouse`.
-           - There is no response—the `bell` is currently a neutral stimulus (NS).
-        
-        3. Pairing NS with US
-           - Move both the `bell` and `cheese` near the `mouse`.
-           - Run the simulation.
-           - The `mouse` begins to associate the bell with the `cheese`.
-           - The `bell` becomes a conditioned stimulus (CS) as it begins to evoke a response.
+        Below are steps to exploring the different behaviors that emerge from classical conditioning and how you can invoke them in the simulation. After each of
+        Activities 1 and 2, reset the simulation by reopening it. Activities 3 through 5 build on one another, so do not reset between them.
 
-        4. Conditioned Response
-           - Eventually, the `bell` alone will trigger the same behavior.
-           - The response to the `bell` is now a conditioned response (CR).
-        
-        5. Extinction
-           - Show the `bell` alone repeatedly, without the `cheese`.
-           - The response gradually disappears—this is `extinction`.
-        
-        6. Tracking Learning
-           - The strength of the association is shown in the `time series window`.
-           - When this strength exceeds `0.7`, the CS-CR link is well established.
-        
+        ## Activity 1: Unconditioned stimulus and response
+
+        - Run the simulation and move the `cheese` near the `mouse`.
+        - The `mouse` will respond (e.g., approach or activate).
+        - `Cheese` is the `US`; the mouse's reaction is the `UR`.
+
+        ## Activity 2: Neutral stimulus
+
+        - Move the `bell` near the `mouse`.
+        - There is no response—the `bell` is currently a neutral stimulus (NS).
+
+        ## Activity 3: Pair the neutral stimulus with the US
+
+        - Move both the `bell` and `cheese` near the `mouse`.
+        - Run the simulation.
+        - The `mouse` begins to associate the bell with the `cheese`.
+        - The `bell` becomes a conditioned stimulus (CS) as it begins to evoke a response.
+
+        ## Activity 4: Observe the conditioned response
+
+        - Eventually, the `bell` alone will trigger the same behavior.
+        - The response to the `bell` is now a conditioned response (CR).
+
+        ## Activity 5: Extinguish the response
+
+        - Show the `bell` alone repeatedly, without the `cheese`.
+        - The response gradually disappears—this is `extinction`.
+
+        ## Activity 6: Track learning
+
+        - The strength of the association is shown in the `time series window`.
+        - When this strength exceeds `0.7`, the CS-CR link is well established.
+
         # Credits
 
         [Jeff Yoshimi](https://jeffyoshimi.net/index.html)

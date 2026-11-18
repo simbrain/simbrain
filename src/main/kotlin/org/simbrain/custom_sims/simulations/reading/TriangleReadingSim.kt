@@ -379,15 +379,15 @@ private suspend fun SimulationScope.installReaderUi(
 
         **Reset** reinitializes the network.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Test and train the network
 
         1. Select a word and press **Test word** to inspect its target phonemes, decoded output, and error.
         2. Press **Training...** to choose a presentation count, learning rate, and either uniform or frequency-weighted sampling.
         3. Press **Show word-frequency chart** to inspect the current network. It evaluates only; it does not change the weights.
 
-        # Experiments
-
-        ## Word-frequency effect
+        ## Activity 2: Word-frequency effect
 
         Reset the model, then press **Show word-frequency chart**: both bars begin at `1.0`. The result window lists raw and baseline-relative error for every word. Condition summaries and the chart use relative error, which controls for differences in phonological target-vector complexity. Train with frequency-weighted experience, then show the chart again; the expected qualitative pattern is lower relative error for the high-frequency group. Switch to uniform sampling as a control: removing differential experience should reduce that advantage.
 

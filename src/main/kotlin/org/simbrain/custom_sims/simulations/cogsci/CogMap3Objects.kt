@@ -141,16 +141,18 @@ val cogMap3Objects = newSim {
     has a stronger impact on the agent's sensory receptors the closer an object is. Because there are multiple objects in this environment, the agent is presented with multiple overlapping patterns of activation. 
     The total pattern of activation of the agent's olfactory receptors is a sum of scaled smell vectors. 
     
-    In this simulation, the agent will be dragged to each of the objects where, its sensory activations are recorded and plotted into the `Cognitive Maps` window. In this PCA plot is a graph of the agent's sensory receptors
+    In this simulation, the agent will be dragged to each of the objects where, its sensory activations are recorded and plotted into the `Cognitive Map` window. In this PCA plot is a graph of the agent's sensory receptors
     and the objects that it has interacted with at different points. Points are labeled when the agent is directly on top of an object. This PCA plot can be thought of as the agent's perception of its environment where,
     through the agent's movement in the odor world, it develops an understanding of its environment.
     
-    # What to Do
+    # Activities
+
+    ## Activity: Build a cognitive map
     
     In this simulation, the mouse is the agent with `3` objects, the cheese, fish, and flower. To get a quick feel of the simulation, run the simulation and drag the agent to each of the objects and observe changes
-    in the `Cognitive Maps` window. Below are the step-by-step instructions:
+    in the `Cognitive Map` window. Below are the step-by-step instructions:
     
-    1. Run the simulation with the `Run workspace` button in the toolbar.
+    1. Run the simulation with the `Run` button in the toolbar.
     
     2. In the `World` window, drag the agent (the mouse) towards each of the objects (cheese, flower, fish).
     

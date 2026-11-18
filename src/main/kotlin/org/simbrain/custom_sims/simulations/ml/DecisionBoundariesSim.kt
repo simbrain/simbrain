@@ -95,21 +95,47 @@ val decisionBoundaries = newSim {
 
         Every control retrains the model immediately. To see all of a model's parameters, such as the SVM's soft margin penalty, double-click the classifier in the network. When the classifier is a random forest, right-click it in the network and choose `Show trees...` to see each tree in the forest as a list of yes/no questions, each ending in a predicted class. Use the arrow buttons to step from tree to tree.
 
-        # What to Do
+        # Activities
 
         Change one thing at a time. After each change, look at the shading, then compare the two accuracies.
 
-        1. Straight lines. The simulation starts with `Moons` and `Logistic regression`. The boundary is a straight line, so the tip of each moon lands on the wrong side. Logistic regression can only draw straight boundaries, however much data it gets.
-        2. Nearest neighbors. Set `Classifier` to `K nearest neighbors`. With `K` at 15 the boundary curves to follow the moons, and accuracy goes up.
-        3. Overfitting. Drag `K` down to 1. The boundary turns jagged, with little islands around single points. Training accuracy is 100%, because each training point is its own nearest neighbor, but test accuracy does not improve. Press `New sample` a few times. The islands jump around because they follow noise in each sample, not the real shape of the moons.
-        4. Underfitting. Drag `K` up to 100. Each vote now averages over most of the data, the boundary flattens toward a line, and both accuracies drop. The best `K` is somewhere in between.
-        5. Support vector machine. Set `Classifier` to `Support vector machine`. With `Kernel width` at 0.5 the boundary is a smooth curve. Try 0.1: each point's influence is tiny, so the model draws tight bubbles around points and overfits. Try 3: each point's influence is broad, and the boundary flattens and underfits. This is the same trade-off you saw with `K`.
-        6. Random forest. Set `Classifier` to `Random forest`. The boundary is made of horizontal and vertical steps, because every question a tree asks compares one feature to a threshold. Set `Max depth` to 1, so each tree asks one question and makes one straight cut. Raise it a step at a time and watch the boundary gain detail.
-        7. One tree. Set `Max depth` to 2 and `Trees` to 1, then right-click the classifier in the network and choose `Show trees...`. With a single tree the shaded regions are exactly that tree's rules: find each threshold in the plot as a horizontal or vertical edge. Now raise `Trees` to 10 and step through the trees with the arrow buttons: each asks different questions. Each tree saw a different resample of the data and drew its edges in slightly different places, so the vote of many trees gives a finer, steadier boundary than any one tree.
-        8. Harder shapes. Set `Dataset` to `Circles`, then `XOR`, and try each model again. Logistic regression gets about 50% or worse, no better than guessing, because no straight line separates these classes. On `XOR`, a random forest with `Max depth` 1 also fails: knowing only `x`, or only `y`, says nothing about the class. It takes two questions, one about each feature. Raise `Max depth` to 2 and the forest starts to work.
-        9. More noise. Go back to `Moons` and raise `Noise` to 0.5. The classes now overlap, so no model can be right everywhere. Flexible settings, such as `K` = 1, a small kernel width, or deep trees, now show a large gap between training and test accuracy.
+        ## Activity 1: Straight lines
 
-        ## Probe the model
+        The simulation starts with `Moons` and `Logistic regression`. The boundary is a straight line, so the tip of each moon lands on the wrong side. Logistic regression can only draw straight boundaries, however much data it gets.
+
+        ## Activity 2: Nearest neighbors
+
+        Set `Classifier` to `K nearest neighbors`. With `K` at 15 the boundary curves to follow the moons, and accuracy goes up.
+
+        ## Activity 3: Overfitting
+
+        Drag `K` down to 1. The boundary turns jagged, with little islands around single points. Training accuracy is 100%, because each training point is its own nearest neighbor, but test accuracy does not improve. Press `New sample` a few times. The islands jump around because they follow noise in each sample, not the real shape of the moons.
+
+        ## Activity 4: Underfitting
+
+        Drag `K` up to 100. Each vote now averages over most of the data, the boundary flattens toward a line, and both accuracies drop. The best `K` is somewhere in between.
+
+        ## Activity 5: Support vector machine
+
+        Set `Classifier` to `Support vector machine`. With `Kernel width` at 0.5 the boundary is a smooth curve. Try 0.1: each point's influence is tiny, so the model draws tight bubbles around points and overfits. Try 3: each point's influence is broad, and the boundary flattens and underfits. This is the same trade-off you saw with `K`.
+
+        ## Activity 6: Random forest
+
+        Set `Classifier` to `Random forest`. The boundary is made of horizontal and vertical steps, because every question a tree asks compares one feature to a threshold. Set `Max depth` to 1, so each tree asks one question and makes one straight cut. Raise it a step at a time and watch the boundary gain detail.
+
+        ## Activity 7: One tree
+
+        Set `Max depth` to 2 and `Trees` to 1, then right-click the classifier in the network and choose `Show trees...`. With a single tree the shaded regions are exactly that tree's rules: find each threshold in the plot as a horizontal or vertical edge. Now raise `Trees` to 10 and step through the trees with the arrow buttons: each asks different questions. Each tree saw a different resample of the data and drew its edges in slightly different places, so the vote of many trees gives a finer, steadier boundary than any one tree.
+
+        ## Activity 8: Harder shapes
+
+        Set `Dataset` to `Circles`, then `XOR`, and try each model again. Logistic regression gets about 50% or worse, no better than guessing, because no straight line separates these classes. On `XOR`, a random forest with `Max depth` 1 also fails: knowing only `x`, or only `y`, says nothing about the class. It takes two questions, one about each feature. Raise `Max depth` to 2 and the forest starts to work.
+
+        ## Activity 9: More noise
+
+        Go back to `Moons` and raise `Noise` to 0.5. The classes now overlap, so no model can be right everywhere. Flexible settings, such as `K` = 1, a small kernel width, or deep trees, now show a large gap between training and test accuracy.
+
+        ## Activity 10: Probe the model
 
         The network shows the classifier as a box connecting two input neurons, `x` and `y`, to two output neurons. Press `Test point` to put a random test point on the inputs. The output neuron for the predicted class turns on, the point is outlined in red in the plot, and `Status` says whether the prediction is right. Press `Next` to step through the test points one by one; the wrong ones are the hollow points sitting on shading of the other color.
 

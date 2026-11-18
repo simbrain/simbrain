@@ -99,14 +99,31 @@ val modelComparison = newSim {
         - `Previous` and `Next`: step through the rows in order, loading each onto the inputs. They use test rows or training rows, whichever you loaded last.
         - `Status`: which row is loaded, its true class, and the model's prediction.
 
-        # What to Do
+        # Activities
 
-        1. Training accuracy can mislead. With `Diabetes` selected, press `Compare all models`. The random forest and the support vector machine both score 100% on the training data, but far less on the test data. A perfect training score usually means the model memorized the rows, not that it will work on new patients.
-        2. Simple can win. On the same table, plain logistic regression has the best test accuracy, near 79%. Compare every score to the baseline of about two thirds. Medical data like this is noisy, and a flexible model has more room to fit that noise.
-        3. Scaling matters for some models. The support vector machine's test accuracy is no better than the baseline: it has memorized the training rows and calls every new patient negative. Check `Standardize features` and press `Compare all models` again. The support vector machine improves by about 10 points, while logistic regression and the random forest do not change.
-        4. A bigger, cleaner table. Set `Dataset` to `Image segments` and compare the models, with and without `Standardize features`. Without it, the support vector machine gets only about half of the test rows right; with it, all four models get at least 94%. The random forest is the best of the four with or without scaling, which is typical for tables like this.
-        5. A small, hard table. Set `Dataset` to `Glass`. With 6 classes and only 43 test rows, every model makes many mistakes, and a single lucky or unlucky row moves test accuracy by more than 2 points. Small differences between models here mean little.
-        6. Try some rows. Pick a `Classifier`, choose a `Class`, and press `Test row` a few times. Each press puts a random test row of that class on the input neurons, the output neuron for the predicted class turns on, and `Status` says whether the prediction is right. Try it on `Glass` to see which kinds of glass get mixed up. Then choose `Random forest` and press `Training row` a few times: it gets every one right, because it has seen them all before.
+        ## Activity 1: Training accuracy can mislead
+
+        With `Diabetes` selected, press `Compare all models`. The random forest and the support vector machine both score 100% on the training data, but far less on the test data. A perfect training score usually means the model memorized the rows, not that it will work on new patients.
+
+        ## Activity 2: Simple can win
+
+        On the same table, plain logistic regression has the best test accuracy, near 79%. Compare every score to the baseline of about two thirds. Medical data like this is noisy, and a flexible model has more room to fit that noise.
+
+        ## Activity 3: Scaling matters for some models
+
+        The support vector machine's test accuracy is no better than the baseline: it has memorized the training rows and calls every new patient negative. Check `Standardize features` and press `Compare all models` again. The support vector machine improves by about 10 points, while logistic regression and the random forest do not change.
+
+        ## Activity 4: A bigger, cleaner table
+
+        Set `Dataset` to `Image segments` and compare the models, with and without `Standardize features`. Without it, the support vector machine gets only about half of the test rows right; with it, all four models get at least 94%. The random forest is the best of the four with or without scaling, which is typical for tables like this.
+
+        ## Activity 5: A small, hard table
+
+        Set `Dataset` to `Glass`. With 6 classes and only 43 test rows, every model makes many mistakes, and a single lucky or unlucky row moves test accuracy by more than 2 points. Small differences between models here mean little.
+
+        ## Activity 6: Try some rows
+
+        Pick a `Classifier`, choose a `Class`, and press `Test row` a few times. Each press puts a random test row of that class on the input neurons, the output neuron for the predicted class turns on, and `Status` says whether the prediction is right. Try it on `Glass` to see which kinds of glass get mixed up. Then choose `Random forest` and press `Training row` a few times: it gets every one right, because it has seen them all before.
 
         ## Takeaways
 

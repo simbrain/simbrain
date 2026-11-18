@@ -164,16 +164,21 @@ val fieldImagePlaceCellsDemo = newSim {
         stronger than the place-cell activations, so it can dominate the field
         when the mouse gets close.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Follow the place cells
 
         1. Press `Run`. The field image will show the mouse's current cell at
            the center, with neighboring cells dimly haloed around it.
         2. Watch how the active label changes as the mouse chases the bug.
            After a few laps the labels fall into a small recurring set.
         3. Adjust `Threshold` to widen or narrow the visible halo.
-        4. Try right-clicking the mouse and pressing `Properties` to bump up
-           `Pursue.maxSpeed`, or drag the bug to a new location to seed a
-           different chase path.
+
+        ## Explore further
+
+        - Try right-clicking the mouse and pressing `Properties...` to bump up
+          `Pursue.maxSpeed`, or drag the bug to a new location to seed a
+          different chase path.
 
         # Credits
 

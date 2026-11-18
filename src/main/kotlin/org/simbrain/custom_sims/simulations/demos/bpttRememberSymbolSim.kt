@@ -109,7 +109,9 @@ val bpttRememberSymbol = newSim {
         first; the recall cue occurs at a different later step in every kind of example. The remaining rows
         pad the trial so that every BPTT computation has the same length.
 
-        ## What to Do
+        # Activities
+
+        ## Activity: Store and recall a symbol
 
         1. Double-click the network and train the supplied data in the normal training dialog.
         2. Click A, B, C, or D, then click `Iterate` any number of times.

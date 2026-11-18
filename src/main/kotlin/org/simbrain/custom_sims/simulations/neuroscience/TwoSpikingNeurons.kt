@@ -78,20 +78,22 @@ val spikingNeuronTwoInputs = newSim {
 
         This simple network has no recurrent or lateral connections—only forward input into a single neuron—so you can clearly see how input balance shapes output behavior.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Drive the neuron with two inputs
 
         1. Press `Run` to start the simulation.
         2. Click either the `Excitatory Input` or `Inhibitory Input` neuron.
         3. Use the arrow keys (`↑` / `↓`) to raise or lower the activation level.
         4. Observe how the spiking neuron's spiking behavior changes in the time series plot.
 
-        ## Exploration of the impacts of input activations
+        ## Activity 2: Explore the impacts of input activations
 
         - Raise only the `Excitatory Input`: The neuron should spike consistently.
         - Raise only the `Inhibitory Input`: The neuron may stop firing.
         - Adjust both inputs to fine-tune whether and when spikes occur.
         
-        ## Exploration of other spiking neuron models
+        ## Activity 3: Explore other spiking neuron models
         
         You can also change the spiking neuron model by double-clicking `Spiking neuron`, opening `Update Rule`, and selecting another model such as Izhikevich or [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
 

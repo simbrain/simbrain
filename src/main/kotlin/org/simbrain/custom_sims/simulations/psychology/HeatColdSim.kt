@@ -160,15 +160,25 @@ val heatColdSim = newSim {
 
         The key mechanism is that the `Cold Receptor` inhibits neuron `A` while also exciting neuron `B`. When the cold stimulus is removed, this inhibition ceases, allowing `B`'s activation to propagate through `A` to the Heat Sensation.
 
-        # What to Do
+        # Activities
 
-        1. `Observe normal heat sensation`: Activate the `Heat Receptor` and `Run` the simulation
-        2. `Observe normal cold sensation`: Activate the `Cold Receptor` and `Run` the simulation
-        3. `Create the heat illusion`:
-           - Activate the `Cold Receptor` briefly
-           - Deactivate it and continue running
-               - Watch the `Heat Sensation` activate paradoxically
-        4. `Experiment`: Try different patterns of activation and observe the network dynamics
+        ## Activity 1: Observe normal heat sensation
+
+        Activate the `Heat Receptor` and `Run` the simulation.
+
+        ## Activity 2: Observe normal cold sensation
+
+        Activate the `Cold Receptor` and `Run` the simulation.
+
+        ## Activity 3: Create the heat illusion
+
+        1. Activate the `Cold Receptor` briefly.
+        2. Deactivate it and continue running.
+        3. Watch the `Heat Sensation` activate paradoxically.
+
+        ## Explore further
+
+        - Try different patterns of activation and observe the network dynamics.
 
         # References
 

@@ -304,13 +304,13 @@ val evolveNetwork = newSim {
 
         # Simulation Details
 
-        This simulation simulates the evolution of a neural network until the `target error` in the control panel is met, exceeded, or when it has reached the `maximum generation`.
+        This simulation simulates the evolution of a neural network until the `target error` in the trainer's `Evolution properties` dialog is met, exceeded, or when it has reached the `maximum generation`.
         The goal of this simulation is to evolve until it is as close as possible to the `target error`.
 
         The `target error` is calculated as the total sum error of the target qualities (e.g., `Target Num of Nodes` `Target Num of Weights`, etc). Each target quality error is
         calculated as the difference between current active quality vs active target quality.
 
-        The target qualities are explained in the tooltip. To see their explanations, hover over them in the control panel. For a comprehensive look into how evolutionary simulations
+        The target qualities are explained in the tooltip. To see their explanations, hover over them in the trainer's `Evolution properties` dialog. For a comprehensive look into how evolutionary simulations
         are developed in Simbrain.
 
         ## Evolutionary Process
@@ -325,20 +325,22 @@ val evolveNetwork = newSim {
         After each generation, a percentage of the top performers is evaluated (e.g, `Evaluation percentile`) to determine if the `target error` has been achieved. This process continues until the simulation has reached the
         `target error` or lower, or when the evolutionary process ends.
 
-        # What to Do
+        # Activities
 
-        In this simulation, similar to the other evolutionary simulations, the control panel controls how the evolutionary process works and what your target qualities are.
+        ## Activity: Evolve a network to target qualities
+
+        In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works and what your target qualities are.
         Below are the steps to evolving the simulation:
 
-        1) Specify the parameters of the simulation.
+        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
             - The addition of more target qualities.
 
             - Setting the target value(s).
 
-        2) After confirming all the default and target values are what you want, click on the `Evolve` button to start the simulation.
+        2. After confirming all the default and target values are what you want, click `Run` in the trainer to start the simulation.
 
-        3) Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
+        3. Now, wait for the evolution process to finish, note that it can take a while depending on your configurations.
 
         # Credits
 

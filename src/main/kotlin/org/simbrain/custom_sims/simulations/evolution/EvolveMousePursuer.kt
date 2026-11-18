@@ -490,11 +490,13 @@ val evolveMousePursuer = newSim { optionString ->
 
         Cheese capture is detected through collision logic rather than a center steering sensor, so the controller remains close to the original Braitenberg setup. When eaten, cheese respawns at a new location away from the mouse and other objects, following the same pursuit pattern used in the Braitenberg reinforcement learning simulation.
 
-        # What to Do
+        # Activities
 
-        1. Set evolutionary parameters in the control panel.
+        ## Activity: Evolve a mouse
+
+        1. Click `Open Trainer`, then set evolutionary parameters in the trainer's `Evolution properties` dialog.
         2. Turn `useEnergyModel` on or off depending on the comparison you want.
-        3. Click `Evolve` and inspect the best evolved mouse and network when the run completes.
+        3. Click `Run` in the trainer and inspect the best evolved mouse and network when the run completes.
         """.trimIndent(),
         width = 300
     )

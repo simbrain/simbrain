@@ -148,7 +148,9 @@ val edgeOfChaos = newSim("edgeOfChaos") {
         to make the states of the reservoir more red if they are closer to the real-time timestep, and they become more transparent as the simulation runs (moving away from the 
         real-time timestep).
          
-        # What to Do
+        # Activities
+
+        ## Activity 1: Find each computational state
                 
         In this simulation, the only configuration for the simulation is the `weight stdev`. To find each state, follow the steps below.
                 
@@ -168,10 +170,10 @@ val edgeOfChaos = newSim("edgeOfChaos") {
                 
         6. Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
          
-        ## Observing The Representations Of The Objects
+        ## Activity 2: Observe the representations of the objects
                 
         To observe the object's representation in the network, delete the recurrent connections (the recurrent synapses) by clicking on them and pressing backspace. Then run 
-        the simulation and repeat steps 2 to 6.
+        the simulation and repeat steps 2 to 6 of Activity 1.
                 
         # References
                 

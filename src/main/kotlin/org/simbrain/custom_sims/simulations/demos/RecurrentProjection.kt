@@ -80,7 +80,9 @@ val recurrentProjection = newSim("recurrent_projection") {
             
             To begin, just click `Run` in Simbrain's main toolbar. Everything else is handled through the custom control panel.
             
-            # What to Do
+            # Activities
+
+            ## Activity: Explore attractors
             
             1. Start the simulation:
                - Press `Run` in the Simbrain toolbar to begin updating the network.
@@ -97,7 +99,7 @@ val recurrentProjection = newSim("recurrent_projection") {
                - Click `Randomize Weights` to create a new network with fresh, randomized connections.
                - This changes the system's dynamics—try again with randomized activations to see what new behavior emerges.
 
-            ## Tips and Tricks
+            ## Explore further
             
             - Speed Up the Simulation
               - Click inside the Network window and press the `5` key to toggle weight visibility off.

@@ -107,34 +107,34 @@ val modernHopfieldSim = newSim {
         - `Add noise`: Corrupts the current query by flipping the sign of about one quarter of its features.
         - `Use retrieved pattern as query`: Copies the current retrieval into the query layer and immediately performs another retrieval step.
 
-        ## What to do
+        # Activities
 
         The query layer is clamped, so it remains the cue you set while the rest of the network updates. Each experiment uses Simbrain's step button to retrieve a pattern; the middle layer shows how much each memory contributes.
 
-        ### 1. Simple retrieval
+        ## Activity 1: Simple retrieval
 
         Choose a `Use memory` button, then step the simulation. The selected stored pattern is the query, so its memory probability should dominate and the retrieved pattern should closely match it. You can instead edit the query array directly with the network tools before stepping.
 
-        ### 2. Retrieval at different beta values
+        ## Activity 2: Retrieval at different beta values
 
         Set `Beta`, choose a `Use memory` button, then step the simulation. High values of beta lead to sharp, winner-take-most retrieval; low values lead to soft retrieval that blends several similar memories.
 
-        ### 3. Retrieval with noise
+        ## Activity 3: Retrieval with noise
 
         Set `Beta`, choose a `Use memory` button, click `Add noise`, then step. `Add noise` flips the sign of about one quarter of the query features. Compare the memory probabilities and retrieved pattern at different beta values to see how selectivity affects recovery from a corrupted cue.
 
-        ### 4. Iterative associative retrieval
+        ## Activity 4: Iterative associative retrieval
 
         After a retrieval, click `Use retrieved pattern as query`. It copies the retrieved pattern to the clamped query layer and immediately runs the next retrieval. Repeat the button to make retrieval into a simple dynamical associative-memory process, analogous to repeatedly updating a classical Hopfield network toward an attractor, but using modern Hopfield retrieval rather than symmetric recurrent weights. With these small, well-separated memories, a clean cue may already be at a fixed point; begin with a noisy cue or a low beta value to make successive steps more informative.
 
         Suggested route:
 
-        - Set `Beta` to `1.0` or `2.0`.
-        - Click `Use memory 1`.
-        - Click `Add noise`, then step the simulation once.
-        - Click `Use retrieved pattern as query` repeatedly and observe the query, memory probabilities, and retrieved pattern.
+        1. Set `Beta` to `1.0` or `2.0`.
+        2. Click `Use memory 1`.
+        3. Click `Add noise`, then step the simulation once.
+        4. Click `Use retrieved pattern as query` repeatedly and observe the query, memory probabilities, and retrieved pattern.
 
-        ## References
+        # References
 
         Ramsauer, H. et al. (2021). [_Hopfield Networks is All You Need_](https://arxiv.org/abs/2008.02217).
 

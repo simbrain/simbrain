@@ -92,9 +92,11 @@ val braitenbergGame = newSim {
     The agent in this simulation, can have both characteristics of the _aggressive vehicle_ and the _coward vehicle_, which were explored in the `Pursuer` and `Avoider` simulations independently. This is as a result
     of the agent's parameters (e.g., weight strengths and velocity) being changed in real-time as the simulation runs.
     
-    # What to Do
+    # Activities
+
+    ## Activity: Reach the cheese
     
-     In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
+    In this simulation similar to the other Braitenberg simulations, simply press `Run` on the top toolbar for the simulation to run. Below are the steps:
         
     1. While it runs, tweak the parameters of the agent to avoid the obstacles and get to the cheese.
     

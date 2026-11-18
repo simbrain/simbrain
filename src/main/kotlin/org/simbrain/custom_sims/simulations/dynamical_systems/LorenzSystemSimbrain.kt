@@ -289,11 +289,11 @@ val lorenzSystemSimbrain = newSim {
 
         The update rule handles integration, and synaptic weights encode the derivative coefficients.
 
-        # What to Do
+        # Activities
 
-        Press `Play` to start the simulation. The behavior is identical to the hand-coded version; this validates that both implementations produce the same Lorenz attractor.
+        ## Activity 1: Explore different regimes
 
-        ## Explore Different Regimes
+        Press `Run` to start the simulation. The behavior is identical to the hand-coded version; this validates that both implementations produce the same Lorenz attractor.
 
         Use the preset buttons to explore different dynamical behaviors:
 
@@ -305,11 +305,11 @@ val lorenzSystemSimbrain = newSim {
 
         4. Test `Pre-Chaotic (Complex)` for transitional behavior near the chaos threshold.
 
-        ## Compare with Hand-Coded Version
+        ## Activity 2: Compare with the hand-coded version
 
         Open the standard `Lorenz attractor` simulation alongside this one and run both with identical parameters. The trajectories should match, validating this pure Simbrain approach.
 
-        ## Inspect the Implementation
+        ## Activity 3: Inspect the implementation
 
         This implementation exposes the underlying network structure:
 
@@ -318,7 +318,7 @@ val lorenzSystemSimbrain = newSim {
         - Observe how product neurons compute nonlinear terms
         - Watch the network update to see how derivatives flow through connections
 
-        ## Modify Parameters
+        ## Activity 4: Modify parameters
 
         When you change parameters using the control panel:
 

@@ -147,11 +147,13 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
         Thomas Natschläger, all three dynamical regimes can be observed. Currently, the regimes are split into the specified value regions: chaos occurs around `5.0` and higher,
         ordered occurs for values around `1.0` and lower, and the edge of chaos occurs around `2.0` till around `4.0`.
 
-        # What to Do
-
         To visualize these concepts, this simulation will utilize two reservoir networks to illustrate the three types of computational states that the neural networks can
         be in. They will begin with the same representations, and through the addition of new activation inputs, they will differ in representation. This difference
         will tell us which computational state the reservoir networks are in.
+
+        # Activities
+
+        ## Activity 1: Find each computational state
 
         In this simulation, the only configuration to the simulation is the `weight stdev`. To find each state, follow the steps below.
 
@@ -159,7 +161,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
 
         2. Start the simulation by clicking on the `Run` button in the top-left corner.
 
-        3. Then, click on the `Activate Nodes` button (the button next to the `cursor` icon), and increase the activation in one of the reservoirs by holding left-click
+        3. Then, click on the `Wand tool` (the button next to the `cursor` icon), and increase the activation in one of the reservoirs by holding left-click
         and moving around in either reservoirs.
 
         4. Now, observe the changes in the time series and determine its current computational state.
@@ -168,16 +170,16 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
 
         6. Afterwards, click back on the `cursor` icon, and left-click outside of the reservoirs to unselect all neurons.
 
-        ## Experimentation with The Ordered State
+        ## Activity 2: Experiment with the ordered state
 
         An experiment to better understand the ordered state is to set `weight stdev` to a very low value, like `0.01`, and look at the two reservoirs' activation patterns.
-        Afterwards, add in new activation with the `Activate Nodes` button and see how the differences between the two reservoirs are changing. This task uses
-        the same steps as above with an added step.
+        Afterwards, add in new activation with the `Wand tool` and see how the differences between the two reservoirs are changing. This task uses
+        the same steps as Activity 1 with an added step.
 
-        ## Find The Edge Of Chaos
+        ## Activity 3: Find the edge of chaos
 
         To find the edge of chaos state, find the state where there is just the right amount of orderliness and chaos, where the difference remains a short period of time,
-        and then disappears. To start, try a `weight stdev` that is greater than `5.0`, and slowly move down, repeating the steps above until the edge of chaos.
+        and then disappears. To start, try a `weight stdev` that is greater than `5.0`, and slowly move down, repeating the steps in Activity 1 until the edge of chaos.
 
         # Links
 

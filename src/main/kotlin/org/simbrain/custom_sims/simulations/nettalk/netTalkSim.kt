@@ -170,17 +170,22 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
       character or reaches the end of the text, so the synthesizer speaks one word at
       a time (in BUFFERED mode). Editing the text clears any partially buffered word.
 
-    # What to Do
+    # Activities
 
-    1. Train the network: right-click the `Network` component -> `Edit/Train Backprop...`,
-       then play. The optimizer settings have been chosen because they work well for this
+    ## Activity: Train the network and hear it read
+
+    1. Train the network: right-click the backprop network -> `Train...`,
+       then click `Run`. The optimizer settings have been chosen because they work well for this
        demo. Training still takes some time: on many computers, around 200 iterations is a
        reasonable target and may take roughly 5-10 minutes. Mean error should drop steadily.
     2. Press `Run`. The reader advances through the text and the
        speech synthesizer decodes feature vectors to phonemes.
        Early in training the output often collapses to an "uh"-like vowel sound; this
        is normal before the network has learned useful letter-to-phoneme mappings.
-    3. Edit the reading text directly in the NETtalk Reader panel to test other passages.
+
+    ## Explore further
+
+    - Edit the reading text directly in the NETtalk Reader panel to test other passages.
 
     # References
 

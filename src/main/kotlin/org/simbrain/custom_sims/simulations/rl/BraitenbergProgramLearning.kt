@@ -518,7 +518,9 @@ val braitenbergProgramLearning = newSim { optionString ->
 
     The program nodes show which program is active (activation = 1.0 for winner, 0.0 for others). Their biases are learned values representing how good each program is. The text label at the top shows which program is currently winning.
 
-    # What to Do
+    # Activities
+
+    ## Activity: Train the agent on a task
 
     1. Select a `Task` from the dropdown menu in the control panel
     2. Make sure `Learning Enabled` is checked

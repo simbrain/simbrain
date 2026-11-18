@@ -158,7 +158,9 @@ val mtcarsRegression = newSim("mtcars_regression") {
 
         **Edit the car by clicking one of its nodes and pressing the up and down arrow keys, then iterate the workspace (`Step` or `Run`) to see what the network predicts.**
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Train and test the network
 
         1. Right-click the backprop network and choose `Train...` (or double-click it) to open the `Train Network` dialog.
 
@@ -172,7 +174,7 @@ val mtcarsRegression = newSim("mtcars_regression") {
 
         Try the same thing on the `Training data` tab. After enough training the network usually does better on the cars it was trained on than on the testing cars. You can also press `Init parameters` and train again to see how much the results vary from run to run.
 
-        ## Why Does It Generalize So Well?
+        ## Activity 2: Test the limits of generalization
 
         The network often does surprisingly well on the testing cars. There are several reasons for this:
 

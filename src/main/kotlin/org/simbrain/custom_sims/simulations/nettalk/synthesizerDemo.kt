@@ -120,9 +120,9 @@ val synthesizerDemo = newSim {
         interpreted by nearest-phoneme match rather than by generating sound directly from
         the vector.
 
-        # What to Do
+        # Activities
 
-        ## Examples
+        ## Activity: Try these phoneme strings
 
         - `h@l'oU` for "hello"
         - `w'3rld` for "world"

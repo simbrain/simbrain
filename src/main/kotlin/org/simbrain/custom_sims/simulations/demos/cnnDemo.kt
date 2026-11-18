@@ -152,7 +152,10 @@ val cnnDemo = newSim {
 
         The `View3DSensor` sends an RGB representation of the agent's current view to the network.
 
-        # What to Do
+        # Activities
+
+        ## Activity: Watch the pipeline respond
+
         - Use arrow keys in the OdorWorld to move the agent
         - Observe channel activations updating in each tensor layer
         - Right-click on tensors to navigate channels or toggle RGB view

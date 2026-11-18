@@ -162,25 +162,29 @@ val roomSchemaSim = newSim {
         When you activate a few descriptive features (like "oven"), the network settles into a stable state that represents the most typical room containing those features. 
         This demonstrates how schemas emerge from the interaction of many simple constraints rather than being stored as explicit data structures.
 
-        # What to Do
-        
-        1. Explore room types: Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living Room`, `Bedroom`) to see the typical features of each room type. Click `Show correlations` to see how much the room patterns overlap. `Living Room` and `Bedroom` overlap the most, while the other rooms are nearly uncorrelated. `Show trained correlations` does the same for the patterns you have trained, labelling a permuted room like `Kitchen ~3`
-        
-        2. Train the network: After setting a room pattern, click `Train on Current Pattern` to strengthen the associations. The network learns by adjusting connection weights 
-        based on which features tend to co-occur
-        
-        3. Test pattern completion: Click `Permute Current Pattern` to randomly flip some features, then click `Recall Current Pattern` to see if the network can restore the 
-        original room pattern
-        
-        4. Experiment with partial cues: Manually activate individual units by clicking on them, then use `Recall Current Pattern` to see what complete room the network constructs 
-        from those cues
-
         The network demonstrates several key properties of schemas:
         - Default values: Missing features are filled in with typical values for that room type
         - Context sensitivity: The same feature (like `telephone`) takes on different meanings in different room contexts  
         - Graceful degradation: Partial or noisy input still leads to reasonable room interpretations
         - Flexible structure: The same underlying network can represent multiple different room types
 
+        # Activities
+
+        ## Activity 1: Explore room types
+
+        Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living Room`, `Bedroom`) to see the typical features of each room type. Click `Show correlations` to see how much the room patterns overlap. `Living Room` and `Bedroom` overlap the most, while the other rooms are nearly uncorrelated. `Show trained correlations` does the same for the patterns you have trained, labelling a permuted room like `Kitchen ~3`.
+
+        ## Activity 2: Train the network
+
+        After setting a room pattern, click `Train on Current Pattern` to strengthen the associations. The network learns by adjusting connection weights based on which features tend to co-occur.
+
+        ## Activity 3: Test pattern completion
+
+        Click `Permute Current Pattern` to randomly flip some features, then click `Recall Current Pattern` to see if the network can restore the original room pattern.
+
+        ## Activity 4: Experiment with partial cues
+
+        Manually activate individual units by clicking on them, then use `Recall Current Pattern` to see what complete room the network constructs from those cues.
 
         # References
         

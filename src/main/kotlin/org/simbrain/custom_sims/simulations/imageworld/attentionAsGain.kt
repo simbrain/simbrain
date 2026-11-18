@@ -265,38 +265,6 @@ val attentionAsGain = newSim {
         
         The gain/slope parameter directly controls how strongly each region responds to its input.
         
-        # What to Do
-        
-        ### Quick Start with Pre-loaded Images
-        
-        1. Click `Image 1: Left bars` to load vertical bars on the left side
-        2. Move the `Left Gain` slider to `4.0` or `5.0`
-        3. Iterate the workspace (play button or spacebar) and observe the left region neurons activate strongly
-        4. Move the `Left Gain` slider back to `1.0` and see how the response drops
-        5. Try `Image 2: Right bars` and experiment with the `Right Gain` slider
-        
-        ### Compare Attended vs Unattended
-        
-        1. Click `Image 3: Both sides` to load a pattern spanning both regions
-        2. Set `Left Gain` to `4.0` and `Right Gain` to `1.0` - observe the left region shows strong activation
-        3. Reverse it: `Left Gain` to `1.0` and `Right Gain` to `4.0` - the relationship flips
-        4. Set both sliders to `4.0` - both regions show strong responses
-        5. Set both sliders to `1.0` - both regions show baseline responses
-        
-        ### Manual Gain Control
-        
-        1. Use the `Left Gain` and `Right Gain` sliders to set arbitrary gain values
-        2. Try gain = `0.5` vs gain = `3.0` to see a `6`-fold difference in response
-        3. Observe how neuron group labels update to show attention state
-        4. Watch the network visualization - attended regions have higher activations (brighter neuron colors)
-        
-        ### Draw Your Own Patterns
-        
-        1. Click `Image 5: Blank canvas` to get a clean slate
-        2. Use the drawing tools in the Image World window to create your own patterns
-        3. Try drawing on just the left or right side, or create patterns that span both
-        4. Experiment with gain settings to see how attention modulates your custom patterns
-        
         ## Things to Notice
         
         - **Multiplicative effect**: A neuron receiving input of `0.5` produces output of `0.5` with gain=`1`, but `2.0` with gain=`4`
@@ -311,8 +279,40 @@ val attentionAsGain = newSim {
         - **Image 3**: Vertical bars on both sides (tests both regions simultaneously)
         - **Image 4**: Horizontal line across both sides (equal input to both regions)
         - **Image 5**: Blank canvas for custom drawings
+
+        # Activities
+
+        ## Activity 1: Try the pre-loaded images
         
-        ## Extensions
+        1. Click `Image 1: Left bars` to load vertical bars on the left side
+        2. Move the `Left Gain` slider to `4.0` or `5.0`
+        3. Iterate the workspace (play button or spacebar) and observe the left region neurons activate strongly
+        4. Move the `Left Gain` slider back to `1.0` and see how the response drops
+        5. Try `Image 2: Right bars` and experiment with the `Right Gain` slider
+        
+        ## Activity 2: Compare attended and unattended regions
+        
+        1. Click `Image 3: Both sides` to load a pattern spanning both regions
+        2. Set `Left Gain` to `4.0` and `Right Gain` to `1.0` - observe the left region shows strong activation
+        3. Reverse it: `Left Gain` to `1.0` and `Right Gain` to `4.0` - the relationship flips
+        4. Set both sliders to `4.0` - both regions show strong responses
+        5. Set both sliders to `1.0` - both regions show baseline responses
+        
+        ## Activity 3: Control the gain manually
+        
+        1. Use the `Left Gain` and `Right Gain` sliders to set arbitrary gain values
+        2. Try gain = `0.5` vs gain = `3.0` to see a `6`-fold difference in response
+        3. Observe how neuron group labels update to show attention state
+        4. Watch the network visualization - attended regions have higher activations (brighter neuron colors)
+        
+        ## Activity 4: Draw your own patterns
+        
+        1. Click `Image 5: Blank canvas` to get a clean slate
+        2. Use the drawing tools in the Image World window to create your own patterns
+        3. Try drawing on just the left or right side, or create patterns that span both
+        4. Experiment with gain settings to see how attention modulates your custom patterns
+
+        ## Explore further
         
         This simulation provides a foundation for exploring other attention mechanisms:
         

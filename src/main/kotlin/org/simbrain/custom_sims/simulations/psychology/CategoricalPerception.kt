@@ -424,30 +424,6 @@ val categoricalPerception = newSim {
         ### Prototype sorting (L1 labels)
         One-hot basic-level label appended: `[CIRCLE, ELLIPSE, SQUARE, RECTANGLE, 0, 0, 0]`
 
-        # What to Do
-
-        ## Option A - Staged training
-        Click `Run Staged Training` in the control panel. This replicates the
-        paper's sequential procedure:
-
-        1. `Stage 1` ($STAGE1_EPOCHS epochs): prototype sorting only - repr layer
-           geometry forms around shape similarity alone
-        2. Click `Analyze Repr Layer` to record baseline within/between distances
-        3. `Stage 2` ($STAGE2_EPOCHS more epochs): label condition added - repr layer
-           is reshaped by the additional categorization pressure
-        4. Click `Analyze Repr Layer` again and compare to baseline
-
-        The CP effect is the *change*: within-class distances should decrease and
-        between-class distances should increase after the label stage.
-
-        ## Option B - Manual staged training
-        1. Set condition to `Prototype sorting (no labels)` in the dropdown
-        2. Right-click the `CNN` outline and select `Train...`, then run until loss stabilizes
-        3. Click `Analyze Repr Layer`; this is your baseline
-        4. Switch condition to `L1` or `L2` in the dropdown (weights are preserved)
-        5. Train again for a smaller number of epochs
-        6. Click `Analyze Repr Layer` and compare to baseline
-
         ## Analysis Metrics
 
         `Analyze Repr Layer` runs all training inputs through the network,
@@ -462,6 +438,30 @@ val categoricalPerception = newSim {
 
         The CP hypothesis predicts that label training will lower within-class
         distances and raise between-class distances relative to the no-label baseline.
+
+        # Activities
+
+        ## Activity 1: Staged training
+        Click `Run Staged Training` in the control panel. This replicates the
+        paper's sequential procedure:
+
+        1. `Stage 1` ($STAGE1_EPOCHS epochs): prototype sorting only - repr layer
+           geometry forms around shape similarity alone
+        2. Click `Analyze Repr Layer` to record baseline within/between distances
+        3. `Stage 2` ($STAGE2_EPOCHS more epochs): label condition added - repr layer
+           is reshaped by the additional categorization pressure
+        4. Click `Analyze Repr Layer` again and compare to baseline
+
+        The CP effect is the *change*: within-class distances should decrease and
+        between-class distances should increase after the label stage.
+
+        ## Activity 2: Manual staged training
+        1. Set condition to `Prototype sorting (no labels)` in the dropdown
+        2. Right-click the `CNN` outline and select `Train...`, then run until loss stabilizes
+        3. Click `Analyze Repr Layer`; this is your baseline
+        4. Switch condition to `L1` or `L2` in the dropdown (weights are preserved)
+        5. Train again for a smaller number of epochs
+        6. Click `Analyze Repr Layer` and compare to baseline
 
         # References
 

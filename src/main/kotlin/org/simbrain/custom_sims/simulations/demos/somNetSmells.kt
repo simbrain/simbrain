@@ -254,7 +254,9 @@ val somNetSmells = newSim {
         - `Reset`: Randomize the SOM weights, restore the initial learning parameters, and clear the
           labels to start training over
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Watch the map organize
 
         1. Press `Auto Tour` to watch the mouse tour the objects by itself until the SOM has nearly
            finished learning. Or press `Run` and drag the mouse near different objects yourself.
@@ -262,7 +264,7 @@ val somNetSmells = newSim {
         3. Watch the labels as the SOM organizes the smells, and watch `Learning rate` and `N-size`
            shrink below the network.
 
-        ## As a Game
+        ## Activity 2: Play the sorting game
 
         The goal: get the three cheese labels (`Swiss`, `Gouda`, `Blue`) into one region of the map
         and the three flower labels (`Flax`, `Tulip`, `Pansy`) into another, with no neuron labeled
@@ -297,7 +299,7 @@ val somNetSmells = newSim {
         The map keeps adjusting after the first split, so a clean split occasionally blurs a little
         near the end.
 
-        ## Things to Try
+        ## Explore further
 
         - Right-click the SOM network's interaction box and choose its `Edit` item to change the learning
           parameters, then press `Reset` so new initial values take effect

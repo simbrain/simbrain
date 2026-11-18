@@ -9,6 +9,7 @@ import org.simbrain.util.UserParameter
 import org.simbrain.util.clip
 import org.simbrain.util.propertyeditor.APETabOder
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.propertyeditor.HiddenTypeOption
 import org.simbrain.util.roundToString
 import org.simbrain.util.stats.ProbabilityDistribution
 import java.util.*
@@ -25,6 +26,7 @@ import kotlin.math.abs
  * should be the leak reversal.
  * 
  */
+@HiddenTypeOption
 @APETabOder( "Main", "Conductances")
 class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMatrixData>() {
 
@@ -79,11 +81,10 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     var resetPotential: Double = 0.1
 
     var gain: Double by GuiEditable(
-        initValue = 1.0,
+        initValue = 100.0,
         label = "Gain",
         description = "Gain factor for output function.",
         min = 0.0,
-        max = 1.0,
         order = 90,
         onUpdate = {
             enableWidget(widgetValue(::outputFunction) == OutputFunction.RATE_CODE)
@@ -221,12 +222,13 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
 //        println(toolTipString)
 
         if (outputFunction === OutputFunction.RATE_CODE) {
-            // "XX1" or "X over X+1" activation function
+            // "XX1" or "X over X+1" activation function, applied to how far excitatory conductance exceeds the
+            // conductance that would put the membrane exactly at threshold
             val inhibTheta = (data.inhibitoryConductance * inhibitoryMaxConductance) * (inhibitoryReversal - thresholdPotential )
             val leakTheta = leakConductance * (leakReversal - thresholdPotential)
             val gETheta =  (inhibTheta + leakTheta) /(thresholdPotential - excitatoryReversal)
-            val x = gain * abs(excitatoryCurrent - gETheta)
-            neuron.activation = x/(x+1)
+            val x = gain * (data.excitatoryConductance * excitatoryMaxConductance - gETheta)
+            neuron.activation = if (x > 0) x / (x + 1) else 0.0
         } else if (outputFunction === OutputFunction.SPIKING) {
             if(data.membranePotential > thresholdPotential) {
                 neuron.isSpike = true

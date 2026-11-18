@@ -180,12 +180,14 @@ val photoAlbumExample = newSim {
         - Image Processing: Resizes images to `100x100` pixels and applies edge detection.
         - Neural Network: `3`-layer network (`10,000` input → `100` hidden → `3` output neurons).
 
-        # What to Do
+        # Activities
+
+        ## Activity: Train the network
         
         The main thing to do is to simply train the network by double clicking on the interaction box and pressing the `play` button
         and running until error is relatively low. It will not completely train, but it will get better.
         
-        Other Things to Try:
+        ## Explore further
         
         - Browse images using the navigation controls in the image world.
         

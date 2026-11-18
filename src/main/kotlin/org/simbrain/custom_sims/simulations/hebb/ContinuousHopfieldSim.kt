@@ -68,9 +68,9 @@ val hopfieldSimContinuous = newSim {
             - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
             - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings, then runs the test and plots the results. The settings are described in the `Discrete Hopfield` simulation's documentation.
 
-            # What to Do
+            # Activities
 
-            ## Learning a Memory
+            ## Activity 1: Learn a memory
 
             1. Click the `Randomize weights` button to get a fresh random weight matrix.
 
@@ -81,7 +81,7 @@ val hopfieldSimContinuous = newSim {
             4. See how well the network has remembered the pattern by looking if the network can reproduce the same pattern or its anti-pattern. Do this
             multiple times by repeating step 3.
 
-            ## Creating a Memory
+            ## Activity 2: Create a memory
 
             You can also create one of your own images for the network to be trained on.
 
@@ -89,9 +89,9 @@ val hopfieldSimContinuous = newSim {
 
             2. Now, click on the `Wand tool` or press `d` and then draw your image in the network.
 
-            3. After that, press `Train once on current pattern` and repeat the steps above in the `Learning a Memory` section.
+            3. After that, press `Train once on current pattern` and repeat the steps in Activity 1.
 
-            ## Memory Capacity Testing
+            ## Activity 3: Test memory capacity
 
             This simulation includes capacity testing tools in the Capacity tab. These tools allow you to systematically study how many patterns
             the network can reliably store and retrieve, both with and without forgetting dynamics.

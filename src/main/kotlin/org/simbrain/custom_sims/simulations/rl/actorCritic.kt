@@ -16,9 +16,12 @@ import org.simbrain.network.core.*
 import org.simbrain.network.layouts.GridLayout
 import org.simbrain.network.layouts.LineLayout
 import org.simbrain.plot.timeseries.TimeSeriesPlotComponent
-import org.simbrain.util.*
 import org.simbrain.util.decayfunctions.StepDecayFunction
+import org.simbrain.util.drawNumericOverlay
 import org.simbrain.util.piccolo.TileMap
+import org.simbrain.util.place
+import org.simbrain.util.showNumericInputDialog
+import org.simbrain.util.updateAction
 import org.simbrain.workspace.couplings.Coupling
 import org.simbrain.workspace.updater.UpdateComponent
 import org.simbrain.workspace.updater.UpdateCoupling
@@ -354,32 +357,40 @@ val actorCritic = newSim {
     2) `Value` (green time series): Increases when the agent expects reward, decreases when it expects punishment. This basically tracks the color values on the world.
     3) `TD Error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them. Updates happen for the location where the agent was at during the last time step. To get a feel for this, you can move the mouse directly from a neutral square to the cheese or poison, and update with the step button, and see that square turn green or red, reflecting the fact that being in that square led to something good or bad.
     
-    # What to Do
-    
+    # Activities
+
+    ## Activity 1: Train the agent to find the cheese
+
     First, click the `run` button in the control panel on the left side of the screen. You can also just click the main desktop run but it won't automatically reset the mouse location each time it gets cheese and run through the trials (The desktop run button can be useful to just see what it does when not reset: which is to learn to just stay near cheese and eat away!).
    
     Observe the agent's actions. It should figure out how to reach the cheese while avoiding the poison at the end of the first set of trials. The green and red location coloring gives you a sense of how it builds up a map of which states are valuable (green) and which are aversive (red).
-    
+
+    ## Activity 2: Move the cheese and poison
+
     You can move the cheese or poison around as you run trials, and see how it will follow old "trails" and build new ones. For example, after it learns to find the cheese in the upper left, you can pull the cheese down a little, and run until it finds the new spot. You can hold the cheese "near" it to help it along and keep re-running the sim. You can make it learn to follow an arbitrary pattern to find the cheese.
-    
-    It's easy to delete, move, or add additional cheese and poison entities to create customized environments (right click in odor world and select `add entity`). Watch how the world gets populated with "good" (green) and "bad" (red) regions or trails as the agent learns. You can also easily delete cheeses or poisons. 
-    
-    ## Mazes
-    
-    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
-    
-    You can also study the time series plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place. 
-    
+
     After the agent has learned, try moving the cheese or poison and observe how it perseverates on old locations before adapting.
-     
-    ## Experimenting With Parameter Values
-    
-    You can change the agent's learning behavior by changing the parameters of the simulation and then follow the steps above again to see the impacts of the changes on the simulation.
+
+    ## Activity 3: Customize the environment
+
+    It's easy to delete, move, or add additional cheese and poison entities to create customized environments (right click in odor world and select `add entity`). Watch how the world gets populated with "good" (green) and "bad" (red) regions or trails as the agent learns. You can also easily delete cheeses or poisons.
+
+    ## Activity 4: Train in a maze
+
+    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
+
+    ## Activity 5: Study the time series plot
+
+    You can also check `Show Time Series` and study the plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place.
+
+    ## Activity 6: Experiment with parameter values
+
+    You can change the agent's learning behavior by changing the parameters of the simulation and then follow the steps in Activity 1 again to see the impacts of the changes on the simulation.
     
     - By making epsilon higher, like `0.8`, it should move randomly. Then try making it low, or take it all the way to `0`. 
         At `0` it will follow the same path every time, reflecting what it's learned.
-    - Higher gamma encourages longer-term thinking. At `0` it only learns one step ahead, and it will never learn the full path. As it approaches 1 it thinks more and more long term and will learn the path, but as gamma is higher it takes longer to learn. 
-    
+    - Higher gamma encourages longer-term thinking. At `0` it only learns one step ahead, and it will never learn the full path. As it approaches 1 it thinks more and more long term and will learn the path, but as gamma is higher it takes longer to learn.
+
     # References
     
     Doya, K. (2007). [_Reinforcement learning: Computational theory and biological mechanisms_](https://doi.org/10.2976/1.2732246/10.2976/1) _HFSP Journal_, _1_(1), 30–40.

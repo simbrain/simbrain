@@ -450,6 +450,10 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
 
+    /** What to select for a node. A collection is selected through its interaction box, as when it is clicked. */
+    private fun selectionTarget(node: ScreenElement): ScreenElement =
+        if (node is NeuronCollectionNode) node.getInteractionBox() else node
+
     /**
      * Add a screen element to the network panel and rezoom the page.
      */
@@ -458,11 +462,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         addNodeOrdered(node)
         // Tied to the node, since undo gives the same model a new node and the old one must stop answering for it
         node.model.events.selected.on(Dispatchers.Default) {
-            if (node is NeuronCollectionNode) {
-                selectionManager.add(node.getInteractionBox())
-            } else {
-                selectionManager.add(node)
-            }
+            selectionManager.add(selectionTarget(node))
         }.cancelWith(node.nodeScope)
         node.model.events.deleted.on(Dispatchers.Unconfined) { nodeRemovals.post(node) }.cancelWith(node.nodeScope)
         zoomToFit.request()
@@ -1086,7 +1086,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
             zoomToFitPage.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             boundsChanged.onImmediate { zoomToFit.request() }.cancelWith(viewScope)
             selected.on(Dispatchers.Default) { list ->
-                selectionManager.set(list.map { modelNodeMap.get(it) })
+                selectionManager.set(list.map { selectionTarget(modelNodeMap.get<ScreenElement>(it)) })
             }.cancelWith(viewScope)
         }
 

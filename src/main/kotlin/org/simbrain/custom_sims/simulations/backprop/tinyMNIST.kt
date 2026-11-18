@@ -89,7 +89,9 @@ val tinyMNIST = newSim {
 
         - `Test generalization`: Reports accuracy on the training set and on every testing set. The progress bar below it shows how far along it is. Stop the simulation first if it is running.
 
-        # What to Do
+        # Activities
+
+        ## Activity 1: Train the network
 
         1. Open the training dialog with `Train network...` in the control panel, or by right-clicking the `BackpropNetwork_1` network (under the `Tiny Mnist` window) and selecting `Train...`
 
@@ -99,7 +101,7 @@ val tinyMNIST = newSim {
 
         Notice that the training error (red line) appears jagged compared to the testing error (blue line). This is because training uses batches of 35 examples when updating, while testing (which happens every 10 iterations, and is thus not visible initially) evaluates the entire test set. See the [docs on supervised learning](https://docs.simbrain.net/docs/network/learning/supervisedLearning.html)
 
-        ## Things You Can Do After Training
+        ## Activity 2: Try the trained network
 
         - Press `Random test image` a few times to see how the network classifies images it was not trained on.
 
@@ -111,7 +113,7 @@ val tinyMNIST = newSim {
 
         - Press `Test generalization`. Accuracy on the original testing images is high, but it falls quickly when the same digits are shifted a pixel or two. The network has learned which pixels matter, not what shape a digit is, and has no notion that a shifted `7` is still a `7`. Set `Testing set` to a shifted set and press `Random test image` to see examples. Compare the `CNN MNIST` simulation, whose pooling layers tolerate small shifts better.
 
-        ## Overfitting and Early Stopping
+        ## Activity 3: Explore overfitting and early stopping
 
         This simulation is a good place to learn about overfitting and early stopping, so here is a short tutorial.
 

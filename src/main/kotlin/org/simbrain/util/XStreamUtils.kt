@@ -123,6 +123,14 @@ private val readResolveHook = DeclaredHook("readResolve")
 private val writeReplaceHook = DeclaredHook("writeReplace")
 
 /**
+ * Marks a property that [createConstructorCallingConverter] never reads from a saved file, even when the file holds a
+ * value under its name. For a property computed from other saved state, whose setter would otherwise receive the
+ * saved value at an arbitrary point relative to that state.
+ */
+@Target(AnnotationTarget.PROPERTY)
+annotation class XStreamNotRestored
+
+/**
  * XStream support for Kotlin classes that require a constructor call. Which constructor to use can be specified by
  * [XStreamConstructor].
  *
@@ -196,6 +204,7 @@ fun createConstructorCallingConverter(
             val propertyMap = (listOf(cls) + cls.allSuperclasses)
                 .map { it.declaredMemberProperties }
                 .flatten()
+                .filter { !it.hasAnnotation<XStreamNotRestored>() }
                 .groupBy { it.name }
                 // if there are multiple properties with the same name, take the one closest to the implementing class
                 .map { (name, properties) -> name to properties.first() }

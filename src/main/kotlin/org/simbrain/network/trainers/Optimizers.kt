@@ -2,6 +2,11 @@
  * Optimizers that turn a parameter matrix's accumulated gradient into the update the trainer adds to it: plain
  * gradient descent with momentum, Adam, and AdamW. The trainer calls [Optimizer.beginStep] once per step, then
  * [Optimizer.computeDelta] for each parameter matrix.
+ *
+ * The running state an optimizer keeps for a parameter (a velocity, or moment estimates) is found by the object that
+ * owns the parameter rather than by the parameter matrix: a synapse group's weights live in its synapses and a neuron
+ * collection's biases in its neurons, so each read of those builds a new matrix. The state belongs to a training
+ * session and is not saved with the optimizer.
  */
 package org.simbrain.network.trainers
 
@@ -12,6 +17,7 @@ import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.math.matrix.Matrix
+import java.util.IdentityHashMap
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -31,7 +37,14 @@ abstract class Optimizer: CopyableObject {
      */
     open fun beginStep() {}
 
-    abstract fun computeDelta(matrix: Matrix, delta: Matrix): Matrix
+    /**
+     * The update to add to [matrix], given its accumulated gradient [delta].
+     *
+     * @param parameter what [matrix] belongs to, such as its weight matrix, synapse group, or layer. It identifies the
+     * parameter from one step to the next, by identity, so it must be the same object at every step. A matrix can
+     * stand for itself only when the same instance is passed each time.
+     */
+    abstract fun computeDelta(parameter: Any, matrix: Matrix, delta: Matrix): Matrix
 
     abstract fun reset()
 
@@ -54,24 +67,25 @@ class BasicOptimizer(
     )
     var momentum: Double = 0.9
 ) : Optimizer() {
-    private var matrixToVelocityMap: HashMap<Matrix, Matrix> = HashMap()
+    @Transient
+    private val velocities = ParameterState()
 
-    override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
-        val velocity = matrixToVelocityMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
+    override fun computeDelta(parameter: Any, matrix: Matrix, delta: Matrix): Matrix {
+        val velocity = velocities.of(parameter, matrix)
         velocity.mul(momentum).add(delta)
         return velocity.clone().mul(learningRate)
     }
 
     override fun reset() {
-        matrixToVelocityMap.clear()
+        velocities.clear()
     }
 
     override fun copy() = BasicOptimizer(momentum).also { it.learningRate = learningRate }
 }
 
 /**
- * State and step shared by [AdamOptimizer] and [AdamWOptimizer]: running moments per parameter matrix and the step
- * count that bias correction uses. Subclasses choose the learning rate for a step and the weight decay.
+ * State and step shared by [AdamOptimizer] and [AdamWOptimizer]: running moments per parameter and the step count that
+ * bias correction uses. Subclasses choose the learning rate for a step and the weight decay.
  */
 abstract class AdamFamilyOptimizer(
     @UserParameter(
@@ -90,19 +104,23 @@ abstract class AdamFamilyOptimizer(
     ) var beta2: Double
 ) : Optimizer() {
 
-    private val matrixRunningMeanMap: HashMap<Matrix, Matrix> = HashMap()
-    private val matrixRunningVarianceMap: HashMap<Matrix, Matrix> = HashMap()
+    @Transient
+    private val runningMeans = ParameterState()
+
+    @Transient
+    private val runningVariances = ParameterState()
 
     /**
      * Optimizer steps since the last reset, which bias correction counts. Trainer iterations are not steps: an epoch
-     * or sequential update takes many steps in one iteration.
+     * or sequential update takes many steps in one iteration. Not saved, so that it always agrees with the moments.
      */
-    private var stepsSinceReset = 0
+    @Transient
+    private var stepCount = 0
 
-    protected val timeSinceLastReset get() = stepsSinceReset.coerceAtLeast(1)
+    protected val timeSinceLastReset get() = stepCount.coerceAtLeast(1)
 
     override fun beginStep() {
-        stepsSinceReset++
+        stepCount++
     }
 
     /** The learning rate for the current step. */
@@ -111,9 +129,9 @@ abstract class AdamFamilyOptimizer(
     /** Decay applied directly to the weights, decoupled from the gradients; zero for plain Adam. */
     protected open val decoupledWeightDecay: Double get() = 0.0
 
-    override fun computeDelta(matrix: Matrix, delta: Matrix): Matrix {
-        val meanEstimate = matrixRunningMeanMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
-        val varianceEstimate = matrixRunningVarianceMap.getOrPut(matrix) { Matrix(matrix.nrow(), matrix.ncol()) }
+    override fun computeDelta(parameter: Any, matrix: Matrix, delta: Matrix): Matrix {
+        val meanEstimate = runningMeans.of(parameter, matrix)
+        val varianceEstimate = runningVariances.of(parameter, matrix)
         return adamStep(
             weights = matrix,
             delta = delta,
@@ -128,9 +146,9 @@ abstract class AdamFamilyOptimizer(
     }
 
     override fun reset() {
-        matrixRunningMeanMap.clear()
-        matrixRunningVarianceMap.clear()
-        stepsSinceReset = 0
+        runningMeans.clear()
+        runningVariances.clear()
+        stepCount = 0
     }
 }
 
@@ -181,6 +199,23 @@ class AdamWOptimizer(
     override val decoupledWeightDecay: Double get() = weightDecay
 
     override fun copy() = AdamWOptimizer(beta1, beta2, weightDecay, learningRateDecay).also { it.learningRate = learningRate }
+}
+
+/**
+ * One running matrix per parameter, such as a velocity or a moment estimate, found by the identity of the object that
+ * stands for the parameter. An entry starts at zero, and starts over if its parameter changes shape.
+ */
+private class ParameterState {
+
+    private val matrices = IdentityHashMap<Any, Matrix>()
+
+    fun of(parameter: Any, matrix: Matrix): Matrix {
+        val current = matrices[parameter]
+        if (current != null && current.nrow() == matrix.nrow() && current.ncol() == matrix.ncol()) return current
+        return Matrix(matrix.nrow(), matrix.ncol()).also { matrices[parameter] = it }
+    }
+
+    fun clear() = matrices.clear()
 }
 
 /**

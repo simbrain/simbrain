@@ -15,6 +15,7 @@ import org.simbrain.network.events.TrainingStats
 import org.simbrain.network.trainers.SupervisedTrainer.*
 import org.simbrain.util.sumOfSquares
 import org.simbrain.util.UserParameter
+import org.simbrain.util.XStreamNotRestored
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
@@ -113,7 +114,16 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     override val name = "Optimizer properties"
 
-    var learningRate by optimizer::learningRate
+    /**
+     * The current [optimizer]'s learning rate. It is saved with the optimizer, and a value saved under this name is not
+     * read back, since it could be applied after the optimizer's own.
+     */
+    @XStreamNotRestored
+    var learningRate: Double
+        get() = optimizer.learningRate
+        set(value) {
+            optimizer.learningRate = value
+        }
 
     fun <T: SupervisedTrainerConfig> copyCurrentInto(toCopy: T) = toCopy.also {
         it.lossFunction = lossFunction
@@ -467,7 +477,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         }
 
         weightAccumulator.forEach { (wm, delta) ->
-            val weightsDelta = config.optimizer.computeDelta(wm.weights, delta.clone().mul(batchScale))
+            val weightsDelta = config.optimizer.computeDelta(wm, wm.weights, delta.clone().mul(batchScale))
             weightAccumulatorContext?.write("delta_${wm.displayName}") { weightsDelta.clone() }
             recordOptimizerUpdate(weightsDelta)
 
@@ -483,7 +493,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
 
         synapseGroupAccumulator.forEach { (sg, delta) ->
             val weightMatrix = sg.getWeightMatrix()
-            val delta = config.optimizer.computeDelta(weightMatrix, delta.clone().mul(batchScale))
+            val delta = config.optimizer.computeDelta(sg, weightMatrix, delta.clone().mul(batchScale))
             weightAccumulatorContext?.write("delta_${sg.displayName}") { delta.clone() }
             recordOptimizerUpdate(delta)
 
@@ -505,7 +515,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         // and under time-unrolled training that drift compounds once per timestep. Deltas are still
         // accumulated above so that every Layer implementation stays comparable via probes.
         biasesAccumulator.filterKeys { !it.isClamped }.forEach { (na, delta) ->
-            val delta = config.optimizer.computeDelta(na.biases, delta.clone().mul(batchScale))
+            val delta = config.optimizer.computeDelta(na, na.biases, delta.clone().mul(batchScale))
             computeDeltaContext?.write(na.displayName, delta)
             recordOptimizerUpdate(delta)
             na.biases = na.biases.add(delta)
@@ -515,7 +525,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
         probeContext?.createMapProbe("updatedBiases")?.writeAll(biasesAccumulator) { na, _ -> na.displayName to na.biases.clone() }
 
         rawMatrixAccumulator.forEach { (matrix, delta) ->
-            val update = config.optimizer.computeDelta(matrix, delta.clone().mul(batchScale))
+            val update = config.optimizer.computeDelta(matrix, matrix, delta.clone().mul(batchScale))
             recordOptimizerUpdate(update)
             matrix.add(update)
         }

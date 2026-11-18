@@ -4,13 +4,19 @@ import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.Network
+import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.core.NeuronCollection
+import org.simbrain.network.core.SynapseGroup
 import org.simbrain.network.core.WeightMatrix
+import org.simbrain.network.core.getNetworkXStream
+import org.simbrain.network.updaterules.SigmoidalRule
 import org.simbrain.util.applyFunction
 import org.simbrain.util.assertMatrixEquals
 import org.simbrain.util.assertMatrixNotEquals
 import org.simbrain.util.flatten
 import org.simbrain.util.frobeniusNorm
+import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.setValuesInPlace
 import smile.math.matrix.Matrix
 import kotlin.math.sqrt
@@ -48,7 +54,7 @@ class OptimizerTest {
             doubleArrayOf(0.4, 0.2)
         ))
 
-        val result1 = optimizer.computeDelta(wm.weights, firstDelta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, firstDelta)
         // v_1 = 0.9 * 0 + firstDelta; update = lr * v_1
         val expected1 = firstDelta.clone().mul(optimizer.learningRate)
 
@@ -59,7 +65,7 @@ class OptimizerTest {
             doubleArrayOf(0.2, 0.1)
         ))
 
-        val result2 = optimizer.computeDelta(wm.weights, secondDelta)
+        val result2 = optimizer.computeDelta(wm, wm.weights, secondDelta)
         // v_2 = 0.9 * v_1 + secondDelta = 0.9 * firstDelta + secondDelta; update = lr * v_2
         val expectedVelocity = firstDelta.clone().mul(0.9).add(secondDelta)
         val expected2 = expectedVelocity.clone().mul(optimizer.learningRate)
@@ -71,7 +77,7 @@ class OptimizerTest {
             doubleArrayOf(0.05, 0.05)
         ))
 
-        val result3 = optimizer.computeDelta(wm.weights, thirdDelta)
+        val result3 = optimizer.computeDelta(wm, wm.weights, thirdDelta)
         // v_3 = 0.9 * v_2 + thirdDelta = 0.81 * firstDelta + 0.9 * secondDelta + thirdDelta
         val expectedVelocity3 = firstDelta.clone().mul(0.9 * 0.9)
             .add(secondDelta.clone().mul(0.9))
@@ -93,13 +99,13 @@ class OptimizerTest {
         ))
         
         // First update to establish momentum
-        optimizer.computeDelta(wm.weights, delta)
+        optimizer.computeDelta(wm, wm.weights, delta)
         
         // Reset optimizer
         optimizer.reset()
         
         // Next update should behave like first update (no momentum)
-        val result = optimizer.computeDelta(wm.weights, delta)
+        val result = optimizer.computeDelta(wm, wm.weights, delta)
         val expected = delta.clone().mul(optimizer.learningRate)
         
         assertMatrixEquals(expected, result, "After reset, should behave like first update")
@@ -117,8 +123,8 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        val result1 = optimizer.computeDelta(wm.weights, delta)
-        val result2 = optimizer.computeDelta(wm.weights, delta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, delta)
+        val result2 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // With zero momentum, both results should be identical
         assertMatrixEquals(result1, result2, "Zero momentum should produce identical results")
@@ -137,7 +143,7 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        val result = optimizer.computeDelta(wm.weights, delta)
+        val result = optimizer.computeDelta(wm, wm.weights, delta)
         
         // After first iteration, running mean should be approximately delta * (1 - beta1)
         // and running variance should be approximately delta^2 * (1 - beta2)
@@ -220,7 +226,7 @@ class OptimizerTest {
             val expected = mean.clone().div(1 - Math.pow(0.85, step.toDouble())).mul(lr)
                 .div(variance.clone().div(1 - Math.pow(0.995, step.toDouble())).applyFunction { sqrt(it) + 1e-8 })
             if (weightDecay != null) expected.sub(parameters.clone().mul(lr * weightDecay))
-            val actual = optimizer.computeDelta(parameters, delta)
+            val actual = optimizer.computeDelta(parameters, parameters, delta)
             assertArrayEquals(expected.flatten(), actual.flatten(), 0.0)
             if (weightDecay != null) parameters.add(actual)
         }
@@ -235,12 +241,12 @@ class OptimizerTest {
         trainer.iteration = 7
         val delta = Matrix.of(arrayOf(doubleArrayOf(0.3, -0.2), doubleArrayOf(0.1, 0.4)))
         optimizer.beginStep()
-        val first = optimizer.computeDelta(wm.weights, delta)
+        val first = optimizer.computeDelta(wm, wm.weights, delta)
         // At step 1 the bias-corrected moments equal the gradient and its square, so each update is lr * sign(g)
         assertEquals(0.01, first[0, 0], 1e-9)
         assertEquals(-0.01, first[0, 1], 1e-9)
         optimizer.beginStep()
-        val second = optimizer.computeDelta(wm.weights, delta)
+        val second = optimizer.computeDelta(wm, wm.weights, delta)
         // A constant gradient keeps the corrected moments equal to it at step 2 as well
         assertEquals(0.01, second[0, 0], 1e-9)
     }
@@ -251,7 +257,7 @@ class OptimizerTest {
         var steps = 0
         trainer.config.optimizer = object : Optimizer() {
             override fun beginStep() { steps++ }
-            override fun computeDelta(matrix: Matrix, delta: Matrix) = Matrix(matrix.nrow(), matrix.ncol())
+            override fun computeDelta(parameter: Any, matrix: Matrix, delta: Matrix) = Matrix(matrix.nrow(), matrix.ncol())
             override fun reset() {}
             override fun copy() = this
         }
@@ -276,13 +282,13 @@ class OptimizerTest {
         
         // Test multiple steps to verify bias correction changes
         optimizer.beginStep()
-        val result1 = optimizer.computeDelta(wm.weights, delta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, delta)
         
         optimizer.beginStep()
-        val result2 = optimizer.computeDelta(wm.weights, delta)
+        val result2 = optimizer.computeDelta(wm, wm.weights, delta)
         
         repeat(8) { optimizer.beginStep() }
-        val result10 = optimizer.computeDelta(wm.weights, delta)
+        val result10 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // Bias correction should make earlier iterations have larger updates
         val norm1 = result1.frobeniusNorm()
@@ -307,16 +313,16 @@ class OptimizerTest {
         repeat(5) { optimizer.beginStep() }
         
         // First update to establish running estimates
-        optimizer.computeDelta(wm.weights, delta)
+        optimizer.computeDelta(wm, wm.weights, delta)
         optimizer.beginStep()
-        val result1 = optimizer.computeDelta(wm.weights, delta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // Reset optimizer - this clears running estimates and restarts the step count
         optimizer.reset()
         optimizer.beginStep()
         
         // Next update should behave like early iterations due to reset
-        val result2 = optimizer.computeDelta(wm.weights, delta)
+        val result2 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // The reset should cause different behavior due to bias correction restarting
         assertMatrixNotEquals(result1, result2, "Reset should clear running estimates and restart bias correction")
@@ -339,7 +345,7 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        val result = optimizer.computeDelta(wm.weights, delta)
+        val result = optimizer.computeDelta(wm, wm.weights, delta)
         
         // AdamW should include weight decay component
         // Expected: adam_update - (learning_rate * weight_decay * weights)
@@ -347,7 +353,7 @@ class OptimizerTest {
         
         // Verify weight decay contribution exists (result should be different from pure Adam)
         val adamOnlyOptimizer = AdamOptimizer(beta1 = 0.9, beta2 = 0.999)
-        val adamOnlyResult = adamOnlyOptimizer.computeDelta(wm.weights, delta)
+        val adamOnlyResult = adamOnlyOptimizer.computeDelta(wm, wm.weights, delta)
         
         assertMatrixNotEquals(adamOnlyResult, result, "AdamW should differ from Adam due to weight decay")
     }
@@ -360,7 +366,7 @@ class OptimizerTest {
         wm.weights.setValuesInPlace { i, j -> if (i == j) 2.0 else -3.0 }
         optimizer.beginStep()
         // With no gradient the Adam term is zero, leaving only the decay: -lr * weightDecay * w
-        val update = optimizer.computeDelta(wm.weights, Matrix(2, 2))
+        val update = optimizer.computeDelta(wm, wm.weights, Matrix(2, 2))
         assertEquals(-0.01 * 0.1 * 2.0, update[0, 0], 1e-15)
         assertEquals(-0.01 * 0.1 * -3.0, update[0, 1], 1e-15)
     }
@@ -379,10 +385,10 @@ class OptimizerTest {
         
         // Test at different steps to verify learning rate decay
         optimizer.beginStep()
-        val result1 = optimizer.computeDelta(wm.weights, delta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, delta)
         
         repeat(9) { optimizer.beginStep() }
-        val result10 = optimizer.computeDelta(wm.weights, delta)
+        val result10 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // Later iterations should have smaller updates due to learning rate decay
         val norm1 = result1.frobeniusNorm()
@@ -404,8 +410,8 @@ class OptimizerTest {
             doubleArrayOf(0.3, 0.4)
         ))
         
-        val adamwResult = adamw.computeDelta(wm.weights, delta)
-        val adamResult = adam.computeDelta(wm.weights, delta)
+        val adamwResult = adamw.computeDelta(wm, wm.weights, delta)
+        val adamResult = adam.computeDelta(wm, wm.weights, delta)
         
         assertMatrixEquals(adamResult, adamwResult, "AdamW with zero weight decay should match Adam")
     }
@@ -485,12 +491,12 @@ class OptimizerTest {
         ))
         
         // Update different matrices with different deltas
-        val result1_1 = optimizer.computeDelta(wm.weights, delta1)
-        val result2_1 = optimizer.computeDelta(wm2.weights, delta2)
+        val result1_1 = optimizer.computeDelta(wm, wm.weights, delta1)
+        val result2_1 = optimizer.computeDelta(wm2, wm2.weights, delta2)
         
         // Second updates should show different momentum for each matrix
-        val result1_2 = optimizer.computeDelta(wm.weights, delta1)
-        val result2_2 = optimizer.computeDelta(wm2.weights, delta2)
+        val result1_2 = optimizer.computeDelta(wm, wm.weights, delta1)
+        val result2_2 = optimizer.computeDelta(wm2, wm2.weights, delta2)
         
         // Each matrix should maintain its own momentum state
         assertMatrixNotEquals(result1_1, result1_2, "First matrix should show momentum effect")
@@ -511,7 +517,7 @@ class OptimizerTest {
             doubleArrayOf(1e-10, 1e-10)
         ))
         
-        val result = optimizer.computeDelta(wm.weights, smallDelta)
+        val result = optimizer.computeDelta(wm, wm.weights, smallDelta)
         
         // Should not produce NaN or infinite values
         for (i in 0 until result.nrow()) {
@@ -523,7 +529,7 @@ class OptimizerTest {
         
         // Test with zero gradients
         val zeroDelta = Matrix(wm.weights.nrow(), wm.weights.ncol())
-        val zeroResult = optimizer.computeDelta(wm.weights, zeroDelta)
+        val zeroResult = optimizer.computeDelta(wm, wm.weights, zeroDelta)
         
         for (i in 0 until zeroResult.nrow()) {
             for (j in 0 until zeroResult.ncol()) {
@@ -548,16 +554,283 @@ class OptimizerTest {
         ))
         
         optimizer.beginStep()
-        val result1 = optimizer.computeDelta(wm.weights, delta)
+        val result1 = optimizer.computeDelta(wm, wm.weights, delta)
         
         repeat(9) { optimizer.beginStep() }  // Learning rate should have decayed
-        val result10 = optimizer.computeDelta(wm.weights, delta)
+        val result10 = optimizer.computeDelta(wm, wm.weights, delta)
         
         // Weight decay should use current (decayed) learning rate
         val norm1 = result1.frobeniusNorm()
         val norm10 = result10.frobeniusNorm()
         
         assertTrue(norm1 > norm10, "Weight decay should scale with decayed learning rate")
+    }
+
+    /**
+     * The same 2-2-1 sigmoidal network built twice with identical weights: once from neuron arrays joined by weight
+     * matrices, and once from neuron collections joined by synapse groups, whose weights and biases live in the
+     * synapses and neurons.
+     */
+    private class TwinNetworks(optimizer: () -> Optimizer) {
+        val arrayNetwork = Network()
+        val collectionNetwork = Network()
+        val weightMatrices: List<WeightMatrix>
+        val synapseGroups: List<SynapseGroup>
+        val arrayLayers: List<NeuronArray>
+        val collectionLayers: List<NeuronCollection>
+        val arrayTrainer: SupervisedTrainer
+        val collectionTrainer: SupervisedTrainer
+
+        init {
+            val sizes = listOf(2, 2, 1)
+            arrayLayers = sizes.mapIndexed { i, size ->
+                NeuronArray(size).apply { if (i == 0) isClamped = true else updateRule = SigmoidalRule() }
+            }
+            weightMatrices = arrayLayers.zipWithNext { source, target -> WeightMatrix(source, target) }
+            val arrayModel = SupervisedModel(arrayLayers.first(), arrayLayers.last())
+
+            val neurons = sizes.map { size -> List(size) { Neuron() } }
+            collectionLayers = neurons.mapIndexed { i, layerNeurons ->
+                NeuronCollection(layerNeurons).apply { if (i == 0) isClamped = true else setNeuronType(SigmoidalRule()) }
+            }
+            synapseGroups = collectionLayers.zipWithNext { source, target -> SynapseGroup(source, target) }
+            val collectionModel = SupervisedModel(collectionLayers.first(), collectionLayers.last())
+
+            runBlocking {
+                arrayNetwork.addNetworkModelsAsync(arrayLayers + weightMatrices + arrayModel)
+                collectionNetwork.addNetworkModelsAsync(neurons.flatten())
+                collectionNetwork.addNetworkModelsAsync(collectionLayers + synapseGroups + collectionModel)
+            }
+
+            val random = Random(7)
+            weightMatrices.zip(synapseGroups).forEach { (wm, sg) ->
+                wm.weights.setValuesInPlace { _, _ -> random.nextDouble(-1.0, 1.0) }
+                sg.setWeightMatrix(wm.weights)
+            }
+
+            val xor = TrainingDataset(
+                inputs = mutableListOf(
+                    mutableListOf(0.0, 0.0), mutableListOf(1.0, 0.0), mutableListOf(0.0, 1.0), mutableListOf(1.0, 1.0)
+                ),
+                targets = mutableListOf(mutableListOf(0.0), mutableListOf(1.0), mutableListOf(1.0), mutableListOf(0.0))
+            )
+            arrayModel.trainingSet = xor
+            collectionModel.trainingSet = xor
+
+            arrayTrainer = SupervisedTrainer(arrayNetwork, arrayModel).apply { config.optimizer = optimizer() }
+            collectionTrainer = SupervisedTrainer(collectionNetwork, collectionModel).apply { config.optimizer = optimizer() }
+        }
+
+        fun trainBoth(steps: Int) {
+            repeat(steps) {
+                with(arrayNetwork) { arrayTrainer.trainBatch(0 until 4) }
+                with(collectionNetwork) { collectionTrainer.trainBatch(0 until 4) }
+            }
+        }
+
+        fun assertSameParameters(message: String) {
+            weightMatrices.zip(synapseGroups).forEachIndexed { i, (wm, sg) ->
+                assertMatrixEquals(wm.weights, sg.getWeightMatrix(), "$message: weights $i", 1e-9)
+            }
+            arrayLayers.zip(collectionLayers).forEachIndexed { i, (array, collection) ->
+                assertMatrixEquals(array.biases, collection.biases, "$message: biases of layer $i", 1e-9)
+            }
+        }
+    }
+
+    private fun assertCollectionsTrainLikeArrays(optimizer: () -> Optimizer) {
+        val twins = TwinNetworks(optimizer)
+        twins.assertSameParameters("before training")
+        twins.trainBoth(25)
+        twins.assertSameParameters("after 25 steps")
+    }
+
+    @Test
+    fun `momentum carries across steps for synapse groups and neuron collections`() {
+        assertCollectionsTrainLikeArrays { BasicOptimizer(momentum = 0.9).apply { learningRate = 0.1 } }
+    }
+
+    @Test
+    fun `Adam moments carry across steps for synapse groups and neuron collections`() {
+        assertCollectionsTrainLikeArrays { AdamOptimizer().apply { learningRate = 0.05 } }
+    }
+
+    @Test
+    fun `AdamW moments carry across steps for synapse groups and neuron collections`() {
+        assertCollectionsTrainLikeArrays { AdamWOptimizer(weightDecay = 0.01).apply { learningRate = 0.05 } }
+    }
+
+    @Test
+    fun `optimizer state follows the parameter, not the matrix instance`() {
+        val delta = Matrix(2, 2, 1.0)
+
+        val basic = BasicOptimizer(momentum = 0.9).apply { learningRate = 1.0 }
+        val parameter = Any()
+        basic.computeDelta(parameter, Matrix(2, 2), delta)
+        // v_2 = 0.9 * v_1 + delta
+        assertMatrixEquals(Matrix(2, 2, 1.9), basic.computeDelta(parameter, Matrix(2, 2), delta), tolerance = 1e-12)
+
+        fun adamSecondStep(sameInstance: Boolean): Matrix {
+            val adam = AdamOptimizer().apply { learningRate = 0.01 }
+            val weights = Matrix(2, 2)
+            val owner = Any()
+            adam.beginStep()
+            adam.computeDelta(owner, weights, delta)
+            adam.beginStep()
+            return adam.computeDelta(owner, if (sameInstance) weights else Matrix(2, 2), delta.clone().mul(3.0))
+        }
+        assertMatrixEquals(adamSecondStep(sameInstance = true), adamSecondStep(sameInstance = false), tolerance = 0.0)
+    }
+
+    @Test
+    fun `equal matrices standing for themselves keep separate state`() {
+        val optimizer = BasicOptimizer(momentum = 0.9).apply { learningRate = 1.0 }
+        val first = Matrix(2, 2)
+        val second = Matrix(2, 2)
+        val delta = Matrix(2, 2, 1.0)
+        optimizer.computeDelta(first, first, delta)
+        assertMatrixEquals(delta, optimizer.computeDelta(second, second, delta), tolerance = 0.0)
+    }
+
+    @Test
+    fun `optimizer state starts over when a parameter changes shape`() {
+        val parameter = Any()
+        val basic = BasicOptimizer(momentum = 0.9).apply { learningRate = 1.0 }
+        basic.computeDelta(parameter, Matrix(2, 2), Matrix(2, 2, 1.0))
+        assertMatrixEquals(Matrix(3, 2, 1.0), basic.computeDelta(parameter, Matrix(3, 2), Matrix(3, 2, 1.0)), tolerance = 0.0)
+
+        val adam = AdamOptimizer()
+        adam.beginStep()
+        adam.computeDelta(parameter, Matrix(2, 2), Matrix(2, 2, 1.0))
+        adam.beginStep()
+        val resized = adam.computeDelta(parameter, Matrix(3, 2), Matrix(3, 2, 1.0))
+        assertEquals(3, resized.nrow())
+        assertTrue(resized.flatten().all { it.isFinite() && it > 0.0 })
+    }
+
+    @Test
+    fun `an optimizer saved with running state loads as a reset optimizer`() {
+        fun entry(value: String) = """
+            <entry>
+              <smile.math.matrix.Matrix><rows>2</rows><cols>2</cols><data>[0.50000, 0.50000, 0.50000, 0.50000]</data></smile.math.matrix.Matrix>
+              <smile.math.matrix.Matrix><rows>2</rows><cols>2</cols><data>[$value, $value, $value, $value]</data></smile.math.matrix.Matrix>
+            </entry>"""
+
+        val basicXml = """
+            <org.simbrain.network.trainers.BasicOptimizer>
+              <matrixToVelocityMap class="java.util.HashMap">${entry("0.10000")}${entry("0.10000")}
+              </matrixToVelocityMap>
+              <momentum>0.8</momentum>
+              <learningRate>0.02</learningRate>
+            </org.simbrain.network.trainers.BasicOptimizer>"""
+        val basic = getSimbrainXStream().fromXML(basicXml) as BasicOptimizer
+        assertEquals(0.8, basic.momentum)
+        assertEquals(0.02, basic.learningRate)
+
+        val adamWXml = """
+            <org.simbrain.network.trainers.AdamWOptimizer>
+              <learningRateDecay>0.1</learningRateDecay>
+              <weightDecay>0.03</weightDecay>
+              <beta1>0.85</beta1>
+              <beta2>0.995</beta2>
+              <matrixRunningMeanMap class="java.util.HashMap">${entry("0.01000")}
+              </matrixRunningMeanMap>
+              <matrixRunningVarianceMap class="java.util.HashMap">${entry("0.00001")}
+              </matrixRunningVarianceMap>
+              <stepsSinceReset>7</stepsSinceReset>
+              <learningRate>0.02</learningRate>
+            </org.simbrain.network.trainers.AdamWOptimizer>"""
+        val loaded = getSimbrainXStream().fromXML(adamWXml) as AdamWOptimizer
+        val fresh = AdamWOptimizer(beta1 = 0.85, beta2 = 0.995, weightDecay = 0.03, learningRateDecay = 0.1)
+            .apply { learningRate = 0.02 }
+        assertEquals(
+            listOf(fresh.beta1, fresh.beta2, fresh.weightDecay, fresh.learningRateDecay, fresh.learningRate),
+            listOf(loaded.beta1, loaded.beta2, loaded.weightDecay, loaded.learningRateDecay, loaded.learningRate)
+        )
+
+        // Moments and step count restart together, so the first step after loading is a first step
+        val weights = Matrix(2, 2, 0.5)
+        val delta = Matrix(2, 2, 0.1)
+        listOf(loaded, fresh).forEach { it.beginStep() }
+        assertMatrixEquals(
+            fresh.computeDelta(weights, weights, delta), loaded.computeDelta(weights, weights, delta), tolerance = 0.0
+        )
+    }
+
+    @Test
+    fun `optimizer state is not written to saved files`() {
+        listOf<() -> Optimizer>({ BasicOptimizer() }, { AdamOptimizer() }, { AdamWOptimizer() }).forEach { optimizer ->
+            val twins = TwinNetworks(optimizer)
+            twins.trainBoth(5)
+            listOf(twins.arrayTrainer, twins.collectionTrainer).forEach { trainer ->
+                val xml = getSimbrainXStream().toXML(trainer.config.optimizer)
+                assertFalse(xml.contains("<rows>")) { "Saved optimizer should hold no matrices, but was:\n${xml.take(600)}" }
+            }
+        }
+    }
+
+    @Test
+    fun `training continues after a network is saved and loaded`() {
+        listOf<() -> Optimizer>({ BasicOptimizer() }, { AdamOptimizer() }, { AdamWOptimizer() }).forEach { optimizer ->
+            val twins = TwinNetworks(optimizer)
+            twins.trainBoth(3)
+            listOf(twins.arrayNetwork, twins.collectionNetwork).forEach { network ->
+                val loaded = getNetworkXStream().fromXML(getNetworkXStream().toXML(network)) as Network
+                val model = loaded.getModels(SupervisedModel::class.java).first()
+                val trainer = SupervisedTrainer(loaded, model)
+                assertEquals(optimizer()::class, trainer.config.optimizer::class)
+                repeat(3) {
+                    val error = with(loaded) { trainer.trainBatch(0 until 4) }
+                    assertTrue(error.isFinite())
+                }
+            }
+        }
+    }
+
+    @Test
+    fun `config learning rate is the current optimizer's`() {
+        val config = SupervisedTrainerConfig()
+        config.optimizer = BasicOptimizer()
+        config.learningRate = 0.1
+        assertEquals(0.1, config.optimizer.learningRate)
+
+        config.optimizer = AdamOptimizer().apply { learningRate = 0.3 }
+        assertEquals(0.3, config.learningRate)
+
+        val copy = config.copy()
+        copy.learningRate = 0.2
+        assertEquals(0.2, copy.optimizer.learningRate)
+        assertEquals(0.3, config.optimizer.learningRate)
+    }
+
+    @Test
+    fun `config learning rate survives saving and loading`() {
+        val config = SupervisedTrainerConfig()
+        config.optimizer = BasicOptimizer().apply { learningRate = 0.02 }
+
+        val loaded = getSimbrainXStream().fromXML(getSimbrainXStream().toXML(config)) as SupervisedTrainerConfig
+
+        assertEquals(0.02, loaded.optimizer.learningRate)
+        loaded.learningRate = 0.5
+        assertEquals(0.5, loaded.optimizer.learningRate)
+    }
+
+    @Test
+    fun `a learning rate saved beside the optimizer does not replace the optimizer's own`() {
+        val besideOptimizer = "<learningRate>0.01</learningRate>"
+        val optimizer = """
+            <optimizer class="org.simbrain.network.trainers.BasicOptimizer">
+              <momentum>0.8</momentum>
+              <learningRate>0.02</learningRate>
+            </optimizer>"""
+        listOf(besideOptimizer + optimizer, optimizer + besideOptimizer).forEach { body ->
+            val xml = """
+                <org.simbrain.network.trainers.SupervisedTrainerConfig>$body
+                </org.simbrain.network.trainers.SupervisedTrainerConfig>"""
+            val loaded = getSimbrainXStream().fromXML(xml) as SupervisedTrainerConfig
+            assertEquals(0.02, loaded.optimizer.learningRate)
+            assertEquals(0.02, loaded.learningRate)
+        }
     }
 
 }

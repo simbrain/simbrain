@@ -1942,4 +1942,34 @@ class ClipboardTest {
         assertEquals(listOf<NetworkModel>(copy), networkPanel.selectionManager.selectedModels.toList())
     }
 
+    @Test
+    fun `connections alone would paste nothing but with their neurons they would`() {
+        val n1 = Neuron()
+        val n2 = Neuron()
+        val synapse = Synapse(n1, n2)
+        assertFalse(Clipboard.wouldCopy(listOf(synapse)))
+        assertFalse(Clipboard.wouldCopy(listOf(TensorLayer(TensorShape(4, 4, 2)))))
+        assertFalse(Clipboard.wouldCopy(listOf()))
+        assertTrue(Clipboard.wouldCopy(listOf(n1, n2, synapse)))
+    }
+
+    @Test
+    fun `copying or duplicating a selection that would paste nothing leaves the clipboard as it was`() = runBlocking {
+        val source = Neuron().also { network.addNetworkModel(it) }
+        val layer = TensorLayer(TensorShape(4, 4, 2)).also { network.addNetworkModel(it) }
+        val networkPanel = (SimbrainDesktop.getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+
+        networkPanel.selectionManager.set(onEdt { networkPanel.screenElements }.filter { it.model == source })
+        assertTrue(networkPanel.copy())
+        val clipboardAfterCopy = Clipboard.contentVersion
+
+        networkPanel.selectionManager.set(onEdt { networkPanel.screenElements }.filter { it.model == layer })
+        assertFalse(networkPanel.copy())
+        networkPanel.duplicate()
+
+        assertEquals(clipboardAfterCopy, Clipboard.contentVersion)
+        assertFalse(Clipboard.isEmpty)
+        assertEquals(1, network.getModels<Neuron>().size, "Duplicating the layer pasted the neuron copied before")
+    }
+
 }

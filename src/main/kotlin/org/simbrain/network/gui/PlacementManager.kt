@@ -2,20 +2,24 @@
  * Automatic placement of new and copied model elements in a network.
  *
  * Three verbs, one rule each:
- * - Add: new objects go to the insertion point (last click on empty canvas) and step right until they find free space,
- *   so repeated adds form a row.
+ * - Add: new objects go to the insertion point (last click on empty canvas) and take the first free slot from there,
+ *   so repeated adds form a row, which wraps to a new row below when it is full.
  * - Duplicate: the copy goes next to its source (right, else below, else further right).
  * - Paste: goes to the insertion point if it was set after the copy, otherwise next to the source, with successive
  *   pastes trailing from the previous paste.
  *
  * Duplicates and pastes that continue from the previous copy repeat any move the user made to that copy, so dragging
- * a copy somewhere and pasting or duplicating again lays out an evenly spaced trail in that direction.
+ * a copy somewhere and pasting or duplicating again lays out an evenly spaced trail in that direction. A paste made
+ * at the insertion point starts a new trail: the next paste goes next to it.
  *
  * Copies can also be left in place, on top of their source, for callers that move them themselves (alt-drag).
  *
  * Automatic placement never lands on an existing object. Placement the user asked for explicitly (a clicked paste
  * point, a repeated duplicate move) is honored exactly. Placement runs on the model side, before GUI nodes exist, so
  * occupancy is judged from model-side footprints rather than node bounds.
+ *
+ * The clipboard is shared by every network, so whether a paste continues from the previous one, or goes to a click,
+ * is judged by the clipboard's contents ([Clipboard.contentVersion]) rather than by what this network last copied.
  */
 package org.simbrain.network.gui
 
@@ -28,15 +32,19 @@ import org.simbrain.util.plus
 import org.simbrain.util.point
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
+import java.util.BitSet
+import kotlin.math.ceil
+import kotlin.math.floor
 
 /**
  * Center-to-center spacing of automatically placed neurons, which is also a neuron's footprint.
  */
-const val NEURON_FOOTPRINT = 45.0
+internal const val NEURON_FOOTPRINT = 45.0
 
 private const val LAYER_PADDING = 20.0
 private const val GROUP_PADDING = 30.0
-private const val MAX_PROBE_STEPS = 50
+internal const val SLOTS_PER_ROW = 50
+private const val MAX_SLOT_ROWS = 1000
 private const val MOVE_TOLERANCE = 0.01
 
 private val nominalLayerSize = point(260.0, 60.0)
@@ -73,13 +81,23 @@ class PlacementManager(private val network: Network) {
     var insertionPoint: Point2D? = null
         set(value) {
             field = value
-            insertionPointIsFresh = value != null
+            fallbackInsertionPoint = null
+            clickAwaitingPaste = if (value != null) Clipboard.contentVersion else null
         }
 
     /**
-     * True when the insertion point was set after the last copy, in which case the next paste goes there.
+     * The clipboard contents (a [Clipboard.contentVersion]) that were current when the insertion point was set, until
+     * a paste goes there. The next paste of those contents goes to the insertion point. Once the clipboard holds
+     * something else the click no longer says where to paste.
      */
-    private var insertionPointIsFresh = false
+    private var clickAwaitingPaste: Int? = null
+
+    /**
+     * Where adds go while there is no insertion point on-screen: the center of the visible canvas as it was at the
+     * first of those adds. Auto zoom re-centers the view after each add, so taking the center afresh every time would
+     * start each add from a different point and leave the row unevenly spaced.
+     */
+    private var fallbackInsertionPoint: Point2D? = null
 
     /**
      * Supplies the visible part of the canvas in model coordinates, so placement can avoid going off-screen.
@@ -87,17 +105,17 @@ class PlacementManager(private val network: Network) {
     var visibleBounds: (() -> Rectangle2D?)? = null
 
     /**
-     * The insertion point if it is set and on-screen, otherwise the center of the visible canvas.
+     * The insertion point if it is set and on-screen, otherwise where adds have been going instead if that is still
+     * on-screen, otherwise the center of the visible canvas.
      */
     val insertionLocation: Point2D
         get() {
             val visible = visibleBounds?.invoke()?.takeIf { !it.isEmpty }
-            val point = insertionPoint
-            return when {
-                point != null && (visible == null || visible.contains(point)) -> point
-                visible != null -> point(visible.centerX, visible.centerY)
-                else -> point ?: point(0.0, 0.0)
-            }
+            fun Point2D?.ifOnScreen() = this?.takeIf { visible == null || visible.contains(it) }
+            return insertionPoint.ifOnScreen()
+                ?: fallbackInsertionPoint.ifOnScreen()
+                ?: visible?.let { point(it.centerX, it.centerY) }
+                ?: point(0.0, 0.0)
         }
 
     /**
@@ -106,60 +124,37 @@ class PlacementManager(private val network: Network) {
     private var lastCopy: LastCopy? = null
 
     /**
-     * False once the clipboard has been refilled, after which a paste starts over from its new source.
-     */
-    private var pasteContinuesLastCopy = false
-
-    /**
-     * @param anchorTopLeft where the thing these copies were placed relative to was
-     * @param placedTopLeft where the copies were put, used to tell whether the user has moved them since
-     * @param repeatDelta the offset being repeated, if any
+     * @param placedAt where the copies were put, used to tell whether the user has moved them since
+     * @param anchoredAt where the thing the copies were placed relative to was. Null for copies pasted at the
+     * insertion point, which were not placed relative to anything.
+     * @param repeatedStep the offset from the anchor, when it repeated an earlier offset rather than being found by
+     * looking for free space
+     * @param clipboardVersion the clipboard contents the copies were made from
      */
     private class LastCopy(
         val copies: Set<LocatableModel>,
-        val anchorTopLeft: Point2D,
-        val placedTopLeft: Point2D,
-        val repeatDelta: Point2D?
+        val placedAt: Point2D,
+        val anchoredAt: Point2D?,
+        val repeatedStep: Point2D?,
+        val clipboardVersion: Int
     )
-
-    /**
-     * Call when the clipboard is refilled: the next paste starts over from the new source.
-     */
-    fun onCopy() {
-        insertionPointIsFresh = false
-        pasteContinuesLastCopy = false
-    }
 
     fun placeObject(model: LocatableModel) {
         placeObjects(listOf(model))
     }
 
     /**
-     * Place newly added objects at the insertion point, stepping right past anything already there.
+     * Place newly added objects at the insertion point, in the first free slot from there.
      */
     fun placeObjects(models: List<LocatableModel>) {
         val movable = models.movable()
         if (movable.isEmpty()) return
 
         val start = insertionLocation
-        pinInsertionPoint(start)
+        if (start != insertionPoint && visibleBounds != null) fallbackInsertionPoint = start
         movable.moveTopLeftTo(start)
-        val footprint = models.footprint()
-        val delta = firstFreeOffset(footprint, occupiedFootprints(models), marchRight(footprint, startStep = 0))
-        movable.translate(delta)
+        movable.translate(SlotGrid(models.footprint(), occupiedFootprints(models)).firstFreeFrom())
         lastCopy = null
-    }
-
-    /**
-     * Keep adding from [start] even when it came from the center of the visible canvas. Auto zoom re-centers the view
-     * after each add, so without this every add would march right from a different point and the row would be
-     * unevenly spaced. Does not count as a click, so it does not redirect the next paste.
-     */
-    private fun pinInsertionPoint(start: Point2D) {
-        if (start == insertionPoint) return
-        val fresh = insertionPointIsFresh
-        insertionPoint = start
-        insertionPointIsFresh = fresh
     }
 
     /**
@@ -171,37 +166,53 @@ class PlacementManager(private val network: Network) {
 
         val expandedSource = source.expanded()
         val present = network.allModels.toSet()
+        val clipboardVersion = Clipboard.contentVersion
 
         // What the copies are placed relative to: the previous copies when continuing from them, else the source
-        val previous = lastCopy?.takeIf { it.isContinuedBy(placement, expandedSource, present) }
+        val previous = lastCopy?.takeIf { it.isContinuedBy(placement, expandedSource, present, clipboardVersion) }
         val anchor = previous?.copies?.toList() ?: expandedSource
         val movableAnchor = anchor.movable()
         val anchorTopLeft = if (movableAnchor.isEmpty()) movable.topLeftLocation else movableAnchor.topLeftLocation
-        val repeatDelta = previous?.repeatDeltaFrom(anchorTopLeft)
 
-        if (placement == CopyPlacement.IN_PLACE) {
+        val atInsertionPoint = placement == CopyPlacement.PASTE && clickAwaitingPaste == clipboardVersion
+        val step = if (atInsertionPoint) null else previous?.stepToRepeat(anchorTopLeft)
+
+        if (atInsertionPoint) {
+            clickAwaitingPaste = null
+            val target = insertionLocation
+            movable.moveTopLeftTo(target)
+            // With the clicked point off-screen this is not a place the user chose, so make room as an add does
+            if (target != insertionPoint) {
+                movable.translate(SlotGrid(copies.footprint(), occupiedFootprints(copies)).firstFreeFrom())
+            }
+        } else if (placement == CopyPlacement.IN_PLACE) {
             movable.moveTopLeftTo(anchorTopLeft)
-        } else if (placement == CopyPlacement.PASTE && insertionPointIsFresh) {
-            insertionPointIsFresh = false
-            movable.moveTopLeftTo(insertionLocation)
-        } else if (repeatDelta != null) {
-            movable.moveTopLeftTo(anchorTopLeft + repeatDelta)
+        } else if (step != null) {
+            movable.moveTopLeftTo(anchorTopLeft + step)
         } else {
             movable.moveTopLeftTo(anchorTopLeft)
             // The anchor has been laid out by the GUI, so its footprint is more reliable than that of fresh copies
             val footprint = if (movableAnchor.isNotEmpty()) anchor.footprint() else copies.footprint()
-            val candidates = if (anchor.any { it in present }) {
-                sequenceOf(point(footprint.width, 0.0), point(0.0, footprint.height)) +
-                        marchRight(footprint, startStep = 2)
+            val slots = SlotGrid(footprint, occupiedFootprints(copies))
+            val offset = if (anchor.any { it in present }) {
+                // Right of the anchor, else below it, else further right
+                slots.offsetIfFree(column = 1, row = 0)
+                    ?: slots.offsetIfFree(column = 0, row = 1)
+                    ?: slots.firstFreeFrom(column = 2)
             } else {
                 // The source is gone (cut) or lives in another network, so its old spot is the first choice
-                marchRight(footprint, startStep = 0)
+                slots.firstFreeFrom()
             }
-            movable.translate(firstFreeOffset(footprint, occupiedFootprints(copies), candidates))
+            movable.translate(offset)
         }
 
-        lastCopy = LastCopy(copies.toSet(), anchorTopLeft, movable.topLeftLocation, repeatDelta)
-        pasteContinuesLastCopy = true
+        lastCopy = LastCopy(
+            copies = copies.toSet(),
+            placedAt = movable.topLeftLocation,
+            anchoredAt = anchorTopLeft.takeUnless { atInsertionPoint },
+            repeatedStep = step,
+            clipboardVersion = clipboardVersion
+        )
     }
 
     /**
@@ -211,21 +222,23 @@ class PlacementManager(private val network: Network) {
     private fun LastCopy.isContinuedBy(
         placement: CopyPlacement,
         expandedSource: List<LocatableModel>,
-        present: Set<NetworkModel>
+        present: Set<NetworkModel>,
+        currentClipboardVersion: Int
     ) = when (placement) {
         CopyPlacement.DUPLICATE -> expandedSource.toSet() == copies
-        CopyPlacement.PASTE -> pasteContinuesLastCopy && present.containsAll(copies)
+        CopyPlacement.PASTE -> clipboardVersion == currentClipboardVersion && present.containsAll(copies)
         CopyPlacement.IN_PLACE -> false
     }
 
     /**
-     * The offset to repeat when continuing from these copies: the move the user has made to them since they were
-     * placed (by dragging them, or by dragging them out in the first place), or else the offset already being
-     * repeated. Null means place automatically.
+     * The offset to repeat when continuing from these copies: the offset from their anchor to where the user has
+     * since moved them (by dragging them, or by dragging them out in the first place), or else the offset already
+     * being repeated. Null means place automatically, which is also what a move of copies that had no anchor leads
+     * to.
      */
-    private fun LastCopy.repeatDeltaFrom(currentTopLeft: Point2D): Point2D? {
-        val moved = currentTopLeft.distance(placedTopLeft) > MOVE_TOLERANCE
-        return if (moved) currentTopLeft - anchorTopLeft else repeatDelta
+    private fun LastCopy.stepToRepeat(currentTopLeft: Point2D): Point2D? {
+        val moved = currentTopLeft.distance(placedAt) > MOVE_TOLERANCE
+        return if (moved) anchoredAt?.let { currentTopLeft - it } else repeatedStep
     }
 
     private fun occupiedFootprints(exclude: Collection<LocatableModel>): List<Rectangle2D> {
@@ -239,28 +252,64 @@ class PlacementManager(private val network: Network) {
 }
 
 /**
- * Offsets that step right one footprint width at a time.
+ * The places a footprint could be moved to, as a grid: slot (column, row) is the footprint shifted right by that many
+ * of its widths and down by that many of its heights. A slot is taken when the footprint would overlap something in
+ * [occupied] there. Rows are [SLOTS_PER_ROW] slots long. Building the grid takes one pass over [occupied], however
+ * many slots are taken.
  */
-private fun marchRight(footprint: Rectangle2D, startStep: Int) =
-    (startStep..MAX_PROBE_STEPS).asSequence().map { point(it * footprint.width, 0.0) }
+private class SlotGrid(footprint: Rectangle2D, occupied: List<Rectangle2D>) {
+
+    private val slotWidth = footprint.width.coerceAtLeast(1.0)
+
+    private val slotHeight = footprint.height.coerceAtLeast(1.0)
+
+    private val taken = BitSet()
+
+    init {
+        // Shrink slightly so that footprints which merely touch do not count as overlapping
+        val probe = footprint.addPadding(-1.0)
+        // A footprint that shrinks to nothing overlaps nothing, wherever it is
+        val hasArea = footprint.width > 2 && footprint.height > 2
+        for (other in occupied) {
+            if (!hasArea || other.isEmpty) continue
+            val columns = shiftsBetween(other.minX - probe.maxX, other.maxX - probe.minX, slotWidth, SLOTS_PER_ROW)
+            val rows = shiftsBetween(other.minY - probe.maxY, other.maxY - probe.minY, slotHeight, MAX_SLOT_ROWS)
+            if (columns.isEmpty()) continue
+            for (row in rows) taken.set(index(columns.first, row), index(columns.last, row) + 1)
+        }
+    }
+
+    /**
+     * The offset to a slot, if it is free.
+     */
+    fun offsetIfFree(column: Int, row: Int): Point2D? = index(column, row).takeIf { !taken[it] }?.let { offsetOf(it) }
+
+    /**
+     * The offset to the first free slot at or after [column] in the first row, reading along each row and then down
+     * to the next.
+     */
+    fun firstFreeFrom(column: Int = 0): Point2D = offsetOf(taken.nextClearBit(column))
+
+    private fun index(column: Int, row: Int) = row * SLOTS_PER_ROW + column
+
+    private fun offsetOf(index: Int) = point((index % SLOTS_PER_ROW) * slotWidth, (index / SLOTS_PER_ROW) * slotHeight)
+
+}
 
 /**
- * The first of the [candidates] offsets at which [footprint] overlaps nothing in [occupied]. Falls back to the first
- * candidate when every candidate is blocked.
+ * The whole numbers n from 0 up to, but not including, [count] for which n * [step] lies strictly between [low] and
+ * [high].
  */
-fun firstFreeOffset(footprint: Rectangle2D, occupied: List<Rectangle2D>, candidates: Sequence<Point2D>): Point2D {
-    // Shrink slightly so that footprints which merely touch do not count as overlapping
-    val probe = footprint.addPadding(-1.0)
-    return candidates.firstOrNull { offset ->
-        val shifted = Rectangle2D.Double(probe.x + offset.x, probe.y + offset.y, probe.width, probe.height)
-        occupied.none { it.intersects(shifted) }
-    } ?: candidates.first()
+private fun shiftsBetween(low: Double, high: Double, step: Double, count: Int): IntRange {
+    val first = (floor(low / step) + 1).coerceIn(0.0, count.toDouble()).toInt()
+    val last = (ceil(high / step) - 1).coerceIn(-1.0, count - 1.0).toInt()
+    return first..last
 }
 
 /**
  * The area a model claims for placement purposes, including breathing room around it.
  */
-fun LocatableModel.footprint(): Rectangle2D = when (this) {
+internal fun LocatableModel.footprint(): Rectangle2D = when (this) {
     is Neuron -> centeredRectangle(location, point(NEURON_FOOTPRINT, NEURON_FOOTPRINT))
     is NeuronCollection -> neuronList.footprint()
     is Layer -> sizedFootprint(width, height, nominalLayerSize)
@@ -281,7 +330,7 @@ fun LocatableModel.footprint(): Rectangle2D = when (this) {
 /**
  * Union of the footprints of the models in the collection.
  */
-fun Collection<LocatableModel>.footprint(): Rectangle2D {
+internal fun Collection<LocatableModel>.footprint(): Rectangle2D {
     val result = Rectangle2D.Double()
     forEachIndexed { i, model ->
         if (i == 0) result.setRect(model.footprint()) else result.add(model.footprint())

@@ -5,6 +5,7 @@ import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Buffer which holds network objects for cutting and pasting. To make a new model type
@@ -17,6 +18,27 @@ object Clipboard {
      * Static list of cut or copied objects.
      */
     private var copiedObjects: List<NetworkModel> = ArrayList()
+        set(value) {
+            field = value
+            version.incrementAndGet()
+        }
+
+    private val version = AtomicInteger()
+
+    /**
+     * Changes whenever the clipboard's contents are replaced, so that code which remembers a paste can tell whether
+     * the clipboard still holds what was pasted.
+     */
+    val contentVersion: Int get() = version.get()
+
+    /**
+     * True if pasting a copy of [objects] would create anything. Connections are only copied along with what they
+     * connect, so nothing comes of copying connections alone.
+     */
+    fun wouldCopy(objects: List<NetworkModel>) = objects.any { it !is InfoText && canCopy(it) && !it.isConnection }
+
+    private val NetworkModel.isConnection
+        get() = this is Synapse || this is GapJunction || this is WeightMatrix || this is SynapseGroup
 
     /** The model types [paste]'s `createCopies` knows how to copy. */
     fun canCopy(model: NetworkModel): Boolean = when (model) {
@@ -79,10 +101,12 @@ object Clipboard {
      *
      * @param net the network to paste into
      * @param placement where the copies go relative to their source
+     * @return the copies that were pasted. Empty when there was nothing to paste, in which case the network, the
+     * selection and the undo history are left as they were.
      */
-    suspend fun paste(net: NetworkPanel, placement: CopyPlacement = CopyPlacement.PASTE) {
+    suspend fun paste(net: NetworkPanel, placement: CopyPlacement = CopyPlacement.PASTE): List<NetworkModel> {
         if (isEmpty) {
-            return
+            return emptyList()
         }
 
         // Match new to old neurons for synapse adding
@@ -214,6 +238,8 @@ object Clipboard {
 
         // Create a copy of the clipboard objects.
         val copy = createCopies(net.network, copiedObjects)
+        // For example a synapse copied without its neurons
+        if (copy.isEmpty()) return emptyList()
         copy.filterIsInstance<LocatableModel>()
             .forEach { it.shouldBePlaced = false }
 
@@ -242,6 +268,7 @@ object Clipboard {
 
         // Select copied objects after pasting them
         net.selectionManager.add(copy.map { net.modelNodeMap.get(it) })
+        return copy
     }
 
     @JvmStatic

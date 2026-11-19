@@ -26,6 +26,7 @@ import org.simbrain.util.piccolo.firstScreenElement
 import org.simbrain.util.piccolo.screenElements
 import java.awt.*
 import java.awt.dnd.DragSource
+import java.awt.event.MouseEvent
 import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import java.awt.image.BaseMultiResolutionImage
@@ -129,6 +130,8 @@ class MouseEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHand
      * the cursor moves at all in between, which a real click often does by a pixel.
      */
     private fun setInsertionPointOnClick(release: PInputEvent) {
+        // The canvas makes up a press for a right button release that arrives without one, as after a popup menu
+        if (release.button != MouseEvent.BUTTON1) return
         // The picked node of a release is the one that was pressed on
         if (release.pickedNode.firstScreenElement != null) return
         if (release.canvasPosition.distance(mousePressedCanvasPoint) > CLICK_TOLERANCE) return

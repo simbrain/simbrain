@@ -137,6 +137,27 @@ class MouseEventHandlerTest {
     }
 
     @Test
+    fun `a right button release with no press before it does not set the insertion point`() {
+        val network = Network()
+        val panel = panelFor(network, neuronAt(0.0, 0.0), neuronAt(600.0, 600.0))
+        network.placementManager.insertionPoint = point(50.0, 500.0)
+
+        // What the canvas gets when a popup menu took the press, or the release arrives after the menu has closed.
+        // The canvas makes up the missing press, so its handlers see a press and release in the same place.
+        val pixel = panel.pixelAt(point(300.0, 100.0))
+        onEdt {
+            panel.canvas.dispatchEvent(
+                MouseEvent(
+                    panel.canvas, MouseEvent.MOUSE_RELEASED, System.currentTimeMillis(), 0,
+                    pixel.x, pixel.y, 1, false, MouseEvent.BUTTON3
+                )
+            )
+        }
+
+        assertEquals(point(50.0, 500.0), network.placementManager.insertionPoint)
+    }
+
+    @Test
     fun `each paste goes to the click before it even when the clicks move slightly`() {
         val network = Network()
         val source = neuronAt(0.0, 0.0)

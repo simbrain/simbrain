@@ -117,10 +117,38 @@ var function by GuiEditable(initValue = ActivationFunction.SIGMOID)
 ./gradlew run                                # Run Simbrain
 ./gradlew runSim -PsimName="Simulation name" # Run simulation
 ./gradlew test                               # Run tests
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot # Render a UI snapshot
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.KitchenSinkSnapshot # Render a UI snapshot
+./gradlew compileSnapshotsKotlin             # Compile the snapshot definitions
 ```
 
-UI snapshot definitions live in `src/snapshots/kotlin/org/simbrain/util/uisnapshot/`. Use them to verify Swing/Piccolo layout, dialog sizing, and visual overlap without manually running the full app. Add a targeted `UiSnapshotDef` when a UI change needs screenshot-level validation; generated images are written to `build/ui-snapshots/`.
+## UI Snapshots
+
+UI snapshot definitions live in `src/snapshots/kotlin/org/simbrain/util/uisnapshot/`; `src/snapshots/README.md` documents the harness. Use them to verify Swing/Piccolo layout, dialog sizing, and visual overlap without manually running the full app. Generated images are written to `build/ui-snapshots/`.
+
+**A snapshot is temporary by default.** Write the `UiSnapshotDef`, run it, look at the image, and delete the file before committing. Keep it temporary when it:
+
+- Checks your own change once: a dialog's sizing, a label overlap, a fix before and after, a look in dark mode
+- Renders one simulation's layout (recipe in `custom_sims/AGENTS_SIMULATIONS.md`)
+- Wraps a single constructor call, such as an `AnnotatedPropertyEditor` on one object or a dialog in its default state
+- Checks something a test can assert: which menu items exist and what they say, whether something is present, enabled, or inside the view, what survives a save and restore. Write the test instead
+- Produces a figure for a paper, talk, or documentation. Keep that definition with the figure's source, not in this repository
+
+**Commit a snapshot only when the next person to change that code would re-run it and could not rebuild it in a few minutes.** It should be one of:
+
+- A reference sheet for a shared visual primitive that many screens depend on: theme widgets, icons, chart chrome, message dialogs, frame chrome, one of every canvas node
+- A deliberate set of cases for a drawing or layout rule, side by side: a range of spacings, every display mode, the edge cases
+- A state that takes real setup to reach by hand (a trained model, a drag in progress, a hand-built dialog showing its error state) in a feature whose appearance is still likely to change
+
+A committed snapshot must:
+
+- Open with a KDoc saying what the image shows and what correct looks like
+- Build its scene from production code rather than a copy of it, and render the same way every run (seed any randomness)
+- Say in its KDoc if it needs anything outside a clean checkout, such as downloaded model weights
+- Use `-Ptheme=dark` for dark mode rather than a separate dark class
+
+Before adding one, list the directory and extend an existing snapshot of the same surface with a new case where that works. Delete a committed snapshot once it stops meeting the bar, for example when a test now covers what it showed.
+
+`./gradlew build` and `./gradlew test` do not compile this source set. After changing an API that snapshots use, run `./gradlew compileSnapshotsKotlin`.
 
 ## Verification Checklist
 
@@ -130,6 +158,7 @@ UI snapshot definitions live in `src/snapshots/kotlin/org/simbrain/util/uisnapsh
 - [ ] User-facing properties use `@UserParameter` or `GuiEditable`
 - [ ] Added to appropriate registry (`RULE_LIST`, etc.)
 - [ ] Tests pass: `./gradlew test`
+- [ ] Temporary UI snapshots deleted; any committed one meets the bar in "UI Snapshots"
 
 ## Common Pitfalls
 

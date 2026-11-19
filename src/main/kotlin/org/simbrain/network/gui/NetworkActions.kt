@@ -11,7 +11,6 @@ import org.simbrain.network.core.*
 import org.simbrain.network.gui.dialogs.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences.excitatoryRandomizer
 import org.simbrain.network.gui.dialogs.NetworkPreferences.inhibitoryRandomizer
-import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
 import org.simbrain.network.gui.dialogs.NetworkPreferences.weightRandomizer
 import org.simbrain.network.gui.dialogs.neuron.AddNeuronsDialog
 import org.simbrain.network.gui.dialogs.text.TextDialog
@@ -474,9 +473,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         iconPath = "menu_icons/ActivationTool.png",
         keyboardShortcut = KeyCombination('D')
     ) {
-        wandPalette.selectedAction?.let { action ->
-            MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
-        }
+        networkPanel.wandEventHandler.refreshCursor()
         networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
     }
 

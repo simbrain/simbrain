@@ -1,3 +1,7 @@
+/**
+ * Swing views of the wand palette: the popup list where actions are selected, edited and one is made the secondary,
+ * and the toolbar split button that switches to the wand and opens that list.
+ */
 package org.simbrain.network.gui
 
 import net.miginfocom.swing.MigLayout
@@ -8,7 +12,9 @@ import org.simbrain.util.propertyeditor.objectWrapper
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.geom.Area
 import java.awt.geom.Ellipse2D
+import java.awt.geom.Path2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -83,6 +89,7 @@ class WandPalettePanel(
             actionRemoved.on { rebuildList() }
             paletteChanged.on { rebuildList() }
             selectionChanged.on { updateSelection() }
+            secondaryChanged.on { rebuildList() }
         }
 
         rebuildList()
@@ -117,6 +124,7 @@ class WandPalettePanel(
 
     private fun createActionRow(index: Int, action: WandAction): JPanel {
         val isSelected = index == palette.selectedIndex
+        val isSecondary = action === palette.secondaryAction
 
         val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
         // Opaque selection wash: blend the accent over the card background so the (opaque) row
@@ -151,6 +159,22 @@ class WandPalettePanel(
                 isOpaque = false
             }
 
+            val secondaryButton = JButton().apply {
+                icon = ShiftIcon(isSecondary)
+                preferredSize = Dimension(20, 24)
+                margin = Insets(0, 0, 0, 0)
+                isFocusPainted = false
+                isContentAreaFilled = false
+                isBorderPainted = false
+                toolTipText = if (isSecondary) {
+                    "Secondary action: applied by dragging the wand with Shift held"
+                } else {
+                    "Make this the secondary action, applied by dragging the wand with Shift held"
+                }
+                addActionListener { makeSecondary(index) }
+            }
+            buttonPanel.add(secondaryButton)
+
             // Kebab menu button for editing
             val kebabButton = JButton().apply {
                 icon = KebabIcon()
@@ -176,10 +200,10 @@ class WandPalettePanel(
 
             add(buttonPanel, BorderLayout.EAST)
 
-            // Click to select, double-click to edit
+            // Click to select, shift-click to make secondary, double-click to edit
             val clickListener = object : MouseAdapter() {
                 override fun mousePressed(e: MouseEvent) {
-                    palette.selectAction(index)
+                    if (e.isShiftDown) makeSecondary(index) else palette.selectAction(index)
                 }
                 override fun mouseClicked(e: MouseEvent) {
                     if (e.clickCount == 2) {
@@ -192,6 +216,11 @@ class WandPalettePanel(
             iconLabel.addMouseListener(clickListener)
             descLabel.addMouseListener(clickListener)
         }
+    }
+
+    private fun makeSecondary(index: Int) {
+        palette.secondaryIndex = index
+        savePalette()
     }
 
     private fun addNewAction() {
@@ -247,7 +276,7 @@ class WandPalettePanel(
         showOpenDialog(extension = "xml") {
             try {
                 val imported = getSimbrainXStream().fromXML(readText()) as WandPalette
-                palette.setActions(imported.actions)
+                palette.setActions(imported.actions, imported.secondaryIndex)
                 savePalette()
             } catch (e: Exception) {
                 showMessage("Failed to import palette: ${e.message}", MessageKind.ERROR, title = "Import Error")
@@ -258,7 +287,7 @@ class WandPalettePanel(
     private fun revertToDefault() {
         if (showConfirm("Reset palette to default actions? This cannot be undone.", okLabel = "Reset", kind = MessageKind.WARNING)) {
             val defaultPalette = WandPalette.createDefault()
-            palette.setActions(defaultPalette.actions)
+            palette.setActions(defaultPalette.actions, defaultPalette.secondaryIndex)
             savePalette()
         }
     }
@@ -331,6 +360,43 @@ class KebabIcon : Icon {
 }
 
 /**
+ * The arrow of a Shift key, marking the palette's secondary action: solid on that action's row and an outline on
+ * the others.
+ */
+class ShiftIcon(private val active: Boolean) : Icon {
+
+    override fun getIconWidth() = 12
+    override fun getIconHeight() = 12
+
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        val g2 = g.create() as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE)
+        g2.translate(x, y)
+
+        val arrow = Path2D.Double().apply {
+            moveTo(6.0, 1.0)
+            lineTo(11.0, 6.5)
+            lineTo(8.0, 6.5)
+            lineTo(8.0, 11.0)
+            lineTo(4.0, 11.0)
+            lineTo(4.0, 6.5)
+            lineTo(1.0, 6.5)
+            closePath()
+        }
+        g2.stroke = BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+        if (active) {
+            g2.color = Theme.foreground
+            g2.fill(arrow)
+        } else {
+            g2.color = Theme.mutedText
+        }
+        g2.draw(arrow)
+        g2.dispose()
+    }
+}
+
+/**
  * Split button for wand actions.
  * Main button area activates wand mode, triangle dropdown shows palette popup.
  * Displays the current action's letter in a black/white icon for consistency with other toolbar buttons.
@@ -352,7 +418,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             isFocusable = false
             icon = WandButtonIcon(palette, 18)
             addActionListener {
-                updateWandCursor()
+                networkPanel.wandEventHandler.refreshCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
                 isSelected = true
             }
@@ -381,38 +447,33 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         // Set initial tooltip after button is created
         updateTooltip()
 
-        // Update icon and cursor when selection changes
-        palette.events.selectionChanged.on {
-            updateWandCursor()
-            updateTooltip()
-            mainButton.repaint()
-        }
-
-        // Update cursor when an action is edited
-        palette.events.actionEdited.on {
-            updateWandCursor()
-            updateTooltip()
-        }
-
-        // Update cursor when palette is loaded/changed
-        palette.events.paletteChanged.on {
-            updateWandCursor()
-            updateTooltip()
+        // Update icon, tooltip and cursor whenever the selected or secondary action may have changed: a new
+        // selection or secondary, an edited, added or removed action, or a loaded palette
+        palette.events.apply {
+            selectionChanged.on { refresh() }
+            secondaryChanged.on { refresh() }
+            actionEdited.on { refresh() }
+            actionAdded.on { refresh() }
+            actionRemoved.on { refresh() }
+            paletteChanged.on { refresh() }
         }
 
         // Set initial cursor
-        updateWandCursor()
+        networkPanel.wandEventHandler.refreshCursor()
     }
 
-    private fun updateWandCursor() {
-        palette.selectedAction?.let { action ->
-            MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
-        }
+    private fun refresh() {
+        networkPanel.wandEventHandler.refreshCursor()
+        updateTooltip()
+        // The icon is wider when there is a secondary action to show
+        mainButton.revalidate()
+        mainButton.repaint()
     }
 
     private fun updateTooltip() {
         val actionDesc = palette.selectedAction?.description ?: "No action selected"
-        mainButton.toolTipText = "Wand tool (d) - $actionDesc"
+        val secondaryDesc = palette.secondaryAction?.let { ". With Shift held: ${it.description} (x swaps the two)" } ?: ""
+        mainButton.toolTipText = "Wand tool (d) - $actionDesc$secondaryDesc"
     }
 
     private fun showPalettePopup() {
@@ -421,7 +482,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         popupMenu = JPopupMenu().apply {
             add(WandPalettePanel(palette) {
                 // On selection changed, activate wand mode and update
-                updateWandCursor()
+                networkPanel.wandEventHandler.refreshCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
                 mainButton.repaint()
             })
@@ -430,11 +491,15 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
     }
 
     /**
-     * Icon for the wand palette button that shows the current action's letter.
+     * Icon for the wand palette button that shows the current action's letter, with the edge of a second circle
+     * behind it when the palette has a secondary action.
      * Uses black/white colors for consistency with other toolbar icons.
      */
     private class WandButtonIcon(private val palette: WandPalette, private val size: Int) : Icon {
-        override fun getIconWidth() = size
+        private val secondarySize = size * 0.6
+        private val secondaryOverhang = size / 3
+
+        override fun getIconWidth() = if (palette.secondaryAction != null) size + secondaryOverhang else size
         override fun getIconHeight() = size
 
         override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
@@ -444,11 +509,30 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
             val padding = 1
             val circleSize = size - padding * 2
+            val circle = Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble())
+
+            g2.color = Theme.foreground
+            if (palette.secondaryAction != null) {
+                // The part of the secondary circle that shows past the main one, with a gap between the two
+                val gap = 2.0
+                val hidden = Ellipse2D.Double(circle.x - gap, circle.y - gap, circle.width + gap * 2, circle.height + gap * 2)
+                val oldClip = g2.clip
+                g2.clip(Area(Rectangle(x, y, iconWidth, iconHeight)).apply { subtract(Area(hidden)) })
+                g2.stroke = BasicStroke(1.2f)
+                g2.draw(
+                    Ellipse2D.Double(
+                        x + iconWidth - secondarySize - padding,
+                        y + iconHeight - secondarySize - padding,
+                        secondarySize,
+                        secondarySize
+                    )
+                )
+                g2.clip = oldClip
+            }
 
             // Draw circle outline, tracking the theme foreground like other toolbar icons
-            g2.color = Theme.foreground
             g2.stroke = BasicStroke(1.5f)
-            g2.draw(Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble()))
+            g2.draw(circle)
 
             // Draw the letter in the center
             val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""

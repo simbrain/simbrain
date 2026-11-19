@@ -1,3 +1,8 @@
+/**
+ * Wand strokes on the network canvas. A stroke runs from mouse press to release and applies one action from the
+ * wand palette to everything the brush passes over: the selected action, or the secondary action if Shift was held
+ * when the stroke began.
+ */
 package org.simbrain.network.gui
 
 import kotlinx.coroutines.Dispatchers
@@ -18,6 +23,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences.wandPalette
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.network.gui.nodes.SynapseNode
 import java.awt.event.InputEvent
+import java.awt.event.MouseEvent
 import java.awt.geom.Ellipse2D
 
 /**
@@ -58,6 +64,47 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
      */
     private val pendingJobs = mutableListOf<Job>()
 
+    /**
+     * The action the stroke in progress applies. Chosen when the stroke begins and kept until it ends, so releasing
+     * Shift or changing the palette part way through does not hand one action's undo state to another.
+     */
+    private var strokeAction: WandAction? = null
+
+    private var strokeInProgress = false
+
+    /**
+     * Whether the cursor shows the secondary action rather than the selected one.
+     */
+    var cursorShowsSecondary = false
+        private set
+
+    /**
+     * Tell the wand whether Shift is held, so the cursor shows the action the next stroke would apply. Ignored
+     * during a stroke, whose cursor stays that of the action it began with. While another tool is current this is
+     * only noted, for the cursor drawn when the wand is next switched to.
+     */
+    fun shiftChanged(shiftDown: Boolean) {
+        if (strokeInProgress || shiftDown == cursorShowsSecondary) return
+        cursorShowsSecondary = shiftDown
+        if (networkPanel.mouseCursor === MouseCursor.Wand) refreshCursor()
+    }
+
+    /**
+     * Redraw the wand cursor for the action a stroke would now apply, and show it if the wand is the current tool.
+     */
+    fun refreshCursor() {
+        val action = (if (cursorShowsSecondary) wandPalette.secondaryAction else null)
+            ?: wandPalette.selectedAction
+            ?: return
+        MouseCursor.Wand.update(action.color, action.radius)
+        if (networkPanel.mouseCursor === MouseCursor.Wand) networkPanel.cursor = MouseCursor.Wand.cursor
+    }
+
+    override fun mouseMoved(event: PInputEvent) {
+        super.mouseMoved(event)
+        shiftChanged(event.isShiftDown)
+    }
+
     override fun mousePressed(event: PInputEvent) {
         super.mousePressed(event)
         undoState = mutableMapOf()
@@ -65,26 +112,30 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         touchedPixels.clear()
         pendingJobs.clear()
 
-        // Notify action that we're starting
-        wandPalette.selectedAction?.beginAction(networkPanel)
+        shiftChanged(event.isShiftDown)
+        strokeInProgress = true
+        strokeAction = if (event.isShiftDown) wandPalette.secondaryAction else wandPalette.selectedAction
 
-        val node = event.path.pickedNode
-        when (node) {
-            is NeuronNode -> modifyModel(node.neuron)
-            is SynapseNode -> modifyModel(node.synapse)
-        }
+        // Notify action that we're starting
+        strokeAction?.beginAction(networkPanel)
+
+        applyUnderBrush(event)
     }
 
-    override fun mouseReleased(event: PInputEvent?) {
+    override fun mouseReleased(event: PInputEvent) {
         super.mouseReleased(event)
-        val action = wandPalette.selectedAction
+        val action = strokeAction
+        val strokeUndoState = undoState
         val jobs = pendingJobs.toList()
+        strokeAction = null
+        strokeInProgress = false
+        shiftChanged(event.isShiftDown)
 
         // Launch a coroutine to await all pending apply jobs, then finalize
         networkPanel.launch(Dispatchers.Swing) {
             jobs.joinAll()
-            if (undoState.isNotEmpty()) networkPanel.networkComponent.markChanged()
-            action?.endAction(networkPanel, undoState)
+            if (strokeUndoState.isNotEmpty()) networkPanel.networkComponent.markChanged()
+            action?.endAction(networkPanel, strokeUndoState)
         }
     }
 
@@ -94,8 +145,14 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
 
     override fun drag(event: PInputEvent) {
         super.drag(event)
+        applyUnderBrush(event)
+    }
 
-        val baseRadius = wandPalette.selectedAction?.radius ?: 40
+    /**
+     * Apply the stroke's action to everything under the brush at the position of [event].
+     */
+    private fun applyUnderBrush(event: PInputEvent) {
+        val baseRadius = strokeAction?.radius ?: return
         // Scale radius by inverse of zoom so cursor size matches effect area
         val viewScale = networkPanel.canvas.camera.viewScale
         val radius = baseRadius / viewScale
@@ -136,7 +193,7 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         if (model in touchedModels) return
         touchedModels.add(model)
         val job = networkPanel.launch(Dispatchers.Swing) {
-            wandPalette.selectedAction?.apply(model, networkPanel, undoState)
+            strokeAction?.apply(model, networkPanel, undoState)
         }
         pendingJobs.add(job)
     }
@@ -149,7 +206,7 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         if (pixel in touchedPixels) return
         touchedPixels.add(pixel)
         val job = networkPanel.launch(Dispatchers.Swing) {
-            wandPalette.selectedAction?.applyToPixel(pixel, networkPanel, undoState)
+            strokeAction?.applyToPixel(pixel, networkPanel, undoState)
         }
         pendingJobs.add(job)
     }
@@ -194,13 +251,15 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
 
     /**
      * Selection event filter, accepts various mouse events, but only when the
-     * network panel's cursor is `MouseCursor.Wand`.
+     * network panel's cursor is `MouseCursor.Wand`. Movement with no button down is accepted too, for the cursor
+     * to follow Shift.
      */
     private inner class WandEventFilter : PInputEventFilter(InputEvent.BUTTON1_MASK) {
         override fun acceptsEvent(event: PInputEvent?, type: Int): Boolean {
             val mouseCursor = networkPanel.mouseCursor
 
-            return mouseCursor === MouseCursor.Wand && super.acceptsEvent(event, type)
+            return mouseCursor === MouseCursor.Wand
+                    && (type == MouseEvent.MOUSE_MOVED || super.acceptsEvent(event, type))
         }
     }
 }

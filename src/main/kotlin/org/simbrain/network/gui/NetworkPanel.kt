@@ -68,6 +68,11 @@ internal fun NetworkModel.waitsForEndpointNodes() =
 class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), CoroutineScope {
 
     /**
+     * Applies wand strokes and owns the wand cursor. Declared ahead of the canvas, which installs it.
+     */
+    val wandEventHandler = WandEventHandler(this)
+
+    /**
      * Main Piccolo canvas object.
      *
      * @see https://github.com/piccolo2d/piccolo2d.java
@@ -1178,7 +1183,7 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
                     scale(1 / newScale, event.position)
                 }
             })
-            addInputEventListener(WandEventHandler(this@NetworkPanel))
+            addInputEventListener(wandEventHandler)
         }
 
         /**

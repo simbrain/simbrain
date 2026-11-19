@@ -1,3 +1,7 @@
+/**
+ * The wand's palette of actions. One action is selected and applied by an ordinary wand stroke; a second, the
+ * secondary, is applied by a stroke made with Shift held.
+ */
 package org.simbrain.network.gui
 
 import org.simbrain.util.FlowEvents
@@ -39,6 +43,26 @@ class WandPalette : EditableObject {
         get() = actions.getOrNull(selectedIndex)
 
     /**
+     * Index of the action chosen as the secondary. Any value that is not the index of an action, such as the -1 of
+     * a palette where none has been chosen, leaves the choice to [secondaryAction].
+     */
+    var secondaryIndex: Int = -1
+        set(value) {
+            if (value != field) {
+                field = value
+                events.secondaryChanged.fire()
+            }
+        }
+
+    /**
+     * The action applied by a stroke made with Shift held: the one chosen with [secondaryIndex], otherwise the first
+     * action that sets neuron activations to zero, so that Shift erases what the wand has drawn. Null if the palette
+     * has neither.
+     */
+    val secondaryAction: WandAction?
+        get() = actions.getOrNull(secondaryIndex) ?: actions.firstOrNull { it.setsActivationToZero }
+
+    /**
      * Add an action to the palette.
      */
     fun addAction(action: WandAction) {
@@ -55,6 +79,10 @@ class WandPalette : EditableObject {
     fun removeAction(index: Int) {
         if (index >= 0 && index < actions.size) {
             val action = actions.removeAt(index)
+            when {
+                index < secondaryIndex -> secondaryIndex--
+                index == secondaryIndex -> secondaryIndex = -1
+            }
             events.actionRemoved.fire(action)
             if (selectedIndex >= actions.size) {
                 selectedIndex = (actions.size - 1).coerceAtLeast(0)
@@ -88,12 +116,24 @@ class WandPalette : EditableObject {
     }
 
     /**
-     * Replace all actions with the given list.
+     * Make the secondary action the selected one and the selected action the secondary. Does nothing if the palette
+     * has no secondary action.
      */
-    fun setActions(newActions: List<WandAction>) {
+    fun swapSelectedAndSecondary() {
+        val secondary = actions.indexOf(secondaryAction ?: return)
+        val selected = selectedIndex
+        selectedIndex = secondary
+        secondaryIndex = selected
+    }
+
+    /**
+     * Replace all actions with the given list, the secondary being the one at [newSecondaryIndex].
+     */
+    fun setActions(newActions: List<WandAction>, newSecondaryIndex: Int = -1) {
         actions.clear()
         actions.addAll(newActions)
         selectedIndex = if (actions.isNotEmpty()) 0 else 0
+        secondaryIndex = newSecondaryIndex
         events.paletteChanged.fire()
     }
 
@@ -103,6 +143,7 @@ class WandPalette : EditableObject {
     fun copy(): WandPalette = WandPalette().also { newPalette ->
         newPalette.actions.addAll(actions.map { it.copy() as WandAction })
         newPalette.selectedIndex = selectedIndex
+        newPalette.secondaryIndex = secondaryIndex
     }
 
     override val name: String get() = "Wand Palette"
@@ -144,8 +185,15 @@ class WandPalette : EditableObject {
  */
 class WandPaletteEvents : FlowEvents() {
     val selectionChanged = NoArgEvent()
+    val secondaryChanged = NoArgEvent()
     val actionAdded = OneArgEvent<WandAction>()
     val actionRemoved = OneArgEvent<WandAction>()
     val actionEdited = OneArgEvent<WandAction>()
     val paletteChanged = NoArgEvent()
 }
+
+private val WandAction.setsActivationToZero: Boolean
+    get() = this is AdjustValueAction
+            && target is AdjustValueTarget.NeuronActivation
+            && operation is AdjustValueOperation.Set
+            && (amount as? AdjustValueAmount.Value)?.value == 0.0

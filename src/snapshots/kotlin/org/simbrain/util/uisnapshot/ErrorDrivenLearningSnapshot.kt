@@ -8,7 +8,9 @@ import org.simbrain.custom_sims.SimulationScope
 import org.simbrain.custom_sims.simulations.leabra.errorDrivenLearning
 import org.simbrain.custom_sims.simulations.leabra.flashcardTrainer
 import org.simbrain.custom_sims.simulations.leabra.flashcards
+import org.simbrain.custom_sims.simulations.leabra.showResult
 import org.simbrain.network.NetworkComponent
+import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.gui.NetworkPanel
 import java.awt.Component
 import java.awt.Dimension
@@ -24,6 +26,9 @@ class ErrorDrivenLearningSnapshot : UiSnapshotDef {
         val component = scope.workspace.componentList.filterIsInstance<NetworkComponent>().first()
         val network = component.network
         flashcardTrainer(network).test(flashcards.first().picture)
+        val texts = network.getModels<NetworkTextObject>().associateBy { it.label }
+        texts.getValue("Learning message").text = "Learning!"
+        texts.getValue("Result").showResult(true)
         val panel = NetworkPanel(component).apply { preferredSize = Dimension(520, 640) }
         SwingUtilities.invokeAndWait {
             JDialog().apply { contentPane = panel; pack() }

@@ -5,11 +5,6 @@
  */
 package org.simbrain.custom_sims.simulations.leabra
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.swing.Swing
-import kotlinx.coroutines.withContext
-import org.piccolo2d.nodes.PPath
 import org.simbrain.custom_sims.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
@@ -26,8 +21,6 @@ import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.util.updateAction
 import org.simbrain.workspace.Workspace
-import java.awt.BasicStroke
-import java.awt.Color
 import javax.swing.JComboBox
 
 val errorDrivenLearning = newSim("leabra_vocabulary") {
@@ -59,14 +52,10 @@ val errorDrivenLearning = newSim("leabra_vocabulary") {
         leabraProjection(word, hidden, FEEDBACK_SCALE),
     )
     projections.forEach { it.weights.label = "${it.source.label} to ${it.target.label}" }
-    val learningText = NetworkTextObject("").apply {
-        fontSize = 20
-        isBold = true
-        color = LEABRA_MESSAGE_COLOR
-        location = point(250, -150)
-    }
+    val learningText = leabraMessage("", LEARNING_LABEL, 250, -150)
+    val resultText = resultLabel(RESULT_LABEL, 250, -215)
     network.addNetworkModels(
-        listOf(picture, hidden, word, learningText) + projections.map { it.weights },
+        listOf(picture, hidden, word, learningText, resultText) + projections.map { it.weights },
         usePlacementManager = false
     )
 
@@ -91,8 +80,8 @@ val errorDrivenLearning = newSim("leabra_vocabulary") {
            most of its set, so the network can name it from part of it. Pictures that look alike share some units,
            which is where its mistakes come from.
 
-        This simulation builds on `Point neuron` and `Layer inhibition`. Every unit is a point neuron, and every
-        layer has the same inhibition. What it adds is learning.
+        This simulation builds on the `Point neuron` and `Layer inhibition` simulations, earlier in this Leabra
+        series. Every unit is a point neuron, and every layer has the same inhibition. What it adds is learning.
 
         # Simulation Details
 
@@ -100,7 +89,8 @@ val errorDrivenLearning = newSim("leabra_vocabulary") {
         `Hidden` layer, connected in both directions to `Word`.
 
         Each card is a trial with two phases. In the minus phase the picture is clamped and the network settles for
-        75 cycles; whatever word unit wins is its guess. In the plus phase the correct word is also clamped and the
+        75 cycles; whatever word unit wins is its guess. After `Show picture` or `Show part of picture`, a label next
+        to `Word` says ✓ CORRECT in green or ✗ WRONG in red. In the plus phase the correct word is also clamped and the
         network settles for 25 more cycles. Each weight then changes according to how much more or less its two units
         were active together in the plus phase than in the minus phase. This is error-driven learning, but no error
         is computed explicitly: the difference between the two phases plays that role.
@@ -258,11 +248,9 @@ private const val WORD = "Word"
 private const val ERROR_PLOT = "Leabra flashcard errors"
 private const val PICTURE_SIZE = 49
 private const val PICTURE_COLUMNS = 7
-private const val FLASH_MARGIN = 6.0
-private const val LEARNING_FLASH_MILLIS = 500L
-private const val FADE_MILLIS = 400L
-private val LEARNING_FLASH_COLOR = Color(255, 200, 0, 130)
 private const val LEARNING_TEXT = "Learning!"
+private const val LEARNING_LABEL = "Learning message"
+private const val RESULT_LABEL = "Result"
 
 private fun quoted(word: String) = "\"$word\""
 
@@ -305,7 +293,9 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
      * Index of the word that `Show answer` teaches. Follows the picture unless changed.
      */
     var taughtIndex = 0
-    val learningText = network.getModels<NetworkTextObject>().first()
+    val texts = network.getModels<NetworkTextObject>()
+    val learningText = texts.first { it.label == LEARNING_LABEL }
+    val resultText = texts.first { it.label == RESULT_LABEL }
 
     network.updateManager.clear()
     network.updateManager.addAction(updateAction("Leabra cycle") { trainer.cycle() })
@@ -322,11 +312,21 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
     }
 
     /**
+     * Guess from [input] and show whether the guess is the card's word.
+     */
+    suspend fun guessAndScore(input: DoubleArray) {
+        guessFrom(input)
+        val acts = word.activationArray
+        resultText.showResult(acts.indices.maxBy { acts[it] } == cardIndex)
+    }
+
+    /**
      * Runs a block that changes weights. With a GUI, the weights flash while it runs.
      */
     var whileLearning: suspend (suspend () -> Unit) -> Unit = { it() }
 
     suspend fun showAnswer() {
+        resultText.showResult(null)
         if (minus == null) guessFrom(pictures[cardIndex])
         val minusActivity = minus!!
         trainer.clamp(word, answers[taughtIndex])
@@ -337,6 +337,7 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
 
     suspend fun study(times: Int) = whileLearning {
         workspace.stop()
+        resultText.showResult(null)
         repeat(times) {
             trainer.trainEpoch(pictures, answers)
             pass++
@@ -348,31 +349,8 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
         val networkPanel = getNetworkPanel(networkComponent)
         val weightNodes = trainer.projections.map { networkPanel.modelNodeMap.get<WeightMatrixNode>(it.weights) }
         whileLearning = { block ->
-            val flashes = withContext(Dispatchers.Swing) {
-                weightNodes.map { node ->
-                    val bounds = node.imageBox.globalFullBounds
-                    PPath.createRoundRectangle(
-                        bounds.x - FLASH_MARGIN, bounds.y - FLASH_MARGIN,
-                        bounds.width + 2 * FLASH_MARGIN, bounds.height + 2 * FLASH_MARGIN, 8.0, 8.0
-                    ).apply {
-                        paint = LEARNING_FLASH_COLOR
-                        stroke = BasicStroke(3f)
-                        strokePaint = LEABRA_MESSAGE_COLOR
-                        pickable = false
-                        networkPanel.canvas.layer.addChild(this)
-                    }
-                }
-            }
             learningText.text = LEARNING_TEXT
-            try {
-                block()
-            } finally {
-                delay(LEARNING_FLASH_MILLIS)
-                learningText.text = ""
-                withContext(Dispatchers.Swing) { flashes.forEach { it.animateToTransparency(0f, FADE_MILLIS) } }
-                delay(FADE_MILLIS)
-                withContext(Dispatchers.Swing) { flashes.forEach { it.removeFromParent() } }
-            }
+            flashWeights(networkPanel, weightNodes, afterHold = { learningText.text = "" }) { block() }
         }
         lateinit var answerBox: JComboBox<String>
         val controlPanel = createControlPanel("Flashcards", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
@@ -382,12 +360,13 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
             ) { english ->
                 cardIndex = flashcards.indexOfFirst { it.english == english }
                 minus = null
+                resultText.showResult(null)
                 answerBox.selectedIndex = cardIndex
             }
-            addButton("Show picture") { guessFrom(pictures[cardIndex]) }.apply {
+            addButton("Show picture") { guessAndScore(pictures[cardIndex]) }.apply {
                 toolTipText = "Show the picture and let the network guess."
             }
-            addButton("Show part of picture") { guessFrom(partOf(pictures[cardIndex])) }.apply {
+            addButton("Show part of picture") { guessAndScore(partOf(pictures[cardIndex])) }.apply {
                 toolTipText = "Show a random half of the picture and let the network guess."
             }
             answerBox = addComboBox(
@@ -414,6 +393,7 @@ private suspend fun SimulationScope.setUpErrorDrivenLearning(workspace: Workspac
             addButton("Reset weights") {
                 trainer.randomizeWeights()
                 minus = null
+                resultText.showResult(null)
                 pass = 0
                 plot.model.clearData()
             }.apply { toolTipText = "Randomize the weights so the network forgets everything, and clear the plot." }

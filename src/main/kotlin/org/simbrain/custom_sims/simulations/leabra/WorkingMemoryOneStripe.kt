@@ -37,15 +37,15 @@ val workingMemoryOneStripe = newSim("leabra_working_memory_1_stripe") {
         location = point(x, y)
     }
 
-    val task = labeledLayer(WmStep.entries.size, TASK, WmStep.entries.map { it.label }, -440, 0).apply { circleSpacingX = 85.0 }
-    val input = labeledLayer(ITEMS.size, INPUT, ITEMS, 0, 300)
+    val task = labeledLayer(WmStep.entries.size, WM_TASK, WmStep.entries.map { it.label }, -440, 0).apply { circleSpacingX = 85.0 }
+    val input = labeledLayer(ITEMS.size, WM_INPUT, ITEMS, 0, 300)
     val memory = labeledLayer(ITEMS.size, MEMORY, ITEMS, 460, 0).apply { circleSpacingX = 85.0 }
-    val hidden = leabraLayer(HIDDEN_SIZE, HIDDEN).apply {
+    val hidden = leabraLayer(WM_HIDDEN_SIZE, WM_HIDDEN).apply {
         gridMode = true
         gridColumns = 5
         location = point(0, 0)
     }
-    val output = leabraLayer(ITEMS.size, OUTPUT).apply {
+    val output = leabraLayer(ITEMS.size, WM_OUTPUT).apply {
         circleMode = true
         circleSpacingX = 70.0
         labelArray = ITEMS.toTypedArray()
@@ -58,15 +58,11 @@ val workingMemoryOneStripe = newSim("leabra_working_memory_1_stripe") {
         leabraProjection(hidden, output),
         leabraProjection(output, hidden, FEEDBACK_SCALE),
     )
-    projections.forEach { it.weights.label = WEIGHTS_LABEL }
-    val gateText = NetworkTextObject(gateMessage(false, false, null)).apply {
-        fontSize = 16
-        isBold = true
-        color = LEABRA_MESSAGE_COLOR
-        location = point(460, 80)
-    }
+    projections.forEach { it.weights.label = WM_WEIGHTS_LABEL }
+    val gateText = leabraMessage(gateMessage(false, false, null), GATE_LABEL, 460, 120)
+    val resultText = resultLabel(RESULT_LABEL, 250, -370)
     network.addNetworkModels(
-        listOf(task, input, memory, hidden, output, gateText) + projections.map { it.weights },
+        listOf(task, input, memory, hidden, output, gateText, resultText) + projections.map { it.weights },
         usePlacementManager = false
     )
 
@@ -91,15 +87,16 @@ val workingMemoryOneStripe = newSim("leabra_working_memory_1_stripe") {
         3. Something has to decide when to open the gate. Here you turn it on by hand. In PBWM the basal ganglia
            learn when to open it, which is the subject of a later simulation.
 
-        This simulation builds on the earlier Leabra simulations. Units are point neurons (`Point neuron`), each
-        layer has the same inhibition (`Layer inhibition`), and the network learns as in `Error-driven learning`.
-        What it adds is a working memory and a gate.
+        This simulation builds on the earlier simulations in this Leabra series: its units are the neuron from
+        `Point neuron`, each layer has the inhibition from `Layer inhibition`, and the network learns as in
+        `Error-driven learning`. What it adds is a working memory and a gate.
 
         # Simulation Details
 
         Each button press is one step. `Task` shows whether the step is `Remember`, `Distractor`, or `Recall`, and
         `Input` shows the item, which is empty on `Recall`. `Output` should stay low until `Recall`, and then show
-        the item last remembered. This is a version of the Store-Ignore-Recall task used to test PBWM.
+        the item last remembered. On `Recall`, a label next to `Output` says ✓ CORRECT in green or ✗ WRONG in red,
+        based on its most active unit. This is a version of the Store-Ignore-Recall task used to test PBWM.
 
         `Memory (1 stripe)` is the working memory, and it holds one item. Without a gate it copies every item shown.
         With the gate, it copies only remembered items and holds each one, unchanged, until the next. PBWM's stripes
@@ -107,7 +104,7 @@ val workingMemoryOneStripe = newSim("leabra_working_memory_1_stripe") {
         gate are wired by hand. The `Weights` are learned: through them, `Hidden` learns to report memory on
         `Recall` and to stay quiet otherwise.
 
-        Learning works as in `Error-driven learning`. On each step the network first responds on its own, then is
+        Learning works as in the `Error-driven learning` simulation. On each step the network first responds on its own, then is
         shown the correct response, and its weights change toward it. Practice uses random sequences: remember an item,
         see zero to two distractors (other items), then recall. The plot shows the percent of recalls that were wrong
         in each block of 10 sequences.
@@ -200,18 +197,19 @@ fun wmSequence(random: Random = Random.Default): List<WmTrial> {
 }
 
 /**
- * The working memory network in [network] together with its gate and the item the task says to recall.
+ * The working memory network in [network] together with its gate and the item the task says to recall. The memory
+ * layer is the one labeled [memoryLabel]. Subclasses can replace the hand-wired gate by overriding [decideGate].
  */
-class WorkingMemoryModel(val network: Network) {
+open class WorkingMemoryModel(val network: Network, memoryLabel: String = MEMORY) {
 
     private val arrays = network.getModels<NeuronArray>()
-    private fun layer(name: String) = arrays.first { it.label == name }
+    protected fun layer(name: String) = arrays.first { it.label == name }
 
-    val task = layer(TASK)
-    val input = layer(INPUT)
-    val memory = layer(MEMORY)
-    val hidden = layer(HIDDEN)
-    val output = layer(OUTPUT)
+    val task = layer(WM_TASK)
+    val input = layer(WM_INPUT)
+    val memory = layer(memoryLabel)
+    val hidden = layer(WM_HIDDEN)
+    val output = layer(WM_OUTPUT)
 
     val trainer = run {
         val layers = listOf(task, input, memory, hidden, output)
@@ -252,13 +250,20 @@ class WorkingMemoryModel(val network: Network) {
     fun target(trial: WmTrial) = if (trial.step == WmStep.RECALL) toRecall else null
 
     /**
-     * Clamp the task, open or close the gate, and reset the rest of the network, ready for a minus phase.
+     * Whether the gate opens on [trial], once its task and input are clamped. Without a gate, every item shown gets
+     * in; with it, only remembered items do.
+     */
+    protected open fun decideGate(trial: WmTrial) = trial.item != null && (!useGate || trial.step == WmStep.REMEMBER)
+
+    /**
+     * Clamp the task and input, open or close the gate, and reset the rest of the network, ready for a minus phase.
      */
     fun startTrial(trial: WmTrial) {
         if (trial.step == WmStep.REMEMBER) toRecall = trial.item
         val item = oneHot(ITEMS.size, trial.item)
         trainer.clamp(task, oneHot(WmStep.entries.size, trial.step.ordinal))
-        gateOpen = trial.item != null && (!useGate || trial.step == WmStep.REMEMBER)
+        trainer.clamp(input, item)
+        gateOpen = decideGate(trial)
         if (gateOpen) trainer.clamp(memory, item) else memory.isClamped = true
         trainer.startTrial(item)
     }
@@ -275,7 +280,7 @@ class WorkingMemoryModel(val network: Network) {
     /**
      * Run a step without learning and return the network's output.
      */
-    fun test(trial: WmTrial, fireEvents: Boolean = false): Int? {
+    open fun test(trial: WmTrial, fireEvents: Boolean = false): Int? {
         startTrial(trial)
         repeat(trainer.minusCycles) { trainer.cycle(fireEvents) }
         return response()
@@ -284,7 +289,7 @@ class WorkingMemoryModel(val network: Network) {
     /**
      * Run a step with a minus and plus phase and learn. Returns whether the minus phase output was right.
      */
-    fun train(trial: WmTrial): Boolean {
+    open fun train(trial: WmTrial): Boolean {
         val response = test(trial)
         val target = target(trial)
         val minus = trainer.snapshot()
@@ -305,7 +310,7 @@ class WorkingMemoryModel(val network: Network) {
     /**
      * Empty working memory and the rest of the network, leaving weights alone.
      */
-    fun clear() {
+    open fun clear() {
         listOf(task, input, memory).forEach { trainer.clamp(it, DoubleArray(it.size)) }
         trainer.resetActivity()
         trainer.layers.forEach { it.events.updated.fire() }
@@ -316,7 +321,7 @@ class WorkingMemoryModel(val network: Network) {
     /**
      * Randomize weights and empty working memory.
      */
-    fun reset() {
+    open fun reset() {
         trainer.randomizeWeights()
         clear()
     }
@@ -331,23 +336,28 @@ private fun gateMessage(useGate: Boolean, open: Boolean, item: Int?): String {
     }
 }
 
-private const val TASK = "Task"
-private const val INPUT = "Input"
+internal const val WM_TASK = "Task"
+internal const val WM_INPUT = "Input"
 private const val MEMORY = "Memory (1 stripe)"
-private const val HIDDEN = "Hidden"
-private const val OUTPUT = "Output"
-private const val HIDDEN_SIZE = 25
-private const val WEIGHTS_LABEL = "Weights"
+internal const val WM_HIDDEN = "Hidden"
+internal const val WM_OUTPUT = "Output"
+internal const val WM_HIDDEN_SIZE = 25
+internal const val WM_WEIGHTS_LABEL = "Weights"
 private const val ERROR_PLOT = "Recall mistakes"
 private const val ERROR_SERIES = "Wrong recalls (%)"
 private const val PRACTICE_SEQUENCES = 100
 private const val PLOT_BLOCK = 10
 
+private const val GATE_LABEL = "Gate"
+private const val RESULT_LABEL = "Result"
+
 private suspend fun SimulationScope.setUpWorkingMemory(workspace: Workspace) {
     val networkComponent = workspace.componentList.filterIsInstance<NetworkComponent>().first()
     val network = networkComponent.network
     val model = WorkingMemoryModel(network)
-    val gateText = network.getModels<NetworkTextObject>().first()
+    val texts = network.getModels<NetworkTextObject>()
+    val gateText = texts.first { it.label == GATE_LABEL }
+    val resultText = texts.first { it.label == RESULT_LABEL }
     val plot = workspace.componentList.filterIsInstance<TimeSeriesPlotComponent>().first { it.name == ERROR_PLOT }
     var sequences = PLOT_BLOCK * (plot.model.timeSeriesList.firstOrNull()?.series?.itemCount ?: 0)
 
@@ -362,7 +372,9 @@ private suspend fun SimulationScope.setUpWorkingMemory(workspace: Workspace) {
         workspace.stop()
         model.startTrial(WmTrial(step, item))
         showGate()
+        resultText.showResult(null)
         workspace.iterateSuspend(model.trainer.minusCycles)
+        if (step == WmStep.RECALL) resultText.showResult(model.toRecall != null && model.response() == model.toRecall)
     }
 
     fun practice() {
@@ -374,6 +386,7 @@ private suspend fun SimulationScope.setUpWorkingMemory(workspace: Workspace) {
         }
         model.clear()
         showGate()
+        resultText.showResult(null)
     }
 
     withGui {
@@ -411,6 +424,7 @@ private suspend fun SimulationScope.setUpWorkingMemory(workspace: Workspace) {
                 workspace.stop()
                 model.reset()
                 showGate()
+                resultText.showResult(null)
                 sequences = 0
                 plot.model.clearData()
             }.apply { toolTipText = "Randomize the weights, empty memory, and clear the plot." }

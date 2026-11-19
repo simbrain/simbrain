@@ -11,6 +11,7 @@ import org.simbrain.custom_sims.simulations.leabra.WmTrial
 import org.simbrain.custom_sims.simulations.leabra.WorkingMemoryModel
 import org.simbrain.custom_sims.simulations.leabra.workingMemoryOneStripe
 import org.simbrain.network.NetworkComponent
+import org.simbrain.custom_sims.simulations.leabra.showResult
 import org.simbrain.network.core.NetworkTextObject
 import org.simbrain.network.gui.NetworkPanel
 import java.awt.Component
@@ -27,7 +28,9 @@ class WorkingMemoryOneStripeSnapshot : UiSnapshotDef {
         val component = scope.workspace.componentList.filterIsInstance<NetworkComponent>().first()
         val network = component.network
         WorkingMemoryModel(network).test(WmTrial(WmStep.REMEMBER, 0), fireEvents = true)
-        network.getModels<NetworkTextObject>().first().text = "Gate open: storing A"
+        val texts = network.getModels<NetworkTextObject>().associateBy { it.label }
+        texts.getValue("Gate").text = "Gate open: storing A"
+        texts.getValue("Result").showResult(false)
         val panel = NetworkPanel(component).apply { preferredSize = Dimension(640, 640) }
         SwingUtilities.invokeAndWait {
             JDialog().apply { contentPane = panel; pack() }

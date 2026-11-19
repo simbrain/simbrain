@@ -476,9 +476,34 @@ For headless options, parse `optionString` parameter in `newSim` (see `evolution
 - Control panels should not include a title label or top separator — the panel title is set via `createControlPanel("Title", ...)` and shown in the window frame
 - Use `showResults(title) { section(...) { row(label, value) } }` from `org.simbrain.util` to display analysis results that fit a label and value layout (accuracies, distances, benchmark sweeps), `showMessage(text)` for short prose, and `showText(text, title)` for long free-form text. Do not print results to the console or embed them in the control panel
 
+## Interface Design
+
+Base visual and interaction choices on established usability guidance rather than taste, and say which principle
+supports each choice when proposing it. Useful sources are Nielsen's usability heuristics (visibility of system
+status, recognition rather than recall, error prevention, consistency) and WCAG for contrast and color.
+
+- **Text on the network:** use the theme's text color (`NetworkTextObject.color = null`). WCAG asks for 4.5:1
+  contrast for normal text and 3:1 for large text; light colors such as orange or yellow on white fail.
+- **Color carries meaning:** reserve color for states such as correct and wrong, and never use color alone. Pair it
+  with a word or symbol, since about 1 in 12 men has red-green color blindness.
+- **Status words:** short labels (one or two words) can be bold all caps, such as `✓ CORRECT` in dark green and
+  `✗ WRONG` in dark red. Keep sentences in sentence case.
+- **Reminders over recall:** when a task has rules a student must keep in mind, show the current state (inputs so
+  far, correct answer, network answer) on the network, and set the rule apart near the top of the sidebar. A rule
+  short enough for one line can go on the network too.
+- **Show, don't tell:** prefer graphical feedback on the network, such as a line that turns solid when a gate opens
+  or a flash where weights change, over text messages that narrate what happened.
+
+The Leabra simulations share helpers for this in `simulations/leabra/LeabraSimUtils.kt` (`leabraMessage`,
+`resultLabel`, `showResult`, `flashWeights`, `showDopamineAndGatingRanges`). `simulations/leabra/AxSequenceStrip.kt`
+has overlays drawn on the 1-2-AX network: a sequence strip, a dopamine badge, and gate lines.
+
 ## Custom Overlays
 
 Simulations can add custom graphics overlays to component canvases using Piccolo2D's `PNode`. This allows flexible visualization of simulation-specific data like learned weights, activation patterns, or annotations.
+
+When an overlay's state changes, call its `repaint()` as well as setting the state. `invalidatePaint()` alone may not
+redraw until something else on the canvas changes.
 
 **OdorWorld overlay example** (from `rl/actorCritic.kt`):
 ```kotlin

@@ -54,8 +54,8 @@ val leabraInhibition = newSim("leabra_inhibition") {
         [Leabra](https://github.com/emer/leabra) this is modeled by computing inhibition for a whole layer at once.
         The result is that only a small fraction of units in a layer are active at a time, however strong the input.
 
-        This simulation builds on `Point neuron`. Each unit is that neuron, and layer inhibition reaches it as its
-        inhibitory conductance.
+        This simulation builds on the `Point neuron` simulation, earlier in this Leabra series. Each unit is that
+        neuron, and layer inhibition reaches it as its inhibitory conductance.
 
         # Simulation Details
 

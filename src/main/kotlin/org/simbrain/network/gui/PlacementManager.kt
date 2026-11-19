@@ -179,7 +179,12 @@ class PlacementManager(private val network: Network) {
 
         if (atInsertionPoint) {
             clickAwaitingPaste = null
-            movable.moveTopLeftTo(insertionLocation)
+            val target = insertionLocation
+            movable.moveTopLeftTo(target)
+            // With the clicked point off-screen this is not a place the user chose, so make room as an add does
+            if (target != insertionPoint) {
+                movable.translate(SlotGrid(copies.footprint(), occupiedFootprints(copies)).firstFreeFrom())
+            }
         } else if (placement == CopyPlacement.IN_PLACE) {
             movable.moveTopLeftTo(anchorTopLeft)
         } else if (step != null) {
@@ -263,8 +268,10 @@ private class SlotGrid(footprint: Rectangle2D, occupied: List<Rectangle2D>) {
     init {
         // Shrink slightly so that footprints which merely touch do not count as overlapping
         val probe = footprint.addPadding(-1.0)
+        // A footprint that shrinks to nothing overlaps nothing, wherever it is
+        val hasArea = footprint.width > 2 && footprint.height > 2
         for (other in occupied) {
-            if (other.isEmpty) continue
+            if (!hasArea || other.isEmpty) continue
             val columns = shiftsBetween(other.minX - probe.maxX, other.maxX - probe.minX, slotWidth, SLOTS_PER_ROW)
             val rows = shiftsBetween(other.minY - probe.maxY, other.maxY - probe.minY, slotHeight, MAX_SLOT_ROWS)
             if (columns.isEmpty()) continue

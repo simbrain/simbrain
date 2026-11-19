@@ -275,6 +275,19 @@ class PlacementManagerTest {
     }
 
     @Test
+    fun `test a paste after a click that is now off-screen does not land on what is there`() {
+        val net = Network()
+        net.placementManager.visibleBounds = { Rectangle2D.Double(1000.0, 1000.0, 200.0, 100.0) }
+        val source = Neuron().also { net.addNetworkModelAsync(it, usePlacementManager = false) }
+        copyToClipboard(source)
+        net.placementManager.insertionPoint = point(0.0, 500.0)
+        // Goes to the center of the view, as the clicked point is off-screen
+        val added = net.addPlacedNeuron()
+        val (paste) = net.copyOf(listOf(source), CopyPlacement.PASTE)
+        assertEquals(point(added.x + NEURON_FOOTPRINT, added.y), paste.location)
+    }
+
+    @Test
     fun `test copying in another network ends this network's paste trail`() {
         val net = Network()
         val n1 = net.addPlacedNeuron()

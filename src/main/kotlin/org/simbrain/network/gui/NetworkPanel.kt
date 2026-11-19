@@ -717,10 +717,16 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
         }
     }
 
-    fun copy() {
-        if (selectionManager.isEmpty) return
+    /**
+     * Put the selection on the clipboard.
+     *
+     * @return false, leaving the clipboard as it was, when pasting the selection would create nothing
+     */
+    fun copy(): Boolean {
+        if (!Clipboard.wouldCopy(selectionManager.selectedModels)) return false
         Clipboard.clear()
         Clipboard.add(selectionManager.selectedModels)
+        return true
     }
 
     suspend fun cut() {
@@ -733,22 +739,20 @@ class NetworkPanel(val networkComponent: NetworkComponent) : JPanel(), Coroutine
     }
 
     suspend fun duplicate() {
-        if (selectionManager.isNotEmpty) {
-            copy()
-        }
+        // A selection that cannot be copied is not replaced by a duplicate of whatever was copied before
+        if (selectionManager.isNotEmpty && !copy()) return
         Clipboard.paste(this, CopyPlacement.DUPLICATE)
     }
 
     /**
      * Duplicate the selection on top of itself and select the copies, for callers that then move them (alt-drag).
      *
-     * @return whether any copies were made. When nothing in the selection can be copied, the clipboard and the
+     * @return the copies. Empty when nothing in the selection can be copied, in which case the clipboard and the
      * selection are left as they were.
      */
-    suspend fun duplicateInPlace(): Boolean {
-        if (!Clipboard.wouldCopy(selectionManager.selectedModels)) return false
-        copy()
-        return Clipboard.paste(this, CopyPlacement.IN_PLACE).isNotEmpty()
+    suspend fun duplicateInPlace(): List<NetworkModel> {
+        if (!copy()) return emptyList()
+        return Clipboard.paste(this, CopyPlacement.IN_PLACE)
     }
 
     private fun updateLocationsWithUndoableAction(

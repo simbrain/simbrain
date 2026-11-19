@@ -66,13 +66,13 @@ class MouseEventHandlerTest {
      * Presses at [networkPoint] and releases [travel] pixels to the right, as a hand that is not perfectly still
      * does. As on a real canvas, moving at all between press and release means no mouse-clicked event follows.
      */
-    private fun NetworkPanel.pressAndRelease(networkPoint: Point2D, travel: Int) {
+    private fun NetworkPanel.pressAndRelease(networkPoint: Point2D, travel: Int, altDown: Boolean = false) {
         val press = pixelAt(networkPoint)
         val release = Point(press.x + travel, press.y)
-        send(MouseEvent.MOUSE_PRESSED, press)
-        if (travel != 0) send(MouseEvent.MOUSE_DRAGGED, release)
-        send(MouseEvent.MOUSE_RELEASED, release)
-        if (travel == 0) send(MouseEvent.MOUSE_CLICKED, release)
+        send(MouseEvent.MOUSE_PRESSED, press, altDown)
+        if (travel != 0) send(MouseEvent.MOUSE_DRAGGED, release, altDown)
+        send(MouseEvent.MOUSE_RELEASED, release, altDown)
+        if (travel == 0) send(MouseEvent.MOUSE_CLICKED, release, altDown)
     }
 
     /**
@@ -121,6 +121,36 @@ class MouseEventHandlerTest {
         panel.pressAndRelease(point(300.0, 100.0), travel = 60)
 
         assertEquals(point(50.0, 500.0), network.placementManager.insertionPoint)
+    }
+
+    @Test
+    fun `dragging a marquee out and back to where it began does not set the insertion point`() {
+        val network = Network()
+        val panel = panelFor(network, neuronAt(0.0, 0.0), neuronAt(600.0, 600.0))
+        network.placementManager.insertionPoint = point(50.0, 500.0)
+
+        val press = panel.pixelAt(point(300.0, 100.0))
+        panel.send(MouseEvent.MOUSE_PRESSED, press)
+        panel.send(MouseEvent.MOUSE_DRAGGED, Point(press.x + 60, press.y + 40))
+        panel.send(MouseEvent.MOUSE_DRAGGED, Point(press.x + 1, press.y))
+        panel.send(MouseEvent.MOUSE_RELEASED, Point(press.x + 1, press.y))
+
+        assertEquals(point(50.0, 500.0), network.placementManager.insertionPoint)
+    }
+
+    @Test
+    fun `alt-clicking a neuron while the cursor moves slightly makes no copy`() {
+        val network = Network()
+        val source = neuronAt(0.0, 0.0)
+        val panel = panelFor(network, source, neuronAt(600.0, 600.0))
+        val clipboardBefore = Clipboard.contentVersion
+
+        panel.pressAndRelease(point(0.0, 0.0), travel = 2, altDown = true)
+
+        // A copy would be made off the event thread, so give one time to turn up
+        Thread.sleep(300)
+        assertEquals(2, network.getModels<Neuron>().size)
+        assertEquals(clipboardBefore, Clipboard.contentVersion)
     }
 
     @Test

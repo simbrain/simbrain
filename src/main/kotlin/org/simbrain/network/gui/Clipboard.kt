@@ -5,6 +5,7 @@ import org.simbrain.network.llm.LanguageModel
 import org.simbrain.network.llm.TinyLanguageModel
 import org.simbrain.network.subnetworks.Subnetwork
 import org.simbrain.network.trainers.SupervisedModel
+import java.util.concurrent.atomic.AtomicInteger
 
 /**
  * Buffer which holds network objects for cutting and pasting. To make a new model type
@@ -19,21 +20,25 @@ object Clipboard {
     private var copiedObjects: List<NetworkModel> = ArrayList()
         set(value) {
             field = value
-            contentVersion++
+            version.incrementAndGet()
         }
+
+    private val version = AtomicInteger()
 
     /**
      * Changes whenever the clipboard's contents are replaced, so that code which remembers a paste can tell whether
      * the clipboard still holds what was pasted.
      */
-    @Volatile
-    var contentVersion = 0
-        private set
+    val contentVersion: Int get() = version.get()
 
     /**
-     * True if copying [objects] would put anything on the clipboard.
+     * True if pasting a copy of [objects] would create anything. Connections are only copied along with what they
+     * connect, so nothing comes of copying connections alone.
      */
-    fun wouldCopy(objects: List<NetworkModel>) = objects.any { it !is InfoText && canCopy(it) }
+    fun wouldCopy(objects: List<NetworkModel>) = objects.any { it !is InfoText && canCopy(it) && !it.isConnection }
+
+    private val NetworkModel.isConnection
+        get() = this is Synapse || this is GapJunction || this is WeightMatrix || this is SynapseGroup
 
     /** The model types [paste]'s `createCopies` knows how to copy. */
     fun canCopy(model: NetworkModel): Boolean = when (model) {

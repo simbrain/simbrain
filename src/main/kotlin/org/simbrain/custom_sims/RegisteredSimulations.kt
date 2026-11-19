@@ -23,6 +23,8 @@ import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
 import org.simbrain.custom_sims.simulations.leabra.errorDrivenLearning
 import org.simbrain.custom_sims.simulations.leabra.leabraInhibition
+import org.simbrain.custom_sims.simulations.leabra.learnedGating
+import org.simbrain.custom_sims.simulations.leabra.oneTwoAx
 import org.simbrain.custom_sims.simulations.leabra.pointNeuronSim
 import org.simbrain.custom_sims.simulations.leabra.workingMemoryOneStripe
 import org.simbrain.custom_sims.simulations.ml.decisionBoundaries
@@ -189,6 +191,8 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Layer inhibition", beta = true) { leabraInhibition }
         item("Error-driven learning", beta = true) { errorDrivenLearning }
         item("Working memory (1 stripe)", beta = true) { workingMemoryOneStripe }
+        item("Learned gating", beta = true) { learnedGating }
+        item("1-2-AX", beta = true) { oneTwoAx }
     }
 
     dir("Associative memory") {

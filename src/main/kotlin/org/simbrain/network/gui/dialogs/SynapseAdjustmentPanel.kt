@@ -137,7 +137,7 @@ class SynapseAdjustmentPanel(
             add(perturberPanel, "growx, wrap")
             add(perturbButton, "align right, gapright 5")
         }
-        val prunerTab = JPanel(MigLayout("fsimbraillx, insets 5", "[grow]")).apply {
+        val prunerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {
             add(PrunerPanel(), "growx, top")
         }
         val scalerTab = JPanel(MigLayout("fillx, insets 5", "[grow]")).apply {

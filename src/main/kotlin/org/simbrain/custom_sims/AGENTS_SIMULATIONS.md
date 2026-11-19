@@ -243,7 +243,7 @@ The UI snapshot harness can render Swing/Piccolo layouts without manually openin
 Run a snapshot with:
 
 ```bash
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.KitchenSinkSnapshot
 ```
 
 Useful options:
@@ -252,7 +252,27 @@ Useful options:
 ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.SomeSnapshot -Pscale=2 -Popen=true
 ```
 
-For simulation layout work, add a small targeted snapshot definition that builds just the relevant `NetworkPanel`, dialog, or component. Use it to check clearance, label overlap, and frame spacing before asking for manual screenshots. Generated images are written to `build/ui-snapshots/`.
+For simulation layout work, write a temporary snapshot definition that builds just the relevant `NetworkPanel`, dialog, or component. Use it to check clearance, label overlap, and frame spacing before asking for manual screenshots. Generated images are written to `build/ui-snapshots/`.
+
+A snapshot of one simulation's layout is scaffolding: delete it before committing, and commit only the positions it helped you choose. The root `AGENTS.md` says when a snapshot is worth keeping. This renders a simulation's network without opening the desktop:
+
+```kotlin
+class MySimLayoutSnapshot : UiSnapshotDef {
+    override val name = "my_sim_layout"
+
+    override fun build(): Component {
+        val scope = SimulationScope()
+        runBlocking { mySim.task.invoke(scope, null) }
+        val component = scope.workspace.componentList.filterIsInstance<NetworkComponent>().first()
+        val panel = NetworkPanel(component).apply { preferredSize = Dimension(700, 700) }
+        SwingUtilities.invokeAndWait {
+            JDialog().apply { contentPane = panel; pack() }
+            panel.network.events.zoomToFitPage.fire()
+        }
+        return panel
+    }
+}
+```
 
 **Couplings:**
 ```kotlin

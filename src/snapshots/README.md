@@ -2,10 +2,12 @@
 
 Off-screen Swing renderer for Simbrain UI screenshots. It builds real dialogs and panels, paints them with FlatLaf, and writes PNGs to `build/ui-snapshots/`.
 
-The snapshot classes support two main workflows:
+The harness supports two main workflows:
 
-- Automated or manual UI testing, including visual regression checks and repeatable inspection of specific UI states.
+- Inspecting specific UI states repeatably while developing: layout, sizing, overlap, and light and dark rendering.
 - Generating publication-quality images for documentation, presentations, and papers without running the full desktop app.
+
+Most snapshot definitions are temporary and are deleted once the image has been checked. See [Temporary or committed](#temporary-or-committed) before adding a file here.
 
 The default behavior is non-interactive, which is appropriate for tests and automation. Add `-Popen=true` when working interactively to open the generated PNG in the system image viewer.
 
@@ -15,11 +17,11 @@ From the `simbrain/` directory:
 
 ```bash
 ./gradlew uiSnapshot \
-  -PsnapshotDef=org.simbrain.util.uisnapshot.AboutDialogSnapshot \
+  -PsnapshotDef=org.simbrain.util.uisnapshot.StandardDialogSnapshot \
   -Popen=true
 ```
 
-This writes `simbrain/build/ui-snapshots/about_dialog.png` and opens it. Omit `-Popen=true` in tests, CI, or batch snapshot generation.
+This writes `simbrain/build/ui-snapshots/standard_dialog.png` and opens it. Omit `-Popen=true` in tests, CI, or batch snapshot generation.
 
 ## Gradle options
 
@@ -36,8 +38,8 @@ Examples:
 # Dark theme
 ./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ThemeWidgetsSnapshot -Ptheme=dark
 
-# 2× resolution (writes about_dialog@2x.png)
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.AboutDialogSnapshot -Pscale=2
+# 2× resolution (writes standard_dialog@2x.png)
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.StandardDialogSnapshot -Pscale=2
 
 # 2× resolution and open the result for inspection
 ./gradlew uiSnapshot \
@@ -131,7 +133,7 @@ override fun build(): Component {
 }
 ```
 
-See `NetworkPanelSnapshot` for a working example.
+See `GapJunctionSnapshot` for a working example.
 
 ### Dialogs that need app context
 
@@ -145,81 +147,27 @@ dialog = with(panel) { cnn.getCnnTrainingDialog() }
 ImageProcessingPipelineDialog(desktopComponent, pipeline)
 ```
 
+## Temporary or committed
+
+A snapshot definition is temporary by default: write it, run it, look at the image, and delete the file before committing. That covers a one-off check of your own change, a single simulation's layout, a wrapper around one constructor call, and anything a test could assert instead.
+
+Commit a definition only when the next person to change that code would re-run it and could not rebuild it in a few minutes: a reference sheet for a shared visual primitive, a deliberate set of cases for a drawing or layout rule, or a state that takes real setup to reach. The root `AGENTS.md` has the full rules and what a committed definition must include.
+
+Definitions for paper, talk, and documentation figures are kept with the figure's source rather than in this directory. Copy one in to render it.
+
 ## Existing snapshots
 
-All classes live in `org.simbrain.util.uisnapshot`. Run any with `-PsnapshotDef=org.simbrain.util.uisnapshot.<ClassName>`.
-
-### Dialogs
+All classes live in `org.simbrain.util.uisnapshot`. List the directory to see what exists; each definition's KDoc says what it shows and what to look for. A file can hold several definitions, so pass the class name, not the file name:
 
 ```bash
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.AboutDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.StandardDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.TextDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.UndoHistoryDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.WorkspacePreferencesDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.CnnTrainerDialogSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ImagePipelineDialogSnapshot
+ls src/snapshots/kotlin/org/simbrain/util/uisnapshot/
+grep -rhE "^(open )?class " src/snapshots/kotlin
+./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.<ClassName>
 ```
 
-### Property editors
+The output file is named by the definition's `name`. With `-Pscale=2`, the suffix `@2x` is appended (e.g. `standard_dialog@2x.png`).
 
-```bash
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.IzhikevichRuleEditorSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.IzhikevichRuleNoiseTabSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.GaborFilterEditorSnapshot
-```
-
-### Network UI
-
-```bash
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkPanelSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkToolbarSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.NetworkToolbarWandActiveSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.SynapseAdjustmentPanelSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.WandPalettePanelSnapshot
-```
-
-### Chrome, theme, and misc
-
-```bash
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ThemeWidgetsSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ChartThemeSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.IconGallerySnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.RoundedInternalFrameSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.RoundedInternalFrameActiveSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.ControlPanelRoundedSnapshot
-./gradlew uiSnapshot -PsnapshotDef=org.simbrain.util.uisnapshot.TablePanelSnapshot
-```
-
-### Output filenames
-
-| Class | Output (`name`) |
-|-------|-------------------|
-| `AboutDialogSnapshot` | `about_dialog.png` |
-| `ChartThemeSnapshot` | `chart_theme.png` |
-| `CnnTrainerDialogSnapshot` | `cnn_trainer_dialog.png` |
-| `ControlPanelRoundedSnapshot` | `rounded_control_panel.png` |
-| `GaborFilterEditorSnapshot` | `gabor_filter_editor.png` |
-| `BidirectionalSynapseSnapshot` | `bidirectional_synapse.png` |
-| `IconGallerySnapshot` | `icon_gallery.png` |
-| `ImagePipelineDialogSnapshot` | `image_pipeline_dialog.png` |
-| `IzhikevichRuleEditorSnapshot` | `izhikevich_rule_editor.png` |
-| `IzhikevichRuleNoiseTabSnapshot` | `izhikevich_rule_noise_tab.png` |
-| `NetworkPanelSnapshot` | `network_panel.png` |
-| `NetworkToolbarSnapshot` | `network_toolbar.png` |
-| `NetworkToolbarWandActiveSnapshot` | `network_toolbar_wand_active.png` |
-| `RoundedInternalFrameSnapshot` | `rounded_internal_frame.png` |
-| `RoundedInternalFrameActiveSnapshot` | `rounded_internal_frame_active.png` |
-| `StandardDialogSnapshot` | `standard_dialog.png` |
-| `SynapseAdjustmentPanelSnapshot` | `synapse_adjustment_panel.png` |
-| `TablePanelSnapshot` | `table_panel.png` |
-| `TextDialogSnapshot` | `text_dialog.png` |
-| `ThemeWidgetsSnapshot` | `theme_widgets.png` |
-| `UndoHistoryDialogSnapshot` | `undo_history_dialog.png` |
-| `WandPalettePanelSnapshot` | `wand_palette_panel.png` |
-| `WorkspacePreferencesDialogSnapshot` | `workspace_preferences_dialog.png` |
-
-With `-Pscale=2`, the suffix `@2x` is appended (e.g. `about_dialog@2x.png`).
+The `snapshots` source set is not compiled by `./gradlew build` or `./gradlew test`. Run `./gradlew compileSnapshotsKotlin` after changing an API that a definition uses.
 
 ## Source layout
 

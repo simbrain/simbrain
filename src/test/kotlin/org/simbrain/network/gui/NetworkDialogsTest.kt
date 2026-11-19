@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.*
+import org.simbrain.network.gui.dialogs.SynapseAdjustmentPanel
 import org.simbrain.util.point
 
 class NetworkDialogsTest {
@@ -240,5 +241,13 @@ class NetworkDialogsTest {
 
         network.update()
         assertArrayEquals(sourceTensor.activations, restoredTarget.activationArray, 0.001)
+    }
+
+    @Test
+    fun `synapse adjustment panel builds for a set of synapses`() {
+        val source = Neuron()
+        val target = Neuron()
+        val panel = SynapseAdjustmentPanel(listOf(Synapse(source, target, 0.5), Synapse(target, source, -0.5)))
+        assertTrue(panel.componentCount > 0)
     }
 }

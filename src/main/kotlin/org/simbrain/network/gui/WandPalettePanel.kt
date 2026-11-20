@@ -1,6 +1,6 @@
 /**
- * Swing views of the wand palette: the popup list where actions are selected, edited and one is made the secondary,
- * and the toolbar split button that switches to the wand and opens that list.
+ * Swing views of the wand palette: the popup list where the actions for a drag and for a drag with Shift held are
+ * chosen and edited, and the toolbar split button that switches to the wand and opens that list.
  */
 package org.simbrain.network.gui
 
@@ -33,9 +33,39 @@ class WandPalettePanel(
     
     private var isRebuilding = false
 
+    /**
+     * Whether a click on a row chooses the secondary action rather than the selected one. Follows the two tabs
+     * above the list.
+     */
+    private var choosingSecondary = false
+
+    private val dragTab = slotTab("Drag", secondary = false)
+
+    private val shiftDragTab = slotTab("Shift + drag", secondary = true)
+
     init {
         layout = BorderLayout()
         border = EmptyBorder(Theme.componentGap, Theme.componentGap, Theme.componentGap, Theme.componentGap)
+
+        ButtonGroup().apply {
+            add(dragTab)
+            add(shiftDragTab)
+        }
+        dragTab.isSelected = true
+        val swapButton = JButton(SwapIcon()).apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
+            toolTipText = "Swap the two actions (x)"
+            addActionListener {
+                palette.swapSelectedAndSecondary()
+                savePalette()
+            }
+        }
+        val slotPanel = JPanel(MigLayout("insets 0 0 ${Theme.tightGap} 0, fillx, gap 0", "[grow,fill,sg slot][grow,fill,sg slot]${Theme.tightGap}[]")).apply {
+            add(dragTab)
+            add(shiftDragTab)
+            add(swapButton)
+        }
+        add(slotPanel, BorderLayout.NORTH)
 
         // Scrollable list area
         val scrollPane = JScrollPane(listPanel).apply {
@@ -95,12 +125,39 @@ class WandPalettePanel(
         rebuildList()
     }
 
+    /**
+     * One of the two tabs above the list. Each shows the action it stands for, and selecting it makes clicks on
+     * the rows choose that action.
+     */
+    private fun slotTab(title: String, secondary: Boolean) = JToggleButton(title).apply {
+        putClientProperty("JButton.buttonType", "tab")
+        horizontalAlignment = SwingConstants.LEFT
+        iconTextGap = Theme.tightGap + 2
+        isFocusable = false
+        addActionListener {
+            choosingSecondary = secondary
+            rebuildList()
+        }
+    }
+
+    private fun updateSlotTab(tab: JToggleButton, action: WandAction?, gesture: String) {
+        tab.icon = action?.let { WandActionIcon(it.color, 20, it.letter) }
+        tab.toolTipText = if (action != null) {
+            "$gesture applies: ${action.description}. Select this tab to choose another action from the list"
+        } else {
+            "$gesture does nothing. Select this tab to choose an action from the list"
+        }
+    }
+
     private fun rebuildList() {
         // Prevent re-entrant calls when events cascade (like when removing an action fires both
         //  actionRemoved and selectionChanged events, each trying to rebuild the list).
         // TODO: Should not be necessary. Try preventing this from happening in the first place.
         if (isRebuilding) return
         isRebuilding = true
+
+        updateSlotTab(dragTab, palette.selectedAction, "Dragging the wand")
+        updateSlotTab(shiftDragTab, palette.secondaryAction, "Dragging the wand with Shift held")
         
         listPanel.removeAll()
         palette.actions.forEachIndexed { index, action ->
@@ -123,8 +180,14 @@ class WandPalettePanel(
     }
 
     private fun createActionRow(index: Int, action: WandAction): JPanel {
-        val isSelected = index == palette.selectedIndex
         val isSecondary = action === palette.secondaryAction
+        // The row highlighted is the action of the tab being chosen for; the other tab's action carries a tag
+        val isSelected = if (choosingSecondary) isSecondary else index == palette.selectedIndex
+        val otherGesture = when {
+            choosingSecondary && index == palette.selectedIndex -> "Drag"
+            !choosingSecondary && isSecondary -> "Shift + drag"
+            else -> null
+        }
 
         val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
         // Opaque selection wash: blend the accent over the card background so the (opaque) row
@@ -159,21 +222,18 @@ class WandPalettePanel(
                 isOpaque = false
             }
 
-            val secondaryButton = JButton().apply {
-                icon = ShiftIcon(isSecondary)
-                preferredSize = Dimension(20, 24)
-                margin = Insets(0, 0, 0, 0)
-                isFocusPainted = false
-                isContentAreaFilled = false
-                isBorderPainted = false
-                toolTipText = if (isSecondary) {
-                    "Secondary action: applied by dragging the wand with Shift held"
-                } else {
-                    "Make this the secondary action, applied by dragging the wand with Shift held"
+            val gestureTag = otherGesture?.let {
+                JLabel(it).apply {
+                    font = Theme.font(10)
+                    foreground = Theme.mutedText
+                    border = BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Theme.divider, 1, true),
+                        EmptyBorder(1, 5, 1, 5)
+                    )
+                    toolTipText = "The action applied by: $it"
                 }
-                addActionListener { makeSecondary(index) }
             }
-            buttonPanel.add(secondaryButton)
+            gestureTag?.let { buttonPanel.add(it) }
 
             // Kebab menu button for editing
             val kebabButton = JButton().apply {
@@ -200,10 +260,10 @@ class WandPalettePanel(
 
             add(buttonPanel, BorderLayout.EAST)
 
-            // Click to select, shift-click to make secondary, double-click to edit
+            // Click to choose for the current tab, shift-click to make secondary, double-click to edit
             val clickListener = object : MouseAdapter() {
                 override fun mousePressed(e: MouseEvent) {
-                    if (e.isShiftDown) makeSecondary(index) else palette.selectAction(index)
+                    if (choosingSecondary || e.isShiftDown) makeSecondary(index) else palette.selectAction(index)
                 }
                 override fun mouseClicked(e: MouseEvent) {
                     if (e.clickCount == 2) {
@@ -215,6 +275,7 @@ class WandPalettePanel(
             addMouseListener(clickListener)
             iconLabel.addMouseListener(clickListener)
             descLabel.addMouseListener(clickListener)
+            gestureTag?.addMouseListener(clickListener)
         }
     }
 
@@ -294,20 +355,18 @@ class WandPalettePanel(
 }
 
 /**
- * Icon component that draws a wand circle with the given color and letter.
+ * Icon that draws a wand circle with the given color and letter.
  */
-class WandIcon(private val color: Color, private val size: Int, private val letter: String = "") : JLabel() {
+class WandActionIcon(private val color: Color, private val size: Int, private val letter: String = "") : Icon {
 
-    init {
-        preferredSize = Dimension(size, size)
-        minimumSize = Dimension(size, size)
-    }
+    override fun getIconWidth() = size
+    override fun getIconHeight() = size
 
-    override fun paintComponent(g: Graphics) {
-        super.paintComponent(g)
-        val g2 = g as Graphics2D
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        val g2 = g.create() as Graphics2D
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+        g2.translate(x, y)
 
         val padding = 2
         val circleSize = size - padding * 2
@@ -329,6 +388,18 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         val textX = (size - fm.stringWidth(displayLetter)) / 2
         val textY = (size - fm.height) / 2 + fm.ascent
         g2.drawString(displayLetter, textX, textY)
+        g2.dispose()
+    }
+}
+
+/**
+ * Icon component that draws a wand circle with the given color and letter.
+ */
+class WandIcon(color: Color, size: Int, letter: String = "") : JLabel(WandActionIcon(color, size, letter)) {
+
+    init {
+        preferredSize = Dimension(size, size)
+        minimumSize = Dimension(size, size)
     }
 }
 
@@ -360,38 +431,36 @@ class KebabIcon : Icon {
 }
 
 /**
- * The arrow of a Shift key, marking the palette's secondary action: solid on that action's row and an outline on
- * the others.
+ * Two arrows pointing opposite ways, for swapping the palette's two actions.
  */
-class ShiftIcon(private val active: Boolean) : Icon {
+class SwapIcon : Icon {
 
-    override fun getIconWidth() = 12
-    override fun getIconHeight() = 12
+    override fun getIconWidth() = 14
+    override fun getIconHeight() = 14
 
     override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
         val g2 = g.create() as Graphics2D
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE)
         g2.translate(x, y)
+        g2.color = Theme.foreground
+        g2.stroke = BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
 
-        val arrow = Path2D.Double().apply {
-            moveTo(6.0, 1.0)
-            lineTo(11.0, 6.5)
-            lineTo(8.0, 6.5)
-            lineTo(8.0, 11.0)
-            lineTo(4.0, 11.0)
-            lineTo(4.0, 6.5)
-            lineTo(1.0, 6.5)
-            closePath()
+        val arrows = Path2D.Double().apply {
+            // Upper arrow, pointing right
+            moveTo(2.0, 4.5)
+            lineTo(12.0, 4.5)
+            moveTo(9.0, 1.5)
+            lineTo(12.0, 4.5)
+            lineTo(9.0, 7.5)
+            // Lower arrow, pointing left
+            moveTo(12.0, 9.5)
+            lineTo(2.0, 9.5)
+            moveTo(5.0, 6.5)
+            lineTo(2.0, 9.5)
+            lineTo(5.0, 12.5)
         }
-        g2.stroke = BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
-        if (active) {
-            g2.color = Theme.foreground
-            g2.fill(arrow)
-        } else {
-            g2.color = Theme.mutedText
-        }
-        g2.draw(arrow)
+        g2.draw(arrows)
         g2.dispose()
     }
 }
@@ -491,13 +560,13 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
     }
 
     /**
-     * Icon for the wand palette button that shows the current action's letter, with the edge of a second circle
-     * behind it when the palette has a secondary action.
+     * Icon for the wand palette button that shows the current action's letter and, smaller and to its lower right,
+     * the letter of the secondary action when the palette has one.
      * Uses black/white colors for consistency with other toolbar icons.
      */
     private class WandButtonIcon(private val palette: WandPalette, private val size: Int) : Icon {
-        private val secondarySize = size * 0.6
-        private val secondaryOverhang = size / 3
+        private val secondarySize = size * 0.62
+        private val secondaryOverhang = (size * 0.56).toInt()
 
         override fun getIconWidth() = if (palette.secondaryAction != null) size + secondaryOverhang else size
         override fun getIconHeight() = size
@@ -511,37 +580,40 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             val circleSize = size - padding * 2
             val circle = Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble())
 
-            g2.color = Theme.foreground
-            if (palette.secondaryAction != null) {
-                // The part of the secondary circle that shows past the main one, with a gap between the two
-                val gap = 2.0
+            palette.secondaryAction?.let { secondary ->
+                // Drawn only where it is clear of the main circle, with a gap between the two
+                val gap = 1.5
                 val hidden = Ellipse2D.Double(circle.x - gap, circle.y - gap, circle.width + gap * 2, circle.height + gap * 2)
                 val oldClip = g2.clip
                 g2.clip(Area(Rectangle(x, y, iconWidth, iconHeight)).apply { subtract(Area(hidden)) })
-                g2.stroke = BasicStroke(1.2f)
-                g2.draw(
-                    Ellipse2D.Double(
-                        x + iconWidth - secondarySize - padding,
-                        y + iconHeight - secondarySize - padding,
-                        secondarySize,
-                        secondarySize
-                    )
+                val secondaryCircle = Ellipse2D.Double(
+                    x + iconWidth - secondarySize - 0.5,
+                    y + iconHeight - secondarySize - 0.5,
+                    secondarySize,
+                    secondarySize
                 )
+                g2.color = blend(Theme.foreground, c?.background ?: Theme.cardBg, 0.7)
+                g2.stroke = BasicStroke(1.1f)
+                g2.draw(secondaryCircle)
+                drawLetter(g2, secondary.letter, secondaryCircle, (secondarySize * 0.62).toFloat())
                 g2.clip = oldClip
             }
 
             // Draw circle outline, tracking the theme foreground like other toolbar icons
+            g2.color = Theme.foreground
             g2.stroke = BasicStroke(1.5f)
             g2.draw(circle)
 
             // Draw the letter in the center
-            val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""
+            drawLetter(g2, palette.selectedAction?.letter ?: "", circle, size * 0.6f)
+        }
 
-            g2.color = Theme.foreground
-            g2.font = Theme.font((size * 0.6).toInt(), Font.BOLD)
+        private fun drawLetter(g2: Graphics2D, letter: String, circle: Ellipse2D, fontSize: Float) {
+            val displayLetter = letter.firstOrNull()?.toString() ?: ""
+            g2.font = Theme.font(1, Font.BOLD).deriveFont(fontSize)
             val fm = g2.fontMetrics
-            val textX = x + (size - fm.stringWidth(displayLetter)) / 2
-            val textY = y + (size - fm.height) / 2 + fm.ascent
+            val textX = (circle.centerX - fm.stringWidth(displayLetter) / 2.0).toFloat()
+            val textY = (circle.centerY - fm.height / 2.0 + fm.ascent).toFloat()
             g2.drawString(displayLetter, textX, textY)
         }
     }

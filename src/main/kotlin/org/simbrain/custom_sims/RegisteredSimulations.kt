@@ -21,17 +21,13 @@ import org.simbrain.custom_sims.simulations.edge_of_chaos.edgeOfChaosBitStream
 import org.simbrain.custom_sims.simulations.iac.*
 import org.simbrain.custom_sims.simulations.imageworld.attentionAsGain
 import org.simbrain.custom_sims.simulations.imageworld.cnnObjectDetector
-import org.simbrain.custom_sims.simulations.leabra.errorDrivenLearning
-import org.simbrain.custom_sims.simulations.leabra.leabraInhibition
-import org.simbrain.custom_sims.simulations.leabra.learnedGating
-import org.simbrain.custom_sims.simulations.leabra.oneTwoAx
-import org.simbrain.custom_sims.simulations.leabra.pointNeuronSim
-import org.simbrain.custom_sims.simulations.leabra.workingMemoryOneStripe
+import org.simbrain.custom_sims.simulations.leabra.*
 import org.simbrain.custom_sims.simulations.ml.decisionBoundaries
 import org.simbrain.custom_sims.simulations.ml.modelComparison
 import org.simbrain.custom_sims.simulations.nettalk.nettalkComponentSim
 import org.simbrain.custom_sims.simulations.nettalk.synthesizerDemo
 import org.simbrain.custom_sims.simulations.neuroscience.*
+import org.simbrain.custom_sims.simulations.nlp.contextualWordMeaningSim
 import org.simbrain.custom_sims.simulations.nlp.lfm2LanguageModel
 import org.simbrain.custom_sims.simulations.nlp.tinyLanguageModelSim
 import org.simbrain.custom_sims.simulations.patterns_of_activity.cogMap3Objects
@@ -127,6 +123,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     dir("Language") {
         item("Basic word embeddings") { nlpSimBasic }
+        item("Contextual embeddings (BERT)", beta = true) { contextualWordMeaningSim }
         item("Synthesizer demo") { synthesizerDemo }
         item("NETtalk") { nettalkComponentSim }
         item("Triangle model of reading", beta = true) { triangleReadingSim }

@@ -162,10 +162,6 @@ class WandPalettePanel(
         updateSlotTab(secondaryTab, secondaryAction, "Dragging the wand with Shift held")
         
         listPanel.removeAll()
-        if (choosingSecondary) {
-            listPanel.add(createAutomaticSecondaryRow(secondaryAction))
-            listPanel.add(Box.createVerticalStrut(2))
-        }
         palette.actions.forEachIndexed { index, action ->
             if (index > 0) {
                 listPanel.add(Box.createVerticalStrut(2))
@@ -185,73 +181,29 @@ class WandPalettePanel(
         onSelectionChanged()
     }
 
-    /**
-     * An empty row of the list, drawn as the choice of the tab being chosen for if [isSelected].
-     */
-    private fun listRow(isSelected: Boolean) = JPanel(BorderLayout(Theme.tightGap, 0)).apply {
-        val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
-        // Opaque selection wash: blend the accent over the card background so the (opaque) row
-        // paints a solid color, rather than an alpha tint that would smear on scroll.
-        val selectedBg = blend(accent, Theme.cardBg, 0.16)
-
-        border = BorderFactory.createCompoundBorder(
-            if (isSelected) BorderFactory.createLineBorder(accent, 2)
-            else BorderFactory.createLineBorder(Theme.divider, 1),
-            EmptyBorder(4, 6, 4, 6)
-        )
-        background = if (isSelected) selectedBg else Theme.cardBg
-        maximumSize = Dimension(Int.MAX_VALUE, 36)
-        preferredSize = Dimension(280, 36)
-    }
-
-    /**
-     * The first row of the list while the secondary is being chosen: leave the choice to the palette, which uses
-     * the opposite of the primary action. [secondaryAction] is the palette's current secondary.
-     */
-    private fun createAutomaticSecondaryRow(secondaryAction: WandAction?): JPanel {
-        val isAutomatic = palette.isSecondaryAutomatic
-        val opposite = if (isAutomatic) secondaryAction else palette.selectedAction?.opposite()
-        return listRow(isSelected = isAutomatic).apply {
-            val iconLabel = if (opposite != null) {
-                WandIcon(opposite.color, 24, opposite.letter)
-            } else {
-                JLabel().apply { preferredSize = Dimension(24, 24) }
-            }
-            add(iconLabel, BorderLayout.WEST)
-
-            val text = if (opposite != null) {
-                "Opposite of primary: ${opposite.description}"
-            } else {
-                "Opposite of primary: none for this action"
-            }
-            val descLabel = JLabel(text).apply {
-                font = Theme.font(12)
-                toolTipText = "Let the secondary action follow the primary one, taking back whatever it does"
-            }
-            add(descLabel, BorderLayout.CENTER)
-
-            val clickListener = object : MouseAdapter() {
-                override fun mousePressed(e: MouseEvent) {
-                    palette.secondaryIndex = -1
-                    savePalette()
-                }
-            }
-            addMouseListener(clickListener)
-            iconLabel.addMouseListener(clickListener)
-            descLabel.addMouseListener(clickListener)
-        }
-    }
-
     private fun createActionRow(index: Int, action: WandAction, secondaryAction: WandAction?): JPanel {
         // The row highlighted is the choice of the tab being chosen for; the other tab's action carries a tag
-        val isSelected = if (choosingSecondary) index == palette.secondaryIndex else index == palette.selectedIndex
+        val isSelected = if (choosingSecondary) action === secondaryAction else index == palette.selectedIndex
         val otherRole = when {
             choosingSecondary && index == palette.selectedIndex -> "Primary"
             !choosingSecondary && action === secondaryAction -> "Secondary"
             else -> null
         }
 
-        return listRow(isSelected).apply {
+        val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
+        // Opaque selection wash: blend the accent over the card background so the (opaque) row
+        // paints a solid color, rather than an alpha tint that would smear on scroll.
+        val selectedBg = blend(accent, Theme.cardBg, 0.16)
+
+        return JPanel(BorderLayout(Theme.tightGap, 0)).apply {
+            border = BorderFactory.createCompoundBorder(
+                if (isSelected) BorderFactory.createLineBorder(accent, 2)
+                else BorderFactory.createLineBorder(Theme.divider, 1),
+                EmptyBorder(4, 6, 4, 6)
+            )
+            background = if (isSelected) selectedBg else Theme.cardBg
+            maximumSize = Dimension(Int.MAX_VALUE, 36)
+            preferredSize = Dimension(280, 36)
 
             // Wand icon (double-click to edit)
             val iconLabel = WandIcon(action.color, 24, action.letter).apply {
@@ -269,6 +221,25 @@ class WandPalettePanel(
             // Right side buttons panel
             val buttonPanel = JPanel(FlowLayout(FlowLayout.RIGHT, 2, 0)).apply {
                 isOpaque = false
+            }
+
+            // On the primary action's row, an offer of its opposite as the secondary when something else is chosen
+            val suggestion = if (index == palette.selectedIndex) palette.suggestedSecondary else null
+            if (suggestion != null) {
+                buttonPanel.add(JButton("Shift \u2192", WandActionIcon(suggestion.color, 16, suggestion.letter)).apply {
+                    horizontalTextPosition = SwingConstants.LEFT
+                    iconTextGap = 3
+                    font = Theme.font(10)
+                    margin = Insets(1, 5, 1, 3)
+                    isFocusPainted = false
+                    toolTipText = "<html>Shift now applies: ${secondaryAction?.description}.<br>" +
+                            "Click to have it take back what this action does instead: ${suggestion.description}.<br>" +
+                            "It will then follow the primary action as that changes.</html>"
+                    addActionListener {
+                        palette.useSuggestedSecondary()
+                        savePalette()
+                    }
+                })
             }
 
             val roleTag = otherRole?.let {

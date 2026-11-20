@@ -125,6 +125,49 @@ class WandPaletteTest {
     }
 
     @Test
+    fun `the opposite of the selected action is suggested when a secondary that does something else is chosen`() {
+        val zero = setTo(0.0)
+        val palette = paletteOf(AdjustValueAction.activate(), zero, AdjustValueAction.inhibit())
+        palette.secondaryIndex = 2
+
+        assertSame(zero, palette.suggestedSecondary)
+
+        palette.useSuggestedSecondary()
+
+        assertSame(zero, palette.secondaryAction)
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `nothing is suggested when the chosen secondary already does what the opposite would`() {
+        val palette = paletteOf(AdjustValueAction.activate(), setTo(0.0), AdjustValueAction.inhibit())
+
+        palette.secondaryIndex = 1
+
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `nothing is suggested when the selected action has no opposite`() {
+        val palette = paletteOf(ForceSpikeAction(), setTo(0.0))
+
+        palette.secondaryIndex = 1
+
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `a suggestion appears when the selection moves away from the action the chosen secondary suits`() {
+        val decrement = AdjustValueAction.decrement()
+        val palette = paletteOf(AdjustValueAction.activate(), setTo(0.0), AdjustValueAction.increment(), decrement)
+        palette.secondaryIndex = 1
+
+        palette.selectAction(2)
+
+        assertSame(decrement, palette.suggestedSecondary)
+    }
+
+    @Test
     fun `removing an action ahead of the chosen secondary leaves the same action secondary`() {
         val inhibit = AdjustValueAction.inhibit()
         val palette = paletteOf(AdjustValueAction.activate(), setTo(0.5), inhibit)

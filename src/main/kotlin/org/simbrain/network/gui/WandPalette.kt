@@ -69,9 +69,28 @@ class WandPalette : EditableObject {
      * opposite.
      */
     val secondaryAction: WandAction?
-        get() = actions.getOrNull(secondaryIndex) ?: selectedAction?.opposite()?.let { opposite ->
-            actions.firstOrNull { it.hasSameEffectAs(opposite) } ?: opposite
+        get() = actions.getOrNull(secondaryIndex) ?: oppositeOfSelected()
+
+    /**
+     * The opposite of the selected action when a secondary has been chosen that does something else, and null
+     * otherwise. It is what [useSuggestedSecondary] would make the secondary.
+     */
+    val suggestedSecondary: WandAction?
+        get() {
+            val chosen = actions.getOrNull(secondaryIndex) ?: return null
+            return oppositeOfSelected()?.takeUnless { chosen.hasSameEffectAs(it) }
         }
+
+    /**
+     * Give up the chosen secondary for the opposite of the selected action, now and as the selection changes.
+     */
+    fun useSuggestedSecondary() {
+        secondaryIndex = -1
+    }
+
+    private fun oppositeOfSelected(): WandAction? = selectedAction?.opposite()?.let { opposite ->
+        actions.firstOrNull { it.hasSameEffectAs(opposite) } ?: opposite
+    }
 
     /**
      * Add an action to the palette.

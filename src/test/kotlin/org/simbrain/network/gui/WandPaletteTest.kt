@@ -58,6 +58,7 @@ class WandPaletteTest {
     fun `actions that nothing takes back have no opposite`() {
         assertNull(AdjustValueAction.synapseStrength(0.0).opposite())
         assertNull(AdjustValueAction(AdjustValueAmount.Random(), AdjustValueOperation.Add).opposite())
+        assertNull(AdjustValueAction(AdjustValueAmount.Relative(0.5), AdjustValueOperation.Add).opposite())
         assertNull(ForceSpikeAction().opposite())
         assertNull(PruneWeightsAction().opposite())
     }
@@ -172,6 +173,20 @@ class WandPaletteTest {
         palette.removeAction(1)
 
         assertSame(inhibit, palette.secondaryAction)
+    }
+
+    @Test
+    fun `removing an action ahead of the selected one leaves the same action selected`() {
+        val inhibit = AdjustValueAction.inhibit()
+        val zero = setTo(0.0)
+        val palette = paletteOf(AdjustValueAction.activate(), inhibit, zero)
+        palette.selectAction(1)
+        palette.secondaryIndex = 2
+
+        palette.removeAction(0)
+
+        assertSame(inhibit, palette.selectedAction)
+        assertSame(zero, palette.secondaryAction)
     }
 
     @Test

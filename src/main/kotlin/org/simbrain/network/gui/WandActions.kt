@@ -170,7 +170,7 @@ sealed class AdjustValueAmount : CopyableObject {
     abstract fun computeValue(lower: Double, upper: Double): Double
     abstract val description: String
 
-    /** Whether this is the value zero whatever the bounds are. */
+    /** Whether this is zero: the value zero, or the relative amount that is zero wherever the bounds allow it. */
     val isZero: Boolean
         get() = (this as? Value)?.value == 0.0 || (this as? Relative)?.relativeValue == 0.0
 
@@ -399,10 +399,11 @@ class AdjustValueAction(
     }
 
     /**
-     * Adding an amount is taken back by adding its negative, and setting a value by setting zero. Setting
+     * Adding a fixed amount is taken back by adding its negative, and setting a value by setting zero. Setting
      * activations to zero is itself taken back by setting them to their upper bound, so that the wand's usual pair
      * of drawing and erasing are each other's opposites. Setting strengths to zero has no opposite, there being no
-     * one strength it erased, nor has adding a bound or a random amount.
+     * one strength it erased. Nor has adding a random amount or one that depends on the bounds: a relative amount
+     * is scaled differently below zero than above it, so its negative takes back a different amount.
      */
     override fun opposite(): WandAction? {
         val amount = amount
@@ -410,10 +411,6 @@ class AdjustValueAction(
         val opposite = when {
             operation is AdjustValueOperation.Add && amount is AdjustValueAmount.Value ->
                 if (amount.value > 0) decrement(amount.value) else increment(-amount.value)
-            operation is AdjustValueOperation.Add && amount is AdjustValueAmount.Relative ->
-                AdjustValueAction(AdjustValueAmount.Relative(-amount.relativeValue), operation).apply {
-                    letter = if (amount.relativeValue > 0) "-" else "+"
-                }
             operation is AdjustValueOperation.Add -> return null
             setsZero && target is AdjustValueTarget.NeuronActivation -> activate()
             setsZero -> return null

@@ -5,6 +5,7 @@
  */
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Job
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
@@ -114,16 +115,35 @@ class WandPalettePanel(
             }
         })
 
-        // Listen for palette changes
-        palette.events.apply {
-            actionAdded.on { rebuildList() }
-            actionRemoved.on { rebuildList() }
-            paletteChanged.on { rebuildList() }
-            selectionChanged.on { updateSelection() }
-            secondaryChanged.on { rebuildList() }
-        }
-
         rebuildList()
+    }
+
+    private var paletteSubscriptions = emptyList<Job>()
+
+    /**
+     * Follows the palette while this panel is on screen. The palette outlives every popup that shows it, so a
+     * panel that went on listening after its popup closed would keep switching its network to the wand whenever
+     * the selection changed.
+     */
+    override fun addNotify() {
+        super.addNotify()
+        paletteSubscriptions.forEach { it.cancel() }
+        paletteSubscriptions = with(palette.events) {
+            listOf(
+                actionAdded.on { rebuildList() },
+                actionRemoved.on { rebuildList() },
+                paletteChanged.on { rebuildList() },
+                selectionChanged.on { updateSelection() },
+                secondaryChanged.on { rebuildList() }
+            )
+        }
+        rebuildList()
+    }
+
+    override fun removeNotify() {
+        paletteSubscriptions.forEach { it.cancel() }
+        paletteSubscriptions = emptyList()
+        super.removeNotify()
     }
 
     /**
@@ -146,7 +166,7 @@ class WandPalettePanel(
         tab.toolTipText = if (action != null) {
             "$gesture applies: ${action.description}. Select this tab to choose another action from the list"
         } else {
-            "$gesture does nothing. Select this tab to choose an action from the list"
+            "No secondary action is chosen, so Shift changes nothing. Select this tab to choose one from the list"
         }
     }
 
@@ -548,12 +568,15 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         // Update icon, tooltip and cursor whenever the selected or secondary action may have changed: a new
         // selection or secondary, an edited, added or removed action, or a loaded palette
         palette.events.apply {
-            selectionChanged.on { refresh() }
-            secondaryChanged.on { refresh() }
-            actionEdited.on { refresh() }
-            actionAdded.on { refresh() }
-            actionRemoved.on { refresh() }
-            paletteChanged.on { refresh() }
+            // The palette outlives the network panel, so these end with the panel's view
+            listOf(
+                selectionChanged.on { refresh() },
+                secondaryChanged.on { refresh() },
+                actionEdited.on { refresh() },
+                actionAdded.on { refresh() },
+                actionRemoved.on { refresh() },
+                paletteChanged.on { refresh() }
+            ).forEach { it.cancelWith(networkPanel.viewScope) }
         }
 
         // Set initial cursor

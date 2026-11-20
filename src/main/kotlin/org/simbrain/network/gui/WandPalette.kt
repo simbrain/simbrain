@@ -102,6 +102,8 @@ class WandPalette : EditableObject {
                 index < secondaryIndex -> secondaryIndex--
                 index == secondaryIndex -> secondaryIndex = -1
             }
+            // Keep the same action selected when one ahead of it goes
+            if (index < selectedIndex) selectedIndex--
             events.actionRemoved.fire(action)
             if (selectedIndex >= actions.size) {
                 selectedIndex = (actions.size - 1).coerceAtLeast(0)

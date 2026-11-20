@@ -172,17 +172,48 @@ class WandStrokeTest {
     }
 
     @Test
-    fun `a stroke with shift held does nothing when there is no secondary action`() = withWandPalette(draw(), null) {
-        val neurons = neuronRow(3)
-        val panel = wandPanelFor(Network(), *neurons.toTypedArray())
+    fun `a stroke with shift held applies the selected action when there is no secondary action`() =
+        withWandPalette(draw(), null) {
+            val neurons = neuronRow(3)
+            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
 
-        panel.strokeOver(neurons, shiftAtPress = true)
-        // A plain stroke over the last neuron alone, to know when the shift stroke before it has been dealt with
-        panel.strokeOver(neurons.takeLast(1))
+            panel.strokeOver(neurons, shiftAtPress = true)
 
-        awaitActivations(neurons.takeLast(1), drawn)
-        assertEquals(listOf(0.0, 0.0), neurons.dropLast(1).map { it.activation })
-    }
+            awaitActivations(neurons, drawn)
+        }
+
+    @Test
+    fun `a click applies its action when the release is already waiting as the press is dealt with`() =
+        withWandPalette(draw(), erase()) {
+            val neurons = neuronRow(1)
+            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
+            val pixel = panel.pixelOf(neurons[0])
+
+            // Both events in one turn of the event queue, so that the work the press sets going runs after the release
+            onEdt {
+                panel.send(MouseEvent.MOUSE_PRESSED, pixel, shiftDown = false)
+                panel.send(MouseEvent.MOUSE_RELEASED, pixel, shiftDown = false)
+            }
+
+            awaitActivations(neurons, drawn)
+            panel.awaitUndoableActions(1)
+        }
+
+    @Test
+    fun `a stroke is finished off when another tool is switched to before the mouse is released`() =
+        withWandPalette(draw(), erase()) {
+            val neurons = neuronRow(2)
+            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
+            val pixels = neurons.map { panel.pixelOf(it) }
+
+            panel.send(MouseEvent.MOUSE_PRESSED, pixels[0], shiftDown = false)
+            panel.send(MouseEvent.MOUSE_DRAGGED, pixels[1], shiftDown = false)
+            onEdt { panel.mouseCursor = MouseEventHandler.MouseCursor.Selection }
+            panel.send(MouseEvent.MOUSE_RELEASED, pixels[1], shiftDown = false)
+
+            awaitActivations(neurons, drawn)
+            panel.awaitUndoableActions(1)
+        }
 
     @Test
     fun `each stroke is undone as a whole with the action it applied`() = withWandPalette(draw(), erase()) {

@@ -24,7 +24,7 @@ val fieldImagePlaceCellsDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val odorWorldComponent = addOdorWorldComponent("Place World")
+    val odorWorldComponent = addOdorWorldComponent("Place world")
     val odorWorld = odorWorldComponent.world.apply {
         tileMap = loadTileMap(File(OdorWorldPreferences.tileMapDirectory, "yulins_world.tmx"))
         wrapAround = true
@@ -74,7 +74,7 @@ val fieldImagePlaceCellsDemo = newSim {
     }
     mouse.select()
 
-    val networkComponent = addNetworkComponent("Place Cell Network")
+    val networkComponent = addNetworkComponent("Place cell network")
     val network = networkComponent.network
 
     val placeCells = network.addNeuronCollection(numRows * numCols) {
@@ -88,7 +88,7 @@ val fieldImagePlaceCellsDemo = newSim {
         upperBound = 1.0
         lowerBound = 0.0
     }
-    placeCells.label = "Place Cells"
+    placeCells.label = "Place cells"
     placeCells.layout = GridLayout(62.0, 62.0, numCols)
     placeCells.applyLayout(0, 0)
     placeCells.neuronList.forEachIndexed { i, n -> n.label = placeLabels[i] }
@@ -102,7 +102,7 @@ val fieldImagePlaceCellsDemo = newSim {
         upperBound = bugReadoutMax
         lowerBound = 0.0
     }
-    bugReadout.label = "Object Readout"
+    bugReadout.label = "Object readout"
     bugReadout.neuronList[0].label = "bug"
     bugReadout.applyLayout(0, 360)
 
@@ -219,7 +219,7 @@ val fieldImagePlaceCellsDemo = newSim {
             add(JLabel("Threshold").apply { toolTipText = thresholdToolTip }, BorderLayout.WEST)
             add(thresholdSlider, BorderLayout.CENTER)
         }
-        val fieldFrame = GenericJInternalFrame("Field Image", true, true, true, true).apply {
+        val fieldFrame = GenericJInternalFrame("Field image", true, true, true, true).apply {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)

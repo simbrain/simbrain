@@ -48,12 +48,12 @@ val corticalLayers = newSim {
 
     // Build network
     val nc = addNetworkComponent(
-        "Cortical Simulation",
+        "Cortical simulation",
     )
 
     val net = nc.network
 
-    val rasterPlot = addRasterPlot("Raster Plot")
+    val rasterPlot = addRasterPlot("Raster plot")
     rasterPlot.model.removeDataSource()
     rasterPlot.model.addDataSources(3, listOf("L2/3", "L4", "L5/6"))
 
@@ -315,7 +315,7 @@ val corticalLayers = newSim {
 
         1. Click `Run` to start the simulation.
         
-        2. Use the `wand` tool with the `Force Spike` action to force spikes in `Layer 5/6`. Few spikes in the other layers should be observed.
+        2. Use the `wand` tool with the `Force spike` action to force spikes in `Layer 5/6`. Few spikes in the other layers should be observed.
         
         3. Use the wand on `Layer 4`. A burst of activity in `Layer 2/3` should then be observed, followed by a burst of activity in `Layer 5/6`, consistent with known connectivity.
         

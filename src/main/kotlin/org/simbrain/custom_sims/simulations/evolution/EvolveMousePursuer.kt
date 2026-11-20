@@ -118,8 +118,8 @@ val evolveMousePursuer = newSim { optionString ->
 
         init {
             // Configure individual input genes
-            inputs.genes[0].mutate { label = "Cheese Left" }
-            inputs.genes[1].mutate { label = "Cheese Right" }
+            inputs.genes[0].mutate { label = "Cheese left" }
+            inputs.genes[1].mutate { label = "Cheese right" }
             inputs.genes[2].mutate { label = "Hunger"; lowerBound = 0.0; upperBound = 1.0 }
 
             // Configure hidden gene
@@ -238,11 +238,11 @@ val evolveMousePursuer = newSim { optionString ->
                 removeAllSensors()
                 removeAllEffectors()
                 addSensor(ObjectSensor(EntityType.Swiss, 50.0, 45.0).apply {
-                    label = "Cheese Left"
+                    label = "Cheese left"
                     decayFunction.dispersion = 160.0
                 })
                 addSensor(ObjectSensor(EntityType.Swiss, 50.0, -45.0).apply {
-                    label = "Cheese Right"
+                    label = "Cheese right"
                     decayFunction.dispersion = 160.0
                 })
                 addDefaultEffectors()
@@ -332,7 +332,7 @@ val evolveMousePursuer = newSim { optionString ->
 
         override suspend fun onBuild() {
             genotype.expressAll(network)
-            genotype.inputs.neurons.neuronList.labels = listOf("Cheese Left", "Cheese Right", "Hunger")
+            genotype.inputs.neurons.neuronList.labels = listOf("Cheese left", "Cheese right", "Hunger")
             genotype.outputs.neurons.neuronList.labels = listOf("Speed", "Left", "Right")
             with(workspace.couplingManager) {
                 mouse.sensors.filterIsInstance<ObjectSensor>() couple genotype.inputs.neurons.neuronList.take(2)
@@ -413,7 +413,7 @@ val evolveMousePursuer = newSim { optionString ->
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+        val panel = controlPanel.show(this, "Control panel", 5, 10, addParamsEditor = false)
         val propertyEditor = AnnotatedPropertyEditor(mouseParams)
         panel.addAnnotatedPropertyEditor(propertyEditor)
 
@@ -468,7 +468,7 @@ val evolveMousePursuer = newSim { optionString ->
         }
 
         controlPanel.addButton(
-            "Open Trainer",
+            "Open trainer",
             toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved mice."
         ) { openTrainer() }
     }
@@ -494,7 +494,7 @@ val evolveMousePursuer = newSim { optionString ->
 
         ## Activity: Evolve a mouse
 
-        1. Click `Open Trainer`, then set evolutionary parameters in the trainer's `Evolution properties` dialog.
+        1. Click `Open trainer`, then set evolutionary parameters in the trainer's `Evolution properties` dialog.
         2. Turn `useEnergyModel` on or off depending on the comparison you want.
         3. Click `Run` in the trainer and inspect the best evolved mouse and network when the run completes.
         """.trimIndent(),

@@ -64,7 +64,7 @@ object PerformanceMonitor {
      * Convenient way to invoke actions and record their performance.
      */
     suspend operator fun UpdateAction.invoke() {
-        record(this, description?: "(Unnamed Action)") {
+        record(this, description?: "(Unnamed action)") {
             run()
         }
     }

@@ -108,7 +108,7 @@ private fun TrainingDataset.withLabels(condition: TrainingCondition): TrainingDa
 val categoricalPerception = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Categorical Perception")
+    val networkComponent = addNetworkComponent("Categorical perception")
     val network = networkComponent.network
 
     // Base Dataset (no labels)
@@ -227,7 +227,7 @@ val categoricalPerception = newSim {
     }
 
     val cnnModel = network.addConvolutionalNeuralNetwork(inputLayer, outputArray) {
-        label = "Categorical Perception CNN"
+        label = "Categorical perception CNN"
         this.trainingSet = trainingSet
         this.testingSet = testingSet
     }
@@ -299,7 +299,7 @@ val categoricalPerception = newSim {
             }
         }
 
-        showResults("Repr Layer Analysis") {
+        showResults("Repr layer analysis") {
             note("Condition: ${condition.displayName}")
             note("Repr layer size: $REPR_LAYER_SIZE, samples per class: $trainSamplesPerClass")
 
@@ -339,7 +339,7 @@ val categoricalPerception = newSim {
     //  stale selection.
     fun runStagedTraining(labelCondition: TrainingCondition) {
         val totalEpochs = STAGE1_EPOCHS + STAGE2_EPOCHS
-        runWithProgressWindow(totalEpochs, "Staged Training") { epoch ->
+        runWithProgressWindow(totalEpochs, "Staged training") { epoch ->
             if (epoch == 0) {
                 val (train, _) = buildDatasets(TrainingCondition.NO_LABELS)
                 trainingSet = train
@@ -363,7 +363,7 @@ val categoricalPerception = newSim {
     withGui {
         val controlPanel = createControlPanel("Analysis", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val conditionToolTip = "Whether the training data includes L1 category labels along with the prototype sorting task."
-            addLabel("Training Condition:").apply { toolTipText = conditionToolTip }
+            addLabel("Training condition:").apply { toolTipText = conditionToolTip }
             addComboBox("", TrainingCondition.entries, currentCondition, toolTip = conditionToolTip) { selectedCondition ->
                 currentCondition = selectedCondition
                 val (newTrain, newTest) = buildDatasets(selectedCondition)
@@ -376,7 +376,7 @@ val categoricalPerception = newSim {
 
             addSeparator()
 
-            addButton("Run Staged Training") {
+            addButton("Run staged training") {
                 runStagedTraining(TrainingCondition.L1_LABELS)
             }.apply {
                 toolTipText = "Train on prototype sorting alone, then continue with L1 labels added."
@@ -384,7 +384,7 @@ val categoricalPerception = newSim {
 
             addSeparator()
 
-            addButton("Analyze Repr Layer") {
+            addButton("Analyze Repr layer") {
                 runAnalysis()
             }.apply {
                 toolTipText = "Report within-class and between-class distances in the representation layer for the current condition."
@@ -426,7 +426,7 @@ val categoricalPerception = newSim {
 
         ## Analysis Metrics
 
-        `Analyze Repr Layer` runs all training inputs through the network,
+        `Analyze Repr layer` runs all training inputs through the network,
         collects the $REPR_LAYER_SIZE-unit repr-layer activations, and computes:
 
         - **Within-class distance**: mean pairwise Euclidean distance within each
@@ -442,15 +442,15 @@ val categoricalPerception = newSim {
         # Activities
 
         ## Activity 1: Staged training
-        Click `Run Staged Training` in the control panel. This replicates the
+        Click `Run staged training` in the control panel. This replicates the
         paper's sequential procedure:
 
         1. `Stage 1` ($STAGE1_EPOCHS epochs): prototype sorting only - repr layer
            geometry forms around shape similarity alone
-        2. Click `Analyze Repr Layer` to record baseline within/between distances
+        2. Click `Analyze Repr layer` to record baseline within/between distances
         3. `Stage 2` ($STAGE2_EPOCHS more epochs): label condition added - repr layer
            is reshaped by the additional categorization pressure
-        4. Click `Analyze Repr Layer` again and compare to baseline
+        4. Click `Analyze Repr layer` again and compare to baseline
 
         The CP effect is the *change*: within-class distances should decrease and
         between-class distances should increase after the label stage.
@@ -458,10 +458,10 @@ val categoricalPerception = newSim {
         ## Activity 2: Manual staged training
         1. Set condition to `Prototype sorting (no labels)` in the dropdown
         2. Right-click the `CNN` outline and select `Train...`, then run until loss stabilizes
-        3. Click `Analyze Repr Layer`; this is your baseline
+        3. Click `Analyze Repr layer`; this is your baseline
         4. Switch condition to `L1` or `L2` in the dropdown (weights are preserved)
         5. Train again for a smaller number of epochs
-        6. Click `Analyze Repr Layer` and compare to baseline
+        6. Click `Analyze Repr layer` and compare to baseline
 
         # References
 

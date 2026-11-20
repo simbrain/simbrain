@@ -70,7 +70,7 @@ class EvolutionTrainerControls(
 
     fun openPropsDialog() {
         val editor = AnnotatedPropertyEditor(evaluatorParams)
-        editor.displayInDialog(title = "Evolution Properties") { editor.commitChanges() }
+        editor.displayInDialog(title = "Evolution properties") { editor.commitChanges() }
     }
 
     private val propsAction = createAction(
@@ -335,7 +335,7 @@ class EvolutionTrainerSession(
     extras: List<JComponent> = emptyList(),
     onExpress: (suspend () -> Unit)? = null,
     val history: ExpressionHistory? = null,
-    val title: String = "Evolution Trainer"
+    val title: String = "Evolution trainer"
 ) {
     val controls = EvolutionTrainerControls(
         runner = runner,

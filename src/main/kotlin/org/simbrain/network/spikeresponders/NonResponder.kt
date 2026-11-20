@@ -20,7 +20,7 @@ class NonResponder : SpikeResponder() {
         return NonResponder()
     }
 
-    override val description: String = "None (No spike response)"
+    override val description: String = "None (no spike response)"
 
     override val name: String
         get() = "None"

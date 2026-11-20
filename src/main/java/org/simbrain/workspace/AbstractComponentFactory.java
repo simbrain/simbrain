@@ -8,12 +8,12 @@ import org.simbrain.network.NetworkComponent;
 import org.simbrain.network.desktop.NetworkDesktopComponent;
 import org.simbrain.plot.barchart.BarChartComponent;
 import org.simbrain.plot.barchart.BarChartDesktopComponent;
+import org.simbrain.plot.heatmap.HeatMapComponent;
+import org.simbrain.plot.heatmap.HeatMapDesktopComponent;
 import org.simbrain.plot.histogram.HistogramComponent;
 import org.simbrain.plot.histogram.HistogramDesktopComponent;
 import org.simbrain.plot.piechart.PieChartComponent;
 import org.simbrain.plot.piechart.PieChartDesktopComponent;
-import org.simbrain.plot.heatmap.HeatMapComponent;
-import org.simbrain.plot.heatmap.HeatMapDesktopComponent;
 import org.simbrain.plot.pixelplot.PixelPlotComponent;
 import org.simbrain.plot.pixelplot.PixelPlotDesktopComponent;
 import org.simbrain.plot.projection.ProjectionComponent;
@@ -64,26 +64,26 @@ public class AbstractComponentFactory {
         putWorkspaceComponentFactory("Network", () -> new NetworkComponent(""));
         putGuiComponentFactory(NetworkComponent.class, NetworkDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Odor world", () -> {
+        putWorkspaceComponentFactory("Odor World", () -> {
             var component = new OdorWorldComponent("");
             OdorWorldUtilsKt.addDefaultEntities(component.getWorld());
             return component;
         });
         putGuiComponentFactory(OdorWorldComponent.class, OdorWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Data world", () -> new DataWorldComponent(""));
+        putWorkspaceComponentFactory("Data World", () -> new DataWorldComponent(""));
         putGuiComponentFactory(DataWorldComponent.class, DataWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Text world", () -> new TextWorldComponent(""));
+        putWorkspaceComponentFactory("Text World", () -> new TextWorldComponent(""));
         putGuiComponentFactory(TextWorldComponent.class, TextWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Image world", ImageWorldComponent::new);
+        putWorkspaceComponentFactory("Image World", ImageWorldComponent::new);
         putGuiComponentFactory(ImageWorldComponent.class, ImageWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Sound world", () -> new SoundWorldComponent(""));
+        putWorkspaceComponentFactory("Sound World", () -> new SoundWorldComponent(""));
         putGuiComponentFactory(SoundWorldComponent.class, SoundWorldDesktopComponent::new);
 
-        putWorkspaceComponentFactory("Speech synthesizer", () -> new SpeechSynthesizerComponent("Speech Synthesizer"));
+        putWorkspaceComponentFactory("Speech synthesizer", () -> new SpeechSynthesizerComponent("Speech synthesizer"));
         putGuiComponentFactory(SpeechSynthesizerComponent.class, SpeechSynthesizerDesktopComponent::new);
 
 

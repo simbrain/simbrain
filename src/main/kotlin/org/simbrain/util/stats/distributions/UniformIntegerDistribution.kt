@@ -44,7 +44,7 @@ class UniformIntegerDistribution(floor:Int = 0, ceil: Int = 1) : ProbabilityDist
 
     val variance get() = ((ceil - floor) * (ceil - floor))/12.0 + (ceil-floor)/6.0
 
-    override val name = "Uniform (Integer)"
+    override val name = "Uniform (integer)"
 
     override fun copy(): UniformIntegerDistribution {
         val copy = UniformIntegerDistribution()

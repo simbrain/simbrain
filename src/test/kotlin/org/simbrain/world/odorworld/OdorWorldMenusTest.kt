@@ -1,9 +1,7 @@
 package org.simbrain.world.odorworld
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.workspace.gui.SimbrainDesktop
@@ -13,7 +11,7 @@ import javax.swing.SwingUtilities
 
 class OdorWorldMenusTest {
 
-    private val component = OdorWorldComponent("Odor world")
+    private val component = OdorWorldComponent("Odor World")
     private val desktopComponent: OdorWorldDesktopComponent
     private val panel get() = desktopComponent.worldPanel
     private val world get() = component.world
@@ -23,7 +21,7 @@ class OdorWorldMenusTest {
         SimbrainDesktop.workspace.addWorkspaceComponent(component)
         lateinit var created: OdorWorldDesktopComponent
         SwingUtilities.invokeAndWait {
-            created = OdorWorldDesktopComponent(GenericJInternalFrame("Odor world", true, true, true, true), component)
+            created = OdorWorldDesktopComponent(GenericJInternalFrame("Odor World", true, true, true, true), component)
         }
         desktopComponent = created
     }

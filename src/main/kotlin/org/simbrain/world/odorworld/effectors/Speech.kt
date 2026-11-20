@@ -32,13 +32,13 @@ class Speech(
 ) : Effector("""Say: "$phrase""""), VisualizableEntityAttribute {
 
     @UserParameter(
-        label = "Characters per Row",
+        label = "Characters per row",
         description = ("The maximum number of characters that can be displayed in one row in the speech bubble. This setting only affects visual representation."),
         order = 20
     )
     var charactersPerRow: Int = 32
 
-    @UserParameter(label = "Decay Function", order = 10, tab = "Dispersion")
+    @UserParameter(label = "Decay function", order = 10, tab = "Dispersion")
     var decayFunction: DecayFunction = LinearDecayFunction(128.0)
 
     /**
@@ -84,7 +84,7 @@ class Speech(
     }
 
     override val name: String
-        get() = "Speech Effector"
+        get() = "Speech effector"
 
     override var label: String
         get() = if (super.label.isEmpty()) {

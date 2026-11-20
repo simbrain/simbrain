@@ -19,11 +19,7 @@ import java.awt.Container
 import java.awt.event.ActionEvent
 import java.awt.event.InputEvent
 import java.awt.event.MouseEvent
-import javax.swing.AbstractButton
-import javax.swing.JComponent
-import javax.swing.JMenu
-import javax.swing.KeyStroke
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 class ImageWorldUndoGuiTest {
 
@@ -51,13 +47,13 @@ class ImageWorldUndoGuiTest {
 
     private fun openWindow(): Window = runBlocking {
         val workspace = Workspace()
-        val component = ImageWorldComponent("Image world")
+        val component = ImageWorldComponent("Image World")
         workspace.addWorkspaceComponent(component)
         component.world.resetImageAlbum(10, 10)
         component.world.penColor = Color.RED
         lateinit var window: Window
         SwingUtilities.invokeAndWait {
-            val frame = GenericJInternalFrame("Image world", true, true, true, true)
+            val frame = GenericJInternalFrame("Image World", true, true, true, true)
             frame.contentPane.add(workspace.componentFactory.createGuiComponent(frame, component))
             window = Window(component, frame)
             window.panel.setSize(10, 10)

@@ -58,7 +58,7 @@ val simulations = dir("Simulations", alphabetical = true) {
 - `item()` creates menu item
 - Labels used for menu and command-line
 - Avoid duplicate labels
-- Use sentence case for submenu and simulation labels. Keep proper names, acronyms, and the existing `(Beta)` status marker capitalized.
+- Use sentence case for submenu and simulation labels, per "UI Text Capitalization" in `simbrain/AGENTS.md`
 
 ## Finding Templates
 

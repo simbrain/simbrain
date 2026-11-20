@@ -62,10 +62,10 @@ class TileSensor @JvmOverloads constructor(
     }
 
     override val name: String
-        get() = "Tile Sensor"
+        get() = "Tile sensor"
 
     override var label = if (super.label.isEmpty()) {
-        "$directionString$tileType Detector"
+        "$directionString$tileType detector".replaceFirstChar { it.uppercase() }
     } else {
         super.label
     }

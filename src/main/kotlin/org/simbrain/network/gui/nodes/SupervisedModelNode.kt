@@ -7,13 +7,9 @@ import org.simbrain.network.events.LocationEvents
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.getSupervisedTrainingDialog
 import org.simbrain.network.trainers.SupervisedModel
-import org.simbrain.util.NetworkTheme
-import org.simbrain.util.StandardDialog
-import org.simbrain.util.createAction
-import java.awt.Color
+import org.simbrain.util.*
 import org.simbrain.util.piccolo.Outline
-import org.simbrain.util.showInputDialog
-import org.simbrain.util.swingDispatcher
+import java.awt.Color
 import javax.swing.JComponent
 import javax.swing.JPopupMenu
 
@@ -86,11 +82,11 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
                 }
             })
             addSeparator()
-            add(createAction("Add Current Data to Training Set") {
+            add(createAction("Add current data to training set") {
                 supervisedModel.trainingSet.inputs.add(supervisedModel.inputLayer.activationArray.copyOf())
                 supervisedModel.trainingSet.targets.add(supervisedModel.outputLayer.activationArray.copyOf())
             })
-            add(createAction("Add Current Data to Testing Set") {
+            add(createAction("Add current data to testing set") {
                 supervisedModel.testingSet.inputs.add(supervisedModel.inputLayer.activationArray.copyOf())
                 supervisedModel.testingSet.targets.add(supervisedModel.outputLayer.activationArray.copyOf())
             })
@@ -119,7 +115,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
     }
 
     private val <T: JComponent> T.removeAction get() = createAction(
-        name = "Remove Supervised Model...",
+        name = "Remove supervised model...",
         iconPath = "menu_icons/minus.png",
         description = "Remove this supervised model...",
         coroutineScope = networkPanel.network
@@ -128,7 +124,7 @@ class SupervisedModelNode(networkPanel: NetworkPanel, val supervisedModel: Super
     }
 
     private fun createApplyImmediateLearningAction() = networkPanel.createAction(
-        name = "Apply Immediate Learning",
+        name = "Apply immediate learning",
         description = "Train this model on the values currently in the input and target layers",
         keyboardShortcut = 'L'
     ) {

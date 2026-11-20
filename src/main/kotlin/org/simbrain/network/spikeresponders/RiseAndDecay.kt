@@ -93,10 +93,10 @@ class RiseAndDecay : SpikeResponder() {
         return RiseAndDecayData()
     }
 
-    override val description: String = "Rise and Decay"
+    override val description: String = "Rise and decay"
 
     override val name: String
-        get() = "Rise and Decay"
+        get() = "Rise and decay"
 }
 
 

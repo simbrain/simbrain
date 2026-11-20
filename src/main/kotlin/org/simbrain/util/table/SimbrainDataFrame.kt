@@ -39,7 +39,7 @@ abstract class SimbrainDataFrame : AbstractTableModel() {
     /**
      * Table-wide cell randomizer for arbitrary groups of cells.
      */
-    @UserParameter(label = "Table Randomizer")
+    @UserParameter(label = "Table randomizer")
     var cellRandomizer: ProbabilityDistribution = UniformRealDistribution()
 
     /**
@@ -372,7 +372,7 @@ class Column(
     /**
      * Randomizer for this column.
      */
-    @UserParameter(label = "Column Randomizer", order = 20)
+    @UserParameter(label = "Column randomizer", order = 20)
     var columnRandomizer: ProbabilityDistribution = UniformRealDistribution()
 
     fun getRandom(): Number {

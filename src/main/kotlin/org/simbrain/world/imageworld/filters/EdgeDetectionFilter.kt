@@ -2,7 +2,9 @@ package org.simbrain.world.imageworld.filters
 
 import org.simbrain.util.UserParameter
 import java.awt.image.BufferedImage
-import kotlin.math.*
+import kotlin.math.exp
+import kotlin.math.min
+import kotlin.math.sqrt
 
 /**
  * Edge detection filter with multiple algorithms for detecting edges in images.
@@ -42,17 +44,17 @@ class EdgeDetectionFilter : ImageFilter() {
             field = maxOf(0.0, minOf(1.0, value))
         }
 
-    @UserParameter(label = "Enhance Edges", description = "Whether to enhance detected edges", order = 4)
+    @UserParameter(label = "Enhance edges", description = "Whether to enhance detected edges", order = 4)
     var enhanceEdges: Boolean = true
 
-    @UserParameter(label = "Gaussian Blur Sigma", description = "Sigma for pre-processing Gaussian blur (0 = no blur)", order = 5)
+    @UserParameter(label = "Gaussian blur sigma", description = "Sigma for pre-processing Gaussian blur (0 = no blur)", order = 5)
     var gaussianSigma: Double = 0.0
         set(value) {
             field = maxOf(0.0, value)
         }
 
     init {
-        name = "Edge Detection Filter"
+        name = "Edge detection filter"
     }
 
     override fun applyFilter(input: BufferedImage): BufferedImage {

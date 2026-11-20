@@ -21,7 +21,7 @@ abstract class ImageOperation : CopyableObject {
     var enabled: Boolean = true
 
     @UserParameter(label = "Name", description = "Name of this operation", order = 1)
-    override var name: String = this::class.simpleName ?: "Unknown Operation"
+    override var name: String = this::class.simpleName ?: "Unknown operation"
 
     /**
      * Apply this operation to the input image and return the result.

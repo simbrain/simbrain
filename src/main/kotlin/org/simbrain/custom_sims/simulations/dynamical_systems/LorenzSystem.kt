@@ -26,7 +26,7 @@ import org.simbrain.util.projection.PCAProjection
 val lorenzSystem = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Lorenz System")
+    val networkComponent = addNetworkComponent("Lorenz system")
     val network = networkComponent.network
 
     // Set smaller time step for numerical stability
@@ -38,7 +38,7 @@ val lorenzSystem = newSim {
         activation = 1.0  // Initial condition
     }
     lorenzNeurons.apply {
-        label = "Lorenz Variables"
+        label = "Lorenz variables"
         layout(LineLayout())
         location = point(50.0, 100.0)
         neuronList.labels = listOf("x", "y", "z")
@@ -51,7 +51,7 @@ val lorenzSystem = newSim {
 
     // Clear default network update and add custom update action
     network.updateManager.clear()
-    workspace.addUpdateAction("Lorenz System Update", position = 0) {
+    workspace.addUpdateAction("Lorenz system update", position = 0) {
 
         // Get current state
         val x = lorenzNeurons.neuronList[0].activation
@@ -72,7 +72,7 @@ val lorenzSystem = newSim {
     }
 
     // Add projection plot to visualize the attractor
-    val projectionPlot = addProjectionPlot("Lorenz Attractor")
+    val projectionPlot = addProjectionPlot("Lorenz attractor")
     projectionPlot.projector.tolerance = 0.1
     projectionPlot.projector.projectionMethod = PCAProjection()
     projectionPlot.projector.coloringManager = DecayColoringManager()
@@ -84,9 +84,9 @@ val lorenzSystem = newSim {
 
     withGui {
         // Control panel for changing parameters and observing different regimes
-        val controlPanel = createControlPanel("Lorenz Parameters", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Lorenz parameters", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addButton("Reset to Initial Conditions") {
+            addButton("Reset to initial conditions") {
                 lorenzNeurons.neuronList[0].activation = 1.0
                 lorenzNeurons.neuronList[1].activation = 1.0
                 lorenzNeurons.neuronList[2].activation = 1.0
@@ -95,9 +95,9 @@ val lorenzSystem = newSim {
             }
 
             addSeparator()
-            addLabel("<html><b>Parameter Presets</b></html>")
+            addLabel("<html><b>Parameter presets</b></html>")
 
-            addButton("Chaotic (Standard)") {
+            addButton("Chaotic (standard)") {
                 sigma = 10.0
                 rho = 28.0
                 beta = 8.0 / 3.0
@@ -105,7 +105,7 @@ val lorenzSystem = newSim {
                 toolTipText = "Set σ = 10, ρ = 28, β = 8/3, Lorenz's classic chaotic attractor."
             }
 
-            addButton("Stable - Converge to Origin") {
+            addButton("Stable - converge to origin") {
                 sigma = 10.0
                 rho = 0.5  // ρ < 1
                 beta = 8.0 / 3.0
@@ -113,7 +113,7 @@ val lorenzSystem = newSim {
                 toolTipText = "Set ρ = 0.5 (below 1), so every trajectory settles at the origin."
             }
 
-            addButton("Stable - Fixed Points") {
+            addButton("Stable - fixed points") {
                 sigma = 10.0
                 rho = 10.0  // 1 < ρ < ~24.74
                 beta = 8.0 / 3.0
@@ -121,7 +121,7 @@ val lorenzSystem = newSim {
                 toolTipText = "Set ρ = 10, so trajectories settle at one of two fixed points."
             }
 
-            addButton("Pre-Chaotic (Complex)") {
+            addButton("Pre-chaotic (complex)") {
                 sigma = 10.0
                 rho = 24.5  // Just below chaos threshold
                 beta = 8.0 / 3.0
@@ -130,24 +130,24 @@ val lorenzSystem = newSim {
             }
 
             addSeparator()
-            addLabel("<html><b>Custom Parameters</b></html>")
+            addLabel("<html><b>Custom parameters</b></html>")
 
             // TODO: The fields start at ρ = 15 although the system starts at ρ = 28, and the presets do not update
             //  them, so the fields often do not show the parameters in use.
             val sigmaField = addTextField(
                 "σ (sigma)", "10.0",
-                toolTip = "Rate at which x moves toward y. Press Apply Custom Parameters to use it."
+                toolTip = "Rate at which x moves toward y. Press Apply custom parameters to use it."
             )
             val rhoField = addTextField(
                 "ρ (rho)", "15.0",
-                toolTip = "Main control parameter; chaos appears above about 24.74. Press Apply Custom Parameters to use it."
+                toolTip = "Main control parameter; chaos appears above about 24.74. Press Apply custom parameters to use it."
             )
             val betaField = addTextField(
                 "β (beta)", "2.7",
-                toolTip = "Damping rate of z. Press Apply Custom Parameters to use it."
+                toolTip = "Damping rate of z. Press Apply custom parameters to use it."
             )
 
-            addButton("Apply Custom Parameters") {
+            addButton("Apply custom parameters") {
                 sigma = sigmaField.text.toDoubleOrNull() ?: sigma
                 rho = rhoField.text.toDoubleOrNull() ?: rho
                 beta = betaField.text.toDoubleOrNull() ?: beta
@@ -188,15 +188,15 @@ val lorenzSystem = newSim {
 
         ## Implementation
 
-        This simulation uses three neurons in the `Lorenz Variables` collection to represent `x`, `y`, and `z`. The equations are implemented using a custom workspace update action that directly computes the derivatives and updates the neuron activations using the Euler integration method with a time step of `0.01`.
+        This simulation uses three neurons in the `Lorenz variables` collection to represent `x`, `y`, and `z`. The equations are implemented using a custom workspace update action that directly computes the derivatives and updates the neuron activations using the Euler integration method with a time step of `0.01`.
 
         ## Dynamic Regimes
 
         The Lorenz system exhibits qualitatively different behaviors depending on parameter values:
 
-        **Stable - Converge to Origin** (`ρ < 1`): All trajectories converge to the origin `(0, 0, 0)`. The system is predictable and stable.
+        **Stable - converge to origin** (`ρ < 1`): All trajectories converge to the origin `(0, 0, 0)`. The system is predictable and stable.
 
-        **Stable - Fixed Points** (`1 < ρ < ~24.74`): Trajectories converge to one of two symmetric steady states. The system settles into non-zero equilibria.
+        **Stable - fixed points** (`1 < ρ < ~24.74`): Trajectories converge to one of two symmetric steady states. The system settles into non-zero equilibria.
 
         **Pre-Chaotic** (`ρ ≈ 24.5`): Near the chaos threshold, the system exhibits complex oscillations. This transitional regime shows increasingly intricate dynamics.
 
@@ -206,42 +206,42 @@ val lorenzSystem = newSim {
 
         - The projection plot uses decay coloring: recent points appear red and gradually fade to transparency, making it easy to see the current trajectory
         - For chaotic parameters, the butterfly shape becomes visible after `~500` iterations
-        - Right-click the `Lorenz Variables` neuron collection and create a time series plot to see how `x`, `y`, and `z` evolve over time
+        - Right-click the `Lorenz variables` neuron collection and create a time series plot to see how `x`, `y`, and `z` evolve over time
         - Different regimes produce distinct patterns: settling points (stable), loops (pre-chaotic), or irregular wandering (chaotic)
 
         # Activities
 
         ## Activity 1: Explore different regimes
 
-        Press `Run` in the toolbar to start the simulation. The `Lorenz Attractor` projection plot shows the system's trajectory in 2D using PCA, with recent points shown in red that fade to transparency over time.
+        Press `Run` in the toolbar to start the simulation. The `Lorenz attractor` projection plot shows the system's trajectory in 2D using PCA, with recent points shown in red that fade to transparency over time.
 
-        Use the preset buttons in the `Lorenz Parameters` control panel to explore different dynamical behaviors:
+        Use the preset buttons in the `Lorenz parameters` control panel to explore different dynamical behaviors:
 
-        1. Click `Chaotic (Standard)` and run the simulation. Watch the characteristic butterfly or owl-face shape emerge in the projection plot as the trajectory loops around two centers.
+        1. Click `Chaotic (standard)` and run the simulation. Watch the characteristic butterfly or owl-face shape emerge in the projection plot as the trajectory loops around two centers.
 
-        2. Click `Reset to Initial Conditions`, then try `Stable - Converge to Origin`. The trajectory collapses toward the center as all variables decay to zero.
+        2. Click `Reset to initial conditions`, then try `Stable - converge to origin`. The trajectory collapses toward the center as all variables decay to zero.
 
-        3. Try `Stable - Fixed Points` to see the system converge to a single point (one of two possible steady states).
+        3. Try `Stable - fixed points` to see the system converge to a single point (one of two possible steady states).
 
-        4. Explore `Pre-Chaotic (Complex)` to observe transitional behavior near the edge of chaos.
+        4. Explore `Pre-chaotic (complex)` to observe transitional behavior near the edge of chaos.
 
         ## Activity 2: Test sensitivity to initial conditions
 
         With chaotic parameters active:
 
-        1. Click `Reset to Initial Conditions` and let the simulation run briefly
+        1. Click `Reset to initial conditions` and let the simulation run briefly
         2. Note the trajectory pattern in the projection plot
-        3. Click inside the `Lorenz System` network window and manually adjust one neuron's activation slightly (e.g., change `x` from `1.0` to `1.001`)
+        3. Click inside the `Lorenz system` network window and manually adjust one neuron's activation slightly (e.g., change `x` from `1.0` to `1.001`)
         4. Watch how quickly the trajectories diverge despite nearly identical starting points
 
         ## Activity 3: Experiment with parameters
 
-        The `Custom Parameters` section shows values for a stable fixed-point regime (`σ=10`, `ρ=15`, `β=2.7`). Try these or your own values:
+        The `Custom parameters` section shows values for a stable fixed-point regime (`σ=10`, `ρ=15`, `β=2.7`). Try these or your own values:
 
         1. Enter custom values in the parameter fields
-        2. Click `Apply Custom Parameters`
-        3. Click `Reset to Initial Conditions`
-        4. Right-click on the `Lorenz Attractor` projection plot and select `Clear data` to remove old trajectories
+        2. Click `Apply custom parameters`
+        3. Click `Reset to initial conditions`
+        4. Right-click on the `Lorenz attractor` projection plot and select `Clear data` to remove old trajectories
         5. Run the simulation to see the new behavior
 
         **Important**: Always clear the projection plot data when changing parameters to avoid mixing trajectories from different parameter regimes.

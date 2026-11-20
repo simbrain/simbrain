@@ -62,6 +62,6 @@ class LogisticRegClassifier(
         return LogisticRegClassifier(dataset)
     }
 
-    override val name = "Logistic Regression"
+    override val name = "Logistic regression"
 
 }

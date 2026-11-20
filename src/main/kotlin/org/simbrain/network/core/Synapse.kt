@@ -36,7 +36,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      */
     @UserParameter(
         label = "Strength",
-        description = "Weight Strength. If you want a value greater" +
+        description = "Weight strength. If you want a value greater" +
                 "than upper bound or less than lower bound you must set those first, and close this dialog.",
         probDist = "Normal",
         probParam1 = .1,
@@ -78,7 +78,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * The update method of this synapse, which corresponds to what kind of synapse it is.
      */
     @UserParameter(
-        label = "Learning Rule",
+        label = "Learning rule",
         description = "Rule which determines how synapse strength changes, usually based on the neurons it is connected to",
         order = 100
     )
@@ -99,7 +99,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
      * Only used if source neuron is a spiking neuron.
      */
     @UserParameter(
-        label = "Spike Responder",
+        label = "Spike responder",
         description = "How this synapse responds when the presynaptic neuron (which must be spiking) spikes ",
         showDetails = false,
         order = 200
@@ -123,7 +123,7 @@ class Synapse : NetworkModel, EditableObject, AttributeContainer {
     /**
      * Amount to increment the neuron.
      */
-    @UserParameter(label = "Increment", description = "Strength Increment", minimumValue = 0.0, order = 2)
+    @UserParameter(label = "Increment", description = "Strength increment", minimumValue = 0.0, order = 2)
     var increment: Double = 1.0
 
     /**

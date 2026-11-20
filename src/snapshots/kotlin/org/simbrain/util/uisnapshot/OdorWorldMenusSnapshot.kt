@@ -3,23 +3,12 @@ package org.simbrain.util.uisnapshot
 import kotlinx.coroutines.runBlocking
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.workspace.Workspace
-import org.simbrain.world.odorworld.OdorWorldComponent
-import org.simbrain.world.odorworld.OdorWorldDesktopComponent
-import org.simbrain.world.odorworld.editMenu
-import org.simbrain.world.odorworld.insertMenu
-import org.simbrain.world.odorworld.viewMenu
+import org.simbrain.world.odorworld.*
 import java.awt.BorderLayout
 import java.awt.Component
 import java.awt.Dimension
 import java.awt.FlowLayout
-import javax.swing.BorderFactory
-import javax.swing.BoxLayout
-import javax.swing.JDesktopPane
-import javax.swing.JFrame
-import javax.swing.JLabel
-import javax.swing.JPanel
-import javax.swing.JPopupMenu
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 /**
  * An odor world frame showing its menu bar and toolbar, with the items of each menu and both context menus laid
@@ -30,7 +19,7 @@ class OdorWorldMenusSnapshot : UiSnapshotDef {
 
     override fun build(): Component {
         val workspace = Workspace()
-        workspace.componentFactory.createWorkspaceComponent("Odor world")
+        workspace.componentFactory.createWorkspaceComponent("Odor World")
         val component = workspace.componentList.filterIsInstance<OdorWorldComponent>().last()
         lateinit var host: JFrame
 
@@ -44,7 +33,7 @@ class OdorWorldMenusSnapshot : UiSnapshotDef {
         lateinit var gui: OdorWorldDesktopComponent
         lateinit var desktop: JDesktopPane
         SwingUtilities.invokeAndWait {
-            val frame = GenericJInternalFrame("Odor world", true, true, true, true)
+            val frame = GenericJInternalFrame("Odor World", true, true, true, true)
             gui = workspace.componentFactory.createGuiComponent(frame, component) as OdorWorldDesktopComponent
             frame.contentPane = gui
             frame.setBounds(16, 16, 420, 320)

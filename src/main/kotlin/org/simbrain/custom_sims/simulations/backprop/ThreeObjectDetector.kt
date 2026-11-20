@@ -26,7 +26,7 @@ import org.simbrain.world.odorworld.sensors.SmellSensor
 val threeObjectDetector = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Object Detector")
+    val networkComponent = addNetworkComponent("Object detector")
     val net = networkComponent.network
 
     val inputLayer = net.addNeuronCollection(3).apply {
@@ -162,7 +162,7 @@ val threeObjectDetector = newSim {
 
             1. Click `Run`, then manually move the mouse around the world. Watch the output neurons as the mouse approaches each object. At first the network should do poorly at classifying the smells.
 
-            2. Double-click on the `Backprop` model in the `Object Detector` network window to open the “Train Network” window.
+            2. Double-click on the `Backprop` model in the `Object detector` network window to open the “Train Network” window.
 
             3. In the top area of this window, select the `Iterate training until stop button is pressed` button to train the network.
                 - The “Sum Squared Error” should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.

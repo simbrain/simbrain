@@ -17,7 +17,7 @@ class IacSimulationsHeadlessTest {
             "Jets and Sharks" to iacJetsSharksFull,
             "Jets and Sharks (5 people)" to iacJetsSharks5People,
             "Games at Alivia's" to iacGames,
-            "Language Classifier" to iacLanguages,
+            "Language classifier" to iacLanguages,
             "Movies" to iacMovies,
             "Novels" to iacNovels,
             "SpongeBob" to iacSpongeBob
@@ -52,7 +52,7 @@ class IacSimulationsHeadlessTest {
     fun `directly named movie and language nodes retrieve their properties`() = runBlocking {
         for ((sim, componentName, retrieval) in listOf(
             Triple(iacMovies, "Movies", "Star Wars" to listOf("Sci-Fi", "Exciting")),
-            Triple(iacLanguages, "Language Classifier", "Arabic" to listOf("Semitic", "Arabic / Abjad", "Fusional", "2"))
+            Triple(iacLanguages, "Language classifier", "Arabic" to listOf("Semitic", "Arabic / Abjad", "Fusional", "2"))
         )) {
             val (cue, expected) = retrieval
             val scope = SimulationScope()

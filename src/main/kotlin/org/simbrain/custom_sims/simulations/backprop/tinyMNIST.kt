@@ -30,7 +30,7 @@ import javax.swing.SwingUtilities
 val tinyMNIST = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Tiny Mnist")
+    val networkComponent = addNetworkComponent("Tiny MNIST")
     val net = networkComponent.network
 
     val bp = BackpropNetwork(intArrayOf(400, 150, 100, 10))
@@ -93,11 +93,11 @@ val tinyMNIST = newSim {
 
         ## Activity 1: Train the network
 
-        1. Open the training dialog with `Train network...` in the control panel, or by right-clicking the `BackpropNetwork_1` network (under the `Tiny Mnist` window) and selecting `Train...`
+        1. Open the training dialog with `Train network...` in the control panel, or by right-clicking the `BackpropNetwork_1` network (under the `Tiny MNIST` window) and selecting `Train...`
 
         2. Train the simulation by clicking the `Iterate training until stop button is pressed` button
 
-        3. Train this simulation until the `Training Error` reaches below `0.2` or `0.1`. With the default settings it will hover around there. At that point it achieves decent results. The blue line on the graph shows how well the model is generalizing to test data
+        3. Train this simulation until the `Training error` reaches below `0.2` or `0.1`. With the default settings it will hover around there. At that point it achieves decent results. The blue line on the graph shows how well the model is generalizing to test data
 
         Notice that the training error (red line) appears jagged compared to the testing error (blue line). This is because training uses batches of 35 examples when updating, while testing (which happens every 10 iterations, and is thus not visible initially) evaluates the entire test set. See the [docs on supervised learning](https://docs.simbrain.net/docs/network/learning/supervisedLearning.html)
 
@@ -108,7 +108,7 @@ val tinyMNIST = newSim {
         - Manually try specific training or testing images. To do this, under the `Inputs` toolbar, go to the table of interest and click the button with this tooltip: `Apply current row as
         input to network` when hovered. Then observe how it classifies written digits. The values of the output layer correspond to the probability it assigns the input to a digit `0-9`.
 
-        - Draw your own image. Press `Draw your own digit` (or right click on the image layer and select `Add image world`), draw a digit, and see how the network does. It generally does poorly since it
+        - Draw your own image. Press `Draw your own digit` (or right click on the image layer and select `Add Image World`), draw a digit, and see how the network does. It generally does poorly since it
         was trained on anti-aliased images.
 
         - Press `Test generalization`. Accuracy on the original testing images is high, but it falls quickly when the same digits are shifted a pixel or two. The network has learned which pixels matter, not what shape a digit is, and has no notion that a shifted `7` is still a `7`. Set `Testing set` to a shifted set and press `Random test image` to see examples. Compare the `CNN MNIST` simulation, whose pooling layers tolerate small shifts better.

@@ -108,7 +108,7 @@ class ThreeValueRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>() {
         }
     }
 
-    override val name: String = "Three Value"
+    override val name: String = "Three value"
 
     override val graphicalLowerBound: Double
         get() = lowerValue - 1

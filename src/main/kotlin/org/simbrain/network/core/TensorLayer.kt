@@ -61,7 +61,7 @@ enum class TensorActivation {
 class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, AttributeContainer {
     override val attributeName get() = displayName
 
-    @UserParameter(label = "Activation Function", description = "Element-wise activation", order = 10)
+    @UserParameter(label = "Activation function", description = "Element-wise activation", order = 10)
     var activationFunction: TensorActivation = TensorActivation.LINEAR
 
     @UserParameter(label = "Clamped", description = "If clamped, inputs are ignored during update", order = 20)
@@ -74,7 +74,7 @@ class TensorLayer(val shape: TensorShape) : LocatableModel(), EditableObject, At
     @UserParameter(label = "Increment amount", description = "Amount to change activations by when using the up and down arrow keys.", increment = .1, order = 25)
     var increment = .1
 
-    @UserParameter(label = "Thumbnail Strip", description = "Show all channels as a thumbnail strip", tab = "GUI", order = 30)
+    @UserParameter(label = "Thumbnail strip", description = "Show all channels as a thumbnail strip", tab = "GUI", order = 30)
     var thumbnailStripMode = true
         set(value) {
             field = value

@@ -28,7 +28,7 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
      */
     @UserParameter(
         label = "m",
-        description = "Max Weight",
+        description = "Max weight",
         minimumValue = -10.0,
         maximumValue = 10.0,
         increment = .1,
@@ -41,7 +41,7 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
      */
     @UserParameter(
         label = "Theta",
-        description = "Weight Offset value",
+        description = "Weight offset value",
         minimumValue = -10.0,
         maximumValue = 10.0,
         increment = .1,
@@ -54,7 +54,7 @@ class HebbianCPCARule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>() {
      */
     @UserParameter(
         label = "Lambda",
-        description = "Sigmomid Function",
+        description = "Sigmomid function",
         minimumValue = -1.0,
         maximumValue = 10.0,
         increment = .1,

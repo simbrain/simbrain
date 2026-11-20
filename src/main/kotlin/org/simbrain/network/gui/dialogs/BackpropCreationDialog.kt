@@ -10,7 +10,7 @@ import org.simbrain.util.showMessage
 class BackpropCreationDialog(networkPanel: NetworkPanel) : FeedForwardCreationDialog(networkPanel) {
 
     init {
-        title = "New Backprop Network"
+        title = "New backprop network"
     }
 
     override fun closeDialogOk() {
@@ -18,7 +18,7 @@ class BackpropCreationDialog(networkPanel: NetworkPanel) : FeedForwardCreationDi
             networkCreationPanel.commit(networkPanel, "Backprop")
             dispose()
         } catch (nfe: NumberFormatException) {
-            showMessage("Inappropriate Field Values (Numbers only in all fields)", MessageKind.ERROR)
+            showMessage("Inappropriate field values (numbers only in all fields)", MessageKind.ERROR)
             nfe.printStackTrace()
         }
     }

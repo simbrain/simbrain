@@ -23,7 +23,7 @@ class GridDrivingTest {
     private class Fixture(val world: OdorWorld, val panel: OdorWorldPanel, val mouse: OdorWorldEntity)
 
     private fun drivingFixture(): Fixture {
-        val component = OdorWorldComponent("Odor world")
+        val component = OdorWorldComponent("Odor World")
         val world = component.world.apply {
             tileMap = TileMap(12, 12)
             gridCellSizeInTiles = 2

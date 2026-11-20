@@ -11,7 +11,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * A sensor which is updated based on the presence of [SmellSource]s near it.
  */
 class SmellSensor @JvmOverloads constructor(
-    override val name: String = "Smell Sensor",
+    override val name: String = "Smell sensor",
     theta: Double = 0.0,
     radius: Double = 0.0,
 ) : SensorWithRelativeLocation(theta, radius), VisualizableEntityAttribute {

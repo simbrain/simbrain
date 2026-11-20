@@ -35,7 +35,7 @@ val serialOrderContextMemory = newSim {
     var targetList = emptyList<Int>()
     val recalledList = mutableListOf<Int>()
 
-    val networkComponent = addNetworkComponent("Burgess-Hitch Positional Context Network")
+    val networkComponent = addNetworkComponent("Burgess-Hitch positional context network")
     val network = networkComponent.network
 
     fun clampedNeuron(label: String) = Neuron().apply {
@@ -234,7 +234,7 @@ val serialOrderContextMemory = newSim {
             resetTrial()
         }
         val columns = listOf("Accuracy", "Mean transposition distance", "Intrusions")
-        showResults("Positional Context Benchmark") {
+        showResults("Positional context benchmark") {
             note("Burgess-Hitch positional-context core, $trials trials per condition, list length $benchmarkListLength")
             section("Letter-selection noise sweep", columns) {
                 note("Retention per step held at ${savedDecayMultiplier.format(2)}")
@@ -248,7 +248,7 @@ val serialOrderContextMemory = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Positional Context Recall", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Positional context recall", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val targetText = addLabelledText("Target", sequenceText(targetList))
             val recalledText = addLabelledText("Recalled", sequenceText(recalledList))
             val phaseText = addLabelledText("Phase", phase.displayName)
@@ -294,10 +294,10 @@ val serialOrderContextMemory = newSim {
                 toolTipText = "Advance one encoding or recall position."
             }
             addSeparator()
-            addButton("Run Trial") { runTrial(); refreshLabels() }.apply {
+            addButton("Run trial") { runTrial(); refreshLabels() }.apply {
                 toolTipText = "Start a new list and run encoding and recall to completion."
             }
-            addButton("Run Benchmark") {
+            addButton("Run benchmark") {
                 runBenchmark()
                 refreshLabels()
             }.apply {
@@ -336,14 +336,14 @@ val serialOrderContextMemory = newSim {
 
         ## Activity 2: Vary one parameter at a time
 
-        Start with the default settings and press `Run Trial`: recall should be nearly perfect. Then experiment with one parameter at a time:
+        Start with the default settings and press `Run trial`: recall should be nearly perfect. Then experiment with one parameter at a time:
 
         - Lower `Retention per step`. Each step then preserves less of the temporary context-to-letter weights, especially weakening early letters before recall, so accuracy falls. A value of 1.00 retains 100%; lower values mean more decay.
         - Raise `Letter-selection noise`. The context sequence remains unchanged, but the hidden noise added to letter competition can make a competing letter win. Because neighboring contexts overlap most, errors are usually nearby transpositions.
 
         ## Activity 3: Run the benchmark
 
-        `Run Benchmark` runs two four-condition sweeps, with 200 trials per condition, at the current list length. The noise sweep holds the selected retention-per-step value fixed; the retention-per-step sweep holds the selected letter-selection noise fixed. It reports accuracy, transposition distance, and intrusions, then restores both controls.
+        `Run benchmark` runs two four-condition sweeps, with 200 trials per condition, at the current list length. The noise sweep holds the selected retention-per-step value fixed; the retention-per-step sweep holds the selected letter-selection noise fixed. It reports accuracy, transposition distance, and intrusions, then restores both controls.
 
         Transposition distance is the number of positions between a wrongly recalled letter's original and recalled locations. For example, if `A B C D` is recalled as `A C B D`, both `B` and `C` have distance 1. The benchmark reports the mean distance for in-list transpositions; intrusions are recalled letters not present in the target list.
 

@@ -24,22 +24,22 @@ val iacGames = newSim {
             at = point(-430, -400), columns = 3
         )
         val type = pool(
-            "Type of Game",
-            "Cooperative Deck Builder", "Cooperative Strategy", "Deck Builder", "Living Card Game", "Party", "Strategy",
+            "Type of game",
+            "Cooperative deck builder", "Cooperative strategy", "Deck builder", "Living card game", "Party", "Strategy",
             at = point(350, -400), columns = 3, hSpacing = 260.0
         )
         val players = pool(
-            "Number of Players",
+            "Number of players",
             "1-4", "1-5", "2-4", "2-5", "2-6", "2-7", "2-8", "3-5", "3-6", "3-10", "4-8", "4-10", "4-30", "5-6", "2+",
             at = point(930, 150), columns = 3, hSpacing = 70.0
         )
         val time = pool(
-            "Time to Play in Minutes",
+            "Time to play in minutes",
             ">5", ">15", ">30", "15+", "30+", "45+", "60+", "90+", "120+",
             at = point(-930, 150), columns = 3, hSpacing = 70.0
         )
         instances("Games", at = point(0, 180), columns = 5, hSpacing = 290.0, vSpacing = 85.0) {
-            instance("Ascension", owner["Alivia"], type["Deck Builder"], players["1-4"], time["30+"])
+            instance("Ascension", owner["Alivia"], type["Deck builder"], players["1-4"], time["30+"])
             instance("Exploding Kittens: NSFW", owner["Alivia"], type["Party"], players["2-5"], time[">15"])
             instance("Game of Thrones The Board Game", owner["Alivia"], type["Strategy"], players["3-6"], time["120+"])
             instance("Palabra", owner["Alivia"], type["Party"], players["2-6"], time[">30"])
@@ -57,38 +57,38 @@ val iacGames = newSim {
             instance("Globalization", owner["Blake"], type["Strategy"], players["2-6"], time["120+"])
             instance("Illuminati", owner["Blake"], type["Party"], players["2-6"], time["60+"])
             instance("Medieval Mastery", owner["Blake"], type["Strategy"], players["2-6"], time["30+"])
-            instance("Pandemic", owner["Blake"], type["Cooperative Strategy"], players["2-4"], time["45+"])
-            instance("Pandemic: Reign of Cthulu", owner["Blake"], type["Cooperative Strategy"], players["2-4"], time["45+"])
+            instance("Pandemic", owner["Blake"], type["Cooperative strategy"], players["2-4"], time["45+"])
+            instance("Pandemic: Reign of Cthulu", owner["Blake"], type["Cooperative strategy"], players["2-4"], time["45+"])
             instance("Risk: GodStorm", owner["Blake"], type["Strategy"], players["2-5"], time["90+"])
             instance("Settlers of Catan", owner["Blake"], type["Strategy"], players["5-6"], time["90+"])
             instance("Sheriff of Nottingham", owner["Blake"], type["Party"], players["3-5"], time["30+"])
             instance("Superfight", owner["Blake"], type["Party"], players["3-10"], time["30+"])
             instance("Twilight Imperium 3rd Edition", owner["Blake"], type["Strategy"], players["3-6"], time["120+"])
-            instance("XCOM", owner["Blake"], type["Cooperative Strategy"], players["1-4"], time["60+"])
+            instance("XCOM", owner["Blake"], type["Cooperative strategy"], players["1-4"], time["60+"])
             instance("Alicematic Heroes", owner["Keddoe"], type["Strategy"], players["3-5"], time["60+"])
             instance("Anima: The Twilight of the Gods", owner["Keddoe"], type["Strategy"], players["2-5"], time["60+"])
             instance("Ascendants of Aetheros", owner["Keddoe"], type["Strategy"], players["2-4"], time["30+"])
-            instance("Ashes Rise of the Phoenixborn", owner["Keddoe"], type["Living Card Game"], players["2-4"], time["15+"])
+            instance("Ashes Rise of the Phoenixborn", owner["Keddoe"], type["Living card game"], players["2-4"], time["15+"])
             instance("Bears VS Babies", owner["Keddoe"], type["Party"], players["2-5"], time[">30"])
             instance("Chocobo's Crystal Hunt", owner["Keddoe"], type["Party"], players["3-5"], time[">30"])
             instance("Don't Turn Your Back", owner["Keddoe"], type["Strategy"], players["2-4"], time["45+"])
-            instance("Dynamite Nurse", owner["Keddoe"], type["Deck Builder"], players["3-5"], time["45+"])
-            instance("Harry Potter Hogwarts Battle", owner["Keddoe"], type["Cooperative Deck Builder"], players["2-4"], time["60+"])
+            instance("Dynamite Nurse", owner["Keddoe"], type["Deck builder"], players["3-5"], time["45+"])
+            instance("Harry Potter Hogwarts Battle", owner["Keddoe"], type["Cooperative deck builder"], players["2-4"], time["60+"])
             instance("Karate Fight", owner["Keddoe"], type["Party"], players["2-4"], time[">15"])
             instance("Munchkin Bites!", owner["Keddoe"], type["Party"], players["3-6"], time["90+"])
             instance("Munchkin Zombies", owner["Keddoe"], type["Party"], players["3-6"], time["90+"])
-            instance("Nightfall", owner["Keddoe"], type["Deck Builder"], players["2-5"], time["45+"])
+            instance("Nightfall", owner["Keddoe"], type["Deck builder"], players["2-5"], time["45+"])
             instance("Ninja All-Stars", owner["Keddoe"], type["Strategy"], players["2-4"], time["90+"])
             instance("One Night Ultimate Werewolf", owner["Keddoe"], type["Party"], players["3-10"], time["15+"])
-            instance("Scott Pilgram's Precious Little Card Game", owner["Keddoe"], type["Deck Builder"], players["1-4"], time["30+"])
+            instance("Scott Pilgram's Precious Little Card Game", owner["Keddoe"], type["Deck builder"], players["1-4"], time["30+"])
             instance("Super Dungeon Explore", owner["Keddoe"], type["Strategy"], players["2-6"], time["120+"])
-            instance("Tanto Cuore", owner["Keddoe"], type["Deck Builder"], players["2-4"], time["45+"])
+            instance("Tanto Cuore", owner["Keddoe"], type["Deck builder"], players["2-4"], time["45+"])
             instance("Tentacle Bento", owner["Keddoe"], type["Party"], players["2-6"], time["30+"])
-            instance("The Dresden Files Cooperative Card Game", owner["Keddoe"], type["Cooperative Strategy"], players["1-5"], time["30+"])
+            instance("The Dresden Files Cooperative Card Game", owner["Keddoe"], type["Cooperative strategy"], players["1-5"], time["30+"])
             instance("The Great Dalmuti", owner["Keddoe"], type["Party"], players["4-8"], time["15+"])
             instance("Three Dragon Ante: Emperor's Gambit", owner["Keddoe"], type["Party"], players["2-6"], time["30+"])
-            instance("Wrath of Ashardalon", owner["Keddoe"], type["Cooperative Strategy"], players["1-5"], time["60+"])
-            instance("XenoShyft Onslaught", owner["Keddoe"], type["Cooperative Deck Builder"], players["1-4"], time["30+"])
+            instance("Wrath of Ashardalon", owner["Keddoe"], type["Cooperative strategy"], players["1-5"], time["60+"])
+            instance("XenoShyft Onslaught", owner["Keddoe"], type["Cooperative deck builder"], players["1-4"], time["30+"])
         }
 
         owner["Alivia"].location = point(-510, -420)

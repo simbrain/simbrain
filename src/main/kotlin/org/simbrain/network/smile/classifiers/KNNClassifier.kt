@@ -24,7 +24,7 @@ class KNNClassifier(
 
     override var model: Classifier<DoubleArray>? = null
 
-    override val name: String = "K Nearest Neighbors"
+    override val name: String = "K nearest neighbors"
 
     override fun fit(inputs: Array<DoubleArray>, targets: IntArray) {
         if (k > trainingData.inputs.size) {

@@ -12,7 +12,10 @@ import java.awt.Color
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import java.util.concurrent.CopyOnWriteArraySet
-import javax.swing.*
+import javax.swing.AbstractAction
+import javax.swing.JMenuItem
+import javax.swing.JPopupMenu
+import javax.swing.KeyStroke
 
 /**
  * PNode representation of a [NeuronCollection]. Contains an interaction box and
@@ -187,13 +190,13 @@ class NeuronCollectionNode(
                 override fun actionPerformed(e: ActionEvent?) = editNeurons()
             })
             addSeparator()
-            add(object : AbstractAction("Select Incoming Synapses") {
+            add(object : AbstractAction("Select incoming synapses") {
                 override fun actionPerformed(e: ActionEvent?) {
                     networkPanel.selectionManager.clear()
                     model.incomingWeights.forEach { it.select() }
                 }
             })
-            add(object : AbstractAction("Select Outgoing Synapses") {
+            add(object : AbstractAction("Select outgoing synapses") {
                 override fun actionPerformed(e: ActionEvent?) {
                     networkPanel.selectionManager.clear()
                     model.outgoingWeights.forEach { it.select() }
@@ -214,14 +217,14 @@ class NeuronCollectionNode(
 
             // Set as source
             addSeparator()
-            add(object : AbstractAction("Set as Source") {
+            add(object : AbstractAction("Set as source") {
                 override fun actionPerformed(e: ActionEvent?) {
                     networkPanel.selectionManager.clear()
                     networkPanel.selectionManager.set(interactionBox)
                     networkPanel.selectionManager.convertSelectedNodesToSourceNodes()
                 }
             })
-            add(object : AbstractAction("Clear Source") {
+            add(object : AbstractAction("Clear source") {
                 override fun actionPerformed(e: ActionEvent?) {
                     networkPanel.selectionManager.clearAllSource()
                 }
@@ -244,7 +247,7 @@ class NeuronCollectionNode(
             with(org.simbrain.workspace.gui.SimbrainDesktop.workspace.couplingManager) {
                 val plotAction = actionManager.createCoupledPlotMenu(
                     model.getProducer("getActivationArray"),
-                    "${model.displayName} Activations",
+                    "${model.displayName} activations",
                     "Plot"
                 )
                 add(plotAction)
@@ -253,7 +256,7 @@ class NeuronCollectionNode(
                     plotAction.add(
                         actionManager.createCoupledRasterPlotAction(
                             model.getProducer("getSpikes"),
-                            "${model.displayName} Spikes"
+                            "${model.displayName} spikes"
                         )
                     )
                 }
@@ -282,7 +285,7 @@ class NeuronCollectionNode(
 
     // Actions
 
-    private val renameAction = object : AbstractAction("Rename Neuron Collection...") {
+    private val renameAction = object : AbstractAction("Rename neuron collection...") {
         override fun actionPerformed(e: ActionEvent?) {
             showInputDialog("Name:", model.label)?.let { model.label = it }
         }
@@ -291,7 +294,7 @@ class NeuronCollectionNode(
     private val removeAction = object : AbstractAction() {
         init {
             putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/minus.png"))
-            putValue(NAME, "Remove Neuron Collection")
+            putValue(NAME, "Remove neuron collection")
             putValue(SHORT_DESCRIPTION, "Remove neuron collection")
         }
         override fun actionPerformed(e: ActionEvent?) = model.deleteBlocking()
@@ -300,7 +303,7 @@ class NeuronCollectionNode(
     private val clampNeuronsAction = object : AbstractAction() {
         init {
             putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"))
-            putValue(NAME, "Clamp Neurons")
+            putValue(NAME, "Clamp neurons")
             putValue(SHORT_DESCRIPTION, "Clamp all neurons in this collection.")
         }
         override fun actionPerformed(e: ActionEvent?) { model.isClamped = true }
@@ -309,7 +312,7 @@ class NeuronCollectionNode(
     private val unclampNeuronsAction = object : AbstractAction() {
         init {
             putValue(SMALL_ICON, ResourceManager.getSmallIcon("menu_icons/Clamp.png"))
-            putValue(NAME, "Unclamp Neurons")
+            putValue(NAME, "Unclamp neurons")
             putValue(SHORT_DESCRIPTION, "Unclamp all neurons in this collection.")
         }
         override fun actionPerformed(e: ActionEvent?) { model.isClamped = false }

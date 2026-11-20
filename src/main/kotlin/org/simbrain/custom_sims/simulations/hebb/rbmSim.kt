@@ -17,7 +17,7 @@ val rbmSim = newSim {
     val rbmCreator = RestrictedBoltzmannMachine.RBMCreator().apply {
         numVisible = 100
         numHidden = 150
-    }.showAPEOptionDialog ("Create RBM Sim")
+    }.showAPEOptionDialog ("Create RBM sim")
     val rbm = rbmCreator?.create()?:return@newSim
 
     workspace.clearWorkspace()
@@ -44,11 +44,11 @@ val rbmSim = newSim {
             - `Clear pattern`: Sets every visible neuron to `0`, giving a blank canvas to draw on with the wand tool.
             - `Random pattern`: Sets each visible neuron randomly to `0` or `1`. Useful as a starting point for testing reconstruction.
             - `Randomize weights`: Replaces the weights with random values, erasing anything the network has learned.
-            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the visible layer.
+            - `Circle`, `Square`, `Diagonal line`, `Cross`: Each loads one of the four built-in patterns into the visible layer.
             - `Show correlations`: Opens a corr plot comparing the four built-in patterns. Patterns with high correlations overlap more and are harder to store together without interference.
             - `Show trained correlations`: Opens a corr plot of the patterns trained with this panel's train buttons, each shown as a small picture. A pattern a few units away from a built-in one is labelled like `Circle ~3`, otherwise it is numbered, and `×2` means it was trained twice. `Randomize weights` clears the list.
-            - `Training iterations`: How many training passes each press of `Train On All Patterns` or `Train on current pattern` applies.
-            - `Train On All Patterns`: Trains on all four built-in patterns in turn, repeated once per training iteration.
+            - `Training iterations`: How many training passes each press of `Train on all patterns` or `Train on current pattern` applies.
+            - `Train on all patterns`: Trains on all four built-in patterns in turn, repeated once per training iteration.
             - `Train on current pattern`: Trains on whatever pattern is currently on the visible layer, once per training iteration.
             - `Add noise`: Adds Gaussian noise to the visible layer so you can watch the network clean it up.
 
@@ -56,7 +56,7 @@ val rbmSim = newSim {
 
             ## Activity 1: Train and test the network
 
-            Click `Train On All Patterns` to train the RBM on all four built-in patterns. The network will iterate through each pattern multiple times based on the `Training 
+            Click `Train on all patterns` to train the RBM on all four built-in patterns. The network will iterate through each pattern multiple times based on the `Training 
             iterations` parameter.
 
             To test the trained network:
@@ -67,12 +67,12 @@ val rbmSim = newSim {
             ## Activity 2: Create custom patterns
 
             To create your own patterns for training:
-            1. Right-click on the visible layer and select `Add image world`.
+            1. Right-click on the visible layer and select `Add Image World`.
             2. In the Image World, load images or draw custom patterns.
             3. The pattern will automatically appear in the visible layer.
-            4. Right-click on the RBM network and select `Add Current Pattern to Training Data`.
+            4. Right-click on the RBM network and select `Add current pattern to training data`.
             5. Repeat for each custom pattern you want to train on.
-            6. Use `Train On All Patterns` or `Train on current pattern` as before.
+            6. Use `Train on all patterns` or `Train on current pattern` as before.
 
             ## Explore further
 
@@ -107,7 +107,7 @@ val rbmSim = newSim {
                     numTrainIterations = num
                 }
             }
-            addButton("Train On All Patterns") {
+            addButton("Train on all patterns") {
                 builtInPatterns(rbm.visibleLayer.size).values.forEach { trainedPatterns.record(it) }
                 with(network) {
                     repeat(numTrainIterations) {

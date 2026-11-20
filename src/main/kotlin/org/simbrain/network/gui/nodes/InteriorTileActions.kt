@@ -82,7 +82,7 @@ fun NetworkPanel.dropInteriorSelectionIfDeselected(host: InteriorTileHost, selec
 /** An LFM's first edit since its weights loaded is confirmed; edits afterwards go straight through. */
 private fun confirmWeightEdit(model: GenerativeModel): Boolean =
     model !is LanguageModel || model.hasEditedWeights ||
-        showConfirm(LFM_EDIT_WARNING, okLabel = "Edit Weights", kind = MessageKind.WARNING)
+        showConfirm(LFM_EDIT_WARNING, okLabel = "Edit weights", kind = MessageKind.WARNING)
 
 fun NetworkPanel.editTileWeights(model: GenerativeModel, tiles: List<TensorTile>, edit: WeightEdit) {
     if (!confirmWeightEdit(model)) return

@@ -19,7 +19,7 @@ class NormalDistribution(mean: Double = 0.0, standardDeviation: Double = 1.0): P
         }
 
     @UserParameter(
-        label = "Std. Dev. (\u03C3)",
+        label = "Std. dev. (\u03C3)",
         description = "The average squared distance from the mean.",
         increment = .1, order = 2)
     var standardDeviation: Double = standardDeviation

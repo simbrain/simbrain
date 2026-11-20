@@ -28,7 +28,7 @@ public class ColorSelector extends JPanel {
     /**
      * The button to open JColorChooser
      */
-    private final JButton colorButton = new JButton("Set Color");
+    private final JButton colorButton = new JButton("Set color");
 
     /**
      * An indicator showing the current color
@@ -55,7 +55,7 @@ public class ColorSelector extends JPanel {
         nullLabel.setVisible(false);
         add(nullLabel);
         colorButton.addActionListener(arg0 -> {
-            var selectedColor = JColorChooser.showDialog(this, "Choose Color", color);
+            var selectedColor = JColorChooser.showDialog(this, "Choose color", color);
             if (selectedColor != null) {
                 setValue(selectedColor);
             }

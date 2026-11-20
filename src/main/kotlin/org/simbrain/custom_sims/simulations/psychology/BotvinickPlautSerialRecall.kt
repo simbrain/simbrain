@@ -31,7 +31,7 @@ val botvinickPlautSerialRecall = newSim {
     workspace.clearWorkspace()
 
     val model = BotvinickPlautModel(random = Random(12))
-    val networkComponent = addNetworkComponent("Botvinick-Plaut Serial Recall")
+    val networkComponent = addNetworkComponent("Botvinick-Plaut serial recall")
     val network = networkComponent.network
 
     val input = NeuronArray(model.inputSize).apply {
@@ -141,7 +141,7 @@ val botvinickPlautSerialRecall = newSim {
                 add(trainButton)
                 add(resetButton)
             }
-            val frame = JFrame("Serial Recall Training").apply {
+            val frame = JFrame("Serial recall training").apply {
                 defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
                 layout = BorderLayout()
                 add(controls, BorderLayout.NORTH)
@@ -192,7 +192,7 @@ val botvinickPlautSerialRecall = newSim {
             frame.isVisible = true
         }
 
-        val controlPanel = createControlPanel("Botvinick-Plaut Serial Recall", 10, 10) {
+        val controlPanel = createControlPanel("Botvinick-Plaut serial recall", 10, 10) {
             val targetText = addLabelledText("Target", sequenceText(trial.items))
             val recalledText = addLabelledText("Recalled", sequenceText(recalled))
             val phaseText = addLabelledText("Phase", "Encoding")
@@ -221,7 +221,7 @@ val botvinickPlautSerialRecall = newSim {
                 refresh()
             }
             addSeparator()
-            addButton("New Trial") {
+            addButton("New trial") {
                 resetTrial()
                 refresh()
             }.apply { toolTipText = "Draw a fresh list and reset the recurrent activation state." }
@@ -229,7 +229,7 @@ val botvinickPlautSerialRecall = newSim {
                 advanceTrial()
                 refresh()
             }.apply { toolTipText = "Advance one encoding or recall timestep using frozen weights." }
-            addButton("Run Trial") {
+            addButton("Run trial") {
                 runTrial()
                 refresh()
             }.apply { toolTipText = "Run a complete frozen-weight serial-recall trial." }
@@ -261,11 +261,11 @@ val botvinickPlautSerialRecall = newSim {
 
         `List length` chooses how many items appear in the displayed trial. It resets the trial but does not alter the model's training curriculum, which includes every length from one through six.
 
-        `New Trial` draws a fresh list at the selected length, clears the recurrent activation state, and prepares the first encoding step. It does not change learned weights.
+        `New trial` draws a fresh list at the selected length, clears the recurrent activation state, and prepares the first encoding step. It does not change learned weights.
 
         `Step` advances one timestep. During encoding, it presents one item and the output echoes it; after the final item, it switches to recall-cue-only input and returns one remembered item per step, followed by `End`.
 
-        `Run Trial` resets to a fresh target list and completes all encoding and recall steps at once, using frozen weights.
+        `Run trial` resets to a fresh target list and completes all encoding and recall steps at once, using frozen weights.
 
         `Training...` opens a separate training window. Set `Training cycles` to control how much experience the model receives; `Train` shows live cross-entropy, and `Reset weights` discards all learned structure so you can compare an untrained or briefly trained model with a well-trained one.
 
@@ -283,9 +283,9 @@ val botvinickPlautSerialRecall = newSim {
 
         ## Activity 1: Test recall before and after training
 
-        1. Choose a list length, click `New Trial`, and use `Step` to walk through the trial. Before training, the network recalls poorly: its hidden activity has no learned structure for maintaining and reading out the list.
+        1. Choose a list length, click `New trial`, and use `Step` to walk through the trial. Before training, the network recalls poorly: its hidden activity has no learned structure for maintaining and reading out the list.
         2. Click `Training...`, leave `Training cycles` at the default 12,000, and click `Train`. Watch cross-entropy fall in the training window.
-        3. Click `New Trial` and use `Step` again. The output still echoes items during encoding, but after the recall cue it should now reproduce the remembered list and then `End` much more accurately.
+        3. Click `New trial` and use `Step` again. The output still echoes items during encoding, but after the recall cue it should now reproduce the remembered list and then `End` much more accurately.
         4. Try shorter training runs after `Reset weights` to see how incomplete learning produces worse recall, especially later in a list.
 
         ## Activity 2: Evaluate aggregate recall
@@ -507,7 +507,7 @@ private fun showEvaluationWindow(evaluation: RecallEvaluation, maxListLength: In
         "Transposition proportion", "Source position − recalled position", "Proportion of errors",
         evaluation.transpositionDistance.mapIndexed { index, value -> index - maxListLength to value }
     )
-    JFrame("Botvinick-Plaut Serial Recall Evaluation").apply {
+    JFrame("Botvinick-Plaut serial recall evaluation").apply {
         defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
         layout = BorderLayout(12, 12)
         add(JPanel(GridLayout(1, 3, 12, 0)).apply {

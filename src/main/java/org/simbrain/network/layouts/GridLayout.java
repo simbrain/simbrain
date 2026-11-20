@@ -49,19 +49,19 @@ public class GridLayout extends Layout {
     /**
      * Horizontal spacing between neurons.
      */
-    @UserParameter(label = "Horizontal Spacing", description = "Horizontal spacing between neurons")
+    @UserParameter(label = "Horizontal spacing", description = "Horizontal spacing between neurons")
     private double hSpacing = DEFAULT_H_SPACING;
 
     /**
      * Vertical spacing between neurons.
      */
-    @UserParameter(label = "Vertical Spacing", description = "Vertical spacing between neurons")
+    @UserParameter(label = "Vertical spacing", description = "Vertical spacing between neurons")
     private double vSpacing = DEFAULT_V_SPACING;
 
     /**
      * Manually set number of columns in grid.
      */
-    @UserParameter(label = "Auto Columns",
+    @UserParameter(label = "Auto columns",
         description = "If true, set the number of columns automatically to get a square or nearly-square grid",
         order = 10)
     private boolean autoColumns = DEFAULT_AUTO_COLS;
@@ -69,7 +69,7 @@ public class GridLayout extends Layout {
     /**
      * Number of columns in the layout, when auto columns is false.
      */
-    @UserParameter(label = "Number of Columns",
+    @UserParameter(label = "Number of columns",
         description = "Number of columns in the grid",
         order = 20)
     private int numColumns = DEFAULT_NUM_COLUMNS;
@@ -216,7 +216,7 @@ public class GridLayout extends Layout {
 
     @Override
     public String toString() {
-        return "Grid Layout";
+        return "Grid layout";
     }
 
     @Override

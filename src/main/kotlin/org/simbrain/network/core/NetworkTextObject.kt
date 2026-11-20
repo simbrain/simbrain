@@ -80,5 +80,5 @@ open class NetworkTextObject : EditableObject, LocatableModel {
         }
 
     override val name: String
-        get() = "Text Object"
+        get() = "Text object"
 }

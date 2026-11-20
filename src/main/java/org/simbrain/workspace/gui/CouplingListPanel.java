@@ -77,7 +77,7 @@ public class CouplingListPanel extends JPanel {
         public void actionPerformed(ActionEvent arg0) {
             java.util.List<Coupling> selected = getSelectedCouplings();
             if (selected.size() != 1) {
-                SwingUtilsKt.showMessage("Select a single coupling to edit its transforms.", MessageKind.WARNING, null, "Edit Transforms");
+                SwingUtilsKt.showMessage("Select a single coupling to edit its transforms.", MessageKind.WARNING, null, "Edit transforms");
                 return;
             }
             showTransformEditor(CouplingListPanel.this, desktop.getWorkspace(), selected.get(0));

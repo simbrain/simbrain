@@ -9,7 +9,7 @@ import javax.swing.*
 import javax.swing.event.ChangeEvent
 
 fun main() {
-    val frame = JFrame("MIDI Sound Generator")
+    val frame = JFrame("MIDI sound generator")
     frame.defaultCloseOperation = JFrame.EXIT_ON_CLOSE
     frame.setSize(500, 200)
 
@@ -45,7 +45,7 @@ fun main() {
     panel.add(volumeSlider)
 
     // Play and Stop buttons
-    val playButton = JButton("Play Note")
+    val playButton = JButton("Play note")
     playButton.addActionListener {
         val selectedInstrument = instrumentDropdown.selectedIndex
         val selectedNote = noteDropdown.selectedIndex + 60 // 60 is middle C
@@ -55,7 +55,7 @@ fun main() {
     }
     panel.add(playButton)
 
-    val stopButton = JButton("Stop Note")
+    val stopButton = JButton("Stop note")
     stopButton.addActionListener {
         midiChannels[0].noteOff(noteDropdown.selectedIndex + 60) // 60 is middle C
     }

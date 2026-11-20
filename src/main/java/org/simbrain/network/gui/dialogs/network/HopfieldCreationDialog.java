@@ -62,7 +62,7 @@ public class HopfieldCreationDialog extends StandardDialog {
     public HopfieldCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
 
-        setTitle("New Hopfield Network");
+        setTitle("New Hopfield network");
 
         // Logic Panel
         hopPropertiesPanel = new AnnotatedPropertyEditor(hc);

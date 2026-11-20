@@ -7,11 +7,7 @@ import org.simbrain.world.odorworld.OdorWorldComponent
 import org.simbrain.world.odorworld.OdorWorldDesktopComponent
 import java.awt.Component
 import java.awt.Dimension
-import javax.swing.JDesktopPane
-import javax.swing.JFrame
-import javax.swing.JInternalFrame
-import javax.swing.SwingConstants
-import javax.swing.SwingUtilities
+import javax.swing.*
 
 /**
  * Two odor worlds with a 4:1 map, both dragged to the same mismatched frame size through the production
@@ -29,7 +25,7 @@ class OdorWorldAspectLockSnapshot : UiSnapshotDef {
         val frames = mutableListOf<Pair<JInternalFrame, OdorWorldDesktopComponent>>()
 
         fun createWorld(locked: Boolean): OdorWorldComponent {
-            workspace.componentFactory.createWorkspaceComponent("Odor world")
+            workspace.componentFactory.createWorkspaceComponent("Odor World")
             val component = workspace.componentList.filterIsInstance<OdorWorldComponent>().last()
             component.world.tileMap.updateMapSize(40, 10)
             component.world.lockAspectRatio = locked

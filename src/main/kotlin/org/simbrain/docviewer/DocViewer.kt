@@ -10,13 +10,13 @@ class DocViewer: EditableObject {
 
     // When calling this manually call render() after
     var text: String = """
-        # Doc Viewer
+        # Doc viewer
         Use markdown to create documentation and to explain simulations. Simple html is supported in markdown 
         so simple html is supported as well, but markdown is suggested. 
         
         A [markdown cheat sheet](https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet).
         
-        # Some Basic commands
+        # Some basic commands
         1. First item 
           - Unordered item with *italics* in one style
           - Unordered sub-item with _italics_ in another style

@@ -141,7 +141,7 @@ val evolveXor = newSim {
 
     withGui {
         workspace.clearWorkspace()
-        controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+        controlPanel.show(this, "Control panel", 5, 10, addParamsEditor = false)
 
         workspace.events.workspaceCleared.on(Dispatchers.Swing) {
             trainerDialog?.dispose()
@@ -200,7 +200,7 @@ val evolveXor = newSim {
         }
 
         controlPanel.addButton(
-            "Open Trainer",
+            "Open trainer",
             toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved networks."
         ) { openTrainer() }
 
@@ -236,7 +236,7 @@ val evolveXor = newSim {
 
         In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works. Below are the steps to evolving the simulation:
 
-        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
+        1. Click `Open trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
         2. After confirming the parameters are what you want, click `Run` in the trainer to start the simulation.
 

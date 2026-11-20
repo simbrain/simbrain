@@ -37,7 +37,7 @@ val braitenbergSim = newSim {
     var velocity = 1.0
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addFormattedNumericTextField(
                 "Left weight", initValue = leftWeight,
                 toolTip = "Weight from the left sensor to the left turn neuron. Press a pair button to apply it."

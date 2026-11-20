@@ -118,7 +118,7 @@ class ContinuousSigmoidalRule() : AbstractSigmoidalRule<ContinuousSigmoidalData,
     }
 
     override val name: String
-        get() = "Sigmoidal (Continuous)"
+        get() = "Sigmoidal (continuous)"
 
 }
 

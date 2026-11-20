@@ -273,19 +273,19 @@ class CnnTrainerControls(
         val stepValidationMessage = when {
             isValid -> "Iterate training once"
             !trainingValid && !testingValid ->
-                "Cannot train: Training (${trainingInputRows}/${trainingTargetRows}) and testing (${testingInputRows}/${testingTargetRows}) row counts do not match."
+                "Cannot train: training (${trainingInputRows}/${trainingTargetRows}) and testing (${testingInputRows}/${testingTargetRows}) row counts do not match."
             !trainingValid ->
-                "Cannot train: Training inputs (${trainingInputRows}) and targets (${trainingTargetRows}) row counts do not match."
+                "Cannot train: training inputs (${trainingInputRows}) and targets (${trainingTargetRows}) row counts do not match."
             else ->
-                "Cannot train: Testing inputs (${testingInputRows}) and targets (${testingTargetRows}) row counts do not match."
+                "Cannot train: testing inputs (${testingInputRows}) and targets (${testingTargetRows}) row counts do not match."
         }
         stepActionRef.putValue(Action.SHORT_DESCRIPTION, stepValidationMessage)
 
         val runValidationMessage = when {
             isValid -> "Iterate training until stop button is pressed"
-            !trainingValid && !testingValid -> "Cannot train: Both training and testing data have mismatched row counts."
-            !trainingValid -> "Cannot train: Training input and target row counts must match."
-            else -> "Cannot train: Testing input and target row counts must match."
+            !trainingValid && !testingValid -> "Cannot train: both training and testing data have mismatched row counts."
+            !trainingValid -> "Cannot train: training input and target row counts must match."
+            else -> "Cannot train: testing input and target row counts must match."
         }
         runActionRef.putValue(Action.SHORT_DESCRIPTION, runValidationMessage)
     }

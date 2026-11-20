@@ -88,5 +88,5 @@ class UnsupervisedTrainer: EditableObject {
     }
 
     override val name: String
-        get() = "Unsupervised Trainer"
+        get() = "Unsupervised trainer"
 }

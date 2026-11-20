@@ -331,7 +331,7 @@ class ClassifierExplorer(
         val mostCommon = trainingRows.targets.groupingBy { it }.eachCount().maxByOrNull { it.value }?.key
         fun ClassificationDataset.fractionMostCommon() =
             if (targets.isEmpty()) Double.NaN else targets.count { it == mostCommon }.toDouble() / targets.size
-        showResults("Model Comparison") {
+        showResults("Model comparison") {
             section(describeData(), listOf("Training", "Test")) {
                 classifiers.forEach { (choice, classifier) ->
                     row(choice.toString(), percent(classifier.trainingAccuracy), percent(classifier.testingAccuracy))

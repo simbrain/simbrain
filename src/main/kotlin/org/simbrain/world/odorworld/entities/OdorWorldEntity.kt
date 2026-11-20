@@ -278,21 +278,21 @@ class OdorWorldEntity @JvmOverloads constructor(
         if (!run.completion.isCompleted) run.completion.complete(false)
     }
 
-    @UserParameter(label = "Enable Sensors", order = 6)
+    @UserParameter(label = "Enable sensors", order = 6)
     var isSensorsEnabled: Boolean = true
 
-    @UserParameter(label = "Enable Effectors", order = 6)
+    @UserParameter(label = "Enable effectors", order = 6)
     var isEffectorsEnabled = true
 
     @UserParameter(
-        label = "Show Sensors / Effectors",
-        description = "Show Attributes (Sensors and Effectors)",
+        label = "Show sensors / effectors",
+        description = "Show attributes (sensors and effectors)",
         order = 30
     )
     var isShowSensorsAndEffectors = true
 
     @UserParameter(
-        label = "Show Trail",
+        label = "Show trail",
         description = "If true, a path is shown indicating where the entity travels",
         order = 40
     )
@@ -375,7 +375,7 @@ class OdorWorldEntity @JvmOverloads constructor(
 
     var showSteeringDebug by GuiEditable(
         initValue = false,
-        label = "Show Steering Debug",
+        label = "Show steering debug",
         description = "Draw the per-candidate scores and obstacle feeler hits used by the NPC behavior",
         tab = "Behavior",
         order = 20
@@ -865,7 +865,7 @@ class OdorWorldEntity @JvmOverloads constructor(
         return sensor
     }
 
-    @get:UserParameter(label = "Linear Speed", order = 9)
+    @get:UserParameter(label = "Linear speed", order = 9)
     override var speed: Double
         get() = if (manualMovement.speed != 0.0 || manualMovement.dtheta != 0.0) manualMovement.speed else movement.speed
         set(value) {

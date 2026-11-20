@@ -174,7 +174,7 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
             return ActivationSequence(sequenceSize, inputSize)
         }
 
-        override val name = "Activation Sequence"
+        override val name = "Activation sequence"
 
     }
 }

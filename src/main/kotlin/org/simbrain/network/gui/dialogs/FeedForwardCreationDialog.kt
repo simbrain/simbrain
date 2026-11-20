@@ -13,7 +13,7 @@ open class FeedForwardCreationDialog(protected val networkPanel: NetworkPanel) :
     protected val networkCreationPanel: LayeredNetworkCreationPanel
 
     init {
-        title = "New Feed-forward Network"
+        title = "New feed-forward network"
         networkCreationPanel = LayeredNetworkCreationPanel(3, this)
         contentPane = networkCreationPanel
     }
@@ -23,7 +23,7 @@ open class FeedForwardCreationDialog(protected val networkPanel: NetworkPanel) :
             networkCreationPanel.commit(networkPanel, "FeedForward")
             super.closeDialogOk()
         } catch (nfe: NumberFormatException) {
-            showMessage("Inappropriate Field Values (Numbers only in all fields)", MessageKind.ERROR)
+            showMessage("Inappropriate field values (numbers only in all fields)", MessageKind.ERROR)
             nfe.printStackTrace()
         }
     }

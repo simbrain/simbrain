@@ -21,7 +21,7 @@ class SpeechSynthesizerComponent @JvmOverloads constructor(
     companion object {
         fun open(input: InputStream?, name: String?, format: String?): SpeechSynthesizerComponent {
             val synthesizer = getSimbrainXStream().fromXML(input) as SpeechSynthesizer
-            return SpeechSynthesizerComponent(name ?: "Speech Synthesizer", synthesizer)
+            return SpeechSynthesizerComponent(name ?: "Speech synthesizer", synthesizer)
         }
     }
 }

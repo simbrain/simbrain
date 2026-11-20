@@ -13,13 +13,13 @@ class ConstantWeightInitializer : WeightInitializer() {
     /**
      * The constant strength for excitatory synapses.
      */
-    @UserParameter(label = "Excitatory Strength", description = "Strength for excitatory synapses", order = 1)
+    @UserParameter(label = "Excitatory strength", description = "Strength for excitatory synapses", order = 1)
     var excitatoryStrength: Double = DEFAULT_EXCITATORY_STRENGTH
 
     /**
      * The constant strength for inhibitory synapses.
      */
-    @UserParameter(label = "Inhibitory Strength", description = "Strength for inhibitory synapses", order = 2)
+    @UserParameter(label = "Inhibitory strength", description = "Strength for inhibitory synapses", order = 2)
     var inhibitoryStrength: Double = DEFAULT_INHIBITORY_STRENGTH
 
     override fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection) {

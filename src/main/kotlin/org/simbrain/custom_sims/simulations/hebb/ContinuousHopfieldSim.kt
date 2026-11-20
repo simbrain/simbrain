@@ -60,13 +60,13 @@ val hopfieldSimContinuous = newSim {
             - `Clear pattern`: Sets every neuron to `-1`, giving a blank canvas to draw on with the wand tool.
             - `Random pattern`: Sets each neuron randomly to `-1` or `1`. Useful as a starting point for testing recall.
             - `Randomize weights`: Replaces the weights with symmetric random values, erasing anything the network has learned.
-            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the network.
+            - `Circle`, `Square`, `Diagonal line`, `Cross`: Each loads one of the four built-in patterns into the network.
             - `Show correlations`: Opens a corr plot comparing the four built-in patterns. Patterns with high correlations overlap more and are harder to store together without interference.
             - `Show trained correlations`: Opens a corr plot of the patterns trained with this panel's train buttons, each shown as a small picture. A pattern a few units away from a built-in one is labelled like `Circle ~3`, otherwise it is numbered, and `×2` means it was trained twice. `Randomize weights` clears the list.
             - `Learning rate`: The Hebbian learning rate used when training. Larger values store a pattern in fewer presses.
             - `Train once on current pattern`: Applies one Hebbian learning step, storing whatever pattern is currently on the neurons in the weights. The anti-pattern is stored along with it. Press it repeatedly to strengthen the memory.
             - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
-            - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings, then runs the test and plots the results. The settings are described in the `Discrete Hopfield` simulation's documentation.
+            - `Capacity` tab, `Capacity test`: Opens a dialog of test settings, then runs the test and plots the results. The settings are described in the `Discrete Hopfield` simulation's documentation.
 
             # Activities
 
@@ -74,7 +74,7 @@ val hopfieldSimContinuous = newSim {
 
             1. Click the `Randomize weights` button to get a fresh random weight matrix.
 
-            2. Load a pattern (e.g., `Circle`, `Square`, `Diagonal Line`, `Cross`) and press `Train once on current pattern` several times.
+            2. Load a pattern (e.g., `Circle`, `Square`, `Diagonal line`, `Cross`) and press `Train once on current pattern` several times.
 
             3. Click `Random pattern` or the `Clear pattern` button and iterate the model repeatedly to see the change in real-time.
 

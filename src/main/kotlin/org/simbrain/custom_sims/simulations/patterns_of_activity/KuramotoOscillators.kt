@@ -54,7 +54,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     fish.smellSource.dispersion = dispersion
 
     // Set up network
-    val networkComponent = addNetworkComponent("Patterns of Activity")
+    val networkComponent = addNetworkComponent("Patterns of activity")
     val net = networkComponent.network
     net.timeStep = 0.5
 
@@ -92,7 +92,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     }.apply {
         setLowerBound(-100.0)
         setUpperBound(100.0)
-        label = "Sensory Neurons"
+        label = "Sensory neurons"
         layout = LineLayout()
         applyLayout()
         setLocation(130.0, 660.0)
@@ -115,7 +115,7 @@ val kuramotoOscillators = newSim("kuramotoOscillators") {
     couplingManager.createCoupling(smellSensor, inputNetwork)
 
     // Set up projection plot
-    val plot = addProjectionPlot("Cognitive Map")
+    val plot = addProjectionPlot("Cognitive map")
     plot.projector.tolerance = 20.0
     couplingManager.createCoupling(reservoirNet, plot)
 

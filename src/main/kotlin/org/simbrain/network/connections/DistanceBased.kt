@@ -50,7 +50,7 @@ class DistanceBased(
      */
     var usePolarityMode by GuiEditable(
         initValue = usePolarityMode,
-        label = "Use Polarity Mode",
+        label = "Use polarity mode",
         description = "Enable separate decay functions for each polarity combination (EE, EI, IE, II)",
         order = 1
     )
@@ -60,7 +60,7 @@ class DistanceBased(
      */
     var decayFunction by GuiEditable(
         initValue = decayFunction,
-        label = "Decay Function",
+        label = "Decay function",
         description = "Decay function for connection probability based on distance",
         conditionallyHiddenBy = DistanceBased::usePolarityMode,
         showDetails = false,
@@ -132,7 +132,7 @@ class DistanceBased(
      */
     var allowSelfConnections by GuiEditable(
         initValue = allowSelfConnections,
-        label = "Allow Self Connections",
+        label = "Allow self connections",
         description = "Allow synapses from neurons to themselves",
         order = 100
     )
@@ -161,9 +161,9 @@ class DistanceBased(
 
     override fun tooltipText(): String {
         return if (usePolarityMode) {
-            "Distance Based (Polarity Mode)"
+            "Distance based (polarity mode)"
         } else {
-            "Distance Based (${decayFunction.name})"
+            "Distance based (${decayFunction.name})"
         }
     }
 
@@ -182,7 +182,7 @@ class DistanceBased(
         }
     }
 
-    override val name = "Distance Based"
+    override val name = "Distance based"
 
 }
 

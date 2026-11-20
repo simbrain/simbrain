@@ -652,7 +652,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
             contextMenu.add(randomizeAction)
             val randomizeBiasesAction = networkPanel.createAction(
-                name = "Randomize Biases",
+                name = "Randomize biases",
                 description = "Randomize the biases of this neuron array",
                 iconPath = "menu_icons/Rand.png"
             ) {
@@ -686,15 +686,15 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(
                 actionManager.createCoupledPlotMenu(
                     neuronArray.getProducer(NeuronArray::activationArray),
-                    objectName = "${neuronArray.id ?: "Neuron Array"} Activations",
-                    menuTitle = "Plot Activations${if (neuronArray.updateRule.isSpikingRule) "/Spikes" else ""}"
+                    objectName = "${neuronArray.id ?: "Neuron array"} activations",
+                    menuTitle = "Plot activations${if (neuronArray.updateRule.isSpikingRule) "/spikes" else ""}"
                 ).also {
                     if (neuronArray.updateRule.isSpikingRule) {
                         it.addSeparator()
                         it.add(
                             actionManager.createCoupledRasterPlotAction(
                                 neuronArray.getProducer(NeuronArray::spikes),
-                                "${neuronArray.displayName} Spikes"
+                                "${neuronArray.displayName} spikes"
                             )
                         )
                     }
@@ -703,14 +703,14 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             contextMenu.add(
                 actionManager.createCoupledPlotMenu(
                     neuronArray.getProducer(NeuronArray::biasArray),
-                    objectName = "${neuronArray.id ?: "Neuron Array"} Biases",
-                    menuTitle = "Plot Biases"
+                    objectName = "${neuronArray.id ?: "Neuron array"} biases",
+                    menuTitle = "Plot biases"
                 )
             )
             contextMenu.add(actionManager.createImageInput(
                 neuronArray.getConsumer(NeuronArray::activationArray),
                 neuronArray.size,
-                menuTitle = "Add image world",
+                menuTitle = "Add Image World",
                 postActionBlock = { imageWorld ->
                     neuronArray.gridMode = true
                     neuronArray.isClamped = true
@@ -720,17 +720,17 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             ))
             contextMenu.add(
                 actionManager.createCoupledDataWorldAction(
-                    name = "Record Activations",
+                    name = "Record activations",
                     neuronArray.getProducer(NeuronArray::activationArray),
-                    sourceName = "${neuronArray.id ?: "Neuron Array"} Activations",
+                    sourceName = "${neuronArray.id ?: "Neuron array"} activations",
                     neuronArray.size
                 )
             )
             contextMenu.add(
                 actionManager.createCoupledDataWorldAction(
-                    name = "Record Biases",
+                    name = "Record biases",
                     neuronArray.getProducer(NeuronArray::biasArray),
-                    sourceName = "${neuronArray.id ?: "Neuron Array"} Biases",
+                    sourceName = "${neuronArray.id ?: "Neuron array"} biases",
                     neuronArray.size
                 )
             )
@@ -751,7 +751,7 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         if (nanList.isEmpty()) return null
 
         nanList.createEditorDialog(
-            titleName = if (nanList.size == 1) "Edit ${nanList.first().displayName}" else "Edit ${nanList.size} Neuron Arrays"
+            titleName = if (nanList.size == 1) "Edit ${nanList.first().displayName}" else "Edit ${nanList.size} neuron arrays"
         )
     }
 

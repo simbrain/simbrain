@@ -28,7 +28,7 @@ class BasicDataFrame(
      */
     fun insertColumn(
         colIndex: Int,
-        name: String = "New Column",
+        name: String = "New column",
         type: Column.DataType = Column.DataType.DoubleType
     ) {
         val newColIndex = if (colIndex == -1) columnCount else colIndex
@@ -41,7 +41,7 @@ class BasicDataFrame(
     }
 
     override fun insertColumn(selectedColumn: Int) {
-        insertColumn(selectedColumn, "New Column")
+        insertColumn(selectedColumn, "New column")
     }
 
     override fun deleteColumn(colIndex: Int, fireEvent: Boolean) {

@@ -18,14 +18,14 @@ class DistanceBasedWeightInitializer : WeightInitializer() {
      * The decay function that determines how weight scales with distance.
      * Returns a scaling factor between 0 and 1.
      */
-    @UserParameter(label = "Decay Function", description = "How weight strength decays with distance", order = 1)
+    @UserParameter(label = "Decay function", description = "How weight strength decays with distance", order = 1)
     var decayFunction: DecayFunction = GaussianDecayFunction()
 
     /**
      * The maximum weight strength (at distance = 0 or peak distance).
      * This is scaled by the decay function based on distance.
      */
-    @UserParameter(label = "Base Strength", description = "Maximum weight strength at peak distance", order = 2)
+    @UserParameter(label = "Base strength", description = "Maximum weight strength at peak distance", order = 2)
     var baseStrength: Double = 1.0
 
     override fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection) {

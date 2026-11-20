@@ -29,10 +29,10 @@ val braitenbergProgramLearning = newSim { optionString ->
     }
 
     val tasks = listOf(
-        Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
-        Task("Seek Both Objects", 1.0, 1.0),
-        Task("Avoid Both Objects", -1.0, -1.0),
-        Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
+        Task("Seek cheese, avoid poison", 1.0, -1.0),
+        Task("Seek both objects", 1.0, 1.0),
+        Task("Avoid both objects", -1.0, -1.0),
+        Task("Seek poison, avoid cheese", -1.0, 1.0)
     )
 
     var learningRate = 0.05
@@ -43,7 +43,7 @@ val braitenbergProgramLearning = newSim { optionString ->
     var poisonRewardMultiplier = -1.0
 
     workspace.clearWorkspace()
-    val oc = addOdorWorldComponent("Program Learning World")
+    val oc = addOdorWorldComponent("Program learning world")
     oc.world.tileMap.updateMapSize(20, 20)
     val world = oc.world
     world.isObjectsBlockMovement = true
@@ -145,10 +145,10 @@ val braitenbergProgramLearning = newSim { optionString ->
     val poisonRightToRightTurn = network.addSynapseAsync(poisonRightInput, rightTurn)
 
     val programNames = listOf(
-        "Seek Cheese, Avoid Poison",
-        "Seek Both Objects",
-        "Avoid Both Objects",
-        "Seek Poison, Avoid Cheese"
+        "Seek cheese, avoid poison",
+        "Seek both objects",
+        "Avoid both objects",
+        "Seek poison, avoid cheese"
     )
     
     val programNodes = listOf(
@@ -379,7 +379,7 @@ val braitenbergProgramLearning = newSim { optionString ->
         }
     }
 
-    workspace.addUpdateAction("Program Learning") {
+    workspace.addUpdateAction("Program learning") {
         currentIteration++
 
         parameterSchedule.filter { it.first == currentIteration }.forEach { (_, params) ->
@@ -439,7 +439,7 @@ val braitenbergProgramLearning = newSim { optionString ->
     withGui {
         activeTextLabel.location = point(50.0, -50.0)
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             addLabel("Task:")
 
@@ -452,7 +452,7 @@ val braitenbergProgramLearning = newSim { optionString ->
             addSeparator()
 
             addCheckBox(
-                "Learning Enabled", learningEnabled,
+                "Learning enabled", learningEnabled,
                 toolTip = "Enable/disable learning on program biases."
             ) { enabled ->
                 learningEnabled = enabled
@@ -460,7 +460,7 @@ val braitenbergProgramLearning = newSim { optionString ->
 
             addSeparator()
 
-            val lrField = addFormattedNumericTextField("Learning Rate", initValue = learningRate) {
+            val lrField = addFormattedNumericTextField("Learning rate", initValue = learningRate) {
                 learningRate = it
             }
             lrField.toolTipText = "Step size for bias updates."
@@ -470,14 +470,14 @@ val braitenbergProgramLearning = newSim { optionString ->
             }
             gammaField.toolTipText = "Discount factor for future rewards."
 
-            val strengthField = addFormattedNumericTextField("Weight Strength", initValue = programWeightStrength) {
+            val strengthField = addFormattedNumericTextField("Weight strength", initValue = programWeightStrength) {
                 programWeightStrength = it
             }
             strengthField.toolTipText = "Magnitude of weights when program is active."
 
             addSeparator()
 
-            val resetButton = addButton("Reset Biases") {
+            val resetButton = addButton("Reset biases") {
                 programNodes.forEach { it.bias = 0.0 }
                 criticWeights.forEach { it.strength = 0.0 }
             }
@@ -500,10 +500,10 @@ val braitenbergProgramLearning = newSim { optionString ->
 
     Each program represents a complete policy (how to respond to both cheese AND poison):
 
-    - **Seek Cheese, Avoid Poison**: Cheese weights +`weightStrength`, poison weights -`weightStrength`
-    - **Seek Both Objects**: All weights set to +`weightStrength` (approach both)
-    - **Avoid Both Objects**: All weights set to -`weightStrength` (avoid both)
-    - **Seek Poison, Avoid Cheese**: Poison weights +`weightStrength`, cheese weights -`weightStrength`
+    - **Seek cheese, avoid poison**: Cheese weights +`weightStrength`, poison weights -`weightStrength`
+    - **Seek both objects**: All weights set to +`weightStrength` (approach both)
+    - **Avoid both objects**: All weights set to -`weightStrength` (avoid both)
+    - **Seek poison, avoid cheese**: Poison weights +`weightStrength`, cheese weights -`weightStrength`
 
     ## How It Works
 
@@ -523,13 +523,13 @@ val braitenbergProgramLearning = newSim { optionString ->
     ## Activity: Train the agent on a task
 
     1. Select a `Task` from the dropdown menu in the control panel
-    2. Make sure `Learning Enabled` is checked
+    2. Make sure `Learning enabled` is checked
     3. Click the workspace run button
     4. Watch which program gets selected (shown by activation and the text label)
     5. Observe the biases change over time
     6. The agent should learn to prefer the program that matches the task
 
-    For example, if you select "Seek Cheese, Avoid Poison" as the task, the agent should learn to prefer the "Seek Cheese, Avoid Poison" program node, since that program's weight pattern maximizes reward for that task.
+    For example, if you select "Seek cheese, avoid poison" as the task, the agent should learn to prefer the "Seek cheese, avoid poison" program node, since that program's weight pattern maximizes reward for that task.
 
     The program nodes' biases represent learned preferences for each complete behavioral policy.
     

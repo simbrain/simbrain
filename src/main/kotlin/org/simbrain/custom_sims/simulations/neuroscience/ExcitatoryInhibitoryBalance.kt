@@ -25,7 +25,7 @@ val excitatoryInhibitoryBalance = newSim {
     var inhDrive = 0.0
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("E/I Balance Network")
+    val networkComponent = addNetworkComponent("E/I balance network")
     val network = networkComponent.network
 
     val layout = GridLayout(gridSpace, gridSpace, (sqrt(numNeurons.toDouble())).toInt())
@@ -80,7 +80,7 @@ val excitatoryInhibitoryBalance = newSim {
 
     neurons.take(20).forEach { it.activation = 30.0 }
 
-    val rasterPlot = RasterPlotComponent("Spike Raster Plot")
+    val rasterPlot = RasterPlotComponent("Spike raster plot")
     workspace.addWorkspaceComponent(rasterPlot)
 
     fun updateDrives() {
@@ -92,23 +92,23 @@ val excitatoryInhibitoryBalance = newSim {
 
     withGui {
         getNetworkPanel(networkComponent).freeWeightsVisible = false
-        val controlPanel = createControlPanel("E/I Balance Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addSlider("Excitatory Drive", 0.0, 30.0, excDrive, 0.5,
+        val controlPanel = createControlPanel("E/I balance controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            addSlider("Excitatory drive", 0.0, 30.0, excDrive, 0.5,
                 toolTip = "Background current delivered to every excitatory neuron.") { value ->
                 excDrive = value
                 updateDrives()
             }
-            addSlider("Inhibitory Drive", 0.0, 30.0, inhDrive, 0.5,
+            addSlider("Inhibitory drive", 0.0, 30.0, inhDrive, 0.5,
                 toolTip = "Background current delivered to every inhibitory neuron.") { value ->
                 inhDrive = value
                 updateDrives()
             }
-            addButton("Randomize Activations") {
+            addButton("Randomize activations") {
                 neuronCollection.randomize()
             }.apply {
                 toolTipText = "Set every neuron to a random activation."
             }
-            addButton("Clear Activation") {
+            addButton("Clear activation") {
                 neurons.forEach { it.activation = 0.0 }
             }.apply {
                 toolTipText = "Set every neuron's activation to zero."
@@ -154,10 +154,10 @@ val excitatoryInhibitoryBalance = newSim {
 
         1. Click `Run` to start the simulation with default parameters (both drives at 0).
 
-        2. Adjust the `Excitatory Drive` slider to ~5-8. This provides tonic input to excitatory neurons. You should
+        2. Adjust the `Excitatory drive` slider to ~5-8. This provides tonic input to excitatory neurons. You should
         see increased spontaneous activity.
 
-        3. Experiment with the `Inhibitory Drive` slider:
+        3. Experiment with the `Inhibitory drive` slider:
             - **High inhibitory drive** (e.g., 8-12): Network activity should be suppressed. Even with excitatory drive,
             inhibition dominates and prevents sustained firing.
             - **Balanced drive** (e.g., excitatory=6-8, inhibitory=4-6): Network should show irregular asynchronous activity,

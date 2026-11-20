@@ -127,7 +127,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     }
 
     /**
-     * @param patternActions network-specific actions added just above "Add Current Pattern to Training Data"
+     * @param patternActions network-specific actions added just above "Add current pattern to training data"
      */
     context(NetworkPanel)
     protected fun JPopupMenu.applyUnsupervisedActions(
@@ -136,7 +136,7 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     ) = apply {
         applyBasicActions()
         patternActions()
-        add(createAction("Add Current Pattern to Training Data") {
+        add(createAction("Add current pattern to training data") {
             net.trainingData.add(net.inputLayer.activationArray.toMutableList())
         })
         addSeparator()

@@ -45,7 +45,7 @@ public class DesktopCouplingManager extends JPanel {
     /**
      * Methods for making couplings.
      */
-    private final String[] tempStrings = {"One to One", "One to Many"};
+    private final String[] tempStrings = {"One to one", "One to many"};
 
     /**
      * Methods for making couplings.
@@ -93,13 +93,13 @@ public class DesktopCouplingManager extends JPanel {
 
         // Bottom controls (trailing)
         JButton helpButton = new JButton(new ShowHelpAction("https://docs.simbrain.net/docs/workspace/couplings.html"));
-        JButton addCouplingsButton = new JButton("Add Coupling(s)");
+        JButton addCouplingsButton = new JButton("Add coupling(s)");
         addCouplingsButton.setToolTipText("Create couplings from currently selected producers and consumers");
         addCouplingsButton.setIcon(ResourceManager.getSmallIcon("menu_icons/plus.png"));
         addCouplingsButton.setActionCommand("addCouplings");
         addCouplingsButton.addActionListener((e) -> addCouplings());
 
-        JButton addWithTransformsButton = new JButton("Add With Transforms...");
+        JButton addWithTransformsButton = new JButton("Add with transforms...");
         addWithTransformsButton.setToolTipText("Create one coupling from the selected producer and consumer through a transform chain; the endpoint types may differ when a transform bridges them");
         addWithTransformsButton.addActionListener((e) -> addCouplingWithTransforms());
 
@@ -151,13 +151,13 @@ public class DesktopCouplingManager extends JPanel {
 
         try {
             String couplingMethod = (String) couplingMethodComboBox.getSelectedItem();
-            if (couplingMethod.equalsIgnoreCase("One to One")) {
+            if (couplingMethod.equalsIgnoreCase("One to one")) {
                 desktop.getWorkspace().getCouplingManager().createOneToOneCouplings(producers, consumers);
-            } else if (couplingMethod.equalsIgnoreCase("One to Many")) {
+            } else if (couplingMethod.equalsIgnoreCase("One to many")) {
                 desktop.getWorkspace().getCouplingManager().createOneToManyCouplings(producers, consumers);
             }
         } catch (MismatchedAttributesException e) {
-            SwingUtilsKt.showMessage(Objects.requireNonNullElse(e.getMessage(), "The selected attributes cannot be coupled."), MessageKind.WARNING, null, "Unmatched Attributes");
+            SwingUtilsKt.showMessage(Objects.requireNonNullElse(e.getMessage(), "The selected attributes cannot be coupled."), MessageKind.WARNING, null, "Unmatched attributes");
         }
     }
 
@@ -170,7 +170,7 @@ public class DesktopCouplingManager extends JPanel {
         List<Consumer> consumers = (List<Consumer>) consumerPanel.getSelectedAttributes();
 
         if (producers.size() != 1 || consumers.size() != 1) {
-            SwingUtilsKt.showMessage("Select exactly one producer and one consumer to create a coupling with transforms.", MessageKind.WARNING, null, "Add With Transforms");
+            SwingUtilsKt.showMessage("Select exactly one producer and one consumer to create a coupling with transforms.", MessageKind.WARNING, null, "Add with transforms");
             return;
         }
         CouplingTransformDialogKt.showTransformEditorForNewCoupling(this, desktop.getWorkspace(), producers.get(0), consumers.get(0));

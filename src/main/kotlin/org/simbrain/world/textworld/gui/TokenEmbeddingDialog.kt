@@ -17,12 +17,12 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
         }
 
     var viewWordEmbeddingSourceAction = createAction(
-        name = "View Token Embedding Source",
+        name = "View token embedding source",
         description = "View token embedding source",
         iconPath = "menu_icons/DocumentInfo.png",
     ) {
         (trainingDocument ?: initialTokenEmbedding.trainingDocument)?.let { document ->
-            showText(document, "Source Document for Embedding")
+            showText(document, "Source document for embedding")
         }
     }.apply {
         // Enabled / disabled by [#trainingDocument]
@@ -57,7 +57,7 @@ class TokenEmbeddingDialog(val initialTokenEmbedding: TokenEmbedding, updateToke
     }.also { contentPane = it }
 
     init {
-        title = "Token Embedding Editor"
+        title = "Token embedding editor"
         trainingDocument = initialTokenEmbedding.trainingDocument
         addCommitTask {
             updateTokenEmbedding(updatedTokenEmbedding ?: initialTokenEmbedding)

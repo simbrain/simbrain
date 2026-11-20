@@ -143,7 +143,7 @@ class ImageWorldPanel(val imageWorldComponent: ImageWorldComponent) : JPanel(), 
     }
 
     val saveImageAction = createAction(
-        "Save Current Image...",
+        "Save current image...",
         description = "Save the current image to a file",
         iconPath =  "menu_icons/Save.png"
     ) {

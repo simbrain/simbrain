@@ -14,7 +14,7 @@ import org.simbrain.workspace.Workspace
 
 val logisticMap = newSim("logistic-map") {
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Logistic Map")
+    val networkComponent = addNetworkComponent("Logistic map")
     val neuron = networkComponent.network.addNeuron {
         label = "Logistic state"
         updateRule = LogisticRule().apply {
@@ -24,7 +24,7 @@ val logisticMap = newSim("logistic-map") {
         }
         activation = 0.2
     }
-    val timeSeries = addTimeSeriesComponent("Logistic Dynamics", "Activation")
+    val timeSeries = addTimeSeriesComponent("Logistic dynamics", "Activation")
     timeSeries.model.apply {
         isAutoRange = false
         rangeLowerBound = 0.0
@@ -115,7 +115,7 @@ private suspend fun SimulationScope.setupLogisticControls(workspace: Workspace) 
     }
 
     withGui {
-        val controlPanel = createControlPanel("Logistic Presets", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Logistic presets", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             listOf(
                 "Fixed point (2.8)" to 2.8,
                 "Period 2 (3.2)" to 3.2,

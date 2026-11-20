@@ -49,7 +49,7 @@ abstract class SensorWithRelativeLocation(
 
     @UserParameter(
         description = "Maximum value of the sensor when agent is right on top of the associated object type",
-        label = "Max Value",
+        label = "Max value",
         order = 10
     )
     var baseValue = 1.0
@@ -57,7 +57,7 @@ abstract class SensorWithRelativeLocation(
     /**
      * Should the sensor node show a label on top.
      */
-    @UserParameter(label = "Show Label", description = "Show label on top of the sensor node", order = 5)
+    @UserParameter(label = "Show label", description = "Show label on top of the sensor node", order = 5)
     var isShowLabel = false
         set(value) {
             field = value

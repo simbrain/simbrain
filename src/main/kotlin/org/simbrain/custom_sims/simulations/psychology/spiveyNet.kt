@@ -29,7 +29,7 @@ val spiveyNet = newSim {
     var conditionText = ""
 
     // Network
-    val networkComponent = addNetworkComponent("Normalized Recurrence")
+    val networkComponent = addNetworkComponent("Normalized recurrence")
     val net = networkComponent.network
 
     val currentStatus = NetworkTextObject("").apply {
@@ -47,7 +47,7 @@ val spiveyNet = newSim {
         layout = LineLayout()
         applyLayout()
         isClamped = true
-        label = "Visual Attention"
+        label = "Visual attention"
         neuronList.labels = listOf("candle", "candy", "handle", "fork")
     }
     val mouseNodes = net.addNeuronCollection(4).apply {
@@ -88,7 +88,7 @@ val spiveyNet = newSim {
     val oc = addOdorWorldComponent("Screen")
     val world = oc.world
     world.isUseCameraCentering = false
-    desktop?.getDesktopComponent(oc)?.title = "Mouse Trace"
+    desktop?.getDesktopComponent(oc)?.title = "Mouse trace"
     val mouse = world.addEntity(157, 271, EntityType.Hand).apply {
         heading = 90.0
     }
@@ -119,7 +119,7 @@ val spiveyNet = newSim {
     }
 
     net.updateManager.clear()
-    workspace.addUpdateAction("Normalized Recurrence Update", position = 0) {
+    workspace.addUpdateAction("Normalized recurrence update", position = 0) {
 
         // Assume lexical nodes have been updated by a control panel button
         with(net) {
@@ -214,7 +214,7 @@ val spiveyNet = newSim {
 
     suspend fun applyControlCondition() {
         // Candle / Fork
-        conditionText = "Control Condition"
+        conditionText = "Control condition"
         currentStatus.text = conditionText
         targetIndex = 0
         competitorObject.entityType = EntityType.Fork
@@ -225,7 +225,7 @@ val spiveyNet = newSim {
 
     suspend fun applyCohortCondition() {
         // Target = Candle, Competitor = Candy
-        conditionText = "Cohort Condition"
+        conditionText = "Cohort condition"
         currentStatus.text = conditionText
         resetExperiment()
         targetIndex = 0
@@ -236,7 +236,7 @@ val spiveyNet = newSim {
 
     suspend fun applyRhymeCondition() {
         // Candle / Handle
-        conditionText = "Rhyme Condition"
+        conditionText = "Rhyme condition"
         currentStatus.text = conditionText
         targetIndex = 0
         competitorObject.entityType = EntityType.Handle
@@ -257,18 +257,18 @@ val spiveyNet = newSim {
 
         applyControlCondition()
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addButton("Control Condition") {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            addButton("Control condition") {
                 applyControlCondition()
             }.apply {
                 toolTipText = "Set up a trial with the target (candle) and an unrelated competitor (fork)."
             }
-            addButton("Cohort Condition") {
+            addButton("Cohort condition") {
                 applyCohortCondition()
             }.apply {
                 toolTipText = "Set up a trial with the target (candle) and a competitor sharing its onset (candy)."
             }
-            addButton("Rhyme Condition") {
+            addButton("Rhyme condition") {
                 applyRhymeCondition()
             }.apply {
                 toolTipText = "Set up a trial with the target (candle) and a rhyming competitor (handle)."

@@ -18,9 +18,9 @@ import kotlin.math.sqrt
  */
 class ConvolutionConnector(
     source: TensorLayer, target: TensorLayer,
-    @UserParameter(label = "Filter Size", description = "Spatial size of each filter", displayOnly = true, order = 1)
+    @UserParameter(label = "Filter size", description = "Spatial size of each filter", displayOnly = true, order = 1)
     val kernelSize: Int = 3,
-    @UserParameter(label = "Num Filters", description = "Number of output filters", displayOnly = true, order = 2)
+    @UserParameter(label = "Num filters", description = "Number of output filters", displayOnly = true, order = 2)
     val numFilters: Int = 8,
     @UserParameter(label = "Stride", description = "Convolution stride", displayOnly = true, order = 3)
     val stride: Int = 1,
@@ -36,7 +36,7 @@ class ConvolutionConnector(
     @UserParameter(label = "Increment amount", description = "Amount to increment filter weights by when using arrow keys.", increment = .1, order = 20)
     var increment = .1
 
-    @UserParameter(label = "Filter Bank Grid", description = "Show all filters in a grid, with one row per filter and one column per input channel", tab = "GUI", order = 50)
+    @UserParameter(label = "Filter bank grid", description = "Show all filters in a grid, with one row per filter and one column per input channel", tab = "GUI", order = 50)
     var kernelGridMode = false
         set(value) {
             field = value

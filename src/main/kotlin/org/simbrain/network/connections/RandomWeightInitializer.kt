@@ -18,25 +18,25 @@ class RandomWeightInitializer(seed: Long = Random.nextLong()) : WeightInitialize
     /**
      * Whether excitatory connections should be randomized.
      */
-    @UserParameter(label = "Randomize Excitatory", description = "Whether to randomize excitatory weights", order = 1)
+    @UserParameter(label = "Randomize excitatory", description = "Whether to randomize excitatory weights", order = 1)
     var useExcitatoryRandomization = true
 
     /**
      * Whether inhibitory connections should be randomized.
      */
-    @UserParameter(label = "Randomize Inhibitory", description = "Whether to randomize inhibitory weights", order = 2)
+    @UserParameter(label = "Randomize inhibitory", description = "Whether to randomize inhibitory weights", order = 2)
     var useInhibitoryRandomization = true
 
     /**
      * The randomizer for excitatory synapses.
      */
-    @UserParameter(label = "Excitatory Randomizer", description = "Distribution for excitatory weights", order = 3, showDetails = false)
+    @UserParameter(label = "Excitatory randomizer", description = "Distribution for excitatory weights", order = 3, showDetails = false)
     var exRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
 
     /**
      * The randomizer for inhibitory synapses.
      */
-    @UserParameter(label = "Inhibitory Randomizer", description = "Distribution for inhibitory weights", order = 4, showDetails = false)
+    @UserParameter(label = "Inhibitory randomizer", description = "Distribution for inhibitory weights", order = 4, showDetails = false)
     var inRandomizer: ProbabilityDistribution = NormalDistribution().apply { randomSeed = seed }
 
     override fun initializeWeights(polarizedSynapses: PolarizedSynapseCollection) {

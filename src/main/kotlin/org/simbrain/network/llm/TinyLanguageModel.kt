@@ -1025,7 +1025,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
             numLayers = numLayers,
         ))
 
-        override val name = "Tiny Language Model"
+        override val name = "Tiny language model"
     }
 
     companion object : WithXStreamPropertyConverter {

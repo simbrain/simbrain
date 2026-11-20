@@ -4,13 +4,11 @@
  */
 package org.simbrain.network.gui
 
-import org.simbrain.util.onEdt
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.swing.Swing
 import kotlinx.coroutines.test.runTest
-import org.simbrain.util.undoableAction
 import kotlinx.coroutines.withContext
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -19,6 +17,8 @@ import org.simbrain.network.core.*
 import org.simbrain.network.desktop.NetworkDesktopComponent
 import org.simbrain.network.gui.nodes.NeuronArrayNode
 import org.simbrain.network.trainers.SupervisedModel
+import org.simbrain.util.onEdt
+import org.simbrain.util.undoableAction
 import org.simbrain.workspace.gui.SimbrainDesktop
 import javax.swing.JButton
 
@@ -674,11 +674,11 @@ class UndoManagerTest {
 
         // Create input and output layers
         val inputLayer = NeuronArray(5).apply { 
-            label = "Input Layer"
+            label = "Input layer"
             isClamped = true
         }
         val outputLayer = NeuronArray(3).apply { 
-            label = "Output Layer"
+            label = "Output layer"
         }
 
         // Create a weight matrix connecting the layers
@@ -765,11 +765,11 @@ class UndoManagerTest {
 
         // Create input and output layers
         val inputLayer = NeuronArray(5).apply { 
-            label = "Input Layer"
+            label = "Input layer"
             isClamped = true
         }
         val outputLayer = NeuronArray(3).apply { 
-            label = "Output Layer"
+            label = "Output layer"
         }
 
         // Create a weight matrix connecting the layers

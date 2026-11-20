@@ -19,7 +19,7 @@ import org.simbrain.world.odorworld.entities.OdorWorldEntity
  * make the location editable at some point, if use-cases emerge.
  */
 class ObjectSensor @JvmOverloads constructor(
-    @UserParameter(label = "Object Type", description = "What type of object this sensor responds to", order = 3)
+    @UserParameter(label = "Object type", description = "What type of object this sensor responds to", order = 3)
     private var objectType: EntityType = EntityType.Swiss,
     radius: Double = DEFAULT_RADIUS,
     theta: Double = DEFAULT_THETA
@@ -28,7 +28,7 @@ class ObjectSensor @JvmOverloads constructor(
     /**
      * Decay function
      */
-    @UserParameter(label = "Decay Function", showDetails = false, order = 15)
+    @UserParameter(label = "Decay function", showDetails = false, order = 15)
     override var decayFunction: DecayFunction = LinearDecayFunction(70.0)
 
     override var showDispersion = false
@@ -83,14 +83,14 @@ class ObjectSensor @JvmOverloads constructor(
     }
 
     override val name: String
-        get() = "Object Sensor"
+        get() = "Object sensor"
 
     fun setObjectType(objectType: EntityType) {
         this.objectType = objectType
     }
 
     override var label = if (super.label.isEmpty()) {
-        directionString + objectType.description + " Detector"
+        directionString + objectType.description + " detector"
     } else {
         super.label
     }

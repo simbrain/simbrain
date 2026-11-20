@@ -44,7 +44,7 @@ abstract class DecayFunction(
      * that is further modulated by distance.
      */
     @UserParameter(
-        label = "Base Multiplier",
+        label = "Base multiplier",
         description = "Scales the output probability (0-1).",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -90,10 +90,10 @@ abstract class DecayFunction(
         /**
          * The layout for the neurons in this group.
          */
-        @UserParameter(label = "Decay Function", tab = "Layout", order = 50)
+        @UserParameter(label = "Decay function", tab = "Layout", order = 50)
         var decayFunction: DecayFunction = decayFunction
 
-        override val name = "Decay Function"
+        override val name = "Decay function"
     }
 
     override fun getTypeList() = decayFunctionTypes

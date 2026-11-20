@@ -52,7 +52,7 @@ class WandPalettePanel(
             toolTipText = "Import palette from file"
             addActionListener { importPalette() }
         }
-        val revertButton = JButton("Revert to Default").apply {
+        val revertButton = JButton("Revert to default").apply {
             toolTipText = "Reset palette to default actions"
             addActionListener { revertToDefault() }
         }
@@ -225,7 +225,7 @@ class WandPalettePanel(
             palette.removeAction(index)
             savePalette()
         } else {
-            showMessage("Cannot delete the last action. The palette must have at least one action.", MessageKind.WARNING, title = "Cannot Delete")
+            showMessage("Cannot delete the last action. The palette must have at least one action.", MessageKind.WARNING, title = "Cannot delete")
         }
     }
 
@@ -250,7 +250,7 @@ class WandPalettePanel(
                 palette.setActions(imported.actions)
                 savePalette()
             } catch (e: Exception) {
-                showMessage("Failed to import palette: ${e.message}", MessageKind.ERROR, title = "Import Error")
+                showMessage("Failed to import palette: ${e.message}", MessageKind.ERROR, title = "Import error")
             }
         }
     }

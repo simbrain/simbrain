@@ -19,7 +19,7 @@ import kotlin.random.Random
 val operantWithEnvironment = newSim("operant_with_environment") {
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Behavioral Control Unit")
+    val networkComponent = addNetworkComponent("Behavioral control unit")
     val network = networkComponent.network
 
     val numNeurons = 3
@@ -44,7 +44,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
 
     val rewardNeuron = network.addNeuron {
         location = point(stimulusNet.maxX + 100, stimulusNet.locationY)
-        label = "Food Pellet"
+        label = "Food pellet"
     }
 
     val punishNeuron = network.addNeuron {
@@ -56,7 +56,7 @@ val operantWithEnvironment = newSim("operant_with_environment") {
         connectAllToAll(stimulusNet, behaviorNet)
     }.onEach { it.strength = 0.0 }
 
-    val odorWorldComponent = addOdorWorldComponent("Three Objects")
+    val odorWorldComponent = addOdorWorldComponent("Three objects")
     val odorWorld = odorWorldComponent.world.apply {
         tileMap = TileMap(12, 12)
         isObjectsBlockMovement = false
@@ -199,7 +199,7 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
     val network = networkComponent.network
     val behaviorNet = network.getModelByLabel<NeuronCollection>("Behaviors")
     val stimulusNet = network.getModelByLabel<NeuronCollection>("Stimuli")
-    val rewardNeuron = network.getModelByLabel<Neuron>("Food Pellet")
+    val rewardNeuron = network.getModelByLabel<Neuron>("Food pellet")
     val punishNeuron = network.getModelByLabel<Neuron>("Shock")
 
     val odorWorldComponent = workspace.componentList.filterIsInstance<OdorWorldComponent>().first()
@@ -264,7 +264,7 @@ suspend fun SimulationScope.setupOperantWithEnvironmentWorkspace(workspace: Work
     })
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             fun normIntrinsicProbabilities() {
                 val totalMass = behaviorNet.neuronList.sumOf { it.auxValue }

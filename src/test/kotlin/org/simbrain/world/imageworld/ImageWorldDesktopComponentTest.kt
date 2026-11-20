@@ -18,10 +18,10 @@ class ImageWorldDesktopComponentTest {
     @Test
     fun `an image update does not wait for the edt`() = runBlocking {
         val workspace = Workspace()
-        val component = ImageWorldComponent("Image world")
+        val component = ImageWorldComponent("Image World")
         workspace.addWorkspaceComponent(component)
         SwingUtilities.invokeAndWait {
-            val frame = GenericJInternalFrame("Image world", true, true, true, true)
+            val frame = GenericJInternalFrame("Image World", true, true, true, true)
             frame.contentPane.add(workspace.componentFactory.createGuiComponent(frame, component))
         }
         val album = component.world.imageAlbum

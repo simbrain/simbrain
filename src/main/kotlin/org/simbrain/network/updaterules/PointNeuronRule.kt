@@ -147,7 +147,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
          */
         RATE_CODE {
             override fun toString(): String {
-                return "Rate Code"
+                return "Rate code"
             }
         },
 
@@ -277,7 +277,7 @@ class PointNeuronRule : SpikingNeuronUpdateRule<PointNeuronScalarData, SpikingMa
     }
 
     override val name: String
-        get() = "Point Neuron"
+        get() = "Point neuron"
 
 }
 

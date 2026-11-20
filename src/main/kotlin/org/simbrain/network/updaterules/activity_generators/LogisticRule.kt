@@ -16,7 +16,7 @@ import org.simbrain.util.propertyeditor.CustomTypeName
  *
  * Not to be confused with the logistic implementation of Sigmoid Rule
  */
-@CustomTypeName("Logistic Activity Generator")
+@CustomTypeName("Logistic activity generator")
 class LogisticRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, ActivityGenerator, ClippedUpdateRule {
     /**
      * Growth rate.

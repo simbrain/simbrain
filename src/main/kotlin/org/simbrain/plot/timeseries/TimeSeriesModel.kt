@@ -39,7 +39,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
         private set
 
     @UserParameter(
-        label = "Auto Range", description = "If true, automatically adjusts the range of the time series data " +
+        label = "Auto range", description = "If true, automatically adjusts the range of the time series data " +
                 "based on the maximum and minimum values present at a given time", order = 10
     )
     var isAutoRange = true
@@ -64,7 +64,7 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
 
     var autoRangeMinimumUpperBound by GuiEditable(
         initValue = 1.0,
-        label = "Auto Range Minimum Upper Bound",
+        label = "Auto range minimum upper bound",
         description = "When auto range is on, if the range is less than this value, the range will be set to this value",
         useCheckboxFrom = TimeSeriesModel::useAutoRangeMinimumUpperBound,
         order = 40
@@ -74,14 +74,14 @@ class TimeSeriesModel : AttributeContainer, EditableObject, AutoCloseable {
 
     var autoRangeMaximumLowerBound by GuiEditable(
         initValue = 0.0,
-        label = "Auto Range Maximum Lower Bound",
+        label = "Auto range maximum lower bound",
         description = "When auto range is on, if the range is greater than this value, the range will be set to this value",
         useCheckboxFrom = TimeSeriesModel::useAutoRangeMaximumLowerBound,
         order = 50
     )
 
     @UserParameter(
-        label = "Fixed Width", description = "If true, the time series window never extends beyond a fixed with",
+        label = "Fixed width", description = "If true, the time series window never extends beyond a fixed with",
         order = 60
     )
     var fixedWidth = PlotPreferences.timeSeriesFixedWidth

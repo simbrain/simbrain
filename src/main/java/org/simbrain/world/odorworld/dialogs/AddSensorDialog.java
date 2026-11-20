@@ -42,9 +42,9 @@ public class AddSensorDialog extends StandardDialog {
      * @param parent parent window for proper dialog stacking
      */
     public AddSensorDialog(OdorWorldEntity entity, Window parent) {
-        super(parent, "Add Sensor");
+        super(parent, "Add sensor");
         this.entity = entity;
-        init("Add Sensor");
+        init("Add sensor");
     }
     
     /**
@@ -53,7 +53,7 @@ public class AddSensorDialog extends StandardDialog {
     public AddSensorDialog(OdorWorldEntity entity) {
         super();
         this.entity = entity;
-        init("Add Sensor");
+        init("Add sensor");
     }
 
     /**
@@ -63,7 +63,7 @@ public class AddSensorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/worlds/odorworld.html");
         addButton(new JButton(helpAction));
-        sensorCreatorPanel = new AnnotatedPropertyEditor<>(AnnotatedPropertyEditorKt.objectWrapper("Add Sensor",
+        sensorCreatorPanel = new AnnotatedPropertyEditor<>(AnnotatedPropertyEditorKt.objectWrapper("Add sensor",
                 new SmellSensor()));
         mainPanel.add(sensorCreatorPanel);
         setContentPane(mainPanel);

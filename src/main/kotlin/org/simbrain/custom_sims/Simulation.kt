@@ -190,7 +190,7 @@ fun SimulationScope.addSoundWorld(name: String, generator: SoundGenerator? = nul
 }
 
 fun SimulationScope.addSpeechSynthesizer(
-    name: String = "Speech Synthesizer",
+    name: String = "Speech synthesizer",
     synthesizer: SpeechSynthesizer = SpeechSynthesizer()
 ): SpeechSynthesizerComponent {
     val component = SpeechSynthesizerComponent(name, synthesizer)

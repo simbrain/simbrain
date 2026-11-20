@@ -79,7 +79,7 @@ object Lfm2Weights {
         okLabel = "Download",
         kind = MessageKind.WARNING,
         heading = "Download $MODEL_NAME weights?",
-        title = "Download Weights",
+        title = "Download weights",
         details = listOf(
             "Destination" to File(getSystemCacheDirectory(), CACHE_SUBDIRECTORY).path,
             "License" to LICENSE_URL,
@@ -102,7 +102,7 @@ fun LanguageModel.obtainWeightsInteractive(scope: CoroutineScope): Boolean {
     return when (showChoice(
         "No ${Lfm2Weights.MODEL_NAME} weights were found on this machine.",
         listOf("Download…", "Locate folder…", "Cancel"),
-        title = "Language Model Weights",
+        title = "Language model weights",
     )) {
         0 -> {
             if (!Lfm2Weights.confirmDownload()) return false

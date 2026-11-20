@@ -98,7 +98,7 @@ class ImageWorldDesktopComponent(frame: GenericFrame, component: ImageWorldCompo
 
         // Help Menu
         val helpMenu = JMenu("Help")
-        val helpItem = JMenuItem("World Help")
+        val helpItem = JMenuItem("World help")
         menuBar.add(helpMenu)
         val helpAction = ShowHelpAction("https://docs.simbrain.net/docs/worlds/imageworld.html")
         helpItem.action = helpAction

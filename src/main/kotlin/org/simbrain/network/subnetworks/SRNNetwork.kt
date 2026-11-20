@@ -199,7 +199,7 @@ class SRNNetwork: FeedForward, SupervisedNetwork {
 
         //TODO: Node type
 
-        override val name = "SRN Network"
+        override val name = "SRN network"
 
         fun create(): SRNNetwork {
             return SRNNetwork(nin, nhidden, nout, initialPosition)

@@ -295,7 +295,7 @@ val grazingCows = newSim { optionString ->
             trainerDialog = null
             session = null
         }
-        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val numCowsTf = addTextField(
                 "Number of cows", "" + numCows,
@@ -306,7 +306,7 @@ val grazingCows = newSim { optionString ->
                 toolTip = "Score a group by its cows' mean fitness instead of the worst cow's. Takes effect the first time you open the trainer."
             )
 
-            addButton("Open Trainer") {
+            addButton("Open trainer") {
                 trainerDialog?.takeIf { it.isDisplayable }?.let {
                     it.toFront()
                     return@addButton
@@ -362,7 +362,7 @@ val grazingCows = newSim { optionString ->
                         runner = runner,
                         evaluatorParams = evaluatorParams,
                         extras = genomeDisplays,
-                        title = "Evolution Trainer (Cows)",
+                        title = "Evolution trainer (cows)",
                         onExpress = ::expressBest,
                         history = history
                     ).also { session = it }
@@ -377,7 +377,7 @@ val grazingCows = newSim { optionString ->
             }
 
             addButton("Load file") {
-                val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
+                val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip archive", "zip")
                 val simFile = simulationChooser.showOpenDialog()
                 val serializer = WorkspaceSerializer(workspace)
                 if (simFile != null) {
@@ -440,7 +440,7 @@ val grazingCows = newSim { optionString ->
 
             - Evolution parameters in the trainer's `Evolution properties` dialog
         
-        2. After confirming the parameters are what you want, click on the `Open Trainer` button.
+        2. After confirming the parameters are what you want, click on the `Open trainer` button.
         
         3. Use the trainer's run controls to start evolution. It can take a while depending on your configuration.
 

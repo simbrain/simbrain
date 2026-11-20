@@ -34,13 +34,13 @@ class BarChartModel : AttributeContainer, EditableObject, AutoCloseable {
     /**
      * Color of bars in barchart.
      */
-    @UserParameter(label = "Bar Color", order = 4)
+    @UserParameter(label = "Bar color", order = 4)
     var barColor: Color = PlotPreferences.barColor
 
     /**
      * Auto range bar chart.
      */
-    @UserParameter(label = "Auto Range", order = 3)
+    @UserParameter(label = "Auto range", order = 3)
     var autoRange = true
         @JvmName("isAutoRange")
         get
@@ -48,13 +48,13 @@ class BarChartModel : AttributeContainer, EditableObject, AutoCloseable {
     /**
      * Maximum range.
      */
-    @UserParameter(label = "Upper Bound", order = 2)
+    @UserParameter(label = "Upper bound", order = 2)
     var upperBound = 10.0
 
     /**
      * Minimum range.
      */
-    @UserParameter(label = "Lower Bound", order = 1)
+    @UserParameter(label = "Lower bound", order = 1)
     var lowerBound = 0.0
 
     /**

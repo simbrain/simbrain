@@ -15,18 +15,18 @@ val spikingNeuronTwoInputs = newSim {
 
     workspace.clearWorkspace()
 
-    val netComponent = addNetworkComponent("Simple Integrate and Fire")
+    val netComponent = addNetworkComponent("Simple integrate and fire")
     val net = netComponent.network
 
     // Create clamped input neurons
     val excitatoryInput = net.addNeuron {
-        label = "Excitatory Input"
+        label = "Excitatory input"
         location = point(50, 100)
         clamped = true
     }
 
     val inhibitoryInput = net.addNeuron {
-        label = "Inhibitory Input"
+        label = "Inhibitory input"
         location = point(50, 200)
         clamped = true
     }
@@ -83,19 +83,19 @@ val spikingNeuronTwoInputs = newSim {
         ## Activity 1: Drive the neuron with two inputs
 
         1. Press `Run` to start the simulation.
-        2. Click either the `Excitatory Input` or `Inhibitory Input` neuron.
+        2. Click either the `Excitatory input` or `Inhibitory input` neuron.
         3. Use the arrow keys (`↑` / `↓`) to raise or lower the activation level.
         4. Observe how the spiking neuron's spiking behavior changes in the time series plot.
 
         ## Activity 2: Explore the impacts of input activations
 
-        - Raise only the `Excitatory Input`: The neuron should spike consistently.
-        - Raise only the `Inhibitory Input`: The neuron may stop firing.
+        - Raise only the `Excitatory input`: The neuron should spike consistently.
+        - Raise only the `Inhibitory input`: The neuron may stop firing.
         - Adjust both inputs to fine-tune whether and when spikes occur.
         
         ## Activity 3: Explore other spiking neuron models
         
-        You can also change the spiking neuron model by double-clicking `Spiking neuron`, opening `Update Rule`, and selecting another model such as Izhikevich or [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
+        You can also change the spiking neuron model by double-clicking `Spiking neuron`, opening `Update rule`, and selecting another model such as Izhikevich or [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html).
 
         # Credits
 

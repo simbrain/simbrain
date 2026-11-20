@@ -104,7 +104,7 @@ sealed class BackpropLossFunction(
      */
     abstract fun canUse(layer: Layer): Boolean
 
-    object SSE : BackpropLossFunction("SSE", "Sum Squared Error") {
+    object SSE : BackpropLossFunction("SSE", "Sum squared error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual sse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -115,7 +115,7 @@ sealed class BackpropLossFunction(
         override fun canUse(layer: Layer) = layer.updateRule !is SoftmaxRule
     }
 
-    object MSE : BackpropLossFunction("MSE", "Mean Squared Error") {
+    object MSE : BackpropLossFunction("MSE", "Mean squared error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual mse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -126,7 +126,7 @@ sealed class BackpropLossFunction(
         override fun canUse(layer: Layer) = layer.updateRule !is SoftmaxRule
     }
 
-    object RMSE : BackpropLossFunction("RMSE", "Root Mean Squared Error") {
+    object RMSE : BackpropLossFunction("RMSE", "Root mean squared error") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = actual rmse target
 
         override fun outputError(actual: Matrix, target: Matrix): Matrix {
@@ -138,7 +138,7 @@ sealed class BackpropLossFunction(
 
     }
 
-    object CrossEntropy : BackpropLossFunction("Cross Entropy", "Cross Entropy") {
+    object CrossEntropy : BackpropLossFunction("Cross entropy", "Cross entropy") {
         override fun scalarLoss(actual: Matrix, target: Matrix) = crossEntropy(actual, target)
 
         /**

@@ -14,7 +14,6 @@ import org.simbrain.custom_sims.simulations
 import org.simbrain.docviewer.DocViewerViewPanel
 import org.simbrain.util.*
 import org.simbrain.util.genericframe.GenericFrame
-import org.simbrain.util.genericframe.GenericJFrame
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.util.piccolo.processPiccoloChanges
 import org.simbrain.util.propertyeditor.TypeOptionVisibility
@@ -159,7 +158,7 @@ object SimbrainDesktop {
                 swingInvokeLater {
                     onboardingManager.showPopup(
                         PopupConfig(
-                            title = "Info Panel Toggle",
+                            title = "Info panel toggle",
                             message = "Use this button to toggle the visibility of this info screen. The info panel shows documentation and help content for various features.",
                             targetComponent = infoDockButton,
                             placement = PopupPlacement.BOTTOM_CENTER,
@@ -316,7 +315,7 @@ object SimbrainDesktop {
                     "Coupling ${failure.coupling.description} failed to update and will keep failing " +
                             "silently until fixed:\n${failure.cause}",
                     MessageKind.WARNING,
-                    title = "Coupling Failed"
+                    title = "Coupling failed"
                 )
             }
         }
@@ -874,7 +873,7 @@ object SimbrainDesktop {
         if (!confirmDiscardChanges()) {
             return
         }
-        val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
+        val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip archive", "zip")
         val simFile = simulationChooser.showOpenDialog()
         if (simFile != null) {
             val progressWindow = ProgressWindow(100, "Loading workspace...")
@@ -920,7 +919,7 @@ object SimbrainDesktop {
         }
 
         // Create the file chooser
-        val chooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
+        val chooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip archive", "zip")
 
         // Set the file
         val theFile: File?
@@ -1033,7 +1032,7 @@ object SimbrainDesktop {
         val result = JOptionPane.showOptionDialog(
             frame,
             editorPane,
-            "Warning: Workspace May Not Reopen Correctly",
+            "Warning: workspace may not reopen correctly",
             JOptionPane.YES_NO_OPTION,
             JOptionPane.WARNING_MESSAGE,
             null, // icon
@@ -1093,7 +1092,7 @@ object SimbrainDesktop {
             e.printStackTrace(PrintWriter(sw))
             e.printStackTrace()
             val stackTrace = sw.toString()
-            showText("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught Exception")
+            showText("An error occurred: ${e.message}\n\n$stackTrace", "Uncaught exception")
         }
 
         /*
@@ -1116,10 +1115,10 @@ object SimbrainDesktop {
      */
     private fun showHasChangedDialog(): Int? = showChoice(
         "Would you like to save these changes?",
-        listOf("Save", "Don't Save", "Cancel"),
+        listOf("Save", "Don't save", "Cancel"),
         kind = MessageKind.WARNING,
         heading = "The workspace has changed since it was last saved",
-        title = "Workspace Has Changed"
+        title = "Workspace has changed"
     )
 
     /**
@@ -1328,10 +1327,10 @@ fun buildAboutDialog(parent: Window?): StandardDialog {
 
     return StandardDialog(parent, "About Simbrain").apply {
         contentPane = content
-        addButton(JButton("Visit Simbrain Website").apply {
+        addButton(JButton("Visit Simbrain website").apply {
             addActionListener { Utils.displayURLInBrowser("https://simbrain.net") }
         })
-        addButton(JButton("View Credits").apply {
+        addButton(JButton("View credits").apply {
             addActionListener { Utils.displayURLInBrowser("https://simbrain.net/credits/") }
         })
         setAsDoneDialog()

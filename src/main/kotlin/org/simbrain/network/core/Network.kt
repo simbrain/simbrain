@@ -95,13 +95,13 @@ class Network: CoroutineScope, EditableObject {
     /**
      * Time step.
      */
-    @UserParameter("Time Step", increment = .1, minimumValue = 0.0, order = 10)
+    @UserParameter("Time step", increment = .1, minimumValue = 0.0, order = 10)
     var timeStep = NetworkPreferences.defaultTimeStep
 
     /**
      * Whether this is a discrete or continuous time network.
      */
-    @UserParameter("Time Type", description = "Whether to display iterations or time (display property only; " +
+    @UserParameter("Time type", description = "Whether to display iterations or time (display property only; " +
             "does not impact logical update)", order = 20)
     var timeType = TimeType.DISCRETE
 

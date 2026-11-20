@@ -84,7 +84,7 @@ val bpttPatternGenerator = newSim {
                 if (step < SEQUENCE_LENGTH) setStatus("Frame $step of $SEQUENCE_LENGTH.")
             }
         }
-        val panel = createControlPanel("Control Panel", 10, 10) {
+        val panel = createControlPanel("Control panel", 10, 10) {
             PATTERN_NAMES.forEachIndexed { index, name ->
                 addButton(name) { start(index) }.apply {
                     toolTipText = "Reset the network and cue the $name pattern, showing its first frame."

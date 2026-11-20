@@ -85,7 +85,7 @@ class SVMClassifier(
         }
     }
 
-    override val name = "Support Vector Machine"
+    override val name = "Support vector machine"
 
     private fun createKernel(): MercerKernel<DoubleArray> = when (kernelType) {
         KernelType.Gaussian -> GaussianKernel(kernelWidth)

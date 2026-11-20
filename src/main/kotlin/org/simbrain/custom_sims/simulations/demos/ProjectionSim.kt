@@ -12,7 +12,7 @@ import org.simbrain.util.showNumericInputDialog
  */
 val recurrentNetArrayBased = newSim {
 
-    val numNeurons = showNumericInputDialog("Size of Neuron Array:", 100) ?:return@newSim
+    val numNeurons = showNumericInputDialog("Size of neuron array:", 100) ?:return@newSim
 
     // Basic setup
     workspace.clearWorkspace()
@@ -24,7 +24,7 @@ val recurrentNetArrayBased = newSim {
     weightMatrix.weights.setSpectralRadius(.99) // for nicer dynamics
     network.addNetworkModelsAsync(listOf(neuronArray, weightMatrix))
 
-    val projectionPlot = addProjectionPlot("Projection Plot").apply {
+    val projectionPlot = addProjectionPlot("Projection plot").apply {
         projector.tolerance = .01
     }
     withGui {

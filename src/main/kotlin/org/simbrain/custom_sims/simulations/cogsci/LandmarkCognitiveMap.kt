@@ -42,7 +42,7 @@ import kotlin.math.min
 val landmarkCognitiveMap = newSim {
     workspace.clearWorkspace()
 
-    val odorWorldComponent = addOdorWorldComponent("Landmark World")
+    val odorWorldComponent = addOdorWorldComponent("Landmark world")
     val odorWorld = odorWorldComponent.world.apply {
         tileMap = TileMap(20, 20)
         wrapAround = true
@@ -90,10 +90,10 @@ val landmarkCognitiveMap = newSim {
         }
     }
 
-    val networkComponent = addNetworkComponent("Distributed Landmark State")
+    val networkComponent = addNetworkComponent("Distributed landmark state")
     val network = networkComponent.network
     val sensoryState = network.addNeuronCollection(stateEncoder.labels.size).apply {
-        label = "Sensory State"
+        label = "Sensory state"
         isClamped = true
         betweenNeuronInterval = 60
         setLayoutBasedOnSize()
@@ -101,7 +101,7 @@ val landmarkCognitiveMap = newSim {
         setLocation(-15.0, 115.0)
     }
     val mainState = network.addNeuronCollection(16).apply {
-        label = "Main State"
+        label = "Main state"
         neuronList.forEach { it.updateRule = SigmoidalRule() }
         betweenNeuronInterval = 38
         setLayoutBasedOnSize()
@@ -109,7 +109,7 @@ val landmarkCognitiveMap = newSim {
         setLocation(311.0, 107.0)
     }
     val objectReadouts = network.addNeuronCollection(stateEncoder.labels.size).apply {
-        label = "Object Readouts"
+        label = "Object readouts"
         neuronList.forEach { it.updateRule = SigmoidalRule() }
         betweenNeuronInterval = 60
         setLayoutBasedOnSize()
@@ -174,7 +174,7 @@ val landmarkCognitiveMap = newSim {
         maxItems = 8
         preferredSize = Dimension(580, 330)
     }
-    val projectionPlot = addProjectionPlot("Distributed State Space").apply {
+    val projectionPlot = addProjectionPlot("Distributed state space").apply {
         projector.tolerance = 0.1
         projector.showLabels = false
         projector.connectPoints = false
@@ -220,7 +220,7 @@ val landmarkCognitiveMap = newSim {
         odorWorldComponent.scale(0.85)
         place(networkComponent, 620, 10, 481, 352)
         place(projectionPlot, 622, 377, 485, 392)
-        val graphFrame = GenericJInternalFrame("Environment Graph", true, true, true, true).apply {
+        val graphFrame = GenericJInternalFrame("Environment graph", true, true, true, true).apply {
             layout = BorderLayout()
             add(graphPanel, BorderLayout.CENTER)
             add(JPanel(FlowLayout(FlowLayout.LEFT)).apply {
@@ -236,8 +236,8 @@ val landmarkCognitiveMap = newSim {
             isVisible = true
         }
         addInternalFrame(graphFrame)
-        val stateControlsFrame = createControlPanel("State Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP) {
-            addCheckBox("Show field plot", true, toolTip = "Show or hide the Field Plot window.") { visible ->
+        val stateControlsFrame = createControlPanel("State controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 600 + SIM_WINDOW_GAP) {
+            addCheckBox("Show field plot", true, toolTip = "Show or hide the field plot window.") { visible ->
                 fieldVisible.set(visible)
                 fieldFrame.isVisible = visible
                 if (visible) fieldImagePanel.repaint()
@@ -267,7 +267,7 @@ val landmarkCognitiveMap = newSim {
             add(JLabel("Threshold").apply { toolTipText = thresholdToolTip }, BorderLayout.WEST)
             add(fieldThresholdSlider, BorderLayout.CENTER)
         }
-        fieldFrame = GenericJInternalFrame("Field Plot", true, true, true, true).apply {
+        fieldFrame = GenericJInternalFrame("Field plot", true, true, true, true).apply {
             layout = BorderLayout()
             add(fieldImagePanel, BorderLayout.CENTER)
             add(fieldControlBar, BorderLayout.SOUTH)
@@ -275,7 +275,7 @@ val landmarkCognitiveMap = newSim {
             isVisible = true
         }
         addInternalFrame(fieldFrame)
-        val legendFrame = GenericJInternalFrame("Projection Color Legend", true, true, true, true).apply {
+        val legendFrame = GenericJInternalFrame("Projection color legend", true, true, true, true).apply {
             layout = BorderLayout()
             add(legendPanel, BorderLayout.CENTER)
             setBounds(627, 771, 486, 200)
@@ -307,9 +307,9 @@ val landmarkCognitiveMap = newSim {
 
         Each landmark contributes a distance-weighted value to its own sensory channel. A thirteenth `Background` channel represents low strongest-landmark evidence. Several objects can therefore be simultaneously active, while background remains a bona fide neural state.
 
-        A frozen autoencoder converts this 13-channel state into a 16-neuron distributed `Main State` and reconstructs continuous object readouts from that state alone. The `Distributed State Space` plot records representative main states. Point colors show the strongest decoded readout, including `Background`; use the color legend or hover over a point to inspect its decoded composition.
+        A frozen autoencoder converts this 13-channel state into a 16-neuron distributed `Main state` and reconstructs continuous object readouts from that state alone. The `Distributed state space` plot records representative main states. Point colors show the strongest decoded readout, including `Background`; use the color legend or hover over a point to inspect its decoded composition.
 
-        The `Field Plot` visualizes these same object readouts. Its labels, size, and intensity therefore reflect the network's current decoded state rather than landmark location or raw sensor input.
+        The `Field plot` visualizes these same object readouts. Its labels, size, and intensity therefore reflect the network's current decoded state rather than landmark location or raw sensor input.
 
         Use **Reset map** to clear the symbolic transition graph.
         """.trimIndent()

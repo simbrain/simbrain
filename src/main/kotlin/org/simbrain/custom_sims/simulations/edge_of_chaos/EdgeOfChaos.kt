@@ -35,7 +35,7 @@ val edgeOfChaos = newSim("edgeOfChaos") {
     // Clear workspace
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Edge of Chaos")
+    val networkComponent = addNetworkComponent("Edge of chaos")
     val net = networkComponent.network
 
     net.timeStep = 0.5

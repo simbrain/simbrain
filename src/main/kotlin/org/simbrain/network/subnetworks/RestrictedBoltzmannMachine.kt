@@ -39,15 +39,15 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
     var learningRate = .01
 
     @UserParameter(
-        label = "RBM Weight randomizer",
+        label = "RBM weight randomizer",
         showDetails = false,
-        description = "Randomizer for RBM Weights.",
+        description = "Randomizer for RBM weights.",
         order = 30,
     )
     var rbmWeightRandomizer = NormalDistribution(0.0, .1)
 
     @UserParameter(
-        label = "RBM Bias randomizer",
+        label = "RBM bias randomizer",
         showDetails = false,
         description = "Randomizer for RBM biases.",
         order = 40,
@@ -82,7 +82,7 @@ class RestrictedBoltzmannMachine : Subnetwork, UnsupervisedNetwork {
 
         // Something like a softmax may be used? See 13.1
         hiddenLayer = NeuronArray(numHiddenNodes).apply {
-            label = "Hidden Layer"
+            label = "Hidden layer"
             gridMode = true
             isShowBias = false
             updateRule = SigmoidalRule()

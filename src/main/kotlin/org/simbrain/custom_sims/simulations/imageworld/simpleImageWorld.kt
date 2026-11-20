@@ -81,7 +81,7 @@ val simpleImageWorld = newSim {
     // Place network in the desktop
     withGui {
         val networkPanel = getNetworkPanel(networkComponent)
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             repeat(outputs.size) { index ->
                 addTextField(
                     "Category ${index + 1}", "",
@@ -89,7 +89,7 @@ val simpleImageWorld = newSim {
                 ) { category ->
                     outputs.neuronList[index].label = category
                 }
-                addButton("Save Image for Category ${index + 1}") {
+                addButton("Save image for category ${index + 1}") {
                     supervisedModel.trainingSet.inputs[index] = (imageWorld.currentPipeline?.brightness ?: doubleArrayOf()).copyOf()
                     val image = imageWorld.currentImage.copy()
                     val frame = imageWorld.imageAlbum.frames[index]

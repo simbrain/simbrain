@@ -24,7 +24,7 @@ import kotlin.math.sqrt
  */
 val spikingNetworkSimulation = newSim {
 
-    val numNeurons = showNumericInputDialog("Number of Neurons:", 49) ?: return@newSim
+    val numNeurons = showNumericInputDialog("Number of neurons:", 49) ?: return@newSim
 
     val gridSpace = 50.0
     var sparsity = 0.15 // Percent of possible connections to make, and change to alter synchronous firing
@@ -35,7 +35,7 @@ val spikingNetworkSimulation = newSim {
 
     // Setup workspace and create network component
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Integrate and Fire Network")
+    val networkComponent = addNetworkComponent("Integrate and fire network")
     val network = networkComponent.network
 
     // Create layout for neurons
@@ -106,13 +106,13 @@ val spikingNetworkSimulation = newSim {
     neurons.forEach { it.randomize() }
 
     // Create a raster plot to visualize the spikes
-    val rasterPlot = RasterPlotComponent("Spike Raster Plot")
+    val rasterPlot = RasterPlotComponent("Spike raster plot")
     workspace.addWorkspaceComponent(rasterPlot)
 
     withGui {
         getNetworkPanel(networkComponent).synapseSpikingOnlyVisible = true
         val controlPanel = createControlPanel("Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addButton("Randomize Activations") {
+            addButton("Randomize activations") {
                 neuronCollection.randomize()
             }.apply {
                 toolTipText = "Set every neuron to a random activation."
@@ -152,7 +152,7 @@ val spikingNetworkSimulation = newSim {
             }.apply {
                 toolTipText = "Ask for a new connection density from 0 to 1, then rewire the network with fresh random synapses."
             }
-            addButton("Excitatory Ratio") {
+            addButton("Excitatory ratio") {
                 percentExcitatory = showNumericInputDialog("Enter percent excitatory (0.0 to 100.0):", percentExcitatory) ?: return@addButton
 
                 // Remove existing synapses
@@ -200,11 +200,11 @@ val spikingNetworkSimulation = newSim {
             }.apply {
                 toolTipText = "Ask for a new mean synaptic delay in milliseconds and give every synapse a new random delay with that mean."
             }
-            addButton("Neuron Type") {
+            addButton("Neuron type") {
                 val selectedOption = showChoice(
                     "Select neuron update rule:",
-                    listOf("Integrate and Fire", "Izhikevich", "Spiking Threshold"),
-                    title = "Change Neuron Type"
+                    listOf("Integrate and fire", "Izhikevich", "Spiking threshold"),
+                    title = "Change neuron type"
                 )
 
                 if (selectedOption != null) {
@@ -234,7 +234,7 @@ val spikingNetworkSimulation = newSim {
             }.apply {
                 toolTipText = "Switch every neuron to integrate-and-fire, Izhikevich, or spiking-threshold dynamics."
             }
-            addButton("Add Pacemaker") {
+            addButton("Add pacemaker") {
                 if (pacemakerNeuron == null) {
                     val frequency = showNumericInputDialog("Enter pacemaker frequency (Hz):", 0.5) ?: return@addButton
 
@@ -313,24 +313,24 @@ val spikingNetworkSimulation = newSim {
 
         The control panel provides several ways to explore network dynamics:
 
-        - `Randomize Activations`: Resets all neuron activations to random values, giving you a new starting point to observe how the network evolves.
+        - `Randomize activations`: Resets all neuron activations to random values, giving you a new starting point to observe how the network evolves.
 
         - `Sparsity`: Adjusts the connectivity density of the network (values ranging from 0.0 to 1.0). Note: The network is rebuilt when you change this parameter.
             - Lower sparsity means fewer connections and typically less synchronous activity.
             - Higher sparsity creates a more densely connected network that may exhibit more coordinated firing patterns.
 
-        - `Excitatory Ratio`: Changes the percentage of excitatory versus inhibitory connections (values ranging 0.0 to 100.0). Note: The network is rebuilt when you change this parameter.
+        - `Excitatory ratio`: Changes the percentage of excitatory versus inhibitory connections (values ranging 0.0 to 100.0). Note: The network is rebuilt when you change this parameter.
             - A higher ratio means more excitatory connections, which can lead to more active, potentially runaway dynamics.
             - Lower ratios increase inhibition, which can stabilize or quiet the network.
 
         - `Delays`: Modifies the mean synaptic delay (in milliseconds) using a Poisson distribution. Delays affect the timing of spike propagation through the network and can influence synchronization patterns.
 
-        - `Neuron Type`: Switches the neuron's model to the provided spiking neuron models:
+        - `Neuron type`: Switches the neuron's model to the provided spiking neuron models:
             - [Integrate and Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html): Simple leaky integration with threshold-based spiking.
             - [Izhikevich](https://docs.simbrain.net/docs/network/neurons/izhikevich.html): More biologically realistic model capable of diverse firing patterns.
             - [Spiking Threshold](https://docs.simbrain.net/docs/network/neurons/spikingThreshold.html): Basic threshold-based spiking model.
 
-        - `Add Pacemaker`: Adds a sinusoidal pacemaker neuron that drives the network rhythmically. The pacemaker connects to all neurons and can induce periodic bursting behavior. You can set the frequency
+        - `Add pacemaker`: Adds a sinusoidal pacemaker neuron that drives the network rhythmically. The pacemaker connects to all neurons and can induce periodic bursting behavior. You can set the frequency
         (in Hz) to control the rhythm. If you see too many or too few spikes in the raster plot, adjust the pacemaker frequency or other network parameters.
 
         # Activities
@@ -339,7 +339,7 @@ val spikingNetworkSimulation = newSim {
 
         1. Click `Run` to start the simulation.
 
-        2. Press `Randomize Activations` to explore different starting points.
+        2. Press `Randomize activations` to explore different starting points.
 
         3. Adjust `sparsity` or `excitatory ratio` with the buttons; each change rebuilds the network.
 

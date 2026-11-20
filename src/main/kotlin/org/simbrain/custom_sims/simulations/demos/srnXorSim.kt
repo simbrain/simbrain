@@ -70,9 +70,9 @@ val srnXORSim = newSim {
             height = 550
         }
 
-        createControlPanel("Control Panel", 5, 10) {
-            val actualText = addLabelledText("Actual Next: ", "0.000")
-            val predictedText = addLabelledText("Predicted Next: ", "0.000")
+        createControlPanel("Control panel", 5, 10) {
+            val actualText = addLabelledText("Actual next: ", "0.000")
+            val predictedText = addLabelledText("Predicted next: ", "0.000")
             val errorText = addLabelledText("Error: ", "0.000")
 
             // TODO: Could add a message or text that says "predictable" every third iteration

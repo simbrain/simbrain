@@ -148,7 +148,7 @@ val modelComparison = newSim {
         var plotBounds = Rectangle()
         var plot = createClassifierProjectionPlot(classifierNetwork, "Data")
 
-        val controlPanel = createControlPanel("Model Comparison", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Model comparison", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComboBox(
                 "Dataset",
                 TableDataset.entries,

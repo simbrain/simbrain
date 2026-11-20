@@ -10,7 +10,7 @@ import org.simbrain.util.UpdateAction
  *
  * @author jyoshimi
  */
-class PriorityUpdate(private val network: Network): UpdateAction("Priority Update", "Priority update of all network models") {
+class PriorityUpdate(private val network: Network): UpdateAction("Priority update", "Priority update of all network models") {
     override suspend fun run() {
         network.updateModelsByPriority()
     }

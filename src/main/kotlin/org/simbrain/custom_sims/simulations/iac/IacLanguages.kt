@@ -16,7 +16,7 @@ val iacLanguages = newSim {
 
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Language Classifier")
+    val networkComponent = addNetworkComponent("Language classifier")
     networkComponent.network.iacNetwork {
         val family = pool(
             "Family",
@@ -29,7 +29,7 @@ val iacLanguages = newSim {
             at = point(700, -160), columns = 1
         )
         val genders = pool(
-            "Noun Genders",
+            "Noun genders",
             "1", "2", "3",
             at = point(700, 120), columns = 1
         )
@@ -77,7 +77,7 @@ val iacLanguages = newSim {
         }
         addSidebarInfo(
             iacSidebarText(
-                title = "Language Classifier",
+                title = "Language classifier",
                 body = """
                     An IAC network modeling the categorization of 20 languages. Each language has a central instance node labelled
                     with its full name and linked directly to four property pools:

@@ -180,8 +180,8 @@ class RiseAndDecayTest {
     @Test
     fun `rise and decay description and name`() {
         val rad = RiseAndDecay()
-        assertEquals("Rise and Decay", rad.description)
-        assertEquals("Rise and Decay", rad.name)
+        assertEquals("Rise and decay", rad.description)
+        assertEquals("Rise and decay", rad.name)
     }
 
     @Test

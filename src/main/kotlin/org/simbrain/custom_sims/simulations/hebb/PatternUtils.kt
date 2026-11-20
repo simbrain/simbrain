@@ -97,7 +97,7 @@ fun applyCrossPattern(layer: Layer, bipolar: Boolean = false) =
 fun builtInPatterns(size: Int, bipolar: Boolean = false): Map<String, DoubleArray> = mapOf(
     "Circle" to circlePattern(size, bipolar),
     "Square" to squarePattern(size, bipolar),
-    "Diagonal Line" to linePattern(size, "diagonal", bipolar),
+    "Diagonal line" to linePattern(size, "diagonal", bipolar),
     "Cross" to crossPattern(size, bipolar),
 )
 
@@ -139,7 +139,7 @@ suspend fun SimulationScope.createPatternControlPanel(
     randomizeWeights: () -> Unit = {},
 ): ControlPanelKt? {
     return withGui {
-        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val offValue = if (isContinuous) -1.0 else 0.0
             addButton("Clear pattern") {
                 layer.setActivations(DoubleArray(layer.size) { offValue })
@@ -168,7 +168,7 @@ suspend fun SimulationScope.createPatternControlPanel(
             }.apply {
                 toolTipText = "Set the neurons to a square outline pattern."
             }
-            addButton("Diagonal Line") {
+            addButton("Diagonal line") {
                 applyLinePattern(layer, "diagonal", isContinuous)
             }.apply {
                 toolTipText = "Set the neurons to a diagonal line pattern."

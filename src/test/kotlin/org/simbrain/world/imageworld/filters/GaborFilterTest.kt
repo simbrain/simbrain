@@ -4,7 +4,8 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.image.BufferedImage
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.abs
 
 /**
  * Unit tests for GaborFilter with educational components explaining the mathematical concepts.
@@ -47,7 +48,7 @@ class GaborFilterTest {
     fun `test gabor filter creation and default parameters`() {
         val filter = GaborFilter()
         
-        assertEquals("Gabor Filter", filter.name)
+        assertEquals("Gabor filter", filter.name)
         assertTrue(filter.enabled)
         assertEquals(0.1, filter.frequency, 0.001)
         assertEquals(0.0, filter.orientationDegrees, 0.001)

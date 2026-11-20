@@ -51,12 +51,12 @@ val discreteHopfieldSim = newSim {
             - `Clear pattern`: Sets every neuron to `0`, giving a blank canvas to draw on with the wand tool.
             - `Random pattern`: Sets each neuron randomly to `0` or `1`. Useful as a starting point for testing recall.
             - `Randomize weights`: Replaces the weights with small symmetric random values, erasing anything the network has learned.
-            - `Circle`, `Square`, `Diagonal Line`, `Cross`: Each loads one of the four built-in patterns into the network.
+            - `Circle`, `Square`, `Diagonal line`, `Cross`: Each loads one of the four built-in patterns into the network.
             - `Show correlations`: Opens a corr plot comparing the four built-in patterns. Patterns with high correlations overlap more and are harder to store together without interference.
             - `Show trained correlations`: Opens a corr plot of the patterns trained with this panel's train buttons, each shown as a small picture. A pattern a few units away from a built-in one is labelled like `Circle ~3`, otherwise it is numbered, and `×2` means it was trained twice. `Randomize weights` clears the list.
             - `Train once on current pattern`: Applies one Hebbian learning step, storing whatever pattern is currently on the neurons in the weights. The anti-pattern (all activations flipped) is stored along with it. Press it repeatedly to strengthen the memory.
             - `Capacity` tab, pattern slider: Loads one of the randomly generated test patterns into the network.
-            - `Capacity` tab, `Capacity Test`: Opens a dialog of test settings (described in _How the Capacity Test Works_ below), then runs the test and plots the results.
+            - `Capacity` tab, `Capacity test`: Opens a dialog of test settings (described in _How the Capacity Test Works_ below), then runs the test and plots the results.
 
             ## Background on Memory Capacity
             
@@ -84,7 +84,7 @@ val discreteHopfieldSim = newSim {
             1. **Pattern Generation**: When the control panel is created, a fixed set of random patterns is generated (one pattern for each neuron in the network). 
             This ensures reproducible results across test runs.
             
-            2. **Running the Test**: Click the `Capacity Test` button to open a configuration dialog where you can set:
+            2. **Running the Test**: Click the `Capacity test` button to open a configuration dialog where you can set:
                - `Distance threshold`: Maximum allowable distance between recalled and original pattern (as a percentage). For discrete Hopfield, this uses Hamming distance.
                - `Percent to test`: What percentage of the network size to use as the number of test patterns
                - `Cue distance`: How much to perturb the pattern when testing retrieval (Hamming distance for discrete Hopfield)
@@ -115,7 +115,7 @@ val discreteHopfieldSim = newSim {
 
             ## Activity 1: Train and recall a pattern
 
-            Load one of the four patterns (`Circle`, `Square`, `Diagonal Line`, or `Cross`) and press `Train once on current pattern` to train the network on it. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
+            Load one of the four patterns (`Circle`, `Square`, `Diagonal line`, or `Cross`) and press `Train once on current pattern` to train the network on it. Each time you press it, the pattern is reinforced into the network's memory. Note that the network learns both the pattern and its anti-pattern (the version with all activations flipped).
 
             To confirm the pattern is remembered, press `Random pattern` (or press `N -> R`) and then iterate by pressing `Space` to see if the pattern is recreated. You can also press `Clear pattern`, draw part of a pattern using the wand tool (press `D` to activate), and see if the network completes it.
 
@@ -125,7 +125,7 @@ val discreteHopfieldSim = newSim {
 
             ## Activity 3: Test memory capacity
 
-            The Capacity tab provides tools to systematically test how many patterns the network can reliably store and retrieve. You can run automated tests that measure recall success rates across different numbers of stored patterns, with or without forgetting dynamics. A slider lets you explore individual test patterns, and the Capacity Test button launches the full analysis.
+            The Capacity tab provides tools to systematically test how many patterns the network can reliably store and retrieve. You can run automated tests that measure recall success rates across different numbers of stored patterns, with or without forgetting dynamics. A slider lets you explore individual test patterns, and the Capacity test button launches the full analysis.
 
             ### Exploring Individual Patterns
             

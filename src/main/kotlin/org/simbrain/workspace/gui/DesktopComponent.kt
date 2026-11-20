@@ -244,10 +244,10 @@ var parentFrame: GenericFrame, workspaceComponent: E
      */
     fun showHasChangedDialog(): Boolean = when (showChoice(
             "Would you like to save these changes?",
-            listOf("Save", "Don't Save", "Cancel"),
+            listOf("Save", "Don't save", "Cancel"),
             kind = MessageKind.WARNING,
             heading = "This component has changed since it was last saved",
-            title = "Component Has Changed"
+            title = "Component has changed"
         )) {
         0 -> {
             save()

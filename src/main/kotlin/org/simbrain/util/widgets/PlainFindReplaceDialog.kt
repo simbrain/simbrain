@@ -20,8 +20,8 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
     private val searchField = JTextField(16).apply { text = textPane.lastSearchedString }
     private var replaceField: JTextField? = null
     private val regexCB = JCheckBox("Regex")
-    private val matchCaseCB = JCheckBox("Match Case")
-    private val wholeWordCB = JCheckBox("Whole Word")
+    private val matchCaseCB = JCheckBox("Match case")
+    private val wholeWordCB = JCheckBox("Whole word")
     private val wrapSearchCB = JCheckBox("Wrap").apply { isSelected = true }
     private val backwardSearch = JRadioButton("Backward")
     private val forwardSearch = JRadioButton("Forward").apply { isSelected = true }
@@ -34,7 +34,7 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
             "[]8[]12[]8[]"
         )
 
-        val findButton = JButton("Find Next").apply {
+        val findButton = JButton("Find next").apply {
             addActionListener {
                 textPane.lastSearchedString = searchField.text
                 find()
@@ -46,7 +46,7 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
 
         if (showReplace) {
             add(findButton)
-            add(JButton("Replace & Find").apply {
+            add(JButton("Replace & find").apply {
                 addActionListener {
                     textPane.lastSearchedString = searchField.text
                     textPane.lastReplacedString = replaceField?.text
@@ -65,7 +65,7 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
                     replaceSelection()
                 }
             })
-            add(JButton("Replace All").apply {
+            add(JButton("Replace all").apply {
                 addActionListener {
                     textPane.lastReplacedString = theReplaceField.text
                     replaceAll()
@@ -185,6 +185,6 @@ class PlainFindReplaceDialog(frame: JFrame, private val textPane: SimbrainTextPa
             }
             textPane.text = replaced
         }
-        showMessage("$count occurrence(s) replaced.", title = "Replace All")
+        showMessage("$count occurrence(s) replaced.", title = "Replace all")
     }
 }

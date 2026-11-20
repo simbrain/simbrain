@@ -41,7 +41,7 @@ val objectTrackingSim = newSim("object_tracking") {
     // Basic setup
     workspace.clearWorkspace()
     exposeTypes(AllostaticUpdateRule::class)
-    val networkComponent = addNetworkComponent("Spontaneous Object Tracking")
+    val networkComponent = addNetworkComponent("Spontaneous object tracking")
     val network = networkComponent.network
 
     // Most connections in network use 10% density
@@ -74,7 +74,7 @@ val objectTrackingSim = newSim("object_tracking") {
     network.addNetworkModels(leftInputNeurons)
     val leftInputs = NeuronCollection(leftInputNeurons)
     network.addNetworkModel(leftInputs)
-    leftInputs.label = "Left Inputs"
+    leftInputs.label = "Left inputs"
     leftInputs.layout(GridLayout())
     leftInputs.location = point(-816, -250)
 
@@ -87,7 +87,7 @@ val objectTrackingSim = newSim("object_tracking") {
     network.addNetworkModels(rightInputNeurons)
     val rightInputs = NeuronCollection(rightInputNeurons)
     network.addNetworkModel(rightInputs)
-    rightInputs.label = "Right Inputs"
+    rightInputs.label = "Right inputs"
     rightInputs.layout(GridLayout())
     rightInputs.location = point(-816, 280)
 
@@ -111,10 +111,10 @@ val objectTrackingSim = newSim("object_tracking") {
     leftTurnNeuron.upperBound = 100.0
     rightTurnNeuron.upperBound = 100.0
     val leftTurnCollection = NeuronCollection(listOf(leftTurnNeuron))
-    leftTurnCollection.label = "Left Turn"
+    leftTurnCollection.label = "Left turn"
     network.addNetworkModel(leftTurnCollection)
     val rightTurnCollection = NeuronCollection(listOf(rightTurnNeuron))
-    rightTurnCollection.label = "Right Turn"
+    rightTurnCollection.label = "Right turn"
     network.addNetworkModel(rightTurnCollection)
     leftTurnNeuron.location = point(700, -300)
     rightTurnNeuron.location = point(700, 350)
@@ -226,7 +226,7 @@ val objectTrackingSim = newSim("object_tracking") {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tfNumIterations: JTextField = addTextField(
                 "Number of iterations", "1000",
                 toolTip = "Number of iterations recorded by Run trial."

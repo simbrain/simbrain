@@ -99,7 +99,7 @@ val nlpSimBasic = newSim {
        `Text World`: Displays a corpus of text and automatically iterates through tokens. The text is used to generate a
        co-occurrence matrix and the resulting word embeddings.
 
-       `Projection Plot` (labeled `Activations`): Shows the embeddings in a two-dimensional scatterplot using PCA.
+       `Projection plot` (labeled `Activations`): Shows the embeddings in a two-dimensional scatterplot using PCA.
        Words with  similar co-occurrence patterns appear near one another.
 
        You can also view the co-occurrence matrix directly by clicking the matrix button. Rows represent target words and

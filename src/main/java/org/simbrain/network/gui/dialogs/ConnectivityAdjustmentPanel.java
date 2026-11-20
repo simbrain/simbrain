@@ -88,7 +88,7 @@ public class ConnectivityAdjustmentPanel extends JPanel {
         gbc.gridwidth = 1;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         gbc.insets = new Insets(10, 10, 0, 10);
-        ssp.add(new JLabel("Percent Connectivity:"), gbc);
+        ssp.add(new JLabel("Percent connectivity:"), gbc);
 
         gbc.gridx = 0;
         gbc.gridy = 1;

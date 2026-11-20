@@ -267,7 +267,7 @@ fun getPreferenceDialog(prefHolder: PreferenceHolder, title: String): StandardDi
     return StandardDialog().apply {
         this.title = title
         contentPane = ape
-        addButton(JButton("Revert to Default").apply {
+        addButton(JButton("Revert to default").apply {
             addActionListener {
                 if (showConfirm(
                         "Reverting to default preferences. This action cannot be undone.",
@@ -304,4 +304,4 @@ object TestPrefs: PreferenceHolder() {
 
 }
 
-fun main() = getPreferenceDialog(TestPrefs, "Test Preferences").display()
+fun main() = getPreferenceDialog(TestPrefs, "Test preferences").display()

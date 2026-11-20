@@ -148,7 +148,7 @@ class PercentExcitatoryPanel(percentExcitatory: Double = 50.0) : JPanel() {
         //     sliderPanel.add(sliderApply, gbc)
         // }
 
-        val sliderBorder: Border = Theme.sectionBorder("Excitatory/Inhibitory Ratio")
+        val sliderBorder: Border = Theme.sectionBorder("Excitatory/inhibitory ratio")
         sliderPanel.border = sliderBorder
         layout = BorderLayout()
         add(sliderPanel, BorderLayout.NORTH)

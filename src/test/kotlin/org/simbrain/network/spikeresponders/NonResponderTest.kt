@@ -65,7 +65,7 @@ class NonResponderTest {
     @Test
     fun `non responder description and name`() {
         val nonResponder = NonResponder()
-        assertEquals("None (No spike response)", nonResponder.description)
+        assertEquals("None (no spike response)", nonResponder.description)
         assertEquals("None", nonResponder.name)
     }
 

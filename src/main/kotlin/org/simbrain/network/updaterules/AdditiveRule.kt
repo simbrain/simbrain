@@ -17,7 +17,7 @@ import kotlin.math.atan
  * Decay-type neuron used with continuous Hopfield networks.
  * See Haykin (2002), section 14.5 and the original Hopfield PNAS article.
  */
-@CustomTypeName("Additive (Continuous Hopfield)")
+@CustomTypeName("Additive (continuous Hopfield)")
 class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), NoisyUpdateRule {
 
     @UserParameter(
@@ -75,6 +75,6 @@ class AdditiveRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Noisy
     }
 
     override val name: String
-        get() = "Additive (Continuous Hopfield)"
+        get() = "Additive (continuous Hopfield)"
 
 }

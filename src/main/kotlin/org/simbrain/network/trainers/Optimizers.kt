@@ -17,14 +17,14 @@ import org.simbrain.util.copyFrom
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.CustomTypeName
 import smile.math.matrix.Matrix
-import java.util.IdentityHashMap
+import java.util.*
 import kotlin.math.pow
 import kotlin.math.sqrt
 
 abstract class Optimizer: CopyableObject {
 
     @UserParameter(
-        label = "Learning Rate", 
+        label = "Learning rate", 
         description = "Step size for gradient descent updates. Higher values learn faster but may overshoot. Typical range: 0.001-0.1",
         increment = .01, 
         minimumValue = 0.0, 
@@ -166,18 +166,18 @@ class AdamOptimizer(beta1: Double = 0.9, beta2: Double = 0.999) : AdamFamilyOpti
  *
  * Reference: "Decoupled Weight Decay Regularization" by Loshchilov & Hutter (2017)
  */
-@CustomTypeName("AdamW Optimizer")
+@CustomTypeName("AdamW optimizer")
 class AdamWOptimizer(
     beta1: Double = 0.9,
     beta2: Double = 0.999,
     @UserParameter(
-        label = "Weight Decay", 
+        label = "Weight decay", 
         description = "L2 regularization strength applied directly to weights (decoupled from gradients). Helps prevent overfitting.",
         minimumValue = 0.0, 
         order = 3
     ) var weightDecay: Double = 0.01,
     @UserParameter(
-        label = "Learning Rate Decay", 
+        label = "Learning rate decay", 
         description = "Fraction by which the learning rate shrinks at each optimizer step: each batch, or each example " +
                 "when training one example at a time. 0.0 means no decay. Higher values decay faster",
         minimumValue = 0.0, 

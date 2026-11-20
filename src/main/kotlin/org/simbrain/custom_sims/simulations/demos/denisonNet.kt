@@ -31,7 +31,7 @@ import kotlin.random.Random
 
 val denisonNet = newSim {
     workspace.clearWorkspace()
-    val netComponent = addNetworkComponent("Temporal Attention Model")
+    val netComponent = addNetworkComponent("Temporal attention model")
     val net = netComponent.network
 
     val trialStatusText = NetworkTextObject("").apply { fontSize = 18 }
@@ -57,8 +57,8 @@ val denisonNet = newSim {
         setLabels(listOf("Target 1", "Target 2"))
         layout(GridLayout(120.0, 50.0, 2))
     }
-    val vaLayer = net.addNeuronCollection(1).apply { label = "Voluntary Attention" }
-    val iaLayer = net.addNeuronCollection(1).apply { label = "Involuntary Attention" }
+    val vaLayer = net.addNeuronCollection(1).apply { label = "Voluntary attention" }
+    val iaLayer = net.addNeuronCollection(1).apply { label = "Involuntary attention" }
 
     sensory1.setUpperBound(0.1)
     sensory2.setUpperBound(0.1)
@@ -88,7 +88,7 @@ val denisonNet = newSim {
 
     val (attentionPlot, IASeries, VASeries, SensoryMeanSeries, SustainedMeanSeries, LateSensoryMeanSeries) = addTimeSeries(
         "Attention",
-        seriesNames = listOf("Involuntary Attention", "Voluntary Attention", "Sensory 1 Mean", "Sensory 2 Mean", "Sensory 3 Mean")
+        seriesNames = listOf("Involuntary attention", "Voluntary attention", "Sensory 1 mean", "Sensory 2 mean", "Sensory 3 mean")
     )
     attentionPlot.apply {
         model.isAutoRange = true
@@ -108,7 +108,7 @@ val denisonNet = newSim {
     val Decision1Plot = couplingManager.createCoupling(decision.getNeuron(0), Decision1Series)
     val Decision2Plot = couplingManager.createCoupling(decision.getNeuron(1), Decision2Series)
     attentionPlot.model.renameTimeSeries(
-        listOf("Involuntary Attention", "Voluntary Attention", "Sensory 1 Mean", "Sensory 2 Mean", "Sensory 3 Mean")
+        listOf("Involuntary attention", "Voluntary attention", "Sensory 1 mean", "Sensory 2 mean", "Sensory 3 mean")
     )
     decisionPlot.model.renameTimeSeries(listOf("Target 1", "Target 2"))
 
@@ -163,7 +163,7 @@ val denisonNet = newSim {
     }
 
     val cueTypes = listOf(
-        MenuOption("Both Targets", 0),
+        MenuOption("Both targets", 0),
         MenuOption("Target 1", 1),
         MenuOption("Target 2", 2)
     )
@@ -582,15 +582,15 @@ val denisonNet = newSim {
             }
         }
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addLabel("Attention Cue:").apply {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            addLabel("Attention cue:").apply {
                 toolTipText = "Choose the cue that initiates voluntary attention before the targets appear."
             }
             addComboBox("", cueTypes, cueTypes[0]) { selectedCue ->
                 vaState = selectedCue.state
                 updateTrialStatusText()
             }.apply { toolTipText = "Select which target time receives voluntary attention." }
-            addLabel("Report Target").apply {
+            addLabel("Report target").apply {
                 toolTipText = "Choose which target's evidence is used for the final report."
             }
             addComboBox("", reportTargets, reportTargets[0]) { selectedReportTarget ->
@@ -697,7 +697,7 @@ val denisonNet = newSim {
                 resetTrial()
             }.apply { toolTipText = "Stop the simulation and return the network and plots to baseline." }
             addSeparator()
-            addButton("Run SOA Sweep") {
+            addButton("Run SOA sweep") {
                 runSweepAction()
             }.apply {
                 toolTipText = "Run every paper stimulus condition across SOAs and plot the d′-like sensitivity proxy."
@@ -726,32 +726,32 @@ addSidebarInfo(
     - `Sensory 2`: a slower, sustained transformation of Sensory 1. The current decision decoder reads this stage.
     - `Sensory 3`: the next, late-normalized stage after Sensory 2. It is calculated and plotted so you can observe the full sensory cascade from the paper architecture, but it is currently a terminal display stage: nothing downstream reads it, so it does not affect the decision or sweep results.
     - `Decision evidence`: two target-specific decisions, one for each target time. The `T1` node reports the evidence for Target 1 and the `T2` node reports the evidence for Target 2; positive values mean clockwise and negative values mean counterclockwise. **The labels inside these two network nodes show the current decision directly:** for example, `T1: clockwise` means the current Target 1 evidence is positive.
-    - `Voluntary Attention`: the temporally targeted gain signal initiated by the cue. A `T1` or `T2` cue favors that target time, and a neutral cue divides the available resource.
-    - `Involuntary Attention`: a stimulus-driven gain signal computed from recent Sensory 1 activity. It rises after a grating onset regardless of the cue.
+    - `Voluntary attention`: the temporally targeted gain signal initiated by the cue. A `T1` or `T2` cue favors that target time, and a neutral cue divides the available resource.
+    - `Involuntary attention`: a stimulus-driven gain signal computed from recent Sensory 1 activity. It rises after a grating onset regardless of the cue.
 
     Both attention systems modulate Sensory 1 gain: higher gain makes its orientation-tuned neurons more responsive to the same grating input. The `Attention` plot shows the two attention signals plus the mean activity of all three sensory stages. Read it as a sequence: a target drives Sensory 1, activity propagates to Sensory 2 and Sensory 3, and Sensory 2 supplies target-specific decision evidence.
 
     ## Control panel
 
-    `Attention Cue` selects the instruction that initiates voluntary attention:
+    `Attention cue` selects the instruction that initiates voluntary attention:
 
-    - `Both Targets`: divides voluntary attention across the two target times (neutral).
+    - `Both targets`: divides voluntary attention across the two target times (neutral).
     - `Target 1`: prioritizes the first target (`T1`).
     - `Target 2`: prioritizes the second target (`T2`).
 
     `SOA` is the stimulus onset asynchrony: the delay, in milliseconds, between `T1` and `T2`. Short SOAs create stronger competition for limited voluntary attention; longer SOAs allow it to recover.
 
-    `Report Target` selects the target whose final evidence is evaluated. `Random` chooses one on each trial. A trial is `valid` when cue and report target match, `invalid` when the cue favors the other target, and `neutral` when the cue is `Both Targets`.
+    `Report target` selects the target whose final evidence is evaluated. `Random` chooses one on each trial. A trial is `valid` when cue and report target match, `invalid` when the cue favors the other target, and `neutral` when the cue is `Both targets`.
 
     - `T1 valid`: cue `Target 1`; report `Target 1`.
     - `T1 invalid`: cue `Target 2`; report `Target 1`.
     - `T2 valid`: cue `Target 2`; report `Target 2`.
     - `T2 invalid`: cue `Target 1`; report `Target 2`.
-    - `Neutral`: cue `Both Targets`; report `Random`.
+    - `Neutral`: cue `Both targets`; report `Random`.
 
     `Start` runs one trial. `Step 10` advances a prepared trial by ten workspace iterations. `Reset` stops the simulation and returns the network and plots to baseline.
 
-    `Run SOA Sweep` evaluates every paper stimulus condition across the available SOAs and opens `T1` and `T2` plots. The curves show signed correct decision evidence, averaged across the four stimulus conditions, as a `d′`-like sensitivity proxy: positive values indicate evidence in the correct direction, values near zero are ambiguous, and negative values indicate evidence in the wrong direction. This is not formal behavioral `d′`, which requires hit and false-alarm rates; it is a model-level measure that lets you directly inspect the paper's SOA-dependent qualitative effects.
+    `Run SOA sweep` evaluates every paper stimulus condition across the available SOAs and opens `T1` and `T2` plots. The curves show signed correct decision evidence, averaged across the four stimulus conditions, as a `d′`-like sensitivity proxy: positive values indicate evidence in the correct direction, values near zero are ambiguous, and negative values indicate evidence in the wrong direction. This is not formal behavioral `d′`, which requires hit and false-alarm rates; it is a model-level measure that lets you directly inspect the paper's SOA-dependent qualitative effects.
 
     <img src="//localfiles/simulations/images/denison/denison-soa-results.png" width="300" alt="Denison et al.'s SOA performance results" />
 
@@ -763,7 +763,7 @@ addSidebarInfo(
 
     ## Activity 1: Simulate an individual trial
 
-    Select an `Attention Cue`, `SOA`, and `Report Target`, then click `Start`. Change `SOA` between trials to see how the gap between targets affects attention allocation and decision evidence. Use `Step 10` repeatedly to watch the trial unfold and observe each event along this timeline:
+    Select an `Attention cue`, `SOA`, and `Report target`, then click `Start`. Change `SOA` between trials to see how the gap between targets affects attention allocation and decision evidence. Use `Step 10` repeatedly to watch the trial unfold and observe each event along this timeline:
 
     ```text
     0 ms        500 ms      530 ms          500 + SOA ms     530 + SOA ms
@@ -775,7 +775,7 @@ addSidebarInfo(
 
     ## Activity 2: Replicate paper conditions with an SOA sweep
 
-    Use `Run SOA Sweep` to evaluate every paper stimulus condition directly and compare valid, neutral, and invalid curves. Look for voluntary-attention tradeoffs, SOA-dependent `T1` sensitivity, and an attentional-blink-like dip for `T2`.
+    Use `Run SOA sweep` to evaluate every paper stimulus condition directly and compare valid, neutral, and invalid curves. Look for voluntary-attention tradeoffs, SOA-dependent `T1` sensitivity, and an attentional-blink-like dip for `T2`.
 
     # Reference
 

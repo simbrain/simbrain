@@ -88,7 +88,7 @@ val objectRecognition3D = newSim {
     }
 
     val view3dSensor = View3DSensor().apply {
-        label = "3D View"
+        label = "3D view"
         fov = 90.0
         this.viewDistance = viewDistance
         outputWidth = viewWidth
@@ -133,7 +133,7 @@ val objectRecognition3D = newSim {
         val classes: List<EntityType?> =
             if (includeNoObject) classEntityTypes + listOf<EntityType?>(null) else classEntityTypes
         val classLabels = classEntityTypes.map { it.description } +
-                if (includeNoObject) listOf("No Object") else emptyList()
+                if (includeNoObject) listOf("No object") else emptyList()
         val totalSamples = classes.size * samplesPerClass
 
         val rng = Random(seed)
@@ -314,7 +314,7 @@ val objectRecognition3D = newSim {
         WeightMatrix(flatArray, outputArray)
 
         val cnnModel = network.addConvolutionalNeuralNetwork(inputTensorLayer, outputArray) {
-            label = "3D Object CNN"
+            label = "3D object CNN"
             this.trainingSet = trainingSet
             this.testingSet = testingSet
         }
@@ -371,7 +371,7 @@ val objectRecognition3D = newSim {
             addComboBox("Class 2", entityChoices, class2, toolTip = "Object type used for the second class.") { class2 = it }
             addComboBox("Class 3", entityChoices, class3, toolTip = "Object type used for the third class.") { class3 = it }
             addCheckBox(
-                "Include 'No Object' class", includeNoObject,
+                "Include 'No object' class", includeNoObject,
                 toolTip = "Add a fourth class of views that face away from the target, so they show no object."
             ) { includeNoObject = it }
             addSeparator()
@@ -431,7 +431,7 @@ val objectRecognition3D = newSim {
           position (within the world margins) and the mouse is placed in
           an annulus of radius `innerRadius`–`outerRadius` around it with
           a heading pointed toward the target ± the heading jitter.
-        - For the optional `No Object` class the heading is flipped 180°
+        - For the optional `No object` class the heading is flipped 180°
           so the target falls behind the FOV and the view contains only
           the tilemap and boundary walls.
 
@@ -441,7 +441,7 @@ val objectRecognition3D = newSim {
 
         1. Adjust the parameters and class selections in the `Configuration` panel.
         2. Click `Generate` to build the datasets and CNN.
-        3. Right-click the `3D Object CNN` subnet and select `Train...`
+        3. Right-click the `3D object CNN` subnet and select `Train...`
         4. Close the dialog and drive the mouse around the world
            (arrow keys) to watch the live predictions.
         5. Tweak parameters and click `Regenerate` to rerun with fresh data.

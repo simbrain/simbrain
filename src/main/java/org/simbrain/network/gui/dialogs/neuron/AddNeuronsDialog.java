@@ -43,7 +43,7 @@ public class AddNeuronsDialog extends StandardDialog {
         // Quantity panel
         JPanel quantityPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
         quantityPanel.setBorder(Theme.sectionBorder("Quantity"));
-        quantityPanel.add(new JLabel("Number of Neurons:"));
+        quantityPanel.add(new JLabel("Number of neurons:"));
         quantityPanel.add(numNeurons);
         mainPanel.add(quantityPanel);
 
@@ -52,7 +52,7 @@ public class AddNeuronsDialog extends StandardDialog {
         // Neuron type panel
         neuronEditor = new AnnotatedPropertyEditor<>(Collections.singletonList(baseNeuron));
         DetailTrianglePanel neuronPanel = new DetailTrianglePanel(neuronEditor, false);
-        neuronPanel.setBorder(Theme.sectionBorder("Neuron Type"));
+        neuronPanel.setBorder(Theme.sectionBorder("Neuron type"));
         mainPanel.add(neuronPanel);
 
         mainPanel.add(Box.createVerticalStrut(Theme.sectionGap));
@@ -60,7 +60,7 @@ public class AddNeuronsDialog extends StandardDialog {
         // Layout panel
         layoutPanel = new AnnotatedPropertyEditor<>(layoutEditor);
         DetailTrianglePanel layoutDetailPanel = new DetailTrianglePanel(layoutPanel, false);
-        layoutDetailPanel.setBorder(Theme.sectionBorder("Neuron Layout"));
+        layoutDetailPanel.setBorder(Theme.sectionBorder("Neuron layout"));
         mainPanel.add(layoutDetailPanel);
 
         // The dialog already supplies its own margin (Theme.dialogBorder), so let the scroll

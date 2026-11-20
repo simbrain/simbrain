@@ -34,9 +34,9 @@ class Hopfield : Subnetwork, UnsupervisedNetwork {
     var learningRate = 0.25
 
     @UserParameter(
-        label = "Hopfield Weight randomizer",
+        label = "Hopfield weight randomizer",
         showDetails = false,
-        description = "Randomizer for Hopfield Weights.",
+        description = "Randomizer for Hopfield weights.",
         order = 30,
     )
     var hopfieldWeightRandomizer = NormalDistribution(0.0, .1)

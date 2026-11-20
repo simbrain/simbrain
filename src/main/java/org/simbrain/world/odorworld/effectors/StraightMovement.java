@@ -24,7 +24,7 @@ public class StraightMovement extends Effector {
     /**
      * Effector moves agent ahead by scaling factor times amount.
      */
-    @UserParameter(label = "Base Movement Amount",
+    @UserParameter(label = "Base movement amount",
             description = "Effector moves agent ahead by scaling factor times amount.",
             order = 4)
     private double scalingFactor = DEFAULT_SCALING_FACTOR;
@@ -85,7 +85,7 @@ public class StraightMovement extends Effector {
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {
-            return "Move Straight";
+            return "Move straight";
         } else {
             return super.getLabel();
         }
@@ -93,7 +93,7 @@ public class StraightMovement extends Effector {
 
     @Override
     public String getName() {
-        return "Straight Movement";
+        return "Straight movement";
     }
 
     @Override

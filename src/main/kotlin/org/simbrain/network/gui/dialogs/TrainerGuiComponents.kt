@@ -1,10 +1,6 @@
 package org.simbrain.network.gui.dialogs
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.events.TrainerEvents
@@ -140,24 +136,24 @@ class TrainerControls(internal val trainer: SupervisedTrainer, supervisedNetwork
         val validationMessage = when {
             isValid -> "Iterate training once"
             !trainingValid && !testingValid -> 
-                "Cannot train: Training data (${trainingInputRows} inputs, ${trainingTargetRows} targets) and testing data (${testingInputRows} inputs, ${testingTargetRows} targets) have mismatched row counts. All tables must have matching row counts."
+                "Cannot train: training data (${trainingInputRows} inputs, ${trainingTargetRows} targets) and testing data (${testingInputRows} inputs, ${testingTargetRows} targets) have mismatched row counts. All tables must have matching row counts."
             !trainingValid -> 
-                "Cannot train: Training data has ${trainingInputRows} input rows and ${trainingTargetRows} target rows. Row counts must match."
+                "Cannot train: training data has ${trainingInputRows} input rows and ${trainingTargetRows} target rows. Row counts must match."
             !testingValid -> 
-                "Cannot train: Testing data has ${testingInputRows} input rows and ${testingTargetRows} target rows. Row counts must match."
-            else -> "Cannot train: Row count validation failed"
+                "Cannot train: testing data has ${testingInputRows} input rows and ${testingTargetRows} target rows. Row counts must match."
+            else -> "Cannot train: row count validation failed"
         }
         stepAction.putValue(Action.SHORT_DESCRIPTION, validationMessage)
         
         val runValidationMessage = when {
             isValid -> "Iterate training until stop button is pressed"
             !trainingValid && !testingValid -> 
-                "Cannot train: Both training and testing data have mismatched input/target row counts"
+                "Cannot train: both training and testing data have mismatched input/target row counts"
             !trainingValid -> 
-                "Cannot train: Training data input and target tables must have the same number of rows"
+                "Cannot train: training data input and target tables must have the same number of rows"
             !testingValid -> 
-                "Cannot train: Testing data input and target tables must have the same number of rows"
-            else -> "Cannot train: Row count validation failed"
+                "Cannot train: testing data input and target tables must have the same number of rows"
+            else -> "Cannot train: row count validation failed"
         }
         runAction.putValue(Action.SHORT_DESCRIPTION, runValidationMessage)
     }
@@ -315,18 +311,18 @@ class TrainingStatsPanel(
         val rows = buildList {
             add(Row("Iterations:", iterationsValue))
             add(Row(
-                "Training Error (${current.lossName}):",
+                "Training error (${current.lossName}):",
                 trainingErrorValue,
-                "Mean ${current.lossName} over the examples in the last ${current.updateMethod?.let { "$it " } ?: ""}update"
+                "Mean ${current.lossName.midSentence()} over the examples in the last ${current.updateMethod?.let { "$it " } ?: ""}update"
             ))
             if (current.testingEnabled) {
-                add(Row("Testing Error (${current.lossName}):", testingErrorValue, "Mean ${current.lossName} over the testing data"))
+                add(Row("Testing error (${current.lossName}):", testingErrorValue, "Mean ${current.lossName.midSentence()} over the testing data"))
             }
-            if (current.computeAccuracy) add(Row("Training Accuracy:", trainingAccuracyValue))
-            if (current.computeAccuracy && current.testingEnabled) add(Row("Testing Accuracy:", testingAccuracyValue))
-            if (current.showStepSize) add(Row("Effective Step Size:", stepSizeValue))
+            if (current.computeAccuracy) add(Row("Training accuracy:", trainingAccuracyValue))
+            if (current.computeAccuracy && current.testingEnabled) add(Row("Testing accuracy:", testingAccuracyValue))
+            if (current.showStepSize) add(Row("Effective step size:", stepSizeValue))
             if (current.stoppingCondition.useEarlyStopping && current.testingEnabled) {
-                add(Row("Early Stopping:", earlyStoppingValue))
+                add(Row("Early stopping:", earlyStoppingValue))
             }
         }
         if (rows != shownRows) {
@@ -405,7 +401,7 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
 
         add(graphPanel, "growx, growy, push") // Make graph fill the panel
 
-        model.addTimeSeries("Training Error")
+        model.addTimeSeries("Training error")
 
         // Each report is bound to the iteration it came from and applied on the EDT in order with resets, so
         // training never waits on the EDT and a reset can't be overtaken by points from before it
@@ -417,7 +413,7 @@ class ErrorTimeSeries(events: TrainerEvents, iterationSupplier: () -> Int) : JPa
                         model.addData(0, iteration, update.stats.trainingError)
                         update.stats.testingError?.let {
                             if (model.timeSeriesList.size == 1) {
-                                model.addTimeSeries("Testing Error")
+                                model.addTimeSeries("Testing error")
                             }
                             model.addData(1, iteration, it)
                         }
@@ -506,10 +502,10 @@ class AddRemoveRows(
                         if (numUnits >= 0) {
                             tables.forEach { it.model.setNumRows(numUnits * rowsPerUnit) }
                         } else {
-                            showMessage("Number of $unitName must be non-negative", MessageKind.ERROR, title = "Invalid Input")
+                            showMessage("Number of $unitName must be non-negative", MessageKind.ERROR, title = "Invalid input")
                         }
                     } catch (e: NumberFormatException) {
-                        showMessage("Please enter a valid integer", MessageKind.ERROR, title = "Invalid Input")
+                        showMessage("Please enter a valid integer", MessageKind.ERROR, title = "Invalid input")
                     }
                 }
             }

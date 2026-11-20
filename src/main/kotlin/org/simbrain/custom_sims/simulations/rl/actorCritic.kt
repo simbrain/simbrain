@@ -63,7 +63,7 @@ val actorCritic = newSim {
     var stop = false
     var goalAchieved = false
 
-    val numTilesInADimension = showNumericInputDialog("Num Tiles In a Dimension", 5) ?: return@newSim
+    val numTilesInADimension = showNumericInputDialog("Num tiles in a dimension", 5) ?: return@newSim
 
     workspace.clearWorkspace()
     val networkComponent = addNetworkComponent("Network")
@@ -125,7 +125,7 @@ val actorCritic = newSim {
         upperBound = 100.0
     }
     val tdError = network.addNeuron(400, 0).apply {
-        label = "TD Error"
+        label = "TD error"
         upperBound = 100.0
         lowerBound = -100.0
     }
@@ -227,7 +227,7 @@ val actorCritic = newSim {
 
     // Network Update
     network.updateManager.clear()
-    network.updateManager.addAction(updateAction("RL Update") {
+    network.updateManager.addAction(updateAction("RL update") {
 
         with(network) {
             sensorNeurons.neuronList.forEach { it.accumulateFanInInputs() }
@@ -278,11 +278,11 @@ val actorCritic = newSim {
     workspace.updater.updateManager.clear()
     workspace.updater.updateManager.addAction(UpdateComponent(odorWorldComponent))
     workspace.updater.updateManager.addAction(UpdateCoupling(gridCoupling))
-    workspace.updater.updateManager.addAction(updateAction("Update Reward") {
+    workspace.updater.updateManager.addAction(updateAction("Update reward") {
         reward.activation = cheeseSensor.currentValue * cheeseReward + poisonSensor.currentValue * poisonReward
     })
     workspace.updater.updateManager.addAction(UpdateComponent(networkComponent))
-    workspace.updater.updateManager.addAction(updateAction("Net -> Movement") {
+    workspace.updater.updateManager.addAction(updateAction("Net -> movement") {
         outputs.neuronList.firstOrNull { it.activation > 0.0 }?.let {
             val direction = when (it.label) {
                 "North" -> GridDirection.NORTH
@@ -305,7 +305,7 @@ val actorCritic = newSim {
     
     The color overlay on the world tiles illustrates these ideas by showing the learned values of locations (value is expected future reward). Locations are colored green proportional to positive value (near rewards like cheese) and red proportional to negative value (near punishments like poison). Notice that as trials are run first the square nearest the cheese turns green (given how the network is wired, the agent is likely to move from that square to a rewarding square soon), then squares near that, and so on until a path backward to the agent's starting position is formed. Similarly, red regions form around the poison as the agent learns to avoid it.  
         
-    Check `Show Time Series` to open a [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window showing how `reward`, `value`, and `TD error` unfold as the simulation runs.
+    Check `Show time series` to open a [time series](https://docs.simbrain.net/docs/plots/timeSeries.html) window showing how `reward`, `value`, and `TD error` unfold as the simulation runs.
        
     Tip: To get the simulation to run faster, minimize the network window or make the weights in the network invisible (network > view > toggle weight visibility)
        
@@ -341,21 +341,21 @@ val actorCritic = newSim {
     
     4) `Epsilon`: Determines the probability of taking a random action. `0` for no random actions; `1` for all random actions. Doya (2007) suggests that this may be related to noradrenaline, which regulates overall arousal.
     
-    5) `Cheese Reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior.
+    5) `Cheese reward`: The value received when the agent reaches the cheese. Positive values reinforce approach behavior.
     
-    6) `Poison Reward`: The value received when the agent reaches the poison. Negative values create aversive learning and produce red tiles in the value overlay.
+    6) `Poison reward`: The value received when the agent reaches the poison. Negative values create aversive learning and produce red tiles in the value overlay.
 
-    7) `Show Grid`: Toggles the colored value overlay on the world tiles. When checked, green tiles indicate locations with positive learned value and red tiles indicate locations with negative learned value.
+    7) `Show grid`: Toggles the colored value overlay on the world tiles. When checked, green tiles indicate locations with positive learned value and red tiles indicate locations with negative learned value.
 
-    8) `Show Values`: Toggles numeric value labels on the world tiles so you can inspect the learned value estimate for each location directly.
+    8) `Show values`: Toggles numeric value labels on the world tiles so you can inspect the learned value estimate for each location directly.
 
-    9) `Show Time Series`: Shows or hides the plot of reward, value, and TD error over time.
+    9) `Show time series`: Shows or hides the plot of reward, value, and TD error over time.
     
     ## Time Series
     
     1) `Reward` (red time series): Positive when the agent is on the cheese, negative when on the poison.
     2) `Value` (green time series): Increases when the agent expects reward, decreases when it expects punishment. This basically tracks the color values on the world.
-    3) `TD Error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them. Updates happen for the location where the agent was at during the last time step. To get a feel for this, you can move the mouse directly from a neutral square to the cheese or poison, and update with the step button, and see that square turn green or red, reflecting the fact that being in that square led to something good or bad.
+    3) `TD error` (blue time series): The mismatch between expected and received reward. Positive error increases value/action weights whereas negative error decreases them. Updates happen for the location where the agent was at during the last time step. To get a feel for this, you can move the mouse directly from a neutral square to the cheese or poison, and update with the step button, and see that square turn green or red, reflecting the fact that being in that square led to something good or bad.
     
     # Activities
 
@@ -377,11 +377,11 @@ val actorCritic = newSim {
 
     ## Activity 4: Train in a maze
 
-    `Generate Maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze Seed` to get the same maze each time, or leave it blank for a random one, and `Clear Maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
+    `Generate maze` places walls between the grid squares so that there is exactly one path from any square to any other. The agent can only move between squares that are not separated by a wall, so it has to learn the path through the maze to the cheese. Enter a `Maze seed` to get the same maze each time, or leave it blank for a random one, and `Clear maze` removes the walls. Learning takes longer in a maze because dead ends have to be discovered and devalued, so try more trials.
 
     ## Activity 5: Study the time series plot
 
-    You can also check `Show Time Series` and study the plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place.
+    You can also check `Show time series` and study the plot to get a better sense of how reward, value and td error work together. Rewards only happen on the cheese or poison. Values accumulate on a path towards the rewarding stimuli.  TD error only spikes up or down after moving to a better or lower place.
 
     ## Activity 6: Experiment with parameter values
 
@@ -440,8 +440,8 @@ val actorCritic = newSim {
             }
 
             val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
-                "Reward, TD Error",
-                seriesNames = listOf("Reward", "Value", "TD Error")
+                "Reward, TD error",
+                seriesNames = listOf("Reward", "Value", "TD error")
             )
             plot.apply {
                 model.isAutoRange = true
@@ -479,7 +479,7 @@ val actorCritic = newSim {
         }
 
         // Control panel
-        val controlPanel = createControlPanel("RL Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("RL controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val tfTrials = addTextField("Trials", "" + numTrials, toolTip = "Number of trials performed by Run.")
             val tfGamma = addTextField(
@@ -491,26 +491,26 @@ val actorCritic = newSim {
                 "Epsilon", "" + epsilon,
                 toolTip = "Probability of taking a random action instead of the best one (exploration). Applied on Run."
             )
-            val tfCheeseReward = addTextField("Cheese Reward", "" + cheeseReward, toolTip = "Reward for reaching the cheese. Applied on Run.")
-            val tfPoisonReward = addTextField("Poison Reward", "" + poisonReward, toolTip = "Reward for touching the poison. Applied on Run.")
+            val tfCheeseReward = addTextField("Cheese reward", "" + cheeseReward, toolTip = "Reward for reaching the cheese. Applied on Run.")
+            val tfPoisonReward = addTextField("Poison reward", "" + poisonReward, toolTip = "Reward for touching the poison. Applied on Run.")
             val tfMazeSeed = addTextField(
-                "Maze Seed", "",
+                "Maze seed", "",
                 toolTip = "Whole number that picks a fixed maze layout. Leave blank for a random maze each time."
             )
-            addCheckBox("Show Grid", showGrid, toolTip = "Shade each tile by its learned value: green for positive, red for negative.") {
+            addCheckBox("Show grid", showGrid, toolTip = "Shade each tile by its learned value: green for positive, red for negative.") {
                 showGrid = it
                 refreshValueOverlay()
             }
-            addCheckBox("Show Values", showValues, toolTip = "Print each tile's learned value on the world.") {
+            addCheckBox("Show values", showValues, toolTip = "Print each tile's learned value on the world.") {
                 showValues = it
                 refreshValueOverlay()
             }
-            addButton("Generate Maze") {
+            addButton("Generate maze") {
                 val seed = tfMazeSeed.text.trim().toLongOrNull()
                 world.generateMaze(numTilesInADimension, numTilesInADimension, tileGridRatio, seed)
                 resetMouse()
             }.apply { toolTipText = "Lay a new perfect maze over the grid and return the mouse to its start." }
-            addButton("Clear Maze") {
+            addButton("Clear maze") {
                 world.clearMaze()
             }.apply { toolTipText = "Remove the maze walls." }
             // Hyphens are just a hack to make sure the panel is big enough when trial numbers are shown
@@ -536,7 +536,7 @@ val actorCritic = newSim {
                             if (stop) {
                                 break
                             }
-                            progressLabel.text = "Status: Running Trial $i of $numTrials"
+                            progressLabel.text = "Status: Running trial $i of $numTrials"
                             goalAchieved = false
                             network.clearActivations()
                             value.auxValue = 0.0
@@ -582,7 +582,7 @@ val actorCritic = newSim {
 
             addSeparator()
 
-            addCheckBox("Show Time Series", false, toolTip = "Show a plot of reward, value, and TD error.") { visible ->
+            addCheckBox("Show time series", false, toolTip = "Show a plot of reward, value, and TD error.") { visible ->
                 if (visible) showTimeSeries() else hideTimeSeries()
             }
         }.awaitLayout()

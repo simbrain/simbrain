@@ -25,7 +25,7 @@ context(NetworkPanel)
 fun ClassifierNetwork.getTrainingDialog(): StandardDialog {
     return StandardDialog().apply {
 
-        title = "Train ${classifier.name} classifier with ${classifier.numClasses} labels"
+        title = "Train ${classifier.name.midSentence()} classifier with ${classifier.numClasses} labels"
         contentPane = JPanel()
         // layout = MigLayout("fillx, debug")
 
@@ -166,7 +166,7 @@ fun RandomForestClassifier.createTreeViewer(featureNames: List<String>, classNam
                 "the trees ask different questions.</body></html>"
     )
     return StandardDialog().apply {
-        title = "Random Forest Trees"
+        title = "Random forest trees"
         contentPane = JPanel(MigLayout("fill, ins 12", "[grow]")).apply {
             add(explanation, "wrap")
             add(JPanel(MigLayout("ins 0", "[][][]")).apply {

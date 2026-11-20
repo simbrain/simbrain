@@ -45,7 +45,7 @@ class HebbianThresholdRule : SynapseUpdateRule<EmptyScalarData, EmptyMatrixData>
     }
 
     override val name: String
-        get() = "Hebbian Threshold"
+        get() = "Hebbian threshold"
 
     override fun copy(): HebbianThresholdRule {
         val h = HebbianThresholdRule()

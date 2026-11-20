@@ -190,7 +190,7 @@ open class IntegrateAndFireRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
         """.trimIndent()
     }
 
-    override val name = "Integrate and Fire"
+    override val name = "Integrate and fire"
 
     // Equal chance of spiking or not spiking, taking on any value between
     // the resting potential and the threshold if not.

@@ -196,7 +196,7 @@ val testSim = newSim {
 
 val linkedNeuronList = newSim {
     repeat(1) {
-        val networkComponent = addNetworkComponent("Neuron List $it")
+        val networkComponent = addNetworkComponent("Neuron list $it")
 
         val network = networkComponent.network
 

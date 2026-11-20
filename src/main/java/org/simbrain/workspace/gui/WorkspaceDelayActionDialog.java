@@ -36,7 +36,7 @@ public class WorkspaceDelayActionDialog extends StandardDialog {
      */
     private void setupEditorPanel() {
         // Initialize Dialog
-        setTitle("Workspace Update Delay");
+        setTitle("Workspace update delay");
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout());
         setContentPane(panel);

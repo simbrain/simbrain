@@ -37,7 +37,7 @@ class SimbrainTextArea : RSyntaxTextArea() {
     init {
         applyLafSyntaxTheme()
         createAction(
-            name = "Find / Replace...",
+            name = "Find / replace...",
             description = "Find and replace text...",
             keyboardShortcut = CmdOrCtrl + 'F'
         ) {
@@ -49,7 +49,7 @@ class SimbrainTextArea : RSyntaxTextArea() {
         val frame = JFrame()
         val dialog = FindReplaceDialog(frame, this)
         frame.contentPane = dialog
-        frame.title = if (isEditable) "Find / Replace..." else "Find..."
+        frame.title = if (isEditable) "Find / replace..." else "Find..."
         frame.isVisible = true
         frame.pack()
         frame.setLocationRelativeTo(null)

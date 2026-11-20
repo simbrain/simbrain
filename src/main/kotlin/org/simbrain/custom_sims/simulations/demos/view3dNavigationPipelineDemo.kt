@@ -48,7 +48,7 @@ val view3dNavigationPipelineDemo = newSim {
     }
 
     val view3dSensor = View3DSensor().apply {
-        label = "3D View"
+        label = "3D view"
         fov = 90.0
         viewDistance = 450.0
         outputWidth = 100
@@ -78,10 +78,10 @@ val view3dNavigationPipelineDemo = newSim {
     // Selecting the agent affords that it is the one whose pov we are taking
     agent.select()
 
-    val imageWorldComponent = addImageWorld("Pipeline View")
+    val imageWorldComponent = addImageWorld("Pipeline view")
     val imageWorld = imageWorldComponent.world.apply {
         resetImageAlbum(100, 100)
-        imagePipelineCollection.addPipeline("3D Edge 100x100") {
+        imagePipelineCollection.addPipeline("3D edge 100x100") {
             addOperation(ResizeOperation(100, 100))
             addOperation(GrayscaleOperation())
             addOperation(EdgeDetectionFilter().apply {
@@ -90,7 +90,7 @@ val view3dNavigationPipelineDemo = newSim {
                 gaussianSigma = 1.0
             })
         }
-        setCurrentPipeline("3D Edge 100x100")
+        setCurrentPipeline("3D edge 100x100")
     }
 
     with(couplingManager) {
@@ -128,7 +128,7 @@ val view3dNavigationPipelineDemo = newSim {
 
         In the `Image World` you can edit the current pipeline and see how this changes the presentation. You can:
 
-        - In the `Pipeline View` window, click the toolbar's `Edit pipeline` button to edit the current pipeline.
+        - In the `Pipeline view` window, click the toolbar's `Edit pipeline` button to edit the current pipeline.
         - Double click the edge detection operation to adjust its algorithm and parameters.
         - Observe how these changes affect processed output while you move.
 

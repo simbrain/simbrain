@@ -11,7 +11,7 @@ import javax.swing.JPanel
 fun TextWorld.showComparisonDialog(): StandardDialog {
     return StandardDialog().apply {
 
-        title = "Compare Word Vectors"
+        title = "Compare word vectors"
         contentPane = JPanel()
         layout = MigLayout("ins 8, gap 20px 20px")
 
@@ -22,20 +22,20 @@ fun TextWorld.showComparisonDialog(): StandardDialog {
         val word1cb = JComboBox(filteredTerms.toTypedArray())
         val word2cb = JComboBox(filteredTerms.toTypedArray())
 
-        val similarityMethod = JComboBox(arrayOf("Cosine Similarity", "Dot Product", "Euclidean Distance"))
+        val similarityMethod = JComboBox(arrayOf("Cosine similarity", "Dot product", "Euclidean distance"))
         val similarity = JLabel("Similarity: ")
 
         fun updatePanel() {
             val vec1 = tokenEmbedding.get(word1cb.selectedItem as String)
             val vec2 = tokenEmbedding.get(word2cb.selectedItem as String)
             when (similarityMethod.selectedItem as String) {
-                "Cosine Similarity" -> {
+                "Cosine similarity" -> {
                     distanceFunction = MathEx::cos
                 }
-                "Dot Product" -> {
+                "Dot product" -> {
                     distanceFunction = MathEx::dot
                 }
-                "Euclidean Distance" -> {
+                "Euclidean distance" -> {
                     distanceFunction = MathEx::distance
                 }
             }

@@ -21,7 +21,7 @@ import kotlin.math.min
  */
 val tinyLanguageModelFF = newSim {
 
-    val options = TinyLmSimOptions(false).showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+    val options = TinyLmSimOptions(false).showAPEOptionDialog("Tiny language model") ?: return@newSim
 
     workspace.clearWorkspace()
 
@@ -49,7 +49,7 @@ val tinyLanguageModelFF = newSim {
     }
 
     // Text World for Inputs
-    val textWorldComponent = addTextWorld("Text World (Inputs)")
+    val textWorldComponent = addTextWorld("Text World (inputs)")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.text = tokenizer.joinTokens(tokenizedTrainingText.take(contextSize))
     textWorldComponent.world.highlightCurrentToken = false
@@ -97,7 +97,7 @@ val tinyLanguageModelFF = newSim {
         testConfiguration.enabled = false
     }
 
-    workspace.addUpdateAction("Encode Context Window") {
+    workspace.addUpdateAction("Encode context window") {
         val encodedContext = textWorldComponent.world.text
             .split(" ")
             .map { tokenEmbedding.get(it).toList() }
@@ -110,7 +110,7 @@ val tinyLanguageModelFF = newSim {
 
     workspace.updater.updateManager.swapElements(0, 1)
 
-    workspace.addUpdateAction("Predict Next Word") {
+    workspace.addUpdateAction("Predict next word") {
         val nextWord = tokenEmbedding.getClosestWord(backpropNetwork.outputLayer.activationArray)
         // update text with predicted word and remove first word so that the context window maintains its size
         textWorldComponent.world.text = textWorldComponent.world.text.tokenize(tokenizer)

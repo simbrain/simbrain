@@ -42,12 +42,12 @@ class BumpSensor(theta: Double = DEFAULT_THETA, radius: Double = DEFAULT_RADIUS)
     }
 
     override val name: String
-        get() = "Bump Sensor"
+        get() = "Bump sensor"
 
 
 
     override var label: String = if (super.label.isEmpty()) {
-            "$directionString Bump Sensor"
+            "${directionString}bump sensor".replaceFirstChar { it.uppercase() }
         } else {
             super.label
         }

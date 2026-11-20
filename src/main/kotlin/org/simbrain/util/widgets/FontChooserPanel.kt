@@ -20,7 +20,7 @@ class FontChooserPanel(private val fonts: List<Font>) : JPanel(
         GraphicsEnvironment.getLocalGraphicsEnvironment().availableFontFamilyNames + fonts.map { it.name })
         .distinct().sorted().toTypedArray()
     val familyList = JList(families)
-    val styleList = JList(arrayOf("Regular", "Bold", "Italic", "Bold Italic"))
+    val styleList = JList(arrayOf("Regular", "Bold", "Italic", "Bold italic"))
     val sizeList = JList(arrayOf("8", "9", "10", "11", "12", "14", "16", "18", "20", "22", "24", "26", "28", "36", "48", "72"))
     val familyField = JTextField(fonts.map { it.name }.distinct().singleOrNull().orEmpty(), 20)
     val styleField = JTextField().apply { isEditable = false }

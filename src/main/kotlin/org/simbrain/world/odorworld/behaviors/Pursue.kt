@@ -23,17 +23,17 @@ import kotlin.random.Random
  */
 class Pursue : NpcBehavior() {
 
-    @UserParameter(label = "Target Type", description = "Entity type to chase", order = 1)
+    @UserParameter(label = "Target type", description = "Entity type to chase", order = 1)
     var targetType: EntityType = EntityType.Swiss
 
-    @UserParameter(label = "Max Speed", minimumValue = 0.0, order = 10)
+    @UserParameter(label = "Max speed", minimumValue = 0.0, order = 10)
     var maxSpeed: Double = 2.0
 
-    @UserParameter(label = "Vision Range", minimumValue = 0.0, order = 20)
+    @UserParameter(label = "Vision range", minimumValue = 0.0, order = 20)
     var visionRange: Double = 300.0
 
     @UserParameter(
-        label = "Lead Ticks",
+        label = "Lead ticks",
         description = "How many ticks ahead to predict the target's position when aiming",
         minimumValue = 0.0,
         order = 30
@@ -41,7 +41,7 @@ class Pursue : NpcBehavior() {
     var leadTicks: Double = 10.0
 
     @UserParameter(
-        label = "Max Turn",
+        label = "Max turn",
         description = "Maximum heading change per tick (degrees)",
         minimumValue = 0.0,
         order = 40
@@ -49,7 +49,7 @@ class Pursue : NpcBehavior() {
     var maxTurn: Double = 10.0
 
     @UserParameter(
-        label = "Obstacle Feeler Length",
+        label = "Obstacle feeler length",
         description = "Distance ahead to probe for walls and other entities",
         minimumValue = 0.0,
         order = 50
@@ -57,7 +57,7 @@ class Pursue : NpcBehavior() {
     var feelerLength: Double = 64.0
 
     @UserParameter(
-        label = "Obstacle Avoidance Weight",
+        label = "Obstacle avoidance weight",
         description = "How strongly walls and non-target entities repel relative to target attraction",
         minimumValue = 0.0,
         order = 60
@@ -65,7 +65,7 @@ class Pursue : NpcBehavior() {
     var wallWeight: Double = 1.5
 
     @UserParameter(
-        label = "Num Rays",
+        label = "Num rays",
         description = "Number of candidate headings sampled each tick. More rays find narrower gaps at higher cost.",
         minimumValue = 4.0,
         order = 70

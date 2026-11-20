@@ -15,8 +15,11 @@ import org.simbrain.network.core.NeuronArray
 import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.*
 import org.simbrain.network.gui.dialogs.NetworkPreferences
+import org.simbrain.network.gui.nodes.WeightMatrixNode.Companion.IMAGE_FILL
+import org.simbrain.network.gui.nodes.WeightMatrixNode.Companion.IMAGE_SIDE_MAX
+import org.simbrain.network.gui.nodes.WeightMatrixNode.Companion.IMAGE_SIDE_MIN
+import org.simbrain.network.gui.nodes.WeightMatrixNode.Companion.fittedImageSide
 import org.simbrain.util.*
-import org.simbrain.util.onUi
 import org.simbrain.util.piccolo.centerOn
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.table.MatrixDataFrame
@@ -550,7 +553,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                         .createCoupledPlotMenu(
                             (weightMatrix).getProducer(WeightMatrix::weightArray),
                             Objects.requireNonNull<String>(weightMatrix.id),
-                            "Plot Weight Matrix"
+                            "Plot weight matrix"
                         )
                 )
                 contextMenu.addSeparator()
@@ -579,7 +582,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                                 " churns; > 1 explodes.",
                     ) {
                         val radius =
-                            showNumericInputDialog("Set spectral Radius:", weightMatrix.weights.maxEigenvalue())
+                            showNumericInputDialog("Set spectral radius:", weightMatrix.weights.maxEigenvalue())
                         if (radius != null) {
                             weightMatrix.weights.setSpectralRadius(radius)
                             weightMatrix.events.updated.fire()
@@ -631,7 +634,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                 wmViewer.addSimpleDefaults()
                 wmViewer.addSeparator()
                 wmViewer.addAction(wmViewer.table.createShowEigenValuesAction())
-                contentPane.addTab("Weight Matrix", wmViewer)
+                contentPane.addTab("Weight matrix", wmViewer)
                 // A learning matrix reports an update every iteration, so the table refreshes at most once per frame
                 editingObject.events.updated.onUi(dialog.viewScope) {
                     if (!targetSourceFormat) {
@@ -646,7 +649,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
                     editingObject.events.updated.fire()
                 }
             } else {
-                dialog.title = "Edit ${editingObjects.size} Weight Matrices"
+                dialog.title = "Edit ${editingObjects.size} weight matrices"
                 contentPane = ape
             }
 

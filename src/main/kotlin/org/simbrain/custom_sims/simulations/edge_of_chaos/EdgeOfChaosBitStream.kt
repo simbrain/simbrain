@@ -31,7 +31,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     workspace.clearWorkspace()
 
     // Build network
-    val networkComponent = addNetworkComponent("Edge of Chaos")
+    val networkComponent = addNetworkComponent("Edge of chaos")
     val net = networkComponent.network
     net.timeStep = 0.5
 
@@ -77,7 +77,7 @@ val edgeOfChaosBitStream = newSim("edgeOfChaosBitStream") {
     net.addNetworkModels(thing2)
 
     // Set up the time series and a custom action
-    val (tsPlot, tsSeries) = addTimeSeries("Time Series", seriesNames = listOf("Difference"))
+    val (tsPlot, tsSeries) = addTimeSeries("Time series", seriesNames = listOf("Difference"))
 
     workspace.updater.updateManager.addAction(updateAction("Update inputs") {
         bitStream1.addInputs(bitStream1.inputData.row(currentRow))

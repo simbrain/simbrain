@@ -38,7 +38,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         class Pool(val template: PoolLayerTemplate = PoolLayerTemplate()) : LayerSpec() {
             override fun description(): String =
-                "Pool: ${template.poolSize}x${template.poolSize} ${template.poolingType.toDisplayText()}, Stride ${template.stride}"
+                "Pool: ${template.poolSize}x${template.poolSize} ${template.poolingType.toDisplayText()}, stride ${template.stride}"
 
             override fun outputShape(inputShape: TensorShape): TensorShape =
                 inputShape.poolOutputShape(template.poolSize, template.stride)
@@ -71,13 +71,13 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     private val flattenLabel = JLabel()
 
     init {
-        title = "New Convolutional Neural Network"
+        title = "New convolutional neural network"
 
         val mainPanel = JPanel(MigLayout("fillx, ins 10, wrap", "[grow,fill]"))
 
         // Input shape section
         val inputPanel = JPanel(MigLayout("ins 0", "[][][][][][]"))
-        inputPanel.add(JLabel("Input Shape:"))
+        inputPanel.add(JLabel("Input shape:"))
         inputPanel.add(JLabel("C:"))
         inputPanel.add(channelsField)
         inputPanel.add(JLabel("H:"))
@@ -98,7 +98,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Tensor layers section
         val tensorSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
-            border = Theme.sectionBorder("Tensor Layers (Conv / Pool)")
+            border = Theme.sectionBorder("Tensor layers (conv / pool)")
         }
         val tensorScrollPane = JScrollPane(tensorLayerListPanel).apply {
             border = null
@@ -108,10 +108,10 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         tensorSection.add(tensorScrollPane, "growx")
 
         val tensorButtonPanel = JPanel(MigLayout("ins 4")).apply {
-            add(JButton("+ Add Conv Layer").apply {
+            add(JButton("+ Add conv layer").apply {
                 addActionListener { addTensorLayer(LayerSpec.Conv()) }
             })
-            add(JButton("+ Add Pool Layer").apply {
+            add(JButton("+ Add pool layer").apply {
                 addActionListener { addTensorLayer(LayerSpec.Pool()) }
             })
         }
@@ -123,7 +123,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Dense layers section
         val denseSection = JPanel(MigLayout("fillx, ins 8 12 8 12, wrap", "[grow,fill]")).apply {
-            border = Theme.sectionBorder("Dense Layers")
+            border = Theme.sectionBorder("Dense layers")
         }
         val denseScrollPane = JScrollPane(denseLayerListPanel).apply {
             border = null
@@ -133,7 +133,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
         denseSection.add(denseScrollPane, "growx")
 
         val denseButtonPanel = JPanel(MigLayout("ins 4")).apply {
-            add(JButton("+ Add Dense Layer").apply {
+            add(JButton("+ Add dense layer").apply {
                 addActionListener { addDenseLayer(DenseLayerSpec()) }
             })
         }
@@ -142,7 +142,7 @@ class CnnCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
 
         // Output section
         val outputPanel = JPanel(MigLayout("ins 0", "[][]"))
-        outputPanel.add(JLabel("Output Neurons:"))
+        outputPanel.add(JLabel("Output neurons:"))
         outputPanel.add(outputNeuronsField)
         mainPanel.add(outputPanel)
 

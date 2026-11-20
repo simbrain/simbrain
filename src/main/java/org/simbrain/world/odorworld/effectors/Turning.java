@@ -31,7 +31,7 @@ public class Turning extends Effector {
      * Turn by amount times direction, which encodes direction: 1 for left, -1
      * for right.
      */
-    @UserParameter(label = "Turning Direction and Weight",
+    @UserParameter(label = "Turning direction and weight",
             description = "Turn by amount times direction, which encodes direction: 1 for left, -1 for right.",
             order = 4)
     private double direction = DEFAULT_DIRECTION;
@@ -44,7 +44,7 @@ public class Turning extends Effector {
     /**
      * Amount to turn in radians.
      */
-    @UserParameter(label = "Turning Amount",
+    @UserParameter(label = "Turning amount",
             description = "Amount to turn in radians.",
             order = 5)
     private double amount = DEFAULT_AMOUNT;
@@ -146,7 +146,7 @@ public class Turning extends Effector {
 
     @Override
     public String getName() {
-        return "Turning Effector";
+        return "Turning effector";
     }
 
     @Override

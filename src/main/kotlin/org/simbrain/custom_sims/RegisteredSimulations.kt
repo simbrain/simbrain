@@ -54,7 +54,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
 
     // dir("Hebbian") {
     //     item("1. Basic Hebb") { hebbianAssociatorSimple }
-    //     item("2. Feed Forward Associator") { hebbianFeedForward }
+    //     item("2. Feed forward associator") { hebbianFeedForward }
     //     item("3. Recurrent Hebb") { hebbianAssociator }
     // }
 
@@ -82,7 +82,7 @@ val simulations = dir("Simulations", alphabetical = true ) {
         item("Edge of chaos bit stream") { edgeOfChaosBitStream }
         item("Edge of chaos embodied") { edgeOfChaos }
         item("Binary reservoir") { binaryReservoir }
-        // item("Pattern Completion") { allostaticPatternCompletion }
+        // item("Pattern completion") { allostaticPatternCompletion }
         item("Object tracking reservoir") { objectTrackingSim }
     }
 
@@ -151,15 +151,15 @@ val simulations = dir("Simulations", alphabetical = true ) {
     }
 
     dir("Evolution") {
-        // item("Evolve Avoider") { evolveAvoider }
-        // item("Evolve Thirsty Cows") { evolveCow }
+        // item("Evolve avoider") { evolveAvoider }
+        // item("Evolve thirsty cows") { evolveCow }
         item("Evolve grazing cows") { grazingCows }
         item("Evolve mouse pursuer", beta = true) { evolveMousePursuer }
-        // item("Evolve AutoEncoder") { evolveAutoAssociator }
-        // item("Evolve Modular (Clune et. al.)") { evolveModularity }
+        // item("Evolve autoencoder") { evolveAutoAssociator }
+        // item("Evolve modular (Clune et. al.)") { evolveModularity }
         item("Evolve network") { evolveNetwork }
         item("Evolve resource pursuer") { evolveResourcePursuer }
-        // item("Evolve Mouse (Sandbox)") { evolveMouse }
+        // item("Evolve mouse (sandbox)") { evolveMouse }
         // item("Evolve XOR") { evolveXor }
         item("Evolve XOR") { evolveXor }
     }
@@ -222,12 +222,12 @@ val simulations = dir("Simulations", alphabetical = true ) {
     dir("Vision") {
         item("Simple drawings (10 x 10)") { simpleImageWorld }
         //item("Photo album (100 x 100)") { photoAlbumExample }
-        //item("3D View Example") { view3dDemo }
+        //item("3D view example") { view3dDemo }
         item("3D navigation and image world") { view3dNavigationPipelineDemo }
         item("3D object recognition") { objectRecognition3D }
         item("3D navigation and lateral inhibition") { view3dNavigationLateralInhibitionDemo }
         item("Attention as gain", beta = true) { attentionAsGain }
-        //item("CNN Demo") { cnnDemo } // Develop into 3d demo
+        //item("CNN demo") { cnnDemo } // Develop into 3d demo
         item("CNN simple demo") { cnnSimpleLineDetector }
         item("CNN object recognition (100 x 100)") { cnnObjectDetector }
     }

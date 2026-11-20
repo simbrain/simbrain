@@ -18,13 +18,13 @@ val stdpSim = newSim {
 
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("STDP Network")
+    val networkComponent = addNetworkComponent("STDP network")
     val network = networkComponent.network
 
     // Data
     val numRows = 20
     val stimAmount = 1.0
-    val dataWorldComponent = addDataWorldComponent("Pre/Post Activity Table", numRows, 2)
+    val dataWorldComponent = addDataWorldComponent("Pre/post activity table", numRows, 2)
     dataWorldComponent.dataWorld.dataModel.setValueAt(stimAmount, 5, 0)
     dataWorldComponent.dataWorld.dataModel.setValueAt(stimAmount, 7, 1)
 
@@ -76,7 +76,7 @@ val stdpSim = newSim {
     }
 
     // Add time series
-    val (plot, series) = addTimeSeries("STDP Plot", seriesNames = listOf("Synapse"))
+    val (plot, series) = addTimeSeries("STDP plot", seriesNames = listOf("Synapse"))
 
     withGui {
         place(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 300)

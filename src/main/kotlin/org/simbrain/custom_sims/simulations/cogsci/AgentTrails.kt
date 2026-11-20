@@ -22,7 +22,7 @@ val kAgentTrails = newSim {
 
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Simple Predictor")
+    val networkComponent = addNetworkComponent("Simple predictor")
 
 //Sensory States + Predictions (861, 327, 441, 308)
 //Simple Predictor (856, 0, 439, 296)
@@ -55,17 +55,17 @@ val kAgentTrails = newSim {
     and to the cheese then fish. The sensory states and predictions show each excursion. The red corresponds to the path that the mouse is currently traveling, and the gray shows all the possible paths that
     the mouse can take. Below are the step-by-step instructions:
 
-    1. Select an object from the `Control Panel`, and the mouse will be activated and move towards the object you selected on the `Simple Predictor` window.
+    1. Select an object from the `Control panel`, and the mouse will be activated and move towards the object you selected on the `Simple predictor` window.
 
         - For example, if the cheese-sensing neuron is on top of the cheese, then it is maximally activated.
 
         - As the agent moves away from the cheese, the neuron's activation diminishes to `0`.
 
-    2. In the `Sensory States + Predictions` window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red.
+    2. In the `Sensory states + predictions` window, the trail that the mouse walks is plotted in gray, and the predicted path of the mouse is red.
 
     3. Repeat this until all 5 paths are taken.
 
-    4. After all 5 paths, Select any object again from the `Control Panel`, and the predictor will be able to correctly predicts where the mouse travels.
+    4. After all 5 paths, Select any object again from the `Control panel`, and the predictor will be able to correctly predicts where the mouse travels.
 
     # References
 
@@ -193,7 +193,7 @@ val kAgentTrails = newSim {
     }
 
     withGui {
-        val plot = addProjectionPlot("Sensory States + Predictions").apply {
+        val plot = addProjectionPlot("Sensory states + predictions").apply {
             projector.tolerance = .001
         }
         place(plot) {
@@ -204,7 +204,7 @@ val kAgentTrails = newSim {
 
         couplingManager.createCoupling(sensoryNet, plot)
 
-        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
 
             fun resetObjects() {
@@ -246,7 +246,7 @@ val kAgentTrails = newSim {
             }.apply {
                 toolTipText = "Reset the objects and move the mouse straight up through the flower."
             }
-            addButton("Cheese > Flower") {
+            addButton("Cheese > flower") {
                 workspace.launch {
                     resetObjects()
                     network.clearActivations()
@@ -264,7 +264,7 @@ val kAgentTrails = newSim {
             }.apply {
                 toolTipText = "Move the mouse up to the cheese, then turn it right toward the flower."
             }
-            addButton("Cheese > Fish") {
+            addButton("Cheese > fish") {
                 workspace.launch {
                     resetObjects()
                     network.clearActivations()

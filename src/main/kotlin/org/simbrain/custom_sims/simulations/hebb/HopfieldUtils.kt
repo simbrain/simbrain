@@ -166,8 +166,8 @@ fun ControlPanelKt.createHopfieldTestPane(
     slider.init()
     slider.toolTipText = "Load one of the randomly generated test patterns into the network."
 
-    addButton("Capacity Test", tab = "Capacity") {
-        patternTestConfig.showAPEOptionDialog("Capacity Test Parameters")
+    addButton("Capacity test", tab = "Capacity") {
+        patternTestConfig.showAPEOptionDialog("Capacity test parameters")
         val seriesNames = buildList {
             add("% pattern remembered")
             if (patternTestConfig.forgetting) add("% pattern remembered (with forgetting)")

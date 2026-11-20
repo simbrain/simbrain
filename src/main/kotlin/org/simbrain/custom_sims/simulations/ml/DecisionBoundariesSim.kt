@@ -193,7 +193,7 @@ val decisionBoundaries = newSim {
             explorer.classifierChangedLocked(newData)
         }
 
-        val controlPanel = createControlPanel("Decision Boundaries", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Decision boundaries", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             launch {
                 while (true) {
                     retrainRequests.receive()
@@ -294,7 +294,7 @@ val decisionBoundaries = newSim {
 
         val plotSize = 560
         val plotX = controlPanel.rightEdgeWithGap()
-        val plot = createClassifierProjectionPlot(classifierNetwork, "Decision Regions")
+        val plot = createClassifierProjectionPlot(classifierNetwork, "Decision regions")
         place(plot, plotX, SIM_WINDOW_GAP, plotSize, plotSize)
         // The network gets a tall column beside the plot when the desktop is wide enough, else the space under the
         // control panel

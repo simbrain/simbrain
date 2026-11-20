@@ -22,7 +22,7 @@ open class SpikingMatrixData(val size: Int) : MatrixDataHolder {
     @UserParameter(label = "Spikes", description = "Spikes for each neuron")
     var spikes = BooleanArray(size) { false }
 
-    @UserParameter(label = "Last Spike Times", description = "Time of last spike for each neuron")
+    @UserParameter(label = "Last spike times", description = "Time of last spike for each neuron")
     var lastSpikeTimes = DoubleArray(size) { Double.NEGATIVE_INFINITY }
 
     override fun copy() = SpikingMatrixData(size).also {

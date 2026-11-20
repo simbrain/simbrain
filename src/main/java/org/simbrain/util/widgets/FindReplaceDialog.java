@@ -38,12 +38,12 @@ public class FindReplaceDialog extends JPanel {
     /**
      * Match case.
      */
-    private JCheckBox matchCaseCB = new JCheckBox("Match Case");
+    private JCheckBox matchCaseCB = new JCheckBox("Match case");
 
     /**
      * Whole word.
      */
-    private JCheckBox wholeWordCB = new JCheckBox("Whole Word");
+    private JCheckBox wholeWordCB = new JCheckBox("Whole word");
 
     /**
      * Wrap search.
@@ -87,7 +87,7 @@ public class FindReplaceDialog extends JPanel {
         searchField.setText(textArea.getLastSearchedString());
 
         // Create buttons
-        JButton findButton = new JButton("Find Next");
+        JButton findButton = new JButton("Find next");
         findButton.addActionListener(e -> {
             textArea.setLastSearchedString(searchField.getText());
             SearchContext context = setUpContext();
@@ -100,7 +100,7 @@ public class FindReplaceDialog extends JPanel {
 
         if (showReplace) {
             add(findButton);
-            JButton replaceFindButton = new JButton("Replace & Find");
+            JButton replaceFindButton = new JButton("Replace & find");
             replaceFindButton.addActionListener(e -> {
                 textArea.setLastSearchedString(searchField.getText());
                 textArea.setLastReplacedString(replaceField.getText());
@@ -121,13 +121,13 @@ public class FindReplaceDialog extends JPanel {
                 replace(context);
             });
 
-            JButton replaceAllButton = new JButton("Replace All");
+            JButton replaceAllButton = new JButton("Replace all");
             replaceAllButton.addActionListener(e -> {
                 textArea.setLastReplacedString(replaceField.getText());
                 SearchContext context = setUpContext();
                 if (context != null) {
                     SearchResult replacements = SearchEngine.replaceAll(textArea, context);
-                    SwingUtilsKt.showMessage(replacements.getCount() + " occurrence(s) replaced.", MessageKind.INFO, null, "Replace All");
+                    SwingUtilsKt.showMessage(replacements.getCount() + " occurrence(s) replaced.", MessageKind.INFO, null, "Replace all");
                 }
             });
 

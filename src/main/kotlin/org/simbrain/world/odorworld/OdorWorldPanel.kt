@@ -6,11 +6,7 @@
  */
 package org.simbrain.world.odorworld
 
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.cancel
-import kotlinx.coroutines.job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.swing.Swing
 import org.piccolo2d.PCanvas
 import org.piccolo2d.PNode
@@ -29,12 +25,7 @@ import org.simbrain.util.widgets.SimbrainToggleButton
 import org.simbrain.world.odorworld.dialogs.EntityDialog
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
 import org.simbrain.world.odorworld.gui.*
-import java.awt.BorderLayout
-import java.awt.Color
-import java.awt.Dimension
-import java.awt.KeyEventDispatcher
-import java.awt.KeyboardFocusManager
-import java.awt.Rectangle
+import java.awt.*
 import java.awt.event.ComponentAdapter
 import java.awt.event.ComponentEvent
 import java.awt.event.MouseEvent
@@ -246,7 +237,7 @@ class OdorWorldPanel(
 
             if (firstNode.get() is PImage) {
                 val selectedTiles = getTileStack(event.point) ?: return ""
-                val sb = StringBuilder("Tile Ids: ")
+                val sb = StringBuilder("Tile ids: ")
                 selectedTiles.stream().filter { obj: Tile? -> Objects.nonNull(obj) }
                     .forEach { tile: Tile -> sb.append(" (" + tile.id + ")") }
 
@@ -597,7 +588,7 @@ class OdorWorldPanel(
         )
         val dialog = StandardDialog()
         dialog.contentPane = sgb
-        dialog.title = "Piccolo Scenegraph Browser"
+        dialog.title = "Piccolo scenegraph browser"
         dialog.isModal = false
         dialog.pack()
         dialog.setLocationRelativeTo(null)

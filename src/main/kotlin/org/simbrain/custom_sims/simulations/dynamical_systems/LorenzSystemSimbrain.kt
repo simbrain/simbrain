@@ -29,7 +29,7 @@ import org.simbrain.util.projection.PCAProjection
 val lorenzSystemSimbrain = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Lorenz System (Pure Simbrain)")
+    val networkComponent = addNetworkComponent("Lorenz system (pure Simbrain)")
     val network = networkComponent.network
 
     // Set smaller time step for numerical stability
@@ -97,7 +97,7 @@ val lorenzSystemSimbrain = newSim {
     // Create neuron collection for the state variables
     val lorenzNeurons = NeuronCollection(listOf(xNeuron, yNeuron, zNeuron))
     lorenzNeurons.apply {
-        label = "Lorenz Variables"
+        label = "Lorenz variables"
         layout(GridLayout())
         location = point(50.0, 50.0)
     }
@@ -146,7 +146,7 @@ val lorenzSystemSimbrain = newSim {
     }
 
     // Add projection plot to visualize the attractor
-    val projectionPlot = addProjectionPlot("Lorenz Attractor (Simbrain)")
+    val projectionPlot = addProjectionPlot("Lorenz attractor (Simbrain)")
     projectionPlot.projector.tolerance = 0.1
     projectionPlot.projector.projectionMethod = PCAProjection()
     projectionPlot.projector.coloringManager = DecayColoringManager()
@@ -173,9 +173,9 @@ val lorenzSystemSimbrain = newSim {
 
     withGui {
         // Control panel for changing parameters
-        val controlPanel = createControlPanel("Lorenz Parameters", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Lorenz parameters", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addButton("Reset to Initial Conditions") {
+            addButton("Reset to initial conditions") {
                 xNeuron.activation = 1.0
                 yNeuron.activation = 1.0
                 zNeuron.activation = 1.0
@@ -184,9 +184,9 @@ val lorenzSystemSimbrain = newSim {
             }
 
             addSeparator()
-            addLabel("<html><b>Parameter Presets</b></html>")
+            addLabel("<html><b>Parameter presets</b></html>")
 
-            addButton("Chaotic (Standard)") {
+            addButton("Chaotic (standard)") {
                 sigma = 10.0
                 rho = 28.0
                 beta = 8.0 / 3.0
@@ -195,7 +195,7 @@ val lorenzSystemSimbrain = newSim {
                 toolTipText = "Set σ = 10, ρ = 28, β = 8/3, Lorenz's classic chaotic attractor."
             }
 
-            addButton("Stable - Converge to Origin") {
+            addButton("Stable - converge to origin") {
                 sigma = 10.0
                 rho = 0.5
                 beta = 8.0 / 3.0
@@ -204,7 +204,7 @@ val lorenzSystemSimbrain = newSim {
                 toolTipText = "Set ρ = 0.5 (below 1), so every trajectory settles at the origin."
             }
 
-            addButton("Stable - Fixed Points") {
+            addButton("Stable - fixed points") {
                 sigma = 10.0
                 rho = 10.0
                 beta = 8.0 / 3.0
@@ -213,7 +213,7 @@ val lorenzSystemSimbrain = newSim {
                 toolTipText = "Set ρ = 10, so trajectories settle at one of two fixed points."
             }
 
-            addButton("Pre-Chaotic (Complex)") {
+            addButton("Pre-chaotic (complex)") {
                 sigma = 10.0
                 rho = 24.5
                 beta = 8.0 / 3.0
@@ -223,24 +223,24 @@ val lorenzSystemSimbrain = newSim {
             }
 
             addSeparator()
-            addLabel("<html><b>Custom Parameters</b></html>")
+            addLabel("<html><b>Custom parameters</b></html>")
 
             // TODO: The fields start at ρ = 15 although the system starts at ρ = 28, and the presets do not update
             //  them, so the fields often do not show the parameters in use.
             val sigmaField = addTextField(
                 "σ (sigma)", "10.0",
-                toolTip = "Rate at which x moves toward y. Press Apply Custom Parameters to use it."
+                toolTip = "Rate at which x moves toward y. Press Apply custom parameters to use it."
             )
             val rhoField = addTextField(
                 "ρ (rho)", "15.0",
-                toolTip = "Main control parameter; chaos appears above about 24.74. Press Apply Custom Parameters to use it."
+                toolTip = "Main control parameter; chaos appears above about 24.74. Press Apply custom parameters to use it."
             )
             val betaField = addTextField(
                 "β (beta)", "2.6667",
-                toolTip = "Damping rate of z. Press Apply Custom Parameters to use it."
+                toolTip = "Damping rate of z. Press Apply custom parameters to use it."
             )
 
-            addButton("Apply Custom Parameters") {
+            addButton("Apply custom parameters") {
                 sigma = sigmaField.text.toDoubleOrNull() ?: sigma
                 rho = rhoField.text.toDoubleOrNull() ?: rho
                 beta = betaField.text.toDoubleOrNull() ?: beta
@@ -297,13 +297,13 @@ val lorenzSystemSimbrain = newSim {
 
         Use the preset buttons to explore different dynamical behaviors:
 
-        1. Click `Chaotic (Standard)` and run the simulation. The butterfly attractor emerges in the projection plot.
+        1. Click `Chaotic (standard)` and run the simulation. The butterfly attractor emerges in the projection plot.
 
-        2. Try `Stable - Converge to Origin` to see trajectories collapse toward zero.
+        2. Try `Stable - converge to origin` to see trajectories collapse toward zero.
 
-        3. Explore `Stable - Fixed Points` to observe convergence to steady states.
+        3. Explore `Stable - fixed points` to observe convergence to steady states.
 
-        4. Test `Pre-Chaotic (Complex)` for transitional behavior near the chaos threshold.
+        4. Test `Pre-chaotic (complex)` for transitional behavior near the chaos threshold.
 
         ## Activity 2: Compare with the hand-coded version
 
@@ -323,7 +323,7 @@ val lorenzSystemSimbrain = newSim {
         When you change parameters using the control panel:
 
         1. Select a preset or enter custom values
-        2. Click `Apply Custom Parameters`
+        2. Click `Apply custom parameters`
         3. The synaptic weights update automatically to reflect new parameter values
         4. Right-click the projection plot and `Clear data`
         5. Run to see the new dynamics

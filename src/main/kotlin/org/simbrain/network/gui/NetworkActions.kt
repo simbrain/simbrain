@@ -505,7 +505,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         keyboardShortcut = KeyCombination('T')
     ) {
         val textObject = NetworkTextObject()
-        TextDialog(listOf(textObject), titleName = "Add Text") {
+        TextDialog(listOf(textObject), titleName = "Add text") {
             if (textObject.text.isNotEmpty()) {
                 undoManager.addUndoableAction(
                     description = "Add text object",
@@ -553,7 +553,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         """.trimIndent()
 
         // Allow test injection of file chooser
-        val chooser = fileChooserForTesting ?: SFileChooser("", "Simbrain Web Format", "json")
+        val chooser = fileChooserForTesting ?: SFileChooser("", "Simbrain web format", "json")
         val file = chooser.showSaveDialog(File("network.json"))
         if (file != null) {
             try {
@@ -600,7 +600,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         description = "Set default properties that apply to all networks in the Simbrain workspace (Cmd/Ctrl-,)",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        getPreferenceDialog(NetworkPreferences, "Network Preferences").display()
+        getPreferenceDialog(NetworkPreferences, "Network preferences").display()
     }
 
     val showNetworkPropertiesAction = networkPanel.createAction(
@@ -758,7 +758,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         }
 
         if (sourceTensors.isNotEmpty() || targetTensors.isNotEmpty()) {
-            reasons.add("TensorLayers require special connectors (use CNN creation dialog)")
+            reasons.add("Tensor layers require special connectors (use CNN creation dialog)")
         }
 
         return reasons.isEmpty() to reasons.joinToString(", ")
@@ -1306,10 +1306,10 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         val source = networkPanel.selectionManager.filterSelectedSourceModels<TensorLayer>().firstOrNull()
         val target = networkPanel.selectionManager.filterSelectedModels<NeuronArray>().firstOrNull()
         if (source == null) {
-            reasons.add("No source Tensor selected (Ctrl+click a Tensor to set as source)")
+            reasons.add("No source tensor selected (Ctrl+click a tensor to set as source)")
         }
         if (target == null) {
-            reasons.add("No target NeuronArray selected")
+            reasons.add("No target neuron array selected")
         }
         if (source != null && target != null) {
             // Check that a path exists through the CNN pipeline
@@ -1334,7 +1334,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     currentTensorLayer = connector.target
                 }
                 if (!foundFlatten) {
-                    reasons.add("No Flatten connector found in pipeline from source Tensor")
+                    reasons.add("No flatten connector found in pipeline from source tensor")
                 } else {
                     // Walk the dense chain from flatten target to verify it reaches the selected target
                     val flattenTarget = pipelineModels.last() as Layer
@@ -1352,7 +1352,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
                     }
                     val reachesTarget = currentLayer == target
                     if (!reachesTarget) {
-                        reasons.add("Dense chain from Flatten does not reach the selected target NeuronArray")
+                        reasons.add("Dense chain from flatten does not reach the selected target neuron array")
                     }
                     if (denseLayerCount == 0) {
                         reasons.add("No dense layers found in pipeline")
@@ -1372,14 +1372,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
         if (source != null && networkPanel.network.getModels<ConvolutionalNeuralNetwork>().any {
                 it.inputTensorLayer == source
             }) {
-            reasons.add("A convolutional neural network already exists for this input Tensor")
+            reasons.add("A convolutional neural network already exists for this input tensor")
         }
         return reasons.isEmpty() to reasons.joinToString(", ")
     }
 
     val createConvolutionalNeuralNetworkAction = networkPanel.createAction(
         name = "Create convolutional neural network",
-        description = "Create a convolutional neural network from selected source Tensor to target NeuronArray"
+        description = "Create a convolutional neural network from selected source tensor to target neuron array"
     ) {
         val (canCreate) = canCreateConvolutionalNeuralNetwork()
 
@@ -1399,7 +1399,7 @@ class NetworkActions(val networkPanel: NetworkPanel) {
             it.isEnabled = canCreate
             it.putValue(
                 SHORT_DESCRIPTION,
-                "Create a convolutional neural network from selected source Tensor to target NeuronArray"
+                "Create a convolutional neural network from selected source tensor to target neuron array"
                         + if (!canCreate) " (Disabled: $reason)" else ""
             )
         }
@@ -1410,14 +1410,14 @@ class NetworkActions(val networkPanel: NetworkPanel) {
     fun createRecordActivationAction(source: Layer) = actionManager.createCoupledDataWorldAction(
         name = "Record activations",
         source.getProducer(Layer::activationArray),
-        sourceName = "${source.displayName} Activations",
+        sourceName = "${source.displayName} activations",
         source.size
     )
 
     fun createNeuronCollectionCoupledImageWorld(collection: NeuronCollection) = actionManager.createImageInput(
         collection.getConsumer(NeuronCollection::activationArray),
         collection.size,
-        menuTitle = "Add image world",
+        menuTitle = "Add Image World",
         postActionBlock = { imageWorld ->
             collection.isClamped = true
             SimbrainDesktop.placeBeside(imageWorld, networkPanel.networkComponent)

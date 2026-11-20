@@ -49,11 +49,11 @@ val backpropAutoEncoder = newSim {
 
         ## Activity: Train the auto-encoder
 
-        1. Double-click on the `Backprop` network in the `Backprop` network window to open the `Train Network` window.
+        1. Double-click on the `Backprop` network in the `Backprop` network window to open the `Train network` window.
 
         2. In the top area of this window, select the `Iterate training until stop button is pressed` button to play the simulation.
 
-        3. The `Sum Squared Error` should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
+        3. The `Sum squared error` should decrease as the iterations increase and end up around `0`. The goal is to get the error as low as possible.
 
         4. Click `Apply current row as input to network` to check the network's performance. With `Auto advance` checked, each click moves to the next row.
 

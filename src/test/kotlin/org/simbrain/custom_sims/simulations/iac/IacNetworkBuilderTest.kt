@@ -5,9 +5,7 @@
 package org.simbrain.custom_sims.simulations.iac
 
 import kotlinx.coroutines.runBlocking
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertThrows
-import org.junit.jupiter.api.Assertions.assertTrue
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.custom_sims.NewSimulation
 import org.simbrain.custom_sims.SimulationScope
@@ -76,7 +74,7 @@ class IacNetworkBuilderTest {
         "Jets and Sharks" to Triple(iacJetsSharksFull, 68, 1754),
         "Jets and Sharks (5 people)" to Triple(iacJetsSharks5People, 24, 124),
         "Games at Alivia's" to Triple(iacGames, 83, 3168),
-        "Language Classifier" to Triple(iacLanguages, 37, 604),
+        "Language classifier" to Triple(iacLanguages, 37, 604),
         "Movies" to Triple(iacMovies, 28, 366),
         "Novels" to Triple(iacNovels, 18, 144),
         "SpongeBob" to Triple(iacSpongeBob, 36, 474)

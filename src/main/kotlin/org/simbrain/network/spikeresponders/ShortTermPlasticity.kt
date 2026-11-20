@@ -27,7 +27,7 @@ import kotlin.math.exp
 class ShortTermPlasticity : SpikeResponder() {
 
     @UserParameter(
-        label = "Mean Use ",
+        label = "Mean use ",
         description = "Fraction (0 to 1) of available resources consumed to produce the post-synaptic current.",
         minimumValue = 0.0,
         maximumValue = 1.0,
@@ -40,7 +40,7 @@ class ShortTermPlasticity : SpikeResponder() {
      * Depression constant.
      */
     @UserParameter(
-        label = "Mean Depression ",
+        label = "Mean depression ",
         description = "Time constant in ms for short term depression (STD). Higher values produce more STD",
         minimumValue = 0.001,
         increment = 10.0,
@@ -55,7 +55,7 @@ class ShortTermPlasticity : SpikeResponder() {
      * Facilitation constant.
      */
     @UserParameter(
-        label = "Mean Facilitation ",
+        label = "Mean facilitation ",
         description = "Time constant in ms. for short term facilitation (STF). Higher values produce more STF",
         minimumValue = 0.001,
         increment = 10.0,
@@ -76,7 +76,7 @@ class ShortTermPlasticity : SpikeResponder() {
             timeConstant = 20.0
         },
         typeMapProvider = ::validSpikeResponderLocals,
-        label = "Spike Responder",
+        label = "Spike responder",
         description = "Short term plasticity sets the max response of this responder",
         showDetails = false,
         order = 50
@@ -98,7 +98,7 @@ class ShortTermPlasticity : SpikeResponder() {
 
     override val description: String
         get() {
-            return "Short-term Plasticity"
+            return "Short-term plasticity"
         }
 
     context(Network)

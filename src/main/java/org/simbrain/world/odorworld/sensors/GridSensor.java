@@ -69,14 +69,14 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     private int y;
 
     @UserParameter(
-            label = "Num Columns",
+            label = "Num columns",
             description = "Number of columns of the sensor grid",
             order = 8
     )
     private int columns = 5;
 
     @UserParameter(
-            label = "Num Rows",
+            label = "Num rows",
             description = "Number of columns of the sensor grid",
             order = 9
     )
@@ -85,7 +85,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Width of the sensor.
      */
-    @UserParameter(label = "Cell Width",
+    @UserParameter(label = "Cell width",
         description = "Determines the size of the tile. Width specifies the horizontal length of the tile sensor.",
         order = 11)
     private double width = DEFAULT_WIDTH;
@@ -93,7 +93,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     /**
      * Height of the sensor.
      */
-    @UserParameter(label = "Cell Height",
+    @UserParameter(label = "Cell height",
         description = "Determines the size of the tile. Height specifies the vertical length.",
         order = 12)
     private double height = DEFAULT_HEIGHT;
@@ -102,7 +102,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
      * Whether to draw the sensor grid in GridSensorNode.
      */
     @UserParameter(
-            label = "Grid Visibility",
+            label = "Grid visibility",
             description = "Show sensor grid when this is set to true, hide when set to false false",
             order = 13
     )
@@ -112,7 +112,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
      * Whether to draw the sensor grid in GridSensorNode.
      */
     @UserParameter(
-            label = "Highlighter Visibility",
+            label = "Highlighter visibility",
             description = "Show sensor grid high lighter when this is set to true, hide when set to false false",
             order = 13
     )
@@ -238,7 +238,7 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
     @Override
     public String getLabel() {
         if (super.getLabel().isEmpty()) {
-            return "Grid Sensor";
+            return "Grid sensor";
         } else {
             return super.getLabel();
         }
@@ -258,6 +258,6 @@ public class GridSensor extends Sensor implements VisualizableEntityAttribute {
 
     @Override
     public String getName() {
-        return "Grid Sensor";
+        return "Grid sensor";
     }
 }

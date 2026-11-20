@@ -62,7 +62,7 @@ class ColorPickerButton(private val imageWorld: ImageWorld) : JButton() {
         customButton.addActionListener {
             val newColor = JColorChooser.showDialog(
                 SwingUtilities.getWindowAncestor(this),
-                "Choose Color",
+                "Choose color",
                 imageWorld.penColor
             )
             if (newColor != null) {
@@ -101,7 +101,7 @@ class ColorPickerButton(private val imageWorld: ImageWorld) : JButton() {
             Color.orange -> "Orange"
             Color.pink -> "Pink"
             Color.gray -> "Gray"
-            Color.darkGray -> "Dark Gray"
+            Color.darkGray -> "Dark gray"
             else -> "RGB(${color.red}, ${color.green}, ${color.blue})"
         }
     }

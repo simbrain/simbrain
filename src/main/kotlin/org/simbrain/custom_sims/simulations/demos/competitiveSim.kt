@@ -58,7 +58,7 @@ val competitiveSim = newSim {
         ## Control Panel Settings
 
         - `Pattern 1` to `Pattern 5`: Put that pattern on the input nodes. Nothing learns until you train.
-        - `Add Noise`: Add small random values to the current input.
+        - `Add noise`: Add small random values to the current input.
         - `Test`: Show which unit wins the current pattern without changing any weights.
         - `Train`: Run one training step on the current pattern. The winning unit's weights move a tenth of the way toward the input.
         - `Train ×10`: Run ten training steps on the current pattern.
@@ -79,7 +79,7 @@ val competitiveSim = newSim {
 
         - `Learning rate`: At `0.5`, each step jumps most of the way, so even taking turns often works. At `0.05`, committing takes twice as many steps.
         - `Normalize inputs`: Turn it off and commit as before. One unit takes every pattern, because its weights grow toward `1` on the pattern's inputs, so it responds `1.0` to every pattern that shares an input.
-        - `Use Leaky learning`: Losing units drift slowly toward each input, which helps a little by bringing unused units into play.
+        - `Use leaky learning`: Losing units drift slowly toward each input, which helps a little by bringing unused units into play.
 
         The `Competitive network (shapes)` simulation plays the same game with five pictures on a `10`x`10` input grid.
 
@@ -102,7 +102,7 @@ val competitiveSim = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             patterns.forEachIndexed { i, pattern ->
                 addButton("Pattern ${i + 1}") {
@@ -110,7 +110,7 @@ val competitiveSim = newSim {
                     winningLabel = "P${i + 1}"
                 }.toolTipText = "Put pattern ${i + 1} on the input nodes."
             }
-            addButton("Add Noise") {
+            addButton("Add noise") {
                 competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
             }.toolTipText = "Add small random values to the current input."
             addButton("Test") {

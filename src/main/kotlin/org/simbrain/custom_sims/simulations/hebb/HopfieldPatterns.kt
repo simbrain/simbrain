@@ -294,31 +294,31 @@ val hopfieldPatterns = newSim {
 
 
     val patternMap = mapOf(
-        "D Pattern" to DShape,
-        "E Pattern" to EShape,
-        "F Pattern" to FShape,
-        "H Pattern" to HShape,
-        "L Pattern" to LShape,
-        "U Pattern" to UShape,
-        "V Pattern" to VShape,
-        "X Pattern" to XShape,
-        "Y Pattern" to YShape,
-        "Z Pattern" to ZShape,
-        "Zero Pattern" to zeroShape,
-        "Eight Pattern" to eightShape,
-        "Diamond Pattern" to DiamondShape,
-        "Stripe Pattern" to StripeShape,
-        "Checker Pattern" to CheckerShape,
+        "D pattern" to DShape,
+        "E pattern" to EShape,
+        "F pattern" to FShape,
+        "H pattern" to HShape,
+        "L pattern" to LShape,
+        "U pattern" to UShape,
+        "V pattern" to VShape,
+        "X pattern" to XShape,
+        "Y pattern" to YShape,
+        "Z pattern" to ZShape,
+        "Zero pattern" to zeroShape,
+        "Eight pattern" to eightShape,
+        "Diamond pattern" to DiamondShape,
+        "Stripe pattern" to StripeShape,
+        "Checker pattern" to CheckerShape,
     )
-    val shortNames = patternMap.mapKeys { it.key.removeSuffix(" Pattern") }
+    val shortNames = patternMap.mapKeys { it.key.removeSuffix(" pattern") }
     val trainedPatterns = TrainedPatterns(shortNames, 0.5, nameInverses = true)
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             for ((label, pattern) in patternMap) {
                 addButton(label) {
                     hopfield.neuronGroup.setActivations(pattern)
                 }.apply {
-                    toolTipText = "Put the ${label.removeSuffix(" Pattern")} pattern on the network."
+                    toolTipText = "Put the ${label.removeSuffix(" pattern")} pattern on the network."
                 }
             }
             addSeparator()

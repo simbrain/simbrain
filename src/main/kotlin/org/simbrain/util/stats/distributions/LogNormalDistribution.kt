@@ -66,6 +66,6 @@ class LogNormalDistribution(location: Double = 1.0, scale: Double = .5, negate: 
         return copy
     }
 
-    override val name = "Log-Normal"
+    override val name = "Log-normal"
 
 }

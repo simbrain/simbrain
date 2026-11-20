@@ -26,7 +26,7 @@ class ThemeWidgetsSnapshot : UiSnapshotDef {
                 preferredSize = Dimension(360, 280)
 
                 add(JPanel(MigLayout("wrap 1, insets 0")).apply {
-                    border = Theme.sectionBorder("Section Header")
+                    border = Theme.sectionBorder("Section header")
                     add(JLabel("Body label"))
                     add(JLabel("Muted label").apply { foreground = Theme.mutedText })
                 }, "growx")

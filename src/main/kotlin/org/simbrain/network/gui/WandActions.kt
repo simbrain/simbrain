@@ -84,7 +84,7 @@ abstract class WandAction : CopyableObject {
 
     /**
      * A new action that takes back what this one does, with the same brush size, or null if this action has no
-     * such opposite. It is what the wand's secondary action is when the palette has not been given one.
+     * such opposite. It is what the wand palette suggests as the secondary action while this one is selected.
      */
     open fun opposite(): WandAction? = null
 

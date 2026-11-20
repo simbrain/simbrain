@@ -235,10 +235,11 @@ class WandPalettePanel(
                     font = Theme.font(10)
                     margin = Insets(1, 3, 1, 5)
                     isFocusPainted = false
+                    val addsIt = if (suggestion in palette.actions) "" else ", adding it to the palette"
+                    val current = secondaryAction?.let { "The secondary is now ${it.description}." }
+                        ?: "There is no secondary action now."
                     toolTipText = "<html>Suggestion: make the secondary action the opposite of the primary one, " +
-                            "${suggestion.description}.<br>" +
-                            "The secondary is now ${secondaryAction?.description}.<br>" +
-                            "After this it follows the primary action as that changes.</html>"
+                            "${suggestion.description}$addsIt.<br>$current</html>"
                     addActionListener {
                         palette.useSuggestedSecondary()
                         savePalette()

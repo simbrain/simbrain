@@ -42,12 +42,8 @@ class WandStrokeTest {
 
     private fun erase() = AdjustValueAction(amount = AdjustValueAmount.Value(0.0))
 
-    /** An action with no opposite, so that it leaves a palette without a secondary action unless one is chosen. */
-    private fun addUpperBound() = AdjustValueAction(AdjustValueAmount.UpperBound(), AdjustValueOperation.Add)
-
     /**
-     * Runs [block] with the wand palette holding [selected] and, if given, [secondary] chosen as its secondary
-     * action. With none chosen the secondary is the opposite of [selected].
+     * Runs [block] with the wand palette holding [selected] and, if given, [secondary] as its secondary action.
      */
     private fun withWandPalette(selected: WandAction, secondary: WandAction?, block: () -> Unit) {
         val palette = NetworkPreferences.wandPalette
@@ -176,29 +172,17 @@ class WandStrokeTest {
     }
 
     @Test
-    fun `with no secondary chosen a stroke with shift held takes back what the selected action draws`() =
-        withWandPalette(draw(), null) {
-            val neurons = neuronRow(3, activation = drawn)
-            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
+    fun `a stroke with shift held does nothing when there is no secondary action`() = withWandPalette(draw(), null) {
+        val neurons = neuronRow(3)
+        val panel = wandPanelFor(Network(), *neurons.toTypedArray())
 
-            panel.strokeOver(neurons, shiftAtPress = true)
+        panel.strokeOver(neurons, shiftAtPress = true)
+        // A plain stroke over the last neuron alone, to know when the shift stroke before it has been dealt with
+        panel.strokeOver(neurons.takeLast(1))
 
-            awaitActivations(neurons, 0.0)
-        }
-
-    @Test
-    fun `a stroke with shift held does nothing when there is no secondary action`() =
-        withWandPalette(addUpperBound(), null) {
-            val neurons = neuronRow(3)
-            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
-
-            panel.strokeOver(neurons, shiftAtPress = true)
-            // A plain stroke over the last neuron alone, to know when the shift stroke before it has been dealt with
-            panel.strokeOver(neurons.takeLast(1))
-
-            awaitUntil(message = "The plain stroke changed nothing") { neurons.last().activation != 0.0 }
-            assertEquals(listOf(0.0, 0.0), neurons.dropLast(1).map { it.activation })
-        }
+        awaitActivations(neurons.takeLast(1), drawn)
+        assertEquals(listOf(0.0, 0.0), neurons.dropLast(1).map { it.activation })
+    }
 
     @Test
     fun `each stroke is undone as a whole with the action it applied`() = withWandPalette(draw(), erase()) {

@@ -1,11 +1,10 @@
 /**
- * The wand palette's secondary action: the opposite of the selected action unless one is chosen, how a chosen one
- * follows edits to the list of actions, and that the choice is saved with the palette.
+ * The wand palette's secondary action: that it changes only when chosen, the opposite of the selected action that
+ * the palette suggests for it, how it survives edits to the list of actions, and that it is saved with the palette.
  */
 package org.simbrain.network.gui
 
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
@@ -64,47 +63,9 @@ class WandPaletteTest {
     }
 
     @Test
-    fun `with no secondary chosen the secondary is the palette's action opposite to the selected one`() {
-        val zero = setTo(0.0)
-        val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.synapseStrength(0.0), zero)
-
-        assertTrue(palette.isSecondaryAutomatic)
-        assertSame(zero, palette.secondaryAction)
-    }
-
-    @Test
-    fun `with no secondary chosen and no opposite in the palette one is made`() {
-        val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.inhibit())
-
-        val secondary = palette.secondaryAction
-
-        assertSets(0.0, AdjustValueTarget.NeuronActivation, secondary)
-        assertFalse(palette.actions.any { it === secondary })
-    }
-
-    @Test
-    fun `an automatic secondary changes with the selected action`() {
-        val decrement = AdjustValueAction.decrement()
-        val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.increment(), decrement, setTo(0.0))
-
-        palette.selectAction(1)
-
-        assertSame(decrement, palette.secondaryAction)
-    }
-
-    @Test
-    fun `the default palette draws and erases activations`() {
-        val palette = WandPalette.createDefault()
-
-        assertTrue((palette.selectedAction as AdjustValueAction).amount is AdjustValueAmount.UpperBound)
-        assertSets(0.0, AdjustValueTarget.NeuronActivation, palette.secondaryAction)
-        assertTrue(palette.actions.any { it === palette.secondaryAction })
-    }
-
-    @Test
-    fun `there is no secondary when the selected action has no opposite and none is chosen`() {
+    fun `a palette has no secondary action until one is chosen`() {
         val inhibit = AdjustValueAction.inhibit()
-        val palette = paletteOf(ForceSpikeAction(), inhibit)
+        val palette = paletteOf(AdjustValueAction.activate(), inhibit, setTo(0.0))
         assertNull(palette.secondaryAction)
 
         palette.secondaryIndex = 1
@@ -113,19 +74,40 @@ class WandPaletteTest {
     }
 
     @Test
-    fun `a chosen secondary is used in place of the opposite of the selected action`() {
-        val inhibit = AdjustValueAction.inhibit()
-        val palette = paletteOf(AdjustValueAction.activate(), setTo(0.0), inhibit)
+    fun `selecting another action leaves the secondary as it was`() {
+        val zero = setTo(0.0)
+        val palette = paletteOf(AdjustValueAction.activate(), zero, AdjustValueAction.increment(), AdjustValueAction.decrement())
+        palette.secondaryIndex = 1
 
-        palette.secondaryIndex = 2
-        palette.selectAction(1)
+        palette.selectAction(2)
 
-        assertFalse(palette.isSecondaryAutomatic)
-        assertSame(inhibit, palette.secondaryAction)
+        assertSame(zero, palette.secondaryAction)
     }
 
     @Test
-    fun `the opposite of the selected action is suggested when a secondary that does something else is chosen`() {
+    fun `the default palette draws and erases activations`() {
+        val palette = WandPalette.createDefault()
+
+        assertTrue((palette.selectedAction as AdjustValueAction).amount is AdjustValueAmount.UpperBound)
+        assertSets(0.0, AdjustValueTarget.NeuronActivation, palette.secondaryAction)
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `the opposite of the selected action is suggested when no secondary is chosen`() {
+        val zero = setTo(0.0)
+        val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.synapseStrength(0.0), zero)
+
+        assertSame(zero, palette.suggestedSecondary)
+
+        palette.useSuggestedSecondary()
+
+        assertSame(zero, palette.secondaryAction)
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `the opposite of the selected action is suggested when the secondary does something else`() {
         val zero = setTo(0.0)
         val palette = paletteOf(AdjustValueAction.activate(), zero, AdjustValueAction.inhibit())
         palette.secondaryIndex = 2
@@ -135,6 +117,20 @@ class WandPaletteTest {
         palette.useSuggestedSecondary()
 
         assertSame(zero, palette.secondaryAction)
+        assertNull(palette.suggestedSecondary)
+    }
+
+    @Test
+    fun `using a suggestion the palette does not have adds it to the palette`() {
+        val palette = paletteOf(AdjustValueAction.activate().apply { radius = 70 }, AdjustValueAction.inhibit())
+        assertSets(0.0, AdjustValueTarget.NeuronActivation, palette.suggestedSecondary)
+
+        palette.useSuggestedSecondary()
+
+        assertEquals(3, palette.actions.size)
+        assertSame(palette.actions[2], palette.secondaryAction)
+        assertSets(0.0, AdjustValueTarget.NeuronActivation, palette.secondaryAction)
+        assertEquals(70, palette.secondaryAction?.radius)
         assertNull(palette.suggestedSecondary)
     }
 
@@ -179,13 +175,12 @@ class WandPaletteTest {
     }
 
     @Test
-    fun `removing the chosen secondary makes the secondary automatic`() {
-        val palette = paletteOf(ForceSpikeAction(), AdjustValueAction.inhibit(), setTo(0.5))
+    fun `removing the secondary action leaves the palette without one`() {
+        val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.inhibit(), setTo(0.5))
         palette.secondaryIndex = 1
 
         palette.removeAction(1)
 
-        assertTrue(palette.isSecondaryAutomatic)
         assertNull(palette.secondaryAction)
     }
 
@@ -203,28 +198,14 @@ class WandPaletteTest {
     }
 
     @Test
-    fun `swapping an automatic secondary leaves it automatic when the two actions are each other's opposites`() {
+    fun `swapping does nothing when there is no secondary action`() {
         val activate = AdjustValueAction.activate()
-        val zero = setTo(0.0)
-        val palette = paletteOf(activate, AdjustValueAction.inhibit(), zero)
+        val palette = paletteOf(activate, setTo(0.0))
 
         palette.swapSelectedAndSecondary()
 
-        assertSame(zero, palette.selectedAction)
-        assertSame(activate, palette.secondaryAction)
-        assertTrue(palette.isSecondaryAutomatic)
-    }
-
-    @Test
-    fun `swapping an automatic secondary chooses the action that was selected when it would not otherwise follow`() {
-        val setHalf = setTo(0.5)
-        val zero = setTo(0.0)
-        val palette = paletteOf(setHalf, zero)
-
-        palette.swapSelectedAndSecondary()
-
-        assertSame(zero, palette.selectedAction)
-        assertSame(setHalf, palette.secondaryAction)
+        assertSame(activate, palette.selectedAction)
+        assertNull(palette.secondaryAction)
     }
 
     @Test
@@ -249,7 +230,7 @@ class WandPaletteTest {
     }
 
     @Test
-    fun `a palette saved before there was a secondary has an automatic one`() {
+    fun `a palette saved before there was a secondary has none, and suggests one`() {
         val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.inhibit(), setTo(0.0))
         val savedWithoutSecondary = getSimbrainXStream().toXML(palette)
             .lines().filterNot { "secondaryIndex" in it }.joinToString("\n")
@@ -257,7 +238,7 @@ class WandPaletteTest {
         val restored = getSimbrainXStream().fromXML(savedWithoutSecondary) as WandPalette
 
         assertEquals(3, restored.actions.size)
-        assertTrue(restored.isSecondaryAutomatic)
-        assertSame(restored.actions[2], restored.secondaryAction)
+        assertNull(restored.secondaryAction)
+        assertSame(restored.actions[2], restored.suggestedSecondary)
     }
 }

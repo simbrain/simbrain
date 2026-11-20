@@ -1,7 +1,7 @@
 /**
  * The wand's palette of actions. One action is selected and applied by an ordinary wand stroke; a second, the
- * secondary, is applied by a stroke made with Shift held. Unless one of the palette's actions is chosen for it, the
- * secondary is the opposite of the selected action and so changes with it.
+ * secondary, is applied by a stroke made with Shift held. The secondary changes only when it is chosen; the palette
+ * can suggest the opposite of the selected action for it.
  */
 package org.simbrain.network.gui
 
@@ -44,8 +44,7 @@ class WandPalette : EditableObject {
         get() = actions.getOrNull(selectedIndex)
 
     /**
-     * Index of the action chosen as the secondary. Any value that is not the index of an action, such as the -1 of
-     * a palette where none has been chosen, makes the secondary automatic: see [secondaryAction].
+     * Index of the action chosen as the secondary, or -1 when none has been.
      */
     var secondaryIndex: Int = -1
         set(value) {
@@ -56,40 +55,30 @@ class WandPalette : EditableObject {
         }
 
     /**
-     * Whether the secondary action is worked out from the selected action rather than chosen.
-     */
-    val isSecondaryAutomatic: Boolean
-        get() = secondaryIndex !in actions.indices
-
-    /**
-     * The action applied by a stroke made with Shift held. When one has been chosen with [secondaryIndex] it is that
-     * action. Otherwise it is the opposite of the selected action, so that Shift takes back what the wand draws:
-     * the palette's own action with that effect if it has one, and failing that an action made for the purpose,
-     * which is not in [actions] and is a new object every time this is read. Null if the selected action has no
-     * opposite.
+     * The action applied by a stroke made with Shift held, or null if none has been chosen.
      */
     val secondaryAction: WandAction?
-        get() = actions.getOrNull(secondaryIndex) ?: oppositeOfSelected()
+        get() = actions.getOrNull(secondaryIndex)
 
     /**
-     * The opposite of the selected action when a secondary has been chosen that does something else, and null
-     * otherwise. It is what [useSuggestedSecondary] would make the secondary.
+     * The opposite of the selected action, when it has one and the secondary action does something else: the
+     * palette's own action with that effect if it has one, and failing that a new action, which is not in
+     * [actions]. Null when there is nothing to suggest. It is what [useSuggestedSecondary] makes the secondary.
      */
     val suggestedSecondary: WandAction?
         get() {
-            val chosen = actions.getOrNull(secondaryIndex) ?: return null
-            return oppositeOfSelected()?.takeUnless { chosen.hasSameEffectAs(it) }
+            val opposite = selectedAction?.opposite() ?: return null
+            if (secondaryAction?.hasSameEffectAs(opposite) == true) return null
+            return actions.firstOrNull { it.hasSameEffectAs(opposite) } ?: opposite
         }
 
     /**
-     * Give up the chosen secondary for the opposite of the selected action, now and as the selection changes.
+     * Make [suggestedSecondary] the secondary action, adding it to the palette if it is not one of its actions.
      */
     fun useSuggestedSecondary() {
-        secondaryIndex = -1
-    }
-
-    private fun oppositeOfSelected(): WandAction? = selectedAction?.opposite()?.let { opposite ->
-        actions.firstOrNull { it.hasSameEffectAs(opposite) } ?: opposite
+        val suggestion = suggestedSecondary ?: return
+        if (suggestion !in actions) addAction(suggestion)
+        secondaryIndex = actions.indexOf(suggestion)
     }
 
     /**
@@ -146,17 +135,14 @@ class WandPalette : EditableObject {
     }
 
     /**
-     * Make the secondary action the selected one and the selected action the secondary. Does nothing if there is no
-     * secondary action or it is not one of the palette's actions. An automatic secondary stays automatic when that
-     * alone makes the action that was selected the secondary.
+     * Make the secondary action the selected one and the selected action the secondary. Does nothing if the palette
+     * has no secondary action.
      */
     fun swapSelectedAndSecondary() {
-        val secondary = actions.indexOf(secondaryAction ?: return)
-        if (secondary < 0) return
+        if (secondaryAction == null) return
         val selected = selectedIndex
-        val wasAutomatic = isSecondaryAutomatic
-        selectedIndex = secondary
-        if (!wasAutomatic || secondaryAction !== actions[selected]) secondaryIndex = selected
+        selectedIndex = secondaryIndex
+        secondaryIndex = selected
     }
 
     /**
@@ -209,6 +195,8 @@ class WandPalette : EditableObject {
             // Neuron increment/decrement
             addAction(AdjustValueAction.increment())
             addAction(AdjustValueAction.decrement())
+            // Shift erases what the first action draws
+            useSuggestedSecondary()
         }
     }
 }

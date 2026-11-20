@@ -3,12 +3,7 @@
  */
 package org.simbrain.console
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.isActive
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeoutOrNull
+import kotlinx.coroutines.*
 import org.simbrain.custom_sims.simulations
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.connections.AllToAll
@@ -28,6 +23,9 @@ private const val RUN_START_TIMEOUT_MS = 5000L
 private const val RELAYED = "This window closes when the workspace is replaced, so this is running in the Terminal tab " +
         "at the bottom of the desktop, which stays open."
 private val NEURON_TYPE_WORDS = listOf("neurons", "collection")
+
+/** Short names accepted by add for component types. */
+private val COMPONENT_TYPE_ALIASES = mapOf("net" to "network")
 
 /** A sequence of examples, each building on the last, shown by `tour`. */
 val tour = listOf(
@@ -53,6 +51,13 @@ val whereExamples = listOf(
 val workspaceCommands: CommandRegistry = commands {
 
     conditionCompleter = { args, prior, partial -> conditionCandidates(args, prior, partial) }
+
+    corrections = listOf(
+        // add 10 neurons becomes add neurons 10
+        Correction("""^add\s+(\d+)\s+(neurons?|collection)\b""", "add $2 $1"),
+        // add neurons 10 to net1 becomes add neurons 10 in=net1
+        Correction("""^(add\s+(?:neurons?|collection)\b.*?)\s+(?:to|into|in)\s+("[^"]*"|\S+)""", "$1 in=$2")
+    )
 
     command(
         name = "ls",
@@ -268,8 +273,15 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Build a small network from scratch and give it random activations", "add network demo", "add neurons 10 in=demo", "set demo/Neuron_* activation=rand()")
         ),
         usage = "add <type> [count or name] [in=path] [layout=type] [key=value ...]",
-        description = "Add neurons, a collection, or a component.",
-        completer = { prior, partial -> if (prior.isEmpty()) wordCandidates(addableTypes(), partial) else emptyList() }
+        description = "Add neurons, a collection, or a component. net is short for network.",
+        completer = { prior, partial ->
+            when {
+                prior.isEmpty() -> wordCandidates(addableTypes(), partial)
+                partial.startsWith("in=", ignoreCase = true) ->
+                    wordCandidates(networkComponents.map { it.name }, partial.substringAfter("=")).map { Candidate("in=${it.text}") }
+                else -> emptyList()
+            }
+        }
     ) { args ->
         val parsed = Arguments.parse(args)
         val type = parsed.words.firstOrNull() ?: fail("Usage: add <type> [count or name]. Types: ${addableTypes().joinToString(", ")}")
@@ -433,7 +445,8 @@ val workspaceCommands: CommandRegistry = commands {
             Example("Clear the neurons in net1 whose activation is above 0.5", "clear net1/* where type=Neuron and activation>0.5")
         ),
         usage = "clear <path> [where condition]",
-        description = "Clear models, or the activations in a network.",
+        description = "Clear activations: set activations and inputs to 0 in a network or in the given neurons and " +
+                "other models. Synapse strengths are kept.",
         completer = pathCompletion
     ) { args ->
         if (args.isEmpty()) fail("clear needs a path, as in clear net1. To clear the screen, use cls.")
@@ -601,7 +614,8 @@ val workspaceCommands: CommandRegistry = commands {
         if (args.isEmpty()) {
             registry.all.groupBy { it.group }.entries.joinToString("\n\n") { (group, members) ->
                 group + "\n" + members.joinToString("\n") { "  " + styledUsage(it) }
-            } + "\n\nIn usage, <x> must be given and [x] is optional. Enter help <command> for details, and " +
+            } + "\n\nA line is a command, then what it acts on, then key=value options, as in " +
+                    "${bold("add neurons 10 in=net1")}. In usage, <x> must be given and [x] is optional. Enter help <command> for details, and " +
                     "examples for commands to copy and paste. Paths look like net1/Neuron_1, and a name by " +
                     "itself is found wherever it is. Use .. to go up, / for the workspace, * and ? to match several, " +
                     "** to match at any depth, {1..5} for a range, and @ for what is selected in the GUI. End a line with " +
@@ -855,7 +869,7 @@ private fun describeRange(ids: List<String>) = if (ids.size > 1) "${ids.first()}
 private fun CommandShell.addComponent(type: String, arguments: Arguments): String {
     val types = workspace.componentFactory.workspaceComponentTypes.associateBy { it }
     val factoryName = try {
-        chooseOption(types, type, "type")
+        chooseOption(types, COMPONENT_TYPE_ALIASES[normalized(type)] ?: type, "type")
     } catch (e: CommandException) {
         fail("Unknown type: $type. Types: ${addableTypes().joinToString(", ")}")
     }

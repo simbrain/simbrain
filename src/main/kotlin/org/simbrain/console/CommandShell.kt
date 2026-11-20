@@ -6,19 +6,15 @@
  * Paths may use `*`, `?`, `**`, and shell-style `{1..10}` ranges, and `@` stands for what is
  * selected in the GUI. A `where` condition at the end of a line filters what a command acts on, and numeric values
  * can be expressions evaluated for each object (see `Expressions.kt`). Output can be filtered with `| grep`. There
- * are deliberately no variables or loops.
+ * are deliberately no variables or loops. A line that fails in a known natural but unsupported way, such as
+ * `add 10 neurons`, gets the supported form suggested (see [Correction]).
  *
  * [CommandShell] parses lines, tracks the current location, resolves paths, and completes partial input. The commands
  * themselves are declared with [commands] in `WorkspaceCommands.kt`.
  */
 package org.simbrain.console
 
-import kotlinx.coroutines.CancellationException
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.currentCoroutineContext
-import kotlinx.coroutines.ensureActive
-import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
+import kotlinx.coroutines.*
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.NetworkModel
@@ -31,7 +27,7 @@ import org.simbrain.workspace.Workspace
 import org.simbrain.workspace.WorkspaceComponent
 import org.simbrain.workspace.gui.SimbrainDesktop
 import java.lang.reflect.InvocationTargetException
-import java.util.IdentityHashMap
+import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 import kotlin.coroutines.AbstractCoroutineContextElement
 import kotlin.coroutines.CoroutineContext
@@ -119,6 +115,17 @@ class Command(
     val action: suspend CommandShell.(args: List<String>) -> String
 )
 
+/**
+ * A natural but unsupported way of writing a line, and how to write it instead. When a line fails, every correction
+ * whose pattern is found in it is made in turn, and the result is suggested in place of the problem.
+ *
+ * @param pattern a regular expression matched against the line, ignoring case
+ * @param replacement what replaces the match, where $1 and so on are the pattern's groups
+ */
+class Correction(pattern: String, val replacement: String) {
+    val pattern = Regex(pattern, RegexOption.IGNORE_CASE)
+}
+
 class CommandRegistry {
 
     private val commandsByName = linkedMapOf<String, Command>()
@@ -128,6 +135,8 @@ class CommandRegistry {
     operator fun get(name: String): Command? = commandsByName[name]
 
     var conditionCompleter: ConditionCompleter = { _, _, _ -> emptyList() }
+
+    var corrections: List<Correction> = emptyList()
 
     fun command(
         name: String,
@@ -239,7 +248,21 @@ class CommandShell(
         return "Error: ${cause.message ?: cause::class.simpleName}"
     }
 
-    private suspend fun runLine(line: String): String {
+    private suspend fun runLine(line: String): String = try {
+        runCommand(line)
+    } catch (e: CommandException) {
+        val corrected = corrected(line) ?: throw e
+        fail("Did you mean: ${bold(corrected)}")
+    }
+
+    /** The line with the corrections that apply to it made, or null if none applies. */
+    private fun corrected(line: String): String? {
+        val entered = line.trim()
+        val corrected = registry.corrections.fold(entered) { text, correction -> correction.pattern.replace(text, correction.replacement) }
+        return corrected.takeIf { it != entered }
+    }
+
+    private suspend fun runCommand(line: String): String {
         val parsed = parseLine(line)
         val name = parsed.words.firstOrNull() ?: return ""
         val command = registry[name] ?: fail("Unknown command: $name. Enter help for a list.")

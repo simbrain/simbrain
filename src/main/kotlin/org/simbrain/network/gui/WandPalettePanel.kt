@@ -1,6 +1,7 @@
 /**
- * Swing views of the wand palette: the popup list where the actions for a drag and for a drag with Shift held are
- * chosen and edited, and the toolbar split button that switches to the wand and opens that list.
+ * Swing views of the wand palette: the popup list where the primary action and the secondary action, the one
+ * applied with Shift held, are chosen and edited, and the toolbar split button that switches to the wand and opens
+ * that list.
  */
 package org.simbrain.network.gui
 
@@ -39,30 +40,30 @@ class WandPalettePanel(
      */
     private var choosingSecondary = false
 
-    private val dragTab = slotTab("Drag", secondary = false)
+    private val primaryTab = slotTab("Primary", secondary = false)
 
-    private val shiftDragTab = slotTab("Shift + drag", secondary = true)
+    private val secondaryTab = slotTab("Secondary (Shift)", secondary = true)
 
     init {
         layout = BorderLayout()
         border = EmptyBorder(Theme.componentGap, Theme.componentGap, Theme.componentGap, Theme.componentGap)
 
         ButtonGroup().apply {
-            add(dragTab)
-            add(shiftDragTab)
+            add(primaryTab)
+            add(secondaryTab)
         }
-        dragTab.isSelected = true
+        primaryTab.isSelected = true
         val swapButton = JButton(SwapIcon()).apply {
             putClientProperty("JButton.buttonType", "toolBarButton")
-            toolTipText = "Swap the two actions (x)"
+            toolTipText = "Swap the primary and secondary actions (x)"
             addActionListener {
                 palette.swapSelectedAndSecondary()
                 savePalette()
             }
         }
         val slotPanel = JPanel(MigLayout("insets 0 0 ${Theme.tightGap} 0, fillx, gap 0", "[grow,fill,sg slot][grow,fill,sg slot]${Theme.tightGap}[]")).apply {
-            add(dragTab)
-            add(shiftDragTab)
+            add(primaryTab)
+            add(secondaryTab)
             add(swapButton)
         }
         add(slotPanel, BorderLayout.NORTH)
@@ -156,15 +157,20 @@ class WandPalettePanel(
         if (isRebuilding) return
         isRebuilding = true
 
-        updateSlotTab(dragTab, palette.selectedAction, "Dragging the wand")
-        updateSlotTab(shiftDragTab, palette.secondaryAction, "Dragging the wand with Shift held")
+        val secondaryAction = palette.secondaryAction
+        updateSlotTab(primaryTab, palette.selectedAction, "Dragging the wand")
+        updateSlotTab(secondaryTab, secondaryAction, "Dragging the wand with Shift held")
         
         listPanel.removeAll()
+        if (choosingSecondary) {
+            listPanel.add(createAutomaticSecondaryRow(secondaryAction))
+            listPanel.add(Box.createVerticalStrut(2))
+        }
         palette.actions.forEachIndexed { index, action ->
             if (index > 0) {
                 listPanel.add(Box.createVerticalStrut(2))
             }
-            listPanel.add(createActionRow(index, action))
+            listPanel.add(createActionRow(index, action, secondaryAction))
         }
         listPanel.add(Box.createVerticalGlue())
         listPanel.revalidate()
@@ -179,30 +185,73 @@ class WandPalettePanel(
         onSelectionChanged()
     }
 
-    private fun createActionRow(index: Int, action: WandAction): JPanel {
-        val isSecondary = action === palette.secondaryAction
-        // The row highlighted is the action of the tab being chosen for; the other tab's action carries a tag
-        val isSelected = if (choosingSecondary) isSecondary else index == palette.selectedIndex
-        val otherGesture = when {
-            choosingSecondary && index == palette.selectedIndex -> "Drag"
-            !choosingSecondary && isSecondary -> "Shift + drag"
-            else -> null
-        }
-
+    /**
+     * An empty row of the list, drawn as the choice of the tab being chosen for if [isSelected].
+     */
+    private fun listRow(isSelected: Boolean) = JPanel(BorderLayout(Theme.tightGap, 0)).apply {
         val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
         // Opaque selection wash: blend the accent over the card background so the (opaque) row
         // paints a solid color, rather than an alpha tint that would smear on scroll.
         val selectedBg = blend(accent, Theme.cardBg, 0.16)
 
-        return JPanel(BorderLayout(Theme.tightGap, 0)).apply {
-            border = BorderFactory.createCompoundBorder(
-                if (isSelected) BorderFactory.createLineBorder(accent, 2)
-                else BorderFactory.createLineBorder(Theme.divider, 1),
-                EmptyBorder(4, 6, 4, 6)
-            )
-            background = if (isSelected) selectedBg else Theme.cardBg
-            maximumSize = Dimension(Int.MAX_VALUE, 36)
-            preferredSize = Dimension(280, 36)
+        border = BorderFactory.createCompoundBorder(
+            if (isSelected) BorderFactory.createLineBorder(accent, 2)
+            else BorderFactory.createLineBorder(Theme.divider, 1),
+            EmptyBorder(4, 6, 4, 6)
+        )
+        background = if (isSelected) selectedBg else Theme.cardBg
+        maximumSize = Dimension(Int.MAX_VALUE, 36)
+        preferredSize = Dimension(280, 36)
+    }
+
+    /**
+     * The first row of the list while the secondary is being chosen: leave the choice to the palette, which uses
+     * the opposite of the primary action. [secondaryAction] is the palette's current secondary.
+     */
+    private fun createAutomaticSecondaryRow(secondaryAction: WandAction?): JPanel {
+        val isAutomatic = palette.isSecondaryAutomatic
+        val opposite = if (isAutomatic) secondaryAction else palette.selectedAction?.opposite()
+        return listRow(isSelected = isAutomatic).apply {
+            val iconLabel = if (opposite != null) {
+                WandIcon(opposite.color, 24, opposite.letter)
+            } else {
+                JLabel().apply { preferredSize = Dimension(24, 24) }
+            }
+            add(iconLabel, BorderLayout.WEST)
+
+            val text = if (opposite != null) {
+                "Opposite of primary: ${opposite.description}"
+            } else {
+                "Opposite of primary: none for this action"
+            }
+            val descLabel = JLabel(text).apply {
+                font = Theme.font(12)
+                toolTipText = "Let the secondary action follow the primary one, taking back whatever it does"
+            }
+            add(descLabel, BorderLayout.CENTER)
+
+            val clickListener = object : MouseAdapter() {
+                override fun mousePressed(e: MouseEvent) {
+                    palette.secondaryIndex = -1
+                    savePalette()
+                }
+            }
+            addMouseListener(clickListener)
+            iconLabel.addMouseListener(clickListener)
+            descLabel.addMouseListener(clickListener)
+        }
+    }
+
+    private fun createActionRow(index: Int, action: WandAction, secondaryAction: WandAction?): JPanel {
+        // The row highlighted is the choice of the tab being chosen for; the other tab's action carries a tag
+        val isSelected = if (choosingSecondary) index == palette.secondaryIndex else index == palette.selectedIndex
+        val otherRole = when {
+            choosingSecondary && index == palette.selectedIndex -> "Primary"
+            !choosingSecondary && action === secondaryAction -> "Secondary"
+            else -> null
+        }
+
+        return listRow(isSelected).apply {
 
             // Wand icon (double-click to edit)
             val iconLabel = WandIcon(action.color, 24, action.letter).apply {
@@ -222,7 +271,7 @@ class WandPalettePanel(
                 isOpaque = false
             }
 
-            val gestureTag = otherGesture?.let {
+            val roleTag = otherRole?.let {
                 JLabel(it).apply {
                     font = Theme.font(10)
                     foreground = Theme.mutedText
@@ -230,10 +279,14 @@ class WandPalettePanel(
                         BorderFactory.createLineBorder(Theme.divider, 1, true),
                         EmptyBorder(1, 5, 1, 5)
                     )
-                    toolTipText = "The action applied by: $it"
+                    toolTipText = if (it == "Primary") {
+                        "The primary action, applied by dragging the wand"
+                    } else {
+                        "The secondary action, applied by dragging the wand with Shift held"
+                    }
                 }
             }
-            gestureTag?.let { buttonPanel.add(it) }
+            roleTag?.let { buttonPanel.add(it) }
 
             // Kebab menu button for editing
             val kebabButton = JButton().apply {
@@ -275,7 +328,7 @@ class WandPalettePanel(
             addMouseListener(clickListener)
             iconLabel.addMouseListener(clickListener)
             descLabel.addMouseListener(clickListener)
-            gestureTag?.addMouseListener(clickListener)
+            roleTag?.addMouseListener(clickListener)
         }
     }
 

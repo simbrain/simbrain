@@ -1,3 +1,8 @@
+/**
+ * The wand's palette of actions. One action is selected and applied by an ordinary wand stroke; a second, the
+ * secondary, is applied by a stroke made with Shift held. The secondary changes only when it is chosen; the palette
+ * can suggest the opposite of the selected action for it.
+ */
 package org.simbrain.network.gui
 
 import org.simbrain.util.FlowEvents
@@ -39,6 +44,44 @@ class WandPalette : EditableObject {
         get() = actions.getOrNull(selectedIndex)
 
     /**
+     * Index of the action chosen as the secondary, or -1 when none has been.
+     */
+    var secondaryIndex: Int = -1
+        set(value) {
+            if (value != field) {
+                field = value
+                events.secondaryChanged.fire()
+            }
+        }
+
+    /**
+     * The action applied by a stroke made with Shift held, or null if none has been chosen.
+     */
+    val secondaryAction: WandAction?
+        get() = actions.getOrNull(secondaryIndex)
+
+    /**
+     * The opposite of the selected action, when it has one and the secondary action does something else: the
+     * palette's own action with that effect if it has one, and failing that a new action, which is not in
+     * [actions]. Null when there is nothing to suggest. It is what [useSuggestedSecondary] makes the secondary.
+     */
+    val suggestedSecondary: WandAction?
+        get() {
+            val opposite = selectedAction?.opposite() ?: return null
+            if (secondaryAction?.hasSameEffectAs(opposite) == true) return null
+            return actions.firstOrNull { it.hasSameEffectAs(opposite) } ?: opposite
+        }
+
+    /**
+     * Make [suggestedSecondary] the secondary action, adding it to the palette if it is not one of its actions.
+     */
+    fun useSuggestedSecondary() {
+        val suggestion = suggestedSecondary ?: return
+        if (suggestion !in actions) addAction(suggestion)
+        secondaryIndex = actions.indexOf(suggestion)
+    }
+
+    /**
      * Add an action to the palette.
      */
     fun addAction(action: WandAction) {
@@ -55,6 +98,12 @@ class WandPalette : EditableObject {
     fun removeAction(index: Int) {
         if (index >= 0 && index < actions.size) {
             val action = actions.removeAt(index)
+            when {
+                index < secondaryIndex -> secondaryIndex--
+                index == secondaryIndex -> secondaryIndex = -1
+            }
+            // Keep the same action selected when one ahead of it goes
+            if (index < selectedIndex) selectedIndex--
             events.actionRemoved.fire(action)
             if (selectedIndex >= actions.size) {
                 selectedIndex = (actions.size - 1).coerceAtLeast(0)
@@ -88,12 +137,24 @@ class WandPalette : EditableObject {
     }
 
     /**
-     * Replace all actions with the given list.
+     * Make the secondary action the selected one and the selected action the secondary. Does nothing if the palette
+     * has no secondary action.
      */
-    fun setActions(newActions: List<WandAction>) {
+    fun swapSelectedAndSecondary() {
+        if (secondaryAction == null) return
+        val selected = selectedIndex
+        selectedIndex = secondaryIndex
+        secondaryIndex = selected
+    }
+
+    /**
+     * Replace all actions with the given list, the secondary being the one at [newSecondaryIndex].
+     */
+    fun setActions(newActions: List<WandAction>, newSecondaryIndex: Int = -1) {
         actions.clear()
         actions.addAll(newActions)
         selectedIndex = if (actions.isNotEmpty()) 0 else 0
+        secondaryIndex = newSecondaryIndex
         events.paletteChanged.fire()
     }
 
@@ -103,6 +164,7 @@ class WandPalette : EditableObject {
     fun copy(): WandPalette = WandPalette().also { newPalette ->
         newPalette.actions.addAll(actions.map { it.copy() as WandAction })
         newPalette.selectedIndex = selectedIndex
+        newPalette.secondaryIndex = secondaryIndex
     }
 
     override val name: String get() = "Wand palette"
@@ -135,6 +197,8 @@ class WandPalette : EditableObject {
             // Neuron increment/decrement
             addAction(AdjustValueAction.increment())
             addAction(AdjustValueAction.decrement())
+            // Shift erases what the first action draws
+            useSuggestedSecondary()
         }
     }
 }
@@ -144,6 +208,7 @@ class WandPalette : EditableObject {
  */
 class WandPaletteEvents : FlowEvents() {
     val selectionChanged = NoArgEvent()
+    val secondaryChanged = NoArgEvent()
     val actionAdded = OneArgEvent<WandAction>()
     val actionRemoved = OneArgEvent<WandAction>()
     val actionEdited = OneArgEvent<WandAction>()

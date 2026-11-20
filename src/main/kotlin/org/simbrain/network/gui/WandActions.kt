@@ -1,3 +1,7 @@
+/**
+ * The actions a wand stroke can apply to the models it passes over, each with its own parameters, undo handling and,
+ * where one exists, an opposite action for the wand palette to offer as the secondary.
+ */
 package org.simbrain.network.gui
 
 import org.simbrain.network.connections.AllToAll
@@ -78,6 +82,17 @@ abstract class WandAction : CopyableObject {
      */
     open fun undoDescription(count: Int): String = "Wand: $description on $count items"
 
+    /**
+     * A new action that takes back what this one does, with the same brush size, or null if this action has no
+     * such opposite. It is what the wand palette suggests as the secondary action while this one is selected.
+     */
+    open fun opposite(): WandAction? = null
+
+    /**
+     * Whether this action does to a model exactly what [other] does, whatever their letters, colors and brush sizes.
+     */
+    open fun hasSameEffectAs(other: WandAction): Boolean = this === other
+
     override fun getTypeList(): List<Class<out CopyableObject>> = listOf(
         AdjustValueAction::class.java,
         ForceSpikeAction::class.java,
@@ -154,6 +169,19 @@ sealed class AdjustValueOperation : EditableObject {
 sealed class AdjustValueAmount : CopyableObject {
     abstract fun computeValue(lower: Double, upper: Double): Double
     abstract val description: String
+
+    /** Whether this is zero: the value zero, or the relative amount that is zero wherever the bounds allow it. */
+    val isZero: Boolean
+        get() = (this as? Value)?.value == 0.0 || (this as? Relative)?.relativeValue == 0.0
+
+    /** Whether this gives the same value as [other] for any bounds. No two random amounts do. */
+    fun isSameAs(other: AdjustValueAmount): Boolean = when (this) {
+        is UpperBound -> other is UpperBound
+        is LowerBound -> other is LowerBound
+        is Value -> other is Value && value == other.value
+        is Relative -> other is Relative && relativeValue == other.relativeValue
+        is Random -> false
+    }
 
     override fun getTypeList() = listOf(
         UpperBound::class.java,
@@ -369,6 +397,41 @@ class AdjustValueAction(
         it.radius = radius
         it.clampToBounds = clampToBounds
     }
+
+    /**
+     * Adding a fixed amount is taken back by adding its negative, and setting a value by setting zero. Setting
+     * activations to zero is itself taken back by setting them to their upper bound, so that the wand's usual pair
+     * of drawing and erasing are each other's opposites. Setting strengths to zero has no opposite, there being no
+     * one strength it erased. Nor has adding a random amount or one that depends on the bounds: a relative amount
+     * is scaled differently below zero than above it, so its negative takes back a different amount.
+     */
+    override fun opposite(): WandAction? {
+        val amount = amount
+        val setsZero = operation is AdjustValueOperation.Set && amount.isZero
+        val opposite = when {
+            operation is AdjustValueOperation.Add && amount is AdjustValueAmount.Value ->
+                if (amount.value > 0) decrement(amount.value) else increment(-amount.value)
+            operation is AdjustValueOperation.Add -> return null
+            setsZero && target is AdjustValueTarget.NeuronActivation -> activate()
+            setsZero -> return null
+            target is AdjustValueTarget.SynapseStrength -> synapseStrength(0.0).apply {
+                letter = "W0"
+                color = Color(150, 150, 150, 220)
+            }
+            else -> setValue(0.0)
+        }
+        return opposite.also {
+            it.target = target
+            it.radius = radius
+            it.clampToBounds = clampToBounds
+        }
+    }
+
+    override fun hasSameEffectAs(other: WandAction): Boolean = other is AdjustValueAction
+            && target === other.target
+            && operation === other.operation
+            && clampToBounds == other.clampToBounds
+            && amount.isSameAs(other.amount)
 
     override val name: String get() = "Adjust value"
 

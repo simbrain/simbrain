@@ -7,7 +7,9 @@ import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.gui.nodes.NeuronNode
 import org.simbrain.util.*
+import java.awt.event.InputEvent
 import java.awt.event.KeyEvent.*
+import javax.swing.KeyStroke
 
 /**
  * Add key bindings to network panel. Controls many keyboard shortcuts. Bindings not found here are in the action
@@ -39,9 +41,7 @@ fun NetworkPanel.addKeyBindings() {
         if (mouseCursor == MouseEventHandler.MouseCursor.Wand) {
             NetworkPreferences.wandPalette.cycleToNextAction()
         } else {
-            NetworkPreferences.wandPalette.selectedAction?.let { action ->
-                MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
-            }
+            wandEventHandler.refreshCursor()
             mouseCursor = MouseEventHandler.MouseCursor.Wand
         }
     }
@@ -50,6 +50,17 @@ fun NetworkPanel.addKeyBindings() {
             NetworkPreferences.wandPalette.cycleToPreviousAction()
         }
     }
+    bind("X") {
+        if (mouseCursor == MouseEventHandler.MouseCursor.Wand) {
+            NetworkPreferences.wandPalette.swapSelectedAndSecondary()
+        }
+    }
+    // Shift on its own, for the wand cursor to show the secondary action while it is held. Run directly rather than
+    // launched, so that a press and the release after it are seen in that order.
+    putInputMap(KeyStroke.getKeyStroke(VK_SHIFT, InputEvent.SHIFT_DOWN_MASK), "Wand shift pressed")
+    actionMap.put("Wand shift pressed") { wandEventHandler.shiftChanged(true) }
+    putInputMap(KeyStroke.getKeyStroke(VK_SHIFT, 0, true), "Wand shift released")
+    actionMap.put("Wand shift released") { wandEventHandler.shiftChanged(false) }
     bind("K") { selectionManager.set(filterScreenElements<NeuronNode>()); clearSelectedObjects() }
     // TODO: Is this the right place for this?
     bind(Shift + 'I') {

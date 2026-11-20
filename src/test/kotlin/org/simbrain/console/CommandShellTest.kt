@@ -569,6 +569,13 @@ class CommandShellTest {
     }
 
     @Test
+    fun `rand runs randomize and help names it`() {
+        val shell = shellWithNetwork()
+        assertEquals("Randomized 1 model(s).", shell.run("rand net1/Neuron_1"))
+        assertTrue(shell.run("help randomize").contains("Short form: rand"))
+    }
+
+    @Test
     fun `sim suggests open`() {
         assertEquals("Did you mean: open XOR force", shellWithNetwork().run("sim XOR force"))
     }

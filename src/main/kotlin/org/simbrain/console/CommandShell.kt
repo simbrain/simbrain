@@ -101,9 +101,11 @@ fun styledSegments(styled: String): List<Pair<String, Boolean>> =
  * @param immediate if true, the command runs as soon as it is entered instead of waiting for earlier commands, as
  * `stop` must
  * @param takesWhere whether a `where` condition at the end of the line filters what the command acts on
+ * @param aliases shorter names that run the same command
  */
 class Command(
     val name: String,
+    val aliases: List<String>,
     val usage: String,
     val description: String,
     val group: String,
@@ -130,9 +132,11 @@ class CommandRegistry {
 
     private val commandsByName = linkedMapOf<String, Command>()
 
+    private val commandsByAlias = hashMapOf<String, Command>()
+
     val all: Collection<Command> get() = commandsByName.values
 
-    operator fun get(name: String): Command? = commandsByName[name]
+    operator fun get(name: String): Command? = commandsByName[name] ?: commandsByAlias[name]
 
     var conditionCompleter: ConditionCompleter = { _, _, _ -> emptyList() }
 
@@ -140,6 +144,7 @@ class CommandRegistry {
 
     fun command(
         name: String,
+        aliases: List<String> = emptyList(),
         usage: String = name,
         description: String,
         group: String = "",
@@ -150,7 +155,9 @@ class CommandRegistry {
         completer: Completer = noCompletion,
         action: suspend CommandShell.(args: List<String>) -> String
     ) {
-        commandsByName[name] = Command(name, usage, description, group, examples, listsItems, immediate, takesWhere, completer, action)
+        val command = Command(name, aliases, usage, description, group, examples, listsItems, immediate, takesWhere, completer, action)
+        commandsByName[name] = command
+        aliases.forEach { commandsByAlias[it] = command }
     }
 }
 

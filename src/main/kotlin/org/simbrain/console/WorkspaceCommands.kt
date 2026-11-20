@@ -412,6 +412,7 @@ val workspaceCommands: CommandRegistry = commands {
 
     command(
         name = "randomize",
+        aliases = listOf("rand"),
         group = "Build",
         takesWhere = true,
         examples = listOf(
@@ -630,7 +631,8 @@ val workspaceCommands: CommandRegistry = commands {
         } else {
             val command = registry[args.first()] ?: fail("Unknown command: ${args.first()}")
             val examples = command.examples.joinToString("\n\n") { it.styled() }
-            "${styledUsage(command)}\n${command.description}" + if (examples.isEmpty()) "" else "\n\nExamples, which can be copied and pasted:\n\n$examples"
+            val aliases = if (command.aliases.isEmpty()) "" else "\nShort form: ${command.aliases.joinToString(", ")}"
+            "${styledUsage(command)}\n${command.description}$aliases" + if (examples.isEmpty()) "" else "\n\nExamples, which can be copied and pasted:\n\n$examples"
         }
     }
 }

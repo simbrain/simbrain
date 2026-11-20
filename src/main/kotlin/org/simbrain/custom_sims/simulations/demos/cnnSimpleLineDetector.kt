@@ -23,7 +23,7 @@ val cnnSimpleLineDetector = newSim {
 
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("CNN Training")
+    val networkComponent = addNetworkComponent("CNN training")
     val network = networkComponent.network
 
     // Input: 1x16x16
@@ -89,14 +89,14 @@ val cnnSimpleLineDetector = newSim {
 
     // Dense output: 3 classes
     val outputLayer = NeuronArray(3).apply {
-        label = "Output Layer"
+        label = "Output layer"
         updateRule = SoftmaxRule()
         circleMode = true
         labelArray = arrayOf("Horizontal", "Vertical", "Diagonal")
     }
     outputLayer.setLocation(-430.0, -363.0)
     val dense = WeightMatrix(flatArray, outputLayer).apply {
-        label = "Dense Connector"
+        label = "Dense connector"
     }
 
     val fullDataset = createSimpleTensorClassificationDataset(
@@ -109,7 +109,7 @@ val cnnSimpleLineDetector = newSim {
 
     // Automatically discovers pipeline from input to output
     val cnnModel = network.addConvolutionalNeuralNetwork(inputLayer, outputLayer) {
-        label = "CNN Classifier"
+        label = "CNN classifier"
         trainingSet = dataset
         testingSet = testDataset
     }

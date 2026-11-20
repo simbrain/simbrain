@@ -21,7 +21,7 @@ val braitenbergGame = newSim {
 
     workspace.clearWorkspace()
 
-    val oc = addOdorWorldComponent("Obstacle Course")
+    val oc = addOdorWorldComponent("Obstacle course")
     //oc.world.isObjectsBlockMovement = false
     oc.world.isUseCameraCentering = false
     oc.world.addEntity(257, 191, EntityType.Poison)
@@ -32,7 +32,7 @@ val braitenbergGame = newSim {
     val vehicle1 = oc.world.createVehicle("Vehicle 1", EntityType.Circle, EntityType.Swiss, Point2D.Double(194.0, 407.0))
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             // Update neuron and weight bounds to reasonable values given weight values
             fun updateBounds(w1: Double, w2: Double) {
                 val bound = graphicalUpperBound(max(w1, w2))

@@ -17,11 +17,11 @@ import kotlin.random.Random
  */
 class Wander : NpcBehavior() {
 
-    @UserParameter(label = "Max Speed", minimumValue = 0.0, order = 10)
+    @UserParameter(label = "Max speed", minimumValue = 0.0, order = 10)
     var maxSpeed: Double = 1.5
 
     @UserParameter(
-        label = "Max Turn",
+        label = "Max turn",
         description = "Maximum heading change per tick (degrees)",
         minimumValue = 0.0,
         order = 20
@@ -29,18 +29,18 @@ class Wander : NpcBehavior() {
     var maxTurn: Double = 5.0
 
     @UserParameter(
-        label = "Obstacle Feeler Length",
+        label = "Obstacle feeler length",
         description = "Distance ahead to probe for walls and other entities",
         minimumValue = 0.0,
         order = 30
     )
     var feelerLength: Double = 64.0
 
-    @UserParameter(label = "Obstacle Avoidance Weight", minimumValue = 0.0, order = 40)
+    @UserParameter(label = "Obstacle avoidance weight", minimumValue = 0.0, order = 40)
     var wallWeight: Double = 1.0
 
     @UserParameter(
-        label = "Heading Drift",
+        label = "Heading drift",
         description = "Max random change of the desired heading per tick (degrees)",
         minimumValue = 0.0,
         order = 50
@@ -48,7 +48,7 @@ class Wander : NpcBehavior() {
     var driftDegreesPerTick: Double = 5.0
 
     @UserParameter(
-        label = "Num Rays",
+        label = "Num rays",
         description = "Number of candidate headings sampled each tick. More rays find narrower gaps at higher cost.",
         minimumValue = 4.0,
         order = 60
@@ -56,7 +56,7 @@ class Wander : NpcBehavior() {
     var numRays: Int = 24
 
     @UserParameter(
-        label = "Grid Turn Chance",
+        label = "Grid turn chance",
         description = "In grid movement mode, the chance per cell of turning into another open direction instead of continuing straight",
         minimumValue = 0.0,
         maximumValue = 1.0,

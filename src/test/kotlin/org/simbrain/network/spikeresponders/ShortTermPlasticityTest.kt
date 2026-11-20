@@ -168,7 +168,7 @@ class ShortTermPlasticityTest {
     @Test
     fun `short term plasticity description and name`() {
         val stp = ShortTermPlasticity()
-        assertEquals("Short-term Plasticity", stp.description)
+        assertEquals("Short-term plasticity", stp.description)
         assertEquals("Short term plasticity", stp.name)
     }
 

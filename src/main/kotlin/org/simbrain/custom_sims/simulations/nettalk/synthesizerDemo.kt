@@ -26,7 +26,7 @@ val synthesizerDemo = newSim {
     workspace.clearWorkspace()
 
     val synthesizer = SpeechSynthesizer()
-    val speechWorld = addSpeechSynthesizer("Speech Synthesizer", synthesizer)
+    val speechWorld = addSpeechSynthesizer("Speech synthesizer", synthesizer)
 
     var wordToSpeak = "hello how are you"
     var phonemesToSpeak = "h@l'oU h'aU A: j'u:"
@@ -65,7 +65,7 @@ val synthesizerDemo = newSim {
 
         This demo shows three ways Simbrain can synthesize speech: ordinary text,
         explicit phoneme strings, and articulatory feature vectors. The `Speak` panel on
-        the left sends examples to the `Speech Synthesizer` component on the right.
+        the left sends examples to the `Speech synthesizer` component on the right.
 
         In the synthesizer component, `Currently speaking` shows the utterance being
         played, `History` shows what has been sent to the synthesizer, and `Most recent

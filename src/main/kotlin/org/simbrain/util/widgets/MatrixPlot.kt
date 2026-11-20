@@ -274,7 +274,7 @@ class CorrPlotPanel(
     }
 
     private val functionComboBox = JComboBox(
-        arrayOf("Correlation", "Cosine Similarity", "Covariance", "Dot Product", "Euclidean Distance")
+        arrayOf("Correlation", "Cosine similarity", "Covariance", "Dot product", "Euclidean distance")
     ).apply {
         addActionListener {
             if (suppressComboAction) return@addActionListener
@@ -286,7 +286,7 @@ class CorrPlotPanel(
 
     val toolbar = JToolBar().apply {
         isFloatable = false
-        add(JLabel("Comparison Function: "))
+        add(JLabel("Comparison function: "))
         add(functionComboBox)
     }
 
@@ -317,9 +317,9 @@ class CorrPlotPanel(
                 val result = when (functionName) {
                     "Correlation" -> computeCorrelationMatrix(data, onProgress)
                     "Covariance" -> computeCovarianceMatrix(data, onProgress)
-                    "Cosine Similarity" -> computeCosineSimilarityMatrix(data, onProgress)
-                    "Euclidean Distance" -> computeSimilarityMatrix(data, onProgress)
-                    "Dot Product" -> computeDotProductMatrix(data, onProgress)
+                    "Cosine similarity" -> computeCosineSimilarityMatrix(data, onProgress)
+                    "Euclidean distance" -> computeSimilarityMatrix(data, onProgress)
+                    "Dot product" -> computeDotProductMatrix(data, onProgress)
                     else -> computeCorrelationMatrix(data, onProgress)
                 }
                 matrixPlot = MatrixPlot(labels, result, thumbnails)

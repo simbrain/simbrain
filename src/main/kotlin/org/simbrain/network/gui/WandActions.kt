@@ -125,7 +125,7 @@ sealed class AdjustValueTarget : EditableObject {
         override fun setValue(model: NetworkModel, value: Double) { (model as Neuron).activation = value }
         override fun getBounds(model: NetworkModel) = (model as Neuron).let { it.lowerBound to it.upperBound }
         override val targetName = "activation"
-        override val name: String get() = "Neuron Activation"
+        override val name: String get() = "Neuron activation"
     }
 
     /** Target synapse strengths (weights) */
@@ -135,7 +135,7 @@ sealed class AdjustValueTarget : EditableObject {
         override fun setValue(model: NetworkModel, value: Double) { (model as Synapse).strength = value }
         override fun getBounds(model: NetworkModel) = (model as Synapse).let { it.lowerBound to it.upperBound }
         override val targetName = "strength"
-        override val name: String get() = "Synapse Strength"
+        override val name: String get() = "Synapse strength"
     }
 }
 
@@ -195,7 +195,7 @@ sealed class AdjustValueAmount : CopyableObject {
     class UpperBound : AdjustValueAmount(), EditableObject {
         override fun computeValue(lower: Double, upper: Double) = upper
         override val description = "upper bound"
-        override val name: String get() = "Upper Bound"
+        override val name: String get() = "Upper bound"
         override fun copy() = UpperBound()
     }
 
@@ -203,7 +203,7 @@ sealed class AdjustValueAmount : CopyableObject {
     class LowerBound : AdjustValueAmount(), EditableObject {
         override fun computeValue(lower: Double, upper: Double) = lower
         override val description = "lower bound"
-        override val name: String get() = "Lower Bound"
+        override val name: String get() = "Lower bound"
         override fun copy() = LowerBound()
     }
 
@@ -230,7 +230,7 @@ sealed class AdjustValueAmount : CopyableObject {
             min = -1.0,
             max = 1.0,
             increment = 0.1,
-            label = "Relative Value",
+            label = "Relative value",
             description = "Value from -1 (lower bound) to 1 (upper bound), with 0 = zero"
         )
 
@@ -314,7 +314,7 @@ class AdjustValueAction(
      */
     var clampToBounds by GuiEditable(
         initValue = false,
-        label = "Clamp to Bounds",
+        label = "Clamp to bounds",
         description = "If true, result is clamped to lower and upper bounds",
         order = 50
     )
@@ -433,7 +433,7 @@ class AdjustValueAction(
             && clampToBounds == other.clampToBounds
             && amount.isSameAs(other.amount)
 
-    override val name: String get() = "Adjust Value"
+    override val name: String get() = "Adjust value"
 
     companion object {
         /** Convenience factory for activate action (set neuron to upper bound) */
@@ -543,7 +543,7 @@ class ForceSpikeAction : WandAction(), EditableObject {
         it.radius = radius
     }
 
-    override val name: String get() = "Force Spike"
+    override val name: String get() = "Force spike"
 }
 
 /**
@@ -559,7 +559,7 @@ class ConnectFromSourceAction(
      */
     var connectionStrategy by GuiEditable(
         initValue = connectionStrategy,
-        label = "Connection Strategy",
+        label = "Connection strategy",
         description = "Strategy for creating connections from source neurons to touched neurons",
         order = 10
     )
@@ -599,7 +599,7 @@ class ConnectFromSourceAction(
             val synapses = createdSynapses.toList()
             val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
-                description = "Wand: Created ${synapses.size} synapses",
+                description = "Wand: created ${synapses.size} synapses",
                 undo = { synapses.forEach { it.delete() } },
                 redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
@@ -607,7 +607,7 @@ class ConnectFromSourceAction(
         createdSynapses.clear()
     }
 
-    override fun undoDescription(count: Int): String = "Wand: Connect from selection"
+    override fun undoDescription(count: Int): String = "Wand: connect from selection"
 
     override fun copy(): CopyableObject = ConnectFromSourceAction(connectionStrategy.copy()).also {
         it.letter = letter
@@ -615,7 +615,7 @@ class ConnectFromSourceAction(
         it.radius = radius
     }
 
-    override val name: String get() = "Connect from Selection"
+    override val name: String get() = "Connect from selection"
 }
 
 /**
@@ -632,7 +632,7 @@ class ConnectToNeighborsAction(
      */
     var connectionStrategy by GuiEditable(
         initValue = connectionStrategy,
-        label = "Connection Strategy",
+        label = "Connection strategy",
         description = "Strategy for creating connections to neighboring neurons",
         order = 10
     )
@@ -642,7 +642,7 @@ class ConnectToNeighborsAction(
      */
     var connectionRadius by GuiEditable(
         initValue = connectionRadius,
-        label = "Connection Radius",
+        label = "Connection radius",
         description = "Radius within which to connect to neighboring neurons",
         min = 1.0,
         order = 20
@@ -685,7 +685,7 @@ class ConnectToNeighborsAction(
             val synapses = createdSynapses.toList()
             val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
-                description = "Wand: Created ${synapses.size} synapses to neighbors",
+                description = "Wand: created ${synapses.size} synapses to neighbors",
                 undo = { synapses.forEach { it.delete() } },
                 redo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) }
             )
@@ -693,7 +693,7 @@ class ConnectToNeighborsAction(
         createdSynapses.clear()
     }
 
-    override fun undoDescription(count: Int): String = "Wand: Connect to neighbors"
+    override fun undoDescription(count: Int): String = "Wand: connect to neighbors"
 
     override fun copy(): CopyableObject = ConnectToNeighborsAction(connectionStrategy.copy(), connectionRadius).also {
         it.letter = letter
@@ -701,7 +701,7 @@ class ConnectToNeighborsAction(
         it.radius = radius
     }
 
-    override val name: String get() = "Connect to Neighbors"
+    override val name: String get() = "Connect to neighbors"
 }
 
 /**
@@ -747,7 +747,7 @@ class PruneWeightsAction(
             val synapses = prunedSynapses.toList()
             val network = networkPanel.network
             networkPanel.undoManager.addUndoableAction(
-                description = "Wand: Pruned ${synapses.size} synapses",
+                description = "Wand: pruned ${synapses.size} synapses",
                 undo = { synapses.addToNetwork(network, usePlacementManager = false, useAutoAssignId = false) },
                 redo = { synapses.forEach { it.delete() } }
             )
@@ -755,12 +755,12 @@ class PruneWeightsAction(
         }
     }
 
-    override fun undoDescription(count: Int): String = "Wand: Prune weights"
+    override fun undoDescription(count: Int): String = "Wand: prune weights"
 
     override fun copy(): CopyableObject = PruneWeightsAction(threshold).also {
         it.letter = letter
         it.color = color
     }
 
-    override val name: String get() = "Prune Weights"
+    override val name: String get() = "Prune weights"
 }

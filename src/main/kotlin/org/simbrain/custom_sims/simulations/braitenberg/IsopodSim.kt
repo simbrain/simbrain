@@ -224,7 +224,7 @@ val isopodSim = newSim { optionString ->
 
     withGui {
         isopod.select()
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             suspend fun runTrials() {
                 log.clear()

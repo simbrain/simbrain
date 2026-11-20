@@ -38,6 +38,8 @@ data class TinyLmConfig(
     val vocabSize: Int = 100,
     val numLayers: Int = 1,
     val normEps: Float = 1e-5f,
+    /** Every position attends to every other (BERT-style) instead of only to earlier ones. */
+    val bidirectional: Boolean = false,
 ) {
     val headDim get() = embedDim / numHeads
 
@@ -142,8 +144,10 @@ class TinyLmModel(val config: TinyLmConfig, seed: Long = 42L) {
             ops += HeadScoresOp("$prefix.attn.score", qHeads, kHeads, scores, c.numHeads)
                 .withDisplayTooltip("Attention scores", "Compare each query with earlier keys to measure their relevance.")
             val attnWeights = workspace("$prefix.attn.weights", c.numHeads * seq, seq)
-            ops += CausalMaskedRowSoftmaxOp("$prefix.attn.softmax", scores, attnWeights, c.numHeads)
-                .withDisplayTooltip("Attention weights", "Convert scores into weights; tokens cannot attend to future tokens.")
+            ops += CausalMaskedRowSoftmaxOp("$prefix.attn.softmax", scores, attnWeights, c.numHeads, causal = !c.bidirectional)
+                .withDisplayTooltip("Attention weights",
+                    if (c.bidirectional) "Convert scores into weights; every token can attend to every other token."
+                    else "Convert scores into weights; tokens cannot attend to future tokens.")
             val mixed = workspace("$prefix.attn.mixed", c.numHeads * seq, c.headDim)
             ops += HeadMixOp("$prefix.attn.mix", attnWeights, vHeads, mixed, c.numHeads)
                 .withDisplayTooltip("Mix values", "Use the attention weights to combine information from tokens in the context.")
@@ -1021,7 +1025,7 @@ class TinyLanguageModel @XStreamConstructor constructor() : GenerativeModel(), N
             numLayers = numLayers,
         ))
 
-        override val name = "Tiny Language Model"
+        override val name = "Tiny language model"
     }
 
     companion object : WithXStreamPropertyConverter {

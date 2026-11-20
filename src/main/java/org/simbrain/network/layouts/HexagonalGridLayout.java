@@ -48,19 +48,19 @@ public class HexagonalGridLayout extends Layout {
     /**
      * Horizontal spacing between neurons.
      */
-    @UserParameter(label = "Horizontal Spacing", description = "Horizontal spacing between neurons", order = 10)
+    @UserParameter(label = "Horizontal spacing", description = "Horizontal spacing between neurons", order = 10)
     private double hSpacing = DEFAULT_H_SPACING;
 
     /**
      * Vertical spacing between neurons.
      */
-    @UserParameter(label = "Vertical Spacing", description = "Vertical spacing between neurons", order = 20)
+    @UserParameter(label = "Vertical spacing", description = "Vertical spacing between neurons", order = 20)
     private double vSpacing = DEFAULT_V_SPACING;
 
     /**
      * Manually set number of columns in grid.
      */
-    @UserParameter(label = "Auto Columns",
+    @UserParameter(label = "Auto columns",
         description = "If true, set the number of columns automatically to get a square or nearly-square grid",
         order = 30)
     private boolean autoColumns = DEFAULT_AUTO_COLS;
@@ -68,7 +68,7 @@ public class HexagonalGridLayout extends Layout {
     /**
      * Number of columns in the layout.
      */
-    @UserParameter(label = "Number of Columns", description = "Number of columns in the grid", order = 40)
+    @UserParameter(label = "Number of columns", description = "Number of columns in the grid", order = 40)
     private int numColumns = DEFAULT_NUM_COLUMNS;
 
     /**
@@ -132,7 +132,7 @@ public class HexagonalGridLayout extends Layout {
 
     @Override
     public String getDescription() {
-        return "Hex Grid";
+        return "Hex grid";
     }
 
     public int getNumColumns() {
@@ -169,7 +169,7 @@ public class HexagonalGridLayout extends Layout {
 
     @Override
     public String toString() {
-        return "Hexagonal Grid Layout";
+        return "Hexagonal grid layout";
     }
 
     @Override

@@ -54,7 +54,7 @@ val spikeResponderSimArray = newSim {
     offsetNetworkModel(spiking, stepResponder, Direction.NORTH, 400.0)
 
     val jumpAndDecay = NeuronArray(arraySize).apply {
-        label = "Jump and Decay"
+        label = "Jump and decay"
     }
     val weightsJump = WeightMatrix(spiking, jumpAndDecay).apply {
         spikeResponder = JumpAndDecay()
@@ -64,7 +64,7 @@ val spikeResponderSimArray = newSim {
     offsetNetworkModel(stepResponder, jumpAndDecay, Direction.SOUTH, 400.0)
 
     val riseAndDecay = NeuronArray(arraySize).apply {
-        label = "Rise and Decay"
+        label = "Rise and decay"
     }
     val weightsRise = WeightMatrix(spiking, riseAndDecay).apply {
         spikeResponder = RiseAndDecay()
@@ -83,7 +83,7 @@ val spikeResponderSimArray = newSim {
     alignNetworkModels(stepResponder, stp, Alignment.VERTICAL)
     offsetNetworkModel(riseAndDecay, stp, Direction.SOUTH, 300.0)
 
-    val spikePlot = addTimeSeriesComponent("Izhikevich", "Membrane Potentials")
+    val spikePlot = addTimeSeriesComponent("Izhikevich", "Membrane potentials")
     withGui {
         placeComponent(networkComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 715, 733)
         placeComponent(spikePlot, SIM_WINDOW_GAP + 715 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)

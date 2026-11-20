@@ -77,7 +77,7 @@ val allostaticPatternCompletion = newSim("allostatic_pattern_completion") {
     // Basic setup
     workspace.clearWorkspace()
     exposeTypes(AllostaticUpdateRule::class)
-    val networkComponent = addNetworkComponent("Allostatic Pattern Completion")
+    val networkComponent = addNetworkComponent("Allostatic pattern completion")
     val network = networkComponent.network
 
     // Reservoir
@@ -114,7 +114,7 @@ val allostaticPatternCompletion = newSim("allostatic_pattern_completion") {
 
     // Connect input nodes to reservoir
     val inputsToRes = SynapseGroup(inputs, reservoir, sparse)
-    inputsToRes.label = "Inputs to Res"
+    inputsToRes.label = "Inputs to res"
     network.addNetworkModel(inputsToRes)
     inputsToRes.synapses.forEach { s ->
         s.strength = 5.0

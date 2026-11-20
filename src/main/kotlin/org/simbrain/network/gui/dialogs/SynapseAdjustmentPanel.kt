@@ -48,9 +48,9 @@ class SynapseAdjustmentPanel(
     // TODO: Simplify by replacing with excitatoryArray and inhibitoryArray.
     private val weights = arrayOf(doubleArrayOf(), doubleArrayOf())
 
-    private val allPanel = AnnotatedPropertyEditor(objectWrapper("All Randomizer", allRandomizer))
-    private val excitatoryPanel = AnnotatedPropertyEditor(objectWrapper("Excitatory Randomizer", excitatoryRandomizer))
-    private val inhibitoryPanel = AnnotatedPropertyEditor(objectWrapper("Inhibitory Randomizer", inhibitoryRandomizer))
+    private val allPanel = AnnotatedPropertyEditor(objectWrapper("All randomizer", allRandomizer))
+    private val excitatoryPanel = AnnotatedPropertyEditor(objectWrapper("Excitatory randomizer", excitatoryRandomizer))
+    private val inhibitoryPanel = AnnotatedPropertyEditor(objectWrapper("Inhibitory randomizer", inhibitoryRandomizer))
 
     private val allRandomizer get() = allPanel.editingObjects.first().editingObject
     private val excitatoryRandomizer get() = excitatoryPanel.editingObjects.first().editingObject
@@ -100,8 +100,8 @@ class SynapseAdjustmentPanel(
         // Extract weight values in usable form by internal methods
         updateWeightArrays(synapses)
 
-        histogramPanel.setxAxisName("Synapse Strength")
-        histogramPanel.setyAxisName("# of Synapses")
+        histogramPanel.setxAxisName("Synapse strength")
+        histogramPanel.setyAxisName("# of synapses")
 
         // TODO: use update
         // (inhibitoryPanel.widgets.first().component as ObjectTypeEditor).dropDown.addActionListener {
@@ -117,7 +117,7 @@ class SynapseAdjustmentPanel(
         }, "align right, wrap")
 
         val synTypePanel = JPanel(MigLayout("wrap 2, fillx, insets 0", "[grow][grow]")).apply {
-            border = Theme.sectionBorder("Synapse Stats")
+            border = Theme.sectionBorder("Synapse stats")
             add(numSynsLabel)
             add(meanLabel)
             add(numExSynsLabel)
@@ -347,7 +347,7 @@ class SynapseAdjustmentPanel(
         statCalculator.calcStats()
         meanLabel.text = "Mean: " + SimbrainMath.roundDouble(statCalculator.mean, 5)
         medianLabel.text = "Median: " + SimbrainMath.roundDouble(statCalculator.median, 5)
-        sdLabel.text = "Std. Dev: " + SimbrainMath.roundDouble(statCalculator.stdDev, 5)
+        sdLabel.text = "Std. dev: " + SimbrainMath.roundDouble(statCalculator.stdDev, 5)
         val tot = weights[0].size + weights[1].size
         numSynsLabel.text = "Synapses: " + Integer.toString(tot)
         numExSynsLabel.text = "Excitatory : " + Integer.toString(weights[0].size)

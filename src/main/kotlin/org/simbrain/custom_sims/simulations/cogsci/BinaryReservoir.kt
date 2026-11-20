@@ -64,7 +64,7 @@ val binaryReservoir = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Reservoir Sim")
+    val networkComponent = addNetworkComponent("Reservoir sim")
     val network = networkComponent.network
 
     // Add a self-connected neuron array to the network
@@ -138,12 +138,12 @@ val binaryReservoir = newSim {
             height = 617
         }
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP + 567 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP + 567 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val tf_stdev: JTextField = addTextField(
                 "Weight variance", "" + variance,
-                toolTip = "Variance of the random reservoir weights. Press Apply Variance to resample the weights."
+                toolTip = "Variance of the random reservoir weights. Press Apply variance to resample the weights."
             )
-            addButton("Apply Variance") {
+            addButton("Apply variance") {
                 val newVariance = tf_stdev.text.toDouble()
                 setVariance(newVariance)
             }.apply {
@@ -216,7 +216,7 @@ val binaryReservoir = newSim {
         
         ## Activity 1: Observe the edge of chaos
         
-        1. Change the `Weight variance` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+        1. Change the `Weight variance` value and press the `Apply variance` button to change the reservoir's weight distribution.
                         
         2. Start the simulation by clicking on the `run` button.
         
@@ -229,7 +229,7 @@ val binaryReservoir = newSim {
 
         ## Activity 2: Research the relationship between PCI and dynamical regimes
         
-        1. Change the `Weight variance` value and press the `Apply Variance` button to change the reservoir's weight distribution.
+        1. Change the `Weight variance` value and press the `Apply variance` button to change the reservoir's weight distribution.
         
         2. Click the `run one trial` button or, the `run one trial per parameter` button.
         

@@ -25,7 +25,7 @@ import org.simbrain.world.odorworld.sensors.ObjectSensor
 val classicalConditioning = newSim("classical conditioning") {
 
     workspace.clearWorkspace()
-    val nc = addNetworkComponent("Agent Brain (Black Box)")
+    val nc = addNetworkComponent("Agent brain (black box)")
     val net = nc.network
 
     // Construct the network
@@ -79,7 +79,7 @@ val classicalConditioning = newSim("classical conditioning") {
     val bellSensor = mouse.addObjectSensor(EntityType.Bell, 10.0, 0.0, 45.0)
 
     // Create a time series plot
-    val plot = addTimeSeriesComponent("Association Strength", "Strength")
+    val plot = addTimeSeriesComponent("Association strength", "Strength")
     plot.model.isAutoRange = false
     plot.model.fixedWidth = true
     plot.model.windowSize = 1500
@@ -170,8 +170,8 @@ val classicalConditioning = newSim("classical conditioning") {
 fun setUpClassicalConditioning(workspace: Workspace) {
 
     val network = workspace.componentList.filterIsInstance<NetworkComponent>().first().network
-    val bellDetectorNeuron = network.getModelByLabel<Neuron>("Bell Detector")
-    val cheeseDetectorNeuron = network.getModelByLabel<Neuron>("Cheese Detector")
+    val bellDetectorNeuron = network.getModelByLabel<Neuron>("Bell detector")
+    val cheeseDetectorNeuron = network.getModelByLabel<Neuron>("Cheese detector")
     val association = network.getModelById<Synapse>("Synapse_2")
 
     // Add custom network update action

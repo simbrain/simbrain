@@ -20,7 +20,7 @@ val nlpSimBasicNN = newSim {
     workspace.clearWorkspace()
 
     // Text World for Inputs
-    val textWorld = addTextWorld("Text World (Inputs)")
+    val textWorld = addTextWorld("Text World (inputs)")
     val text = readSimulationFileContents("texts" / "mlk.txt")
     TokenEmbeddingBuilder().build(text)
     textWorld.world.text = text
@@ -52,7 +52,7 @@ val nlpSimBasicNN = newSim {
     }
 
     // Text World for Outputs
-    val textWorldOut = addTextWorld("Text World (Outputs)")
+    val textWorldOut = addTextWorld("Text World (outputs)")
     TokenEmbeddingBuilder().build(text)
 
     withGui {
@@ -88,7 +88,7 @@ val nlpSimBasicNN = newSim {
         
         The simulation consists of:
         - **Input Text World**: Displays the source text (MLK speech by default) and allows navigation through tokens
-        - **SRN Network**: A simple recurrent network that learns word relationships through next-word prediction
+        - **SRN network**: A simple recurrent network that learns word relationships through next-word prediction
         - **Output Text World**: Shows the closest predicted word based on the network's current output
         
         The network learns by trying to predict the next word in a sequence. Through this process, it develops internal representations (word embeddings) that capture semantic relationships between words.

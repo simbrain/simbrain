@@ -57,7 +57,7 @@ fun NetworkPanel.showNeuronArrayCreationDialog() {
             redo = { network.addNetworkModel(neuronArray, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
-        it.title = "Create Neuron Array"
+        it.title = "Create neuron array"
     }.display()
 }
 
@@ -67,7 +67,7 @@ fun NetworkPanel.showAddNeuronArrayDialog(sourceNeuronArray: NeuronArray) {
     }.createEditorDialog {
         addNeuronArray(sourceNeuronArray, it)
     }.also {
-        it.title = "Add Neuron Array from ${sourceNeuronArray.displayName}"
+        it.title = "Add neuron array from ${sourceNeuronArray.displayName}"
     }.display()
 }
 
@@ -104,7 +104,7 @@ fun NetworkPanel.showActivationSequenceCreationDialog() {
             redo = { network.addNetworkModel(activationSequence, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
-        it.title = "Create Activation Sequence"
+        it.title = "Create activation sequence"
     }.display()
 }
 
@@ -118,7 +118,7 @@ fun NetworkPanel.showTensorCreationDialog() {
             redo = { network.addNetworkModel(tensor, usePlacementManager = false, useAutoAssignedId = false) }
         )
     }.also {
-        it.title = "Create Tensor"
+        it.title = "Create tensor"
     }.display()
 }
 
@@ -130,7 +130,7 @@ fun NetworkPanel.showAddConvLayerDialog(sourceTensorLayer: TensorLayer) {
     template.createEditorDialog {
         addConvLayer(sourceTensorLayer, it)
     }.also {
-        it.title = "Add Conv Layer from ${sourceTensorLayer.displayName}"
+        it.title = "Add conv layer from ${sourceTensorLayer.displayName}"
     }.display()
 }
 
@@ -142,7 +142,7 @@ fun NetworkPanel.showAddPoolLayerDialog(sourceTensorLayer: TensorLayer) {
     template.createEditorDialog {
         addPoolLayer(sourceTensorLayer, it)
     }.also {
-        it.title = "Add Pool Layer from ${sourceTensorLayer.displayName}"
+        it.title = "Add pool layer from ${sourceTensorLayer.displayName}"
     }.display()
 }
 
@@ -222,10 +222,10 @@ fun NetworkPanel.addFlattenLayer(sourceTensorLayer: TensorLayer) {
  * Template for convolution layer creation dialog.
  */
 class ConvLayerTemplate : EditableObject {
-    @UserParameter(label = "Filter Size", description = "Spatial size of each filter", minimumValue = 1.0, order = 1)
+    @UserParameter(label = "Filter size", description = "Spatial size of each filter", minimumValue = 1.0, order = 1)
     var kernelSize = 3
 
-    @UserParameter(label = "Num Filters", description = "Number of output filters", minimumValue = 1.0, order = 2)
+    @UserParameter(label = "Num filters", description = "Number of output filters", minimumValue = 1.0, order = 2)
     var numFilters = 8
 
     @UserParameter(label = "Stride", description = "Convolution stride", minimumValue = 1.0, order = 3)
@@ -241,27 +241,27 @@ class ConvLayerTemplate : EditableObject {
     @UserParameter(label = "Activation", description = "Activation function for output tensor", order = 5)
     var activation = TensorActivation.RELU
 
-    override val name = "Convolution Layer"
+    override val name = "Convolution layer"
 }
 
 /**
  * Template for pooling layer creation dialog.
  */
 class PoolLayerTemplate : EditableObject {
-    @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", minimumValue = 1.0, order = 1)
+    @UserParameter(label = "Pool size", description = "Spatial size of pooling window", minimumValue = 1.0, order = 1)
     var poolSize = 2
 
     @UserParameter(label = "Stride", description = "Pooling stride", minimumValue = 1.0, order = 2)
     var stride = 2
 
-    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", order = 3)
+    @UserParameter(label = "Pooling type", description = "MAX or AVERAGE pooling", order = 3)
     var poolingType = PoolingType.MAX
 
-    override val name = "Pooling Layer"
+    override val name = "Pooling layer"
 }
 
 fun NetworkPanel.showLanguageModelCreationDialog() {
-    LanguageModel.CreationTemplate().createEditorDialog("Create Language Model") { template ->
+    LanguageModel.CreationTemplate().createEditorDialog("Create language model") { template ->
         val languageModel = template.create("")
         if (languageModel.obtainWeightsInteractive(network)) {
             addLanguageModel(languageModel)
@@ -279,7 +279,7 @@ private fun NetworkPanel.addLanguageModel(languageModel: LanguageModel) {
 }
 
 fun NetworkPanel.showTinyLanguageModelCreationDialog() {
-    TinyLanguageModel.CreationTemplate().createEditorDialog("Create Tiny Language Model") { template ->
+    TinyLanguageModel.CreationTemplate().createEditorDialog("Create tiny language model") { template ->
         val tinyLanguageModel = template.create()
         network.addNetworkModelAsync(tinyLanguageModel)
         undoManager.addUndoableAction(
@@ -318,7 +318,7 @@ fun showNetwork(networkComponent: NetworkComponent) {
 fun NetworkPanel.showPiccoloDebugger() {
     StandardDialog().apply {
         contentPane = SceneGraphBrowser(canvas.root)
-        title = "Piccolo Scenegraph Browser"
+        title = "Piccolo scenegraph browser"
         isModal = false
         pack()
         setLocationRelativeTo(null)
@@ -393,9 +393,9 @@ fun SynapseGroupNode.getDialog(): StandardDialog {
         layout = BoxLayout(this, BoxLayout.PAGE_AXIS)
         add(tabbedPane)
         tabbedPane.addTab("Weights", synapseAdjustmentPanel)
-        tabbedPane.addTab("Update Rule", synapsesEditorApplyPanel)
-        tabbedPane.addTab("Connection Strategy", connectionStrategyApplyPanel)
-        tabbedPane.add("Weight Matrix", matrixViewerApplyPanel)
+        tabbedPane.addTab("Update rule", synapsesEditorApplyPanel)
+        tabbedPane.addTab("Connection strategy", connectionStrategyApplyPanel)
+        tabbedPane.add("Weight matrix", matrixViewerApplyPanel)
     }
 
     return dialog
@@ -410,7 +410,7 @@ fun NetworkPanel.showClassifierCreationDialog() {
         commitChanges()
         addSubnetworkAction(this@NetworkPanel) { creator.create(network) }
     }.also {
-        it.title = "Create Classifier"
+        it.title = "Create classifier"
     }
 }
 
@@ -419,7 +419,7 @@ fun NetworkPanel.showUndoHistoryDialog() {
 }
 
 fun NetworkPanel.buildUndoHistoryDialog(): StandardDialog {
-    val dialog = StandardDialog(JFrame.getFrames().firstOrNull(), "Undo / Redo History")
+    val dialog = StandardDialog(JFrame.getFrames().firstOrNull(), "Undo / redo history")
 
     val undoListModel = DefaultListModel<String>().apply {
         addAll(undoManager.undoStack.reversed().mapIndexed { index, action ->
@@ -447,7 +447,7 @@ fun NetworkPanel.buildUndoHistoryDialog(): StandardDialog {
         }
     }
 
-    val goToButton = JButton("Go To Selected Point").apply {
+    val goToButton = JButton("Go to selected point").apply {
         isEnabled = undoJList.selectedIndex != -1 || redoJList.selectedIndex != -1
         addActionListener {
             val undoIndex = undoJList.selectedIndex
@@ -479,12 +479,12 @@ fun NetworkPanel.buildUndoHistoryDialog(): StandardDialog {
     redoJList.addListSelectionListener(listSelectionListener)
 
     val undoPanel = JPanel(BorderLayout(0, Theme.tightGap)).apply {
-        add(JLabel("Undo Stack (${undoListModel.size()} items)"), BorderLayout.NORTH)
+        add(JLabel("Undo stack (${undoListModel.size()} items)"), BorderLayout.NORTH)
         add(JScrollPane(undoJList), BorderLayout.CENTER)
     }
 
     val redoPanel = JPanel(BorderLayout(0, Theme.tightGap)).apply {
-        add(JLabel("Redo Stack (${redoListModel.size()} items)"), BorderLayout.NORTH)
+        add(JLabel("Redo stack (${redoListModel.size()} items)"), BorderLayout.NORTH)
         add(JScrollPane(redoJList), BorderLayout.CENTER)
     }
 
@@ -501,11 +501,11 @@ fun NetworkPanel.buildUndoHistoryDialog(): StandardDialog {
 
 fun NetworkPanel.showPriorityTableDialog() {
     val dialog = StandardDialog()
-    dialog.title = "Network Model Priorities"
+    dialog.title = "Network model priorities"
 
     val allModels = network.allModels.sortedBy { it.priority }
 
-    val columnNames = arrayOf("Display Name", "Priority")
+    val columnNames = arrayOf("Display name", "Priority")
     val data = allModels.map { model ->
         arrayOf(model.displayName, model.priority)
     }.toTypedArray()
@@ -634,7 +634,7 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
         }
     }
 
-    sb.appendLine("=== Network Debug Info ===")
+    sb.appendLine("=== Network debug info ===")
     sb.appendLine("Time: ${network.timeLabel}  |  Time step: ${network.timeStep}")
     sb.appendLine()
 
@@ -662,12 +662,12 @@ fun NetworkPanel.showNetworkDebugInfoDialog() {
         freeSynapses.forEach { appendModel(it) }
     }
 
-    showText(sb.toString(), "Network Debug Info")
+    showText(sb.toString(), "Network debug info")
 }
 
 class ConnectionStrategyPanel(connectionStrategy: ConnectionStrategy) : JPanel() {
 
-    val strategySelector = objectWrapper("Connection Strategy", connectionStrategy)
+    val strategySelector = objectWrapper("Connection strategy", connectionStrategy)
     val connectionStrategy get() = strategySelector.editingObject
     val editor = AnnotatedPropertyEditor(strategySelector)
     val percentExcitatoryPanel = PercentExcitatoryPanel(connectionStrategy.percentExcitatory)

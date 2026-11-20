@@ -36,7 +36,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
     val view3dSensor = scene.view3dSensor
     val imageSize = view3dSensor.outputWidth * view3dSensor.outputHeight
 
-    val networkComponent = addNetworkComponent("Lateral Inhibition Network")
+    val networkComponent = addNetworkComponent("Lateral inhibition network")
     val network = networkComponent.network
 
     val retina = network.addNeuronCollection(imageSize) {
@@ -45,7 +45,7 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             slope = 1.0
         }
     }.apply {
-        label = "Lateral Inhibition Retina"
+        label = "Lateral inhibition retina"
         setUpperBound(1.0)
         layout(GridLayout(26.0, 26.0, view3dSensor.outputWidth))
         location = point(0.0, 0.0)
@@ -123,31 +123,31 @@ val view3dNavigationLateralInhibitionDemo = newSim {
             }
         }
 
-        val controlPanel = createControlPanel("Lateral Inhibition Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addLabel("Brightness Array")
+        val controlPanel = createControlPanel("Lateral inhibition controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            addLabel("Brightness array")
             addComponent(brightnessPanel)
             addSeparator()
-            addSlider("Input Gain", 0.1, 2.5, inputGain, 0.05,
+            addSlider("Input gain", 0.1, 2.5, inputGain, 0.05,
                 toolTip = "Multiplier applied to the brightness values before they reach the network (results are capped at 1).") {
                 inputGain = it
             }
-            addCheckBox("Reverse Input (1-x)", reverseInput,
+            addCheckBox("Reverse input (1-x)", reverseInput,
                 toolTip = "Invert the brightness input, so dark regions drive the network instead of bright ones.") { enabled ->
                 reverseInput = enabled
             }
-            addSlider("Excitatory Lateral", 0.0, 0.6, excitStrength, 0.01,
+            addSlider("Excitatory lateral", 0.0, 0.6, excitStrength, 0.01,
                 toolTip = "Strength of the excitatory lateral connections between nearby neurons.") {
                 excitStrength = it
                 applyStrengths()
             }
-            addSlider("Inhibitory Lateral", 0.0, 1.2, inhibStrength, 0.01,
+            addSlider("Inhibitory lateral", 0.0, 1.2, inhibStrength, 0.01,
                 toolTip = "Strength of the inhibitory lateral connections that sharpen edges in the map.") {
                 inhibStrength = it
                 applyStrengths()
             }
             // TODO: Raw Input Mode zeroes the strengths without moving the lateral sliders, and dragging a slider
             //  while the mode is on silently re-enables that connection.
-            addCheckBox("Raw Input Mode", rawInputMode,
+            addCheckBox("Raw input mode", rawInputMode,
                 toolTip = "Turn off both lateral connections so the map shows the unprocessed input. Unchecking restores the previous strengths.") { enabled ->
                 rawInputMode = enabled
                 if (enabled) {
@@ -199,13 +199,13 @@ val view3dNavigationLateralInhibitionDemo = newSim {
         ## Activity: Compare lateral inhibition settings
 
         1. Click `Run` and watch Amy wander through `Odor World`, or move her manually.
-        2. Watch `Brightness Array` in the control panel to see the raw data sent to the network
+        2. Watch `Brightness array` in the control panel to see the raw data sent to the network
         3. Watch the network window which shows how a simple retina-like circuit processes this information
         4. Adjust controls and compare:
-           - More `Inhibitory Lateral`: sharper contrast, stronger surround suppression.
-           - More `Excitatory Lateral`: broader local spread / smoothing.
-           - `Reverse Input (1-x)`: inverts polarity so that darker regions map to less rather than more neural activity
-           - `Raw Input Mode`: disables recurrent effects so you can compare what the network does with direct input.
+           - More `Inhibitory lateral`: sharper contrast, stronger surround suppression.
+           - More `Excitatory lateral`: broader local spread / smoothing.
+           - `Reverse input (1-x)`: inverts polarity so that darker regions map to less rather than more neural activity
+           - `Raw input mode`: disables recurrent effects so you can compare what the network does with direct input.
 
         """.trimIndent()
     )

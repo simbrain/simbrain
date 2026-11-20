@@ -42,7 +42,7 @@ public class LineLayout extends Layout {
     /**
      * Current line orientation.
      */
-    @UserParameter(label = "Orientation", description = "Horizontal or Vertical")
+    @UserParameter(label = "Orientation", description = "Horizontal or vertical")
     private LineOrientation orientation = DEFAULT_LINE_ORIENTATION;
 
     /**
@@ -158,7 +158,7 @@ public class LineLayout extends Layout {
 
     @Override
     public String toString() {
-        return "Line Layout";
+        return "Line layout";
     }
 
     @Override

@@ -390,7 +390,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
         channelLabel.visible = true
         channelLabel.textPaint = NetworkTheme.current.valueText
         channelLabel.text = if (tensorLayer.rgbComposite && tensorLayer.shape.channels == 3) {
-            "RGB Composite"
+            "RGB composite"
         } else {
             "Ch ${tensorLayer.currentChannel + 1}/${tensorLayer.shape.channels}"
         }
@@ -551,19 +551,19 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             contextMenu.addSeparator()
 
             // Edit
-            contextMenu.add(networkPanel.createAction(name = "Edit Tensor...") {
+            contextMenu.add(networkPanel.createAction(name = "Edit tensor...") {
                 createEditDialog().display()
             })
             contextMenu.addSeparator()
 
             // Add layers (Flow B)
-            contextMenu.add(networkPanel.createAction(name = "Add Conv Layer...") {
+            contextMenu.add(networkPanel.createAction(name = "Add conv layer...") {
                 networkPanel.showAddConvLayerDialog(tensorLayer)
             })
-            contextMenu.add(networkPanel.createAction(name = "Add Pool Layer...") {
+            contextMenu.add(networkPanel.createAction(name = "Add pool layer...") {
                 networkPanel.showAddPoolLayerDialog(tensorLayer)
             })
-            contextMenu.add(networkPanel.createAction(name = "Add Flatten Layer") {
+            contextMenu.add(networkPanel.createAction(name = "Add flatten layer") {
                 networkPanel.addFlattenLayer(tensorLayer)
             })
             contextMenu.addSeparator()
@@ -574,7 +574,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             // Channel navigation & display modes
             // Thumbnail strip toggle
             contextMenu.add(networkPanel.createAction(
-                name = if (tensorLayer.thumbnailStripMode) "Show Single Channel View" else "Show Thumbnail View"
+                name = if (tensorLayer.thumbnailStripMode) "Show single channel view" else "Show thumbnail view"
             ) {
                 tensorLayer.thumbnailStripMode = !tensorLayer.thumbnailStripMode
             })
@@ -582,7 +582,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             if (tensorLayer.shape.channels == 3) {
                 contextMenu.add(
                     networkPanel.createAction(
-                        name = if (tensorLayer.rgbComposite) "Hide RGB Composite" else "Show RGB Composite"
+                        name = if (tensorLayer.rgbComposite) "Hide RGB composite" else "Show RGB composite"
                     ) {
                         tensorLayer.rgbComposite = !tensorLayer.rgbComposite
                     })
@@ -602,7 +602,7 @@ class TensorNode(networkPanel: NetworkPanel, val tensorLayer: TensorLayer) : Scr
             contextMenu.addSeparator()
 
             // Image input submenu
-            val imageWorldMenu = JMenu("Add image world")
+            val imageWorldMenu = JMenu("Add Image World")
             for (c in 0 until tensorLayer.shape.channels) {
                 imageWorldMenu.add(actionManager.createTensorChannelImageInput(tensorLayer, c))
             }

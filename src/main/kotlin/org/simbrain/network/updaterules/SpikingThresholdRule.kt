@@ -82,5 +82,5 @@ open class SpikingThresholdRule : SpikingNeuronUpdateRule<SpikingScalarData, Spi
     }
 
     override val name: String
-        get() = "Spiking Threshold"
+        get() = "Spiking threshold"
 }

@@ -284,7 +284,7 @@ class BPTTNetwork : FeedForward, SupervisedNetwork {
         @UserParameter(label = "Number of outputs", order = 30)
         var nout = 5
 
-        override val name = "BPTT Network"
+        override val name = "BPTT network"
 
         fun create(): BPTTNetwork {
             return BPTTNetwork(nin, nhidden, nout, initialPosition)

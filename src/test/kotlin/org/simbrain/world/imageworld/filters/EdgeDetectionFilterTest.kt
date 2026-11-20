@@ -4,7 +4,6 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import java.awt.Color
 import java.awt.image.BufferedImage
-import kotlin.math.*
 
 /**
  * Unit tests for EdgeDetectionFilter with components explaining different edge detection algorithms.
@@ -75,7 +74,7 @@ class EdgeDetectionFilterTest {
     fun `test edge detection filter creation and default parameters`() {
         val filter = EdgeDetectionFilter()
         
-        assertEquals("Edge Detection Filter", filter.name)
+        assertEquals("Edge detection filter", filter.name)
         assertTrue(filter.enabled)
         assertEquals(EdgeDetectionFilter.EdgeDetectionMethod.SOBEL, filter.method)
         assertEquals(0.3, filter.threshold, 0.001)

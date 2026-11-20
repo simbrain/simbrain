@@ -167,9 +167,16 @@ class HeadScoresOp(name: String, val q: TensorPort, val k: TensorPort, val out: 
 /**
  * Causal mask fused with per-row softmax: within each head, row i is a distribution over
  * positions j <= i; masked positions come out exactly zero. The VJP needs no mask branches —
- * masked probabilities are zero, so their gradient terms vanish on their own.
+ * masked probabilities are zero, so their gradient terms vanish on their own. With [causal]
+ * false every row spans all positions (bidirectional, BERT-style attention).
  */
-class CausalMaskedRowSoftmaxOp(name: String, val scores: TensorPort, val out: TensorPort, val numHeads: Int) : TensorOp(name) {
+class CausalMaskedRowSoftmaxOp(
+    name: String,
+    val scores: TensorPort,
+    val out: TensorPort,
+    val numHeads: Int,
+    val causal: Boolean = true,
+) : TensorOp(name) {
 
     private val seq = scores.tensor.cols
 
@@ -191,17 +198,18 @@ class CausalMaskedRowSoftmaxOp(name: String, val scores: TensorPort, val out: Te
         for (h in 0 until numHeads) {
             for (i in 0 until seq) {
                 val row = (h * seq + i) * seq
+                val last = lastVisible(i)
                 var max = Float.NEGATIVE_INFINITY
-                for (j in 0..i) max = maxOf(max, src.get(row + j))
+                for (j in 0..last) max = maxOf(max, src.get(row + j))
                 var sum = 0f
-                for (j in 0..i) {
+                for (j in 0..last) {
                     val e = exp(src.get(row + j) - max)
                     dst.put(row + j, e)
                     sum += e
                 }
                 val invSum = 1f / sum
-                for (j in 0..i) dst.put(row + j, dst.get(row + j) * invSum)
-                for (j in i + 1 until seq) dst.put(row + j, 0f)
+                for (j in 0..last) dst.put(row + j, dst.get(row + j) * invSum)
+                for (j in last + 1 until seq) dst.put(row + j, 0f)
             }
         }
     }
@@ -216,14 +224,17 @@ class CausalMaskedRowSoftmaxOp(name: String, val scores: TensorPort, val out: Te
         for (h in 0 until numHeads) {
             for (i in 0 until seq) {
                 val row = (h * seq + i) * seq
+                val last = lastVisible(i)
                 var dot = 0f
-                for (j in 0..i) dot += g.get(row + j) * p.get(row + j)
-                for (j in 0..i) {
+                for (j in 0..last) dot += g.get(row + j) * p.get(row + j)
+                for (j in 0..last) {
                     gScores.put(row + j, gScores.get(row + j) + p.get(row + j) * (g.get(row + j) - dot))
                 }
             }
         }
     }
+
+    private fun lastVisible(i: Int) = if (causal) i else seq - 1
 }
 
 /**

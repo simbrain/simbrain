@@ -67,8 +67,8 @@ val photoAlbumExample = newSim {
 
     // Connect layers with weight matrices
     val weights = listOf(
-        WeightMatrix(inputArray, hiddenLayer).apply { label = "Input to Hidden" },
-        WeightMatrix(hiddenLayer, outputLayer).apply { label = "Hidden to Output" }
+        WeightMatrix(inputArray, hiddenLayer).apply { label = "Input to hidden" },
+        WeightMatrix(hiddenLayer, outputLayer).apply { label = "Hidden to output" }
     ).onEach {
         it.randomize()
     }.also {
@@ -88,7 +88,7 @@ val photoAlbumExample = newSim {
     val component = addImageWorld("Image World")
     placeComponent(component,350,0,720,600)
     val imageWorld = component.world
-    imageWorld.imagePipelineCollection.addPipeline("Edge Detector 100x100") {
+    imageWorld.imagePipelineCollection.addPipeline("Edge detector 100x100") {
         addOperation(ResizeOperation(100, 100))
         addOperation(EdgeDetectionFilter())
     }
@@ -96,7 +96,7 @@ val photoAlbumExample = newSim {
     val imageNames = imageFiles.map { it.nameWithoutExtension }
     val imageCategories = imageNames.associateWith { it.takeWhile { ch -> !ch.isDigit() } }
     imageWorld.loadImages(imageFiles)
-    imageWorld.setCurrentPipeline("Edge Detector 100x100")
+    imageWorld.setCurrentPipeline("Edge detector 100x100")
 
     // Create training data
     val categoryNames = listOf("bird", "crocodile", "flower", "plane")

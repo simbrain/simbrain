@@ -107,7 +107,7 @@ val competitiveGridSim = newSim {
             ## Control Panel Settings
 
             - `O`, `Δ`, `T`, `X`, `—`: Put that picture on the input grid. Nothing learns until you train.
-            - `Add Noise`: Add small random values to the current input.
+            - `Add noise`: Add small random values to the current input.
             - `Test`: Show which unit wins the current pattern without changing any weights.
             - `Train`: Run one training step on the current pattern. The winning unit's weights move a tenth of the way toward the input.
             - `Train ×10`: Run ten training steps on the current pattern.
@@ -139,7 +139,7 @@ val competitiveGridSim = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             pictures.forEach { (label, pattern) ->
                 addButton(label) {
@@ -148,7 +148,7 @@ val competitiveGridSim = newSim {
                 }.toolTipText = "Put the ${pictureNames.getValue(label)} on the input grid."
             }
 
-            addButton("Add Noise") {
+            addButton("Add noise") {
                 competitive.inputLayer.activationArray = competitive.inputLayer.activationArray.add(NormalDistribution(standardDeviation = .01).sampleDouble(competitive.inputLayer.activationArray.size))
             }.toolTipText = "Add small random values to the current input."
             addButton("Test") {

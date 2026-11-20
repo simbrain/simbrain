@@ -17,7 +17,7 @@ class SOMCreationDialog(private val networkPanel: NetworkPanel) : StandardDialog
     private val sc = SOMNetwork.SOMCreator()
 
     init {
-        title = "New SOM Network"
+        title = "New SOM network"
         somPanel = AnnotatedPropertyEditor(sc)
         contentPane = somPanel
 

@@ -17,7 +17,7 @@ class CompetitiveCreationDialog(private val networkPanel: NetworkPanel) : Standa
     private val cc = CompetitiveNetwork.CompetitiveCreator()
 
     init {
-        title = "New Competitive Network"
+        title = "New competitive network"
         competitivePanel = AnnotatedPropertyEditor(cc)
         contentPane = competitivePanel
 

@@ -33,7 +33,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     override var updateRule: NeuronUpdateRule<ScalarDataHolder, MatrixDataHolder> by GuiEditable(
         initValue = LinearRule(),
         order = 100,
-        tab = "Update Rule",
+        tab = "Update rule",
         typeMapProvider = NeuronUpdateRule<*, *>::getNeuronArrayTypeMap,
         setter = {
             val typeChanged = field::class != it::class
@@ -89,14 +89,14 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         get() = labelArray.mapIndexed { index, label -> AttributeComponent("$index", label) }
 
     @get:Producible
-    @UserParameter("Bias Array", "Biases", order = 3)
+    @UserParameter("Bias array", "Biases", order = 3)
     override var biases: Matrix = Matrix(inputSize, 1)
         set(newBiases) {
             field.copyFrom(newBiases)
             events.updated.fire()
         }
 
-    @UserParameter(label = "Use Layer Norm", description = "Whether to use layer normalization", order = 4)
+    @UserParameter(label = "Use layer norm", description = "Whether to use layer normalization", order = 4)
     var useLayerNorm = false
 
     @get:Producible
@@ -123,7 +123,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     var isRenderActivations = true
 
     @UserParameter(
-        label = "Grid Mode",
+        label = "Grid mode",
         description = "If true, show activations as a grid, otherwise show them as a line",
         tab = "GUI",
         order = 10
@@ -135,7 +135,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Grid Columns",
+        label = "Grid columns",
         description = "Number of cells per grid line in grid mode. 0 picks a square grid. With a vertical layout " +
                 "the grid is transposed, so this counts rows.",
         minimumValue = 0.0,
@@ -149,7 +149,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Circle Mode",
+        label = "Circle mode",
         description = "If true, show activations as neuron circles",
         tab = "GUI",
         order = 12
@@ -161,7 +161,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Circle Spacing X",
+        label = "Circle spacing X",
         description = "Horizontal centre-to-centre distance between neuron circles in circle mode",
         minimumValue = 1.0,
         tab = "GUI",
@@ -174,7 +174,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Circle Spacing Y",
+        label = "Circle spacing Y",
         description = "Vertical centre-to-centre distance between neuron circles in circle mode",
         minimumValue = 1.0,
         tab = "GUI",
@@ -187,7 +187,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Vertical Layout",
+        label = "Vertical layout",
         description = "If true, orient the array vertically, otherwise horizontally",
         tab = "GUI",
         order = 20
@@ -199,7 +199,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
         }
 
     @UserParameter(
-        label = "Biases Visible",
+        label = "Biases visible",
         description = "If true, show biases.",
         tab = "GUI",
         order = 30)
@@ -342,7 +342,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
     }
 
     override val name: String
-        get() = "Neuron Array"
+        get() = "Neuron array"
 
     /**
      * Offset this neuron array
@@ -376,7 +376,7 @@ class NeuronArray(inputSize: Int) : ArrayLayer(inputSize), EditableObject, Attri
             return NeuronArray(numNodes)
         }
 
-        override val name = "Neuron Array"
+        override val name = "Neuron array"
 
     }
 

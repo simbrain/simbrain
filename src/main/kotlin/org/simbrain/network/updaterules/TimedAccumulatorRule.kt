@@ -142,7 +142,7 @@ class TimedAccumulatorRule : SpikingThresholdRule() {
     }
 
     override val name: String
-        get() = "Timed Accumulator"
+        get() = "Timed accumulator"
 
     companion object {
         const val defaultKappa: Double = 0.9

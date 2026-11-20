@@ -37,7 +37,7 @@ class WeightMatrixAdjustmentPanel(
     private val numExcLabel = JLabel()
     private val numInhLabel = JLabel()
 
-    private val initializationStrategy = objectWrapper("Weight Initialization", org.simbrain.network.trainers.Randomize() as WeightInitializationStrategy)
+    private val initializationStrategy = objectWrapper("Weight initialization", org.simbrain.network.trainers.Randomize() as WeightInitializationStrategy)
     private val strategyEditor = AnnotatedPropertyEditor(initializationStrategy)
     private val strategyPanel = strategyEditor.createApplyPanel {
         commitChanges()
@@ -47,12 +47,12 @@ class WeightMatrixAdjustmentPanel(
     }
 
     init {
-        histogramPanel.setxAxisName("Weight Value")
-        histogramPanel.setyAxisName("# of Weights")
+        histogramPanel.setxAxisName("Weight value")
+        histogramPanel.setyAxisName("# of weights")
 
         layout = GridBagLayout()
         val statsInfoPanel = JPanel().apply {
-            border = Theme.sectionBorder("Weight Matrix Stats")
+            border = Theme.sectionBorder("Weight matrix stats")
             layout = GridLayout(3, 2)
             add(shapeLabel)
             add(meanLabel)
@@ -149,7 +149,7 @@ class WeightMatrixAdjustmentPanel(
         shapeLabel.text = "Shape: ${weightMatrix.sizeString}"
         meanLabel.text = "Mean: ${SimbrainMath.roundDouble(mean, 5)}"
         medianLabel.text = "Median: ${SimbrainMath.roundDouble(median, 5)}"
-        sdLabel.text = "Std. Dev: ${SimbrainMath.roundDouble(stdDev, 5)}"
+        sdLabel.text = "Std. dev: ${SimbrainMath.roundDouble(stdDev, 5)}"
         numExcLabel.text = "Excitatory: $excitatoryCount"
         numInhLabel.text = "Inhibitory: $inhibitoryCount"
         statsPanel.revalidate()

@@ -51,7 +51,7 @@ private fun showCategorySelectionDialog(
 
     while (true) {
         val result = JOptionPane.showConfirmDialog(
-            null, panel, "Select Caltech101 Categories",
+            null, panel, "Select Caltech101 categories",
             JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE
         )
         if (result != JOptionPane.OK_OPTION) return null
@@ -188,7 +188,7 @@ val cnnObjectDetector = newSim {
     val categoryNames: List<String> = categoryImages.keys.toList()   // sorted
     val numClasses = categoryNames.size
 
-    val networkComponent = addNetworkComponent("CNN Object Detector")
+    val networkComponent = addNetworkComponent("CNN object detector")
     val network = networkComponent.network
 
     // U-shaped layout coordinates use layer centers. Keep the second convolution on the right leg

@@ -9,13 +9,13 @@ import org.jfree.data.xy.XYSeries
 import org.jfree.data.xy.XYSeriesCollection
 import org.simbrain.plot.PlotPreferences
 import org.simbrain.plot.RasterPlotEvents
+import org.simbrain.util.EdtUpdates
 import org.simbrain.util.UserParameter
 import org.simbrain.util.getSimbrainXStream
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
-import org.simbrain.util.EdtUpdates
 import java.util.function.Supplier
 
 /**
@@ -35,7 +35,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoClo
     val rasterConsumerList = dataset.series.mapIndexed { index, _ -> RasterConsumer(index) }.toMutableList()
 
     @UserParameter(
-        label = "Dot Size",
+        label = "Dot size",
         description = "Size of dots in chart",
         order = 5)
     var dotSize: Int = PlotPreferences.rasterDotSize
@@ -46,7 +46,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoClo
 
     var windowSize: Int by GuiEditable(
         initValue = PlotPreferences.rasterWindowSize,
-        label = "Window Size",
+        label = "Window size",
         setter = {
             field = it
             events.propertyChanged.fire()
@@ -68,7 +68,7 @@ class RasterModel(timeSupplier: Supplier<Int>? = null) : EditableObject, AutoClo
         }
 
     @UserParameter(
-        label = "Spike Threshold",
+        label = "Spike threshold",
         description = "For nonspiking neurons activation above this is taken to be a spike",
         order = 40
     )

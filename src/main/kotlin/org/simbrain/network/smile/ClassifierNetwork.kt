@@ -54,12 +54,12 @@ class ClassifierNetwork(
     var winner = Integer.MIN_VALUE
 
     val inputNeuronGroup = addNeuronCollection(List(classifier.trainingData.inputs.first().size) { Neuron() }).apply {
-        label = "Input Layer"
+        label = "Input layer"
         setLayoutBasedOnSize()
     }
 
     val outputNeuronGroup = addNeuronCollection(List(classifier.numClasses) { Neuron() }).apply {
-        label = "Output Layer"
+        label = "Output layer"
         setLayoutBasedOnSize()
         // Outputs are one-hot or probabilities, so 1 should show as fully saturated
         neuronList.forEach {
@@ -151,7 +151,7 @@ class ClassifierNetwork(
             order = 20
         )
 
-        @UserParameter(label = "Classifier Type", showDetails = false, order = 40)
+        @UserParameter(label = "Classifier type", showDetails = false, order = 40)
         var classifierType: SimbrainClassifier = SVMClassifier()
 
         override val name = "Classifier"

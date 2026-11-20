@@ -1,14 +1,14 @@
 package org.simbrain.network.updaterules
 
-import smile.math.matrix.Matrix
-import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronArray
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.util.EmptyMatrixData
 import org.simbrain.network.util.EmptyScalarData
 import org.simbrain.util.addi
+import smile.math.matrix.Matrix
 
 /**
  * Discrete sigmoidal provides various implementations of a standard sigmoidal neuron.
@@ -54,6 +54,6 @@ class SigmoidalRule : AbstractSigmoidalRule<EmptyScalarData, EmptyMatrixData>(),
     }
 
     override val name: String
-        get() = "Sigmoidal (Discrete)"
+        get() = "Sigmoidal (discrete)"
 
 }

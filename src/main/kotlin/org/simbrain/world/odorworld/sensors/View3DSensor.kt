@@ -19,14 +19,14 @@ class View3DSensor @JvmOverloads constructor(
 ) : SensorWithRelativeLocation(theta, radius) {
 
     @UserParameter(
-        label = "Field of View",
+        label = "Field of view",
         description = "Horizontal field of view in degrees",
         order = 10
     )
     var fov: Double = 90.0
 
     @UserParameter(
-        label = "View Distance",
+        label = "View distance",
         description = "Maximum render distance in pixels",
         order = 11
     )
@@ -47,49 +47,49 @@ class View3DSensor @JvmOverloads constructor(
     var outputHeight: Int = 64
 
     @UserParameter(
-        label = "Horizon Position",
+        label = "Horizon position",
         description = "Where the horizon sits on screen (0.0 = bottom, 1.0 = top)",
         order = 14
     )
     var horizonPosition: Double = 0.5
 
     @UserParameter(
-        label = "Camera Height",
+        label = "Camera height",
         description = "Height of camera above ground in world units",
         order = 15
     )
     var cameraWorldHeight: Double = 16.0
 
     @UserParameter(
-        label = "Wall Height",
+        label = "Wall height",
         description = "Height of maze and boundary walls relative to camera height (1.0 = horizon level, 2.0 = extends above horizon)",
         order = 16
     )
     var wallHeight: Double = 2.0
 
     @UserParameter(
-        label = "Textured Walls",
+        label = "Textured walls",
         description = "Draw a brick pattern and a seam at every grid cell boundary on walls, so distance along a wall is visible",
         order = 18
     )
     var textureWalls: Boolean = true
 
     @UserParameter(
-        label = "Billboard Sprites",
+        label = "Billboard sprites",
         description = "When enabled, sprites always face the camera. When disabled, sprites face their entity's heading and appear foreshortened at angles.",
         order = 17
     )
     var billboardSprites: Boolean = true
 
     @UserParameter(
-        label = "Sky Color",
+        label = "Sky color",
         description = "Color of the sky/ceiling",
         order = 20
     )
     var skyColor: Color = Color(135, 206, 235)  // Sky blue
 
     @UserParameter(
-        label = "Wall Color",
+        label = "Wall color",
         description = "Base color of maze and boundary walls (darker shade used for N/S walls)",
         order = 21
     )
@@ -256,8 +256,8 @@ class View3DSensor @JvmOverloads constructor(
     }
 
     override val name: String
-        get() = "3D View Sensor"
+        get() = "3D view sensor"
 
-    override var label: String = "3D View"
+    override var label: String = "3D view"
 
 }

@@ -576,7 +576,7 @@ suspend fun SimulationScope.setUpMirrorLearning(workspace: Workspace): MirrorTri
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComboBox(
                 "Object", listOf(CANDY, BELL), CANDY,
                 toolTip = "The object the buttons below send people to."

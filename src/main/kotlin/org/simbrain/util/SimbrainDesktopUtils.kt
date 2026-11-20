@@ -100,7 +100,7 @@ suspend fun SimulationScope.place(workspaceComponent: WorkspaceComponent, x: Int
     }
 }
 
-class ControlPanelKt(title: String = "Control Panel"):
+class ControlPanelKt(title: String = "Control panel"):
     GenericJInternalFrame(title, true, true, false, false), CoroutineScope {
 
     @Transient
@@ -542,7 +542,7 @@ class ControlPanelKt(title: String = "Control Panel"):
 }
 
 suspend fun SimbrainDesktop.loadWorkspaceZipFromFileChooser(): Boolean {
-    val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip Archive", "zip")
+    val simulationChooser = SFileChooser(WorkspacePreferences.simulationDirectory, "Zip archive", "zip")
     val simFile = simulationChooser.showOpenDialog()
     val serializer = WorkspaceSerializer(workspace)
 
@@ -577,7 +577,7 @@ fun classifierColor(classIndex: Int) = classifierColors[Math.floorMod(classIndex
  */
 suspend fun SimbrainDesktop.createClassifierProjectionPlot(
     smileClassifier: ClassifierNetwork,
-    name: String = "${smileClassifier.displayName} Plot"
+    name: String = "${smileClassifier.displayName} plot"
 ): ProjectionComponent {
     val showRegions = smileClassifier.inputSize == 2
     val projectionComponent = ProjectionComponent(name).apply {

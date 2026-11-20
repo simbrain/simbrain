@@ -1,11 +1,7 @@
 package org.simbrain.util.widgets
 
-import org.simbrain.util.Theme
-import org.simbrain.util.UserParameter
-import org.simbrain.util.createEditorDialog
-import org.simbrain.util.display
+import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.EditableObject
-import org.simbrain.util.toHSB
 import java.awt.*
 import javax.swing.JButton
 import javax.swing.JPanel
@@ -57,7 +53,7 @@ class FieldImagePanel(
         isFocusable = false
         addActionListener {
             settings.createEditorDialog(
-                titleName = "Field Image Preferences",
+                titleName = "Field image preferences",
                 parent = SwingUtilities.getWindowAncestor(this@FieldImagePanel)
             ) {
                 repaint()

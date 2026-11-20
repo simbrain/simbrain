@@ -79,7 +79,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
 
         // Bottom panel
         JPanel bottomPanel = new JPanel();
-        JButton button = new JButton("Set Visibility");
+        JButton button = new JButton("Set visibility");
         button.addActionListener(evt -> showAttributeTypePanel());
         bottomPanel.add(button);
         add(bottomPanel, BorderLayout.SOUTH);
@@ -93,7 +93,7 @@ public class AttributePanel extends JPanel implements ActionListener, MouseListe
     private void showAttributeTypePanel() {
         if (attributeTypePanel != null) {
             Window parentWindow = SwingUtilities.getWindowAncestor(this);
-            StandardDialog dialog = new StandardDialog(parentWindow, "Set Visibility");
+            StandardDialog dialog = new StandardDialog(parentWindow, "Set visibility");
             dialog.setAsDoneDialog();
             dialog.setContentPane(attributeTypePanel);
             dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);

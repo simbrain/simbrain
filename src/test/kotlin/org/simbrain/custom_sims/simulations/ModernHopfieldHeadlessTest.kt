@@ -16,7 +16,7 @@ class ModernHopfieldHeadlessTest {
     fun `selected memory becomes more probable under iterative retrieval`() = runBlocking {
         val scope = SimulationScope()
         modernHopfieldSim.task.invoke(scope, null)
-        val network = (scope.workspace.getComponent("Modern Hopfield Network") as NetworkComponent).network
+        val network = (scope.workspace.getComponent("Modern Hopfield network") as NetworkComponent).network
         val query = network.getModelByLabel<NeuronArray>("Query / current state")
         val retrieved = network.getModelByLabel<NeuronArray>("Retrieved pattern")
         val attention = network.getModelByLabel<NeuronArray>("Memory probabilities")

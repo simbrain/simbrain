@@ -421,7 +421,7 @@ val evolveResourcePursuer = newSim { optionString ->
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+        val panel = controlPanel.show(this, "Control panel", 5, 10, addParamsEditor = false)
         val propertyEditor = AnnotatedPropertyEditor(evolutionParams)
         panel.addAnnotatedPropertyEditor(propertyEditor)
 
@@ -498,11 +498,11 @@ val evolveResourcePursuer = newSim { optionString ->
         }
 
         controlPanel.addButton(
-            "Open Trainer",
+            "Open trainer",
             toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved agents."
         ) { openTrainer() }
 
-        panel.addButton("Load Workspace") {
+        panel.addButton("Load workspace") {
             val loadOk = loadWorkspaceZipFromFileChooser()
             if (loadOk) {
 
@@ -634,7 +634,7 @@ val evolveResourcePursuer = newSim { optionString ->
         In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works. As mentioned before, there are genes that can be activated to allow
         the simulation to have additional mutations. Click on the dropdown box next to the gene you want active, and change it to `Yes`. Below are the steps to evolving the simulation:
 
-        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
+        1. Click `Open trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
             - The addition of more mutations.
 

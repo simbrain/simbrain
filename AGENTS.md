@@ -71,6 +71,16 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 - Use backtick test names: `` `test that something works`() ``
 - Avoid class-level doc comments that frame ordinary unit tests as regressions or describe specific historical bugs; put scenario intent in the test name and only use local comments when they clarify a non-obvious setup or assertion.
 
+## UI Text Capitalization
+
+Use sentence case for all user-facing UI text: menus and submenus, `createAction` names, buttons, dialog and window titles, tabs, checkboxes, `GuiEditable` and `@UserParameter` labels, enum display names, and tooltips.
+
+- Capitalize the first word only: "Add neuron group...", "Learning rate", "Reset weights"
+- Keep proper nouns and acronyms as written: Hebbian, Hopfield, Leabra, SOM, PCA, LSTM, CNN
+- Treat world names as proper nouns: Odor World, Text World
+- Keep status markers such as `(Beta)` capitalized
+- When changing a label, update docs in `simbraindocs/` that quote it, since docs match UI labels exactly
+
 ## Common Tasks
 
 **Adding a simulation:** See `custom_sims/AGENTS_SIMULATIONS.md` (includes neuron layout spacing pitfalls and `SimulationLayoutUtils.kt` for multi-layer subnetworks)
@@ -93,15 +103,15 @@ grep: "RULE_LIST" "network/updaterules/"  # Check UI availability
 ```kotlin
 var learningRate by GuiEditable(
     initValue = 0.1,
-    label = "Learning Rate",
+    label = "Learning rate",
     description = "Rate at which weights change"
 )
 
 // Conditional visibility
-var useAdvanced by GuiEditable(initValue = false, label = "Use Advanced")
+var useAdvanced by GuiEditable(initValue = false, label = "Use advanced")
 var advancedParam by GuiEditable(
     initValue = 0.5,
-    label = "Advanced Parameter",
+    label = "Advanced parameter",
     conditionallyEnabledBy = MyClass::useAdvanced
 )
 

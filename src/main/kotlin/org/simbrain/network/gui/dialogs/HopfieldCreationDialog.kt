@@ -27,7 +27,7 @@ class HopfieldCreationDialog(private val networkPanel: NetworkPanel) : StandardD
     private val layoutPanel: AnnotatedPropertyEditor<Layout.LayoutEditor>
 
     init {
-        title = "New Hopfield Network"
+        title = "New Hopfield network"
 
         // Logic Panel
         hopPropertiesPanel = AnnotatedPropertyEditor(hc)

@@ -231,7 +231,7 @@ val evolveNetwork = newSim {
 
     withGui {
         workspace.clearWorkspace()
-        val panel = controlPanel.show(this, "Control Panel", 5, 10, addParamsEditor = false)
+        val panel = controlPanel.show(this, "Control panel", 5, 10, addParamsEditor = false)
 
         panel.addSeparator()
         val propertyEditor = AnnotatedPropertyEditor(networkParams)
@@ -292,7 +292,7 @@ val evolveNetwork = newSim {
         }
 
         controlPanel.addButton(
-            "Open Trainer",
+            "Open trainer",
             toolTip = "Open the evolution trainer, where you can run evolution, watch fitness, and express evolved networks."
         ) { openTrainer() }
 
@@ -332,7 +332,7 @@ val evolveNetwork = newSim {
         In this simulation, similar to the other evolutionary simulations, the trainer controls how the evolutionary process works and what your target qualities are.
         Below are the steps to evolving the simulation:
 
-        1. Click `Open Trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
+        1. Click `Open trainer`, then specify the parameters of the simulation in the trainer's `Evolution properties` dialog.
 
             - The addition of more target qualities.
 

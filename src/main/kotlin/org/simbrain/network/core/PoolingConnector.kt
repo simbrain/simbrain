@@ -17,11 +17,11 @@ enum class PoolingType {
  */
 class PoolingConnector(
     source: TensorLayer, target: TensorLayer,
-    @UserParameter(label = "Pool Size", description = "Spatial size of pooling window", displayOnly = true, order = 1)
+    @UserParameter(label = "Pool size", description = "Spatial size of pooling window", displayOnly = true, order = 1)
     val poolSize: Int = 2,
     @UserParameter(label = "Stride", description = "Pooling stride", displayOnly = true, order = 2)
     val stride: Int = 2,
-    @UserParameter(label = "Pooling Type", description = "MAX or AVERAGE pooling", order = 3)
+    @UserParameter(label = "Pooling type", description = "MAX or AVERAGE pooling", order = 3)
     var poolingType: PoolingType = PoolingType.MAX
 ) : TensorConnector(source, target) {
 
@@ -77,6 +77,6 @@ class PoolingConnector(
     override val name: String get() = "Pooling"
 
     override fun toString(): String =
-        "$displayName (${poolingType.name} Pool ${poolSize}x${poolSize})"
+        "$displayName (${poolingType.name} pool ${poolSize}x${poolSize})"
 
 }

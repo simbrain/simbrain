@@ -26,7 +26,7 @@ abstract class ConnectionStrategy(seed: Long = Random.nextLong()) : CopyableObje
     /**
      * Strategy for initializing synapse weights after connections are created.
      */
-    @UserParameter(label = "Weight Initializer", description = "How to initialize synapse weights", order = 100, showDetails = false)
+    @UserParameter(label = "Weight initializer", description = "How to initialize synapse weights", order = 100, showDetails = false)
     var weightInitializer: WeightInitializer = ConstantWeightInitializer()
 
     /**

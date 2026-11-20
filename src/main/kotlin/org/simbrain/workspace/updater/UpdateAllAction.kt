@@ -12,7 +12,7 @@ import org.simbrain.util.UpdateAction
  *
  * @author jyoshimi
  */
-class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(description = "Update All Components and Couplings") {
+class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(description = "Update all components and couplings") {
 
     override suspend fun run(): Unit = coroutineScope {
         val components = updater.components
@@ -21,7 +21,7 @@ class UpdateAllAction(@Transient val updater: WorkspaceUpdater) : UpdateAction(d
             .filter { it.updateOn }
             .map {
             async {
-               PerformanceMonitor.record("Updating Component ${it.name}") {
+               PerformanceMonitor.record("Updating component ${it.name}") {
                    it.update()
                }
             }

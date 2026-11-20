@@ -2,7 +2,8 @@ package org.simbrain.network.updaterules
 
 import org.simbrain.network.core.*
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
-import org.simbrain.network.util.*
+import org.simbrain.network.util.SpikingMatrixData
+import org.simbrain.network.util.SpikingScalarData
 import org.simbrain.util.UserParameter
 import org.simbrain.util.math.SimbrainMath.clip
 import org.simbrain.util.propertyeditor.CustomTypeName
@@ -22,7 +23,7 @@ import org.simbrain.workspace.Producible
  *
  * @author Zoë Tosi
  */
-@CustomTypeName("AdEx Rule")
+@CustomTypeName("AdEx rule")
 open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), NoisyUpdateRule {
 
     /**
@@ -36,7 +37,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                 + "an action potential has fired.",
         increment = .1,
         order = 3,
-        tab = "Membrane Voltage",
+        tab = "Membrane voltage",
         minimumValue = -70.0,
         maximumValue = -35.0,
         probDist = "Normal",
@@ -57,7 +58,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                 + "toward infinity and is not the voltage at which we consider the neuron to have spiked.",
         increment = .1,
         order = 2,
-        tab = "Membrane Voltage"
+        tab = "Membrane voltage"
     )
     var v_Th = -50.4
 
@@ -70,7 +71,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "The peak voltage after which we say with certainty that an action potential has occurred (mV).",
         increment = .1,
         order = 1,
-        tab = "Membrane Voltage"
+        tab = "Membrane voltage"
     )
     var v_Peak = 20.0
 
@@ -82,7 +83,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "The inverse of the resistance of the channels through which current leaks from the neuron.",
         increment = .1,
         order = 6,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var g_L = 30.0
 
@@ -94,7 +95,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "The excitatory conductance if all excitatory channels are open.",
         increment = .1,
         order = 7,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var g_e_bar = 10.0
 
@@ -106,7 +107,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "The inhibitory conductance if all inhibitory channels are open.",
         increment = .1,
         order = 8,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var g_i_bar = 10.0
 
@@ -119,7 +120,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                 + "any effect on the neuron's membrane potential.",
         increment = .1,
         order = 9,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var leakReversal = -70.6
 
@@ -132,7 +133,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                 + "inputs reach equilibrium.",
         increment = .1,
         order = 10,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var exReversal = 0.0
 
@@ -145,7 +146,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
                 + "inputs reach equilibrium.",
         increment = .1,
         order = 11,
-        tab = "Input Currents"
+        tab = "Input currents"
     )
     var inReversal = -75.0
 
@@ -186,7 +187,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
      */
     @UserParameter(
         label = "Slope factor", description = "A value which regulates the overall effect of the exponential term on "
-                + "the membrane potential equation.", increment = .1, order = 6, tab = "Membrane Voltage"
+                + "the membrane potential equation.", increment = .1, order = 6, tab = "Membrane voltage"
     )
     private var slopeFactor = 2.0
 
@@ -211,7 +212,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "A parameter designating the overall ability of the neuron's membrane to retain a charge.",
         increment = .1,
         order = 4,
-        tab = "Membrane Voltage",
+        tab = "Membrane voltage",
         minimumValue = 181.0,
         maximumValue = 381.0,
         probDist = "Normal",
@@ -228,7 +229,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
         description = "A tunable parameter in some ways similar to a bias parameter for non-spiking neurons.",
         increment = .1,
         order = 5,
-        tab = "Membrane Voltage"
+        tab = "Membrane voltage"
     )
     private var i_bg = 0.0
 
@@ -365,7 +366,7 @@ open class AdExIFRule : SpikingNeuronUpdateRule<AdexData, AdexMatrixData>(), Noi
     }
 
     override val name: String
-        get() = "AdEx Integrate and Fire"
+        get() = "AdEx integrate and fire"
 
     override val graphicalLowerBound: Double
         get() = leakReversal - 20

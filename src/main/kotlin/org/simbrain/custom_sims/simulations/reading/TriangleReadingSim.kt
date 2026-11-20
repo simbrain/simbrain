@@ -99,7 +99,7 @@ private suspend fun SimulationScope.installReaderUi(
     withGui desktop@{
         desktopPane.allFrames.filter { it.title == "Triangle reading controls" }.forEach { it.dispose() }
         Frame.getFrames().filter {
-            it.title == "Triangle Reading Training" || it.title == "Word-frequency results" || it.title == "Word-frequency effect"
+            it.title == "Triangle reading training" || it.title == "Word-frequency results" || it.title == "Word-frequency effect"
         }.forEach { it.dispose() }
         var selectedWord = reader.dataset.words.first()
         var samplingMode = SamplingMode.FREQUENCY_WEIGHTED
@@ -223,7 +223,7 @@ private suspend fun SimulationScope.installReaderUi(
                 add(resetButton)
                 add(JLabel())
             }
-            val frame = JFrame("Triangle Reading Training").apply {
+            val frame = JFrame("Triangle reading training").apply {
                 defaultCloseOperation = JFrame.DISPOSE_ON_CLOSE
                 layout = BorderLayout()
                 add(trainingControls, BorderLayout.NORTH)

@@ -37,6 +37,13 @@ fun String.removeSpecialCharacters(): String {
 /**
  * Removes extra spaces and newlines
  */
+/**
+ * Lowercases the first letter of a sentence-case display name so it can sit mid-sentence, e.g. "Train
+ * random forest classifier". Leaves acronyms such as "SSE" or "KNN" unchanged.
+ */
+fun String.midSentence(): String =
+    if (length > 1 && this[1].isLowerCase()) replaceFirstChar { it.lowercase() } else this
+
 fun String.normalizeSpacing(): String = replace("[\n\r\t]".toRegex(), " ").replace("\\s+".toRegex(), " ")
 
 /**
@@ -460,7 +467,7 @@ fun embeddingSimilarity(vectorA: DoubleArray, vectorB: DoubleArray, simfun: (Dou
 }
 
 @JvmOverloads
-fun textEntryDialog(initialString: String, title: String = "Edit Text", columns: Int = 20, rows: Int = 5, commitAction: (String) -> Unit = {}): StandardDialog {
+fun textEntryDialog(initialString: String, title: String = "Edit text", columns: Int = 20, rows: Int = 5, commitAction: (String) -> Unit = {}): StandardDialog {
     val dialog = StandardDialog(null as Frame?, title)
     val textArea = JTextArea(initialString)
     textArea.columns = columns

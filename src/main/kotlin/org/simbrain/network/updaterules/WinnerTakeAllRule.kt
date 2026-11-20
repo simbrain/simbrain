@@ -75,7 +75,7 @@ class WinnerTakeAllRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), 
         throw UnsupportedOperationException("WinnerTakeAllRule does not support scalar data")
     }
 
-    override val name = "Winner Take All"
+    override val name = "Winner take all"
     override val timeType = Network.TimeType.DISCRETE
 
     override fun createMatrixData(size: Int) = EmptyMatrixData

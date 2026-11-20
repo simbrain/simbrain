@@ -62,7 +62,7 @@ class FontWidget<O : EditableObject>(
     private fun updateSummary() {
         val fonts = editor.editingObjects.map { valueFor(it) }
         summary.text = fonts.distinct().singleOrNull()?.let {
-            val style = arrayOf("Regular", "Bold", "Italic", "Bold Italic")[it.style]
+            val style = arrayOf("Regular", "Bold", "Italic", "Bold italic")[it.style]
             "${it.name}, $style, ${it.size}"
         } ?: "Mixed fonts"
     }

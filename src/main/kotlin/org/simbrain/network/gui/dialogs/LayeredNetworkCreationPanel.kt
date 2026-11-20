@@ -38,7 +38,7 @@ class LayeredNetworkCreationPanel(
     init {
         val header = Box.createHorizontalBox()
         header.alignmentX = RIGHT_ALIGNMENT
-        header.add(JLabel("Number of Layers: "))
+        header.add(JLabel("Number of layers: "))
         layersTF.text = "" + initialNumLayers
         layersTF.columns = 3
         val applyButton = JButton("Change")
@@ -65,18 +65,18 @@ class LayeredNetworkCreationPanel(
         for (i in numLayers downTo 1) {
             var layer: LayerCreationPanel
             if (i == 1) {
-                layer = LayerCreationPanel(DEFAULT_NEURON_TYPES, "Input Layer", 5)
+                layer = LayerCreationPanel(DEFAULT_NEURON_TYPES, "Input layer", 5)
                 layer.setComboBox("Linear")
             } else if (i == numLayers) {
-                layer = LayerCreationPanel(DEFAULT_NEURON_TYPES, "Output Layer", 5)
+                layer = LayerCreationPanel(DEFAULT_NEURON_TYPES, "Output layer", 5)
                 layer.setComboBox("Sigmoid")
             } else {
                 layer = if (numLayers == 3) {
-                    LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden Layer", 5)
+                    LayerCreationPanel(DEFAULT_NEURON_TYPES, "Hidden layer", 5)
                 } else {
                     LayerCreationPanel(
                         DEFAULT_NEURON_TYPES,
-                        "Hidden Layer " + (i - 1),
+                        "Hidden layer " + (i - 1),
                         5
                     )
                 }

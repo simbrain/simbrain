@@ -246,7 +246,7 @@ val evolveCow = newSim {
                 "$it: ${state.nthPercentileFitness(it).format(3)}"
             }.also {
                 println("[${state.generation}] $it")
-                progressWindow.text = "5th Percentile Fitness: ${state.nthPercentileFitness(10).format(3)}"
+                progressWindow.text = "5th percentile fitness: ${state.nthPercentileFitness(10).format(3)}"
                 progressWindow.value = state.generation
             }
         }

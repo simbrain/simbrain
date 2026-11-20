@@ -92,7 +92,7 @@ class TinyLmSimOptions(var showTransformerOptions: Boolean = true) : EditableObj
     var tokenizer by GuiEditable(
         initValue = SimpleTokenizer(usePunctuation = true) as Tokenizer<*>,
         description = "Options for tokenizing the text",
-        tab = "Text Parsing",
+        tab = "Text parsing",
         order = 20,
     )
 }
@@ -165,7 +165,7 @@ val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
         }
     } else {
         // Use GUI dialog for interactive mode
-        TinyLmSimOptions().showAPEOptionDialog("Tiny Language Model") ?: return@newSim
+        TinyLmSimOptions().showAPEOptionDialog("Tiny language model") ?: return@newSim
     }
 
     workspace.clearWorkspace()
@@ -253,7 +253,7 @@ val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
     }
 
     // Text World showing the model's sliding context window, editable while stopped
-    val textWorldComponent = addTextWorld("Text Inputs")
+    val textWorldComponent = addTextWorld("Text inputs")
     textWorldComponent.world.tokenEmbedding = tokenEmbedding
     textWorldComponent.world.highlightCurrentToken = false
     textWorldComponent.world.autoAdvance = false
@@ -265,7 +265,7 @@ val tinyLanguageModelSim = newSim("tiny_language_model") { optionString ->
         val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
         SimbrainDesktop.onboardingManager.showPopup(
             PopupConfig(
-                title = "Language Model Prompt",
+                title = "Language model prompt",
                 message = "To enter a prompt, add some text here. Then click Play (or Step) on the main toolbar — " +
                     "each workspace step generates one token. Pause the workspace to edit the text; " +
                     "it continues from your edit on the next Play.",
@@ -370,8 +370,8 @@ fun SimulationScope.setupGeneration(workspace: Workspace) {
                 warning = true,
             )
             unrecognized.size == typedTokens.size -> TextWorldStatus(
-                if (running) "No known tokens — pause, then see Show Vocabulary"
-                else "No known tokens — see Show Vocabulary",
+                if (running) "No known tokens — pause, then see Show vocabulary"
+                else "No known tokens — see Show vocabulary",
                 warning = true,
             )
             unrecognized.isNotEmpty() -> TextWorldStatus(
@@ -428,7 +428,7 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
     withGui {
         val textWorldWidth = 401
         val textWorldHeight = 372
-        val controlPanel = createControlPanel("Language Model Controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Language model controls", SIM_WINDOW_GAP, SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP) {
 
             addButton("Train...", Dispatchers.Swing) {
                 languageModel.createTrainingDialog(SimbrainDesktop.frame).display()
@@ -446,16 +446,16 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
 
             addSeparator()
 
-            addButton("Show Vocabulary") {
+            addButton("Show vocabulary") {
                 val labels = languageModel.tokenLabels ?: arrayListOf()
                 showTextDialog("Vocabulary (${labels.size} tokens)", labels.joinToString("\n"))
             }.apply {
                 toolTipText = "Open a list of every token the model knows."
             }
 
-            addButton("Show Training Text") {
+            addButton("Show training text") {
                 val corpus = languageModel.corpusTokenIds?.let(languageModel::decode) ?: "No training corpus"
-                showTextDialog("Training Text", corpus)
+                showTextDialog("Training text", corpus)
             }.apply {
                 toolTipText = "Open the full text the model was trained on."
             }
@@ -469,11 +469,11 @@ private suspend fun SimulationScope.setupTinyLmGui(workspace: Workspace) {
                 languageModel.samplingTemperature = temp
             }
 
-            addButton("Configure Sampling Strategy...") {
-                val wrapper = objectWrapper("Sampling Strategy", languageModel.samplingStrategy.copy() as SamplingStrategy)
+            addButton("Configure sampling strategy...") {
+                val wrapper = objectWrapper("Sampling strategy", languageModel.samplingStrategy.copy() as SamplingStrategy)
                 val editor = AnnotatedPropertyEditor(wrapper)
                 val dialog = StandardDialog(editor).apply {
-                    title = "Configure Sampling Strategy"
+                    title = "Configure sampling strategy"
                     addCommitTask {
                         editor.commitChanges()
                         languageModel.samplingStrategy = wrapper.editingObject as SamplingStrategy
@@ -509,10 +509,10 @@ private val TINY_LM_SIDEBAR = """
 
         - `Train...` opens the trainer (see "Train the model" below).
         - `Reset` clears the text, the model's context window, and the activations shown in the diagram. Trained weights are kept.
-        - `Show Vocabulary` displays the tokens the model recognizes.
-        - `Show Training Text` displays the training corpus.
+        - `Show vocabulary` displays the tokens the model recognizes.
+        - `Show training text` displays the training corpus.
         - `Temperature` controls how varied the generated tokens are.
-        - `Configure Sampling Strategy...` changes how the next token is selected.
+        - `Configure sampling strategy...` changes how the next token is selected.
 
         ## Reading the Diagram
 
@@ -550,13 +550,13 @@ private val TINY_LM_SIDEBAR = """
 
         ## Activity 2: Generate text
 
-        1. Type a prompt in the `Text Inputs` component
+        1. Type a prompt in the `Text inputs` component
         2. Click `Run` (or `Step`) in the main toolbar
         3. Each workspace step runs the full model on the current context and samples one new token
 
         There is no start or stop mode: the model writes whenever the workspace runs and there is text to continue. Pause the workspace to edit the text; the next `Play` continues from your edit.
 
-        Tokens you type that aren't in the vocabulary are ignored. The message below `Text Inputs` turns amber when there is no usable prompt, explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show Vocabulary`).
+        Tokens you type that aren't in the vocabulary are ignored. The message below `Text inputs` turns amber when there is no usable prompt, explains when no token is recognized and identifies ignored tokens (the vocabulary comes from the training text — see `Show vocabulary`).
 
         ## Activity 3: Step through the computation, one operation at a time
 

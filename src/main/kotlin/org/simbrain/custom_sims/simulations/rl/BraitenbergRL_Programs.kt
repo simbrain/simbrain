@@ -43,7 +43,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     var justHitPoison = false
 
     workspace.clearWorkspace()
-    val oc = addOdorWorldComponent("TD Experiments World")
+    val oc = addOdorWorldComponent("TD experiments world")
     oc.world.tileMap.updateMapSize(20, 20)
     val world = oc.world
     world.isObjectsBlockMovement = true
@@ -52,8 +52,8 @@ val braitenbergRLPrograms = newSim { optionString ->
     val cheese = oc.world.addEntity(500, 184, EntityType.Swiss)
 
     val sharedDecayFunction = GaussianDecayFunction(75.0)
-    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
-    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
+    val cheeseRewardConfig = RewardConfig("Cheese reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
+    val poisonRewardConfig = RewardConfig("Poison reward", sharedDecayFunction.copy() as DecayFunction).apply { maxReward = 15.0 }
 
     fun calculateReward(agent: OdorWorldEntity): Double {
         if (sparseReward) {
@@ -149,10 +149,10 @@ val braitenbergRLPrograms = newSim { optionString ->
 
     // Program NeuronArray with SoftmaxRule (4 programs, circle mode, vertical)
     val programNames = listOf(
-        "Seek Cheese, Avoid Poison",
-        "Seek Both Objects",
-        "Avoid Both Objects",
-        "Seek Poison, Avoid Cheese"
+        "Seek cheese, avoid poison",
+        "Seek both objects",
+        "Avoid both objects",
+        "Seek poison, avoid cheese"
     )
     val numPrograms = programNames.size
 
@@ -177,7 +177,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     // Critic and TD error neurons
     val rewardNeuron = network.addNeuron(205, 3).apply { clamped = true; label = "Reward" }
     val valueNeuron = network.addNeuron(255, 3).apply { label = "Value"; upperBound = 100.0; lowerBound = -100.0 }
-    val tdErrorNeuron = network.addNeuron(305, 3).apply { label = "TD Error"; upperBound = 100.0; lowerBound = -100.0 }
+    val tdErrorNeuron = network.addNeuron(305, 3).apply { label = "TD error"; upperBound = 100.0; lowerBound = -100.0 }
 
     // Critic weights: sensors → value
     val criticWeights = sensorNeurons.map { sensorNeuron ->
@@ -244,7 +244,7 @@ val braitenbergRLPrograms = newSim { optionString ->
         }
     }
 
-    workspace.addUpdateAction("TD Experiments") {
+    workspace.addUpdateAction("TD experiments") {
 
         val sensorValues = sensorNeurons.map { it.activation }.toDoubleArray()
         val sensorsActive = sensorValues.sum() > sensorActivationThreshold
@@ -355,7 +355,7 @@ val braitenbergRLPrograms = newSim { optionString ->
     withGui {
         activeTextLabel.location = point(50.0, -70.0)
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val taskToolTip = "Set whether cheese and poison are rewarding or punishing."
             addLabel("Task:").apply { toolTipText = taskToolTip }
@@ -367,26 +367,26 @@ val braitenbergRLPrograms = newSim { optionString ->
             addSeparator()
 
             addCheckBox(
-                "Learning Enabled", learningEnabled,
+                "Learning enabled", learningEnabled,
                 toolTip = "Update the actor and critic weights while the simulation runs. Uncheck to freeze what has been learned."
             ) { learningEnabled = it }
 
             addCheckBox(
-                "Sparse Reward (collision only)", sparseReward,
+                "Sparse reward (collision only)", sparseReward,
                 toolTip = "Give reward only when the mouse touches the cheese or poison. Uncheck for reward that grows as the mouse gets closer."
             ) { sparseReward = it }
 
             addSeparator()
 
             addFormattedNumericTextField(
-                "Critic Learning Rate", initValue = learningRate,
+                "Critic learning rate", initValue = learningRate,
                 toolTip = "How quickly the critic's value estimates change in response to TD error."
             ) {
                 learningRate = it
             }
 
             addFormattedNumericTextField(
-                "Actor Learning Rate", initValue = actorLearningRate,
+                "Actor learning rate", initValue = actorLearningRate,
                 toolTip = "How quickly the actor's preferences for each program change in response to TD error."
             ) {
                 actorLearningRate = it
@@ -407,14 +407,14 @@ val braitenbergRLPrograms = newSim { optionString ->
             }
 
             addFormattedNumericTextField(
-                "Speed Bias", initValue = straight.bias,
+                "Speed bias", initValue = straight.bias,
                 toolTip = "Bias on the Straight neuron, which sets the mouse's forward speed."
             ) {
                 straight.bias = it
             }
 
             addFormattedNumericTextField(
-                "Weight Strength", initValue = programWeightStrength,
+                "Weight strength", initValue = programWeightStrength,
                 toolTip = "Size of the sensor-to-turn weights each program uses to approach or avoid cheese and poison."
             ) {
                 programWeightStrength = it
@@ -422,7 +422,7 @@ val braitenbergRLPrograms = newSim { optionString ->
 
             addSeparator()
 
-            addButton("Reset Learning") { resetLearning() }.apply {
+            addButton("Reset learning") { resetLearning() }.apply {
                 toolTipText = "Clear the learned actor and critic weights so the mouse starts learning from scratch."
             }
 
@@ -491,10 +491,10 @@ val braitenbergRLPrograms = newSim { optionString ->
     ## The Setup
 
     Four programs (discrete actions) control a Braitenberg vehicle:
-    - **Seek Cheese, Avoid Poison**: approach cheese, flee poison
-    - **Seek Both Objects**: approach everything
-    - **Avoid Both Objects**: flee everything
-    - **Seek Poison, Avoid Cheese**: approach poison, flee cheese
+    - **Seek cheese, avoid poison**: approach cheese, flee poison
+    - **Seek both objects**: approach everything
+    - **Avoid both objects**: flee everything
+    - **Seek poison, avoid cheese**: approach poison, flee cheese
 
     The agent selects programs using a **softmax policy**. The program activations show the current probability of selecting each program.
 

@@ -28,11 +28,11 @@ class ConvolutionalNeuralNetworkNode(
                 }
             })
             addSeparator()
-            add(createAction("Add Current Data to Training Set") {
+            add(createAction("Add current data to training set") {
                 cnn.trainingSet.inputs.add(cnn.inputTensorLayer.activations.copyOf())
                 cnn.trainingSet.targets.add(cnn.outputArray.activationArray.copyOf())
             })
-            add(createAction("Add Current Data to Testing Set") {
+            add(createAction("Add current data to testing set") {
                 cnn.testingSet.inputs.add(cnn.inputTensorLayer.activations.copyOf())
                 cnn.testingSet.targets.add(cnn.outputArray.activationArray.copyOf())
             })

@@ -38,7 +38,7 @@ val iacJetsSharksFull = newSim {
             at = point(540, 80), columns = 1
         )
         val marital = pool(
-            "Marital Status",
+            "Marital status",
             "Single", "Married", "Divorced",
             at = point(560, 370), columns = 1
         )
@@ -99,7 +99,7 @@ val iacJetsSharksFull = newSim {
         }
         addSidebarInfo(
             iacSidebarText(
-                title = "Classic IAC Jets and Sharks Network",
+                title = "Classic IAC Jets and Sharks network",
                 body = """
                     The network is from McClelland (1981) and models an agent's knowledge of the members of two gangs, the
                     Jets and the Sharks. Each person has a name, a gang, an age, an education level, a marital status, and an

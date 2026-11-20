@@ -35,7 +35,7 @@ sealed class EntityType(
 ): EditableObject {
     object Swiss: EntityType("Swiss", rotating = false, width = 32, height = 32)
     object Gouda : EntityType("Gouda", rotating = false, width = 32, height = 32)
-    object BlueCheese : EntityType("Blue Cheese", imageName = "Bluecheese", rotating = false, width = 32, height = 32)
+    object BlueCheese : EntityType("Blue cheese", imageName = "Bluecheese", rotating = false, width = 32, height = 32)
     object Bell : EntityType("Bell", rotating = false, width = 32, height = 32)
     object Poison : EntityType("Poison", rotating = false, width = 32, height = 32)
     object Candle : EntityType("Candle", rotating = false, width = 32, height = 32)

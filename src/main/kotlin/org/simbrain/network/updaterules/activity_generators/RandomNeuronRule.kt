@@ -15,7 +15,7 @@ import org.simbrain.util.stats.distributions.UniformRealDistribution
 /**
  * Produces random activations within specified parameters.
  */
-@CustomTypeName("Random Activity Generator")
+@CustomTypeName("Random activity generator")
 class RandomNeuronRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>, ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
     /**
      * Noise source.

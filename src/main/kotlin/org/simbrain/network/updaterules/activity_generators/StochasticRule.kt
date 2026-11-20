@@ -12,7 +12,7 @@ import org.simbrain.util.propertyeditor.CustomTypeName
 /**
  * Produces spikes using a user settable probability.
  */
-@CustomTypeName("Stochastic Spike Generator")
+@CustomTypeName("Stochastic spike generator")
 class StochasticRule : SpikingNeuronUpdateRule<SpikingScalarData, SpikingMatrixData>(), ActivityGenerator {
 
     @UserParameter(

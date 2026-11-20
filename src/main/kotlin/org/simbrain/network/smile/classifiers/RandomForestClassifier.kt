@@ -63,7 +63,7 @@ class RandomForestClassifier(
 
     override var model: Classifier<DoubleArray>? = null
 
-    override val name = "Random Forest"
+    override val name = "Random forest"
 
     /**
      * Number of trees in the trained forest, which can differ from [numTrees] if that was edited since training.

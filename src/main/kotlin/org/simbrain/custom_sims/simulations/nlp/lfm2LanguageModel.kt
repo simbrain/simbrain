@@ -27,7 +27,7 @@ class Lfm2LanguageModelOptions : EditableObject {
         order = 1,
     )
 
-    override val name = "LFM2 Language Model"
+    override val name = "LFM2 language model"
 }
 
 /**
@@ -38,7 +38,7 @@ class Lfm2LanguageModelOptions : EditableObject {
  */
 val lfm2LanguageModel = newSim("lfm2_language_model") {
 
-    val options = Lfm2LanguageModelOptions().showAPEOptionDialog("LFM2 Language Model")
+    val options = Lfm2LanguageModelOptions().showAPEOptionDialog("LFM2 language model")
         ?: return@newSim
 
     workspace.clearWorkspace()
@@ -57,7 +57,7 @@ val lfm2LanguageModel = newSim("lfm2_language_model") {
     }
     languageModel.location = point(0, 0)
 
-    val textWorldComponent = addTextWorld("Context Window")
+    val textWorldComponent = addTextWorld("Context window")
     textWorldComponent.world.autoAdvance = false
     textWorldComponent.world.showTokenBoundaries = false
     textWorldComponent.world.text = "Here is a brief two-paragraph parable:"
@@ -69,7 +69,7 @@ val lfm2LanguageModel = newSim("lfm2_language_model") {
         val textWorldDesktopComponent = SimbrainDesktop.getDesktopComponent(textWorldComponent)
         SimbrainDesktop.onboardingManager.showPopup(
             PopupConfig(
-                title = "The Model's Document",
+                title = "The model's document",
                 message = "This document is the model's context window. Press Play on the main " +
                     "toolbar to watch the model read it one token per step, then generate its " +
                     "continuation the same way — the workspace pauses itself when the model " +
@@ -96,7 +96,7 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
         val textWorldWidth = 420
         val textWorldHeight = 380
         val controlPanel = createControlPanel(
-            "Language Model Controls",
+            "Language model controls",
             SIM_WINDOW_GAP,
             SIM_WINDOW_GAP + textWorldHeight + SIM_WINDOW_GAP,
         ) {
@@ -108,7 +108,7 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
             }
 
             addButton("Settings...") {
-                languageModel.createEditorDialog("Language Model Settings").display()
+                languageModel.createEditorDialog("Language model settings").display()
             }.apply {
                 toolTipText = "Change prompt mode, token limit, sampling strategy, and other generation settings."
             }
@@ -207,7 +207,7 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
 
         # Special Tokens
 
-        Neutral text in the `Context Window` can be a special token: a single token with a control meaning rather than ordinary language. LFM2 uses a ChatML-like format in which `<|im_start|>` and `<|im_end|>` mean _start of the message_ and _end of the message_; Liquid AI does not expand `im` further. `Conversation focus` is the default color theme; it fades the harness so the conversation stands out. `Role colors` renders user text blue, assistant text green, system text violet, and tool activity teal.
+        Neutral text in the `Context window` can be a special token: a single token with a control meaning rather than ordinary language. LFM2 uses a ChatML-like format in which `<|im_start|>` and `<|im_end|>` mean _start of the message_ and _end of the message_; Liquid AI does not expand `im` further. `Conversation focus` is the default color theme; it fades the harness so the conversation stands out. `Role colors` renders user text blue, assistant text green, system text violet, and tool activity teal.
 
         - `<|startoftext|>` begins every document. Simbrain adds it automatically if you omit it.
         - `<|im_start|>user` opens a user turn; `<|im_start|>assistant` opens the reply the model is expected to write.

@@ -9,11 +9,11 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.MultilineStringWidget
 import java.awt.BorderLayout
 import java.awt.Font
-import javax.swing.*
+import javax.swing.JPanel
 
 class TextDialog(
     models: List<NetworkTextObject>,
-    titleName: String = if (models.size == 1) "Edit Text" else "Edit ${models.size} Text Objects",
+    titleName: String = if (models.size == 1) "Edit text" else "Edit ${models.size} text objects",
     onCommit: (List<NetworkTextObject>) -> Unit = {}
 ) : StandardDialog() {
     val editor = TextEditorPanel(models)

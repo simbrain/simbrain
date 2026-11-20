@@ -10,12 +10,7 @@ import java.awt.Dimension
 import java.awt.FlowLayout
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
-import javax.swing.BorderFactory
-import javax.swing.JCheckBox
-import javax.swing.JComponent
-import javax.swing.JColorChooser
-import javax.swing.JLabel
-import javax.swing.JPanel
+import javax.swing.*
 
 /**
  * Compact editor for a [ThemeColor]: a light swatch, a dark swatch, and an "auto" checkbox that derives
@@ -44,8 +39,8 @@ class ThemeColorSelector : JPanel(FlowLayout(FlowLayout.LEFT, 4, 0)) {
     private val lightLabel = JLabel("Light")
     private val darkLabel = JLabel("Dark")
 
-    private val lightSwatch = swatch { chooseColor("Choose Light Color", lightColor) { lightColor = it } }
-    private val darkSwatch = swatch { chooseColor("Choose Dark Color", effectiveDark()) { manualDarkColor = it } }
+    private val lightSwatch = swatch { chooseColor("Choose light color", lightColor) { lightColor = it } }
+    private val darkSwatch = swatch { chooseColor("Choose dark color", effectiveDark()) { manualDarkColor = it } }
 
     private val autoCheckBox = JCheckBox("auto").apply {
         toolTipText = "Derive the dark-mode color from the light color"

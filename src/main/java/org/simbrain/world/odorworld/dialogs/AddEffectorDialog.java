@@ -42,7 +42,7 @@ public class AddEffectorDialog extends StandardDialog {
      * @param parent parent window for proper dialog stacking
      */
     public AddEffectorDialog(OdorWorldEntity entity, Window parent) {
-        super(parent, "Add Effector");
+        super(parent, "Add effector");
         this.entity = entity;
         init("Add effector");
     }
@@ -63,7 +63,7 @@ public class AddEffectorDialog extends StandardDialog {
         setTitle(title);
         ShowHelpAction helpAction = new ShowHelpAction("https://docs.simbrain.net/docs/worlds/odorworld.html");
         addButton(new JButton(helpAction));
-        effectorCreatorPanel = new AnnotatedPropertyEditor(AnnotatedPropertyEditorKt.objectWrapper("Add Effector",
+        effectorCreatorPanel = new AnnotatedPropertyEditor(AnnotatedPropertyEditorKt.objectWrapper("Add effector",
                 new StraightMovement()));
         mainPanel.add(effectorCreatorPanel);
         setContentPane(mainPanel);

@@ -48,7 +48,7 @@ class NeuronCollection : Layer, CopyableObject {
 
     @get:Producible(arrayComponentsMethod = "getAttributeComponents")
     @set:Consumable
-    @UserParameter("Activation Array", "Activations", order = 10)
+    @UserParameter("Activation array", "Activations", order = 10)
     override var activationArray: DoubleArray
         get() = neuronList
             .map { it.activation }
@@ -60,7 +60,7 @@ class NeuronCollection : Layer, CopyableObject {
             }
         }
 
-    @UserParameter("Bias Array", "Biases", order = 20)
+    @UserParameter("Bias array", "Biases", order = 20)
     override var biasArray: DoubleArray
         get() = neuronList
             .map { it.bias }
@@ -414,7 +414,7 @@ class NeuronCollection : Layer, CopyableObject {
     val minY: Double get() = neuronList.minY
     val maxY: Double get() = neuronList.maxY
 
-    override val name = "Neuron Collection"
+    override val name = "Neuron collection"
 
     override fun onCommit() {}
 

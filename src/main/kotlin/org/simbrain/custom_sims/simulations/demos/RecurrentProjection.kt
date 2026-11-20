@@ -22,7 +22,7 @@ import org.simbrain.workspace.Workspace
  */
 val recurrentProjection = newSim("recurrent_projection") {
 
-    val numNeurons = showNumericInputDialog("Number of Neurons:", 49)?:return@newSim
+    val numNeurons = showNumericInputDialog("Number of neurons:", 49)?:return@newSim
 
     // Basic setup
     workspace.clearWorkspace()
@@ -92,11 +92,11 @@ val recurrentProjection = newSim("recurrent_projection") {
                - Observe the evolving trajectory in the projection plot.
                - Try this multiple times to explore different outcomes.
             
-            3. Clear Plot
-               - When the trajectory slows down or stabilizes, click `Clear Plot` to reset the display.
+            3. Clear plot
+               - When the trajectory slows down or stabilizes, click `Clear plot` to reset the display.
             
-            4. Randomize Weights
-               - Click `Randomize Weights` to create a new network with fresh, randomized connections.
+            4. Randomize weights
+               - Click `Randomize weights` to create a new network with fresh, randomized connections.
                - This changes the system's dynamics—try again with randomized activations to see what new behavior emerges.
 
             ## Explore further
@@ -144,12 +144,12 @@ suspend fun SimulationScope.setUpRecurrentSim(workspace: Workspace) {
             }.apply {
                 toolTipText = "Set every neuron to a random starting activation."
             }
-            addButton("Randomize Weights") {
+            addButton("Randomize weights") {
                 wts.forEach { it.randomize(UniformRealDistribution(-10.0, 10.0)) }
             }.apply {
                 toolTipText = "Set every recurrent weight to a random value between -10 and 10, changing the network's dynamics."
             }
-            addButton("Clear Plot") {
+            addButton("Clear plot") {
                 (getDesktopComponent(projectionPlot) as ProjectionDesktopComponent).clearData()
             }.apply {
                 toolTipText = "Remove all points from the projection plot."

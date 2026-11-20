@@ -70,7 +70,7 @@ class CnnTrainerConfig : EditableObject {
         description = "Display the average size of the optimizer's per-parameter updates, which helps diagnose training that stalls or diverges.",
         order = 100,
     )
-    override val name = "CNN Trainer Config"
+    override val name = "CNN trainer config"
 }
 
 /**
@@ -86,7 +86,7 @@ sealed class CnnLossFunction(val shortName: String, val description: String) : E
     /** Compute output-layer gradient (dL/d(output)). Written into [grad]. */
     abstract fun outputGrad(actual: DoubleArray, target: DoubleArray, grad: DoubleArray)
 
-    object SSE : CnnLossFunction("SSE", "Sum Squared Error") {
+    object SSE : CnnLossFunction("SSE", "Sum squared error") {
         override fun loss(actual: DoubleArray, target: DoubleArray): Double {
             var sum = 0.0
             for (i in actual.indices) {
@@ -105,7 +105,7 @@ sealed class CnnLossFunction(val shortName: String, val description: String) : E
         override fun toString() = shortName
     }
 
-    object CrossEntropy : CnnLossFunction("Cross Entropy", "Cross Entropy") {
+    object CrossEntropy : CnnLossFunction("Cross entropy", "Cross entropy") {
         override fun loss(actual: DoubleArray, target: DoubleArray): Double {
             val prediction = if (actual.isProbabilityVector()) actual else softmax(actual)
             var sum = 0.0

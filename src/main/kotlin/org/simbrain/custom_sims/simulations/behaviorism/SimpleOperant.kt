@@ -100,9 +100,9 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             }
         }
 
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addButton("Reward Agent") {
+            addButton("Reward agent") {
                 for (n in behaviorNet.neuronList) {
                     if (n.activation > 0) {
                         val p = n.auxValue
@@ -116,7 +116,7 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
                 toolTipText = "Raise the probability of the currently active behavior, then advance one step."
             }
 
-            addButton("Punish Agent") {
+            addButton("Punish agent") {
                 for (n in behaviorNet.neuronList) {
                     if (n.activation > 0) {
                         val p = n.auxValue
@@ -180,8 +180,8 @@ suspend fun SimulationScope.setUpSimpleOperantWorkpace(workspace: Workspace) {
             2. Choose a target behavior you want the agent to learn (e.g., make it always `Wiggle`)
             
             3. Apply reinforcement:
-               - When your target behavior is active (activation = `1.0`), click `Reward Agent`
-               - When other behaviors are active, click `Punish Agent`
+               - When your target behavior is active (activation = `1.0`), click `Reward agent`
+               - When other behaviors are active, click `Punish agent`
                - You can also click `Don't reinforce or punish` to just observe without learning
             
             4. Monitor the probabilities shown in the neuron labels. They should shift toward your target behavior over time.

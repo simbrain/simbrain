@@ -93,7 +93,7 @@ public final class SynapseDialog extends StandardDialog {
      * Private constructor with frame.
      */
     private SynapseDialog(final List<Synapse> synapseList, final Frame parent) {
-        super(parent, "Synapse Dialog");
+        super(parent, "Synapse dialog");
         this.synapseList = synapseList;
         init(synapseList);
     }
@@ -105,8 +105,8 @@ public final class SynapseDialog extends StandardDialog {
         synapseEditingPanel  = new AnnotatedPropertyEditor<>(synapseList);
         initializeLayout();
         updateHelp(synapseList.stream().findFirst().get().getLearningRule());
-        synapseEditingPanel.getWidgetEventsByLabel("Learning Rule").getValueChanged().on(newValue -> {
-            updateHelp((SynapseUpdateRule<?, ?>) synapseEditingPanel.getWidgetValueByLabel("Learning Rule"));
+        synapseEditingPanel.getWidgetEventsByLabel("Learning rule").getValueChanged().on(newValue -> {
+            updateHelp((SynapseUpdateRule<?, ?>) synapseEditingPanel.getWidgetValueByLabel("Learning rule"));
         });
     }
 

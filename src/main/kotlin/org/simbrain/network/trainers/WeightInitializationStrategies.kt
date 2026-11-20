@@ -159,7 +159,7 @@ class LeCun(seed: Long? = null): WeightInitializationStrategy(seed) {
     }
 }
 
-@CustomTypeName("Random Initialization")
+@CustomTypeName("Random initialization")
 class Randomize(seed: Long? = null): WeightInitializationStrategy(seed) {
 
     @UserParameter(

@@ -202,7 +202,7 @@ context(NetworkPanel)
 fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
     val supervisedNetwork = this
     val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
-    return StandardDialog(parentWindow as? JFrame, "Train Network").apply {
+    return StandardDialog(parentWindow as? JFrame, "Train network").apply {
 
         isModal = true
         isAlwaysOnTop = false  // Ensure this is not always on top
@@ -320,7 +320,7 @@ fun SupervisedNetwork.getSupervisedTrainingDialog(): StandardDialog {
 context(NetworkPanel)
 fun getUnsupervisedTrainingPanel(unsupervisedNetwork: UnsupervisedNetwork, trainAction: context(Network)() -> Unit = {}): StandardDialog {
     val parentWindow = SwingUtilities.getWindowAncestor(this@NetworkPanel)
-    return StandardDialog(parentWindow as? JFrame, "Train Network").apply dialog@ {
+    return StandardDialog(parentWindow as? JFrame, "Train network").apply dialog@ {
 
         isModal = true
 

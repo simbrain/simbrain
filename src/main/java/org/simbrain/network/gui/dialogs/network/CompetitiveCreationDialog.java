@@ -29,7 +29,7 @@ public class CompetitiveCreationDialog extends StandardDialog {
 
     public CompetitiveCreationDialog(final NetworkPanel networkPanel) {
         this.networkPanel = networkPanel;
-        setTitle("New Competitive Network");
+        setTitle("New competitive network");
         competitivePanel = new AnnotatedPropertyEditor(cc);
         setContentPane(competitivePanel);
 

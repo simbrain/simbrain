@@ -43,7 +43,7 @@ val cnnDemo = newSim {
     }
 
     val view3dSensor = View3DSensor().apply {
-        label = "3D View"
+        label = "3D view"
         fov = 90.0
         viewDistance = 400.0
         outputWidth = 64

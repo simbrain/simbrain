@@ -167,7 +167,7 @@ class WandPalette : EditableObject {
         newPalette.secondaryIndex = secondaryIndex
     }
 
-    override val name: String get() = "Wand Palette"
+    override val name: String get() = "Wand palette"
 
     companion object {
         /**

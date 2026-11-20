@@ -89,7 +89,7 @@ val SOMSim = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComboBox("Animal", animals.keys.toList(), selectedAnimal,
                 toolTip = "Put an animal's features on the input nodes.") {
                 selectedAnimal = it
@@ -100,9 +100,9 @@ val SOMSim = newSim {
 
             addSeparator()
 
-            addButton("Train All") { train(1) }.toolTipText =
+            addButton("Train all") { train(1) }.toolTipText =
                 "Present all sixteen animals once, in random order (16 training steps)."
-            addButton("Train All ×10") { train(10) }.toolTipText =
+            addButton("Train all ×10") { train(10) }.toolTipText =
                 "Present all sixteen animals in random order, ten times over (160 training steps)."
 
             addSeparator()
@@ -158,26 +158,26 @@ val SOMSim = newSim {
 
         - `Animal`: Put that animal's features on the input nodes.
         - `Test`: Light up the neuron that wins the selected animal, without changing any weights.
-        - `Train All`: Present all sixteen animals once, in random order (`16` training steps).
-        - `Train All ×10`: Present all sixteen animals in random order, ten times over (`160` training steps).
+        - `Train all`: Present all sixteen animals once, in random order (`16` training steps).
+        - `Train all ×10`: Present all sixteen animals in random order, ten times over (`160` training steps).
         - `Reset`: Randomize the weights, restore the initial learning rate and neighborhood size, and clear the
           labels.
 
-        After `Train All`, `Train All ×10`, or `Reset`, the selected animal goes back on the input nodes and its winner
+        After `Train all`, `Train all ×10`, or `Reset`, the selected animal goes back on the input nodes and its winner
         lights up.
 
         # Activities
 
         ## Activity: Train and test the map
 
-        1. The map opens untrained, with random weights and no labels. Press `Train All` once: each animal is
+        1. The map opens untrained, with random weights and no labels. Press `Train all` once: each animal is
            labeled as soon as training presents it, and at this point the animals are scattered or piled onto a
            few neurons in no particular order. Press `Reset` at any time to return to an untrained map.
-        2. Press `Train All` a few more times and watch the labels. While the neighborhood is wide, whole groups of animals
+        2. Press `Train all` a few more times and watch the labels. While the neighborhood is wide, whole groups of animals
            move together.
-        3. Press `Train All ×10`. The birds, the hunters (`Fox`, `Dog`, `Wolf`, `Cat`, `Tiger`, `Lion`), and the
+        3. Press `Train all ×10`. The birds, the hunters (`Fox`, `Dog`, `Wolf`, `Cat`, `Tiger`, `Lion`), and the
            hoofed grazers (`Horse`, `Zebra`, `Cow`) should now occupy separate regions of the map.
-        4. Press `Train All ×10` two or three more times. The regions stay put while similar animals, such as `Tiger`
+        4. Press `Train all ×10` two or three more times. The regions stay put while similar animals, such as `Tiger`
            and `Lion`, often move onto neighboring neurons of their own.
         5. Choose animals from `Animal` and press `Test` to see which neuron wins each one. Compare the features of animals that
            are neighbors on the map, such as `Duck` and `Goose`.
@@ -190,7 +190,7 @@ val SOMSim = newSim {
           neuron's weights appear on the input nodes, showing the feature profile it has learned. Try an unlabeled
           neuron between two regions. Choose an animal from `Animal` to put a real animal back on the inputs.
         - Right-click the SOM network and choose its `Edit` item to change the learning parameters, then press
-          `Reset` so they take effect. With `Initial Neighborhood size` set to `0`, only the winner learns: the
+          `Reset` so they take effect. With `Initial neighborhood size` set to `0`, only the winner learns: the
           animals pile up on a handful of neurons and most of the map is never used.
         - Choose an animal and press `Run` in the main toolbar to train on that animal alone, over and over. The
           neurons around its winner all move toward it, so animals that won nearby neurons may move elsewhere,

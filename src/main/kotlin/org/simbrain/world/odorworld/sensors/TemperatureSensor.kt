@@ -78,10 +78,10 @@ class TemperatureSensor @JvmOverloads constructor(
     }
 
     override val name: String
-        get() = "Temperature Sensor"
+        get() = "Temperature sensor"
 
     override var label = if (super.label.isEmpty()) {
-        "${directionString}Temperature Sensor"
+        "${directionString}temperature sensor".replaceFirstChar { it.uppercase() }
     } else {
         super.label
     }

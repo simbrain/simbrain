@@ -335,7 +335,7 @@ fun Matrix.flatten(): DoubleArray = flattenArray(toArray())
  * matrix as an argument in case the matrix to be rendered changes (example: randomizing a weight matrix create a new matrix).
  */
 @JvmOverloads
-fun Matrix.showHistogram(title: String = "Show Histogram", label: String = ""): (Matrix) -> Unit {
+fun Matrix.showHistogram(title: String = "Show histogram", label: String = ""): (Matrix) -> Unit {
     val histogramPanel = HistogramPanel(HistogramModel())
     histogramPanel.model.resetData(mutableListOf(this.flatten()), mutableListOf(label))
     histogramPanel.displayInDialog().apply { this.title = title }

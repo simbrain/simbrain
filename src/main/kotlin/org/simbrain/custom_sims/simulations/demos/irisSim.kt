@@ -130,13 +130,13 @@ val irisClassifier = newSim {
             exampleNoun = "flower",
             describeData = { "Iris flowers" }
         )
-        val controlPanel = createControlPanel("Iris Classifier", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Iris classifier", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             explorer.addModelControls(this)
             addSeparator()
             explorer.addExampleControls(this, ClassifierExplorer.ExampleStyle.ClassButtons)
         }.awaitLayout()
         explorer.showAccuracy()
-        val plot = createClassifierProjectionPlot(classifierNetwork, "Iris Flowers")
+        val plot = createClassifierProjectionPlot(classifierNetwork, "Iris flowers")
         placeExplorerWindows(controlPanel, plot, networkComponent)
     }
 }

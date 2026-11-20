@@ -25,7 +25,7 @@ val cortexKuramoto = newSim {
 
     // Basic setup
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Cortex Simulation")
+    val networkComponent = addNetworkComponent("Cortex simulation")
     val network = networkComponent.network
 
     // Template for Kuramoto neuron

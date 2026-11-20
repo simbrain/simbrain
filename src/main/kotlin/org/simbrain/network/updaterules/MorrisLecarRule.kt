@@ -22,7 +22,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "Calcium conductance. If higher, voltage pulled more quickly to Ca2+ equilibrium.",
         increment = .1,
         order = 7,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var g_Ca = 4.0
 
@@ -30,11 +30,11 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Potassium channel conductance (micro Siemens/cm^2).
      */
     @UserParameter(
-        label = "K⁺ Conductance (µS/cm²)",
+        label = "K⁺ conductance (µS/cm²)",
         description = "Potassium conductance. If higher, voltage pulled more quickly to K+ equilibrium.",
         increment = .1,
         order = 8,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var g_K = 8.0
 
@@ -43,10 +43,10 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      */
     @UserParameter(
         label = "Leak conductance (µS/cm²)",
-        description = "Leak conductance. If higher, voltage pulled more quickly to Leak equilibrium.",
+        description = "Leak conductance. If higher, voltage pulled more quickly to leak equilibrium.",
         increment = .1,
         order = 9,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var g_L = 2.0
 
@@ -58,7 +58,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "Calcium equilibrium.",
         increment = .1,
         order = 10,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var vRest_Ca = 120.0
 
@@ -66,11 +66,11 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Resting potential potassium (mV).
      */
     @UserParameter(
-        label = "K⁺ Equilibrium (mV)",
+        label = "K⁺ equilibrium (mV)",
         description = "An option to add noise.",
         increment = .1,
         order = 11,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var vRest_k = -80.0
 
@@ -82,7 +82,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "An option to add noise.",
         increment = .1,
         order = 12,
-        tab = "Ion Properties"
+        tab = "Ion properties"
     )
     private var vRest_L = -60.0
 
@@ -95,7 +95,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
                 + "in the cell.",
         increment = .1,
         order = 1,
-        tab = "Membrane Properties"
+        tab = "Membrane properties"
     )
     private var cMembrane = 5.0
 
@@ -107,7 +107,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "How does calcium respond to voltage.",
         increment = .1,
         order = 2,
-        tab = "Membrane Properties"
+        tab = "Membrane properties"
     )
     private var v_m1 = -1.2
 
@@ -119,7 +119,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "How does calcium respond to voltage.",
         increment = .1,
         order = 3,
-        tab = "Membrane Properties"
+        tab = "Membrane properties"
     )
     private var v_m2 = 18.0
 
@@ -127,7 +127,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Potassium channel constant 1.
      */
     @UserParameter(
-        label = "K⁺  Const. 1",
+        label = "K⁺  const. 1",
         description = "V3 on the Scholarpedia page, which roughly corresponds to how potassium current "
                 + "responds to membrane voltage.",
         increment = .1,
@@ -140,7 +140,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
      * Potassium channel constant 2.
      */
     @UserParameter(
-        label = "K⁺  Const. 2",
+        label = "K⁺  const. 2",
         description = "V4 on the Scholarpedia page.",
         increment = .1,
         order = 14,
@@ -168,7 +168,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "A constant level of current that can be set.",
         increment = .1,
         order = 5,
-        tab = "Membrane Properties"
+        tab = "Membrane properties"
     )
     private var i_bg = 46.0
 
@@ -180,7 +180,7 @@ class MorrisLecarRule : SpikingNeuronUpdateRule<MorrisLecarData, SpikingMatrixDa
         description = "Voltages above this make the neuron spike",
         increment = .1,
         order = 4,
-        tab = "Membrane Properties"
+        tab = "Membrane properties"
     )
     private var threshold = 40.0
 

@@ -15,11 +15,8 @@ import org.simbrain.workspace.updater.PerformanceMonitor
 import java.awt.BorderLayout
 import java.awt.Font
 import java.awt.event.HierarchyEvent
-import java.util.TreeMap
-import javax.swing.BoxLayout
-import javax.swing.JList
-import javax.swing.JPanel
-import javax.swing.JScrollPane
+import java.util.*
+import javax.swing.*
 import javax.swing.Timer
 import kotlin.math.max
 import kotlin.math.min
@@ -54,7 +51,7 @@ class PerformanceMonitorPanel(private val workspace: Workspace) : JPanel(BorderL
     init {
         val contentPanel = JPanel()
         contentPanel.layout = BoxLayout(contentPanel, BoxLayout.X_AXIS)
-        contentPanel.add(JScrollPane(timersList).apply { border = Theme.sectionBorder("Update Actions") })
+        contentPanel.add(JScrollPane(timersList).apply { border = Theme.sectionBorder("Update actions") })
         contentPanel.add(JScrollPane(threadsList).apply { border = Theme.sectionBorder("Threads") })
         add(contentPanel, BorderLayout.CENTER)
 

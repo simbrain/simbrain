@@ -19,7 +19,7 @@ fun createExtractEmbeddingAction(block: (TokenEmbedding) -> Unit) = createAction
     val options = ExtractEmbeddingOptions()
     val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
     val dialog = StandardDialog(editor).apply {
-        title = "Generate Token Embedding From Document"
+        title = "Generate token embedding from document"
         
         // Add validation to prevent dialog from closing if validation fails
         setClosingCheck {
@@ -59,14 +59,14 @@ val TextWorld.extractEmbeddingFromCurrentText
         iconPath = "menu_icons/Extract.png"
     ) {
         if (text.isEmpty()) {
-            showMessage("No text in text world. Please load or enter some text first.", MessageKind.WARNING)
+            showMessage("No text in Text World. Please load or enter some text first.", MessageKind.WARNING)
             return@createAction
         }
         
         val options = ExtractEmbeddingOptions(showDocumentPath = false)
         val editor = org.simbrain.util.propertyeditor.AnnotatedPropertyEditor(listOf(options))
         val dialog = StandardDialog(editor).apply {
-            title = "Generate Token Embedding From Current Text"
+            title = "Generate token embedding from current text"
             
             addCommitTask {
                 editor.commitChanges()
@@ -106,7 +106,7 @@ val TextWorldDesktopComponent.loadTextAction
     }
 
 fun TextWorldDesktopComponent.createShowFindAndReplaceAction() = createAction(
-    name = "Find / Replace...",
+    name = "Find / replace...",
     keyboardShortcut = CmdOrCtrl + 'F'
 ) {
     panel.textArea.showFindReplaceDialog()
@@ -128,7 +128,7 @@ val TextWorld.textWorldPrefs
         createEditorDialog {
             events.preferencesChanged.fire()
         }.also {
-            it.title = "Text World Preferences"
+            it.title = "Text World preferences"
         }.display()
     }
 

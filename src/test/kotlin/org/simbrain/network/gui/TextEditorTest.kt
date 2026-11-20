@@ -4,8 +4,8 @@ package org.simbrain.network.gui
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.core.NetworkTextObject
-import org.simbrain.network.gui.dialogs.text.TextEditorPanel
 import org.simbrain.network.gui.dialogs.text.TextDialog
+import org.simbrain.network.gui.dialogs.text.TextEditorPanel
 import org.simbrain.util.propertyeditor.FontWidget
 import java.awt.Font
 import javax.swing.SwingUtilities
@@ -15,7 +15,7 @@ class TextEditorTest {
     fun `creation dialog commits text and font before callback and cancel creates nothing`() = SwingUtilities.invokeAndWait {
         val draft = NetworkTextObject()
         val created = mutableListOf<NetworkTextObject>()
-        val dialog = TextDialog(listOf(draft), titleName = "Add Text") { created.addAll(it) }
+        val dialog = TextDialog(listOf(draft), titleName = "Add text") { created.addAll(it) }
         try {
             dialog.editor.textArea.text = "created\ntext"
             val font = dialog.editor.propertyEditor.propertyNameWidgetMap["font"] as FontWidget
@@ -28,7 +28,7 @@ class TextEditorTest {
             assertEquals(24, created.single().fontSize)
         } finally { dialog.dispose() }
         val cancelledDraft = NetworkTextObject()
-        val cancelled = TextDialog(listOf(cancelledDraft), titleName = "Add Text") { created.addAll(it) }
+        val cancelled = TextDialog(listOf(cancelledDraft), titleName = "Add text") { created.addAll(it) }
         try {
             cancelled.editor.textArea.text = "cancelled"
             cancelled.cancelButton.doClick()

@@ -16,7 +16,7 @@ class Hearing(
     phrase: String = "Hi!",
 
     @UserParameter(
-        label = "Output Amount",
+        label = "Output amount",
         description = "The amount of activation to be sent to a neuron coupled with this sensor.",
         order = 20
     )
@@ -37,7 +37,7 @@ class Hearing(
         }
 
     @UserParameter(
-        label = "Linger Time",
+        label = "Linger time",
         description = "Anything heard will remain `heard` for this many iterations. " +
                 "Allows the agent to process a signal before it disappears.",
         order = 30
@@ -48,7 +48,7 @@ class Hearing(
      * Maximum characters per row before warping around in a HearingNode.
      */
     @UserParameter(
-        label = "Characters per Row",
+        label = "Characters per row",
         description = ("The maximum number of characters that can be displayed in one row in the hearing bubble. "
                 + "This setting only affects visual representation."),
         order = 50
@@ -104,7 +104,7 @@ class Hearing(
         }
 
 
-    override val name = "Hearing Sensor"
+    override val name = "Hearing sensor"
 
     override fun copy(): Hearing {
         return Hearing(phrase, outputAmount).also {

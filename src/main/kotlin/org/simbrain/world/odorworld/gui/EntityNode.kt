@@ -20,11 +20,7 @@ import org.simbrain.network.gui.nodes.NodeHandle
 import org.simbrain.util.Theme
 import org.simbrain.util.distanceTo
 import org.simbrain.util.minus
-import org.simbrain.util.piccolo.NodeSync
-import org.simbrain.util.piccolo.PixelExactImagePainter
-import org.simbrain.util.piccolo.PixelExactSpriteCache
-import org.simbrain.util.piccolo.ScopedNode
-import org.simbrain.util.piccolo.nodeScopeIn
+import org.simbrain.util.piccolo.*
 import org.simbrain.util.toRadian
 import org.simbrain.workspace.couplings.getProducer
 import org.simbrain.workspace.gui.CouplingMenu
@@ -551,9 +547,9 @@ class EntityNode(
         addSeparator()
         add(
             SimbrainDesktop.actionManager.createCoupledDataWorldAction(
-            name = "Record Locations",
+            name = "Record locations",
             entity.getProducer(OdorWorldEntity::locationArray),
-            sourceName = "${entity.id ?: "Entity"} Location",
+            sourceName = "${entity.id ?: "Entity"} location",
             numCols = 2
         ))
         add(SimbrainDesktop.actionManager.createFirstPersonViewAction(entity))

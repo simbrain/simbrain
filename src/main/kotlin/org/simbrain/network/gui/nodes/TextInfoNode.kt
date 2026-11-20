@@ -64,7 +64,7 @@ private fun createInfoTextEditor(infoText: InfoText): StandardDialog {
     
     // Create dialog
     val dialog = StandardDialog(panel).apply {
-        title = "Info Text Settings"
+        title = "Info text settings"
     }
     
     // Add commit task to save changes
@@ -74,7 +74,7 @@ private fun createInfoTextEditor(infoText: InfoText): StandardDialog {
             infoText.spacing = spacingField.text.toDouble()
         } catch (e: NumberFormatException) {
             // Show error message if spacing is not a valid number
-            showMessage("Please enter a valid number for spacing.", MessageKind.ERROR, title = "Invalid Input")
+            showMessage("Please enter a valid number for spacing.", MessageKind.ERROR, title = "Invalid input")
         }
     }
     

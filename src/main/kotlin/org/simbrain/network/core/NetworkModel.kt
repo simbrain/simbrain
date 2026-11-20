@@ -30,7 +30,7 @@ abstract class NetworkModel {
             events.labelChanged.fire(oldLabel, this.label)
         }
 
-    @UserParameter(label = "Update Priority", order = 20)
+    @UserParameter(label = "Update priority", order = 20)
     var priority: Int = 0
 
     /**
@@ -116,7 +116,7 @@ abstract class NetworkModel {
 
     val displayName: String get() =
         if (label.isNullOrEmpty()) {
-            id ?: "Uninitialized Network Model"
+            id ?: "Uninitialized network model"
         } else {
             label!!
         }

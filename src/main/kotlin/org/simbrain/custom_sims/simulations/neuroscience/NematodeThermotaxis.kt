@@ -48,23 +48,23 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
     workspace.clearWorkspace()
     exposeTypes(AfdThermoreceptorRule::class)
 
-    val networkComponent = addNetworkComponent("Thermotaxis Circuit")
+    val networkComponent = addNetworkComponent("Thermotaxis circuit")
     val network = networkComponent.network
     val circuit = ThermotaxisNativeCircuit.build(network)
 
-    circuit.afd.apply { label = "AFD (Temperature)"; location = point(190.0, 400.0) }
+    circuit.afd.apply { label = "AFD (temperature)"; location = point(190.0, 400.0) }
     circuit.aib.location = point(290.0, 320.0)
     circuit.aiy.location = point(90.0, 320.0)
     circuit.aiz.location = point(190.0, 230.0)
-    circuit.dmn.apply { label = "DMN (Output)"; location = point(280.0, 135.0) }
-    circuit.vmn.apply { label = "VMN (Output)"; location = point(100.0, 135.0) }
+    circuit.dmn.apply { label = "DMN (output)"; location = point(280.0, 135.0) }
+    circuit.vmn.apply { label = "VMN (output)"; location = point(100.0, 135.0) }
     circuit.cpg.location = point(190.0, 45.0)
     circuit.synapses.values.forEach {
         it.lowerBound = -15.0
         it.upperBound = 15.0
     }
 
-    val worldComponent = addOdorWorldComponent("Thermal Plate")
+    val worldComponent = addOdorWorldComponent("Thermal plate")
     val world = worldComponent.world.apply {
         wrapAround = false
         isObjectsBlockMovement = false
@@ -222,7 +222,7 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
             ensembleFrame?.isSelected = true
         }
 
-        val controlPanel = createControlPanel("Thermotaxis Controls", 10, 10) {
+        val controlPanel = createControlPanel("Thermotaxis controls", 10, 10) {
             addButton("Reset up") { resetSimulation() }.apply {
                 toolTipText = "Reset the circuit and return the worm to the center of the plate, facing up."
             }
@@ -275,7 +275,7 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
             }
             addButton("Run population simulation") {
                 val validationButton = this
-                val options = ThermotaxisPopulationSimulationOptions().showAPEOptionDialog("Population Simulation Options") ?: return@addButton
+                val options = ThermotaxisPopulationSimulationOptions().showAPEOptionDialog("Population simulation options") ?: return@addButton
                 val trajectories = options.worms
                 val seconds = options.seconds
                 val cancelRequested = AtomicBoolean(false)
@@ -397,10 +397,10 @@ val nematodeThermotaxis = newSim("nematode_thermotaxis") { optionString ->
 
         ## Circuit Guide
 
-        - **AFD (Temperature)** is the thermosensory neuron. It responds to *change* in temperature rather than its absolute value: its measured response function is convolved over the previous 100 seconds and is biphasic, so a steady temperature leaves AFD near rest while warming drives it positive and cooling drives it negative.
+        - **AFD (temperature)** is the thermosensory neuron. It responds to *change* in temperature rather than its absolute value: its measured response function is convolved over the previous 100 seconds and is biphasic, so a steady temperature leaves AFD near rest while warming drives it positive and cooling drives it negative.
         - **AIB, AIY, and AIZ** are interneurons that relay and transform the AFD signal within the steering circuit. The AFD–AIY link is chemical, and all three track AFD closely: the paper reports correlations of 0.99, 0.98, and 0.99 between AFD and each of them.
         - **CPG** is a central pattern generator: an oscillatory input that supplies opposite rhythmic drive to the motor neurons, producing small dorsal–ventral wiggles that sample the temperature gradient.
-        - **DMN (Output)** and **VMN (Output)** are abbreviations for larger, highly correlated dorsal and ventral neck motor-neuron groups, as discussed in the PNAS study. Their activity difference determines instantaneous path curvature.
+        - **DMN (output)** and **VMN (output)** are abbreviations for larger, highly correlated dorsal and ventral neck motor-neuron groups, as discussed in the PNAS study. Their activity difference determines instantaneous path curvature.
 
         The AFD–AIB electrical gap junction is a real bidirectional Simbrain gap junction, drawn as a line with a paired-bars channel glyph at its midpoint. It has a single conductance and no direction: it passes `conductance × (V other − V this)` into both endpoints simultaneously, computed from the neurons' internal membrane states.
 

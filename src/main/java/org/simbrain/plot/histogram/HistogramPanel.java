@@ -118,7 +118,7 @@ public class HistogramPanel extends JPanel {
     /**
      * Number of bins label.
      */
-    private final JLabel numBinLabel = new JLabel("# of Bins: ");
+    private final JLabel numBinLabel = new JLabel("# of bins: ");
 
     /**
      * A text field for specifying the number of bins.

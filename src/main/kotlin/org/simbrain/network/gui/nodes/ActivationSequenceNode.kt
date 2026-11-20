@@ -283,7 +283,7 @@ class ActivationSequenceNode(networkPanel: NetworkPanel, val activationSequence:
 
             contextMenu.add(randomizeAction)
             val randomizeBiasesAction = networkPanel.createAction(
-                name = "Randomize Biases",
+                name = "Randomize biases",
                 description = "Randomize the biases of this neuron array",
                 iconPath = "menu_icons/Rand.png"
             ) {

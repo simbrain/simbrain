@@ -17,7 +17,7 @@ import kotlin.math.sin
 /**
  * **SinusoidalNeuron** produces a sine wave.
  */
-@CustomTypeName("Sinusoidal Activity Generator")
+@CustomTypeName("Sinusoidal activity generator")
 class SinusoidalRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), ActivityGenerator, ClippedUpdateRule, NoisyUpdateRule {
     /**
      * Phase.

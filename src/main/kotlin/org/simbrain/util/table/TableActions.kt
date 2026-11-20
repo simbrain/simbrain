@@ -66,8 +66,8 @@ val SimbrainJTable.randomizeColumnAction
 
 val SimbrainJTable.zeroFillAction
     get() = createAction(
-        name = "Zero Fill",
-        description = "Zero Fill selected cells",
+        name = "Zero fill",
+        description = "Zero fill selected cells",
         iconPath = "menu_icons/Fill_0.png",
         keyboardShortcut = 'Z',
         initBlock = {
@@ -107,7 +107,7 @@ val SimbrainJTable.editRandomizerAction
         description = "Edit table wide randomizer",
         iconPath = "menu_icons/Tools.png"
     ) {
-        objectWrapper("Table Randomizer", model.cellRandomizer).createEditorDialog {
+        objectWrapper("Table randomizer", model.cellRandomizer).createEditorDialog {
             model.cellRandomizer = it.editingObject
         }.display()
     }
@@ -175,7 +175,7 @@ val SimbrainJTable.setRowsColumnsAction
             val result = JOptionPane.showConfirmDialog(
                 this@createAction,
                 panel,
-                "Set Table Dimensions",
+                "Set table dimensions",
                 JOptionPane.OK_CANCEL_OPTION,
                 JOptionPane.QUESTION_MESSAGE
             )
@@ -187,11 +187,11 @@ val SimbrainJTable.setRowsColumnsAction
                     if (newRows > 0 && newCols > 0) {
                         Pair(newRows, newCols)
                     } else {
-                        showMessage("Rows and columns must be positive integers", MessageKind.ERROR, title = "Invalid Input")
+                        showMessage("Rows and columns must be positive integers", MessageKind.ERROR, title = "Invalid input")
                         null
                     }
                 } catch (e: NumberFormatException) {
-                    showMessage("Please enter valid integer values", MessageKind.ERROR, title = "Invalid Input")
+                    showMessage("Please enter valid integer values", MessageKind.ERROR, title = "Invalid input")
                     null
                 }
             } else null
@@ -274,7 +274,7 @@ val SimbrainJTable.showBoxPlotAction
 // Maybe be possible to adapt that code to a more generic context
 val SimbrainJTable.showScatterPlotAction
     get() = createAction(
-        name = "Scatter Plots",
+        name = "Scatter plots",
         description = "Show all pairwise scatter plots across columns",
         iconPath = "menu_icons/ScatterIcon.png"
     ) {
@@ -289,7 +289,7 @@ val SimbrainJTable.showScatterPlotAction
     }
 
 fun SimbrainJTable.createShowEigenValuesAction() = createAction(
-    name = "Show Eigenvalues",
+    name = "Show eigenvalues",
     description = "Show the eigenvalues of the matrix",
     iconPath = "menu_icons/lambda.png",
     initBlock = {
@@ -516,7 +516,7 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         plot.properties.createEditorDialog {
             plot.repaint()
         }.also {
-            it.title = "Text World Preferences"
+            it.title = "Text World preferences"
         }.display()
     })
 

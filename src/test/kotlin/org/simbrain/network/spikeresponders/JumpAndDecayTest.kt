@@ -188,8 +188,8 @@ class JumpAndDecayTest {
     @Test
     fun `jump and decay description and name`() {
         val jd = JumpAndDecay()
-        assertEquals("Jump and Decay", jd.description)
-        assertEquals("Jump and Decay", jd.name)
+        assertEquals("Jump and decay", jd.description)
+        assertEquals("Jump and decay", jd.name)
     }
 
     @Test

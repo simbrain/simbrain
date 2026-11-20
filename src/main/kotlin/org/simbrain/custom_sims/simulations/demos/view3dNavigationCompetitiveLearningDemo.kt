@@ -19,12 +19,12 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
     val view3dSensor = scene.view3dSensor
     val inputSize = view3dSensor.outputWidth * view3dSensor.outputHeight
 
-    val prototypeComponent = addImageWorld("Winner Prototype")
+    val prototypeComponent = addImageWorld("Winner prototype")
     val prototypeWorld = prototypeComponent.world.apply {
         resetImageAlbum(view3dSensor.outputWidth, view3dSensor.outputHeight)
     }
 
-    val networkComponent = addNetworkComponent("Competitive Feature Network")
+    val networkComponent = addNetworkComponent("Competitive feature network")
     val network = networkComponent.network
     val competitive = CompetitiveNetwork(inputSize, 8)
     network.addNetworkModelAsync(competitive)
@@ -71,32 +71,32 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
         place(prototypeComponent, 425, 0, 320, 420)
         place(networkComponent, 0, 425, 745, 340)
 
-        createControlPanel("Competitive Controls", 750, 0) {
+        createControlPanel("Competitive controls", 750, 0) {
             winnerLabelRef = addLabel(winnerLabelText)
 
-            addComboBox("Input Mode", listOf("Raw", "Edge"), inputMode) { selected ->
+            addComboBox("Input mode", listOf("Raw", "Edge"), inputMode) { selected ->
                 inputMode = selected
             }
-            addFormattedNumericTextField("Learning Rate", initValue = learningRate) { value ->
+            addFormattedNumericTextField("Learning rate", initValue = learningRate) { value ->
                 learningRate = value
                 if (learningEnabled) {
                     competitive.learningRate = learningRate
                 }
             }
-            addCheckBox("Learning Enabled", learningEnabled) { enabled ->
+            addCheckBox("Learning enabled", learningEnabled) { enabled ->
                 learningEnabled = enabled
                 competitive.learningRate = if (enabled) learningRate else 0.0
             }
-            addCheckBox("Normalize Inputs", competitive.normalizeInputs) { checked ->
+            addCheckBox("Normalize inputs", competitive.normalizeInputs) { checked ->
                 competitive.normalizeInputs = checked
             }
-            addCheckBox("Use Leaky Learning", competitive.useLeakyLearning) { checked ->
+            addCheckBox("Use leaky learning", competitive.useLeakyLearning) { checked ->
                 competitive.useLeakyLearning = checked
             }
-            addFormattedNumericTextField("Leaky Rate", initValue = competitive.leakyLearningRate) { value ->
+            addFormattedNumericTextField("Leaky rate", initValue = competitive.leakyLearningRate) { value ->
                 competitive.leakyLearningRate = value
             }
-            addButton("Randomize Weights") {
+            addButton("Randomize weights") {
                 competitive.randomize()
             }
         }
@@ -117,8 +117,8 @@ val view3dNavigationCompetitiveLearningDemo = newSim {
         ## Activity: Watch features self-organize
 
         1. Move the agent to sample different viewpoints and landmarks.
-        2. Watch `Winner` and the `Winner Prototype` image update over time.
-        3. Switch `Input Mode` between `Raw` and `Edge`.
+        2. Watch `Winner` and the `Winner prototype` image update over time.
+        3. Switch `Input mode` between `Raw` and `Edge`.
         4. Adjust learning settings (learning rate, normalization, leaky learning).
         """.trimIndent()
     )

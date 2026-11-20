@@ -16,7 +16,7 @@ import org.simbrain.workspace.Workspace
 
 val twoNeuronDynamics = newSim("two-neuron-dynamics") {
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Two-Neuron Network")
+    val networkComponent = addNetworkComponent("Two-neuron network")
     val neurons = networkComponent.network.addTwoNeuronDynamicsNetwork()
     val plotModel = TimeSeriesModel().apply {
         isAutoRange = false
@@ -29,7 +29,7 @@ val twoNeuronDynamics = newSim("two-neuron-dynamics") {
         recurrenceEmbeddingDimension = 3
         recurrenceEmbeddingDelay = 1
     }
-    val timeSeries = TimeSeriesPlotComponent("Two-Neuron Dynamics", plotModel).apply {
+    val timeSeries = TimeSeriesPlotComponent("Two-neuron dynamics", plotModel).apply {
         addTimeSeries("Neuron 1")
         addTimeSeries("Neuron 2")
     }
@@ -163,7 +163,7 @@ private suspend fun SimulationScope.setupTwoNeuronControls(workspace: Workspace)
     val firstNeuron = neurons.neuronList[0]
     val secondNeuron = neurons.neuronList[1]
     withGui {
-        val controlPanel = createControlPanel("Two-Neuron Presets", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Two-neuron presets", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             val gainField = addTextField(
                 "Feedback gain", (requireNotNull(getSynapse(firstNeuron, firstNeuron)).strength / 4.43).toString(),
                 toolTip = "Scale the base weight pattern by a gain from 0 to 1.3; click Apply gain."

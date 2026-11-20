@@ -182,15 +182,15 @@ class WorkspaceActions {
         name = "Network preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(NetworkPreferences, "Network Preferences").display()
+        getPreferenceDialog(NetworkPreferences, "Network preferences").display()
     }
 
     val showOdorWorldPreferencesAction = desktopPane.createAction(
         iconPath = "menu_icons/Prefs.png",
-        name = "Odor world preferences...",
+        name = "Odor World preferences...",
         description = "Set default properties that apply to all odor worlds in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(OdorWorldPreferences, "Odor World Preferences").display()
+        getPreferenceDialog(OdorWorldPreferences, "Odor World preferences").display()
     }
 
     val showPlotPreferencesAction = desktopPane.createAction(
@@ -198,7 +198,7 @@ class WorkspaceActions {
         name = "Plot preferences...",
         description = "Set default properties that apply to all plots in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(PlotPreferences, "Plot Preferences").display()
+        getPreferenceDialog(PlotPreferences, "Plot preferences").display()
     }
 
     val showWorkspacePreferencesAction = createAction(
@@ -206,7 +206,7 @@ class WorkspaceActions {
         name = "Workspace preferences...",
         description = "Set default properties that apply to all networks in the Simbrain workspace.",
     ) {
-        getPreferenceDialog(WorkspacePreferences, "Workspace Preferences").display()
+        getPreferenceDialog(WorkspacePreferences, "Workspace preferences").display()
     }
 
     val showUpdaterDialog = desktopPane.createAction(
@@ -238,7 +238,7 @@ class WorkspaceActions {
         name = "Show component bounds...",
         description = "Show locations and sizes of all workspace components"
     ) {
-        showText(SimbrainDesktop.getComponentBoundsString(), "Component Bounds")
+        showText(SimbrainDesktop.getComponentBoundsString(), "Component bounds")
     }
 
     val runControlActions = listOf(runAction, stopAction)
@@ -272,11 +272,11 @@ class WorkspaceActions {
         createComponentFactoryAction("Time series", "menu_icons/TimeSeries.png")
     )
     val newWorldActions = listOf(
-        createComponentFactoryAction("Data world", "menu_icons/TableBold.png"),
-        createComponentFactoryAction("Odor world", "menu_icons/mouse_icon.png"),
-        createComponentFactoryAction("Image world", "menu_icons/camera.png"),
-        createComponentFactoryAction("Text world", "menu_icons/Text.png"),
-        //createComponentFactoryAction("Sound world", "menu_icons/speaker.png")
+        createComponentFactoryAction("Data World", "menu_icons/TableBold.png"),
+        createComponentFactoryAction("Odor World", "menu_icons/mouse_icon.png"),
+        createComponentFactoryAction("Image World", "menu_icons/camera.png"),
+        createComponentFactoryAction("Text World", "menu_icons/Text.png"),
+        //createComponentFactoryAction("Sound World", "menu_icons/speaker.png")
     )
 
     fun <T: WorkspaceComponent> createImportAction(desktopComponent: DesktopComponent<T>) = desktopComponent.createAction(
@@ -512,7 +512,7 @@ class WorkspaceActions {
      * number of units.
      */
     @JvmOverloads
-    fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Add image world", postActionBlock:
+    fun createImageInput(consumer: Consumer, numUnits: Int, menuTitle: String = "Add Image World", postActionBlock:
         suspend (ImageWorldComponent) -> Unit = {}) = desktopPane.createAction(
         name = menuTitle,
         iconPath = "menu_icons/photo.png",

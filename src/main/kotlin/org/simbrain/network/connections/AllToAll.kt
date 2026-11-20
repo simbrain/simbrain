@@ -36,7 +36,7 @@ class AllToAll @JvmOverloads constructor(
 
 ) : ConnectionStrategy(seed) {
 
-    override val name: String = "All to All"
+    override val name: String = "All to all"
 
     override fun toString(): String {
         return name

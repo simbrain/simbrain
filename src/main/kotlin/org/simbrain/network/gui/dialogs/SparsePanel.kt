@@ -135,7 +135,7 @@ class SparsePanel(
         densityTf.preferredSize = sSize
         sparseTextPanel.add(densityTf)
         val equalizerPanel = JPanel(FlowLayout())
-        equalizerPanel.add(JLabel("Equalize Efferents:"))
+        equalizerPanel.add(JLabel("Equalize efferents:"))
         equalizerPanel.add(equalizeEfferentsChkBx)
         sSize = synsPerSource.preferredSize
         sSize.width = 80
@@ -143,7 +143,7 @@ class SparsePanel(
         equalizerPanel.add(synsPerSource)
         synsPerSource.isVisible = numTargs > 0
         allowSelfConnectPanel = JPanel(FlowLayout())
-        allowSelfConnectPanel.add(JLabel("Self Connections: "))
+        allowSelfConnectPanel.add(JLabel("Self connections: "))
         allowSelfConnectPanel.add(allowSelfConnectChkBx)
 
         // Begin laying out components

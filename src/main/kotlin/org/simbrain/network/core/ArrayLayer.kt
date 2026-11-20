@@ -13,7 +13,7 @@ abstract class ArrayLayer(
 ) : Layer() {
 
     @UserParameter(
-        label = "Increment Amount",
+        label = "Increment amount",
         description = "Amount to increment components when pressing up and down arrows",
         increment = .1,
         order = 20)

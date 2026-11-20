@@ -5,9 +5,9 @@
  */
 package org.simbrain.world.imageworld
 
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Test
-import kotlinx.coroutines.runBlocking
 import org.simbrain.util.genericframe.GenericJInternalFrame
 import org.simbrain.workspace.Workspace
 import javax.swing.SwingUtilities
@@ -18,14 +18,14 @@ class ImagePipelineCollectionGuiTest {
     fun `building the gui leaves a non default pipeline current`() {
         repeat(10) { attempt ->
             val workspace = Workspace()
-            val component = ImageWorldComponent("Image world")
+            val component = ImageWorldComponent("Image World")
             workspace.addWorkspaceComponent(component)
             val pipelines = component.world.imagePipelineCollection
             val target = pipelines.pipelines[3]
             runBlocking { pipelines.setCurrentPipeline(target) }
 
             SwingUtilities.invokeAndWait {
-                val frame = GenericJInternalFrame("Image world", true, true, true, true)
+                val frame = GenericJInternalFrame("Image World", true, true, true, true)
                 frame.contentPane.add(workspace.componentFactory.createGuiComponent(frame, component))
             }
 

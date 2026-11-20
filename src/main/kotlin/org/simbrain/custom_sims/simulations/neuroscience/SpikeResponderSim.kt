@@ -45,7 +45,7 @@ val spikeResponderSim = newSim {
     }
 
     val jumpAndDecay = network.addNeuron {
-        label = "Jump and Decay"
+        label = "Jump and decay"
         location = point(290, 60)
     }
     network.addSynapseAsync(spiking, jumpAndDecay).apply {
@@ -77,7 +77,7 @@ val spikeResponderSim = newSim {
     }
 
     val (spikePlot, izhikevichSeries) = addTimeSeries("Spikes", seriesNames = listOf("Izhikevich"))
-    val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries, stpSeries) = addTimeSeries("Spike Responders", seriesNames = listOf("Step", "Jump and Decay", "Rise and Decay", "Short Term Plasticity"))
+    val (spikeResponderPlot, stepSeries, jumpSeries, riseSeries, stpSeries) = addTimeSeries("Spike responders", seriesNames = listOf("Step", "Jump and decay", "Rise and decay", "Short term plasticity"))
 
     withGui {
         placeComponent(spikePlot, SIM_WINDOW_GAP + 400 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 400, 400)
@@ -104,12 +104,12 @@ val spikeResponderSim = newSim {
 
         - `Clamped Input`: A user-controlled input neuron, which you adjust with arrow keys.
         - `Izhikevich Neuron`: A biologically inspired spiking model that drives the system.
-        - Four [`Spike Responders`](https://docs.simbrain.net/docs/network/spikeresponders/): Each connection uses a different spike responder to shape the signal.
+        - Four [`Spike responders`](https://docs.simbrain.net/docs/network/spikeresponders/): Each connection uses a different spike responder to shape the signal.
             1. [Step](https://docs.simbrain.net/docs/network/spikeresponders/step.html): Fixed response for a set duration.
             2. [Jump and Decay](https://docs.simbrain.net/docs/network/spikeresponders/jumpdecay.html): Instant rise with exponential decay.
             3. [Rise and Decay](https://docs.simbrain.net/docs/network/spikeresponders/riseAndDecay.html): Gradual rise and fall, mimicking slower chemical transmission.
             4. [Short-Term Plasticity](https://docs.simbrain.net/docs/network/spikeresponders/shortTermPlasticity.html): History-dependent responses that adapt over time.
-        - `Spike Responders Plot`: A time series that visualizes each downstream neuron's post-synaptic response to spikes
+        - `Spike responders` plot: A time series that visualizes each downstream neuron's post-synaptic response to spikes
 
         Spike responders convert spikes into post-synaptic signals, modeling how neurons influence one another across synapses. Simbrain includes several types, each representing 
         a different kind of [synaptic dynamic](https://www.sciencedirect.com/topics/computer-science/synaptic-dynamic).
@@ -134,7 +134,7 @@ val spikeResponderSim = newSim {
         1. Click `Run` to start the simulation. 
         2. Select the `Input neuron` and use the up/down arrow keys to change its activation. 
         3. Watch the `Izhikevich neuron` fire in response.
-        4. Observe each downstream neuron's unique post-synaptic response in the Spike Responders plot.
+        4. Observe each downstream neuron's unique post-synaptic response in the Spike responders plot.
         
         ## Activity 2: Explore other spiking neuron models
         

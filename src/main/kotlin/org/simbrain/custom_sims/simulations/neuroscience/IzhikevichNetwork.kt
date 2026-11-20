@@ -16,12 +16,7 @@ import org.simbrain.network.layouts.GridLayout
 import org.simbrain.util.place
 import org.simbrain.util.point
 import org.simbrain.workspace.AttributeContainer
-import kotlin.math.ceil
-import kotlin.math.floor
-import kotlin.math.log10
-import kotlin.math.pow
-import kotlin.math.roundToLong
-import kotlin.math.sqrt
+import kotlin.math.*
 import kotlin.random.Random
 import kotlin.reflect.KProperty0
 
@@ -39,7 +34,7 @@ fun izhikevichNetworkSim(
     p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
     weightScale: Double = 1.0,
     seed: Long? = null
-) = izhikevichSim("Izhikevich Network", arrays = false, n, p) { network ->
+) = izhikevichSim("Izhikevich network", arrays = false, n, p) { network ->
     val rng = seed?.let { Random(it) } ?: Random.Default
     val neurons = izhikevichNeurons(n, rng)
     GridLayout(IZHIKEVICH_GRID_SPACING, IZHIKEVICH_GRID_SPACING, gridColumns(n)).layoutNeurons(neurons)
@@ -65,7 +60,7 @@ fun izhikevichNetworkArraySim(
     p: Double = IZHIKEVICH_CONNECTION_PROBABILITY,
     weightScale: Double = 1.0,
     seed: Long? = null
-) = izhikevichSim("Izhikevich Network (Array)", arrays = true, n, p) { network ->
+) = izhikevichSim("Izhikevich network (array)", arrays = true, n, p) { network ->
     val (array, weights) = izhikevichArray(n, p, seed?.let { Random(it) } ?: Random.Default, weightScale)
     array.location = point(0, 0)
     network.addNetworkModels(array, weights, usePlacementManager = false)

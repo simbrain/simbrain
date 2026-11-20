@@ -85,7 +85,7 @@ public class WorkspaceChangedDialog extends JDialog {
         layout.putConstraint(SpringLayout.NORTH, browsePanel, 5, SpringLayout.SOUTH, textPanel);
         layout.putConstraint(SpringLayout.NORTH, buttonPanel, 5, SpringLayout.SOUTH, browsePanel);
 
-        setTitle("Save Resources");
+        setTitle("Save resources");
 
         setLocationRelativeTo(null);
         setModal(true);
@@ -142,7 +142,7 @@ public class WorkspaceChangedDialog extends JDialog {
             public void actionPerformed(final ActionEvent e) {
                 JFileChooser chooser = new JFileChooser(location.getText());
 
-                chooser.addChoosableFileFilter(new Filter("zip", "Simbrain Archives"));
+                chooser.addChoosableFileFilter(new Filter("zip", "Simbrain archives"));
 
                 switch (chooser.showOpenDialog(WorkspaceChangedDialog.this)) {
 

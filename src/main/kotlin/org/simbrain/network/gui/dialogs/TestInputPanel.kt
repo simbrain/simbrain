@@ -54,11 +54,11 @@ private fun createTestInputPanel(initData: Matrix, applyInputs: suspend MatrixEd
     })
     toolbar.add(advanceRowCheckbox)
     toolbar.add(JCheckBox(createAction(
-        description = "Workspace Mode"
+        description = "Workspace mode"
     ) { event ->
         event?.source.let {
             workspaceMode = if (it is JCheckBoxMenuItem) it.state else !workspaceMode
         }
     }).apply { this.isSelected = workspaceMode })
-    toolbar.add(JLabel("Workspace Mode"))
+    toolbar.add(JLabel("Workspace mode"))
 }

@@ -46,7 +46,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
     )
 
     var initNeighborhoodSize by GuiEditable(
-        label = "Initial Neighborhood size",
+        label = "Initial neighborhood size",
         description = "Initial radius around each neuron within which learning takes place",
         initValue = 100.0,
         order = 70
@@ -82,7 +82,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
             n.lowerBound = -1.0
         }
         som = addNeuronCollection(somNeurons)
-        som.label = "SOM Group"
+        som.label = "SOM group"
         som.layout = HexagonalGridLayout(50.0, 50.0, sqrt(numSOMNeurons.toDouble()).toInt())
         som.applyLayout()
 
@@ -305,7 +305,7 @@ class SOMNetwork : Subnetwork, UnsupervisedNetwork {
      */
     class SOMCreator : EditableObject {
 
-        @UserParameter(label = "Number of som neurons", order = 10)
+        @UserParameter(label = "Number of SOM neurons", order = 10)
         var numSom: Int = 20
 
         @UserParameter(label = "Number of inputs", order = 20)

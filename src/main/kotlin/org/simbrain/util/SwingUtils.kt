@@ -94,7 +94,7 @@ fun main() {
 /**
  * Shows a dialog that lets you select a directory, then returns that directory path as a string.
  */
-fun showDirectorySelectionDialog(approveButtonText: String = "Select Folder"): String? {
+fun showDirectorySelectionDialog(approveButtonText: String = "Select folder"): String? {
     val chooser = JFileChooser()
     chooser.fileSelectionMode = JFileChooser.DIRECTORIES_ONLY
     return if (chooser.showDialog(null, approveButtonText) == JFileChooser.APPROVE_OPTION) {

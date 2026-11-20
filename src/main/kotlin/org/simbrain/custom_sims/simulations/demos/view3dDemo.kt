@@ -64,7 +64,7 @@ val view3dDemo = newSim {
 
     // Add View3DSensor to the mouse
     val view3dSensor = View3DSensor().apply {
-        label = "3D View"
+        label = "3D view"
         fov = 90.0
         viewDistance = 400.0
         outputWidth = 128
@@ -126,7 +126,7 @@ val view3dDemo = newSim {
         }
 
         // Create control panel with the 3D view display
-        val controlPanel = createControlPanel("3D View", 5, 10) {
+        val controlPanel = createControlPanel("3D view", 5, 10) {
             addComponent(viewPanel)
             addSeparator()
             addLabel("Use arrow keys in OdorWorld")
@@ -136,27 +136,27 @@ val view3dDemo = newSim {
                 toolTip = "Field of view of the 3D camera, in degrees.") { value ->
                 view3dSensor.fov = value
             }
-            addSlider("View Distance", 100.0, 800.0, 400.0, 50.0,
+            addSlider("View distance", 100.0, 800.0, 400.0, 50.0,
                 toolTip = "Maximum distance, in pixels, that the camera renders.") { value ->
                 view3dSensor.viewDistance = value
             }
-            addSlider("Horizon Position", 0.1, 0.9, 0.5, 0.1,
+            addSlider("Horizon position", 0.1, 0.9, 0.5, 0.1,
                 toolTip = "Where the horizon sits in the view, from 0 (bottom) to 1 (top).") { value ->
                 view3dSensor.horizonPosition = value
             }
-            addSlider("Camera Height", 4.0, 64.0, 16.0, 4.0,
+            addSlider("Camera height", 4.0, 64.0, 16.0, 4.0,
                 toolTip = "Height of the camera above the ground, in world units.") { value ->
                 view3dSensor.cameraWorldHeight = value
             }
-            addSlider("Wall Height", 0.5, 4.0, 2.0, 0.5,
+            addSlider("Wall height", 0.5, 4.0, 2.0, 0.5,
                 toolTip = "Height of the walls relative to the camera height; 1 reaches the horizon.") { value ->
                 view3dSensor.wallHeight = value
             }
-            addCheckBox("Wrap Around (no walls)", false,
+            addCheckBox("Wrap around (no walls)", false,
                 toolTip = "Remove the boundary walls so the agent leaving one edge reappears at the opposite edge.") { checked ->
                 odorWorld.wrapAround = checked
             }
-            addCheckBox("Billboard Sprites", true,
+            addCheckBox("Billboard sprites", true,
                 toolTip = "Draw objects facing the camera. Uncheck to draw them facing their own heading, foreshortened at angles.") { checked ->
                 view3dSensor.billboardSprites = checked
             }
@@ -189,7 +189,7 @@ val view3dDemo = newSim {
         ## What You See
 
         - **Floor**: Textured from the tilemap (grass tiles)
-        - **Walls**: World boundary walls (disable "Wrap Around" to see them)
+        - **Walls**: World boundary walls (disable "Wrap around" to see them)
         - **Sprites**: Other entities (cheese, flowers) rendered as billboards
         - **Sky**: Simple gradient ceiling
 
@@ -197,12 +197,12 @@ val view3dDemo = newSim {
 
         Adjust these in the control panel:
         - **FOV**: Field of view (wider = more peripheral vision)
-        - **View Distance**: How far the camera can see
-        - **Horizon Position**: Where the horizon sits on screen
-        - **Camera Height**: Vertical position of the viewpoint
-        - **Wall Height**: Height of boundary walls (1.0 = horizon level)
-        - **Wrap Around**: When disabled, walls appear at world boundaries
-        - **Billboard Sprites**: When enabled, sprites always face the camera.
+        - **View distance**: How far the camera can see
+        - **Horizon position**: Where the horizon sits on screen
+        - **Camera height**: Vertical position of the viewpoint
+        - **Wall height**: Height of boundary walls (1.0 = horizon level)
+        - **Wrap around**: When disabled, walls appear at world boundaries
+        - **Billboard sprites**: When enabled, sprites always face the camera.
           When disabled, sprites face their entity's heading and appear
           foreshortened when viewed at angles (try this with the cow!)
 

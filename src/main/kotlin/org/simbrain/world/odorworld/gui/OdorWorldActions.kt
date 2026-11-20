@@ -12,12 +12,8 @@ import org.simbrain.util.piccolo.loadTileMap
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
-import org.simbrain.world.odorworld.OdorWorld
-import org.simbrain.world.odorworld.OdorWorldPanel
-import org.simbrain.world.odorworld.OdorWorldPreferences
+import org.simbrain.world.odorworld.*
 import org.simbrain.world.odorworld.entities.OdorWorldEntity
-import org.simbrain.world.odorworld.layerEditor
-import org.simbrain.world.odorworld.showTilePicker
 import java.awt.event.ActionEvent
 import java.awt.event.KeyEvent
 import javax.swing.JCheckBoxMenuItem
@@ -79,14 +75,14 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         iconPath = "menu_icons/Tools.png",
         keyboardShortcut = CmdOrCtrl + ','
     ) {
-        world.createEditorDialog(titleName = "World Properties") { it.events.propertiesChanged.fire() }.display()
+        world.createEditorDialog(titleName = "World properties") { it.events.propertiesChanged.fire() }.display()
     }
 
     val loadTileMapAction = odorWorldPanel.createAction(
         name = "Load tile map...",
         description = "Replace the current tile map with one loaded from a Tiled (tmx) file"
     ) {
-        val chooser = SFileChooser(OdorWorldPreferences.tileMapDirectory, "Load TMX Tilemap", null, true)
+        val chooser = SFileChooser(OdorWorldPreferences.tileMapDirectory, "Load TMX tilemap", null, true)
         chooser.addExtension("tmx")
         chooser.showOpenDialog()?.let { file ->
             odorWorldPanel.odorWorldComponent.markChanged()
@@ -162,7 +158,7 @@ class OdorWorldActions(val odorWorldPanel: OdorWorldPanel) {
         description = "Lay a new perfect maze over the world, resizing the tile map to fit the chosen cells"
     ) {
         val settings = MazeSettings(world)
-        settings.createEditorDialog(titleName = "Add Maze") {
+        settings.createEditorDialog(titleName = "Add maze") {
             val seed = if (it.useSeed) it.seed.toLong() else null
             world.generateMaze(it.columns, it.rows, it.cellSizeInTiles, seed)
         }.display()

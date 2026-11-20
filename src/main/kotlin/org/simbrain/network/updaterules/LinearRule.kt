@@ -1,10 +1,9 @@
 package org.simbrain.network.updaterules
 
-import smile.math.matrix.Matrix
-import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.core.Layer
 import org.simbrain.network.core.Network
 import org.simbrain.network.core.Neuron
+import org.simbrain.network.updaterules.interfaces.BatchActivation
 import org.simbrain.network.updaterules.interfaces.BoundedUpdateRule
 import org.simbrain.network.updaterules.interfaces.DifferentiableUpdateRule
 import org.simbrain.network.updaterules.interfaces.NoisyUpdateRule
@@ -17,6 +16,7 @@ import org.simbrain.util.math.SimbrainMath
 import org.simbrain.util.propertyeditor.GuiEditable
 import org.simbrain.util.stats.ProbabilityDistribution
 import org.simbrain.util.stats.distributions.UniformRealDistribution
+import smile.math.matrix.Matrix
 import kotlin.math.max
 
 /**
@@ -63,7 +63,7 @@ open class LinearRule : NeuronUpdateRule<EmptyScalarData, EmptyMatrixData>(), Di
         },
         PiecewiseLinear {
             override fun toString(): String {
-                return "Piecewise Linear"
+                return "Piecewise linear"
             }
         },
         Relu {

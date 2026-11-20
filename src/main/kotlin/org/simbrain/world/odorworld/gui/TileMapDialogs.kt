@@ -11,9 +11,10 @@ import org.piccolo2d.util.PPaintContext
 import org.simbrain.util.*
 import org.simbrain.util.piccolo.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
-import java.awt.*
+import java.awt.BasicStroke
+import java.awt.BorderLayout
+import java.awt.Dimension
 import java.awt.event.MouseEvent
-import java.awt.geom.Point2D
 import java.awt.geom.Rectangle2D
 import javax.swing.*
 import javax.swing.table.DefaultTableModel
@@ -32,7 +33,7 @@ fun showTilePicker(tileSets: List<TileSet>, currentTileId: Int? = null, block: s
 fun List<TileSet>.tilePicker(currentGid: Int, block: suspend (Int) -> Unit) = StandardDialog().apply {
 
     var pickedTile = currentGid
-    title = "Pick / Edit Tile"
+    title = "Pick / edit tile"
 
     /**
      * Make a PNode for every tile in a tileset and add to the canvas.
@@ -151,7 +152,7 @@ fun List<TileSet>.tilePicker(currentGid: Int, block: suspend (Int) -> Unit) = St
 
 fun OdorWorld.layerEditor() = StandardDialog().apply {
 
-    title = "Edit Layers"
+    title = "Edit layers"
     setSize(300, 400)
 
     val columnNames = arrayOf("Name", "Visible", "Blocking")

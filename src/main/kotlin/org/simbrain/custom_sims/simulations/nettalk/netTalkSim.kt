@@ -77,11 +77,11 @@ val nettalkComponentSim = newSim("nettalk_component") {
     bp.hiddenLayers().firstOrNull()?.location = point(238, 13)
     bp.outputLayer.location = point(-275, -214)
 
-    val speechComponent = addSpeechSynthesizer("Speech Synthesizer")
+    val speechComponent = addSpeechSynthesizer("Speech synthesizer")
     wireNetTalk(workspace, reader)
 
     withGui {
-        val readerFrame = createControlPanel("NETtalk Reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val readerFrame = createControlPanel("NETtalk reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
         }
@@ -95,7 +95,7 @@ val nettalkComponentSim = newSim("nettalk_component") {
     val reader = NettalkReader()
     wireNetTalk(workspace, reader)
     withGui {
-        val readerFrame = createControlPanel("NETtalk Reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val readerFrame = createControlPanel("NETtalk reader", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
         }
@@ -185,7 +185,7 @@ private val NETTALK_COMPONENT_SIDEBAR: String = """
 
     ## Explore further
 
-    - Edit the reading text directly in the NETtalk Reader panel to test other passages.
+    - Edit the reading text directly in the NETtalk reader panel to test other passages.
 
     # References
 

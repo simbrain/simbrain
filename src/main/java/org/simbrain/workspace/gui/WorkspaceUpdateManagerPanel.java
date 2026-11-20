@@ -287,7 +287,7 @@ public class WorkspaceUpdateManagerPanel extends JPanel {
         }
         configureAvailableJList(availableActionJList);
         Window parentWindow = SwingUtilities.getWindowAncestor(this);
-        StandardDialog addActionsDialog = new StandardDialog(parentWindow, "Add Available Update Action") {
+        StandardDialog addActionsDialog = new StandardDialog(parentWindow, "Add available update action") {
             @Override
             protected void closeDialogOk() {
                 super.closeDialogOk();

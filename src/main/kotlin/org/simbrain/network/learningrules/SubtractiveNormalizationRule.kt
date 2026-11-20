@@ -20,7 +20,7 @@ class SubtractiveNormalizationRule : SynapseUpdateRule<EmptyScalarData, EmptyMat
     }
 
     override val name: String
-        get() = "Subtractive Normalization"
+        get() = "Subtractive normalization"
 
     override fun copy(): SynapseUpdateRule<*, *> {
         val sns = SubtractiveNormalizationRule()

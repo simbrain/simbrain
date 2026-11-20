@@ -12,11 +12,11 @@ import org.simbrain.util.toGrayScaleImage
 val attentionAsGain = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Attention Network")
+    val networkComponent = addNetworkComponent("Attention network")
     val network = networkComponent.network
 
     // Create image world with drawable canvas
-    val imageWorldComponent = addImageWorld("Visual Input")
+    val imageWorldComponent = addImageWorld("Visual input")
     val w = 24
     val h = 24
     val halfSize = (w * h) / 2  
@@ -69,7 +69,7 @@ val attentionAsGain = newSim {
     }
 
     val imageInput = network.addNeuronCollection(w*h).apply {
-        label = "Visual Input"
+        label = "Visual input"
         isClamped = true
         setUpperBound(1.0)
         layout(GridLayout(40.0, 40.0, w))
@@ -82,7 +82,7 @@ val attentionAsGain = newSim {
             slope = 1.0
         }
     }.apply {
-        label = "Left Region (Unattended)"
+        label = "Left region (unattended)"
         layout(GridLayout(40.0, 40.0, w / 2))
     }
 
@@ -93,7 +93,7 @@ val attentionAsGain = newSim {
             slope = 1.0
         }
     }.apply {
-        label = "Right Region (Unattended)"
+        label = "Right region (unattended)"
         layout(GridLayout(40.0, 40.0, w / 2))
     }
 
@@ -165,30 +165,30 @@ val attentionAsGain = newSim {
         // Update labels to reflect attention state
         when {
             leftGain > rightGain + 0.1 -> {
-                leftRegion.label = "Left Region (ATTENDED)"
-                rightRegion.label = "Right Region (Unattended)"
+                leftRegion.label = "Left region (ATTENDED)"
+                rightRegion.label = "Right region (unattended)"
             }
             rightGain > leftGain + 0.1 -> {
-                leftRegion.label = "Left Region (Unattended)"
-                rightRegion.label = "Right Region (ATTENDED)"
+                leftRegion.label = "Left region (unattended)"
+                rightRegion.label = "Right region (ATTENDED)"
             }
             else -> {
-                leftRegion.label = "Left Region (Equal Attention)"
-                rightRegion.label = "Right Region (Equal Attention)"
+                leftRegion.label = "Left region (equal attention)"
+                rightRegion.label = "Right region (equal attention)"
             }
         }
     }
 
     withGui {
         // Control panel on the left
-        val controlPanel = createControlPanel("Attention Control", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
-            addSlider("Left Gain", 0.1, 5.0, leftGain, 0.1,
+        val controlPanel = createControlPanel("Attention control", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+            addSlider("Left gain", 0.1, 5.0, leftGain, 0.1,
                 toolTip = "Slope of the left-region neurons. Raising it simulates attending to the left side.") { value ->
                 leftGain = value
                 updateGains()
             }
             
-            addSlider("Right Gain", 0.1, 5.0, rightGain, 0.1,
+            addSlider("Right gain", 0.1, 5.0, rightGain, 0.1,
                 toolTip = "Slope of the right-region neurons. Raising it simulates attending to the right side.") { value ->
                 rightGain = value
                 updateGains()
@@ -228,7 +228,7 @@ val attentionAsGain = newSim {
             
             addSeparator()
             
-            addButton("Reset Network") {
+            addButton("Reset network") {
                 network.clearActivations()
             }.apply {
                 toolTipText = "Set every neuron's activation to zero; the gains are unchanged."
@@ -285,22 +285,22 @@ val attentionAsGain = newSim {
         ## Activity 1: Try the pre-loaded images
         
         1. Click `Image 1: Left bars` to load vertical bars on the left side
-        2. Move the `Left Gain` slider to `4.0` or `5.0`
+        2. Move the `Left gain` slider to `4.0` or `5.0`
         3. Iterate the workspace (play button or spacebar) and observe the left region neurons activate strongly
-        4. Move the `Left Gain` slider back to `1.0` and see how the response drops
-        5. Try `Image 2: Right bars` and experiment with the `Right Gain` slider
+        4. Move the `Left gain` slider back to `1.0` and see how the response drops
+        5. Try `Image 2: Right bars` and experiment with the `Right gain` slider
         
         ## Activity 2: Compare attended and unattended regions
         
         1. Click `Image 3: Both sides` to load a pattern spanning both regions
-        2. Set `Left Gain` to `4.0` and `Right Gain` to `1.0` - observe the left region shows strong activation
-        3. Reverse it: `Left Gain` to `1.0` and `Right Gain` to `4.0` - the relationship flips
+        2. Set `Left gain` to `4.0` and `Right gain` to `1.0` - observe the left region shows strong activation
+        3. Reverse it: `Left gain` to `1.0` and `Right gain` to `4.0` - the relationship flips
         4. Set both sliders to `4.0` - both regions show strong responses
         5. Set both sliders to `1.0` - both regions show baseline responses
         
         ## Activity 3: Control the gain manually
         
-        1. Use the `Left Gain` and `Right Gain` sliders to set arbitrary gain values
+        1. Use the `Left gain` and `Right gain` sliders to set arbitrary gain values
         2. Try gain = `0.5` vs gain = `3.0` to see a `6`-fold difference in response
         3. Observe how neuron group labels update to show attention state
         4. Watch the network visualization - attended regions have higher activations (brighter neuron colors)

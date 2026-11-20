@@ -35,7 +35,7 @@ class NettalkFlushTest {
         bp.initBiases()
         bp.initWeights()
         val synthesizer = SpeechSynthesizer()
-        workspace.addWorkspaceComponent(SpeechSynthesizerComponent("Speech Synthesizer", synthesizer))
+        workspace.addWorkspaceComponent(SpeechSynthesizerComponent("Speech synthesizer", synthesizer))
         val reader = NettalkReader()
         with(scope) { wireNetTalk(workspace, reader) }
         reader.text = text

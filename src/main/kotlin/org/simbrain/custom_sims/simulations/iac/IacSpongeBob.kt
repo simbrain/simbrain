@@ -25,7 +25,7 @@ val iacSpongeBob = newSim {
         )
         val residence = pool(
             "Residence",
-            "Bikini Bottom", "Atlantis", "Human World",
+            "Bikini Bottom", "Atlantis", "Human world",
             at = point(-440, 160), columns = 1
         )
         val morals = pool(
@@ -35,12 +35,12 @@ val iacSpongeBob = newSim {
         )
         val occupation = pool(
             "Occupation",
-            "Works at the Krusty Krab", "No Job", "Unknown", "Works at the Chumbucket", "Student", "Monarchy", "Retired", "Criminal", "Pirate",
+            "Works at the Krusty Krab", "No job", "Unknown", "Works at the Chumbucket", "Student", "Monarchy", "Retired", "Criminal", "Pirate",
             at = point(480, 0), columns = 1, vSpacing = 45.0
         )
         val characters = instances("Characters", at = point(0, 0), columns = 4, hSpacing = 150.0, vSpacing = 80.0) {
             instance("SpongeBob", married["No"], residence["Bikini Bottom"], morals["Protagonist"], occupation["Works at the Krusty Krab"])
-            instance("Patrick", married["No"], residence["Bikini Bottom"], morals["Protagonist"], occupation["No Job"])
+            instance("Patrick", married["No"], residence["Bikini Bottom"], morals["Protagonist"], occupation["No job"])
             instance("Squidward", married["No"], residence["Bikini Bottom"], morals["Antagonist"], occupation["Works at the Krusty Krab"])
             instance("Krabs", married["Yes"], residence["Bikini Bottom"], morals["Neutral"], occupation["Works at the Krusty Krab"])
             instance("Sandy", married["No"], residence["Bikini Bottom"], morals["Protagonist"], occupation["Unknown"])
@@ -54,7 +54,7 @@ val iacSpongeBob = newSim {
             instance("Flying Dutchman", married["Unknown"], residence["Bikini Bottom"], morals["Villain"], occupation["Pirate"])
             instance("King Neptune", married["Yes"], residence["Atlantis"], morals["Neutral"], occupation["Monarchy"])
             instance("Princess Mindy", married["No"], residence["Atlantis"], morals["Hero"], occupation["Monarchy"])
-            instance("Patchy the Pirate", married["Unknown"], residence["Human World"], morals["Protagonist"], occupation["Unknown"])
+            instance("Patchy the Pirate", married["Unknown"], residence["Human world"], morals["Protagonist"], occupation["Unknown"])
         }
         connect(characters["Krabs"], occupation["Works at the Chumbucket"], -1.0)
     }

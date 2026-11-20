@@ -42,16 +42,16 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
     @UserParameter(label = "Learning rate", order = 40, increment = .1)
     var learningRate = 0.1
 
-    @UserParameter(label = "Winner Value", order = 50)
+    @UserParameter(label = "Winner value", order = 50)
     var winValue = 1.0
 
-    @UserParameter(label = "Lose Value", order = 60)
+    @UserParameter(label = "Lose value", order = 60)
     var loseValue = 0.0
 
     @UserParameter(label = "Normalize inputs", order = 70)
     var normalizeInputs = true
 
-    @UserParameter(label = "Use Leaky learning", order = 80)
+    @UserParameter(label = "Use leaky learning", order = 80)
     var useLeakyLearning = false
 
     var leakyLearningRate by GuiEditable(
@@ -104,7 +104,7 @@ class CompetitiveNetwork : Subnetwork, UnsupervisedNetwork {
         trainingData = mutableListOf()
 
         competitive = addNeuronCollection(List(numCompetitiveNeurons) { Neuron() })
-        competitive.label = "Competitive Group"
+        competitive.label = "Competitive group"
         competitive.setLayoutBasedOnSize()
 
         inputLayer = addNeuronCollection(List(numInputNeurons) { Neuron() })

@@ -108,7 +108,7 @@ class CouplingTransformDialog(
 
     private fun buildAvailablePanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = Theme.sectionBorder("Available Transforms")
+        panel.border = Theme.sectionBorder("Available transforms")
 
         availableList.selectionMode = ListSelectionModel.SINGLE_SELECTION
         availableList.cellRenderer = object : DefaultListCellRenderer() {
@@ -164,7 +164,7 @@ class CouplingTransformDialog(
 
     private fun buildChainPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = Theme.sectionBorder("Transform Chain")
+        panel.border = Theme.sectionBorder("Transform chain")
 
         chainList.selectionMode = ListSelectionModel.SINGLE_SELECTION
         chainList.cellRenderer = object : DefaultListCellRenderer() {

@@ -15,21 +15,10 @@ import org.simbrain.util.CmdOrCtrl
 import org.simbrain.util.KeyCombination
 import org.simbrain.util.Shift
 import org.simbrain.util.put
-import javax.swing.JComponent
-import javax.swing.JFrame
-import javax.swing.JMenuItem
-import javax.swing.JPopupMenu
-import javax.swing.JTextPane
+import javax.swing.*
 import javax.swing.event.PopupMenuEvent
 import javax.swing.event.PopupMenuListener
-import javax.swing.text.AbstractDocument
-import javax.swing.text.BadLocationException
-import javax.swing.text.DefaultHighlighter
-import javax.swing.text.Element
-import javax.swing.text.LabelView
-import javax.swing.text.StyledEditorKit
-import javax.swing.text.View
-import javax.swing.text.ViewFactory
+import javax.swing.text.*
 import javax.swing.undo.CannotRedoException
 import javax.swing.undo.CannotUndoException
 import javax.swing.undo.UndoManager
@@ -123,7 +112,7 @@ class SimbrainTextPane : JTextPane() {
         val frame = JFrame()
         val dialog = PlainFindReplaceDialog(frame, this)
         frame.contentPane = dialog
-        frame.title = if (isEditable) "Find / Replace..." else "Find..."
+        frame.title = if (isEditable) "Find / replace..." else "Find..."
         frame.isVisible = true
         frame.pack()
         frame.setLocationRelativeTo(null)
@@ -140,7 +129,7 @@ class SimbrainTextPane : JTextPane() {
         val cutItem = JMenuItem("Cut").apply { addActionListener { cut() } }
         val copyItem = JMenuItem("Copy").apply { addActionListener { copy() } }
         val pasteItem = JMenuItem("Paste").apply { addActionListener { paste() } }
-        val selectAllItem = JMenuItem("Select All").apply { addActionListener { selectAll() } }
+        val selectAllItem = JMenuItem("Select all").apply { addActionListener { selectAll() } }
         add(undoItem)
         add(redoItem)
         addSeparator()

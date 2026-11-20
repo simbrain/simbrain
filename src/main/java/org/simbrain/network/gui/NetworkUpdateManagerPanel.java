@@ -49,7 +49,7 @@ public class NetworkUpdateManagerPanel extends JPanel {
         JScrollPane currentListScroll = new JScrollPane(currentActionJList);
         currentListScroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         currentListScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        currentListScroll.setBorder(Theme.sectionBorder("Current Update Sequence"));
+        currentListScroll.setBorder(Theme.sectionBorder("Current update sequence"));
         updateCurrentActionsList();
         add(currentListScroll, BorderLayout.CENTER);
 

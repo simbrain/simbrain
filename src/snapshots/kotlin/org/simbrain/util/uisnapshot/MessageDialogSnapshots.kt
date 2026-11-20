@@ -32,7 +32,7 @@ class MessageConfirmSnapshot : UiSnapshotDef {
         options = listOf("Download", "Cancel"),
         kind = MessageKind.WARNING,
         heading = "Download LFM2.5-230M weights?",
-        title = "Download Weights",
+        title = "Download weights",
         details = listOf(
             "Destination" to "~/Library/Caches/Simbrain/lfm2.5-230m",
             "License" to "https://www.liquid.ai/lfm-license",
@@ -55,16 +55,16 @@ class MessageChoiceSnapshot : UiSnapshotDef {
     override val name = "message_choice"
     override fun build(): Component = createMessageDialog(
         "Would you like to save these changes?",
-        options = listOf("Save", "Don't Save", "Cancel"),
+        options = listOf("Save", "Don't save", "Cancel"),
         kind = MessageKind.WARNING,
         heading = "The workspace has changed since it was last saved",
-        title = "Workspace Has Changed"
+        title = "Workspace has changed"
     )
 }
 
 class MessageShortInfoSnapshot : UiSnapshotDef {
     override val name = "message_short_info"
-    override fun build(): Component = createMessageDialog("3 occurrence(s) replaced.", title = "Replace All")
+    override fun build(): Component = createMessageDialog("3 occurrence(s) replaced.", title = "Replace all")
 }
 
 class InputTextSnapshot : UiSnapshotDef {

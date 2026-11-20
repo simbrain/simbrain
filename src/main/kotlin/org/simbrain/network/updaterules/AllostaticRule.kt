@@ -88,7 +88,7 @@ class AllostaticUpdateRule : SpikingNeuronUpdateRule<AllostaticDataHolder, Spiki
         return copy
     }
 
-    override val name = "Allostatic Update Rule"
+    override val name = "Allostatic update rule"
 
     // Test getSpikingInput
     fun main() {

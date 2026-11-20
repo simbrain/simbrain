@@ -26,7 +26,7 @@ class JumpAndDecay : SpikeResponder() {
     var baseLine = 0.0
 
     @UserParameter(
-        label = "Time Constant",
+        label = "Time constant",
         description = "Time constant of decay (ms). Roughly the time it takes to decay to\n" +
                 "near-baseline. Larger time constants produce slower decay.",
         increment = .1,
@@ -39,7 +39,7 @@ class JumpAndDecay : SpikeResponder() {
         }
 
     @UserParameter(
-        label = "Use Convolution",
+        label = "Use convolution",
         description = "If true the current spike response adds the psr from the previous iteration, which smoothes out the response.",
         order = 4
     )
@@ -149,10 +149,10 @@ class JumpAndDecay : SpikeResponder() {
         }
     }
 
-    override val description: String = "Jump and Decay"
+    override val description: String = "Jump and decay"
 
     override val name: String
-        get() = "Jump and Decay"
+        get() = "Jump and decay"
 }
 
 /**

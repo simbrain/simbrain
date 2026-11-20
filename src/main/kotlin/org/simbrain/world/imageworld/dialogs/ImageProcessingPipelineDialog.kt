@@ -27,12 +27,12 @@ class ImageProcessingPipelineDialog(
     private val availableOperationsList = JList(availableOperationsListModel)
 
     init {
-        title = "Image Processing Pipeline - ${pipeline.name}"
+        title = "Image processing pipeline - ${pipeline.name}"
         setContentPane(createPipelinePanel())
-        addButton(JButton("Clear All").apply {
+        addButton(JButton("Clear all").apply {
             toolTipText = "Remove all operations from the pipeline"
             addActionListener {
-                if (showConfirm("Remove all operations from the pipeline?", okLabel = "Remove All")) {
+                if (showConfirm("Remove all operations from the pipeline?", okLabel = "Remove all")) {
                     pipeline.clearOperations()
                 }
             }
@@ -94,7 +94,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createNamePanel(): JPanel {
         val panel = JPanel(FlowLayout(FlowLayout.LEFT))
-        panel.border = Theme.sectionBorder("Pipeline Settings")
+        panel.border = Theme.sectionBorder("Pipeline settings")
 
         panel.add(JLabel("Name:"))
         
@@ -127,7 +127,7 @@ class ImageProcessingPipelineDialog(
     private fun updatePipelineName(newName: String) {
         if (newName.isNotBlank() && newName != pipeline.name) {
             pipeline.name = newName
-            title = "Image Processing Pipeline - $newName"
+            title = "Image processing pipeline - $newName"
             // Update parent UI to reflect name change (e.g., in dropdown lists)
             parent.repaint()
         }
@@ -135,7 +135,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createAvailableOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = Theme.sectionBorder("Available Operations")
+        panel.border = Theme.sectionBorder("Available operations")
 
         // Configure available operations list
         availableOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION
@@ -174,7 +174,7 @@ class ImageProcessingPipelineDialog(
 
     private fun createActiveOperationsPanel(): JPanel {
         val panel = JPanel(BorderLayout())
-        panel.border = Theme.sectionBorder("Pipeline Operations")
+        panel.border = Theme.sectionBorder("Pipeline operations")
 
         // Configure active operations list
         activeOperationsList.selectionMode = ListSelectionModel.SINGLE_SELECTION
@@ -221,7 +221,7 @@ class ImageProcessingPipelineDialog(
         editButton.addActionListener { editSelectedActiveOperation() }
         panel.add(editButton)
 
-        val toggleButton = JButton("Enable/Disable")
+        val toggleButton = JButton("Enable/disable")
         toggleButton.addActionListener { toggleSelectedOperation() }
         panel.add(toggleButton)
 

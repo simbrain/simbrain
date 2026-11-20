@@ -50,7 +50,7 @@ suspend fun SimulationScope.createView3dNavigationScene(
     }
 
     val view3dSensor = View3DSensor().apply {
-        label = "3D View"
+        label = "3D view"
         fov = 90.0
         viewDistance = 450.0
         this.outputWidth = outputWidth

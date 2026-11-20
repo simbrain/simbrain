@@ -29,7 +29,7 @@ val fieldImageDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val odorWorldComponent = addOdorWorldComponent("Field World")
+    val odorWorldComponent = addOdorWorldComponent("Field world")
     val odorWorld = odorWorldComponent.world.apply {
         tileMap = loadTileMap(File(OdorWorldPreferences.tileMapDirectory, "yulins_world.tmx"))
         wrapAround = true
@@ -47,7 +47,7 @@ val fieldImageDemo = newSim {
     }
 
     val view3dSensor = View3DSensor().apply {
-        label = "Mouse View"
+        label = "Mouse view"
         fov = 90.0
         viewDistance = 400.0
         outputWidth = 200
@@ -82,7 +82,7 @@ val fieldImageDemo = newSim {
     odorWorld.addEntity(220, 200, EntityType.Pansy).apply { name = "Pansy" }
     odorWorld.addEntity(220, 380, EntityType.Tulip).apply { name = "Tulip" }
 
-    val networkComponent = addNetworkComponent("Sensor Network")
+    val networkComponent = addNetworkComponent("Sensor network")
     val network = networkComponent.network
 
     val sensorNeurons = network.addNeuronCollection(4) {
@@ -177,10 +177,10 @@ val fieldImageDemo = newSim {
 
         ## Toy Vision Readout
 
-        The mouse from the `NPC Basic Demo` carries a `View3DSensor`, and the
+        The mouse from the `NPC basic demo` carries a `View3DSensor`, and the
         four neurons in the `Sensors` collection are set directly from that
         camera geometry. On each update, objects are projected into the same
-        camera frustum used by the `Mouse 3D View`; if a `Swiss`, `Pansy`,
+        camera frustum used by the `Mouse 3D view`; if a `Swiss`, `Pansy`,
         `Tulip`, or `Fish` would appear on screen, the corresponding neuron is
         activated according to its distance from the camera.
 
@@ -232,7 +232,7 @@ val fieldImageDemo = newSim {
                 if (image != null) g.drawImage(image, 0, 0, width, height, null)
             }
         }
-        val viewFrame = GenericJInternalFrame("Mouse 3D View", true, true, true, true).apply {
+        val viewFrame = GenericJInternalFrame("Mouse 3D view", true, true, true, true).apply {
             layout = BorderLayout()
             add(viewPanel, BorderLayout.CENTER)
             setBounds(SIM_WINDOW_GAP + 480 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 250 + SIM_WINDOW_GAP, 360, 250)
@@ -263,7 +263,7 @@ val fieldImageDemo = newSim {
             add(JLabel("Threshold").apply { toolTipText = thresholdToolTip }, BorderLayout.WEST)
             add(thresholdSlider, BorderLayout.CENTER)
         }
-        val fieldFrame = GenericJInternalFrame("Field Image", true, true, true, true).apply {
+        val fieldFrame = GenericJInternalFrame("Field image", true, true, true, true).apply {
             layout = BorderLayout()
             add(fieldPanel, BorderLayout.CENTER)
             add(controlBar, BorderLayout.SOUTH)

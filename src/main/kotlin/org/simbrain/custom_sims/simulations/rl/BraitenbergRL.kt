@@ -35,10 +35,10 @@ class RewardConfig(
 ) : EditableObject {
     override val name = label
 
-    @UserParameter(label = "Max Reward", description = "Maximum reward magnitude", order = 1)
+    @UserParameter(label = "Max reward", description = "Maximum reward magnitude", order = 1)
     var maxReward: Double = 15.0
 
-    @UserParameter(label = "Decay Function", showDetails = false, order = 2)
+    @UserParameter(label = "Decay function", showDetails = false, order = 2)
     var decayFunction: DecayFunction = initDecayFunction
 
     fun calculateReward(distance: Double, multiplier: Double): Double {
@@ -61,10 +61,10 @@ data class Task(
 }
 
 val rlTasks = listOf(
-    Task("Seek Cheese, Avoid Poison", 1.0, -1.0),
-    Task("Seek Both Objects", 1.0, 1.0),
-    Task("Avoid Both Objects", -1.0, -1.0),
-    Task("Seek Poison, Avoid Cheese", -1.0, 1.0)
+    Task("Seek cheese, avoid poison", 1.0, -1.0),
+    Task("Seek both objects", 1.0, 1.0),
+    Task("Avoid both objects", -1.0, -1.0),
+    Task("Seek poison, avoid cheese", -1.0, 1.0)
 )
 
 fun respawnObject(world: org.simbrain.world.odorworld.OdorWorld, obj: OdorWorldEntity, minSeparation: Double = 100.0) {
@@ -240,8 +240,8 @@ val braitenbergRL = newSim { optionString ->
     var sharedDecayFunction: DecayFunction = GaussianDecayFunction(75.0)
 
     // Configurable reward configs (share decay function via sharedDecayFunction)
-    val cheeseRewardConfig = RewardConfig("Cheese Reward", sharedDecayFunction.copy() as DecayFunction)
-    val poisonRewardConfig = RewardConfig("Poison Reward", sharedDecayFunction.copy() as DecayFunction)
+    val cheeseRewardConfig = RewardConfig("Cheese reward", sharedDecayFunction.copy() as DecayFunction)
+    val poisonRewardConfig = RewardConfig("Poison reward", sharedDecayFunction.copy() as DecayFunction)
 
     // Function to update the shared decay function and propagate to reward configs
     fun updateSharedDecayFunction(newDecayFunction: DecayFunction) {
@@ -364,8 +364,8 @@ val braitenbergRL = newSim { optionString ->
     }
 
     val (plot, rewardSeries, valueSeries, tdErrorSeries) = addTimeSeries(
-        "Reward, Value, TD Error",
-        seriesNames = listOf("Reward", "Value", "TD Error")
+        "Reward, value, TD error",
+        seriesNames = listOf("Reward", "Value", "TD error")
     )
 
     couplingManager.createCoupling(rewardNeuron, rewardSeries)
@@ -725,7 +725,7 @@ val braitenbergRL = newSim { optionString ->
         }
 
         // Combined control panel
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
             val taskToolTip = "Select the learning task: which objects to seek or avoid."
             addLabel("Task:").apply { toolTipText = taskToolTip }
@@ -742,28 +742,28 @@ val braitenbergRL = newSim { optionString ->
             addSeparator()
 
             addFormattedNumericTextField(
-                "Learning Rate", initValue = learningRate,
+                "Learning rate", initValue = learningRate,
                 toolTip = "Step size for weight updates (higher = faster but less stable)."
             ) {
                 learningRate = it
             }
 
             addFormattedNumericTextField(
-                "Gamma (Discount Factor)", initValue = gamma,
+                "Gamma (discount factor)", initValue = gamma,
                 toolTip = "Importance of future rewards (0-1, higher = more farsighted)."
             ) {
                 gamma = it
             }
 
             addFormattedNumericTextField(
-                "Speed Bias", initValue = straight.bias,
+                "Speed bias", initValue = straight.bias,
                 toolTip = "Base forward speed (higher = faster default movement)."
             ) {
                 straight.bias = it
             }
 
             addCheckBox(
-                "Learning Enabled", learningEnabled,
+                "Learning enabled", learningEnabled,
                 toolTip = "Enable/disable weight updates (unchecking freezes all weights)."
             ) { enabled ->
                 learningEnabled = enabled
@@ -775,7 +775,7 @@ val braitenbergRL = newSim { optionString ->
             }
 
             addCheckBox(
-                "Train Speed Connections", trainSpeedConnections,
+                "Train speed connections", trainSpeedConnections,
                 toolTip = "Include sensor-to-speed connections in learning."
             ) { enabled ->
                 trainSpeedConnections = enabled
@@ -796,7 +796,7 @@ val braitenbergRL = newSim { optionString ->
             // Shared decay function editor
             val decayLabel = addLabel("Decay: ${getDecaySummary()}")
             val decaySelector = DecayFunction.DecayFunctionSelector(sharedDecayFunction.copy() as DecayFunction)
-            val decayEditButton = addButton("Edit Decay Function...") {
+            val decayEditButton = addButton("Edit decay function...") {
                 decaySelector.decayFunction = sharedDecayFunction.copy() as DecayFunction
                 decaySelector.createEditorDialog {
                     updateSharedDecayFunction(decaySelector.decayFunction)
@@ -818,7 +818,7 @@ val braitenbergRL = newSim { optionString ->
                         )
                     )
                     weightSpacePanel = panel
-                    GenericJInternalFrame("Braitenberg Actor Weight Space", true, true, true, true).apply {
+                    GenericJInternalFrame("Braitenberg actor weight space", true, true, true, true).apply {
                         layout = BorderLayout()
                         add(panel, BorderLayout.CENTER)
                         setBounds(165, 155, 760, 420)
@@ -847,7 +847,7 @@ val braitenbergRL = newSim { optionString ->
             }
 
             weightSpaceCheckBox = addCheckBox(
-                "Show Weight Space", false,
+                "Show weight space", false,
                 toolTip = "Show a live display of cheese and poison actor weights."
             ) { visible ->
                 withContext(Dispatchers.Swing) {
@@ -855,7 +855,7 @@ val braitenbergRL = newSim { optionString ->
                 }
             }
 
-            addCheckBox("Show Time Series", false, toolTip = "Show reward, value, and TD error time series.") { visible ->
+            addCheckBox("Show time series", false, toolTip = "Show reward, value, and TD error time series.") { visible ->
                 withContext(Dispatchers.Swing) {
                     if (plotFrame is JInternalFrame) {
                         plotFrame.setIcon(!visible)
@@ -866,7 +866,7 @@ val braitenbergRL = newSim { optionString ->
 
             addSeparator()
 
-            val randomResetButton = addButton("Reset (Random Weights)") {
+            val randomResetButton = addButton("Reset (random weights)") {
                 network.freeSynapses.forEach { s ->
                     s.strength = s.lowerBound + Math.random() * (s.upperBound - s.lowerBound)
                 }
@@ -874,7 +874,7 @@ val braitenbergRL = newSim { optionString ->
             }
             randomResetButton.toolTipText = "Randomize all weights within their current bounds."
 
-            val zeroResetButton = addButton("Reset (0 Weights)") {
+            val zeroResetButton = addButton("Reset (0 weights)") {
                 network.freeSynapses.forEach { s ->
                     s.strength = 0.0
                 }
@@ -939,10 +939,10 @@ val braitenbergRL = newSim { optionString ->
 
     ## Reward Configuration
 
-    The proximity rewards use a configurable decay function. Cheese and poison share one decay function, set with `Edit Decay Function...`. The settings are:
+    The proximity rewards use a configurable decay function. Cheese and poison share one decay function, set with `Edit decay function...`. The settings are:
 
-    - `Max Reward`: Maximum reward magnitude (default: `15.0`)
-    - `Decay Function`: How reward diminishes with distance
+    - `Max reward`: Maximum reward magnitude (default: `15.0`)
+    - `Decay function`: How reward diminishes with distance
       - `Gaussian`: Smooth bell-curve decay (recommended for natural behavior)
       - `Linear`: Linear interpolation to zero at dispersion radius
       - `Step`: Binary on/off at dispersion radius
@@ -961,7 +961,7 @@ val braitenbergRL = newSim { optionString ->
 
     `Value`: The critic's prediction of expected future cumulative reward from the current state. Early in training this is inaccurate, but it improves over time. You should see value increase as the agent approaches rewarding objects and decrease near penalizing ones, reflecting learned predictions about what will happen next.
 
-    `TD Error`: The temporal difference error, which can be understood as: `TD_error = reward + γ×V(current) - V(previous)`. This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
+    `TD error`: The temporal difference error, which can be understood as: `TD_error = reward + γ×V(current) - V(previous)`. This is the learning signal that drives all weight updates. It represents the difference between what the critic predicted at the previous time step and what actually happened (current reward plus discounted current value). When value estimates are low or changing slowly, TD error tracks closely with reward. As the critic learns better predictions, TD error reflects prediction errors rather than just reward magnitude.
 
     ## Reading the Learning Process
 
@@ -989,14 +989,14 @@ val braitenbergRL = newSim { optionString ->
     ## Activity 1: Train the vehicle on a task
 
     1. Select a task from the `Task` dropdown menu in the control panel
-    2. Check `Learning Enabled` to allow weight updates
-    3. Optionally check `Train Speed Connections` to include speed modulation learning
+    2. Check `Learning enabled` to allow weight updates
+    3. Optionally check `Train speed connections` to include speed modulation learning
     4. Click the workspace run button to start learning
     5. Watch the vehicle move around the environment as it learns
-    6. Check `Show Time Series` and observe the `Reward, Value, TD Error` plot to monitor learning progress
-    7. Check `Show Weight Space` to watch the cheese and poison actor weights move through pursuit / avoidance space
+    6. Check `Show time series` and observe the `Reward, value, TD error` plot to monitor learning progress
+    7. Check `Show weight space` to watch the cheese and poison actor weights move through pursuit / avoidance space
 
-    You can stop and examine weights at any time, then continue. Uncheck `Learning Enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
+    You can stop and examine weights at any time, then continue. Uncheck `Learning enabled` to freeze weights and watch the vehicle execute its learned policy without further updates.
 
     **Performance tip**: Training runs much faster if you minimize or iconify component windows (time series, network, odor world). The simulation still runs in the background but doesn't spend time rendering visualizations. Another option is to leave the odor world open since it does not impact performance much and it's fun to watch it learn.
 
@@ -1004,22 +1004,22 @@ val braitenbergRL = newSim { optionString ->
     - How the vehicle's movement patterns change over time
     - The `Reward` trace showing how total reward changes
     - The `Value` trace showing the critic's learned predictions
-    - The `TD Error` showing the learning signal
+    - The `TD error` showing the learning signal
     - The network weights updating in real-time
-    - The `Show Weight Space` display, where each point shows the current left and right turn weights for cheese or poison. Points above the anti-diagonal indicate mostly pursuing behavior; points below it indicate mostly avoiding behavior.
+    - The `Show weight space` display, where each point shows the current left and right turn weights for cheese or poison. Points above the anti-diagonal indicate mostly pursuing behavior; points below it indicate mostly avoiding behavior.
 
     ## Activity 2: Adjust the parameters
 
     You can adjust parameters to see their effects:
 
-    - `Learning Rate`: Controls how quickly weights change (higher = faster but less stable learning)
+    - `Learning rate`: Controls how quickly weights change (higher = faster but less stable learning)
     - `Gamma`: Discount factor for future rewards (higher = more farsighted)
-    - `Dispersion`: Sensor range (higher = wider detection), set with `Edit Decay Function...`
-    - `Speed Bias`: Base forward speed (higher = faster default movement)
+    - `Dispersion`: Sensor range (higher = wider detection), set with `Edit decay function...`
+    - `Speed bias`: Base forward speed (higher = faster default movement)
 
     ## Activity 3: Train on a different task
 
-    After training on one task, try clicking `Reset (Random Weights)` or `Reset (0 Weights)` and training on a different task to see how the vehicle adapts.
+    After training on one task, try clicking `Reset (random weights)` or `Reset (0 weights)` and training on a different task to see how the vehicle adapts.
 
     # References
 

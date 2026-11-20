@@ -20,12 +20,12 @@ import org.simbrain.util.point
 val heatColdSim = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Heat-Cold Network")
+    val networkComponent = addNetworkComponent("Heat-cold network")
     val network = networkComponent.network
 
     // Create the neurons based on the XML structure
     val heatReceptor = network.addNeuron {
-        label = "Heat Receptor"
+        label = "Heat receptor"
         location = point(18.5, -73.3)
         updateRule = ThresholdRule().apply {
             threshold = 0.5
@@ -36,7 +36,7 @@ val heatColdSim = newSim {
     }
 
     val coldReceptor = network.addNeuron {
-        label = "Cold Receptor"  
+        label = "Cold receptor"  
         location = point(17.3, 70.5)
         updateRule = ThresholdRule().apply {
             threshold = 0.5
@@ -47,7 +47,7 @@ val heatColdSim = newSim {
     }
 
     val heatSensation = network.addNeuron {
-        label = "Heat Sensation"
+        label = "Heat sensation"
         location = point(154.5, -74.0)
         updateRule = ThresholdRule().apply {
             threshold = 1.0
@@ -56,7 +56,7 @@ val heatColdSim = newSim {
     }
 
     val coldSensation = network.addNeuron {
-        label = "Cold Sensation"
+        label = "Cold sensation"
         location = point(149.1, 70.3)
         updateRule = ThresholdRule().apply {
             threshold = 1.0
@@ -138,9 +138,9 @@ val heatColdSim = newSim {
         The illusion arises when the cold receptor is activated just once. As the inhibition to node `A` is removed, the activation to node `B` propagates forward and creates a brief perception of heat.
 
         To see this:
-        1. Click the `Cold Receptor` neuron and press the `up arrow` to activate it
+        1. Click the `Cold receptor` neuron and press the `up arrow` to activate it
         2. Press `Space` to iterate the simulation once
-        3. Click the `Cold Receptor` again and press the `down arrow` to deactivate it
+        3. Click the `Cold receptor` again and press the `down arrow` to deactivate it
         4. Keep iterating and observe activation propagate to heat sensation
 
         You can see this mechanism in action in [this animation](https://twitter.com/JeffYoshimi/status/1583922612924665856).
@@ -152,29 +152,29 @@ val heatColdSim = newSim {
         This was likely unintentional in the original model. It shows how even experts fluent in formal logic can miss consequences that become immediately evident in a visualization.
 
         The network consists of:
-        - **Heat Receptor**: Input for heat stimuli (clamped)
-        - **Cold Receptor**: Input for cold stimuli (clamped)  
-        - **Heat Sensation**: Output representing heat perception
-        - **Cold Sensation**: Output representing cold perception
+        - **Heat receptor**: Input for heat stimuli (clamped)
+        - **Cold receptor**: Input for cold stimuli (clamped)  
+        - **Heat sensation**: Output representing heat perception
+        - **Cold sensation**: Output representing cold perception
         - **Neurons A & B**: Intermediate processing nodes that create the illusion
 
-        The key mechanism is that the `Cold Receptor` inhibits neuron `A` while also exciting neuron `B`. When the cold stimulus is removed, this inhibition ceases, allowing `B`'s activation to propagate through `A` to the Heat Sensation.
+        The key mechanism is that the `Cold receptor` inhibits neuron `A` while also exciting neuron `B`. When the cold stimulus is removed, this inhibition ceases, allowing `B`'s activation to propagate through `A` to the Heat sensation.
 
         # Activities
 
         ## Activity 1: Observe normal heat sensation
 
-        Activate the `Heat Receptor` and `Run` the simulation.
+        Activate the `Heat receptor` and `Run` the simulation.
 
         ## Activity 2: Observe normal cold sensation
 
-        Activate the `Cold Receptor` and `Run` the simulation.
+        Activate the `Cold receptor` and `Run` the simulation.
 
         ## Activity 3: Create the heat illusion
 
-        1. Activate the `Cold Receptor` briefly.
+        1. Activate the `Cold receptor` briefly.
         2. Deactivate it and continue running.
-        3. Watch the `Heat Sensation` activate paradoxically.
+        3. Watch the `Heat sensation` activate paradoxically.
 
         ## Explore further
 

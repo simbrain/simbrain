@@ -31,7 +31,7 @@ val spikingNeuron = newSim {
         location = point(200, 100)
     }
     val postSpiking = network.addNeuron {
-        label = "Post-Synaptic Response"
+        label = "Post-synaptic response"
         location = point(300, 100)
     }
 
@@ -100,11 +100,11 @@ val spikingNeuron = newSim {
         
         ## Activity 3: Explore other spiking neuron models and spike responders
         
-        You can also experiment with other spike responders by double-clicking the connection from `Spiking` to `Post-Synaptic Response`, then changing the current spike responder 
+        You can also experiment with other spike responders by double-clicking the connection from `Spiking` to `Post-synaptic response`, then changing the current spike responder 
         to a different [spike responder](https://docs.simbrain.net/docs/network/spikeresponders/). In addition to this, you can also change the spiking neuron model to a different 
         model (i.e., Izhikevich, [Integrate-and-Fire](https://docs.simbrain.net/docs/network/neurons/integrateAndFire.html), etc) and see their behaviors.
         
-        One simulation that is recommended to see if you are interested in seeing a comparison in behavior between different spike responders is the `Spike Responders` simulation.
+        One simulation that is recommended to see if you are interested in seeing a comparison in behavior between different spike responders is the `Spike responders` simulation.
 
         # References
 

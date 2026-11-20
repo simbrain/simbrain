@@ -21,7 +21,7 @@ import kotlin.random.Random
 val modernHopfieldSim = newSim {
     workspace.clearWorkspace()
 
-    val networkComponent = addNetworkComponent("Modern Hopfield Network")
+    val networkComponent = addNetworkComponent("Modern Hopfield network")
     val network = networkComponent.network
     val vectorSize = 16
     val memoryCount = 4
@@ -143,7 +143,7 @@ val modernHopfieldSim = newSim {
     )
 
     withGui {
-        val controlPanel = createControlPanel("Modern Hopfield Controls", 10, 10) {
+        val controlPanel = createControlPanel("Modern Hopfield controls", 10, 10) {
             addSliderWithTextField(
                 label = "Beta",
                 minValue = 0.1,

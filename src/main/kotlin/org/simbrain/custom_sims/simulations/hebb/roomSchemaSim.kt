@@ -60,7 +60,7 @@ val roomSchemaSim = newSim {
             "bookshelf", "typewriter", "telephone", "desk", "large", "door", "walls", "ceiling"
         ),
         "Bathroom" to listOf("scale", "toilet", "bathtub", "cupboard", "sink", "very-small", "door", "walls", "ceiling"),
-        "Living Room" to listOf(
+        "Living room" to listOf(
             "television", "drapes", "fireplace", "easy-chair", "sofa", "floor-lamp", "picture",
             "clock", "books", "carpet", "bookshelf", "telephone", "very-large", "windows", "door",
             "walls", "ceiling"
@@ -82,7 +82,7 @@ val roomSchemaSim = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             for ((room, features) in rooms) {
                 addButton(room) {
                     activateNodes(features)
@@ -102,7 +102,7 @@ val roomSchemaSim = newSim {
                 toolTipText = "Show how strongly each pair of patterns trained so far overlaps."
             }
             addSeparator()
-            addButton("Train on Current Pattern") {
+            addButton("Train on current pattern") {
                 trainedPatterns.record(rbm.visibleLayer.activationArray)
                 with(network) {
                     runWithProgressWindow(20, batchSize = 10) {
@@ -112,12 +112,12 @@ val roomSchemaSim = newSim {
             }.apply {
                 toolTipText = "Run 20 RBM training steps on the room features currently active on the visible layer."
             }
-            addButton("Recall Current Pattern") {
+            addButton("Recall current pattern") {
                 workspace.iterateSuspend(10)
             }.apply {
                 toolTipText = "Run the network for 10 steps so it settles toward a stored room schema."
             }
-            addButton("Permute Current Pattern") {
+            addButton("Permute current pattern") {
                 rbm.visibleLayer.activationArray = rbm.visibleLayer
                     .activationArray
                     .map { flipBitWithChance(it.toInt(), 0.1).toDouble() }
@@ -172,19 +172,19 @@ val roomSchemaSim = newSim {
 
         ## Activity 1: Explore room types
 
-        Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living Room`, `Bedroom`) to see the typical features of each room type. Click `Show correlations` to see how much the room patterns overlap. `Living Room` and `Bedroom` overlap the most, while the other rooms are nearly uncorrelated. `Show trained correlations` does the same for the patterns you have trained, labelling a permuted room like `Kitchen ~3`.
+        Click the room buttons (`Kitchen`, `Office`, `Bathroom`, `Living room`, `Bedroom`) to see the typical features of each room type. Click `Show correlations` to see how much the room patterns overlap. `Living room` and `Bedroom` overlap the most, while the other rooms are nearly uncorrelated. `Show trained correlations` does the same for the patterns you have trained, labelling a permuted room like `Kitchen ~3`.
 
         ## Activity 2: Train the network
 
-        After setting a room pattern, click `Train on Current Pattern` to strengthen the associations. The network learns by adjusting connection weights based on which features tend to co-occur.
+        After setting a room pattern, click `Train on current pattern` to strengthen the associations. The network learns by adjusting connection weights based on which features tend to co-occur.
 
         ## Activity 3: Test pattern completion
 
-        Click `Permute Current Pattern` to randomly flip some features, then click `Recall Current Pattern` to see if the network can restore the original room pattern.
+        Click `Permute current pattern` to randomly flip some features, then click `Recall current pattern` to see if the network can restore the original room pattern.
 
         ## Activity 4: Experiment with partial cues
 
-        Manually activate individual units by clicking on them, then use `Recall Current Pattern` to see what complete room the network constructs from those cues.
+        Manually activate individual units by clicking on them, then use `Recall current pattern` to see what complete room the network constructs from those cues.
 
         # References
         

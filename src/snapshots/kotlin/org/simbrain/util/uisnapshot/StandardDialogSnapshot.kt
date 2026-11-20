@@ -17,7 +17,7 @@ class StandardDialogSnapshot : UiSnapshotDef {
         val editor = AnnotatedPropertyEditor(listOf(IzhikevichRule()))
         val dialog = StandardDialog()
         dialog.contentPane = editor
-        dialog.title = "Standard Dialog"
+        dialog.title = "Standard dialog"
         dialog.addButton(JButton("Help").apply { putClientProperty("JButton.buttonType", "help") })
         return dialog
     }

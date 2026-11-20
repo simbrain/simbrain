@@ -30,7 +30,7 @@ val srnElmanSentences = newSim {
     }.build(allWords)
 
     // Text World for Inputs
-    val textWorldInputs = addTextWorld("Text World (Inputs)").apply {
+    val textWorldInputs = addTextWorld("Text World (inputs)").apply {
         updateOn = false
         world.autoAdvance = true
     }
@@ -40,7 +40,7 @@ val srnElmanSentences = newSim {
 
 
     // Text World for Outputs
-    val textWorldOut = addTextWorld("Text World (Outputs)").apply { updateOn = false }
+    val textWorldOut = addTextWorld("Text World (outputs)").apply { updateOn = false }
     textWorldOut.world.showTokenBoundaries = false
     textWorldOut.world.highlightCurrentToken = false
     TokenEmbeddingBuilder().build(text)
@@ -95,20 +95,20 @@ val srnElmanSentences = newSim {
         place(networkComponent, SIM_WINDOW_GAP + 531 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 204 + SIM_WINDOW_GAP, 500, 550)
     }
 
-    workspace.addUpdateAction("Update Inputs") {
+    workspace.addUpdateAction("Update inputs") {
         textWorldInputs.update()
     }
 
-    workspace.addUpdateAction("Set Current Word as Input Activations") {
+    workspace.addUpdateAction("Set current word as input activations") {
         val currentVector = textWorldInputs.world.currentVector
         srn.inputLayer.setActivations(currentVector)
     }
 
-    workspace.addUpdateAction("Update Network") {
+    workspace.addUpdateAction("Update network") {
         networkComponent.update()
     }
 
-    workspace.addUpdateAction("Write Predicted Next Word to Output") {
+    workspace.addUpdateAction("Write predicted next word to output") {
         val totalActivations = srn.outputLayer.activations.toDoubleArray().sum()
         val choices = srn.outputLayer.activations.toDoubleArray().mapIndexed { index, d -> index to d }
             .sortedByDescending { (_, d) -> d }
@@ -156,9 +156,9 @@ val srnElmanSentences = newSim {
 
         1. Run the simulation to see the network processing the current sentence.
 
-        2. Train the network by right-clicking on the `SRN` network and opening the `Train Network` dialog.
+        2. Train the network by right-clicking on the `SRN` network and opening the `Train network` dialog.
 
-        3. Monitor learning progress through the `Loss Function` - the network should learn to predict grammatically appropriate next words.
+        3. Monitor learning progress through the `Loss function` - the network should learn to predict grammatically appropriate next words.
 
         4. Observe predictions in the `Output Text World` to see what words the network thinks should come next.
 

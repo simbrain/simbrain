@@ -74,7 +74,7 @@ val bpttRememberSymbol = newSim {
             if (!active) setStatus("Choose a symbol first.")
             else if (advance(oneHot(INPUT_SIZE, SYMBOL_NAMES.size).toDoubleArray())) setStatus("Recall at step $step of $SEQUENCE_LENGTH.")
         }
-        val panel = createControlPanel("Control Panel", 10, 10) {
+        val panel = createControlPanel("Control panel", 10, 10) {
             SYMBOL_NAMES.forEachIndexed { index, symbol ->
                 addButton(symbol) { cue(index) }.apply {
                     toolTipText = "Reset the network and present $symbol as the symbol to remember."

@@ -53,7 +53,7 @@ class SmileClassifierNode(networkPanel: NetworkPanel, private val smileClassifie
                 })
             }
             addSeparator()
-            val plotName = if (smileClassifier.inputSize == 2) "Plot Decision Regions..." else "Plot Data..."
+            val plotName = if (smileClassifier.inputSize == 2) "Plot decision regions..." else "Plot data..."
             add(createAction(plotName) {
                 SimbrainDesktop.workspace.launch(Dispatchers.Default) {
                     SimbrainDesktop.createClassifierProjectionPlot(smileClassifier)

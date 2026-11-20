@@ -21,11 +21,11 @@ class DesktopComponentScopeTest {
     @Test
     fun `closing a component ends its view scope and its panel's`() {
         val workspace = Workspace()
-        val component = OdorWorldComponent("Odor world")
+        val component = OdorWorldComponent("Odor World")
         workspace.addWorkspaceComponent(component)
         lateinit var desktop: OdorWorldDesktopComponent
         SwingUtilities.invokeAndWait {
-            desktop = OdorWorldDesktopComponent(GenericJInternalFrame("Odor world", true, true, true, true), component)
+            desktop = OdorWorldDesktopComponent(GenericJInternalFrame("Odor World", true, true, true, true), component)
         }
         assertTrue(desktop.viewScope.isActive)
 
@@ -39,7 +39,7 @@ class DesktopComponentScopeTest {
     fun `clearing the workspace ends a component's view scope and its panel's`() = runBlocking {
         val workspace = SimbrainDesktop.workspace
         workspace.clearWorkspace()
-        val component = OdorWorldComponent("Odor world")
+        val component = OdorWorldComponent("Odor World")
         workspace.addWorkspaceComponent(component)
         val desktop = SimbrainDesktop.getDesktopComponent(component) as OdorWorldDesktopComponent
         assertTrue(desktop.viewScope.isActive)

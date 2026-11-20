@@ -45,7 +45,7 @@ val cogMap3Objects = newSim {
     val inputNetwork = network.addNeuronCollection(3).apply {
         setLowerBound(-1.0)
         setUpperBound(1.0)
-        label = "Sensory Neurons"
+        label = "Sensory neurons"
         betweenNeuronInterval = 30
         setLayoutBasedOnSize(point(0.0, 751.0))
         applyLayout()
@@ -58,7 +58,7 @@ val cogMap3Objects = newSim {
     }
     val inputToRes = SynapseGroup(inputNetwork, recurrent, sparseExcitatory)
     inputToRes.displaySynapses = false
-    inputToRes.label = "Sparse Excitatory"
+    inputToRes.label = "Sparse excitatory"
     inputToRes.randomizeExcitatory()
     network.addNetworkModel(inputToRes)
 
@@ -114,7 +114,7 @@ val cogMap3Objects = newSim {
     }
 
     // Plot
-    val projectionPlot = addProjectionPlot("Cognitive Map")
+    val projectionPlot = addProjectionPlot("Cognitive map")
     projectionPlot.projector.tolerance = .9
     projectionPlot.projector.connectPoints = false
     projectionPlot.projector.baseColor = ThemeColor(Color.GRAY.brighter())
@@ -132,7 +132,7 @@ val cogMap3Objects = newSim {
     """ 
     # Recurrent 3 Object Detector
     
-    The Generic 3 Objects Simulation consists of a central recurrent network where, sparse input from the distributed olfactory neuron group (`Sensory Neurons`) are sent into the recurrent network. The inputs function 
+    The Generic 3 Objects Simulation consists of a central recurrent network where, sparse input from the distributed olfactory neuron group (`Sensory neurons`) are sent into the recurrent network. The inputs function 
     similarly to the `Agent Trails` simulation; objects sensed by the agent's receptors are plotted into the plot where, the agent's responses to each object are recorded.  
     
     # Simulation Details
@@ -141,7 +141,7 @@ val cogMap3Objects = newSim {
     has a stronger impact on the agent's sensory receptors the closer an object is. Because there are multiple objects in this environment, the agent is presented with multiple overlapping patterns of activation. 
     The total pattern of activation of the agent's olfactory receptors is a sum of scaled smell vectors. 
     
-    In this simulation, the agent will be dragged to each of the objects where, its sensory activations are recorded and plotted into the `Cognitive Map` window. In this PCA plot is a graph of the agent's sensory receptors
+    In this simulation, the agent will be dragged to each of the objects where, its sensory activations are recorded and plotted into the `Cognitive map` window. In this PCA plot is a graph of the agent's sensory receptors
     and the objects that it has interacted with at different points. Points are labeled when the agent is directly on top of an object. This PCA plot can be thought of as the agent's perception of its environment where,
     through the agent's movement in the odor world, it develops an understanding of its environment.
     
@@ -150,15 +150,15 @@ val cogMap3Objects = newSim {
     ## Activity: Build a cognitive map
     
     In this simulation, the mouse is the agent with `3` objects, the cheese, fish, and flower. To get a quick feel of the simulation, run the simulation and drag the agent to each of the objects and observe changes
-    in the `Cognitive Map` window. Below are the step-by-step instructions:
+    in the `Cognitive map` window. Below are the step-by-step instructions:
     
     1. Run the simulation with the `Run` button in the toolbar.
     
     2. In the `World` window, drag the agent (the mouse) towards each of the objects (cheese, flower, fish).
     
-    3. Observe how the elements in the `Network` and `Cognitive Map` windows change when the agent is moved around.
+    3. Observe how the elements in the `Network` and `Cognitive map` windows change when the agent is moved around.
 
-    4. If the map development slows down, restart the `Cognitive Map` window with the `Eraser` button in the plot toolbar.
+    4. If the map development slows down, restart the `Cognitive map` window with the `Eraser` button in the plot toolbar.
     
         - Note: You can also run the simulation again to start the mapping again and reset the weights. 
         

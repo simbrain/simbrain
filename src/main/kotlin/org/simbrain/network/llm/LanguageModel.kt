@@ -825,7 +825,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         fun create(weightsDirectory: String): LanguageModel =
             LanguageModel(weightsDirectory, contextWindowSize)
 
-        override val name = "Language Model"
+        override val name = "Language model"
     }
 }
 

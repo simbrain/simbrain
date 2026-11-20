@@ -104,11 +104,11 @@ val xorSim = newSim { optionString ->
 
         ## Activity 1: Train the network
 
-        1. Double-click on the `XOR` network in the `XOR` network window to open the `Train Network` window.
+        1. Double-click on the `XOR` network in the `XOR` network window to open the `Train network` window.
 
         2. In the top area of this window, select the `Iterate training until stop button is pressed` button to play the simulation.
 
-        3. Watch the `Sum Squared Error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Init parameters` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
+        3. Watch the `Sum squared error` as training runs. If it levels off above `0`, that is evidence of a local minimum or plateau. Click `Init parameters` and train again; it may take a few tries before the network reaches the global minimum, where error is near `0`.
 
         4. Click `Apply current row as input to network` to check the network's performance. With `Auto advance` checked, each click moves to the next row.
 
@@ -116,11 +116,11 @@ val xorSim = newSim { optionString ->
 
         ## Activity 2: Make training harder
 
-        Making training harder is informative about gradient descent: it shows what can trap or stall it. Weight initialization is an especially direct way to do this. In the training window, click `Trainer properties`, set `Weight Initialization Strategy` to `Random Initialization`, and choose one of these distributions. Then press `Init parameters` so the new weights are used, and train:
+        Making training harder is informative about gradient descent: it shows what can trap or stall it. Weight initialization is an especially direct way to do this. In the training window, click `Trainer properties`, set `Weight Initialization Strategy` to `Random initialization`, and choose one of these distributions. Then press `Init parameters` so the new weights are used, and train:
 
-        - **Nearly identical weights**, for example `Uniform (Real)` with `Floor` `0.5` and `Ceiling` `0.501`. The two hidden units start out as near copies, so they tend to learn the same thing and behave like one hidden unit, which cannot solve XOR.
-        - **Very small weights**, for example `Normal` with `Std. Dev. (σ)` `0.01`. All outputs start near `0.5`, and the error can sit on a long, flat plateau.
-        - **Very large weights**, for example `Normal` with `Std. Dev. (σ)` `10`. The sigmoids saturate, the gradients become tiny, and the network barely moves.
+        - **Nearly identical weights**, for example `Uniform (real)` with `Floor` `0.5` and `Ceiling` `0.501`. The two hidden units start out as near copies, so they tend to learn the same thing and behave like one hidden unit, which cannot solve XOR.
+        - **Very small weights**, for example `Normal` with `Std. dev. (σ)` `0.01`. All outputs start near `0.5`, and the error can sit on a long, flat plateau.
+        - **Very large weights**, for example `Normal` with `Std. dev. (σ)` `10`. The sigmoids saturate, the gradients become tiny, and the network barely moves.
 
         ## Explore further
 

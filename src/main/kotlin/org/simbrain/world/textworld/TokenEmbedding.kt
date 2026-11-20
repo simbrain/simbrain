@@ -290,7 +290,7 @@ class TokenEmbeddingBuilder(
 ): EditableObject {
 
     override val name: String
-        get() = "Token Embedding Builder"
+        get() = "Token embedding builder"
 
     /**
      * Extract a token embedding from the provided string.
@@ -338,7 +338,7 @@ class ExtractEmbeddingOptions(
         order = 70
     )
     
-    override val name: String get() = "Extract Embedding Options"
+    override val name: String get() = "Extract embedding options"
     
     /**
      * Build embedding from file path (when showDocumentPath is true).

@@ -10,7 +10,7 @@ import org.simbrain.util.UpdateAction
  *
  * @author jyoshimi
  */
-class UpdateAllCouplings(@Transient val updater: WorkspaceUpdater) : UpdateAction(description = "Update All Couplings") {
+class UpdateAllCouplings(@Transient val updater: WorkspaceUpdater) : UpdateAction(description = "Update all couplings") {
 
     override suspend fun run(): Unit = coroutineScope {
         updater.workspace.couplingManager.updateCouplings()

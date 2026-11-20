@@ -98,7 +98,7 @@ class DataWorldDesktopComponent(frame: GenericFrame, val component: DataWorldCom
         edit.add(
             actionManager.createCoupledPlotMenu(
                 dataWorld.getProducer(DataWorld::getCurrentNumericRow),
-                "${dataWorld.id} Data",
+                "${dataWorld.id} data",
             )
         )
         edit.addSeparator()

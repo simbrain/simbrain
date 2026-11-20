@@ -22,7 +22,7 @@ val npcSteeringDemo = newSim {
 
     workspace.clearWorkspace()
 
-    val odorWorldComponent = addOdorWorldComponent("NPC Basic Demo")
+    val odorWorldComponent = addOdorWorldComponent("NPC basic demo")
     val odorWorld = odorWorldComponent.world.apply {
         tileMap = loadTileMap(File(OdorWorldPreferences.tileMapDirectory, "yulins_world.tmx"))
         wrapAround = true
@@ -45,7 +45,7 @@ val npcSteeringDemo = newSim {
 
     // Add 3D view sensor to the mouse
     val view3dSensor = View3DSensor().apply {
-        label = "Mouse View"
+        label = "Mouse view"
         fov = 90.0
         viewDistance = 400.0
         outputWidth = 200
@@ -132,7 +132,7 @@ val npcSteeringDemo = newSim {
         - Drag a cheese close to the mouse — watch it react.
         - Drag the Pansy or Tulip into the cheese's escape path.
         - Open an entity's property dialog (right-click -> `Properties`) and tweak
-          behavior parameters like `Max Speed`, `Vision Range`, or `Num Rays`.
+          behavior parameters like `Max speed`, `Vision range`, or `Num rays`.
         """.trimIndent(),
         width = 350
     )
@@ -156,7 +156,7 @@ val npcSteeringDemo = newSim {
             }
         }
 
-        createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP) {
+        createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP) {
             addCheckBox(
                 "Show steering debug", false,
                 toolTip = "Overlay each moving agent's candidate headings, obstacle feelers, and current behavior."
@@ -172,7 +172,7 @@ val npcSteeringDemo = newSim {
             }
         }
 
-        val view3dPanel = createControlPanel("Mouse 3D View", SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val view3dPanel = createControlPanel("Mouse 3D view", SIM_WINDOW_GAP + 550 + SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
             addComponent(viewPanel)
         }.awaitLayout()
 

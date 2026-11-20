@@ -50,7 +50,7 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
     /**
      * Help menu item.
      */
-    private val helpItem = JMenuItem("Reader Help")
+    private val helpItem = JMenuItem("Reader help")
 
     /**
      * The pane representing the text world.
@@ -116,14 +116,14 @@ class TextWorldDesktopComponent(frame: GenericFrame, component: TextWorldCompone
             SimbrainDesktop.actionManager.createCoupledDataWorldAction(
                 name = "Record token embeddings",
                 world.getProducer(TextWorld::currentVector),
-                sourceName = "${world.id} Token Embeddings",
+                sourceName = "${world.id} token embeddings",
                 world.tokenEmbedding.dimension
             )
         )
         edit.add(
             SimbrainDesktop.actionManager.createCoupledPlotMenu(
                 world.getProducer(TextWorld::currentVector),
-                "${world.id} Token Embeddings",
+                "${world.id} token embeddings",
             )
         )
         edit.addSeparator()

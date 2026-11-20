@@ -20,7 +20,7 @@ import org.simbrain.util.updateAction
 val mtcarsRegression = newSim("mtcars_regression") {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("Cars Dataset")
+    val networkComponent = addNetworkComponent("Cars dataset")
     val net = networkComponent.network
 
     val cars = parseMtcars(readSimulationFileContents("tables" / "mtcars.csv"))
@@ -162,7 +162,7 @@ val mtcarsRegression = newSim("mtcars_regression") {
 
         ## Activity 1: Train and test the network
 
-        1. Right-click the backprop network and choose `Train...` (or double-click it) to open the `Train Network` dialog.
+        1. Right-click the backprop network and choose `Train...` (or double-click it) to open the `Train network` dialog.
 
         2. Press `Run` to train, and `Stop` once the training error (red) levels off, usually within a thousand or so iterations. The testing error (blue) shows how well the network does on the `7` testing cars. If you keep training well past that point, the testing error often starts to rise while the training error keeps falling: the network is memorizing the `25` training cars rather than learning something that carries over to new ones (overfitting).
 

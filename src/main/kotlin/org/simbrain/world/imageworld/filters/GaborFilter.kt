@@ -2,7 +2,10 @@ package org.simbrain.world.imageworld.filters
 
 import org.simbrain.util.UserParameter
 import java.awt.image.BufferedImage
-import kotlin.math.*
+import kotlin.math.PI
+import kotlin.math.cos
+import kotlin.math.exp
+import kotlin.math.sin
 
 /**
  * Gabor filter for detecting edges and textures at specific orientations and frequencies.
@@ -42,7 +45,7 @@ class GaborFilter : ImageFilter() {
     @UserParameter(label = "Phase", description = "Phase offset of the sinusoidal component", order = 6)
     var phase: Double = 0.0
 
-    @UserParameter(label = "Kernel Size", description = "Size of the filter kernel (must be odd)", order = 7)
+    @UserParameter(label = "Kernel size", description = "Size of the filter kernel (must be odd)", order = 7)
     var kernelSize: Int = 15
         set(value) {
             field = if (value % 2 == 0) value + 1 else value
@@ -50,7 +53,7 @@ class GaborFilter : ImageFilter() {
         }
 
     init {
-        name = "Gabor Filter"
+        name = "Gabor filter"
     }
 
     override fun applyFilter(input: BufferedImage): BufferedImage {

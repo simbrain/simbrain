@@ -27,7 +27,7 @@ import kotlin.math.atan2
 val somNetSmells = newSim {
 
     workspace.clearWorkspace()
-    val networkComponent = addNetworkComponent("SOM Network")
+    val networkComponent = addNetworkComponent("SOM network")
     val network = networkComponent.network
 
     val somNet = SOMNetwork(9, 16)
@@ -54,7 +54,7 @@ val somNetSmells = newSim {
 
     val labeler = PrototypeLabeler(somNet.som.neuronList, somNet::winnerFor)
 
-    val oc = addOdorWorldComponent("Flowers and Cheeses")
+    val oc = addOdorWorldComponent("Flowers and cheeses")
     val world = oc.world
 
     val mouse = world.addEntity(140, 205, EntityType.Mouse)
@@ -154,7 +154,7 @@ val somNetSmells = newSim {
     val tourSpeed = 3.0
     var tourTarget = objectsWithLabels.random().first
 
-    workspace.addUpdateAction("Auto Tour") {
+    workspace.addUpdateAction("Auto tour") {
         if (!touring) return@addUpdateAction
         val dx = tourTarget.location.x - mouse.location.x
         val dy = tourTarget.location.y - mouse.location.y
@@ -169,9 +169,9 @@ val somNetSmells = newSim {
     }
 
     withGui {
-        val controlPanel = createControlPanel("Control Panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
+        val controlPanel = createControlPanel("Control panel", SIM_WINDOW_GAP, SIM_WINDOW_GAP) {
 
-            addButton("Auto Tour") {
+            addButton("Auto tour") {
                 if (workspace.updater.isRunning) return@addButton
                 touring = true
                 workspace.iterateWhile { workspace.updater.isRunning && somNet.somLearningRate > 0.001 }
@@ -247,7 +247,7 @@ val somNetSmells = newSim {
 
         ## Control Panel Settings
 
-        - `Auto Tour`: Walk the mouse straight through the objects one after another, in random order,
+        - `Auto tour`: Walk the mouse straight through the objects one after another, in random order,
           until the learning rate falls below `0.001` (about `6000` updates from a fresh start), then
           stop. Press `Stop` to end early. Once the learning rate is below `0.001`, press `Reset`
           first to start over.
@@ -258,7 +258,7 @@ val somNetSmells = newSim {
 
         ## Activity 1: Watch the map organize
 
-        1. Press `Auto Tour` to watch the mouse tour the objects by itself until the SOM has nearly
+        1. Press `Auto tour` to watch the mouse tour the objects by itself until the SOM has nearly
            finished learning. Or press `Run` and drag the mouse near different objects yourself.
         2. Each object's label appears once the mouse has been near it (see `About the Labeling System`).
         3. Watch the labels as the SOM organizes the smells, and watch `Learning rate` and `N-size`
@@ -293,7 +293,7 @@ val somNetSmells = newSim {
            cheeses from flowers about half the time or less; sweeping through the objects one
            after another nearly always does.
 
-        To see a good round first, press `Reset` and then `Auto Tour`: it plays with the recommended
+        To see a good round first, press `Reset` and then `Auto tour`: it plays with the recommended
         strategy. Then press `Reset` again and try to match it by hand.
 
         The map keeps adjusting after the first split, so a clean split occasionally blurs a little
@@ -306,7 +306,7 @@ val somNetSmells = newSim {
         - Stop the simulation, select a SOM neuron, and right-click the SOM network's interaction box
           and choose `Recall SOM memory` to put the smell that neuron is tuned to on the input nodes
         - Position the mouse between objects to observe how the network responds to smell mixtures
-        - After `Auto Tour` finishes, press `Run` and drag the mouse slowly in a straight line away
+        - After `Auto tour` finishes, press `Run` and drag the mouse slowly in a straight line away
           from an object. The lit neuron walks across the map from the object's label toward the
           region where weak smells land
         - The `SOM network (animals)` simulation shows the same kind of map with labeled features and no

@@ -1,15 +1,7 @@
 package org.simbrain.console
 
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withTimeout
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertFalse
-import org.junit.jupiter.api.Assertions.assertNotEquals
-import org.junit.jupiter.api.Assertions.assertNotSame
-import org.junit.jupiter.api.Assertions.assertTrue
+import kotlinx.coroutines.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.simbrain.network.NetworkComponent
 import org.simbrain.network.core.NetworkModel
@@ -379,6 +371,22 @@ class CommandShellTest {
     }
 
     @Test
+    fun `rm star force removes every component`() {
+        val shell = shellWithNetwork()
+        shell.run("add network net2")
+        shell.run("add neurons 2 in=net2")
+        assertEquals("Removed 2 object(s).", shell.run("rm /* force"))
+        assertTrue(shell.workspace.componentList.isEmpty())
+    }
+
+    @Test
+    fun `net is short for network in add`() {
+        val shell = CommandShell(Workspace())
+        assertEquals("Added net1.", shell.run("add net net1"))
+        assertTrue(shell.workspace.getComponent("net1") is NetworkComponent)
+    }
+
+    @Test
     fun `add refuses a duplicate name and an unknown type`() {
         val shell = shellWithNetwork()
         assertEquals("There is already a component named net1.", shell.run("add network net1"))
@@ -407,6 +415,33 @@ class CommandShellTest {
         assertEquals("Which network? Use cd or in=<network>.", shell.run("add neurons 2"))
         shell.run("add neurons 2 in=net2")
         assertEquals(2, (shell.workspace.getComponent("net2") as NetworkComponent).network.getModels<Neuron>().size)
+    }
+
+    @Test
+    fun `add with the count first or a to clause suggests the supported form and adds nothing`() {
+        val shell = shellWithNetwork()
+        assertEquals("Did you mean: add neurons 3", shell.run("add 3 neurons"))
+        assertEquals("Did you mean: add neurons 3 in=net1", shell.run("add 3 neurons to net1"))
+        assertEquals("Did you mean: add collection 3 in=net1 label=input", shell.run("add collection 3 into net1 label=input"))
+        assertEquals(2, shell.network().getModels<Neuron>().size)
+    }
+
+    @Test
+    fun `add completes the network after in=`() {
+        val shell = shellWithNetwork()
+        assertEquals("add neurons 10 in=net1 ", shell.complete("add neurons 10 in=Ne").line)
+    }
+
+    @Test
+    fun `a suggested correction runs`() {
+        val shell = shellWithNetwork()
+        val suggested = shell.run("add 3 neurons to net1").removePrefix("Did you mean: ")
+        assertEquals("Added Neuron_3 to Neuron_5.", shell.run(suggested))
+    }
+
+    @Test
+    fun `a failing line with no correction keeps its own problem`() {
+        assertEquals("Count must be a positive whole number: x", shellWithNetwork().run("add neurons x"))
     }
 
     @Test
@@ -527,10 +562,22 @@ class CommandShellTest {
     }
 
     @Test
-    fun `sims lists simulations and sim needs the desktop`() {
+    fun `sims lists simulations and open needs the desktop`() {
         val shell = shellWithNetwork()
         assertTrue(shell.run("sims xor").contains("XOR"))
-        assertEquals("Simulations can only be opened from the desktop.", shell.run("sim XOR"))
+        assertEquals("Simulations can only be opened from the desktop.", shell.run("open XOR"))
+    }
+
+    @Test
+    fun `rand runs randomize and help names it`() {
+        val shell = shellWithNetwork()
+        assertEquals("Randomized 1 model(s).", shell.run("rand net1/Neuron_1"))
+        assertTrue(shell.run("help randomize").contains("Short form: rand"))
+    }
+
+    @Test
+    fun `sim suggests open`() {
+        assertEquals("Did you mean: open XOR force", shellWithNetwork().run("sim XOR force"))
     }
 
     @Test
@@ -893,7 +940,7 @@ class CommandShellTest {
 
     @Test
     fun `every example runs in a small workspace`() {
-        val needsDesktop = setOf("sim")
+        val needsDesktop = setOf("open")
         for (command in workspaceCommands.all.filter { it.name !in needsDesktop }) {
             for (example in command.examples) {
                 val workspace = Workspace()

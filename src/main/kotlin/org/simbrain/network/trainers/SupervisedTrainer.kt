@@ -6,19 +6,19 @@
  */
 package org.simbrain.network.trainers
 
-import org.simbrain.network.tensor.Blas
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import org.simbrain.network.core.*
 import org.simbrain.network.events.TrainerEvents
 import org.simbrain.network.events.TrainingStats
+import org.simbrain.network.tensor.Blas
 import org.simbrain.network.trainers.SupervisedTrainer.*
-import org.simbrain.util.sumOfSquares
 import org.simbrain.util.UserParameter
 import org.simbrain.util.XStreamNotRestored
 import org.simbrain.util.propertyeditor.CopyableObject
 import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.util.propertyeditor.GuiEditable
+import org.simbrain.util.sumOfSquares
 import org.simbrain.util.toColumnVector
 import smile.math.matrix.Matrix
 import kotlin.math.sqrt
@@ -42,7 +42,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     var lossFunction:BackpropLossFunction by GuiEditable(
         initValue = BackpropLossFunction.SSE,
-        description = "Loss function used to measure prediction error. SSE/MSE for regression; cross Entropy for classification",
+        description = "Loss function used to measure prediction error. SSE/MSE for regression; cross entropy for classification",
         typeMapProvider = lossFunctionProvider
     )
 
@@ -55,7 +55,7 @@ open class SupervisedTrainerConfig(lossFunctionProvider: KFunction<List<Class<ou
 
     @UserParameter(
         label = "Update type", 
-        description = "Training update method. Stochastic updates after each random example; Sequential Online processes all examples in order; Epoch processes entire dataset; Batch processes fixed-size random batches",
+        description = "Training update method. Stochastic updates after each random example; Sequential online processes all examples in order; Epoch processes entire dataset; Batch processes fixed-size random batches",
         showDetails = false, 
         order = 30
     )
@@ -637,7 +637,7 @@ open class SupervisedTrainer(val network: Network, val supervisedNetwork: Superv
 
         class SequentialOnline : UpdateMethod() {
             override fun copy() = this
-            override fun toString() = "Sequential Online"
+            override fun toString() = "Sequential online"
         }
 
         override fun getTypeList(): List<Class<out CopyableObject>>? {
@@ -832,7 +832,7 @@ class SRNTrainerConfig(lossFunctionProvider: KFunction<List<Class<out EditableOb
 
     override var updateType: UpdateMethod by GuiEditable(
         initValue = UpdateMethod.SequentialOnline(),
-        description = "Training update method. SRN networks require Sequential Online mode to properly handle temporal sequences by processing examples in order",
+        description = "Training update method. SRN networks require Sequential online mode to properly handle temporal sequences by processing examples in order",
         typeMapProvider = UpdateMethod::srnTypeList,
         order = 3
     )

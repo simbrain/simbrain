@@ -56,7 +56,9 @@ val workspaceCommands: CommandRegistry = commands {
         // add 10 neurons becomes add neurons 10
         Correction("""^add\s+(\d+)\s+(neurons?|collection)\b""", "add $2 $1"),
         // add neurons 10 to net1 becomes add neurons 10 in=net1
-        Correction("""^(add\s+(?:neurons?|collection)\b.*?)\s+(?:to|into|in)\s+("[^"]*"|\S+)""", "$1 in=$2")
+        Correction("""^(add\s+(?:neurons?|collection)\b.*?)\s+(?:to|into|in)\s+("[^"]*"|\S+)""", "$1 in=$2"),
+        // sim XOR becomes open XOR
+        Correction("""^sim\b""", "open")
     )
 
     command(
@@ -526,13 +528,13 @@ val workspaceCommands: CommandRegistry = commands {
     }
 
     command(
-        name = "sim",
+        name = "open",
         group = "Run",
         examples = listOf(
-            Example("Open the XOR simulation, discarding unsaved changes", "sim XOR force"),
-            Example("Open the XOR simulation and look at its layers", "sim XOR force", "ls XOR where type=NeuronCollection", "get XOR/** activation where type=Neuron")
+            Example("Open the XOR simulation, discarding unsaved changes", "open XOR force"),
+            Example("Open the XOR simulation and look at its layers", "open XOR force", "ls XOR where type=NeuronCollection", "get XOR/** activation where type=Neuron")
         ),
-        usage = "sim <name> [force]",
+        usage = "open <simulation> [force]",
         description = "Open a simulation, replacing the current workspace. force discards unsaved changes. From a " +
                 "Console window, which closes with the workspace, it runs in the Terminal tab at the bottom of the desktop.",
         completer = { _, partial -> wordCandidates(simulations.items.map { it.first }.toList(), partial) }
@@ -540,13 +542,13 @@ val workspaceCommands: CommandRegistry = commands {
         val theDesktop = desktop ?: fail("Simulations can only be opened from the desktop.")
         val force = args.size > 1 && args.last() == "force"
         val nameArgs = if (force) args.dropLast(1) else args
-        if (nameArgs.isEmpty()) fail("Usage: sim <name> [force]")
+        if (nameArgs.isEmpty()) fail("Usage: open <simulation> [force]")
         val sim = chooseOption(simulations.items.toMap(), nameArgs.joinToString(" "), "simulation")
         relayToTerminal?.let { relay ->
-            relay("sim " + args.joinToString(" ") { quoted(it) })
+            relay("open " + args.joinToString(" ") { quoted(it) })
             return@command RELAYED
         }
-        requireSafeToReplace(force, "sim <name> force")
+        requireSafeToReplace(force, "open <simulation> force")
         withContext(Dispatchers.Default) { sim.run(theDesktop) }
         ""
     }

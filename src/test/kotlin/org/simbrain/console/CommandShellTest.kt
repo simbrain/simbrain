@@ -562,10 +562,15 @@ class CommandShellTest {
     }
 
     @Test
-    fun `sims lists simulations and sim needs the desktop`() {
+    fun `sims lists simulations and open needs the desktop`() {
         val shell = shellWithNetwork()
         assertTrue(shell.run("sims xor").contains("XOR"))
-        assertEquals("Simulations can only be opened from the desktop.", shell.run("sim XOR"))
+        assertEquals("Simulations can only be opened from the desktop.", shell.run("open XOR"))
+    }
+
+    @Test
+    fun `sim suggests open`() {
+        assertEquals("Did you mean: open XOR force", shellWithNetwork().run("sim XOR force"))
     }
 
     @Test
@@ -928,7 +933,7 @@ class CommandShellTest {
 
     @Test
     fun `every example runs in a small workspace`() {
-        val needsDesktop = setOf("sim")
+        val needsDesktop = setOf("open")
         for (command in workspaceCommands.all.filter { it.name !in needsDesktop }) {
             for (example in command.examples) {
                 val workspace = Workspace()

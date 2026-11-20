@@ -223,18 +223,21 @@ class WandPalettePanel(
                 isOpaque = false
             }
 
-            // On the primary action's row, an offer of its opposite as the secondary when something else is chosen
-            val suggestion = if (index == palette.selectedIndex) palette.suggestedSecondary else null
+            // On the primary action's row while the primary is being chosen, an offer of its opposite as the
+            // secondary when something else is chosen. Worded as something to do, so that it is not read as
+            // saying what the secondary is.
+            val suggestion =
+                if (!choosingSecondary && index == palette.selectedIndex) palette.suggestedSecondary else null
             if (suggestion != null) {
-                buttonPanel.add(JButton("Shift \u2192", WandActionIcon(suggestion.color, 16, suggestion.letter)).apply {
-                    horizontalTextPosition = SwingConstants.LEFT
+                buttonPanel.add(JButton("Use for Shift", WandActionIcon(suggestion.color, 16, suggestion.letter)).apply {
                     iconTextGap = 3
                     font = Theme.font(10)
-                    margin = Insets(1, 5, 1, 3)
+                    margin = Insets(1, 3, 1, 5)
                     isFocusPainted = false
-                    toolTipText = "<html>Shift now applies: ${secondaryAction?.description}.<br>" +
-                            "Click to have it take back what this action does instead: ${suggestion.description}.<br>" +
-                            "It will then follow the primary action as that changes.</html>"
+                    toolTipText = "<html>Suggestion: make the secondary action the opposite of this one, " +
+                            "${suggestion.description}.<br>" +
+                            "The secondary is now ${secondaryAction?.description}.<br>" +
+                            "After this it follows the primary action as that changes.</html>"
                     addActionListener {
                         palette.useSuggestedSecondary()
                         savePalette()

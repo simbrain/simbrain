@@ -239,6 +239,16 @@ class WandPaletteTest {
     }
 
     @Test
+    fun `the selected action is saved with the palette`() {
+        val palette = paletteOf(AdjustValueAction.activate(), setTo(0.0), AdjustValueAction.inhibit())
+        palette.selectAction(2)
+
+        val restored = getSimbrainXStream().fromXML(getSimbrainXStream().toXML(palette)) as WandPalette
+
+        assertEquals(2, restored.selectedIndex)
+    }
+
+    @Test
     fun `a palette saved before there was a secondary has an automatic one`() {
         val palette = paletteOf(AdjustValueAction.activate(), AdjustValueAction.inhibit(), setTo(0.0))
         val savedWithoutSecondary = getSimbrainXStream().toXML(palette)

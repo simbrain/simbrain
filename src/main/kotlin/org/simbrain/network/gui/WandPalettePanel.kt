@@ -1,5 +1,11 @@
+/**
+ * Swing views of the wand palette: the popup list where the primary action and the secondary action, the one
+ * applied with Shift held, are chosen and edited, and the toolbar split button that switches to the wand and opens
+ * that list.
+ */
 package org.simbrain.network.gui
 
+import kotlinx.coroutines.Job
 import net.miginfocom.swing.MigLayout
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.*
@@ -8,7 +14,9 @@ import org.simbrain.util.propertyeditor.objectWrapper
 import java.awt.*
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
+import java.awt.geom.Area
 import java.awt.geom.Ellipse2D
+import java.awt.geom.Path2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 
@@ -27,9 +35,39 @@ class WandPalettePanel(
     
     private var isRebuilding = false
 
+    /**
+     * Whether a click on a row chooses the secondary action rather than the selected one. Follows the two tabs
+     * above the list.
+     */
+    private var choosingSecondary = false
+
+    private val primaryTab = slotTab("Primary", secondary = false)
+
+    private val secondaryTab = slotTab("Secondary (Shift)", secondary = true)
+
     init {
         layout = BorderLayout()
         border = EmptyBorder(Theme.componentGap, Theme.componentGap, Theme.componentGap, Theme.componentGap)
+
+        ButtonGroup().apply {
+            add(primaryTab)
+            add(secondaryTab)
+        }
+        primaryTab.isSelected = true
+        val swapButton = JButton(SwapIcon()).apply {
+            putClientProperty("JButton.buttonType", "toolBarButton")
+            toolTipText = "Swap the primary and secondary actions (x)"
+            addActionListener {
+                palette.swapSelectedAndSecondary()
+                savePalette()
+            }
+        }
+        val slotPanel = JPanel(MigLayout("insets 0 0 ${Theme.tightGap} 0, fillx, gap 0", "[grow,fill,sg slot][grow,fill,sg slot]${Theme.tightGap}[]")).apply {
+            add(primaryTab)
+            add(secondaryTab)
+            add(swapButton)
+        }
+        add(slotPanel, BorderLayout.NORTH)
 
         // Scrollable list area
         val scrollPane = JScrollPane(listPanel).apply {
@@ -77,15 +115,59 @@ class WandPalettePanel(
             }
         })
 
-        // Listen for palette changes
-        palette.events.apply {
-            actionAdded.on { rebuildList() }
-            actionRemoved.on { rebuildList() }
-            paletteChanged.on { rebuildList() }
-            selectionChanged.on { updateSelection() }
-        }
-
         rebuildList()
+    }
+
+    private var paletteSubscriptions = emptyList<Job>()
+
+    /**
+     * Follows the palette while this panel is on screen. The palette outlives every popup that shows it, so a
+     * panel that went on listening after its popup closed would keep switching its network to the wand whenever
+     * the selection changed.
+     */
+    override fun addNotify() {
+        super.addNotify()
+        paletteSubscriptions.forEach { it.cancel() }
+        paletteSubscriptions = with(palette.events) {
+            listOf(
+                actionAdded.on { rebuildList() },
+                actionRemoved.on { rebuildList() },
+                paletteChanged.on { rebuildList() },
+                selectionChanged.on { updateSelection() },
+                secondaryChanged.on { rebuildList() }
+            )
+        }
+        rebuildList()
+    }
+
+    override fun removeNotify() {
+        paletteSubscriptions.forEach { it.cancel() }
+        paletteSubscriptions = emptyList()
+        super.removeNotify()
+    }
+
+    /**
+     * One of the two tabs above the list. Each shows the action it stands for, and selecting it makes clicks on
+     * the rows choose that action.
+     */
+    private fun slotTab(title: String, secondary: Boolean) = JToggleButton(title).apply {
+        putClientProperty("JButton.buttonType", "tab")
+        horizontalAlignment = SwingConstants.LEFT
+        iconTextGap = Theme.tightGap + 2
+        isFocusable = false
+        addActionListener {
+            choosingSecondary = secondary
+            rebuildList()
+        }
+    }
+
+    private fun updateSlotTab(tab: JToggleButton, action: WandAction?, gesture: String) {
+        tab.icon = action?.let { WandActionIcon(it.color, 20, it.letter) }
+        tab.toolTipText = if (action != null) {
+            "$gesture applies: ${action.description}. Select this tab to choose another action from the list"
+        } else {
+            "No secondary action is chosen, so Shift changes nothing. Select this tab to choose one from the list"
+        }
     }
 
     private fun rebuildList() {
@@ -94,13 +176,17 @@ class WandPalettePanel(
         // TODO: Should not be necessary. Try preventing this from happening in the first place.
         if (isRebuilding) return
         isRebuilding = true
+
+        val secondaryAction = palette.secondaryAction
+        updateSlotTab(primaryTab, palette.selectedAction, "Dragging the wand")
+        updateSlotTab(secondaryTab, secondaryAction, "Dragging the wand with Shift held")
         
         listPanel.removeAll()
         palette.actions.forEachIndexed { index, action ->
             if (index > 0) {
                 listPanel.add(Box.createVerticalStrut(2))
             }
-            listPanel.add(createActionRow(index, action))
+            listPanel.add(createActionRow(index, action, secondaryAction))
         }
         listPanel.add(Box.createVerticalGlue())
         listPanel.revalidate()
@@ -115,8 +201,14 @@ class WandPalettePanel(
         onSelectionChanged()
     }
 
-    private fun createActionRow(index: Int, action: WandAction): JPanel {
-        val isSelected = index == palette.selectedIndex
+    private fun createActionRow(index: Int, action: WandAction, secondaryAction: WandAction?): JPanel {
+        // The row highlighted is the choice of the tab being chosen for; the other tab's action carries a tag
+        val isSelected = if (choosingSecondary) action === secondaryAction else index == palette.selectedIndex
+        val otherRole = when {
+            choosingSecondary && index == palette.selectedIndex -> "Primary"
+            !choosingSecondary && action === secondaryAction -> "Secondary"
+            else -> null
+        }
 
         val accent = UIManager.getColor("Component.focusColor") ?: Color(100, 150, 255)
         // Opaque selection wash: blend the accent over the card background so the (opaque) row
@@ -151,6 +243,47 @@ class WandPalettePanel(
                 isOpaque = false
             }
 
+            // On the highlighted row, an offer of the primary action's opposite as the secondary when something
+            // else is chosen. That row is the primary action in one tab and the chosen secondary in the other, so
+            // the offer stays with the selection. Worded as something to do, so that it is not read as saying what
+            // the secondary is.
+            val suggestion = if (isSelected) palette.suggestedSecondary else null
+            if (suggestion != null) {
+                val label = if (choosingSecondary) "Use instead" else "Use for Shift"
+                buttonPanel.add(JButton(label, WandActionIcon(suggestion.color, 16, suggestion.letter)).apply {
+                    iconTextGap = 3
+                    font = Theme.font(10)
+                    margin = Insets(1, 3, 1, 5)
+                    isFocusPainted = false
+                    val addsIt = if (suggestion in palette.actions) "" else ", adding it to the palette"
+                    val current = secondaryAction?.let { "The secondary is now ${it.description}." }
+                        ?: "There is no secondary action now."
+                    toolTipText = "<html>Suggestion: make the secondary action the opposite of the primary one, " +
+                            "${suggestion.description}$addsIt.<br>$current</html>"
+                    addActionListener {
+                        palette.useSuggestedSecondary()
+                        savePalette()
+                    }
+                })
+            }
+
+            val roleTag = otherRole?.let {
+                JLabel(it).apply {
+                    font = Theme.font(10)
+                    foreground = Theme.mutedText
+                    border = BorderFactory.createCompoundBorder(
+                        BorderFactory.createLineBorder(Theme.divider, 1, true),
+                        EmptyBorder(1, 5, 1, 5)
+                    )
+                    toolTipText = if (it == "Primary") {
+                        "The primary action, applied by dragging the wand"
+                    } else {
+                        "The secondary action, applied by dragging the wand with Shift held"
+                    }
+                }
+            }
+            roleTag?.let { buttonPanel.add(it) }
+
             // Kebab menu button for editing
             val kebabButton = JButton().apply {
                 icon = KebabIcon()
@@ -176,10 +309,10 @@ class WandPalettePanel(
 
             add(buttonPanel, BorderLayout.EAST)
 
-            // Click to select, double-click to edit
+            // Click to choose for the current tab, shift-click to make secondary, double-click to edit
             val clickListener = object : MouseAdapter() {
                 override fun mousePressed(e: MouseEvent) {
-                    palette.selectAction(index)
+                    if (choosingSecondary || e.isShiftDown) makeSecondary(index) else palette.selectAction(index)
                 }
                 override fun mouseClicked(e: MouseEvent) {
                     if (e.clickCount == 2) {
@@ -191,7 +324,13 @@ class WandPalettePanel(
             addMouseListener(clickListener)
             iconLabel.addMouseListener(clickListener)
             descLabel.addMouseListener(clickListener)
+            roleTag?.addMouseListener(clickListener)
         }
+    }
+
+    private fun makeSecondary(index: Int) {
+        palette.secondaryIndex = index
+        savePalette()
     }
 
     private fun addNewAction() {
@@ -247,7 +386,7 @@ class WandPalettePanel(
         showOpenDialog(extension = "xml") {
             try {
                 val imported = getSimbrainXStream().fromXML(readText()) as WandPalette
-                palette.setActions(imported.actions)
+                palette.setActions(imported.actions, imported.secondaryIndex)
                 savePalette()
             } catch (e: Exception) {
                 showMessage("Failed to import palette: ${e.message}", MessageKind.ERROR, title = "Import error")
@@ -258,27 +397,25 @@ class WandPalettePanel(
     private fun revertToDefault() {
         if (showConfirm("Reset palette to default actions? This cannot be undone.", okLabel = "Reset", kind = MessageKind.WARNING)) {
             val defaultPalette = WandPalette.createDefault()
-            palette.setActions(defaultPalette.actions)
+            palette.setActions(defaultPalette.actions, defaultPalette.secondaryIndex)
             savePalette()
         }
     }
 }
 
 /**
- * Icon component that draws a wand circle with the given color and letter.
+ * Icon that draws a wand circle with the given color and letter.
  */
-class WandIcon(private val color: Color, private val size: Int, private val letter: String = "") : JLabel() {
+class WandActionIcon(private val color: Color, private val size: Int, private val letter: String = "") : Icon {
 
-    init {
-        preferredSize = Dimension(size, size)
-        minimumSize = Dimension(size, size)
-    }
+    override fun getIconWidth() = size
+    override fun getIconHeight() = size
 
-    override fun paintComponent(g: Graphics) {
-        super.paintComponent(g)
-        val g2 = g as Graphics2D
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        val g2 = g.create() as Graphics2D
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON)
+        g2.translate(x, y)
 
         val padding = 2
         val circleSize = size - padding * 2
@@ -300,6 +437,18 @@ class WandIcon(private val color: Color, private val size: Int, private val lett
         val textX = (size - fm.stringWidth(displayLetter)) / 2
         val textY = (size - fm.height) / 2 + fm.ascent
         g2.drawString(displayLetter, textX, textY)
+        g2.dispose()
+    }
+}
+
+/**
+ * Icon component that draws a wand circle with the given color and letter.
+ */
+class WandIcon(color: Color, size: Int, letter: String = "") : JLabel(WandActionIcon(color, size, letter)) {
+
+    init {
+        preferredSize = Dimension(size, size)
+        minimumSize = Dimension(size, size)
     }
 }
 
@@ -331,6 +480,41 @@ class KebabIcon : Icon {
 }
 
 /**
+ * Two arrows pointing opposite ways, for swapping the palette's two actions.
+ */
+class SwapIcon : Icon {
+
+    override fun getIconWidth() = 14
+    override fun getIconHeight() = 14
+
+    override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
+        val g2 = g.create() as Graphics2D
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON)
+        g2.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE)
+        g2.translate(x, y)
+        g2.color = Theme.foreground
+        g2.stroke = BasicStroke(1.4f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND)
+
+        val arrows = Path2D.Double().apply {
+            // Upper arrow, pointing right
+            moveTo(2.0, 4.5)
+            lineTo(12.0, 4.5)
+            moveTo(9.0, 1.5)
+            lineTo(12.0, 4.5)
+            lineTo(9.0, 7.5)
+            // Lower arrow, pointing left
+            moveTo(12.0, 9.5)
+            lineTo(2.0, 9.5)
+            moveTo(5.0, 6.5)
+            lineTo(2.0, 9.5)
+            lineTo(5.0, 12.5)
+        }
+        g2.draw(arrows)
+        g2.dispose()
+    }
+}
+
+/**
  * Split button for wand actions.
  * Main button area activates wand mode, triangle dropdown shows palette popup.
  * Displays the current action's letter in a black/white icon for consistency with other toolbar buttons.
@@ -352,7 +536,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
             isFocusable = false
             icon = WandButtonIcon(palette, 18)
             addActionListener {
-                updateWandCursor()
+                networkPanel.wandEventHandler.refreshCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
                 isSelected = true
             }
@@ -381,38 +565,36 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         // Set initial tooltip after button is created
         updateTooltip()
 
-        // Update icon and cursor when selection changes
-        palette.events.selectionChanged.on {
-            updateWandCursor()
-            updateTooltip()
-            mainButton.repaint()
-        }
-
-        // Update cursor when an action is edited
-        palette.events.actionEdited.on {
-            updateWandCursor()
-            updateTooltip()
-        }
-
-        // Update cursor when palette is loaded/changed
-        palette.events.paletteChanged.on {
-            updateWandCursor()
-            updateTooltip()
+        // Update icon, tooltip and cursor whenever the selected or secondary action may have changed: a new
+        // selection or secondary, an edited, added or removed action, or a loaded palette
+        palette.events.apply {
+            // The palette outlives the network panel, so these end with the panel's view
+            listOf(
+                selectionChanged.on { refresh() },
+                secondaryChanged.on { refresh() },
+                actionEdited.on { refresh() },
+                actionAdded.on { refresh() },
+                actionRemoved.on { refresh() },
+                paletteChanged.on { refresh() }
+            ).forEach { it.cancelWith(networkPanel.viewScope) }
         }
 
         // Set initial cursor
-        updateWandCursor()
+        networkPanel.wandEventHandler.refreshCursor()
     }
 
-    private fun updateWandCursor() {
-        palette.selectedAction?.let { action ->
-            MouseEventHandler.MouseCursor.Wand.update(action.color, action.radius)
-        }
+    private fun refresh() {
+        networkPanel.wandEventHandler.refreshCursor()
+        updateTooltip()
+        // The icon is wider when there is a secondary action to show
+        mainButton.revalidate()
+        mainButton.repaint()
     }
 
     private fun updateTooltip() {
         val actionDesc = palette.selectedAction?.description ?: "No action selected"
-        mainButton.toolTipText = "Wand tool (d) - $actionDesc"
+        val secondaryDesc = palette.secondaryAction?.let { ". With Shift held: ${it.description} (x swaps the two)" } ?: ""
+        mainButton.toolTipText = "Wand tool (d) - $actionDesc$secondaryDesc"
     }
 
     private fun showPalettePopup() {
@@ -421,7 +603,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
         popupMenu = JPopupMenu().apply {
             add(WandPalettePanel(palette) {
                 // On selection changed, activate wand mode and update
-                updateWandCursor()
+                networkPanel.wandEventHandler.refreshCursor()
                 networkPanel.mouseCursor = MouseEventHandler.MouseCursor.Wand
                 mainButton.repaint()
             })
@@ -430,11 +612,15 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
     }
 
     /**
-     * Icon for the wand palette button that shows the current action's letter.
+     * Icon for the wand palette button that shows the current action's letter and, smaller and to its lower right,
+     * the letter of the secondary action when the palette has one.
      * Uses black/white colors for consistency with other toolbar icons.
      */
     private class WandButtonIcon(private val palette: WandPalette, private val size: Int) : Icon {
-        override fun getIconWidth() = size
+        private val secondarySize = size * 0.62
+        private val secondaryOverhang = (size * 0.56).toInt()
+
+        override fun getIconWidth() = if (palette.secondaryAction != null) size + secondaryOverhang else size
         override fun getIconHeight() = size
 
         override fun paintIcon(c: Component?, g: Graphics, x: Int, y: Int) {
@@ -444,20 +630,42 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
 
             val padding = 1
             val circleSize = size - padding * 2
+            val circle = Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble())
+
+            palette.secondaryAction?.let { secondary ->
+                // Drawn only where it is clear of the main circle, with a gap between the two
+                val gap = 1.5
+                val hidden = Ellipse2D.Double(circle.x - gap, circle.y - gap, circle.width + gap * 2, circle.height + gap * 2)
+                val oldClip = g2.clip
+                g2.clip(Area(Rectangle(x, y, iconWidth, iconHeight)).apply { subtract(Area(hidden)) })
+                val secondaryCircle = Ellipse2D.Double(
+                    x + iconWidth - secondarySize - 0.5,
+                    y + iconHeight - secondarySize - 0.5,
+                    secondarySize,
+                    secondarySize
+                )
+                g2.color = blend(Theme.foreground, c?.background ?: Theme.cardBg, 0.7)
+                g2.stroke = BasicStroke(1.1f)
+                g2.draw(secondaryCircle)
+                drawLetter(g2, secondary.letter, secondaryCircle, (secondarySize * 0.62).toFloat())
+                g2.clip = oldClip
+            }
 
             // Draw circle outline, tracking the theme foreground like other toolbar icons
             g2.color = Theme.foreground
             g2.stroke = BasicStroke(1.5f)
-            g2.draw(Ellipse2D.Double((x + padding).toDouble(), (y + padding).toDouble(), circleSize.toDouble(), circleSize.toDouble()))
+            g2.draw(circle)
 
             // Draw the letter in the center
-            val displayLetter = palette.selectedAction?.letter?.firstOrNull()?.toString() ?: ""
+            drawLetter(g2, palette.selectedAction?.letter ?: "", circle, size * 0.6f)
+        }
 
-            g2.color = Theme.foreground
-            g2.font = Theme.font((size * 0.6).toInt(), Font.BOLD)
+        private fun drawLetter(g2: Graphics2D, letter: String, circle: Ellipse2D, fontSize: Float) {
+            val displayLetter = letter.firstOrNull()?.toString() ?: ""
+            g2.font = Theme.font(1, Font.BOLD).deriveFont(fontSize)
             val fm = g2.fontMetrics
-            val textX = x + (size - fm.stringWidth(displayLetter)) / 2
-            val textY = y + (size - fm.height) / 2 + fm.ascent
+            val textX = (circle.centerX - fm.stringWidth(displayLetter) / 2.0).toFloat()
+            val textY = (circle.centerY - fm.height / 2.0 + fm.ascent).toFloat()
             g2.drawString(displayLetter, textX, textY)
         }
     }

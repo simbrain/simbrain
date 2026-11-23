@@ -193,8 +193,8 @@ class SupervisedModel(
     override fun toString(): String {
         return """
                 Name: $displayName
-                Input: ${inputLayer.displayName} (${inputLayer.shapeString}) 
-                Output: ${outputLayer.displayName} (${outputLayer.shapeString}) 
+                Input: ${inputLayer.displayName} (${inputLayer.sizeDescription})
+                Output: ${outputLayer.displayName} (${outputLayer.sizeDescription})
             """.trimIndent()
     }
 }

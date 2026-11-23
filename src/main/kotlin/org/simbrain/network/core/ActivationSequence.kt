@@ -125,13 +125,16 @@ class ActivationSequence(val sequenceSize: Int, inputSize: Int): ArrayLayer(inpu
 
     override fun toString(): String {
         return """
-                Name: $displayName ($sequenceSize x $inputSize)
+                Name: $displayName ($sizeDescription)
                 Sequence Size: $sequenceSize
                 Input Size: $inputSize
             """.trimIndent()
     }
 
     override val shapeString: String get() = "$sequenceSize x $inputSize"
+
+    override val sizeDescription: String get() =
+        "${if (sequenceSize == 1) "1 step" else "$sequenceSize steps"} × ${super.sizeDescription}"
 
     override fun clear() {
         activations.fill(0.0)

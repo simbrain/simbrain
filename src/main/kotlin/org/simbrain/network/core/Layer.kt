@@ -200,5 +200,9 @@ abstract class Layer : LocatableModel(), AttributeContainer, CopyableObject {
             events.locationChanged.fire()
         }
 
+    /** Shape of the activation matrix, for debugging and developer-facing messages. */
     open val shapeString: String get() = "$size x 1"
+
+    /** Size in user terms, for tooltips and other user-facing text. */
+    open val sizeDescription: String get() = if (size == 1) "1 neuron" else "$size neurons"
 }

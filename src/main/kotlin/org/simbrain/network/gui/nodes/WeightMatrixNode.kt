@@ -257,13 +257,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     }
 
     private fun updateShapeCaption() {
-        val weights = (weightMatrix as WeightMatrix).weights
-        val (rows, cols) = if (NetworkPreferences.weightMatrixTargetSource) {
-            weights.nrow() to weights.ncol()
-        } else {
-            weights.ncol() to weights.nrow()
-        }
-        shapeCaption.text = "${rows}×${cols}"
+        shapeCaption.text = (weightMatrix as WeightMatrix).sizeString
         shapeCaption.refresh()
     }
 

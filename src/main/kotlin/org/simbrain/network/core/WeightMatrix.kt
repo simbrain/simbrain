@@ -382,9 +382,9 @@ class WeightMatrix(source: Layer, target: Layer) : Connector(source, target) {
     }
 
     val sizeString get() = if (NetworkPreferences.weightMatrixTargetSource) {
-        "${weights.nrow()} x ${weights.ncol()}"
+        "${weights.nrow()}×${weights.ncol()}"
     } else {
-        "${weights.ncol()} x ${weights.nrow()}"
+        "${weights.ncol()}×${weights.nrow()}"
     }
 
     override fun toString(): String {

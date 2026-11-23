@@ -90,12 +90,23 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
     }
 
     /**
-     * Redraw the wand cursor for the action a stroke would now apply, and show it if the wand is the current tool.
+     * The action the cursor shows: that of the stroke in progress, or between strokes the one a stroke begun now
+     * would apply. Without a secondary action Shift changes nothing.
+     */
+    val cursorAction: WandAction?
+        get() = if (strokeInProgress) {
+            strokeAction
+        } else {
+            (if (cursorShowsSecondary) wandPalette.secondaryAction else null) ?: wandPalette.selectedAction
+        }
+
+    /**
+     * Redraw the wand cursor for [cursorAction], and show it if the wand is the current tool. During a stroke the
+     * cursor stays that of the stroke's action whatever happens to the palette, which shows again once the stroke
+     * ends.
      */
     fun refreshCursor() {
-        val action = (if (cursorShowsSecondary) wandPalette.secondaryAction else null)
-            ?: wandPalette.selectedAction
-            ?: return
+        val action = cursorAction ?: return
         MouseCursor.Wand.update(action.color, action.radius)
         if (networkPanel.mouseCursor === MouseCursor.Wand) networkPanel.cursor = MouseCursor.Wand.cursor
     }
@@ -115,9 +126,9 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         // A stroke whose release never arrived is over all the same
         strokeInProgress = false
         shiftChanged(event.isShiftDown)
+        // The stroke applies what the cursor shows
+        strokeAction = cursorAction
         strokeInProgress = true
-        // Without a secondary action Shift changes nothing, as the cursor shows
-        strokeAction = (if (event.isShiftDown) wandPalette.secondaryAction else null) ?: wandPalette.selectedAction
 
         // Notify action that we're starting
         strokeAction?.beginAction(networkPanel)
@@ -132,7 +143,9 @@ class WandEventHandler(val networkPanel: NetworkPanel) : PDragSequenceEventHandl
         val jobs = pendingJobs.toList()
         strokeAction = null
         strokeInProgress = false
-        shiftChanged(event.isShiftDown)
+        // The palette may have changed during the stroke, so redraw even if Shift is as it was
+        cursorShowsSecondary = event.isShiftDown
+        refreshCursor()
 
         // Launch a coroutine to await all pending apply jobs, then finalize
         networkPanel.launch(Dispatchers.Swing) {

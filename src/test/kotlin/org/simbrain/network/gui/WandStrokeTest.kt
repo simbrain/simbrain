@@ -2,8 +2,8 @@
  * Wand strokes on the network canvas, made with mouse events sent to the canvas.
  *
  * A stroke applies the palette's selected action, or its secondary action if Shift is held when the stroke begins,
- * and keeps that action until the mouse is released. Between strokes the cursor shows the secondary action while
- * Shift is held. The palette is the application-wide one, so each test swaps its own actions in and puts the
+ * and keeps that action until the mouse is released. The cursor shows a stroke's action for as long as the stroke
+ * lasts, and between strokes shows the secondary action while Shift is held. The palette is the application-wide one, so each test swaps its own actions in and puts the
  * previous ones back; nothing is written to the saved palette.
  */
 package org.simbrain.network.gui
@@ -11,6 +11,7 @@ package org.simbrain.network.gui
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertSame
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.piccolo2d.PNode
@@ -24,6 +25,7 @@ import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.util.awaitUntil
 import org.simbrain.util.onEdt
 import org.simbrain.util.point
+import java.awt.Color
 import java.awt.Dimension
 import java.awt.Point
 import java.awt.event.InputEvent
@@ -298,6 +300,37 @@ class WandStrokeTest {
             assertFalse(panel.wandEventHandler.cursorShowsSecondary)
             awaitActivations(neurons, 0.0)
         }
+
+    @Test
+    fun `swapping the actions part way through a stroke changes neither its action nor its cursor`() {
+        val draw = draw().apply { color = Color.ORANGE }
+        val erase = erase().apply { color = Color.GRAY }
+        withWandPalette(draw, erase) {
+            val neurons = neuronRow(2)
+            val panel = wandPanelFor(Network(), *neurons.toTypedArray())
+            val pixels = neurons.map { panel.pixelOf(it) }
+
+            panel.send(MouseEvent.MOUSE_PRESSED, pixels[0], shiftDown = false)
+            // The cursor is redrawn as the toolbar button redraws it when the palette changes. Its colour is read
+            // in the same turn of the event queue, before any other panel redraws the cursor they all share.
+            val colorDuringStroke = onEdt {
+                NetworkPreferences.wandPalette.swapSelectedAndSecondary()
+                panel.wandEventHandler.refreshCursor()
+                MouseEventHandler.MouseCursor.Wand.wandColor
+            }
+            panel.send(MouseEvent.MOUSE_DRAGGED, pixels[1], shiftDown = false)
+            assertEquals(draw.color, colorDuringStroke)
+            assertSame(draw, panel.wandEventHandler.cursorAction)
+
+            val colorAfterStroke = onEdt {
+                panel.send(MouseEvent.MOUSE_RELEASED, pixels[1], shiftDown = false)
+                MouseEventHandler.MouseCursor.Wand.wandColor
+            }
+            assertEquals(erase.color, colorAfterStroke)
+            assertSame(erase, panel.wandEventHandler.cursorAction)
+            awaitActivations(neurons, drawn)
+        }
+    }
 
     @Test
     fun `a click applies the action to the neuron array cell under the brush`() = withWandPalette(draw(), erase()) {

@@ -12,6 +12,8 @@ import org.simbrain.util.*
 import org.simbrain.util.propertyeditor.AnnotatedPropertyEditor
 import org.simbrain.util.propertyeditor.objectWrapper
 import java.awt.*
+import java.awt.event.AWTEventListener
+import java.awt.event.KeyEvent
 import java.awt.event.MouseAdapter
 import java.awt.event.MouseEvent
 import java.awt.geom.Area
@@ -19,13 +21,18 @@ import java.awt.geom.Ellipse2D
 import java.awt.geom.Path2D
 import javax.swing.*
 import javax.swing.border.EmptyBorder
+import javax.swing.event.PopupMenuEvent
+import javax.swing.event.PopupMenuListener
 
 /**
  * UI panel for displaying and managing the wand action palette.
  * Shows a list of configurable actions that can be selected for use with the wand tool.
+ *
+ * @param persist saves the palette after a change made here; by default to the user's preferences
  */
 class WandPalettePanel(
     val palette: WandPalette,
+    private val persist: (WandPalette) -> Unit = { NetworkPreferences.wandPalette = it },
     private val onSelectionChanged: () -> Unit = {}
 ) : JPanel() {
 
@@ -44,6 +51,21 @@ class WandPalettePanel(
     private val primaryTab = slotTab("Primary", secondary = false)
 
     private val secondaryTab = slotTab("Secondary (Shift)", secondary = true)
+
+    /**
+     * The popup this panel is shown in, if it is in one.
+     */
+    private val hostPopup get() = SwingUtilities.getAncestorOfClass(JPopupMenu::class.java, this) as JPopupMenu?
+
+    /**
+     * The row menu now open, if one is.
+     */
+    private var rowMenu: JPopupMenu? = null
+
+    /**
+     * Whether the palette stays up once [rowMenu] has closed.
+     */
+    private var keepPaletteAfterRowMenu = false
 
     init {
         layout = BorderLayout()
@@ -109,9 +131,7 @@ class WandPalettePanel(
         inputMap.put(KeyStroke.getKeyStroke("ESCAPE"), "closePopup")
         actionMap.put("closePopup", object : AbstractAction() {
             override fun actionPerformed(e: java.awt.event.ActionEvent) {
-                SwingUtilities.getAncestorOfClass(JPopupMenu::class.java, this@WandPalettePanel)?.let {
-                    (it as JPopupMenu).isVisible = false
-                }
+                hostPopup?.isVisible = false
             }
         })
 
@@ -176,6 +196,9 @@ class WandPalettePanel(
         // TODO: Should not be necessary. Try preventing this from happening in the first place.
         if (isRebuilding) return
         isRebuilding = true
+
+        // A row menu belongs to a row that is about to be replaced
+        closeRowMenu()
 
         val secondaryAction = palette.secondaryAction
         updateSlotTab(primaryTab, palette.selectedAction, "Dragging the wand")
@@ -284,28 +307,17 @@ class WandPalettePanel(
             }
             roleTag?.let { buttonPanel.add(it) }
 
-            // Kebab menu button for editing
-            val kebabButton = JButton().apply {
-                icon = KebabIcon()
-                preferredSize = Dimension(20, 24)
-                margin = Insets(0, 0, 0, 0)
-                isFocusPainted = false
-                isContentAreaFilled = false
-                isBorderPainted = false
-                toolTipText = "Edit this action"
-                addActionListener { editAction(index) }
-            }
-            buttonPanel.add(kebabButton)
-
-            // Delete button
-            val deleteButton = JButton("×").apply {
+            // Kebab button for the row's menu, shown pressed while that menu is open
+            val kebabButton = JToggleButton(KebabIcon()).apply {
+                putClientProperty("JButton.buttonType", "toolBarButton")
                 preferredSize = Dimension(24, 24)
                 margin = Insets(0, 0, 0, 0)
-                isFocusPainted = false
-                toolTipText = "Delete this action"
-                addActionListener { deleteAction(index) }
+                isFocusable = false
+                toolTipText = "Edit or delete this action"
+                // The button's own state, not the row's isSelected
+                addActionListener { if (model.isSelected) showRowMenu(this, index) else closeRowMenu() }
             }
-            buttonPanel.add(deleteButton)
+            buttonPanel.add(kebabButton)
 
             add(buttonPanel, BorderLayout.EAST)
 
@@ -333,10 +345,92 @@ class WandPalettePanel(
         savePalette()
     }
 
+    /**
+     * Opens the menu of the row at [index] under its kebab button, with the palette held open beneath it. Closing
+     * the menu backs out one level, leaving the palette up, when the user is still at work in the palette: after a
+     * delete, a press elsewhere in the palette, a second press on the kebab button, or Escape. Anything else that
+     * closes the menu, such as choosing to edit or a press outside the palette, closes the palette with it.
+     */
+    private fun showRowMenu(kebab: JToggleButton, index: Int) {
+        val host = hostPopup as? WandPalettePopup
+        val menu = JPopupMenu()
+        menu.add(JMenuItem("Edit...").apply {
+            addActionListener {
+                // Closed before the dialog opens rather than under it
+                hostPopup?.isVisible = false
+                editAction(index)
+            }
+        })
+        menu.add(JMenuItem("Delete").apply {
+            if (palette.actions.size <= 1) {
+                isEnabled = false
+                toolTipText = "The palette must have at least one action"
+            }
+            addActionListener {
+                keepPaletteAfterRowMenu = true
+                deleteAction(index)
+            }
+        })
+
+        // Presses in the palette do not close a popup menu shown over it, and Escape would close the palette too
+        val watcher = AWTEventListener { event ->
+            if (event is KeyEvent) {
+                if (event.id == KeyEvent.KEY_PRESSED && event.keyCode == KeyEvent.VK_ESCAPE) {
+                    event.consume()
+                    closeRowMenu()
+                }
+            } else if (event.id == MouseEvent.MOUSE_PRESSED) {
+                // A press on the kebab button is left to the button, which closes the menu when it is released
+                val source = event.source as? Component
+                if (source !== kebab && host != null && SwingUtilities.isDescendingFrom(source, host)) closeRowMenu()
+            }
+        }
+        menu.addPopupMenuListener(object : PopupMenuListener {
+            override fun popupMenuWillBecomeVisible(e: PopupMenuEvent) {}
+            override fun popupMenuCanceled(e: PopupMenuEvent) {}
+            override fun popupMenuWillBecomeInvisible(e: PopupMenuEvent) {
+                Toolkit.getDefaultToolkit().removeAWTEventListener(watcher)
+                kebab.isSelected = false
+                // Once the menu item that closed the menu has run, so that it has its say on the palette
+                SwingUtilities.invokeLater { rowMenuClosed(menu, host) }
+            }
+        })
+
+        rowMenu = menu
+        keepPaletteAfterRowMenu = false
+        host?.heldOpen = true
+        Toolkit.getDefaultToolkit().addAWTEventListener(watcher, AWTEvent.MOUSE_EVENT_MASK or AWTEvent.KEY_EVENT_MASK)
+        menu.show(kebab, 0, kebab.height)
+    }
+
+    /**
+     * Closes the open row menu, if there is one, leaving the palette up.
+     */
+    private fun closeRowMenu() {
+        val menu = rowMenu ?: return
+        keepPaletteAfterRowMenu = true
+        menu.isVisible = false
+    }
+
+    private fun rowMenuClosed(menu: JPopupMenu, host: WandPalettePopup?) {
+        // A menu opened since then holds the palette open in its turn
+        if (rowMenu !== menu) return
+        rowMenu = null
+        host ?: return
+        host.heldOpen = false
+        if (!host.isVisible) return
+        if (keepPaletteAfterRowMenu) {
+            // The palette is the open menu again, so a press outside it closes it
+            MenuSelectionManager.defaultManager().selectedPath = arrayOf(host)
+        } else {
+            host.isVisible = false
+        }
+    }
+
     private fun addNewAction() {
         // Create a default action wrapped for type selection
         val wrapper = objectWrapper("Action", AdjustValueAction() as WandAction)
-        AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog {
+        AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog(title = "Add wand action") {
             commitChanges(markUnsaved = false)
             val newAction = wrapper.editingObject
             palette.addAction(newAction)
@@ -348,7 +442,7 @@ class WandPalettePanel(
     private fun editAction(index: Int) {
         // Wrap the action so user can change its type
         val wrapper = objectWrapper("Action", palette.actions[index])
-        AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog {
+        AnnotatedPropertyEditor(listOf(wrapper)).displayInDialog(title = "Edit wand action") {
             commitChanges(markUnsaved = false)
             // Replace the action in the list (type may have changed)
             palette.actions[index] = wrapper.editingObject
@@ -360,19 +454,17 @@ class WandPalettePanel(
     }
 
     private fun deleteAction(index: Int) {
-        if (palette.actions.size > 1) {
-            palette.removeAction(index)
-            savePalette()
-        } else {
-            showMessage("Cannot delete the last action. The palette must have at least one action.", MessageKind.WARNING, title = "Cannot delete")
-        }
+        // The palette must have at least one action
+        if (palette.actions.size <= 1) return
+        palette.removeAction(index)
+        savePalette()
     }
 
     /**
      * Persists the palette to system preferences.
      */
     private fun savePalette() {
-        NetworkPreferences.wandPalette = palette
+        persist(palette)
     }
 
     private fun exportPalette() {
@@ -400,6 +492,20 @@ class WandPalettePanel(
             palette.setActions(defaultPalette.actions, defaultPalette.secondaryIndex)
             savePalette()
         }
+    }
+}
+
+/**
+ * The popup the palette panel is shown in. A popup menu closes as soon as another popup menu opens or a menu item is
+ * chosen, which would take the palette away whenever a row's menu was used, so the palette stays up while [heldOpen]
+ * is set. Hiding it outright still works.
+ */
+class WandPalettePopup : JPopupMenu() {
+
+    var heldOpen = false
+
+    override fun menuSelectionChanged(isIncluded: Boolean) {
+        if (isIncluded || !heldOpen) super.menuSelectionChanged(isIncluded)
     }
 }
 
@@ -600,7 +706,7 @@ class WandPaletteButton(val palette: WandPalette, val networkPanel: NetworkPanel
     private fun showPalettePopup() {
         popupMenu?.isVisible = false
 
-        popupMenu = JPopupMenu().apply {
+        popupMenu = WandPalettePopup().apply {
             add(WandPalettePanel(palette) {
                 // On selection changed, activate wand mode and update
                 networkPanel.wandEventHandler.refreshCursor()

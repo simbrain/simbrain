@@ -1,6 +1,9 @@
 /**
  * Small caption showing an object's shape under tensors, convolution kernels, and weight matrices, so
  * adjacent shapes can be compared at a glance. Visibility follows [NetworkPreferences.showShapeCaptions].
+ *
+ * A node gets a caption only when its drawing hides its shape. Nodes that draw one cell per unit, such as neuron
+ * arrays, leave the size to the tooltip.
  */
 package org.simbrain.network.gui.nodes
 

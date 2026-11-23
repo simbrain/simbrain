@@ -276,9 +276,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
 
     override val margin = 10.0
 
-    /** Number of neurons, shown below the activations. */
-    private val shapeCaption = ShapeCaption("${neuronArray.size}")
-
     /**
      * Height of array when in "flat" mode.
      */
@@ -299,7 +296,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
             gridMode = neuronArray.gridMode
             showBias = neuronArray.isShowBias
             layoutNeuronCircles()
-            updateShapeCaption()
             networkPanel.network.events.zoomToFitPage.fire()
         }.untilDisposed()
         gridMode = neuronArray.gridMode
@@ -323,7 +319,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
         activationImage.offset(0.0, 5.0)
         spikeImage.offset(0.0, 5.0)
         activationImage.addBorder()
-        updateShapeCaption()
         updateBorder()
 
         // call once to make sure all the actions are registered
@@ -334,8 +329,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
     override fun refreshTheme() {
         super.refreshTheme()
         updateActivationImage()
-        shapeCaption.refresh()
-        updateShapeCaption()
         updateBorder()
         if (neuronArray.circleMode) {
             val acts = neuronArray.activations.toDoubleArray()
@@ -343,18 +336,6 @@ class NeuronArrayNode(networkPanel: NetworkPanel, val neuronArray: NeuronArray) 
                 circle.drawActivation(acts.getOrElse(i) { 0.0 }, neuronArray.updateRule.graphicalBounds)
             }
         }
-    }
-
-    /**
-     * Show or hide the shape caption per preferences and place it centered below the current content. The
-     * caption is removed from [mainNode] rather than hidden so the border shrinks with it.
-     */
-    private fun updateShapeCaption() {
-        mainNode.removeChild(shapeCaption)
-        if (!NetworkPreferences.showShapeCaptions) return
-        val content = mainNode.fullBounds
-        shapeCaption.setOffset(content.centerX - shapeCaption.width / 2, content.maxY + 4.0)
-        mainNode.addChild(shapeCaption)
     }
 
     private fun updateActivationImage() {

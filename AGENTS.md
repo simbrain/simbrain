@@ -81,6 +81,10 @@ Use sentence case for all user-facing UI text: menus and submenus, `createAction
 - Keep status markers such as `(Beta)` capitalized
 - When changing a label, update docs in `simbraindocs/` that quote it, since docs match UI labels exactly
 
+## Shape Captions
+
+Give a network node a `ShapeCaption` only when its drawing hides its shape, as with tensors (hidden channels), convolution kernels, and weight matrices. Nodes that draw one cell per unit, such as neuron arrays, get no caption; their size goes in the tooltip. Update the `showShapeCaptions` preference description when this list changes.
+
 ## Common Tasks
 
 **Adding a simulation:** See `custom_sims/AGENTS_SIMULATIONS.md` (includes neuron layout spacing pitfalls and `SimulationLayoutUtils.kt` for multi-layer subnetworks)

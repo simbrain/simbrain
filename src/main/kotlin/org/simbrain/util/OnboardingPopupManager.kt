@@ -122,9 +122,27 @@ class OnboardingPopupManager(private val rootFrame: JFrame) {
             }
         }
         
+        if (config.suppressionKey != null) {
+            activePopups.removeAll { it.suppressionKey == config.suppressionKey }
+        }
         activePopups.add(popup)
         glassPane.isVisible = true
         glassPane.repaint()
+    }
+
+    /**
+     * Whether a popup with this suppression key is currently showing
+     */
+    fun isShowing(suppressionKey: String) = activePopups.any { it.suppressionKey == suppressionKey }
+
+    /**
+     * Dismiss the active popup with this suppression key, if any
+     */
+    suspend fun dismiss(suppressionKey: String) = withContext(Dispatchers.Swing) {
+        if (activePopups.removeAll { it.suppressionKey == suppressionKey }) {
+            glassPane.isVisible = activePopups.isNotEmpty()
+            glassPane.repaint()
+        }
     }
     
     /**
@@ -202,6 +220,8 @@ private class OnboardingPopup(
     private val shadowOffset = 4
     private val arrowSize = 12
     
+    val suppressionKey get() = config.suppressionKey
+
     private var bounds: Rectangle
     private var doNotShowAgainChecked = false
     private var closeButtonBounds: Rectangle
@@ -469,8 +489,12 @@ private class OnboardingPopup(
                 config.showDoNotShowAgain && 
                 (checkboxBounds.contains(e.point) || checkboxTextBounds.contains(e.point)) -> {
                     doNotShowAgainChecked = !doNotShowAgainChecked
-                    if (doNotShowAgainChecked && config.suppressionKey != null) {
-                        WorkspacePreferences.suppressPopup(config.suppressionKey)
+                    if (config.suppressionKey != null) {
+                        if (doNotShowAgainChecked) {
+                            WorkspacePreferences.suppressPopup(config.suppressionKey)
+                        } else {
+                            WorkspacePreferences.unsuppressPopup(config.suppressionKey)
+                        }
                     }
                     return true
                 }

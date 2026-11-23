@@ -169,9 +169,9 @@ class WorkspaceActions {
         DesktopCouplingManager(SimbrainDesktop).displayInDialog(title = "Couplings") {  }
     }
 
-    val resetOnboardingWindows = desktopPane.createAction(
-        name = "Reset onboarding windows",
-        description = "All onboarding windows will be reset to appear again.",
+    val resetHints = desktopPane.createAction(
+        name = "Reset hints",
+        description = "Hints hidden with \"Do not show again\" will appear again.",
     ) {
         WorkspacePreferences.clearAllPopupSuppressions()
     }

@@ -152,25 +152,72 @@ object SimbrainDesktop {
         orientation = JSplitPane.HORIZONTAL_SPLIT,
         defaultSize = (screenSize.width * .2).toInt()
     ).apply {
-        // Add listener for when the info dock becomes visible to show onboarding popup
+        // A user who opens the sidebar after the hint pointed at the info button gets the hint about the guide itself
         dockComponent.addComponentListener(object : ComponentAdapter() {
             override fun componentShown(e: ComponentEvent?) {
-                swingInvokeLater {
-                    onboardingManager.showPopup(
-                        PopupConfig(
-                            title = "Info panel toggle",
-                            message = "Use this button to toggle the visibility of this info screen. The info panel shows documentation and help content for various features.",
-                            targetComponent = infoDockButton,
-                            placement = PopupPlacement.BOTTOM_CENTER,
-                            suppressionKey = "info_dock_help",
-                            style = PopupStyle.INFO
-                        )
-                    )
-
+                if (guideHintPointsAtButton && onboardingManager.isShowing(SIMULATION_GUIDE_HINT)) {
+                    showSimulationGuideHint()
                 }
-
             }
         })
+    }
+
+    private const val WELCOME_HINT = "welcome_hint"
+
+    private const val SIMULATION_GUIDE_HINT = "simulation_guide_hint"
+
+    private var guideHintPointsAtButton = false
+
+    /**
+     * On startup, suggest running a simulation as the way to begin.
+     */
+    private fun showWelcomeHint(): Unit = swingInvokeLater {
+        onboardingManager.showPopup(
+            PopupConfig(
+                title = "Welcome to Simbrain",
+                message = "To get started, choose a simulation from the Simulations menu in the menu bar and run it.",
+                targetComponent = desktopPane,
+                targetBounds = Rectangle(0, 0, 10, 10),
+                suppressionKey = WELCOME_HINT,
+                condition = { workspace.componentList.isEmpty() },
+                style = PopupStyle.INFO
+            )
+        )
+    }
+
+    /**
+     * When a simulation with an Activities section opens, point the user to it, either in the open sidebar or
+     * through the button that opens the sidebar.
+     */
+    fun showSimulationGuideHint(): Unit = swingInvokeLater {
+        frame.validate()
+        val dock: JComponent = sideDockSplitter.dockComponent
+        val hasActivities = workspace.infoDoc.text.contains("# Activities")
+        guideHintPointsAtButton = !dock.isVisible
+        val config = if (dock.isVisible) {
+            PopupConfig(
+                title = "Simulation guide",
+                message = "This panel explains the simulation. We suggest you start by scrolling down to the " +
+                        "Activities section and following the steps.",
+                targetComponent = dock,
+                targetBounds = Rectangle(0, dock.height * 2 / 3, dock.width, 1),
+                placement = PopupPlacement.RIGHT,
+                suppressionKey = SIMULATION_GUIDE_HINT,
+                condition = { hasActivities },
+                style = PopupStyle.INFO
+            )
+        } else {
+            PopupConfig(
+                title = "Simulation guide",
+                message = "Click this button to open a guide to this simulation.",
+                targetComponent = infoDockButton,
+                placement = PopupPlacement.BOTTOM_CENTER,
+                suppressionKey = SIMULATION_GUIDE_HINT,
+                condition = { hasActivities },
+                style = PopupStyle.INFO
+            )
+        }
+        onboardingManager.showPopup(config)
     }
 
     private val terminalPanel = CommandConsolePanel(workspace, this)
@@ -321,7 +368,10 @@ object SimbrainDesktop {
         }
         workspace.couplingManager.events.couplingRemoved.on { warnedCouplings.remove(it) }
 
-        events.componentAdded.on(Dispatchers.Swing.immediate) { addDesktopComponent(it) }
+        events.componentAdded.on(Dispatchers.Swing.immediate) {
+            addDesktopComponent(it)
+            onboardingManager.dismiss(WELCOME_HINT)
+        }
         events.componentRemoved.on(Dispatchers.Swing) { wc  ->
             val component = workspaceComponentDesktopComponentMap.getImmediately(wc) as? DesktopComponent<*> ?: return@on
             workspaceComponentDesktopComponentMap.remove(wc)
@@ -551,7 +601,7 @@ object SimbrainDesktop {
             add(actionManager.showPlotPreferencesAction)
         })
         fileMenu.addSeparator()
-        fileMenu.add(actionManager.resetOnboardingWindows)
+        fileMenu.add(actionManager.resetHints)
         // On macOS, Quit (with its Cmd-Q shortcut) lives in the application menu; see the quit handler
         if (!Utils.isMacOSX()) {
             fileMenu.addSeparator()
@@ -1106,6 +1156,7 @@ object SimbrainDesktop {
         // openWorkspace(workspace.getCurrentFile());
 
         frame.isVisible = true
+        showWelcomeHint()
     }
 
     /**

@@ -284,6 +284,7 @@ suspend fun SimulationScope.addSidebarInfoFromFile(fileName: String, initiallyOp
         } else {
             sideDockSplitter.hideDock()
         }
+        showSimulationGuideHint()
     }
 }
 
@@ -307,6 +308,7 @@ suspend fun SimulationScope.addSidebarInfo(markdownText: String, width: Int? = n
         } else {
             sideDockSplitter.hideDock()
         }
+        showSimulationGuideHint()
     }
 }
 

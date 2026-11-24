@@ -335,7 +335,7 @@ class ConnectorPlacementTest {
     }
 
     @Test
-    fun `panning the view does not lay the connectors out again, and zooming out past full size does`() {
+    fun `panning or zooming the view does not lay the connectors out again`() {
         val source = arrayAt(0.0, 0.0)
         val target = arrayAt(0.0, -300.0)
         val matrix = WeightMatrix(source, target)
@@ -349,12 +349,7 @@ class ConnectorPlacementTest {
 
         onEdt { panel.canvas.camera.viewScale = 0.5 }
         panel.awaitCanvasIdle()
-        assertTrue(onEdt { panel.connectionLayout.passes } > before)
-        // The label box is drawn larger, and still sits on top of the image
-        val node = onEdt { panel.getNode(matrix) as WeightMatrixNode }
-        assertEquals(
-            onEdt { node.imageBox.globalBounds.y }, onEdt { node.interactionBox.globalFullBounds.maxY }, 1.0
-        )
+        assertEquals(before, onEdt { panel.connectionLayout.passes })
     }
 
     @Test

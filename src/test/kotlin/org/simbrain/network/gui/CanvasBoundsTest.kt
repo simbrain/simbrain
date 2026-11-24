@@ -1,6 +1,6 @@
 /**
  * Checks that the canvas finishes its bounds bookkeeping after the changes connectors lay themselves out for: a
- * layer moving, a layer changing size, and the view zooming, which rescales label boxes below full size.
+ * layer moving, a layer changing size, and the view zooming.
  */
 package org.simbrain.network.gui
 
@@ -57,7 +57,6 @@ class CanvasBoundsTest {
             check(name)
         }
 
-        /** Zooming in leaves label boxes at full size; zooming out below full size rescales them. */
         fun zoomInAndOut() {
             step("zooming in") { panel.canvas.camera.scaleViewAboutPoint(1.7, 0.0, 0.0) }
             step("zooming out") { panel.canvas.camera.scaleViewAboutPoint(0.3, 0.0, 0.0) }

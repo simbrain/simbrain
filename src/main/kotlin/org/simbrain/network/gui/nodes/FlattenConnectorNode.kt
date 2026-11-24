@@ -111,7 +111,7 @@ class FlattenConnectorNode(networkPanel: NetworkPanel, val connector: FlattenCon
     override val isDraggable: Boolean = false
 
     /** The label box. */
-    override fun measureFootprint() = footprintOf(interactionBox.layoutBoundsCentered)
+    override fun measureFootprint() = footprintOf(interactionBox.globalFullBounds)
 
     override val contextMenu: JPopupMenu
         get() {

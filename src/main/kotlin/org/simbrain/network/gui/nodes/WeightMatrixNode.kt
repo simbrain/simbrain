@@ -186,6 +186,8 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
             // The label box is placed by its middle, which a change of width moves, and its width guides placement
             requestLayout()
         }.untilDisposed()
+        // As wide as the image at its largest, so that the label does not hold images on nearby arrows apart
+        interactionBox.maxWidth = IMAGE_SIDE_MAX
         addChild(interactionBox)
         addChild(imageBox)
         addChild(shapeCaption)
@@ -268,9 +270,9 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
      * which it overlaps what is in the way.
      */
     internal fun drawing() = ShaftDrawing(
-        above = interactionBox.layoutHeight,
+        above = interactionBox.bounds.height,
         below = if (shapeCaption.visible) shapeCaption.height + CAPTION_GAP else 0.0,
-        minWidth = interactionBox.layoutWidth,
+        minWidth = interactionBox.bounds.width,
         minSide = IMAGE_SIDE_MIN,
         maxSide = IMAGE_SIDE_MAX,
         fill = IMAGE_FILL
@@ -487,7 +489,7 @@ class WeightMatrixNode(networkPanel: NetworkPanel, val weightMatrix: Connector) 
     /** The image with its label box and, when it is showing, its caption. */
     override fun measureFootprint() = footprintOf(
         imageBox.box.globalFullBounds,
-        interactionBox.layoutBounds,
+        interactionBox.globalFullBounds,
         shapeCaption.globalBounds.takeIf { shapeCaption.visible }
     )
 

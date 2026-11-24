@@ -68,7 +68,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
             offShaft != null -> interactionBox.centerOn(offShaft.x, offShaft.y)
             else -> updateInteractionBoxLocation()
         }
-        return interactionBox.layoutBoundsCentered
+        return interactionBox.globalFullBounds
     }
 
     val sourceNode by lazy { networkPanel.getNode(synapseGroup.source) as NeuronCollectionNode }
@@ -167,7 +167,7 @@ class SynapseGroupNode(networkPanel: NetworkPanel, val synapseGroup: SynapseGrou
     override val isDraggable: Boolean = false
 
     /** The label box. */
-    override fun measureFootprint() = footprintOf(interactionBox.layoutBoundsCentered)
+    override fun measureFootprint() = footprintOf(interactionBox.globalFullBounds)
 
     override val model: SynapseGroup
         get() = synapseGroup

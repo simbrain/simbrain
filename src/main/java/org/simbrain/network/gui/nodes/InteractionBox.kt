@@ -1,24 +1,22 @@
+/**
+ * The label box on a network element: a tab showing the element's name, with a kebab that opens its menu. Subclasses
+ * supply the menu, property dialog, and tooltip. The box is as wide as its label, up to [InteractionBox.maxWidth],
+ * and scales with the rest of the canvas when the view zooms.
+ */
 package org.simbrain.network.gui.nodes
 
-import org.piccolo2d.PCamera
 import org.piccolo2d.PNode
 import org.piccolo2d.event.PBasicInputEventHandler
 import org.piccolo2d.event.PInputEvent
 import org.piccolo2d.nodes.PPath
 import org.piccolo2d.nodes.PText
-import org.piccolo2d.util.PBounds
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.util.NetworkTheme
 import org.simbrain.util.Theme
 import org.simbrain.util.blend
 import java.awt.Color
 import java.awt.geom.Rectangle2D
-import java.beans.PropertyChangeEvent
-import java.beans.PropertyChangeListener
 
-/**
- * Interaction Box: graphical element for interacting with a group. Subclasses support custom menus, dialogs, etc.
- */
 abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networkPanel) {
 
     private val textLabel: PText
@@ -35,39 +33,6 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
     private val paddingY = 2.0
     private val kebabPaddingX = 6.0
     private val kebabPaddingY = 2.0
-
-    /**
-     * Reference to property change listener so it can be cleaned up later.
-     */
-    val zoomListener: PropertyChangeListener = PropertyChangeListener { evt: PropertyChangeEvent? ->
-        setScale(zoomRescale(networkPanel.canvas.camera.viewScale))
-    }
-
-    /**
-     * Width of the box at full size. The box is drawn larger than this when the view is zoomed out, so that its
-     * text stays readable, but what is laid out around it is laid out for this width, so that zooming moves nothing.
-     */
-    val layoutWidth: kotlin.Double get() = bounds.width
-
-    /** Height of the box at full size. See [layoutWidth]. */
-    val layoutHeight: kotlin.Double get() = bounds.height
-
-    /**
-     * The space the box takes up at full size, in canvas coordinates, for a box that sits on top of something: it
-     * has the middle and the bottom edge the box is drawn with, which stay where they are as the box is drawn larger.
-     */
-    val layoutBounds: PBounds
-        get() {
-            val drawn = globalFullBounds
-            return PBounds(drawn.centerX - layoutWidth / 2, drawn.maxY - layoutHeight, layoutWidth, layoutHeight)
-        }
-
-    /** The space the box takes up at full size, in canvas coordinates, for a box that is centered on a point. */
-    val layoutBoundsCentered: PBounds
-        get() {
-            val drawn = globalFullBounds
-            return PBounds(drawn.centerX - layoutWidth / 2, drawn.centerY - layoutHeight / 2, layoutWidth, layoutHeight)
-        }
 
     /**
      * Rectangle that displays the box.
@@ -87,10 +52,6 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         addChild(kebabMenu)
 
         applyThemeColors()
-
-        networkPanel.canvas.camera.addPropertyChangeListener(PCamera.PROPERTY_VIEW_TRANSFORM, zoomListener)
-        // A box made while the view is zoomed out is drawn as large as the boxes already there
-        setScale(zoomRescale(networkPanel.canvas.camera.viewScale))
     }
 
     /** Re-apply the themed tab colors (fill, border, label, kebab dots). */
@@ -159,6 +120,20 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         contextMenu?.show(networkPanel, event.canvasPosition.x.toInt(), event.canvasPosition.y.toInt())
     }
 
+    /** The label as given to [setText], which is cut short where it does not fit in [maxWidth]. */
+    private var fullText = " "
+
+    /**
+     * Widest the box is, so that it does not crowd its neighbors. A label that does not fit has its middle replaced
+     * with an ellipsis, keeping the start and the end, where default names like "WeightMatrix_3" differ.
+     */
+    var maxWidth = kotlin.Double.POSITIVE_INFINITY
+        set(value) {
+            if (value == field) return
+            field = value
+            updateLayout()
+        }
+
     /**
      * Set text for interaction box.
      *
@@ -173,6 +148,7 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
         if (text.isEmpty()) {
             text = " " // Use a blank string rather than an empty string so that the box does not disappear
         }
+        fullText = text
         textLabel.setText(text)
 
         // Make smaller than interaction box if scale is 1
@@ -186,15 +162,17 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
 
         updateLayout()
     }
-    
-            /**
+
+    /**
      * Updates the layout of text and kebab menu within the bounds
      */
     private fun updateLayout() {
+        val menuBounds = kebabMenu.bounds  // Now using regular bounds since we set them explicitly
+        fitText(maxWidth - paddingX * 2 - menuBounds.width)
+
         // Calculate total width needed (text + padding + menu + padding)
         // Use fullBounds to account for the 0.8x scale transform applied to the text
         val textBounds = textLabel.fullBounds
-        val menuBounds = kebabMenu.bounds  // Now using regular bounds since we set them explicitly
         val totalWidth = textBounds.width + paddingX + menuBounds.width + paddingX
         val totalHeight = maxOf(textBounds.height, menuBounds.height) + paddingY * 2
         
@@ -210,6 +188,17 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
             totalWidth - menuBounds.width,
             (totalHeight - menuBounds.height) / 2
         )
+    }
+
+    /** Show as much of [fullText] as fits in [room], with an ellipsis in place of the middle if any is left out. */
+    private fun fitText(room: kotlin.Double) {
+        textLabel.text = fullText
+        var shown = fullText.length
+        while (textLabel.fullBounds.width > room && shown > 2) {
+            shown--
+            val head = shown / 2
+            textLabel.text = fullText.take(head).trimEnd() + "\u2026" + fullText.takeLast(shown - head).trimStart()
+        }
     }
 
     override val isDraggable: Boolean = false
@@ -228,19 +217,5 @@ abstract class InteractionBox(networkPanel: NetworkPanel) : ScreenElement(networ
          * Height of interaction box.
          */
         private const val DEFAULT_HEIGHT = 10f
-
-        /**
-         * This is the largest amount an interaction box's scale can be zoomed when the scale gets small. Easiest to
-         * understand by changing the value and "zooming out" of a network containing a neuron group.
-         */
-        private const val LARGEST_ZOOM_RESCALE_FACTOR = 4.0
-
-        /**
-         * The counter-scale keeping an interaction box readable at [viewScale]: as the view scale goes
-         * from 1 to 0 the rescale goes from 1 to [LARGEST_ZOOM_RESCALE_FACTOR]. Nodes that anchor other
-         * chrome to an interaction box use the same curve so their placement tracks the box's footprint.
-         */
-        fun zoomRescale(viewScale: kotlin.Double): kotlin.Double =
-            if (viewScale < 1) (1 - LARGEST_ZOOM_RESCALE_FACTOR) * viewScale + LARGEST_ZOOM_RESCALE_FACTOR else 1.0
     }
 }

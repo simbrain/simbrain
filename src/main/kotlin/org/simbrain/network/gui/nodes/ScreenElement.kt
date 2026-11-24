@@ -95,9 +95,8 @@ abstract class ScreenElement protected constructor(val networkPanel: NetworkPane
      * The space this element takes up on the canvas, in canvas coordinates: what it draws in its own place, without
      * its [connectionDrawing] and without selection handles, which come and go. What is laid out around an
      * element, such as a connector's arrow or a subnetwork's outline, is laid out against this, so that it does not
-     * shift when the element is selected. A label box counts at its full size, though it is drawn larger when the
-     * view is zoomed out, so that zooming moves nothing either. An element that does not say otherwise counts
-     * everything in its node but its handles.
+     * shift when the element is selected. An element that does not say otherwise counts everything in its node but
+     * its handles.
      */
     val footprint: PBounds
         get() {

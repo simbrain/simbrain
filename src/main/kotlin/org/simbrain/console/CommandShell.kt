@@ -81,6 +81,9 @@ class Example(val description: String, vararg lines: String) {
     fun styled() = (listOf("# $description") + lines.map(::bold)).joinToString("\n")
 }
 
+/** The command lines of these examples alone, one per line in bold, with a line that repeats shown once. */
+fun List<Example>.compact() = flatMap { it.lines }.distinct().joinToString("\n", transform = ::bold)
+
 private const val BOLD_START = '\u0001'
 private const val BOLD_END = '\u0002'
 

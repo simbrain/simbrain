@@ -8,6 +8,7 @@ import org.simbrain.network.core.NetworkModel
 import org.simbrain.network.core.Neuron
 import org.simbrain.network.core.NeuronCollection
 import org.simbrain.network.core.Synapse
+import org.simbrain.network.core.WeightMatrix
 import org.simbrain.network.gui.NetworkPanel
 import org.simbrain.network.gui.dialogs.NetworkPreferences
 import org.simbrain.network.subnetworks.Hopfield
@@ -584,9 +585,20 @@ class CommandShellTest {
     fun `examples shows one of each command, or all for one command`() {
         val shell = shellWithNetwork()
         val all = shell.run("examples")
-        assertTrue(all.contains("# List the components in the workspace\nls\n\n# Go into net1"), all)
+        assertTrue(all.startsWith("Enter examples <command> for more.\n# Add\nadd network demo\ncd demo\n"), all)
+        assertTrue(all.contains("connect NeuronArray_1 NeuronArray_2\nadd timeseries plot1\n"), all)
+        assertTrue(all.contains("# Inspect\nls\ncd net1\nshow\n"), all)
         assertTrue(shell.run("tour").endsWith(tour.joinToString("\n\n")))
-        assertEquals(workspaceCommands["set"]!!.examples.joinToString("\n\n"), shell.run("examples set"))
+        assertEquals(plainText(workspaceCommands["set"]!!.examples.compact()), shell.run("examples set"))
+    }
+
+    @Test
+    fun `the add walkthrough runs in a workspace that has a network`() {
+        val shell = shellWithNetwork()
+        for (line in addWalkthrough.lines) {
+            runBlocking { withTimeout(30_000) { shell.executeOrThrow(line) } }
+        }
+        assertEquals(1, shell.workspace.getComponent("demo").let { it as NetworkComponent }.network.getModels<WeightMatrix>().size)
     }
 
     @Test
@@ -915,15 +927,27 @@ class CommandShellTest {
     }
 
     @Test
-    fun `help groups commands`() {
-        val listing = shellWithNetwork().run("help")
-        assertTrue(listing.startsWith("Inspect\n  ls"), listing)
-        listOf("Build", "Run", "Other").forEach { assertTrue(it in listing, it) }
+    fun `add makes neuron arrays and connect joins them with a weight matrix`() {
+        val shell = shellWithNetwork()
+        assertEquals("Added NeuronArray_1 with 10 node(s).", shell.run("add array 10 in=net1"))
+        shell.run("add array 5 in=net1")
+        assertEquals("Added WeightMatrix_1.", shell.run("connect net1/NeuronArray_1 net1/NeuronArray_2"))
+        val matrix = shell.network().getModels<WeightMatrix>().single()
+        assertEquals(5, matrix.weights.nrow())
+        assertEquals(10, matrix.weights.ncol())
     }
 
     @Test
-    fun `help on a command shows examples as comments and commands`() {
-        assertTrue(shellWithNetwork().run("help ls").contains("# List the components in the workspace\nls\n\n# List what is in net1\nls net1"))
+    fun `help groups commands`() {
+        val listing = shellWithNetwork().run("help")
+        assertTrue(listing.startsWith("Add\n  add"), listing)
+        assertTrue("\n  couple" in listing && "\nModify\n  set" in listing, listing)
+        listOf("Remove", "Inspect", "Run", "Other").forEach { assertTrue("\n$it\n" in listing, it) }
+    }
+
+    @Test
+    fun `help on a command shows examples as single lines`() {
+        assertTrue(shellWithNetwork().run("help ls").contains("Examples:\nls\nls net1\nls net1/Neuron_*\n"))
     }
 
     @Test

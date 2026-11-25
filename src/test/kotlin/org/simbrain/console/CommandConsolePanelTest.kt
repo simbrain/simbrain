@@ -251,13 +251,13 @@ class CommandConsolePanelTest {
         val clipboard = Clipboard("test")
         onEdt {
             val text = panel.textPane.document.getText(0, panel.textPane.document.length)
-            val start = text.indexOf("# List the components")
-            val end = text.indexOf("# List the neurons in net1\n")
+            val start = text.indexOf("Examples:\n") + "Examples:\n".length
+            val end = text.indexOf("ls net1/Neuron_*")
             panel.textPane.select(start, end)
             panel.textPane.transferHandler.exportToClipboard(panel.textPane, clipboard, TransferHandler.COPY)
         }
         val copied = clipboard.getData(DataFlavor.stringFlavor) as String
-        assertEquals("# List the components in the workspace\nls\n\n# List what is in net1\nls net1\n\n", copied)
+        assertEquals("ls\nls net1\n", copied)
         onEdt { panel.pasteText(copied) }
         panel.awaitText("> ls net1\n(empty)")
         assertTrue(panel.text.contains("> ls\nnet1\n"), panel.text)

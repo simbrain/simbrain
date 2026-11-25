@@ -1,18 +1,24 @@
 package org.simbrain.custom_sims.simulations
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.swing.Swing
 import org.simbrain.custom_sims.*
+import org.simbrain.network.desktop.NetworkDesktopComponent
+import org.simbrain.network.gui.nodes.SubnetworkNode
 import org.simbrain.network.subnetworks.SRNNetwork
 import org.simbrain.network.trainers.BasicOptimizer
 import org.simbrain.network.trainers.TrainingDataset
 import org.simbrain.util.*
 import org.simbrain.world.textworld.EmbeddingType
+import org.simbrain.workspace.gui.SimbrainDesktop
 import org.simbrain.world.textworld.TokenEmbeddingBuilder
+import java.awt.geom.Rectangle2D
 
 
 /**
- * Simulate temporal xor in a simple recurrent network as described by Elman (1990).
+ * Next-word prediction on simple generated sentences in a simple recurrent network, after Elman (1990).
  */
 val srnElmanSentences = newSim {
 
@@ -93,6 +99,29 @@ val srnElmanSentences = newSim {
         place(textWorldInputs, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 531, 929)
         place(textWorldOut, SIM_WINDOW_GAP + 531 + SIM_WINDOW_GAP, SIM_WINDOW_GAP, 500, 204)
         place(networkComponent, SIM_WINDOW_GAP + 531 + SIM_WINDOW_GAP, SIM_WINDOW_GAP + 204 + SIM_WINDOW_GAP, 500, 550)
+        val networkPanel = (getDesktopComponent(networkComponent) as NetworkDesktopComponent).networkPanel
+        workspace.launch(Dispatchers.Swing) {
+            // Wait for the network panel's zoom to fit so the popup points at the box's final position
+            delay(500L)
+            val box = (networkPanel.getNode(srn) as SubnetworkNode).interactionBox.globalFullBounds
+            val boxOnCanvas = networkPanel.canvas.camera.viewToLocal(
+                Rectangle2D.Double(box.x, box.y, box.width, box.height)
+            ).bounds
+            SimbrainDesktop.onboardingManager.showPopup(
+                PopupConfig(
+                    title = "Train the network",
+                    message = "The network is untrained, so it will predict poorly if you use it now " +
+                        "(click Step on the main toolbar to see). Double-click this box to open the trainer " +
+                        "and press Play until accuracy reaches about 30%. Then step the workspace again to " +
+                        "see it predict much better.",
+                    targetComponent = networkPanel.canvas,
+                    targetBounds = boxOnCanvas,
+                    placement = PopupPlacement.AUTO_VERTICAL,
+                    suppressionKey = "srn_word_prediction_train_hint",
+                    style = PopupStyle.INFO
+                )
+            )
+        }
     }
 
     workspace.addUpdateAction("Update inputs") {
@@ -133,7 +162,8 @@ val srnElmanSentences = newSim {
         """
         # Next Word Prediction (SRN)
 
-        This simulation implements Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs).
+        This simulation is a scaled-down version of Elman's (1990) classic study of temporal pattern learning in Simple Recurrent Networks (SRNs),
+        with fewer training sentences and a smaller vocabulary.
         The network learns to predict the next word in grammatically constrained sentences, developing internal representations
         that capture syntactic and semantic relationships.
 
@@ -150,6 +180,26 @@ val srnElmanSentences = newSim {
 
         The SRN processes these sentences one word at a time, using its recurrent connections to maintain context and predict the next word based on grammatical constraints.
 
+        ## Expected accuracy
+
+        The network starts untrained, so its predictions are close to random until you train it.
+
+        As Elman notes, the prediction task is non-deterministic: after `man`, any verb that fits a human subject can
+        come next, so some error is inevitable. Elman therefore compared the network's output not to the actual next
+        word but to the probability of each possible next word, computed from training sentences that match up to that
+        point. By that measure the network learned to approximate those probabilities.
+
+        The trainer here reports top-1 accuracy: how often the most active output is the actual next word. Estimated
+        values for this grammar:
+
+        - Chance: about 5% (21 words)
+        - Guessing from the current word only: about 26%
+        - Best possible, always choosing the most probable next word: about 31%
+
+        So an accuracy near 30% means the network has learned what the grammar allows. Training accuracy can climb
+        higher with long training, but that comes from memorizing this particular training text rather than, in
+        Elman's terms, extracting generalizations.
+
         # Activities
 
         ## Activity: Train the network to predict next words
@@ -159,6 +209,7 @@ val srnElmanSentences = newSim {
         2. Train the network by right-clicking on the `SRN` network and opening the `Train network` dialog.
 
         3. Monitor learning progress through the `Loss function` - the network should learn to predict grammatically appropriate next words.
+           Aim for an accuracy of about 30%.
 
         4. Observe predictions in the `Output Text World` to see what words the network thinks should come next.
 

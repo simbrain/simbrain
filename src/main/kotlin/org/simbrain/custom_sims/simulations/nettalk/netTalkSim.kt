@@ -70,6 +70,8 @@ val nettalkComponentSim = newSim("nettalk_component") {
     )
     bp.initBiases()
     bp.initWeights()
+    bp.inputLayer.label = "Letter window"
+    bp.outputLayer.label = "Phoneme features"
     bp.inputLayer.gridMode = true
     bp.hiddenLayers().firstOrNull()?.gridMode = true
     bp.outputLayer.gridMode = true
@@ -85,9 +87,9 @@ val nettalkComponentSim = newSim("nettalk_component") {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
         }
-        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 636, 256)
+        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP + 430 + SIM_WINDOW_GAP, 636, 256)
         place(networkComponent, readerFrame.rightEdgeWithGap(), SIM_WINDOW_GAP, 851, 835)
-        place(speechComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP + 256 + SIM_WINDOW_GAP, 637, 593)
+        place(speechComponent, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 637, 430)
     }
 
     addSidebarInfo(NETTALK_COMPONENT_SIDEBAR)
@@ -99,12 +101,12 @@ val nettalkComponentSim = newSim("nettalk_component") {
             centralPanel.removeAll()
             centralPanel.add(NettalkReaderPanel(reader), BorderLayout.CENTER)
         }
-        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP, 636, 256)
+        readerFrame.setBounds(SIM_WINDOW_GAP, SIM_WINDOW_GAP + 430 + SIM_WINDOW_GAP, 636, 256)
         workspace.componentList.filterIsInstance<NetworkComponent>().firstOrNull()?.let {
             place(it, readerFrame.rightEdgeWithGap(), SIM_WINDOW_GAP, 851, 835)
         }
         workspace.componentList.filterIsInstance<SpeechSynthesizerComponent>().firstOrNull()?.let {
-            place(it, SIM_WINDOW_GAP, SIM_WINDOW_GAP + 256 + SIM_WINDOW_GAP, 637, 593)
+            place(it, SIM_WINDOW_GAP, SIM_WINDOW_GAP, 637, 430)
         }
     }
     addSidebarInfo(NETTALK_COMPONENT_SIDEBAR)

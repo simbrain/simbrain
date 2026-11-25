@@ -43,14 +43,14 @@ class SpeechSynthesizerPanel(private val synthesizer: SpeechSynthesizer) : JPane
 
         add(JLabel("Currently speaking:"))
         add(currentLabel, "growx, hmin 24")
-        add(DetailTrianglePanel(editor, defaultOpen = false, upLabel = "Settings", downLabel = "Settings"), "growx")
-        add(JLabel("History:"))
+        add(JLabel("Spoken so far:"))
         add(JScrollPane(transcriptionArea), "growx, h 96!")
-        add(JButton("Clear history").apply {
+        add(JButton("Clear").apply {
             addActionListener { synthesizer.clearTranscription() }
         }, "alignx right")
         add(featureLabel)
         add(featureBars, "growx")
+        add(DetailTrianglePanel(editor, defaultOpen = false, upLabel = "Settings", downLabel = "Settings"), "growx")
 
         synthesizer.events.speakingChanged.on(Dispatchers.Swing) {
             updateReadout()

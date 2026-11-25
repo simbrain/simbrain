@@ -31,7 +31,8 @@ open class SubnetworkNode(networkPanel: NetworkPanel, val subnetwork: Subnetwork
     /**
      * The interaction box for this neuron group.
      */
-    private var interactionBox: SubnetworkNodeInteractionBox
+    var interactionBox: SubnetworkNodeInteractionBox
+        private set
 
     /**
      * The outlined objects (neuron and synapse groups) for this node.

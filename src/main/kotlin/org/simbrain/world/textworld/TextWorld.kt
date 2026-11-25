@@ -6,7 +6,6 @@ import org.simbrain.util.propertyeditor.EditableObject
 import org.simbrain.workspace.AttributeContainer
 import org.simbrain.workspace.Consumable
 import org.simbrain.workspace.Producible
-import java.awt.Color
 import kotlin.math.min
 
 enum class DocumentStructureDisplay(private val label: String) {
@@ -262,11 +261,6 @@ class TextWorld : AttributeContainer, EditableObject {
     var position = 0
 
     /**
-     * Highlight color.
-     */
-    var highlightColor = Color.GRAY
-
-    /**
      * The current text item.
      */
     private val currentTextItem: TokenizerResult get() = tokens[currentTokenIndex]
@@ -342,7 +336,9 @@ class TextWorld : AttributeContainer, EditableObject {
             events.atEnd.fire()
             setCurrentTokenIndexSuspend(0)
         }
-        position = tokens[currentTokenIndex].end
+        // Token ends are inclusive, so end + 1 puts the cursor just after the token rather than before its last
+        // character, where it would be hidden inside the token highlight.
+        position = tokens[currentTokenIndex].end + 1
     }
 
     /**

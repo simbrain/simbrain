@@ -14,6 +14,7 @@ import org.simbrain.util.HIGH_RATE_GUI_REFRESH_INTERVAL_MS
 import org.simbrain.util.Theme
 import org.simbrain.util.TokenizerResult
 import org.simbrain.util.UiScope
+import org.simbrain.util.blend
 import org.simbrain.util.onUi
 import org.simbrain.util.widgets.SimbrainTextPane
 import org.simbrain.world.textworld.TextWorld
@@ -355,6 +356,14 @@ class TextWorldPanel(
 
     internal inner class MyHighlightPainter(color: Color?) : DefaultHighlightPainter(color)
 
+    /**
+     * Current-token fill: a wash of the text color over the text background, so the token's text and the caret,
+     * which share that text color, stay legible on it in either theme. Read per highlight so a theme switch
+     * picks it up. Dark takes a larger fraction for the same visible step, as with [Theme.rowBand].
+     */
+    private val currentTokenColor: Color
+        get() = blend(textArea.foreground, textArea.background, if (Theme.isDark) 0.3 else 0.25)
+
     companion object {
         private const val RUN_LOCK_EXPLANATION =
             "The workspace is running, so this document is read-only. " +
@@ -364,7 +373,7 @@ class TextWorldPanel(
     fun highlight(begin: Int, end: Int) {
         if (!world.highlightCurrentToken) return
         // An instance of the private subclass of the default highlight painter
-        val myHighlightPainter: Highlighter.HighlightPainter = MyHighlightPainter(world.highlightColor)
+        val myHighlightPainter: Highlighter.HighlightPainter = MyHighlightPainter(currentTokenColor)
         removeHighlights(textArea)
         try {
             val hilite = textArea.highlighter

@@ -1,3 +1,8 @@
+/**
+ * The two-way sync between a language model's context window and a text world document, run
+ * through real workspace couplings: echoes against edits, the end of a run, and chat messages
+ * sent from outside the workspace iteration.
+ */
 package org.simbrain.network.llm
 
 import kotlinx.coroutines.delay
@@ -15,7 +20,12 @@ import java.nio.file.Path
 
 class ContextWindowSyncTest {
 
-    private class Rig(dir: Path, sealAtEndOfText: Boolean = false) {
+    private class Rig(
+        dir: Path,
+        sealAtEndOfText: Boolean = false,
+        seeded: Boolean = true,
+        maxSeqLen: Int = 64,
+    ) {
         val promptText = "The capital of France is"
         val workspace = Workspace()
         val world: TextWorld
@@ -27,8 +37,8 @@ class ContextWindowSyncTest {
             val textWorldComponent = TextWorldComponent("text")
             workspace.addWorkspaceComponent(textWorldComponent)
             world = textWorldComponent.world
-            languageModel = LanguageModel(dir.toString(), maxSeqLen = 64)
-            languageModel.initialText = promptText
+            languageModel = LanguageModel(dir.toString(), maxSeqLen = maxSeqLen)
+            if (seeded) languageModel.initialText = promptText
             languageModel.stopAtEndOfText = sealAtEndOfText
             runBlocking { network.addNetworkModel(languageModel) }
             languageModel.loadWeights()
@@ -210,5 +220,111 @@ class ContextWindowSyncTest {
         assertTrue(rig.languageModel.canAdvance, "an advancing model keeps advancing through an edit")
         assertTrue(rig.world.text.startsWith("<|startoftext|>Count:"),
             "the document snaps to the rebuilt window, got: ${rig.world.text}")
+    }
+
+    /** Sends [message] the way a control outside the workspace iteration does. */
+    private fun Rig.send(message: String) {
+        world.setTextIfChanged(languageModel.sendUserMessageToDocument(world.text, message))
+    }
+
+    /** A rig whose document holds one finished, fully synced chat exchange. */
+    private fun finishedChatRig(dir: Path): Rig {
+        val rig = Rig(dir, sealAtEndOfText = true, seeded = false, maxSeqLen = 128)
+        rig.send("What is the capital of France?")
+        var guard = 0
+        while (rig.languageModel.canAdvance && guard++ < 128) rig.workspace.simpleIterate()
+        repeat(2) { rig.workspace.simpleIterate() }
+        assertTrue(rig.languageModel.isSealed, "the reply ends before the window fills")
+        return rig
+    }
+
+    @Test
+    fun `a message sent over unread plain text replaces it with a new conversation`() {
+        val dir = assumeOrRequireWeights()
+
+        val rig = Rig(dir, seeded = false)
+        rig.world.text = "Here is a brief parable:"
+        assertFalse(rig.languageModel.isConversation(rig.world.text))
+        rig.send("Hi")
+
+        val sent = Lfm2ChatFormat.chatPrompt("Hi")
+        assertEquals(sent, rig.world.text, "the document shows the sent turn before anything runs")
+
+        repeat(3) { rig.workspace.simpleIterate() }
+        assertEquals(3, rig.languageModel.loaded!!.model.position,
+            "the document's echo of the sent window is not an edit")
+        assertTrue(rig.languageModel.contextWindow.startsWith(sent),
+            "got: ${rig.languageModel.contextWindow}")
+    }
+
+    @Test
+    fun `a message sent over an unread conversation lands after it`() {
+        val dir = assumeOrRequireWeights()
+
+        val rig = Rig(dir, seeded = false)
+        val unread = Lfm2ChatFormat.chatPrompt("Name a color.") + "Blue.<|im_end|>\n"
+        rig.world.text = unread
+        assertTrue(rig.languageModel.isConversation(rig.world.text))
+        rig.send("Another?")
+
+        val sent = "$unread<|im_start|>user\nAnother?<|im_end|>\n<|im_start|>assistant\n"
+        assertEquals(sent, rig.world.text)
+
+        repeat(3) { rig.workspace.simpleIterate() }
+        assertEquals(3, rig.languageModel.loaded!!.model.position)
+        assertTrue(rig.languageModel.contextWindow.startsWith(sent),
+            "got: ${rig.languageModel.contextWindow}")
+    }
+
+    @Test
+    fun `a message sent after editing a finished conversation keeps the edit`() {
+        val dir = assumeOrRequireWeights()
+
+        val rig = finishedChatRig(dir)
+        val edited = rig.world.text.replace("France", "Germany")
+        assertNotEquals(edited, rig.world.text)
+        rig.world.text = edited
+        rig.send("And Italy?")
+        rig.workspace.simpleIterate()
+
+        val window = rig.languageModel.contextWindow
+        assertTrue(window.startsWith("$edited\n<|im_start|>user\nAnd Italy?<|im_end|>"), "got: $window")
+        assertTrue(rig.languageModel.canAdvance, "the sent turn reopens the finished conversation")
+    }
+
+    @Test
+    fun `a message sent over a synced conversation does not rebuild the context`() {
+        val dir = assumeOrRequireWeights()
+
+        val rig = finishedChatRig(dir)
+        val finished = rig.world.text
+        val position = rig.languageModel.loaded!!.model.position
+
+        rig.send("And Italy?")
+        assertTrue(rig.world.text.startsWith("$finished\n<|im_start|>user\nAnd Italy?<|im_end|>"),
+            "got: ${rig.world.text}")
+        rig.workspace.simpleIterate()
+        assertEquals(position + 1, rig.languageModel.loaded!!.model.position,
+            "the cached context is kept and the sent turn feeds on from it")
+    }
+
+    @Test
+    fun `a message sent into a running completion replaces it though the document lags`() {
+        val dir = assumeOrRequireWeights()
+
+        val rig = Rig(dir)
+        val promptTokens = rig.languageModel.loaded!!.tokenizer.encode(rig.promptText).size
+        repeat(promptTokens + 3) { rig.workspace.simpleIterate() }
+        assertTrue(rig.world.text.contains(rig.promptText))
+
+        rig.languageModel.sendUserMessage("Hi")
+        repeat(2) { rig.workspace.simpleIterate() }
+
+        val sent = Lfm2ChatFormat.chatPrompt("Hi")
+        assertEquals(2, rig.languageModel.loaded!!.model.position,
+            "the lagging document is an echo, not an edit that restores the completion")
+        assertTrue(rig.languageModel.contextWindow.startsWith(sent),
+            "got: ${rig.languageModel.contextWindow}")
+        assertTrue(rig.world.text.startsWith(sent), "got: ${rig.world.text}")
     }
 }

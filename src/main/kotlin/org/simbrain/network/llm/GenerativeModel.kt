@@ -235,14 +235,23 @@ abstract class GenerativeModel : LocatableModel(), EditableObject, AttributeCont
      */
     @Synchronized
     fun clearWindow() {
+        emptyWindow()
+        syncGate.reset()
+        events.updated.fire()
+    }
+
+    /**
+     * Empties the window and run state but keeps the sync gate's memory of published windows,
+     * for a caller about to put new content in: a paired document still showing the old
+     * window then reads as a lagging echo, not as an edit that restores it.
+     */
+    protected fun emptyWindow() {
         onClear()
         pending = ArrayDeque()
         sampledToken = -1
         lastGenerated = ""
         currentSpan = IntArray(0)
         text = ""
-        syncGate.reset()
-        events.updated.fire()
     }
 
     /** Text of the token generated this iteration; empty while prefilling or halted. */

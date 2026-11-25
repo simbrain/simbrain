@@ -227,6 +227,31 @@ class LanguageModelTest {
     }
 
     @Test
+    fun `a message sent while a reply is streaming closes the unfinished turn first`() {
+        val dir = assumeOrRequireWeights()
+
+        val languageModel = LanguageModel(dir.toString(), maxSeqLen = 128)
+        languageModel.loadWeights()
+        val word = languageModel.loaded!!.tokenizer.encode(" yes", addSpecials = false).first()
+        languageModel.sampleOverride = { word }
+        languageModel.sendUserMessage("First")
+        val promptTokens = languageModel.loaded!!.tokenizer
+            .encode(Lfm2ChatFormat.chatPrompt("First"), addSpecials = false).size
+        repeat(promptTokens + 2) { languageModel.step() }
+        assertFalse(languageModel.isPromptProcessing, "the reply is under way")
+
+        languageModel.sendUserMessage("Second")
+
+        val window = languageModel.contextWindow
+        val unfinished = window.substringAfter(Lfm2ChatFormat.chatPrompt("First"))
+            .substringBefore(Lfm2ChatFormat.IM_END)
+        assertTrue(unfinished.isNotBlank() && !unfinished.contains("<|"), "got: $window")
+        assertTrue(window.endsWith(
+            "$unfinished<|im_end|>\n<|im_start|>user\nSecond<|im_end|>\n<|im_start|>assistant\n"),
+            "got: $window")
+    }
+
+    @Test
     fun `coupling attributes are safe while weights are not loaded`() {
         val languageModel = LanguageModel("/no/such/dir", maxSeqLen = 64)
         assertEquals("", languageModel.generatedToken)

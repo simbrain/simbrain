@@ -105,6 +105,8 @@ class Lfm2ToolLoopTest {
         val window = languageModel.contextWindow
         assertTrue(window.contains("<|tool_response_start|>"),
             "the local tool result reaches the window, got: $window")
+        assertTrue(window.contains("<|tool_call_end|><|im_end|>\n<|im_start|>tool\n"),
+            "the tool turn follows the call's turn the way the chat template renders it, got: $window")
         val toolResult = window
             .substringAfter("<|tool_response_start|>")
             .substringBefore("<|tool_response_end|>")

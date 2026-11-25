@@ -686,8 +686,8 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
 
     /**
      * Executes [calls] and injects the tool-result turn into the feed queue — the closing
-     * `im_end` is fed first, then the tool turn and a reopened assistant turn — so decoding
-     * continues through the answer instead of stopping.
+     * `im_end` is fed first, then the newline the template puts after it, the tool turn and a
+     * reopened assistant turn — so decoding continues through the answer instead of stopping.
      */
     private fun answerToolCalls(state: LoadedState, calls: List<Lfm2ChatFormat.ToolCall>) {
         val results = calls.map { call ->
@@ -696,7 +696,7 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
             else runCatching { tool.execute(call.arguments) }.getOrElse { "error: ${it.message}" }
         }
         val ids = state.tokenizer.encode(
-            Lfm2ChatFormat.toolResultTurn(results.joinToString("\n")),
+            TURN_SEPARATOR + Lfm2ChatFormat.toolResultTurn(results.joinToString("\n")),
             addSpecials = false,
         )
         if (pending.isEmpty() && sampledToken >= 0) pending.addLast(sampledToken)
@@ -711,18 +711,31 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
     /**
      * Appends a templated user turn and the open assistant turn to the stream — the chat
      * counterpart of [injectText], with the template applied on this side of the coupling,
-     * like a chat runtime would. On an empty window the message starts the conversation: the
-     * chat scaffolding (BOS and, when enabled, the tool list) is
-     * prepended, so the first send produces exactly the canonical chat prompt. Sending into a
-     * sealed stream moves it past the end marker (the unfed marker is queued first, the same
-     * way a tool answer reopens the turn). Meant for chat mode.
+     * like a chat runtime would. A window that holds no conversation — empty, or plain text
+     * to complete — is replaced rather than extended: the message starts the conversation,
+     * with the chat scaffolding (BOS and, when enabled, the tool list) prepended, so the first
+     * send produces exactly the canonical chat prompt. Sending into a sealed stream moves it
+     * past the end marker (the unfed marker is queued first, the same way a tool answer
+     * reopens the turn), with the newline the template puts between turns, which the model
+     * stops short of generating. Sending while a turn is still open, as when a reply is interrupted
+     * midway, closes that turn first so the transcript stays well formed. Meant for chat mode.
      */
     @Synchronized
     @Consumable
     fun sendUserMessage(message: String) {
         if (message.isBlank()) return
         val state = loaded ?: return
-        val prefix = if (windowIds.isEmpty()) chatScaffolding() else ""
+        if (!holdsConversation) emptyWindow()
+        val prefix = when {
+            windowIds.isEmpty() -> chatScaffolding()
+            hasOpenTurn -> {
+                toolCallBuffer = null
+                pendingToolCalls = null
+                Lfm2ChatFormat.IM_END + TURN_SEPARATOR
+            }
+            windowIds.last() == Lfm2ChatFormat.IM_END_ID -> TURN_SEPARATOR
+            else -> ""
+        }
         val ids = state.tokenizer.encode(
             prefix + Lfm2ChatFormat.turn("user", message.trim()) + Lfm2ChatFormat.GENERATION_PROMPT,
             addSpecials = false,
@@ -736,6 +749,33 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
         syncGate.invalidate()
         text += state.tokenizer.decode(ids, skipSpecials = true)
         events.updated.fire()
+    }
+
+    private val holdsConversation get() = windowIds.contains(Lfm2ChatFormat.IM_START_ID)
+
+    private val hasOpenTurn
+        get() = windowIds.lastIndexOf(Lfm2ChatFormat.IM_START_ID) > windowIds.lastIndexOf(Lfm2ChatFormat.IM_END_ID)
+
+    /**
+     * Whether [sendUserMessageToDocument] continues [document] as a conversation; any other
+     * document, one with no chat turn in it, is replaced by the conversation the message starts.
+     */
+    fun isConversation(document: String) = document.contains(Lfm2ChatFormat.IM_START)
+
+    /**
+     * [sendUserMessage] for a caller outside the workspace iteration whose document is paired
+     * with [contextWindow]: one round of the document sync around the send. [document] is the
+     * paired document's text now. A conversation is taken in first, the way the next
+     * iteration's coupling would take it, so hand edits the model has not read are kept and
+     * the turn lands after them; a document that [isConversation] rejects is dropped. Returns
+     * the window for the document to adopt, which the next iteration then recognizes as an echo.
+     */
+    @Synchronized
+    fun sendUserMessageToDocument(document: String, message: String): String {
+        if (message.isBlank() || loaded == null) return ""
+        if (isConversation(document)) contextWindow = document else emptyWindow()
+        sendUserMessage(message)
+        return contextWindow
     }
 
     /**
@@ -796,6 +836,9 @@ class LanguageModel @XStreamConstructor constructor() : GenerativeModel(), Netwo
     }
 
     companion object {
+
+        /** What the chat template puts between a closed turn and the next one. */
+        private const val TURN_SEPARATOR = "\n"
 
         /** Offline built-in tools for the tool-calling demonstration. */
         val demoTools: List<LlmTool> = listOf(

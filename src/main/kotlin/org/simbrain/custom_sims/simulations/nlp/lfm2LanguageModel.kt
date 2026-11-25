@@ -141,22 +141,53 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
 
             val messageField = addTextField(
                 "Chat message", "",
-                toolTip = "In Chat prompt mode, type a user turn; press Enter or Send message to generate an assistant reply.",
+                toolTip = "Type a user turn; press Enter or the send button to generate an assistant reply.",
             )
+            val textWorld = textWorldComponent.world
+            // A message waits for the model to finish or the run to be paused, the same way
+            // the document is locked against edits while the workspace runs
+            fun modelIsBusy() = workspace.updater.isRunning && languageModel.canAdvance
             fun sendChatMessage() {
-                if (!languageModel.isLoaded) return
+                if (!languageModel.isLoaded || modelIsBusy()) return
                 val message = messageField.text.trim()
                 if (message.isEmpty()) return
-                languageModel.sendUserMessage(message)
+                if (workspace.updater.isRunning) {
+                    // The document is locked and the couplings are keeping it in step
+                    languageModel.sendUserMessage(message)
+                } else {
+                    // The document may hold text the model has not read yet: its opening text,
+                    // or an edit made since the last run
+                    textWorld.setTextIfChanged(languageModel.sendUserMessageToDocument(textWorld.text, message))
+                }
                 messageField.text = ""
                 if (!workspace.updater.isRunning) workspace.run()
             }
             messageField.addActionListener { sendChatMessage() }
-            addButton("Send message") {
+            val sendLabel = "Send message"
+            val resetAndSendLabel = "Reset and send message"
+            val sendToolTip = "Add the message above as a user turn and generate an assistant reply. " +
+                "A context window holding plain text rather than a conversation is cleared first."
+            val busyToolTip = "The model is still reading or generating. Pause the workspace to send a message now."
+            val sendButton = addButton(resetAndSendLabel) {
                 sendChatMessage()
             }.apply {
-                toolTipText = "In Chat prompt mode, add the message above as a user turn and generate an assistant reply."
+                // Sized for the longer label, so the panel keeps its layout as the label changes
+                preferredSize = preferredSize
             }
+            // The label names what a send will do to the document as it stands
+            fun updateSendButton() {
+                val document = textWorld.text
+                val continues = document.isBlank() || languageModel.isConversation(document)
+                val busy = modelIsBusy()
+                sendButton.text = if (continues) sendLabel else resetAndSendLabel
+                sendButton.isEnabled = !busy
+                sendButton.toolTipText = if (busy) busyToolTip else sendToolTip
+            }
+            updateSendButton()
+            textWorld.events.textChanged.onUi(this) { updateSendButton() }
+            languageModel.events.updated.onUi(this) { updateSendButton() }
+            workspace.updater.events.runStarted.onUi(this) { updateSendButton() }
+            workspace.updater.events.runFinished.onUi(this) { updateSendButton() }
         }.awaitLayout()
         controlPanel.setLocation(
             controlPanel.centeredXInColumn(SIM_WINDOW_GAP, textWorldWidth),
@@ -189,7 +220,7 @@ private suspend fun SimulationScope.setupLfm2Gui(workspace: Workspace) {
         - `Reset` clears the context window and starts a new model context.
         - `Tools` enables the optional `Current time` tool for a new chat context.
         - `Color theme` changes how chat roles, system text, and tool calls appear.
-        - In `Chat` prompt mode, enter text in `Chat message` and use `Send message` (or press Enter) to add a user turn and generate a reply.
+        - Enter text in `Chat message` and use `Send message` (or press Enter) to add a user turn and generate a reply. While the context window holds plain text rather than a conversation, the button reads `Reset and send message`: sending replaces that text with a new conversation. The button is disabled while the model is reading or generating; pause the workspace to interrupt a reply with a new message.
 
         # How to interact with the network
 

@@ -516,7 +516,7 @@ fun SimbrainJTable.createShowMatrixPlotAction() = createAction(
         plot.properties.createEditorDialog {
             plot.repaint()
         }.also {
-            it.title = "Text World preferences"
+            it.title = "Matrix plot preferences"
         }.display()
     })
 
